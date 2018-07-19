@@ -1,0 +1,81 @@
+@import "variables";
+
+.box-shadow {
+
+}
+
+.box-shadow:hover, box-shadow:focus-within {
+}
+
+html {
+  font-family: $font;
+  font-size: $font-size-regular;
+  color: $font-color;
+  background-color: $background-color;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+
+  *, *:before, *:after {
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    font-size: $font-size-regular;
+  }
+
+  button:focus {
+    outline: 0;
+  }
+
+  input[type=text], input[type=date] {
+    font-family: $font;
+    font-size: $font-size-regular;
+  }
+  /**
+  input[type=text], input[type=date] {
+    font-size: $font-size-regular;
+    font-family: $font;
+    border-radius: 0;
+    height: $row-height-large;
+    border: none;
+    width: 100%;
+    text-overflow: ellipsis;
+  }
+
+  input[type=text]:focus, input[type=date]:focus {
+    outline: none;
+  } **/
+
+  input::placeholder {
+    color: $font-color-third;
+  }
+
+  /* for accessibility */
+  .hide {
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+  }
+
+  .rotate-180 {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+}
+
+@media screen and (max-width: $mobile) {
+  html {
+    font-size: $font-size-mobile;
+  }
+}
