@@ -1,0 +1,33 @@
+@import 'variables';
+
+.base-box {
+  background: white;
+  box-shadow: $box-shadow-reg;
+  transition: $box-transition;
+
+  &:hover {
+    box-shadow: $box-shadow-hov;
+  }
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  font-size: $font-size-regular;
+}
+
+button:focus {
+  outline: 0;
+}
+
+input[type=text], input[type=date] {
+  font-family: $font;
+  font-size: $font-size-regular;
+}

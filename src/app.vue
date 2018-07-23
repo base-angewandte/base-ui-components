@@ -58,6 +58,10 @@
         :label="''"
         type="text"
         placeholder="Enter your Name" />
+      <base-box-button
+        :icon-url="require('./static/icons/icons-collected-11.svg')"
+        text="Datei hinzufügen"
+        subtext="(Click oder durch drag'n drop hinzufügen)" />
     </div>
 
   </div>
@@ -67,6 +71,7 @@
 import BasePopUp from './components/BasePopUp';
 import BaseDropDown from './components/BaseDropDown';
 import BaseInput from './components/BaseInput';
+import BaseBoxButton from './components/BaseBoxButton';
 
 export default {
   name: 'App',
@@ -74,6 +79,7 @@ export default {
     BaseDropDown,
     BasePopUp,
     BaseInput,
+    BaseBoxButton,
   },
   data() {
     return {

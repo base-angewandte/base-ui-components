@@ -28,6 +28,7 @@ $font-size-large: 1.25em;
 $line-height: 1.2em;
 
 /* colors */
+$app-color: green !default;
 $font-color: rgb(0, 0, 0);
 $font-color-second: rgb(111, 111, 111);
 $font-color-third: rgb(160, 160, 160);
@@ -40,7 +41,7 @@ $page-max-width: 1400px;
 $page-min-width: 305px;
 
 /* icons */
-$icon_max: 48px;
+$icon-max: 48px;
 $icon-large: 24px;
 $icon-medium: 16px;
 $icon-small: 12px;
