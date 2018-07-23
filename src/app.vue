@@ -2,8 +2,9 @@
   <div id="app">
     <button @click="showPopUp = true">Click</button>
     <base-drop-down
-      :default-select="'Alle Typen'"
-      :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']" />
+      :label="'select type'"
+      :default-select="'Alle Typ'"
+      :selection-list="['Bild', 'Publikation', 'Film/Video']" />
     <base-drop-down
       :default-select="'Alle Typen'"
       :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']" />
@@ -32,11 +33,12 @@
       </div>
       <div class="popup-text">
         <base-drop-down
+          :label="'select type'"
           :default-select="'Alle Typen'"
           :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']"
           :fixed-width="true" />
         <base-drop-down
-          :default-select="'Alle Typen'"
+          :default-select="'Alle Typenasdfasdf'"
           :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']"
           :fixed-width="true" />
       </div>
@@ -95,6 +97,7 @@ export default {
 
   .popup-text {
     display: flex;
+    align-items: flex-end;
   }
 
   .popup-text .base-input, .popup-text .dropdown-box {

@@ -1,42 +1,51 @@
 <template>
   <div
-    v-click-outside="hide"
-    ref="box"
     :style="{ width: fixedWidth ? '100%': bodyWidth }"
     class="dropdown-box">
-
-    <!-- SELECTION DISPLAY -->
-    <div
-      class="dropdown-header"
-      @click="showMenu = !showMenu">
-      <div
-        :class="{'dropdown-selected-fadeout': fixedWidth}"
-        class="dropdown-selected" >
-        {{ selectedInt }}
-      </div>
-      <div class="dropdown-icon">
-        <img src="../static/icons/icons-basiswien-09.svg">
-      </div>
+    <div class="base-input-label">
+      <label
+        :class="{ 'hide': !label }"
+        :for="label">
+        {{ label }}
+      </label>
     </div>
 
-    <!-- BODY -->
     <div
-      ref="entries"
-      :class="{'hide-body': !showMenu }"
-      :style="{ width: bodyWidth }"
-      class="dropdown-body" >
+      v-click-outside="hide"
+      ref="box">
+
+      <!-- SELECTION DISPLAY -->
       <div
-        v-for="(item, index) in listInt"
-        :key="index"
-        class="dropdown-item"
-        @click="selectItem(item)">
-        <p class="dropdown-text">
-          {{ item }}
-        </p>
+        class="dropdown-header"
+        @click="showMenu = !showMenu">
+        <div
+          :class="{'dropdown-selected-fadeout': fixedWidth}"
+          class="dropdown-selected" >
+          <p ref="header">{{ selectedInt }}</p>
+        </div>
+        <div class="dropdown-icon">
+          <img src="../static/icons/icons-basiswien-09.svg">
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div
+        ref="entries"
+        :class="{'hide-body': !showMenu }"
+        :style="{ width: bodyWidth }"
+        class="dropdown-body" >
+        <div
+          v-for="(item, index) in listInt"
+          :key="index"
+          class="dropdown-item"
+          @click="selectItem(item)">
+          <p class="dropdown-text">
+            {{ item }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -48,6 +57,10 @@ export default {
     ClickOutside,
   },
   props: {
+    label: {
+      type: String,
+      default: '',
+    },
     defaultSelect: {
       type: String,
       default: '',
@@ -83,12 +96,11 @@ export default {
       }
     },
   },
-  /* eslint-disable-object-shorthand */
   mounted() {
-    if (this.$refs.entries && this.$refs.box) {
-      const entriesWidth = (this.$refs.entries.clientWidth || this.$refs.entries.scrollWidth + 16);
-      const boxWidth = (this.$refs.box.clientWidth || this.$refs.box.scrollWidth + 16);
-      this.bodyWidth = entriesWidth > boxWidth ? entriesWidth : boxWidth;
+    if (this.$refs.entries && this.$refs.header) {
+      const entriesWidth = (this.$refs.entries.clientWidth || this.$refs.entries.scrollWidth + 48);
+      const headerWidth = (this.$refs.header.clientWidth || this.$refs.header.scrollWidth + 64);
+      this.bodyWidth = entriesWidth > headerWidth ? entriesWidth : headerWidth;
       this.bodyWidth = this.bodyWidth === 0 ? 'auto' : `${this.bodyWidth}px`;
     } else {
       this.bodyWidth = '100%';
@@ -126,6 +138,7 @@ export default {
     background-color: $background-color;
     cursor: pointer;
     padding: 4px #{$spacing};
+    white-space: nowrap;
   }
 
   .dropdown-selected {
@@ -185,6 +198,10 @@ export default {
   .popup-box {
     .dropdown-body {
       box-shadow: $pop-up-drop-shadow;
+    }
+
+    .dropdown-header {
+      color: $font-color;
     }
   }
 </style>
