@@ -7,6 +7,13 @@
 .box-shadow:hover, box-shadow:focus-within {
 }
 
+@if global-variable-exists(app-color) {
+  html {
+    button:hover {
+      color: $app-color;
+    }
+  }
+}
 html {
   font-family: $font;
   font-size: $font-size-regular;
@@ -56,6 +63,11 @@ html {
 
   input::placeholder {
     color: $font-color-third;
+  }
+
+  .base-input-label {
+    color: $font-color-second;
+    margin-bottom: 16px;
   }
 
   /* for accessibility */

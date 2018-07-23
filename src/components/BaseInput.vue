@@ -70,13 +70,9 @@ export default {
     overflow: hidden;
   }
 
-  .base-input-label {
-    color: $font-color-second;
-  }
-
   .base-input-field {
     height: $row-height-small;
-    margin: #{$spacing} 0;
+    margin-bottom: $spacing;
     padding: 0 #{$spacing};
   }
 

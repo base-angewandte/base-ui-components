@@ -40,8 +40,6 @@
 <script>
 import BaseButton from './BaseButton';
 
-const url2 = require('../static/icons/icons-basiswien-04.svg');
-
 export default {
   name: 'BasePopUp',
   components: { BaseButton },
@@ -75,7 +73,7 @@ export default {
     // icon shown in right button
     buttonRightIcon: {
       type: String,
-      default: url2,
+      default: require('../static/icons/icons-basiswien-04.svg'),
     },
     /* eslint-enable global-require */
   },
@@ -130,6 +128,22 @@ export default {
 
     button:last-child {
       margin-right: 0;
+    }
+  }
+
+  @media screen and (max-width: $tablet) {
+    .popup-box {
+      max-width: 100%;
+      width: 70%;
+      left: 15%;
+    }
+  }
+
+  @media screen and (max-width: $mobile) {
+    .popup-box {
+      max-width: 100%;
+      width: 90%;
+      left: 5%;
     }
   }
 </style>
