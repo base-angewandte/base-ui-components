@@ -11,11 +11,31 @@ npm install
 # serve with hot reload at localhost:9000
 npm run dev
 
+# build library components with watcher
+npm run dev:lib
+
+# build for serving on localhost:9000 with hot reload
+npm run dev:docs
+
 # build for production with minification
 npm run build
 
+# build components
+npm run build:lib
+
+# build documentation website 
+npm run build:docs
+
 # build for production and view the bundle analyzer report
 npm run build --report
-```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+# lint files
+npm run lint
+
+# to use locally for development
+# in this project
+npm link
+
+# in target project
+npm link base-components
+```
