@@ -9,10 +9,10 @@
         class="popup-title">
         {{ title }}
       </div>
-      <img
+      <svg-icon
         class="popup-remove"
-        src="../static/icons/icons-basiswien-05.svg"
-        @click="$emit('close')">
+        name="remove"
+        @click="$emit('close')" />
     </div>
 
     <!-- POP UP CONTENT -->
@@ -21,13 +21,13 @@
       <div class="popup-button-row">
         <base-button
           :text="buttonLeftText"
-          :icon-url="buttonLeftIcon"
+          :icon="buttonLeftIcon"
           :icon-position="'right'"
           @clicked="$emit('clicked', 'buttonLeft')"
         />
         <base-button
           :text="buttonRightText"
-          :icon-url="buttonRightIcon"
+          :icon="buttonRightIcon"
           :icon-position="'right'"
           @clicked="$emit('clicked', 'buttonRight')"
         />
@@ -38,11 +38,13 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
 import BaseButton from './BaseButton';
+import '../assets/icons';
 
 export default {
   name: 'BasePopUp',
-  components: { BaseButton },
+  components: { BaseButton, SvgIcon },
   props: {
     // used to control visibility
     show: {
@@ -68,12 +70,12 @@ export default {
     // icon shown in left button
     buttonLeftIcon: {
       type: String,
-      default: require('../static/icons/icons-basiswien-05.svg'),
+      default: 'remove',
     },
     // icon shown in right button
     buttonRightIcon: {
       type: String,
-      default: require('../static/icons/icons-basiswien-04.svg'),
+      default: 'check-mark',
     },
     /* eslint-enable global-require */
   },

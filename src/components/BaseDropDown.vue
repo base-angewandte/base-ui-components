@@ -24,7 +24,7 @@
           <p ref="header">{{ selectedInt }}</p>
         </div>
         <div class="dropdown-icon">
-          <img src="../static/icons/icons-basiswien-09.svg">
+          <img src="../static/icons/drop-down-4.svg">
         </div>
       </div>
 

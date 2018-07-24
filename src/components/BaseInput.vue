@@ -82,7 +82,7 @@ export default {
   }
 
   input[type='date'].base-input-field {
-    background: url('../static/icons/icons-basiswien-01.svg') right no-repeat;
+    background: url('../static/icons/magnifier-2.svg') right no-repeat;
   }
 
   input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {

@@ -14,7 +14,8 @@
     "build": "npm run build:lib && npm run build:docs",
     "build:lib": "node build/build-lib.js",
     "build:docs": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src"
+    "lint": "eslint --ext .js,.vue src",
+    "svg": "npx vsvg -s ./src/static/icons/ -t ./src/assets/icons/ --es6"
   },
   "dependencies": {
     "vue": "^2.5.16",
@@ -61,6 +62,7 @@
     "url-loader": "^1.0.1",
     "vue-loader": "^15.2.4",
     "vue-style-loader": "^4.1.0",
+    "vue-svgicon": "^3.0.4",
     "vue-template-compiler": "^2.5.16",
     "webpack": "^4.16.0",
     "webpack-bundle-analyzer": "^2.2.1",

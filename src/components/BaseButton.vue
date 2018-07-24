@@ -2,27 +2,34 @@
   <button
     class="base-button"
     @click="$emit('clicked')">
-    <img
-      v-if="iconPosition === 'left' && iconUrl"
-      :src="iconUrl"
-      class="button-icon left-button-icon">
+    <svg-icon
+      v-if="iconPosition === 'left' && icon"
+      :name="icon"
+      class="button-icon left-button-icon" />
     {{ text }}
-    <img
-      v-if="iconPosition === 'right' && iconUrl"
-      :src="iconUrl"
-      class="button-icon right-button-icon">
+    <svg-icon
+      v-if="iconPosition === 'right' && icon"
+      :name="icon"
+      class="button-icon right-button-icon"
+    />
   </button>
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
+import '../assets/icons';
+
 export default {
   name: 'BaseButton',
+  components: {
+    SvgIcon,
+  },
   props: {
     text: {
       type: String,
       default: 'Submit',
     },
-    iconUrl: {
+    icon: {
       type: String,
       default: null,
     },
@@ -46,6 +53,10 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &:hover {
+      color: $app-color;
+    }
   }
 
   .button-icon {

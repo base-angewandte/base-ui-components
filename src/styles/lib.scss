@@ -1,5 +1,12 @@
 @import 'variables';
 
+/* for accessibility */
+.hide {
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
 .base-box {
   background: white;
   box-shadow: $box-shadow-reg;
@@ -30,4 +37,35 @@ button:focus {
 input[type=text], input[type=date] {
   font-family: $font;
   font-size: $font-size-regular;
+}
+
+/* recommended css code for vue-svgicon */
+.svg-icon {
+  display: inline-block;
+  color: inherit;
+  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+}
+
+.svg-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.svg-up {
+  /* default */
+  transform: rotate(0deg);
+}
+
+.svg-right {
+  transform: rotate(90deg);
+}
+
+.svg-down {
+  transform: rotate(180deg);
+}
+
+.svg-left {
+  transform: rotate(-90deg);
 }

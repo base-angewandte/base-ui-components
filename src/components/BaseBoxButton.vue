@@ -2,13 +2,15 @@
   <div class="base-box button-box">
     <div
       class="button-box-imgs">
-      <img
-        src="../static/icons/icons-collected-13.svg"
+      <svg-icon
+        v-if="showPlus"
+        name="icons-collected-13"
         alt="add"
-        class="button-box-plus">
-      <img
-        :src="iconUrl"
-        class="button-box-img">
+        class="button-box-plus"/>
+      <svg-icon
+        v-if="icon"
+        :name="icon"
+        class="button-box-img"/>
     </div>
     <div class="button-box-text">{{ text }}</div>
     <div class="button-box-subtext">{{ subtext }}</div>
@@ -17,13 +19,19 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
+import '../assets/icons';
+
 export default {
+  components: {
+    SvgIcon,
+  },
   props: {
     boxStyle: {
       type: String,
       default: 'large',
     },
-    iconUrl: {
+    icon: {
       type: String,
       default: null,
     },
@@ -88,9 +96,7 @@ export default {
   }
 
   .button-box-plus {
-    color: black;
     height: $icon-large;
-    margin-right:16px;
     margin-left: 40px;
   }
 </style>
