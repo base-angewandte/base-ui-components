@@ -64,10 +64,14 @@ export default {
   @import "../styles/variables.scss";
 
   .base-input {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
     overflow: hidden;
+    width: 100%;
+
+    &:first-of-type + .base-input {
+      margin-left: $spacing;
+    }
   }
 
   .base-input-field {

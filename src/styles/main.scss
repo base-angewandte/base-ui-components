@@ -18,6 +18,10 @@ html {
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
 
+  button {
+    font-family: $font;
+  }
+
 
   /**
   input[type=text], input[type=date] {

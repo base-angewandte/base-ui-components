@@ -1,20 +1,26 @@
 <template>
-  <div class="base-box button-box">
-    <div
-      class="button-box-imgs">
-      <svg-icon
-        v-if="showPlus"
-        name="icons-collected-13"
-        alt="add"
-        class="button-box-plus"/>
-      <svg-icon
-        v-if="icon"
-        :name="icon"
-        class="button-box-img"/>
-    </div>
-    <div class="button-box-text">{{ text }}</div>
-    <div class="button-box-subtext">{{ subtext }}</div>
+  <div
+    ref="buttonBox"
+    :style="boxSizeInt"
+    class="base-box base-box-button"
+    @click="$emit('clicked')">
+    <div class="button-box-content">
+      <div
+        class="button-box-imgs">
+        <svg-icon
+          v-if="showPlus"
+          name="plus"
+          alt="add"
+          class="button-box-plus"/>
+        <svg-icon
+          v-if="icon"
+          :name="icon"
+          class="button-box-img"/>
+      </div>
+      <div class="button-box-text">{{ text }}</div>
+      <div class="button-box-subtext">{{ subtext }}</div>
 
+    </div>
   </div>
 </template>
 
@@ -47,6 +53,17 @@ export default {
       type: String,
       default: '',
     },
+    boxSize: {
+      type: Object,
+      default() {
+        return { width: '200px' };
+      },
+    },
+  },
+  computed: {
+    boxSizeInt() {
+      return Object.assign({}, this.$props.boxSize);
+    },
   },
 };
 </script>
@@ -54,49 +71,61 @@ export default {
 <style lang="scss" scoped>
   @import "../styles/variables.scss";
 
-  .button-box {
+  .base-box-button {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 200px;
-    width: 200px;
+    min-height: 100%;
+    position: relative;
+    overflow: hidden;
 
     &:hover {
       color: $app-color;
     }
-  }
 
-  .button-box-imgs {
-    position: relative;
-    display: flex;
-    align-items: center;
-    margin-bottom: calc(12px + 16px);
-    margin-top: 32px;
-  }
+    &:before {
+      content:  '';
+      padding-top: 100%;
+    }
 
-  .button-box-img {
-    height: $icon-max;
-    max-height: $icon-max;
-    width: $icon-max;
-    max-width: $icon-max;
-    position: absolute;
-    left: calc(50% - 24px);
-    top: calc(50% - 24px);
-  }
+    .button-box-content {
+      position: absolute;
+      padding: $spacing;
+      width: 100%;
 
-  .button-box-text, .button-box-subtext {
-    text-align: center;
-    padding: 0 16px;
-  }
+      .button-box-imgs {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-bottom: calc(12px + 16px);
+        margin-top: 32px;
+      }
 
-  .button-box-subtext {
-    margin-top: 8px;
-    font-size: $font-size-small;
+      .button-box-img {
+        height: $icon-max;
+        max-height: $icon-max;
+        width: $icon-max;
+        max-width: $icon-max;
+        position: absolute;
+        left: calc(50% - 24px);
+        top: calc(50% - 24px);
+      }
 
-  }
+      .button-box-text, .button-box-subtext {
+        text-align: center;
+      }
 
-  .button-box-plus {
-    height: $icon-large;
-    margin-left: 40px;
+      .button-box-subtext {
+        margin-top: $spacing-small;
+        font-size: $font-size-small;
+
+      }
+
+      .button-box-plus {
+        height: $icon-large;
+        position: absolute;
+        left: calc(50% - 56px);
+      }
+    }
   }
 </style>

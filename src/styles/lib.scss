@@ -27,7 +27,8 @@ a {
 }
 
 button {
-  font-size: $font-size-regular;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 button:focus {
@@ -35,8 +36,8 @@ button:focus {
 }
 
 input[type=text], input[type=date] {
-  font-family: $font;
-  font-size: $font-size-regular;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 /* recommended css code for vue-svgicon */

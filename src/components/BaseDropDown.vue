@@ -127,6 +127,10 @@ export default {
   .dropdown-box {
     display: inline-block;
     overflow: hidden;
+
+    &:nth-of-type(n+1) + .dropdown-box {
+      margin-left: $spacing;
+    }
   }
 
   .dropdown-header {
