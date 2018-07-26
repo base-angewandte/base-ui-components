@@ -1,36 +1,57 @@
 <template>
-  <div
-    ref="buttonBox"
-    :style="boxSizeInt"
-    class="base-box base-box-button"
-    @click="$emit('clicked')">
-    <div class="button-box-content">
-      <div
-        class="button-box-imgs">
-        <svg-icon
-          v-if="showPlus"
-          name="plus"
-          alt="add"
-          class="button-box-plus"/>
-        <svg-icon
-          v-if="icon"
-          :name="icon"
-          class="button-box-img"/>
+  <base-box
+    :box-size="boxSize"
+    class="base-box-button"
+    @clicked="$emit('clicked')">
+    <div
+      v-if="boxStyle === 'large'"
+      class="button-box-content">
+      <div class="button-box-center">
+        <div
+          class="button-box-image-row">
+          <div class="button-box-plus-container">
+            <svg-icon
+              v-if="showPlus"
+              name="plus"
+              alt="add"
+              class="button-box-plus"/>
+          </div>
+          <div class="button-box-icon-container">
+            <svg-icon
+              v-if="icon"
+              :name="icon"
+              class="button-box-icon"/>
+          </div>
+
+        </div>
+        <div class="button-box-text">{{ text }}</div>
       </div>
-      <div class="button-box-text">{{ text }}</div>
+
       <div class="button-box-subtext">{{ subtext }}</div>
 
     </div>
-  </div>
+    <div
+      v-else
+      class="button-box-content-small">
+      <svg-icon
+        v-if="icon"
+        :name="icon"
+        class="button-box-icon-small"/>
+      <div class="button-box-text-small">{{ text }}</div>
+    </div>
+    <slot />
+  </base-box>
 </template>
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import BaseBox from './BaseBox';
 import '../assets/icons';
 
 export default {
   components: {
     SvgIcon,
+    BaseBox,
   },
   props: {
     boxStyle: {
@@ -56,13 +77,8 @@ export default {
     boxSize: {
       type: Object,
       default() {
-        return { width: '200px' };
+        return { width: '250px' };
       },
-    },
-  },
-  computed: {
-    boxSizeInt() {
-      return Object.assign({}, this.$props.boxSize);
     },
   },
 };
@@ -72,43 +88,54 @@ export default {
   @import "../styles/variables.scss";
 
   .base-box-button {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 100%;
-    position: relative;
-    overflow: hidden;
 
     &:hover {
       color: $app-color;
     }
 
-    &:before {
-      content:  '';
-      padding-top: 100%;
-    }
-
     .button-box-content {
-      position: absolute;
       padding: $spacing;
+      position: absolute;
+      height: 100%;
       width: 100%;
 
-      .button-box-imgs {
-        position: relative;
-        display: flex;
-        align-items: center;
-        margin-bottom: calc(12px + 16px);
-        margin-top: 32px;
-      }
-
-      .button-box-img {
-        height: $icon-max;
-        max-height: $icon-max;
-        width: $icon-max;
-        max-width: $icon-max;
+      .button-box-center {
         position: absolute;
-        left: calc(50% - 24px);
-        top: calc(50% - 24px);
+        top: 50%;
+        transform: translate(0, -50%);
+        width: calc(100% - (2 * #{$spacing}));
+
+        .button-box-image-row {
+          line-height: $icon-max;
+          margin-bottom: $spacing;
+          height: $icon-max;
+
+          .button-box-plus-container {
+            position: absolute;
+            width: 100%;
+            left: calc(50% - 54px);
+
+            .button-box-plus {
+              width: $icon-large;
+              max-height: $icon-large;
+              max-width:$icon-large;
+            }
+          }
+
+          .button-box-icon-container {
+            width: calc(100% - (2 * #{$icon-large}));
+            position: absolute;
+            left: calc(50% - #{$icon-large});
+
+            .button-box-icon {
+              max-height: $icon-max;
+              max-width: $icon-max;
+            }
+          }
+        }
+        .button-box-text {
+          height: calc(2 * #{$line-height})
+        }
       }
 
       .button-box-text, .button-box-subtext {
@@ -118,13 +145,25 @@ export default {
       .button-box-subtext {
         margin-top: $spacing-small;
         font-size: $font-size-small;
-
-      }
-
-      .button-box-plus {
-        height: $icon-large;
         position: absolute;
-        left: calc(50% - 56px);
+        width: calc(100% - (2 * #{$spacing}));
+        top: calc(50% + 52px);
+      }
+    }
+
+    .button-box-content-small {
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+
+      .button-box-icon-small {
+        flex-shrink: 0;
+        margin-right: 16px;
+        height: $icon-large;
+        max-height: $icon-large;
+        max-width: $icon-large;
       }
     }
   }

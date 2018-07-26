@@ -11,6 +11,14 @@
   background: white;
   box-shadow: $box-shadow-reg;
   transition: $box-transition;
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    content:  '';
+    padding-top: 100%;
+  }
 
   &:hover {
     box-shadow: $box-shadow-hov;
@@ -24,6 +32,7 @@
 
 a {
   text-decoration: none;
+  color: $app-color;
 }
 
 button {
@@ -38,6 +47,10 @@ button:focus {
 input[type=text], input[type=date] {
   font-family: inherit;
   font-size: inherit;
+}
+
+input[type=text]:focus, input[type=date]:focus {
+  outline: none;
 }
 
 /* recommended css code for vue-svgicon */

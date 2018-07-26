@@ -93,4 +93,8 @@ export default {
     outline: none;
     box-shadow: $input-shadow;
   }
+
+  input::placeholder {
+    color: $font-color-third;
+  }
 </style>

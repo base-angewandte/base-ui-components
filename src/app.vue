@@ -1,6 +1,20 @@
 <template>
   <div id="app">
-    <base-button @clicked="showPopUp = true">Click</base-button>
+    <div class="flex row">
+      <base-drop-box
+        :show-plus="true"
+        :box-size="{ width: 'calc(25% - 16px)' }"
+        icon="camera"
+        text="Datei hinzufügen"
+        subtext="(Click oder durch drag'n drop hinzufügen)"
+        @dropped="dropped($event)"
+        @clicked="boxClicked"/>
+      <base-drop-box />
+    </div>
+
+    <base-button
+      draggable="true"
+      @clicked="showPopUp = true">Click</base-button>
     <base-drop-down
       :label="'select type'"
       :default-select="'Alle Typ'"
@@ -70,40 +84,32 @@
     <div class="flex">
 
       <base-box-button
-        :show-plus="true"
+        :box-style="'small'"
+        :show-plus="false"
         :box-size="{ width: 'calc(25% - 16px)' }"
         icon="sheet-plus"
         text="Datei hinzufügen"
-        subtext="(Click oder durch drag'n drop hinzufügen)"
-        @clicked="buttonTriggered($event)"/>
+        @clicked="boxClicked($event)"/>
       <base-box-button
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
         icon="sheet-plus"
         text="Datei hinzufügen"
-        subtext="(Click oder durch drag'n drop hinzufügen)"
-        @clicked="buttonTriggered($event)"/>
+        @clicked="boxClicked($event)"/>
       <base-box-button
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
         icon="sheet-plus"
-        text="Datei hinzufügen"
+        text="Datei hinzufügen bis morgen oder gar nicht"
         subtext="(Click oder durch drag'n drop hinzufügen)"
-        @clicked="buttonTriggered($event)"/>
+        @clicked="boxClicked($event)"/>
       <base-box-button
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
         icon="sheet-plus"
-        text="Datei hinzufügen"
+        text="Vorhandenen Eintrag hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
-        @clicked="buttonTriggered($event)"/>
-      <base-box-button
-        :show-plus="true"
-        :box-size="{ width: 'calc(25% - 16px)' }"
-        icon="sheet-plus"
-        text="Datei hinzufügen"
-        subtext="(Click oder durch drag'n drop hinzufügen)"
-        @clicked="buttonTriggered($event)"/>
+        @clicked="boxClicked($event)"/>
     </div>
 
     <base-box-button
@@ -112,13 +118,13 @@
       icon="sheet-plus"
       text="Datei hinzufügen"
       subtext="(Click oder durch drag'n drop hinzufügen)"
-      @clicked="buttonTriggered($event)"/>
+      @clicked="boxClicked($event)"/>
     <base-box-button
       :show-plus="true"
       :box-size="{ width: '25%' }"
       icon="sheet-plus"
       text="Datei hinzufügen"
-      @clicked="buttonTriggered($event)"/>
+      @clicked="boxClicked($event)"/>
 
   </div>
 </template>
@@ -129,6 +135,8 @@ import BaseDropDown from './components/BaseDropDown';
 import BaseInput from './components/BaseInput';
 import BaseBoxButton from './components/BaseBoxButton';
 import BaseButton from './components/BaseButton';
+import BaseDropBox from './components/BaseDropBox';
+import BaseBox from './components/BaseBox';
 
 export default {
   name: 'App',
@@ -138,17 +146,30 @@ export default {
     BaseInput,
     BaseBoxButton,
     BaseButton,
+    BaseDropBox,
+    BaseBox,
   },
   data() {
     return {
       showPopUp: false,
+      files: [],
     };
   },
   methods: {
+    boxClicked() {
+      console.log('clicked');
+    },
     buttonTriggered(event) {
       if (event === 'buttonLeft') {
         this.showPopUp = false;
       }
+    },
+    dropped(e) {
+      console.log(e);
+      for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
+        this.files.push(e.dataTransfer.files[i]);
+      }
+      console.log(this.files);
     },
   },
 };
@@ -157,6 +178,10 @@ export default {
 <style>
   .flex {
     display: flex;
+  }
+
+  .row {
+    max-height: 300px;
   }
 
   div > .base-box-button {
