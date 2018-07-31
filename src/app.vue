@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <base-menu-entry
+      :icon="'sheet-empty'"
+      :active="true"
+      :thumbnails="['attention', 'people']"/>
     <div class="flex row">
       <base-drop-box
         :show-plus="true"
@@ -130,6 +134,7 @@
 </template>
 
 <script>
+import BaseMenuEntry from './components/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp';
 import BaseDropDown from './components/BaseDropDown';
 import BaseInput from './components/BaseInput';
@@ -141,6 +146,7 @@ import BaseBox from './components/BaseBox';
 export default {
   name: 'App',
   components: {
+    BaseMenuEntry,
     BaseDropDown,
     BasePopUp,
     BaseInput,
