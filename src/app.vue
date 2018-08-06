@@ -2,8 +2,16 @@
   <div id="app">
     <base-menu-entry
       :icon="'sheet-empty'"
-      :active="true"
-      :thumbnails="['attention', 'people']"/>
+      :active="false"
+      :select-active="showCheckbox"
+      :is-selectable="true"
+      :thumbnails="['attention', 'people']"
+      title="Poesie oh Poesie"
+      subtext="Aus einer anderen Welt"
+      description="Gemälde"/>
+    <base-button
+      text="blaaa"
+      @clicked="showCheckbox = !showCheckbox"/>
     <div class="flex row">
       <base-drop-box
         :show-plus="true"
@@ -18,7 +26,7 @@
 
     <base-button
       draggable="true"
-      @clicked="showPopUp = true">Click</base-button>
+      @clicked="showPopUp = true" />
     <base-drop-down
       :label="'select type'"
       :default-select="'Alle Typ'"
@@ -157,6 +165,7 @@ export default {
   },
   data() {
     return {
+      showCheckbox: false,
       showPopUp: false,
       files: [],
     };

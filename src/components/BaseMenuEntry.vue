@@ -6,39 +6,32 @@
     <svg-icon
       :name="icon"
       class="base-menu-entry-icon"/>
-    <div class="base-menu-entry-title">Die Poesie der Dinge</div>
+    <div class="base-menu-entry-title">{{ title }}</div>
     <div class="base-menu-entry-subtext">{{ subtext }}</div>
-    <div class="base-menu-entry-thumbnail-container">
+    <div
+      class="base-menu-entry-thumbnail-container">
       <svg-icon
         v-for="tn in thumbnails"
         :key="tn"
         :name="tn"
         class="base-menu-entry-thumbnail" />
     </div>
-    <div class="base-menu-entry-description">Bild</div>
-    <!--
     <div
-      v-if="selectActive"
-      class="base-menu-entry-checkbox-container">
-      <label
-        :for="title"
-        class="hide">Select Menu Entry {{ title }}</label>
-      <input
-        v-model="selected"
-        :name="title"
-        :value="title"
-        type="checkbox"
-        class="base-menu-entry-checkbox">
-      <div
-        class="base-menu-entry-checkmark-container">
-        <svg-icon
-          v-if="selected"
-          name="check-mark"
-          class="base-menu-entry-checkmark"/>
-      </div>
-    </div> -->
-    <base-checkmark
-      title="checkbox" />
+      :class="{'base-menu-entry-description-checkmark-active': selectActive}"
+      class="base-menu-entry-description">
+      {{ description }}
+    </div>
+    <transition
+      v-if="isSelectable"
+      name="slide-fade"
+      class="base-menu-checkmark-container">
+      <base-checkmark
+        v-if="selectActive"
+        title="checkbox"
+        mark-style="checkbox"
+        class="hidden"
+        @clicked="clicked"/>
+    </transition>
   </div>
 </template>
 
@@ -84,13 +77,19 @@ export default {
     },
     selectActive: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
     return {
       selected: false,
     };
+  },
+  methods: {
+    clicked(val) {
+      console.log('clicked');
+      this.selected = val;
+    },
   },
 };
 </script>
@@ -148,54 +147,22 @@ export default {
       color: $font-color-second;
       font-size: $font-size-small;
       margin-right: 16px;
+      transition: 0.3s ease;
     }
 
-    .base-menu-entry-checkbox-container {
-      position: relative;
-      width: 16px;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
+    .base-menu-entry-description-checkmark-active {
+      margin-right: 32px;
+    }
 
-      &:hover input ~ .base-menu-entry-checkmark-container {
-        border: 1.5px solid $app-color;
-      }
-
-      & input:checked ~ .base-menu-entry-checkmark-container {
-        border-color: $app-color;
-      }
-
-      .base-menu-entry-checkbox {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-      }
-
-      .base-menu-entry-checkmark-container {
-        height: 16px;
-        width: 16px;
-        border: 1px solid black;
-        border-radius: 8px;
-
-        .base-menu-entry-checkmark {
-          height: 8px;
-          width: 8px;
-          position: absolute;
-          top: 4px;
-          left: 4px;
-          opacity: 1;
-        }
-
-        &:after {
-          content: "";
-          position: absolute;
-          display: none;
-        }
-      }
+    .slide-fade-enter-active {
+      transition: all .3s ease;
+    }
+    .slide-fade-leave-active {
+      transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+    .slide-fade-enter, .slide-fade-leave-to {
+      transform: translateX(10px);
+      opacity: 0;
     }
   }
 </style>

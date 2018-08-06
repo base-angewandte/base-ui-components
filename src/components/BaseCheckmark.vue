@@ -1,5 +1,7 @@
 <template>
-  <div class="base-checkbox-container">
+  <div
+    class="base-checkbox-container"
+    @click="$emit('clicked', selectedInt)">
     <label
       :for="label"
       class="hide">Select Menu Entry {{ label }}</label>
@@ -32,6 +34,9 @@ export default {
     markStyle: {
       type: String,
       default: 'radio',
+      validator(val) {
+        return (val === 'radio' || val === 'checkbox');
+      },
     },
     label: {
       type: String,
@@ -65,6 +70,7 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    margin-right: 16px;
 
     &:hover input ~ .base-checkmark-container {
       border: 1.5px solid $app-color;
