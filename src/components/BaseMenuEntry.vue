@@ -1,7 +1,11 @@
 <template>
-  <div class="base-menu-entry">
+  <div
+    ref="menuEntry"
+    draggable="true"
+    class="base-menu-entry"
+    @click="selectActive ? selected(!isSelected) : $emit('clicked')">
     <div
-      :class="{ 'base-menu-entry-border-active': $props.active}"
+      :class="{ 'base-menu-entry-border-active': $props.active }"
       class="base-menu-entry-border" />
     <svg-icon
       :name="icon"
@@ -27,10 +31,11 @@
       class="base-menu-checkmark-container">
       <base-checkmark
         v-if="selectActive"
+        :selected="isSelected"
         title="checkbox"
         mark-style="checkbox"
         class="hidden"
-        @clicked="clicked"/>
+        @clicked="selected"/>
     </transition>
   </div>
 </template>
@@ -38,6 +43,8 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 import BaseCheckmark from './BaseCheckmark';
+
+const imgUrl = require('../static/icons/sheet-empty.svg');
 
 export default {
   components: {
@@ -82,15 +89,39 @@ export default {
   },
   data() {
     return {
-      selected: false,
+      isSelected: false,
+      isActive: this.$props.active,
+      dragAndDropCapable: true,
     };
   },
+  mounted() {
+    this.dragAndDropCapable = this.determineDragAndDropCapable();
+    if (this.dragAndDropCapable) {
+      this.$refs.menuEntry.addEventListener('dragstart', ((e) => {
+        e.stopPropagation();
+        e.dataTransfer.setData('Text', this.isSelected);
+        const img = document.createElement('img');
+        img.scr = imgUrl;
+        img.style.width = '24px';
+        img.style.height = '25px';
+        e.dataTransfer.setDragImage(img, 0, 0);
+        console.log(SvgIcon.icons);
+        console.log('starting');
+      }), false);
+    }
+  },
   methods: {
-    clicked(val) {
-      console.log('clicked');
-      this.selected = val;
+    selected(val) {
+      this.isSelected = val;
+      this.$emit('selected', val);
+    },
+    determineDragAndDropCapable() {
+      const div = document.createElement('div');
+      return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div))
+        && 'FormData' in window && 'FileReader' in window;
     },
   },
+
 };
 </script>
 
@@ -117,17 +148,46 @@ export default {
     .base-menu-entry-icon {
       height: $icon-large;
       max-width: $icon-large;
+      min-width: $icon-large;
       margin-left: 16px;
     }
 
     .base-menu-entry-title {
       padding: 0 16px;
+      margin-right: $spacing;
+      flex-shrink: 1;
     }
 
     .base-menu-entry-subtext {
       color: $font-color-second;
       font-size: $font-size-small;
       flex-grow: 2;
+      flex-shrink: 99;
+
+      &::after {
+        content: '';
+        width: 16px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: linear-gradient(to right, transparent , white);
+      }
+    }
+    .base-menu-entry-subtext, .base-menu-entry-title {
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &::after {
+        content: '';
+        width: 10px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: linear-gradient(to right, transparent , white);
+      }
     }
 
     .base-menu-entry-thumbnail-container {
@@ -135,11 +195,12 @@ export default {
       flex-direction: column;
       justify-content: space-evenly;
       height: 100%;
-      margin-right: 16px;
+      margin: 0 $spacing;
 
       .base-menu-entry-thumbnail {
-        height: $icon-min;
-        max-width: $icon-min;
+        height: $icon-small;
+        max-width: $icon-small;
+        min-width: $icon-small;
       }
     }
 
@@ -148,6 +209,7 @@ export default {
       font-size: $font-size-small;
       margin-right: 16px;
       transition: 0.3s ease;
+      flex-basis: 100px;
     }
 
     .base-menu-entry-description-checkmark-active {
@@ -164,5 +226,9 @@ export default {
       transform: translateX(10px);
       opacity: 0;
     }
+  }
+
+  .base-menu-entry + .base-menu-entry {
+    border-top: $separation-line;
   }
 </style>

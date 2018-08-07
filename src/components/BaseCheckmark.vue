@@ -1,21 +1,21 @@
 <template>
   <div
     class="base-checkbox-container"
-    @click="$emit('clicked', selectedInt)">
+    @click="$emit('clicked', selectedPar)">
     <label
       :for="label"
       class="hide">Select Menu Entry {{ label }}</label>
     <input
-      v-model="selectedInt"
+      v-model="selectedPar"
       :name="label"
       :value="label"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
       class="base-checkbox">
     <div
-      :class="{'base-radiomark': markStyle === 'radio' && selectedInt }"
+      :class="{'base-radiomark': markStyle === 'radio' && selectedPar }"
       class="base-checkmark-container">
       <svg-icon
-        v-if="markStyle === 'checkbox' && selectedInt"
+        v-if="markStyle === 'checkbox' && selectedPar"
         name="check-mark"
         class="base-checkmark"/>
 
@@ -49,12 +49,17 @@ export default {
   },
   data() {
     return {
-      selectedInt: this.selectedPar,
+      selectedInt: this.$props.selected,
     };
   },
   computed: {
-    selectedPar() {
-      return this.$props.selected;
+    selectedPar: {
+      get() {
+        return this.$props.selected || (this.$props.selected && this.selectedInt);
+      },
+      set(val) {
+        this.selectedInt = val;
+      },
     },
   },
 };

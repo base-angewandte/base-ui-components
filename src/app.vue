@@ -1,14 +1,19 @@
 <template>
   <div id="app">
+    <base-menu-list
+      :selected="showCheckbox"
+      :list="list"
+      @clicked="activateMenuEntry"/>
     <base-menu-entry
       :icon="'sheet-empty'"
-      :active="false"
+      :active="menuEntryActive"
       :select-active="showCheckbox"
       :is-selectable="true"
       :thumbnails="['attention', 'people']"
-      title="Poesie oh Poesie"
-      subtext="Aus einer anderen Welt"
-      description="Gemälde"/>
+      title="Poesie oh Poesisssssssssssssssssssssssssssssssssse"
+      subtext="Aus einer anderen Weltsssssssssssssssssssssssssss"
+      description="Gemälde"
+      @clicked="menuEntryActive = true"/>
     <base-button
       text="blaaa"
       @clicked="showCheckbox = !showCheckbox"/>
@@ -150,10 +155,13 @@ import BaseBoxButton from './components/BaseBoxButton';
 import BaseButton from './components/BaseButton';
 import BaseDropBox from './components/BaseDropBox';
 import BaseBox from './components/BaseBox';
+import BaseMenuList from './components/BaseMenuList';
+import BaseMenuTableRow from './components/BaseMenuTableRow';
 
 export default {
   name: 'App',
   components: {
+    BaseMenuList,
     BaseMenuEntry,
     BaseDropDown,
     BasePopUp,
@@ -162,12 +170,44 @@ export default {
     BaseButton,
     BaseDropBox,
     BaseBox,
+    BaseMenuTableRow,
   },
   data() {
     return {
+      menuEntryActive: false,
       showCheckbox: false,
       showPopUp: false,
       files: [],
+      elements: [],
+      list: [
+        {
+          title: 'On a lovely Summers Day',
+          active: false,
+          type: 'Bild',
+          selected: false,
+          shared: true,
+          error: true,
+        },
+        {
+          title: 'test1',
+          active: false,
+          type: 'Bild',
+          selected: false,
+        },
+        {
+          title: 'test1',
+          active: false,
+          type: 'Ausstellung',
+          selected: false,
+          shared: true,
+        },
+        {
+          title: 'test1',
+          active: false,
+          type: 'Bild',
+          selected: false,
+        },
+      ],
     };
   },
   methods: {
@@ -184,7 +224,16 @@ export default {
       for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
         this.files.push(e.dataTransfer.files[i]);
       }
+      for (let i = 0; i < e.dataTransfer.items.length; i += 1) {
+        this.elements.push(e.dataTransfer.items[i]);
+      }
+      console.log(e.dataTransfer.getData('Text'));
       console.log(this.files);
+      console.log(this.elements);
+    },
+    activateMenuEntry(index) {
+      this.list.forEach(item => this.$set(item, 'active', false));
+      this.$set(this.list[index], 'active', true);
     },
   },
 };
