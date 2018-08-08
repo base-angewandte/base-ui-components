@@ -146,9 +146,8 @@ export default {
     }
 
     .base-menu-entry-icon {
-      height: $icon-large;
-      max-width: $icon-large;
-      min-width: $icon-large;
+      max-height: $icon-large;
+      width: $icon-large;
       margin-left: 16px;
     }
 
@@ -198,9 +197,8 @@ export default {
       margin: 0 $spacing;
 
       .base-menu-entry-thumbnail {
-        height: $icon-small;
-        max-width: $icon-small;
-        min-width: $icon-small;
+        max-height: $icon-small;
+        width: $icon-small;
       }
     }
 

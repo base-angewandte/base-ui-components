@@ -118,7 +118,6 @@ export default {
             .button-box-plus {
               width: $icon-large;
               max-height: $icon-large;
-              max-width:$icon-large;
             }
           }
 
@@ -129,7 +128,7 @@ export default {
 
             .button-box-icon {
               max-height: $icon-max;
-              max-width: $icon-max;
+              width: $icon-max;
             }
           }
         }
@@ -161,9 +160,8 @@ export default {
       .button-box-icon-small {
         flex-shrink: 0;
         margin-right: 16px;
-        height: $icon-large;
+        width: $icon-large;
         max-height: $icon-large;
-        max-width: $icon-large;
       }
     }
   }
