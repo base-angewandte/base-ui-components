@@ -8,6 +8,7 @@
       :class="{ 'base-menu-entry-border-active': $props.active }"
       class="base-menu-entry-border" />
     <svg-icon
+      ref="entryIcon"
       :name="icon"
       class="base-menu-entry-icon"/>
     <div class="base-menu-entry-title">{{ title }}</div>
@@ -44,7 +45,7 @@
 import SvgIcon from 'vue-svgicon';
 import BaseCheckmark from './BaseCheckmark';
 
-const imgUrl = require('../static/icons/sheet-empty.svg');
+// const imgUrl = require('../static/icons/sheet-empty.svg');
 
 export default {
   components: {
@@ -52,6 +53,10 @@ export default {
     BaseCheckmark,
   },
   props: {
+    id: {
+      type: String,
+      default: null,
+    },
     title: {
       type: String,
       default: '',
@@ -78,11 +83,19 @@ export default {
       type: String,
       default: '',
     },
+    selectActive: {
+      type: Boolean,
+      default: false,
+    },
     isSelectable: {
       type: Boolean,
       default: false,
     },
-    selectActive: {
+    isActivatable: {
+      type: Boolean,
+      default: true,
+    },
+    isDraggable: {
       type: Boolean,
       default: false,
     },
@@ -99,14 +112,19 @@ export default {
     if (this.dragAndDropCapable) {
       this.$refs.menuEntry.addEventListener('dragstart', ((e) => {
         e.stopPropagation();
-        e.dataTransfer.setData('Text', this.isSelected);
-        const img = document.createElement('img');
-        img.scr = imgUrl;
-        img.style.width = '24px';
-        img.style.height = '25px';
-        e.dataTransfer.setDragImage(img, 0, 0);
-        console.log(SvgIcon.icons);
-        console.log('starting');
+        // clone the svg used in this entry
+        const pic = this.$refs.entryIcon.$el.cloneNode(true);
+        pic.style.height = '48px';
+        pic.style.maxHeight = '48px';
+        pic.style.width = '48px';
+        pic.style.backgroundColor = 'white';
+
+        // add the element to the dom
+        document.body.appendChild(pic);
+        e.dataTransfer.setDragImage(pic, 0, 0);
+
+        // add data to identify the entry on receiver side
+        e.dataTransfer.setData('text/plain', this.$props.id);
       }), false);
     }
   },

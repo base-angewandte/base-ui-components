@@ -28,6 +28,13 @@
         @clicked="boxClicked"/>
       <base-drop-box />
     </div>
+    <div>
+      <ul>
+        <li
+          v-for="item in elements"
+          :key="item.id">{{ item.title }}</li>
+      </ul>
+    </div>
 
     <base-button
       draggable="true"
@@ -181,6 +188,7 @@ export default {
       elements: [],
       list: [
         {
+          id: '1',
           title: 'On a lovely Summers Day',
           active: false,
           type: 'Bild',
@@ -189,20 +197,23 @@ export default {
           error: true,
         },
         {
-          title: 'test1',
+          id: '2',
+          title: 'Oh this hot hot heat',
           active: false,
           type: 'Bild',
           selected: false,
         },
         {
-          title: 'test1',
+          id: '3',
+          title: 'And then again a different title',
           active: false,
           type: 'Ausstellung',
           selected: false,
           shared: true,
         },
         {
-          title: 'test1',
+          id: '4',
+          title: 'Allons-y!!',
           active: false,
           type: 'Bild',
           selected: false,
@@ -220,20 +231,24 @@ export default {
       }
     },
     dropped(e) {
-      console.log(e);
       for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
         this.files.push(e.dataTransfer.files[i]);
       }
-      for (let i = 0; i < e.dataTransfer.items.length; i += 1) {
-        this.elements.push(e.dataTransfer.items[i]);
+      if (e.dataTransfer.items) {
+        const id = e.dataTransfer.getData('text');
+        if (!this.elements.find(item => item.id === id)) {
+          this.elements.push(this.list.find(item => item.id === id));
+        }
       }
-      console.log(e.dataTransfer.getData('Text'));
-      console.log(this.files);
-      console.log(this.elements);
     },
     activateMenuEntry(index) {
-      this.list.forEach(item => this.$set(item, 'active', false));
-      this.$set(this.list[index], 'active', true);
+      // TODO: this should be a functionality INSIDE menu list!!
+      if (!this.list[index].active) {
+        this.list.forEach(item => this.$set(item, 'active', false));
+        this.$set(this.list[index], 'active', true);
+      } else {
+        this.$set(this.list[index], 'active', false);
+      }
     },
   },
 };

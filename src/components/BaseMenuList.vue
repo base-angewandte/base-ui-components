@@ -3,14 +3,18 @@
     <base-menu-entry
       v-for="(item, index) in list"
       v-if="item"
+      ref="menuEntry"
       :key="index"
+      :id="item.id"
       :title="item.title"
       :active="item.active"
       :icon="getType(item)"
       :thumbnails="getThumbnails(item)"
       :description="item.type"
       :is-selectable="true"
+      :is-draggable="true"
       :select-active="selectActive"
+
       @clicked="activateItem($event, index)"
       @selected="item.selected = $event"/>
   </div>
@@ -18,6 +22,8 @@
 
 <script>
 import BaseMenuEntry from './BaseMenuEntry';
+
+// const imgUrl = require('../static/icons/sheet-empty.svg');
 
 export default {
   components: {
