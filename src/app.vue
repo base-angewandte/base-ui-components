@@ -5,6 +5,7 @@
       :list="list"
       @clicked="activateMenuEntry"/>
     <base-menu-entry
+      :id="'asingleentry'"
       :icon="'sheet-empty'"
       :active="menuEntryActive"
       :select-active="showCheckbox"

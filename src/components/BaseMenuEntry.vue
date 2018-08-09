@@ -1,7 +1,7 @@
 <template>
   <div
     ref="menuEntry"
-    draggable="true"
+    :draggable="isDraggable"
     class="base-menu-entry"
     @click="selectActive ? selected(!isSelected) : $emit('clicked')">
     <div
@@ -56,6 +56,7 @@ export default {
     id: {
       type: String,
       default: null,
+      required: true,
     },
     title: {
       type: String,
@@ -108,24 +109,26 @@ export default {
     };
   },
   mounted() {
-    this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable) {
-      this.$refs.menuEntry.addEventListener('dragstart', ((e) => {
-        e.stopPropagation();
-        // clone the svg used in this entry
-        const pic = this.$refs.entryIcon.$el.cloneNode(true);
-        pic.style.height = '48px';
-        pic.style.maxHeight = '48px';
-        pic.style.width = '48px';
-        pic.style.backgroundColor = 'white';
+    if (this.isDraggable) {
+      this.dragAndDropCapable = this.determineDragAndDropCapable();
+      if (this.dragAndDropCapable) {
+        this.$refs.menuEntry.addEventListener('dragstart', ((e) => {
+          e.stopPropagation();
+          // clone the svg used in this entry
+          const pic = this.$refs.entryIcon.$el.cloneNode(true);
+          pic.style.height = '48px';
+          pic.style.maxHeight = '48px';
+          pic.style.width = '48px';
+          pic.style.backgroundColor = 'white';
 
-        // add the element to the dom
-        document.body.appendChild(pic);
-        e.dataTransfer.setDragImage(pic, 0, 0);
+          // add the element to the dom
+          document.body.appendChild(pic);
+          e.dataTransfer.setDragImage(pic, 0, 0);
 
-        // add data to identify the entry on receiver side
-        e.dataTransfer.setData('text/plain', this.$props.id);
-      }), false);
+          // add data to identify the entry on receiver side
+          e.dataTransfer.setData('text/plain', this.$props.id);
+        }), false);
+      }
     }
   },
   methods: {
