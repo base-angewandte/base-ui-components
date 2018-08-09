@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <div class="form-field">
+      <base-input />
+      <base-chips-input />
+    </div>
     <base-menu-list
       :selected="showCheckbox"
       :list="list"
@@ -165,10 +169,12 @@ import BaseDropBox from './components/BaseDropBox';
 import BaseBox from './components/BaseBox';
 import BaseMenuList from './components/BaseMenuList';
 import BaseMenuTableRow from './components/BaseMenuTableRow';
+import BaseChipsInput from './components/BaseChipsInput';
 
 export default {
   name: 'App',
   components: {
+    BaseChipsInput,
     BaseMenuList,
     BaseMenuEntry,
     BaseDropDown,

@@ -6,6 +6,7 @@
       class="base-input-label">
       {{ label }}
     </label>
+    <slot v-if="type === 'text'" />
     <input
       v-if="type === 'text'"
       :id="label"
