@@ -2,7 +2,13 @@
   <div id="app">
     <div class="form-field">
       <base-input />
-      <base-chips-input />
+      <base-chips-input
+        :list="[
+          '...alle Verhältnisse umzuwerfen',
+          'in denen der Mensch',
+          'ein erniedrigtes, ein geknechtetes',
+          'ein verlassenes, ein verächtliches',
+          'Wesen ist']"/>
     </div>
     <base-menu-list
       :selected="showCheckbox"

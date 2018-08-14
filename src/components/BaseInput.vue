@@ -6,28 +6,37 @@
       class="base-input-label">
       {{ label }}
     </label>
-    <slot v-if="type === 'text'" />
-    <input
-      v-if="type === 'text'"
-      :id="label"
-      :title="label"
-      :placeholder="placeholder"
-      v-model="input"
-      type="text"
-      class="base-input-field"
-      @keyup.enter="triggerInput()"
-      @blur="triggerInput()">
+    <div
+      :class="{ 'base-input-field-container-active': active }"
+      class="base-input-field-container">
+      <slot
+        v-if="type === 'text'" />
+      <input
+        v-if="type === 'text'"
+        :id="label"
+        :title="label"
+        :placeholder="placeholder"
+        v-model="input"
+        type="text"
+        class="base-input-field"
+        @focus="$emit('input-focus')"
+        @keyup.enter="$emit('enter', input)"
+        @keyup="$emit('autocomplete', input)"
+        @blur="blurInput()"
+        @click="active = true">
 
-    <input
-      v-else-if="type === 'date'"
-      :id="label"
-      :title="label"
-      :placeholder="placeholder"
-      v-model="input"
-      type="text"
-      class="base-input-field"
-      @keyup.enter="triggerInput()"
-      @blur="triggerInput()">
+      <input
+        v-else-if="type === 'date'"
+        :id="label"
+        :title="label"
+        :placeholder="placeholder"
+        v-model="input"
+        type="text"
+        class="base-input-field"
+        @focus="$emit('inputFocus')"
+        @keyup.enter="triggerInput()"
+        @blur="triggerInput()">
+    </div>
   </div>
 </template>
 
@@ -38,6 +47,9 @@ export default {
     type: {
       type: String,
       default: 'text',
+      validator(val) {
+        return (val === 'text' || val === 'date');
+      },
     },
     label: {
       type: String,
@@ -51,11 +63,13 @@ export default {
   data() {
     return {
       input: null,
+      active: false,
     };
   },
   methods: {
-    triggerInput() {
-      this.$emit('input', this.input);
+    blurInput() {
+      this.active = false;
+      this.$emit('input-blur', this.input);
     },
   },
 };
@@ -73,17 +87,29 @@ export default {
     &:first-of-type + .base-input {
       margin-left: $spacing;
     }
-  }
 
-  .base-input-field {
-    height: $row-height-small;
-    margin-bottom: $spacing;
-    padding: 0 #{$spacing};
+    .base-input-field-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: $spacing;
+      padding-left: $spacing;
+      min-height: $row-height-small;
+      border: 1px solid rgb(200, 200, 200);
+    }
+
+    .base-input-field-container-active {
+      box-shadow: $input-shadow;
+    }
+
+    .base-input-field {
+      flex: 1 1 auto;
+      padding-right: $spacing;
+    }
   }
 
   input[type='text'].base-input-field {
-    line-height: $row-height-small;
-    border: 1px solid rgb(200, 200, 200);
+    border: none;
   }
 
   input[type='date'].base-input-field {
@@ -92,7 +118,7 @@ export default {
 
   input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
     outline: none;
-    box-shadow: $input-shadow;
+    /** box-shadow: inset -2px 1px 4px 0 rgba(0,0,0,0.2); **/
   }
 
   input::placeholder {
