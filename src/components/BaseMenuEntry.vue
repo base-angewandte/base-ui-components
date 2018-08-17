@@ -13,31 +13,37 @@
       class="base-menu-entry-icon"/>
     <div class="base-menu-entry-title">{{ title }}</div>
     <div class="base-menu-entry-subtext">{{ subtext }}</div>
-    <div
-      class="base-menu-entry-thumbnail-container">
-      <svg-icon
-        v-for="tn in thumbnails"
-        :key="tn"
-        :name="tn"
-        class="base-menu-entry-thumbnail" />
-    </div>
-    <div
-      :class="{'base-menu-entry-description-checkmark-active': selectActive}"
-      class="base-menu-entry-description">
-      {{ description }}
-    </div>
-    <transition
-      v-if="isSelectable"
+
+    <transition-group
       name="slide-fade"
-      class="base-menu-checkmark-container">
+      class="base-menu-entry-group">
+      <div
+        :key="id + 'thumbnail'"
+        class="base-menu-entry-thumbnail-container">
+        <svg-icon
+          v-for="tn in thumbnails"
+          :key="tn"
+          :name="tn"
+          class="base-menu-entry-thumbnail" />
+      </div>
+      <div
+        :key="id + 'description'"
+        class="base-menu-entry-description">
+        {{ description }}
+      </div>
       <base-checkmark
         v-if="selectActive"
+        :key="id + 'checkmark'"
         :selected="isSelected"
         title="checkbox"
         mark-style="checkbox"
         class="hidden"
         @clicked="selected"/>
-    </transition>
+      <div
+        v-if="isSelectable"
+        :key="id + 'checkmark-box'"
+        class="base-menu-checkmark-container" />
+    </transition-group>
   </div>
 </template>
 
@@ -214,7 +220,7 @@ export default {
       display: flex;
       flex-direction: column;
       justify-content: space-evenly;
-      height: 100%;
+      height: $row-height-large;
       margin: 0 $spacing;
 
       .base-menu-entry-thumbnail {
@@ -226,28 +232,27 @@ export default {
     .base-menu-entry-description {
       color: $font-color-second;
       font-size: $font-size-small;
-      margin-right: 16px;
+      margin-right: $spacing;
       transition: 0.3s ease;
-      flex-basis: 100px;
+      width: 100px;
     }
 
-    .base-menu-entry-description-checkmark-active {
-      margin-right: 32px;
-    }
-
-    .slide-fade-enter-active {
-      transition: all .3s ease;
-    }
-    .slide-fade-leave-active {
-      transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
+      transition: all 0.5s ease;
     }
     .slide-fade-enter, .slide-fade-leave-to {
-      transform: translateX(10px);
       opacity: 0;
+      transform: translateX(#{$spacing});
+      margin-left: calc(-2 * #{$spacing});
     }
   }
 
   .base-menu-entry + .base-menu-entry {
     border-top: $separation-line;
+  }
+
+  .base-menu-entry-group {
+    display: flex;
+    align-items: center;
   }
 </style>
