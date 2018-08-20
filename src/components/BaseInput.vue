@@ -104,12 +104,14 @@ export default {
 
     .base-input-field {
       flex: 1 1 auto;
-      padding-right: $spacing;
+      margin-right: $spacing;
     }
   }
 
   input[type='text'].base-input-field {
     border: none;
+    height: calc(#{$line-height} - 0.1em);
+    overflow: hidden;
   }
 
   input[type='date'].base-input-field {
