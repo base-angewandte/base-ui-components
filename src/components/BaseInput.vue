@@ -21,6 +21,7 @@
         class="base-input-field"
         @focus="$emit('input-focus')"
         @keyup.enter="$emit('enter', input)"
+        @keyup.up.down="$emit('arrow-key', $event)"
         @keyup="$emit('autocomplete', input)"
         @blur="blurInput()"
         @click="active = true">
@@ -93,7 +94,7 @@ export default {
       align-items: center;
       flex-wrap: wrap;
       margin-bottom: $spacing;
-      padding-left: $spacing;
+      padding-left: $spacing-small;
       min-height: $row-height-small;
       border: 1px solid rgb(200, 200, 200);
     }
@@ -110,8 +111,9 @@ export default {
 
   input[type='text'].base-input-field {
     border: none;
-    height: calc(#{$line-height} - 0.1em);
     overflow: hidden;
+    padding: 4px 0;
+    height: $line-height;
   }
 
   input[type='date'].base-input-field {
