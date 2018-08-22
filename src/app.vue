@@ -8,7 +8,33 @@
           'in denen der Mensch',
           'ein erniedrigtes, ein geknechtetes',
           'ein verlassenes, ein verächtliches',
-          'Wesen ist']"/>
+          'Wesen ist']"
+        :placeholder="'Select Your Marx'"
+        :allow-multiple-entries="true"/>
+      <base-chips-input
+        :list="[
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '***' },
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '**' },
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '*' },
+          { title: 'in denen der Mensch' },
+          { title: 'ein erniedrigtes, ein geknechtetes' },
+          { title: 'ein verlassenes, ein verächtliches' },
+          { title: 'Wesen ist' }]"
+        :placeholder="'Select your Marx'"
+        :label="'single choice with special drop down body'"
+        :allow-multiple-entries="false">
+        <template
+          slot="drop-down-entry"
+          slot-scope="props">
+          <span>{{ props.item.title }}</span>
+          <span>{{ props.item.additional }}</span>
+          <span>{{ props.item.remark }}</span>
+        </template>
+      </base-chips-input>
+
     </div>
     <base-menu-list
       :selected="showCheckbox"

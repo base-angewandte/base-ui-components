@@ -2,8 +2,12 @@
   <div
     v-click-outside="hide"
     class="base-chips-input">
+
+    <!-- INPUT LABEL AND FIELD -->
     <base-input
       ref="baseInput"
+      :placeholder="allowMultipleEntries || !selectedList.length ? $props.placeholder : ''"
+      :label="$props.label"
       @autocomplete="input = $event"
       @input-focus="activateDropDown()"
       @arrow-key="triggerArrowKey"
@@ -12,7 +16,9 @@
         v-for="(entry,index) in selectedList"
         :key="index"
         class="base-chips-input-chip">
-        <div class="base-chips-input-chip-text">{{ entry }}</div>
+        <div class="base-chips-input-chip-text">
+          {{ entry.title }}
+        </div>
         <div
           class="base-chips-input-chip-icon"
           @click="removeEntry(index)">
@@ -22,21 +28,35 @@
         </div>
       </div>
     </base-input>
+
+    <!-- DROP DOWN MENU -->
     <div
-      v-if="showSelect"
-      class="base-chips-input-select">
+      v-if="showDropDown"
+      class="base-chips-drop-down">
       <div
         v-for="(entry, index) in dropDownListInt"
         :key="index"
-        :class="{ 'base-chips-input-select-entry-active': index === selectedMenuEntryIndex }"
-        class="base-chips-input-select-entry"
+        :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
+        class="base-chips-drop-down-entry-wrapper"
         @click="addSelected(entry)"
         @mouseover="selectedMenuEntryIndex = index">
-        {{ entry }}
+
+        <!-- THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
+        <slot
+          :item="entry"
+          name="drop-down-entry">
+          <!-- SLOT DEFAULT -->
+          <div class="base-chips-drop-down-entry">
+            {{ entry.title }}
+          </div>
+        </slot>
+
       </div>
       <div
         v-if="!dropDownList.length"
-        class="base-chips-input-select-entry">No options available</div>
+        class="base-chips-drop-down-entry-wrapper">
+        No options available
+      </div>
     </div>
   </div>
 
@@ -61,6 +81,14 @@ export default {
         return [];
       },
     },
+    label: {
+      type: String,
+      default: null,
+    },
+    placeholder: {
+      type: String,
+      default: null,
+    },
     // can the user add Entries that are not available in the vocabulary (selectable list)
     allowUnknownEntries: {
       type: Boolean,
@@ -70,18 +98,29 @@ export default {
     allowMultipleEntries: {
       type: Boolean,
       default: true,
+      validator(val) {
+        return val === true || val === false;
+      },
     },
   },
   data() {
     return {
       // show drop down entries list
-      showSelect: false,
+      showDropDown: false,
       // the current text input
       input: null,
       // list of selected entries
       selectedList: [],
+      // create a original list from text or object with internal id
+      dropDownListOrig: this.$props.list
+        .map((entry, index) => {
+          if (typeof entry === 'object') {
+            return Object.assign({}, entry, { idInt: index, title: entry.title || entry });
+          }
+          return Object.assign({}, { idInt: index, title: entry.title || entry });
+        }),
       // list of selectable entries received from parent component
-      dropDownList: this.$props.list,
+      dropDownList: [],
       selectedMenuEntryIndex: 0,
     };
   },
@@ -91,42 +130,57 @@ export default {
         return this.dropDownList;
       },
       set(val) {
-        this.dropDownList = val;
+        this.dropDownList = val.filter(entry => !this.selectedList
+          .map(selected => selected.idInt).includes(entry.idInt));
       },
     },
   },
   watch: {
     input(val) {
-      this.dropDownListInt = val ? this.$props.list
-        .filter(entry => !this.selectedList.includes(entry))
-        .filter(entry => entry.toLowerCase().includes(val.toLowerCase())) : this.$props.list
-        .filter(entry => !this.selectedList.includes(entry));
+      this.dropDownListInt = val ? this.dropDownListOrig
+        .filter(entry => entry.title.toLowerCase().includes(val.toLowerCase()))
+        : this.dropDownListOrig;
     },
+  },
+  mounted() {
+    this.dropDownListInt = this.dropDownListOrig;
   },
   methods: {
     // open drop down menu and set the currently selected entry (the first one per default)
     activateDropDown() {
       this.selectedMenuEntryIndex = 0;
-      this.showSelect = true;
+      this.showDropDown = true;
     },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
-      // this adds the entry who's index is currently set
-      // TODO: this needs to be different for unknown entries allowed!
-      this.selectedList.push(this.dropDownListInt[this.selectedMenuEntryIndex]);
+      if (this.allowMultipleEntries) {
+        // this adds the entry who's index is currently set
+        // TODO: this needs to be different for unknown entries allowed!
+        this.selectedList.push(this.dropDownListInt[this.selectedMenuEntryIndex]);
+      } else {
+        this.selectedList = [this.dropDownListInt[this.selectedMenuEntryIndex]];
+        this.showDropDown = false;
+      }
       // reset input
       this.input = null;
       // reset the child input variable
       // TODO: check if alternatively input should be set from outside (prop)?
       this.$refs.baseInput.$data.input = null;
       // filter the selected entry from the list of drop down menu entries
-      this.dropDownListInt = this.$props.list.filter(entry => !this.selectedList.includes(entry));
+      this.dropDownListInt = this.dropDownListOrig;
       this.selectedMenuEntryIndex = 0;
     },
     // remove an entry from the list of selected entries
     removeEntry(index) {
+      // const selectedToRemove = this.selectedList[index];
       this.dropDownListInt.push(this.selectedList[index]);
-      this.selectedList = this.selectedList.filter(sel => this.selectedList.indexOf(sel) !== index);
+      // sort all entries by id to restore the original order
+      this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
+      // this.dropDownListInt.splice(selectedToRemove.id, 0, selectedToRemove);
+      this.selectedList.splice(index, 1);
+      if (!this.$props.allowMultipleEntries) {
+        this.showDropDown = true;
+      }
     },
     // allow for navigation and selection with arrow keys
     triggerArrowKey(event) {
@@ -140,7 +194,7 @@ export default {
     },
     // with directive this can not be done inline
     hide() {
-      this.showSelect = false;
+      this.showDropDown = false;
     },
   },
 };
@@ -154,15 +208,19 @@ export default {
 
     .base-chips-input-chip {
       margin: 4px $spacing-small 4px 0;
-      padding-left:$spacing-small;
+      padding-left: $spacing-small;
       flex: 0 0 auto;
       background-color: $background-color;
       height: $line-height;
       display: flex;
       align-items: flex-end;
 
+      .base-chips-input-chip-text {
+        padding-right: $spacing-small;
+      }
+
       .base-chips-input-chip-icon {
-        padding: 0 $spacing-small 0 $spacing;
+        padding: 0 $spacing-small;
         cursor: pointer;
 
         .base-chips-input-chip-icon-img {
@@ -172,7 +230,7 @@ export default {
       }
     }
 
-    .base-chips-input-select {
+    .base-chips-drop-down {
       position: absolute;
       background: white;
       margin-top: -$spacing;
@@ -180,12 +238,21 @@ export default {
       z-index: 2;
       box-shadow: $drop-shadow;
 
-      .base-chips-input-select-entry {
+      .base-chips-drop-down-entry-wrapper {
         padding: 0 16px;
         line-height: $row-height-small;
 
-        &.base-chips-input-select-entry-active {
+        &.base-chips-drop-down-entry-wrapper-active {
           background: $background-color;
+        }
+
+        .base-chips-drop-down-entry-additional {
+          color: $font-color-second;
+          margin-left: $spacing-small;
+        }
+
+        .base-chips-drop-down-entry-remark {
+          float: right;
         }
       }
     }
