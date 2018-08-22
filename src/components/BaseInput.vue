@@ -97,6 +97,7 @@ export default {
       padding-left: $spacing-small;
       min-height: $row-height-small;
       border: 1px solid rgb(200, 200, 200);
+      background: white;
     }
 
     .base-input-field-container-active {

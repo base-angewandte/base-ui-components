@@ -10,7 +10,11 @@
           'ein verlassenes, ein verächtliches',
           'Wesen ist']"
         :placeholder="'Select Your Marx'"
+        :selected-list="chipsInput"
         :allow-multiple-entries="true"/>
+      <base-button
+        text="change input"
+        @clicked="changeInput" />
       <base-chips-input
         :list="[
           { title: '...alle Verhältnisse umzuwerfen',
@@ -220,6 +224,7 @@ export default {
   },
   data() {
     return {
+      chipsInput: [],
       menuEntryActive: false,
       showCheckbox: false,
       showPopUp: false,
@@ -261,6 +266,11 @@ export default {
     };
   },
   methods: {
+    changeInput() {
+      const index = Math.floor((Math.random() * 10) + 1);
+      this.chipsInput = [(['test1', 'test2', 'test3', 'test4', 'test5',
+        'test6', 'test7', 'test8', 'test9', 'test10'][index])];
+    },
     boxClicked() {
       console.log('clicked');
     },
