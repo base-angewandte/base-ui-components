@@ -52,11 +52,15 @@
         </slot>
 
       </div>
-      <div
+      <slot
         v-if="!dropDownList.length"
-        class="base-chips-drop-down-entry-wrapper">
-        No options available
-      </div>
+        name="no-options">
+        <div
+          class="base-chips-drop-down-entry-wrapper">
+          {{ dropDownNoOptionsInfo }}
+        </div>
+      </slot>
+
     </div>
   </div>
 
@@ -95,17 +99,27 @@ export default {
       type: String,
       default: null,
     },
+    dropDownNoOptionsInfo: {
+      type: String,
+      default: 'No options available',
+    },
     // can the user add Entries that are not available in the vocabulary (selectable list)
     allowUnknownEntries: {
       type: Boolean,
       default: false,
     },
+    // TODO: not implemented yet!!
     // define if one or several entries can be selected from drop down menu
     allowMultipleEntries: {
       type: Boolean,
       default: true,
     },
     allowDynamicDropDownEntries: {
+      type: Boolean,
+      default: false,
+    },
+    // TODO: this is not implemented yet!
+    chipsInline: {
       type: Boolean,
       default: false,
     },
@@ -124,13 +138,7 @@ export default {
         return Object.assign({}, { idInt: null, title: entry });
       }),
       // create a original list from text or object with internal id
-      dropDownListOrig: this.$props.list
-        .map((entry, index) => {
-          if (typeof entry === 'object') {
-            return Object.assign({}, entry, { idInt: index, title: entry.title });
-          }
-          return Object.assign({}, { idInt: index, title: entry });
-        }),
+      dropDownListOrig: [],
       // list of selectable entries received from parent component
       dropDownList: [],
       selectedMenuEntryIndex: 0,
@@ -142,8 +150,10 @@ export default {
         return this.dropDownList;
       },
       set(val) {
-        this.dropDownList = val.filter(entry => !this.selectedListInt
-          .map(selected => selected.idInt).includes(entry.idInt));
+        this.dropDownList = !this.allowDynamicDropDownEntries
+          ? val.filter(entry => !this.selectedListInt
+            .map(selected => selected.idInt).includes(entry.idInt))
+          : val;
       },
     },
   },
@@ -151,7 +161,6 @@ export default {
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
-        // TODO: use this to update the dropDownList from outside!
         this.$emit('fetchDropDownEntries', val);
       } else {
         // if content is static filter the existing entries for the ones matching input
@@ -172,19 +181,26 @@ export default {
         return Object.assign({}, { idInt: null, title: entry });
       });
     },
-    dropDownList(val) {
-      console.log(val);
-      // TODO:
-      // 1. update internal dropdown list (original one! (too?))
-      // 2. with dynamic dropdown list only start getting results after first
-      // three letters and with typing timeout
-      // 3. --> create prop for that!
-      // 4. ??
-      // 5. do i need to keep getter and setter?
+    list(val) {
+      this.dropDownListInt = val.map((entry, index) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, { idInt: index, title: entry.title });
+        }
+        return Object.assign({}, { idInt: index, title: entry });
+      });
     },
   },
   mounted() {
-    this.dropDownListInt = this.dropDownListOrig;
+    if (!this.allowDynamicDropDownEntries) {
+      this.dropDownListOrig = this.$props.list
+        .map((entry, index) => {
+          if (typeof entry === 'object') {
+            return Object.assign({}, entry, { idInt: index, title: entry.title });
+          }
+          return Object.assign({}, { idInt: index, title: entry });
+        });
+      this.dropDownListInt = this.dropDownListOrig;
+    }
   },
   methods: {
     // open drop down menu and set the currently selected entry (the first one per default)
@@ -205,22 +221,24 @@ export default {
       // reset input
       this.input = null;
       // reset the child input variable
-      // TODO: check if alternatively input should be set from outside (prop)?
       this.$refs.baseInput.$data.input = null;
-      // filter the selected entry from the list of drop down menu entries
-      this.dropDownListInt = this.dropDownListOrig;
+      if (!this.allowDynamicDropDownEntries) {
+        // filter the selected entry from the list of drop down menu entries
+        this.dropDownListInt = this.dropDownListOrig;
+      }
       this.selectedMenuEntryIndex = 0;
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
-      // check if the item id was set
-      if (!item.intId) {
-        this.dropDownListInt = [];
+      if (!this.allowDynamicDropDownEntries) {
+        // check if the item id was set
+        if (!item.intId) {
+          this.dropDownListInt = [];
+        }
+        this.dropDownListInt.push(item);
+        // sort all entries by id to restore the original order
+        this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
       }
-      this.dropDownListInt.push(item);
-      // sort all entries by id to restore the original order
-      this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
-
       // remove entry from selected list
       this.selectedListInt.splice(index, 1);
       if (!this.$props.allowMultipleEntries) {
@@ -256,9 +274,19 @@ export default {
       padding-left: $spacing-small;
       flex: 0 0 auto;
       background-color: $background-color;
-      height: $line-height;
+      line-height: $line-height;
+      max-width: calc(100% - #{$spacing-small};
       display: flex;
-      align-items: flex-end;
+      align-items: center;
+
+      &::after {
+        content: '';
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: linear-gradient(to right, transparent , white);
+      }
 
       .base-chips-input-chip-text {
         padding-right: $spacing-small;

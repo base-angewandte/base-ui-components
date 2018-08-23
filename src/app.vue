@@ -3,15 +3,12 @@
     <div class="form-field">
       <base-input />
       <base-chips-input
-        :list="[
-          '...alle Verhältnisse umzuwerfen',
-          'in denen der Mensch',
-          'ein erniedrigtes, ein geknechtetes',
-          'ein verlassenes, ein verächtliches',
-          'Wesen ist']"
+        :list="dropDownInput"
         :placeholder="'Select Your Marx'"
         :selected-list="chipsInput"
-        :allow-multiple-entries="true"/>
+        :allow-multiple-entries="true"
+        :allow-dynamic-drop-down-entries="true"
+        @fetchDropDownEntries="fetch"/>
       <base-button
         text="change input"
         @clicked="changeInput" />
@@ -195,6 +192,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import BaseMenuEntry from './components/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp';
 import BaseDropDown from './components/BaseDropDown';
@@ -225,6 +223,12 @@ export default {
   data() {
     return {
       chipsInput: [],
+      dropDownInput: [
+        '...alle Verhältnisse umzuwerfen',
+        'in denen der Mensch',
+        'ein erniedrigtes, ein geknechtetes',
+        'ein verlassenes, ein verächtliches',
+        'Wesen ist'],
       menuEntryActive: false,
       showCheckbox: false,
       showPopUp: false,
@@ -297,6 +301,17 @@ export default {
         this.$set(this.list[index], 'active', true);
       } else {
         this.$set(this.list[index], 'active', false);
+      }
+    },
+    async fetch(string) {
+      if (!string || string.length > 3) {
+        const result = await axios.get('http://localhost:9900/fetch', {
+          params:
+            {
+              string,
+            },
+        });
+        this.dropDownInput = result.data;
       }
     },
   },
