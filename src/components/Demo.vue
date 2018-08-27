@@ -32,7 +32,6 @@
           :placeholder="'Select your Marx'"
           :label="'single choice with special drop down body'"
           :allow-multiple-entries="false">
-          <!-- TODO: should allow to add custom-class! -->
           <template
             slot="drop-down-entry"
             slot-scope="props">
@@ -41,25 +40,60 @@
             <span id="chips-remark">{{ props.item.remark }}</span>
           </template>
         </base-chips-input>
+        <base-chips-input
+          :list="dropDownInput"
+          :label="`Multiselect with dynamically fetched options and
+          the option to change selected from outside`"
+          :placeholder="'Select Your Marx'"
+          :selected-list="chipsInput"
+          :allow-multiple-entries="true"
+          :allow-dynamic-drop-down-entries="true"
+          @fetchDropDownEntries="fetch"/>
+        <base-button
+          text="change input"
+          @clicked="changeInput" />
       </div>
     </demo-section>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 import BaseChipsInput from './BaseChipsInput';
+import BaseButton from './BaseButton';
 import DemoSection from './DemoSection';
 import { COMPONENT_DATA } from '../assets/data/component-data';
 
 export default {
   components: {
     BaseChipsInput,
+    BaseButton,
     DemoSection,
   },
   data() {
     return {
       componentInfo: COMPONENT_DATA,
+      chipsInput: [],
+      dropDownInput: [],
     };
+  },
+  methods: {
+    changeInput() {
+      const index = Math.floor((Math.random() * 10) + 1);
+      this.chipsInput = ['test1', 'test2', 'test3', 'test4', 'test5',
+        'test6', 'test7', 'test8', 'test9', 'test10'].splice(index, 2);
+    },
+    async fetch(string) {
+      if (!string || string.length > 3) {
+        const result = await axios.get('http://localhost:9900/fetch', {
+          params:
+            {
+              string,
+            },
+        });
+        this.dropDownInput = result.data;
+      }
+    },
   },
 };
 </script>
