@@ -39,3 +39,13 @@ npm link
 # in target project
 npm link base-components
 ```
+
+## Base Components
+
+components currently included in the build:
+* BasePopUp
+* BaseDropDown
+* BaseButton
+* BaseBoxButton
+* BaseInput
+* BaseChipsInput
