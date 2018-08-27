@@ -6,14 +6,14 @@
     <!-- INPUT LABEL AND FIELD -->
     <base-input
       ref="baseInput"
-      :placeholder="allowMultipleEntries || !selectedList.length ? $props.placeholder : ''"
+      :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="$props.label"
       @autocomplete="input = $event"
       @input-focus="activateDropDown()"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
       <div
-        v-for="(entry,index) in selectedList"
+        v-for="(entry,index) in selectedListInt"
         :key="index"
         class="base-chips-input-chip">
         <div class="base-chips-input-chip-text">
@@ -21,7 +21,7 @@
         </div>
         <div
           class="base-chips-input-chip-icon"
-          @click="removeEntry(index)">
+          @click="removeEntry(entry, index)">
           <img
             class="base-chips-input-chip-icon-img"
             src="../static/icons/remove.svg">
@@ -52,11 +52,15 @@
         </slot>
 
       </div>
-      <div
+      <slot
         v-if="!dropDownList.length"
-        class="base-chips-drop-down-entry-wrapper">
-        No options available
-      </div>
+        name="no-options">
+        <div
+          class="base-chips-drop-down-entry-wrapper">
+          {{ dropDownNoOptionsInfo }}
+        </div>
+      </slot>
+
     </div>
   </div>
 
@@ -81,6 +85,12 @@ export default {
         return [];
       },
     },
+    selectedList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
     label: {
       type: String,
       default: null,
@@ -89,6 +99,11 @@ export default {
       type: String,
       default: null,
     },
+    dropDownNoOptionsInfo: {
+      type: String,
+      default: 'No options available',
+    },
+    // TODO: not implemented yet!!
     // can the user add Entries that are not available in the vocabulary (selectable list)
     allowUnknownEntries: {
       type: Boolean,
@@ -98,9 +113,15 @@ export default {
     allowMultipleEntries: {
       type: Boolean,
       default: true,
-      validator(val) {
-        return val === true || val === false;
-      },
+    },
+    allowDynamicDropDownEntries: {
+      type: Boolean,
+      default: false,
+    },
+    // TODO: this (the useage of this variable and chips NOT inline) is not implemented yet!
+    chipsInline: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -110,15 +131,14 @@ export default {
       // the current text input
       input: null,
       // list of selected entries
-      selectedList: [],
+      selectedListInt: this.$props.selectedList.map((entry) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, { idInt: null, title: entry.title });
+        }
+        return Object.assign({}, { idInt: null, title: entry });
+      }),
       // create a original list from text or object with internal id
-      dropDownListOrig: this.$props.list
-        .map((entry, index) => {
-          if (typeof entry === 'object') {
-            return Object.assign({}, entry, { idInt: index, title: entry.title || entry });
-          }
-          return Object.assign({}, { idInt: index, title: entry.title || entry });
-        }),
+      dropDownListOrig: [],
       // list of selectable entries received from parent component
       dropDownList: [],
       selectedMenuEntryIndex: 0,
@@ -130,20 +150,57 @@ export default {
         return this.dropDownList;
       },
       set(val) {
-        this.dropDownList = val.filter(entry => !this.selectedList
-          .map(selected => selected.idInt).includes(entry.idInt));
+        this.dropDownList = !this.allowDynamicDropDownEntries
+          ? val.filter(entry => !this.selectedListInt
+            .map(selected => selected.idInt).includes(entry.idInt))
+          : val;
       },
     },
   },
   watch: {
     input(val) {
-      this.dropDownListInt = val ? this.dropDownListOrig
-        .filter(entry => entry.title.toLowerCase().includes(val.toLowerCase()))
-        : this.dropDownListOrig;
+      // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
+      if (this.allowDynamicDropDownEntries) {
+        this.$emit('fetchDropDownEntries', val);
+      } else {
+        // if content is static filter the existing entries for the ones matching input
+        this.dropDownListInt = val
+          ? this.dropDownListOrig
+            .filter(entry => entry.title.toLowerCase().includes(val.toLowerCase()))
+          : this.dropDownListOrig;
+      }
+    },
+    // watch selectedList prop for changes triggered from outside
+    selectedList(val) {
+      // if entries are objects merge with internally necessary properties,
+      // else use entry (string? TODO: should probably check this) as title
+      this.selectedListInt = val.map((entry) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, { idInt: null, title: entry.title });
+        }
+        return Object.assign({}, { idInt: null, title: entry });
+      });
+    },
+    list(val) {
+      this.dropDownListInt = val.map((entry, index) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, { idInt: index, title: entry.title });
+        }
+        return Object.assign({}, { idInt: index, title: entry });
+      });
     },
   },
   mounted() {
-    this.dropDownListInt = this.dropDownListOrig;
+    if (!this.allowDynamicDropDownEntries) {
+      this.dropDownListOrig = this.$props.list
+        .map((entry, index) => {
+          if (typeof entry === 'object') {
+            return Object.assign({}, entry, { idInt: index, title: entry.title });
+          }
+          return Object.assign({}, { idInt: index, title: entry });
+        });
+      this.dropDownListInt = this.dropDownListOrig;
+    }
   },
   methods: {
     // open drop down menu and set the currently selected entry (the first one per default)
@@ -156,33 +213,39 @@ export default {
       if (this.allowMultipleEntries) {
         // this adds the entry who's index is currently set
         // TODO: this needs to be different for unknown entries allowed!
-        this.selectedList.push(this.dropDownListInt[this.selectedMenuEntryIndex]);
+        this.selectedListInt.push(this.dropDownListInt[this.selectedMenuEntryIndex]);
       } else {
-        this.selectedList = [this.dropDownListInt[this.selectedMenuEntryIndex]];
+        this.selectedListInt = [this.dropDownListInt[this.selectedMenuEntryIndex]];
         this.showDropDown = false;
       }
       // reset input
       this.input = null;
       // reset the child input variable
-      // TODO: check if alternatively input should be set from outside (prop)?
       this.$refs.baseInput.$data.input = null;
-      // filter the selected entry from the list of drop down menu entries
-      this.dropDownListInt = this.dropDownListOrig;
+      if (!this.allowDynamicDropDownEntries) {
+        // filter the selected entry from the list of drop down menu entries
+        this.dropDownListInt = this.dropDownListOrig;
+      }
       this.selectedMenuEntryIndex = 0;
     },
     // remove an entry from the list of selected entries
-    removeEntry(index) {
-      // const selectedToRemove = this.selectedList[index];
-      this.dropDownListInt.push(this.selectedList[index]);
-      // sort all entries by id to restore the original order
-      this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
-      // this.dropDownListInt.splice(selectedToRemove.id, 0, selectedToRemove);
-      this.selectedList.splice(index, 1);
+    removeEntry(item, index) {
+      if (!this.allowDynamicDropDownEntries) {
+        // check if the item id was set
+        if (!item.intId) {
+          this.dropDownListInt = [];
+        }
+        this.dropDownListInt.push(item);
+        // sort all entries by id to restore the original order
+        this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
+      }
+      // remove entry from selected list
+      this.selectedListInt.splice(index, 1);
       if (!this.$props.allowMultipleEntries) {
         this.showDropDown = true;
       }
     },
-    // allow for navigation and selection with arrow keys
+    // allow for navigation with arrow keys
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
@@ -211,9 +274,19 @@ export default {
       padding-left: $spacing-small;
       flex: 0 0 auto;
       background-color: $background-color;
-      height: $line-height;
+      line-height: $line-height;
+      max-width: calc(100% - #{$spacing-small};
       display: flex;
-      align-items: flex-end;
+      align-items: center;
+
+      &::after {
+        content: '';
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: linear-gradient(to right, transparent , white);
+      }
 
       .base-chips-input-chip-text {
         padding-right: $spacing-small;
