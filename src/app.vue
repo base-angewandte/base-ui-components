@@ -16,6 +16,12 @@ export default {
 </script>
 
 <style lang="scss">
+  #app {
+    padding: 16px;
+    max-width: 1400px;
+    margin: auto;
+  }
+
   .flex {
     display: flex;
   }

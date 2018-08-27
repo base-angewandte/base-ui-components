@@ -227,6 +227,7 @@ export default {
         this.dropDownListInt = this.dropDownListOrig;
       }
       this.selectedMenuEntryIndex = 0;
+      this.$emit('selected', this.selectedListInt);
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
