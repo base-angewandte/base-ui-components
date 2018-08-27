@@ -227,6 +227,7 @@ export default {
         this.dropDownListInt = this.dropDownListOrig;
       }
       this.selectedMenuEntryIndex = 0;
+      this.$emit('selected', this.selectedListInt);
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
@@ -275,7 +276,7 @@ export default {
       flex: 0 0 auto;
       background-color: $background-color;
       line-height: $line-height;
-      max-width: calc(100% - #{$spacing-small};
+      max-width: calc(100% - #{$spacing-small});
       display: flex;
       align-items: center;
 
