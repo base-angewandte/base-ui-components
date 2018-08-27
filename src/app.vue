@@ -272,8 +272,8 @@ export default {
   methods: {
     changeInput() {
       const index = Math.floor((Math.random() * 10) + 1);
-      this.chipsInput = [(['test1', 'test2', 'test3', 'test4', 'test5',
-        'test6', 'test7', 'test8', 'test9', 'test10'][index])];
+      this.chipsInput = ['test1', 'test2', 'test3', 'test4', 'test5',
+        'test6', 'test7', 'test8', 'test9', 'test10'].splice(index, 2);
     },
     boxClicked() {
       console.log('clicked');

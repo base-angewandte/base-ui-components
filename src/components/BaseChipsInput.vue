@@ -103,12 +103,12 @@ export default {
       type: String,
       default: 'No options available',
     },
+    // TODO: not implemented yet!!
     // can the user add Entries that are not available in the vocabulary (selectable list)
     allowUnknownEntries: {
       type: Boolean,
       default: false,
     },
-    // TODO: not implemented yet!!
     // define if one or several entries can be selected from drop down menu
     allowMultipleEntries: {
       type: Boolean,
@@ -118,10 +118,10 @@ export default {
       type: Boolean,
       default: false,
     },
-    // TODO: this is not implemented yet!
+    // TODO: this (the useage of this variable and chips NOT inline) is not implemented yet!
     chipsInline: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   data() {
@@ -245,7 +245,7 @@ export default {
         this.showDropDown = true;
       }
     },
-    // allow for navigation and selection with arrow keys
+    // allow for navigation with arrow keys
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1

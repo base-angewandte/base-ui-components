@@ -9,7 +9,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "dev": "npm-run-all --parallel dev:lib dev:docs",
-    "dev:lib": "webpack --config build/webpack.lib.conf.js --watch --progress --hide-modules",
+    "dev:lib": "webpack --config build/webpack.lib.conf.js --watch --progress --hide-modules & node server.js",
     "dev:docs": "node build/dev-server.js",
     "build": "npm run build:lib && npm run build:docs",
     "build:lib": "node build/build-lib.js",
