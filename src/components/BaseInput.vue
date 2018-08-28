@@ -12,7 +12,7 @@
       <slot
         v-if="type === 'text'" />
       <input
-        v-if="type === 'text'"
+        v-if="type === 'text' && !hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
@@ -60,6 +60,10 @@ export default {
       type: String,
       default: 'Enter Text Here',
     },
+    hideInputField: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -85,10 +89,6 @@ export default {
     overflow: hidden;
     width: 100%;
 
-    &:first-of-type + .base-input {
-      margin-left: $spacing;
-    }
-
     .base-input-field-container {
       display: flex;
       align-items: center;
@@ -107,6 +107,12 @@ export default {
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;
+    }
+
+    .base-input-label {
+      color: $font-color-second;
+      margin-bottom: $spacing-small;
+      text-align: left;
     }
   }
 

@@ -305,12 +305,13 @@ export default {
     },
     async fetch(string) {
       if (!string || string.length > 3) {
-        const result = await axios.get('http://localhost:9900/fetch', {
+        const result = await axios.get('http://localhost:9900/fetchAutocomplete/title', {
           params:
             {
               string,
             },
         });
+        debugger;
         this.dropDownInput = result.data;
       }
     },
