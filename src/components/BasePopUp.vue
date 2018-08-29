@@ -23,12 +23,16 @@
           :text="buttonLeftText"
           :icon="buttonLeftIcon"
           :icon-position="'right'"
+          :icon-size="'small'"
+          class="base-popup-button"
           @clicked="$emit('clicked', 'buttonLeft')"
         />
         <base-button
           :text="buttonRightText"
           :icon="buttonRightIcon"
           :icon-position="'right'"
+          :icon-size="'small'"
+          class="base-popup-button"
           @clicked="$emit('clicked', 'buttonRight')"
         />
       </div>
@@ -123,12 +127,13 @@ export default {
     display: flex;
     flex-direction: row;
 
-    button {
+    /* TODO: check if button size should just be adjustable via props in general" */
+    & .base-popup-button {
       margin-right: $spacing;
       width: calc(50% - 8px);
     }
 
-    button:last-child {
+    & .base-popup-button:last-child {
       margin-right: 0;
     }
   }

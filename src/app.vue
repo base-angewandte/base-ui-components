@@ -1,6 +1,13 @@
 <template>
   <div id="app">
     <div class="canvas">
+      <base-button
+        :active="false"
+        icon="sheet-plus"
+        icon-size="large"
+        button-style="row" />
+    </div>
+    <div class="canvas">
       <base-search
         :show-image="true"
         @input="triggerInput"/>
@@ -16,6 +23,7 @@
         @fetchDropDownEntries="fetch"/>
       <base-button
         text="change input"
+        icon="remove"
         @clicked="changeInput" />
       <base-chips-input
         :list="[
