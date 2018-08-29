@@ -1,5 +1,10 @@
 <template>
   <div id="app">
+    <div class="canvas">
+      <base-search
+        :show-image="true"
+        @input="triggerInput"/>
+    </div>
     <div class="form-field">
       <base-input />
       <base-chips-input
@@ -204,10 +209,12 @@ import BaseBox from './components/BaseBox';
 import BaseMenuList from './components/BaseMenuList';
 import BaseMenuTableRow from './components/BaseMenuTableRow';
 import BaseChipsInput from './components/BaseChipsInput';
+import BaseSearch from './components/BaseSearch';
 
 export default {
   name: 'App',
   components: {
+    BaseSearch,
     BaseChipsInput,
     BaseMenuList,
     BaseMenuEntry,
@@ -270,6 +277,9 @@ export default {
     };
   },
   methods: {
+    triggerInput(val) {
+      console.log(val);
+    },
     changeInput() {
       const index = Math.floor((Math.random() * 10) + 1);
       this.chipsInput = ['test1', 'test2', 'test3', 'test4', 'test5',
@@ -320,6 +330,10 @@ export default {
 </script>
 
 <style>
+  .canvas {
+    padding: 16px;
+  }
+
   .flex {
     display: flex;
   }
