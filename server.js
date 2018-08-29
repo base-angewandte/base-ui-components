@@ -62,12 +62,10 @@ app.get('/fetchAutocomplete/:type', (req, res) => {
       .reduce((prev, curr) => prev.concat(curr[type]), [])
       .filter(prop => prop.toLowerCase().includes(string.toLowerCase())) : [];
   }
-  resArr = resArr.reduce((prev, curr) => {
-    console.log(prev);
-    console.log(curr);
-    return (prev.includes(curr) ? prev : prev.concat(curr));
-  }, []);
+  // remove double entries
+  resArr = Array.from(new Set(resArr));
+  // .reduce((prev, curr) => (prev.includes(curr) ? prev : prev.concat(curr)), []);
   res.send(resArr);
 });
 
-app.listen(9900, () => console.log('Example app listening on port 9900!'));
+app.listen(9900, () => console.log('App listening on port 9900!'));
