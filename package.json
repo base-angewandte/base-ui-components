@@ -19,9 +19,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "vue-axios": "2.0.2",
     "body-parser": "^1.18.3",
     "vue": "^2.5.16",
-    "vue-click-outside": "^1.0.7"
+    "vue-click-outside": "^1.0.7",
+    "vuex": "^2.2.1"
   },
   "devDependencies": {
     "autoprefixer": "^8.6.5",
