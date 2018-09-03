@@ -9,25 +9,28 @@
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="$props.label"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
+      :input="input"
       @autocomplete="input = $event"
       @input-focus="activateDropDown()"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
-      <div
-        v-for="(entry,index) in selectedListInt"
-        :key="index"
-        class="base-chips-input-chip">
-        <div class="base-chips-input-chip-text">
-          {{ entry[objectProp] }}
-        </div>
+      <template v-if="allowMultipleEntries">
         <div
-          class="base-chips-input-chip-icon"
-          @click="removeEntry(entry, index)">
-          <img
-            class="base-chips-input-chip-icon-img"
-            src="../static/icons/remove.svg">
+          v-for="(entry,index) in selectedListInt"
+          :key="index"
+          class="base-chips-input-chip">
+          <div class="base-chips-input-chip-text">
+            {{ entry[objectProp] }}
+          </div>
+          <div
+            class="base-chips-input-chip-icon"
+            @click="removeEntry(entry, index)">
+            <img
+              class="base-chips-input-chip-icon-img"
+              src="../static/icons/remove.svg">
+          </div>
         </div>
-      </div>
+      </template>
     </base-input>
 
     <!-- DROP DOWN MENU -->
@@ -136,15 +139,7 @@ export default {
       // the current text input
       input: null,
       // list of selected entries
-      selectedListInt: this.$props.selectedList.map((entry) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: null,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
-      }),
+      selectedListInt: [],
       // create a original list from text or object with internal id
       dropDownListOrig: [],
       // list of selectable entries received from parent component
@@ -191,6 +186,10 @@ export default {
         }
         return Object.assign({}, { idInt: null, [this.objectProp]: entry });
       });
+      if (!this.allowMultipleEntries) {
+        this.input = this.selectedListInt && this.selectedListInt.length
+          ? this.selectedListInt[0][this.objectProp] : '';
+      }
     },
     list(val) {
       this.dropDownListInt = val.map((entry, index) => {
@@ -205,6 +204,15 @@ export default {
     },
   },
   mounted() {
+    this.selectedListInt = this.$props.selectedList.map((entry) => {
+      if (typeof entry === 'object') {
+        return Object.assign({}, entry, {
+          idInt: null,
+          [this.objectProp]: entry[this.objectProp],
+        });
+      }
+      return Object.assign({}, { idInt: null, [this.objectProp]: entry });
+    });
     if (!this.allowDynamicDropDownEntries) {
       this.dropDownListOrig = this.$props.list
         .map((entry, index) => {
@@ -233,17 +241,17 @@ export default {
           // this adds the entry who's index is currently set
           // TODO: this needs to be different for unknown entries allowed!
           this.selectedListInt.push(selected);
+          // reset input
+          this.input = '';
         } else {
           this.selectedListInt = [selected];
           this.showDropDown = false;
+          this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
         }
-        // reset input
-        this.input = null;
-        // reset the child input variable
-        this.$refs.baseInput.$data.input = null;
         if (!this.allowDynamicDropDownEntries) {
           // filter the selected entry from the list of drop down menu entries
           this.dropDownListInt = this.dropDownListOrig;
+          this.input = selected[this.objectProp];
         }
         this.selectedMenuEntryIndex = 0;
         this.$emit('selected', selected);
@@ -301,15 +309,6 @@ export default {
       max-width: calc(100% - #{$spacing-small});
       display: flex;
       align-items: center;
-
-      &::after {
-        content: '';
-        height: 100%;
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: linear-gradient(to right, transparent , white);
-      }
 
       .base-chips-input-chip-text {
         padding-right: $spacing-small;

@@ -12,17 +12,17 @@
       <slot
         v-if="type === 'text'" />
       <input
-        v-if="type === 'text' && !hideInputField"
+        v-if="type === 'text'"
         :id="label"
         :title="label"
         :placeholder="placeholder"
-        v-model="input"
+        v-model="inputInt"
         type="text"
         class="base-input-field"
         @focus="$emit('input-focus')"
-        @keyup.enter="$emit('enter', input)"
+        @keyup.enter="$emit('enter', inputInt)"
         @keyup.up.down="$emit('arrow-key', $event)"
-        @keyup="$emit('autocomplete', input)"
+        @keyup="$emit('autocomplete', inputInt)"
         @blur="blurInput()"
         @click="active = true">
 
@@ -31,7 +31,7 @@
         :id="label"
         :title="label"
         :placeholder="placeholder"
-        v-model="input"
+        v-model="inputInt"
         type="text"
         class="base-input-field"
         @focus="$emit('inputFocus')"
@@ -52,6 +52,10 @@ export default {
         return (val === 'text' || val === 'date');
       },
     },
+    input: {
+      type: String,
+      default: '',
+    },
     label: {
       type: String,
       default: '',
@@ -67,14 +71,22 @@ export default {
   },
   data() {
     return {
-      input: null,
+      inputInt: '',
       active: false,
     };
+  },
+  watch: {
+    input(val) {
+      this.inputInt = val;
+    },
+  },
+  mounted() {
+    this.inputInt = this.$props.input;
   },
   methods: {
     blurInput() {
       this.active = false;
-      this.$emit('input-blur', this.input);
+      this.$emit('input-blur', this.inputInt);
     },
   },
 };
@@ -90,6 +102,7 @@ export default {
     width: 100%;
 
     .base-input-field-container {
+      position: relative;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -98,6 +111,16 @@ export default {
       min-height: $row-height-small;
       border: 1px solid rgb(200, 200, 200);
       background: white;
+
+      &::after {
+        content: '';
+        height: $line-height;
+        width: 30px;
+        position: absolute;
+        top: 4px;
+        right: $spacing;
+        background: linear-gradient(to right, transparent , white);
+      }
     }
 
     .base-input-field-container-active {
