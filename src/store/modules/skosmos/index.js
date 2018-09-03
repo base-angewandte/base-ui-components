@@ -1,13 +1,13 @@
-import * as api from './api';
+import * as api from './skosmos_api';
 
-api.setDomain('https://wksgoose.hephaistos.arz.oeaw.ac.at/api/v1');
+api.setDomain('https://voc.uni-ak.ac.at/skosmos/');
 
 
 const state = {
   apilib: api,
   loading: false,
   loadmsg: '',
-  schemas: {},
+  vocabs: {},
 };
 
 const $config = {
@@ -20,7 +20,7 @@ const $config = {
 const getters = {
   availableEndpoints: s => s.apilib.keys,
   f: s => name => s.apilib[name],
-  schema: s => name => s.schemas[name],
+  vocab: s => name => s.vocabs[name],
   types: s => s.schemas.keys,
 };
 
@@ -36,9 +36,9 @@ const mutations = {
     s.loading = false;
     s.loadmsg = '';
   },
-  setSchema(s, { type, attributes }) {
-    if (type && attributes) {
-      s.schemas[type] = attributes;
+  setVocab(s, { uri, id }) {
+    if (uri && id) {
+      s.vocabs[id] = uri;
     }
   },
 };
@@ -46,65 +46,23 @@ const mutations = {
 const actions = {
   init({ state, commit }) {
     commit('setLoading', 'Loading Database Configuration.');
-    state.apilib.get( { $config } ).then((res) => {
-      if (res.data.data && res.data.data.length > 0) {
-        const sa = res.data.data;
+    state.apilib.getVocabularies( { $config } ).then((res) => {
+      if (res.data.vocabularies && res.data.vocabularies.length > 0) {
+        const sa = res.data.vocabularies;
         for (let i = 0; i < sa.length; i++) {
-          commit('setSchema', sa[i]);
+          commit('setVocab', sa[i]);
         }
         commit('setLoadingFinished');
       }
     });
   },
-  get({ state, commit }, { type, id, sort, skip, limit, query, populate }) {
+  getSearch({ state, commit }, { query, lang, vocab, type, parent, group, maxhits, offset, unique }) {
     let p = {};
     let t = type.charAt(0).toUpperCase() + type.slice(1);
     return new Promise((resolve, reject) => {
-      if (type && id) {
+      if (query) {
         commit('setLoading', `Getting ${type} ${id} from Database`);
-        p = state.apilib[`get${t}ById`]({ id, $config });
-      } else if (type && !id) {
-        commit('setLoading', `Getting Queryset of ${type} from Database`);
-        p = state.apilib[`get${t}`]({ sort, skip, limit, query, populate, $config });
-      } else reject('Invalid or Insufficient Parameters');
-      p.then((res) => {
-        commit('setLoadingFinished');
-        resolve(res);
-      })
-      .catch((error) => {
-        commit('setLoadingFinished');
-        reject(error);
-      });
-    });
-  },
-  post({ state, commit }, { type, id, body }) {
-    let p = {};
-    let t = type.charAt(0).toUpperCase() + type.slice(1);
-    return new Promise((resolve, reject) => {
-      if (type && id) {
-        commit('setLoading', `Updating ${type} ${id} to Database`);
-        p = state.apilib[`post${t}ByID`]({ id, [type]: body, $config });
-      } else if (type && !id) {
-        commit('setLoading', `Creating a ${type} in Database`);
-        p = state.apilib[`post${t}`]({ [type]: body, $config });
-      } else reject('Invalid or Insufficient Parameters');
-      p.then((res) => {
-        commit('setLoadingFinished');
-        resolve(res);
-      })
-      .catch((error) => {
-        commit('setLoadingFinished');
-        reject(error);
-      });
-    });
-  },
-  delete({ state, commit }, { type, id }) {
-    let p = {};
-    let t = type.charAt(0).toUpperCase() + type.slice(1);
-    return new Promise((resolve, reject) => {
-      if (type && id) {
-        commit('setLoading', `Deleting ${type} ${id} in Database`);
-        p = state.apilib[`delete${t}ByID`]({ id });
+        p = state.apilib.getSearch({query, lang, vocab, type, parent, group, maxhits, offset, unique, $config });
       } else reject('Invalid or Insufficient Parameters');
       p.then((res) => {
         commit('setLoadingFinished');
