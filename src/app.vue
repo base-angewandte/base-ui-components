@@ -2,10 +2,18 @@
   <div id="app">
     <div class="canvas">
       <base-multiline-text-input
+        v-model="multiline"
         :label="'Label'"
         :placeholder="'Enter Text'"
         :tabs="['German', 'English']"
-        :active-tab="'English'"/>
+        :active-tab="langTab"
+        @tabSwitch="tabSwitched"/>
+      <base-button
+        :active="false"
+        icon="sheet-plus"
+        icon-size="large"
+        button-style="row"
+        @clicked="changeInput()"/>
     </div>
     <div class="canvas">
       <base-button
@@ -258,6 +266,18 @@ export default {
       showPopUp: false,
       files: [],
       elements: [],
+      multilineInput: 'test',
+      multilineInputObj: [
+        {
+          lang: 'English',
+          value: 'testeng',
+        },
+        {
+          lang: 'German',
+          value: 'testger',
+        },
+      ],
+      langTab: 'English',
       list: [
         {
           id: '1',
@@ -293,6 +313,11 @@ export default {
       ],
     };
   },
+  computed: {
+    multiline() {
+      return this.langTab === 'English' ? this.multilineInputObj[0].value : this.multilineInputObj[1].value;
+    },
+  },
   methods: {
     triggerInput(val) {
       console.log(val);
@@ -301,6 +326,8 @@ export default {
       const index = Math.floor((Math.random() * 10) + 1);
       this.chipsInput = ['test1', 'test2', 'test3', 'test4', 'test5',
         'test6', 'test7', 'test8', 'test9', 'test10'].splice(index, 2);
+      this.multilineInput = ['test1', 'test2', 'test3', 'test4', 'test5',
+        'test6', 'test7', 'test8', 'test9', 'test10'].splice(index, 1);
     },
     boxClicked() {
       console.log('clicked');
@@ -340,6 +367,9 @@ export default {
         });
         this.dropDownInput = result.data;
       }
+    },
+    tabSwitched(val) {
+      this.langTab = val;
     },
   },
 };

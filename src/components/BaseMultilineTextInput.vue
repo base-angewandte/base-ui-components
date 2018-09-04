@@ -31,33 +31,60 @@
 </template>
 
 <script>
+/**
+ * A multiline textfield base component
+ */
 export default {
+  model: {
+    prop: 'input',
+    event: 'textInput',
+  },
   props: {
+    /**
+     * @model
+     */
     input: {
-      type: String,
+      type: [Number, String],
       default: '',
     },
+    /**
+     * set the label for the input component
+     */
     label: {
       type: String,
       default: '',
     },
+    /**
+     * set true if label should be visible
+     */
     showLabel: {
       type: Boolean,
       default: true,
     },
+    /**
+     * set input field placeholder
+     */
     placeholder: {
       type: String,
-      default: 'Enter Text Here',
+      default: '',
     },
+    /**
+     * set tabs for the input field
+     */
     tabs: {
       type: Array,
       default() {
         return [];
       },
     },
+    /**
+     * set the currently active tab
+     */
     activeTab: {
       type: String,
-      default: null,
+      default() {
+        return this.$props.tabs && this.$props.tabs.length ? this.$props.tabs[0] : null;
+      },
     },
   },
   data() {
@@ -74,16 +101,24 @@ export default {
       this.inputInt = val;
     },
     activeTab(val) {
-      this.activeTabIndex = this.$props.tabs.indexOf(val);
+      const tabIndex = this.$props.tabs.indexOf(val);
+      this.activeTabIndex = tabIndex === -1 ? 0 : tabIndex;
     },
   },
   mounted() {
     this.inputInt = this.$props.input;
-    this.activeTabIndex = this.$props.tabs.indexOf(this.$props.activeTab);
+    const tabIndex = this.$props.tabs.indexOf(this.$props.activeTab);
+    this.activeTabIndex = tabIndex === -1 ? 0 : tabIndex;
   },
   methods: {
     tabTrigger(val, index) {
       this.activeTabIndex = index;
+      /**
+       * Tab click event
+       *
+       * @event tabSwitch
+       * @type String
+       */
       this.$emit('tabSwitch', val);
     },
   },
