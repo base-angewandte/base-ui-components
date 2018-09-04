@@ -1,23 +1,25 @@
 <template>
   <div
-    class="base-checkbox-container"
-    @click="$emit('clicked', selectedPar)">
+    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
+    @click="$emit('clicked', selectedInt)">
     <label
       :for="label"
       class="hide">Select Menu Entry {{ label }}</label>
     <input
-      v-model="selectedPar"
+      v-model="selectedInt"
       :name="label"
       :value="label"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
       class="base-checkbox">
     <div
-      :class="{'base-radiomark': markStyle === 'radio' && selectedPar }"
-      class="base-checkmark-container">
+      :class="[
+        'base-checkmark-container',
+        'base-checkmark-container-' + checkBoxSize,
+        {'base-radiomark': markStyle === 'radio' && selectedInt }]">
       <svg-icon
-        v-if="markStyle === 'checkbox' && selectedPar"
-        name="check-mark"
-        class="base-checkmark"/>
+        v-if="markStyle === 'checkbox' && selectedInt"
+        :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
+        name="check-mark"/>
 
     </div>
   </div>
@@ -46,20 +48,22 @@ export default {
       type: Boolean,
       default: false,
     },
+    checkBoxSize: {
+      type: String,
+      default: 'small',
+      validator(val) {
+        return val === 'small' || val === 'large';
+      },
+    },
   },
   data() {
     return {
       selectedInt: this.$props.selected,
     };
   },
-  computed: {
-    selectedPar: {
-      get() {
-        return this.$props.selected || (this.$props.selected && this.selectedInt);
-      },
-      set(val) {
-        this.selectedInt = val;
-      },
+  watch: {
+    selected(val) {
+      this.selectedInt = val;
     },
   },
 };
@@ -70,12 +74,20 @@ export default {
 
   .base-checkbox-container {
     position: relative;
-    width: 16px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    margin-right: 16px;
+    margin-right: $spacing;
+
+    .base-checkbox-container-small {
+      width: $spacing-small*2;
+    }
+
+    .base-checkbox-container-large {
+      width: $spacing*2;
+    }
+
 
     &:hover input ~ .base-checkmark-container {
       border: 1.5px solid $app-color;
@@ -95,22 +107,39 @@ export default {
     }
 
     .base-checkmark-container {
-      height: 16px;
-      width: 16px;
-      border: 1px solid black;
-      border-radius: 8px;
 
       .base-checkmark {
-        height: 8px;
-        width: 8px;
         position: absolute;
-        top: 4px;
-        left: 4px;
         opacity: 1;
       }
+    }
 
-      &:after {
+    .base-checkmark-container-small {
+      border: 1px solid black;
+      height: $spacing-small*2;
+      width: $spacing-small*2;
+      border-radius: $spacing-small;
 
+      .base-checkmark-small {
+        height: $spacing-small;
+        width: $spacing-small;
+        top: $spacing-small/2;
+        left: $spacing-small/2;
+      }
+    }
+
+    .base-checkmark-container-large {
+      border: 2px solid white;
+      height: $spacing*2;
+      width: $spacing*2;
+      border-radius: $spacing;
+
+      .base-checkmark-large {
+        height: $spacing;
+        width: $spacing;
+        top: $spacing/2;
+        left: $spacing/2;
+        color: white;
       }
     }
 
