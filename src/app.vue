@@ -1,6 +1,13 @@
 <template>
   <div id="app">
     <div class="canvas">
+      <base-multiline-text-input
+        :label="'Label'"
+        :placeholder="'Enter Text'"
+        :tabs="['German', 'English']"
+        :active-tab="'English'"/>
+    </div>
+    <div class="canvas">
       <base-button
         :active="false"
         icon="sheet-plus"
@@ -218,10 +225,12 @@ import BaseMenuList from './components/BaseMenuList';
 import BaseMenuTableRow from './components/BaseMenuTableRow';
 import BaseChipsInput from './components/BaseChipsInput';
 import BaseSearch from './components/BaseSearch';
+import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 
 export default {
   name: 'App',
   components: {
+    BaseMultilineTextInput,
     BaseSearch,
     BaseChipsInput,
     BaseMenuList,
@@ -329,7 +338,6 @@ export default {
               string,
             },
         });
-        debugger;
         this.dropDownInput = result.data;
       }
     },

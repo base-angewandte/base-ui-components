@@ -1,7 +1,7 @@
 <template>
   <div class="base-input">
     <label
-      :class="{ 'hide': !label }"
+      :class="{ 'hide': !showLabel }"
       :for="label"
       class="base-input-label">
       {{ label }}
@@ -60,6 +60,10 @@ export default {
       type: String,
       default: '',
     },
+    showLabel: {
+      type: Boolean,
+      default: true,
+    },
     placeholder: {
       type: String,
       default: 'Enter Text Here',
@@ -109,7 +113,7 @@ export default {
       margin-bottom: $spacing;
       padding-left: $spacing-small;
       min-height: $row-height-small;
-      border: 1px solid rgb(200, 200, 200);
+      border: $input-field-border;
       background: white;
 
       &::after {
@@ -152,10 +156,5 @@ export default {
 
   input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
     outline: none;
-    /** box-shadow: inset -2px 1px 4px 0 rgba(0,0,0,0.2); **/
-  }
-
-  input::placeholder {
-    color: $font-color-third;
   }
 </style>
