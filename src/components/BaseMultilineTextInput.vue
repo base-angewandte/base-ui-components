@@ -26,7 +26,7 @@
       v-model="inputInt"
       rows="10"
       class="base-multiline-text-input-textarea"
-      @keyup="$emit('textInput', { val: inputInt, tab: tab })" />
+      @keyup="$emit('textInput', { val: inputInt, tab: activeTab })" />
   </div>
 </template>
 
