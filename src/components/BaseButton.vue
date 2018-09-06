@@ -69,12 +69,13 @@ export default {
   @import "../styles/variables.scss";
 
   .base-button {
-    padding: 4px #{$spacing};
+    padding: calc(#{$spacing-small}/2 + 3px) #{$spacing} calc(#{$spacing-small}/2);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-bottom: 3px solid transparent;
 
     .base-button-icon {
       margin-right: $spacing;
@@ -124,6 +125,7 @@ export default {
       border-bottom: 3px solid #{$app-color};
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg;
+      z-index: 1;
     }
 
     &:hover {

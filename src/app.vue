@@ -1,5 +1,43 @@
 <template>
   <div id="app">
+    <div class="form-field">
+      <base-upload-bar
+        :progress="progress"
+        :filename="'testfile.jpg'"/>
+      <base-button
+        :active="false"
+        :text="'Change Progress'"
+        icon-size="large"
+        button-style="row"
+        @clicked="changeProgress"/>
+    </div>
+    <div class="canvas flex">
+      <base-image-box
+        :selectable="selectable"
+        :show-title="false"
+        :image-url="require('./static/images/icons.png')"
+        description="Bildserie"
+        title="Afterlife II Ausstellungsansichten"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/icons.png')"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-button
+        :active="false"
+        :text="'Activate Select'"
+        icon-size="large"
+        button-style="row"
+        @clicked="enableSelect()"/>
+    </div>
     <div class="canvas">
       <base-multiline-text-input
         v-model="multiline"
@@ -234,10 +272,14 @@ import BaseMenuTableRow from './components/BaseMenuTableRow';
 import BaseChipsInput from './components/BaseChipsInput';
 import BaseSearch from './components/BaseSearch';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput';
+import BaseImageBox from './components/BaseImageBox';
+import BaseUploadBar from './components/BaseUploadBar';
 
 export default {
   name: 'App',
   components: {
+    BaseUploadBar,
+    BaseImageBox,
     BaseMultilineTextInput,
     BaseSearch,
     BaseChipsInput,
@@ -267,6 +309,8 @@ export default {
       files: [],
       elements: [],
       multilineInput: 'test',
+      selectable: false,
+      progress: 0,
       multilineInputObj: [
         {
           lang: 'English',
@@ -314,11 +358,30 @@ export default {
     };
   },
   computed: {
-    multiline() {
-      return this.langTab === 'English' ? this.multilineInputObj[0].value : this.multilineInputObj[1].value;
+    multiline: {
+      get() {
+        return this.langTab === 'English' ? this.multilineInputObj[0].value : this.multilineInputObj[1].value;
+      },
+      set(event) {
+        if (event.tab === 'English') {
+          this.$set(this.multilineInputObj[0], 'value', event.val);
+        } else {
+          this.$set(this.multilineInputObj[1], 'value', event.val);
+        }
+      },
     },
   },
   methods: {
+    changeProgress() {
+      if (this.progress <= 75) {
+        this.progress += 25;
+      } else {
+        this.progress = 0;
+      }
+    },
+    enableSelect() {
+      this.selectable = !this.selectable;
+    },
     triggerInput(val) {
       console.log(val);
     },
@@ -405,5 +468,9 @@ export default {
     background-color: white;
     padding: 16px;
     margin-bottom: 32px;
+  }
+
+  .image-box {
+    margin: 8px;
   }
 </style>

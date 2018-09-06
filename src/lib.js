@@ -4,6 +4,8 @@ import BaseButton from './components/BaseButton';
 import BaseBoxButton from './components/BaseBoxButton';
 import BaseInput from './components/BaseInput';
 import BaseChipsInput from './components/BaseChipsInput';
+import BaseSearch from './components/BaseSearch';
+import BaseMenuList from './components/BaseMenuList';
 import './styles/lib.scss';
 
 export {
@@ -13,4 +15,6 @@ export {
   BaseBoxButton,
   BaseInput,
   BaseChipsInput,
+  BaseSearch,
+  BaseMenuList,
 };

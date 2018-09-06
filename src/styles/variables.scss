@@ -15,6 +15,7 @@ $drop-shadow: 0px 10px 10px 0px rgba(0,0,0,0.25);
 $pop-up-shadow: 0px 0px 36px 0px rgba(0,0,0,0.5);
 $pop-up-drop-shadow: 0px 46px 46px 0px rgba(0,0,0,0.25);
 $input-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.2);
+$preview-box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.25);
 $box-transition: box-shadow 0.3s ease-in-out;
 $separation-line: 2px solid rgb(240, 240, 240);
 $list-border: 5px solid rgba(76, 175, 80, 1);
@@ -39,6 +40,8 @@ $font-color-third: rgb(160, 160, 160);
 $button-header-color: rgb(240, 240, 240);
 $background-color: #f0f0f0;
 $box-color: white;
+/* self defined for now! */
+$uploadbar-color: #999999;
 
 /* sizing */
 $page-max-width: 1400px;
