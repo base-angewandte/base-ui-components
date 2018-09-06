@@ -50,7 +50,6 @@ export default {
     height: $row-height-small;
     background-color: $button-header-color;
     line-height: $row-height-small;
-    overflow: hidden;
 
     .base-upload-bar-text {
       width: calc(100% - 2*#{$spacing-small});
@@ -66,7 +65,7 @@ export default {
       left: 0;
       z-index: 1;
       height: 100%;
-      background-color: #999999;
+      background-color: $uploadbar-color;
     }
   }
 </style>
