@@ -83,6 +83,7 @@ export default {
 
   .base-drop-box {
     background-color: $background-color !important;
+    display: flex;
 
     &:hover {
       color: inherit !important;

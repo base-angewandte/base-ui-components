@@ -37,7 +37,7 @@
         :selected="isSelected"
         title="checkbox"
         mark-style="checkbox"
-        class="hidden"
+        class="hidden base-menu-entry-checkbox"
         @clicked="selected"/>
       <div
         v-if="isSelectable"
@@ -254,5 +254,9 @@ export default {
   .base-menu-entry-group {
     display: flex;
     align-items: center;
+
+    .base-menu-entry-checkbox {
+      margin-right: $spacing;
+    }
   }
 </style>

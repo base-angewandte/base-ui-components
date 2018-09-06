@@ -35,7 +35,6 @@ export default {
     min-height: 100%;
     position: relative;
     overflow: hidden;
-    display: flex;
 
     &:before {
       content:  '';

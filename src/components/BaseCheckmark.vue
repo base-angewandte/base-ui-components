@@ -78,7 +78,6 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    margin-right: $spacing;
 
     .base-checkbox-container-small {
       width: $spacing-small*2;
@@ -89,11 +88,11 @@ export default {
     }
 
 
-    &:hover input ~ .base-checkmark-container {
+    &:hover input ~ .base-checkmark-container-small {
       border: 1.5px solid $app-color;
     }
 
-    & input:checked ~ .base-checkmark-container {
+    & input:checked ~ .base-checkmark-container-small {
       border-color: $app-color;
     }
 
@@ -107,6 +106,7 @@ export default {
     }
 
     .base-checkmark-container {
+      border-radius: 50%;
 
       .base-checkmark {
         position: absolute;
@@ -118,7 +118,6 @@ export default {
       border: 1px solid black;
       height: $spacing-small*2;
       width: $spacing-small*2;
-      border-radius: $spacing-small;
 
       .base-checkmark-small {
         height: $spacing-small;
@@ -132,7 +131,6 @@ export default {
       border: 2px solid white;
       height: $spacing*2;
       width: $spacing*2;
-      border-radius: $spacing;
 
       .base-checkmark-large {
         height: $spacing;

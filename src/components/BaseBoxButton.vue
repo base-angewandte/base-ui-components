@@ -88,6 +88,7 @@ export default {
   @import "../styles/variables.scss";
 
   .base-box-button {
+    display: flex;
 
     &:hover {
       color: $app-color;
