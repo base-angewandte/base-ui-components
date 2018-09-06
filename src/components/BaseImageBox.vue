@@ -42,7 +42,9 @@ export default {
   },
   props: {
     /**
-     * The title of the item in question, also used as img alt text (atm)
+     * The title of the item in question, also used as img alt text
+     * (atm - TODO: should there be a separate alt text (then again - what would that be since
+     * file uploads dont have any properties)?)
      */
     title: {
       type: String,
@@ -151,7 +153,7 @@ export default {
       text-overflow: ellipsis;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
-      line-height: $line-height;          /* fallback */
+      line-height: $line-height;
       flex-shrink: 0;
       height: $line-height * 2;
     }
