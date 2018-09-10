@@ -91,7 +91,7 @@ export default {
 
   .popup-box {
     box-shadow: $pop-up-shadow;
-    position: absolute;
+    position: fixed;
     top: 20vh;
     left: 25%;
     z-index: 100;
