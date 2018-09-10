@@ -176,6 +176,7 @@ export default {
       max-height: $icon-large;
       width: $icon-large;
       margin-left: 16px;
+      flex: 0 0 #{$icon-large};
     }
 
     .base-menu-entry-title {
@@ -207,7 +208,7 @@ export default {
 
       &::after {
         content: '';
-        width: 10px;
+        width: 30px;
         height: 100%;
         position: absolute;
         top: 0;
