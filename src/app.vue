@@ -66,13 +66,15 @@
         @input="triggerInput"/>
     </div>
     <div class="form-field">
-      <base-input />
+      <base-input :label="'unknown'"/>
       <base-chips-input
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
         :selected-list="chipsInput"
         :allow-multiple-entries="true"
         :allow-dynamic-drop-down-entries="true"
+        :object-prop="'title'"
+        label="A label"
         @fetchDropDownEntries="fetch"/>
       <base-button
         text="change input"
@@ -91,6 +93,7 @@
           { title: 'ein verlassenes, ein verächtliches' },
           { title: 'Wesen ist' }]"
         :placeholder="'Select your Marx'"
+        :object-prop="'title'"
         :label="'single choice with special drop down body'"
         :allow-multiple-entries="false">
         <template
@@ -421,11 +424,11 @@ export default {
       }
     },
     async fetch(string) {
-      if (!string || string.length > 3) {
-        const result = await axios.get('http://localhost:9900/fetchAutocomplete/title', {
+      if (!string.value || string.value.length > 3) {
+        const result = await axios.get('http://localhost:9900/fetch', {
           params:
             {
-              string,
+              string: string.value,
             },
         });
         this.dropDownInput = result.data;

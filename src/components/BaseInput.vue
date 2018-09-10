@@ -10,8 +10,8 @@
       :class="['base-input-field-container',
                { 'base-input-field-container-active': active },
                { 'base-input-field-show': !$props.hideInputField }]">
-      <slot
-        v-if="type === 'text'" />
+      <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
+      <slot />
       <!--
         @event input-focus
         @event arrow-key

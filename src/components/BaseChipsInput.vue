@@ -9,8 +9,7 @@
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="$props.label"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
-      :input="input"
-      @autocomplete="input = $event"
+      v-model="input"
       @input-focus="activateDropDown()"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
@@ -229,14 +228,14 @@ export default {
     },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
+      // reset input
+      this.input = '';
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
           // TODO: this needs to be different for unknown entries allowed!
           this.selectedListInt.push(selected);
-          // reset input
-          this.input = '';
         } else {
           this.selectedListInt = [selected];
           this.showDropDown = false;
@@ -254,7 +253,7 @@ export default {
     removeEntry(item, index) {
       if (!this.allowDynamicDropDownEntries) {
         // check if the item id was set
-        if (!item.intId) {
+        if (!item.idInt) {
           this.dropDownListInt = [];
         }
         this.dropDownListInt.push(item);
