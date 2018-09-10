@@ -14,23 +14,21 @@
       @input-focus="activateDropDown()"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
-      <template v-if="allowMultipleEntries">
-        <div
-          v-for="(entry,index) in selectedListInt"
-          :key="index"
-          class="base-chips-input-chip">
-          <div class="base-chips-input-chip-text">
-            {{ entry[objectProp] }}
-          </div>
-          <div
-            class="base-chips-input-chip-icon"
-            @click="removeEntry(entry, index)">
-            <img
-              class="base-chips-input-chip-icon-img"
-              src="../static/icons/remove.svg">
-          </div>
+      <div
+        v-for="(entry,index) in selectedListInt"
+        :key="index"
+        class="base-chips-input-chip">
+        <div class="base-chips-input-chip-text">
+          {{ entry[objectProp] }}
         </div>
-      </template>
+        <div
+          class="base-chips-input-chip-icon"
+          @click="removeEntry(entry, index)">
+          <img
+            class="base-chips-input-chip-icon-img"
+            src="../static/icons/remove.svg">
+        </div>
+      </div>
     </base-input>
 
     <!-- DROP DOWN MENU -->
@@ -186,10 +184,6 @@ export default {
         }
         return Object.assign({}, { idInt: null, [this.objectProp]: entry });
       });
-      if (!this.allowMultipleEntries) {
-        this.input = this.selectedListInt && this.selectedListInt.length
-          ? this.selectedListInt[0][this.objectProp] : '';
-      }
     },
     list(val) {
       this.dropDownListInt = val.map((entry, index) => {
@@ -251,7 +245,6 @@ export default {
         if (!this.allowDynamicDropDownEntries) {
           // filter the selected entry from the list of drop down menu entries
           this.dropDownListInt = this.dropDownListOrig;
-          this.input = selected[this.objectProp];
         }
         this.selectedMenuEntryIndex = 0;
         this.$emit('selected', selected);

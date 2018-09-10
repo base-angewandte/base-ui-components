@@ -7,12 +7,13 @@
       {{ label }}
     </label>
     <div
-      :class="{ 'base-input-field-container-active': active }"
-      class="base-input-field-container">
+      :class="['base-input-field-container',
+               { 'base-input-field-container-active': active },
+               { 'base-input-field-show': !$props.hideInputField }]">
       <slot
         v-if="type === 'text'" />
       <input
-        v-if="type === 'text'"
+        v-if="type === 'text' && !hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
@@ -115,20 +116,20 @@ export default {
       min-height: $row-height-small;
       border: $input-field-border;
       background: white;
-
-      &::after {
-        content: '';
-        height: $line-height;
-        width: 30px;
-        position: absolute;
-        top: 4px;
-        right: $spacing;
-        background: linear-gradient(to right, transparent , white);
-      }
     }
 
     .base-input-field-container-active {
       box-shadow: $input-shadow;
+    }
+
+    &.base-input-field-show::after {
+      content: '';
+      height: $line-height;
+      width: 30px;
+      position: absolute;
+      bottom: 4px;
+      right: $spacing;
+      background: linear-gradient(to right, transparent , white);
     }
 
     .base-input-field {
