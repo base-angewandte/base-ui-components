@@ -10,7 +10,7 @@
       :label="$props.label"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       v-model="input"
-      @input-focus="activateDropDown()"
+      @input-focus="showDropDown = true"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
       <div
@@ -195,6 +195,13 @@ export default {
         return Object.assign({}, { idInt: index, [this.objectProp]: entry });
       });
     },
+    showDropDown(val) {
+      if (val) {
+        this.selectedMenuEntryIndex = 0;
+        // TODO: prevent jumping around (scrolling to top)
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+      }
+    },
   },
   mounted() {
     this.selectedListInt = this.$props.selectedList.map((entry) => {
@@ -221,11 +228,6 @@ export default {
     }
   },
   methods: {
-    // open drop down menu and set the currently selected entry (the first one per default)
-    activateDropDown() {
-      this.selectedMenuEntryIndex = 0;
-      this.showDropDown = true;
-    },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
       // reset input

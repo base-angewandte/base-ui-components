@@ -8,8 +8,7 @@
     </label>
     <div
       :class="['base-input-field-container',
-               { 'base-input-field-container-active': active },
-               { 'base-input-field-show': !$props.hideInputField }]">
+               { 'base-input-field-container-active': active }]">
       <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
       <slot />
       <!--
@@ -18,13 +17,13 @@
         @event autocomplete
       -->
       <input
-        v-if="type === 'text' && !hideInputField"
+        v-if="type === 'text'"
         :id="label"
         :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
+        :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
         type="text"
-        class="base-input-field"
         @focus="$emit('input-focus')"
         @keypress.enter="$emit('enter', inputInt)"
         @keyup.up.down.prevent="$emit('arrow-key', $event)"
@@ -173,6 +172,12 @@ export default {
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;
+
+      &.base-input-field-hidden {
+        position: absolute;
+        top: -99999px;
+        right: -99999px;
+      }
     }
 
     .base-input-label {
