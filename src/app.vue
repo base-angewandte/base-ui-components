@@ -74,6 +74,7 @@
         :allow-multiple-entries="true"
         :allow-dynamic-drop-down-entries="true"
         :object-prop="'title'"
+        :chips-inline="false"
         label="A label"
         @fetchDropDownEntries="fetch"/>
       <base-button

@@ -13,18 +13,19 @@
       @input-focus="showDropDown = true"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
-      <template v-if="chipsInline">
+      <template v-if="!allowMultipleEntries || chipsInline">
         <div
           v-click-outside="() => entry.editable = false"
           v-for="(entry,index) in selectedListInt"
           :key="index"
-          :class="['base-chips-input-chip', { 'base-chips-input-chip-edited': entry.edited }]">
+          :class="['base-chips-input-chip-inline',
+                   { 'base-chips-input-chip-edited': entry.edited }]">
           <div
             :contenteditable="entry.editable"
             class="base-chips-input-chip-text"
             @click="$set(entry, 'editable', true)"
             @keypress="entry.edited = true">
-            {{ entry.edited + entry[objectProp] }}
+            {{ entry[objectProp] }}
           </div>
           <div
             class="base-chips-input-chip-icon"
@@ -70,8 +71,32 @@
       </slot>
 
     </div>
-  </div>
 
+    <div
+      v-if="!chipsInline && selectedListInt.length"
+      class="base-chips-input-chips-container">
+      <div
+        v-click-outside="() => entry.editable = false"
+        v-for="(entry,index) in selectedListInt"
+        :key="index"
+        :class="['base-chips-input-chip', { 'base-chips-input-chip-edited': entry.edited }]">
+        <div
+          :contenteditable="entry.editable"
+          class="base-chips-input-chip-text"
+          @click="$set(entry, 'editable', true)"
+          @keypress="entry.edited = true">
+          {{ entry[objectProp] }}
+        </div>
+        <div
+          class="base-chips-input-chip-icon"
+          @click="removeEntry(entry, index)">
+          <img
+            class="base-chips-input-chip-icon-img"
+            src="../static/icons/remove.svg">
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -265,8 +290,6 @@ export default {
           this.selectedListInt.push(selected);
         } else {
           this.selectedListInt = [selected];
-          this.showDropDown = false;
-          this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
         }
         if (!this.allowDynamicDropDownEntries) {
           // filter the selected entry from the list of drop down menu entries
@@ -274,6 +297,10 @@ export default {
         }
         this.selectedMenuEntryIndex = 0;
         this.$emit('selected', selected);
+        if (!this.allowMultipleEntries || !this.chipsInline) {
+          this.showDropDown = false;
+          this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
+        }
       }
     },
     // remove an entry from the list of selected entries
@@ -303,10 +330,6 @@ export default {
           ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
       }
     },
-    // with directive this can not be done inline
-    hide() {
-      this.showDropDown = false;
-    },
   },
 };
 </script>
@@ -319,7 +342,7 @@ export default {
     width: 100%;
     text-align: left;
 
-    .base-chips-input-chip {
+    .base-chips-input-chip, .base-chips-input-chip-inline {
       margin: 4px $spacing-small 4px 0;
       padding-left: $spacing-small;
       flex: 0 0 auto;
@@ -328,7 +351,6 @@ export default {
       max-width: calc(100% - #{$spacing-small});
       display: flex;
       align-items: center;
-
 
       &.base-chips-input-chip-edited {
         background-color: transparent;
@@ -380,6 +402,16 @@ export default {
         .base-chips-drop-down-entry-remark {
           float: right;
         }
+      }
+    }
+
+    .base-chips-input-chips-container {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: $spacing;
+
+      .base-chips-input-chip {
+        align-self: start;
       }
     }
   }
