@@ -1,6 +1,6 @@
 <template>
   <div
-    v-click-outside="hide"
+    v-click-outside="() => showDropDown = false"
     class="base-chips-input">
 
     <!-- INPUT LABEL AND FIELD -->
@@ -13,21 +13,28 @@
       @input-focus="showDropDown = true"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
-      <div
-        v-for="(entry,index) in selectedListInt"
-        :key="index"
-        class="base-chips-input-chip">
-        <div class="base-chips-input-chip-text">
-          {{ entry[objectProp] }}
-        </div>
+      <template v-if="chipsInline">
         <div
-          class="base-chips-input-chip-icon"
-          @click="removeEntry(entry, index)">
-          <img
-            class="base-chips-input-chip-icon-img"
-            src="../static/icons/remove.svg">
+          v-click-outside="() => entry.editable = false"
+          v-for="(entry,index) in selectedListInt"
+          :key="index"
+          :class="['base-chips-input-chip', { 'base-chips-input-chip-edited': entry.edited }]">
+          <div
+            :contenteditable="entry.editable"
+            class="base-chips-input-chip-text"
+            @click="$set(entry, 'editable', true)"
+            @keypress="entry.edited = true">
+            {{ entry.edited + entry[objectProp] }}
+          </div>
+          <div
+            class="base-chips-input-chip-icon"
+            @click="removeEntry(entry, index)">
+            <img
+              class="base-chips-input-chip-icon-img"
+              src="../static/icons/remove.svg">
+          </div>
         </div>
-      </div>
+      </template>
     </base-input>
 
     <!-- DROP DOWN MENU -->
@@ -128,6 +135,11 @@ export default {
       type: Boolean,
       default: true,
     },
+    // TODO: not implemented yet
+    chipsEditable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -178,6 +190,8 @@ export default {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
             idInt: null,
+            edited: false,
+            editable: false,
             [this.objectProp]: entry[this.objectProp],
           });
         }
@@ -189,10 +203,17 @@ export default {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
             idInt: index,
+            edited: false,
+            editable: false,
             [this.objectProp]: entry[this.objectProp],
           });
         }
-        return Object.assign({}, { idInt: index, [this.objectProp]: entry });
+        return Object.assign({}, {
+          idInt: index,
+          edited: false,
+          editable: false,
+          [this.objectProp]: entry,
+        });
       });
     },
     showDropDown(val) {
@@ -208,6 +229,8 @@ export default {
       if (typeof entry === 'object') {
         return Object.assign({}, entry, {
           idInt: null,
+          editable: false,
+          edited: false,
           [this.objectProp]: entry[this.objectProp],
         });
       }
@@ -219,6 +242,8 @@ export default {
           if (typeof entry === 'object') {
             return Object.assign({}, entry, {
               idInt: index,
+              editable: false,
+              edited: false,
               [this.objectProp]: entry[this.objectProp],
             });
           }
@@ -304,8 +329,20 @@ export default {
       display: flex;
       align-items: center;
 
+
+      &.base-chips-input-chip-edited {
+        background-color: transparent;
+      }
+
       .base-chips-input-chip-text {
-        padding-right: $spacing-small;
+        margin-right: $spacing-small;
+        border: none;
+        background-color: transparent;
+        color: $font-color;
+
+        &:active, &:focus {
+          outline: none;
+        }
       }
 
       .base-chips-input-chip-icon {
