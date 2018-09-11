@@ -15,16 +15,16 @@
       @enter="addSelected($event)">
       <template v-if="!allowMultipleEntries || chipsInline">
         <div
-          v-click-outside="() => entry.editable = false"
+          v-click-outside="() => $set(entry, 'editable', false)"
           v-for="(entry,index) in selectedListInt"
           :key="index"
           :class="['base-chips-input-chip-inline',
                    { 'base-chips-input-chip-edited': entry.edited }]">
           <div
-            :contenteditable="entry.editable"
+            :contenteditable="$props.chipsEditable && entry.editable"
             class="base-chips-input-chip-text"
-            @click="$set(entry, 'editable', true)"
-            @keypress="entry.edited = true">
+            @click="enableEdit(entry)"
+            @keypress="$set(entry, 'edited', true)">
             {{ entry[objectProp] }}
           </div>
           <div
@@ -73,18 +73,19 @@
     </div>
 
     <div
-      v-if="!chipsInline && selectedListInt.length"
+      v-if="$props.allowMultipleEntries && !$props.chipsInline && selectedListInt.length"
       class="base-chips-input-chips-container">
       <div
-        v-click-outside="() => entry.editable = false"
+        v-click-outside="() => $set(entry, 'editable', false)"
         v-for="(entry,index) in selectedListInt"
         :key="index"
-        :class="['base-chips-input-chip', { 'base-chips-input-chip-edited': entry.edited }]">
+        :class="['base-chips-input-chip',
+                 { 'base-chips-input-chip-edited': entry.edited }]">
         <div
-          :contenteditable="entry.editable"
+          :contenteditable="$props.chipsEditable && entry.editable"
           class="base-chips-input-chip-text"
-          @click="$set(entry, 'editable', true)"
-          @keypress="entry.edited = true">
+          @click="enableEdit(entry)"
+          @keypress="$set(entry, 'edited', true)">
           {{ entry[objectProp] }}
         </div>
         <div
@@ -160,7 +161,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    // TODO: not implemented yet
     chipsEditable: {
       type: Boolean,
       default: false,
@@ -330,6 +330,11 @@ export default {
           ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
       }
     },
+    enableEdit(entry) {
+      console.log(entry);
+      this.$set(entry, 'editable', true);
+      console.log(entry);
+    },
   },
 };
 </script>
@@ -412,6 +417,11 @@ export default {
 
       .base-chips-input-chip {
         align-self: start;
+        margin: 0 0 $spacing $spacing-small;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
       }
     }
   }

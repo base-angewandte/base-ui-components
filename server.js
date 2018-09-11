@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const scienceData = require('./data.js').SCIENCE_DATA;
+const gndData = require('./data.js').GND_DATA;
 
 const app = express();
 
@@ -65,6 +66,13 @@ app.get('/fetchAutocomplete/:type', (req, res) => {
   // remove double entries
   resArr = Array.from(new Set(resArr));
   // .reduce((prev, curr) => (prev.includes(curr) ? prev : prev.concat(curr)), []);
+  let gndRes = [];
+  if (type === 'author') {
+    resArr = resArr.map(item => Object.assign({}, { author: item, source: '*' }))
+    gndRes = string ? gndData.filter(item => item.name.toLowerCase().includes(string.toLowerCase()))
+      .map(result => Object.assign({}, { author: result.name, born: result.born, source: '**' })) : [];
+    resArr = gndRes.concat(resArr);
+  }
   res.send(resArr);
 });
 

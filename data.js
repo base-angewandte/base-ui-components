@@ -698,4 +698,43 @@ module.exports = {
       pages: '218-27',
     },
   ],
+  GND_DATA: [
+    {
+      name: 'Holger Daims',
+      born: '1970',
+      publications: [
+        'Population structure and functional analyses by in situ techniques of nitrifying bacteria in wastewater treatment plants',
+      ],
+    },
+    {
+      name: 'Holger Daims',
+      born: '1970',
+      publications: [
+        'Impacts and Importance of Ammonia- and Nitrite Oxidation in the Marine Nitrogen Cycle',
+        'NxrB encoding the beta subunit of nitrite oxidoreductase as functional and phylogenetic marker for nitrite-oxidizing Nitrospira',
+      ],
+    },
+    {
+      name: 'Matthias Horn',
+      born: '1971',
+      publications: [
+        'Molecular ecology of free-living amoebae and their bacterial endosymbionts',
+      ],
+    },
+    {
+      name: 'Alexander Loy a',
+      born: null,
+      publications: [
+        'Distribution and Activity of Anammox and Sulfide-Oxidizing Nitrate-Reducing Bacteria in Oxygen Minimum Zones',
+        'Phylogenetic and environmental diversity of DsrAB-type dissimilatory (bi)sulfite reductases',
+      ],
+    },
+    {
+      name: 'Michael Wagner',
+      born: '1965',
+      publications: [
+        'Die Anwendung von in situ Hybridisierungssonden zur Aufklärung mikrobieller Populationsstrukturen in der Abwasserreinigung',
+      ],
+    },
+  ],
 };

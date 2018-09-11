@@ -17,12 +17,12 @@
         @event autocomplete
       -->
       <input
-        v-if="type === 'text'"
+        v-if="type === 'text' && !hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
-        :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
+        class="base-input-field"
         type="text"
         @focus="$emit('input-focus')"
         @keypress.enter="$emit('enter', inputInt)"
@@ -33,7 +33,7 @@
 
       <!-- TODO: refactor (and test) date input field according to text input above -->
       <input
-        v-else-if="type === 'date'"
+        v-else-if="type === 'date' && !hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
@@ -172,12 +172,6 @@ export default {
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;
-
-      &.base-input-field-hidden {
-        position: absolute;
-        top: -99999px;
-        right: -99999px;
-      }
     }
 
     .base-input-label {
