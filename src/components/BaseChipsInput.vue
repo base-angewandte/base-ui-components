@@ -24,7 +24,7 @@
             :contenteditable="$props.chipsEditable && entry.editable"
             class="base-chips-input-chip-text"
             @click="enableEdit(entry)"
-            @keypress="$set(entry, 'edited', true)">
+            @keyup="$set(entry, 'edited', true)">
             {{ entry[objectProp] }}
           </div>
           <div
@@ -85,7 +85,7 @@
           :contenteditable="$props.chipsEditable && entry.editable"
           class="base-chips-input-chip-text"
           @click="enableEdit(entry)"
-          @keypress="$set(entry, 'edited', true)">
+          @keyup="$set(entry, 'edited', true)">
           {{ entry[objectProp] }}
         </div>
         <div

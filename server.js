@@ -1,9 +1,48 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 const scienceData = require('./data.js').SCIENCE_DATA;
 const gndData = require('./data.js').GND_DATA;
 
 const app = express();
+
+const viafAuto = 'http://www.viaf.org/viaf/AutoSuggest?query=';
+const gndAuto = 'https://lobid.org/gnd/search?format=json:preferredName,dateOfBirth,professionOrOccupation&filter=type:Person&q=';
+const gndFull = 'https://lobid.org/gnd/';
+
+async function getExternalData(string, resource, full=false) {
+  let extRes = [];
+  if (resource === 'gnd') {
+    try {
+      if (full) {
+        extRes = await axios.get(`${gndFull}${string}.json`);
+        extRes = extRes.data;
+        extRes = Object.assign({}, {
+          author: `${extRes.preferredNameEntityForThePerson.forename} ${extRes.preferredNameEntityForThePerson.surname}`,
+          dob: extRes.dateOfBirth,
+          id: extRes.gndIdentifier,
+          source: '**' });
+      } else {
+        extRes = await axios.get(`${gndAuto}${string}`);
+        extRes = extRes.data;
+        extRes = extRes && extRes.length
+          ? extRes.map(result => Object.assign({}, { author: result.label, id: result.id, source: '**' })) : [];
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  } if (resource === 'viaf') {
+    try {
+      extRes = await axios.get(`${viafAuto}${string}`);
+    } catch (e) {
+      console.log(e);
+    }
+    extRes = extRes.data.result;
+    extRes = extRes && extRes.length
+      ? extRes.map(result => Object.assign({}, { author: result.displayForm, source: '**' })) : [];
+  }
+  return extRes;
+}
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -43,13 +82,13 @@ const MARX_DATA = [
 app.get('/fetch', (req, res) => {
   const { string } = req.query;
   const resArr = string ? MARX_DATA
-      .filter(entry => entry.toLowerCase().includes(string.toLowerCase()))
+    .filter(entry => entry.toLowerCase().includes(string.toLowerCase()))
     : MARX_DATA.slice(0, 20);
   res.send(resArr);
 });
 
-app.get('/fetchAutocomplete/:type', (req, res) => {
-  const { string } = req.query;
+app.get('/fetchAutocomplete/:type', async (req, res) => {
+  const { string, resource } = req.query;
   const { type } = req.params;
   let resArr = [];
   if (type === 'title' || type === 'doi') {
@@ -67,13 +106,25 @@ app.get('/fetchAutocomplete/:type', (req, res) => {
   resArr = Array.from(new Set(resArr));
   // .reduce((prev, curr) => (prev.includes(curr) ? prev : prev.concat(curr)), []);
   let gndRes = [];
+  let extResults = [];
   if (type === 'author') {
-    resArr = resArr.map(item => Object.assign({}, { author: item, source: '*' }))
+    if (string) {
+      extResults = await getExternalData(string, resource);
+    }
+    resArr = resArr.map(item => Object.assign({}, { author: item, source: '*' }));
     gndRes = string ? gndData.filter(item => item.name.toLowerCase().includes(string.toLowerCase()))
-      .map(result => Object.assign({}, { author: result.name, born: result.born, source: '**' })) : [];
-    resArr = gndRes.concat(resArr);
+      .map(result => Object.assign({}, { author: result.name, born: result.born, source: '***' })) : [];
+    resArr = gndRes.concat(extResults, resArr);
   }
   res.send(resArr);
+});
+
+app.get('/data/:id', async (req, res) => {
+  let result = [];
+  const { resource } = req.query;
+  const { id } = req.params;
+  result = await getExternalData(id, resource, true);
+  res.send(result);
 });
 
 app.listen(9900, () => console.log('App listening on port 9900!'));
