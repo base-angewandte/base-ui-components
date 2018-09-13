@@ -165,6 +165,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    addSelectedEntryDirectly: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -287,7 +291,10 @@ export default {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
           // TODO: this needs to be different for unknown entries allowed!
-          this.selectedListInt.push(selected);
+          // TODO: also do this for single entries?
+          if (this.addSelectedEntryDirectly) {
+            this.selectedListInt.push(selected);
+          }
         } else {
           this.selectedListInt = [selected];
         }
