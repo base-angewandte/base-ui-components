@@ -1,47 +1,51 @@
 <template>
   <div
     ref="menuEntry"
-    :draggable="isDraggable"
+    :draggable="$props.isDraggable"
     class="base-menu-entry"
-    @click="selectActive ? selected(!isSelected) : $emit('clicked')">
+    @click="$props.selectActive ? selected(!isSelected) : $emit('clicked')">
     <div
       :class="{ 'base-menu-entry-border-active': $props.active }"
       class="base-menu-entry-border" />
     <svg-icon
       ref="entryIcon"
-      :name="icon"
+      :name="$props.icon"
       class="base-menu-entry-icon"/>
-    <div class="base-menu-entry-title">{{ title }}</div>
-    <div class="base-menu-entry-subtext">{{ subtext }}</div>
+    <div
+      v-if="$props.title"
+      class="base-menu-entry-title">{{ title }}</div>
+    <div
+      v-if="$props.subtext"
+      class="base-menu-entry-subtext">{{ subtext }}</div>
 
     <transition-group
       name="slide-fade"
       class="base-menu-entry-group">
       <div
-        :key="id + 'thumbnail'"
+        :key="$props.id + 'thumbnail'"
         class="base-menu-entry-thumbnail-container">
         <svg-icon
-          v-for="tn in thumbnails"
+          v-for="tn in $props.thumbnails"
           :key="tn"
           :name="tn"
           class="base-menu-entry-thumbnail" />
       </div>
       <div
-        :key="id + 'description'"
+        :key="$props.id + 'description'"
         class="base-menu-entry-description">
-        {{ description }}
+        {{ $props.description }}
       </div>
       <base-checkmark
-        v-if="selectActive"
-        :key="id + 'checkmark'"
+        v-if="$props.selectActive"
+        :key="$props.id + 'checkmark'"
         :selected="isSelected"
         title="checkbox"
         mark-style="checkbox"
         class="hidden base-menu-entry-checkbox"
         @clicked="selected"/>
       <div
-        v-if="isSelectable"
-        :key="id + 'checkmark-box'"
+        v-if="$props.isSelectable"
+        :key="$props.id + 'checkmark-box'"
         class="base-menu-checkmark-container" />
     </transition-group>
   </div>
@@ -50,8 +54,6 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 import BaseCheckmark from './BaseCheckmark';
-
-// const imgUrl = require('../static/icons/sheet-empty.svg');
 
 export default {
   components: {
@@ -110,6 +112,7 @@ export default {
   data() {
     return {
       isSelected: false,
+      // TODO: check this variable - seems unused??
       isActive: this.$props.active,
       dragAndDropCapable: true,
     };
@@ -180,12 +183,13 @@ export default {
     }
 
     .base-menu-entry-title {
-      padding: 0 16px;
+      padding-left: 16px;
       margin-right: $spacing;
       flex-shrink: 1;
     }
 
     .base-menu-entry-subtext {
+      padding-left: 16px;
       color: $font-color-second;
       font-size: $font-size-small;
       flex-grow: 2;

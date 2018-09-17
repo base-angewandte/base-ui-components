@@ -77,6 +77,12 @@ export default {
         background-size: $icon-large;
         padding-left: calc(#{$icon-large} + #{$spacing});
       }
+
+      &:active.base-search-input-img, &:focus.base-search-input-img {
+        background: url(../static/icons/magnifier-2.svg) left no-repeat;
+        background-size: $icon-large;
+        padding-left: calc(#{$icon-large} + #{$spacing});
+      }
     }
   }
 </style>

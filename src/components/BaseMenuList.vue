@@ -23,8 +23,6 @@
 <script>
 import BaseMenuEntry from './BaseMenuEntry';
 
-// const imgUrl = require('../static/icons/sheet-empty.svg');
-
 export default {
   components: {
     BaseMenuEntry,

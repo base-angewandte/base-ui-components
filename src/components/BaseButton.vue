@@ -9,14 +9,14 @@
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-left',
-               { ['base-button-icon-' + iconSize]: buttonStyle === 'row'}]" />
+               'base-button-icon-' + iconSize]" />
     {{ text }}
     <svg-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-right',
-               { ['base-button-icon-' + iconSize]: buttonStyle === 'row'}]"
+               'base-button-icon-' + iconSize]"
     />
   </button>
 </template>
@@ -95,12 +95,12 @@ export default {
       height: $row-height-large;
       background: white;
 
-      & .base-button-icon-large {
+      .base-button-icon-large {
         height: $icon-large;
         max-width: $icon-large;
       }
 
-      & .base-button-icon-small {
+      .base-button-icon-small {
         height: $icon-medium;
         max-width: $icon-medium;
       }
@@ -110,12 +110,12 @@ export default {
       background-color: $button-header-color;
       height: $row-height-small;
 
-      & .base-button-icon-large {
+      .base-button-icon-large {
         height: $icon-medium;
         max-width: $icon-medium;
       }
 
-      & .base-button-icon-small {
+      .base-button-icon-small {
         height: $icon-small;
         max-width: $icon-small;
       }
