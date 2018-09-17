@@ -186,6 +186,7 @@ export default {
       padding-left: 16px;
       margin-right: $spacing;
       flex-shrink: 1;
+      flex-grow: 1;
     }
 
     .base-menu-entry-subtext {
