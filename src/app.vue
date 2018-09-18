@@ -66,6 +66,13 @@
         @input="triggerInput"/>
     </div>
     <div class="form-field">
+      <base-autocomplete-input
+        :list="dropDownInput"
+        :placeholder="'Select Your Marxccccc'"
+        :object-prop="'title'"
+        v-model="autocompleteInput"
+        label="text input with dynamic autocomplete"
+        @selected="fetchOther($event, 'this is my type')"/>
       <base-input :label="'unknown'"/>
       <base-chips-input
         :list="dropDownInput"
@@ -278,10 +285,12 @@ import BaseSearch from './components/BaseSearch';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 import BaseImageBox from './components/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar';
+import BaseAutocompleteInput from './components/BaseAutocompleteInput';
 
 export default {
   name: 'App',
   components: {
+    BaseAutocompleteInput,
     BaseUploadBar,
     BaseImageBox,
     BaseMultilineTextInput,
@@ -315,6 +324,7 @@ export default {
       multilineInput: 'test',
       selectable: false,
       progress: 0,
+      autocompleteInput: 'testtttttttttttt',
       multilineInputObj: [
         {
           lang: 'English',
@@ -373,6 +383,19 @@ export default {
           this.$set(this.multilineInputObj[1], 'value', event.val);
         }
       },
+    },
+  },
+  watch: {
+    async autocompleteInput(val) {
+      if (!val || val.length > 3) {
+        const result = await axios.get('http://localhost:9900/fetch', {
+          params:
+            {
+              string: val,
+            },
+        });
+        this.dropDownInput = result.data;
+      }
     },
   },
   methods: {
@@ -437,6 +460,9 @@ export default {
     },
     tabSwitched(val) {
       this.langTab = val;
+    },
+    fetchOther(value, type) {
+      console.log(type);
     },
   },
 };

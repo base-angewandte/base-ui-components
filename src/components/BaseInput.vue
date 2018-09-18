@@ -7,6 +7,7 @@
       {{ label }}
     </label>
     <div
+      v-click-outside="() => $emit('clicked-outside')"
       :class="['base-input-field-container',
                { 'base-input-field-container-active': active }]">
       <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
@@ -51,8 +52,13 @@
 /**
  * Form Input Field Component
  */
+import ClickOutside from 'vue-click-outside';
+
 export default {
   name: 'BaseInput',
+  directives: {
+    ClickOutside,
+  },
   model: {
     prop: 'input',
     event: 'autocomplete',

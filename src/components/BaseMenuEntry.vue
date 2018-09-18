@@ -195,17 +195,8 @@ export default {
       font-size: $font-size-small;
       flex-grow: 2;
       flex-shrink: 99;
-
-      &::after {
-        content: '';
-        width: 16px;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: linear-gradient(to right, transparent , white);
-      }
     }
+
     .base-menu-entry-subtext, .base-menu-entry-title {
       position: relative;
       white-space: nowrap;

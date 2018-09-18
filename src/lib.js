@@ -7,6 +7,7 @@ import BaseChipsInput from './components/BaseChipsInput';
 import BaseSearch from './components/BaseSearch';
 import BaseMenuList from './components/BaseMenuList';
 import BaseMenuEntry from './components/BaseMenuEntry';
+import BaseAutocompleteInput from './components/BaseAutocompleteInput';
 import './styles/lib.scss';
 
 export {
@@ -19,4 +20,5 @@ export {
   BaseSearch,
   BaseMenuList,
   BaseMenuEntry,
+  BaseAutocompleteInput,
 };
