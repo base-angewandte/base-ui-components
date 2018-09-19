@@ -129,6 +129,10 @@ export default {
   @import "../styles/variables.scss";
 
   .base-multiline-text-input{
+    position: relative;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
 
     .base-multiline-text-input-label-row {
       display: flex;

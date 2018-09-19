@@ -8,6 +8,7 @@ import BaseSearch from './components/BaseSearch';
 import BaseMenuList from './components/BaseMenuList';
 import BaseMenuEntry from './components/BaseMenuEntry';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput';
+import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 import './styles/lib.scss';
 
 export {
@@ -21,4 +22,5 @@ export {
   BaseMenuList,
   BaseMenuEntry,
   BaseAutocompleteInput,
+  BaseMultilineTextInput,
 };

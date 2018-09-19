@@ -72,7 +72,8 @@
         :object-prop="'title'"
         v-model="autocompleteInput"
         label="text input with dynamic autocomplete"
-        @selected="fetchOther($event, 'this is my type')"/>
+        @selected="fetchOther($event, 'this is my type')"
+        @autocomplete="fetch({ value: $event })"/>
       <base-input :label="'unknown'"/>
       <base-chips-input
         :list="dropDownInput"

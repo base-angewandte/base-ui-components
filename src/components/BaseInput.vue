@@ -25,6 +25,7 @@
         v-model="inputInt"
         class="base-input-field"
         type="text"
+        autocomplete="off"
         @focus="$emit('input-focus')"
         @keypress.enter="$emit('enter', inputInt)"
         @keyup.up.down.prevent="$emit('arrow-key', $event)"
