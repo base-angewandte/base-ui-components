@@ -15,7 +15,7 @@
       :is-draggable="true"
       :select-active="selectActive"
 
-      @clicked="activateItem($event, index)"
+      @clicked="activateItem(item, index)"
       @selected="item.selected = $event"/>
   </div>
 </template>
@@ -62,6 +62,8 @@ export default {
       return thumbnails;
     },
     activateItem(val, index) {
+      this.$props.list.forEach((entry) => { this.$set(entry, 'active', false); });
+      this.$set(val, 'active', true);
       this.$emit('clicked', index);
     },
   },

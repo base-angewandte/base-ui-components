@@ -133,17 +133,13 @@ export default {
   .dropdown-box {
     display: inline-block;
     overflow: hidden;
-
-    &:nth-of-type(n+1) + .dropdown-box {
-      margin-left: $spacing;
-    }
   }
 
   .dropdown-icon {
     padding-left: $spacing;
 
     .dropdown-icon-svg {
-      height: $icon-min;
+      height: $icon-small;
       fill: $font-color-second;
     }
   }

@@ -13,12 +13,16 @@
       class="base-menu-entry-icon"/>
     <div
       v-if="$props.title"
-      class="base-menu-entry-title">{{ title }}</div>
+      :class="['base-menu-entry-title',
+               { 'base-menu-entry-title-bold': $props.active || $props.titleBold }]">
+      {{ title }}
+    </div>
     <div
       v-if="$props.subtext"
       class="base-menu-entry-subtext">{{ subtext }}</div>
 
     <transition-group
+      v-if="$props.thumbnails.length || $props.description"
       name="slide-fade"
       class="base-menu-entry-group">
       <div
@@ -92,10 +96,12 @@ export default {
       type: String,
       default: '',
     },
+    // defines if checkbox is visible and a click selects entry
     selectActive: {
       type: Boolean,
       default: false,
     },
+    // defines if entry is selectable
     isSelectable: {
       type: Boolean,
       default: false,
@@ -105,6 +111,10 @@ export default {
       default: true,
     },
     isDraggable: {
+      type: Boolean,
+      default: false,
+    },
+    titleBold: {
       type: Boolean,
       default: false,
     },
@@ -165,6 +175,7 @@ export default {
     width: 100%;
     position: relative;
     background: white;
+    cursor: pointer;
 
     .base-menu-entry-border {
       position: absolute;
@@ -187,13 +198,21 @@ export default {
       margin-right: $spacing;
       flex-shrink: 1;
       flex-grow: 1;
+
+      &.base-menu-entry-title-bold {
+        font-weight: bold;
+      }
+    }
+
+    &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title {
+      fill: $app-color;
+      color: $app-color;
     }
 
     .base-menu-entry-subtext {
-      padding-left: 16px;
       color: $font-color-second;
       font-size: $font-size-small;
-      flex-grow: 2;
+      flex-grow: 99;
       flex-shrink: 99;
     }
 
@@ -211,6 +230,10 @@ export default {
         right: 0;
         background: linear-gradient(to right, transparent , white);
       }
+    }
+
+    .base-menu-entry-icon + .base-menu-entry-subtext {
+      margin-left: 16px;
     }
 
     .base-menu-entry-thumbnail-container {

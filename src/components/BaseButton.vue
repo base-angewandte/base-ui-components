@@ -42,6 +42,9 @@ export default {
     iconPosition: {
       type: String,
       default: 'left',
+      validator(val) {
+        return ['left', 'right'].includes(val);
+      },
     },
     active: {
       type: Boolean,
