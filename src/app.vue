@@ -40,11 +40,9 @@
     </div>
     <div class="canvas">
       <base-multiline-text-input
-        v-model="multiline"
+        v-model="multilineInputObj"
         :label="'Label'"
         :placeholder="'Enter Text'"
-        :tabs="['German', 'English']"
-        :active-tab="langTab"
         @tabSwitch="tabSwitched"/>
       <base-button
         :active="false"
@@ -326,16 +324,10 @@ export default {
       selectable: false,
       progress: 0,
       autocompleteInput: 'testtttttttttttt',
-      multilineInputObj: [
-        {
-          lang: 'English',
-          value: 'testeng',
-        },
-        {
-          lang: 'German',
-          value: 'testger',
-        },
-      ],
+      multilineInputObj: {
+        English: 'testeng',
+        German: 'testger',
+      },
       langTab: 'English',
       list: [
         {

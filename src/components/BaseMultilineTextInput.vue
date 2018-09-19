@@ -7,15 +7,14 @@
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
-      <template v-if="$props.tabs && $props.tabs.length">
+      <template v-if="$props.tabs && $props.tabs[0] !== 'default'">
         <div
           v-for="(tab, index) in $props.tabs"
           :key="index"
           :class="[
             'base-multiline-text-input-tab',
-            {'base-multiline-text-input-tab-active': activeTabIndex === index }
-          ]"
-          @click="tabTrigger(tab, index)">
+            {'base-multiline-text-input-tab-active': activeTabInt === tab }]"
+          @click="activeTabInt = tab">
           {{ tab }}
         </div>
       </template>
@@ -23,10 +22,11 @@
 
     <textarea
       :placeholder="placeholder"
-      v-model="inputInt"
+      v-model="fieldContent[activeTabInt]"
       rows="10"
       class="base-multiline-text-input-textarea"
-      @keyup="$emit('textInput', { val: inputInt, tab: activeTab })" />
+      @keyup="$emit('textInput', typeof $props.input === 'string'
+      ? fieldContent[activeTabInt] : fieldContent)" />
   </div>
 </template>
 
@@ -44,8 +44,10 @@ export default {
      * @model
      */
     input: {
-      type: [Number, String],
-      default: '',
+      type: [Object, String],
+      default() {
+        return '';
+      },
     },
     /**
      * set the label for the input component
@@ -74,7 +76,7 @@ export default {
     tabs: {
       type: Array,
       default() {
-        return [];
+        return ['default'];
       },
     },
     /**
@@ -83,44 +85,33 @@ export default {
     activeTab: {
       type: String,
       default() {
-        return this.$props.tabs && this.$props.tabs.length ? this.$props.tabs[0] : null;
+        return this.$props.tabs[0];
       },
     },
   },
   data() {
     return {
-      inputInt: '',
-      activeTabIndex: 0,
+      fieldContent: {},
+      activeTabInt: this.$props.activeTab,
     };
   },
   watch: {
-    // TODO: for now the input (dependent on tab active) is just set from outside
-    // not sure if this is sufficient or if it needs a more complex logic to switch between
-    // tab contents
     input(val) {
-      this.inputInt = val;
+      if (typeof val === 'string') {
+        this.$set(this.fieldContent, this.activeTabInt || 'default', val);
+      } else {
+        this.$props.tabs.forEach(tab => this.$set(this.fieldContent, tab, val[tab]));
+      }
     },
     activeTab(val) {
-      const tabIndex = this.$props.tabs.indexOf(val);
-      this.activeTabIndex = tabIndex === -1 ? 0 : tabIndex;
+      this.activeTabInt = val;
     },
   },
   mounted() {
-    this.inputInt = this.$props.input;
-    const tabIndex = this.$props.tabs.indexOf(this.$props.activeTab);
-    this.activeTabIndex = tabIndex === -1 ? 0 : tabIndex;
-  },
-  methods: {
-    tabTrigger(val, index) {
-      this.activeTabIndex = index;
-      /**
-       * Tab click event
-       *
-       * @event tabSwitch
-       * @type String
-       */
-      this.$emit('tabSwitch', val);
-    },
+    this.fieldContent = this.$props.tabs.reduce((prev, curr) => {
+      this.$set(prev, [curr], this.$props.input[curr] || this.$props.input || '');
+      return prev;
+    }, {});
   },
 };
 </script>
