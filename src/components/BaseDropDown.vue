@@ -24,7 +24,9 @@
           <p ref="header">{{ selectedInt }}</p>
         </div>
         <div class="dropdown-icon">
-          <img src="../static/icons/drop-down-4.svg">
+          <svg-icon
+            name="drop-down"
+            class="dropdown-icon-svg" />
         </div>
       </div>
 
@@ -49,10 +51,14 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
 import ClickOutside from 'vue-click-outside';
 
 export default {
   name: 'BaseDropDown',
+  components: {
+    SvgIcon,
+  },
   directives: {
     ClickOutside,
   },
@@ -133,6 +139,15 @@ export default {
     }
   }
 
+  .dropdown-icon {
+    padding-left: $spacing;
+
+    .dropdown-icon-svg {
+      height: $icon-min;
+      fill: $font-color-second;
+    }
+  }
+
   .dropdown-header {
     display: flex;
     flex-direction: row;
@@ -143,6 +158,14 @@ export default {
     cursor: pointer;
     padding: 4px #{$spacing};
     white-space: nowrap;
+
+    &:hover {
+      color: $app-color;
+
+      .dropdown-icon-svg {
+        fill: $app-color;
+      }
+    }
   }
 
   .dropdown-selected {
@@ -159,15 +182,6 @@ export default {
     top: 0;
     right: 0;
     background: linear-gradient(to right, transparent , #{$background-color});
-  }
-
-  .dropdown-icon {
-    padding-left: $spacing;
-
-    img {
-      height: 8px;
-      fill: $font-color-second;
-    }
   }
 
   .dropdown-body {
