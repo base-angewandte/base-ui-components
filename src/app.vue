@@ -284,7 +284,7 @@ import BaseSearch from './components/BaseSearch';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 import BaseImageBox from './components/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar';
-import BaseAutocompleteInput from './components/BaseAutocompleteInput';
+import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 
 export default {
   name: 'App',
@@ -455,6 +455,7 @@ export default {
       this.langTab = val;
     },
     fetchOther(value, type) {
+      console.log(value);
       console.log(type);
     },
   },

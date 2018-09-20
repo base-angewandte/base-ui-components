@@ -99,7 +99,8 @@ export default {
     flex-direction: column;
     justify-content: space-evenly;
     height: 100%;
-    margin-right: 16px;
+    margin-right: $spacing;
+    min-width: $icon-small;
 
     .base-menu-entry-thumbnail {
       height: $icon-small;

@@ -55,7 +55,7 @@
  * Form Input Field Component with Autocomplete Functionality
  */
 import ClickOutside from 'vue-click-outside';
-import BaseInput from './BaseInput';
+import BaseInput from '../BaseInput';
 
 export default {
   components: {
@@ -64,20 +64,20 @@ export default {
   directives: {
     ClickOutside,
   },
-  // TODO: remove this since it is not useful for using this component in the form!
   model: {
     prop: 'inputText',
     event: 'autocomplete',
   },
   props: {
     /**
+     * input field settable from outside
+     *
      * @model
      *
-     * input field settable from outside
      */
     inputText: {
       type: String,
-      default: null,
+      default: '',
     },
     /**
      * list of selectable entries
@@ -133,6 +133,9 @@ export default {
     };
   },
   computed: {
+    // show drop down is governed by these two variables - one from baseinput component
+    // and one from drop down (to prevent label (which is part of baseinput)
+    // to be inside the "clickoutside" area)
     showDropDown: {
       get() {
         return this.insideInput || this.insideDropDown;
@@ -176,6 +179,7 @@ export default {
   methods: {
     // add an entry selected from the drop down list
     selectEntry(entry) {
+      // check if entry was selected by clicking in the dropdown
       if (entry) {
         this.inputTextInt = entry[this.$props.objectProp];
         /**
@@ -185,6 +189,8 @@ export default {
          * @type object | string
          */
         this.$emit('selected', entry);
+        // or was selected by use of arrow keys
+        // (else no explicit setting of inputTextInt and event emitting is needed)
       } else if (this.selectedMenuEntryIndex >= 0) {
         this.inputTextInt = this.listInt[this.selectedMenuEntryIndex][this.$props.objectProp];
         this.$emit('selected', this.listInt[this.selectedMenuEntryIndex]);
@@ -196,6 +202,8 @@ export default {
     },
     onInputFocus() {
       this.selectedMenuEntryIndex = -1;
+      // TODO: check if maybe event should also be triggered if input is empty
+      // e.g. for fetching of initial list??
       if (this.inputTextInt) {
         /**
          * emitting event on text input
@@ -224,7 +232,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-autocomplete-input {
     position: relative;

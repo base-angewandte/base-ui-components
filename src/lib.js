@@ -7,7 +7,7 @@ import BaseChipsInput from './components/BaseChipsInput';
 import BaseSearch from './components/BaseSearch';
 import BaseMenuList from './components/BaseMenuList';
 import BaseMenuEntry from './components/BaseMenuEntry';
-import BaseAutocompleteInput from './components/BaseAutocompleteInput';
+import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 import './styles/lib.scss';
 
