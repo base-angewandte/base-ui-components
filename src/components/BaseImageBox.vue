@@ -33,7 +33,7 @@
 
 <script>
 import BaseBox from './BaseBox/BaseBox';
-import BaseCheckmark from './BaseCheckmark';
+import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {

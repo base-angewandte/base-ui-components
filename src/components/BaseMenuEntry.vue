@@ -57,7 +57,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
-import BaseCheckmark from './BaseCheckmark';
+import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {

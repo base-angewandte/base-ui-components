@@ -26,6 +26,17 @@
 </template>
 
 <script>
+/**
+ * Checkbox and Radio Button Component
+ */
+
+/**
+ * when the box is clicked an event is triggered transmitting the
+ * corresponding value
+ *
+ * @event clicked
+ * @type String|Boolean
+ */
 import SvgIcon from 'vue-svgicon';
 
 export default {
@@ -33,6 +44,10 @@ export default {
     SvgIcon,
   },
   props: {
+    /**
+     * choose the style <br>
+     * valid values: 'radio' | 'checkbox'
+     */
     markStyle: {
       type: String,
       default: 'radio',
@@ -40,14 +55,26 @@ export default {
         return (val === 'radio' || val === 'checkbox');
       },
     },
+    /**
+     * specify a discriptive label <br>
+     * this will not be displayed but is only there for usability purposes <br>
+     * TODO: for radio button label should actually be visible!
+     */
     label: {
       type: String,
       default: 'select',
     },
+    /**
+     * checkbox checked or radio button selected can be set from outside
+     */
     selected: {
       type: Boolean,
       default: false,
     },
+    /**
+     * set the size of the checkBox <br>
+     * valid values: 'large' | 'small'
+     */
     checkBoxSize: {
       type: String,
       default: 'small',
@@ -70,7 +97,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-checkbox-container {
     position: relative;

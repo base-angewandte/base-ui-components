@@ -23,7 +23,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
-import '../assets/icons';
+import '../../assets/icons/index';
 
 export default {
   name: 'BaseButton',
@@ -31,14 +31,30 @@ export default {
     SvgIcon,
   },
   props: {
+    /**
+     * Button Text
+     */
     text: {
       type: String,
       default: 'Submit',
     },
+    // TODO: need to check if it is possible to use custom icons --> if yes description!
+    /**
+     * icon displayed <br>
+     * available per default:
+     * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
+     * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
+     * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin'
+     */
     icon: {
       type: String,
       default: null,
     },
+    /**
+     * specify if icon should be displayed left or right <br>
+     * valid values: 'left' | 'right'
+     */
     iconPosition: {
       type: String,
       default: 'left',
@@ -46,10 +62,17 @@ export default {
         return ['left', 'right'].includes(val);
       },
     },
+    /**
+     * set button active (will display a colored border on botton)
+     */
     active: {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify a button style <br>
+     * valid values: 'single' | 'row'
+     */
     buttonStyle: {
       type: String,
       default: 'single',
@@ -57,6 +80,10 @@ export default {
         return val === 'single' || val === 'row';
       },
     },
+    /**
+     * specify icon size <br>
+     * valid values: 'large' | 'small'
+     */
     iconSize: {
       type: String,
       default: 'small',
@@ -69,7 +96,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-button {
     padding: calc(#{$spacing-small}/2 + 3px) #{$spacing} calc(#{$spacing-small}/2);

@@ -43,7 +43,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
-import BaseButton from './BaseButton';
+import BaseButton from './BaseButton/BaseButton';
 import '../assets/icons';
 
 export default {

@@ -80,8 +80,7 @@ export default {
      * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
      * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
      * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' <br>
-     * please check below for a description on how to use custom svgs
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin'
      */
     icon: {
       type: String,

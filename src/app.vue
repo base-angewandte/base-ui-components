@@ -274,7 +274,7 @@ import BasePopUp from './components/BasePopUp';
 import BaseDropDown from './components/BaseDropDown';
 import BaseInput from './components/BaseInput';
 import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
-import BaseButton from './components/BaseButton';
+import BaseButton from './components/BaseButton/BaseButton';
 import BaseDropBox from './components/BaseDropBox';
 import BaseBox from './components/BaseBox/BaseBox';
 import BaseMenuList from './components/BaseMenuList';
