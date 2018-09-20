@@ -44,9 +44,20 @@
 </template>
 
 <script>
+/**
+ * A Base Box Shaped Button
+ */
+
+/**
+ * event triggered on click
+ *
+ * @event clicked
+ * @type None
+ *
+ */
 import SvgIcon from 'vue-svgicon';
-import BaseBox from './BaseBox/BaseBox';
-import '../assets/icons';
+import BaseBox from '../BaseBox/BaseBox';
+import '../../assets/icons/index';
 
 export default {
   components: {
@@ -54,26 +65,54 @@ export default {
     BaseBox,
   },
   props: {
+    /**
+     * Define type of button box style: <br>'large' | 'small'
+     */
     boxStyle: {
       type: String,
       default: 'large',
+      validator(val) {
+        return ['large', 'small'].includes(val);
+      },
     },
+    /**
+     * specify icon name if desired, this uses svg icon; available per default:
+     * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
+     * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
+     * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' <br>
+     * please check below for a description on how to use custom svgs
+     */
     icon: {
       type: String,
       default: null,
     },
+    /**
+     * show a plus sign next to the icon if true <br>
+     * only available for large button style
+     */
     showPlus: {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify the text for the button
+     */
     text: {
       type: String,
       default: '',
     },
+    /**
+     * specify subtext for the button <br>
+     * only available for large button style
+     */
     subtext: {
       type: String,
       default: '',
     },
+    /**
+     * define box size
+     */
     boxSize: {
       type: Object,
       default() {
@@ -85,7 +124,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-box-button {
     display: flex;

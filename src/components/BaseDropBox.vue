@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import BaseBoxButton from './BaseBoxButton';
+import BaseBoxButton from './BaseBoxButton/BaseBoxButton';
 
 export default {
   components: {
