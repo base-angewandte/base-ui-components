@@ -276,7 +276,7 @@ import BaseInput from './components/BaseInput';
 import BaseBoxButton from './components/BaseBoxButton';
 import BaseButton from './components/BaseButton';
 import BaseDropBox from './components/BaseDropBox';
-import BaseBox from './components/BaseBox';
+import BaseBox from './components/BaseBox/BaseBox';
 import BaseMenuList from './components/BaseMenuList';
 import BaseMenuTableRow from './components/BaseMenuTableRow';
 import BaseChipsInput from './components/BaseChipsInput';

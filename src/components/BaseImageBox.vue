@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import BaseBox from './BaseBox';
+import BaseBox from './BaseBox/BaseBox';
 import BaseCheckmark from './BaseCheckmark';
 
 export default {

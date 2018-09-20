@@ -8,8 +8,21 @@
 </template>
 
 <script>
+/**
+ * Base Component for everything Box shaped
+ */
 export default {
+  /**
+   * event emitted when clicked on box
+   *
+   * @event clicked
+   * @type None
+   */
   props: {
+    /**
+     * define the size of the box
+     * should be an object with width and / or height
+     */
     boxSize: {
       type: Object,
       default() {
@@ -18,6 +31,7 @@ export default {
     },
   },
   computed: {
+    // TODO: do i need this?? why not use prop directly again??
     boxSizeInt() {
       return Object.assign({}, this.$props.boxSize);
     },
@@ -26,7 +40,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-box {
     background: white;
@@ -36,8 +50,9 @@ export default {
     position: relative;
     overflow: hidden;
 
-    &:before {
+    &:after {
       content:  '';
+      display: block;
       padding-top: 100%;
     }
 

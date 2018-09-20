@@ -45,7 +45,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
-import BaseBox from './BaseBox';
+import BaseBox from './BaseBox/BaseBox';
 import '../assets/icons';
 
 export default {
