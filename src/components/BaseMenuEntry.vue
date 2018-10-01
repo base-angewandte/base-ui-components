@@ -45,12 +45,8 @@
         :selected="isSelected"
         title="checkbox"
         mark-style="checkbox"
-        class="hidden base-menu-entry-checkbox"
+        class="base-menu-entry-checkbox"
         @clicked="selected"/>
-      <div
-        v-if="$props.isSelectable"
-        :key="$props.id + 'checkmark-box'"
-        class="base-menu-checkmark-container" />
     </transition-group>
   </div>
 </template>

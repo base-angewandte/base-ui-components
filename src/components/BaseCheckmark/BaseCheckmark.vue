@@ -10,7 +10,7 @@
       :name="label"
       :value="label"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      class="base-checkbox">
+      :class="['base-checkbox-input', {'base-checkbox-checked': selectedInt }]">
     <div
       :class="[
         'base-checkmark-container',
@@ -120,10 +120,10 @@ export default {
     }
 
     & input:checked ~ .base-checkmark-container-small {
-      border-color: $app-color;
+      border: 1.5px solid $app-color;
     }
 
-    .base-checkbox {
+    .base-checkbox-input {
       position: absolute;
       opacity: 0;
       cursor: pointer;

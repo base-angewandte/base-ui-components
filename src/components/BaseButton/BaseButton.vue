@@ -9,14 +9,16 @@
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-left',
-               'base-button-icon-' + iconSize]" />
+               'base-button-icon-' + iconSize,
+               { 'base-button-icon-hide': $props.hideIcon }]"/>
     {{ text }}
     <svg-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-right',
-               'base-button-icon-' + iconSize]"
+               'base-button-icon-' + iconSize,
+               { 'base-button-icon-hide': $props.hideIcon }]"
     />
   </button>
 </template>
@@ -50,6 +52,13 @@ export default {
     icon: {
       type: String,
       default: null,
+    },
+    /**
+     * set from outside if icon should be made invisible
+     */
+    hideIcon: {
+      type: Boolean,
+      default: false,
     },
     /**
      * specify if icon should be displayed left or right <br>
@@ -160,6 +169,10 @@ export default {
 
     &:hover {
       color: $app-color;
+    }
+
+    .base-button-icon-hide {
+      visibility: hidden;
     }
   }
 

@@ -19,7 +19,7 @@
           v-for="(entry,index) in selectedListInt"
           :key="index"
           :class="['base-chips-input-chip-inline',
-                   { 'base-chips-input-chip-edited': entry.edited }]">
+                   { 'base-chips-input-chip-edited': entry.edited || !entry.idInt }]">
           <div
             :contenteditable="$props.chipsEditable && entry.editable"
             class="base-chips-input-chip-text"
@@ -182,7 +182,7 @@ export default {
       dropDownListOrig: [],
       // list of selectable entries received from parent component
       dropDownList: [],
-      selectedMenuEntryIndex: 0,
+      selectedMenuEntryIndex: this.getAllowUnknown(),
     };
   },
   computed: {
@@ -247,7 +247,7 @@ export default {
     },
     showDropDown(val) {
       if (val) {
-        this.selectedMenuEntryIndex = 0;
+        this.selectedMenuEntryIndex = this.getAllowUnknown();
         // TODO: prevent jumping around (scrolling to top)
         this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
       }
@@ -284,8 +284,6 @@ export default {
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
-      // reset input
-      this.input = '';
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
@@ -302,13 +300,17 @@ export default {
           // filter the selected entry from the list of drop down menu entries
           this.dropDownListInt = this.dropDownListOrig;
         }
-        this.selectedMenuEntryIndex = 0;
+        this.selectedMenuEntryIndex = this.getAllowUnknown();
         this.$emit('selected', selected);
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
         }
+      } else if (this.input && this.allowUnknownEntries) {
+        this.selectedListInt.push({ name: this.input });
       }
+      // reset input
+      this.input = '';
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
@@ -338,9 +340,10 @@ export default {
       }
     },
     enableEdit(entry) {
-      console.log(entry);
       this.$set(entry, 'editable', true);
-      console.log(entry);
+    },
+    getAllowUnknown() {
+      return this.$props.allowUnknownEntries ? -1 : 0;
     },
   },
 };
