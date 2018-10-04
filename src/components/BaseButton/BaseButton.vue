@@ -120,6 +120,7 @@ export default {
       margin-right: $spacing;
       height: $icon-small;
       max-width: $icon-small;
+      flex: 0 0 auto;
 
       &.base-button-icon-left {
         margin-right: #{$spacing};

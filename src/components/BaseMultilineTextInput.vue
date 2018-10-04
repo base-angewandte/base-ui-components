@@ -7,8 +7,12 @@
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
-      <template v-if="$props.tabs && $props.tabs[0] !== 'default'">
-        <div
+      <!-- slot for text type -->
+      <slot />
+      <div
+        v-if="$props.tabs && $props.tabs[0] !== 'default'"
+        class="base-multiline-text-input-tabs">
+        <span
           v-for="(tab, index) in $props.tabs"
           :key="index"
           :class="[
@@ -16,8 +20,8 @@
             {'base-multiline-text-input-tab-active': activeTabInt === tab }]"
           @click="activeTabInt = tab">
           {{ tab }}
-        </div>
-      </template>
+        </span>
+      </div>
     </div>
 
     <textarea
@@ -138,14 +142,19 @@ export default {
         align-self: flex-end;
       }
 
-      .base-multiline-text-input-tab {
-        padding: 0 $spacing;
-        border: 1px solid transparent;
-        cursor: pointer;
-      }
+      .base-multiline-text-input-tabs {
+        align-self: center;
+        margin: 4px 0;
 
-      .base-multiline-text-input-tab-active {
-        border: $input-field-border;
+        .base-multiline-text-input-tab {
+          padding: $spacing-small/2 $spacing;
+          border: 1px solid transparent;
+          cursor: pointer;
+        }
+
+        .base-multiline-text-input-tab-active {
+          border: $input-field-border;
+        }
       }
     }
 
@@ -159,6 +168,13 @@ export default {
       &:active, &:focus {
         box-shadow: $input-shadow;
       }
+    }
+  }
+
+  @media screen and (max-width: $mobile) {
+    .base-multiline-text-input-label-row {
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
   }
 </style>

@@ -358,8 +358,8 @@ export default {
     text-align: left;
 
     .base-chips-input-chip, .base-chips-input-chip-inline {
-      margin: 4px $spacing-small 4px 0;
-      padding-left: $spacing-small;
+      margin: $chips-spacing $spacing-small $chips-spacing 0;
+      padding: $chips-spacing 0 $chips-spacing $spacing-small;
       flex: 0 0 auto;
       background-color: $background-color;
       line-height: $line-height;

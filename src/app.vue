@@ -42,8 +42,15 @@
       <base-multiline-text-input
         v-model="multilineInputObj"
         :label="'Label'"
+        :tabs="['German', 'English']"
         :placeholder="'Enter Text'"
-        @tabSwitch="tabSwitched"/>
+        @tabSwitch="tabSwitched">
+        <div class="multiline-dropdown">
+          <base-drop-down
+            :default-select="'Textart'"
+            :selection-list="['Beschreibung', 'Ausstellungseinladung', 'Zeitungsartikel']" />
+        </div>
+      </base-multiline-text-input>
       <base-button
         :active="false"
         icon="sheet-plus"
@@ -177,7 +184,7 @@
         <base-input
           :label="'Test1'"
           type="text"
-          placeholder="Enter your Name" />
+          placeholder="Enter your Name"/>
         <base-input
           :label="'Test'"
           type="text"
@@ -188,10 +195,12 @@
           :label="'select type'"
           :default-select="'Alle Typen'"
           :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']"
-          :fixed-width="true" />
+          :background-color="'rgb(240, 240, 240)'"
+          :fixed-width="true"/>
         <base-drop-down
           :default-select="'Alle Typenasdfasdf'"
           :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']"
+          :background-color="'rgb(240, 240, 240)'"
           :fixed-width="true" />
       </div>
     </base-pop-up>
@@ -488,6 +497,10 @@ export default {
     align-items: flex-end;
   }
 
+  .popup-text > div:first-of-type {
+    margin-right: 16px;
+  }
+
   .form-field {
     background-color: white;
     padding: 16px;
@@ -496,5 +509,9 @@ export default {
 
   .image-box {
     margin: 8px;
+  }
+
+  .multiline-dropdown {
+    margin-bottom: -4px;
   }
 </style>

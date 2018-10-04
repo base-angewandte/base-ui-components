@@ -9,6 +9,7 @@ import BaseMenuList from './components/BaseMenuList';
 import BaseMenuEntry from './components/BaseMenuEntry';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput';
+import BaseDropBox from './components/BaseDropBox';
 import './styles/lib.scss';
 
 export {
@@ -23,4 +24,5 @@ export {
   BaseMenuEntry,
   BaseAutocompleteInput,
   BaseMultilineTextInput,
+  BaseDropBox,
 };

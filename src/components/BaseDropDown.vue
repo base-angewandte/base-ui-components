@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="dropdownBox"
     :style="{ width: fixedWidth ? '100%': bodyWidth }"
     class="dropdown-box">
     <div class="base-input-label">
@@ -16,6 +17,7 @@
 
       <!-- SELECTION DISPLAY -->
       <div
+        :style="{ 'background-color': backgroundColor }"
         class="dropdown-header"
         @click="showMenu = !showMenu">
         <div
@@ -79,6 +81,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set the background color of the drop down header
+     */
+    backgroundColor: {
+      type: String,
+      default: 'inherit',
+    },
   },
   data() {
     return {
@@ -106,7 +115,12 @@ export default {
     if (this.$refs.entries && this.$refs.header) {
       const entriesWidth = (this.$refs.entries.clientWidth || this.$refs.entries.scrollWidth + 48);
       const headerWidth = (this.$refs.header.clientWidth || this.$refs.header.scrollWidth + 64);
-      this.bodyWidth = entriesWidth > headerWidth ? entriesWidth : headerWidth;
+      if (this.fixedWidth) {
+        // TODO: check (with Flo etc) if this is the desired behaviour
+        this.bodyWidth = this.$refs.dropdownBox.clientWidth;
+      } else {
+        this.bodyWidth = entriesWidth > headerWidth ? entriesWidth : headerWidth;
+      }
       this.bodyWidth = this.bodyWidth === 0 ? 'auto' : `${this.bodyWidth}px`;
     } else {
       this.bodyWidth = '100%';
@@ -150,10 +164,13 @@ export default {
     justify-content: space-between;
     align-items: center;
     color: $font-color-second;
-    background-color: $background-color;
+    background-color: inherit;
     cursor: pointer;
-    padding: 4px #{$spacing};
+    padding: 0 #{$spacing};
     white-space: nowrap;
+    height: $row-height-small;
+    position: relative;
+    z-index: 2;
 
     &:hover {
       color: $app-color;
@@ -185,11 +202,11 @@ export default {
     display: flex;
     flex-direction: column;
     position: absolute;
-    margin-top: 4px;
     margin-left: 0;
     box-shadow: $drop-shadow;
-    z-index: 10;
+    z-index: 1;
     text-align: left;
+    max-width: inherit;
   }
 
   .hide-body {
@@ -212,6 +229,11 @@ export default {
   .popup-box {
     .dropdown-body {
       box-shadow: $pop-up-drop-shadow;
+    }
+
+    .base-input-label {
+      margin-bottom: $spacing-small;
+      color: $font-color-second;
     }
 
     .dropdown-header {
