@@ -87,3 +87,23 @@ input::placeholder, textarea::placeholder {
 .svg-left {
   transform: rotate(-90deg);
 }
+
+input.base-input-datepicker-input {
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+input.base-input-datepicker-input:focus {
+  outline: none;
+}
+
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
+  border-color: $app-color;
+}
+
+.calendar-class .cell.selected, .calendar-class .cell.selected:hover {
+  background: $app-color;
+}

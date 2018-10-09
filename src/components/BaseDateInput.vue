@@ -10,20 +10,35 @@
       <div
         v-click-outside="() => $emit('clicked-outside')"
         :class="['base-input-field-container',
-                 { 'base-input-field-container-active': active }]">
-        <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
-        <slot />
-        <!--
-          @event input-focus
-          @event arrow-key
-          @event autocomplete
-        -->
+                 { 'base-input-field-container-active': activeFrom }]">
+        <datepicker
+          id="from"
+          key="from"
+          :monday-first="true"
+          :input-class="'base-input-datepicker-input'"
+          v-model="inputInt.from"
+          calendar-class="calendar-class"
+          format="dd.MM.yyyy"
+          class="base-input-datepicker"
+          @opened="activeFrom = true"
+          @closed="activeFrom = false"/>
+        <svg-icon
+          name="calendar-many"
+          class="base-input-date-icon"/>
+      </div>
+      <span
+        v-if="type === 'range'"
+        class="separator">bis</span>
+      <div
+        v-click-outside="() => $emit('clicked-outside')"
+        :class="['base-input-field-container',
+                 { 'base-input-field-container-active': activeTo }]">
         <input
-          v-if="!hideInputField"
+          v-if="type === 'datetime'"
           :id="label"
           :title="label"
           :placeholder="placeholder"
-          v-model="inputInt"
+          v-model="inputInt.to"
           class="base-input-field"
           type="text"
           autocomplete="off"
@@ -32,9 +47,33 @@
           @keyup.up.down.prevent="$emit('arrow-key', $event)"
           @input="$emit('autocomplete', inputInt)"
           @blur="blurInput()"
-          @click="active = true">
+          @click="activeTo = true">
+        <datepicker
+          v-else
+          id="to"
+          key="to"
+          :monday-first="true"
+          :input-class="'base-input-datepicker-input'"
+          v-model="inputInt.to"
+          calendar-class="calendar-class"
+          format="dd.MM.yyyy"
+          class="base-input-datepicker"
+          @opened="activeTo = true"
+          @closed="activeTo = false"/>
+
+        <svg-icon
+          v-if="type === 'datetime'"
+          name="clock"
+          class="base-input-date-icon"/>
+
+        <svg-icon
+          v-else
+          name="calendar-many"
+          class="base-input-date-icon"/>
       </div>
     </div>
+
+
   </div>
 </template>
 
@@ -43,11 +82,13 @@
  * Form Input Field Component
  */
 import ClickOutside from 'vue-click-outside';
+import Datepicker from 'vuejs-datepicker';
 import SvgIcon from 'vue-svgicon';
 
 export default {
-  name: 'BaseInput',
+  name: 'BaseDateInput',
   components: {
+    Datepicker,
     SvgIcon,
   },
   directives: {
@@ -55,17 +96,30 @@ export default {
   },
   model: {
     prop: 'input',
-    event: 'autocomplete',
+    event: 'selected',
   },
   props: {
+  /**
+   * selecte date or datetime
+   * values: 'range'|'datetime'
+   */
+    type: {
+      type: String,
+      default: 'range',
+      validator(val) {
+        return (val === 'range' || val === 'datetime');
+      },
+    },
     /**
      * @model
      *
      * input field settable from outside
-      */
+     */
     input: {
-      type: String,
-      default: '',
+      type: Object,
+      default() {
+        return { from: '', to: '' };
+      },
     },
     /** label for input field, required for usability purposes, handle
      * showing of label with property showLabel
@@ -99,7 +153,8 @@ export default {
   data() {
     return {
       inputInt: '',
-      active: false,
+      activeFrom: false,
+      activeTo: false,
     };
   },
   watch: {
@@ -112,7 +167,7 @@ export default {
   },
   methods: {
     blurInput() {
-      this.active = false;
+      this.activeFrom = false;
       /**
        * emit an event when focus leaves the input
        *
@@ -145,7 +200,11 @@ export default {
       min-height: $row-height-small;
       border: $input-field-border;
       background: white;
-      flex-grow: 1;
+      flex: 1;
+    }
+
+    .base-input-field-container + .base-input-field-container {
+      margin-left: $spacing;
     }
 
     .base-input-field-container-active {
@@ -188,4 +247,55 @@ export default {
   input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
     outline: none;
   }
+
+  .base-input-datepicker {
+    flex-grow: 1;
+    width: 16px;
+  }
+
+  .base-input-date-icon {
+    width: 24px;
+    max-height: 24px;
+    color: $font-color-second;
+    margin: 0 $spacing;
+  }
+
+  .input-field-wrapper {
+    display: flex;
+  }
+
+  .separator {
+    padding: 0 $spacing;
+    line-height: $row-height-small;
+  }
+</style>
+
+<style module lang="scss">
+  @import "../styles/variables.scss";
+
+  input.base-input-datepicker-input {
+    border: none;
+    outline: none;
+    width: 100%;
+  }
+
+  input.base-input-datepicker-input:focus {
+    outline: none;
+  }
+
+  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
+  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
+  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
+    border-color: $app-color;
+  }
+
+  .calendar-class .cell.selected, .calendar-class .cell.selected:hover {
+    background: $app-color;
+  }
+
+  .calendar-class {
+    left: -9px;
+    top: 2em;
+  }
+
 </style>
