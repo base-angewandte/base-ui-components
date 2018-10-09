@@ -50,10 +50,9 @@ export default {
     position: relative;
     overflow: hidden;
 
-    &:after {
+    &:before {
       content:  '';
-      display: block;
-      padding-top: 100%;
+      padding-top: 50%;
     }
 
     &:hover {

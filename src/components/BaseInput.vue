@@ -32,19 +32,6 @@
         @input="$emit('autocomplete', inputInt)"
         @blur="blurInput()"
         @click="active = true">
-
-      <!-- TODO: refactor (and test) date input field according to text input above -->
-      <input
-        v-else-if="type === 'date' && !hideInputField"
-        :id="label"
-        :title="label"
-        :placeholder="placeholder"
-        v-model="inputInt"
-        type="text"
-        class="base-input-field"
-        @focus="$emit('inputFocus')"
-        @keyup.enter="triggerInput()"
-        @blur="triggerInput()">
     </div>
   </div>
 </template>
