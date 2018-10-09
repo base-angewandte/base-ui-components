@@ -14,27 +14,13 @@
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
       <template v-if="!allowMultipleEntries || chipsInline">
-        <div
-          v-click-outside="() => $set(entry, 'editable', false)"
+        <base-chip
           v-for="(entry,index) in selectedListInt"
           :key="index"
-          :class="['base-chips-input-chip-inline',
-                   { 'base-chips-input-chip-edited': entry.edited || !entry.idInt }]">
-          <div
-            :contenteditable="$props.chipsEditable && entry.editable"
-            class="base-chips-input-chip-text"
-            @click="enableEdit(entry)"
-            @keyup="$set(entry, 'edited', true)">
-            {{ entry[objectProp] }}
-          </div>
-          <div
-            class="base-chips-input-chip-icon"
-            @click="removeEntry(entry, index)">
-            <img
-              class="base-chips-input-chip-icon-img"
-              src="../static/icons/remove.svg">
-          </div>
-        </div>
+          :entry="entry"
+          :object-prop="objectProp"
+          :chip-editable="chipsEditable"
+          @removeEntry="removeEntry($event, index)"/>
       </template>
     </base-input>
 
@@ -69,44 +55,34 @@
           {{ dropDownNoOptionsInfo }}
         </div>
       </slot>
-
     </div>
 
+    <!-- CHIPS BELOW -->
     <div
       v-if="$props.allowMultipleEntries && !$props.chipsInline && selectedListInt.length"
       class="base-chips-input-chips-container">
-      <div
-        v-click-outside="() => $set(entry, 'editable', false)"
+      <base-chip
         v-for="(entry,index) in selectedListInt"
+        :entry="entry"
         :key="index"
-        :class="['base-chips-input-chip',
-                 { 'base-chips-input-chip-edited': entry.edited }]">
-        <div
-          :contenteditable="$props.chipsEditable && entry.editable"
-          class="base-chips-input-chip-text"
-          @click="enableEdit(entry)"
-          @keyup="$set(entry, 'edited', true)">
-          {{ entry[objectProp] }}
-        </div>
-        <div
-          class="base-chips-input-chip-icon"
-          @click="removeEntry(entry, index)">
-          <img
-            class="base-chips-input-chip-icon-img"
-            src="../static/icons/remove.svg">
-        </div>
-      </div>
+        :object-prop="objectProp"
+        :chip-editable="chipsEditable"
+        class="base-chips-input-chip"
+        @removeEntry="removeEntry($event, index)"/>
     </div>
+
   </div>
 </template>
 
 <script>
 import ClickOutside from 'vue-click-outside';
 import BaseInput from './BaseInput';
+import BaseChip from './BaseChip';
 
 export default {
   components: {
     BaseInput,
+    BaseChip,
   },
   directives: {
     ClickOutside,
@@ -219,8 +195,6 @@ export default {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
             idInt: null,
-            edited: false,
-            editable: false,
             [this.objectProp]: entry[this.objectProp],
           });
         }
@@ -232,24 +206,22 @@ export default {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
             idInt: index,
-            edited: false,
-            editable: false,
             [this.objectProp]: entry[this.objectProp],
           });
         }
         return Object.assign({}, {
           idInt: index,
-          edited: false,
-          editable: false,
           [this.objectProp]: entry,
         });
       });
     },
     showDropDown(val) {
+      // debugger;
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
-        // TODO: prevent jumping around (scrolling to top)
-        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        // below disabled for now due to errors with single entry mode but check
+        // if this is necessary for multi entry inline mode
+        // this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
       }
     },
   },
@@ -258,8 +230,6 @@ export default {
       if (typeof entry === 'object') {
         return Object.assign({}, entry, {
           idInt: null,
-          editable: false,
-          edited: false,
           [this.objectProp]: entry[this.objectProp],
         });
       }
@@ -271,8 +241,6 @@ export default {
           if (typeof entry === 'object') {
             return Object.assign({}, entry, {
               idInt: index,
-              editable: false,
-              edited: false,
               [this.objectProp]: entry[this.objectProp],
             });
           }
@@ -339,9 +307,6 @@ export default {
           ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
       }
     },
-    enableEdit(entry) {
-      this.$set(entry, 'editable', true);
-    },
     getAllowUnknown() {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
@@ -356,42 +321,6 @@ export default {
     position: relative;
     width: 100%;
     text-align: left;
-
-    .base-chips-input-chip, .base-chips-input-chip-inline {
-      margin: $chips-spacing $spacing-small $chips-spacing 0;
-      padding: $chips-spacing 0 $chips-spacing $spacing-small;
-      flex: 0 0 auto;
-      background-color: $background-color;
-      line-height: $line-height;
-      max-width: calc(100% - #{$spacing-small});
-      display: flex;
-      align-items: center;
-
-      &.base-chips-input-chip-edited {
-        background-color: transparent;
-      }
-
-      .base-chips-input-chip-text {
-        margin-right: $spacing-small;
-        border: none;
-        background-color: transparent;
-        color: $font-color;
-
-        &:active, &:focus {
-          outline: none;
-        }
-      }
-
-      .base-chips-input-chip-icon {
-        padding: 0 $spacing-small;
-        cursor: pointer;
-
-        .base-chips-input-chip-icon-img {
-          height: $icon-min;
-          vertical-align: middle;
-        }
-      }
-    }
 
     .base-chips-drop-down {
       position: absolute;
