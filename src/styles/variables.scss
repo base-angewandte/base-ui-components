@@ -9,14 +9,15 @@ $font-size-large: 1.25em;
 $line-height: 1.2em;
 
 /* height and spacing */
-$spacing: 16px;
-$spacing-small: 8px;
+$spacing: .84em;
+$spacing-small: 0.42em;
 $spacing-large: 32px;
 /* new styleguide: font size + relative spacing! */
 $row-height-large: 1em +  2*1em;
 $row-height-small: 1em +  2*.5em;
 $header-height: 55px;
 $chips-spacing: 0.2em;
+$chips-list-height: 1em + 2*.8em;
 
 /* shadows and borders */
 $box-shadow-reg: 0px 0px 3px 0px rgba(0,0,0,0.05);

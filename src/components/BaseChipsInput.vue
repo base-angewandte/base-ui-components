@@ -7,7 +7,8 @@
     <base-input
       ref="baseInput"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
-      :label="$props.label"
+      :label="label"
+      :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       v-model="input"
       @input-focus="showDropDown = true"
@@ -20,6 +21,7 @@
           :entry="entry"
           :object-prop="objectProp"
           :chip-editable="chipsEditable"
+          @valueChanged="entry = $event"
           @removeEntry="removeEntry($event, index)"/>
       </template>
     </base-input>
@@ -36,7 +38,7 @@
         @click="addSelected(entry)"
         @mouseover="selectedMenuEntryIndex = index">
 
-        <!-- THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
+        <!-- @ slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
           :item="entry"
           name="drop-down-entry">
@@ -56,25 +58,35 @@
         </div>
       </slot>
     </div>
-
     <!-- CHIPS BELOW -->
     <div
       v-if="$props.allowMultipleEntries && !$props.chipsInline && selectedListInt.length"
       class="base-chips-input-chips-container">
-      <base-chip
-        v-for="(entry,index) in selectedListInt"
-        :entry="entry"
-        :key="index"
-        :object-prop="objectProp"
-        :chip-editable="chipsEditable"
-        class="base-chips-input-chip"
-        @removeEntry="removeEntry($event, index)"/>
+      <!-- @slot a slot to customize the chips display below the input field -->
+      <slot
+        :list="selectedListInt"
+        name="chips-area">
+        <!-- SLOT DEFAULT -->
+        <base-chip
+          v-for="(entry,index) in selectedListInt"
+          :entry="entry"
+          :object-prop="objectProp"
+          :key="index"
+          :chip-editable="chipsEditable"
+          class="base-chips-input-chip"
+          @valueChanged="entry = $event"
+          @removeEntry="removeEntry($event, index)"/>
+      </slot>
     </div>
 
   </div>
 </template>
 
 <script>
+/**
+ * Base Chips Input component with autocomplete function
+ */
+
 import ClickOutside from 'vue-click-outside';
 import BaseInput from './BaseInput';
 import BaseChip from './BaseChip';
@@ -87,60 +99,108 @@ export default {
   directives: {
     ClickOutside,
   },
+  model: {
+    prop: 'selectedList',
+    event: 'selected',
+  },
   props: {
-    // selectable list
+    /**
+     * list of selectable options (strings or objects)
+     */
     list: {
       type: Array,
       default() {
         return [];
       },
     },
+    /**
+     * list of already selected options (strings or objects), displayed as chips
+     */
     selectedList: {
       type: Array,
       default() {
         return [];
       },
     },
+    /**
+     * if object array was passed - define the property that should be
+     * displayed in the chip
+     */
     objectProp: {
       type: String,
       default: 'name',
     },
+    /**
+     * input field label
+     */
     label: {
       type: String,
       default: null,
     },
+    /**
+     * define if label should be visible (should always be set for usability
+     */
+    showLabel: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * input field placeholder
+     */
     placeholder: {
       type: String,
       default: null,
     },
+    /**
+     * message displayed when no selectable obtions are available
+     */
     dropDownNoOptionsInfo: {
       type: String,
       default: 'No options available',
     },
-    // TODO: not implemented yet!!
+    /**
+     * define if the user can add an option that is not in the list
+     */
     // can the user add Entries that are not available in the vocabulary (selectable list)
     allowUnknownEntries: {
       type: Boolean,
       default: false,
     },
+    /**
+     * define only a single or multiple options can be selected
+     */
     // define if one or several entries can be selected from drop down menu
     allowMultipleEntries: {
       type: Boolean,
       default: true,
     },
+    /**
+     * define if selectable list options should be fetched every time of if the
+     * list passed in the beginning is used
+     */
     allowDynamicDropDownEntries: {
       type: Boolean,
       default: false,
     },
-    // TODO: this (the useage of this variable and chips NOT inline) is not implemented yet!
+    /**
+     * define if chips should be displayed in the input field (inline) or below
+     */
     chipsInline: {
       type: Boolean,
       default: true,
     },
+    /**
+     * define if chips should be editable
+     */
     chipsEditable: {
       type: Boolean,
       default: false,
     },
+    /**
+     * this prop was added because there was some action needed to be done before entry was added
+     * so this is possible if entry is not added to selectedList directly but only in parent
+     * component
+     */
     addSelectedEntryDirectly: {
       type: Boolean,
       default: true,
@@ -153,7 +213,15 @@ export default {
       // the current text input
       input: null,
       // list of selected entries
-      selectedListInt: [],
+      selectedListInt: this.$props.selectedList.map((entry) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, {
+            idInt: null,
+            [this.objectProp]: entry[this.objectProp],
+          });
+        }
+        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
+      }),
       // create a original list from text or object with internal id
       dropDownListOrig: [],
       // list of selectable entries received from parent component
@@ -178,6 +246,13 @@ export default {
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event fetchDropDownEntries
+         * @type { value, type }
+         *
+         */
         this.$emit('fetchDropDownEntries', { value: val, type: this.$props.objectProp });
       } else {
         // if content is static filter the existing entries for the ones matching input
@@ -194,7 +269,7 @@ export default {
       this.selectedListInt = val.map((entry) => {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
-            idInt: null,
+            idInt: entry.idInt,
             [this.objectProp]: entry[this.objectProp],
           });
         }
@@ -202,30 +277,31 @@ export default {
       });
     },
     list(val) {
-      this.dropDownListInt = val.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
+      if (this.allowDynamicDropDownEntries) {
+        this.dropDownListInt = val.map((entry, index) => {
+          if (typeof entry === 'object') {
+            return Object.assign({}, entry, {
+              idInt: index,
+              [this.objectProp]: entry[this.objectProp],
+            });
+          }
+          return Object.assign({}, {
             idInt: index,
-            [this.objectProp]: entry[this.objectProp],
+            [this.objectProp]: entry,
           });
-        }
-        return Object.assign({}, {
-          idInt: index,
-          [this.objectProp]: entry,
         });
-      });
+      }
     },
     showDropDown(val) {
-      // debugger;
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
-        // below disabled for now due to errors with single entry mode but check
+        // TODO below disabled for now due to errors with single entry mode but check
         // if this is necessary for multi entry inline mode
         // this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
       }
     },
   },
-  mounted() {
+  created() {
     this.selectedListInt = this.$props.selectedList.map((entry) => {
       if (typeof entry === 'object') {
         return Object.assign({}, entry, {
@@ -269,7 +345,13 @@ export default {
           this.dropDownListInt = this.dropDownListOrig;
         }
         this.selectedMenuEntryIndex = this.getAllowUnknown();
-        this.$emit('selected', selected);
+        /**
+         * event triggered when an entry from the drop down was selected or enter was pressed
+         *
+         * @event selected
+         * @type {object}
+         */
+        this.$emit('selected', this.selectedListInt);
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
@@ -284,7 +366,7 @@ export default {
     removeEntry(item, index) {
       if (!this.allowDynamicDropDownEntries) {
         // check if the item id was set
-        if (!item.idInt) {
+        if (item.idInt !== 0 && !item.idInt) {
           this.dropDownListInt = [];
         }
         this.dropDownListInt.push(item);
@@ -325,7 +407,6 @@ export default {
     .base-chips-drop-down {
       position: absolute;
       background: white;
-      margin-top: -$spacing;
       width: 100%;
       z-index: 2;
       box-shadow: $drop-shadow;
@@ -353,15 +434,6 @@ export default {
       display: flex;
       flex-direction: column;
       margin-bottom: $spacing;
-
-      .base-chips-input-chip {
-        align-self: start;
-        margin: 0 0 $spacing $spacing-small;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
     }
   }
 </style>

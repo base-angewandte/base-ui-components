@@ -39,6 +39,10 @@ export default {
   directives: {
     ClickOutside,
   },
+  model: {
+    prop: 'entry',
+    event: 'valueChanged',
+  },
   props: {
     /**
      * defines if chips can be edited
@@ -48,8 +52,9 @@ export default {
       default: false,
     },
     /**
+     * @model
+     *
      * pass the data object for the chip
-     * TODO: check if title would be enough actually (see above)
      */
     entry: {
       type: Object,
@@ -66,8 +71,17 @@ export default {
   },
   data() {
     return {
-      entryInt: Object.assign({}, this.entry, { editable: false, edited: false }),
+      entryInt: {},
     };
+  },
+  watch: {
+    entry() {
+      this.entryInt = Object.assign({}, this.entry,
+        { editable: this.entryInt.editable, edited: this.entryInt.edited });
+    },
+  },
+  created() {
+    this.entryInt = Object.assign({}, this.entry, { editable: false, edited: false });
   },
   methods: {
     content() {

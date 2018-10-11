@@ -1,9 +1,8 @@
 <template>
   <div class="base-input">
     <label
-      :class="{ 'hide': !showLabel }"
-      :for="label"
-      class="base-input-label">
+      :class="['base-input-label', { 'hide': !showLabel }]"
+      :for="label">
       {{ label }}
     </label>
     <div
@@ -142,7 +141,6 @@ export default {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: $spacing;
       padding-left: $spacing-small;
       min-height: $row-height-small;
       border: $input-field-border;
@@ -179,7 +177,6 @@ export default {
     border: none;
     overflow: hidden;
     padding: 4px 0;
-    height: $line-height;
   }
 
   input[type='date'].base-input-field {

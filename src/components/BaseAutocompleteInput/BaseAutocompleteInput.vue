@@ -242,7 +242,6 @@ export default {
     .base-autocomplete-drop-down {
       position: absolute;
       background: white;
-      margin-top: -$spacing;
       width: 100%;
       z-index: 2;
       box-shadow: $drop-shadow;
