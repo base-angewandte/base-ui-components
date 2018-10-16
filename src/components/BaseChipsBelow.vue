@@ -21,9 +21,9 @@
               class="base-chips-below-list-item">
               <div class="base-chips-below-list-item-chip-wrapper">
                 <base-chip
-                  :entry="entry"
+                  v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
-                  :key="index"
+                  :key="entry[objectProp]"
                   class="base-chips-input-chip"
                   @valueChanged="entry = $event"
                   @removeEntry="removeEntry($event, index)"/>

@@ -4,6 +4,7 @@
       <base-chips-below
         :chips-inline="false"
         v-model="selectedList"
+        :chips-editable="true"
         :list="['Herbert Marcuse', 'Erich From', 'Georg Werth']"
         label="chips-below-test"/>
       <base-upload-bar

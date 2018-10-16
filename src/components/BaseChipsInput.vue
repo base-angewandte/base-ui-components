@@ -18,10 +18,8 @@
         <base-chip
           v-for="(entry,index) in selectedListInt"
           :key="index"
-          :entry="entry"
-          :object-prop="objectProp"
+          v-model="entry[objectProp]"
           :chip-editable="chipsEditable"
-          @valueChanged="entry = $event"
           @removeEntry="removeEntry($event, index)"/>
       </template>
     </base-input>
@@ -69,12 +67,10 @@
         <!-- SLOT DEFAULT -->
         <base-chip
           v-for="(entry,index) in selectedListInt"
-          :entry="entry"
-          :object-prop="objectProp"
+          v-model="entry[objectProp]"
           :key="index"
           :chip-editable="chipsEditable"
           class="base-chips-input-chip"
-          @valueChanged="entry = $event"
           @removeEntry="removeEntry($event, index)"/>
       </slot>
     </div>
@@ -213,14 +209,14 @@ export default {
       // the current text input
       input: null,
       // list of selected entries
-      selectedListInt: this.$props.selectedList.map((entry) => {
+      selectedListInt: this.selectedList.map((entry, index) => {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
-            idInt: null,
+            idInt: this.list.length + index,
             [this.objectProp]: entry[this.objectProp],
           });
         }
-        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
+        return Object.assign({}, { idInt: this.list.length + index, [this.objectProp]: entry });
       }),
       // create a original list from text or object with internal id
       dropDownListOrig: [],

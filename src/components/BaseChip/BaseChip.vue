@@ -1,14 +1,14 @@
 <template>
   <div
-    v-click-outside="() => $set(entryInt, 'editable', false)"
+    v-click-outside="() => entryEditable = false"
     :class="['base-chip',
-             { 'base-chip-edited': entryInt.edited }]">
+             { 'base-chip-edited': entryEdited }]">
     <div
-      :contenteditable="chipEditable && entryInt.editable"
+      :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
-      @click="$set(entryInt, 'editable', true)"
+      @click="entryEditable = true"
       @blur="editText"
-      @keyup="$set(entryInt, 'edited', true)"
+      @keyup="entryEdited = true"
       v-html="content()" />
     <div
       class="base-chip-icon"
@@ -27,7 +27,6 @@
 
 /**
  * triggered when the remove icon is clicked and returns the data behind the chip
- * TODO: check if title would actually be enough (passing to and from the component)
  *
  * @event removeEntry
  * @type Object
@@ -54,42 +53,48 @@ export default {
     /**
      * @model
      *
-     * pass the data object for the chip
+     * pass the text for the chip
      */
     entry: {
-      type: Object,
+      type: String,
       required: true,
     },
     /**
-     * define which property of the data object should be displayed
-     * TODO: check if title would be enough actually (see above)
+     * set if entry is a linked data entry and displayed with grey background
      */
-    objectProp: {
-      type: String,
-      default: 'name',
+    isLinked: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
     return {
       entryInt: {},
+      entryEditable: false,
+      entryEdited: false,
     };
   },
   watch: {
     entry() {
-      this.entryInt = Object.assign({}, this.entry,
-        { editable: this.entryInt.editable, edited: this.entryInt.edited });
+      this.entryInt = this.entry;
+    },
+    isLinked(val) {
+      if (!this.entryEdited) {
+        this.entryEdited = !val;
+      }
     },
   },
   created() {
-    this.entryInt = Object.assign({}, this.entry, { editable: false, edited: false });
+    this.entryInt = this.entry;
+    this.entryEdited = !this.isLinked;
   },
   methods: {
     content() {
-      return `<span>${this.entryInt[this.objectProp]}</span>`;
+      return `<span>${this.entryInt}</span>`;
     },
     editText(evt) {
-      if (this.entryInt[this.objectProp] !== evt.target.innerText) {
-        this.$set(this.entryInt, this.objectProp, evt.target.innerText);
+      if (this.entryInt !== evt.target.innerText) {
+        this.entryInt = evt.target.innerText;
 
         /**
          * event emitted when the chip content was edited
