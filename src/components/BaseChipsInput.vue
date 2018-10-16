@@ -89,7 +89,7 @@
 
 import ClickOutside from 'vue-click-outside';
 import BaseInput from './BaseInput';
-import BaseChip from './BaseChip';
+import BaseChip from './BaseChip/BaseChip';
 
 export default {
   components: {
@@ -250,7 +250,7 @@ export default {
          * event to fetch drop down entries with changing input
          *
          * @event fetchDropDownEntries
-         * @type { value, type }
+         * @type { object }
          *
          */
         this.$emit('fetchDropDownEntries', { value: val, type: this.$props.objectProp });

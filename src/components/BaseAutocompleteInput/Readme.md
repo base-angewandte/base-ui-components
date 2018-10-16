@@ -19,7 +19,16 @@ Form Input Field with Dynamic Autocomplete
 export default {
   data() {
     return {
-      dropDownInput: [],
+      dropDownInput: [
+        'Biology',
+        'Math',
+        'English',
+        'Philosophy',
+        'Physical Education',
+        'Physics',
+        'Chemistry',
+        'Psychology',
+      ],
       autocompleteInput: '',
       list: [
         'Biology',
@@ -45,7 +54,7 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  
+
   .base-styling {
     font-family: $font !important;
   }

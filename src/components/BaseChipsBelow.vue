@@ -47,7 +47,7 @@
 <script>
 import Draggable from 'vuedraggable';
 import BaseChipsInput from './BaseChipsInput';
-import BaseChip from './BaseChip';
+import BaseChip from './BaseChip/BaseChip';
 
 export default {
   components: {

@@ -1,27 +1,26 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @click="$emit('clicked', selectedInt)">
-    <label
-      :for="label"
-      class="hide">Select Menu Entry {{ label }}</label>
+    @click="$emit('clicked', label)">
     <input
-      v-model="selectedInt"
+      v-model="checkedInt"
       :name="label"
       :value="label"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', {'base-checkbox-checked': selectedInt }]">
+      :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]">
     <div
       :class="[
         'base-checkmark-container',
         'base-checkmark-container-' + checkBoxSize,
-        {'base-radiomark': markStyle === 'radio' && selectedInt }]">
+        {'base-radiomark': markStyle === 'radio' && checkedInt === label }]">
       <svg-icon
-        v-if="markStyle === 'checkbox' && selectedInt"
+        v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
         name="check-mark"/>
-
     </div>
+    <label
+      :for="label"
+      :class="['base-checkbox-labeltext', { 'hide': !showLabel }]">{{ label }}</label>
   </div>
 </template>
 
@@ -42,6 +41,10 @@ import SvgIcon from 'vue-svgicon';
 export default {
   components: {
     SvgIcon,
+  },
+  model: {
+    prop: 'checked',
+    event: 'clicked',
   },
   props: {
     /**
@@ -65,11 +68,24 @@ export default {
       default: 'select',
     },
     /**
-     * checkbox checked or radio button selected can be set from outside
+     * define if label should be visible - default set false because
+     * currentyl not needed in base project
      */
-    selected: {
+    showLabel: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * checkbox checked or radio button checked can be set from outside, default
+     * value depending on type of selector
+     *
+     * @model
+     */
+    checked: {
+      type: [Boolean, String],
+      default() {
+        return this.type === 'checkbox' ? false : '';
+      },
     },
     /**
      * set the size of the checkBox <br>
@@ -85,12 +101,12 @@ export default {
   },
   data() {
     return {
-      selectedInt: this.$props.selected,
+      checkedInt: this.checked,
     };
   },
   watch: {
-    selected(val) {
-      this.selectedInt = val;
+    checked(val) {
+      this.checkedInt = val;
     },
   },
 };
@@ -105,6 +121,8 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    display: flex;
+    align-items: center;
 
     .base-checkbox-container-small {
       width: $spacing-small*2;
@@ -134,9 +152,11 @@ export default {
 
     .base-checkmark-container {
       border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       .base-checkmark {
-        position: absolute;
         opacity: 1;
       }
     }
@@ -171,9 +191,8 @@ export default {
     .base-radiomark {
       &:after {
         content: "";
-        position: absolute;
         left: 4px;
-        top: 4px;
+        top: 8px;
         width: 8px;
         height: 8px;
         background-color: black;
@@ -181,6 +200,10 @@ export default {
         border-radius: 8px;
 
       }
+    }
+
+    .base-checkbox-labeltext {
+      padding-left: $spacing;
     }
   }
 </style>

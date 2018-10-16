@@ -1,45 +1,48 @@
 <template>
   <base-box
     :box-size="boxSize"
+    :box-ratio="boxRatio"
     class="base-box-button"
     @clicked="$emit('clicked')">
-    <div
-      v-if="boxStyle === 'large'"
-      class="button-box-content">
-      <div class="button-box-center">
-        <div
-          class="button-box-image-row">
-          <div class="button-box-plus-container">
-            <svg-icon
-              v-if="showPlus"
-              name="plus"
-              alt="add"
-              class="button-box-plus"/>
-          </div>
-          <div class="button-box-icon-container">
-            <svg-icon
-              v-if="icon"
-              :name="icon"
-              class="button-box-icon"/>
-          </div>
+    <div class="button-box-content">
+      <div
+        v-if="boxStyle === 'large'"
+        class="button-box-content-large">
+        <div class="button-box-center">
+          <div
+            class="button-box-image-row">
+            <div class="button-box-plus-container">
+              <svg-icon
+                v-if="showPlus"
+                name="plus"
+                alt="add"
+                class="button-box-plus"/>
+            </div>
+            <div class="button-box-icon-container">
+              <svg-icon
+                v-if="icon"
+                :name="icon"
+                class="button-box-icon"/>
+            </div>
 
+          </div>
+          <div class="button-box-text">{{ text }}</div>
         </div>
-        <div class="button-box-text">{{ text }}</div>
+
+        <div class="button-box-subtext">{{ subtext }}</div>
+
       </div>
-
-      <div class="button-box-subtext">{{ subtext }}</div>
-
+      <div
+        v-else
+        class="button-box-content-small">
+        <svg-icon
+          v-if="icon"
+          :name="icon"
+          class="button-box-icon-small"/>
+        <span class="button-box-text-small">{{ text }}</span>
+      </div>
+      <slot />
     </div>
-    <div
-      v-else
-      class="button-box-content-small">
-      <svg-icon
-        v-if="icon"
-        :name="icon"
-        class="button-box-icon-small"/>
-      <div class="button-box-text-small">{{ text }}</div>
-    </div>
-    <slot />
   </base-box>
 </template>
 
@@ -115,8 +118,16 @@ export default {
     boxSize: {
       type: Object,
       default() {
-        return { width: '250px' };
+        return { width: '25%' };
       },
+    },
+    /**
+     * define the ratio of width and height of the box
+     * (in percent string, e.g. 1:1 --> '100', 1:2 --> '50')
+     */
+    boxRatio: {
+      type: String,
+      default: '100',
     },
   },
 };
@@ -126,7 +137,6 @@ export default {
   @import "../../styles/variables";
 
   .base-box-button {
-    display: flex;
 
     &:hover {
       color: $app-color;
@@ -135,6 +145,7 @@ export default {
     .button-box-content {
       padding: $spacing;
       position: absolute;
+      display: flex;
       height: 100%;
       width: 100%;
 
@@ -196,8 +207,12 @@ export default {
       align-items: center;
       width: 100%;
 
+      .button-box-content-text {
+        flex: 1 1 75%;
+      }
+
       .button-box-icon-small {
-        flex-shrink: 0;
+        flex: 0 0 25%;
         margin-right: 16px;
         width: $icon-large;
         max-height: $icon-large;

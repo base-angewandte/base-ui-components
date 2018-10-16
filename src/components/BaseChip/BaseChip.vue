@@ -15,7 +15,7 @@
       @click="$emit('removeEntry', entryInt)">
       <img
         class="base-chip-icon-img"
-        src="../static/icons/remove.svg">
+        src="../../static/icons/remove.svg">
     </div>
   </div>
 </template>
@@ -105,7 +105,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-chip, .base-chip-inline {
     margin: $chips-spacing $spacing-small $chips-spacing 0;
