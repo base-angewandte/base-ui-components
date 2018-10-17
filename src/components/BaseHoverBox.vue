@@ -1,6 +1,6 @@
 <template>
   <div
-    :style="boxSize"
+    :style="[boxSize, boxPosition]"
     class="base-hover-box">
     <base-image-box v-bind="$props">
       <div
@@ -93,6 +93,7 @@ export default {
   data() {
     return {
       boxTextStyle: {},
+      boxPosition: { top: 0, left: 0 },
     };
   },
   mounted() {
@@ -106,6 +107,11 @@ export default {
       '-webkit-line-clamp': lines,
     };
   },
+  methods: {
+    setPosition(x, y) {
+      this.boxPosition = { top: `${y}px`, left: `${x}px` };
+    },
+  },
 };
 </script>
 
@@ -116,10 +122,11 @@ export default {
     box-shadow: $preview-box-shadow;
     position: absolute;
     z-index: 10;
+    margin: $spacing;
 
     .base-hover-box-text {
       display: flex;
-      margin: 0 16px 16px;
+      margin: 0 $spacing $spacing;
       overflow-wrap: break-word;
       overflow: hidden;
       display: -webkit-box;

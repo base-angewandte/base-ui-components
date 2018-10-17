@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <base-hover-box
+    <!-- <base-hover-box
       :box-text="[
         'Alias: Max Mustermann, Stephan Mustermann',
         'Mitglied der Gruppe für Gestaltung'
       ]"
       title="Andreas M."
-      subtext="*1970 Steyr, Oberösterreich"/>
+      subtext="*1970 Steyr, Oberösterreich"/> -->
     <div class="form-field">
       <base-chips-below
         :chips-inline="false"

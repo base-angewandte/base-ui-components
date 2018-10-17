@@ -6,7 +6,9 @@
     <div
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
-      @click="entryEditable = true"
+      @click="clickAction"
+      @mousemove="moveBox"
+      @mouseleave="hideBox"
       @blur="editText"
       @keyup="entryEdited = true"
       v-html="content()" />
@@ -17,6 +19,11 @@
         class="base-chip-icon-img"
         src="../../static/icons/remove.svg">
     </div>
+    <base-hover-box
+      v-if="hoverBoxEnabled"
+      ref="hoverBox"
+      v-bind="hoverBoxContent"
+      :class="{ 'visible': !showInfoBox }"/>
   </div>
 </template>
 
@@ -33,10 +40,14 @@
  *
  */
 import ClickOutside from 'vue-click-outside';
+import BaseHoverBox from '../BaseHoverBox';
 
 export default {
   directives: {
     ClickOutside,
+  },
+  components: {
+    BaseHoverBox,
   },
   model: {
     prop: 'entry',
@@ -66,13 +77,29 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * if a hover box is associated with the chip add all relevant properties here
+     * (see BaseHoverBox for details)
+     */
+    hoverBoxContent: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
   },
   data() {
     return {
       entryInt: {},
       entryEditable: false,
       entryEdited: false,
+      showInfoBox: false,
     };
+  },
+  computed: {
+    hoverBoxEnabled() {
+      return this.isLinked && !!Object.keys(this.hoverBoxContent).length;
+    },
   },
   watch: {
     entry() {
@@ -105,6 +132,27 @@ export default {
         this.$emit('valueChanged', this.entryInt);
       }
     },
+    // TODO: does this need some kind of event because content for hover box
+    // actually needs to be fetched first???
+    clickAction(e) {
+      if (this.hoverBoxEnabled) {
+        this.$refs.hoverBox.setPosition(e.clientX, e.clientY);
+        this.showInfoBox = !this.showInfoBox;
+      }
+      if (this.chipEditable) {
+        this.entryEditable = true;
+      }
+    },
+    moveBox(e) {
+      if (this.hoverBoxEnabled && this.showInfoBox) {
+        this.$refs.hoverBox.setPosition(e.clientX, e.clientY);
+      }
+    },
+    hideBox() {
+      if (this.hoverBoxEnabled) {
+        this.showInfoBox = false;
+      }
+    },
   },
 };
 </script>
@@ -121,6 +169,7 @@ export default {
     max-width: calc(100% - #{$spacing-small});
     display: inline-flex;
     align-items: center;
+    cursor: default;
 
     &.base-chip-edited {
       background-color: transparent;
@@ -134,6 +183,7 @@ export default {
 
       &:active, &:focus {
         outline: none;
+        cursor: text;
       }
     }
 
@@ -146,5 +196,9 @@ export default {
         vertical-align: middle;
       }
     }
+  }
+
+  .visible {
+    visibility: hidden;
   }
 </style>

@@ -48,9 +48,11 @@
 import Draggable from 'vuedraggable';
 import BaseChipsInput from './BaseChipsInput';
 import BaseChip from './BaseChip/BaseChip';
+import BaseHoverBox from './BaseHoverBox';
 
 export default {
   components: {
+    BaseHoverBox,
     BaseChipsInput,
     Draggable,
     BaseChip,
