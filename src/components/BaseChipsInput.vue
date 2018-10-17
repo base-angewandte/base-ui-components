@@ -20,7 +20,7 @@
           :key="index"
           v-model="entry[objectProp]"
           :chip-editable="chipsEditable"
-          @removeEntry="removeEntry($event, index)"/>
+          @removeEntry="removeEntry(entry, index)"/>
       </template>
     </base-input>
 
@@ -262,14 +262,17 @@ export default {
     selectedList(val) {
       // if entries are objects merge with internally necessary properties,
       // else use entry (string? TODO: should probably check this) as [this.objectProp]
-      this.selectedListInt = val.map((entry) => {
+      this.selectedListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
             idInt: entry.idInt,
             [this.objectProp]: entry[this.objectProp],
           });
         }
-        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
+        return Object.assign({}, {
+          idInt: this.list.length + index,
+          [this.objectProp]: entry,
+        });
       });
     },
     list(val) {
@@ -374,6 +377,7 @@ export default {
       if (!this.$props.allowMultipleEntries) {
         this.showDropDown = true;
       }
+      this.$emit('selected', this.selectedListInt);
     },
     // allow for navigation with arrow keys
     triggerArrowKey(event) {
