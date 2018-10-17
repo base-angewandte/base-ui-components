@@ -10,11 +10,21 @@
       :label="label"
       :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
+      :show-input-border="showInputBorder"
       v-model="input"
       @input-focus="showDropDown = true"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
-      <template v-if="!allowMultipleEntries || chipsInline">
+      <template
+        v-if="sortable"
+        slot="label-addition">
+        <div
+          class="base-chips-input-sort"
+          @click="sort">Sortieren von A-Z</div>
+      </template>
+      <template
+        v-if="!allowMultipleEntries || chipsInline"
+        slot="input-field-addition">
         <base-chip
           v-for="(entry,index) in selectedListInt"
           :key="index"
@@ -201,6 +211,17 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * option to have the border of the input field not displayed
+     */
+    showInputBorder: {
+      type: Boolean,
+      default: true,
+    },
+    sortable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -209,15 +230,7 @@ export default {
       // the current text input
       input: null,
       // list of selected entries
-      selectedListInt: this.selectedList.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: this.list.length + index,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, { idInt: this.list.length + index, [this.objectProp]: entry });
-      }),
+      selectedListInt: [],
       // create a original list from text or object with internal id
       dropDownListOrig: [],
       // list of selectable entries received from parent component
@@ -301,10 +314,10 @@ export default {
     },
   },
   created() {
-    this.selectedListInt = this.$props.selectedList.map((entry) => {
+    this.selectedListInt = this.$props.selectedList.map((entry, index) => {
       if (typeof entry === 'object') {
         return Object.assign({}, entry, {
-          idInt: null,
+          idInt: this.list.length + index,
           [this.objectProp]: entry[this.objectProp],
         });
       }
@@ -392,6 +405,10 @@ export default {
     getAllowUnknown() {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
+    sort() {
+      this.selectedListInt.sort((a, b) => a[this.objectProp] > b[this.objectProp]);
+      this.$emit('selected', this.selectedListInt);
+    },
   },
 };
 </script>
@@ -403,6 +420,10 @@ export default {
     position: relative;
     width: 100%;
     text-align: left;
+
+    .base-chips-input-sort {
+      cursor: pointer;
+    }
 
     .base-chips-drop-down {
       position: absolute;

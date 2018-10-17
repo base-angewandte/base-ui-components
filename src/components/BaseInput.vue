@@ -1,16 +1,21 @@
 <template>
   <div class="base-input">
-    <label
-      :class="['base-input-label', { 'hide': !showLabel }]"
-      :for="label">
-      {{ label }}
-    </label>
+    <div
+      :class="['base-input-label-row', { 'hide': !showLabel }]">
+      <label
+        :class="['base-input-label']"
+        :for="label">
+        {{ label }}
+      </label>
+      <slot name="label-addition" />
+    </div>
     <div
       v-click-outside="() => $emit('clicked-outside')"
       :class="['base-input-field-container',
+               { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active }]">
       <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
-      <slot />
+      <slot name="input-field-addition" />
       <!--
         @event input-focus
         @event arrow-key
@@ -95,6 +100,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * option to have the border of the input field not displayed
+     */
+    showInputBorder: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -143,8 +155,11 @@ export default {
       flex-wrap: wrap;
       padding-left: $spacing-small;
       min-height: $row-height-small;
-      border: $input-field-border;
       background: white;
+    }
+
+    .base-input-field-container-border {
+      border: $input-field-border;
     }
 
     .base-input-field-container-active {
@@ -166,10 +181,15 @@ export default {
       margin-right: $spacing;
     }
 
-    .base-input-label {
-      color: $font-color-second;
+    .base-input-label-row {
+      display: flex;
       margin-bottom: $spacing-small;
-      text-align: left;
+
+      .base-input-label {
+        color: $font-color-second;
+        text-align: left;
+        flex-grow: 1;
+      }
     }
   }
 

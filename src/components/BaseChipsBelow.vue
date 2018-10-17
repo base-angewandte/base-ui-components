@@ -3,6 +3,7 @@
     <base-chips-input
       v-bind="$props"
       v-model="selectedBelowListInt"
+      :sortable="true"
       @selected="addedEntry">
       <template
         slot="chips-area"
@@ -17,15 +18,17 @@
             <div
               v-for="(entry,index) in props.list"
               :name="entry[objectProp]"
-              :key="index"
+              :key="entry.idInt"
               class="base-chips-below-list-item">
               <div class="base-chips-below-list-item-chip-wrapper">
                 <base-chip
+                  ref="selectedChip"
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
                   :key="entry[objectProp]"
+                  :is-linked="!entry.edited"
                   class="base-chips-input-chip"
-                  @valueChanged="entry = $event"
+                  @valueChanged="$set(entry, 'edited', true)"
                   @removeEntry="removeEntry($event, index)"/>
               </div>
               <base-chips-input
@@ -34,6 +37,7 @@
                 :key="index"
                 v-model="entry.roles"
                 :list="['Editor', 'Actor', 'Farmer', 'Philosopher', 'Magician']"
+                :show-input-border="false"
                 placeholder="Select Role"
                 @selected="updateRoles($event, index)"/>
             </div>
@@ -223,6 +227,7 @@ export default {
       .base-chips-below-list-item-chip-wrapper {
         width: 100%;
         margin-left: $spacing-small;
+        align-self: flex-start;
       }
     }
 

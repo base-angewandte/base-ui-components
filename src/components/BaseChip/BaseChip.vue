@@ -23,7 +23,7 @@
       v-if="hoverBoxEnabled"
       ref="hoverBox"
       v-bind="hoverBoxContent"
-      :class="{ 'visible': !showInfoBox }"/>
+      :class="{ 'hidden': !showInfoBox }"/>
   </div>
 </template>
 
@@ -198,7 +198,7 @@ export default {
     }
   }
 
-  .visible {
+  .hidden {
     visibility: hidden;
   }
 </style>
