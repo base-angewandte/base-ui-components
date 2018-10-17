@@ -1,5 +1,12 @@
 <template>
   <div id="app">
+    <base-hover-box
+      :box-text="[
+        'Alias: Max Mustermann, Stephan Mustermann',
+        'Mitglied der Gruppe für Gestaltung'
+      ]"
+      title="Andreas M."
+      subtext="*1970 Steyr, Oberösterreich"/>
     <div class="form-field">
       <base-chips-below
         :chips-inline="false"
@@ -303,10 +310,12 @@ import BaseImageBox from './components/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow';
+import BaseHoverBox from './components/BaseHoverBox';
 
 export default {
   name: 'App',
   components: {
+    BaseHoverBox,
     BaseChipsBelow,
     BaseAutocompleteInput,
     BaseUploadBar,

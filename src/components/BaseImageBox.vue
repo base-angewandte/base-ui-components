@@ -3,19 +3,27 @@
     :box-size="$props.boxSize"
     :class="['base-image-box', { 'base-image-box-selected': selected }]"
     @clicked="boxSelect">
-    <div
-      v-if="$props.showTitle"
-      class="base-image-box-title">
-      {{ $props.title }}
+    <div class="base-image-box-header">
+      <div
+        v-if="$props.showTitle"
+        class="base-image-box-title">
+        {{ title }}
+      </div>
+      <div
+        v-if="subtext"
+        class="base-image-box-subtext">{{ subtext }}</div>
     </div>
     <div
+      v-if="imageUrl"
       :class="['base-image-box-img-wrapper', imageShadowClass]">
       <!-- TODO: what if no image is available?? (what content should be displayed?) -->
       <img
         :alt="title"
-        :src="$props.imageUrl"
+        :src="imageUrl"
         class="base-image-box-img">
     </div>
+    <!-- Slot for BaseHoverBox to display text -->
+    <slot />
     <div class="base-image-box-description">
       {{ $props.description }}
     </div>
@@ -42,13 +50,20 @@ export default {
   },
   props: {
     /**
-     * The title of the item in question, also used as img alt text
+     * The title of the item in question (max 2 lines), also used as img alt text
      * (atm - TODO: should there be a separate alt text (then again - what would that be since
      * file uploads dont have any properties)?)
      */
     title: {
       type: String,
       default: 'No title',
+    },
+    /**
+     * Text displayed directly below title (max two lines; max 3 lines with title)
+     */
+    subtext: {
+      type: String,
+      default: '',
     },
     /**
      * should the title be displayed or box only display the image
@@ -144,20 +159,34 @@ export default {
       }
     }
 
-    .base-image-box-title {
-      font-weight: bold;
-      margin: $spacing;
+    .base-image-box-header {
       overflow-wrap: break-word;
       overflow: hidden;
       display: -webkit-box;
       text-overflow: ellipsis;
       -webkit-box-orient: vertical;
+      margin: $spacing;
       -webkit-line-clamp: 2;
-      line-height: $line-height;
+      line-height: $line-height;          /* fallback */
       flex-shrink: 0;
       height: $line-height * 2;
-    }
 
+      .base-image-box-title, .base-image-box-subtext {
+        overflow-wrap: break-word;
+        overflow: hidden;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-height: $line-height;
+        flex-shrink: 0;
+        max-height: $line-height * 2;
+      }
+
+      .base-image-box-title {
+        font-weight: bold;
+      }
+    }
     .base-image-box-img-wrapper {
       width: 100%;
       height: 100%;
