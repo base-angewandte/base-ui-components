@@ -22,7 +22,7 @@
         @event autocomplete
       -->
       <input
-        v-if="type === 'text' && !hideInputField"
+        v-if="!hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
@@ -56,13 +56,6 @@ export default {
     event: 'autocomplete',
   },
   props: {
-    type: {
-      type: String,
-      default: 'text',
-      validator(val) {
-        return (val === 'text' || val === 'date');
-      },
-    },
     /**
      * @model
      *

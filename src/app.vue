@@ -84,6 +84,11 @@
         @input="triggerInput"/>
     </div>
     <div class="form-field">
+      <base-date-input
+        :type="'datetime'"
+        :label="'unknown'"/>
+      <base-date-input
+        :label="'unknown'"/>
       <base-autocomplete-input
         :list="dropDownInput"
         :placeholder="'Select Your Marxccccc'"
@@ -311,12 +316,14 @@ import BaseUploadBar from './components/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow';
 import BaseHoverBox from './components/BaseHoverBox';
+import BaseDateInput from './components/BaseDateInput';
 
 export default {
   name: 'App',
   components: {
     BaseHoverBox,
     BaseChipsBelow,
+    BaseDateInput,
     BaseAutocompleteInput,
     BaseUploadBar,
     BaseImageBox,
