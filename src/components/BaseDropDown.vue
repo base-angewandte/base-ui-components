@@ -170,7 +170,6 @@ export default {
     white-space: nowrap;
     height: $row-height-small;
     position: relative;
-    z-index: 2;
 
     &:hover {
       color: $app-color;

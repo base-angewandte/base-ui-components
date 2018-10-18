@@ -144,7 +144,7 @@ export default {
 
       .base-multiline-text-input-tabs {
         align-self: center;
-        margin: 4px 0;
+        margin: $spacing-small/2 0;
 
         .base-multiline-text-input-tab {
           padding: $spacing-small/2 $spacing;
