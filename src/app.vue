@@ -317,8 +317,6 @@ import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutoco
 import BaseChipsBelow from './components/BaseChipsBelow';
 import BaseHoverBox from './components/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput';
-import BaseChipsBelow from './components/BaseChipsBelow';
-import BaseHoverBox from './components/BaseHoverBox';
 
 export default {
   name: 'App',
@@ -326,8 +324,6 @@ export default {
     BaseHoverBox,
     BaseChipsBelow,
     BaseDateInput,
-    BaseHoverBox,
-    BaseChipsBelow,
     BaseAutocompleteInput,
     BaseUploadBar,
     BaseImageBox,
