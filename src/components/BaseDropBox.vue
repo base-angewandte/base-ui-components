@@ -2,6 +2,7 @@
   <base-box-button
     v-bind="$props"
     :class="{ 'is-drag-over': isDragOver }"
+    :box-ratio="boxRatio"
     class="base-drop-box"
     @clicked="$emit('clicked')">
     <div
@@ -40,6 +41,14 @@ export default {
       default() {
         return { width: '250px' };
       },
+    },
+    /**
+     * define the ratio of width and height of the box
+     * (in percent string, e.g. 1:1 --> '100', 1:2 --> '50')
+     */
+    boxRatio: {
+      type: String,
+      default: '100',
     },
   },
   data() {

@@ -1,6 +1,19 @@
 <template>
   <div id="app">
+    <!-- <base-hover-box
+      :box-text="[
+        'Alias: Max Mustermann, Stephan Mustermann',
+        'Mitglied der Gruppe für Gestaltung'
+      ]"
+      title="Andreas M."
+      subtext="*1970 Steyr, Oberösterreich"/> -->
     <div class="form-field">
+      <base-chips-below
+        :chips-inline="false"
+        v-model="selectedList"
+        :chips-editable="true"
+        :list="['Herbert Marcuse', 'Erich From', 'Georg Werth']"
+        label="chips-below-test"/>
       <base-upload-bar
         :progress="progress"
         :filename="'testfile.jpg'"/>
@@ -93,6 +106,7 @@
         :allow-dynamic-drop-down-entries="true"
         :object-prop="'title'"
         :chips-inline="false"
+        :chips-editable="true"
         label="A label"
         @fetchDropDownEntries="fetch"/>
       <base-button
@@ -113,6 +127,7 @@
           { title: 'Wesen ist' }]"
         :placeholder="'Select your Marx'"
         :object-prop="'title'"
+        :chips-editable="true"
         :label="'single choice with special drop down body'"
         :allow-multiple-entries="false">
         <template
@@ -299,12 +314,20 @@ import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 import BaseImageBox from './components/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
+import BaseChipsBelow from './components/BaseChipsBelow';
+import BaseHoverBox from './components/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput';
+import BaseChipsBelow from './components/BaseChipsBelow';
+import BaseHoverBox from './components/BaseHoverBox';
 
 export default {
   name: 'App',
   components: {
+    BaseHoverBox,
+    BaseChipsBelow,
     BaseDateInput,
+    BaseHoverBox,
+    BaseChipsBelow,
     BaseAutocompleteInput,
     BaseUploadBar,
     BaseImageBox,
@@ -324,6 +347,7 @@ export default {
   },
   data() {
     return {
+      selectedList: ['Leo Löwenthal', 'Eike Geisel', 'Theodor Adorno'],
       chipsInput: [],
       dropDownInput: [
         '...alle Verhältnisse umzuwerfen',

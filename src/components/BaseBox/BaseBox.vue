@@ -1,7 +1,7 @@
 <template>
   <div
     :style="boxSizeInt"
-    class="base-box"
+    :class="['base-box', 'base-box-' + $props.boxRatio]"
     @click="$emit('clicked')">
     <slot />
   </div>
@@ -29,6 +29,14 @@ export default {
         return { width: '200px' };
       },
     },
+    /**
+     * define the ratio of width and height of the box
+     * (in percent string, e.g. 1:1 --> '100', 1:2 --> '50')
+     */
+    boxRatio: {
+      type: String,
+      default: '100',
+    },
   },
   computed: {
     // TODO: do i need this?? why not use prop directly again??
@@ -50,10 +58,19 @@ export default {
     position: relative;
     overflow: hidden;
 
+
     &:after {
       content:  '';
       display: block;
-      padding-top: 100%;
+      background: white;
+    }
+
+    &.base-box-100::after {
+      padding-bottom: 100%;
+    }
+
+    &.base-box-50::after {
+      padding-bottom: 50%;
     }
 
     &:hover {

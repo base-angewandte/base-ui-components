@@ -3,7 +3,8 @@
 const executeFire = function(){
     alert('button clicked!');
 }
-<div style="background-color: rgb(240, 240, 240); padding: 16px; display:flex;">
+<div 
+  style="background-color: rgb(240, 240, 240); padding: 16px; display:flex;">
   <base-box-button 
        :show-plus="true"
        style="margin-right: 16px;"

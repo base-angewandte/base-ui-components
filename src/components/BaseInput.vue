@@ -1,39 +1,41 @@
 <template>
   <div class="base-input">
-    <label
-      :class="{ 'hide': !showLabel }"
-      :for="label"
-      class="base-input-label">
-      {{ label }}
-    </label>
-    <div class="input-field-wrapper">
-      <div
-        v-click-outside="() => $emit('clicked-outside')"
-        :class="['base-input-field-container',
-                 { 'base-input-field-container-active': active }]">
-        <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
-        <slot />
-        <!--
-          @event input-focus
-          @event arrow-key
-          @event autocomplete
-        -->
-        <input
-          v-if="!hideInputField"
-          :id="label"
-          :title="label"
-          :placeholder="placeholder"
-          v-model="inputInt"
-          class="base-input-field"
-          type="text"
-          autocomplete="off"
-          @focus="$emit('input-focus')"
-          @keypress.enter="$emit('enter', inputInt)"
-          @keyup.up.down.prevent="$emit('arrow-key', $event)"
-          @input="$emit('autocomplete', inputInt)"
-          @blur="blurInput()"
-          @click="active = true">
-      </div>
+    <div
+      :class="['base-input-label-row', { 'hide': !showLabel }]">
+      <label
+        :class="['base-input-label']"
+        :for="label">
+        {{ label }}
+      </label>
+      <slot name="label-addition" />
+    </div>
+    <div
+      v-click-outside="() => $emit('clicked-outside')"
+      :class="['base-input-field-container',
+               { 'base-input-field-container-border': showInputBorder },
+               { 'base-input-field-container-active': active }]">
+      <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
+      <slot name="input-field-addition" />
+      <!--
+        @event input-focus
+        @event arrow-key
+        @event autocomplete
+      -->
+      <input
+        v-if="!hideInputField"
+        :id="label"
+        :title="label"
+        :placeholder="placeholder"
+        v-model="inputInt"
+        class="base-input-field"
+        type="text"
+        autocomplete="off"
+        @focus="$emit('input-focus')"
+        @keypress.enter="$emit('enter', inputInt)"
+        @keyup.up.down.prevent="$emit('arrow-key', $event)"
+        @input="$emit('autocomplete', inputInt)"
+        @blur="blurInput()"
+        @click="active = true">
     </div>
   </div>
 </template>
@@ -43,13 +45,9 @@
  * Form Input Field Component
  */
 import ClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 
 export default {
   name: 'BaseInput',
-  components: {
-    SvgIcon,
-  },
   directives: {
     ClickOutside,
   },
@@ -95,6 +93,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * option to have the border of the input field not displayed
+     */
+    showInputBorder: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -133,6 +138,7 @@ export default {
   .base-input {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     width: 100%;
 
     .base-input-field-container {
@@ -140,12 +146,13 @@ export default {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: $spacing;
       padding-left: $spacing-small;
       min-height: $row-height-small;
-      border: $input-field-border;
       background: white;
-      flex-grow: 1;
+    }
+
+    .base-input-field-container-border {
+      border: $input-field-border;
     }
 
     .base-input-field-container-active {
@@ -167,10 +174,15 @@ export default {
       margin-right: $spacing;
     }
 
-    .base-input-label {
-      color: $font-color-second;
+    .base-input-label-row {
+      display: flex;
       margin-bottom: $spacing-small;
-      text-align: left;
+
+      .base-input-label {
+        color: $font-color-second;
+        text-align: left;
+        flex-grow: 1;
+      }
     }
   }
 
@@ -178,7 +190,6 @@ export default {
     border: none;
     overflow: hidden;
     padding: 4px 0;
-    height: $line-height;
   }
 
   input[type='date'].base-input-field {

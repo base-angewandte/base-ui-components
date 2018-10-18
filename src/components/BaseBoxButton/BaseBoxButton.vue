@@ -1,6 +1,7 @@
 <template>
   <base-box
     :box-size="boxSize"
+    :box-ratio="boxRatio"
     class="base-box-button"
     @clicked="$emit('clicked')">
     <div
@@ -115,8 +116,16 @@ export default {
     boxSize: {
       type: Object,
       default() {
-        return { width: '250px' };
+        return { width: '25%' };
       },
+    },
+    /**
+     * define the ratio of width and height of the box
+     * (in percent string, e.g. 1:1 --> '100', 1:2 --> '50')
+     */
+    boxRatio: {
+      type: String,
+      default: '100',
     },
   },
 };

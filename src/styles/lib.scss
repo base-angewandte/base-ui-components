@@ -7,24 +7,6 @@
   left: -9999px !important;
 }
 
-.base-box {
-  background: white;
-  box-shadow: $box-shadow-reg;
-  transition: $box-transition;
-  min-height: 100%;
-  position: relative;
-  overflow: hidden;
-
-  &:before {
-    content:  '';
-    padding-top: 100%;
-  }
-
-  &:hover {
-    box-shadow: $box-shadow-hov;
-  }
-}
-
 *, *:before, *:after {
   box-sizing: border-box;
   margin: 0;
