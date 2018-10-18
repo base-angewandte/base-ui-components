@@ -406,7 +406,12 @@ export default {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
     sort() {
-      this.selectedListInt.sort((a, b) => a[this.objectProp] > b[this.objectProp]);
+      this.selectedListInt.sort((a, b) => {
+        if (a[this.objectProp] > b[this.objectProp]) {
+          return 1;
+        }
+        return -1;
+      });
       this.$emit('selected', this.selectedListInt);
     },
   },
