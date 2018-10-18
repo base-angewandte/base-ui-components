@@ -1,7 +1,7 @@
 <template>
   <div class="base-menu-list">
     <base-menu-entry
-      v-for="(item, index) in list"
+      v-for="(item, index) in listInt"
       v-if="item"
       ref="menuEntry"
       :key="index"
@@ -16,7 +16,7 @@
       :select-active="selectActive"
 
       @clicked="activateItem(item, index)"
-      @selected="item.selected = $event"/>
+      @selected="selectItem(item, $event)"/>
   </div>
 </template>
 
@@ -30,6 +30,10 @@ import BaseMenuEntry from './BaseMenuEntry';
 export default {
   components: {
     BaseMenuEntry,
+  },
+  model: {
+    prop: 'list',
+    event: 'changed',
   },
   props: {
     /**
@@ -49,10 +53,23 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      listInt: [],
+    };
+  },
   computed: {
     selectActive() {
       return this.selected;
     },
+  },
+  watch: {
+    list(val) {
+      this.listInt = [].concat(val);
+    },
+  },
+  mounted() {
+    this.listInt = [].concat(this.list);
   },
   methods: {
     // determines which icon should be shown for each menu entry
@@ -77,7 +94,7 @@ export default {
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
     activateItem(val, index) {
-      this.$props.list.forEach((entry) => { this.$set(entry, 'active', false); });
+      this.listInt.forEach((entry) => { this.$set(entry, 'active', false); });
       this.$set(val, 'active', true);
       /**
        * event emited when a menu entry is clicked - returning the index of the respective entry
@@ -86,6 +103,13 @@ export default {
        * @type: index
        */
       this.$emit('clicked', index);
+      this.$emit('changed', this.listInt);
+    },
+    selectItem(item, evt) {
+      // TODO: vue store is complaining a this - not working!
+      debugger;
+      this.$set(item, 'selected', evt);
+      this.$emit('changed', this.listInt);
     },
   },
 };

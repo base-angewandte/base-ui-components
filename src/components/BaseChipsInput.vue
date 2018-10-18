@@ -314,17 +314,20 @@ export default {
     },
   },
   created() {
-    this.selectedListInt = this.$props.selectedList.map((entry, index) => {
-      if (typeof entry === 'object') {
-        return Object.assign({}, entry, {
-          idInt: this.list.length + index,
-          [this.objectProp]: entry[this.objectProp],
-        });
-      }
-      return Object.assign({}, { idInt: null, [this.objectProp]: entry });
-    });
+    if (this.selectedList) {
+      this.selectedListInt = this.selectedList.map((entry, index) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, {
+            idInt: this.list.length + index,
+            [this.objectProp]: entry[this.objectProp],
+          });
+        }
+        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
+      });
+    }
+
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = this.$props.list
+      this.dropDownListOrig = this.list
         .map((entry, index) => {
           if (typeof entry === 'object') {
             return Object.assign({}, entry, {
@@ -407,7 +410,11 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        if (a[this.objectProp] > b[this.objectProp]) {
+        // TODO: alternatively - make prop flag sortByLastName (however also
+        // problematic if names in diff format...) or make sort just event emit?
+        const compA = this.objectProp === 'name' ? a[this.objectProp].split(' ')[-1] : a[this.objectProp];
+        const compB = this.objectProp === 'name' ? b[this.objectProp].split(' ')[-1] : b[this.objectProp];
+        if (compA > compB) {
           return 1;
         }
         return -1;

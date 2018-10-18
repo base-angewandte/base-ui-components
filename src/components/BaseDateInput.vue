@@ -10,7 +10,8 @@
       <div
         v-click-outside="() => $emit('clicked-outside')"
         :class="['base-input-field-container',
-                 { 'base-input-field-container-active': activeFrom }]">
+                 { 'base-input-field-container-active': activeFrom },
+                 { 'base-input-field-container-multiple': type === 'datetime' }]">
         <datepicker
           id="from"
           key="from"
@@ -31,15 +32,17 @@
         class="separator">bis</span>
       <div
         v-click-outside="() => $emit('clicked-outside')"
+        v-if="type !== 'single'"
         :class="['base-input-field-container',
-                 { 'base-input-field-container-active': activeTo }]">
+                 { 'base-input-field-container-active': activeTo },
+                 { 'base-input-field-container-multiple': type === 'datetime' }]">
         <input
           v-if="type === 'datetime'"
-          :id="label"
-          :title="label"
-          :placeholder="placeholder"
+          :id="label + '-time'"
+          :title="label + '-time'"
+          :placeholder="placeholder + ' Time'"
           v-model="inputInt.to"
-          class="base-input-field"
+          class="base-input-field base-date-input-field"
           type="text"
           autocomplete="off"
           @focus="$emit('input-focus')"
@@ -101,13 +104,13 @@ export default {
   props: {
   /**
    * selecte date or datetime
-   * values: 'range'|'datetime'
+   * values: 'range'|'datetime | single'
    */
     type: {
       type: String,
       default: 'range',
       validator(val) {
-        return (val === 'range' || val === 'datetime');
+        return (val === 'range' || val === 'datetime' || val === 'single');
       },
     },
     /**
@@ -195,12 +198,13 @@ export default {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: $spacing;
+      justify-content: space-between;
       padding-left: $spacing-small;
       min-height: $row-height-small;
       border: $input-field-border;
       background: white;
-      flex: 1;
+      flex: 1 0 auto;
+      max-width: 100%;
     }
 
     .base-input-field-container + .base-input-field-container {
@@ -209,6 +213,10 @@ export default {
 
     .base-input-field-container-active {
       box-shadow: $input-shadow;
+    }
+
+    .base-input-field-container-multiple {
+      max-width: calc(50% - 8px);
     }
 
     &.base-input-field-show::after {
@@ -224,6 +232,11 @@ export default {
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;
+
+      &.base-date-input-field {
+        width: calc(100% - #{$icon-large} - (2 * #{$spacing}));
+        margin-right: 0;
+      }
     }
 
     .base-input-label {
@@ -238,6 +251,7 @@ export default {
     overflow: hidden;
     padding: 4px 0;
     height: $line-height;
+    max-width: 60%;
   }
 
   input[type='date'].base-input-field {

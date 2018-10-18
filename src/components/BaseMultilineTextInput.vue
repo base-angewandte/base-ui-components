@@ -89,14 +89,14 @@ export default {
     activeTab: {
       type: String,
       default() {
-        return this.$props.tabs[0];
+        return this.tabs[0];
       },
     },
   },
   data() {
     return {
       fieldContent: {},
-      activeTabInt: this.$props.activeTab,
+      activeTabInt: this.activeTab,
     };
   },
   watch: {
@@ -112,8 +112,8 @@ export default {
     },
   },
   mounted() {
-    this.fieldContent = this.$props.tabs.reduce((prev, curr) => {
-      this.$set(prev, [curr], this.$props.input[curr] || this.$props.input || '');
+    this.fieldContent = this.tabs.reduce((prev, curr) => {
+      this.$set(prev, [curr], this.input && this.input[curr] ? this.input[curr] : this.$props.input || '');
       return prev;
     }, {});
   },
