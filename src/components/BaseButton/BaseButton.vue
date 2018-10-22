@@ -1,7 +1,7 @@
 <template>
   <button
     :class="['base-button',
-             $props.buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
+             buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
     @click="$emit('clicked')">
     <svg-icon
@@ -10,15 +10,15 @@
       :class="['base-button-icon',
                'base-button-icon-left',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': $props.hideIcon }]"/>
-    {{ text }}
+               { 'base-button-icon-hide': hideIcon }]"/>
+    <span class="base-button-text">{{ text }}</span>
     <svg-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-right',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': $props.hideIcon }]"
+               { 'base-button-icon-hide': hideIcon }]"
     />
   </button>
 </template>
@@ -116,6 +116,10 @@ export default {
     justify-content: center;
     border-bottom: 3px solid transparent;
 
+    .base-button-text {
+      text-align: center;
+    }
+
     .base-button-icon {
       margin-right: $spacing;
       height: $icon-small;
@@ -132,7 +136,7 @@ export default {
     }
 
     &.base-button-row {
-      height: $row-height-large;
+      min-height: $row-height-large;
       background: white;
 
       .base-button-icon-large {
@@ -148,7 +152,7 @@ export default {
 
     &.base-button-single {
       background-color: $button-header-color;
-      height: $row-height-small;
+      min-height: $row-height-small;
 
       .base-button-icon-large {
         height: $icon-medium;
