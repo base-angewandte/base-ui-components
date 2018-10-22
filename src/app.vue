@@ -379,7 +379,7 @@ export default {
           id: '2',
           title: 'Oh this hot hot heat',
           active: false,
-          type: 'Bild',
+          type: '',
           selected: false,
         },
         {

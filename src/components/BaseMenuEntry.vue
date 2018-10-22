@@ -12,35 +12,44 @@
       :name="$props.icon"
       class="base-menu-entry-icon"/>
     <div
-      v-if="$props.title"
+      v-if="title"
       :class="['base-menu-entry-title',
-               { 'base-menu-entry-title-bold': $props.active || $props.titleBold }]">
+               { 'base-menu-entry-title-bold': active || titleBold }]">
       {{ title }}
     </div>
     <div
-      v-if="$props.subtext"
+      v-if="subtext"
       class="base-menu-entry-subtext">{{ subtext }}</div>
 
     <transition-group
-      v-if="$props.thumbnails.length || $props.description"
+      name="slide-fade">
+      <div
+        v-if="!selectActive"
+        :key="id + 'rightGroup'"
+        class="base-menu-entry-right-group">
+        <div
+          v-if="thumbnails.length"
+          :key="id + 'thumbnail'"
+          class="base-menu-entry-thumbnail-container">
+          <svg-icon
+            v-for="tn in thumbnails"
+            :key="tn"
+            :name="tn"
+            class="base-menu-entry-thumbnail" />
+        </div>
+        <div
+          v-if="description"
+          :key="id + 'description'"
+          class="base-menu-entry-description">
+          {{ $props.description }}
+        </div>
+      </div>
+    </transition-group>
+    <transition-group
       name="slide-fade"
       class="base-menu-entry-group">
-      <div
-        :key="$props.id + 'thumbnail'"
-        class="base-menu-entry-thumbnail-container">
-        <svg-icon
-          v-for="tn in $props.thumbnails"
-          :key="tn"
-          :name="tn"
-          class="base-menu-entry-thumbnail" />
-      </div>
-      <div
-        :key="$props.id + 'description'"
-        class="base-menu-entry-description">
-        {{ $props.description }}
-      </div>
       <base-checkmark
-        v-if="$props.selectActive"
+        v-if="selectActive"
         :key="$props.id + 'checkmark'"
         :selected="isSelected"
         title="checkbox"
@@ -208,6 +217,7 @@ export default {
     .base-menu-entry-subtext {
       color: $font-color-second;
       font-size: $font-size-small;
+      margin-right: $spacing;
       flex-grow: 99;
       flex-shrink: 99;
     }
@@ -232,25 +242,30 @@ export default {
       margin-left: 16px;
     }
 
-    .base-menu-entry-thumbnail-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      height: $row-height-large;
-      margin: 0 $spacing;
-
-      .base-menu-entry-thumbnail {
-        max-height: $icon-small;
-        width: $icon-small;
-      }
-    }
-
-    .base-menu-entry-description {
-      color: $font-color-second;
-      font-size: $font-size-small;
-      margin-right: $spacing;
+    .base-menu-entry-right-group {
       transition: 0.3s ease;
-      width: 100px;
+      display: flex;
+      flex-direction: row;
+
+      .base-menu-entry-thumbnail-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        height: $row-height-large;
+        margin-right: $spacing;
+
+        .base-menu-entry-thumbnail {
+          max-height: $icon-small;
+          width: $icon-small;
+        }
+      }
+
+      .base-menu-entry-description {
+        color: $font-color-second;
+        font-size: $font-size-small;
+        margin-right: $spacing;
+        width: 100px;
+      }
     }
 
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
