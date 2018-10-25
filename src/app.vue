@@ -179,7 +179,8 @@
 
     <base-button
       draggable="true"
-      @clicked="showPopUp = true" />
+      icon="options-menu"
+      @clicked="showPopUp = true"/>
     <base-drop-down
       :label="'select type'"
       :default-select="'Alle Typ'"

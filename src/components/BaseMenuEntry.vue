@@ -1,15 +1,15 @@
 <template>
   <div
     ref="menuEntry"
-    :draggable="$props.isDraggable"
+    :draggable="isDraggable"
     class="base-menu-entry"
-    @click="$props.selectActive ? selected(!isSelected) : $emit('clicked')">
+    @click="$props.selectActive ? selected() : $emit('clicked')">
     <div
-      :class="{ 'base-menu-entry-border-active': $props.active }"
+      :class="{ 'base-menu-entry-border-active': active }"
       class="base-menu-entry-border" />
     <svg-icon
       ref="entryIcon"
-      :name="$props.icon"
+      :name="icon"
       class="base-menu-entry-icon"/>
     <div
       v-if="title"
@@ -51,7 +51,7 @@
       <base-checkmark
         v-if="selectActive"
         :key="$props.id + 'checkmark'"
-        :selected="isSelected"
+        :checked="isSelected"
         title="checkbox"
         mark-style="checkbox"
         class="base-menu-entry-checkbox"
@@ -156,9 +156,9 @@ export default {
     }
   },
   methods: {
-    selected(val) {
-      this.isSelected = val;
-      this.$emit('selected', val);
+    selected() {
+      this.isSelected = !this.isSelected;
+      this.$emit('selected', this.isSelected);
     },
     determineDragAndDropCapable() {
       const div = document.createElement('div');

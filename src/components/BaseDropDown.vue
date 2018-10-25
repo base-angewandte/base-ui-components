@@ -73,6 +73,14 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * this will just give a description if nothing is selected but not be included
+     * in the list
+     */
+    placeholder: {
+      type: String,
+      default: 'Select',
+    },
     selectionList: {
       type: Array,
       default: () => [],
@@ -94,7 +102,7 @@ export default {
       // control selector list
       showMenu: false,
       // internal copy of provided default entry
-      selectedInt: this.defaultSelect,
+      selectedInt: this.defaultSelect || this.placeholder,
       // internal copy of provided selection list
       listInt: this.selectionList,
       // helper variable so element always has width of widest list entrty

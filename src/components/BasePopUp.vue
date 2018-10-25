@@ -50,10 +50,10 @@ export default {
   name: 'BasePopUp',
   components: { BaseButton, SvgIcon },
   props: {
-    // used to control visibility
+    // could be used to control visibility
     show: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     // header text
     title: {

@@ -1,13 +1,13 @@
 <template>
   <div class="base-menu-list">
     <base-menu-entry
-      v-for="(item, index) in listInt"
+      v-for="(item, index) in list"
       v-if="item"
       ref="menuEntry"
-      :key="index"
+      :key="item.id || item.title"
       :id="item.id"
       :title="item.title"
-      :active="item.active"
+      :active="entryProps[index].active"
       :icon="getType(item)"
       :thumbnails="getThumbnails(item)"
       :description="item.type"
@@ -15,8 +15,8 @@
       :is-draggable="true"
       :select-active="selectActive"
 
-      @clicked="activateItem(item, index)"
-      @selected="selectItem(item, $event)"/>
+      @clicked="activateItem(index)"
+      @selected="selectItem(index, $event)"/>
   </div>
 </template>
 
@@ -30,10 +30,6 @@ import BaseMenuEntry from './BaseMenuEntry';
 export default {
   components: {
     BaseMenuEntry,
-  },
-  model: {
-    prop: 'list',
-    event: 'changed',
   },
   props: {
     /**
@@ -52,10 +48,20 @@ export default {
         return [];
       },
     },
+    /**
+     * index of the entry that should currently be active
+     * TODO: check if it would be better to use id here!
+     */
+    activeEntry: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
-      listInt: [],
+      // have internally necessary props in separate array to prevent issues with
+      // outside store mutations
+      entryProps: [],
     };
   },
   computed: {
@@ -64,12 +70,32 @@ export default {
     },
   },
   watch: {
-    list(val) {
-      this.listInt = [].concat(val);
+    list() {
+      this.entryProps = this.list.map(() => Object.assign({}, {
+        selected: false,
+        active: false,
+        error: false,
+      }));
+      if (this.activeEntry !== null) {
+        this.$set(this.entryProps[this.activeEntry], 'active', true);
+      }
+    },
+    activeEntry(val) {
+      this.entryProps.map(item => this.$set(item, 'active', false));
+      if (val !== null && this.entryProps[val]) {
+        this.$set(this.entryProps[val], 'active', true);
+      }
     },
   },
-  mounted() {
-    this.listInt = [].concat(this.list);
+  created() {
+    this.entryProps = this.list.map(() => Object.assign({}, {
+      selected: false,
+      active: false,
+      error: false,
+    }));
+    if (this.activeEntry !== null) {
+      this.$set(this.entryProps[this.activeEntry], 'active', true);
+    }
   },
   methods: {
     // determines which icon should be shown for each menu entry
@@ -93,23 +119,21 @@ export default {
       return thumbnails;
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
-    activateItem(val, index) {
-      this.listInt.forEach((entry) => { this.$set(entry, 'active', false); });
-      this.$set(val, 'active', true);
+    activateItem(index) {
+      // commented out since this makes problems with the store (do not mutate outside...)
+      this.entryProps.forEach((entry) => { this.$set(entry, 'active', false); });
+      this.$set(this.entryProps[index], 'active', true);
       /**
-       * event emited when a menu entry is clicked - returning the index of the respective entry
+       * event emitted when a menu entry is clicked - returning the index of the respective entry
        *
        * @event: clicked
        * @type: index
        */
       this.$emit('clicked', index);
-      this.$emit('changed', this.listInt);
     },
-    selectItem(item, evt) {
-      // TODO: vue store is complaining a this - not working!
-      debugger;
-      this.$set(item, 'selected', evt);
-      this.$emit('changed', this.listInt);
+    selectItem(index, evt) {
+      this.$set(this.entryProps[index], 'selected', evt);
+      this.$emit('selected', index);
     },
   },
 };
