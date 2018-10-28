@@ -4,7 +4,8 @@
       v-bind="$props"
       v-model="selectedBelowListInt"
       :sortable="true"
-      @selected="addedEntry">
+      @selected="addedEntry"
+      @fetchDropDownEntries="$emit('fetchDropDownEntries')">
       <template
         slot="chips-area"
         slot-scope="props">
@@ -21,6 +22,7 @@
               :key="entry.idInt"
               class="base-chips-below-list-item">
               <div class="base-chips-below-list-item-chip-wrapper">
+                <!-- TODO: @valueChanged: this change needs to be propagated to parent! -->
                 <base-chip
                   ref="selectedChip"
                   v-model="entry[objectProp]"
@@ -31,6 +33,8 @@
                   @valueChanged="$set(entry, 'edited', true)"
                   @removeEntry="removeEntry($event, index)"/>
               </div>
+              <!-- TODO: roles list still hardcoded?? need this outside component again
+              or possibility to specify list there -->
               <base-chips-input
                 :show-label="false"
                 :label="label + '-roles'"
@@ -49,10 +53,22 @@
 </template>
 
 <script>
+/**
+* Chips Component with Chips displayed below form input field
+*/
+
+/**
+ * if drop down entries dynamically set - fetch new entries on input
+ *
+ * @event fetchDropDownEntries
+ * @type {object}
+ *
+ */
+
 import Draggable from 'vuedraggable';
-import BaseChipsInput from './BaseChipsInput';
-import BaseChip from './BaseChip/BaseChip';
-import BaseHoverBox from './BaseHoverBox';
+import BaseChipsInput from '../BaseChipsInput';
+import BaseChip from '../BaseChip/BaseChip';
+import BaseHoverBox from '../BaseHoverBox';
 
 export default {
   components: {
@@ -76,6 +92,8 @@ export default {
       },
     },
     /**
+     * @model
+     *
      * list of already selected options (strings or objects), displayed as chips
      */
     selectedList: {
@@ -97,7 +115,14 @@ export default {
      */
     label: {
       type: String,
-      default: null,
+      required: true,
+    },
+    /**
+     * define if label should be visible
+     */
+    showLabel: {
+      type: Boolean,
+      default: true,
     },
     /**
      * input field placeholder
@@ -142,7 +167,7 @@ export default {
      */
     chipsInline: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * define if chips should be editable
@@ -163,7 +188,7 @@ export default {
   },
   data() {
     return {
-      chipsArray: ['Charlie Anders', 'Martin Elfinger', 'Elfriede Soso'],
+      chipsArray: [],
       selectedBelowListInt: this.selectedList.map((entry) => {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, { roles: [] });
@@ -208,7 +233,7 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-chips-below {
     .base-chips-below-list {

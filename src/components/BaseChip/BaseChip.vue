@@ -127,7 +127,7 @@ export default {
          * event emitted when the chip content was edited
          *
          * @event valueChanged
-         * @type Object
+         * @type String
          */
         this.$emit('valueChanged', this.entryInt);
       }

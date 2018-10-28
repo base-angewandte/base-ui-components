@@ -46,7 +46,7 @@
         @click="addSelected(entry)"
         @mouseover="selectedMenuEntryIndex = index">
 
-        <!-- @ slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
+        <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
           :item="entry"
           name="drop-down-entry">
@@ -57,6 +57,9 @@
         </slot>
 
       </div>
+      <!--
+        @slot customize what is displayed when no drop down options are available
+      -->
       <slot
         v-if="!dropDownList.length"
         name="no-options">
@@ -120,6 +123,8 @@ export default {
       },
     },
     /**
+     * @model
+     *
      * list of already selected options (strings or objects), displayed as chips
      */
     selectedList: {
@@ -141,10 +146,10 @@ export default {
      */
     label: {
       type: String,
-      default: null,
+      required: true,
     },
     /**
-     * define if label should be visible (should always be set for usability
+     * define if label should be visible
      */
     showLabel: {
       type: Boolean,
@@ -218,6 +223,9 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * if true a button with that functionality will be visible
+     */
     sortable: {
       type: Boolean,
       default: false,
@@ -412,8 +420,8 @@ export default {
       this.selectedListInt.sort((a, b) => {
         // TODO: alternatively - make prop flag sortByLastName (however also
         // problematic if names in diff format...) or make sort just event emit?
-        const compA = this.objectProp === 'name' ? a[this.objectProp].split(' ')[-1] : a[this.objectProp];
-        const compB = this.objectProp === 'name' ? b[this.objectProp].split(' ')[-1] : b[this.objectProp];
+        const compA = this.objectProp === 'name' ? a[this.objectProp].split(' ').pop() : a[this.objectProp];
+        const compB = this.objectProp === 'name' ? b[this.objectProp].split(' ').pop() : b[this.objectProp];
         if (compA > compB) {
           return 1;
         }
