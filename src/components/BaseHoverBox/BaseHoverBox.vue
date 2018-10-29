@@ -19,7 +19,11 @@
 </template>
 
 <script>
-import BaseImageBox from './BaseImageBox';
+/**
+ * A box for information display after mouse hover or click
+ */
+
+import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
 export default {
   components: {
@@ -36,7 +40,7 @@ export default {
       default: 'No title',
     },
     /**
-     * Text displayed directly below title (max two lines; max 3 lines with title)
+     * Text displayed directly below title (max one line; max 2 lines with title)
      */
     subtext: {
       type: String,
@@ -108,6 +112,13 @@ export default {
     };
   },
   methods: {
+    /**
+     * to set the position of the pox from outside
+     * @param x
+     * @param y
+     *
+     * @public
+     */
     setPosition(x, y) {
       this.boxPosition = { top: `${y}px`, left: `${x}px` };
     },
@@ -116,7 +127,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-hover-box {
     box-shadow: $preview-box-shadow;

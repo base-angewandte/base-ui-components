@@ -25,7 +25,7 @@
  * Base Component for SideBar Menu Entries
   */
 
-import BaseMenuEntry from './BaseMenuEntry';
+import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 export default {
   components: {

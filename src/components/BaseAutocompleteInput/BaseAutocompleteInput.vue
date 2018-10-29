@@ -55,7 +55,7 @@
  * Form Input Field Component with Autocomplete Functionality
  */
 import ClickOutside from 'vue-click-outside';
-import BaseInput from '../BaseInput';
+import BaseInput from '../BaseInput/BaseInput';
 
 export default {
   components: {

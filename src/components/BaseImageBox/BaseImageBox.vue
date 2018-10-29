@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import BaseBox from './BaseBox/BaseBox';
-import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
+import BaseBox from '../BaseBox/BaseBox';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
@@ -140,7 +140,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-image-box {
 

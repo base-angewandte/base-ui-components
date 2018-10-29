@@ -97,8 +97,8 @@
  */
 
 import ClickOutside from 'vue-click-outside';
-import BaseInput from './BaseInput';
-import BaseChip from './BaseChip/BaseChip';
+import BaseInput from '../BaseInput/BaseInput';
+import BaseChip from '../BaseChip/BaseChip';
 
 export default {
   components: {
@@ -434,7 +434,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-chips-input {
     position: relative;

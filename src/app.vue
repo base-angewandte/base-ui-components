@@ -299,25 +299,25 @@
 
 <script>
 import axios from 'axios';
-import BaseMenuEntry from './components/BaseMenuEntry';
-import BasePopUp from './components/BasePopUp';
-import BaseDropDown from './components/BaseDropDown';
-import BaseInput from './components/BaseInput';
+import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
+import BasePopUp from './components/BasePopUp/BasePopUp';
+import BaseDropDown from './components/BaseDropDown/BaseDropDown';
+import BaseInput from './components/BaseInput/BaseInput';
 import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
 import BaseButton from './components/BaseButton/BaseButton';
-import BaseDropBox from './components/BaseDropBox';
+import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseBox from './components/BaseBox/BaseBox';
-import BaseMenuList from './components/BaseMenuList';
+import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 import BaseMenuTableRow from './components/BaseMenuTableRow';
-import BaseChipsInput from './components/BaseChipsInput';
+import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch';
-import BaseMultilineTextInput from './components/BaseMultilineTextInput';
-import BaseImageBox from './components/BaseImageBox';
+import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
+import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
-import BaseChipsBelow from './components/BaseChipsBelow';
-import BaseHoverBox from './components/BaseHoverBox';
-import BaseDateInput from './components/BaseDateInput';
+import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
+import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
+import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 
 export default {
   name: 'App',
