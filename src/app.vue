@@ -315,7 +315,7 @@ import BaseMultilineTextInput from './components/BaseMultilineTextInput';
 import BaseImageBox from './components/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
-import BaseChipsBelow from './components/BaseChipsBelow';
+import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseHoverBox from './components/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput';
 
