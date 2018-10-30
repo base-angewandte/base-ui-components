@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import BaseBoxButton from './BaseBoxButton/BaseBoxButton';
+import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 
 export default {
   components: {
@@ -88,7 +88,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-drop-box {
     background-color: $background-color !important;

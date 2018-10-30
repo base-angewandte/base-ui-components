@@ -68,7 +68,7 @@
  */
 
 import SvgIcon from 'vue-svgicon';
-import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
@@ -225,7 +225,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
   .base-menu-entry {
     display: flex;
     align-items: center;

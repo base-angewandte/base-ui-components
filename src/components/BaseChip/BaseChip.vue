@@ -40,7 +40,7 @@
  *
  */
 import ClickOutside from 'vue-click-outside';
-import BaseHoverBox from '../BaseHoverBox';
+import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 export default {
   directives: {

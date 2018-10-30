@@ -186,7 +186,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-input {
     display: flex;
@@ -255,7 +255,7 @@ export default {
   }
 
   input[type='date'].base-input-field {
-    background: url('../static/icons/magnifier-2.svg') right no-repeat;
+    background: url('../../static/icons/magnifier-2.svg') right no-repeat;
   }
 
   input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
@@ -285,7 +285,7 @@ export default {
 </style>
 
 <style module lang="scss">
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   input.base-input-datepicker-input {
     border: none;
