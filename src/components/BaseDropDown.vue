@@ -153,12 +153,16 @@ export default {
   @import "../styles/variables.scss";
 
   .dropdown-box {
-    display: inline-block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     overflow: hidden;
   }
 
   .dropdown-icon {
     padding-left: $spacing;
+    display: flex;
+    align-items: center;
 
     .dropdown-icon-svg {
       height: $icon-small;
@@ -176,7 +180,7 @@ export default {
     cursor: pointer;
     padding: 0 #{$spacing};
     white-space: nowrap;
-    height: $row-height-small;
+    height: $line-height;
     position: relative;
 
     &:hover {
