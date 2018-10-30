@@ -13,7 +13,8 @@
 
     <div
       v-click-outside="hide"
-      ref="box">
+      ref="box"
+      class="dropdown-container">
 
       <!-- SELECTION DISPLAY -->
       <div
@@ -121,8 +122,8 @@ export default {
   },
   mounted() {
     if (this.$refs.entries && this.$refs.header) {
-      const entriesWidth = (this.$refs.entries.clientWidth || this.$refs.entries.scrollWidth + 48);
-      const headerWidth = (this.$refs.header.clientWidth || this.$refs.header.scrollWidth + 64);
+      const entriesWidth = (this.$refs.entries.clientWidth || this.$refs.entries.scrollWidth + 16);
+      const headerWidth = (this.$refs.header.clientWidth || this.$refs.header.scrollWidth + 32);
       if (this.fixedWidth) {
         // TODO: check (with Flo etc) if this is the desired behaviour
         this.bodyWidth = this.$refs.dropdownBox.clientWidth;
@@ -156,7 +157,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    overflow: hidden;
+    margin: 0 $spacing;
   }
 
   .dropdown-icon {
@@ -170,6 +171,10 @@ export default {
     }
   }
 
+  .dropdown-container {
+    width: 100%;
+  }
+
   .dropdown-header {
     display: flex;
     flex-direction: row;
@@ -178,7 +183,6 @@ export default {
     color: $font-color-second;
     background-color: inherit;
     cursor: pointer;
-    padding: 0 #{$spacing};
     white-space: nowrap;
     height: $line-height;
     position: relative;
@@ -214,6 +218,7 @@ export default {
     flex-direction: column;
     position: absolute;
     margin-left: 0;
+    margin-top: $spacing-small;
     box-shadow: $drop-shadow;
     z-index: 1;
     text-align: left;
