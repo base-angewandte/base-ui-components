@@ -132,9 +132,9 @@ export default {
        */
       this.$emit('clicked', index);
     },
-    selectItem(index, evt) {
-      this.$set(this.entryProps[index], 'selected', evt);
-      this.$emit('selected', index);
+    selectItem(index, selected) {
+      this.$set(this.entryProps[index], 'selected', selected);
+      this.$emit('selected', { index, selected });
     },
   },
 };
