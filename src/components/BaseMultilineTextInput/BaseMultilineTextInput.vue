@@ -29,8 +29,8 @@
       v-model="fieldContent[activeTabInt]"
       rows="10"
       class="base-multiline-text-input-textarea"
-      @keyup="$emit('textInput', typeof $props.input === 'string'
-      ? fieldContent[activeTabInt] : fieldContent)" />
+      @keyup="$emit('textInput', tabs.length > 1
+      ? fieldContent : fieldContent[activeTabInt])" />
   </div>
 </template>
 
@@ -101,10 +101,10 @@ export default {
   },
   watch: {
     input(val) {
-      if (typeof val === 'string') {
+      if (this.tabs.length < 2) {
         this.$set(this.fieldContent, this.activeTabInt || 'default', val);
       } else {
-        this.$props.tabs.forEach(tab => this.$set(this.fieldContent, tab, val[tab]));
+        this.tabs.forEach(tab => this.$set(this.fieldContent, tab, val[tab]));
       }
     },
     activeTab(val) {

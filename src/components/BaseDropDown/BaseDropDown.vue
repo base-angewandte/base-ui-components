@@ -65,12 +65,16 @@ export default {
   directives: {
     ClickOutside,
   },
+  model: {
+    prop: 'selected',
+    event: 'selected',
+  },
   props: {
-    label: {
+    selected: {
       type: String,
       default: '',
     },
-    defaultSelect: {
+    label: {
       type: String,
       default: '',
     },
@@ -103,7 +107,7 @@ export default {
       // control selector list
       showMenu: false,
       // internal copy of provided default entry
-      selectedInt: this.defaultSelect || this.placeholder,
+      selectedInt: this.selected || this.placeholder,
       // internal copy of provided selection list
       listInt: this.selectionList,
       // helper variable so element always has width of widest list entrty
@@ -115,9 +119,12 @@ export default {
     // necessary)
     selectedInt() {
       this.listInt = [].concat(this.selectionList.filter(entry => entry !== this.selectedInt));
-      if (this.selectedInt !== this.defaultSelect) {
-        this.listInt.unshift(this.defaultSelect);
+      if (this.selectedInt !== this.selected) {
+        this.listInt.unshift(this.selected);
       }
+    },
+    selected(val) {
+      this.selectedInt = val;
     },
   },
   mounted() {

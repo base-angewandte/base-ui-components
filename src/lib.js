@@ -11,6 +11,7 @@ import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
+import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import './styles/lib.scss';
 
 export {
@@ -27,4 +28,5 @@ export {
   BaseAutocompleteInput,
   BaseMultilineTextInput,
   BaseDropBox,
+  BaseChipsBelow,
 };

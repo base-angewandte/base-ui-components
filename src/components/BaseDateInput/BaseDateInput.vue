@@ -22,7 +22,7 @@
           format="dd.MM.yyyy"
           class="base-input-datepicker"
           @opened="activeFrom = true"
-          @closed="activeFrom = false"/>
+          @closed="selected('from')"/>
         <svg-icon
           name="calendar-many"
           class="base-input-date-icon"/>
@@ -62,7 +62,7 @@
           format="dd.MM.yyyy"
           class="base-input-datepicker"
           @opened="activeTo = true"
-          @closed="activeTo = false"/>
+          @closed="selected('from')"/>
 
         <svg-icon
           v-if="type === 'datetime'"
@@ -155,7 +155,7 @@ export default {
   },
   data() {
     return {
-      inputInt: '',
+      inputInt: { to: null, from: null },
       activeFrom: false,
       activeTo: false,
     };
@@ -165,8 +165,8 @@ export default {
       this.inputInt = val;
     },
   },
-  mounted() {
-    this.inputInt = this.$props.input;
+  created() {
+    this.inputInt = this.input || { to: null, from: null };
   },
   methods: {
     blurInput() {
@@ -176,10 +176,18 @@ export default {
        *
        * TODO: check again if this is needed???
        *
-       * @event input-blur
+       * @event selected
        * @type string
        */
-      this.$emit('input-blur', this.inputInt);
+      this.$emit('selected', this.inputInt);
+    },
+    selected(field) {
+      if (field === 'from') {
+        this.ActiveFrom = false;
+      } else if (field === 'to') {
+        this.ActiveTo = false;
+      }
+      this.$emit('selected', this.inputInt);
     },
   },
 };
