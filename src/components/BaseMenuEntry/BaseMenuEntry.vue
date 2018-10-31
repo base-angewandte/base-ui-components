@@ -3,7 +3,7 @@
     ref="menuEntry"
     :draggable="isDraggable"
     class="base-menu-entry"
-    @click="$props.selectActive ? selected() : $emit('clicked')">
+    @click="selectActive ? selected() : $emit('clicked')">
     <div
       :class="{ 'base-menu-entry-border-active': isActive }"
       class="base-menu-entry-border" />
@@ -11,7 +11,10 @@
       ref="entryIcon"
       :name="icon"
       class="base-menu-entry-icon"/>
-    <div class="base-menu-entry-text-wrapper">
+    <div
+      :class="['base-menu-entry-text-wrapper',
+               { 'base-menu-entry-text-wrapper-full': (!thumbnails.length && !description)
+      || selectActive }]">
       <div
         v-if="title"
         :class="['base-menu-entry-title',
@@ -42,7 +45,7 @@
         <div
           :key="id + 'description'"
           class="base-menu-entry-description">
-          {{ $props.description }}
+          {{ description }}
         </div>
       </div>
     </transition-group>
@@ -192,12 +195,21 @@ export default {
         this.$refs.menuEntry.addEventListener('dragstart', ((e) => {
           const size = `${(this.$refs.entryIcon.$el.clientHeight * 2)}px`;
           e.stopPropagation();
+          // remove previous drag items from the body again if necessary
+          const elem = document.getElementById('drag-icon');
+          if (elem) {
+            elem.parentNode.removeChild(elem);
+          }
           // clone the svg used in this entry
           const pic = this.$refs.entryIcon.$el.cloneNode(true);
+          pic.id = 'drag-icon';
           pic.style.height = size;
           pic.style.maxHeight = size;
           pic.style.width = size;
           pic.style.backgroundColor = 'white';
+          pic.style.position = 'absolute';
+          pic.style.top = -99999;
+          pic.style.left = -99999;
 
           // add the element to the dom
           document.body.appendChild(pic);
@@ -256,8 +268,14 @@ export default {
       flex-grow: 1;
       flex-shrink: 1;
       display: flex;
+      // TODO: this is not working!!!
       max-width: calc(100% - 100px - #{$icon-min} - #{$icon-large} - 48px);
       position: relative;
+
+      &.base-menu-entry-text-wrapper-full {
+        // TODO: together with the above - too hacky - think of a better solution!!
+        max-width: calc(100% - 24px - 16px);
+      }
 
       .overflow-fade {
         content: '';
