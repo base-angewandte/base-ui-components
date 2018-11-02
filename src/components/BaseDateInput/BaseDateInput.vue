@@ -17,9 +17,10 @@
           key="from"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
+          :format="dateFormat"
+          :minimum-view="format"
           v-model="inputInt.from"
           calendar-class="calendar-class"
-          format="dd.MM.yyyy"
           class="base-input-datepicker"
           @opened="activeFrom = true"
           @closed="selected('from')"/>
@@ -57,12 +58,14 @@
           key="to"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
+          :format="dateFormat"
+          :minimum-view="format"
           v-model="inputInt.to"
           calendar-class="calendar-class"
-          format="dd.MM.yyyy"
           class="base-input-datepicker"
           @opened="activeTo = true"
           @closed="selected('from')"/>
+        {{ format }}
 
         <svg-icon
           v-if="type === 'datetime'"
@@ -152,6 +155,17 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify date format
+     * allowed values: 'day', 'month', 'year'
+     */
+    format: {
+      type: String,
+      default: 'day',
+      validator(val) {
+        return ['day', 'month', 'year'].includes(val);
+      },
+    },
   },
   data() {
     return {
@@ -160,13 +174,24 @@ export default {
       activeTo: false,
     };
   },
+  computed: {
+    dateFormat() {
+      if (this.format === 'year') {
+        return 'yyyy';
+      }
+      if (this.format === 'month') {
+        return 'MM.yyyy';
+      }
+      return 'dd.MM.yyyy';
+    },
+  },
   watch: {
     input(val) {
-      this.inputInt = val;
+      this.inputInt = Object.assign({}, val);
     },
   },
   created() {
-    this.inputInt = this.input || { to: null, from: null };
+    this.inputInt = Object.assign({}, this.input) || { to: null, from: null };
   },
   methods: {
     blurInput() {
