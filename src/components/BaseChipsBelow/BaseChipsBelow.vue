@@ -191,7 +191,7 @@ export default {
       chipsArray: [],
       selectedBelowListInt: this.selectedList.map((entry) => {
         if (typeof entry === 'object') {
-          return Object.assign({}, entry, { roles: [] });
+          return Object.assign({}, { roles: [] }, entry);
         }
         return Object.assign({}, { [this.objectProp]: entry, roles: [] });
       }),
@@ -199,7 +199,12 @@ export default {
   },
   watch: {
     selectedList(val) {
-      this.selectedBelowListInt = val;
+      this.selectedBelowListInt = val.map((entry) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, { roles: [] }, entry);
+        }
+        return Object.assign({}, { [this.objectProp]: entry, roles: [] });
+      });
     },
   },
   methods: {

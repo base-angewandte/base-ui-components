@@ -65,7 +65,6 @@
           class="base-input-datepicker"
           @opened="activeTo = true"
           @closed="selected('from')"/>
-        {{ format }}
 
         <svg-icon
           v-if="type === 'datetime'"
