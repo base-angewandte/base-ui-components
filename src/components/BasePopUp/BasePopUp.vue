@@ -1,49 +1,54 @@
 <template>
   <div
     v-if="showInt"
-    class="popup-box">
+    class="base-pop-up">
+    <div class="base-pop-up-background" />
+    <div
+      class="popup-box">
 
-    <!-- POP UP HEADER -->
-    <div class="popup-header">
-      <div
-        class="popup-title">
-        {{ title }}
+      <!-- POP UP HEADER -->
+      <div class="popup-header">
+        <div
+          class="popup-title">
+          {{ title }}
+        </div>
+        <!-- @event close -->
+        <svg-icon
+          class="popup-remove"
+          name="remove"
+          @click="close" />
       </div>
-      <!-- @event close -->
-      <svg-icon
-        class="popup-remove"
-        name="remove"
-        @click="close" />
-    </div>
 
-    <!-- POP UP CONTENT -->
-    <div class="popup-content">
-      <!-- @slot slot to fill the body of the box with custom content -->
-      <slot />
-      <div class="popup-button-row">
-        <!-- @event buttonLeft
-             @type none -->
-        <base-button
-          :text="buttonLeftText"
-          :icon="buttonLeftIcon"
-          :icon-position="'right'"
-          :icon-size="'small'"
-          class="base-popup-button"
-          @clicked="$emit('buttonLeft')"
-        />
-        <!-- @event buttonRight -->
-        <base-button
-          :text="buttonRightText"
-          :icon="buttonRightIcon"
-          :icon-position="'right'"
-          :icon-size="'small'"
-          class="base-popup-button"
-          @clicked="$emit('buttonRight')"
-        />
+      <!-- POP UP CONTENT -->
+      <div class="popup-content">
+        <!-- @slot slot to fill the body of the box with custom content -->
+        <slot />
+        <div class="popup-button-row">
+          <!-- @event buttonLeft
+               @type none -->
+          <base-button
+            :text="buttonLeftText"
+            :icon="buttonLeftIcon"
+            :icon-position="'right'"
+            :icon-size="'small'"
+            class="base-popup-button"
+            @clicked="$emit('buttonLeft')"
+          />
+          <!-- @event buttonRight -->
+          <base-button
+            :text="buttonRightText"
+            :icon="buttonRightIcon"
+            :icon-position="'right'"
+            :icon-size="'small'"
+            class="base-popup-button"
+            @clicked="$emit('buttonRight')"
+          />
+        </div>
       </div>
-    </div>
 
+    </div>
   </div>
+
 </template>
 
 <script>
@@ -144,6 +149,14 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
+
+  .base-pop-up-background {
+    position: absolute;
+    height: 100%;
+    width: calc(100% - 2 * #{$spacing});
+    z-index: 99;
+    overflow: hidden;
+  }
 
   .popup-box {
     box-shadow: $pop-up-shadow;
