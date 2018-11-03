@@ -2,7 +2,7 @@
   <div
     ref="dropdownBox"
     :style="{ width: fixedWidth ? '100%': bodyWidth }"
-    class="dropdown-box">
+    :class="['dropdown-box', 'dropdown-box-' + headerStyle]">
     <div class="base-input-label">
       <label
         :class="{ 'hide': !label }"
@@ -101,6 +101,17 @@ export default {
       type: String,
       default: 'inherit',
     },
+    /**
+     * styling choices to fit also pop up
+     * valid options: 'single', 'inline'
+     */
+    headerStyle: {
+      type: String,
+      default: 'single',
+      validator(val) {
+        return ['single', 'inline'].includes(val);
+      },
+    },
   },
   data() {
     return {
@@ -162,78 +173,86 @@ export default {
 
   .dropdown-box {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 $spacing;
-  }
+    flex-direction: column;
+    justify-content: center;
 
-  .dropdown-icon {
-    padding-left: $spacing;
-    display: flex;
-    align-items: center;
+    .dropdown-container {
+      width: 100%;
 
-    .dropdown-icon-svg {
-      height: $icon-small;
-      fill: $font-color-second;
-    }
-  }
+      .dropdown-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        color: $font-color-second;
+        background-color: inherit;
+        cursor: pointer;
+        white-space: nowrap;
+        height: $row-height-small;
+        position: relative;
 
-  .dropdown-container {
-    width: 100%;
-  }
+        &:hover {
+          color: $app-color;
 
-  .dropdown-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    color: $font-color-second;
-    background-color: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-    height: $line-height;
-    position: relative;
+          .dropdown-icon-svg {
+            fill: $app-color;
+          }
+        }
 
-    &:hover {
-      color: $app-color;
+        .dropdown-selected {
+          overflow: hidden;
+          position: relative;
+          width: 100%;
+        }
 
-      .dropdown-icon-svg {
-        fill: $app-color;
+        .dropdown-selected-fadeout::after {
+          content: '';
+          width: 10px;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: linear-gradient(to right, transparent , #{$background-color});
+        }
+
+        .dropdown-icon {
+          padding-left: $spacing;
+          display: flex;
+          align-items: center;
+
+          .dropdown-icon-svg {
+            height: $icon-small;
+            fill: $font-color-second;
+          }
+        }
       }
     }
-  }
 
-  .dropdown-selected {
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-  }
+    &.dropdown-box-inline {
+      .dropdown-header {
+        padding: 0 $spacing;
+      }
+    }
 
-  .dropdown-selected-fadeout::after {
-    content: '';
-    width: 10px;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: linear-gradient(to right, transparent , #{$background-color});
-  }
+    &.dropdown-box-single {
+      margin: 0 $spacing;
+    }
 
-  .dropdown-body {
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    margin-left: 0;
-    margin-top: $spacing-small;
-    box-shadow: $drop-shadow;
-    z-index: 1;
-    text-align: left;
-    max-width: inherit;
-  }
+    .dropdown-body {
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      margin-left: 0;
+      box-shadow: $drop-shadow;
+      z-index: 1;
+      text-align: left;
+      max-width: inherit;
+    }
 
-  .hide-body {
-    visibility: hidden;
+    .hide-body {
+      visibility: hidden;
+    }
   }
 
   .dropdown-item {

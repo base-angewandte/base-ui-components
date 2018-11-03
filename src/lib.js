@@ -12,6 +12,7 @@ import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutoco
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
+import BaseUploadBar from './components/BaseUploadBar';
 import './styles/lib.scss';
 
 export {
@@ -29,4 +30,5 @@ export {
   BaseMultilineTextInput,
   BaseDropBox,
   BaseChipsBelow,
+  BaseUploadBar,
 };
