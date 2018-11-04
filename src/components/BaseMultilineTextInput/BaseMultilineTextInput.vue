@@ -7,7 +7,7 @@
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
-      <!-- slot for text type -->
+      <!-- @slot to add drop down needed for text input field (base specific) -->
       <slot />
       <div
         v-if="$props.tabs && $props.tabs[0] !== 'default'"
@@ -38,6 +38,13 @@
 /**
  * A multiline textfield base component
  */
+
+/**
+ * Event emitted on keyup (text input change)
+ *
+ * @event isTextInput
+ * @type object | string
+ */
 export default {
   model: {
     prop: 'input',
@@ -45,13 +52,15 @@ export default {
   },
   props: {
     /**
+     * input displayed in the textarea <br>
+     *   if tabs are set this needs to be an object with properties corresponding to
+     *   tab names
+     *
      * @model
      */
     input: {
       type: [Object, String],
-      default() {
-        return '';
-      },
+      default: '',
     },
     /**
      * set the label for the input component
@@ -100,22 +109,29 @@ export default {
     };
   },
   watch: {
+    // watch for input changes from outside
     input(val) {
-      if (this.tabs.length < 2) {
-        this.$set(this.fieldContent, this.activeTabInt || 'default', val);
-      } else {
-        this.tabs.forEach(tab => this.$set(this.fieldContent, tab, val[tab]));
-      }
+      // if input changes set internal fieldContent variable
+      this.setFieldContent(val);
     },
+    // set active tab from outside
     activeTab(val) {
       this.activeTabInt = val;
     },
   },
   mounted() {
-    this.fieldContent = this.tabs.reduce((prev, curr) => {
-      this.$set(prev, [curr], this.input && this.input[curr] ? this.input[curr] : this.$props.input || '');
-      return prev;
-    }, {});
+    // set internal field content variable
+    this.setFieldContent(this.input);
+  },
+  methods: {
+    setFieldContent(val) {
+      if (this.tabs.length < 2) {
+        const propName = this.activeTabInt || 'default';
+        this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
+      } else {
+        this.tabs.forEach(tab => this.$set(this.fieldContent, tab, val[tab]));
+      }
+    },
   },
 };
 </script>

@@ -41,7 +41,11 @@ export default {
       default: false,
     },
     /**
-     * list of menu entries - array of objects - for object properties see Base Menu Entry Component
+     * list of menu entries - array of objects <br>
+     *   Entry properties that can be displayed: <br>
+     *     required: 'id' <br>
+     *     optional: 'title', 'type', 'active', 'selected',
+     *     'shared', 'published', 'error'
      */
     list: {
       type: Array,
@@ -72,14 +76,7 @@ export default {
   },
   watch: {
     list() {
-      this.entryProps = this.list.map(() => Object.assign({}, {
-        selected: false,
-        active: false,
-        error: false,
-      }));
-      if (this.activeEntry !== null) {
-        this.$set(this.entryProps[this.activeEntry], 'active', true);
-      }
+      this.setInternalVar();
     },
     activeEntry(val) {
       this.entryProps.map(item => this.$set(item, 'active', false));
@@ -89,20 +86,13 @@ export default {
     },
   },
   created() {
-    this.entryProps = this.list.map(() => Object.assign({}, {
-      selected: false,
-      active: false,
-      error: false,
-    }));
-    if (this.activeEntry !== null) {
-      this.$set(this.entryProps[this.activeEntry], 'active', true);
-    }
+    this.setInternalVar();
   },
   methods: {
     // determines which icon should be shown for each menu entry
     // TODO: this should probably also be definable per entry dynamically on the long run...
     getType(val) {
-      return ['Ausstellung', 'Event'].includes(val.type) ? 'calendar-number' : 'sheet-empty';
+      return ['Ausstellung', 'Event', 'Konzert'].includes(val.type) ? 'calendar-number' : 'sheet-empty';
     },
     // define which thumbnails should be shown for each item
     // TODO: currently hardcoded here but needs dynamic solution!
@@ -125,16 +115,34 @@ export default {
       this.entryProps.forEach((entry) => { this.$set(entry, 'active', false); });
       this.$set(this.entryProps[index], 'active', true);
       /**
-       * event emitted when a menu entry is clicked - returning the index of the respective entry
+       * event emitted when a menu entry is clicked
+       * - returning the index of the respective entry
        *
-       * @event: clicked
-       * @type: index
+       * @event clicked
+       * @type string
        */
       this.$emit('clicked', index);
     },
     selectItem(index, selected) {
       this.$set(this.entryProps[index], 'selected', selected);
+      /**
+       * event emitted when entry is clicked and select is active
+       * - returns the index and selected (true/false)
+       *
+       * @event selected
+       * @type {object}
+       */
       this.$emit('selected', { index, selected });
+    },
+    setInternalVar() {
+      this.entryProps = this.list.map(entry => Object.assign({}, {
+        selected: entry.selected || false,
+        active: entry.active || false,
+        error: entry.error || false,
+      }));
+      if (this.activeEntry !== null) {
+        this.$set(this.entryProps[this.activeEntry], 'active', true);
+      }
     },
   },
 };

@@ -83,7 +83,7 @@ export default {
      * An id to allow identification needs to be specified
      */
     id: {
-      type: String,
+      type: [Number, String],
       default: null,
       required: true,
     },

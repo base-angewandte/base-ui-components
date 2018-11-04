@@ -10,6 +10,9 @@
 </template>
 
 <script>
+/**
+ * The status bar displayed during file upload
+  */
 export default {
   props: {
     /**
@@ -20,10 +23,10 @@ export default {
       required: true,
     },
     /**
-     * progress of the upload (in percent)
+     * progress of the upload (percentage ratio)
      */
     progress: {
-      type: Number,
+      type: [Number, String],
       default: 0,
     },
   },
@@ -34,7 +37,7 @@ export default {
   },
   watch: {
     progress(val) {
-      this.progressWidth = val;
+      this.progressWidth = val * 100;
     },
   },
 };
@@ -42,9 +45,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-upload-bar {
+    font-family: inherit;
+    font-size: inherit;
     position: relative;
     width: 100%;
     height: $row-height-small;

@@ -18,24 +18,42 @@
 </template>
 
 <script>
+/**
+ * A basic text search to filter entries or files
+  */
+
+/**
+ * Event emitted on keyup
+ *
+ * @event input
+ * @type String
+ */
 export default {
   props: {
-    // placeholder to show for input
+    /**
+     * placeholder to show for input
+     */
     placeholder: {
       type: String,
       default: 'Search your works and events',
     },
-    // label connected with input (will not be visible but for usability!)
+    /**
+     * label connected with input (will not be visible but for usability!)
+     */
     label: {
       type: String,
       default: 'Search',
     },
-    // define if the magnifier glass should be shown
+    /**
+     * define if the magnifier glass should be shown
+     */
     showImage: {
       type: Boolean,
       default: false,
     },
-    // specify additional styling for the component e.g. height & width
+    /**
+     * specify additional styling for the component e.g. height & width
+     */
     styleProps: {
       type: Object,
       default() {
@@ -52,7 +70,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-search {
     position: relative;
@@ -73,13 +91,13 @@ export default {
       }
 
       &.base-search-input-img {
-        background: url(../static/icons/magnifier.svg) left no-repeat;
+        background: url(../../static/icons/magnifier.svg) left no-repeat;
         background-size: $icon-large;
         padding-left: calc(#{$icon-large} + #{$spacing});
       }
 
       &:active.base-search-input-img, &:focus.base-search-input-img {
-        background: url(../static/icons/magnifier-2.svg) left no-repeat;
+        background: url(../../static/icons/magnifier-2.svg) left no-repeat;
         background-size: $icon-large;
         padding-left: calc(#{$icon-large} + #{$spacing});
       }

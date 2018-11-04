@@ -5,14 +5,14 @@ import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
 import BaseInput from './components/BaseInput/BaseInput';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
-import BaseSearch from './components/BaseSearch';
+import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseUploadBar from './components/BaseUploadBar';
+import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import './styles/lib.scss';
 
 export {
