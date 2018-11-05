@@ -1,6 +1,7 @@
 <template>
   <div class="base-chips-below">
     <base-chips-input
+      ref="chipsInput"
       v-bind="$props"
       v-model="selectedBelowListInt"
       :sortable="true"
@@ -209,6 +210,12 @@ export default {
   },
   methods: {
     addedEntry() {
+      this.$emit('listChange', this.selectedBelowListInt);
+    },
+    removeEntry(evt, index) {
+      const item = this.selectedBelowListInt.splice(index, 1);
+      this.$set(item, 'roles', {});
+      this.$refs.chipsInput.dropDownList = this.$refs.chipsInput.dropDownList.concat(item);
       this.$emit('listChange', this.selectedBelowListInt);
     },
     updateList(evt, list) {
