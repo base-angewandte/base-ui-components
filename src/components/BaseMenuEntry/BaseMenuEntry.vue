@@ -308,9 +308,13 @@ export default {
     .base-menu-entry-subtext {
       color: $font-color-second;
       font-size: $font-size-small;
-      margin-right: $spacing;
+      margin: 0 $spacing;
       flex-grow: 99;
       flex-shrink: 99;
+    }
+
+    .base-menu-entry-title + .base-menu-entry-subtext {
+      margin-left: 0;
     }
 
     .base-menu-entry-subtext, .base-menu-entry-title {
