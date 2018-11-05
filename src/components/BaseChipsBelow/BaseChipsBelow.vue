@@ -232,6 +232,7 @@ export default {
     },
     updateRoles(evt, index) {
       this.$set(this.selectedBelowListInt[index], 'roles', evt);
+      this.$emit('listChange', this.selectedBelowListInt);
     },
   },
 };
