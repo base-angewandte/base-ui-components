@@ -380,7 +380,7 @@ export default {
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
         }
       } else if (this.input && this.allowUnknownEntries) {
-        this.selectedListInt.push({ name: this.input });
+        this.selectedListInt.push({ [this.objectProp]: this.input });
       }
       // reset input
       this.input = '';
