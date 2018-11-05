@@ -8,6 +8,36 @@
       title="Andreas M."
       subtext="*1970 Steyr, Oberösterreich"/> -->
     <div class="form-field">
+      <base-chips-input
+        :list="[
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '***' },
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '**' },
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '*' },
+          { title: 'in denen der Mensch' },
+          { title: 'ein erniedrigtes, ein geknechtetes' },
+          { title: 'ein verlassenes, ein verächtliches' },
+          { title: 'Wesen ist' }]"
+        :placeholder="'Select your Marx'"
+        :allow-unknown-entries="true"
+        :object-prop="'title'"
+        :chips-editable="true"
+        :label="'single choice with special drop down body'"
+        :allow-multiple-entries="true">
+        <template
+          slot="drop-down-entry"
+          slot-scope="props">
+          <span>{{ props.item.title }}</span>
+          <span>{{ props.item.additional }}</span>
+          <span>{{ props.item.remark }}</span>
+        </template>
+      </base-chips-input>
+    </div>
+
+
+    <div class="form-field">
       <base-chips-below
         :chips-inline="false"
         v-model="selectedList"
