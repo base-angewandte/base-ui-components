@@ -189,7 +189,6 @@ export default {
   input[type='text'].base-input-field {
     border: none;
     overflow: hidden;
-    padding: 4px 0;
   }
 
   input[type='date'].base-input-field {

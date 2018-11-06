@@ -17,6 +17,7 @@
           key="from"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
+          :typeable="true"
           :format="dateFormat"
           :minimum-view="format"
           v-model="inputInt.from"
@@ -187,6 +188,9 @@ export default {
   watch: {
     input(val) {
       this.inputInt = Object.assign({}, val);
+    },
+    inputInt(val) {
+      console.log(val);
     },
   },
   created() {

@@ -453,7 +453,7 @@ export default {
       box-shadow: $drop-shadow;
 
       .base-chips-drop-down-entry-wrapper {
-        padding: 0 16px;
+        padding: 0 $spacing;
         line-height: $row-height-small;
 
         &.base-chips-drop-down-entry-wrapper-active {
