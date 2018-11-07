@@ -2,7 +2,8 @@
   <div
     ref="menuEntry"
     :draggable="isDraggable"
-    class="base-menu-entry"
+    :class="['base-menu-entry',
+             {'base-menu-entry-activatable': isActivatable }]"
     @click="selectActive ? selected() : $emit('clicked')">
     <div
       :class="{ 'base-menu-entry-border-active': isActive }"
@@ -246,15 +247,23 @@ export default {
     width: 100%;
     position: relative;
     background: white;
-    cursor: pointer;
 
-    .base-menu-entry-border {
-      position: absolute;
-      height: 100%;
-    }
+    &.base-menu-entry-activatable {
+      cursor: pointer;
 
-    .base-menu-entry-border-active {
-      border: 2px solid #{$app-color};
+      .base-menu-entry-border-active {
+        border: 2px solid #{$app-color};
+      }
+
+      .base-menu-entry-border {
+        position: absolute;
+        height: 100%;
+      }
+
+      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title {
+        fill: $app-color;
+        color: $app-color;
+      }
     }
 
     .base-menu-entry-icon {
@@ -298,11 +307,6 @@ export default {
       &.base-menu-entry-title-bold {
         font-weight: bold;
       }
-    }
-
-    &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title {
-      fill: $app-color;
-      color: $app-color;
     }
 
     .base-menu-entry-subtext {
