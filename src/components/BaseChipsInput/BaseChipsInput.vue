@@ -1,6 +1,5 @@
 <template>
   <div
-    v-click-outside="() => showDropDown = false"
     class="base-chips-input">
 
     <!-- INPUT LABEL AND FIELD -->
@@ -12,6 +11,7 @@
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
       v-model="input"
+      @clicked-outside="insideInput = false"
       @input-focus="showDropDown = true"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)">
@@ -36,6 +36,7 @@
 
     <!-- DROP DOWN MENU -->
     <div
+      v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       class="base-chips-drop-down">
       <div
@@ -233,8 +234,6 @@ export default {
   },
   data() {
     return {
-      // show drop down entries list
-      showDropDown: false,
       // the current text input
       input: null,
       // list of selected entries
@@ -244,6 +243,8 @@ export default {
       // list of selectable entries received from parent component
       dropDownList: [],
       selectedMenuEntryIndex: this.getAllowUnknown(),
+      insideDropDown: false,
+      insideInput: false,
     };
   },
   computed: {
@@ -256,6 +257,16 @@ export default {
           ? val.filter(entry => !this.selectedListInt
             .map(selected => selected.idInt).includes(entry.idInt))
           : val;
+      },
+    },
+    showDropDown: {
+      get() {
+        return this.insideDropDown || this.insideInput;
+      },
+      set(val) {
+        debugger;
+        this.insideInput = val;
+        this.insideInput = val;
       },
     },
   },
@@ -351,6 +362,7 @@ export default {
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
+      debugger;
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
@@ -378,6 +390,8 @@ export default {
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
+        } else {
+          this.insideDropDown = true;
         }
       } else if (this.input && this.allowUnknownEntries) {
         this.selectedListInt.push({ [this.objectProp]: this.input });

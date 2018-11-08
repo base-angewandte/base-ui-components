@@ -1,7 +1,7 @@
 @import 'fonts';
 
 /* fonts */
-$font: "Source Sans Pro", sans-serif;
+$font: "Source Sans Pro", serif;
 $font-size-regular: 14pt;
 $font-size-mobile: 12pt;
 $font-size-small: 0.85em;
@@ -16,7 +16,7 @@ $spacing-large: 1.68em;
 $row-height-large: 1em +  2*1em;
 $row-height-small: 1em +  2*$spacing-small;
 $header-height: 55px;
-$chips-spacing: 0.1em;
+$chips-spacing: 0.05em;
 $chips-list-height: 1em + 2*$spacing;
 
 /* shadows and borders */

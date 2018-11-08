@@ -135,7 +135,7 @@
         :allow-multiple-entries="true"
         :allow-dynamic-drop-down-entries="true"
         :object-prop="'title'"
-        :chips-inline="false"
+        :chips-inline="true"
         :chips-editable="true"
         label="A label"
         @fetchDropDownEntries="fetch"/>

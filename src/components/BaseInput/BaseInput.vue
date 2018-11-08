@@ -4,7 +4,8 @@
       :class="['base-input-label-row', { 'hide': !showLabel }]">
       <label
         :class="['base-input-label']"
-        :for="label">
+        :for="label"
+        @click.prevent="$emit('clicked-outside')">
         {{ label }}
       </label>
       <slot name="label-addition" />

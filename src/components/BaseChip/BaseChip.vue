@@ -161,7 +161,7 @@ export default {
   @import "../../styles/variables";
 
   .base-chip, .base-chip-inline {
-    margin: $chips-spacing $spacing-small $chips-spacing 0;
+    margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
     padding: $chips-spacing 0 $chips-spacing $spacing-small;
     flex: 0 0 auto;
     background-color: $background-color;
