@@ -10,11 +10,13 @@
       :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
+      :is-active="showDropDown"
       v-model="input"
       @clicked-outside="insideInput = false"
       @input-focus="showDropDown = true"
       @arrow-key="triggerArrowKey"
-      @enter="addSelected($event)">
+      @enter="addSelected($event)"
+      @clickInputField="insideInput = true">
       <template
         v-if="sortable"
         slot="label-addition">
@@ -264,9 +266,8 @@ export default {
         return this.insideDropDown || this.insideInput;
       },
       set(val) {
-        debugger;
         this.insideInput = val;
-        this.insideInput = val;
+        this.insideDropDown = val;
       },
     },
   },
@@ -362,7 +363,6 @@ export default {
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
-      debugger;
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
@@ -389,7 +389,10 @@ export default {
         this.$emit('selected', this.selectedListInt);
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
-          this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
+          const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
+          if (inputElems && inputElems.length) {
+            inputElems[0].blur();
+          }
         } else {
           this.insideDropDown = true;
         }
@@ -412,9 +415,8 @@ export default {
       }
       // remove entry from selected list // TODO: is this okay?? (for dynamic entries)
       this.selectedListInt.splice(index, 1);
-      if (!this.$props.allowMultipleEntries) {
-        this.showDropDown = true;
-      }
+      // if dropdown is already open keep open!
+      this.insideInput = this.showDropDown;
       this.$emit('selected', this.selectedListInt);
     },
     // allow for navigation with arrow keys

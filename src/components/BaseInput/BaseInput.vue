@@ -14,13 +14,15 @@
       v-click-outside="() => $emit('clicked-outside')"
       :class="['base-input-field-container',
                { 'base-input-field-container-border': showInputBorder },
-               { 'base-input-field-container-active': active }]">
+               { 'base-input-field-container-active': active || isActive }]"
+      @click="$emit('clickInputField')">
       <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
       <slot name="input-field-addition" />
       <!--
         @event input-focus
         @event arrow-key
         @event autocomplete
+        @event clickInputField
       -->
       <input
         v-if="!hideInputField"
@@ -100,6 +102,13 @@ export default {
     showInputBorder: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * show input field active
+     */
+    isActive: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
