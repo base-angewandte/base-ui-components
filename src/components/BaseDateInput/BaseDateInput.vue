@@ -189,12 +189,6 @@ export default {
     input(val) {
       this.inputInt = Object.assign({}, val);
     },
-    inputInt: {
-      handler(val) {
-        console.log(val);
-      },
-      deep: true,
-    },
   },
   created() {
     this.inputInt = Object.assign({}, this.input) || { to: null, from: null };
