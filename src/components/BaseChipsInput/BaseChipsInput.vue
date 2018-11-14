@@ -27,12 +27,16 @@
       <template
         v-if="!allowMultipleEntries || chipsInline"
         slot="input-field-addition">
-        <base-chip
-          v-for="(entry,index) in selectedListInt"
-          :key="index"
-          v-model="entry[objectProp]"
-          :chip-editable="chipsEditable"
-          @removeEntry="removeEntry(entry, index)"/>
+        <draggable
+          :options="{ disabled: !draggable }"
+          v-model="selectedListInt">
+          <base-chip
+            v-for="(entry, index) in selectedListInt"
+            :key="entry.idInt"
+            v-model="entry[objectProp]"
+            :chip-editable="chipsEditable"
+            @removeEntry="removeEntry(entry, index)"/>
+        </draggable>
       </template>
     </base-input>
 
@@ -82,9 +86,9 @@
         name="chips-area">
         <!-- SLOT DEFAULT -->
         <base-chip
-          v-for="(entry,index) in selectedListInt"
+          v-for="(entry, index) in selectedListInt"
           v-model="entry[objectProp]"
-          :key="index"
+          :key="entry.idInt"
           :chip-editable="chipsEditable"
           class="base-chips-input-chip"
           @removeEntry="removeEntry($event, index)"/>
@@ -100,6 +104,7 @@
  */
 
 import ClickOutside from 'vue-click-outside';
+import Draggable from 'vuedraggable';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 
@@ -107,6 +112,7 @@ export default {
   components: {
     BaseInput,
     BaseChip,
+    Draggable,
   },
   directives: {
     ClickOutside,
@@ -230,6 +236,13 @@ export default {
      * if true a button with that functionality will be visible
      */
     sortable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * define if chips should be draggable (currently only available for inline)
+     */
+    draggable: {
       type: Boolean,
       default: false,
     },
@@ -467,6 +480,7 @@ export default {
       width: 100%;
       z-index: 2;
       box-shadow: $drop-shadow;
+      cursor: pointer;
 
       .base-chips-drop-down-entry-wrapper {
         padding: 0 $spacing;
