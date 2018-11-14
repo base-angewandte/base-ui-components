@@ -16,14 +16,10 @@
                { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active || isActive }]"
       @click="$emit('clickInputField')">
-      <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
+      <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips)
+        (before \<input\>)
+       -->
       <slot name="input-field-addition" />
-      <!--
-        @event input-focus
-        @event arrow-key
-        @event autocomplete
-        @event clickInputField
-      -->
       <input
         v-if="!hideInputField"
         :id="label"
@@ -46,6 +42,55 @@
 <script>
 /**
  * Form Input Field Component
+ */
+
+/**
+ * Event emitted on input focus
+ *
+ * @event input-focus
+ * @type None
+ *
+ */
+
+/**
+ * Event emitted on arrow key up or down (in base project needed for
+ * autocomplete / chips input)
+ *
+ * @event arrow-key
+ * @type {Event}
+ *
+ */
+
+/**
+ * Event emitted on keypress, emitting input string
+ *
+ * @event enter
+ * @type String
+ *
+ */
+
+/**
+ * Event emitted on input, passing input string
+ *
+ * @event autocomplete
+ * @type String
+ *
+ */
+
+/**
+ * Event emitted on click on input field \<div\>
+ *
+ * @event clickInputField
+ * @type None
+ *
+ */
+
+/**
+ * Event emitted when click outside input field \<div\> is registered
+ *
+ * @event clicked-outside
+ * @type None
+ *
  */
 import ClickOutside from 'vue-click-outside';
 
@@ -130,8 +175,6 @@ export default {
       this.active = false;
       /**
        * emit an event when focus leaves the input
-       *
-       * TODO: check again if this is needed???
        *
        * @event input-blur
        * @type string
