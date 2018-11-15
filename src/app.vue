@@ -1,5 +1,35 @@
 <template>
   <div id="app">
+    <div class="canvas flex">
+      <base-image-box
+        :selectable="selectable"
+        :show-title="false"
+        :image-url="require('./static/images/icons.png')"
+        :box-size="{ width: '25%' }"
+        description="Bildserie"
+        title="Afterlife II Ausstellungsansichten"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/icons.png')"
+        :box-size="{ width: '25%' }"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
+        :box-size="{ width: '25%' }"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-button
+        :active="false"
+        :text="'Activate Select'"
+        icon-size="large"
+        button-style="row"
+        @clicked="enableSelect()"/>
+    </div>
     <!-- <base-hover-box
       :box-text="[
         'Alias: Max Mustermann, Stephan Mustermann',
