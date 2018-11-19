@@ -28,7 +28,7 @@
                   ref="selectedChip"
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
-                  :key="entry[objectProp]"
+                  :key="entry.idInt"
                   :is-linked="!entry.edited"
                   class="base-chips-input-chip"
                   @valueChanged="$set(entry, 'edited', true)"

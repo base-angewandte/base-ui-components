@@ -52,10 +52,11 @@
           { title: 'Wesen ist' }]"
         :placeholder="'Select your Marx'"
         :allow-unknown-entries="true"
+        :allow-dynamic-drop-down-entries="false"
         :object-prop="'title'"
         :chips-editable="true"
         :label="'single choice with special drop down body'"
-        :allow-multiple-entries="true">
+        :allow-multiple-entries="false">
         <template
           slot="drop-down-entry"
           slot-scope="props">
@@ -164,9 +165,11 @@
         :selected-list="chipsInput"
         :allow-multiple-entries="true"
         :allow-dynamic-drop-down-entries="true"
-        :object-prop="'title'"
+        :object-prop="'value'"
         :chips-inline="true"
         :chips-editable="true"
+        :identifier="'id'"
+        draggable
         label="A label"
         @fetchDropDownEntries="fetch"/>
       <base-button

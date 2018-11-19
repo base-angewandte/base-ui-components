@@ -13,7 +13,8 @@
       :is-active="showDropDown"
       v-model="input"
       @clicked-outside="insideInput = false"
-      @input-focus="showDropDown = true"
+      @input-focus="onInputFocus"
+      @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
       @enter="addSelected($event)"
       @clickInputField="insideInput = true">
@@ -35,7 +36,9 @@
             :key="entry.idInt"
             v-model="entry[objectProp]"
             :chip-editable="chipsEditable"
-            @removeEntry="removeEntry(entry, index)"/>
+            :is-linked="entry.idInt === 0 || !!entry.idInt"
+            @removeEntry="removeEntry(entry, index)"
+            @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
         </draggable>
       </template>
     </base-input>
@@ -51,7 +54,8 @@
         :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
         class="base-chips-drop-down-entry-wrapper"
         @click="addSelected(entry)"
-        @mouseover="selectedMenuEntryIndex = index">
+        @mouseover="selectedMenuEntryIndex = index"
+        @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
 
         <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
@@ -246,6 +250,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * for dynamic drop down entries a unique identifier (id, uuid) is needed
+     */
+    identifier: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -268,10 +279,8 @@ export default {
         return this.dropDownList;
       },
       set(val) {
-        this.dropDownList = !this.allowDynamicDropDownEntries
-          ? val.filter(entry => !this.selectedListInt
-            .map(selected => selected.idInt).includes(entry.idInt))
-          : val;
+        this.dropDownList = val.filter(entry => !this.selectedListInt
+          .map(selected => selected.idInt).includes(entry.idInt));
       },
     },
     showDropDown: {
@@ -295,13 +304,16 @@ export default {
          * @type { object }
          *
          */
-        this.$emit('fetchDropDownEntries', { value: val, type: this.$props.objectProp });
+        this.$emit('fetchDropDownEntries', { value: val, type: this.objectProp });
       } else {
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
           ? this.dropDownListOrig
             .filter(entry => entry[this.objectProp].toLowerCase().includes(val.toLowerCase()))
           : this.dropDownListOrig;
+        if (!this.dropDownListInt.length) {
+          this.selectedMenuEntryIndex = -1;
+        }
       }
     },
     // watch selectedList prop for changes triggered from outside
@@ -311,7 +323,7 @@ export default {
       this.selectedListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
-            idInt: entry.idInt,
+            idInt: this.identifier ? entry[this.identifier] : entry.idInt,
             [this.objectProp]: entry[this.objectProp],
           });
         }
@@ -326,7 +338,7 @@ export default {
         this.dropDownListInt = val.map((entry, index) => {
           if (typeof entry === 'object') {
             return Object.assign({}, entry, {
-              idInt: index,
+              idInt: this.identifier ? entry[this.identifier] : index,
               [this.objectProp]: entry[this.objectProp],
             });
           }
@@ -335,6 +347,9 @@ export default {
             [this.objectProp]: entry,
           });
         });
+        if (!this.dropDownListInt.length) {
+          this.selectedMenuEntryIndex = -1;
+        }
       }
     },
     showDropDown(val) {
@@ -351,7 +366,7 @@ export default {
       this.selectedListInt = this.selectedList.map((entry, index) => {
         if (typeof entry === 'object') {
           return Object.assign({}, entry, {
-            idInt: this.list.length + index,
+            idInt: this.identifier ? entry[this.identifier] : this.list.length + index,
             [this.objectProp]: entry[this.objectProp],
           });
         }
@@ -359,38 +374,34 @@ export default {
       });
     }
 
+    this.dropDownListInt = this.list
+      .map((entry, index) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, {
+            idInt: this.identifier ? entry[this.identifier] : index,
+            [this.objectProp]: entry[this.objectProp],
+          });
+        }
+        return Object.assign({}, { idInt: index, [this.objectProp]: entry });
+      });
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = this.list
-        .map((entry, index) => {
-          if (typeof entry === 'object') {
-            return Object.assign({}, entry, {
-              idInt: index,
-              [this.objectProp]: entry[this.objectProp],
-            });
-          }
-          return Object.assign({}, { idInt: index, [this.objectProp]: entry });
-        });
-      this.dropDownListInt = this.dropDownListOrig;
+      this.dropDownListOrig = [].concat(this.dropDownListInt);
     }
   },
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
+      this.showDropDown = true;
+      // check if entry was selected
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
-          // TODO: this needs to be different for unknown entries allowed!
-          // TODO: also do this for single entries?
           if (this.addSelectedEntryDirectly) {
             this.selectedListInt.push(selected);
           }
         } else {
           this.selectedListInt = [selected];
-        }
-        if (!this.allowDynamicDropDownEntries) {
-          // filter the selected entry from the list of drop down menu entries
-          this.dropDownListInt = this.dropDownListOrig;
         }
         this.selectedMenuEntryIndex = this.getAllowUnknown();
         /**
@@ -409,22 +420,32 @@ export default {
         } else {
           this.insideDropDown = true;
         }
+        // reset input
+        this.input = '';
       } else if (this.input && this.allowUnknownEntries) {
         this.selectedListInt.push({ [this.objectProp]: this.input });
+        // reset input
+        this.input = '';
       }
-      // reset input
-      this.input = '';
+      if (!this.allowDynamicDropDownEntries) {
+        // filter the selected entry from the list of drop down menu entries
+        this.dropDownListInt = this.dropDownListOrig;
+      } else {
+        this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
+          .map(sel => sel.idInt).includes(entry.idInt));
+      }
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
       if (!this.allowDynamicDropDownEntries) {
-        // check if the item id was set
-        if (item.idInt !== 0 && !item.idInt) {
-          this.dropDownListInt = [];
+        // check if item has an id (= is not an custom entry)
+        // TODO: is this the desired behaviour?? (or should unknown entry also appear
+        // in drop down?
+        if (item.idInt) {
+          this.dropDownListInt.push(item);
+          // sort all entries by id to restore the original order
+          this.sort();
         }
-        this.dropDownListInt.push(item);
-        // sort all entries by id to restore the original order
-        this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
       }
       // remove entry from selected list // TODO: is this okay?? (for dynamic entries)
       this.selectedListInt.splice(index, 1);
@@ -444,6 +465,20 @@ export default {
     },
     getAllowUnknown() {
       return this.$props.allowUnknownEntries ? -1 : 0;
+    },
+    onInputBlur() {
+      this.showDropDown = false;
+      if (this.input && this.allowUnknownEntries) {
+        this.selectedListInt.push({ [this.objectProp]: this.input });
+      }
+      if (this.selectedMenuEntryIndex >= 0) {
+        this.insideDropDown = true;
+      } else {
+        this.input = '';
+      }
+    },
+    onInputFocus() {
+      this.showDropDown = true;
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
