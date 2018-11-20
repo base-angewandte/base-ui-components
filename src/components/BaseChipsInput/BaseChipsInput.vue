@@ -441,7 +441,7 @@ export default {
         // check if item has an id (= is not an custom entry)
         // TODO: is this the desired behaviour?? (or should unknown entry also appear
         // in drop down?
-        if (item.idInt) {
+        if (item.idInt === 0 || item.idInt) {
           this.dropDownListInt.push(item);
           // sort all entries by id to restore the original order
           this.sort();
