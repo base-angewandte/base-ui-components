@@ -16,17 +16,16 @@
                { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active || isActive }]"
       @click="$emit('clickInputField')">
-      <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips)
+      <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
         (before \<input\>)
        -->
       <slot name="input-field-addition" />
       <input
-        v-if="!hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
-        class="base-input-field"
+        :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
         type="text"
         autocomplete="off"
         @focus="$emit('input-focus')"
@@ -225,6 +224,13 @@ export default {
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;
+    }
+
+    .base-input-field-hidden {
+      width: 0;
+      overflow: hidden;
+      opacity:0;
+      filter:alpha(opacity=0);
     }
 
     .base-input-label-row {

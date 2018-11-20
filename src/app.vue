@@ -65,6 +65,20 @@
           <span>{{ props.item.remark }}</span>
         </template>
       </base-chips-input>
+      <base-chips-input
+        :list="dropDownInput"
+        :placeholder="'Select Your Marx'"
+        :selected-list="chipsInput"
+        :allow-multiple-entries="true"
+        :allow-dynamic-drop-down-entries="false"
+        :allow-unknown-entries="true"
+        :object-prop="'value'"
+        :chips-inline="true"
+        :chips-editable="true"
+        :identifier="'id'"
+        draggable
+        label="A label"
+        @fetchDropDownEntries="fetch"/>
     </div>
 
 

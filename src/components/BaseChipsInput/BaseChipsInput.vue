@@ -16,7 +16,7 @@
       @input-focus="onInputFocus"
       @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
-      @enter="addSelected($event)"
+      @enter="addSelected()"
       @clickInputField="insideInput = true">
       <template
         v-if="sortable"
@@ -47,13 +47,16 @@
     <div
       v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
-      class="base-chips-drop-down">
+      ref="dropdownContainer"
+      class="base-chips-drop-down"
+      @keydown.up.down.prevent="triggerArrowKey">
       <div
         v-for="(entry, index) in dropDownListInt"
+        ref="option"
         :key="index"
         :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
         class="base-chips-drop-down-entry-wrapper"
-        @click="addSelected(entry)"
+        @click="addSelected()"
         @mouseover="selectedMenuEntryIndex = index"
         @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
 
@@ -62,7 +65,8 @@
           :item="entry"
           name="drop-down-entry">
           <!-- SLOT DEFAULT -->
-          <div class="base-chips-drop-down-entry">
+          <div
+            class="base-chips-drop-down-entry">
             {{ entry[objectProp] }}
           </div>
         </slot>
@@ -105,6 +109,7 @@
 <script>
 /**
  * Base Chips Input component with autocomplete function
+ *
  */
 
 import ClickOutside from 'vue-click-outside';
@@ -306,14 +311,13 @@ export default {
          */
         this.$emit('fetchDropDownEntries', { value: val, type: this.objectProp });
       } else {
+        const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
           ? this.dropDownListOrig
             .filter(entry => entry[this.objectProp].toLowerCase().includes(val.toLowerCase()))
           : this.dropDownListOrig;
-        if (!this.dropDownListInt.length) {
-          this.selectedMenuEntryIndex = -1;
-        }
+        this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
     },
     // watch selectedList prop for changes triggered from outside
@@ -334,6 +338,7 @@ export default {
       });
     },
     list(val) {
+      const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (this.allowDynamicDropDownEntries) {
         this.dropDownListInt = val.map((entry, index) => {
           if (typeof entry === 'object') {
@@ -347,17 +352,13 @@ export default {
             [this.objectProp]: entry,
           });
         });
-        if (!this.dropDownListInt.length) {
-          this.selectedMenuEntryIndex = -1;
-        }
+        this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
     },
     showDropDown(val) {
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
-        // TODO below disabled for now due to errors with single entry mode but check
-        // if this is necessary for multi entry inline mode
-        // this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
       }
     },
   },
@@ -403,7 +404,6 @@ export default {
         } else {
           this.selectedListInt = [selected];
         }
-        this.selectedMenuEntryIndex = this.getAllowUnknown();
         /**
          * event triggered when an entry from the drop down was selected or enter was pressed
          *
@@ -462,13 +462,16 @@ export default {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex > 0
           ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
       }
+      if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
+        this.$refs.option[this.selectedMenuEntryIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
     },
     getAllowUnknown() {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
       this.showDropDown = false;
-      if (this.input && this.allowUnknownEntries) {
+      if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
         this.selectedListInt.push({ [this.objectProp]: this.input });
       }
       if (this.selectedMenuEntryIndex >= 0) {
@@ -479,6 +482,20 @@ export default {
     },
     onInputFocus() {
       this.showDropDown = true;
+    },
+    getIndex(oldEntry) {
+      if (!this.dropDownListInt.length) {
+        return -1;
+      }
+      // set the index to the entry previously selected (if any)
+      if (oldEntry) {
+        const index = this.dropDownListInt.map(e => e.idInt).indexOf(oldEntry.idInt);
+        if (index < 0) {
+          return this.getAllowUnknown();
+        }
+        return index;
+      }
+      return this.getAllowUnknown();
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
@@ -513,6 +530,8 @@ export default {
       position: absolute;
       background: white;
       width: 100%;
+      max-height: 10 * $row-height-small;
+      overflow-y: auto;
       z-index: 2;
       box-shadow: $drop-shadow;
       cursor: pointer;

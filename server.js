@@ -24,7 +24,7 @@ async function getExternalData(string, resource, full=false) {
         extRes = await axios.get(`${gndFull}${string}.json`);
         extRes = extRes.data;
         extRes = Object.assign({}, {
-          author: `${extRes.preferredNameEntityForThePerson.forename} ${extRes.preferredNameEntityForThePerson.surname}`,
+          authors: `${extRes.preferredNameEntityForThePerson.forename} ${extRes.preferredNameEntityForThePerson.surname}`,
           dob: extRes.dateOfBirth,
           id: extRes.gndIdentifier,
           source: '**' });
@@ -45,7 +45,7 @@ async function getExternalData(string, resource, full=false) {
     }
     extRes = extRes.data.result;
     extRes = extRes && extRes.length
-      ? extRes.map(result => Object.assign({}, { author: result.displayForm, source: '**' })) : [];
+      ? extRes.map(result => Object.assign({}, { authors: result.displayForm, source: '**' })) : [];
   }
   return extRes;
 }
@@ -105,7 +105,7 @@ app.get('/fetchAutocomplete/:type', async (req, res) => {
         .includes(string.toLowerCase()))
       : [];
   }
-  if (type === 'author' || type === 'journal') {
+  if (type === 'authors' || type === 'journal') {
     resArr = string ? scienceData
       .reduce((prev, curr) => prev.concat(curr[type]), [])
       .filter(prop => prop.toLowerCase().includes(string.toLowerCase())) : [];
@@ -115,13 +115,13 @@ app.get('/fetchAutocomplete/:type', async (req, res) => {
   // .reduce((prev, curr) => (prev.includes(curr) ? prev : prev.concat(curr)), []);
   let gndRes = [];
   let extResults = [];
-  if (type === 'author') {
+  if (type === 'authors') {
     if (string) {
       extResults = await getExternalData(string, resource);
     }
-    resArr = resArr.map(item => Object.assign({}, { author: item, source: '*' }));
+    resArr = resArr.map(item => Object.assign({}, { [type]: item, source: '*' }));
     gndRes = string ? gndData.filter(item => item.name.toLowerCase().includes(string.toLowerCase()))
-      .map(result => Object.assign({}, { author: result.name, born: result.born, source: '***' })) : [];
+      .map(result => Object.assign({}, { [type]: result.name, born: result.born, source: '***' })) : [];
     resArr = gndRes.concat(extResults, resArr);
   }
   res.send(resArr);
