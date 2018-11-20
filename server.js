@@ -1,11 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const multer = require('multer');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const Loki = require('lokijs');
-const del = require('del');
+// const multer = require('multer');
+// const cors = require('cors');
+// const fs = require('fs');
+// const path = require('path');
+// const Loki = require('lokijs');
+// const del = require('del');
 const axios = require('axios');
 const scienceData = require('./data.js').SCIENCE_DATA;
 const gndData = require('./data.js').GND_DATA;
@@ -135,6 +135,8 @@ app.get('/data/:id', async (req, res) => {
   res.send(result);
 });
 
+/* testing file upload
+
 const DB_NAME = 'db.json';
 const COLLECTION_NAME = 'images';
 const UPLOAD_PATH = 'uploads';
@@ -169,5 +171,6 @@ app.post('/file-progress', upload.array('file'), (req, res) => {
     }
   });
 });
+ */
 
 app.listen(9900, () => console.log('App listening on port 9900!'));
