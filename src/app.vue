@@ -88,6 +88,7 @@
         v-model="selectedList"
         :chips-editable="true"
         :list="['Herbert Marcuse', 'Erich From', 'Georg Werth']"
+        :role-options="['Farmer', 'Magician', 'Priest']"
         label="chips-below-test"/>
       <base-upload-bar
         :progress="progress"

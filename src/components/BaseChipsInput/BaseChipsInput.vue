@@ -31,6 +31,7 @@
         <draggable
           :options="{ disabled: !draggable }"
           v-model="selectedListInt">
+          <!-- TODO: is-linked should be associated solely with external identifier!! -->
           <base-chip
             v-for="(entry, index) in selectedListInt"
             :key="entry.idInt"
@@ -284,7 +285,20 @@ export default {
         return this.dropDownList;
       },
       set(val) {
-        this.dropDownList = val.filter(entry => !this.selectedListInt
+        const list = val.map((entry, index) => {
+          if (typeof entry === 'object') {
+            let id = entry.idInt;
+            if (id !== 0 && !id) {
+              id = this.identifier ? entry[this.identifier] : index;
+            }
+            return Object.assign({}, entry, {
+              idInt: id,
+              [this.objectProp]: entry[this.objectProp],
+            });
+          }
+          return Object.assign({}, { idInt: index, [this.objectProp]: entry });
+        });
+        this.dropDownList = list.filter(entry => !this.selectedListInt
           .map(selected => selected.idInt).includes(entry.idInt));
       },
     },
@@ -322,36 +336,12 @@ export default {
     },
     // watch selectedList prop for changes triggered from outside
     selectedList(val) {
-      // if entries are objects merge with internally necessary properties,
-      // else use entry (string? TODO: should probably check this) as [this.objectProp]
-      this.selectedListInt = val.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: this.identifier ? entry[this.identifier] : entry.idInt,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, {
-          idInt: this.list.length + index,
-          [this.objectProp]: entry,
-        });
-      });
+      this.setSelectedList(val);
     },
     list(val) {
       const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (this.allowDynamicDropDownEntries) {
-        this.dropDownListInt = val.map((entry, index) => {
-          if (typeof entry === 'object') {
-            return Object.assign({}, entry, {
-              idInt: this.identifier ? entry[this.identifier] : index,
-              [this.objectProp]: entry[this.objectProp],
-            });
-          }
-          return Object.assign({}, {
-            idInt: index,
-            [this.objectProp]: entry,
-          });
-        });
+        this.dropDownListInt = val;
         this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
     },
@@ -362,29 +352,9 @@ export default {
       }
     },
   },
-  created() {
-    if (this.selectedList) {
-      this.selectedListInt = this.selectedList.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: this.identifier ? entry[this.identifier] : this.list.length + index,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
-      });
-    }
-
-    this.dropDownListInt = this.list
-      .map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: this.identifier ? entry[this.identifier] : index,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, { idInt: index, [this.objectProp]: entry });
-      });
+  mounted() {
+    this.setSelectedList(this.selectedList);
+    this.dropDownListInt = this.list;
     if (!this.allowDynamicDropDownEntries) {
       this.dropDownListOrig = [].concat(this.dropDownListInt);
     }
@@ -509,6 +479,23 @@ export default {
         return -1;
       });
       this.$emit('selected', this.selectedListInt);
+    },
+    setSelectedList(val) {
+      if (val && val.length) {
+        this.selectedListInt = val.map((entry, index) => {
+          if (typeof entry === 'object') {
+            return Object.assign({}, entry, {
+              idInt: this.identifier ? entry[this.identifier] : entry.idInt,
+              [this.objectProp]: entry[this.objectProp],
+            });
+          }
+          return Object.assign({}, {
+            idInt: this.list.length + index,
+            [this.objectProp]: entry,
+          });
+        });
+      }
+      return [];
     },
   },
 };

@@ -34,14 +34,12 @@
                   @valueChanged="$set(entry, 'edited', true)"
                   @removeEntry="removeEntry($event, index)"/>
               </div>
-              <!-- TODO: roles list still hardcoded?? need this outside component again
-              or possibility to specify list there -->
               <base-chips-input
                 :show-label="false"
                 :label="label + '-roles'"
-                :key="index"
+                :key="entry.idInt"
                 v-model="entry.roles"
-                :list="['Editor', 'Actor', 'Farmer', 'Philosopher', 'Magician']"
+                :list="roleOptions"
                 :show-input-border="false"
                 placeholder="Select Role"
                 @selected="updateRoles($event, index)"/>
@@ -186,27 +184,36 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * specify a property (e.g. id, uuid) that can be used for identification
+     */
+    identifier: {
+      type: String,
+      default: '',
+    },
+    /**
+     * Role options will set the roles available for the selected entries
+     */
+    roleOptions: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
       chipsArray: [],
-      selectedBelowListInt: this.selectedList.map((entry) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, { roles: [] }, entry);
-        }
-        return Object.assign({}, { [this.objectProp]: entry, roles: [] });
-      }),
+      selectedBelowListInt: [],
     };
   },
   watch: {
     selectedList(val) {
-      this.selectedBelowListInt = val.map((entry) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, { roles: [] }, entry);
-        }
-        return Object.assign({}, { [this.objectProp]: entry, roles: [] });
-      });
+      this.createInternalList(val);
     },
+  },
+  created() {
+    this.createInternalList(this.selectedList);
   },
   methods: {
     addedEntry() {
@@ -240,6 +247,28 @@ export default {
     updateRoles(evt, index) {
       this.$set(this.selectedBelowListInt[index], 'roles', evt);
       this.$emit('listChange', this.selectedBelowListInt);
+    },
+    createInternalList(val) {
+      this.selectedBelowListInt = val.map((entry, index) => {
+        if (typeof entry === 'object') {
+          // check if entry already has an id
+          let id = entry.idInt;
+          if (!(id === 0 || id)) {
+            // if not - create one
+            id = this.identifier ? entry[this.identifier] : this.list.length + index;
+          }
+          return Object.assign({}, {
+            roles: [],
+            idInt: id,
+          }, entry);
+        }
+        return Object.assign({}, {
+          [this.objectProp]:
+          entry,
+          idInt: this.list.length + index,
+          roles: [],
+        });
+      });
     },
   },
 };
