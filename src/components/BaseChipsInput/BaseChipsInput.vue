@@ -335,8 +335,11 @@ export default {
       }
     },
     // watch selectedList prop for changes triggered from outside
-    selectedList(val) {
-      this.setSelectedList(val);
+    selectedList: {
+      handler(val) {
+        this.setSelectedList(val);
+      },
+      deep: true,
     },
     list(val) {
       const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
@@ -494,8 +497,9 @@ export default {
             [this.objectProp]: entry,
           });
         });
+      } else {
+        this.selectedListInt = [];
       }
-      return [];
     },
   },
 };
