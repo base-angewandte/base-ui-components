@@ -84,6 +84,11 @@ export default {
         this.$set(this.entryProps[val], 'active', true);
       }
     },
+    selectActive(val) {
+      if (!val) {
+        this.entryProps.forEach(entry => this.$set(entry, 'selected', false));
+      }
+    },
   },
   created() {
     this.setInternalVar();
