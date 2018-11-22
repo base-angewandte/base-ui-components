@@ -377,13 +377,6 @@ export default {
         } else {
           this.selectedListInt = [selected];
         }
-        /**
-         * event triggered when an entry from the drop down was selected or enter was pressed
-         *
-         * @event selected
-         * @type {object}
-         */
-        this.$emit('selected', this.selectedListInt);
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
           const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
@@ -407,6 +400,13 @@ export default {
         this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
           .map(sel => sel.idInt).includes(entry.idInt));
       }
+      /**
+       * event triggered when an entry from the drop down was selected or enter was pressed
+       *
+       * @event selected
+       * @type {object}
+       */
+      this.$emit('selected', this.selectedListInt);
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
@@ -446,6 +446,7 @@ export default {
       this.showDropDown = false;
       if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
         this.selectedListInt.push({ [this.objectProp]: this.input });
+        this.$emit('selected', this.selectedListInt);
       }
       if (this.selectedMenuEntryIndex >= 0) {
         this.insideDropDown = true;
