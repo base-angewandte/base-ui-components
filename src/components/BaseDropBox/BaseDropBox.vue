@@ -13,6 +13,16 @@
 </template>
 
 <script>
+/**
+ * An Element for dropping files or other UI Elements into
+  */
+
+/**
+ * Triggered when the box is clicked
+ *
+ * @event clicked
+ * @type None
+ */
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 
 export default {
@@ -20,22 +30,37 @@ export default {
     BaseBoxButton,
   },
   props: {
+    /**
+     * specify an icon to be displayed centered in the box
+     */
     icon: {
       type: String,
       default: null,
     },
+    /**
+     * if true a plus sign is displayed in front of the icon
+     */
     showPlus: {
       type: Boolean,
       default: false,
     },
+    /**
+     * the text displayed below the icon
+     */
     text: {
       type: String,
       default: '',
     },
+    /**
+     * specify a potential subtext
+     */
     subtext: {
       type: String,
       default: '',
     },
+    /**
+     * define the box size
+     */
     boxSize: {
       type: Object,
       default() {
@@ -68,6 +93,12 @@ export default {
       }));
       this.$refs.fileform.addEventListener('drop', (e) => {
         this.isDragOver = false;
+        /**
+         * event emitted when a file or an element is dropped on the box, emitting the type of event
+         *
+         * @event dropped
+         * @type {object}
+         */
         this.$emit('dropped', e);
       });
       ['dragenter', 'dragleave'].forEach(((evt) => {
