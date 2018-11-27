@@ -37,7 +37,7 @@
             :key="entry.idInt"
             v-model="entry[objectProp]"
             :chip-editable="chipsEditable"
-            :is-linked="entry.idInt === 0 || !!entry.idInt"
+            :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
             @removeEntry="removeEntry(entry, index)"
             @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
         </draggable>
@@ -73,6 +73,11 @@
         </slot>
 
       </div>
+      <!--
+        @slot a slot to expand the drop down area (needed for "Expand Functionality"
+      -->
+      <slot
+        name="drop-down-extended" />
       <!--
         @slot customize what is displayed when no drop down options are available
       -->
@@ -262,6 +267,13 @@ export default {
     identifier: {
       type: String,
       default: '',
+    },
+    /**
+     * define if entries should always appear linked (-> with grey background)
+     */
+    alwaysLinked: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
