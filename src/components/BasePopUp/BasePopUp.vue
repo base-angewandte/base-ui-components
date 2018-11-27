@@ -152,6 +152,8 @@ export default {
 
   .base-pop-up-background {
     position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
     width: calc(100% - 2 * #{$spacing});
     z-index: 99;
