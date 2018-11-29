@@ -531,6 +531,7 @@ export default {
       } else {
         this.selectedListInt = [];
       }
+      this.dropDownListInt = this.list;
     },
     checkLeave(e) {
       if (e.relatedTarget.closest('.base-chips-input')
