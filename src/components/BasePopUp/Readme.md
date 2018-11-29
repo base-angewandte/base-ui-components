@@ -12,8 +12,8 @@ A basic example
       title="An Example Pop Up"
       button-right-text="Custom Submit"
       @close="showPopUp = false"
-      @buttonLeft="showPopUp = false"
-      @buttonRight="action">
+      @button-left="showPopUp = false"
+      @button-right="action">
       <div class="body">Specify Content here</div>
     </base-pop-up>
 </div>

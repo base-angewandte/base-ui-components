@@ -39,38 +39,11 @@
       subtext="*1970 Steyr, Oberösterreich"/> -->
     <div class="form-field">
       <base-chips-input
-        :list="[
-          { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '***' },
-          { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '**' },
-          { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '*' },
-          { title: 'in denen der Mensch' },
-          { title: 'ein erniedrigtes, ein geknechtetes' },
-          { title: 'ein verlassenes, ein verächtliches' },
-          { title: 'Wesen ist' }]"
-        :placeholder="'Select your Marx'"
-        :allow-unknown-entries="true"
-        :allow-dynamic-drop-down-entries="false"
-        :object-prop="'title'"
-        :chips-editable="true"
-        :label="'single choice with special drop down body'"
-        :allow-multiple-entries="false">
-        <template
-          slot="drop-down-entry"
-          slot-scope="props">
-          <span>{{ props.item.title }}</span>
-          <span>{{ props.item.additional }}</span>
-          <span>{{ props.item.remark }}</span>
-        </template>
-      </base-chips-input>
-      <base-chips-input
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
         :selected-list="chipsInput"
         :allow-multiple-entries="true"
-        :allow-dynamic-drop-down-entries="false"
+        :allow-dynamic-drop-down-entries="true"
         :allow-unknown-entries="true"
         :object-prop="'value'"
         :chips-inline="true"
@@ -78,8 +51,19 @@
         :identifier="'id'"
         draggable
         label="A label"
-        @fetchDropDownEntries="fetch"/>
+        @fetch-dropdown-entries="fetch">
+        <template slot="drop-down-extended">
+          <div
+            v-if="dropDownInput && dropDownInput.length"
+            class="dropdown-extended">
+            <div class="show-more-toggle">
+              Show more results...
+            </div>
+          </div>
+        </template>
+      </base-chips-input>
     </div>
+    <div :style="{ height: '400px' }" />
 
 
     <div class="form-field">
@@ -133,7 +117,7 @@
         :label="'Label'"
         :tabs="['German', 'English']"
         :placeholder="'Enter Text'"
-        @tabSwitch="tabSwitched">
+        @tab-switch="tabSwitched">
         <div class="multiline-dropdown">
           <base-drop-down
             :default-select="'Textart'"
@@ -577,7 +561,18 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+  @import "./styles/variables.scss";
+
+  .dropdown-extended {
+    border-top: $separation-line;
+    padding: $spacing;
+
+    .show-more-toggle {
+      color: $app-color;
+    }
+  }
+
   .canvas {
     padding: 16px;
   }

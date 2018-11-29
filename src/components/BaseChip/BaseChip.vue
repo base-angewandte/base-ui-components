@@ -14,7 +14,7 @@
       v-html="content()" />
     <div
       class="base-chip-icon"
-      @click="$emit('removeEntry', entryInt)">
+      @click="$emit('remove-entry', entryInt)">
       <img
         class="base-chip-icon-img"
         src="../../static/icons/remove.svg">
@@ -35,7 +35,7 @@
 /**
  * triggered when the remove icon is clicked and returns the data behind the chip
  *
- * @event removeEntry
+ * @event remove-entry
  * @type Object
  *
  */
@@ -51,7 +51,7 @@ export default {
   },
   model: {
     prop: 'entry',
-    event: 'valueChanged',
+    event: 'value-changed',
   },
   props: {
     /**
@@ -129,7 +129,7 @@ export default {
          * @event valueChanged
          * @type String
          */
-        this.$emit('valueChanged', this.entryInt);
+        this.$emit('value-changed', this.entryInt);
       }
     },
     // TODO: does this need some kind of event because content for hover box

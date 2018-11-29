@@ -6,7 +6,7 @@
       v-model="selectedBelowListInt"
       :sortable="true"
       @selected="addedEntry"
-      @fetchDropDownEntries="$emit('fetchDropDownEntries')">
+      @fetch-dropdown-entries="$emit('fetch-dropdown-entries')">
       <template
         slot="chips-area"
         slot-scope="props">
@@ -31,8 +31,8 @@
                   :key="entry.idInt"
                   :is-linked="!entry.edited"
                   class="base-chips-input-chip"
-                  @valueChanged="$set(entry, 'edited', true)"
-                  @removeEntry="removeEntry($event, index)"/>
+                  @value-changed="$set(entry, 'edited', true)"
+                  @remove-entry="removeEntry($event, index)"/>
               </div>
               <base-chips-input
                 :show-label="false"
@@ -217,24 +217,24 @@ export default {
   },
   methods: {
     addedEntry() {
-      this.$emit('listChange', this.selectedBelowListInt);
+      this.$emit('list-change', this.selectedBelowListInt);
     },
     removeEntry(evt, index) {
       const item = this.selectedBelowListInt.splice(index, 1);
       this.$set(item, 'roles', {});
       this.$refs.chipsInput.dropDownList = this.$refs.chipsInput.dropDownList.concat(item);
-      this.$emit('listChange', this.selectedBelowListInt);
+      this.$emit('list-change', this.selectedBelowListInt);
     },
     updateList(evt, list) {
       /**
        * propagate list change from dragging event to parent
        *
-       * @event listChange
+       * @event list-change
        * @type {object}
        *
        */
       // TODO: check if this is working for objects!
-      /* this.$emit('listChange', list.map((chip) => {
+      /* this.$emit('list-change', list.map((chip) => {
         if (typeof this.selectedList[0] === 'object') {
           // restore original object properties
           return Object.keys(this.list).map(key => chip[key]);
@@ -242,11 +242,11 @@ export default {
         // or send string
         return chip[this.objectProp];
       })); */
-      this.$emit('listChange', list);
+      this.$emit('list-change', list);
     },
     updateRoles(evt, index) {
       this.$set(this.selectedBelowListInt[index], 'roles', evt);
-      this.$emit('listChange', this.selectedBelowListInt);
+      this.$emit('list-change', this.selectedBelowListInt);
     },
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {

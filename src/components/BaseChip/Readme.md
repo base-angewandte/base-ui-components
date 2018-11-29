@@ -6,12 +6,12 @@ A chip that can be edited
       <base-chip
           v-model="entry"
           :chip-editable="true"
-          @removeEntry="remove"/>
+          @remove-entry="remove"/>
       <base-chip
           :entry="'A chip not Linked'"
           :chip-editable="true"
           :is-linked="false"
-          @removeEmtry="remove"/>    
+          @remove-entry="remove"/>    
   </div>
 </template>
 

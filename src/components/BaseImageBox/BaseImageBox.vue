@@ -122,10 +122,10 @@ export default {
       /**
        * event triggered when box is selectable and clicked upon
        *
-       * @event selectTriggered
+       * @event select-triggered
        * @type Boolean
        */
-      this.$emit('selectTriggered', this.selected);
+      this.$emit('select-triggered', this.selected);
     },
   },
   methods: {
