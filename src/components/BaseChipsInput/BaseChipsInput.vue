@@ -17,7 +17,7 @@
       @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
       @enter="addSelected()"
-      @clickInputField="insideInput = true">
+      @click-input-field="insideInput = true">
       <template
         v-if="sortable"
         slot="label-addition">
@@ -38,7 +38,7 @@
             v-model="entry[objectProp]"
             :chip-editable="chipsEditable"
             :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-            @removeEntry="removeEntry(entry, index)"
+            @remove-entry="removeEntry(entry, index)"
             @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
         </draggable>
       </template>
@@ -50,7 +50,9 @@
       v-if="showDropDown"
       ref="dropdownContainer"
       class="base-chips-drop-down"
-      @keydown.up.down.prevent="triggerArrowKey">
+      @keydown.up.down.prevent="triggerArrowKey"
+      @mouseenter="insideDropDown = true"
+      @mouseleave="checkLeave">
       <div
         v-for="(entry, index) in dropDownListInt"
         ref="option"
@@ -105,7 +107,7 @@
           :key="entry.idInt"
           :chip-editable="chipsEditable"
           class="base-chips-input-chip"
-          @removeEntry="removeEntry($event, index)"/>
+          @remove-entry="removeEntry($event, index)"/>
       </slot>
     </div>
 
@@ -301,7 +303,8 @@ export default {
           if (typeof entry === 'object') {
             let id = entry.idInt;
             if (id !== 0 && !id) {
-              id = this.identifier ? entry[this.identifier] : index;
+              id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+                ? entry[this.identifier] : index;
             }
             return Object.assign({}, entry, {
               idInt: id,
@@ -331,11 +334,11 @@ export default {
         /**
          * event to fetch drop down entries with changing input
          *
-         * @event fetchDropDownEntries
+         * @event fetch-dropdown-entries
          * @type { object }
          *
          */
-        this.$emit('fetchDropDownEntries', { value: val, type: this.objectProp });
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
         const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
         // if content is static filter the existing entries for the ones matching input
@@ -355,15 +358,30 @@ export default {
     },
     list(val) {
       const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
-      if (this.allowDynamicDropDownEntries) {
-        this.dropDownListInt = val;
-        this.selectedMenuEntryIndex = this.getIndex(oldEntry);
-      }
+      this.dropDownListInt = val;
+      this.selectedMenuEntryIndex = this.getIndex(oldEntry);
     },
     showDropDown(val) {
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
         this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        /**
+         * event triggered on show drop down
+         *
+         * @event show-dropdown
+         * @type None
+         *
+         */
+        this.$emit('show-dropdown');
+      } else {
+        /**
+         * event triggered on hide drop down
+         *
+         * @event hide-dropdown
+         * @type None
+         *
+         */
+        this.$emit('hide-dropdown');
       }
     },
   },
@@ -422,6 +440,7 @@ export default {
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
+      this.insideInput = true;
       if (!this.allowDynamicDropDownEntries) {
         // check if item has an id (= is not an custom entry)
         // TODO: is this the desired behaviour?? (or should unknown entry also appear
@@ -455,19 +474,18 @@ export default {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
-      this.showDropDown = false;
-      if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
-        this.selectedListInt.push({ [this.objectProp]: this.input });
-        this.$emit('selected', this.selectedListInt);
-      }
-      if (this.selectedMenuEntryIndex >= 0) {
-        this.insideDropDown = true;
-      } else {
+      if (!this.insideDropDown) {
+        if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
+          this.selectedListInt.push({ [this.objectProp]: this.input });
+          this.$emit('selected', this.selectedListInt);
+        }
         this.input = '';
       }
+      this.insideInput = false;
     },
     onInputFocus() {
-      this.showDropDown = true;
+      this.insideInput = true;
+      this.insideDropDown = false;
     },
     getIndex(oldEntry) {
       if (!this.dropDownListInt.length) {
@@ -512,6 +530,12 @@ export default {
         });
       } else {
         this.selectedListInt = [];
+      }
+    },
+    checkLeave(e) {
+      if (e.relatedTarget.closest('.base-chips-input')
+        !== e.target.parentElement) {
+        this.insideDropDown = false;
       }
     },
   },

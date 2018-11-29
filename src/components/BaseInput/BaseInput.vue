@@ -15,7 +15,7 @@
       :class="['base-input-field-container',
                { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active || isActive }]"
-      @click="$emit('clickInputField')">
+      @click="$emit('click-input-field')">
       <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
         (before \<input\>)
        -->
@@ -25,6 +25,7 @@
         :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
+        :disabled="hideInputField"
         :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
         type="text"
         autocomplete="off"
@@ -79,7 +80,7 @@
 /**
  * Event emitted on click on input field \<div\>
  *
- * @event clickInputField
+ * @event click-input-field
  * @type None
  *
  */
@@ -168,6 +169,12 @@ export default {
   },
   mounted() {
     this.inputInt = this.$props.input;
+  },
+  updated() {
+    const elems = this.$el.getElementsByTagName('input');
+    if (this.active && elems && elems.length) {
+      this.$el.getElementsByTagName('input')[0].focus();
+    }
   },
   methods: {
     blurInput() {

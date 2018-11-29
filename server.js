@@ -27,12 +27,12 @@ async function getExternalData(string, resource, full=false) {
           authors: `${extRes.preferredNameEntityForThePerson.forename} ${extRes.preferredNameEntityForThePerson.surname}`,
           dob: extRes.dateOfBirth,
           id: extRes.gndIdentifier,
-          source: '**' });
+          source: resource });
       } else {
         extRes = await axios.get(`${gndAuto}${string}`);
         extRes = extRes.data;
         extRes = extRes && extRes.length
-          ? extRes.map(result => Object.assign({}, { author: result.label, id: result.id, source: '**' })) : [];
+          ? extRes.map(result => Object.assign({}, { author: result.label, uuid: result.id, source: resource })) : [];
       }
     } catch (e) {
       console.log(e);
@@ -45,7 +45,7 @@ async function getExternalData(string, resource, full=false) {
     }
     extRes = extRes.data.result;
     extRes = extRes && extRes.length
-      ? extRes.map(result => Object.assign({}, { authors: result.displayForm, source: '**' })) : [];
+      ? extRes.map(result => Object.assign({}, { authors: result.displayForm, uuid: result.recordID, source: resource })) : [];
   }
   return extRes;
 }
@@ -119,9 +119,9 @@ app.get('/fetchAutocomplete/:type', async (req, res) => {
     if (string) {
       extResults = await getExternalData(string, resource);
     }
-    resArr = resArr.map(item => Object.assign({}, { [type]: item, source: '*' }));
+    resArr = resArr.map(item => Object.assign({}, { [type]: item, source: 'Local Authors' }));
     gndRes = string ? gndData.filter(item => item.name.toLowerCase().includes(string.toLowerCase()))
-      .map(result => Object.assign({}, { [type]: result.name, born: result.born, source: '***' })) : [];
+      .map(result => Object.assign({}, { [type]: result.name, born: result.born, source: 'Local Papers' })) : [];
     resArr = gndRes.concat(extResults, resArr);
   }
   res.send(resArr);
