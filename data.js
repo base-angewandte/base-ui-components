@@ -2,7 +2,7 @@ module.exports = {
   SCIENCE_DATA: [
     {
       title: 'Biodegradation of synthetic polymers in soils: Tracking carbon into CO(2) and microbial biomass.',
-      author: ['Zumstein MT', 'Schintlmeister A', 'Nelson TF', 'Baumgartner R', 'Woebken D', 'Wagner M', 'Kohler HE', 'McNeill K', 'Sander M'],
+      authors: ['Zumstein MT', 'Schintlmeister A', 'Nelson TF', 'Baumgartner R', 'Woebken D', 'Wagner M', 'Kohler HE', 'McNeill K', 'Sander M'],
       journal: 'Sci Adv. 2018 Jul 25',
       issue: '4(7)',
       pages: 'eaas9024',
@@ -10,7 +10,7 @@ module.exports = {
     },
     {
       title: 'Ammonia Monooxygenase-Mediated Cometabolic Biotransformation and Hydroxylamine-Mediated Abiotic Transformation of Micropollutants in an AOB/NOB Coculture.',
-      author: ['Yu Y', 'Han P', 'Zhou LJ', 'Li Z', 'Wagner M', 'Men Y'],
+      authors: ['Yu Y', 'Han P', 'Zhou LJ', 'Li Z', 'Wagner M', 'Men Y'],
       journal: 'Environ Sci Technol. 2018 Aug 21',
       issue: '52(16)',
       pages: '9196-9205',
@@ -18,7 +18,7 @@ module.exports = {
     },
     {
       title: 'Characterization of the First "Candidatus Nitrotoga" Isolate Reveals Metabolic Versatility and Separate Evolution of Widespread Nitrite-Oxidizing Bacteria.',
-      author: ['Kitzinger K', 'Koch H', 'Lücker S', 'Sedlacek CJ', 'Herbold C', 'Schwarz J', 'Daebeler A', 'Mueller AJ', 'Lukumbuzya M', 'Romano S', 'Leisch N', 'Karst SM', 'Kirkegaard R', 'Albertsen M', 'Nielsen PH', 'Wagner M', 'Daims H'],
+      authors: ['Kitzinger K', 'Koch H', 'Lücker S', 'Sedlacek CJ', 'Herbold C', 'Schwarz J', 'Daebeler A', 'Mueller AJ', 'Lukumbuzya M', 'Romano S', 'Leisch N', 'Karst SM', 'Kirkegaard R', 'Albertsen M', 'Nielsen PH', 'Wagner M', 'Daims H'],
       journal: 'MBio. 2018 Jul 10',
       issue: '9(4). pii',
       pages: 'e01186-18',
@@ -26,7 +26,7 @@ module.exports = {
     },
     {
       title: 'Long-distance electron transport in individual, living cable bacteria.',
-      author: ['Bjerg JT', 'Boschker HTS', 'Larsen S', 'Berry D', 'Schmid M', 'Millo D', 'Tataru P', 'Meysman FJR', 'Wagner M', 'Nielsen LP', 'Schramm A'],
+      authors: ['Bjerg JT', 'Boschker HTS', 'Larsen S', 'Berry D', 'Schmid M', 'Millo D', 'Tataru P', 'Meysman FJR', 'Wagner M', 'Nielsen LP', 'Schramm A'],
       journal: 'Proc Natl Acad Sci U S A. 2018 May 29',
       issue: '115(22)',
       pages: '5786-5791',
@@ -34,7 +34,7 @@ module.exports = {
     },
     {
       title: 'Nitrospira.',
-      author: ['Daims H', 'Wagner M'],
+      authors: ['Daims H', 'Wagner M'],
       journal: 'Trends Microbiol. 2018 May',
       issue: '26(5)',
       pages: '462-463',
@@ -42,7 +42,7 @@ module.exports = {
     },
     {
       title: 'Cultivation and Genomic Analysis of "Candidatus Nitrosocaldus islandicus", an Obligately Thermophilic, Ammonia-Oxidizing Thaumarchaeon from a Hot Spring Biofilm in Graendalur Valley, Iceland.',
-      author: ['Daebeler A', 'Herbold CW', 'Vierheilig J', 'Sedlacek CJ', 'Pjevac P', 'Albertsen M', 'Kirkegaard RH', 'de la Torre JR', 'Daims H', 'Wagner M'],
+      authors: ['Daebeler A', 'Herbold CW', 'Vierheilig J', 'Sedlacek CJ', 'Pjevac P', 'Albertsen M', 'Kirkegaard RH', 'de la Torre JR', 'Daims H', 'Wagner M'],
       journal: 'Front Microbiol. 2018 Feb 14',
       issue: '9',
       pages: '193',
@@ -50,7 +50,7 @@ module.exports = {
     },
     {
       title: 'Draft Genome Sequence of Telmatospirillum siberiense 26-4b1, an Acidotolerant Peatland Alphaproteobacterium Potentially Involved in Sulfur Cycling.',
-      author: ['Hausmann B', 'Pjevac P', 'Schreck K', 'Herbold CW', 'Daims H', 'Wagner M', 'Loy A'],
+      authors: ['Hausmann B', 'Pjevac P', 'Schreck K', 'Herbold CW', 'Daims H', 'Wagner M', 'Loy A'],
       journal: 'Genome Announc. 2018 Jan 25',
       issue: '6(4). pii',
       pages: 'e01524-17',
@@ -58,7 +58,7 @@ module.exports = {
     },
     {
       title: 'Ammonia-oxidising archaea living at low pH: Insights from comparative genomics.',
-      author: ['Herbold CW', 'Lehtovirta-Morley LE', 'Jung MY', 'Jehmlich N', 'Hausmann B', 'Han P', 'Loy A', 'Pester M', 'Sayavedra-Soto LA', 'Rhee SK', 'Prosser JI', 'Nicol GW', 'Wagner M', 'Gubry-Rangin C'],
+      authors: ['Herbold CW', 'Lehtovirta-Morley LE', 'Jung MY', 'Jehmlich N', 'Hausmann B', 'Han P', 'Loy A', 'Pester M', 'Sayavedra-Soto LA', 'Rhee SK', 'Prosser JI', 'Nicol GW', 'Wagner M', 'Gubry-Rangin C'],
       journal: 'Environ Microbiol. 2017 Dec',
       issue: '19(12)',
       pages: '4939-4952',
@@ -66,7 +66,7 @@ module.exports = {
     },
     {
       title: 'Abiotic Conversion of Extracellular NH(2)OH Contributes to N(2)O Emission during Ammonia Oxidation.',
-      author: ['Liu S', 'Han P', 'Hink L', 'Prosser JI', 'Wagner M', 'Brüggemann N'],
+      authors: ['Liu S', 'Han P', 'Hink L', 'Prosser JI', 'Wagner M', 'Brüggemann N'],
       journal: 'Environ Sci Technol. 2017 Nov 21',
       issue: '51(22)',
       pages: '13122-13132',
@@ -74,7 +74,7 @@ module.exports = {
     },
     {
       title: 'Kinetic analysis of a complete nitrifier reveals an oligotrophic lifestyle.',
-      author: ['Kits KD', 'Sedlacek CJ', 'Lebedeva EV', 'Han P', 'Bulaev A', 'Pjevac P', 'Daebeler A', 'Romano S', 'Albertsen M', 'Stein LY', 'Daims H', 'Wagner M'],
+      authors: ['Kits KD', 'Sedlacek CJ', 'Lebedeva EV', 'Han P', 'Bulaev A', 'Pjevac P', 'Daebeler A', 'Romano S', 'Albertsen M', 'Stein LY', 'Daims H', 'Wagner M'],
       journal: 'Nature. 2017 Sep 14',
       issue: '549(7671)',
       pages: '269-272',
@@ -82,7 +82,7 @@ module.exports = {
     },
     {
       title: 'AmoA-Targeted Polymerase Chain Reaction Primers for the Specific Detection and Quantification of Comammox Nitrospira in the Environment.',
-      author: ['Pjevac P', 'Schauberger C', 'Poghosyan L', 'Herbold CW', 'van Kessel MAHJ', 'Daebeler A', 'Steinberger M', 'Jetten MSM', 'Lücker S', 'Wagner M', 'Daims H'],
+      authors: ['Pjevac P', 'Schauberger C', 'Poghosyan L', 'Herbold CW', 'van Kessel MAHJ', 'Daebeler A', 'Steinberger M', 'Jetten MSM', 'Lücker S', 'Wagner M', 'Daims H'],
       journal: 'Front Microbiol. 2017 Aug 4',
       issue: '8',
       pages: '1508',
@@ -90,7 +90,7 @@ module.exports = {
     },
     {
       title: 'Crenothrix are major methane consumers in stratified lakes.',
-      author: ['Oswald K', 'Graf JS', 'Littmann S', 'Tienken D', 'Brand A', 'Wehrli B', 'Albertsen M', 'Daims H', 'Wagner M', 'Kuypers MM', 'Schubert CJ', 'Milucka J'],
+      authors: ['Oswald K', 'Graf JS', 'Littmann S', 'Tienken D', 'Brand A', 'Wehrli B', 'Albertsen M', 'Daims H', 'Wagner M', 'Kuypers MM', 'Schubert CJ', 'Milucka J'],
       journal: 'ISME J. 2017 Sep',
       issue: '11(9)',
       pages: '2124-2140',
@@ -98,7 +98,7 @@ module.exports = {
     },
     {
       title: 'Capturing the genetic makeup of the active microbiome in situ.',
-      author: ['Singer E', 'Wagner M', 'Woyke T'],
+      authors: ['Singer E', 'Wagner M', 'Woyke T'],
       journal: 'ISME J. 2017 Sep',
       issue: '11(9)',
       pages: '1949-1963',
@@ -106,7 +106,7 @@ module.exports = {
     },
     {
       title: 'Giant viruses with an expanded complement of translation system components.',
-      author: ['Schulz F', 'Yutin N', 'Ivanova NN', 'Ortega DR', 'Lee TK', 'Vierheilig J', 'Daims H', 'Horn M', 'Wagner M', 'Jensen GJ', 'Kyrpides NC', 'Koonin EV', 'Woyke T'],
+      authors: ['Schulz F', 'Yutin N', 'Ivanova NN', 'Ortega DR', 'Lee TK', 'Vierheilig J', 'Daims H', 'Horn M', 'Wagner M', 'Jensen GJ', 'Kyrpides NC', 'Koonin EV', 'Woyke T'],
       journal: 'Science. 2017 Apr 7',
       issue: '356(6333)',
       pages: '82-85',
@@ -114,7 +114,7 @@ module.exports = {
     },
     {
       title: 'Cultivation and characterization of Candidatus Nitrosocosmicus exaquare, an ammonia-oxidizing archaeon from a municipal wastewater treatment system.',
-      author: ['Sauder LA', 'Albertsen M', 'Engel K', 'Schwarz J', 'Nielsen PH', 'Wagner M', 'Neufeld JD'],
+      authors: ['Sauder LA', 'Albertsen M', 'Engel K', 'Schwarz J', 'Nielsen PH', 'Wagner M', 'Neufeld JD'],
       journal: 'ISME J. 2017 May',
       issue: '11(5)',
       pages: '1142-1157',
@@ -122,7 +122,7 @@ module.exports = {
     },
     {
       title: 'A New Perspective on Microbes Formerly Known as Nitrite-Oxidizing Bacteria.',
-      author: ['Daims H', 'Lücker S', 'Wagner M'],
+      authors: ['Daims H', 'Lücker S', 'Wagner M'],
       journal: 'Trends Microbiol. 2016 Sep',
       issue: '24(9)',
       pages: '699-712',
@@ -130,7 +130,7 @@ module.exports = {
     },
     {
       title: 'Single cell stable isotope probing in microbiology using Raman microspectroscopy.',
-      author: ['Wang Y', 'Huang WE', 'Cui L', 'Wagner M'],
+      authors: ['Wang Y', 'Huang WE', 'Cui L', 'Wagner M'],
       journal: 'Curr Opin Biotechnol. 2016 Oct',
       issue: '41',
       pages: '34-42',
@@ -138,7 +138,7 @@ module.exports = {
     },
     {
       title: 'Biotransformation of Two Pharmaceuticals by the Ammonia-Oxidizing Archaeon Nitrososphaera gargensis.',
-      author: ['Men Y', 'Han P', 'Helbling DE', 'Jehmlich N', 'Herbold C', 'Gulde R', 'Onnis-Hayden A', 'Gu AZ', 'Johnson DR', 'Wagner M', 'Fenner K'],
+      authors: ['Men Y', 'Han P', 'Helbling DE', 'Jehmlich N', 'Herbold C', 'Gulde R', 'Onnis-Hayden A', 'Gu AZ', 'Johnson DR', 'Wagner M', 'Fenner K'],
       journal: 'Environ Sci Technol. 2016 May 3',
       issue: '50(9)',
       pages: '4682-92',
@@ -146,7 +146,7 @@ module.exports = {
     },
     {
       title: 'Back to the Future of Soil Metagenomics.',
-      author: ['Nesme J', 'Achouak W', 'Agathos SN', 'Bailey M', 'Baldrian P', 'Brunel D', 'Frostegård Å', 'Heulin T', 'Jansson JK', 'Jurkevitch E', 'Kruus KL', 'Kowalchuk GA', 'Lagares A', 'Lappin-Scott HM', 'Lemanceau P', 'Le Paslier D', 'Mandic-Mulec I', 'Murrell JC', 'Myrold DD', 'Nalin R', 'Nannipieri P', 'Neufeld JD', 'et al'],
+      authors: ['Nesme J', 'Achouak W', 'Agathos SN', 'Bailey M', 'Baldrian P', 'Brunel D', 'Frostegård Å', 'Heulin T', 'Jansson JK', 'Jurkevitch E', 'Kruus KL', 'Kowalchuk GA', 'Lagares A', 'Lappin-Scott HM', 'Lemanceau P', 'Le Paslier D', 'Mandic-Mulec I', 'Murrell JC', 'Myrold DD', 'Nalin R', 'Nannipieri P', 'Neufeld JD', 'et al'],
       journal: 'Front Microbiol. 2016 Feb 10',
       issue: '7',
       pages: '73',
@@ -154,7 +154,7 @@ module.exports = {
     },
     {
       title: 'Intestinal Microbiota Signatures Associated with Inflammation History in Mice Experiencing Recurring Colitis.',
-      author: ['Berry D', 'Kuzyk O', 'Rauch I', 'Heider S', 'Schwab C', 'Hainzl E', 'Decker T', 'Müller M', 'Strobl B', 'Schleper C', 'Urich T', 'Wagner M', 'Kenner L', 'Loy A'],
+      authors: ['Berry D', 'Kuzyk O', 'Rauch I', 'Heider S', 'Schwab C', 'Hainzl E', 'Decker T', 'Müller M', 'Strobl B', 'Schleper C', 'Urich T', 'Wagner M', 'Kenner L', 'Loy A'],
       journal: 'Front Microbiol. 2015 Dec 15',
       issue: '6',
       pages: '1408',
@@ -162,7 +162,7 @@ module.exports = {
     },
     {
       title: 'Complete nitrification by Nitrospira bacteria.',
-      author: ['Daims H', 'Lebedeva EV', 'Pjevac P', 'Han P', 'Herbold C', 'Albertsen M', 'Jehmlich N', 'Palatinszky M', 'Vierheilig J', 'Bulaev A', 'Kirkegaard RH', 'von Bergen M', 'Rattei T', 'Bendinger B', 'Nielsen PH', 'Wagner M'],
+      authors: ['Daims H', 'Lebedeva EV', 'Pjevac P', 'Han P', 'Herbold C', 'Albertsen M', 'Jehmlich N', 'Palatinszky M', 'Vierheilig J', 'Bulaev A', 'Kirkegaard RH', 'von Bergen M', 'Rattei T', 'Bendinger B', 'Nielsen PH', 'Wagner M'],
       journal: 'Nature. 2015 Dec 24',
       issue: '528(7583)',
       pages: '504-9',
@@ -170,7 +170,7 @@ module.exports = {
     },
     {
       title: 'Advancements in the application of NanoSIMS and Raman microspectroscopy to investigate the activity of microbial cells in soils.',
-      author: ['Eichorst SA', 'Strasser F', 'Woyke T', 'Schintlmeister A', 'Wagner M', 'Woebken D'],
+      authors: ['Eichorst SA', 'Strasser F', 'Woyke T', 'Schintlmeister A', 'Wagner M', 'Woebken D'],
       journal: 'FEMS Microbiol Ecol. 2015 Oct',
       issue: '91(10). pii',
       pages: 'fiv106',
@@ -178,7 +178,7 @@ module.exports = {
     },
     {
       title: 'Expanded metabolic versatility of ubiquitous nitrite-oxidizing bacteria from the genus Nitrospira.',
-      author: ['Koch H', 'Lücker S', 'Albertsen M', 'Kitzinger K', 'Herbold C', 'Spieck E', 'Nielsen PH', 'Wagner M', 'Daims H'],
+      authors: ['Koch H', 'Lücker S', 'Albertsen M', 'Kitzinger K', 'Herbold C', 'Spieck E', 'Nielsen PH', 'Wagner M', 'Daims H'],
       journal: 'Proc Natl Acad Sci U S A. 2015 Sep 8',
       issue: '112(36)',
       pages: '11371-6',
@@ -186,7 +186,7 @@ module.exports = {
     },
     {
       title: 'Cyanate as an energy source for nitrifiers.',
-      author: ['Palatinszky M', 'Herbold C', 'Jehmlich N', 'Pogoda M', 'Han P', 'von Bergen M', 'Lagkouvardos I', 'Karst SM', 'Galushko A', 'Koch H', 'Berry D', 'Daims H', 'Wagner M'],
+      authors: ['Palatinszky M', 'Herbold C', 'Jehmlich N', 'Pogoda M', 'Han P', 'von Bergen M', 'Lagkouvardos I', 'Karst SM', 'Galushko A', 'Koch H', 'Berry D', 'Daims H', 'Wagner M'],
       journal: 'Nature. 2015 Aug 6',
       issue: '524(7563)',
       pages: '105-8',
@@ -194,7 +194,7 @@ module.exports = {
     },
     {
       title: 'Ecophysiology of an uncultivated lineage of Aigarchaeota from an oxic, hot spring filamentous "streamer" community.',
-      author: ['Beam JP', 'Jay ZJ', 'Schmid MC', 'Rusch DB', 'Romine MF', 'Jennings Rde M', 'Kozubal MA', 'Tringe SG', 'Wagner M', 'Inskeep WP'],
+      authors: ['Beam JP', 'Jay ZJ', 'Schmid MC', 'Rusch DB', 'Romine MF', 'Jennings Rde M', 'Kozubal MA', 'Tringe SG', 'Wagner M', 'Inskeep WP'],
       journal: 'ISME J. 2016 Jan',
       issue: '10(1)',
       pages: '210-24',
@@ -202,7 +202,7 @@ module.exports = {
     },
     {
       title: 'Tracking heavy water (D2O) incorporation for identifying and sorting active microbial cells.',
-      author: ['Berry D', 'Mader E', 'Lee TK', 'Woebken D', 'Wang Y', 'Zhu D', 'Palatinszky M', 'Schintlmeister A', 'Schmid MC', 'Hanson BT', 'Shterzer N', 'Mizrahi I', 'Rauch I', 'Decker T', 'Bocklitz T', 'Popp J', 'Gibson CM', 'Fowler PW', 'Huang WE', 'Wagner M'],
+      authors: ['Berry D', 'Mader E', 'Lee TK', 'Woebken D', 'Wang Y', 'Zhu D', 'Palatinszky M', 'Schintlmeister A', 'Schmid MC', 'Hanson BT', 'Shterzer N', 'Mizrahi I', 'Rauch I', 'Decker T', 'Bocklitz T', 'Popp J', 'Gibson CM', 'Fowler PW', 'Huang WE', 'Wagner M'],
       journal: 'Proc Natl Acad Sci U S A. 2015 Jan 13',
       issue: '112(2)',
       pages: 'E194-203',
@@ -210,7 +210,7 @@ module.exports = {
     },
     {
       title: 'Biology of a widespread uncultivated archaeon that contributes to carbon fixation in the subsurface.',
-      author: ['Probst AJ', 'Weinmaier T', 'Raymann K', 'Perras A', 'Emerson JB', 'Rattei T', 'Wanner G', 'Klingl A', 'Berg IA', 'Yoshinaga M', 'Viehweger B', 'Hinrichs KU', 'Thomas BC', 'Meck S', 'Auerbach AK', 'Heise M', 'Schintlmeister A', 'Schmid M', 'Wagner M', 'Gribaldo S', 'Banfield JF', 'Moissl-Eichinger C'],
+      authors: ['Probst AJ', 'Weinmaier T', 'Raymann K', 'Perras A', 'Emerson JB', 'Rattei T', 'Wanner G', 'Klingl A', 'Berg IA', 'Yoshinaga M', 'Viehweger B', 'Hinrichs KU', 'Thomas BC', 'Meck S', 'Auerbach AK', 'Heise M', 'Schintlmeister A', 'Schmid M', 'Wagner M', 'Gribaldo S', 'Banfield JF', 'Moissl-Eichinger C'],
       journal: 'Nat Commun. 2014 Nov 26',
       issue: '5',
       pages: '5497',
@@ -218,7 +218,7 @@ module.exports = {
     },
     {
       title: 'Revisiting N₂ fixation in Guerrero Negro intertidal microbial mats with a functional single-cell approach.',
-      author: ['Woebken D', 'Burow LC', 'Behnam F', 'Mayali X', 'Schintlmeister A', 'Fleming ED', 'Prufert-Bebout L', 'Singer SW', 'Cortés AL', 'Hoehler TM', 'Pett-Ridge J', 'Spormann AM', 'Wagner M', 'Weber PK', 'Bebout BM'],
+      authors: ['Woebken D', 'Burow LC', 'Behnam F', 'Mayali X', 'Schintlmeister A', 'Fleming ED', 'Prufert-Bebout L', 'Singer SW', 'Cortés AL', 'Hoehler TM', 'Pett-Ridge J', 'Spormann AM', 'Wagner M', 'Weber PK', 'Bebout BM'],
       journal: 'ISME J. 2015 Feb',
       issue: '9(2)',
       pages: '485-96',
@@ -226,7 +226,7 @@ module.exports = {
     },
     {
       title: 'Nitrotoga-like bacteria are previously unrecognized key nitrite oxidizers in full-scale wastewater treatment plants.',
-      author: ['Lücker S', 'Schwarz J', 'Gruber-Dorninger C', 'Spieck E', 'Wagner M', 'Daims H'],
+      authors: ['Lücker S', 'Schwarz J', 'Gruber-Dorninger C', 'Spieck E', 'Wagner M', 'Daims H'],
       journal: 'ISME J. 2015 Mar',
       issue: '9(3)',
       pages: '708-20',
@@ -234,7 +234,7 @@ module.exports = {
     },
     {
       title: 'Growth of nitrite-oxidizing bacteria by aerobic hydrogen oxidation.',
-      author: ['Koch H', 'Galushko A', 'Albertsen M', 'Schintlmeister A', 'Gruber-Dorninger C', 'Lücker S', 'Pelletier E', 'Le Paslier D', 'Spieck E', 'Richter A', 'Nielsen PH', 'Wagner M', 'Daims H'],
+      authors: ['Koch H', 'Galushko A', 'Albertsen M', 'Schintlmeister A', 'Gruber-Dorninger C', 'Lücker S', 'Pelletier E', 'Le Paslier D', 'Spieck E', 'Richter A', 'Nielsen PH', 'Wagner M', 'Daims H'],
       journal: 'Science. 2014 Aug 29',
       issue: '345(6200)',
       pages: '1052-4',
@@ -242,7 +242,7 @@ module.exports = {
     },
     {
       title: 'Functionally relevant diversity of closely related Nitrospira in activated sludge.',
-      author: ['Gruber-Dorninger C', 'Pester M', 'Kitzinger K', 'Savio DF', 'Loy A', 'Rattei T', 'Wagner M', 'Daims H'],
+      authors: ['Gruber-Dorninger C', 'Pester M', 'Kitzinger K', 'Savio DF', 'Loy A', 'Rattei T', 'Wagner M', 'Daims H'],
       journal: 'ISME J. 2015 Mar',
       issue: '9(3)',
       pages: '643-55',
@@ -250,7 +250,7 @@ module.exports = {
     },
     {
       title: 'Genomic encyclopedia of bacteria and archaea: sequencing a myriad of type strains.',
-      author: ['Kyrpides NC', 'Hugenholtz P', 'Eisen JA', 'Woyke T', 'Göker M', 'Parker CT', 'Amann R', 'Beck BJ', 'Chain PS', 'Chun J', 'Colwell RR', 'Danchin A', 'Dawyndt P', 'Dedeurwaerdere T', 'DeLong EF', 'Detter JC', 'De Vos P', 'Donohue TJ', 'Dong XZ', 'Ehrlich DS', 'Fraser C', 'Gibbs R', 'et al'],
+      authors: ['Kyrpides NC', 'Hugenholtz P', 'Eisen JA', 'Woyke T', 'Göker M', 'Parker CT', 'Amann R', 'Beck BJ', 'Chain PS', 'Chun J', 'Colwell RR', 'Danchin A', 'Dawyndt P', 'Dedeurwaerdere T', 'DeLong EF', 'Detter JC', 'De Vos P', 'Donohue TJ', 'Dong XZ', 'Ehrlich DS', 'Fraser C', 'Gibbs R', 'et al'],
       journal: 'PLoS Biol. 2014 Aug 5',
       issue: '12(8)',
       pages: 'e1001920',
@@ -258,7 +258,7 @@ module.exports = {
     },
     {
       title: 'A nanoscale secondary ion mass spectrometry study of dinoflagellate functional diversity in reef-building corals.',
-      author: ['Pernice M', 'Dunn SR', 'Tonk L', 'Dove S', 'Domart-Coulon I', 'Hoppe P', 'Schintlmeister A', 'Wagner M', 'Meibom A'],
+      authors: ['Pernice M', 'Dunn SR', 'Tonk L', 'Dove S', 'Domart-Coulon I', 'Hoppe P', 'Schintlmeister A', 'Wagner M', 'Meibom A'],
       journal: 'Environ Microbiol. 2015 Oct',
       issue: '17(10)',
       pages: '3570-80',
@@ -266,7 +266,7 @@ module.exports = {
     },
     {
       title: 'Longitudinal study of murine microbiota activity and interactions with the host during acute inflammation and recovery.',
-      author: ['Schwab C', 'Berry D', 'Rauch I', 'Rennisch I', 'Ramesmayer J', 'Hainzl E', 'Heider S', 'Decker T', 'Kenner L', 'Müller M', 'Strobl B', 'Wagner M', 'Schleper C', 'Loy A', 'Urich T'],
+      authors: ['Schwab C', 'Berry D', 'Rauch I', 'Rennisch I', 'Ramesmayer J', 'Hainzl E', 'Heider S', 'Decker T', 'Kenner L', 'Müller M', 'Strobl B', 'Wagner M', 'Schleper C', 'Loy A', 'Urich T'],
       journal: 'ISME J. 2014 May',
       issue: '8(5)',
       pages: '1101-14',
@@ -274,7 +274,7 @@ module.exports = {
     },
     {
       title: 'NxrB encoding the beta subunit of nitrite oxidoreductase as functional and phylogenetic marker for nitrite-oxidizing Nitrospira.',
-      author: ['Pester M', 'Maixner F', 'Berry D', 'Rattei T', 'Koch H', 'Lücker S', 'Nowka B', 'Richter A', 'Spieck E', 'Lebedeva E', 'Loy A', 'Wagner M', 'Daims H'],
+      authors: ['Pester M', 'Maixner F', 'Berry D', 'Rattei T', 'Koch H', 'Lücker S', 'Nowka B', 'Richter A', 'Spieck E', 'Lebedeva E', 'Loy A', 'Wagner M', 'Daims H'],
       journal: 'Environ Microbiol. 2014 Oct',
       issue: '16(10)',
       pages: '3055-71',
@@ -282,7 +282,7 @@ module.exports = {
     },
     {
       title: 'High-fat diet alters gut microbiota physiology in mice.',
-      author: ['Daniel H', 'Gholami AM', 'Berry D', 'Desmarchelier C', 'Hahne H', 'Loh G', 'Mondot S', 'Lepage P', 'Rothballer M', 'Walker A', 'Böhm C', 'Wenning M', 'Wagner M', 'Blaut M', 'Schmitt-Kopplin P', 'Kuster B', 'Haller D', 'Clavel T'],
+      authors: ['Daniel H', 'Gholami AM', 'Berry D', 'Desmarchelier C', 'Hahne H', 'Loh G', 'Mondot S', 'Lepage P', 'Rothballer M', 'Walker A', 'Böhm C', 'Wenning M', 'Wagner M', 'Blaut M', 'Schmitt-Kopplin P', 'Kuster B', 'Haller D', 'Clavel T'],
       journal: 'ISME J. 2014 Feb',
       issue: '8(2)',
       pages: '295-308',
@@ -290,7 +290,7 @@ module.exports = {
     },
     {
       title: 'Host-compound foraging by intestinal microbiota revealed by single-cell stable isotope probing.',
-      author: ['Berry D', 'Stecher B', 'Schintlmeister A', 'Reichert J', 'Brugiroux S', 'Wild B', 'Wanek W', 'Richter A', 'Rauch I', 'Decker T', 'Loy A', 'Wagner M'],
+      authors: ['Berry D', 'Stecher B', 'Schintlmeister A', 'Reichert J', 'Brugiroux S', 'Wild B', 'Wanek W', 'Richter A', 'Rauch I', 'Decker T', 'Loy A', 'Wagner M'],
       journal: 'Proc Natl Acad Sci U S A. 2013 Mar 19',
       issue: '110(12)',
       pages: '4720-5',
@@ -298,7 +298,7 @@ module.exports = {
     },
     {
       title: 'Interactions of nitrifying bacteria and heterotrophs: identification of a Micavibrio-like putative predator of Nitrospira spp.',
-      author: ['Dolinšek J', 'Lagkouvardos I', 'Wanek W', 'Wagner M', 'Daims H'],
+      authors: ['Dolinšek J', 'Lagkouvardos I', 'Wanek W', 'Wagner M', 'Daims H'],
       journal: 'Appl Environ Microbiol. 2013 Mar',
       issue: '79(6)',
       pages: '2027-37',
@@ -306,7 +306,7 @@ module.exports = {
     },
     {
       title: 'Depletion of unwanted nucleic acid templates by selective cleavage: LNAzymes, catalytically active oligonucleotides containing locked nucleic acids, open a new window for detecting rare microbial community members.',
-      author: ['Dolinsek J', 'Dorninger C', 'Lagkouvardos I', 'Wagner M', 'Daims H'],
+      authors: ['Dolinsek J', 'Dorninger C', 'Lagkouvardos I', 'Wagner M', 'Daims H'],
       journal: 'Appl Environ Microbiol. 2013 Mar',
       issue: '79(5)',
       pages: '1534-44',
@@ -314,7 +314,7 @@ module.exports = {
     },
     {
       title: 'Complete genome sequences of Desulfosporosinus orientis DSM765T, Desulfosporosinus youngiae DSM17734T, Desulfosporosinus meridiei DSM13257T, and Desulfosporosinus acidiphilus DSM22704T.',
-      author: ['Pester M', 'Brambilla E', 'Alazard D', 'Rattei T', 'Weinmaier T', 'Han J', 'Lucas S', 'Lapidus A', 'Cheng JF', 'Goodwin L', 'Pitluck S', 'Peters L', 'Ovchinnikova G', 'Teshima H', 'Detter JC', 'Han CS', 'Tapia R', 'Land ML', 'Hauser L', 'Kyrpides NC', 'Ivanova NN', 'Pagani I', 'et al'],
+      authors: ['Pester M', 'Brambilla E', 'Alazard D', 'Rattei T', 'Weinmaier T', 'Han J', 'Lucas S', 'Lapidus A', 'Cheng JF', 'Goodwin L', 'Pitluck S', 'Peters L', 'Ovchinnikova G', 'Teshima H', 'Detter JC', 'Han CS', 'Tapia R', 'Land ML', 'Hauser L', 'Kyrpides NC', 'Ivanova NN', 'Pagani I', 'et al'],
       journal: 'J Bacteriol. 2012 Nov',
       issue: '194(22)',
       pages: '6300-1',
@@ -322,7 +322,7 @@ module.exports = {
     },
     {
       title: 'A straightforward DOPE (double labeling of oligonucleotide probes)-FISH (fluorescence in situ hybridization) method for simultaneous multicolor detection of six microbial populations.',
-      author: ['Behnam F', 'Vilcinskas A', 'Wagner M', 'Stoecker K'],
+      authors: ['Behnam F', 'Vilcinskas A', 'Wagner M', 'Stoecker K'],
       journal: 'Appl Environ Microbiol. 2012 Aug',
       issue: '78(15)',
       pages: '5138-42',
@@ -330,7 +330,7 @@ module.exports = {
     },
     {
       title: 'Phylotype-level 16S rRNA analysis reveals new bacterial indicators of health state in acute murine colitis.',
-      author: ['Berry D', 'Schwab C', 'Milinovich G', 'Reichert J', 'Ben Mahfoudh K', 'Decker T', 'Engel M', 'Hai B', 'Hainzl E', 'Heider S', 'Kenner L', 'Müller M', 'Rauch I', 'Strobl B', 'Wagner M', 'Schleper C', 'Urich T', 'Loy A'],
+      authors: ['Berry D', 'Schwab C', 'Milinovich G', 'Reichert J', 'Ben Mahfoudh K', 'Decker T', 'Engel M', 'Hai B', 'Hainzl E', 'Heider S', 'Kenner L', 'Müller M', 'Rauch I', 'Strobl B', 'Wagner M', 'Schleper C', 'Urich T', 'Loy A'],
       journal: 'ISME J. 2012 Nov',
       issue: '6(11)',
       pages: '2091-106',
@@ -338,7 +338,7 @@ module.exports = {
     },
     {
       title: 'Sulfate-reducing microorganisms in wetlands - fameless actors in carbon cycling and climate change.',
-      author: ['Pester M', 'Knorr KH', 'Friedrich MW', 'Wagner M', 'Loy A'],
+      authors: ['Pester M', 'Knorr KH', 'Friedrich MW', 'Wagner M', 'Loy A'],
       journal: 'Front Microbiol. 2012 Feb 28',
       issue: '3',
       pages: '72',
@@ -346,7 +346,7 @@ module.exports = {
     },
     {
       title: 'amoA-based consensus phylogeny of ammonia-oxidizing archaea and deep sequencing of amoA genes from soils of four different geographic regions.',
-      author: ['Pester M', 'Rattei T', 'Flechl S', 'Gröngröft A', 'Richter A', 'Overmann J', 'Reinhold-Hurek B', 'Loy A', 'Wagner M'],
+      authors: ['Pester M', 'Rattei T', 'Flechl S', 'Gröngröft A', 'Richter A', 'Overmann J', 'Reinhold-Hurek B', 'Loy A', 'Wagner M'],
       journal: 'Environ Microbiol. 2012 Feb',
       issue: '14(2)',
       pages: '525-39',
@@ -354,7 +354,7 @@ module.exports = {
     },
     {
       title: 'New trends in fluorescence in situ hybridization for identification and functional analyses of microbes.',
-      author: ['Wagner M', 'Haider S'],
+      authors: ['Wagner M', 'Haider S'],
       journal: 'Curr Opin Biotechnol. 2012 Feb',
       issue: '23(1)',
       pages: '96-102',
@@ -362,7 +362,7 @@ module.exports = {
     },
     {
       title: 'Thaumarchaeotes abundant in refinery nitrifying sludges express amoA but are not obligate autotrophic ammonia oxidizers.',
-      author: ['Mussmann M', 'Brito I', 'Pitcher A', 'Sinninghe Damsté JS', 'Hatzenpichler R', 'Richter A', 'Nielsen JL', 'Nielsen PH', 'Müller A', 'Daims H', 'Wagner M', 'Head IM'],
+      authors: ['Mussmann M', 'Brito I', 'Pitcher A', 'Sinninghe Damsté JS', 'Hatzenpichler R', 'Richter A', 'Nielsen JL', 'Nielsen PH', 'Müller A', 'Daims H', 'Wagner M', 'Head IM'],
       journal: 'Proc Natl Acad Sci U S A. 2011 Oct 4',
       issue: '108(40)',
       pages: '16771-6',
@@ -370,7 +370,7 @@ module.exports = {
     },
     {
       title: 'Barcoded primers used in multiplex amplicon pyrosequencing bias amplification.',
-      author: ['Berry D', 'Ben Mahfoudh K', 'Wagner M', 'Loy A'],
+      authors: ['Berry D', 'Ben Mahfoudh K', 'Wagner M', 'Loy A'],
       journal: 'Appl Environ Microbiol. 2011 Nov',
       issue: '77(21)',
       pages: '7846-9',
@@ -378,7 +378,7 @@ module.exports = {
     },
     {
       title: 'Systematic spatial bias in DNA microarray hybridization is caused by probe spot position-dependent variability in lateral diffusion.',
-      author: ['Steger D', 'Berry D', 'Haider S', 'Horn M', 'Wagner M', 'Stocker R', 'Loy A'],
+      authors: ['Steger D', 'Berry D', 'Haider S', 'Horn M', 'Wagner M', 'Stocker R', 'Loy A'],
       journal: 'PLoS One. 2011',
       issue: '6(8)',
       pages: 'e23727',
@@ -386,7 +386,7 @@ module.exports = {
     },
     {
       title: 'Bacteriocyte-associated gammaproteobacterial symbionts of the Adelges nordmannianae/piceae complex (Hemiptera: Adelgidae).',
-      author: ['Toenshoff ER', 'Penz T', 'Narzt T', 'Collingro A', 'Schmitz-Esser S', 'Pfeiffer S', 'Klepal W', 'Wagner M', 'Weinmaier T', 'Rattei T', 'Horn M'],
+      authors: ['Toenshoff ER', 'Penz T', 'Narzt T', 'Collingro A', 'Schmitz-Esser S', 'Pfeiffer S', 'Klepal W', 'Wagner M', 'Weinmaier T', 'Rattei T', 'Horn M'],
       journal: 'ISME J. 2012 Feb',
       issue: '6(2)',
       pages: '384-96',
@@ -394,7 +394,7 @@ module.exports = {
     },
     {
       title: 'The Thaumarchaeota: an emerging view of their phylogeny and ecophysiology.',
-      author: ['Pester M', 'Schleper C', 'Wagner M'],
+      authors: ['Pester M', 'Schleper C', 'Wagner M'],
       journal: 'Curr Opin Microbiol. 2011 Jun',
       issue: '14(3)',
       pages: '300-6',
@@ -402,7 +402,7 @@ module.exports = {
     },
     {
       title: 'In situ techniques and digital image analysis methods for quantifying spatial localization patterns of nitrifiers and other microorganisms in biofilm and flocs.',
-      author: ['Daims H', 'Wagner M'],
+      authors: ['Daims H', 'Wagner M'],
       journal: 'Methods Enzymol. 2011',
       issue: '496',
       pages: '185-215',
@@ -410,7 +410,7 @@ module.exports = {
     },
     {
       title: 'Proteomic analysis reveals a virtually complete set of proteins for translation and energy generation in elementary bodies of the amoeba symbiont Protochlamydia amoebophila.',
-      author: ['Sixt BS', 'Heinz C', 'Pichler P', 'Heinz E', 'Montanaro J', 'Op den Camp HJ', 'Ammerer G', 'Mechtler K', 'Wagner M', 'Horn M'],
+      authors: ['Sixt BS', 'Heinz C', 'Pichler P', 'Heinz E', 'Montanaro J', 'Op den Camp HJ', 'Ammerer G', 'Mechtler K', 'Wagner M', 'Horn M'],
       journal: 'Proteomics. 2011 May',
       issue: '11(10)',
       pages: '1868-92',
@@ -418,7 +418,7 @@ module.exports = {
     },
     {
       title: 'Microorganisms with novel dissimilatory (bi)sulfite reductase genes are widespread and part of the core microbiota in low-sulfate peatlands.',
-      author: ['Steger D', 'Wentrup C', 'Braunegger C', 'Deevong P', 'Hofer M', 'Richter A', 'Baranyi C', 'Pester M', 'Wagner M', 'Loy A'],
+      authors: ['Steger D', 'Wentrup C', 'Braunegger C', 'Deevong P', 'Hofer M', 'Richter A', 'Baranyi C', 'Pester M', 'Wagner M', 'Loy A'],
       journal: 'Appl Environ Microbiol. 2011 Feb',
       issue: '77(4)',
       pages: '1231-42',
@@ -426,7 +426,7 @@ module.exports = {
     },
     {
       title: 'Proteomic analysis of the outer membrane of Protochlamydia amoebophila elementary bodies.',
-      author: ['Heinz E', 'Pichler P', 'Heinz C', 'Op den Camp HJ', 'Toenshoff ER', 'Ammerer G', 'Mechtler K', 'Wagner M', 'Horn M'],
+      authors: ['Heinz E', 'Pichler P', 'Heinz C', 'Op den Camp HJ', 'Toenshoff ER', 'Ammerer G', 'Mechtler K', 'Wagner M', 'Horn M'],
       journal: 'Proteomics. 2010 Dec',
       issue: '10(24)',
       pages: '4363-76',
@@ -434,7 +434,7 @@ module.exports = {
     },
     {
       title: 'Inclusion membrane proteins of Protochlamydia amoebophila UWE25 reveal a conserved mechanism for host cell interaction among the Chlamydiae.',
-      author: ['Heinz E', 'Rockey DD', 'Montanaro J', 'Aistleitner K', 'Wagner M', 'Horn M'],
+      authors: ['Heinz E', 'Rockey DD', 'Montanaro J', 'Aistleitner K', 'Wagner M', 'Horn M'],
       journal: 'J Bacteriol. 2010 Oct',
       issue: '192(19)',
       pages: '5093-102',
@@ -442,7 +442,7 @@ module.exports = {
     },
     {
       title: 'A Nitrospira metagenome illuminates the physiology and evolution of globally important nitrite-oxidizing bacteria.',
-      author: ['Lücker S', 'Wagner M', 'Maixner F', 'Pelletier E', 'Koch H', 'Vacherie B', 'Rattei T', 'Damsté JS', 'Spieck E', 'Le Paslier D', 'Daims H'],
+      authors: ['Lücker S', 'Wagner M', 'Maixner F', 'Pelletier E', 'Koch H', 'Vacherie B', 'Rattei T', 'Damsté JS', 'Spieck E', 'Le Paslier D', 'Daims H'],
       journal: 'Proc Natl Acad Sci U S A. 2010 Jul 27',
       issue: '107(30)',
       pages: '13479-84',
@@ -450,7 +450,7 @@ module.exports = {
     },
     {
       title: 'Raman microspectroscopy reveals long-term extracellular activity of Chlamydiae.',
-      author: ['Haider S', 'Wagner M', 'Schmid MC', 'Sixt BS', 'Christian JG', 'Häcker G', 'Pichler P', 'Mechtler K', 'Müller A', 'Baranyi C', 'Toenshoff ER', 'Montanaro J', 'Horn M'],
+      authors: ['Haider S', 'Wagner M', 'Schmid MC', 'Sixt BS', 'Christian JG', 'Häcker G', 'Pichler P', 'Mechtler K', 'Müller A', 'Baranyi C', 'Toenshoff ER', 'Montanaro J', 'Horn M'],
       journal: 'Mol Microbiol. 2010 Aug',
       issue: '77(3)',
       pages: '687-700',
@@ -458,7 +458,7 @@ module.exports = {
     },
     {
       title: 'A "rare biosphere" microorganism contributes to sulfate reduction in a peatland.',
-      author: ['Pester M', 'Bittner N', 'Deevong P', 'Wagner M', 'Loy A'],
+      authors: ['Pester M', 'Bittner N', 'Deevong P', 'Wagner M', 'Loy A'],
       journal: 'ISME J. 2010 Dec',
       issue: '4(12)',
       pages: '1591-602',
@@ -466,7 +466,7 @@ module.exports = {
     },
     {
       title: 'Comprehensive in silico prediction and analysis of chlamydial outer membrane proteins reflects evolution and life style of the Chlamydiae.',
-      author: ['Heinz E', 'Tischler P', 'Rattei T', 'Myers G', 'Wagner M', 'Horn M'],
+      authors: ['Heinz E', 'Tischler P', 'Rattei T', 'Myers G', 'Wagner M', 'Horn M'],
       journal: 'BMC Genomics. 2009 Dec 29',
       issue: '10',
       pages: '634',
@@ -474,7 +474,7 @@ module.exports = {
     },
     {
       title: 'The genome of the amoeba symbiont "Candidatus Amoebophilus asiaticus" reveals common mechanisms for host cell interaction among amoeba-associated bacteria.',
-      author: ['Schmitz-Esser S', 'Tischler P', 'Arnold R', 'Montanaro J', 'Wagner M', 'Rattei T', 'Horn M'],
+      authors: ['Schmitz-Esser S', 'Tischler P', 'Arnold R', 'Montanaro J', 'Wagner M', 'Rattei T', 'Horn M'],
       journal: 'J Bacteriol. 2010 Feb',
       issue: '192(4)',
       pages: '1045-57',
@@ -482,7 +482,7 @@ module.exports = {
     },
     {
       title: 'Double labeling of oligonucleotide probes for fluorescence in situ hybridization (DOPE-FISH) improves signal intensity and increases rRNA accessibility.',
-      author: ['Stoecker K', 'Dorninger C', 'Daims H', 'Wagner M'],
+      authors: ['Stoecker K', 'Dorninger C', 'Daims H', 'Wagner M'],
       journal: 'Appl Environ Microbiol. 2010 Feb',
       issue: '76(3)',
       pages: '922-6',
@@ -490,7 +490,7 @@ module.exports = {
     },
     {
       title: 'Single-cell ecophysiology of microbes as revealed by Raman microspectroscopy or secondary ion mass spectrometry imaging.',
-      author: ['Wagner M'],
+      authors: ['Wagner M'],
       journal: 'Annu Rev Microbiol. 2009',
       issue: '63',
       pages: '411-29',
@@ -498,7 +498,7 @@ module.exports = {
     },
     {
       title: 'Reverse dissimilatory sulfite reductase as phylogenetic marker for a subgroup of sulfur-oxidizing prokaryotes.',
-      author: ['Loy A', 'Duller S', 'Baranyi C', 'Mussmann M', 'Ott J', 'Sharon I', 'Béjà O', 'Le Paslier D', 'Dahl C', 'Wagner M'],
+      authors: ['Loy A', 'Duller S', 'Baranyi C', 'Mussmann M', 'Ott J', 'Sharon I', 'Béjà O', 'Le Paslier D', 'Dahl C', 'Wagner M'],
       journal: 'Environ Microbiol. 2009 Feb',
       issue: '11(2)',
       pages: '289-99',
@@ -506,7 +506,7 @@ module.exports = {
     },
     {
       title: 'probeCheck--a central resource for evaluating oligonucleotide probe coverage and specificity.',
-      author: ['Loy A', 'Arnold R', 'Tischler P', 'Rattei T', 'Wagner M', 'Horn M'],
+      authors: ['Loy A', 'Arnold R', 'Tischler P', 'Rattei T', 'Wagner M', 'Horn M'],
       journal: 'Environ Microbiol. 2008 Oct',
       issue: '10(10)',
       pages: '2894-8',
@@ -514,7 +514,7 @@ module.exports = {
     },
     {
       title: 'Diversity of bacterial endosymbionts of environmental acanthamoeba isolates.',
-      author: ['Schmitz-Esser S', 'Toenshoff ER', 'Haider S', 'Heinz E', 'Hoenninger VM', 'Wagner M', 'Horn M'],
+      authors: ['Schmitz-Esser S', 'Toenshoff ER', 'Haider S', 'Heinz E', 'Hoenninger VM', 'Wagner M', 'Horn M'],
       journal: 'Appl Environ Microbiol. 2008 Sep',
       issue: '74(18)',
       pages: '5822-31',
@@ -522,7 +522,7 @@ module.exports = {
     },
     {
       title: 'Chlamydia-like bacteria in respiratory samples of community-acquired pneumonia patients.',
-      author: ['Haider S', 'Collingro A', 'Walochnik J', 'Wagner M', 'Horn M'],
+      authors: ['Haider S', 'Collingro A', 'Walochnik J', 'Wagner M', 'Horn M'],
       journal: 'FEMS Microbiol Lett. 2008 Apr',
       issue: '281(2)',
       pages: '198-202',
@@ -530,7 +530,7 @@ module.exports = {
     },
     {
       title: 'A moderately thermophilic ammonia-oxidizing crenarchaeote from a hot spring.',
-      author: ['Hatzenpichler R', 'Lebedeva EV', 'Spieck E', 'Stoecker K', 'Richter A', 'Daims H', 'Wagner M'],
+      authors: ['Hatzenpichler R', 'Lebedeva EV', 'Spieck E', 'Stoecker K', 'Richter A', 'Daims H', 'Wagner M'],
       journal: 'Proc Natl Acad Sci U S A. 2008 Feb 12',
       issue: '105(6)',
       pages: '2134-9',
@@ -538,7 +538,7 @@ module.exports = {
     },
     {
       title: 'Diversity and mode of transmission of ammonia-oxidizing archaea in marine sponges.',
-      author: ['Steger D', 'Ettinger-Epstein P', 'Whalan S', 'Hentschel U', 'de Nys R', 'Wagner M', 'Taylor MW'],
+      authors: ['Steger D', 'Ettinger-Epstein P', 'Whalan S', 'Hentschel U', 'de Nys R', 'Wagner M', 'Taylor MW'],
       journal: 'Environ Microbiol. 2008 Apr',
       issue: '10(4)',
       pages: '1087-94',
@@ -546,153 +546,153 @@ module.exports = {
     },
     {
       title: 'Raman-FISH: combining stable-isotope Raman spectroscopy and fluorescence in situ hybridization for the single cell analysis of identity and function.',
-      author: ['Huang WE', 'Stoecker K', 'Griffiths R', 'Newbold L', 'Daims H', 'Whiteley AS', 'Wagner M'],
+      authors: ['Huang WE', 'Stoecker K', 'Griffiths R', 'Newbold L', 'Daims H', 'Whiteley AS', 'Wagner M'],
       journal: 'Environ Microbiol. 2007 Aug',
       issue: '9(8):1878-89.',
     },
     {
       title: 'Sponge-associated microorganisms: evolution, ecology, and biotechnological potential.',
-      author: ['Taylor MW', 'Radax R', 'Steger D', 'Wagner M'],
+      authors: ['Taylor MW', 'Radax R', 'Steger D', 'Wagner M'],
       journal: 'Microbiol Mol Biol Rev. 2007 Jun',
       issue: '71(2)',
       pages: '295-347',
     },
     {
       title: 'An Acanthamoeba sp. containing two phylogenetically different bacterial endosymbionts.',
-      author: ['Heinz E', 'Kolarov I', 'Kästner C', 'Toenshoff ER', 'Wagner M', 'Horn M'],
+      authors: ['Heinz E', 'Kolarov I', 'Kästner C', 'Toenshoff ER', 'Wagner M', 'Horn M'],
       journal: 'Environ Microbiol. 2007 Jun',
       issue: '9(6):1604-9.',
     },
     {
       title: 'Improved 16S rRNA-targeted probe set for analysis of sulfate-reducing bacteria by fluorescence in situ hybridization.',
-      author: ['Lücker S', 'Steger D', 'Kjeldsen KU', 'MacGregor BJ', 'Wagner M', 'Loy A'],
+      authors: ['Lücker S', 'Steger D', 'Kjeldsen KU', 'MacGregor BJ', 'Wagner M', 'Loy A'],
       journal: 'J Microbiol Methods. 2007 Jun',
       issue: '69(3)',
       pages: '523-8',
     },
     {
       title: 'Unravelling microbial communities with DNA-microarrays: challenges and future directions.',
-      author: ['Wagner M', 'Smidt H', 'Loy A', 'Zhou J'],
+      authors: ['Wagner M', 'Smidt H', 'Loy A', 'Zhou J'],
       journal: 'Microb Ecol. 2007 Apr',
       issue: '53(3)',
       pages: '498-506',
     },
     {
       title: 'Quantification of uncultured microorganisms by fluorescence microscopy and digital image analysis.',
-      author: ['Daims H', 'Wagner M'],
+      authors: ['Daims H', 'Wagner M'],
       journal: 'Appl Microbiol Biotechnol. 2007 May',
       issue: '75(2)',
       pages: '237-48',
     },
     {
       title: 'probeBase--an online resource for rRNA-targeted oligonucleotide probes: new features 2007.',
-      author: ['Loy A', 'Maixner F', 'Wagner M', 'Horn M'],
+      authors: ['Loy A', 'Maixner F', 'Wagner M', 'Horn M'],
       journal: 'Nucleic Acids Res. 2007 Jan',
       issue: '35(Database issue)',
       pages: 'D800-4',
     },
     {
       title: 'Wastewater treatment: a model system for microbial ecology.',
-      author: ['Daims H', 'Taylor MW', 'Wagner M'],
+      authors: ['Daims H', 'Taylor MW', 'Wagner M'],
       journal: 'Trends Biotechnol. 2006 Nov',
       issue: '24(11)',
       pages: '483-9',
     },
     {
       title: 'The Planctomycetes, Verrucomicrobia, Chlamydiae and sister phyla comprise a superphylum with biotechnological and medical relevance.',
-      author: ['Wagner M', 'Horn M'],
+      authors: ['Wagner M', 'Horn M'],
       journal: 'Curr Opin Biotechnol. 2006 Jun',
       issue: '17(3)',
       pages: '241-9',
     },
     {
       title: 'A vista for microbial ecology and environmental biotechnology.',
-      author: ['Rittmann BE', 'Hausner M', 'Löffler F', 'Love NG', 'Muyzer G', 'Okabe S', 'Oerther DB', 'Peccia J', 'Raskin L', 'Wagner M'],
+      authors: ['Rittmann BE', 'Hausner M', 'Löffler F', 'Love NG', 'Muyzer G', 'Okabe S', 'Oerther DB', 'Peccia J', 'Raskin L', 'Wagner M'],
       journal: 'Environ Sci Technol. 2006 Feb 15',
       issue: '40(4)',
       pages: '1096-103',
     },
     {
       title: 'daime, a novel image analysis program for microbial ecology and biofilm research.',
-      author: ['Daims H', 'Lücker S', 'Wagner M'],
+      authors: ['Daims H', 'Lücker S', 'Wagner M'],
       journal: 'Environ Microbiol. 2006 Feb',
       issue: '8(2):200-13.',
     },
     {
       title: 'Linking microbial community structure with function: fluorescence in situ hybridization-microautoradiography and isotope arrays.',
-      author: ['Wagner M', 'Nielsen PH', 'Loy A', 'Nielsen JL', 'Daims H'],
+      authors: ['Wagner M', 'Nielsen PH', 'Loy A', 'Nielsen JL', 'Daims H'],
       journal: 'Curr Opin Biotechnol. 2006 Feb',
       issue: '17(1)',
       pages: '83-91',
     },
     {
       title: 'Functional marker genes for identification of sulfate-reducing prokaryotes.',
-      author: ['Wagner M', 'Loy A', 'Klein M', 'Lee N', 'Ramsing NB', 'Stahl DA', 'Friedrich MW'],
+      authors: ['Wagner M', 'Loy A', 'Klein M', 'Lee N', 'Ramsing NB', 'Stahl DA', 'Friedrich MW'],
       journal: 'Methods Enzymol. 2005',
       issue: '397:469-89.',
     },
     {
       title: '"Candidatus Protochlamydia amoebophila", an endosymbiont of Acanthamoeba spp.',
-      author: ['Collingro A', 'Toenshoff ER', 'Taylor MW', 'Fritsche TR', 'Wagner M', 'Horn M'],
+      authors: ['Collingro A', 'Toenshoff ER', 'Taylor MW', 'Fritsche TR', 'Wagner M', 'Horn M'],
       journal: 'Int J Syst Evol Microbiol. 2005 Sep',
       issue: '55(Pt 5):1863-6.',
     },
     {
       title: 'Crystal ball. The community level: physiology and interactions of prokaryotes in the wilderness.',
-      author: ['Wagner M'],
+      authors: ['Wagner M'],
       journal: 'Environ Microbiol. 2005 Apr',
       issue: '7(4)',
       pages: '483-5',
     },
     {
       title: '16S rRNA gene-based oligonucleotide microarray for environmental monitoring of the betaproteobacterial order "Rhodocyclales"',
-      author: ['Loy A', 'Schulz C', 'Lücker S', 'Schöpfer-Wendels A', 'Stoecker K', 'Baranyi C', 'Lehner A', 'Wagner M'],
+      authors: ['Loy A', 'Schulz C', 'Lücker S', 'Schöpfer-Wendels A', 'Stoecker K', 'Baranyi C', 'Lehner A', 'Wagner M'],
       journal: 'Appl Environ Microbiol. 2005 Mar',
       issue: '71(3):1373-86.',
     },
     {
       title: 'Recovery of an environmental Chlamydia strain from activated sludge by co-cultivation with Acanthamoeba sp.',
-      author: ['Collingro A', 'Poppert S', 'Heinz E', 'Schmitz-Esser S', 'Essig A', 'Schweikert M', 'Wagner M', 'Horn M'],
+      authors: ['Collingro A', 'Poppert S', 'Heinz E', 'Schmitz-Esser S', 'Essig A', 'Schweikert M', 'Wagner M', 'Horn M'],
       journal: 'Microbiology. 2005 Jan',
       issue: '151(Pt 1):301-9.',
     },
     {
       title: 'Microarray and functional gene analyses of sulfate-reducing prokaryotes in low-sulfate, acidic fens reveal cooccurrence of recognized genera and novel lineages.',
-      author: ['Loy A', 'Küsel K', 'Lehner A', 'Drake HL', 'Wagner M'],
+      authors: ['Loy A', 'Küsel K', 'Lehner A', 'Drake HL', 'Wagner M'],
       journal: 'Appl Environ Microbiol. 2004 Dec',
       issue: '70(12):6998-7009.',
     },
     {
       title: 'Bacterial endosymbionts of free-living amoebae.',
-      author: ['Horn M', 'Wagner M'],
+      authors: ['Horn M', 'Wagner M'],
       journal: 'J Eukaryot Microbiol. 2004 Sep-Oct',
       issue: '51(5)',
       pages: '509-14',
     },
     {
       title: 'Illuminating the evolutionary history of chlamydiae.',
-      author: ['Horn M', 'Collingro A', 'Schmitz-Esser S', 'Beier CL', 'Purkhold U', 'Fartmann B', 'Brandt P', 'Nyakatura GJ', 'Droege M', 'Frishman D', 'Rattei T', 'Mewes HW', 'Wagner M'],
+      authors: ['Horn M', 'Collingro A', 'Schmitz-Esser S', 'Beier CL', 'Purkhold U', 'Fartmann B', 'Brandt P', 'Nyakatura GJ', 'Droege M', 'Frishman D', 'Rattei T', 'Mewes HW', 'Wagner M'],
       journal: 'Science. 2004 Apr 30',
       issue: '304(5671)',
       pages: '728-30',
     },
     {
       title: 'Fluorescence in situ hybridisation for the identification and characterisation of prokaryotes.',
-      author: ['Wagner M', 'Horn M', 'Daims H'],
+      authors: ['Wagner M', 'Horn M', 'Daims H'],
       journal: 'Curr Opin Microbiol. 2003 Jun',
       issue: '6(3)',
       pages: '302-9',
     },
     {
       title: 'Microbial community composition and function in wastewater treatment plants.',
-      author: ['Wagner M', 'Loy A', 'Nogueira R', 'Purkhold U', 'Lee N', 'Daims H'],
+      authors: ['Wagner M', 'Loy A', 'Nogueira R', 'Purkhold U', 'Lee N', 'Daims H'],
       journal: 'Antonie Van Leeuwenhoek. 2002 Aug',
       issue: '81(1-4)',
       pages: '665-80',
     },
     {
       title: 'Bacterial community composition and function in sewage treatment systems.',
-      author: ['Wagner M', 'Loy A'],
+      authors: ['Wagner M', 'Loy A'],
       journal: 'Curr Opin Biotechnol. 2002 Jun',
       issue: '13(3)',
       pages: '218-27',

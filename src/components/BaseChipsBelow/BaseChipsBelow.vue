@@ -1,11 +1,12 @@
 <template>
   <div class="base-chips-below">
     <base-chips-input
+      ref="chipsInput"
       v-bind="$props"
       v-model="selectedBelowListInt"
       :sortable="true"
       @selected="addedEntry"
-      @fetchDropDownEntries="$emit('fetchDropDownEntries')">
+      @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
       <template
         slot="chips-area"
         slot-scope="props">
@@ -19,28 +20,28 @@
             <div
               v-for="(entry,index) in props.list"
               :name="entry[objectProp]"
-              :key="entry.idInt"
+              :key="'item' + entry.idInt"
               class="base-chips-below-list-item">
-              <div class="base-chips-below-list-item-chip-wrapper">
+              <div
+                :key="'chip-wrapper' + entry.idInt"
+                class="base-chips-below-list-item-chip-wrapper">
                 <!-- TODO: @valueChanged: this change needs to be propagated to parent! -->
                 <base-chip
                   ref="selectedChip"
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
-                  :key="entry[objectProp]"
+                  :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited"
                   class="base-chips-input-chip"
-                  @valueChanged="$set(entry, 'edited', true)"
-                  @removeEntry="removeEntry($event, index)"/>
+                  @value-changed="$set(entry, 'edited', true)"
+                  @remove-entry="removeEntry($event, index)"/>
               </div>
-              <!-- TODO: roles list still hardcoded?? need this outside component again
-              or possibility to specify list there -->
               <base-chips-input
                 :show-label="false"
                 :label="label + '-roles'"
-                :key="index"
+                :key="'input' + entry.idInt"
                 v-model="entry.roles"
-                :list="['Editor', 'Actor', 'Farmer', 'Philosopher', 'Magician']"
+                :list="roleOptions"
                 :show-input-border="false"
                 placeholder="Select Role"
                 @selected="updateRoles($event, index)"/>
@@ -60,7 +61,7 @@
 /**
  * if drop down entries dynamically set - fetch new entries on input
  *
- * @event fetchDropDownEntries
+ * @event fetch-dropdown-entries
  * @type {object}
  *
  */
@@ -79,7 +80,7 @@ export default {
   },
   model: {
     prop: 'selectedList',
-    event: 'listChange',
+    event: 'list-change',
   },
   props: {
     /**
@@ -185,42 +186,57 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * specify a property (e.g. id, uuid) that can be used for identification
+     */
+    identifier: {
+      type: String,
+      default: '',
+    },
+    /**
+     * Role options will set the roles available for the selected entries
+     */
+    roleOptions: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
       chipsArray: [],
-      selectedBelowListInt: this.selectedList.map((entry) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, { roles: [] }, entry);
-        }
-        return Object.assign({}, { [this.objectProp]: entry, roles: [] });
-      }),
+      selectedBelowListInt: [],
     };
   },
   watch: {
     selectedList(val) {
-      this.selectedBelowListInt = val.map((entry) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, { roles: [] }, entry);
-        }
-        return Object.assign({}, { [this.objectProp]: entry, roles: [] });
-      });
+      this.createInternalList(val);
     },
+  },
+  created() {
+    this.createInternalList(this.selectedList);
   },
   methods: {
     addedEntry() {
-      this.$emit('listChange', this.selectedBelowListInt);
+      this.$emit('list-change', this.selectedBelowListInt);
+    },
+    removeEntry(evt, index) {
+      const item = this.selectedBelowListInt.splice(index, 1);
+      this.$set(item, 'roles', {});
+      this.$refs.chipsInput.dropDownList = this.$refs.chipsInput.dropDownList.concat(item);
+      this.$emit('list-change', this.selectedBelowListInt);
     },
     updateList(evt, list) {
       /**
        * propagate list change from dragging event to parent
        *
-       * @event listChange
+       * @event list-change
        * @type {object}
        *
        */
       // TODO: check if this is working for objects!
-      /* this.$emit('listChange', list.map((chip) => {
+      /* this.$emit('list-change', list.map((chip) => {
         if (typeof this.selectedList[0] === 'object') {
           // restore original object properties
           return Object.keys(this.list).map(key => chip[key]);
@@ -228,10 +244,33 @@ export default {
         // or send string
         return chip[this.objectProp];
       })); */
-      this.$emit('listChange', list);
+      this.$emit('list-change', list);
     },
     updateRoles(evt, index) {
       this.$set(this.selectedBelowListInt[index], 'roles', evt);
+      this.$emit('list-change', this.selectedBelowListInt);
+    },
+    createInternalList(val) {
+      this.selectedBelowListInt = val.map((entry, index) => {
+        if (typeof entry === 'object') {
+          // check if entry already has an id
+          let id = entry.idInt;
+          if (!(id === 0 || id)) {
+            // if not - create one
+            id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+              ? entry[this.identifier] : this.entry[this.objectProp] + index;
+          }
+          return Object.assign({}, {
+            roles: [],
+            idInt: id,
+          }, entry);
+        }
+        return Object.assign({}, {
+          [this.objectProp]: entry,
+          idInt: this.list.length + index,
+          roles: [],
+        });
+      });
     },
   },
 };

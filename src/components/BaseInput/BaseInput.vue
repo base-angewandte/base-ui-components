@@ -4,7 +4,8 @@
       :class="['base-input-label-row', { 'hide': !showLabel }]">
       <label
         :class="['base-input-label']"
-        :for="label">
+        :for="label"
+        @click.prevent="$emit('clicked-outside')">
         {{ label }}
       </label>
       <slot name="label-addition" />
@@ -13,21 +14,19 @@
       v-click-outside="() => $emit('clicked-outside')"
       :class="['base-input-field-container',
                { 'base-input-field-container-border': showInputBorder },
-               { 'base-input-field-container-active': active }]">
-      <!-- @slot Slot to allow for additional elements in the input field (e.g. chips) -->
+               { 'base-input-field-container-active': active || isActive }]"
+      @click="$emit('click-input-field')">
+      <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
+        (before \<input\>)
+       -->
       <slot name="input-field-addition" />
-      <!--
-        @event input-focus
-        @event arrow-key
-        @event autocomplete
-      -->
       <input
-        v-if="!hideInputField"
         :id="label"
         :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
-        class="base-input-field"
+        :disabled="hideInputField"
+        :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
         type="text"
         autocomplete="off"
         @focus="$emit('input-focus')"
@@ -43,6 +42,55 @@
 <script>
 /**
  * Form Input Field Component
+ */
+
+/**
+ * Event emitted on input focus
+ *
+ * @event input-focus
+ * @type None
+ *
+ */
+
+/**
+ * Event emitted on arrow key up or down (in base project needed for
+ * autocomplete / chips input)
+ *
+ * @event arrow-key
+ * @type {Event}
+ *
+ */
+
+/**
+ * Event emitted on keypress, emitting input string
+ *
+ * @event enter
+ * @type String
+ *
+ */
+
+/**
+ * Event emitted on input, passing input string
+ *
+ * @event autocomplete
+ * @type String
+ *
+ */
+
+/**
+ * Event emitted on click on input field \<div\>
+ *
+ * @event click-input-field
+ * @type None
+ *
+ */
+
+/**
+ * Event emitted when click outside input field \<div\> is registered
+ *
+ * @event clicked-outside
+ * @type None
+ *
  */
 import ClickOutside from 'vue-click-outside';
 
@@ -100,6 +148,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * show input field active
+     */
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -115,13 +170,17 @@ export default {
   mounted() {
     this.inputInt = this.$props.input;
   },
+  updated() {
+    const elems = this.$el.getElementsByTagName('input');
+    if (this.active && elems && elems.length) {
+      this.$el.getElementsByTagName('input')[0].focus();
+    }
+  },
   methods: {
     blurInput() {
       this.active = false;
       /**
        * emit an event when focus leaves the input
-       *
-       * TODO: check again if this is needed???
        *
        * @event input-blur
        * @type string
@@ -174,6 +233,13 @@ export default {
       margin-right: $spacing;
     }
 
+    .base-input-field-hidden {
+      width: 0;
+      overflow: hidden;
+      opacity:0;
+      filter:alpha(opacity=0);
+    }
+
     .base-input-label-row {
       display: flex;
       margin-bottom: $spacing-small;
@@ -189,7 +255,6 @@ export default {
   input[type='text'].base-input-field {
     border: none;
     overflow: hidden;
-    padding: 4px 0;
   }
 
   input[type='date'].base-input-field {

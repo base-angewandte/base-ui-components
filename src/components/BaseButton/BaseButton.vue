@@ -1,5 +1,6 @@
 <template>
   <button
+    :disabled="disabled"
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
@@ -100,6 +101,13 @@ export default {
         return val === 'small' || val === 'large';
       },
     },
+    /**
+     * set button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>
@@ -174,6 +182,14 @@ export default {
 
     &:hover {
       color: $app-color;
+    }
+
+    &:disabled {
+      cursor: default;
+
+      &:hover {
+        color: graytext;
+      }
     }
 
     .base-button-icon-hide {

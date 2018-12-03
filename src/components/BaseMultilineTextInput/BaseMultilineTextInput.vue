@@ -29,7 +29,7 @@
       v-model="fieldContent[activeTabInt]"
       rows="10"
       class="base-multiline-text-input-textarea"
-      @keyup="$emit('textInput', tabs.length > 1
+      @keyup="$emit('text-input', tabs.length > 1
       ? fieldContent : fieldContent[activeTabInt])" />
   </div>
 </template>
@@ -42,13 +42,13 @@
 /**
  * Event emitted on keyup (text input change)
  *
- * @event isTextInput
+ * @event text-input
  * @type object | string
  */
 export default {
   model: {
     prop: 'input',
-    event: 'textInput',
+    event: 'text-input',
   },
   props: {
     /**

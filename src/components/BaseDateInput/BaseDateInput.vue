@@ -3,12 +3,13 @@
     <label
       :class="{ 'hide': !showLabel }"
       :for="label"
-      class="base-input-label">
+      class="base-input-label"
+      @click.prevent="">
       {{ label }}
     </label>
     <div class="input-field-wrapper">
       <div
-        v-click-outside="() => $emit('clicked-outside')"
+        v-click-outside="() => selected('from')"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeFrom },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
@@ -32,7 +33,7 @@
         v-if="type === 'range'"
         class="separator">bis</span>
       <div
-        v-click-outside="() => $emit('clicked-outside')"
+        v-click-outside="() => selected('to')"
         v-if="type !== 'single'"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeTo },
@@ -64,7 +65,7 @@
           calendar-class="calendar-class"
           class="base-input-datepicker"
           @opened="activeTo = true"
-          @closed="selected('from')"/>
+          @closed="selected('to')"/>
 
         <svg-icon
           v-if="type === 'datetime'"
@@ -207,9 +208,12 @@ export default {
     },
     selected(field) {
       if (field === 'from') {
-        this.ActiveFrom = false;
+        this.activeFrom = false;
       } else if (field === 'to') {
-        this.ActiveTo = false;
+        this.activeTo = false;
+      } else {
+        this.activeFrom = false;
+        this.activeTo = false;
       }
       this.$emit('selected', this.inputInt);
     },

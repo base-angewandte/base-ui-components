@@ -84,6 +84,11 @@ export default {
         this.$set(this.entryProps[val], 'active', true);
       }
     },
+    selectActive(val) {
+      if (!val) {
+        this.entryProps.forEach(entry => this.$set(entry, 'selected', false));
+      }
+    },
   },
   created() {
     this.setInternalVar();
@@ -113,7 +118,9 @@ export default {
     activateItem(index) {
       // commented out since this makes problems with the store (do not mutate outside...)
       this.entryProps.forEach((entry) => { this.$set(entry, 'active', false); });
-      this.$set(this.entryProps[index], 'active', true);
+      if (this.entryProps.length) {
+        this.$set(this.entryProps[index], 'active', true);
+      }
       /**
        * event emitted when a menu entry is clicked
        * - returning the index of the respective entry
@@ -140,7 +147,7 @@ export default {
         active: entry.active || false,
         error: entry.error || false,
       }));
-      if (this.activeEntry !== null) {
+      if (this.entryProps.length && this.activeEntry !== null) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },

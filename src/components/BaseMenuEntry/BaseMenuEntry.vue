@@ -2,7 +2,8 @@
   <div
     ref="menuEntry"
     :draggable="isDraggable"
-    class="base-menu-entry"
+    :class="['base-menu-entry',
+             {'base-menu-entry-activatable': isActivatable }]"
     @click="selectActive ? selected() : $emit('clicked')">
     <div
       :class="{ 'base-menu-entry-border-active': isActive }"
@@ -12,9 +13,7 @@
       :name="icon"
       class="base-menu-entry-icon"/>
     <div
-      :class="['base-menu-entry-text-wrapper',
-               { 'base-menu-entry-text-wrapper-full': (!thumbnails.length && !description)
-      || selectActive }]">
+      :class="['base-menu-entry-text-wrapper']">
       <div
         v-if="title"
         :class="['base-menu-entry-title',
@@ -24,43 +23,44 @@
       <div
         v-if="subtext"
         class="base-menu-entry-subtext">{{ subtext }}</div>
-      <div class="overflow-fade" />
     </div>
-
-    <transition-group
-      name="slide-fade">
-      <div
-        v-if="!selectActive"
-        :key="id + 'rightGroup'"
-        class="base-menu-entry-right-group">
+    <div
+      v-if="isSelectable"
+      class="base-menu-entry-transition-group-wrapper">
+      <transition-group
+        name="slide-fade"
+        class="slide-fade-group">
         <div
-          :key="id + 'thumbnail'"
-          class="base-menu-entry-thumbnail-container">
-          <svg-icon
-            v-for="tn in thumbnails"
-            :key="tn"
-            :name="tn"
-            class="base-menu-entry-thumbnail" />
+          v-if="!selectActive"
+          :key="id + 'rightGroup'"
+          class="base-menu-entry-right-group">
+          <div
+            :key="id + 'thumbnail'"
+            class="base-menu-entry-thumbnail-container">
+            <svg-icon
+              v-for="tn in thumbnails"
+              :key="tn"
+              :name="tn"
+              class="base-menu-entry-thumbnail" />
+          </div>
+          <div
+            :key="id + 'description'"
+            class="base-menu-entry-description">
+            {{ description }}
+          </div>
         </div>
         <div
-          :key="id + 'description'"
-          class="base-menu-entry-description">
-          {{ description }}
+          v-if="selectActive"
+          :key="$props.id + 'checkmark'"
+          class="base-menu-entry-checkbox">
+          <base-checkmark
+            :checked="isSelected"
+            title="checkbox"
+            mark-style="checkbox"
+            @clicked="selected"/>
         </div>
-      </div>
-    </transition-group>
-    <transition-group
-      name="slide-fade"
-      class="base-menu-entry-group">
-      <base-checkmark
-        v-if="selectActive"
-        :key="$props.id + 'checkmark'"
-        :checked="isSelected"
-        title="checkbox"
-        mark-style="checkbox"
-        class="base-menu-entry-checkbox"
-        @clicked="selected"/>
-    </transition-group>
+      </transition-group>
+    </div>
   </div>
 </template>
 
@@ -246,15 +246,24 @@ export default {
     width: 100%;
     position: relative;
     background: white;
-    cursor: pointer;
+    overflow: hidden;
 
-    .base-menu-entry-border {
-      position: absolute;
-      height: 100%;
-    }
+    &.base-menu-entry-activatable {
+      cursor: pointer;
 
-    .base-menu-entry-border-active {
-      border: 2px solid #{$app-color};
+      .base-menu-entry-border-active {
+        border: $border-width solid #{$app-color};
+      }
+
+      .base-menu-entry-border {
+        position: absolute;
+        height: 100%;
+      }
+
+      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title {
+        fill: $app-color;
+        color: $app-color;
+      }
     }
 
     .base-menu-entry-icon {
@@ -268,25 +277,9 @@ export default {
       flex-grow: 1;
       flex-shrink: 1;
       display: flex;
-      // TODO: this is not working!!!
-      max-width: calc(100% - 100px - #{$icon-min} - #{$icon-large} - 48px);
+      max-width: calc(100% - #{$icon-large} - #{$spacing} - #{$border-width}
+      - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
-
-      &.base-menu-entry-text-wrapper-full {
-        // TODO: together with the above - too hacky - think of a better solution!!
-        max-width: calc(100% - 24px - 16px);
-      }
-
-      .overflow-fade {
-        content: '';
-        width: 30px;
-        height: 80%;
-        position: absolute;
-        top: $spacing-small;
-        right: $spacing;
-        background: linear-gradient(to right, transparent , white);
-        z-index: 1;
-      }
     }
 
     .base-menu-entry-title {
@@ -300,17 +293,17 @@ export default {
       }
     }
 
-    &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title {
-      fill: $app-color;
-      color: $app-color;
-    }
-
     .base-menu-entry-subtext {
       color: $font-color-second;
       font-size: $font-size-small;
-      margin-right: $spacing;
+      margin: 0 $spacing;
       flex-grow: 99;
-      flex-shrink: 99;
+      flex-shrink: 0;
+      padding-right: $spacing;
+    }
+
+    .base-menu-entry-title + .base-menu-entry-subtext {
+      margin-left: 0;
     }
 
     .base-menu-entry-subtext, .base-menu-entry-title {
@@ -326,15 +319,29 @@ export default {
     .base-menu-entry-right-group {
       transition: 0.3s ease;
       display: flex;
-      width: calc(100px + (#{$spacing} * 2) + #{$icon-min});
+      position: absolute;
+      top: 0;
       flex-direction: row;
+      right: 0;
+      background: white;
+
+      &::before {
+        content: '';
+        width: 30px;
+        height: $row-height-large;
+        position: absolute;
+        top: 0;
+        left: -30px;
+        background: linear-gradient(to right, transparent , white);
+        z-index: 1;
+      }
 
       .base-menu-entry-thumbnail-container {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
         height: $row-height-large;
-        margin-right: $spacing;
+        margin: 0 $spacing;
         width: $icon-small;
 
         .base-menu-entry-thumbnail {
@@ -351,13 +358,35 @@ export default {
       }
     }
 
+    .base-menu-entry-checkbox {
+      height: 100%;
+      padding: 0 $spacing;
+      top: 0;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      display: flex;
+      align-items: center;
+    }
+
+    .base-menu-entry-checkbox::before {
+      content: '';
+      width: 30px;
+      height: $row-height-large;
+      position: absolute;
+      right: 2 * $spacing-small + 2 * $spacing;
+      top: 0;
+      background: linear-gradient(to right, transparent , white);
+      z-index: 1;
+    }
+
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
+      background-color: white;
       transition: all 0.5s ease;
     }
     .slide-fade-enter, .slide-fade-leave-to {
       opacity: 0;
       transform: translateX(#{$spacing});
-      margin-left: calc(-2 * #{$spacing});
     }
   }
 
@@ -365,12 +394,14 @@ export default {
     border-top: $separation-line;
   }
 
-  .base-menu-entry-group {
+  .base-menu-entry-transition-group-wrapper{
+    background-color: white;
+    min-width: 2 * $spacing + 2 * $spacing-small;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: $row-height-large;
     display: flex;
     align-items: center;
-
-    .base-menu-entry-checkbox {
-      margin-right: $spacing;
-    }
   }
 </style>

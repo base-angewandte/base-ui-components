@@ -1,5 +1,35 @@
 <template>
   <div id="app">
+    <div class="canvas flex">
+      <base-image-box
+        :selectable="selectable"
+        :show-title="false"
+        :image-url="require('./static/images/icons.png')"
+        :box-size="{ width: '25%' }"
+        description="Bildserie"
+        title="Afterlife II Ausstellungsansichten"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/icons.png')"
+        :box-size="{ width: '25%' }"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
+        :box-size="{ width: '25%' }"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-button
+        :active="false"
+        :text="'Activate Select'"
+        icon-size="large"
+        button-style="row"
+        @clicked="enableSelect()"/>
+    </div>
     <!-- <base-hover-box
       :box-text="[
         'Alias: Max Mustermann, Stephan Mustermann',
@@ -8,11 +38,42 @@
       title="Andreas M."
       subtext="*1970 Steyr, Oberösterreich"/> -->
     <div class="form-field">
+      <base-chips-input
+        :list="dropDownInput"
+        :placeholder="'Select Your Marx'"
+        :selected-list="chipsInput"
+        :allow-multiple-entries="true"
+        :allow-dynamic-drop-down-entries="true"
+        :allow-unknown-entries="true"
+        :object-prop="'value'"
+        :chips-inline="true"
+        :chips-editable="true"
+        :identifier="'id'"
+        draggable
+        label="A label"
+        @fetch-dropdown-entries="fetch">
+        <template slot="drop-down-extended">
+          <div
+            v-if="dropDownInput && dropDownInput.length"
+            class="dropdown-extended">
+            <div class="show-more-toggle">
+              Show more results...
+            </div>
+          </div>
+        </template>
+      </base-chips-input>
+    </div>
+    <div :style="{ height: '400px' }" />
+
+
+    <div class="form-field">
       <base-chips-below
         :chips-inline="false"
         v-model="selectedList"
         :chips-editable="true"
+        :allow-unknown-entries="true"
         :list="['Herbert Marcuse', 'Erich From', 'Georg Werth']"
+        :role-options="['Farmer', 'Magician', 'Priest']"
         label="chips-below-test"/>
       <base-upload-bar
         :progress="progress"
@@ -57,7 +118,7 @@
         :label="'Label'"
         :tabs="['German', 'English']"
         :placeholder="'Enter Text'"
-        @tabSwitch="tabSwitched">
+        @tab-switch="tabSwitched">
         <div class="multiline-dropdown">
           <base-drop-down
             :default-select="'Textart'"
@@ -104,9 +165,11 @@
         :selected-list="chipsInput"
         :allow-multiple-entries="true"
         :allow-dynamic-drop-down-entries="true"
-        :object-prop="'title'"
-        :chips-inline="false"
+        :object-prop="'value'"
+        :chips-inline="true"
         :chips-editable="true"
+        :identifier="'id'"
+        draggable
         label="A label"
         @fetchDropDownEntries="fetch"/>
       <base-button
@@ -499,7 +562,18 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+  @import "./styles/variables.scss";
+
+  .dropdown-extended {
+    border-top: $separation-line;
+    padding: $spacing;
+
+    .show-more-toggle {
+      color: $app-color;
+    }
+  }
+
   .canvas {
     padding: 16px;
   }

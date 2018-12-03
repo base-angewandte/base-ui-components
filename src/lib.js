@@ -13,6 +13,7 @@ import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMult
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
+import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import './styles/lib.scss';
 
 export {
@@ -31,4 +32,5 @@ export {
   BaseDropBox,
   BaseChipsBelow,
   BaseUploadBar,
+  BaseImageBox,
 };

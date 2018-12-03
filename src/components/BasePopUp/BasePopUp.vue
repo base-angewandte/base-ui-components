@@ -32,7 +32,7 @@
             :icon-position="'right'"
             :icon-size="'small'"
             class="base-popup-button"
-            @clicked="$emit('buttonLeft')"
+            @clicked="$emit('button-left')"
           />
           <!-- @event buttonRight -->
           <base-button
@@ -41,7 +41,7 @@
             :icon-position="'right'"
             :icon-size="'small'"
             class="base-popup-button"
-            @clicked="$emit('buttonRight')"
+            @clicked="$emit('button-right')"
           />
         </div>
       </div>
@@ -58,16 +58,16 @@
  */
 
 /**
- * Event triggered on right top corner close action
+ * Event triggered with right button
  *
- * @event close
+ * @event button-right
  * @type none
  */
 
 /**
- * Event triggred with left button
+ * Event triggered with left button
  *
- * @event buttonLeft
+ * @event button-left
  * @type none
  */
 
@@ -135,9 +135,9 @@ export default {
   methods: {
     close() {
       /**
-       * Event triggred with right button
+       * Event triggered on right top corner close action
        *
-       * @event buttonRight
+       * @event close
        * @type none
        */
       this.$emit('close');
@@ -152,6 +152,8 @@ export default {
 
   .base-pop-up-background {
     position: absolute;
+    top: 0;
+    left: 0;
     height: 100%;
     width: calc(100% - 2 * #{$spacing});
     z-index: 99;

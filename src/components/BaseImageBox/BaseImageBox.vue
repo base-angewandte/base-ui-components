@@ -1,6 +1,7 @@
 <template>
   <base-box
     :box-size="$props.boxSize"
+    :box-ratio="'100'"
     :class="['base-image-box', { 'base-image-box-selected': selected }]"
     @clicked="boxSelect">
     <div class="base-image-box-header">
@@ -121,10 +122,10 @@ export default {
       /**
        * event triggered when box is selectable and clicked upon
        *
-       * @event selectTriggered
+       * @event select-triggered
        * @type Boolean
        */
-      this.$emit('selectTriggered', this.selected);
+      this.$emit('select-triggered', this.selected);
     },
   },
   methods: {
@@ -143,6 +144,9 @@ export default {
   @import "../../styles/variables";
 
   .base-image-box {
+    &:after {
+      margin-top: -($line-height * 2 + 2 * $spacing);
+    }
 
     &.base-image-box-selected {
       background: $app-color;
@@ -190,6 +194,7 @@ export default {
     .base-image-box-img-wrapper {
       width: 100%;
       height: 100%;
+      position: absolute;
 
       .base-image-box-img {
         min-width: 100%;

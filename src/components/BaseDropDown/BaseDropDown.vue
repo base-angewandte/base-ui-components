@@ -245,7 +245,7 @@ export default {
       position: absolute;
       margin-left: 0;
       box-shadow: $drop-shadow;
-      z-index: 1;
+      z-index: 3;
       text-align: left;
       max-width: inherit;
     }

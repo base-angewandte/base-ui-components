@@ -1,6 +1,5 @@
 <template>
   <div
-    v-click-outside="() => showDropDown = false"
     class="base-chips-input">
 
     <!-- INPUT LABEL AND FIELD -->
@@ -11,10 +10,14 @@
       :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
+      :is-active="showDropDown"
       v-model="input"
-      @input-focus="showDropDown = true"
+      @clicked-outside="insideInput = false"
+      @input-focus="onInputFocus"
+      @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
-      @enter="addSelected($event)">
+      @enter="addSelected()"
+      @click-input-field="insideInput = true">
       <template
         v-if="sortable"
         slot="label-addition">
@@ -25,38 +28,58 @@
       <template
         v-if="!allowMultipleEntries || chipsInline"
         slot="input-field-addition">
-        <base-chip
-          v-for="(entry,index) in selectedListInt"
-          :key="index"
-          v-model="entry[objectProp]"
-          :chip-editable="chipsEditable"
-          @removeEntry="removeEntry(entry, index)"/>
+        <draggable
+          :options="{ disabled: !draggable }"
+          v-model="selectedListInt">
+          <!-- TODO: is-linked should be associated solely with external identifier!! -->
+          <base-chip
+            v-for="(entry, index) in selectedListInt"
+            :key="entry.idInt"
+            v-model="entry[objectProp]"
+            :chip-editable="chipsEditable"
+            :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+            @remove-entry="removeEntry(entry, index)"
+            @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
+        </draggable>
       </template>
     </base-input>
 
     <!-- DROP DOWN MENU -->
     <div
+      v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
-      class="base-chips-drop-down">
+      ref="dropdownContainer"
+      class="base-chips-drop-down"
+      @keydown.up.down.prevent="triggerArrowKey"
+      @mouseenter="insideDropDown = true"
+      @mouseleave="checkLeave">
       <div
         v-for="(entry, index) in dropDownListInt"
+        ref="option"
         :key="index"
         :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
         class="base-chips-drop-down-entry-wrapper"
-        @click="addSelected(entry)"
-        @mouseover="selectedMenuEntryIndex = index">
+        @click="addSelected()"
+        @mouseover="selectedMenuEntryIndex = index"
+        @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
 
         <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
           :item="entry"
           name="drop-down-entry">
           <!-- SLOT DEFAULT -->
-          <div class="base-chips-drop-down-entry">
+          <div
+            class="base-chips-drop-down-entry">
             {{ entry[objectProp] }}
           </div>
         </slot>
 
       </div>
+      <!--
+        @slot a slot to expand the drop down area (needed for "Expand Functionality"
+      -->
+      <slot
+        name="drop-down-extended" />
       <!--
         @slot customize what is displayed when no drop down options are available
       -->
@@ -79,12 +102,12 @@
         name="chips-area">
         <!-- SLOT DEFAULT -->
         <base-chip
-          v-for="(entry,index) in selectedListInt"
+          v-for="(entry, index) in selectedListInt"
           v-model="entry[objectProp]"
-          :key="index"
+          :key="entry.idInt"
           :chip-editable="chipsEditable"
           class="base-chips-input-chip"
-          @removeEntry="removeEntry($event, index)"/>
+          @remove-entry="removeEntry($event, index)"/>
       </slot>
     </div>
 
@@ -94,9 +117,11 @@
 <script>
 /**
  * Base Chips Input component with autocomplete function
+ *
  */
 
 import ClickOutside from 'vue-click-outside';
+import Draggable from 'vuedraggable';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 
@@ -104,6 +129,7 @@ export default {
   components: {
     BaseInput,
     BaseChip,
+    Draggable,
   },
   directives: {
     ClickOutside,
@@ -230,11 +256,30 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * define if chips should be draggable (currently only available for inline)
+     */
+    draggable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * for dynamic drop down entries a unique identifier (id, uuid) is needed
+     */
+    identifier: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if entries should always appear linked (-> with grey background)
+     */
+    alwaysLinked: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
-      // show drop down entries list
-      showDropDown: false,
       // the current text input
       input: null,
       // list of selected entries
@@ -244,6 +289,8 @@ export default {
       // list of selectable entries received from parent component
       dropDownList: [],
       selectedMenuEntryIndex: this.getAllowUnknown(),
+      insideDropDown: false,
+      insideInput: false,
     };
   },
   computed: {
@@ -252,10 +299,31 @@ export default {
         return this.dropDownList;
       },
       set(val) {
-        this.dropDownList = !this.allowDynamicDropDownEntries
-          ? val.filter(entry => !this.selectedListInt
-            .map(selected => selected.idInt).includes(entry.idInt))
-          : val;
+        const list = val.map((entry, index) => {
+          if (typeof entry === 'object') {
+            let id = entry.idInt;
+            if (id !== 0 && !id) {
+              id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+                ? entry[this.identifier] : index;
+            }
+            return Object.assign({}, entry, {
+              idInt: id,
+              [this.objectProp]: entry[this.objectProp],
+            });
+          }
+          return Object.assign({}, { idInt: index, [this.objectProp]: entry });
+        });
+        this.dropDownList = list.filter(entry => !this.selectedListInt
+          .map(selected => selected.idInt).includes(entry.idInt));
+      },
+    },
+    showDropDown: {
+      get() {
+        return this.insideDropDown || this.insideInput;
+      },
+      set(val) {
+        this.insideInput = val;
+        this.insideDropDown = val;
       },
     },
   },
@@ -266,141 +334,127 @@ export default {
         /**
          * event to fetch drop down entries with changing input
          *
-         * @event fetchDropDownEntries
+         * @event fetch-dropdown-entries
          * @type { object }
          *
          */
-        this.$emit('fetchDropDownEntries', { value: val, type: this.$props.objectProp });
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
+        const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
           ? this.dropDownListOrig
             .filter(entry => entry[this.objectProp].toLowerCase().includes(val.toLowerCase()))
           : this.dropDownListOrig;
+        this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
     },
     // watch selectedList prop for changes triggered from outside
-    selectedList(val) {
-      // if entries are objects merge with internally necessary properties,
-      // else use entry (string? TODO: should probably check this) as [this.objectProp]
-      this.selectedListInt = val.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: entry.idInt,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, {
-          idInt: this.list.length + index,
-          [this.objectProp]: entry,
-        });
-      });
+    selectedList: {
+      handler(val) {
+        this.setSelectedList(val);
+      },
+      deep: true,
     },
     list(val) {
-      if (this.allowDynamicDropDownEntries) {
-        this.dropDownListInt = val.map((entry, index) => {
-          if (typeof entry === 'object') {
-            return Object.assign({}, entry, {
-              idInt: index,
-              [this.objectProp]: entry[this.objectProp],
-            });
-          }
-          return Object.assign({}, {
-            idInt: index,
-            [this.objectProp]: entry,
-          });
-        });
-      }
+      const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
+      this.dropDownListInt = val;
+      this.selectedMenuEntryIndex = this.getIndex(oldEntry);
     },
     showDropDown(val) {
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
-        // TODO below disabled for now due to errors with single entry mode but check
-        // if this is necessary for multi entry inline mode
-        // this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        /**
+         * event triggered on show drop down
+         *
+         * @event show-dropdown
+         * @type None
+         *
+         */
+        this.$emit('show-dropdown');
+      } else {
+        /**
+         * event triggered on hide drop down
+         *
+         * @event hide-dropdown
+         * @type None
+         *
+         */
+        this.$emit('hide-dropdown');
       }
     },
   },
-  created() {
-    if (this.selectedList) {
-      this.selectedListInt = this.selectedList.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return Object.assign({}, entry, {
-            idInt: this.list.length + index,
-            [this.objectProp]: entry[this.objectProp],
-          });
-        }
-        return Object.assign({}, { idInt: null, [this.objectProp]: entry });
-      });
-    }
-
+  mounted() {
+    this.setSelectedList(this.selectedList);
+    this.dropDownListInt = this.list;
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = this.list
-        .map((entry, index) => {
-          if (typeof entry === 'object') {
-            return Object.assign({}, entry, {
-              idInt: index,
-              [this.objectProp]: entry[this.objectProp],
-            });
-          }
-          return Object.assign({}, { idInt: index, [this.objectProp]: entry });
-        });
-      this.dropDownListInt = this.dropDownListOrig;
+      this.dropDownListOrig = [].concat(this.dropDownListInt);
     }
   },
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
+      this.showDropDown = true;
+      // check if entry was selected
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
-          // TODO: this needs to be different for unknown entries allowed!
-          // TODO: also do this for single entries?
           if (this.addSelectedEntryDirectly) {
             this.selectedListInt.push(selected);
           }
         } else {
           this.selectedListInt = [selected];
         }
-        if (!this.allowDynamicDropDownEntries) {
-          // filter the selected entry from the list of drop down menu entries
-          this.dropDownListInt = this.dropDownListOrig;
-        }
-        this.selectedMenuEntryIndex = this.getAllowUnknown();
-        /**
-         * event triggered when an entry from the drop down was selected or enter was pressed
-         *
-         * @event selected
-         * @type {object}
-         */
-        this.$emit('selected', this.selectedListInt);
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
-          this.$refs.baseInput.$el.getElementsByTagName('input')[0].blur();
+          const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
+          if (inputElems && inputElems.length) {
+            inputElems[0].blur();
+          }
+        } else {
+          this.insideDropDown = true;
         }
+        // reset input
+        this.input = '';
       } else if (this.input && this.allowUnknownEntries) {
-        this.selectedListInt.push({ name: this.input });
+        this.selectedListInt.push({ [this.objectProp]: this.input });
+        // reset input
+        this.input = '';
       }
-      // reset input
-      this.input = '';
+      if (!this.allowDynamicDropDownEntries) {
+        // filter the selected entry from the list of drop down menu entries
+        this.dropDownListInt = this.dropDownListOrig;
+      } else {
+        this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
+          .map(sel => sel.idInt).includes(entry.idInt));
+      }
+      /**
+       * event triggered when an entry from the drop down was selected or enter was pressed
+       *
+       * @event selected
+       * @type {object}
+       */
+      this.$emit('selected', this.selectedListInt);
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
+      this.insideInput = true;
       if (!this.allowDynamicDropDownEntries) {
-        // check if the item id was set
-        if (item.idInt !== 0 && !item.idInt) {
-          this.dropDownListInt = [];
+        // check if item has an id (= is not an custom entry)
+        // TODO: is this the desired behaviour?? (or should unknown entry also appear
+        // in drop down?
+        if (item.idInt === 0 || item.idInt) {
+          this.dropDownListInt.push(item);
+          // sort all entries by id to restore the original order
+          this.sort();
         }
-        this.dropDownListInt.push(item);
-        // sort all entries by id to restore the original order
-        this.dropDownListInt.sort((a, b) => a.idInt > b.idInt);
       }
       // remove entry from selected list // TODO: is this okay?? (for dynamic entries)
       this.selectedListInt.splice(index, 1);
-      if (!this.$props.allowMultipleEntries) {
-        this.showDropDown = true;
-      }
+      // if dropdown is already open keep open!
+      this.insideInput = this.showDropDown;
       this.$emit('selected', this.selectedListInt);
     },
     // allow for navigation with arrow keys
@@ -412,9 +466,40 @@ export default {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex > 0
           ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
       }
+      if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
+        this.$refs.option[this.selectedMenuEntryIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
     },
     getAllowUnknown() {
       return this.$props.allowUnknownEntries ? -1 : 0;
+    },
+    onInputBlur() {
+      if (!this.insideDropDown) {
+        if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
+          this.selectedListInt.push({ [this.objectProp]: this.input });
+          this.$emit('selected', this.selectedListInt);
+        }
+        this.input = '';
+      }
+      this.insideInput = false;
+    },
+    onInputFocus() {
+      this.insideInput = true;
+      this.insideDropDown = false;
+    },
+    getIndex(oldEntry) {
+      if (!this.dropDownListInt.length) {
+        return -1;
+      }
+      // set the index to the entry previously selected (if any)
+      if (oldEntry) {
+        const index = this.dropDownListInt.map(e => e.idInt).indexOf(oldEntry.idInt);
+        if (index < 0) {
+          return this.getAllowUnknown();
+        }
+        return index;
+      }
+      return this.getAllowUnknown();
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
@@ -428,6 +513,31 @@ export default {
         return -1;
       });
       this.$emit('selected', this.selectedListInt);
+    },
+    setSelectedList(val) {
+      if (val && val.length) {
+        this.selectedListInt = val.map((entry, index) => {
+          if (typeof entry === 'object') {
+            return Object.assign({}, entry, {
+              idInt: this.identifier ? entry[this.identifier] : entry.idInt,
+              [this.objectProp]: entry[this.objectProp],
+            });
+          }
+          return Object.assign({}, {
+            idInt: this.list.length + index,
+            [this.objectProp]: entry,
+          });
+        });
+      } else {
+        this.selectedListInt = [];
+      }
+      this.dropDownListInt = this.list;
+    },
+    checkLeave(e) {
+      if (e.relatedTarget.closest('.base-chips-input')
+        !== e.target.parentElement) {
+        this.insideDropDown = false;
+      }
     },
   },
 };
@@ -449,11 +559,14 @@ export default {
       position: absolute;
       background: white;
       width: 100%;
+      max-height: 10 * $row-height-small;
+      overflow-y: auto;
       z-index: 2;
       box-shadow: $drop-shadow;
+      cursor: pointer;
 
       .base-chips-drop-down-entry-wrapper {
-        padding: 0 16px;
+        padding: 0 $spacing;
         line-height: $row-height-small;
 
         &.base-chips-drop-down-entry-wrapper-active {
