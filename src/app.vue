@@ -71,6 +71,7 @@
         :chips-inline="false"
         v-model="selectedList"
         :chips-editable="true"
+        :allow-unknown-entries="true"
         :list="['Herbert Marcuse', 'Erich From', 'Georg Werth']"
         :role-options="['Farmer', 'Magician', 'Priest']"
         label="chips-below-test"/>

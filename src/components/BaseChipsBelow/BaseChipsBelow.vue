@@ -6,7 +6,7 @@
       v-model="selectedBelowListInt"
       :sortable="true"
       @selected="addedEntry"
-      @fetch-dropdown-entries="$emit('fetch-dropdown-entries')">
+      @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
       <template
         slot="chips-area"
         slot-scope="props">
@@ -20,15 +20,17 @@
             <div
               v-for="(entry,index) in props.list"
               :name="entry[objectProp]"
-              :key="entry.idInt"
+              :key="'item' + entry.idInt"
               class="base-chips-below-list-item">
-              <div class="base-chips-below-list-item-chip-wrapper">
+              <div
+                :key="'chip-wrapper' + entry.idInt"
+                class="base-chips-below-list-item-chip-wrapper">
                 <!-- TODO: @valueChanged: this change needs to be propagated to parent! -->
                 <base-chip
                   ref="selectedChip"
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
-                  :key="entry.idInt"
+                  :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited"
                   class="base-chips-input-chip"
                   @value-changed="$set(entry, 'edited', true)"
@@ -37,7 +39,7 @@
               <base-chips-input
                 :show-label="false"
                 :label="label + '-roles'"
-                :key="entry.idInt"
+                :key="'input' + entry.idInt"
                 v-model="entry.roles"
                 :list="roleOptions"
                 :show-input-border="false"
@@ -59,7 +61,7 @@
 /**
  * if drop down entries dynamically set - fetch new entries on input
  *
- * @event fetchDropDownEntries
+ * @event fetch-dropdown-entries
  * @type {object}
  *
  */
@@ -78,7 +80,7 @@ export default {
   },
   model: {
     prop: 'selectedList',
-    event: 'listChange',
+    event: 'list-change',
   },
   props: {
     /**
@@ -255,7 +257,8 @@ export default {
           let id = entry.idInt;
           if (!(id === 0 || id)) {
             // if not - create one
-            id = this.identifier ? entry[this.identifier] : this.list.length + index;
+            id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+              ? entry[this.identifier] : this.entry[this.objectProp] + index;
           }
           return Object.assign({}, {
             roles: [],
@@ -263,8 +266,7 @@ export default {
           }, entry);
         }
         return Object.assign({}, {
-          [this.objectProp]:
-          entry,
+          [this.objectProp]: entry,
           idInt: this.list.length + index,
           roles: [],
         });
