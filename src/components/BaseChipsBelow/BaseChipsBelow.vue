@@ -32,6 +32,7 @@
                   :chip-editable="chipsEditable"
                   :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
+                  :hover-box-content="{}"
                   class="base-chips-input-chip"
                   @value-changed="$set(entry, 'edited', true)"
                   @remove-entry="removeEntry($event, index)"/>

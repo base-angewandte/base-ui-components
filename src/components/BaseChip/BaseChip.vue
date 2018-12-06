@@ -136,7 +136,7 @@ export default {
     // actually needs to be fetched first???
     clickAction(e) {
       if (this.hoverBoxEnabled) {
-        this.$refs.hoverBox.setPosition(e.clientX, e.clientY);
+        this.$refs.hoverBox.setPosition(e.layerX, e.layerY);
         this.showInfoBox = !this.showInfoBox;
       }
       if (this.chipEditable) {
@@ -145,7 +145,7 @@ export default {
     },
     moveBox(e) {
       if (this.hoverBoxEnabled && this.showInfoBox) {
-        this.$refs.hoverBox.setPosition(e.clientX, e.clientY);
+        this.$refs.hoverBox.setPosition(e.layerX, e.layerY);
       }
     },
     hideBox() {
