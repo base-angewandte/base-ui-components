@@ -70,7 +70,7 @@ export default {
     }
 
     &.base-box-50::after {
-      padding-bottom: 50%;
+      padding-bottom: calc(50% - #{$spacing-small});
     }
 
     &:hover {

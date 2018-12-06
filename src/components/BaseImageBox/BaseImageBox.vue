@@ -2,11 +2,12 @@
   <base-box
     :box-size="$props.boxSize"
     :box-ratio="'100'"
-    :class="['base-image-box', { 'base-image-box-selected': selected }]"
+    :class="['base-image-box', { 'base-image-box-selected': selectable && selected }]"
     @clicked="boxSelect">
-    <div class="base-image-box-header">
+    <div
+      v-if="showTitle"
+      class="base-image-box-header">
       <div
-        v-if="$props.showTitle"
         class="base-image-box-title">
         {{ title }}
       </div>
@@ -31,8 +32,8 @@
     <transition
       name="slide-fade">
       <base-checkmark
-        v-if="$props.selectable"
-        :selected="selected"
+        v-if="selectable"
+        :checked="selected"
         mark-style="checkbox"
         check-box-size="large"
         class="base-image-box-checkbox" />
@@ -113,7 +114,7 @@ export default {
   computed: {
     // determine if shadow should cover half or third of box
     imageShadowClass() {
-      return this.$props.showTitle ? 'base-image-box-img-third' : 'base-image-box-img-half';
+      return this.showTitle ? 'base-image-box-img-third' : 'base-image-box-img-half';
     },
   },
   watch: {
@@ -127,10 +128,13 @@ export default {
        */
       this.$emit('select-triggered', this.selected);
     },
+    selectable() {
+      this.selected = false;
+    },
   },
   methods: {
     boxSelect() {
-      if (this.$props.selectable) {
+      if (this.selectable) {
         this.selected = !this.selected;
       }
       // TODO: alternate action (e.g. link to item when item is not selectable?) (but maybe
@@ -149,17 +153,16 @@ export default {
     }
 
     &.base-image-box-selected {
-      background: $app-color;
 
       &:after {
         content: '';
         width: 100%;
         height: 100%;
-        position: absolute;
         top: 0;
         right: 0;
         background-color: $app-color;
         opacity: 0.75;
+        padding-bottom: 100%;
       }
     }
 
@@ -243,6 +246,7 @@ export default {
       position: absolute;
       bottom: 16px;
       right: 16px;
+      z-index: 1;
     }
 
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
