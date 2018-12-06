@@ -72,8 +72,21 @@
         v-model="selectedList"
         :chips-editable="true"
         :allow-unknown-entries="true"
-        :list="['Herbert Marcuse', 'Erich From', 'Georg Werth']"
+        :list="[{
+                  id: '1',
+                  name: 'Herbert Marcuse'
+                },
+                {
+                  id: '2',
+                  name: 'Erich From',
+                },
+                {
+                  id: '',
+                  name: 'Georg Werth',
+        }]"
         :role-options="['Farmer', 'Magician', 'Priest']"
+        identifier="id"
+        object-prop="name"
         label="chips-below-test"/>
       <base-upload-bar
         :progress="progress"

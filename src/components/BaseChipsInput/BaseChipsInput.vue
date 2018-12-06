@@ -291,6 +291,7 @@ export default {
       selectedMenuEntryIndex: this.getAllowUnknown(),
       insideDropDown: false,
       insideInput: false,
+      returnAsObject: false,
     };
   },
   computed: {
@@ -299,22 +300,34 @@ export default {
         return this.dropDownList;
       },
       set(val) {
+        // get the values from props.list and assign an internal id (idInt) if not already set
         const list = val.map((entry, index) => {
           if (typeof entry === 'object') {
+            this.returnAsObject = true;
             let id = entry.idInt;
             if (id !== 0 && !id) {
               id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier] : index;
+                ? entry[this.identifier] : entry[this.objectProp] + index;
             }
             return Object.assign({}, entry, {
               idInt: id,
               [this.objectProp]: entry[this.objectProp],
             });
           }
-          return Object.assign({}, { idInt: index, [this.objectProp]: entry });
+          this.returnAsString = true;
+          // TODO: this could still cause issues with duplicate keys!!
+          return Object.assign({}, {
+            idInt: entry + index,
+            [this.objectProp]: entry,
+          });
         });
-        this.dropDownList = list.filter(entry => !this.selectedListInt
-          .map(selected => selected.idInt).includes(entry.idInt));
+        if (this.identifier) {
+          this.dropDownList = list.filter(entry => !this.selectedListInt
+            .map(selected => selected[this.identifier]).includes(entry[this.identifier]));
+        } else {
+          this.dropDownList = list.filter(entry => !this.selectedListInt
+            .map(selected => selected.idInt).includes(entry.idInt));
+        }
       },
     },
     showDropDown: {
@@ -386,8 +399,11 @@ export default {
     },
   },
   mounted() {
+    // initialize the internal selected list with props.selectedList
     this.setSelectedList(this.selectedList);
+    // initialize the drop down list with props.list
     this.dropDownListInt = this.list;
+    // if dropdown entries are static set the copy for subsequent references (e.g. filtering)
     if (!this.allowDynamicDropDownEntries) {
       this.dropDownListOrig = [].concat(this.dropDownListInt);
     }
@@ -396,7 +412,7 @@ export default {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
       this.showDropDown = true;
-      // check if entry was selected
+      // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
       if (selected) {
         if (this.allowMultipleEntries) {
@@ -418,8 +434,12 @@ export default {
         }
         // reset input
         this.input = '';
+        // if there is an input and unknown entries are allowed add an entry to selected list
       } else if (this.input && this.allowUnknownEntries) {
-        this.selectedListInt.push({ [this.objectProp]: this.input });
+        this.selectedListInt.push({
+          [this.objectProp]: this.input,
+          idInt: this.getInternalId(this.input + this.selectedListInt.length),
+        });
         // reset input
         this.input = '';
       }
@@ -436,7 +456,7 @@ export default {
        * @event selected
        * @type {object}
        */
-      this.$emit('selected', this.selectedListInt);
+      this.emitSelectedList();
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
@@ -455,7 +475,7 @@ export default {
       this.selectedListInt.splice(index, 1);
       // if dropdown is already open keep open!
       this.insideInput = this.showDropDown;
-      this.$emit('selected', this.selectedListInt);
+      this.emitSelectedList();
     },
     // allow for navigation with arrow keys
     triggerArrowKey(event) {
@@ -477,7 +497,7 @@ export default {
       if (!this.insideDropDown) {
         if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
           this.selectedListInt.push({ [this.objectProp]: this.input });
-          this.$emit('selected', this.selectedListInt);
+          this.emitSelectedList();
         }
         this.input = '';
       }
@@ -512,19 +532,21 @@ export default {
         }
         return -1;
       });
-      this.$emit('selected', this.selectedListInt);
+      this.emitSelectedList();
     },
     setSelectedList(val) {
       if (val && val.length) {
         this.selectedListInt = val.map((entry, index) => {
           if (typeof entry === 'object') {
+            this.returnAsObject = true;
             return Object.assign({}, entry, {
-              idInt: this.identifier ? entry[this.identifier] : entry.idInt,
+              idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+                ? entry[this.identifier] : entry.idInt,
               [this.objectProp]: entry[this.objectProp],
             });
           }
           return Object.assign({}, {
-            idInt: this.list.length + index,
+            idInt: this.getInternalId(entry + this.list.length + index),
             [this.objectProp]: entry,
           });
         });
@@ -537,6 +559,24 @@ export default {
       if (e.relatedTarget.closest('.base-chips-input')
         !== e.target.parentElement) {
         this.insideDropDown = false;
+      }
+    },
+    getInternalId(val) {
+      let id = val;
+      if (this.selectedListInt.map(e => e.idInt).includes(id)) {
+        id = this.getInternalId(id + 1);
+      }
+      return id;
+    },
+    emitSelectedList() {
+      if (!this.returnAsObject) {
+        this.$emit('selected', this.selectedListInt.map(sel => sel[this.objectProp]));
+      } else {
+        const sendArr = [];
+        this.selectedListInt
+          .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
+        sendArr.forEach(sel => this.$delete(sel, 'idInt'));
+        this.$emit('selected', sendArr);
       }
     },
   },

@@ -31,7 +31,7 @@
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
                   :key="'chip' + entry.idInt"
-                  :is-linked="!entry.edited"
+                  :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
                   class="base-chips-input-chip"
                   @value-changed="$set(entry, 'edited', true)"
                   @remove-entry="removeEntry($event, index)"/>
@@ -218,14 +218,19 @@ export default {
     this.createInternalList(this.selectedList);
   },
   methods: {
-    addedEntry() {
-      this.$emit('list-change', this.selectedBelowListInt);
+    addedEntry(list) {
+      this.emitInternalList(list.map((entry) => {
+        if (typeof entry === 'object') {
+          return Object.assign({}, entry, { roles: entry.roles || [] });
+        }
+        return Object.assign({}, { [this.objectProp]: entry, roles: entry.roles || [] });
+      }));
     },
     removeEntry(evt, index) {
       const item = this.selectedBelowListInt.splice(index, 1);
       this.$set(item, 'roles', {});
       this.$refs.chipsInput.dropDownList = this.$refs.chipsInput.dropDownList.concat(item);
-      this.$emit('list-change', this.selectedBelowListInt);
+      this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
       /**
@@ -244,25 +249,19 @@ export default {
         // or send string
         return chip[this.objectProp];
       })); */
-      this.$emit('list-change', list);
+      this.emitInternalList(list);
     },
     updateRoles(evt, index) {
       this.$set(this.selectedBelowListInt[index], 'roles', evt);
-      this.$emit('list-change', this.selectedBelowListInt);
+      this.emitInternalList(this.selectedBelowListInt);
     },
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
-          // check if entry already has an id
-          let id = entry.idInt;
-          if (!(id === 0 || id)) {
-            // if not - create one
-            id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-              ? entry[this.identifier] : this.entry[this.objectProp] + index;
-          }
           return Object.assign({}, {
             roles: [],
-            idInt: id,
+            idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+              ? entry[this.identifier] : entry[this.objectProp] + index,
           }, entry);
         }
         return Object.assign({}, {
@@ -271,6 +270,12 @@ export default {
           roles: [],
         });
       });
+    },
+    emitInternalList(val) {
+      const sendArr = [];
+      val.forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
+      sendArr.forEach(sel => this.$delete(sel, 'idInt'));
+      this.$emit('list-change', sendArr);
     },
   },
 };
