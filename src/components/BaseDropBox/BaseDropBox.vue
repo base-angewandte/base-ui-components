@@ -126,7 +126,7 @@ export default {
     display: flex;
 
     &:hover {
-      color: inherit !important;
+      color: $app-color !important;
     }
 
     .base-drop-box-inner {
