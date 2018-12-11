@@ -1,46 +1,48 @@
 <template>
-  <base-box
-    :box-size="$props.boxSize"
-    :box-ratio="'100'"
-    :class="['base-image-box', { 'base-image-box-selected': selectable && selected }]"
+  <BaseBox
+    :box-size="boxSize"
+    box-ratio="100"
     @clicked="boxSelect">
     <div
-      v-if="showTitle"
-      class="base-image-box-header">
-      <div
-        class="base-image-box-title">
-        {{ title }}
+      :class="['base-image-box-content-wrapper',
+               { 'base-image-box-selected': selectable && selected }]">
+      <div :class="['base-image-box-content', imageShadowClass]">
+        <div
+          v-if="showTitle"
+          class="base-image-box-header">
+          <div
+            class="base-image-box-title">
+            {{ title }}
+          </div>
+          <div
+            v-if="subtext"
+            class="base-image-box-subtext">{{ subtext }}</div>
+        </div>
+        <div class="base-image-box-img-wrapper">
+          <img
+            :src="imageUrl"
+            class="base-image-box-image">
+        </div>
+        <!-- Slot for BaseHoverBox to display text -->
+        <slot />
       </div>
-      <div
-        v-if="subtext"
-        class="base-image-box-subtext">{{ subtext }}</div>
+      <div class="base-image-box-description">
+        {{ description }}
+      </div>
     </div>
-    <div
-      v-if="imageUrl"
-      :class="['base-image-box-img-wrapper', imageShadowClass]">
-      <!-- TODO: what if no image is available?? (what content should be displayed?) -->
-      <img
-        :alt="title"
-        :src="imageUrl"
-        class="base-image-box-img">
+    <div class="base-image-box-features">
+      <transition
+        name="slide-fade">
+        <BaseCheckmark
+          v-if="selectable"
+          :checked="selected"
+          mark-style="checkbox"
+          check-box-size="large"
+          class="base-image-box-checkbox" />
+      </transition>
     </div>
-    <!-- Slot for BaseHoverBox to display text -->
-    <slot />
-    <div class="base-image-box-description">
-      {{ $props.description }}
-    </div>
-    <transition
-      name="slide-fade">
-      <base-checkmark
-        v-if="selectable"
-        :checked="selected"
-        mark-style="checkbox"
-        check-box-size="large"
-        class="base-image-box-checkbox" />
-    </transition>
-  </base-box>
+  </BaseBox>
 </template>
-
 <script>
 import BaseBox from '../BaseBox/BaseBox';
 import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
@@ -147,10 +149,10 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-image-box {
-    &:after {
-      margin-top: -($line-height * 2 + 2 * $spacing);
-    }
+  .base-image-box-content-wrapper {
+    position: absolute;
+    height: 100%;
+    width: 100%;
 
     &.base-image-box-selected {
 
@@ -158,6 +160,7 @@ export default {
         content: '';
         width: 100%;
         height: 100%;
+        position: absolute;
         top: 0;
         right: 0;
         background-color: $app-color;
@@ -166,42 +169,51 @@ export default {
       }
     }
 
-    .base-image-box-header {
-      overflow-wrap: break-word;
-      overflow: hidden;
-      display: -webkit-box;
-      text-overflow: ellipsis;
-      -webkit-box-orient: vertical;
-      margin: $spacing;
-      -webkit-line-clamp: 2;
-      line-height: $line-height;          /* fallback */
-      flex-shrink: 0;
-      height: $line-height * 2;
+    .base-image-box-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      width: 100%;
 
-      .base-image-box-title, .base-image-box-subtext {
+      .base-image-box-header {
         overflow-wrap: break-word;
         overflow: hidden;
         display: -webkit-box;
         text-overflow: ellipsis;
         -webkit-box-orient: vertical;
+        margin: $spacing;
         -webkit-line-clamp: 2;
-        line-height: $line-height;
+        line-height: $line-height;          /* fallback */
         flex-shrink: 0;
-        max-height: $line-height * 2;
+        height: $line-height * 2;
+
+        .base-image-box-title, .base-image-box-subtext {
+          overflow-wrap: break-word;
+          overflow: hidden;
+          display: -webkit-box;
+          text-overflow: ellipsis;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          line-height: $line-height;
+          flex-shrink: 0;
+          max-height: $line-height * 2;
+        }
+
+        .base-image-box-title {
+          font-weight: bold;
+        }
       }
 
-      .base-image-box-title {
-        font-weight: bold;
-      }
-    }
-    .base-image-box-img-wrapper {
-      width: 100%;
-      height: 100%;
-      position: absolute;
+      .base-image-box-img-wrapper {
+        flex: 1 1 auto;
+        height: 66%;
 
-      .base-image-box-img {
-        min-width: 100%;
-        height: 100%;
+        .base-image-box-image {
+          margin-top: auto;
+          height: 100%;
+        }
       }
 
       &.base-image-box-img-third:after {
@@ -232,30 +244,29 @@ export default {
             hsla(0, 0%, 0%, 0.6) 100%);
       }
     }
+  }
 
-    .base-image-box-description {
-      color: white;
-      font-weight: bold;
-      position: absolute;
-      bottom: 16px;
-      left: 16px;
-      line-height: 16px;
-    }
+  .base-image-box-description {
+    position: absolute;
+    font-weight: bold;
+    color: white;
+    bottom: $spacing;
+    left: $spacing;
+  }
 
-    .base-image-box-checkbox {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      z-index: 1;
-    }
+  .base-image-box-checkbox {
+    position: absolute;
+    z-index: 1;
+    bottom: $spacing;
+    right: $spacing;
+  }
 
-    .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
-      transition: all 0.5s ease;
-    }
-    .slide-fade-enter, .slide-fade-leave-to {
-      opacity: 0;
-      transform: translateX(#{$spacing});
-      margin-left: calc(-2 * #{$spacing});
-    }
+  .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
+    transition: all 0.5s ease;
+  }
+  .slide-fade-enter, .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateX(#{$spacing});
+    margin-left: calc(-2 * #{$spacing});
   }
 </style>
