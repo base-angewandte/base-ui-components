@@ -135,6 +135,10 @@ export default {
       width: 100%;
       border: $upload-border;
 
+      &:hover {
+        border: $upload-border-hover;
+      }
+
       form{
         text-align: center;
         height: 100%;
@@ -145,5 +149,9 @@ export default {
 
   .is-drag-over {
     color: $app-color;
+
+    .base-drop-box-inner {
+      border: $upload-border-hover;
+    }
   }
 </style>

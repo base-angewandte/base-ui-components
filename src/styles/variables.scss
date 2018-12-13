@@ -19,6 +19,17 @@ $header-height: 55px;
 $chips-spacing: 0.05em;
 $chips-list-height: 1em + 2*$spacing;
 
+/* colors */
+$app-color: #FF9800 !default;
+$font-color: rgb(0, 0, 0);
+$font-color-second: rgb(111, 111, 111);
+$font-color-third: rgb(160, 160, 160);
+$button-header-color: rgb(240, 240, 240);
+$background-color: #f0f0f0;
+$box-color: white;
+/* self defined for now! */
+$uploadbar-color: #999999;
+
 /* shadows and borders */
 $border-width: 2px;
 $box-shadow-reg: 0px 0px 3px 0px rgba(0,0,0,0.05);
@@ -34,20 +45,8 @@ $list-border: 5px solid rgba(76, 175, 80, 1);
 $list-border-transparent-50: 5px solid rgba(76, 175, 80, 0.5);
 $list-border-transparent-100: 5px solid rgba(76, 175, 80, 0);
 $upload-border: $border-width dashed rgb(111,111,111);
+$upload-border-hover: $border-width dashed $app-color;
 $input-field-border: 1px solid rgb(200, 200, 200);
-
-
-
-/* colors */
-$app-color: #FF9800 !default;
-$font-color: rgb(0, 0, 0);
-$font-color-second: rgb(111, 111, 111);
-$font-color-third: rgb(160, 160, 160);
-$button-header-color: rgb(240, 240, 240);
-$background-color: #f0f0f0;
-$box-color: white;
-/* self defined for now! */
-$uploadbar-color: #999999;
 
 /* sizing */
 $page-max-width: 1400px;
