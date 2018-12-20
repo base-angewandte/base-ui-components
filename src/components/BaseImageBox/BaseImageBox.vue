@@ -7,6 +7,8 @@
       :class="['base-image-box-content-wrapper',
                { 'base-image-box-selected': selectable && selected }]">
       <div :class="['base-image-box-content', imageShadowClass]">
+        <!-- @SLOT for published icon of files -->
+        <slot name="top" />
         <div
           v-if="showTitle"
           class="base-image-box-header">
@@ -24,7 +26,7 @@
             class="base-image-box-image">
         </div>
         <!-- Slot for BaseHoverBox to display text -->
-        <slot />
+        <slot name="text"/>
       </div>
       <div class="base-image-box-description">
         {{ description }}

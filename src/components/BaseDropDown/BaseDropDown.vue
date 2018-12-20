@@ -5,7 +5,7 @@
     :class="['dropdown-box', 'dropdown-box-' + headerStyle]">
     <div class="base-input-label">
       <label
-        :class="{ 'hide': !label }"
+        :class="{ 'hide': !label || !showLabel }"
         :for="label">
         {{ label }}
       </label>
@@ -102,7 +102,7 @@ export default {
       default: 'inherit',
     },
     /**
-     * styling choices to fit also pop up
+     * styling choices to fit also pop up (=inline) <br>
      * valid options: 'single', 'inline'
      */
     headerStyle: {
@@ -111,6 +111,10 @@ export default {
       validator(val) {
         return ['single', 'inline'].includes(val);
       },
+    },
+    showLabel: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {

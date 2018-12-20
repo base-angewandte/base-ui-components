@@ -199,7 +199,7 @@ export default {
     }
 
     .button-box-content-small {
-      padding: 16px;
+      padding: $spacing;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -207,7 +207,7 @@ export default {
 
       .button-box-icon-small {
         flex-shrink: 0;
-        margin-right: 16px;
+        margin-right: $spacing;
         width: $icon-large;
         max-height: $icon-large;
       }
