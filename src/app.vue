@@ -3,25 +3,12 @@
     <div class="canvas flex">
       <base-image-box
         :selectable="selectable"
-        :show-title="false"
-        :image-url="require('./static/images/icons.png')"
-        :box-size="{ width: '25%' }"
+        :show-title="true"
+        :box-text="['Size: 200kb', 'Creator: S.H.', 'Last Modified: xxxxx', 'xxxxx',
+                    'xxxxx', 'yyyyyyyyyyyyyyy']"
+        :box-size="{ width: '150px' }"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
-        class="image-box"/>
-      <base-image-box
-        :selectable="selectable"
-        :image-url="require('./static/images/icons.png')"
-        :box-size="{ width: '25%' }"
-        title="Afterlife II Ausstellungsansichten"
-        description="Bildserie"
-        class="image-box"/>
-      <base-image-box
-        :selectable="selectable"
-        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
-        :box-size="{ width: '25%' }"
-        title="Afterlife II Ausstellungsansichten"
-        description="Bildserie"
         class="image-box"/>
       <base-button
         :active="false"

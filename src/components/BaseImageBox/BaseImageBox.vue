@@ -1,5 +1,6 @@
 <template>
   <BaseBox
+    ref="baseBox"
     :box-size="boxSize"
     box-ratio="100"
     @clicked="boxSelect">
@@ -11,6 +12,7 @@
         <slot name="top" />
         <div
           v-if="showTitle"
+          ref="headerBox"
           class="base-image-box-header">
           <div
             class="base-image-box-title">
@@ -20,13 +22,31 @@
             v-if="subtext"
             class="base-image-box-subtext">{{ subtext }}</div>
         </div>
-        <div class="base-image-box-img-wrapper">
+        <div
+          v-if="imageUrl"
+          class="base-image-box-img-wrapper">
+          <!-- TODO: image display error handling -->
           <img
             :src="imageUrl"
             class="base-image-box-image">
         </div>
-        <!-- Slot for BaseHoverBox to display text -->
-        <slot name="text"/>
+        <!-- @slot to display more advanced text -->
+        <slot
+          :text="boxText"
+          name="text">
+          <!-- default -->
+          <div
+            v-if="!imageUrl && boxText.length"
+            ref="boxText"
+            :style="boxTextStyle"
+            class="base-image-box-text">
+            <div
+              v-for="(entry, index) in boxText"
+              :key="index">
+              {{ entry }}
+            </div>
+          </div>
+        </slot>
       </div>
       <div class="base-image-box-description">
         {{ description }}
@@ -109,10 +129,21 @@ export default {
         return { width: '200px', height: '200px' };
       },
     },
+    /**
+     * specify any text that should be displayed instead of an image;
+     * each array element on new line
+     */
+    boxText: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
       selected: false,
+      boxTextStyle: {},
     };
   },
   computed: {
@@ -136,13 +167,45 @@ export default {
       this.selected = false;
     },
   },
+  mounted() {
+    if (this.boxText.length) {
+      const elem = this.$refs.boxText;
+      let boxHeight = window.getComputedStyle(elem, null)
+        .getPropertyValue('height').replace('px', '');
+      const lineHeight = window.getComputedStyle(elem, null)
+        .getPropertyValue('line-height').replace('px', '');
+      // if there is a descrption also leave space for that so its not overlapping
+      // TODO: check if this is wanted
+      if (this.description) {
+        boxHeight -= lineHeight;
+      }
+      const lines = Math.floor(boxHeight / lineHeight);
+      this.boxTextStyle = {
+        height: `${lineHeight * lines}px`,
+        '-webkit-line-clamp': lines,
+      };
+    }
+  },
   methods: {
     boxSelect() {
       if (this.selectable) {
         this.selected = !this.selected;
+        /**
+         * event triggered when box is selectable and clicked upon
+         *
+         * @event select-triggered
+         * @type Boolean
+         */
+        this.$emit('select-triggered', this.selected);
+      } else {
+        /**
+         * event triggered when selectable is false and box is clicked
+         *
+         * @event clicked
+         * @type None
+         */
+        this.$emit('clicked');
       }
-      // TODO: alternate action (e.g. link to item when item is not selectable?) (but maybe
-      // should be implemented as router-link?
     },
   },
 };
@@ -175,7 +238,6 @@ export default {
       position: relative;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       height: 100%;
       width: 100%;
 
@@ -244,6 +306,17 @@ export default {
             hsla(0, 0%, 0%, 0.538) 77.5%,
             hsla(0, 0%, 0%, 0.583) 88.1%,
             hsla(0, 0%, 0%, 0.6) 100%);
+      }
+
+      .base-image-box-text {
+        display: flex;
+        margin: 0 $spacing $spacing;
+        overflow-wrap: break-word;
+        overflow: hidden;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        line-height: $line-height;          /* fallback */
       }
     }
   }

@@ -2,19 +2,7 @@
   <div
     :style="[boxSize, boxPosition]"
     class="base-hover-box">
-    <base-image-box v-bind="$props">
-      <div
-        v-if="!imageUrl"
-        ref="boxText"
-        :style="boxTextStyle"
-        class="base-hover-box-text">
-        <div
-          v-for="(entry, index) in boxText"
-          :key="index">
-          {{ entry }}
-        </div>
-      </div>
-    </base-image-box>
+    <base-image-box v-bind="$props" />
   </div>
 </template>
 
@@ -104,6 +92,7 @@ export default {
     const elem = this.$refs.boxText;
     const lineHeight = window.getComputedStyle(elem, null).getPropertyValue('line-height').replace('px', '');
     const spacing = window.getComputedStyle(elem, null).getPropertyValue('margin-bottom').replace('px', '');
+    // TODO: this could lead to an error if user only specifies width not heigth!
     const elementHeight = this.boxSize.height.replace('px', '') - (2 * spacing) - (2 * lineHeight);
     const lines = Math.floor(elementHeight / lineHeight);
     this.boxTextStyle = {
@@ -134,16 +123,5 @@ export default {
     position: absolute;
     z-index: 10;
     margin: $spacing;
-
-    .base-hover-box-text {
-      display: flex;
-      margin: 0 $spacing $spacing;
-      overflow-wrap: break-word;
-      overflow: hidden;
-      display: -webkit-box;
-      text-overflow: ellipsis;
-      -webkit-box-orient: vertical;
-      line-height: $line-height;          /* fallback */
-    }
   }
 </style>
