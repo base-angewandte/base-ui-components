@@ -21,6 +21,7 @@
       <template
         v-if="sortable"
         slot="label-addition">
+        <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
           @click="sort">Sortieren von A-Z</div>
@@ -605,6 +606,10 @@ export default {
 
     .base-chips-input-sort {
       cursor: pointer;
+
+      &:hover {
+        color: $app-color;
+      }
     }
 
     .base-chips-drop-down {

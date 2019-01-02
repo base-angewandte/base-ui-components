@@ -22,6 +22,9 @@
               :name="entry[objectProp]"
               :key="'item' + entry.idInt"
               class="base-chips-below-list-item">
+              <SvgIcon
+                name="sort"
+                class="base-chips-below-list-icon"/>
               <div
                 :key="'chip-wrapper' + entry.idInt"
                 class="base-chips-below-list-item-chip-wrapper">
@@ -69,6 +72,7 @@
  */
 
 import Draggable from 'vuedraggable';
+import SvgIcon from 'vue-svgicon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
@@ -79,6 +83,7 @@ export default {
     BaseChipsInput,
     Draggable,
     BaseChip,
+    SvgIcon,
   },
   model: {
     prop: 'selectedList',
@@ -309,6 +314,17 @@ export default {
       border-bottom: $separation-line;
       display: flex;
       align-items: center;
+
+      .base-chips-below-list-icon {
+        max-height: 100%;
+        width: $icon-large;
+        cursor: grab;
+
+        &:hover {
+          color: $app-color;
+          fill: $app-color;
+        }
+      }
 
       .base-chips-below-list-item-chip-wrapper {
         width: 100%;
