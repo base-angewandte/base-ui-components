@@ -84,20 +84,7 @@ export default {
   },
   data() {
     return {
-      boxTextStyle: {},
       boxPosition: { top: 0, left: 0 },
-    };
-  },
-  mounted() {
-    const elem = this.$refs.boxText;
-    const lineHeight = window.getComputedStyle(elem, null).getPropertyValue('line-height').replace('px', '');
-    const spacing = window.getComputedStyle(elem, null).getPropertyValue('margin-bottom').replace('px', '');
-    // TODO: this could lead to an error if user only specifies width not heigth!
-    const elementHeight = this.boxSize.height.replace('px', '') - (2 * spacing) - (2 * lineHeight);
-    const lines = Math.floor(elementHeight / lineHeight);
-    this.boxTextStyle = {
-      height: `${lineHeight * lines}px`,
-      '-webkit-line-clamp': lines,
     };
   },
   methods: {
