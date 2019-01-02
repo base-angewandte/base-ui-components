@@ -20,7 +20,6 @@
         src="../../static/icons/remove.svg">
     </div>
     <base-hover-box
-      v-if="hoverBoxEnabled"
       ref="hoverBox"
       v-bind="hoverBoxContent"
       :class="{ 'hidden': !showInfoBox }"/>
@@ -132,11 +131,10 @@ export default {
         this.$emit('value-changed', this.entryInt);
       }
     },
-    // TODO: does this need some kind of event because content for hover box
-    // actually needs to be fetched first???
     clickAction(e) {
-      if (this.hoverBoxEnabled) {
-        this.$refs.hoverBox.setPosition(e.layerX, e.layerY);
+      if (this.isLinked) {
+        this.$emit('hoverbox-active', true);
+        this.$refs.hoverBox.setPosition(e);
         this.showInfoBox = !this.showInfoBox;
       }
       if (this.chipEditable) {
@@ -145,11 +143,12 @@ export default {
     },
     moveBox(e) {
       if (this.hoverBoxEnabled && this.showInfoBox) {
-        this.$refs.hoverBox.setPosition(e.layerX, e.layerY);
+        this.$refs.hoverBox.setPosition(e);
       }
     },
     hideBox() {
       if (this.hoverBoxEnabled) {
+        this.$emit('hoverbox-active', false);
         this.showInfoBox = false;
       }
     },

@@ -25,11 +25,11 @@ export default {
   methods: {
     show(e) {
       this.showBox = true;
-      this.$refs.hoverBox.setPosition(e.layerX, e.layerY);
+      this.$refs.hoverBox.setPosition(e);
 
     },
     move(e) {
-      this.$refs.hoverBox.setPosition(e.layerX, e.layerY);
+      this.$refs.hoverBox.setPosition(e);
     },
   },
 };

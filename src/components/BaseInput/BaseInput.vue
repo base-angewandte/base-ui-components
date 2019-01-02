@@ -197,7 +197,6 @@ export default {
   .base-input {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     width: 100%;
 
     .base-input-field-container {

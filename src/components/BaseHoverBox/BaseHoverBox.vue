@@ -90,12 +90,25 @@ export default {
   methods: {
     /**
      * to set the position of the pox from outside
-     * @param x
-     * @param y
+     * @param {MouseEvent} e
      *
      * @public
+     *
+     * @returns void
      */
-    setPosition(x, y) {
+    setPosition(e) {
+      let x = e.layerX;
+      let y = e.layerY;
+      const width = parseInt(this.boxSize.width.replace('px', ''), 10);
+      const elem = this.$el;
+      const boxMargin = window.getComputedStyle(elem, null)
+        .getPropertyValue('margin').replace('px', '');
+      if (e.clientX + 3 * boxMargin + width > window.innerWidth) {
+        x = e.layerX - width - 2 * boxMargin;
+      }
+      if (e.clientY + 2 * boxMargin + width > window.innerHeight) {
+        y = e.layerY - width - boxMargin;
+      }
       this.boxPosition = { top: `${y}px`, left: `${x}px` };
     },
   },

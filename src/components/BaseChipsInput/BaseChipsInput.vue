@@ -37,8 +37,10 @@
             :key="entry.idInt"
             v-model="entry[objectProp]"
             :chip-editable="chipsEditable"
+            :hover-box-content="hoverboxContent"
             :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
             @remove-entry="removeEntry(entry, index)"
+            @hoverbox-active="$emit('hoverbox-active', $event, entry)"
             @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
         </draggable>
       </template>
@@ -276,6 +278,16 @@ export default {
     alwaysLinked: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * set content for the info box activatable by click <br>
+     * see BaseHoverBox for more details
+     */
+    hoverboxContent: {
+      type: Object,
+      default() {
+        return {};
+      },
     },
   },
   data() {

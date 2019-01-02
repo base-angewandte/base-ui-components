@@ -36,6 +36,7 @@
         :chips-inline="true"
         :chips-editable="true"
         :identifier="'id'"
+        :hoverbox-content="{ title: 'test' }"
         draggable
         label="A label"
         @fetch-dropdown-entries="fetch">
@@ -72,9 +73,11 @@
                   name: 'Georg Werth',
         }]"
         :role-options="['Farmer', 'Magician', 'Priest']"
+        :hoverbox-content="hoverboxContent"
         identifier="id"
         object-prop="name"
-        label="chips-below-test"/>
+        label="chips-below-test"
+        @hoverbox-active="setHoverBox"/>
       <base-upload-bar
         :progress="progress"
         :filename="'testfile.jpg'"/>
@@ -462,6 +465,7 @@ export default {
           selected: false,
         },
       ],
+      hoverboxContent: {},
     };
   },
   computed: {
@@ -492,6 +496,14 @@ export default {
     },
   },
   methods: {
+    setHoverBox(val, entry) {
+      if (val) {
+        console.log(entry);
+        this.hoverboxContent = { title: 'test' };
+      } else {
+        this.hoverboxContent = {};
+      }
+    },
     changeProgress() {
       if (this.progress <= 75) {
         this.progress += 25;

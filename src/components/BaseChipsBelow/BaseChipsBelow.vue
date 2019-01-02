@@ -32,9 +32,10 @@
                   :chip-editable="chipsEditable"
                   :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
-                  :hover-box-content="{}"
+                  :hover-box-content="hoverboxContent"
                   class="base-chips-input-chip"
                   @value-changed="$set(entry, 'edited', true)"
+                  @hoverbox-active="$emit('hoverbox-active', $event, entry)"
                   @remove-entry="removeEntry($event, index)"/>
               </div>
               <base-chips-input
@@ -201,6 +202,16 @@ export default {
       type: Array,
       default() {
         return [];
+      },
+    },
+    /**
+     * set content for the info box activatable by click <br>
+     * see BaseHoverBox for more details
+     */
+    hoverboxContent: {
+      type: Object,
+      default() {
+        return {};
       },
     },
   },
