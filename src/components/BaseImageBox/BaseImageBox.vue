@@ -168,7 +168,7 @@ export default {
     },
   },
   mounted() {
-    if (this.boxText.length) {
+    if (!this.imageUrl && this.boxText.length) {
       const elem = this.$refs.boxText;
       let boxHeight = window.getComputedStyle(elem, null)
         .getPropertyValue('height').replace('px', '');
