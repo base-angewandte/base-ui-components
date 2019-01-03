@@ -22,9 +22,12 @@
               :name="entry[objectProp]"
               :key="'item' + entry.idInt"
               class="base-chips-below-list-item">
-              <SvgIcon
-                name="sort"
-                class="base-chips-below-list-icon"/>
+              <div class="base-chips-below-list-icon-wrapper">
+                <SvgIcon
+                  name="drag-lines"
+                  class="svg-icon base-chips-below-list-icon"/>
+              </div>
+
               <div
                 :key="'chip-wrapper' + entry.idInt"
                 class="base-chips-below-list-item-chip-wrapper">
@@ -311,25 +314,29 @@ export default {
 
     .base-chips-below-list-item {
       padding: $spacing-small/2 0;
+      margin-bottom: -2px;
       border-bottom: $separation-line;
       display: flex;
       align-items: center;
 
-      .base-chips-below-list-icon {
-        max-height: 100%;
-        width: $icon-large;
+      .base-chips-below-list-icon-wrapper {
+        width: $icon-medium;
+        height: $icon-medium;
+        display: flex;
+        flex: 0 0 auto;
         cursor: grab;
 
-        &:hover {
-          color: $app-color;
-          fill: $app-color;
+        .base-chips-below-list-icon {
+          max-height: 100%;
+          width: $icon-medium;
+          color: $input-field-color;
+          margin: auto;
         }
       }
 
       .base-chips-below-list-item-chip-wrapper {
         width: 100%;
         margin-left: $spacing-small;
-        align-self: flex-start;
       }
     }
 

@@ -1,4 +1,3 @@
-
 /* eslint-disable */
 /* tslint:disable */
 // @ts-ignore
@@ -8,6 +7,6 @@ icon.register({
     width: 16,
     height: 16,
     viewBox: '0 0 70.87 70.87',
-    data: '<defs/><path pid="0" class="cls-1" transform="rotate(90 35.72 35.43)" d="M.29 31h70.87v8.87H.29z"/><path pid="1" class="cls-1" transform="rotate(180 35.435 34.995)" d="M0 30.56h70.87v8.87H0z"/>'
+    data: '<path pid="0" _fill="#1d1d1b" d="M40.15 0v70.87h-8.87V0z"/><path pid="1" _fill="#1d1d1b" d="M70.87 39.43H0v-8.87h70.87z"/>'
   }
 })
