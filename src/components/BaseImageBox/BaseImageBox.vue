@@ -275,8 +275,9 @@ export default {
         height: 66%;
 
         .base-image-box-image {
-          margin-top: auto;
           height: 100%;
+          display: block;
+          margin: auto;
         }
       }
 
