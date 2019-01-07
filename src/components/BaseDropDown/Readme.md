@@ -11,7 +11,6 @@ Drop Down Single Style without label
         label="Select a Color"
         placeholder="Select A Color"
         />
-      <div>{{ datepicked }}</div>
   </div>
 
 </template>
@@ -49,7 +48,6 @@ Drop Down Inline and Single Style comparison with custom background color
         background-color="rgb(240, 240, 240)"
         label="Select a Color"
         />
-      <div>{{ datepicked }}</div>
   </div>
 
 </template>
