@@ -54,6 +54,11 @@
 </template>
 
 <script>
+/**
+ * A Drop Down Component
+ *
+ */
+
 import SvgIcon from 'vue-svgicon';
 import ClickOutside from 'vue-click-outside';
 
@@ -70,10 +75,16 @@ export default {
     event: 'selected',
   },
   props: {
+    /**
+     * the string selected from the drop down menu
+     */
     selected: {
       type: String,
       default: '',
     },
+    /**
+     * A label for the drop down
+     */
     label: {
       type: String,
       default: '',
@@ -86,10 +97,16 @@ export default {
       type: String,
       default: 'Select',
     },
+    /**
+     * The list displayed in the drop down
+     */
     selectionList: {
       type: Array,
       default: () => [],
     },
+    /**
+   * the dropdown can have a fixed width or adjust to the longest option
+   */
     fixedWidth: {
       type: Boolean,
       default: false,
@@ -112,6 +129,9 @@ export default {
         return ['single', 'inline'].includes(val);
       },
     },
+    /**
+     * define if the label should be shown
+     */
     showLabel: {
       type: Boolean,
       default: true,
@@ -152,7 +172,11 @@ export default {
       } else {
         this.bodyWidth = entriesWidth > headerWidth ? entriesWidth : headerWidth;
       }
-      this.bodyWidth = this.bodyWidth === 0 ? 'auto' : `${this.bodyWidth}px`;
+      this.bodyWidth = this.bodyWidth === 0 ? 'auto' : this.bodyWidth;
+      if (this.headerStyle === 'inline') {
+        this.bodyWidth += 32;
+      }
+      this.bodyWidth = `${this.bodyWidth}px`;
     } else {
       this.bodyWidth = '100%';
     }
@@ -160,6 +184,12 @@ export default {
   methods: {
     // handle entry selection
     selectItem(item) {
+      /**
+       * Event emitted when an option is selected
+       *
+       * @event selected
+       * @type String
+       */
       this.$emit('selected', item);
       this.selectedInt = item;
       this.showMenu = false;

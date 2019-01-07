@@ -10,7 +10,6 @@ Form Input Field with Dynamic Autocomplete
         :object-prop="'title'"
         v-model="autocompleteInput"
         label="Favourite Subject"
-        @selected="fetchOther($event, 'this is my type')"
         @autocomplete="fetch"/>
 </div>
 </template>
@@ -39,13 +38,16 @@ export default {
         'Physics',
         'Chemistry',
         'Psychology',
-      ]
+      ],
     }
   },
   methods: {
     fetch(event) {
+
       if (event) {
         this.dropDownInput = this.list.filter(entry => entry.toLowerCase().includes(event.toLowerCase()));
+      } else {
+        this.dropDownInput = [].concat(this.list);
       }
     }
   }

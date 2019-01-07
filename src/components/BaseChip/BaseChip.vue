@@ -22,7 +22,7 @@
     <base-hover-box
       ref="hoverBox"
       v-bind="hoverBoxContent"
-      :class="{ 'hidden': !showInfoBox }"/>
+      :class="{ 'hidden': !hoverBoxEnabled || !showInfoBox }"/>
   </div>
 </template>
 
@@ -78,7 +78,7 @@ export default {
     },
     /**
      * if a hover box is associated with the chip add all relevant properties here
-     * (see BaseHoverBox for details)
+     * (@see [BaseHoverBox](#basehoverbox) for details)
      */
     hoverBoxContent: {
       type: Object,

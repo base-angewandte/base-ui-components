@@ -51,8 +51,7 @@ export default {
       },
     },
     /**
-     * image url // TODO: should probably be required? otherwise we need definition of
-     * what alternate content should be? (--> are there items without image? probably yes?)
+     * image url
      */
     imageUrl: {
       type: String,
@@ -89,7 +88,7 @@ export default {
   },
   methods: {
     /**
-     * to set the position of the pox from outside
+     * to set the position of the box from outside
      * @param {MouseEvent} e
      *
      * @public

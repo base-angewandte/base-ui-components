@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
     "prepublishOnly": "npm run build",
-    "dev": "npm-run-all --parallel dev:lib dev:docs styleguide",
+    "dev": "npm-run-all --parallel dev:lib dev:docs",
     "dev:docs": "node build/dev-server.js",
     "dev:lib": "webpack --config build/webpack.lib.conf.js --watch --progress --hide-modules & node server.js",
     "build": "npm run build:lib && npm run build:docs",

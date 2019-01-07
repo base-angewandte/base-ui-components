@@ -4,6 +4,7 @@
       ref="chipsInput"
       v-bind="$props"
       v-model="selectedBelowListInt"
+      :chips-inline="false"
       :sortable="true"
       @selected="addedEntry"
       @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
@@ -51,7 +52,10 @@
                 v-model="entry.roles"
                 :list="roleOptions"
                 :show-input-border="false"
-                placeholder="Select Role"
+                :allow-dynamic-drop-down-entries="false"
+                :placeholder="rolesPlaceholder"
+                :always-linked="true"
+                object-prop="role"
                 @selected="updateRoles($event, index)"/>
             </div>
           </transition-group>
@@ -63,14 +67,8 @@
 
 <script>
 /**
-* Chips Component with Chips displayed below form input field
-*/
-
-/**
- * if drop down entries dynamically set - fetch new entries on input
- *
- * @event fetch-dropdown-entries
- * @type {object}
+ * A very specialized component based on [BaseChipsInput](#basechipsinput)
+ * in order to assign roles to selected entries)]
  *
  */
 
@@ -174,13 +172,6 @@ export default {
       default: false,
     },
     /**
-     * define if chips should be displayed in the input field (inline) or below
-     */
-    chipsInline: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * define if chips should be editable
      */
     chipsEditable: {
@@ -211,6 +202,13 @@ export default {
       default() {
         return [];
       },
+    },
+    /**
+     * specify a placeholder of the roles input field
+     */
+    rolesPlaceholder: {
+      type: String,
+      default: 'Select role(s)',
     },
     /**
      * set content for the info box activatable by click <br>
@@ -260,19 +258,11 @@ export default {
        * @type {object}
        *
        */
-      // TODO: check if this is working for objects!
-      /* this.$emit('list-change', list.map((chip) => {
-        if (typeof this.selectedList[0] === 'object') {
-          // restore original object properties
-          return Object.keys(this.list).map(key => chip[key]);
-        }
-        // or send string
-        return chip[this.objectProp];
-      })); */
       this.emitInternalList(list);
     },
     updateRoles(evt, index) {
-      this.$set(this.selectedBelowListInt[index], 'roles', evt);
+      // TODO: should role be saved as string or with id etc. ?? (now: just string!)
+      this.$set(this.selectedBelowListInt[index], 'roles', evt.map(sel => sel.role));
       this.emitInternalList(this.selectedBelowListInt);
     },
     createInternalList(val) {
@@ -299,6 +289,14 @@ export default {
     },
   },
 };
+
+/**
+ * if drop down entries dynamically set - fetch new entries on input
+ *
+ * @event fetch-dropdown-entries
+ * @type {object}
+ *
+ */
 </script>
 
 <style lang="scss">

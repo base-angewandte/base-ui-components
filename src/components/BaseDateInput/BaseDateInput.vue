@@ -19,6 +19,7 @@
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
+          :placeholder="placeholder"
           :minimum-view="format"
           v-model="inputInt.from"
           calendar-class="calendar-class"
@@ -61,6 +62,7 @@
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
           :minimum-view="format"
+          :placeholder="placeholder"
           v-model="inputInt.to"
           calendar-class="calendar-class"
           class="base-input-datepicker"
@@ -85,7 +87,11 @@
 
 <script>
 /**
- * Form Input Field Component
+ * Form Input Field Component for Date, Date - Date or Date - Time
+ *
+ * Date/Time is always saved as { from:, to: }
+ *
+ * Time field is currently just a text input field
  */
 import ClickOutside from 'vue-click-outside';
 import Datepicker from 'vuejs-datepicker';
@@ -147,13 +153,6 @@ export default {
     placeholder: {
       type: String,
       default: 'Enter Text Here',
-    },
-    /**
-     * option to hide input field from outside (required for chips input)
-     */
-    hideInputField: {
-      type: Boolean,
-      default: false,
     },
     /**
      * specify date format

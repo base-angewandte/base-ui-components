@@ -183,7 +183,7 @@ export default {
       if (entry) {
         this.inputTextInt = entry[this.$props.objectProp];
         /**
-         * event triggered when entry is selected from autocomplete
+         * event triggered when entry is selected from drop down menu
          *
          * @event selected
          * @type object | string

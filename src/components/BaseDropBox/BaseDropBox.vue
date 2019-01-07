@@ -17,12 +17,6 @@
  * An Element for dropping files or other UI Elements into
   */
 
-/**
- * Triggered when the box is clicked
- *
- * @event clicked
- * @type None
- */
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 
 export default {
@@ -116,6 +110,13 @@ export default {
     },
   },
 };
+
+/**
+ * Triggered when the box is clicked
+ *
+ * @event clicked
+ * @type None
+ */
 </script>
 
 <style lang="scss" scoped>

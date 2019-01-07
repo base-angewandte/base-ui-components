@@ -282,7 +282,7 @@ export default {
     },
     /**
      * set content for the info box activatable by click <br>
-     * see BaseHoverBox for more details
+     * see [BaseHoverBox](#basehoverbox) for more details
      */
     hoverboxContent: {
       type: Object,
@@ -314,26 +314,29 @@ export default {
       },
       set(val) {
         // get the values from props.list and assign an internal id (idInt) if not already set
-        const list = val.map((entry, index) => {
-          if (typeof entry === 'object') {
-            this.returnAsObject = true;
-            let id = entry.idInt;
-            if (id !== 0 && !id) {
-              id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier] : entry[this.objectProp] + index;
+        let list = val;
+        if (this.dropDownList.length) {
+          list = val.map((entry, index) => {
+            if (typeof entry === 'object') {
+              this.returnAsObject = true;
+              let id = entry.idInt;
+              if (id !== 0 && !id) {
+                id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+                  ? entry[this.identifier] : entry[this.objectProp] + index;
+              }
+              return Object.assign({}, entry, {
+                idInt: id,
+                [this.objectProp]: entry[this.objectProp],
+              });
             }
-            return Object.assign({}, entry, {
-              idInt: id,
-              [this.objectProp]: entry[this.objectProp],
+            // TODO: this could still cause issues with duplicate keys!!
+            return Object.assign({}, {
+              idInt: entry + index,
+              [this.objectProp]: entry,
             });
-          }
-          this.returnAsString = true;
-          // TODO: this could still cause issues with duplicate keys!!
-          return Object.assign({}, {
-            idInt: entry + index,
-            [this.objectProp]: entry,
           });
-        });
+        }
+        // filter already selected entries from the drop down
         if (this.identifier) {
           this.dropDownList = list.filter(entry => !this.selectedListInt
             .map(selected => selected[this.identifier]).includes(entry[this.identifier]));
@@ -390,7 +393,9 @@ export default {
     showDropDown(val) {
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
-        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        if (!this.chipsEditable) {
+          this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        }
         /**
          * event triggered on show drop down
          *
@@ -458,7 +463,11 @@ export default {
       }
       if (!this.allowDynamicDropDownEntries) {
         // filter the selected entry from the list of drop down menu entries
-        this.dropDownListInt = this.dropDownListOrig;
+        this.dropDownListInt = selected[this.objectProp] && !this.returnAsObject
+          ? this.dropDownListOrig
+            .filter(entry => entry[this.objectProp].toLowerCase()
+              !== selected[this.objectProp].toLowerCase())
+          : this.dropDownListOrig;
       } else {
         this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
           .map(sel => sel.idInt).includes(entry.idInt));
