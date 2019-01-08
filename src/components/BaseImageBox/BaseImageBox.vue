@@ -27,7 +27,9 @@
           class="base-image-box-img-wrapper">
           <!-- TODO: image display error handling -->
           <img
+            ref="image"
             :src="imageUrl"
+            :style="imageStyle"
             class="base-image-box-image">
         </div>
         <!-- @slot to display more advanced text -->
@@ -144,6 +146,7 @@ export default {
     return {
       selected: false,
       boxTextStyle: {},
+      imageStyle: {},
     };
   },
   computed: {
@@ -168,6 +171,14 @@ export default {
     },
   },
   mounted() {
+    if (this.$refs.image) {
+      const imageEl = this.$refs.image;
+      if (imageEl.naturalHeight > imageEl.naturalWidth) {
+        this.imageStyle = { width: '100%', 'min-height': '100%' };
+      } else {
+        this.imageStyle = { height: '100%', 'min-width': '100%' };
+      }
+    }
     if (!this.imageUrl && this.boxText.length) {
       const elem = this.$refs.boxText;
       let boxHeight = window.getComputedStyle(elem, null)
@@ -275,7 +286,6 @@ export default {
         height: 66%;
 
         .base-image-box-image {
-          height: 100%;
           display: block;
           margin: auto;
         }
