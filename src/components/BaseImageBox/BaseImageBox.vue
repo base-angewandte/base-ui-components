@@ -173,11 +173,13 @@ export default {
   mounted() {
     if (this.$refs.image) {
       const imageEl = this.$refs.image;
-      if (imageEl.naturalHeight > imageEl.naturalWidth) {
-        this.imageStyle = { width: '100%', 'min-height': '100%' };
-      } else {
-        this.imageStyle = { height: '100%', 'min-width': '100%' };
-      }
+      imageEl.addEventListener('load', () => {
+        if (imageEl.naturalHeight > imageEl.naturalWidth) {
+          this.imageStyle = { width: '100%', 'min-height': '100%' };
+        } else {
+          this.imageStyle = { height: '100%', 'min-width': '100%' };
+        }
+      });
     }
     if (!this.imageUrl && this.boxText.length) {
       const elem = this.$refs.boxText;
