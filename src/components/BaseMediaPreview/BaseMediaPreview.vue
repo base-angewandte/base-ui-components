@@ -12,10 +12,11 @@
     </div>
     <!-- TODO_ add transition -->
     <transition name="grow">
-      <div class="base-media-preview-image">
+      <div class="base-media-preview-image-stage">
         <img
           v-vue-click-outside="() => $emit('hide-preview')"
-          :src="imageUrl">
+          :src="imageUrl"
+          class="base-media-preview-image">
       </div>
     </transition>
   </div>
@@ -78,6 +79,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import "../../styles/variables";
+
   .base-media-preview-background{
     z-index: 10000000;
     position: fixed;
@@ -90,21 +93,27 @@ export default {
 
     .base-media-preview-close {
       position: fixed;
-      top: 16px;
-      right: 16px;
-      height: 16px;
-      width: 16px;
+      top: $spacing;
+      right: $spacing;
+      height: $icon-large;
+      width: $icon-large;
       z-index: 10000001;
       cursor: pointer;
     }
 
-    .base-media-preview-image {
+    .base-media-preview-image-stage {
       margin: auto;
       height: 100vh;
       width: 100vw;
       display: flex;
       justify-content: center;
       align-items: center;
+
+      .base-media-preview-image {
+        max-height: 100%;
+        max-width: 100%;
+        padding: $spacing;
+      }
     }
   }
 </style>
