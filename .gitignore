@@ -13,3 +13,4 @@ yarn-error.log*
 
 dist/
 styleguide/
+index.html

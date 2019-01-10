@@ -15,6 +15,7 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
+import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import './styles/lib.scss';
 
 export {
@@ -35,4 +36,5 @@ export {
   BaseUploadBar,
   BaseImageBox,
   BaseHoverBox,
+  BaseMediaPreview,
 };
