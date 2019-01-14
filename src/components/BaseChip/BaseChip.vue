@@ -7,6 +7,7 @@
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
       @click="clickAction"
+      @mousedown="$emit('mouse-down')"
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
@@ -132,6 +133,14 @@ export default {
       }
     },
     clickAction(e) {
+      /**
+       * event emitted when chip is clicked
+       *
+       * @event clicked
+       * @type none
+       *
+       */
+      this.$emit('clicked');
       if (this.isLinked) {
         this.$emit('hoverbox-active', true);
         this.$refs.hoverBox.setPosition(e);

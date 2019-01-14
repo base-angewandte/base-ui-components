@@ -30,16 +30,20 @@
         v-if="!allowMultipleEntries || chipsInline"
         slot="input-field-addition">
         <draggable
-          :options="{ disabled: !draggable }"
-          v-model="selectedListInt">
+          :options="{ disabled: !draggable, setData: setDragElement }"
+          v-model="selectedListInt"
+          @end="onDragEnd">
           <!-- TODO: is-linked should be associated solely with external identifier!! -->
           <base-chip
             v-for="(entry, index) in selectedListInt"
+            ref="baseChip"
+            :id="'base-chip' + index"
             :key="entry.idInt"
             v-model="entry[objectProp]"
             :chip-editable="chipsEditable"
             :hover-box-content="hoverboxContent"
             :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+            @mouse-down="chipActive = index"
             @remove-entry="removeEntry(entry, index)"
             @hoverbox-active="$emit('hoverbox-active', $event, entry)"
             @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
@@ -305,6 +309,7 @@ export default {
       insideDropDown: false,
       insideInput: false,
       returnAsObject: false,
+      chipActive: -1,
     };
   },
   computed: {
@@ -599,6 +604,24 @@ export default {
           .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
         sendArr.forEach(sel => this.$delete(sel, 'idInt'));
         this.$emit('selected', sendArr);
+      }
+    },
+    // need to set custom due to some strange effects not showing correct element in some cases
+    setDragElement(dataTransfer, dragEl) {
+      const img = dragEl.cloneNode(true);
+      img.id = 'chip-inline-drag';
+      img.style.position = 'absolute';
+      img.style.top = '-99999px';
+      img.style.left = '-99999px';
+
+      // add the element to the dom
+      document.body.appendChild(img);
+      dataTransfer.setDragImage(img, 0, 0);
+    },
+    onDragEnd() {
+      const elem = document.getElementById('chip-inline-drag');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
       }
     },
   },

@@ -208,8 +208,8 @@ export default {
           pic.style.width = size;
           pic.style.backgroundColor = 'white';
           pic.style.position = 'absolute';
-          pic.style.top = -99999;
-          pic.style.left = -99999;
+          pic.style.top = '-99999px';
+          pic.style.left = '-99999px';
 
           // add the element to the dom
           document.body.appendChild(pic);

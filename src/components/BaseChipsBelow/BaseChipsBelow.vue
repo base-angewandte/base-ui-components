@@ -13,18 +13,25 @@
         slot-scope="props">
         <draggable
           v-model="props.list"
-          :options="{ group: 'people' }"
+          :options="{
+            group: 'people',
+            handle: '.base-chips-below-list-icon-wrapper'
+          }"
           @end="updateList($event, props.list)">
-          <transition-group
-            name="base-chips-below-list"
-            class="base-chips-below-list">
+          <div
+            v-for="(entry,index) in props.list"
+            :name="entry[objectProp]"
+            :key="'item' + entry.idInt"
+            class="base-chips-below-list-item"
+            @mousedown="chipActive = index">
             <div
-              v-for="(entry,index) in props.list"
-              :name="entry[objectProp]"
-              :key="'item' + entry.idInt"
-              class="base-chips-below-list-item">
-              <div class="base-chips-below-list-icon-wrapper">
+              :key="'line' + entry.idInt"
+              class="base-chips-below-list-item-line">
+              <div
+                :key="'iconwrapper' + entry.idInt"
+                class="base-chips-below-list-icon-wrapper">
                 <SvgIcon
+                  :key="'icon' + entry.idInt"
                   name="drag-lines"
                   class="svg-icon base-chips-below-list-icon"/>
               </div>
@@ -35,6 +42,7 @@
                 <!-- TODO: @valueChanged: this change needs to be propagated to parent! -->
                 <base-chip
                   ref="selectedChip"
+                  :id="'chips-below' + index"
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
                   :key="'chip' + entry.idInt"
@@ -58,7 +66,7 @@
                 object-prop="role"
                 @selected="updateRoles($event, index)"/>
             </div>
-          </transition-group>
+          </div>
         </draggable>
       </template>
     </base-chips-input>
@@ -225,6 +233,7 @@ export default {
     return {
       chipsArray: [],
       selectedBelowListInt: [],
+      chipActive: -1,
     };
   },
   watch: {
@@ -251,6 +260,11 @@ export default {
       this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
+      // destroy drag element again
+      const elem = document.getElementById('chip-below-drag');
+      if (elem) {
+        // elem.parentNode.removeChild(elem);
+      }
       /**
        * propagate list change from dragging event to parent
        *
@@ -303,44 +317,42 @@ export default {
   @import "../../styles/variables";
 
   .base-chips-below {
-    .base-chips-below-list {
-      display: flex;
-      flex-direction: column;
-      margin-top: $spacing-small;
-
-    }
-
     .base-chips-below-list-item {
       padding: $spacing-small/2 0;
       margin-bottom: -2px;
       border-bottom: $separation-line;
-      display: flex;
-      align-items: center;
 
-      .base-chips-below-list-icon-wrapper {
-        width: $icon-medium;
-        height: $icon-medium;
+
+      .base-chips-below-list-item-line {
         display: flex;
-        flex: 0 0 auto;
-        cursor: grab;
+        align-items: center;
 
-        .base-chips-below-list-icon {
-          max-height: 100%;
+        .base-chips-below-list-icon-wrapper {
           width: $icon-medium;
-          color: $input-field-color;
-          margin: auto;
-        }
-      }
+          height: $icon-medium;
+          display: flex;
+          flex: 0 0 auto;
+          cursor: grab;
 
-      .base-chips-below-list-item-chip-wrapper {
-        width: 100%;
-        margin-left: $spacing-small;
+          .base-chips-below-list-icon {
+            max-height: 100%;
+            width: $icon-medium;
+            color: $input-field-color;
+            margin: auto;
+          }
+        }
+
+        .base-chips-below-list-item-chip-wrapper {
+          width: 100%;
+          margin-left: $spacing-small;
+        }
       }
     }
 
-    /* TODO: not working anymore! (because of using child components?) */
-    .base-chips-below-list-enter, .base-chips-below-list-leave-active {
-      opacity: 0;
+    .base-chips-below-list-item-chosen {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
     }
   }
 </style>
