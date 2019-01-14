@@ -255,9 +255,8 @@ export default {
       width: 100%;
 
       .base-image-box-header {
-        overflow-wrap: break-word;
         overflow: hidden;
-        display: -webkit-box;
+        display: block;
         text-overflow: ellipsis;
         -webkit-box-orient: vertical;
         margin: $spacing;
@@ -267,15 +266,14 @@ export default {
         height: $line-height * 2;
 
         .base-image-box-title, .base-image-box-subtext {
-          overflow-wrap: break-word;
           overflow: hidden;
-          display: -webkit-box;
+          display: block;
           text-overflow: ellipsis;
           -webkit-box-orient: vertical;
-          -webkit-line-clamp: 2;
+          -webkit-line-clamp: 1;
           line-height: $line-height;
           flex-shrink: 0;
-          max-height: $line-height * 2;
+          max-height: $line-height * 1;
         }
 
         .base-image-box-title {
