@@ -14,10 +14,12 @@
     <div
       v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
+      ref="dropdownContainer"
       class="base-autocomplete-drop-down"
       @mouseleave="selectedMenuEntryIndex = -1">
       <div
         v-for="(entry, index) in listInt"
+        ref="option"
         :key="index"
         :class="{
           'base-autocomplete-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex
@@ -226,6 +228,9 @@ export default {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex > 0
           ? this.selectedMenuEntryIndex - 1 : -1;
       }
+      if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
+        this.$refs.option[this.selectedMenuEntryIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
     },
   },
 };
@@ -242,9 +247,12 @@ export default {
     .base-autocomplete-drop-down {
       position: absolute;
       background: white;
+      max-height: 10 * $row-height-small;
+      overflow-y: auto;
       width: 100%;
       z-index: 2;
       box-shadow: $drop-shadow;
+      cursor: pointer;
 
       .base-autocomplete-drop-down-entry-wrapper {
         padding: 0 16px;

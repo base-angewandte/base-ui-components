@@ -33,7 +33,6 @@
           :options="{ disabled: !draggable, setData: setDragElement }"
           v-model="selectedListInt"
           @end="onDragEnd">
-          <!-- TODO: is-linked should be associated solely with external identifier!! -->
           <base-chip
             v-for="(entry, index) in selectedListInt"
             ref="baseChip"
@@ -57,7 +56,6 @@
       v-if="showDropDown"
       ref="dropdownContainer"
       class="base-chips-drop-down"
-      @keydown.up.down.prevent="triggerArrowKey"
       @mouseenter="insideDropDown = true"
       @mouseleave="checkLeave">
       <div
