@@ -68,6 +68,10 @@
   </BaseBox>
 </template>
 <script>
+/**
+ * A component with the primary purpose to display
+ * images in responsive boxes but also allowing for text only
+  */
 import BaseBox from '../BaseBox/BaseBox';
 import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
@@ -203,13 +207,6 @@ export default {
     boxSelect() {
       if (this.selectable) {
         this.selected = !this.selected;
-        /**
-         * event triggered when box is selectable and clicked upon
-         *
-         * @event select-triggered
-         * @type Boolean
-         */
-        this.$emit('select-triggered', this.selected);
       } else {
         /**
          * event triggered when selectable is false and box is clicked

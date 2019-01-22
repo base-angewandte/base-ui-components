@@ -8,6 +8,9 @@
         @click.prevent="$emit('clicked-outside')">
         {{ label }}
       </label>
+      <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
+        (e.g. language tabs))
+      -->
       <slot name="label-addition" />
     </div>
     <div
@@ -42,55 +45,6 @@
 <script>
 /**
  * Form Input Field Component
- */
-
-/**
- * Event emitted on input focus
- *
- * @event input-focus
- * @type None
- *
- */
-
-/**
- * Event emitted on arrow key up or down (in base project needed for
- * autocomplete / chips input)
- *
- * @event arrow-key
- * @type {Event}
- *
- */
-
-/**
- * Event emitted on keypress, emitting input string
- *
- * @event enter
- * @type String
- *
- */
-
-/**
- * Event emitted on input, passing input string
- *
- * @event autocomplete
- * @type String
- *
- */
-
-/**
- * Event emitted on click on input field \<div\>
- *
- * @event click-input-field
- * @type None
- *
- */
-
-/**
- * Event emitted when click outside input field \<div\> is registered
- *
- * @event clicked-outside
- * @type None
- *
  */
 import ClickOutside from 'vue-click-outside';
 
@@ -189,6 +143,55 @@ export default {
     },
   },
 };
+
+/**
+ * Event emitted on input focus
+ *
+ * @event input-focus
+ * @type None
+ *
+ */
+
+/**
+ * Event emitted on arrow key up or down (in base project needed for
+ * autocomplete / chips input)
+ *
+ * @event arrow-key
+ * @type {Event}
+ *
+ */
+
+/**
+ * Event emitted on keypress, emitting input string
+ *
+ * @event enter
+ * @type String
+ *
+ */
+
+/**
+ * Event emitted on input, passing input string
+ *
+ * @event autocomplete
+ * @type String
+ *
+ */
+
+/**
+ * Event emitted on click on input field \<div\>
+ *
+ * @event click-input-field
+ * @type None
+ *
+ */
+
+/**
+ * Event emitted when click outside input field \<div\> is registered
+ *
+ * @event clicked-outside
+ * @type None
+ *
+ */
 </script>
 
 <style lang="scss" scoped>

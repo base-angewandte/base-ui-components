@@ -16,7 +16,7 @@ const viafAuto = 'http://www.viaf.org/viaf/AutoSuggest?query=';
 const gndAuto = 'https://lobid.org/gnd/search?format=json:preferredName,dateOfBirth,professionOrOccupation&filter=type:Person&q=';
 const gndFull = 'https://lobid.org/gnd/';
 
-async function getExternalData(string, resource, full=false) {
+async function getExternalData(string, resource, full = false) {
   let extRes = [];
   if (resource === 'gnd') {
     try {
@@ -27,12 +27,17 @@ async function getExternalData(string, resource, full=false) {
           authors: `${extRes.preferredNameEntityForThePerson.forename} ${extRes.preferredNameEntityForThePerson.surname}`,
           dob: extRes.dateOfBirth,
           id: extRes.gndIdentifier,
-          source: resource });
+          source: resource,
+        });
       } else {
         extRes = await axios.get(`${gndAuto}${string}`);
         extRes = extRes.data;
         extRes = extRes && extRes.length
-          ? extRes.map(result => Object.assign({}, { author: result.label, uuid: result.id, source: resource })) : [];
+          ? extRes.map(result => Object.assign({}, {
+            author: result.label,
+            uuid: result.id,
+            source: resource,
+          })) : [];
       }
     } catch (e) {
       console.log(e);
@@ -45,7 +50,11 @@ async function getExternalData(string, resource, full=false) {
     }
     extRes = extRes.data.result;
     extRes = extRes && extRes.length
-      ? extRes.map(result => Object.assign({}, { authors: result.displayForm, uuid: result.recordID, source: resource })) : [];
+      ? extRes.map(result => Object.assign({}, {
+        authors: result.displayForm,
+        uuid: result.recordID,
+        source: resource,
+      })) : [];
   }
   return extRes;
 }

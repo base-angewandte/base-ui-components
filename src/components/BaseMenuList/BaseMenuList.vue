@@ -5,7 +5,7 @@
       v-if="item"
       ref="menuEntry"
       :key="item.id || item.title"
-      :id="item.id"
+      :entry-id="item.id"
       :title="item.title"
       :is-active="entryProps[index].active"
       :is-selected="entryProps[index].selected"

@@ -25,17 +25,16 @@
         class="base-menu-entry-subtext">{{ subtext }}</div>
     </div>
     <div
-      v-if="isSelectable"
       class="base-menu-entry-transition-group-wrapper">
       <transition-group
         name="slide-fade"
         class="slide-fade-group">
         <div
           v-if="!selectActive"
-          :key="id + 'rightGroup'"
+          :key="entryId + 'rightGroup'"
           class="base-menu-entry-right-group">
           <div
-            :key="id + 'thumbnail'"
+            :key="entryId + 'thumbnail'"
             class="base-menu-entry-thumbnail-container">
             <svg-icon
               v-for="tn in thumbnails"
@@ -44,14 +43,14 @@
               class="base-menu-entry-thumbnail" />
           </div>
           <div
-            :key="id + 'description'"
+            :key="entryId + 'description'"
             class="base-menu-entry-description">
             {{ description }}
           </div>
         </div>
         <div
-          v-if="selectActive"
-          :key="$props.id + 'checkmark'"
+          v-if="isSelectable && selectActive"
+          :key="entryId + 'checkmark'"
           class="base-menu-entry-checkbox">
           <base-checkmark
             :checked="isSelected"
@@ -82,7 +81,7 @@ export default {
     /**
      * An id to allow identification needs to be specified
      */
-    id: {
+    entryId: {
       type: [Number, String],
       default: null,
       required: true,
@@ -216,7 +215,7 @@ export default {
           e.dataTransfer.setDragImage(pic, 0, 0);
 
           // add data to identify the entry on receiver side
-          e.dataTransfer.setData('text/plain', this.$props.id);
+          e.dataTransfer.setData('text/plain', this.entryId);
         }), false);
       }
     }
@@ -224,6 +223,12 @@ export default {
   methods: {
     selected() {
       this.isSelectedInt = !this.isSelectedInt;
+      /**
+       * Event emitted when selectActive is true and the entry is clicked
+       *
+       * @event selected
+       * @type Boolean
+       */
       this.$emit('selected', this.isSelectedInt);
     },
     determineDragAndDropCapable() {
@@ -234,6 +239,13 @@ export default {
   },
 
 };
+
+/**
+ * Event emitted when entry is clicked and selectActive is false (=checkbox not shown)
+ *
+ * @event clicked
+ * @type None
+ */
 </script>
 
 <style lang="scss" scoped>
@@ -260,7 +272,8 @@ export default {
         height: 100%;
       }
 
-      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title {
+      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title,
+      &:hover .base-menu-entry-subtext {
         fill: $app-color;
         color: $app-color;
       }

@@ -17,6 +17,9 @@ npm run dev:lib
 # build for serving on localhost:9000 with hot reload
 npm run dev:docs
 
+# run styleguide for development purposes
+npm run styleguide
+
 # build for production with minification
 npm run build
 
@@ -32,6 +35,9 @@ npm run build --report
 # lint files
 npm run lint
 
+# create styleable components from svg icons
+npm run svg
+
 # to use locally for development
 # in this project
 npm link
@@ -42,10 +48,5 @@ npm link base-components
 
 ## Base Components
 
-components currently included in the build:
-* BasePopUp
-* BaseDropDown
-* BaseButton
-* BaseBoxButton
-* BaseInput
-* BaseChipsInput
+for a list of components included in the build and their options run ```npm run styleguide``` 
+or see deployed styleguide at ...
