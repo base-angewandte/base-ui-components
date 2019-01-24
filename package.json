@@ -88,8 +88,8 @@
     "not ie <= 8"
   ],
   "main": "dist/lib/base-components.min.js",
-  "author": "shauzmayer <sandra.hauzmayer@uni-ak.ac.at>",
-  "description": "Agewandte Base Component Library",
+  "author": "baseAngewandte <basemail@uni-ak.ac.at>",
+  "description": "base Angewandte Component Library",
   "engines": {
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
