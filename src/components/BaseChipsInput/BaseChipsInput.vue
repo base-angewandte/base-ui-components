@@ -318,7 +318,7 @@ export default {
       set(val) {
         // get the values from props.list and assign an internal id (idInt) if not already set
         let list = val;
-        if (this.dropDownList.length) {
+        if (val.length) {
           list = val.map((entry, index) => {
             if (typeof entry === 'object') {
               this.returnAsObject = true;
@@ -394,6 +394,10 @@ export default {
       this.selectedMenuEntryIndex = this.getIndex(oldEntry);
     },
     showDropDown(val) {
+      // allow also for static drop down entries to be loaded on first drop down show only
+      if (!this.allowDynamicDropDownEntries && !this.dropDownListInt.length) {
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
+      }
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
         if (!this.chipsEditable) {
