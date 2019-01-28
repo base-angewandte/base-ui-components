@@ -1,7 +1,8 @@
 <template>
   <div
     v-if="showInt"
-    class="base-pop-up">
+    class="base-pop-up"
+    @wheel="scrollAction">
     <div class="base-pop-up-background" />
     <div
       class="popup-box">
@@ -133,6 +134,10 @@ export default {
     },
   },
   methods: {
+    scrollAction(evt) {
+      // disable page scrolling
+      evt.preventDefault();
+    },
     close() {
       /**
        * Event triggered on right top corner close action
@@ -151,7 +156,7 @@ export default {
   @import "../../styles/variables";
 
   .base-pop-up-background {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     height: 100%;
@@ -164,7 +169,8 @@ export default {
     box-shadow: $pop-up-shadow;
     position: fixed;
     top: 20vh;
-    left: 25%;
+    left: 50%;
+    margin-left: -350px;
     z-index: 100;
     min-width: 288px;
     width: 50%;
@@ -211,6 +217,7 @@ export default {
 
   @media screen and (max-width: $tablet) {
     .popup-box {
+      margin-left: 0;
       max-width: 100%;
       width: 70%;
       left: 15%;
