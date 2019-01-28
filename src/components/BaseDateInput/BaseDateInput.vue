@@ -16,6 +16,7 @@
         <datepicker
           id="from"
           key="from"
+          ref="datepickerFrom"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
@@ -25,10 +26,12 @@
           calendar-class="calendar-class"
           class="base-input-datepicker"
           @opened="activeFrom = true"
-          @closed="selected('from')"/>
+          @closed="selected('from')"
+          @click="openDatePicker('from')"/>
         <svg-icon
           name="calendar-many"
-          class="base-input-date-icon"/>
+          class="base-input-date-icon"
+          @click="openDatePicker('from')"/>
       </div>
       <span
         v-if="type === 'range'"
@@ -58,6 +61,7 @@
           v-else
           id="to"
           key="to"
+          ref="datepickerTo"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
@@ -77,7 +81,8 @@
         <svg-icon
           v-else
           name="calendar-many"
-          class="base-input-date-icon"/>
+          class="base-input-date-icon"
+          @click="openDatePicker('to')"/>
       </div>
     </div>
 
@@ -208,13 +213,26 @@ export default {
     selected(field) {
       if (field === 'from') {
         this.activeFrom = false;
+        this.$refs.datepickerFrom.close();
       } else if (field === 'to') {
         this.activeTo = false;
+        this.$refs.datepickerTo.close();
       } else {
         this.activeFrom = false;
         this.activeTo = false;
+        this.$refs.datepickerFrom.close();
+        this.$refs.datepickerTo.close();
       }
       this.$emit('selected', this.inputInt);
+    },
+    openDatePicker(type) {
+      if (type === 'from') {
+        this.activeFrom = true;
+        this.$refs.datepickerFrom.showCalendar();
+      } else if (type === 'to') {
+        this.activeTo = true;
+        this.$refs.datepickerTo.showCalendar();
+      }
     },
   },
 };
