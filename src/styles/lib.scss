@@ -7,24 +7,6 @@
   left: -9999px !important;
 }
 
-.base-box {
-  background: white;
-  box-shadow: $box-shadow-reg;
-  transition: $box-transition;
-  min-height: 100%;
-  position: relative;
-  overflow: hidden;
-
-  &:before {
-    content:  '';
-    padding-top: 100%;
-  }
-
-  &:hover {
-    box-shadow: $box-shadow-hov;
-  }
-}
-
 *, *:before, *:after {
   box-sizing: border-box;
   margin: 0;
@@ -44,13 +26,17 @@ button:focus {
   outline: 0;
 }
 
-input[type=text], input[type=date] {
+input[type=text], input[type=date], textarea {
   font-family: inherit;
   font-size: inherit;
 }
 
-input[type=text]:focus, input[type=date]:focus {
+input[type=text]:focus, input[type=date]:focus, textarea:focus {
   outline: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: $font-color-third;
 }
 
 /* recommended css code for vue-svgicon */
@@ -82,4 +68,24 @@ input[type=text]:focus, input[type=date]:focus {
 
 .svg-left {
   transform: rotate(-90deg);
+}
+
+input.base-input-datepicker-input {
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+input.base-input-datepicker-input:focus {
+  outline: none;
+}
+
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
+.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
+  border-color: $app-color;
+}
+
+.calendar-class .cell.selected, .calendar-class .cell.selected:hover {
+  background: $app-color;
 }
