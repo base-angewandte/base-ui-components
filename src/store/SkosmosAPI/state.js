@@ -2,8 +2,8 @@ const state = {
   apilib: null,
   loading: false,
   loadmsg: 'inactive',
-  vocabs: null,
+  vocabs: {},
   lang: null,
-  fields: null,
+  fields: [],
 };
 export default state;

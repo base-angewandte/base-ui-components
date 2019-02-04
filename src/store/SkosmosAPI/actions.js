@@ -5,10 +5,16 @@ const $config = {
 };
 
 export default {
-  fetchVocabs({ state, commit }) {
+  fetchVocabs({ state, commit }, { lang }) {
+    console.log(state, commit);
+    const params = {
+      lang: state.lang,
+      $config,
+    };
+    if (lang) params.lang = lang;
     return new Promise((resolve, reject) => {
       commit('setLoading', 'Loading available Vocabularies.');
-      state.apilib.getVocabularies({ $config }).then((res) => {
+      state.apilib.getVocabularies(params).then((res) => {
         if (res.data.vocabularies) {
           const sa = res.data.vocabularies;
           for (let i = 0; i < sa.length; i += 1) {
@@ -29,14 +35,15 @@ export default {
   init({ commit, dispatch }, config) {
     return new Promise((resolve, reject) => {
       if (![
-        'baseURL',
+        'baseURL', 'lang',
       ].every(opt => Boolean(config[opt]))) {
         // TODO: we need to have some overall error handling to inject here
         reject(new Error('baseURL is required in the config object.'));
       }
       Api.setDomain(config.baseURL);
       commit('setApiLib', Api);
-      dispatch('fetchVocabs').then((res) => {
+      commit('setLang', config.lang);
+      dispatch('fetchVocabs', {}).then((res) => {
         resolve(res);
       });
     });

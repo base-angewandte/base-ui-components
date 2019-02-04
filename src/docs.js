@@ -14,6 +14,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({ strict: false });
 SkosmosAPI(store, {
   baseURL: 'https://voc.uni-ak.ac.at/skosmos/rest/v1/',
+  lang: 'en',
 }, 'SkosmosAPI');
 
 
