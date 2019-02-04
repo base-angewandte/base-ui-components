@@ -376,7 +376,7 @@ export default {
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
           ? this.dropDownListOrig
-            .filter(entry => entry[this.objectProp].toLowerCase().includes(val.toLowerCase()))
+            .filter(entry => entry.toLowerCase().includes(val.toLowerCase()))
           : this.dropDownListOrig;
         this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
