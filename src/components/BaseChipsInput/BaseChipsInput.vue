@@ -391,6 +391,7 @@ export default {
     list(val) {
       const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
       this.dropDownListInt = val;
+      this.dropDownListOrig = [].concat(val);
       this.selectedMenuEntryIndex = this.getIndex(oldEntry);
     },
     showDropDown(val) {
@@ -430,7 +431,7 @@ export default {
     this.dropDownListInt = this.list;
     // if dropdown entries are static set the copy for subsequent references (e.g. filtering)
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = [].concat(this.dropDownListInt);
+      this.dropDownListOrig = [].concat(this.list);
     }
   },
   methods: {
@@ -470,9 +471,10 @@ export default {
       }
       if (!this.allowDynamicDropDownEntries) {
         // filter the selected entry from the list of drop down menu entries
+        // TODO: check if this is still working for entries that are objects!
         this.dropDownListInt = selected[this.objectProp] && !this.returnAsObject
           ? this.dropDownListOrig
-            .filter(entry => entry[this.objectProp].toLowerCase()
+            .filter(entry => entry.toLowerCase()
               !== selected[this.objectProp].toLowerCase())
           : this.dropDownListOrig;
       } else {
