@@ -27,6 +27,7 @@ Vue.use(SvgIcon, {
 
 /* eslint-disable no-new */
 new Vue({
+  store,
   el: '#app',
   render: h => h(App),
 });

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   isInitialized: s => Boolean(s.apilib && s.vocabs),
   isLoading: s => s.loading,
   f: s => name => s.apilib[name],

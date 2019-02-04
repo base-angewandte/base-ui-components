@@ -6,7 +6,6 @@ const $config = {
 
 export default {
   fetchVocabs({ state, commit }, { lang }) {
-    console.log(state, commit);
     const params = {
       lang: state.lang,
       $config,
@@ -66,7 +65,7 @@ export default {
   getSearch({ state, commit }, { query, lang, vocab, type, parent, group, maxhits, offset, unique, fields }) {
     let p = {};
     const params = {
-      query,
+      query: `${query}*`,
       lang: state.lang,
       vocab,
       type,

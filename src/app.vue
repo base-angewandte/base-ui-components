@@ -155,12 +155,12 @@
         :label="'unknown'"/>
       <base-autocomplete-input
         :list="dropDownInput"
-        :placeholder="'Select Your Marxccccc'"
-        :object-prop="'title'"
+        :placeholder="'Fetching from SkosMos'"
+        :object-prop="'prefLabel'"
         v-model="autocompleteInput"
         label="text input with dynamic autocomplete"
         @selected="fetchOther($event, 'this is my type')"
-        @autocomplete="fetch({ value: $event })"/>
+        @autocomplete="fetchSkosMos({ value: $event })"/>
       <base-input :label="'unknown'"/>
       <base-chips-input
         :list="dropDownInput"
@@ -364,7 +364,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { mapActions } from 'vuex';
+
 import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseDropDown from './components/BaseDropDown/BaseDropDown';
@@ -483,17 +484,6 @@ export default {
     },
   },
   watch: {
-    async autocompleteInput(val) {
-      if (!val || val.length > 3) {
-        const result = await axios.get('http://localhost:9900/fetch', {
-          params:
-            {
-              string: val,
-            },
-        });
-        this.dropDownInput = result.data;
-      }
-    },
   },
   methods: {
     setHoverBox(val, entry) {
@@ -552,17 +542,20 @@ export default {
         this.$set(this.list[index], 'active', false);
       }
     },
-    async fetch(string) {
+    fetchSkosMos(string) {
+      console.log('testing', this);
       if (!string.value || string.value.length > 3) {
-        const result = await axios.get('http://localhost:9900/fetch', {
-          params:
-            {
-              string: string.value,
-            },
+        this.getSearch({
+          query: string.value,
+          vocab: 'portfolio',
+        }).then((res) => {
+          this.dropDownInput = res.data.results;
         });
-        this.dropDownInput = result.data;
       }
     },
+    ...mapActions('SkosmosAPI', [
+      'getSearch',
+    ]),
     tabSwitched(val) {
       this.langTab = val;
     },

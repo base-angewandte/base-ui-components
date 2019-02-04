@@ -25,10 +25,10 @@ export default {
     if (fields && fields.isArray) s.fields = fields;
   },
   addField(s, field) {
-    if(field && typeof(field) == 'string') s.fields.push(field);
+    if (field && typeof (field) === 'string') s.fields.push(field);
   },
   removeField(s, field) {
-    if(field && typeof(field) == 'string') {
+    if (field && typeof (field) === 'string') {
       const i = s.fields.indexOf(field);
       if (i) s.fields.splice(i, 1);
     }

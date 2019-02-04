@@ -3,7 +3,7 @@ import getters from './getters';
 import mutations from './mutations';
 import actions from './actions';
 
-export default (store, config, namespace = 'skosmos', vuexModuleOptions) => {
+export default (store, config, namespace, vuexModuleOptions) => {
   store.registerModule(namespace, {
     namespaced: true,
     actions,
