@@ -437,6 +437,7 @@ export default {
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
+      debugger;
       this.showDropDown = true;
       // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
@@ -472,7 +473,7 @@ export default {
       if (!this.allowDynamicDropDownEntries) {
         // filter the selected entry from the list of drop down menu entries
         // TODO: check if this is still working for entries that are objects!
-        this.dropDownListInt = selected[this.objectProp] && !this.returnAsObject
+        this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
           ? this.dropDownListOrig
             .filter(entry => entry.toLowerCase()
               !== selected[this.objectProp].toLowerCase())
@@ -502,10 +503,14 @@ export default {
           this.sort();
         }
       }
-      // remove entry from selected list // TODO: is this okay?? (for dynamic entries)
       this.selectedListInt.splice(index, 1);
       // if dropdown is already open keep open!
       this.insideInput = this.showDropDown;
+      // for single entries focus on input again
+      // TODO: not working!
+      if (!this.allowMultipleEntries) {
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+      }
       this.emitSelectedList();
     },
     // allow for navigation with arrow keys
