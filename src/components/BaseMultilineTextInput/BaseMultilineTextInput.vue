@@ -10,15 +10,15 @@
       <!-- @slot to add drop down needed for text input field (base specific) -->
       <slot />
       <div
-        v-if="$props.tabs && $props.tabs[0] !== 'default'"
+        v-if="tabs && tabs[0] !== 'default'"
         class="base-multiline-text-input-tabs">
         <span
-          v-for="(tab, index) in $props.tabs"
+          v-for="(tab, index) in tabs"
           :key="index"
           :class="[
             'base-multiline-text-input-tab',
-            {'base-multiline-text-input-tab-active': activeTabInt === tab }]"
-          @click="activeTabInt = tab">
+            {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
+          @click="activeTabInt = tab.toLowerCase()">
           {{ tab }}
         </span>
       </div>
@@ -28,9 +28,7 @@
       :placeholder="placeholder"
       v-model="fieldContent[activeTabInt]"
       rows="10"
-      class="base-multiline-text-input-textarea"
-      @keyup="$emit('text-input', tabs.length > 1
-      ? fieldContent : fieldContent[activeTabInt])" />
+      class="base-multiline-text-input-textarea" />
   </div>
 </template>
 
@@ -98,14 +96,14 @@ export default {
     activeTab: {
       type: String,
       default() {
-        return this.tabs[0];
+        return this.tabs[0] || 'default';
       },
     },
   },
   data() {
     return {
       fieldContent: {},
-      activeTabInt: this.activeTab,
+      activeTabInt: this.activeTab.toLowerCase(),
     };
   },
   watch: {
@@ -116,7 +114,17 @@ export default {
     },
     // set active tab from outside
     activeTab(val) {
-      this.activeTabInt = val;
+      this.activeTabInt = val.toLowerCase();
+    },
+    fieldContent: {
+      handler(val) {
+        if (typeof this.input === 'object' && JSON.stringify(val) !== JSON.stringify(this.input)) {
+          this.$emit('text-input', val);
+        } else if (typeof this.input === 'string' && val[this.activeTabInt] !== this.input) {
+          this.$emit('text-input', val[this.activeTabInt]);
+        }
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -126,10 +134,11 @@ export default {
   methods: {
     setFieldContent(val) {
       if (this.tabs.length < 2) {
-        const propName = this.activeTabInt || 'default';
+        const propName = this.activeTabInt.toLowerCase() || 'default';
         this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
       } else {
-        this.tabs.forEach(tab => this.$set(this.fieldContent, tab, val[tab]));
+        this.tabs.forEach(tab => this.$set(this.fieldContent, tab.toLowerCase(),
+          val[tab.toLowerCase()]));
       }
     },
   },
@@ -166,6 +175,7 @@ export default {
           padding: $spacing-small/2 $spacing;
           border: 1px solid transparent;
           cursor: pointer;
+          text-transform: capitalize;
         }
 
         .base-multiline-text-input-tab-active {
