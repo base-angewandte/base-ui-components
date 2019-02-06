@@ -2,7 +2,7 @@ const state = {
   apilib: null,
   loading: false,
   loadmsg: 'inactive',
-  lang: null,
-  schemas: null,
+  schemas: [],
+  user: {},
 };
 export default state;

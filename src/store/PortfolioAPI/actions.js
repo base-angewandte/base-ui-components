@@ -5,20 +5,8 @@ const $config = {
 };
 
 export default {
-  fetchSchemas({ state, commit }) {
-    return new Promise((resolve, reject) => {
-      commit('setLoading', 'Loading available Schemas.');
-      state.apilib.jsonschema_list({ $config }).then((res) => {
-        resolve(res);
-        // fetch all available schemas one by one - sensible?
-      }).catch((error) => {
-        // TODO: we need to have some overall error handling to inject here
-        commit('setLoadingFinished');
-        reject(error);
-      });
-    });
-  },
   init({ commit, dispatch }, config) {
+    const p = [];
     return new Promise((resolve, reject) => {
       if (![
         'baseURL',
@@ -28,9 +16,42 @@ export default {
       }
       Api.setDomain(config.baseURL);
       commit('setApiLib', Api);
-      dispatch('fetchSchemas').then((res) => {
-        resolve(res);
+      p.push(dispatch('fetchSchemas'));
+      p.push(dispatch('fetchUser'));
+      Promise.all(p).then((res) => {
+        console.log(res);
+      }).catch(err => reject(err));
+    });
+  },
+  fetchSchemas({ state, commit }) {
+    return new Promise((resolve, reject) => {
+      commit('setLoading', 'Fetching available Schemas');
+      state.apilib.api_v1_jsonschema_list({ $config }).then((res) => {
+        commit('setSchemas', res.data);
+        commit('setLoadingFinished', 'Fetching available Schemas finished');
+        resolve(res.data);
+      }).catch((error) => {
+        commit('setLoadingFinished', 'Error while fetching available Schemas');
+        reject(error);
       });
     });
+  },
+  fetchUser({ state, commit }) {
+    return new Promise((resolve, reject) => {
+      commit('setLoading', 'Fetching User Data');
+      state.apilib.api_v1_user_read({ $config }).then((res) => {
+        commit('setUser', res.data);
+        commit('setLoadingFinished', 'Fetching User Data finished');
+        resolve(res.data);
+      }).catch((error) => {
+        commit('setLoadingFinished', 'Error while fetching User Data');
+        reject(error);
+      });
+    });
+  },
+  errorHandler({ state }, error) {
+    // TODO: how do we want to handle error notifications?
+    // it's probably better to let the component decide what to do with an error
+    console.log(state, error);
   },
 };

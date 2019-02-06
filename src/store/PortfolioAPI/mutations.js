@@ -13,12 +13,12 @@ export default {
       s.apilib = lib;
     }
   },
-  setSchema(s, { schema, id }) {
-    if (schema && id) {
-      s.schemas[id] = schema;
+  setSchemas(s, schemas) {
+    if (schemas && Array.isArray(schemas)) {
+      s.schemas = schemas;
     }
   },
-  setLang(s, lang) {
-    if (lang) s.lang = lang;
+  setUser(s, user) {
+    if (typeof user === 'object') s.user = user;
   },
 };

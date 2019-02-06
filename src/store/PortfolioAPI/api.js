@@ -381,6 +381,51 @@ export const api_v1_entity_deleteURL = function(parameters = {}) {
   return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
 }
 /**
+ * Return list of media objects.
+ * request: api_v1_entity_media
+ * url: api_v1_entity_mediaURL
+ * method: api_v1_entity_media_TYPE
+ * raw_url: api_v1_entity_media_RAW_URL
+ * @param id -
+ */
+export const api_v1_entity_media = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v1/entity/{id}/media/'
+  let body
+  let queryParameters = {}
+  let form = {}
+  path = path.replace('{id}', `${parameters['id']}`)
+  if (parameters['id'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: id'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('get', domain + path, body, queryParameters, form, config)
+}
+export const api_v1_entity_media_RAW_URL = function() {
+  return '/api/v1/entity/{id}/media/'
+}
+export const api_v1_entity_media_TYPE = function() {
+  return 'get'
+}
+export const api_v1_entity_mediaURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v1/entity/{id}/media/'
+  path = path.replace('{id}', `${parameters['id']}`)
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
  * Returns a list of all available JSONSchemas.
  * request: api_v1_jsonschema_list
  * url: api_v1_jsonschema_listURL
@@ -455,6 +500,104 @@ export const api_v1_jsonschema_readURL = function(parameters = {}) {
   let queryParameters = {}
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v1/jsonschema/{id}/'
+  path = path.replace('{id}', `${parameters['id']}`)
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ *
+ * request: api_v1_media_create
+ * url: api_v1_media_createURL
+ * method: api_v1_media_create_TYPE
+ * raw_url: api_v1_media_create_RAW_URL
+ * @param file -
+ * @param entity -
+ */
+export const api_v1_media_create = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v1/media/'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters['file'] !== undefined) {
+    form['file'] = parameters['file']
+  }
+  if (parameters['file'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: file'))
+  }
+  if (parameters['entity'] !== undefined) {
+    form['entity'] = parameters['entity']
+  }
+  if (parameters['entity'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: entity'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('post', domain + path, body, queryParameters, form, config)
+}
+export const api_v1_media_create_RAW_URL = function() {
+  return '/api/v1/media/'
+}
+export const api_v1_media_create_TYPE = function() {
+  return 'post'
+}
+export const api_v1_media_createURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v1/media/'
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ *
+ * request: api_v1_media_read
+ * url: api_v1_media_readURL
+ * method: api_v1_media_read_TYPE
+ * raw_url: api_v1_media_read_RAW_URL
+ * @param id -
+ */
+export const api_v1_media_read = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v1/media/{id}/'
+  let body
+  let queryParameters = {}
+  let form = {}
+  path = path.replace('{id}', `${parameters['id']}`)
+  if (parameters['id'] === undefined) {
+    return Promise.reject(new Error('Missing required  parameter: id'))
+  }
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('get', domain + path, body, queryParameters, form, config)
+}
+export const api_v1_media_read_RAW_URL = function() {
+  return '/api/v1/media/{id}/'
+}
+export const api_v1_media_read_TYPE = function() {
+  return 'get'
+}
+export const api_v1_media_readURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v1/media/{id}/'
   path = path.replace('{id}', `${parameters['id']}`)
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
@@ -774,6 +917,45 @@ export const api_v1_relation_deleteURL = function(parameters = {}) {
   const domain = parameters.$domain ? parameters.$domain : getDomain()
   let path = '/api/v1/relation/{id}/'
   path = path.replace('{id}', `${parameters['id']}`)
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    })
+  }
+  let keys = Object.keys(queryParameters)
+  return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')) : '')
+}
+/**
+ *
+ * request: api_v1_user_read
+ * url: api_v1_user_readURL
+ * method: api_v1_user_read_TYPE
+ * raw_url: api_v1_user_read_RAW_URL
+ */
+export const api_v1_user_read = function(parameters = {}) {
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  const config = parameters.$config
+  let path = '/api/v1/user/'
+  let body
+  let queryParameters = {}
+  let form = {}
+  if (parameters.$queryParameters) {
+    Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
+      queryParameters[parameterName] = parameters.$queryParameters[parameterName]
+    });
+  }
+  return request('get', domain + path, body, queryParameters, form, config)
+}
+export const api_v1_user_read_RAW_URL = function() {
+  return '/api/v1/user/'
+}
+export const api_v1_user_read_TYPE = function() {
+  return 'get'
+}
+export const api_v1_user_readURL = function(parameters = {}) {
+  let queryParameters = {}
+  const domain = parameters.$domain ? parameters.$domain : getDomain()
+  let path = '/api/v1/user/'
   if (parameters.$queryParameters) {
     Object.keys(parameters.$queryParameters).forEach(function(parameterName) {
       queryParameters[parameterName] = parameters.$queryParameters[parameterName]
