@@ -19,7 +19,7 @@
             'base-multiline-text-input-tab',
             {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
           @click="activeTabInt = tab.toLowerCase()">
-          {{ tab }}
+          {{ tabLabels[index] || tab }}
         </span>
       </div>
     </div>
@@ -91,7 +91,16 @@ export default {
       },
     },
     /**
-     * set the currently active tab
+     * give the possibility to specify what should be displayed in the tabs
+     */
+    tabLabels: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    /**
+     * set the currently active tab (specify the property of the object not the label)
      */
     activeTab: {
       type: String,
