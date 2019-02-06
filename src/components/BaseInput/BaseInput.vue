@@ -122,7 +122,7 @@ export default {
     },
   },
   mounted() {
-    this.inputInt = this.$props.input;
+    this.inputInt = this.input;
   },
   updated() {
     const elems = this.$el.getElementsByTagName('input');
