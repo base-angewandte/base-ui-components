@@ -341,6 +341,7 @@ export default {
       color: $font-color-second;
       margin-bottom: $spacing-small;
       text-align: left;
+      text-transform: capitalize;
     }
   }
 

@@ -174,6 +174,7 @@ export default {
         margin-bottom: $spacing-small/2;
         flex-grow: 2;
         align-self: flex-end;
+        text-transform: capitalize;
       }
 
       .base-multiline-text-input-tabs {
