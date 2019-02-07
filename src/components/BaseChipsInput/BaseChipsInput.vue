@@ -376,7 +376,7 @@ export default {
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
           ? this.dropDownListOrig
-            .filter(entry => entry[this.objectProp].toLowerCase().includes(val.toLowerCase()))
+            .filter(entry => entry.toLowerCase().includes(val.toLowerCase()))
           : this.dropDownListOrig;
         this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
@@ -391,6 +391,7 @@ export default {
     list(val) {
       const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
       this.dropDownListInt = val;
+      this.dropDownListOrig = [].concat(val);
       this.selectedMenuEntryIndex = this.getIndex(oldEntry);
     },
     showDropDown(val) {
@@ -430,12 +431,13 @@ export default {
     this.dropDownListInt = this.list;
     // if dropdown entries are static set the copy for subsequent references (e.g. filtering)
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = [].concat(this.dropDownListInt);
+      this.dropDownListOrig = [].concat(this.list);
     }
   },
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
+      debugger;
       this.showDropDown = true;
       // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
@@ -470,9 +472,10 @@ export default {
       }
       if (!this.allowDynamicDropDownEntries) {
         // filter the selected entry from the list of drop down menu entries
-        this.dropDownListInt = selected[this.objectProp] && !this.returnAsObject
+        // TODO: check if this is still working for entries that are objects!
+        this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
           ? this.dropDownListOrig
-            .filter(entry => entry[this.objectProp].toLowerCase()
+            .filter(entry => entry.toLowerCase()
               !== selected[this.objectProp].toLowerCase())
           : this.dropDownListOrig;
       } else {
@@ -500,10 +503,14 @@ export default {
           this.sort();
         }
       }
-      // remove entry from selected list // TODO: is this okay?? (for dynamic entries)
       this.selectedListInt.splice(index, 1);
       // if dropdown is already open keep open!
       this.insideInput = this.showDropDown;
+      // for single entries focus on input again
+      // TODO: not working!
+      if (!this.allowMultipleEntries) {
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+      }
       this.emitSelectedList();
     },
     // allow for navigation with arrow keys

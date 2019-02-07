@@ -122,7 +122,7 @@ export default {
     },
   },
   mounted() {
-    this.inputInt = this.$props.input;
+    this.inputInt = this.input;
   },
   updated() {
     const elems = this.$el.getElementsByTagName('input');
@@ -250,6 +250,7 @@ export default {
         color: $font-color-second;
         text-align: left;
         flex-grow: 1;
+        text-transform: capitalize;
       }
     }
   }

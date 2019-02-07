@@ -14,15 +14,15 @@
                  { 'base-input-field-container-active': activeFrom },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
         <datepicker
-          id="from"
-          key="from"
+          id="dateFrom"
+          key="dateFrom"
           ref="datepickerFrom"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
           :placeholder="placeholder"
           :minimum-view="format"
-          v-model="inputInt.from"
+          v-model="dateFrom"
           calendar-class="calendar-class"
           class="base-input-datepicker"
           @opened="activeFrom = true"
@@ -47,7 +47,7 @@
           :id="label + '-time'"
           :title="label + '-time'"
           :placeholder="placeholder + ' Time'"
-          v-model="inputInt.to"
+          v-model="timeFrom"
           class="base-input-field base-date-input-field"
           type="text"
           autocomplete="off"
@@ -67,7 +67,7 @@
           :format="dateFormat"
           :minimum-view="format"
           :placeholder="placeholder"
-          v-model="inputInt.to"
+          v-model="inputInt.date_to"
           calendar-class="calendar-class"
           class="base-input-datepicker"
           @opened="activeTo = true"
@@ -85,7 +85,6 @@
           @click="openDatePicker('to')"/>
       </div>
     </div>
-
 
   </div>
 </template>
@@ -135,7 +134,14 @@ export default {
     input: {
       type: Object,
       default() {
-        return { from: '', to: '' };
+        return {
+          date: null,
+          date_from: null,
+          date_to: null,
+          time: null,
+          time_from: null,
+          time_to: null,
+        };
       },
     },
     /** label for input field, required for usability purposes, handle
@@ -173,7 +179,14 @@ export default {
   },
   data() {
     return {
-      inputInt: { to: null, from: null },
+      inputInt: {
+        date: null,
+        date_from: null,
+        date_to: null,
+        time: null,
+        time_from: null,
+        time_to: null,
+      },
       activeFrom: false,
       activeTo: false,
     };
@@ -188,6 +201,33 @@ export default {
       }
       return 'dd.MM.yyyy';
     },
+    inputProperties() {
+      return Object.keys(this.input);
+    },
+    dateFrom: {
+      get() {
+        return this.inputInt.date || this.inputInt.date_from;
+      },
+      set(val) {
+        if (this.inputProperties.includes('date_from')) {
+          this.inputInt.date_from = val;
+        } else {
+          this.inputInt.date = val;
+        }
+      },
+    },
+    timeFrom: {
+      get() {
+        return this.inputInt.time || this.inputInt.time_from;
+      },
+      set(val) {
+        if (this.inputProperties.includes('time_from')) {
+          this.inputInt.date_from = val;
+        } else {
+          this.inputInt.date = val;
+        }
+      },
+    },
   },
   watch: {
     input(val) {
@@ -195,20 +235,12 @@ export default {
     },
   },
   created() {
-    this.inputInt = Object.assign({}, this.input) || { to: null, from: null };
+    this.inputInt = Object.assign({}, this.input);
   },
   methods: {
     blurInput() {
       this.activeFrom = false;
-      /**
-       * emit an event when focus leaves the input
-       *
-       * TODO: check again if this is needed???
-       *
-       * @event selected
-       * @type string
-       */
-      this.$emit('selected', this.inputInt);
+      this.emitData();
     },
     selected(field) {
       if (field === 'from') {
@@ -223,7 +255,7 @@ export default {
         this.$refs.datepickerFrom.close();
         this.$refs.datepickerTo.close();
       }
-      this.$emit('selected', this.inputInt);
+      this.emitData();
     },
     openDatePicker(type) {
       if (type === 'from') {
@@ -233,6 +265,19 @@ export default {
         this.activeTo = true;
         this.$refs.datepickerTo.showCalendar();
       }
+    },
+    emitData() {
+      const data = {};
+      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
+      /**
+       * emit an event when focus leaves the input
+       *
+       * TODO: check again if this is needed???
+       *
+       * @event selected
+       * @type string
+       */
+      this.$emit('selected', data);
     },
   },
 };
@@ -296,6 +341,7 @@ export default {
       color: $font-color-second;
       margin-bottom: $spacing-small;
       text-align: left;
+      text-transform: capitalize;
     }
   }
 
@@ -353,7 +399,7 @@ export default {
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-    border-color: $app-color;
+    border-color: $app-color !important;
   }
 
   .calendar-class .cell.selected, .calendar-class .cell.selected:hover {

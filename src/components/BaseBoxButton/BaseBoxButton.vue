@@ -136,6 +136,7 @@ export default {
 
   .base-box-button {
     display: flex;
+    cursor: pointer;
 
     &:hover {
       color: $app-color;

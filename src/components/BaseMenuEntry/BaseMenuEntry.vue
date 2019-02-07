@@ -30,7 +30,7 @@
         name="slide-fade"
         class="slide-fade-group">
         <div
-          v-if="!selectActive"
+          v-if="showRightGroup && !selectActive"
           :key="entryId + 'rightGroup'"
           class="base-menu-entry-right-group">
           <div
@@ -181,6 +181,11 @@ export default {
       isSelectedInt: false,
       dragAndDropCapable: true,
     };
+  },
+  computed: {
+    showRightGroup() {
+      return this.thumbnails.length || this.description;
+    },
   },
   watch: {
     isSelected(val) {
@@ -409,7 +414,6 @@ export default {
 
   .base-menu-entry-transition-group-wrapper{
     background-color: white;
-    min-width: 2 * $spacing + 2 * $spacing-small;
     position: absolute;
     top: 0;
     right: 0;
