@@ -11,15 +11,14 @@ export default {
       if (![
         'baseURL',
       ].every(opt => Boolean(config[opt]))) {
-        // TODO: we need to have some overall error handling to inject here
-        reject(new Error('baseURL is required in the config object.'));
+        reject(new Error('The Configuration is incomplete'));
       }
       Api.setDomain(config.baseURL);
       commit('setApiLib', Api);
       p.push(dispatch('fetchSchemas'));
       p.push(dispatch('fetchUser'));
       Promise.all(p).then((res) => {
-        console.log(res);
+        resolve(res);
       }).catch(err => reject(err));
     });
   },
@@ -45,6 +44,60 @@ export default {
         resolve(res.data);
       }).catch((error) => {
         commit('setLoadingFinished', 'Error while fetching User Data');
+        reject(error);
+      });
+    });
+  },
+  get({ state, commit }, { kind, type, id, sort, offset, limit }) {
+    let p = {};
+    return new Promise((resolve, reject) => {
+      if (kind && id) {
+        commit('setLoading', `Getting ${kind} ${id} from Database`);
+        p = state.apilib[`api_v1_${kind}_read`]({ id, $config });
+      } else if (kind && !id) {
+        commit('setLoading', `Getting Queryset of ${kind} from Database`);
+        p = state.apilib[`api_v1_${kind}_list`]({ type, sort, offset, limit, $config });
+      } else reject(new Error('Invalid or Insufficient Parameters'));
+      p.then((res) => {
+        commit('setLoadingFinished', `Fetching ${kind} finished.`);
+        resolve(res.data);
+      }).catch((error) => {
+        commit('setLoadingFinished', `Error while fetching ${kind}`);
+        reject(error);
+      });
+    });
+  },
+  post({ state, commit }, { kind, id, data }) {
+    let p = {};
+    return new Promise((resolve, reject) => {
+      if (kind && id && data) {
+        commit('setLoading', `Updating ${kind} ${id} to Database`);
+        p = state.apilib[`api_v1_${kind}_update`]({ id, data, $config });
+      } else if (kind && data && !id) {
+        commit('setLoading', `Creating a ${kind} in Database`);
+        p = state.apilib[`api_v1_${kind}_create`]({ data, $config });
+      } else reject(new Error('Invalid or Insufficient Parameters'));
+      p.then((res) => {
+        commit('setLoadingFinished', `Fetching ${kind} finished.`);
+        resolve(res.data);
+      }).catch((error) => {
+        commit('setLoadingFinished', `Error while fetching ${kind}`);
+        reject(error);
+      });
+    });
+  },
+  delete({ state, commit }, { kind, type, id }) {
+    let p = {};
+    return new Promise((resolve, reject) => {
+      if (type && id) {
+        commit('setLoading', `Deleting ${kind} ${id} in Database`);
+        p = state.apilib[`api_v1_${kind}_delete`]({ id });
+      } else reject(new Error('Invalid or Insufficient Parameters'));
+      p.then((res) => {
+        commit('setLoadingFinished', `Fetching ${kind} finished.`);
+        resolve(res);
+      }).catch((error) => {
+        commit('setLoadingFinished', `Error while fetching ${kind}`);
         reject(error);
       });
     });
