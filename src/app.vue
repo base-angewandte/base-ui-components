@@ -71,26 +71,25 @@
     <div class="form-field">
       <div class="flex">
         <base-input
-          :label="'Test3'"
+          :label="'Title'"
+          v-model="newEntity.title"
           type="text"
-          placeholder="Enter your Name" />
+          placeholder="Enter a Title" />
         <base-input
-          :label="'Test4'"
+          :label="'Subtitle'"
+          v-model="newEntity.subtitle"
           type="text"
-          placeholder="Enter your Name" />
+          placeholder="Enter a Subtitle" />
       </div>
-      <base-input
-        :label="'x'"
-        type="text"
-        placeholder="Enter your Name" />
-      <base-input
-        :label="'y'"
-        type="text"
-        placeholder="Enter your Name" />
-      <base-input
-        :label="'c'"
-        type="text"
-        placeholder="Enter your Name" />
+      <base-autocomplete-input
+        :list="$store.state.PortfolioAPI.schemas"
+        :placeholder="'Choose a Type'"
+        v-model="newEntity.type"
+        label="Type"/>
+      <base-button
+        :label="'Submit'"
+        icon="save"
+        @clicked="submit(newEntity)"/>
     </div>
   </div>
 </template>
@@ -143,6 +142,11 @@ export default {
   },
   data() {
     return {
+      newEntity: {
+        title: '',
+        subtitle: '',
+        type: '',
+      },
       selectedList: ['Leo Löwenthal', 'Eike Geisel', 'Theodor Adorno'],
       chipsInput: [],
       dropDownInput: [
@@ -285,8 +289,19 @@ export default {
         });
       }
     },
+    submit(e) {
+      this.post({
+        kind: 'entity',
+        data: e,
+      });
+    },
     ...mapActions('SkosmosAPI', [
       'getSearch',
+    ]),
+    ...mapActions('PortfolioAPI', [
+      'get',
+      'post',
+      'delete',
     ]),
     tabSwitched(val) {
       this.langTab = val;
@@ -296,6 +311,7 @@ export default {
       console.log(type);
     },
   },
+
 };
 </script>
 
