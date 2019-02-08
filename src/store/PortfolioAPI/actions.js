@@ -2,6 +2,8 @@ import * as Api from './api';
 
 const $config = {
   withCredentials: true,
+  xsrfCookieName: 'csrftoken_portfolio',
+  xsrfHeaderName: 'X-CSRFToken',
 };
 
 export default {
@@ -102,6 +104,7 @@ export default {
       });
     });
   },
+
   errorHandler({ state }, error) {
     // TODO: how do we want to handle error notifications?
     // it's probably better to let the component decide what to do with an error

@@ -96,6 +96,7 @@
 
 <script>
 import { mapActions } from 'vuex';
+import axios from 'axios';
 
 import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp/BasePopUp';
@@ -293,7 +294,16 @@ export default {
       this.post({
         kind: 'entity',
         data: e,
-      });
+      }).catch(err => console.log(err));
+      axios.defaults.xsrfCookieName = ' csrftoken_portfolio';
+      axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+      axios.post('https://basedev.uni-ak.ac.at/portfolio/api/v1/entity/', e, {
+        withCredentials: true,
+        xsrfCookieName: 'csrftoken_portfolio',
+        xsrfHeaderName: 'X-CSRFToken',
+      })
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
     },
     ...mapActions('SkosmosAPI', [
       'getSearch',

@@ -2,7 +2,7 @@
 import axios from 'axios'
 import qs from 'qs'
 let domain = 'https://basedev.uni-ak.ac.at/portfolio'
-let axiosInstance = axios.create()
+let axiosInstance = axios.create();
 export const getDomain = () => {
   return domain
 }
