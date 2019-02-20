@@ -1,11 +1,163 @@
 <template>
   <div id="app">
+    <div class="canvas flex">
+      <base-image-box
+        :selectable="selectable"
+        :show-title="true"
+        :box-text="['Size: 200kb', 'Creator: S.H.', 'Last Modified: xxxxx', 'xxxxx',
+                    'xxxxx', 'yyyyyyyyyyyyyyy']"
+        :box-size="{ width: '150px' }"
+        description="Bildserie"
+        title="Afterlife II Ausstellungsansichten"
+        class="image-box"/>
+      <base-button
+        :active="false"
+        :text="'Activate Select'"
+        icon-size="large"
+        button-style="row"
+        @clicked="enableSelect()"/>
+    </div>
+    <!-- <base-hover-box
+      :box-text="[
+        'Alias: Max Mustermann, Stephan Mustermann',
+        'Mitglied der Gruppe für Gestaltung'
+      ]"
+      title="Andreas M."
+      subtext="*1970 Steyr, Oberösterreich"/> -->
+    <div class="form-field">
+      <base-chips-input
+        :list="dropDownInput"
+        :placeholder="'Select Your Marx'"
+        :selected-list="chipsInput"
+        :allow-multiple-entries="true"
+        :allow-dynamic-drop-down-entries="true"
+        :allow-unknown-entries="true"
+        :object-prop="'value'"
+        :chips-inline="true"
+        :chips-editable="true"
+        :identifier="'id'"
+        :hoverbox-content="{ title: 'test' }"
+        draggable
+        label="A label"
+        @fetch-dropdown-entries="fetch">
+        <template slot="drop-down-extended">
+          <div
+            v-if="dropDownInput && dropDownInput.length"
+            class="dropdown-extended">
+            <div class="show-more-toggle">
+              Show more results...
+            </div>
+          </div>
+        </template>
+      </base-chips-input>
+    </div>
+    <div :style="{ height: '400px' }" />
+
+
+    <div class="form-field">
+      <base-chips-below
+        :chips-inline="false"
+        v-model="selectedList"
+        :chips-editable="true"
+        :allow-unknown-entries="true"
+        :list="[{
+                  id: '1',
+                  name: 'Herbert Marcuse'
+                },
+                {
+                  id: '2',
+                  name: 'Erich From',
+                },
+                {
+                  id: '',
+                  name: 'Georg Werth',
+        }]"
+        :role-options="['Farmer', 'Magician', 'Priest']"
+        :hoverbox-content="hoverboxContent"
+        identifier="id"
+        object-prop="name"
+        label="chips-below-test"
+        @hoverbox-active="setHoverBox"/>
+      <base-upload-bar
+        :progress="progress"
+        :filename="'testfile.jpg'"/>
+      <base-button
+        :active="false"
+        :text="'Change Progress'"
+        icon-size="large"
+        button-style="row"
+        @clicked="changeProgress"/>
+    </div>
+    <div class="canvas flex">
+      <base-image-box
+        :selectable="selectable"
+        :show-title="false"
+        :image-url="require('./static/images/icons.png')"
+        description="Bildserie"
+        title="Afterlife II Ausstellungsansichten"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/icons.png')"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box"/>
+      <base-button
+        :active="false"
+        :text="'Activate Select'"
+        icon-size="large"
+        button-style="row"
+        @clicked="enableSelect()"/>
+    </div>
+    <div class="canvas">
+      <base-multiline-text-input
+        v-model="multilineInputObj"
+        :label="'Label'"
+        :tabs="['German', 'English']"
+        :placeholder="'Enter Text'"
+        @tab-switch="tabSwitched">
+        <div class="multiline-dropdown">
+          <base-drop-down
+            :default-select="'Textart'"
+            :selection-list="['Beschreibung', 'Ausstellungseinladung', 'Zeitungsartikel']" />
+        </div>
+      </base-multiline-text-input>
+      <base-multiline-text-input
+        :input="multilineTest"
+        :label="'Label'"
+        :placeholder="'Enter Text'"
+        @text-input="handleMultilineInput"/>
+      <base-button
+        :active="false"
+        icon="sheet-plus"
+        icon-size="large"
+        button-style="row"
+        @clicked="changeInput()"/>
+    </div>
+    <div class="canvas">
+      <base-button
+        :active="false"
+        icon="sheet-plus"
+        icon-size="large"
+        button-style="row" />
+    </div>
     <div class="canvas">
       <base-search
         :show-image="true"
         @input="triggerInput"/>
     </div>
     <div class="form-field">
+      <base-date-input
+        :type="'datetime'"
+        :label="'unknown'"/>
+      <base-date-input
+        :label="'unknown'"/>
       <base-autocomplete-input
         :list="dropDownInput"
         :placeholder="'Fetching from SkosMos'"
@@ -16,6 +168,33 @@
         @autocomplete="fetchSkosMos({ value: $event })"/>
       <base-chips-input
         :list="dropDownInput"
+        :placeholder="'Select Your Marx'"
+        :selected-list="chipsInput"
+        :allow-multiple-entries="true"
+        :allow-dynamic-drop-down-entries="true"
+        :object-prop="'value'"
+        :chips-inline="true"
+        :chips-editable="true"
+        :identifier="'id'"
+        draggable
+        label="A label"
+        @fetchDropDownEntries="fetch"/>
+      <base-button
+        text="change input"
+        icon="remove"
+        @clicked="changeInput" />
+      <base-chips-input
+        :list="[
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '***' },
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '**' },
+          { title: '...alle Verhältnisse umzuwerfen',
+            additional: 'part1', remark: '*' },
+          { title: 'in denen der Mensch' },
+          { title: 'ein erniedrigtes, ein geknechtetes' },
+          { title: 'ein verlassenes, ein verächtliches' },
+          { title: 'Wesen ist' }]"
         :placeholder="'Select your Marx'"
         :object-prop="'title'"
         :chips-editable="true"
@@ -30,10 +209,57 @@
         </template>
       </base-chips-input>
     </div>
+    <base-menu-list
+      :selected="showCheckbox"
+      :list="list"
+      @clicked="activateMenuEntry"/>
+    <base-menu-entry
+      :entry-id="'asingleentry'"
+      :icon="'sheet-empty'"
+      :active="menuEntryActive"
+      :select-active="showCheckbox"
+      :is-selectable="true"
+      :thumbnails="['attention', 'people']"
+      title="Poesie oh Poesisssssssssssssssssssssssssssssssssse"
+      subtext="Aus einer anderen Weltsssssssssssssssssssssssssss"
+      description="Gemälde"
+      @clicked="menuEntryActive = true"/>
+    <base-button
+      text="blaaa"
+      @clicked="showCheckbox = !showCheckbox"/>
+    <div class="flex row">
+      <base-drop-box
+        :show-plus="true"
+        :box-size="{ width: 'calc(25% - 16px)' }"
+        icon="camera"
+        text="Datei hinzufügen"
+        subtext="(Click oder durch drag'n drop hinzufügen)"
+        @dropped="dropped($event)"
+        @clicked="boxClicked"/>
+      <base-drop-box />
+    </div>
+    <div>
+      <ul>
+        <li
+          v-for="item in elements"
+          :key="item.id">{{ item.title }}</li>
+      </ul>
+    </div>
+
     <base-button
       draggable="true"
       icon="options-menu"
       @clicked="showPopUp = true"/>
+    <base-drop-down
+      :label="'select type'"
+      :default-select="'Alle Typ'"
+      :selection-list="['Bild', 'Publikation', 'Film/Video']" />
+    <base-drop-down
+      :default-select="'Alle Typen'"
+      :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']" />
+    <div>
+      More text test xtxts atea
+    </div>
     <base-pop-up
       :show="showPopUp"
       title="Bild entfernen"
@@ -162,6 +388,7 @@ export default {
       files: [],
       elements: [],
       multilineInput: 'test',
+      multilineTest: '',
       selectable: false,
       progress: 0,
       autocompleteInput: 'testtttttttttttt',
@@ -221,8 +448,23 @@ export default {
     },
   },
   watch: {
+    async autocompleteInput(val) {
+      if (!val || val.length > 3) {
+        const result = await axios.get('http://localhost:9900/fetch', {
+          params:
+            {
+              string: val,
+            },
+        });
+        this.dropDownInput = result.data;
+      }
+    },
   },
   methods: {
+    handleMultilineInput(val) {
+      debugger;
+      console.log(val);
+    },
     setHoverBox(val, entry) {
       if (val) {
         console.log(entry);
@@ -290,6 +532,17 @@ export default {
         });
       }
     },
+    async fetch(string) {
+      if (!string.value || string.value.length > 3) {
+        const result = await axios.get('http://localhost:9900/fetch', {
+          params:
+            {
+              string: string.value,
+            },
+        });
+        this.dropDownInput = result.data;
+      }
+    },
     submit(e) {
       this.post({
         kind: 'entity',
@@ -321,7 +574,6 @@ export default {
       console.log(type);
     },
   },
-
 };
 </script>
 
