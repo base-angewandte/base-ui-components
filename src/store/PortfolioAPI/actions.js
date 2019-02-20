@@ -88,12 +88,12 @@ export default {
       });
     });
   },
-  delete({ state, commit }, { kind, type, id }) {
+  delete({ state, commit }, { kind, id }) {
     let p = {};
     return new Promise((resolve, reject) => {
-      if (type && id) {
+      if (kind && id) {
         commit('setLoading', `Deleting ${kind} ${id} in Database`);
-        p = state.apilib[`api_v1_${kind}_delete`]({ id });
+        p = state.apilib[`api_v1_${kind}_delete`]({ id, $config });
       } else reject(new Error('Invalid or Insufficient Parameters'));
       p.then((res) => {
         commit('setLoadingFinished', `Fetching ${kind} finished.`);
