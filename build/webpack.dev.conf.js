@@ -1,4 +1,3 @@
-var path = require('path')
 var utils = require('./utils')
 var webpack = require('webpack')
 var config = require('../config')
@@ -7,21 +6,25 @@ var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
-
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-  baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
-})
+const path = require('path')
 
 module.exports = merge(baseWebpackConfig, {
   mode: "development",
   devServer: {
+    clientLogLevel: 'warning',
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 8082,
-    host: "fe.basedev.uni-ak.ac.at",
-    https: true,
-    hot: true
+    port: config.dev.env.DEV_PORT,
+    host: config.dev.env.DEV_HOST,
+    https: config.dev.env.DEV_HTTPS,
+    hot: true,
+    publicPath: config.dev.assetsPublicPath,
+    quiet: true, // necessary for FriendlyErrorsPlugin
+    historyApiFallback: {
+      rewrites: [
+        { from: /.*/, to: path.posix.join(config.dev.assetsPublicPath, 'index.html') },
+      ],
+    },
   },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })

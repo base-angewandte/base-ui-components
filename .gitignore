@@ -13,4 +13,6 @@ yarn-error.log*
 
 dist/
 styleguide/
-index.html
+/index.html
+config/dev.env.js
+config/prod.env.js
