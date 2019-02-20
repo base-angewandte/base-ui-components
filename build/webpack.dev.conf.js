@@ -20,11 +20,6 @@ module.exports = merge(baseWebpackConfig, {
     hot: true,
     publicPath: config.dev.assetsPublicPath,
     quiet: true, // necessary for FriendlyErrorsPlugin
-    historyApiFallback: {
-      rewrites: [
-        { from: /.*/, to: path.posix.join(config.dev.assetsPublicPath, 'index.html') },
-      ],
-    },
   },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
