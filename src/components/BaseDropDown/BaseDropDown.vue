@@ -161,6 +161,11 @@ export default {
     selected(val) {
       this.selectedInt = val;
     },
+    selectionList(val) {
+      if (val !== this.listInt) {
+        this.listInt = val;
+      }
+    },
   },
   mounted() {
     if (this.$refs.entries && this.$refs.header) {
