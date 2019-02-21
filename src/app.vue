@@ -1,29 +1,6 @@
 <template>
   <div id="app">
-    <div class="canvas flex">
-      <base-image-box
-        :selectable="selectable"
-        :show-title="true"
-        :box-text="['Size: 200kb', 'Creator: S.H.', 'Last Modified: xxxxx', 'xxxxx',
-                    'xxxxx', 'yyyyyyyyyyyyyyy']"
-        :box-size="{ width: '150px' }"
-        description="Bildserie"
-        title="Afterlife II Ausstellungsansichten"
-        class="image-box"/>
-      <base-button
-        :active="false"
-        :text="'Activate Select'"
-        icon-size="large"
-        button-style="row"
-        @clicked="enableSelect()"/>
-    </div>
-    <!-- <base-hover-box
-      :box-text="[
-        'Alias: Max Mustermann, Stephan Mustermann',
-        'Mitglied der Gruppe für Gestaltung'
-      ]"
-      title="Andreas M."
-      subtext="*1970 Steyr, Oberösterreich"/> -->
+    <BasePagination :total="100" />
     <div class="form-field">
       <base-chips-input
         :list="dropDownInput"
@@ -51,8 +28,6 @@
         </template>
       </base-chips-input>
     </div>
-    <div :style="{ height: '400px' }" />
-
 
     <div class="form-field">
       <base-chips-below
@@ -343,10 +318,12 @@ import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutoco
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
+import BasePagination from './components/BasePagination/BasePagination';
 
 export default {
   name: 'App',
   components: {
+    BasePagination,
     BaseHoverBox,
     BaseChipsBelow,
     BaseDateInput,
