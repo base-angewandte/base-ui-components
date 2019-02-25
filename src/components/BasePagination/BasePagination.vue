@@ -24,10 +24,10 @@
 
         @click="active = n">{{ n }}</span>
       <span
-        v-if="end < total && end !== total"
+        v-if="(end) < (total - 1) && (end) !== (total - 1)"
         class="base-pagination-more">&#8943;</span>
       <span
-        v-if="end <= total"
+        v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
         :class="{ 'base-pagination-number-active': active === total}"
         class="base-pagination-number"
         @click="active = total">{{ total }}
@@ -82,13 +82,19 @@ export default {
   data() {
     return {
       active: this.current,
-      start: 1,
-      end: 0,
+      start: null,
+      end: null,
+      subsetNumber: 7,
     };
   },
   computed: {
     subset() {
-      return Array.from({ length: this.end - this.start }, (v, k) => k + this.start);
+      // check if subset number would exceed total number of items and start
+      // array from total - subsetNumber
+      const subsetStart = this.start + this.subsetNumber > this.total
+        ? this.total - this.subsetNumber + 1 : this.start;
+      return Array.from({ length: this.subsetNumber },
+        (v, k) => k + subsetStart);
     },
   },
   watch: {
@@ -106,24 +112,24 @@ export default {
       this.active = this.current;
     },
   },
-  created() {
+  mounted() {
     this.setStartEnd();
   },
   methods: {
     setStartEnd() {
-      let len = this.active + 6 <= this.total ? 6 : this.total - this.start + 1;
-      const windowWidth = window.innerWidth;
-      if (windowWidth < 440) {
-        this.start = this.active;
-        len = 1;
-      } else if (windowWidth < 710) {
-        this.start = this.active - 1 > 1 ? this.active - 1 : 1;
-        len = this.active + 4 <= this.total ? 4 : this.total - this.start + 1;
-      } else {
-        this.start = this.active - 2 > 1 ? this.active - 2 : 1;
-        len = this.active + 6 <= this.total ? 6 : this.total - this.start + 1;
+      const parentWidth = this.$parent.$el.clientWidth
+        || this.$parent.clientWidth || window.innerWidth;
+      if (parentWidth < 390) {
+        this.subsetNumber = 1;
+      } else if (parentWidth < 570) {
+        this.subsetNumber = 3;
+      } else if (parentWidth < 710) {
+        this.subsetNumber = 5;
       }
-      this.end = this.start + len;
+      this.start = this.active - this.subsetNumber / 2 > 0
+        ? this.active - Math.floor(this.subsetNumber / 2) : 1;
+      this.end = this.active + this.subsetNumber / 2 < this.total
+        ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
     },
   },
 };
