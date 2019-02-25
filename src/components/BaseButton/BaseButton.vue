@@ -116,13 +116,14 @@ export default {
   @import "../../styles/variables";
 
   .base-button {
-    padding: calc(#{$spacing-small}/2 + 3px) #{$spacing} calc(#{$spacing-small}/2);
+    padding: calc(#{$spacing-small}/2 + #{$border-active-width})
+      #{$spacing} calc(#{$spacing-small}/2);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 3px solid transparent;
+    border-bottom: $border-active-width solid transparent;
 
     .base-button-text {
       text-align: center;
@@ -174,7 +175,7 @@ export default {
     }
 
     &.base-button-active {
-      border-bottom: 3px solid #{$app-color};
+      border-bottom: $active-border;
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg;
       z-index: 1;

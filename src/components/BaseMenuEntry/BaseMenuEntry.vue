@@ -269,7 +269,7 @@ export default {
       cursor: pointer;
 
       .base-menu-entry-border-active {
-        border: $border-width solid #{$app-color};
+        border-left: $active-border;
       }
 
       .base-menu-entry-border {
