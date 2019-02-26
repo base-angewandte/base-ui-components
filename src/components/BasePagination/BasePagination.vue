@@ -5,7 +5,7 @@
       class="base-pagination-arrow"
       @click="active = active - 1 > 0 ? active - 1 : 1"/>
     <div
-      v-if="total > 10"
+      v-if="total > maxNumbers"
       class="base-pagination-row">
       <span
         v-if="start !== 1"
@@ -35,7 +35,7 @@
     </div>
     <div
       v-else
-      class="base-pagination-row-item">
+      class="base-pagination-row">
       <span
         v-for="n in total"
         :key="n"
@@ -85,6 +85,7 @@ export default {
       start: null,
       end: null,
       subsetNumber: 7,
+      maxNumbers: 10,
     };
   },
   computed: {
@@ -121,8 +122,10 @@ export default {
         || this.$parent.clientWidth || window.innerWidth;
       if (parentWidth < 390) {
         this.subsetNumber = 1;
+        this.maxNumbers = 5;
       } else if (parentWidth < 570) {
         this.subsetNumber = 3;
+        this.maxNumbers = 8;
       } else if (parentWidth < 710) {
         this.subsetNumber = 5;
       }
