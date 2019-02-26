@@ -13,6 +13,9 @@
       :placeholder="$props.placeholder"
       :class="['base-search-input', { 'base-search-input-img': showImage }]"
       type="text"
+      autocomplete="off"
+      @focus.prevent="test"
+      @click.prevent="test"
       @keyup="$emit('input', input)" >
   </div>
 </template>
@@ -65,6 +68,11 @@ export default {
     return {
       input: null,
     };
+  },
+  methods: {
+    test() {
+      return null;
+    },
   },
 };
 </script>
