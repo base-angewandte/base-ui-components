@@ -99,18 +99,20 @@ export default {
     },
   },
   watch: {
-    active() {
+    active(val) {
       /**
        * triggered on page select
        *
        * @event set-page
        * @type Number
        */
-      this.$emit('set-page', this.active);
+      if (this.current !== val) {
+        this.$emit('set-page', val);
+      }
       this.setStartEnd();
     },
-    current() {
-      this.active = this.current;
+    current(val) {
+      this.active = val;
     },
   },
   mounted() {
