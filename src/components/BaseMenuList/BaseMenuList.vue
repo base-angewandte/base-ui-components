@@ -116,7 +116,6 @@ export default {
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
     activateItem(index) {
-      // commented out since this makes problems with the store (do not mutate outside...)
       this.entryProps.forEach((entry) => { this.$set(entry, 'active', false); });
       if (this.entryProps.length) {
         this.$set(this.entryProps[index], 'active', true);
@@ -147,7 +146,7 @@ export default {
         active: entry.active || false,
         error: entry.error || false,
       }));
-      if (this.entryProps.length && this.activeEntry !== null) {
+      if (this.entryProps.length && !this.activeEntry < 0) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },
