@@ -437,7 +437,6 @@ export default {
   methods: {
     // add an entry from the drop down to the list of selected entries
     addSelected() {
-      debugger;
       this.showDropDown = true;
       // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
