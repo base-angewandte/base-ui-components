@@ -558,10 +558,8 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        // TODO: alternatively - make prop flag sortByLastName (however also
-        // problematic if names in diff format...) or make sort just event emit?
-        const compA = this.objectProp === 'name' ? a[this.objectProp].split(' ').pop() : a[this.objectProp];
-        const compB = this.objectProp === 'name' ? b[this.objectProp].split(' ').pop() : b[this.objectProp];
+        const compA = a[this.objectProp].toLowerCase();
+        const compB = b[this.objectProp].toLowerCase();
         if (compA > compB) {
           return 1;
         }
