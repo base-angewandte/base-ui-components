@@ -50,7 +50,8 @@ export default {
       });
     });
   },
-  get({ state, commit }, { kind, type, id, sort, offset, limit }) {
+  /* eslint-disable-next-line camelcase */
+  get({ state, commit }, { kind, type, id, sort, offset, limit, q, link_selection_for }) {
     let p = {};
     return new Promise((resolve, reject) => {
       if (kind && id) {
@@ -58,7 +59,7 @@ export default {
         p = state.apilib[`api_v1_${kind}_read`]({ id, $config });
       } else if (kind && !id) {
         commit('setLoading', `Getting Queryset of ${kind} from Database`);
-        p = state.apilib[`api_v1_${kind}_list`]({ type, sort, offset, limit, $config });
+        p = state.apilib[`api_v1_${kind}_list`]({ type, sort, offset, limit, q, link_selection_for, $config });
       } else reject(new Error('Invalid or Insufficient Parameters'));
       p.then((res) => {
         commit('setLoadingFinished', `Fetching ${kind} finished.`);
