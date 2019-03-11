@@ -24,7 +24,7 @@
         <div
           :class="{'dropdown-selected-fadeout': fixedWidth}"
           class="dropdown-selected" >
-          <p ref="header">{{ selectedInt }}</p>
+          <p ref="header">{{ selectedInt.label }}</p>
         </div>
         <div class="dropdown-icon">
           <svg-icon
@@ -45,7 +45,7 @@
           class="dropdown-item"
           @click="selectItem(item)">
           <p class="dropdown-text">
-            {{ item }}
+            {{ item.label }}
           </p>
         </div>
       </div>
@@ -79,8 +79,10 @@ export default {
      * the string selected from the drop down menu
      */
     selected: {
-      type: String,
-      default: '',
+      type: Object,
+      default() {
+        return {};
+      },
     },
     /**
      * A label for the drop down
@@ -98,7 +100,7 @@ export default {
       default: 'Select',
     },
     /**
-     * The list displayed in the drop down
+     * The list displayed in the drop down, it needs a 'label' and a 'value' property!
      */
     selectionList: {
       type: Array,
@@ -142,9 +144,9 @@ export default {
       // control selector list
       showMenu: false,
       // internal copy of provided default entry
-      selectedInt: this.selected || this.placeholder,
+      selectedInt: this.selected.label ? Object.assign({}, this.selected) : { label: this.placeholder, value: '' },
       // internal copy of provided selection list
-      listInt: this.selectionList,
+      listInt: Object.assign({}, this.selectionList),
       // helper variable so element always has width of widest list entrty
       bodyWidth: 0,
     };
@@ -152,9 +154,10 @@ export default {
   watch: {
     // when selected entry changes also adjust entry list (remove selected and add default value if
     // necessary)
-    selectedInt() {
-      this.listInt = [].concat(this.selectionList.filter(entry => entry !== this.selectedInt));
-      if (this.selectedInt !== this.selected) {
+    selectedInt(val) {
+      this.listInt = [].concat(this.selectionList
+        .filter(entry => entry.value !== val.value));
+      if (val.value !== this.selected.value) {
         this.listInt.unshift(this.selected);
       }
     },
@@ -163,7 +166,8 @@ export default {
     },
     selectionList(val) {
       if (val !== this.listInt) {
-        this.listInt = val;
+        this.listInt = Object.assign({}, val
+          .filter(option => option.value !== this.selectedInt.value));
       }
     },
   },
@@ -196,7 +200,7 @@ export default {
        * @type String
        */
       this.$emit('selected', item);
-      this.selectedInt = item;
+      this.selectedInt = Object.assign({}, item);
       this.showMenu = false;
     },
     // for click-outside directive
