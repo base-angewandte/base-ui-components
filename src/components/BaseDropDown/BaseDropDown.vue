@@ -291,6 +291,9 @@ export default {
       z-index: 3;
       text-align: left;
       max-width: inherit;
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .hide-body {
