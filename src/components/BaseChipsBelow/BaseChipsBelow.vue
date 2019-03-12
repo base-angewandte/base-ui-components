@@ -63,7 +63,8 @@
                 :allow-dynamic-drop-down-entries="false"
                 :placeholder="rolesPlaceholder"
                 :always-linked="true"
-                object-prop="role"
+                identifier="value"
+                object-prop="label"
                 @selected="updateRoles($event, index)"/>
             </div>
           </div>
