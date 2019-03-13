@@ -6,7 +6,7 @@
     @clicked="boxSelect">
     <div
       :class="['base-image-box-content-wrapper',
-               { 'base-image-box-selected': selectable && selected }]">
+               { 'base-image-box-selected': selectable && selectedInt }]">
       <div :class="['base-image-box-content', imageShadowClass]">
         <!-- @SLOT for published icon of files -->
         <slot name="top" />
@@ -59,7 +59,7 @@
         name="slide-fade">
         <BaseCheckmark
           v-if="selectable"
-          :checked="selected"
+          :checked="selectedInt"
           mark-style="checkbox"
           check-box-size="large"
           class="base-image-box-checkbox" />
@@ -127,6 +127,13 @@ export default {
       default: false,
     },
     /**
+     * set select status (checkbox checked) from outside
+     */
+    selected: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * specify the size of the box
      */
     boxSize: {
@@ -148,7 +155,7 @@ export default {
   },
   data() {
     return {
-      selected: false,
+      selectedInt: false,
       boxTextStyle: {},
       imageStyle: {},
     };
@@ -161,20 +168,25 @@ export default {
   },
   watch: {
     // TODO: could probably just be added to boxSelect method?
-    selected() {
-      /**
-       * event triggered when box is selectable and clicked upon
-       *
-       * @event select-triggered
-       * @type Boolean
-       */
-      this.$emit('select-triggered', this.selected);
+    selectedInt(val) {
+      if (this.selected !== val) {
+        /**
+         * event triggered when box is selectable and clicked upon
+         *
+         * @event select-triggered
+         * @type Boolean
+         */
+        this.$emit('select-triggered', val);
+      }
     },
-    selectable() {
-      this.selected = false;
+    selected(val) {
+      if (this.selectedInt !== val) {
+        this.selectedInt = val;
+      }
     },
   },
   mounted() {
+    this.selectedInt = this.selected;
     if (this.$refs.image) {
       const imageEl = this.$refs.image;
       imageEl.addEventListener('load', () => {
@@ -206,7 +218,7 @@ export default {
   methods: {
     boxSelect() {
       if (this.selectable) {
-        this.selected = !this.selected;
+        this.selectedInt = !this.selectedInt;
       } else {
         /**
          * event triggered when selectable is false and box is clicked
