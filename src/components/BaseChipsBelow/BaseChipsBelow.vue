@@ -70,6 +70,13 @@
           </div>
         </draggable>
       </template>
+      <template
+        slot="drop-down-entry"
+        slot-scope="props">
+        <slot
+          :item="props.item"
+          name="below-drop-down-entry" />
+      </template>
     </base-chips-input>
   </div>
 </template>
