@@ -276,8 +276,7 @@ export default {
       this.emitInternalList(list);
     },
     updateRoles(evt, index) {
-      // TODO: should role be saved as string or with id etc. ?? (now: just string!)
-      this.$set(this.selectedBelowListInt[index], 'roles', evt.map(sel => sel.role));
+      this.$set(this.selectedBelowListInt[index], 'roles', evt);
       this.emitInternalList(this.selectedBelowListInt);
     },
     createInternalList(val) {

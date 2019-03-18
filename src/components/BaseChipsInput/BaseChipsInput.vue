@@ -384,7 +384,9 @@ export default {
     // watch selectedList prop for changes triggered from outside
     selectedList: {
       handler(val) {
-        this.setSelectedList(val);
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+          this.setSelectedList(val);
+        }
       },
       deep: true,
     },
@@ -487,7 +489,7 @@ export default {
        * @event selected
        * @type {object}
        */
-      this.emitSelectedList();
+      this.emitSelectedList(this.selectedListInt);
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
