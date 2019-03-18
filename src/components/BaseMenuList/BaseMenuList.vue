@@ -9,7 +9,7 @@
       :title="item.title"
       :is-active="entryProps[index].active"
       :is-selected="entryProps[index].selected"
-      :icon="getType(item)"
+      :icon="getType(item.icon)"
       :thumbnails="getThumbnails(item)"
       :description="item.type"
       :is-selectable="true"
@@ -44,7 +44,7 @@ export default {
      * list of menu entries - array of objects <br>
      *   Entry properties that can be displayed: <br>
      *     required: 'id' <br>
-     *     optional: 'title', 'type', 'active', 'selected',
+     *     optional: 'title', 'type', 'active', 'selected', 'icon',
      *     'shared', 'published', 'error'
      */
     list: {
@@ -97,7 +97,7 @@ export default {
     // determines which icon should be shown for each menu entry
     // TODO: this should probably also be definable per entry dynamically on the long run...
     getType(val) {
-      return ['Ausstellung', 'Event', 'Konzert'].includes(val.type) ? 'calendar-number' : 'sheet-empty';
+      return val && val.includes('calendar-number') ? 'calendar-number' : 'sheet-empty';
     },
     // define which thumbnails should be shown for each item
     // TODO: currently hardcoded here but needs dynamic solution!
