@@ -489,7 +489,7 @@ export default {
        * @event selected
        * @type {object}
        */
-      this.emitSelectedList(this.selectedListInt);
+      this.emitSelectedList();
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
