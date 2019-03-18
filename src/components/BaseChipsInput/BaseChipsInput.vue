@@ -384,7 +384,9 @@ export default {
     // watch selectedList prop for changes triggered from outside
     selectedList: {
       handler(val) {
-        this.setSelectedList(val);
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+          this.setSelectedList(val);
+        }
       },
       deep: true,
     },
