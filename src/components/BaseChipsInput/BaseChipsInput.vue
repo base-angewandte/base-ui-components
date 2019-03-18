@@ -397,7 +397,7 @@ export default {
     showDropDown(val) {
       // allow also for static drop down entries to be loaded on first drop down show only
       if (!this.allowDynamicDropDownEntries && !this.dropDownListInt.length) {
-        this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
+        this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
       }
       if (val) {
         this.selectedMenuEntryIndex = this.getAllowUnknown();
