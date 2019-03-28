@@ -7,20 +7,22 @@
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
-      <!-- @slot to add drop down needed for text input field (base specific) -->
-      <slot />
-      <div
-        v-if="tabs && tabs[0] !== 'default'"
-        class="base-multiline-text-input-tabs">
-        <span
-          v-for="(tab, index) in tabs"
-          :key="index"
-          :class="[
-            'base-multiline-text-input-tab',
-            {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
-          @click="activeTabInt = tab.toLowerCase()">
-          {{ tabLabels[index] || tab }}
-        </span>
+      <div class="base-multiline-text-input-additions">
+        <!-- @slot to add drop down needed for text input field (base specific) -->
+        <slot />
+        <div
+          v-if="tabs && tabs[0] !== 'default'"
+          class="base-multiline-text-input-tabs">
+          <span
+            v-for="(tab, index) in tabs"
+            :key="index"
+            :class="[
+              'base-multiline-text-input-tab',
+              {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
+            @click="activeTabInt = tab.toLowerCase()">
+            {{ tabLabels[index] || tab }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -177,19 +179,25 @@ export default {
         text-transform: capitalize;
       }
 
-      .base-multiline-text-input-tabs {
-        align-self: center;
-        margin: $spacing-small/2 0;
+      .base-multiline-text-input-additions {
+        display: flex;
+        flex-wrap: wrap;
 
-        .base-multiline-text-input-tab {
-          padding: $spacing-small/2 $spacing;
-          border: 1px solid transparent;
-          cursor: pointer;
-          text-transform: capitalize;
-        }
+        .base-multiline-text-input-tabs {
+          align-self: center;
+          margin: $spacing-small/2 0;
+          flex-shrink: 0;
 
-        .base-multiline-text-input-tab-active {
-          border: $input-field-border;
+          .base-multiline-text-input-tab {
+            padding: $spacing-small/2 $spacing;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-transform: capitalize;
+          }
+
+          .base-multiline-text-input-tab-active {
+            border: $input-field-border;
+          }
         }
       }
     }
@@ -211,6 +219,10 @@ export default {
     .base-multiline-text-input-label-row {
       flex-wrap: wrap;
       justify-content: flex-end;
+
+      .base-multiline-text-input-additions {
+        justify-content: flex-end;
+      }
     }
   }
 </style>
