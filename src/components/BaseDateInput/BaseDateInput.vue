@@ -13,7 +13,23 @@
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeFrom },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
+        <input
+          v-if="type === 'timerange'"
+          id="timeFrom"
+          :title="label + '-time'"
+          :placeholder="placeholder + ' Time'"
+          v-model="inputInt.time_from"
+          class="base-input-field base-date-input-field"
+          type="text"
+          autocomplete="off"
+          @focus="$emit('input-focus')"
+          @keypress.enter="$emit('enter', inputInt)"
+          @keyup.up.down.prevent="$emit('arrow-key', $event)"
+          @input="$emit('autocomplete', inputInt)"
+          @blur="blurInput()"
+          @click="activeFrom = true">
         <datepicker
+          v-else
           id="dateFrom"
           key="dateFrom"
           ref="datepickerFrom"
@@ -29,12 +45,17 @@
           @closed="selected('from')"
           @click="openDatePicker('from')"/>
         <svg-icon
+          v-if="type === 'timerange'"
+          name="clock"
+          class="base-input-date-icon"/>
+        <svg-icon
+          v-else
           name="calendar-many"
           class="base-input-date-icon"
           @click="openDatePicker('from')"/>
       </div>
       <span
-        v-if="type === 'range'"
+        v-if="type === 'daterange' || type === 'timerange'"
         class="separator">bis</span>
       <div
         v-click-outside="() => selected('to')"
@@ -43,11 +64,11 @@
                  { 'base-input-field-container-active': activeTo },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
         <input
-          v-if="type === 'datetime'"
-          :id="label + '-time'"
+          v-if="type === 'datetime' || type === 'timerange'"
+          id="timeTo"
           :title="label + '-time'"
           :placeholder="placeholder + ' Time'"
-          v-model="timeFrom"
+          v-model="timeTo"
           class="base-input-field base-date-input-field"
           type="text"
           autocomplete="off"
@@ -59,8 +80,8 @@
           @click="activeTo = true">
         <datepicker
           v-else
-          id="to"
-          key="to"
+          id="dateTo"
+          key="dateTo"
           ref="datepickerTo"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
@@ -74,7 +95,7 @@
           @closed="selected('to')"/>
 
         <svg-icon
-          v-if="type === 'datetime'"
+          v-if="type === 'datetime' || type === 'timerange'"
           name="clock"
           class="base-input-date-icon"/>
 
@@ -117,13 +138,13 @@ export default {
   props: {
   /**
    * selecte date or datetime
-   * values: 'range'|'datetime | single'
+   * values: 'daterange'|'datetime' | 'single' | 'timerange'
    */
     type: {
       type: String,
       default: 'range',
       validator(val) {
-        return (val === 'range' || val === 'datetime' || val === 'single');
+        return ['daterange', 'datetime', 'single', 'timerange'].includes(val);
       },
     },
     /**
@@ -132,17 +153,8 @@ export default {
      * input field settable from outside
      */
     input: {
-      type: Object,
-      default() {
-        return {
-          date: null,
-          date_from: null,
-          date_to: null,
-          time: null,
-          time_from: null,
-          time_to: null,
-        };
-      },
+      type: [Object, String],
+      default: '',
     },
     /** label for input field, required for usability purposes, handle
      * showing of label with property showLabel
@@ -216,44 +228,48 @@ export default {
         }
       },
     },
-    timeFrom: {
+    timeTo: {
       get() {
-        return this.inputInt.time || this.inputInt.time_from;
+        return this.inputInt.time || this.inputInt.time_to;
       },
       set(val) {
         if (this.inputProperties.includes('time_from')) {
-          this.inputInt.date_from = val;
+          this.inputInt.time_to = val;
         } else {
-          this.inputInt.date = val;
+          this.inputInt.time = val;
         }
       },
     },
   },
   watch: {
     input(val) {
-      this.inputInt = Object.assign({}, val);
+      this.inputInt = typeof val === 'string' ? { date: val } : Object.assign({}, val);
     },
   },
   created() {
-    this.inputInt = Object.assign({}, this.input);
+    this.inputInt = typeof this.input === 'string' ? { date: this.input }
+      : Object.assign({}, this.input);
   },
   methods: {
     blurInput() {
       this.activeFrom = false;
+      this.activeTo = false;
       this.emitData();
     },
     selected(field) {
-      if (field === 'from') {
-        this.activeFrom = false;
-        this.$refs.datepickerFrom.close();
-      } else if (field === 'to') {
-        this.activeTo = false;
-        this.$refs.datepickerTo.close();
-      } else {
-        this.activeFrom = false;
-        this.activeTo = false;
-        this.$refs.datepickerFrom.close();
-        this.$refs.datepickerTo.close();
+      if (this.$refs.datepickerFrom && this.$refs.datepickerTo) {
+        if (field === 'from') {
+          this.activeFrom = false;
+          this.$refs.datepickerFrom.close();
+        } else if (field === 'to') {
+          this.activeTo = false;
+          this.$refs.datepickerTo.close();
+        } else {
+          this.activeFrom = false;
+          this.activeTo = false;
+          this.$refs.datepickerFrom.close();
+          this.$refs.datepickerTo.close();
+        }
       }
       this.emitData();
     },
@@ -267,17 +283,21 @@ export default {
       }
     },
     emitData() {
-      const data = {};
-      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
-      /**
-       * emit an event when focus leaves the input
-       *
-       * TODO: check again if this is needed???
-       *
-       * @event selected
-       * @type string
-       */
-      this.$emit('selected', data);
+      if (typeof this.input === 'string') {
+        this.$emit('selected', this.inputInt.date);
+      } else {
+        const data = {};
+        this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
+        /**
+         * emit an event when focus leaves the input
+         *
+         * TODO: check again if this is needed???
+         *
+         * @event selected
+         * @type string
+         */
+        this.$emit('selected', data);
+      }
     },
   },
 };
@@ -301,7 +321,7 @@ export default {
       min-height: $row-height-small;
       border: $input-field-border;
       background: white;
-      flex: 1 0 auto;
+      flex: 1 1 auto;
       max-width: 100%;
     }
 
