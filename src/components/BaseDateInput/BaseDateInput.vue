@@ -195,8 +195,10 @@ export default {
       default: 'Enter Text Here',
     },
     /**
-     * specify date format
-     * allowed values: 'day', 'month', 'year'
+     * specify date format<br>
+     * allowed values: 'day', 'month', 'year', 'date_year'<br>
+     *   ('date_year': display tabs that allow for toggle between only choosing year
+     *   or complete date)
      */
     format: {
       type: String,
@@ -216,12 +218,17 @@ export default {
         time_from: null,
         time_to: null,
       },
+      // variable for toggling format
       dateFormatInt: 'DD.MM.YYY',
+      // attempt to control 'active' status of input field
+      // TODO: not working correctly at the moment (especially for datepicker)
       activeFrom: false,
       activeTo: false,
     };
   },
   computed: {
+    // compute the date format needed for the date picker based on what
+    // was specified in format and what date toggle tabs (via dateFormatInt) might say
     dateFormat() {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
         return 'yyyy';
@@ -231,10 +238,10 @@ export default {
       }
       return 'dd.MM.yyyy';
     },
+    // if the format is settable this.format is date_year and can not be
+    // used directly for the date picker component
     minDateView() {
-      // if the format is settable this.format is date_year and can not b
-      // used directly for the date picker component
-      if (this.dateFormatInt === 'YYYY') {
+      if (this.format === 'date_year' && this.dateFormatInt === 'YYYY') {
         return 'year';
       }
       if (this.format === 'date_year' && this.dateFormatInt === 'DD.MM.YYYY') {
@@ -242,11 +249,15 @@ export default {
       }
       return this.format;
     },
+    // compute the properties of the object provided in input
     inputProperties() {
       return Object.keys(this.input);
     },
     showFormatOptions() {
       return this.format === 'date_year';
+    },
+    isSingleDate() {
+      return typeof this.input === 'string' || !this.inputProperties.length;
     },
     dateFrom: {
       get() {
@@ -275,22 +286,16 @@ export default {
   },
   watch: {
     input(val) {
-      this.inputInt = typeof val === 'string' ? { date: val } : Object.assign({}, val);
-      if (this.showFormatOptions && this.checkDateFormat()) {
+      this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
+      if (this.showFormatOptions && this.isDateFormatYear()) {
         this.dateFormatInt = 'YYYY';
       }
     },
-    dateFormatInt() {
-      Object.keys(this.inputInt).filter(key => !!key.includes('date'))
-        .forEach(dateKey => this.$set(this.inputInt, dateKey,
-          this.convertDate(this.inputInt[dateKey])));
-      this.emitData();
-    },
   },
   created() {
-    this.inputInt = typeof this.input === 'string' ? { date: this.input }
+    this.inputInt = this.isSingleDate ? { date: this.input }
       : Object.assign({}, this.input);
-    this.dateFormatInt = this.showFormatOptions && this.checkDateFormat()
+    this.dateFormatInt = this.showFormatOptions && this.isDateFormatYear()
       ? 'YYYY' : 'DD.MM.YYYY';
   },
   methods: {
@@ -326,7 +331,8 @@ export default {
       }
     },
     emitData() {
-      if (typeof this.input === 'string') {
+      this.convertDate();
+      if (this.isSingleDate) {
         this.$emit('selected', this.inputInt.date);
       } else {
         const data = {};
@@ -337,27 +343,28 @@ export default {
          * TODO: check again if this is needed???
          *
          * @event selected
-         * @type string
+         * @type string|object
          */
         this.$emit('selected', data);
       }
     },
-    checkDateFormat() {
-      return Object.keys(this.inputInt).filter(key => !!key.includes('date')
-        && this.inputInt[key] && this.inputInt.length <= 4).length;
+    isDateFormatYear() {
+      return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
+        || this.inputProperties.some(key => !!key.includes('date')
+        && this.inputInt[key] && this.inputInt[key].length <= 4));
     },
-    convertDate(date) {
-      if (!date) {
-        return date;
-      }
-      if (this.minDateView === 'year') {
-        return new Date(date).getFullYear().toString();
-      }
-      if (this.minDateView === 'month') {
-        // TODO: add month view!
-        return date;
-      }
-      return new Date(date);
+    convertDate() {
+      Object.keys(this.inputInt).filter(key => !!key.includes('date'))
+        .forEach((dateKey) => {
+          if (this.inputInt[dateKey]) {
+            if (this.minDateView === 'year') {
+              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
+                .getFullYear().toString());
+            } else {
+              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey]));
+            }
+          }
+        });
     },
   },
 };
