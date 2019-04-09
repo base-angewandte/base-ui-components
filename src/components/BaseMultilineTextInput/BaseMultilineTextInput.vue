@@ -159,7 +159,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-multiline-text-input{
+  .base-multiline-text-input {
     position: relative;
     width: 100%;
     font-family: inherit;
@@ -208,9 +208,18 @@ export default {
       border: $input-field-border;
       padding: $spacing;
       margin: 0;
+      height: 240px;
 
       &:active, &:focus {
         box-shadow: $input-shadow;
+      }
+    }
+  }
+
+  @media screen and (max-width: $tablet) {
+    .base-multiline-text-input {
+      .base-multiline-text-input-textarea {
+        height: 200px;
       }
     }
   }
