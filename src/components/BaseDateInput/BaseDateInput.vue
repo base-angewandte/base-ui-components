@@ -1,12 +1,29 @@
 <template>
   <div class="base-input">
-    <label
-      :class="{ 'hide': !showLabel }"
-      :for="label"
-      class="base-input-label"
-      @click.prevent="">
-      {{ label }}
-    </label>
+    <div
+      class="base-input-label-row">
+      <label
+        :class="{ 'hide': !showLabel }"
+        :for="label"
+        class="base-input-label"
+        @click.prevent="">
+        {{ label }}
+      </label>
+      <div
+        v-if="showFormatOptions"
+        class="base-date-input-format-tabs">
+        <span
+          v-for="(tab, index) in ['DD.MM.YYYY', 'YYYY']"
+          :key="index"
+          :class="[
+            'base-multiline-text-input-tab',
+            {'base-multiline-text-input-tab-active': dateFormatInt === tab }]"
+          @click="dateFormatInt = tab">
+          {{ tab }}
+        </span>
+      </div>
+    </div>
+
     <div class="input-field-wrapper">
       <div
         v-click-outside="() => selected('from')"
@@ -37,7 +54,7 @@
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
           :placeholder="placeholder"
-          :minimum-view="format"
+          :minimum-view="minDateView"
           v-model="dateFrom"
           calendar-class="calendar-class"
           class="base-input-datepicker"
@@ -86,7 +103,7 @@
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
-          :minimum-view="format"
+          :minimum-view="minDateView"
           :placeholder="placeholder"
           v-model="inputInt.date_to"
           calendar-class="calendar-class"
@@ -142,7 +159,7 @@ export default {
    */
     type: {
       type: String,
-      default: 'range',
+      default: 'single',
       validator(val) {
         return ['daterange', 'datetime', 'single', 'timerange'].includes(val);
       },
@@ -153,7 +170,7 @@ export default {
      * input field settable from outside
      */
     input: {
-      type: [Object, String],
+      type: [Object, String, Date],
       default: '',
     },
     /** label for input field, required for usability purposes, handle
@@ -185,7 +202,7 @@ export default {
       type: String,
       default: 'day',
       validator(val) {
-        return ['day', 'month', 'year'].includes(val);
+        return ['day', 'month', 'year', 'date_year'].includes(val);
       },
     },
   },
@@ -199,13 +216,14 @@ export default {
         time_from: null,
         time_to: null,
       },
+      dateFormatInt: 'DD.MM.YYY',
       activeFrom: false,
       activeTo: false,
     };
   },
   computed: {
     dateFormat() {
-      if (this.format === 'year') {
+      if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
         return 'yyyy';
       }
       if (this.format === 'month') {
@@ -213,8 +231,22 @@ export default {
       }
       return 'dd.MM.yyyy';
     },
+    minDateView() {
+      // if the format is settable this.format is date_year and can not b
+      // used directly for the date picker component
+      if (this.dateFormatInt === 'YYYY') {
+        return 'year';
+      }
+      if (this.format === 'date_year' && this.dateFormatInt === 'DD.MM.YYYY') {
+        return 'day';
+      }
+      return this.format;
+    },
     inputProperties() {
       return Object.keys(this.input);
+    },
+    showFormatOptions() {
+      return this.format === 'date_year';
     },
     dateFrom: {
       get() {
@@ -244,11 +276,22 @@ export default {
   watch: {
     input(val) {
       this.inputInt = typeof val === 'string' ? { date: val } : Object.assign({}, val);
+      if (this.showFormatOptions && this.checkDateFormat()) {
+        this.dateFormatInt = 'YYYY';
+      }
+    },
+    dateFormatInt() {
+      Object.keys(this.inputInt).filter(key => !!key.includes('date'))
+        .forEach(dateKey => this.$set(this.inputInt, dateKey,
+          this.convertDate(this.inputInt[dateKey])));
+      this.emitData();
     },
   },
   created() {
     this.inputInt = typeof this.input === 'string' ? { date: this.input }
       : Object.assign({}, this.input);
+    this.dateFormatInt = this.showFormatOptions && this.checkDateFormat()
+      ? 'YYYY' : 'DD.MM.YYYY';
   },
   methods: {
     blurInput() {
@@ -299,6 +342,23 @@ export default {
         this.$emit('selected', data);
       }
     },
+    checkDateFormat() {
+      return Object.keys(this.inputInt).filter(key => !!key.includes('date')
+        && this.inputInt[key] && this.inputInt.length <= 4).length;
+    },
+    convertDate(date) {
+      if (!date) {
+        return date;
+      }
+      if (this.minDateView === 'year') {
+        return new Date(date).getFullYear().toString();
+      }
+      if (this.minDateView === 'month') {
+        // TODO: add month view!
+        return date;
+      }
+      return new Date(date);
+    },
   },
 };
 </script>
@@ -310,6 +370,38 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+
+    .base-input-label-row {
+      display: flex;
+      width: 100%;
+      margin-bottom: $spacing-small/2;
+      justify-content: space-between;
+
+      .base-input-label {
+        color: $font-color-second;
+        margin-bottom: $spacing-small/2;
+        text-align: left;
+        text-transform: capitalize;
+        align-self: flex-end;
+      }
+
+      .base-date-input-format-tabs {
+        align-self: center;
+        margin: $spacing-small/2 0;
+        flex-shrink: 0;
+
+        .base-multiline-text-input-tab {
+          padding: $spacing-small/2 $spacing;
+          border: 1px solid transparent;
+          cursor: pointer;
+          text-transform: capitalize;
+        }
+
+        .base-multiline-text-input-tab-active {
+          border: $input-field-border;
+        }
+      }
+    }
 
     .base-input-field-container {
       position: relative;
@@ -355,13 +447,6 @@ export default {
         width: calc(100% - #{$icon-large} - (2 * #{$spacing}));
         margin-right: 0;
       }
-    }
-
-    .base-input-label {
-      color: $font-color-second;
-      margin-bottom: $spacing-small;
-      text-align: left;
-      text-transform: capitalize;
     }
   }
 
