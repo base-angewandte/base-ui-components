@@ -185,11 +185,9 @@ export default {
 
         .base-multiline-text-input-tabs {
           align-self: center;
-          margin: $spacing-small/2 0;
           flex-shrink: 0;
 
           .base-multiline-text-input-tab {
-            padding: $spacing-small/2 $spacing;
             border: 1px solid transparent;
             cursor: pointer;
             text-transform: capitalize;
@@ -216,21 +214,47 @@ export default {
     }
   }
 
+  .base-multiline-text-input-tabs {
+    margin: $spacing-small/2 0;
+
+    .base-multiline-text-input-tab {
+      padding: $spacing-small/2 $spacing;
+    }
+  }
+
   @media screen and (max-width: $tablet) {
     .base-multiline-text-input {
       .base-multiline-text-input-textarea {
         height: 200px;
       }
+
+      .base-multiline-text-input-label-row {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+
+        .base-multiline-text-input-label {
+          flex-basis: 33%;
+        }
+
+        .base-multiline-text-input-additions {
+          justify-content: flex-end;
+        }
+      }
     }
   }
 
   @media screen and (max-width: $mobile) {
-    .base-multiline-text-input-label-row {
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    .base-multiline-text-input {
+      .base-multiline-text-input-label-row {
+        .base-multiline-text-input-additions {
+          .base-multiline-text-input-tabs {
+            margin: $spacing-small 0;
 
-      .base-multiline-text-input-additions {
-        justify-content: flex-end;
+            .base-multiline-text-input-tab {
+              padding: $spacing-small $spacing;
+            }
+          }
+        }
       }
     }
   }
