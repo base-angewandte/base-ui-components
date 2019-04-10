@@ -291,6 +291,7 @@ export default {
       flex-grow: 1;
       flex-shrink: 1;
       display: flex;
+      align-items: baseline;
       max-width: calc(100% - #{$icon-large} - #{$spacing} - #{$border-width}
       - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
