@@ -1,5 +1,6 @@
 <template>
   <div class="base-menu-list">
+    <div>{{ entryProps[activeEntry] }}</div>
     <base-menu-entry
       v-for="(item, index) in list"
       v-if="item"
@@ -146,7 +147,7 @@ export default {
         active: entry.active || false,
         error: entry.error || false,
       }));
-      if (this.entryProps.length && !this.activeEntry < 0) {
+      if (this.entryProps.length && !(this.activeEntry < 0)) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },
