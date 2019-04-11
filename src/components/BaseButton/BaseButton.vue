@@ -5,6 +5,8 @@
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
     @click="$emit('clicked')">
+    <!-- @slot create custom content (e.g. icon) left of text -->
+    <slot name="left-of-text"/>
     <svg-icon
       v-if="iconPosition === 'left' && icon"
       :name="icon"
@@ -13,6 +15,8 @@
                'base-button-icon-' + iconSize,
                { 'base-button-icon-hide': hideIcon }]"/>
     <span class="base-button-text">{{ text }}</span>
+    <!-- @slot create custom content (e.g. icon) right of text -->
+    <slot name="right-of-text"/>
     <svg-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"

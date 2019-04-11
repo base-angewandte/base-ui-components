@@ -27,23 +27,26 @@
         <div class="popup-button-row">
           <!-- @event buttonLeft
                @type none -->
-          <base-button
-            :text="buttonLeftText"
-            :icon="buttonLeftIcon"
-            :icon-position="'right'"
-            :icon-size="'small'"
-            class="base-popup-button"
-            @clicked="$emit('button-left')"
-          />
-          <!-- @event buttonRight -->
-          <base-button
-            :text="buttonRightText"
-            :icon="buttonRightIcon"
-            :icon-position="'right'"
-            :icon-size="'small'"
-            class="base-popup-button"
-            @clicked="$emit('button-right')"
-          />
+          <!-- @slot custom button row -->
+          <slot name="button-row">
+            <base-button
+              :text="buttonLeftText"
+              :icon="buttonLeftIcon"
+              :icon-position="'right'"
+              :icon-size="'small'"
+              class="base-popup-button"
+              @clicked="$emit('button-left')"
+            />
+            <!-- @event buttonRight -->
+            <base-button
+              :text="buttonRightText"
+              :icon="buttonRightIcon"
+              :icon-position="'right'"
+              :icon-size="'small'"
+              class="base-popup-button"
+              @clicked="$emit('button-right')"
+            />
+          </slot>
         </div>
       </div>
 
