@@ -9,7 +9,7 @@
     <SvgIcon
       v-if="status === 'success'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-success"
-      name="attention"/>
+      name="success"/>
     <SvgIcon
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
