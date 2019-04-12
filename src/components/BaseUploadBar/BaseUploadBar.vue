@@ -9,11 +9,11 @@
     <SvgIcon
       v-if="status === 'success'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-success"
-      name="check-mark"/>
+      name="attention"/>
     <SvgIcon
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
-      name="remove"/>
+      name="attention"/>
   </div>
 </template>
 
@@ -107,7 +107,7 @@ export default {
       z-index: 2;
 
       &.base-upload-bar-status-icon-success {
-        fill: #33cc33;
+        fill: white;
       }
 
       &.base-upload-bar-status-icon-fail {
