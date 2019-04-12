@@ -328,4 +328,11 @@ export default {
       color: $font-color;
     }
   }
+
+  @media screen and (max-width: $mobile) {
+    .dropdown-box .dropdown-container .dropdown-header {
+      height: $row-height-small + $spacing-small;
+    }
+
+  }
 </style>

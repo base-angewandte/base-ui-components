@@ -59,7 +59,7 @@ export default {
      */
     activeEntry: {
       type: Number,
-      default: null,
+      default: -1,
     },
   },
   data() {
@@ -80,7 +80,7 @@ export default {
     },
     activeEntry(val) {
       this.entryProps.map(item => this.$set(item, 'active', false));
-      if (val !== null && this.entryProps[val]) {
+      if (val >= 0 && this.entryProps[val]) {
         this.$set(this.entryProps[val], 'active', true);
       }
     },
@@ -146,7 +146,7 @@ export default {
         active: entry.active || false,
         error: entry.error || false,
       }));
-      if (this.entryProps.length && !this.activeEntry < 0) {
+      if (this.entryProps.length && this.activeEntry >= 0) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },
@@ -155,5 +155,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .base-menu-list {
+    position: relative;
+  }
 
 </style>

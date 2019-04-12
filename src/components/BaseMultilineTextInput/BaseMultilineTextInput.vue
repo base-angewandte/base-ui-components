@@ -7,20 +7,22 @@
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
-      <!-- @slot to add drop down needed for text input field (base specific) -->
-      <slot />
-      <div
-        v-if="tabs && tabs[0] !== 'default'"
-        class="base-multiline-text-input-tabs">
-        <span
-          v-for="(tab, index) in tabs"
-          :key="index"
-          :class="[
-            'base-multiline-text-input-tab',
-            {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
-          @click="activeTabInt = tab.toLowerCase()">
-          {{ tabLabels[index] || tab }}
-        </span>
+      <div class="base-multiline-text-input-additions">
+        <!-- @slot to add drop down needed for text input field (base specific) -->
+        <slot />
+        <div
+          v-if="tabs && tabs[0] !== 'default'"
+          class="base-multiline-text-input-tabs">
+          <span
+            v-for="(tab, index) in tabs"
+            :key="index"
+            :class="[
+              'base-multiline-text-input-tab',
+              {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
+            @click="activeTabInt = tab.toLowerCase()">
+            {{ tabLabels[index] || tab }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -157,7 +159,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-multiline-text-input{
+  .base-multiline-text-input {
     position: relative;
     width: 100%;
     font-family: inherit;
@@ -177,19 +179,23 @@ export default {
         text-transform: capitalize;
       }
 
-      .base-multiline-text-input-tabs {
-        align-self: center;
-        margin: $spacing-small/2 0;
+      .base-multiline-text-input-additions {
+        display: flex;
+        flex-wrap: wrap;
 
-        .base-multiline-text-input-tab {
-          padding: $spacing-small/2 $spacing;
-          border: 1px solid transparent;
-          cursor: pointer;
-          text-transform: capitalize;
-        }
+        .base-multiline-text-input-tabs {
+          align-self: center;
+          flex-shrink: 0;
 
-        .base-multiline-text-input-tab-active {
-          border: $input-field-border;
+          .base-multiline-text-input-tab {
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-transform: capitalize;
+          }
+
+          .base-multiline-text-input-tab-active {
+            border: $input-field-border;
+          }
         }
       }
     }
@@ -200,6 +206,7 @@ export default {
       border: $input-field-border;
       padding: $spacing;
       margin: 0;
+      height: 240px;
 
       &:active, &:focus {
         box-shadow: $input-shadow;
@@ -207,10 +214,48 @@ export default {
     }
   }
 
+  .base-multiline-text-input-tabs {
+    margin: $spacing-small/2 0;
+
+    .base-multiline-text-input-tab {
+      padding: $spacing-small/2 $spacing;
+    }
+  }
+
+  @media screen and (max-width: $tablet) {
+    .base-multiline-text-input {
+      .base-multiline-text-input-textarea {
+        height: 200px;
+      }
+
+      .base-multiline-text-input-label-row {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+
+        .base-multiline-text-input-label {
+          flex-basis: 33%;
+        }
+
+        .base-multiline-text-input-additions {
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
+
   @media screen and (max-width: $mobile) {
-    .base-multiline-text-input-label-row {
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    .base-multiline-text-input {
+      .base-multiline-text-input-label-row {
+        .base-multiline-text-input-additions {
+          .base-multiline-text-input-tabs {
+            margin: $spacing-small 0;
+
+            .base-multiline-text-input-tab {
+              padding: $spacing-small $spacing;
+            }
+          }
+        }
+      }
     }
   }
 </style>

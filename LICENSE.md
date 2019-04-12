@@ -18,3 +18,5 @@ duplicate by Adrien Coquet from the Noun Project
 Forbidden by Noah from the Noun Project
 
 drag by b farias from the Noun Project
+
+success by Trident from the Noun Project

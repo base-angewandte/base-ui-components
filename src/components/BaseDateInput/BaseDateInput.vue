@@ -1,12 +1,29 @@
 <template>
   <div class="base-input">
-    <label
-      :class="{ 'hide': !showLabel }"
-      :for="label"
-      class="base-input-label"
-      @click.prevent="">
-      {{ label }}
-    </label>
+    <div
+      class="base-input-label-row">
+      <label
+        :class="{ 'hide': !showLabel }"
+        :for="label"
+        class="base-input-label"
+        @click.prevent="">
+        {{ label }}
+      </label>
+      <div
+        v-if="showFormatOptions"
+        class="base-date-input-format-tabs">
+        <span
+          v-for="(tab, index) in ['DD.MM.YYYY', 'YYYY']"
+          :key="index"
+          :class="[
+            'base-multiline-text-input-tab',
+            {'base-multiline-text-input-tab-active': dateFormatInt === tab }]"
+          @click="dateFormatInt = tab">
+          {{ tab }}
+        </span>
+      </div>
+    </div>
+
     <div class="input-field-wrapper">
       <div
         v-click-outside="() => selected('from')"
@@ -37,7 +54,7 @@
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
           :placeholder="placeholder"
-          :minimum-view="format"
+          :minimum-view="minDateView"
           v-model="dateFrom"
           calendar-class="calendar-class"
           class="base-input-datepicker"
@@ -86,7 +103,7 @@
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
-          :minimum-view="format"
+          :minimum-view="minDateView"
           :placeholder="placeholder"
           v-model="inputInt.date_to"
           calendar-class="calendar-class"
@@ -142,7 +159,7 @@ export default {
    */
     type: {
       type: String,
-      default: 'range',
+      default: 'single',
       validator(val) {
         return ['daterange', 'datetime', 'single', 'timerange'].includes(val);
       },
@@ -153,7 +170,7 @@ export default {
      * input field settable from outside
      */
     input: {
-      type: [Object, String],
+      type: [Object, String, Date],
       default: '',
     },
     /** label for input field, required for usability purposes, handle
@@ -178,14 +195,16 @@ export default {
       default: 'Enter Text Here',
     },
     /**
-     * specify date format
-     * allowed values: 'day', 'month', 'year'
+     * specify date format<br>
+     * allowed values: 'day', 'month', 'year', 'date_year'<br>
+     *   ('date_year': display tabs that allow for toggle between only choosing year
+     *   or complete date)
      */
     format: {
       type: String,
       default: 'day',
       validator(val) {
-        return ['day', 'month', 'year'].includes(val);
+        return ['day', 'month', 'year', 'date_year'].includes(val);
       },
     },
   },
@@ -199,13 +218,19 @@ export default {
         time_from: null,
         time_to: null,
       },
+      // variable for toggling format
+      dateFormatInt: 'DD.MM.YYY',
+      // attempt to control 'active' status of input field
+      // TODO: not working correctly at the moment (especially for datepicker)
       activeFrom: false,
       activeTo: false,
     };
   },
   computed: {
+    // compute the date format needed for the date picker based on what
+    // was specified in format and what date toggle tabs (via dateFormatInt) might say
     dateFormat() {
-      if (this.format === 'year') {
+      if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
         return 'yyyy';
       }
       if (this.format === 'month') {
@@ -213,8 +238,26 @@ export default {
       }
       return 'dd.MM.yyyy';
     },
+    // if the format is settable this.format is date_year and can not be
+    // used directly for the date picker component
+    minDateView() {
+      if (this.format === 'date_year' && this.dateFormatInt === 'YYYY') {
+        return 'year';
+      }
+      if (this.format === 'date_year' && this.dateFormatInt === 'DD.MM.YYYY') {
+        return 'day';
+      }
+      return this.format;
+    },
+    // compute the properties of the object provided in input
     inputProperties() {
       return Object.keys(this.input);
+    },
+    showFormatOptions() {
+      return this.format === 'date_year';
+    },
+    isSingleDate() {
+      return typeof this.input === 'string' || !this.inputProperties.length;
     },
     dateFrom: {
       get() {
@@ -243,12 +286,17 @@ export default {
   },
   watch: {
     input(val) {
-      this.inputInt = typeof val === 'string' ? { date: val } : Object.assign({}, val);
+      this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
+      if (this.showFormatOptions && this.isDateFormatYear()) {
+        this.dateFormatInt = 'YYYY';
+      }
     },
   },
   created() {
-    this.inputInt = typeof this.input === 'string' ? { date: this.input }
+    this.inputInt = this.isSingleDate ? { date: this.input }
       : Object.assign({}, this.input);
+    this.dateFormatInt = this.showFormatOptions && this.isDateFormatYear()
+      ? 'YYYY' : 'DD.MM.YYYY';
   },
   methods: {
     blurInput() {
@@ -283,7 +331,8 @@ export default {
       }
     },
     emitData() {
-      if (typeof this.input === 'string') {
+      this.convertDate();
+      if (this.isSingleDate) {
         this.$emit('selected', this.inputInt.date);
       } else {
         const data = {};
@@ -294,10 +343,28 @@ export default {
          * TODO: check again if this is needed???
          *
          * @event selected
-         * @type string
+         * @type string|object
          */
         this.$emit('selected', data);
       }
+    },
+    isDateFormatYear() {
+      return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
+        || this.inputProperties.some(key => !!key.includes('date')
+        && this.inputInt[key] && this.inputInt[key].length <= 4));
+    },
+    convertDate() {
+      Object.keys(this.inputInt).filter(key => !!key.includes('date'))
+        .forEach((dateKey) => {
+          if (this.inputInt[dateKey]) {
+            if (this.minDateView === 'year') {
+              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
+                .getFullYear().toString());
+            } else {
+              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey]));
+            }
+          }
+        });
     },
   },
 };
@@ -310,6 +377,38 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+
+    .base-input-label-row {
+      display: flex;
+      width: 100%;
+      margin-bottom: $spacing-small/2;
+      justify-content: space-between;
+
+      .base-input-label {
+        color: $font-color-second;
+        margin-bottom: $spacing-small/2;
+        text-align: left;
+        text-transform: capitalize;
+        align-self: flex-end;
+      }
+
+      .base-date-input-format-tabs {
+        align-self: center;
+        margin: $spacing-small/2 0;
+        flex-shrink: 0;
+
+        .base-multiline-text-input-tab {
+          padding: $spacing-small/2 $spacing;
+          border: 1px solid transparent;
+          cursor: pointer;
+          text-transform: capitalize;
+        }
+
+        .base-multiline-text-input-tab-active {
+          border: $input-field-border;
+        }
+      }
+    }
 
     .base-input-field-container {
       position: relative;
@@ -355,13 +454,6 @@ export default {
         width: calc(100% - #{$icon-large} - (2 * #{$spacing}));
         margin-right: 0;
       }
-    }
-
-    .base-input-label {
-      color: $font-color-second;
-      margin-bottom: $spacing-small;
-      text-align: left;
-      text-transform: capitalize;
     }
   }
 

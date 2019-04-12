@@ -6,15 +6,15 @@
     <div
       class="base-media-preview-close"
       @click="$emit('hide-preview')">
-      <img
-        src="../../static/icons/remove.svg"
-        class="base-media-preview-close-icon">
+      <SvgIcon
+        name="remove"
+        class="base-media-preview-close-icon" />
     </div>
     <!-- TODO_ add transition -->
     <transition name="grow">
       <div class="base-media-preview-image-stage">
         <img
-          v-vue-click-outside="() => $emit('hide-preview')"
+          v-vue-click-outside.prevent="clickOutside"
           :src="imageUrl"
           class="base-media-preview-image">
       </div>
@@ -30,6 +30,9 @@
 import VueClickOutside from 'vue-click-outside';
 
 export default {
+  components: {
+    SvgIcon: () => import('vue-svgicon'),
+  },
   directives: {
     VueClickOutside,
   },
@@ -66,6 +69,13 @@ export default {
       evt.preventDefault();
       // TODO: image zoom?
     },
+    clickOutside(event) {
+      // for some reason clickOutside is also triggered when opening the box
+      // --> to prevent immediate closure
+      if (event.target.className === 'base-media-preview-image-stage') {
+        this.$emit('hide-preview');
+      }
+    },
   },
 };
 
@@ -89,7 +99,7 @@ export default {
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
 
     .base-media-preview-close {
       position: fixed;
@@ -99,6 +109,10 @@ export default {
       width: $icon-large;
       z-index: 10000001;
       cursor: pointer;
+
+      .base-media-preview-close-icon {
+        fill: white;
+      }
     }
 
     .base-media-preview-image-stage {
@@ -110,8 +124,8 @@ export default {
       align-items: center;
 
       .base-media-preview-image {
-        max-height: 100%;
-        max-width: 100%;
+        max-height: calc(100% - #{$spacing }*4);
+        max-width: calc(100% - #{$spacing }*4);
         padding: $spacing;
       }
     }

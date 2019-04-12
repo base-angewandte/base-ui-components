@@ -17,6 +17,7 @@ import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import BasePagination from './components/BasePagination/BasePagination';
+import BaseLoader from './components/BaseLoader/BaseLoader';
 import SkosmosAPI from './store/SkosmosAPI';
 import PortfolioAPI from './store/PortfolioAPI';
 import './styles/lib.scss';
@@ -43,4 +44,5 @@ export {
   BaseHoverBox,
   BaseMediaPreview,
   BasePagination,
+  BaseLoader,
 };

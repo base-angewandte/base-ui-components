@@ -1,5 +1,7 @@
 <template>
   <div class="base-input">
+    <!-- TODO: hidden label seems not working? (there is no hide class...) -->
+    <!-- plus show label should probably only influence the label not the additional slot -->
     <div
       :class="['base-input-label-row', { 'hide': !showLabel }]">
       <label

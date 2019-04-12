@@ -27,23 +27,26 @@
         <div class="popup-button-row">
           <!-- @event buttonLeft
                @type none -->
-          <base-button
-            :text="buttonLeftText"
-            :icon="buttonLeftIcon"
-            :icon-position="'right'"
-            :icon-size="'small'"
-            class="base-popup-button"
-            @clicked="$emit('button-left')"
-          />
-          <!-- @event buttonRight -->
-          <base-button
-            :text="buttonRightText"
-            :icon="buttonRightIcon"
-            :icon-position="'right'"
-            :icon-size="'small'"
-            class="base-popup-button"
-            @clicked="$emit('button-right')"
-          />
+          <!-- @slot custom button row -->
+          <slot name="button-row">
+            <base-button
+              :text="buttonLeftText"
+              :icon="buttonLeftIcon"
+              :icon-position="'right'"
+              :icon-size="'small'"
+              class="base-popup-button"
+              @clicked="$emit('button-left')"
+            />
+            <!-- @event buttonRight -->
+            <base-button
+              :text="buttonRightText"
+              :icon="buttonRightIcon"
+              :icon-position="'right'"
+              :icon-size="'small'"
+              class="base-popup-button"
+              @clicked="$emit('button-right')"
+            />
+          </slot>
         </div>
       </div>
 
@@ -200,14 +203,15 @@ export default {
   }
 
   .popup-button-row {
-    margin-top: 16px;
+    margin-top: $spacing;
     display: flex;
     flex-direction: row;
 
     /* TODO: check if button size should just be adjustable via props in general" */
     & .base-popup-button {
       margin-right: $spacing;
-      width: calc(50% - 8px);
+      // width: calc(50% - 8px);
+      flex-basis: 50%;
     }
 
     & .base-popup-button:last-child {
@@ -229,6 +233,23 @@ export default {
       max-width: 100%;
       width: 90%;
       left: 5%;
+    }
+
+    .popup-content {
+      padding: $spacing $spacing-small;
+    }
+
+    .popup-button-row {
+      flex-wrap: wrap;
+
+      & .base-popup-button {
+        margin-right: 0;
+        flex-basis: 100%;
+      }
+
+      & .base-popup-button:last-child {
+        margin-top: $spacing-small;
+      }
     }
   }
 </style>

@@ -24,42 +24,39 @@
         v-if="subtext"
         class="base-menu-entry-subtext">{{ subtext }}</div>
     </div>
-    <div
-      class="base-menu-entry-transition-group-wrapper">
-      <transition-group
-        name="slide-fade"
-        class="slide-fade-group">
+    <transition-group
+      name="slide-fade"
+      class="slide-fade-group">
+      <div
+        v-if="showRightGroup && !selectActive"
+        :key="entryId + 'rightGroup'"
+        class="base-menu-entry-right-group">
         <div
-          v-if="showRightGroup && !selectActive"
-          :key="entryId + 'rightGroup'"
-          class="base-menu-entry-right-group">
-          <div
-            :key="entryId + 'thumbnail'"
-            class="base-menu-entry-thumbnail-container">
-            <svg-icon
-              v-for="tn in thumbnails"
-              :key="tn"
-              :name="tn"
-              class="base-menu-entry-thumbnail" />
-          </div>
-          <div
-            :key="entryId + 'description'"
-            class="base-menu-entry-description">
-            {{ description }}
-          </div>
+          :key="entryId + 'thumbnail'"
+          class="base-menu-entry-thumbnail-container">
+          <svg-icon
+            v-for="tn in thumbnails"
+            :key="tn"
+            :name="tn"
+            class="base-menu-entry-thumbnail" />
         </div>
         <div
-          v-if="isSelectable && selectActive"
-          :key="entryId + 'checkmark'"
-          class="base-menu-entry-checkbox">
-          <base-checkmark
-            :checked="isSelected"
-            title="checkbox"
-            mark-style="checkbox"
-            @clicked="selected"/>
+          :key="entryId + 'description'"
+          class="base-menu-entry-description">
+          {{ description }}
         </div>
-      </transition-group>
-    </div>
+      </div>
+      <div
+        v-if="isSelectable && selectActive"
+        :key="entryId + 'checkmark'"
+        class="base-menu-entry-checkbox">
+        <base-checkmark
+          :checked="isSelected"
+          title="checkbox"
+          mark-style="checkbox"
+          @clicked="selected"/>
+      </div>
+    </transition-group>
   </div>
 </template>
 
@@ -259,7 +256,6 @@ export default {
     display: flex;
     align-items: center;
     height: $row-height-large;
-    line-height: $row-height-large;
     width: 100%;
     position: relative;
     background: white;
@@ -295,6 +291,7 @@ export default {
       flex-grow: 1;
       flex-shrink: 1;
       display: flex;
+      align-items: baseline;
       max-width: calc(100% - #{$icon-large} - #{$spacing} - #{$border-width}
       - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
@@ -340,6 +337,7 @@ export default {
       position: absolute;
       top: 0;
       flex-direction: row;
+      align-items: center;
       right: 0;
       background: white;
 
@@ -372,7 +370,9 @@ export default {
         color: $font-color-second;
         font-size: $font-size-small;
         margin-right: $spacing;
-        width: 100px;
+        width: 120px;
+        word-break: break-word;
+        hyphens: auto;
       }
     }
 
@@ -410,15 +410,5 @@ export default {
 
   .base-menu-entry + .base-menu-entry {
     border-top: $separation-line;
-  }
-
-  .base-menu-entry-transition-group-wrapper{
-    background-color: white;
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: $row-height-large;
-    display: flex;
-    align-items: center;
   }
 </style>
