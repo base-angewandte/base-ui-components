@@ -1,58 +1,11 @@
 <template>
   <div id="app">
+    <!-- PAGINATION TEST -->
     <BasePagination :total="100" />
-    <div class="form-field">
-      <base-chips-input
-        :list="dropDownInput"
-        :placeholder="'Select Your Marx'"
-        :selected-list="chipsInput"
-        :allow-multiple-entries="true"
-        :allow-dynamic-drop-down-entries="true"
-        :allow-unknown-entries="true"
-        :object-prop="'value'"
-        :chips-inline="true"
-        :chips-editable="true"
-        :identifier="'id'"
-        :hoverbox-content="{ title: 'test' }"
-        draggable
-        label="A label"
-        @fetch-dropdown-entries="fetch">
-        <template slot="drop-down-extended">
-          <div
-            v-if="dropDownInput && dropDownInput.length"
-            class="dropdown-extended">
-            <div class="show-more-toggle">
-              Show more results...
-            </div>
-          </div>
-        </template>
-      </base-chips-input>
-    </div>
 
+    <!-- CHIPS BELOW TEST -->
     <div class="form-field">
-      <base-chips-below
-        :chips-inline="false"
-        v-model="selectedList"
-        :chips-editable="true"
-        :allow-unknown-entries="true"
-        :list="[{
-                  id: '1',
-                  name: 'Herbert Marcuse'
-                },
-                {
-                  id: '2',
-                  name: 'Erich From',
-                },
-                {
-                  id: '',
-                  name: 'Georg Werth',
-        }]"
-        :role-options="['Farmer', 'Magician', 'Priest']"
-        :hoverbox-content="hoverboxContent"
-        identifier="id"
-        object-prop="name"
-        label="chips-below-test"
-        @hoverbox-active="setHoverBox"/>
+      <!-- UPLOAD BAR TEST -->
       <base-upload-bar
         :progress="progress"
         :filename="'testfile.jpg'"/>
@@ -63,7 +16,10 @@
         button-style="row"
         @clicked="changeProgress"/>
     </div>
+
     <div class="canvas flex">
+
+      <!-- BASE IMAGE BOX TEST -->
       <base-image-box
         :selectable="selectable"
         :show-title="false"
@@ -90,7 +46,9 @@
         button-style="row"
         @clicked="enableSelect()"/>
     </div>
+
     <div class="canvas">
+      <!-- MULTILINE WITH TABS TEST -->
       <base-multiline-text-input
         v-model="multilineInputObj"
         :label="'Label'"
@@ -108,39 +66,32 @@
         :label="'Label'"
         :placeholder="'Enter Text'"
         @text-input="handleMultilineInput"/>
-      <base-button
-        :active="false"
-        icon="sheet-plus"
-        icon-size="large"
-        button-style="row"
-        @clicked="changeInput()"/>
     </div>
-    <div class="canvas">
-      <base-button
-        :active="false"
-        icon="sheet-plus"
-        icon-size="large"
-        button-style="row" />
-    </div>
+
+    <!-- SEARCH TEST -->
     <div class="canvas">
       <base-search
         :show-image="true"
         @input="triggerInput"/>
     </div>
+
+    <!-- FORM FIELD TESTING -->
     <div class="form-field">
       <base-date-input
         :type="'datetime'"
         :label="'unknown'"/>
       <base-date-input
-        :label="'unknown'"/>
+        :label="'unknown'"
+        :input="inputDate"
+        type="daterange"
+        format="date_year"/>
       <base-autocomplete-input
         :list="dropDownInput"
         :placeholder="'Fetching from SkosMos'"
         :object-prop="'prefLabel'"
         v-model="autocompleteInput"
         label="text input with dynamic autocomplete"
-        @selected="fetchOther($event, 'this is my type')"
-        @autocomplete="fetchSkosMos({ value: $event })"/>
+        @selected="fetchOther($event, 'this is my type')"/>
       <base-chips-input
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
@@ -183,7 +134,32 @@
           <span>{{ props.item.remark }}</span>
         </template>
       </base-chips-input>
+      <base-chips-below
+        :chips-inline="false"
+        v-model="selectedList"
+        :chips-editable="true"
+        :allow-unknown-entries="true"
+        :list="[{
+                  id: '1',
+                  name: 'Herbert Marcuse'
+                },
+                {
+                  id: '2',
+                  name: 'Erich From',
+                },
+                {
+                  id: '',
+                  name: 'Georg Werth',
+        }]"
+        :role-options="['Farmer', 'Magician', 'Priest']"
+        :hoverbox-content="hoverboxContent"
+        identifier="id"
+        object-prop="name"
+        label="chips-below-test"
+        @hoverbox-active="setHoverBox"/>
     </div>
+
+    <!-- MENU LIST TEST -->
     <base-menu-list
       :selected="showCheckbox"
       :list="list"
@@ -200,8 +176,11 @@
       description="Gemälde"
       @clicked="menuEntryActive = true"/>
     <base-button
-      text="blaaa"
+      text="toggle checkboxes"
+      button-style="row"
       @clicked="showCheckbox = !showCheckbox"/>
+
+    <!-- DROP BOX TEST -->
     <div class="flex row">
       <base-drop-box
         :show-plus="true"
@@ -221,20 +200,11 @@
       </ul>
     </div>
 
+    <!-- POP UP TEST -->
     <base-button
       draggable="true"
       icon="options-menu"
       @clicked="showPopUp = true"/>
-    <base-drop-down
-      :label="'select type'"
-      :default-select="'Alle Typ'"
-      :selection-list="['Bild', 'Publikation', 'Film/Video']" />
-    <base-drop-down
-      :default-select="'Alle Typen'"
-      :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']" />
-    <div>
-      More text test xtxts atea
-    </div>
     <base-pop-up
       :show="showPopUp"
       title="Bild entfernen"
@@ -269,34 +239,19 @@
           :fixed-width="true" />
       </div>
     </base-pop-up>
-    <div class="form-field">
-      <div class="flex">
-        <base-input
-          :label="'Title'"
-          v-model="newEntity.title"
-          type="text"
-          placeholder="Enter a Title" />
-        <base-input
-          :label="'Subtitle'"
-          v-model="newEntity.subtitle"
-          type="text"
-          placeholder="Enter a Subtitle" />
-      </div>
-      <base-autocomplete-input
-        :list="$store.state.PortfolioAPI.schemas"
-        :placeholder="'Choose a Type'"
-        v-model="newEntity.type"
-        label="Type"/>
-      <base-button
-        :label="'Submit'"
-        icon="save"
-        @clicked="submit(newEntity)"/>
-    </div>
+
+    <!-- DROP DOWN TEST -->
+    <base-drop-down
+      :label="'select type'"
+      :default-select="'Alle Typ'"
+      :selection-list="['Bild', 'Publikation', 'Film/Video']" />
+    <base-drop-down
+      :default-select="'Alle Typen'"
+      :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']" />
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
 import axios from 'axios';
 
 import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
@@ -369,6 +324,7 @@ export default {
       selectable: false,
       progress: 0,
       autocompleteInput: 'testtttttttttttt',
+      inputDate: '2019',
       multilineInputObj: {
         English: 'testeng',
         German: 'testger',
@@ -379,7 +335,7 @@ export default {
           id: '1',
           title: 'On a lovely Summers Day',
           active: false,
-          type: 'Bild',
+          type: 'Wissenschaftliche Abhandlungggggggggggggggggg',
           selected: false,
           shared: true,
           error: true,
@@ -439,7 +395,6 @@ export default {
   },
   methods: {
     handleMultilineInput(val) {
-      debugger;
       console.log(val);
     },
     setHoverBox(val, entry) {
@@ -451,8 +406,8 @@ export default {
       }
     },
     changeProgress() {
-      if (this.progress <= 75) {
-        this.progress += 25;
+      if (this.progress <= 0.75) {
+        this.progress += 0.25;
       } else {
         this.progress = 0;
       }
@@ -498,17 +453,6 @@ export default {
         this.$set(this.list[index], 'active', false);
       }
     },
-    fetchSkosMos(string) {
-      console.log('testing', this);
-      if (!string.value || string.value.length > 3) {
-        this.getSearch({
-          query: string.value,
-          vocab: 'portfolio',
-        }).then((res) => {
-          this.dropDownInput = res.data.results;
-        });
-      }
-    },
     async fetch(string) {
       if (!string.value || string.value.length > 3) {
         const result = await axios.get('http://localhost:9900/fetch', {
@@ -520,29 +464,6 @@ export default {
         this.dropDownInput = result.data;
       }
     },
-    submit(e) {
-      this.post({
-        kind: 'entity',
-        data: e,
-      }).catch(err => console.log(err));
-      axios.defaults.xsrfCookieName = ' csrftoken_portfolio';
-      axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-      axios.post('https://basedev.uni-ak.ac.at/portfolio/api/v1/entity/', e, {
-        withCredentials: true,
-        xsrfCookieName: 'csrftoken_portfolio',
-        xsrfHeaderName: 'X-CSRFToken',
-      })
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
-    },
-    ...mapActions('SkosmosAPI', [
-      'getSearch',
-    ]),
-    ...mapActions('PortfolioAPI', [
-      'get',
-      'post',
-      'delete',
-    ]),
     tabSwitched(val) {
       this.langTab = val;
     },

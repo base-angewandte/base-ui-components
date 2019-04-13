@@ -21,7 +21,6 @@
     "body-parser": "^1.18.3",
     "vue": "^2.5.17",
     "vue-click-outside": "^1.0.7",
-    "vuex": "^2.2.1",
     "vuedraggable": "^2.16.0",
     "vuejs-datepicker": "^1.5.4"
   },
