@@ -376,7 +376,11 @@ export default {
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
           ? this.dropDownListOrig
-            .filter(entry => entry.toLowerCase().includes(val.toLowerCase()))
+            .filter((entry) => {
+              // cover case of options list being string or object array
+              const dropDownValue = entry[this.objectProp] || entry;
+              return dropDownValue.toLowerCase().includes(val.toLowerCase());
+            })
           : this.dropDownListOrig;
         this.selectedMenuEntryIndex = this.getIndex(oldEntry);
       }
@@ -433,7 +437,7 @@ export default {
     this.dropDownListInt = this.list;
     // if dropdown entries are static set the copy for subsequent references (e.g. filtering)
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = [].concat(this.list);
+      this.dropDownListOrig = [].concat(this.drop);
     }
   },
   methods: {
