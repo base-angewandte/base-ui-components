@@ -19,7 +19,7 @@
             'base-multiline-text-input-tab',
             {'base-multiline-text-input-tab-active': dateFormatInt === tab }]"
           @click="dateFormatInt = tab">
-          {{ tab }}
+          {{ tab === 'DD.MM.YYYY' ? dateFormatLabels.date : dateFormatLabels.year }}
         </span>
       </div>
     </div>
@@ -205,6 +205,20 @@ export default {
       default: 'day',
       validator(val) {
         return ['day', 'month', 'year', 'date_year'].includes(val);
+      },
+    },
+    /**
+     * specify labels displayed instead of 'DD.MM.YYYY' and 'YYYY' <br>
+     *   should have the form { date: 'xxx', year: 'yyy' }
+     */
+    dateFormatLabels: {
+      type: Object,
+      default() {
+        return { date: 'DD.MM.YYYY', year: 'YYYY' };
+      },
+      validator(val) {
+        const labelKeys = Object.keys(val);
+        return labelKeys.includes('date') && labelKeys.includes('year');
       },
     },
   },
