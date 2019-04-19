@@ -173,13 +173,13 @@ export default {
     position: fixed;
     top: 20vh;
     left: 50%;
-    margin-left: -350px;
     z-index: 100;
     min-width: 288px;
     width: 50%;
     max-width: 700px;
     display: flex;
     flex-direction: column;
+    transform: translateX(-50%);
   }
 
   .popup-header {
@@ -221,10 +221,8 @@ export default {
 
   @media screen and (max-width: $tablet) {
     .popup-box {
-      margin-left: 0;
       max-width: 100%;
       width: 70%;
-      left: 15%;
     }
   }
 
@@ -232,7 +230,6 @@ export default {
     .popup-box {
       max-width: 100%;
       width: 90%;
-      left: 5%;
     }
 
     .popup-content {
