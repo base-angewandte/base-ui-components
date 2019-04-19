@@ -57,8 +57,23 @@
         @tab-switch="tabSwitched">
         <div class="multiline-dropdown">
           <base-drop-down
-            :default-select="'Textart'"
-            :selection-list="['Beschreibung', 'Ausstellungseinladung', 'Zeitungsartikel']" />
+            :selected-option="{ label: 'Textart', value: '' }"
+            :options="[{
+                         value: 'Beschreibung',
+                         label: 'Beschreibung',
+                       },
+                       {
+                         value: 'Ausstellungseinladung',
+                         label: 'Ausstellungseinladung',
+                       },
+                       {
+                         label: 'Textart',
+                         value: '',
+                       },
+                       {
+                         value: 'Zeitungsartikel',
+                         label: 'Zeitungsartikel',
+          }]" />
         </div>
       </base-multiline-text-input>
       <base-multiline-text-input
@@ -228,27 +243,38 @@
       <div class="popup-text">
         <base-drop-down
           :label="'select type'"
-          :default-select="'Alle Typen'"
-          :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']"
-          :background-color="'rgb(240, 240, 240)'"
-          :fixed-width="true"/>
+          :option-selected="{ label: 'Alle Typen', value: '' }"
+          :options="[
+            { label: 'Alle Typen', value: '' },
+            { label: 'Bild', value: 'picture' },
+            { label: 'Publikation', value: 'publication' },
+            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
+          ]"
+          :header-background-color="'rgb(240, 240, 240)'"/>
         <base-drop-down
-          :default-select="'Alle Typenasdfasdf'"
-          :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']"
-          :background-color="'rgb(240, 240, 240)'"
-          :fixed-width="true" />
+          :label="'select type'"
+          :option-selected="{ label: 'Alle Typen', value: '' }"
+          :options="[
+            { label: 'Alle Typen', value: '' },
+            { label: 'Bild', value: 'picture' },
+            { label: 'Publikation', value: 'publication' },
+            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
+          ]"
+          :header-background-color="'rgb(240, 240, 240)'"/>
       </div>
     </base-pop-up>
 
     <!-- DROP DOWN TEST -->
     <base-drop-down
       :label="'select type'"
-      :default-select="'Alle Typ'"
-      :selection-list="['Bild', 'Publikation', 'Film/Video']" />
+      :show-label="true"
+      v-model="selectedVal"
+      :options="selectionList" />
     <base-drop-down
-      :default-select="'Alle Typen'"
-      :selection-list="['Bild', 'Publikation', 'Film/Videobbbbbbbbbbbbb']" />
+      :options="selectionList" />
+    <div class="spacer" />
   </div>
+
 </template>
 
 <script>
@@ -274,6 +300,7 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
+
 
 export default {
   name: 'App',
@@ -301,6 +328,28 @@ export default {
   },
   data() {
     return {
+      selectionList: [
+        { label: 'Option 1', value: 'option 1' },
+        { label: 'Option 2', value: 'option 2' },
+        { label: 'Option 3', value: 'option 3' },
+        { label: 'Option 4', value: 'option 4' },
+        { label: 'Option 44444444444444444444', value: 'option 4466' },
+        { label: 'Option 44444444444444444444', value: 'option 4455' },
+        { label: 'Option 44444444444444444444', value: 'option 44166' },
+        { label: 'Option 44444444444444444444', value: 'option 44143' },
+        { label: 'Option 44444444444444444444', value: 'option 4412' },
+        { label: 'Option 44444444444444444444', value: 'option 4490' },
+        { label: 'Option 44444444444444444444', value: 'option 449' },
+        { label: 'Option 44444444444444444444', value: 'option 448' },
+        { label: 'Option 44444444444444444444', value: 'option 447' },
+        { label: 'Option 44444444444444444444', value: 'option 446' },
+        { label: 'Option 44444444444444444444', value: 'option 445' },
+        { label: 'Option 44444444444444444444', value: 'option 443' },
+        { label: 'Option 44444444444444444444', value: 'option 444' },
+        { label: 'Option 44444444444444444444', value: 'option 442' },
+        { label: 'Option 44444444444444444444', value: 'option 441' },
+      ],
+      selectedVal: {},
       newEntity: {
         title: '',
         subtitle: '',
@@ -528,5 +577,8 @@ export default {
 
   .multiline-dropdown {
     margin-bottom: -4px;
+  }
+  .spacer {
+    height: 300px;
   }
 </style>

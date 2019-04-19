@@ -1,211 +1,176 @@
 <template>
-  <div
-    ref="dropdownBox"
-    :style="{ width: fixedWidth ? '100%': bodyWidth }"
-    :class="['dropdown-box', 'dropdown-box-' + headerStyle]">
-    <div class="base-input-label">
+  <div class="base-drop-down">
+    <div :class="['base-drop-down-label-wrapper', { 'hide': !label || !showLabel }]">
       <label
-        :class="{ 'hide': !label || !showLabel }"
-        :for="label">
+        :for="label"
+        class="base-drop-down-label">
         {{ label }}
       </label>
     </div>
-
+    <button
+      ref="dropDownButton"
+      :id="label"
+      :aria-expanded="showDropDown"
+      :style="{ 'background-color': headerBackgroundColor }"
+      :class="['base-drop-down-head', { 'base-drop-down-head': !leftDropDown }]"
+      aria-haspopup="listbox"
+      type="button"
+      @click.prevent="showDropDown = !showDropDown"
+      @keydown.enter.esc.down.up.prevent="selectByKey">
+      <span class="base-drop-down-head-text">{{ selectedOptionInt }}</span>
+      <!-- @slot place elements right of header -->
+      <slot name="header-right">
+        <SvgIcon
+          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+          name="drop-down"
+        />
+      </slot>
+    </button>
     <div
-      v-click-outside="hide"
-      ref="box"
-      class="dropdown-container">
-
-      <!-- SELECTION DISPLAY -->
-      <div
-        :style="{ 'background-color': backgroundColor }"
-        class="dropdown-header"
-        @click="showMenu = !showMenu">
-        <div
-          :class="{'dropdown-selected-fadeout': fixedWidth}"
-          class="dropdown-selected" >
-          <p ref="header">{{ selectedInt.label }}</p>
-        </div>
-        <div class="dropdown-icon">
-          <svg-icon
-            name="drop-down"
-            class="dropdown-icon-svg" />
-        </div>
-      </div>
-
-      <!-- BODY -->
-      <div
-        ref="entries"
-        :class="{'hide-body': !showMenu }"
-        :style="{ width: bodyWidth }"
-        class="dropdown-body" >
-        <div
-          v-for="(item, index) in listInt"
-          :key="index"
-          class="dropdown-item"
-          @click="selectItem(item)">
-          <p class="dropdown-text">
-            {{ item.label }}
-          </p>
-        </div>
-      </div>
+      v-if="showDropDown"
+      ref="dropdownContainer"
+      class="base-drop-down-body">
+      <!-- @slot create custom drop down body -->
+      <slot>
+        <ul
+          tabindex="-1"
+          role="listbox"
+          class="base-drop-down-body-list">
+          <li
+            v-for="(option, index) in options"
+            ref="option"
+            :key="option.value"
+            :class="[
+              'base-drop-down-option',
+              { 'base-drop-down-option-selected': option.value === selectedOption.value },
+              { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
+            role="option"
+            @click="selectValue(option)">
+            {{ option.label }}
+          </li>
+        </ul>
+      </slot>
     </div>
   </div>
 </template>
 
 <script>
-/**
- * A Drop Down Component
- *
- */
-
 import SvgIcon from 'vue-svgicon';
-import ClickOutside from 'vue-click-outside';
 
 export default {
-  name: 'BaseDropDown',
   components: {
     SvgIcon,
   },
-  directives: {
-    ClickOutside,
-  },
   model: {
-    prop: 'selected',
-    event: 'selected',
+    prop: 'selectedOption',
+    event: 'value-selected',
   },
+  /**
+   * specify options to choose from <br>
+   *   needs to be an array with label and value object
+   */
   props: {
-    /**
-     * the string selected from the drop down menu
-     */
-    selected: {
-      type: Object,
+    options: {
+      type: Array,
       default() {
-        return {};
+        return [];
       },
     },
     /**
-     * A label for the drop down
+     * label for the drop down, recommended to define for accessibility
      */
     label: {
       type: String,
-      default: '',
+      default: 'Drop Down',
     },
     /**
-     * this will just give a description if nothing is selected but not be included
-     * in the list
+     * placeholder appearing in select when no option was
+     * selected
      */
     placeholder: {
       type: String,
       default: 'Select',
     },
     /**
-     * The list displayed in the drop down, it needs a 'label' and a 'value' property!
+     * @model
+     *
+     * the selected value
      */
-    selectionList: {
-      type: Array,
-      default: () => [],
+    selectedOption: {
+      type: Object,
+      default() {
+        return { value: '', label: '' };
+      },
     },
     /**
-   * the dropdown can have a fixed width or adjust to the longest option
-   */
-    fixedWidth: {
+     * define if label should be shown
+     */
+    showLabel: {
       type: Boolean,
       default: false,
     },
     /**
-     * set the background color of the drop down header
+     * set the background color of drop down head
      */
-    backgroundColor: {
+    headerBackgroundColor: {
       type: String,
       default: 'inherit',
-    },
-    /**
-     * styling choices to fit also pop up (=inline) <br>
-     * valid options: 'single', 'inline'
-     */
-    headerStyle: {
-      type: String,
-      default: 'single',
-      validator(val) {
-        return ['single', 'inline'].includes(val);
-      },
-    },
-    /**
-     * define if the label should be shown
-     */
-    showLabel: {
-      type: Boolean,
-      default: true,
     },
   },
   data() {
     return {
-      // control selector list
-      showMenu: false,
-      // internal copy of provided default entry
-      selectedInt: this.selected.label ? Object.assign({}, this.selected) : { label: this.placeholder, value: '' },
-      // internal copy of provided selection list
-      listInt: Object.assign({}, this.selectionList),
-      // helper variable so element always has width of widest list entrty
-      bodyWidth: 0,
+      showDropDown: false,
+      keySelectedIndex: -1,
+      leftDropDown: false,
     };
   },
-  watch: {
-    // when selected entry changes also adjust entry list (remove selected and add default value if
-    // necessary)
-    selectedInt(val) {
-      this.listInt = [].concat(this.selectionList
-        .filter(entry => entry.value !== val.value));
-      if (val.value !== this.selected.value) {
-        this.listInt.unshift(this.selected);
-      }
-    },
-    selected(val) {
-      this.selectedInt = val;
-    },
-    selectionList(val) {
-      if (val !== this.listInt) {
-        this.listInt = Object.assign({}, val
-          .filter(option => option.value !== this.selectedInt.value));
-      }
+  computed: {
+    selectedOptionInt() {
+      return this.selectedOption.label || this.placeholder || '';
     },
   },
-  mounted() {
-    if (this.$refs.entries && this.$refs.header) {
-      const entriesWidth = (this.$refs.entries.clientWidth || this.$refs.entries.scrollWidth + 16);
-      const headerWidth = (this.$refs.header.clientWidth || this.$refs.header.scrollWidth + 32);
-      if (this.fixedWidth) {
-        // TODO: check (with Flo etc) if this is the desired behaviour
-        this.bodyWidth = this.$refs.dropdownBox.clientWidth;
-      } else {
-        this.bodyWidth = entriesWidth > headerWidth ? entriesWidth : headerWidth;
-      }
-      this.bodyWidth = this.bodyWidth === 0 ? 'auto' : this.bodyWidth;
-      if (this.headerStyle === 'inline') {
-        this.bodyWidth += 32;
-      }
-      this.bodyWidth = `${this.bodyWidth}px`;
-    } else {
-      this.bodyWidth = '100%';
-    }
+  watch: {
+    showDropDown() {
+      this.keySelectedIndex = -1;
+    },
   },
   methods: {
-    // handle entry selection
-    selectItem(item) {
+    // event triggered by clicking on option or Enter after
+    // selecting via keys
+    selectValue(option) {
+      this.showDropDown = false;
       /**
        * Event emitted when an option is selected
        *
-       * @event selected
+       * @event value-selected
        * @type String
        */
-      this.$emit('selected', item);
-      this.selectedInt = Object.assign({}, item);
-      this.showMenu = false;
+      this.$emit('value-selected', option);
     },
-    // for click-outside directive
-    hide() {
-      this.showMenu = false;
+    // adding key navigation for accessibility
+    selectByKey(event) {
+      if (event.key === 'ArrowDown') {
+        if (this.keySelectedIndex < this.options.length) {
+          this.keySelectedIndex += 1;
+        }
+      } else if (event.key === 'ArrowUp') {
+        if (this.keySelectedIndex > 0) {
+          this.keySelectedIndex -= 1;
+        }
+      } else if (event.key === 'Enter') {
+        if (this.showDropDown && this.keySelectedIndex >= 0) {
+          this.selectValue(this.options[this.keySelectedIndex]);
+        } else if (!this.showDropDown) {
+          this.showDropDown = true;
+        }
+      } else if (event.key === 'Escape') {
+        this.showDropDown = false;
+      }
+      if (this.$refs.option[this.keySelectedIndex]
+        && this.$refs.dropdownContainer.scrollHeight
+        !== this.$refs.dropdownContainer.clientHeight) {
+        this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
     },
   },
 };
@@ -214,125 +179,92 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .dropdown-box {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  .base-drop-down {
+    display: inline-block;
+    position: relative;
 
-    .dropdown-container {
-      width: 100%;
+    .base-drop-down-label-wrapper {
+      margin-bottom: $spacing-small;
 
-      .dropdown-header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
+      .base-drop-down-label {
         color: $font-color-second;
-        background-color: inherit;
-        cursor: pointer;
+        margin-bottom: $spacing-small;
+      }
+    }
+
+    .base-drop-down-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: $row-height-small;
+      width: 100%;
+      line-height: $row-height-small;
+      cursor: pointer;
+      padding: 0 $spacing;
+      color: $font-color-second;
+      fill: $font-color-second;
+      background-color: $background-color;
+      border: none;
+
+      .base-drop-down-head-text {
+        margin-right: $spacing;
         white-space: nowrap;
-        height: $row-height-small;
-        position: relative;
+      }
+      .base-drop-down-icon {
+        transition: all 0.5s ease;
+        height: $icon-small;
 
-        &:hover {
-          color: $app-color;
-
-          .dropdown-icon-svg {
-            fill: $app-color;
-          }
+        &.base-drop-down-icon-rotated {
+          transform: rotate(180deg);
         }
+      }
 
-        .dropdown-selected {
-          overflow: hidden;
-          position: relative;
-          width: 100%;
-        }
+      &:hover {
+        color: $app-color;
+        fill: $app-color;
+      }
 
-        .dropdown-selected-fadeout::after {
-          content: '';
-          width: 10px;
-          height: 100%;
-          position: absolute;
-          top: 0;
-          right: 0;
-          background: linear-gradient(to right, transparent , #{$background-color});
-        }
-
-        .dropdown-icon {
-          padding-left: $spacing;
-          display: flex;
-          align-items: center;
-
-          .dropdown-icon-svg {
-            height: $icon-small;
-            fill: $font-color-second;
-          }
-        }
+      &:active .base-drop-down-icon, &:focus .base-drop-down-icon {
+        fill: $app-color;
       }
     }
 
-    &.dropdown-box-inline {
-      .dropdown-header {
-        padding: 0 $spacing;
-      }
-    }
-
-    &.dropdown-box-single {
-      margin: 0 $spacing;
-    }
-
-    .dropdown-body {
-      background-color: white;
+    .base-drop-down-body {
+      position: absolute;
       display: flex;
       flex-direction: column;
-      position: absolute;
-      margin-left: 0;
-      box-shadow: $drop-shadow;
+      background-color: white;
       z-index: 3;
-      text-align: left;
-      max-width: inherit;
+      box-shadow: $drop-shadow;
       max-height: 300px;
+      min-width: 100%;
       overflow-y: auto;
       overflow-x: hidden;
+      cursor: pointer;
+
+      .base-drop-down-body-list {
+        list-style-type: none;
+        padding-inline-start: 0;
+
+        &:focus {
+          outline: none;
+        }
+
+        .base-drop-down-option {
+          padding: 0 $spacing;
+          line-height: $row-height-small;
+          width: 100%;
+          white-space: nowrap;
+
+          &.base-drop-down-option-selected {
+            color: $app-color;
+          }
+
+          &:hover, &.base-drop-down-option-key-selected {
+            background-color: $button-header-color;
+          }
+        }
+      }
     }
-
-    .hide-body {
-      visibility: hidden;
-    }
-  }
-
-  .dropdown-item {
-    line-height: $row-height-small;
-    cursor: pointer;
-
-    :hover {
-      background-color: $button-header-color;
-    }
-  }
-
-  .dropdown-text {
-    padding: 0 #{$spacing};
-  }
-
-  .popup-box {
-    .dropdown-body {
-      box-shadow: $pop-up-drop-shadow;
-    }
-
-    .base-input-label {
-      margin-bottom: $spacing-small;
-      color: $font-color-second;
-    }
-
-    .dropdown-header {
-      color: $font-color;
-    }
-  }
-
-  @media screen and (max-width: $mobile) {
-    .dropdown-box .dropdown-container .dropdown-header {
-      height: $row-height-small + $spacing-small;
-    }
-
   }
 </style>
