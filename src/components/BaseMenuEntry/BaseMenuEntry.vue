@@ -3,11 +3,9 @@
     ref="menuEntry"
     :draggable="isDraggable"
     :class="['base-menu-entry',
-             {'base-menu-entry-activatable': isActivatable }]"
+             {'base-menu-entry-activatable': isActivatable,
+              'base-menu-entry-active': isActive }]"
     @click="selectActive ? selected() : $emit('clicked')">
-    <div
-      :class="{ 'base-menu-entry-border-active': isActive }"
-      class="base-menu-entry-border" />
     <svg-icon
       ref="entryIcon"
       :name="icon"
@@ -264,13 +262,8 @@ export default {
     &.base-menu-entry-activatable {
       cursor: pointer;
 
-      .base-menu-entry-border-active {
-        border-left: $active-border;
-      }
-
-      .base-menu-entry-border {
-        position: absolute;
-        height: 100%;
+      &.base-menu-entry-active {
+        box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
       &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title,

@@ -120,14 +120,12 @@ export default {
   @import "../../styles/variables";
 
   .base-button {
-    padding: calc(#{$spacing-small}/2 + #{$border-active-width})
-      #{$spacing} calc(#{$spacing-small}/2);
+    padding: 0 $spacing;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: $border-active-width solid transparent;
 
     .base-button-text {
       text-align: center;
@@ -179,9 +177,8 @@ export default {
     }
 
     &.base-button-active {
-      border-bottom: $active-border;
       /* TODO: adjust this to style guide if necessary */
-      box-shadow: $box-shadow-reg;
+      box-shadow: $box-shadow-reg, inset 0 -$border-active-width 0 0 $app-color;
       z-index: 1;
     }
 
