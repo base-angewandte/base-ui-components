@@ -1,5 +1,10 @@
 <template>
-  <div class="base-switch-buttons">
+  <!-- REMINDER: fieldset tag does not work with flexbox (in chrome and edge) -->
+  <fieldset
+    class="base-switch-buttons">
+    <legend
+      id="base-switch-buttons-label"
+      class="hide">{{ label }}</legend>
     <template
       v-for="option in options">
       <input
@@ -7,20 +12,30 @@
         :key="option.value + 'input'"
         v-model="selectedOption"
         :checked="option.value === selectedOption"
+        :aria-checked="option.value === selectedOption"
         :value="option.value"
+        :class="['hide', 'base-switch-button-input',
+                 { 'base-switch-button-input-active': option.value === selectedOption }]"
         type="radio"
-        class="base-switch-button-input"
         name="radioTabTest">
       <label
         :key="option.value + 'label'"
-        :for="option.value">{{ option.label }}</label>
+        :for="option.value"
+        class="base-switch-button-label">
+        {{ option.label }}
+        <!-- TODO: add slot for icons etc -->
+      </label>
     </template>
-  </div>
+  </fieldset>
 
 </template>
 
 <script>
 export default {
+  model: {
+    prop: 'activeTab',
+    event: 'switch',
+  },
   props: {
     /**
      * specify the tabs as array of object with value and label properties
@@ -33,6 +48,8 @@ export default {
     },
     /**
      * set the currently active tab (specify the value of the object not the label)
+     *
+     * @model
      */
     activeTab: {
       type: String,
@@ -40,16 +57,30 @@ export default {
         return this.options[0] ? this.options[0].value : 'tab';
       },
     },
+    label: {
+      type: String,
+      default: 'Select one of these options',
+    },
   },
   data() {
     return {
-      selectedOption: {},
+      selectedOption: this.activeTab,
     };
   },
   watch: {
     selectedOption(val) {
-      console.log(val);
+      /**
+       * Event emitted on options switch, value of options object is emitted
+       *
+       * @event switch
+       * @type string
+       */
       this.$emit('switch', val);
+    },
+    activeTab(val) {
+      if (val !== this.selectedOption) {
+        this.selectedOption = val;
+      }
     },
   },
 };
@@ -62,39 +93,34 @@ export default {
     clear: both;
     display: inline-block;
     position: relative;
-    margin: $spacing-small/2 0;
+    line-height: $row-height-small;
   }
 
   input.base-switch-button-input {
-    position: absolute;
-    left: -99999em;
-    top: -99999em;
 
-    & + label {
+    & + .base-switch-button-label {
       cursor: pointer;
       text-transform: capitalize;
-      border: $input-field-border;
-      border-bottom: 0;
-      background-color: #fff;
-      margin-right: -1px;
+      background-color: inherit;
+      margin-right: -2px;
       padding: $spacing-small/2 $spacing;
       position: relative;
-
-      &:hover {
-        background-color: #eee;
-      }
+      border: 1px solid transparent;
     }
 
-    &:checked + label {
-      box-shadow: 0 3px 0 -1px #fff;
-      background-color: #fff;
-      border-color: $input-field-color;
-      z-index: 1;
+    &.base-switch-button-input-active + .base-switch-button-label {
+      border: $input-field-border;
+    }
+
+    &:focus + .base-switch-button-label {
+      border-bottom-color: $app-color;
     }
   }
 
   @media screen and (max-width: $mobile) {
     .base-switch-buttons {
+      margin: $spacing-small 0;
+
       input.base-switch-button-input {
         & + label {
           padding: $spacing-small $spacing;

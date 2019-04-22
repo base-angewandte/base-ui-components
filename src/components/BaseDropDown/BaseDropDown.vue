@@ -204,7 +204,6 @@ export default {
       color: $font-color-second;
       fill: $font-color-second;
       background-color: $background-color;
-      border: none;
 
       .base-drop-down-head-text {
         margin-right: $spacing;
@@ -243,12 +242,6 @@ export default {
       cursor: pointer;
 
       .base-drop-down-body-list {
-        list-style-type: none;
-        padding-inline-start: 0;
-
-        &:focus {
-          outline: none;
-        }
 
         .base-drop-down-option {
           padding: 0 $spacing;

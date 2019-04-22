@@ -121,7 +121,6 @@ export default {
 
   .base-button {
     padding: 0 $spacing;
-    border: none;
     cursor: pointer;
     display: flex;
     align-items: center;

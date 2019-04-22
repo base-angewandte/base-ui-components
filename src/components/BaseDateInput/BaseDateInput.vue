@@ -12,15 +12,16 @@
       <div
         v-if="showFormatOptions"
         class="base-date-input-format-tabs">
-        <span
-          v-for="(tab, index) in ['DD.MM.YYYY', 'YYYY']"
-          :key="index"
-          :class="[
-            'base-multiline-text-input-tab',
-            {'base-multiline-text-input-tab-active': dateFormatInt === tab }]"
-          @click="dateFormatInt = tab">
-          {{ tab === 'DD.MM.YYYY' ? dateFormatLabels.date : dateFormatLabels.year }}
-        </span>
+        <BaseSwitchButton
+          :options="[
+            { label: dateFormatLabels.date, value: 'DD.MM.YYYY' },
+            { label: dateFormatLabels.year, value: 'YYYY' },
+          ]"
+          :label="formatTabsLegend"
+          :active-tab="dateFormatInt"
+          v-model="dateFormatInt"
+          class="base-multiline-text-input-tabs"
+        />
       </div>
     </div>
 
@@ -138,12 +139,14 @@
 import ClickOutside from 'vue-click-outside';
 import Datepicker from 'vuejs-datepicker';
 import SvgIcon from 'vue-svgicon';
+import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
 export default {
   name: 'BaseDateInput',
   components: {
     Datepicker,
     SvgIcon,
+    BaseSwitchButton,
   },
   directives: {
     ClickOutside,
@@ -220,6 +223,10 @@ export default {
         const labelKeys = Object.keys(val);
         return labelKeys.includes('date') && labelKeys.includes('year');
       },
+    },
+    formatTabsLegend: {
+      type: String,
+      default: 'Switch between date formats',
     },
   },
   data() {
@@ -305,6 +312,9 @@ export default {
         this.dateFormatInt = 'YYYY';
       }
     },
+    dateFormatInt() {
+      this.emitData();
+    },
   },
   created() {
     this.inputInt = this.isSingleDate ? { date: this.input }
@@ -357,6 +367,7 @@ export default {
          * TODO: check again if this is needed???
          *
          * @event selected
+         * @event selected
          * @type string|object
          */
         this.$emit('selected', data);
@@ -408,19 +419,7 @@ export default {
 
       .base-date-input-format-tabs {
         align-self: center;
-        margin: $spacing-small/2 0;
         flex-shrink: 0;
-
-        .base-multiline-text-input-tab {
-          padding: $spacing-small/2 $spacing;
-          border: 1px solid transparent;
-          cursor: pointer;
-          text-transform: capitalize;
-        }
-
-        .base-multiline-text-input-tab-active {
-          border: $input-field-border;
-        }
       }
     }
 

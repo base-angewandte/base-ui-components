@@ -13,15 +13,13 @@
         <div
           v-if="tabs && tabs[0] !== 'default'"
           class="base-multiline-text-input-tabs">
-          <span
-            v-for="(tab, index) in tabs"
-            :key="index"
-            :class="[
-              'base-multiline-text-input-tab',
-              {'base-multiline-text-input-tab-active': activeTabInt === tab.toLowerCase() }]"
-            @click="activeTabInt = tab.toLowerCase()">
-            {{ tabLabels[index] || tab }}
-          </span>
+          <BaseSwitchButton
+            :options="switchTabs"
+            :label="tabsLegend"
+            :active-tab="activeTab"
+            v-model="activeTabInt"
+            class="base-multiline-text-input-tabs"
+          />
         </div>
       </div>
     </div>
@@ -39,6 +37,7 @@
  * A multiline textfield base component
  */
 
+import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 /**
  * Event emitted on keyup (text input change)
  *
@@ -46,6 +45,7 @@
  * @type object | string
  */
 export default {
+  components: { BaseSwitchButton },
   model: {
     prop: 'input',
     event: 'text-input',
@@ -110,12 +110,25 @@ export default {
         return this.tabs[0] || 'default';
       },
     },
+    /**
+     * set a legend for the tabs to be read (for accessibility only, hidden)
+     */
+    tabsLegend: {
+      type: String,
+      default: 'Select a field to be displayed',
+    },
   },
   data() {
     return {
       fieldContent: {},
-      activeTabInt: this.activeTab.toLowerCase(),
+      activeTabInt: this.activeTab,
     };
+  },
+  computed: {
+    // TODO: refactor component props to already match object necessary for switch component
+    switchTabs() {
+      return this.tabs.map((tab, index) => ({ value: tab, label: this.tabLabels[index] || tab }));
+    },
   },
   watch: {
     // watch for input changes from outside
@@ -125,7 +138,7 @@ export default {
     },
     // set active tab from outside
     activeTab(val) {
-      this.activeTabInt = val.toLowerCase();
+      this.activeTabInt = val;
     },
     fieldContent: {
       handler(val) {
@@ -145,11 +158,11 @@ export default {
   methods: {
     setFieldContent(val) {
       if (this.tabs.length < 2) {
-        const propName = this.activeTabInt.toLowerCase() || 'default';
+        const propName = this.activeTabInt || 'default';
         this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
       } else {
-        this.tabs.forEach(tab => this.$set(this.fieldContent, tab.toLowerCase(),
-          val[tab.toLowerCase()]));
+        this.tabs.forEach(tab => this.$set(this.fieldContent, tab,
+          val[tab]));
       }
     },
   },
@@ -186,16 +199,6 @@ export default {
         .base-multiline-text-input-tabs {
           align-self: center;
           flex-shrink: 0;
-
-          .base-multiline-text-input-tab {
-            border: 1px solid transparent;
-            cursor: pointer;
-            text-transform: capitalize;
-          }
-
-          .base-multiline-text-input-tab-active {
-            border: $input-field-border;
-          }
         }
       }
     }
@@ -211,14 +214,6 @@ export default {
       &:active, &:focus {
         box-shadow: $input-shadow;
       }
-    }
-  }
-
-  .base-multiline-text-input-tabs {
-    margin: $spacing-small/2 0;
-
-    .base-multiline-text-input-tab {
-      padding: $spacing-small/2 $spacing;
     }
   }
 
@@ -238,22 +233,6 @@ export default {
 
         .base-multiline-text-input-additions {
           justify-content: flex-end;
-        }
-      }
-    }
-  }
-
-  @media screen and (max-width: $mobile) {
-    .base-multiline-text-input {
-      .base-multiline-text-input-label-row {
-        .base-multiline-text-input-additions {
-          .base-multiline-text-input-tabs {
-            margin: $spacing-small 0;
-
-            .base-multiline-text-input-tab {
-              padding: $spacing-small $spacing;
-            }
-          }
         }
       }
     }

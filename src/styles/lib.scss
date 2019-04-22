@@ -3,7 +3,7 @@
 /* for accessibility */
 .hide {
   position: absolute !important;
-  top: -9999px !important;
+  top: auto !important;
   left: -9999px !important;
 }
 
@@ -20,10 +20,27 @@ a {
 button {
   font-family: inherit;
   font-size: inherit;
+  border: none;
+
+  &:focus {
+    outline: 0;
+  }
 }
 
-button:focus {
-  outline: 0;
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+
+  &:focus {
+    outline: 0;
+  }
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
 input[type=text], input[type=date], textarea {
