@@ -321,7 +321,6 @@ export default {
         if (val.length) {
           list = val.map((entry, index) => {
             if (typeof entry === 'object') {
-              this.returnAsObject = true;
               let id = entry.idInt;
               if (id !== 0 && !id) {
                 id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
@@ -397,6 +396,9 @@ export default {
     list(val) {
       const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
       this.dropDownListInt = val;
+      if (val && val.length) {
+        this.returnAsObject = typeof val[0] === 'object';
+      }
       this.dropDownListOrig = [].concat(val);
       this.selectedMenuEntryIndex = this.getIndex(oldEntry);
     },
@@ -435,9 +437,12 @@ export default {
     this.setSelectedList(this.selectedList);
     // initialize the drop down list with props.list
     this.dropDownListInt = this.list;
+    if (this.list && this.list.length) {
+      this.returnAsObject = typeof this.list[0] === 'object';
+    }
     // if dropdown entries are static set the copy for subsequent references (e.g. filtering)
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = [].concat(this.dropDownListInt);
+      this.dropDownListOrig = [].concat(this.dropDownList);
     }
   },
   methods: {
@@ -477,11 +482,13 @@ export default {
       }
       if (!this.allowDynamicDropDownEntries) {
         // filter the selected entry from the list of drop down menu entries
-        // TODO: check if this is still working for entries that are objects!
         this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
           ? this.dropDownListOrig
-            .filter(entry => entry.toLowerCase()
-              !== selected[this.objectProp].toLowerCase())
+            .filter((entry) => {
+              const origEntry = entry[this.objectProp] || entry;
+              return origEntry.toLowerCase()
+              !== selected[this.objectProp].toLowerCase();
+            })
           : this.dropDownListOrig;
       } else {
         this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
