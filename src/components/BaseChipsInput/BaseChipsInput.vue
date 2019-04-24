@@ -437,7 +437,7 @@ export default {
     this.dropDownListInt = this.list;
     // if dropdown entries are static set the copy for subsequent references (e.g. filtering)
     if (!this.allowDynamicDropDownEntries) {
-      this.dropDownListOrig = [].concat(this.drop);
+      this.dropDownListOrig = [].concat(this.dropDownListInt);
     }
   },
   methods: {
