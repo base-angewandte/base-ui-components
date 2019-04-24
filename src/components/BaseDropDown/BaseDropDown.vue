@@ -16,7 +16,8 @@
       aria-haspopup="listbox"
       type="button"
       @click.prevent="showDropDown = !showDropDown"
-      @keydown.enter.esc.down.up.prevent="selectByKey">
+      @keydown.enter.esc.down.up.prevent="selectByKey"
+      @keydown.tab="selectByKey">
       <span class="base-drop-down-head-text">{{ selectedOptionInt }}</span>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
@@ -130,8 +131,11 @@ export default {
     },
   },
   watch: {
-    showDropDown() {
-      this.keySelectedIndex = -1;
+    showDropDown(val) {
+      // reset index on close
+      if (!val) {
+        this.keySelectedIndex = -1;
+      }
     },
   },
   methods: {
@@ -150,7 +154,8 @@ export default {
     // adding key navigation for accessibility
     selectByKey(event) {
       if (event.key === 'ArrowDown') {
-        if (this.keySelectedIndex < this.options.length) {
+        this.showDropDown = true;
+        if (this.keySelectedIndex < this.options.length - 1) {
           this.keySelectedIndex += 1;
         }
       } else if (event.key === 'ArrowUp') {
@@ -163,10 +168,10 @@ export default {
         } else if (!this.showDropDown) {
           this.showDropDown = true;
         }
-      } else if (event.key === 'Escape') {
+      } else if (event.key === 'Escape' || event.key === 'Tab') {
         this.showDropDown = false;
       }
-      if (this.$refs.option[this.keySelectedIndex]
+      if (this.$refs.option && this.$refs.option[this.keySelectedIndex]
         && this.$refs.dropdownContainer.scrollHeight
         !== this.$refs.dropdownContainer.clientHeight) {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
