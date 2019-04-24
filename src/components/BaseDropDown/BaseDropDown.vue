@@ -43,7 +43,8 @@
             :key="option.value"
             :class="[
               'base-drop-down-option',
-              { 'base-drop-down-option-selected': option.value === selectedOption.value },
+              { 'base-drop-down-option-selected': selectedOption.value
+                && option.value === selectedOption.value },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
             @click="selectValue(option)">
