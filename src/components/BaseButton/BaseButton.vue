@@ -1,10 +1,11 @@
 <template>
   <button
     :disabled="disabled"
+    :type="buttonType"
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
-    @click="$emit('clicked')">
+    @click.prevent="$emit('clicked')">
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text"/>
     <svg-icon
@@ -111,6 +112,13 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * set button type
+     */
+    buttonType: {
+      type: String,
+      default: 'button',
     },
   },
 };
