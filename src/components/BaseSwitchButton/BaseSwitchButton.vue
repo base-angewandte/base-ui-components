@@ -10,14 +10,15 @@
       <input
         :id="option.value"
         :key="option.value + 'input'"
+        :tabindex="option.value === selectedOption ? 0 : -1"
         v-model="selectedOption"
         :checked="option.value === selectedOption"
         :aria-checked="option.value === selectedOption"
         :value="option.value"
+        :name="label"
         :class="['hide', 'base-switch-button-input',
                  { 'base-switch-button-input-active': option.value === selectedOption }]"
-        type="radio"
-        name="radioTabTest">
+        type="radio">
       <label
         :key="option.value + 'label'"
         :for="option.value"
@@ -57,9 +58,12 @@ export default {
         return this.options[0] ? this.options[0].value : 'tab';
       },
     },
+    /**
+     * set a label for the switches, not visible but needed for accessibility
+     */
     label: {
       type: String,
-      default: 'Select one of these options',
+      required: true,
     },
   },
   data() {

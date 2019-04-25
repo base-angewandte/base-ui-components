@@ -10,17 +10,13 @@
       <div class="base-multiline-text-input-additions">
         <!-- @slot to add drop down needed for text input field (base specific) -->
         <slot />
-        <div
+        <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
-          class="base-multiline-text-input-tabs">
-          <BaseSwitchButton
-            :options="switchTabs"
-            :label="tabsLegend"
-            :active-tab="activeTab"
-            v-model="activeTabInt"
-            class="base-multiline-text-input-tabs"
-          />
-        </div>
+          :options="switchTabs"
+          :label="tabsLegend"
+          :active-tab="activeTab"
+          v-model="activeTabInt"
+          class="base-multiline-text-input-tabs" />
       </div>
     </div>
 
@@ -115,7 +111,7 @@ export default {
      */
     tabsLegend: {
       type: String,
-      default: 'Select a field to be displayed',
+      default: 'Radiogroup',
     },
   },
   data() {
