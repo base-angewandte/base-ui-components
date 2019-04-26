@@ -106,7 +106,6 @@ export default {
       cursor: pointer;
       text-transform: capitalize;
       background-color: inherit;
-      margin-right: -2px;
       padding: $spacing-small/2 $spacing;
       position: relative;
       border: 1px solid transparent;
