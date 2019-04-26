@@ -38,8 +38,8 @@ A example with label and slot demonstrations
     <template slot="label-addition">
       <div>Add elements here</div>
     </template>
-    <template slot="input-field-addition">
-      <div class="input-field-addition">Or here</div>
+    <template slot="input-field-addition-before">
+      <div class="input-field-addition-before">Or here</div>
     </template>
   </BaseInput>
 </template>

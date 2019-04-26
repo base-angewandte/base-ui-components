@@ -6,6 +6,7 @@
       v-model="selectedBelowListInt"
       :chips-inline="false"
       :sortable="true"
+      :is-loading="isLoading"
       @selected="addedEntry"
       @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
       <template
@@ -235,6 +236,14 @@ export default {
       default() {
         return {};
       },
+    },
+    /**
+     * show spinner to indicate that something is loading
+     * (for dynamically fetched entries that need to do backend requests)
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

@@ -1,6 +1,6 @@
 <template>
   <div class="base-autocomplete-input">
-    <base-input
+    <BaseInput
       ref="baseInput"
       :placeholder="!inputTextInt ? $props.placeholder : ''"
       :label="$props.label"
@@ -8,7 +8,15 @@
       @clicked-outside="insideInput = false"
       @input-focus="onInputFocus"
       @arrow-key="triggerArrowKey"
-      @enter="selectEntry()"/>
+      @enter="selectEntry()">
+      <template slot="input-field-addition-after">
+        <div
+          v-if="isLoading"
+          class="base-input-loader">
+          <BaseLoader />
+        </div>
+      </template>
+    </BaseInput>
 
     <!-- DROP DOWN MENU -->
     <div
@@ -58,10 +66,12 @@
  */
 import ClickOutside from 'vue-click-outside';
 import BaseInput from '../BaseInput/BaseInput';
+import BaseLoader from '../BaseLoader/BaseLoader';
 
 export default {
   components: {
     BaseInput,
+    BaseLoader,
   },
   directives: {
     ClickOutside,
@@ -117,6 +127,14 @@ export default {
     objectProp: {
       type: String,
       default: 'name',
+    },
+    /**
+     * show spinner to indicate that something is loading
+     * (for dynamically fetched entries that need to do backend requests)
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -243,6 +261,11 @@ export default {
     position: relative;
     font-family: inherit;
     font-size: inherit;
+
+    .base-input-loader {
+      transform: scale(0.5);
+      margin-right: $spacing-large;
+    }
 
     .base-autocomplete-drop-down {
       position: absolute;

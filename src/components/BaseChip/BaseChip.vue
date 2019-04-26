@@ -188,6 +188,7 @@ export default {
       border: none;
       background-color: transparent;
       color: $font-color;
+      word-break: break-all;
 
       &:active, &:focus {
         outline: none;

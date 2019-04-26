@@ -28,25 +28,34 @@
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
-        slot="input-field-addition">
-        <draggable
-          :options="{ disabled: !draggable, setData: setDragElement }"
-          v-model="selectedListInt"
-          @end="onDragEnd">
-          <base-chip
-            v-for="(entry, index) in selectedListInt"
-            ref="baseChip"
-            :id="'base-chip' + index"
-            :key="entry.idInt"
-            v-model="entry[objectProp]"
-            :chip-editable="chipsEditable"
-            :hover-box-content="hoverboxContent"
-            :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-            @mouse-down="chipActive = index"
-            @remove-entry="removeEntry(entry, index)"
-            @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-            @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
-        </draggable>
+        slot="input-field-addition-before">
+        <div class="base-chips-input-chips">
+          <draggable
+            :options="{ disabled: !draggable, setData: setDragElement }"
+            v-model="selectedListInt"
+            @end="onDragEnd">
+            <base-chip
+              v-for="(entry, index) in selectedListInt"
+              ref="baseChip"
+              :id="'base-chip' + index"
+              :key="entry.idInt"
+              v-model="entry[objectProp]"
+              :chip-editable="chipsEditable"
+              :hover-box-content="hoverboxContent"
+              :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+              @mouse-down="chipActive = index"
+              @remove-entry="removeEntry(entry, index)"
+              @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+              @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
+          </draggable>
+        </div>
+      </template>
+      <template slot="input-field-addition-after">
+        <div
+          v-if="isLoading"
+          class="base-chips-input-loader">
+          <BaseLoader />
+        </div>
       </template>
     </base-input>
 
@@ -129,9 +138,11 @@ import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
+import BaseLoader from '../BaseLoader/BaseLoader';
 
 export default {
   components: {
+    BaseLoader,
     BaseInput,
     BaseChip,
     Draggable,
@@ -291,6 +302,14 @@ export default {
       default() {
         return {};
       },
+    },
+    /**
+     * show spinner to indicate that something is loading
+     * (for dynamically fetched entries that need to do backend requests)
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -655,12 +674,21 @@ export default {
     width: 100%;
     text-align: left;
 
+    .base-chips-input-chips {
+      max-width: 100%;
+    }
+
     .base-chips-input-sort {
       cursor: pointer;
 
       &:hover {
         color: $app-color;
       }
+    }
+
+    .base-chips-input-loader {
+      transform: scale(0.5);
+      margin-right: $spacing-large;
     }
 
     .base-chips-drop-down {

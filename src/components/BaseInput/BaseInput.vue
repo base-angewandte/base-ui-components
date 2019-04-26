@@ -24,7 +24,7 @@
       <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
         (before \<input\>)
        -->
-      <slot name="input-field-addition" />
+      <slot name="input-field-addition-before" />
       <input
         :id="label"
         :title="label"
@@ -36,10 +36,11 @@
         autocomplete="off"
         @focus="$emit('input-focus')"
         @keypress.enter="$emit('enter', inputInt)"
-        @keyup.up.down.prevent="$emit('arrow-key', $event)"
+        @keydown.up.down.prevent="$emit('arrow-key', $event)"
         @input="$emit('autocomplete', inputInt)"
         @blur="blurInput()"
         @click="active = true">
+      <slot name="input-field-addition-after" />
     </div>
   </div>
 </template>
