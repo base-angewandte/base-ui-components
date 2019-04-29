@@ -66,6 +66,7 @@
                 :always-linked="true"
                 identifier="source"
                 object-prop="label"
+                class="base-chips-below-chips-input"
                 @selected="updateRoles($event, index)"/>
             </div>
           </div>
@@ -361,6 +362,10 @@ export default {
         .base-chips-below-list-item-chip-wrapper {
           width: 100%;
           margin-left: $spacing-small;
+        }
+
+        .base-chips-below-chips-input {
+          text-transform: capitalize;
         }
       }
     }
