@@ -16,6 +16,7 @@
       @input-focus="onInputFocus"
       @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
+      @input-keydown="checkKeyEvent"
       @enter="addSelected()"
       @click-input-field="insideInput = true">
       <template
@@ -327,6 +328,8 @@ export default {
       insideInput: false,
       returnAsObject: false,
       chipActive: -1,
+      timeout: null,
+      fired: '',
     };
   },
   computed: {
@@ -423,7 +426,7 @@ export default {
     },
     showDropDown(val) {
       // allow also for static drop down entries to be loaded on first drop down show only
-      if (!this.allowDynamicDropDownEntries && !this.dropDownListInt.length) {
+      if (val && !this.allowDynamicDropDownEntries && !this.dropDownListInt.length) {
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
       }
       if (val) {
@@ -470,6 +473,7 @@ export default {
       this.showDropDown = true;
       // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
+      // add selected to the selected list
       if (selected) {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
@@ -488,8 +492,13 @@ export default {
         } else {
           this.insideDropDown = true;
         }
-        // reset input
-        this.input = '';
+        /**
+         * event triggered when an entry from the drop down was selected or enter was pressed
+         *
+         * @event selected
+         * @type {object}
+         */
+        this.emitSelectedList();
         // if there is an input and unknown entries are allowed add an entry to selected list
       } else if (this.input && this.allowUnknownEntries) {
         this.selectedListInt.push({
@@ -497,8 +506,10 @@ export default {
           idInt: this.getInternalId(this.input + this.selectedListInt.length),
         });
         // reset input
-        this.input = '';
+        this.emitSelectedList();
       }
+      this.input = '';
+      // reset the drop down list
       if (!this.allowDynamicDropDownEntries) {
         // filter the selected entry from the list of drop down menu entries
         this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
@@ -506,20 +517,13 @@ export default {
             .filter((entry) => {
               const origEntry = entry[this.objectProp] || entry;
               return origEntry.toLowerCase()
-              !== selected[this.objectProp].toLowerCase();
+                !== selected[this.objectProp].toLowerCase();
             })
           : this.dropDownListOrig;
       } else {
         this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
           .map(sel => sel.idInt).includes(entry.idInt));
       }
-      /**
-       * event triggered when an entry from the drop down was selected or enter was pressed
-       *
-       * @event selected
-       * @type {object}
-       */
-      this.emitSelectedList();
     },
     // remove an entry from the list of selected entries
     removeEntry(item, index) {
@@ -660,6 +664,30 @@ export default {
       const elem = document.getElementById('chip-inline-drag');
       if (elem) {
         elem.parentNode.removeChild(elem);
+      }
+    },
+    checkKeyEvent(event) {
+      if (event.key === 'Backspace') {
+        if (!this.fired && !this.input) {
+          const lastIndex = this.selectedListInt.length - 1;
+          this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+        }
+        // necessary to prevent accidential delete of chips when user keeps backspace pressed
+        // TODO: in a later version chips should be tabbable anyway and maybe it could work
+        // in a way that first backspace makes last chip active second backspace removes
+        this.fired = true;
+        if (this.timeout) {
+          clearTimeout(this.timeout);
+          this.timeout = null;
+        }
+        this.timeout = setTimeout(() => {
+          this.fired = false;
+        }, 300);
+      }
+      if (event.code === 'Comma' && this.input) {
+        event.preventDefault();
+        this.addSelected();
+        this.input = '';
       }
     },
   },
