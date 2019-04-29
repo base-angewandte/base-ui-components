@@ -36,6 +36,7 @@
         autocomplete="off"
         @focus="$emit('input-focus')"
         @keypress.enter="$emit('enter', inputInt)"
+        @keydown="$emit('input-keydown', $event)"
         @keydown.up.down.prevent="$emit('arrow-key', $event)"
         @input="$emit('autocomplete', inputInt)"
         @blur="blurInput()"
