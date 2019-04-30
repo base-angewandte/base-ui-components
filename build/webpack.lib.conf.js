@@ -12,7 +12,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 var env = config.lib.env
 
 baseWebpackConfig.entry = {
-  'base-components': './src/lib.js'
+  'base-ui-components': './src/lib.js'
 }
 
 var webpackConfig = merge(baseWebpackConfig, {

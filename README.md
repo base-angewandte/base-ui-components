@@ -1,52 +1,62 @@
-# base-components
+# base-ui-components
 
-> Agewandte Base Component Library
+> base Agewandte Component Library
 
-## Build Setup
+This is a component library developed by and used for projects of the
+[base](https://base.uni-ak.ac.at), 
+a collection of applications for the staff and students of the [University of 
+Applied Arts Vienna](https://www.dieangewandte.at).
 
-``` bash
-# install dependencies
-npm install
+### Installation and Usage
 
-# serve with hot reload at localhost:9000
-npm run dev
-
-# build library components with watcher
-npm run dev:lib
-
-# build for serving on localhost:9000 with hot reload
-npm run dev:docs
-
-# run styleguide for development purposes
-npm run styleguide
-
-# build for production with minification
-npm run build
-
-# build components
-npm run build:lib
-
-# build documentation website 
-npm run build:docs
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# lint files
-npm run lint
-
-# create styleable components from svg icons
-npm run svg
-
-# to use locally for development
-# in this project
-npm link
-
-# in target project
-npm link base-components
+<!---
+Install via:
 ```
+npm i base-ui-components
+```
+-->
 
-## Base Components
+Currently this project is still under development and therefore usage
+can not be wholeheartedly be recommended at this point. Also the code base
+is not publicly avaiable yet, however in future this project will be 
+completely open source and is licensed as specified in the
+license section below.
+<!-- replaced in future with 
+in the [license file](LICENSE.md) -->
 
-for a list of components included in the build and their options run ```npm run styleguide``` 
-or see deployed styleguide at ...
+<!-- A styleguide will be available at [tbd](). -->
+
+<!-- Development instructions can be found in the [buildSetup](buildSetup.md)
+file. -->
+
+### License
+
+base Angewandte design by zukunvt.com is licensed under a Creative Commons Attribution 4.0 International License. Permissions beyond the scope of this license may be available at base.uni-ak.ac.at.
+
+Icons used are licensed under a Creative Commons Attribution (CC-BY) license and following attributions should be included:
+
+Trash by Ruslan Mirsalikhov from the Noun project<br>
+Save by Markus from the Noun project<br>
+Eye by Heipi from the Noun project<br>
+Warning by DewDrops from the Noun project<br>
+File by By Skye Selbiger, US from the Noun project <br>
+duplicate by Adrien Coquet from the Noun Project<br>
+Forbidden by Noah from the Noun Project<br>
+drag by b farias from the Noun Project<br>
+success by Trident from the Noun Project<br>
+
+The software of this project is licensed under the MIT license.
+
+Copyright 2019 Universität für angewandte Kunst Wien (University of Applied Arts Vienna)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+<!-- logo angewandte -->
+![alt text](static/angewandte-logo.svg "Logo Title Text 1")
+<!-- logo base -->
+![alt text](static/base.png "Logo Title Text 1")
+<!-- logo zukunvt?  or anything else? -->

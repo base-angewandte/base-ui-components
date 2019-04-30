@@ -11,7 +11,7 @@ module.exports = {
   mode: process.env.NODE_ENV,
   entry: {
     docs: './src/docs.js',
-    ['base-components']: './src/lib.js'
+    ['base-ui-components']: './src/lib.js'
   },
   output: {
     path: config.build.assetsRoot,

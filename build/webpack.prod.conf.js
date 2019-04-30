@@ -39,10 +39,10 @@ var webpackConfig = merge(baseWebpackConfig, {
           enforce: true
         },
         // split your library css/js into separate files
-        'base-components': {
+        'base-ui-components': {
           chunks: "initial",
-          test: 'base-components',
-          name: 'base-components',
+          test: 'base-ui-components',
+          name: 'base-ui-components',
           enforce: true
         },
       },
