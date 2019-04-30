@@ -12,11 +12,14 @@
       class="base-menu-entry-icon"/>
     <div
       :class="['base-menu-entry-text-wrapper']">
-      <div
-        v-if="title"
-        :class="['base-menu-entry-title',
-                 { 'base-menu-entry-title-bold': isActive || titleBold }]">
-        {{ title }}
+      <div class="base-menu-entry-title-description-wrapper">
+        <div
+          v-if="title"
+          :class="['base-menu-entry-title',
+                   { 'base-menu-entry-title-bold': isActive || titleBold }]">
+          {{ title }}
+        </div>
+        <div class="base-menu-entry-description">{{ description }}</div>
       </div>
       <div
         v-if="subtext"
@@ -37,11 +40,6 @@
             :key="tn"
             :name="tn"
             class="base-menu-entry-thumbnail" />
-        </div>
-        <div
-          :key="entryId + 'description'"
-          class="base-menu-entry-description">
-          {{ description }}
         </div>
       </div>
       <div
@@ -288,16 +286,24 @@ export default {
       max-width: calc(100% - #{$icon-large} - #{$spacing} - #{$border-width}
       - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
-    }
 
-    .base-menu-entry-title {
-      padding-left: 16px;
-      margin-right: $spacing;
-      flex-shrink: 1;
-      flex-grow: 1;
+      .base-menu-entry-title-description-wrapper {
+        padding-left: $spacing;
+        margin-right: $spacing;
+        flex-shrink: 1;
+        flex-grow: 1;
 
-      &.base-menu-entry-title-bold {
-        font-weight: bold;
+        .base-menu-entry-title {
+
+          &.base-menu-entry-title-bold {
+            font-weight: bold;
+          }
+        }
+
+        .base-menu-entry-description {
+          color: $font-color-second;
+          font-size: $font-size-small;
+        }
       }
     }
 
@@ -357,15 +363,6 @@ export default {
           max-height: $icon-small;
           width: $icon-small;
         }
-      }
-
-      .base-menu-entry-description {
-        color: $font-color-second;
-        font-size: $font-size-small;
-        margin-right: $spacing;
-        width: 120px;
-        word-break: break-word;
-        hyphens: auto;
       }
     }
 
