@@ -25,7 +25,7 @@
         <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
-          @click="sort">Sortieren von A-Z</div>
+          @click="sort">{{ sortText }}</div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
@@ -311,6 +311,13 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * if sorting is enabled this will be the text shown in the button
+     */
+    sortText: {
+      type: String,
+      default: 'Sort A – Z',
     },
   },
   data() {

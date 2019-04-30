@@ -7,6 +7,7 @@
       :chips-inline="false"
       :sortable="true"
       :is-loading="isLoading"
+      :sort-text="sortText"
       @selected="addedEntry"
       @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
       <template
@@ -245,6 +246,13 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * if sorting is enabled this will be the text shown in the button
+     */
+    sortText: {
+      type: String,
+      default: 'Sort A – Z',
     },
   },
   data() {
