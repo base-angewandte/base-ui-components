@@ -29,7 +29,7 @@
       name="slide-fade"
       class="slide-fade-group">
       <div
-        v-if="showRightGroup && !selectActive"
+        v-if="showThumbnails && !selectActive"
         :key="entryId + 'rightGroup'"
         class="base-menu-entry-right-group">
         <div
@@ -168,17 +168,19 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * define if thumbnail overlay should be shown
+     */
+    showThumbnails: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
       isSelectedInt: false,
       dragAndDropCapable: true,
     };
-  },
-  computed: {
-    showRightGroup() {
-      return this.thumbnails.length || this.description;
-    },
   },
   watch: {
     isSelected(val) {
