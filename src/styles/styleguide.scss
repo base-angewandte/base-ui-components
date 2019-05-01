@@ -1,0 +1,7 @@
+@import './variables';
+@import './lib';
+
+html {
+  font-family: $font;
+  font-size: $font-size-regular;
+}
