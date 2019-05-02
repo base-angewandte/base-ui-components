@@ -2,6 +2,7 @@
   <div class="base-loader">
     <svg class="base-loader-circular">
       <circle
+        :style="loaderColorInt"
         class="base-loader-path"
         cx="50"
         cy="50"
@@ -16,9 +17,17 @@
 <script>
 export default {
   props: {
+    /**
+     * define a color for the loader
+     */
     loaderColor: {
       type: String,
-      default: 'grey',
+      default: '',
+    },
+  },
+  computed: {
+    loaderColorInt() {
+      return this.loaderColor ? { stroke: this.loaderColor, color: this.loaderColor } : {};
     },
   },
 };
