@@ -9,11 +9,25 @@ Applied Arts Vienna](https://www.dieangewandte.at).
 
 ### Installation and Usage
 
+<!---
+Install via:
+```
+npm i base-ui-components
+```
+-->
+
 Currently this project is still under development and therefore usage
 can not be wholeheartedly be recommended at this point. Also the code base
 is not publicly available yet, however, in future this project will be 
 completely open source and is licensed as specified in the
 license section below.
+<!-- replaced in future with 
+in the [license file](LICENSE.md) -->
+
+<!-- A styleguide will be available at [tbd](). -->
+
+<!-- Development instructions can be found in the [buildSetup](buildSetup.md)
+file. -->
 
 ### License
 
