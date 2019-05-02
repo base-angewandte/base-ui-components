@@ -1,33 +1,19 @@
 # base-ui-components
 
-> base Agewandte Component Library
+> base Angewandte Component Library
 
 This is a component library developed by and used for projects of the
-[base](https://base.uni-ak.ac.at), 
-a collection of applications for the staff and students of the [University of 
+[base Angewandte](https://base.uni-ak.ac.at), 
+a collection of applications for the staff and students at the [University of 
 Applied Arts Vienna](https://www.dieangewandte.at).
 
 ### Installation and Usage
 
-<!---
-Install via:
-```
-npm i base-ui-components
-```
--->
-
 Currently this project is still under development and therefore usage
 can not be wholeheartedly be recommended at this point. Also the code base
-is not publicly avaiable yet, however in future this project will be 
+is not publicly available yet, however, in future this project will be 
 completely open source and is licensed as specified in the
 license section below.
-<!-- replaced in future with 
-in the [license file](LICENSE.md) -->
-
-<!-- A styleguide will be available at [tbd](). -->
-
-<!-- Development instructions can be found in the [buildSetup](buildSetup.md)
-file. -->
 
 ### License
 
@@ -56,7 +42,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 <!-- logo angewandte -->
-![alt text](static/angewandte-logo.svg "Logo Title Text 1")
+![alt text](static/angewandte-logo.svg "Angewandte")
 <!-- logo base -->
-![alt text](static/base.png "Logo Title Text 1")
+![alt text](static/base.png "base Angewandte")
 <!-- logo zukunvt?  or anything else? -->
+
