@@ -1,6 +1,11 @@
 .DS_Store
 node_modules
 /dist
+/styleguide
+index.html
+
+# temporary ignore! TODO: remove as soon as these env files are deleted permanently
+config/
 
 # local env files
 .env.local
