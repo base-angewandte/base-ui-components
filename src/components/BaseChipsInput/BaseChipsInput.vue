@@ -1,7 +1,6 @@
 <template>
   <div
-    class="base-chips-input"
-  >
+    class="base-chips-input">
     <!-- INPUT LABEL AND FIELD -->
     <base-input
       ref="baseInput"
@@ -18,30 +17,25 @@
       @arrow-key="triggerArrowKey"
       @input-keydown="checkKeyEvent"
       @enter="addSelected()"
-      @click-input-field="insideInput = true"
-    >
+      @click-input-field="insideInput = true">
       <template
         v-if="sortable"
-        slot="label-addition"
-      >
+        slot="label-addition">
         <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
-          @click="sort"
-        >
+          @click="sort">
           {{ sortText }}
         </div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
-        slot="input-field-addition-before"
-      >
+        slot="input-field-addition-before">
         <div class="base-chips-input-chips">
           <draggable
             v-model="selectedListInt"
             :options="{ disabled: !draggable, setData: setDragElement }"
-            @end="onDragEnd"
-          >
+            @end="onDragEnd">
             <base-chip
               v-for="(entry, index) in selectedListInt"
               :id="'base-chip' + index"
@@ -54,16 +48,14 @@
               @mouse-down="chipActive = index"
               @remove-entry="removeEntry(entry, index)"
               @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-              @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)"
-            />
+              @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
           </draggable>
         </div>
       </template>
       <template slot="input-field-addition-after">
         <div
           v-if="isLoading"
-          class="base-chips-input-loader"
-        >
+          class="base-chips-input-loader">
           <BaseLoader />
         </div>
       </template>
@@ -76,8 +68,7 @@
       v-click-outside="() => insideDropDown = false"
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
-      @mouseleave="checkLeave"
-    >
+      @mouseleave="checkLeave">
       <div
         v-for="(entry, index) in dropDownListInt"
         ref="option"
@@ -86,17 +77,14 @@
         class="base-chips-drop-down-entry-wrapper"
         @click="addSelected()"
         @mouseover="selectedMenuEntryIndex = index"
-        @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null"
-      >
+        @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
         <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
           :item="entry"
-          name="drop-down-entry"
-        >
+          name="drop-down-entry">
           <!-- SLOT DEFAULT -->
           <div
-            class="base-chips-drop-down-entry"
-          >
+            class="base-chips-drop-down-entry">
             {{ entry[objectProp] }}
           </div>
         </slot>
@@ -105,18 +93,15 @@
         @slot a slot to expand the drop down area (needed for "Expand Functionality"
       -->
       <slot
-        name="drop-down-extended"
-      />
+        name="drop-down-extended" />
       <!--
         @slot customize what is displayed when no drop down options are available
       -->
       <slot
         v-if="!dropDownList.length"
-        name="no-options"
-      >
+        name="no-options">
         <div
-          class="base-chips-drop-down-entry-wrapper"
-        >
+          class="base-chips-drop-down-entry-wrapper">
           {{ dropDownNoOptionsInfo }}
         </div>
       </slot>
@@ -124,13 +109,11 @@
     <!-- CHIPS BELOW -->
     <div
       v-if="$props.allowMultipleEntries && !$props.chipsInline && selectedListInt.length"
-      class="base-chips-input-chips-container"
-    >
+      class="base-chips-input-chips-container">
       <!-- @slot a slot to customize the chips display below the input field -->
       <slot
         :list="selectedListInt"
-        name="chips-area"
-      >
+        name="chips-area">
         <!-- SLOT DEFAULT -->
         <base-chip
           v-for="(entry, index) in selectedListInt"
@@ -138,8 +121,7 @@
           v-model="entry[objectProp]"
           :chip-editable="chipsEditable"
           class="base-chips-input-chip"
-          @remove-entry="removeEntry($event, index)"
-        />
+          @remove-entry="removeEntry($event, index)" />
       </slot>
     </div>
   </div>

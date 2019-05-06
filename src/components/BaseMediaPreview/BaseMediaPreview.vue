@@ -2,16 +2,13 @@
   <div
     v-if="showPreviewInt"
     class="base-media-preview-background"
-    @wheel="scrollAction"
-  >
+    @wheel="scrollAction">
     <div
       class="base-media-preview-close"
-      @click="$emit('hide-preview')"
-    >
+      @click="$emit('hide-preview')">
       <SvgIcon
         name="remove"
-        class="base-media-preview-close-icon"
-      />
+        class="base-media-preview-close-icon" />
     </div>
     <!-- TODO_ add transition -->
     <transition name="grow">
@@ -19,8 +16,7 @@
         <img
           v-vue-click-outside.prevent="clickOutside"
           :src="imageUrl"
-          class="base-media-preview-image"
-        >
+          class="base-media-preview-image">
       </div>
     </transition>
   </div>

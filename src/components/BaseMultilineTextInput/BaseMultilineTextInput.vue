@@ -4,8 +4,7 @@
       <label
         :class="{ 'hide': !showLabel }"
         :for="label"
-        class="base-multiline-text-input-label"
-      >
+        class="base-multiline-text-input-label">
         {{ label }}
       </label>
       <div class="base-multiline-text-input-additions">
@@ -17,8 +16,7 @@
           :options="switchTabs"
           :label="tabsLegend"
           :active-tab="activeTab"
-          class="base-multiline-text-input-tabs"
-        />
+          class="base-multiline-text-input-tabs" />
       </div>
     </div>
 
@@ -26,8 +24,7 @@
       v-model="fieldContent[activeTabInt]"
       :placeholder="placeholder"
       rows="10"
-      class="base-multiline-text-input-textarea"
-    />
+      class="base-multiline-text-input-textarea" />
   </div>
 </template>
 

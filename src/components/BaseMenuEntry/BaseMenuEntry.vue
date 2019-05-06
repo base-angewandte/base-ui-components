@@ -5,22 +5,18 @@
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
-    @click="selectActive ? selected() : $emit('clicked')"
-  >
+    @click="selectActive ? selected() : $emit('clicked')">
     <svg-icon
       ref="entryIcon"
       :name="icon"
-      class="base-menu-entry-icon"
-    />
+      class="base-menu-entry-icon" />
     <div
-      :class="['base-menu-entry-text-wrapper']"
-    >
+      :class="['base-menu-entry-text-wrapper']">
       <div class="base-menu-entry-title-description-wrapper">
         <div
           v-if="title"
           :class="['base-menu-entry-title',
-                   { 'base-menu-entry-title-bold': isActive || titleBold }]"
-        >
+                   { 'base-menu-entry-title-bold': isActive || titleBold }]">
           {{ title }}
         </div>
         <div class="base-menu-entry-description">
@@ -29,43 +25,36 @@
       </div>
       <div
         v-if="subtext"
-        class="base-menu-entry-subtext"
-      >
+        class="base-menu-entry-subtext">
         {{ subtext }}
       </div>
     </div>
     <transition-group
       name="slide-fade"
-      class="slide-fade-group"
-    >
+      class="slide-fade-group">
       <div
         v-if="showThumbnails && !selectActive"
         :key="entryId + 'rightGroup'"
-        class="base-menu-entry-right-group"
-      >
+        class="base-menu-entry-right-group">
         <div
           :key="entryId + 'thumbnail'"
-          class="base-menu-entry-thumbnail-container"
-        >
+          class="base-menu-entry-thumbnail-container">
           <svg-icon
             v-for="tn in thumbnails"
             :key="tn"
             :name="tn"
-            class="base-menu-entry-thumbnail"
-          />
+            class="base-menu-entry-thumbnail" />
         </div>
       </div>
       <div
         v-if="isSelectable && selectActive"
         :key="entryId + 'checkmark'"
-        class="base-menu-entry-checkbox"
-      >
+        class="base-menu-entry-checkbox">
         <base-checkmark
           :checked="isSelected"
           title="checkbox"
           mark-style="checkbox"
-          @clicked="selected"
-        />
+          @clicked="selected" />
       </div>
     </transition-group>
   </div>

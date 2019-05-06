@@ -3,62 +3,52 @@
     <SvgIcon
       name="arrow-left"
       class="base-pagination-arrow"
-      @click="active = active - 1 > 0 ? active - 1 : 1"
-    />
+      @click="active = active - 1 > 0 ? active - 1 : 1" />
     <div
       v-if="total > maxNumbers"
-      class="base-pagination-row"
-    >
+      class="base-pagination-row">
       <span
         v-if="start !== 1"
         :class="{ 'base-pagination-number-active': active === 1}"
         class="base-pagination-number"
-        @click="active = 1"
-      >{{ 1 }}
+        @click="active = 1">{{ 1 }}
       </span>
       <span
         v-if="start > 2"
-        class="base-pagination-more"
-      >&#8943;</span>
+        class="base-pagination-more">&#8943;</span>
       <span
         v-for="n in subset"
         :key="n"
         :class="{ 'base-pagination-number-active': active === n}"
         class="base-pagination-number"
 
-        @click="active = n"
-      >{{ n }}</span>
+        @click="active = n">{{ n }}</span>
       <span
         v-if="(end) < (total - 1) && (end) !== (total - 1)"
-        class="base-pagination-more"
-      >&#8943;</span>
+        class="base-pagination-more">&#8943;</span>
       <span
         v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
         :class="{ 'base-pagination-number-active': active === total}"
         class="base-pagination-number"
-        @click="active = total"
-      >{{ total }}
+        @click="active = total">{{ total }}
       </span>
     </div>
     <div
       v-else
-      class="base-pagination-row"
-    >
+      class="base-pagination-row">
       <span
         v-for="n in total"
         :key="n"
         :class="{ 'base-pagination-number-active': active === n}"
         class="base-pagination-number"
-        @click="active = n"
-      >
+        @click="active = n">
         {{ n }}
       </span>
     </div>
     <SvgIcon
       name="arrow-left"
       class="base-pagination-arrow base-pagination-arrow-right"
-      @click="active = active + 1 <= total ? active + 1 : total"
-    />
+      @click="active = active + 1 <= total ? active + 1 : total" />
   </div>
 </template>
 

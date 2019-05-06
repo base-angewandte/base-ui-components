@@ -3,30 +3,25 @@
     :box-size="boxSize"
     :box-ratio="boxRatio"
     class="base-box-button"
-    @clicked="$emit('clicked')"
-  >
+    @clicked="$emit('clicked')">
     <div
       v-if="boxStyle === 'large'"
-      class="button-box-content"
-    >
+      class="button-box-content">
       <div class="button-box-center">
         <div
-          class="button-box-image-row"
-        >
+          class="button-box-image-row">
           <div class="button-box-plus-container">
             <svg-icon
               v-if="showPlus"
               name="plus"
               alt="add"
-              class="button-box-plus"
-            />
+              class="button-box-plus" />
           </div>
           <div class="button-box-icon-container">
             <svg-icon
               v-if="icon"
               :name="icon"
-              class="button-box-icon"
-            />
+              class="button-box-icon" />
           </div>
         </div>
         <div class="button-box-text">
@@ -40,13 +35,11 @@
     </div>
     <div
       v-else
-      class="button-box-content-small"
-    >
+      class="button-box-content-small">
       <svg-icon
         v-if="icon"
         :name="icon"
-        class="button-box-icon-small"
-      />
+        class="button-box-icon-small" />
       <div class="button-box-text-small">
         {{ text }}
       </div>

@@ -2,25 +2,21 @@
   <div
     v-if="showInt"
     class="base-pop-up"
-    @wheel="scrollAction"
-  >
+    @wheel="scrollAction">
     <div class="base-pop-up-background" />
     <div
-      class="popup-box"
-    >
+      class="popup-box">
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
-          class="popup-title"
-        >
+          class="popup-title">
           {{ title }}
         </div>
         <!-- @event close -->
         <svg-icon
           class="popup-remove"
           name="remove"
-          @click="close"
-        />
+          @click="close" />
       </div>
 
       <!-- POP UP CONTENT -->
@@ -38,8 +34,7 @@
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-left')"
-            />
+              @clicked="$emit('button-left')" />
             <!-- @event buttonRight -->
             <base-button
               :text="buttonRightText"
@@ -47,8 +42,7 @@
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-right')"
-            />
+              @clicked="$emit('button-right')" />
           </slot>
         </div>
       </div>

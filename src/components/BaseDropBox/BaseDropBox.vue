@@ -4,11 +4,9 @@
     :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
     class="base-drop-box"
-    @clicked="$emit('clicked')"
-  >
+    @clicked="$emit('clicked')">
     <div
-      class="base-drop-box-inner"
-    >
+      class="base-drop-box-inner">
       <form ref="fileform" />
     </div>
   </base-box-button>

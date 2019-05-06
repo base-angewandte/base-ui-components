@@ -5,18 +5,15 @@
     </div>
     <div
       :style="{ 'width': progressWidth + '%'}"
-      class="base-upload-bar-progress"
-    />
+      class="base-upload-bar-progress" />
     <SvgIcon
       v-if="status === 'success'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-success"
-      name="success"
-    />
+      name="success" />
     <SvgIcon
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
-      name="attention"
-    />
+      name="attention" />
   </div>
 </template>
 

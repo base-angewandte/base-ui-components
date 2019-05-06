@@ -3,8 +3,7 @@
     <td>
       <svg-icon
         :name="icon"
-        class="base-menu-entry-icon"
-      />
+        class="base-menu-entry-icon" />
     </td>
     <td>{{ title }}</td>
     <td>{{ subtext }}</td>
@@ -13,15 +12,13 @@
         v-for="tn in thumbnails"
         :key="tn"
         :name="tn"
-        class="base-menu-entry-thumbnail"
-      />
+        class="base-menu-entry-thumbnail" />
     </td>
     <td>{{ description }}</td>
     <transition
       v-if="isSelectable"
       name="slide-fade"
-      class="base-menu-checkmark-container"
-    >
+      class="base-menu-checkmark-container">
       <td>
         <base-checkmark
           v-if="selectActive"
@@ -29,8 +26,7 @@
           title="checkbox"
           mark-style="checkbox"
           class="hidden"
-          @clicked="selected"
-        />
+          @clicked="selected" />
       </td>
     </transition>
   </tr>

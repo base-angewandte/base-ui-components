@@ -9,8 +9,7 @@
         r="20"
         fill="none"
         stroke-width="4"
-        stroke-miterlimit="10"
-      />
+        stroke-miterlimit="10" />
     </svg>
   </div>
 </template>

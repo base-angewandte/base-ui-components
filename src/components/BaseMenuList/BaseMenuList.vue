@@ -16,8 +16,7 @@
       :select-active="selectActive"
 
       @clicked="activateItem(index)"
-      @selected="selectItem(index, $event)"
-    />
+      @selected="selectItem(index, $event)" />
   </div>
 </template>
 

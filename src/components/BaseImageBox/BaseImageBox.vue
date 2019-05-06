@@ -3,60 +3,50 @@
     ref="baseBox"
     :box-size="boxSize"
     box-ratio="100"
-    @clicked="boxSelect"
-  >
+    @clicked="boxSelect">
     <div
       :class="['base-image-box-content-wrapper',
-               { 'base-image-box-selected': selectable && selectedInt }]"
-    >
+               { 'base-image-box-selected': selectable && selectedInt }]">
       <div :class="['base-image-box-content', imageShadowClass]">
         <!-- @SLOT for published icon of files -->
         <slot name="top" />
         <div
           v-if="showTitle"
           ref="headerBox"
-          class="base-image-box-header"
-        >
+          class="base-image-box-header">
           <div
-            class="base-image-box-title"
-          >
+            class="base-image-box-title">
             {{ title }}
           </div>
           <div
             v-if="subtext"
-            class="base-image-box-subtext"
-          >
+            class="base-image-box-subtext">
             {{ subtext }}
           </div>
         </div>
         <div
           v-if="imageUrl"
-          class="base-image-box-img-wrapper"
-        >
+          class="base-image-box-img-wrapper">
           <!-- TODO: image display error handling -->
           <img
             ref="image"
             :src="imageUrl"
             :style="imageStyle"
-            class="base-image-box-image"
-          >
+            class="base-image-box-image">
         </div>
         <!-- @slot to display more advanced text -->
         <slot
           :text="boxText"
-          name="text"
-        >
+          name="text">
           <!-- default -->
           <div
             v-if="!imageUrl && boxText.length"
             ref="boxText"
             :style="boxTextStyle"
-            class="base-image-box-text"
-          >
+            class="base-image-box-text">
             <div
               v-for="(entry, index) in boxText"
-              :key="index"
-            >
+              :key="index">
               {{ entry }}
             </div>
           </div>
@@ -68,15 +58,13 @@
     </div>
     <div class="base-image-box-features">
       <transition
-        name="slide-fade"
-      >
+        name="slide-fade">
         <BaseCheckmark
           v-if="selectable"
           :checked="selectedInt"
           mark-style="checkbox"
           check-box-size="large"
-          class="base-image-box-checkbox"
-        />
+          class="base-image-box-checkbox" />
       </transition>
     </div>
   </BaseBox>

@@ -3,8 +3,7 @@
     <div :class="['base-drop-down-label-wrapper', { 'hide': !label || !showLabel }]">
       <label
         :for="label"
-        class="base-drop-down-label"
-      >
+        class="base-drop-down-label">
         {{ label }}
       </label>
     </div>
@@ -18,29 +17,25 @@
       type="button"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
-      @keydown.tab="selectByKey"
-    >
+      @keydown.tab="selectByKey">
       <span class="base-drop-down-head-text">{{ selectedOptionInt }}</span>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
         <SvgIcon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          name="drop-down"
-        />
+          name="drop-down" />
       </slot>
     </button>
     <div
       v-if="showDropDown"
       ref="dropdownContainer"
-      class="base-drop-down-body"
-    >
+      class="base-drop-down-body">
       <!-- @slot create custom drop down body -->
       <slot>
         <ul
           tabindex="-1"
           role="listbox"
-          class="base-drop-down-body-list"
-        >
+          class="base-drop-down-body-list">
           <li
             v-for="(option, index) in options"
             ref="option"
@@ -51,8 +46,7 @@
                 && option.value === selectedOption.value },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
-            @click="selectValue(option)"
-          >
+            @click="selectValue(option)">
             {{ option.label }}
           </li>
         </ul>

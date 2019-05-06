@@ -9,46 +9,38 @@
       :is-loading="isLoading"
       :sort-text="sortText"
       @selected="addedEntry"
-      @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)"
-    >
+      @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
       <template
         slot="chips-area"
-        slot-scope="props"
-      >
+        slot-scope="props">
         <draggable
           v-model="props.list"
           :options="{
             group: 'people',
             handle: '.base-chips-below-list-icon-wrapper'
           }"
-          @end="updateList($event, props.list)"
-        >
+          @end="updateList($event, props.list)">
           <div
             v-for="(entry,index) in props.list"
             :key="'item' + entry.idInt"
             :name="entry[objectProp]"
             class="base-chips-below-list-item"
-            @mousedown="chipActive = index"
-          >
+            @mousedown="chipActive = index">
             <div
               :key="'line' + entry.idInt"
-              class="base-chips-below-list-item-line"
-            >
+              class="base-chips-below-list-item-line">
               <div
                 :key="'iconwrapper' + entry.idInt"
-                class="base-chips-below-list-icon-wrapper"
-              >
+                class="base-chips-below-list-icon-wrapper">
                 <SvgIcon
                   :key="'icon' + entry.idInt"
                   name="drag-lines"
-                  class="svg-icon base-chips-below-list-icon"
-                />
+                  class="svg-icon base-chips-below-list-icon" />
               </div>
 
               <div
                 :key="'chip-wrapper' + entry.idInt"
-                class="base-chips-below-list-item-chip-wrapper"
-              >
+                class="base-chips-below-list-item-chip-wrapper">
                 <!-- TODO: @valueChanged: this change needs to be propagated to parent! -->
                 <BaseChip
                   :id="'chips-below' + index"
@@ -61,8 +53,7 @@
                   class="base-chips-input-chip"
                   @value-changed="$set(entry, 'edited', true)"
                   @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-                  @remove-entry="removeEntry($event, index)"
-                />
+                  @remove-entry="removeEntry($event, index)" />
               </div>
               <base-chips-input
                 :key="'input' + entry.idInt"
@@ -77,20 +68,17 @@
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
-                @selected="updateRoles($event, index)"
-              />
+                @selected="updateRoles($event, index)" />
             </div>
           </div>
         </draggable>
       </template>
       <template
         slot="drop-down-entry"
-        slot-scope="props"
-      >
+        slot-scope="props">
         <slot
           :item="props.item"
-          name="below-drop-down-entry"
-        />
+          name="below-drop-down-entry" />
       </template>
     </BaseChipsInput>
   </div>

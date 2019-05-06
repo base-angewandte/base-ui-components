@@ -3,13 +3,11 @@
     <!-- TODO: hidden label seems not working? (there is no hide class...) -->
     <!-- plus show label should probably only influence the label not the additional slot -->
     <div
-      :class="['base-input-label-row', { 'hide': !showLabel }]"
-    >
+      :class="['base-input-label-row', { 'hide': !showLabel }]">
       <label
         :class="['base-input-label']"
         :for="label"
-        @click.prevent="$emit('clicked-outside')"
-      >
+        @click.prevent="$emit('clicked-outside')">
         {{ label }}
       </label>
       <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
@@ -22,8 +20,7 @@
       :class="['base-input-field-container',
                { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active || isActive }]"
-      @click="$emit('click-input-field')"
-    >
+      @click="$emit('click-input-field')">
       <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
         (before \<input\>)
        -->
@@ -43,8 +40,7 @@
         @keydown.up.down.prevent="$emit('arrow-key', $event)"
         @input="$emit('autocomplete', inputInt)"
         @blur="blurInput()"
-        @click="active = true"
-      >
+        @click="active = true">
       <slot name="input-field-addition-after" />
     </div>
   </div>
