@@ -19,7 +19,7 @@
       @click="$emit('remove-entry', entryInt)">
       <img
         class="base-chip-icon-img"
-        src="../../static/icons/remove.svg">
+        src="../../static/icons/remove.svg" >
     </div>
     <base-hover-box
       ref="hoverBox"
