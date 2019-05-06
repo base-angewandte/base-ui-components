@@ -1,25 +1,28 @@
 <template>
   <div class="base-input">
     <div
-      class="base-input-label-row">
+      class="base-input-label-row"
+    >
       <label
         :class="{ 'hide': !showLabel }"
         :for="label"
         class="base-input-label"
-        @click.prevent="">
+        @click.prevent=""
+      >
         {{ label }}
       </label>
       <div
         v-if="showFormatOptions"
-        class="base-date-input-format-tabs">
+        class="base-date-input-format-tabs"
+      >
         <BaseSwitchButton
+          v-model="dateFormatInt"
           :options="[
             { label: dateFormatLabels.date, value: 'DD.MM.YYYY' },
             { label: dateFormatLabels.year, value: 'YYYY' },
           ]"
           :label="formatTabsLegend"
           :active-tab="dateFormatInt"
-          v-model="dateFormatInt"
           class="base-multiline-text-input-tabs"
         />
       </div>
@@ -30,13 +33,14 @@
         v-click-outside="() => selected('from')"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeFrom },
-                 { 'base-input-field-container-multiple': type === 'datetime' }]">
+                 { 'base-input-field-container-multiple': type === 'datetime' }]"
+      >
         <input
           v-if="type === 'timerange'"
           id="timeFrom"
+          v-model="inputInt.time_from"
           :title="label + '-time'"
           :placeholder="placeholder + ' Time'"
-          v-model="inputInt.time_from"
           class="base-input-field base-date-input-field"
           type="text"
           autocomplete="off"
@@ -45,48 +49,54 @@
           @keyup.up.down.prevent="$emit('arrow-key', $event)"
           @input="$emit('autocomplete', inputInt)"
           @blur="blurInput()"
-          @click="activeFrom = true">
+          @click="activeFrom = true"
+        >
         <datepicker
           v-else
           id="dateFrom"
           key="dateFrom"
           ref="datepickerFrom"
+          v-model="dateFrom"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
           :placeholder="placeholder"
           :minimum-view="minDateView"
-          v-model="dateFrom"
           calendar-class="calendar-class"
           class="base-input-datepicker"
           @opened="activeFrom = true"
           @closed="selected('from')"
-          @click="openDatePicker('from')"/>
+          @click="openDatePicker('from')"
+        />
         <svg-icon
           v-if="type === 'timerange'"
           name="clock"
-          class="base-input-date-icon"/>
+          class="base-input-date-icon"
+        />
         <svg-icon
           v-else
           name="calendar-many"
           class="base-input-date-icon"
-          @click="openDatePicker('from')"/>
+          @click="openDatePicker('from')"
+        />
       </div>
       <span
         v-if="type === 'daterange' || type === 'timerange'"
-        class="separator">bis</span>
+        class="separator"
+      >bis</span>
       <div
-        v-click-outside="() => selected('to')"
         v-if="type !== 'single'"
+        v-click-outside="() => selected('to')"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeTo },
-                 { 'base-input-field-container-multiple': type === 'datetime' }]">
+                 { 'base-input-field-container-multiple': type === 'datetime' }]"
+      >
         <input
           v-if="type === 'datetime' || type === 'timerange'"
           id="timeTo"
+          v-model="timeTo"
           :title="label + '-time'"
           :placeholder="placeholder + ' Time'"
-          v-model="timeTo"
           class="base-input-field base-date-input-field"
           type="text"
           autocomplete="off"
@@ -95,36 +105,39 @@
           @keyup.up.down.prevent="$emit('arrow-key', $event)"
           @input="$emit('autocomplete', inputInt)"
           @blur="blurInput()"
-          @click="activeTo = true">
+          @click="activeTo = true"
+        >
         <datepicker
           v-else
           id="dateTo"
           key="dateTo"
           ref="datepickerTo"
+          v-model="inputInt.date_to"
           :monday-first="true"
           :input-class="'base-input-datepicker-input'"
           :format="dateFormat"
           :minimum-view="minDateView"
           :placeholder="placeholder"
-          v-model="inputInt.date_to"
           calendar-class="calendar-class"
           class="base-input-datepicker"
           @opened="activeTo = true"
-          @closed="selected('to')"/>
+          @closed="selected('to')"
+        />
 
         <svg-icon
           v-if="type === 'datetime' || type === 'timerange'"
           name="clock"
-          class="base-input-date-icon"/>
+          class="base-input-date-icon"
+        />
 
         <svg-icon
           v-else
           name="calendar-many"
           class="base-input-date-icon"
-          @click="openDatePicker('to')"/>
+          @click="openDatePicker('to')"
+        />
       </div>
     </div>
-
   </div>
 </template>
 

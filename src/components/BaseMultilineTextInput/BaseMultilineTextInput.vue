@@ -4,7 +4,8 @@
       <label
         :class="{ 'hide': !showLabel }"
         :for="label"
-        class="base-multiline-text-input-label">
+        class="base-multiline-text-input-label"
+      >
         {{ label }}
       </label>
       <div class="base-multiline-text-input-additions">
@@ -12,19 +13,21 @@
         <slot />
         <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
+          v-model="activeTabInt"
           :options="switchTabs"
           :label="tabsLegend"
           :active-tab="activeTab"
-          v-model="activeTabInt"
-          class="base-multiline-text-input-tabs" />
+          class="base-multiline-text-input-tabs"
+        />
       </div>
     </div>
 
     <textarea
-      :placeholder="placeholder"
       v-model="fieldContent[activeTabInt]"
+      :placeholder="placeholder"
       rows="10"
-      class="base-multiline-text-input-textarea" />
+      class="base-multiline-text-input-textarea"
+    />
   </div>
 </template>
 

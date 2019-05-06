@@ -12,7 +12,7 @@ function addStyleResource(rule) {
 module.exports = {
   pages: {
     index: './src/main.js',
-    'base-components-cli': 'src/lib.js',
+    'base-ui-components': 'src/lib.js',
   },
   css: {
     sourceMap: true,

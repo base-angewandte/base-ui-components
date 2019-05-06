@@ -1,34 +1,40 @@
 <template>
   <!-- REMINDER: fieldset tag does not work with flexbox (in chrome and edge) -->
   <fieldset
-    class="base-switch-buttons">
+    class="base-switch-buttons"
+  >
     <legend
       id="base-switch-buttons-label"
-      class="hide">{{ label }}</legend>
+      class="hide"
+    >
+      {{ label }}
+    </legend>
     <template
-      v-for="option in options">
+      v-for="option in options"
+    >
       <input
         :id="option.value"
         :key="option.value + 'input'"
-        :tabindex="option.value === selectedOption ? 0 : -1"
         v-model="selectedOption"
+        :tabindex="option.value === selectedOption ? 0 : -1"
         :checked="option.value === selectedOption"
         :aria-checked="option.value === selectedOption"
         :value="option.value"
         :name="label"
         :class="['hide', 'base-switch-button-input',
                  { 'base-switch-button-input-active': option.value === selectedOption }]"
-        type="radio">
+        type="radio"
+      >
       <label
         :key="option.value + 'label'"
         :for="option.value"
-        class="base-switch-button-label">
+        class="base-switch-button-label"
+      >
         {{ option.label }}
         <!-- TODO: add slot for icons etc -->
       </label>
     </template>
   </fieldset>
-
 </template>
 
 <script>

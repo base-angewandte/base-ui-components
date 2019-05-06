@@ -2,7 +2,7 @@
   <div
     v-click-outside="() => entryEditable = false"
     :class="['base-chip',
-             { 'base-chip-edited': entryEdited }]">
+             { 'base-chip-edited': entryEdited }]" >
     <div
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
@@ -11,14 +11,15 @@
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
-      @keyup="entryEdited = true"
-      v-html="content()" />
+      @keyup="entryEdited = true" >
+      {{ entryInt }}
+    </div>
     <div
       class="base-chip-icon"
-      @click="$emit('remove-entry', entryInt)">
+      @click="$emit('remove-entry', entryInt)" >
       <img
         class="base-chip-icon-img"
-        src="../../static/icons/remove.svg">
+        src="../../static/icons/remove.svg" >
     </div>
     <base-hover-box
       ref="hoverBox"
@@ -116,9 +117,6 @@ export default {
     this.entryEdited = !this.isLinked;
   },
   methods: {
-    content() {
-      return `<span>${this.entryInt}</span>`;
-    },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
         this.entryInt = evt.target.innerText;

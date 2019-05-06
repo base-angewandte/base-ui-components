@@ -1,7 +1,8 @@
 <template>
   <div
     :style="[boxSize, boxPosition]"
-    class="base-hover-box">
+    class="base-hover-box"
+  >
     <base-image-box v-bind="$props" />
   </div>
 </template>

@@ -2,22 +2,25 @@
   <div
     v-if="showInt"
     class="base-pop-up"
-    @wheel="scrollAction">
+    @wheel="scrollAction"
+  >
     <div class="base-pop-up-background" />
     <div
-      class="popup-box">
-
+      class="popup-box"
+    >
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
-          class="popup-title">
+          class="popup-title"
+        >
           {{ title }}
         </div>
         <!-- @event close -->
         <svg-icon
           class="popup-remove"
           name="remove"
-          @click="close" />
+          @click="close"
+        />
       </div>
 
       <!-- POP UP CONTENT -->
@@ -49,10 +52,8 @@
           </slot>
         </div>
       </div>
-
     </div>
   </div>
-
 </template>
 
 <script>

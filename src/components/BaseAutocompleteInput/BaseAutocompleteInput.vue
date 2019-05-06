@@ -2,9 +2,9 @@
   <div class="base-autocomplete-input">
     <BaseInput
       ref="baseInput"
+      v-model="inputTextInt"
       :placeholder="!inputTextInt ? $props.placeholder : ''"
       :label="$props.label"
-      v-model="inputTextInt"
       @clicked-outside="insideInput = false"
       @input-focus="onInputFocus"
       @arrow-key="triggerArrowKey"
@@ -20,9 +20,9 @@
 
     <!-- DROP DOWN MENU -->
     <div
-      v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       ref="dropdownContainer"
+      v-click-outside="() => insideDropDown = false"
       class="base-autocomplete-drop-down"
       @mouseleave="selectedMenuEntryIndex = -1">
       <div
@@ -45,7 +45,6 @@
             {{ entry[objectProp] }}
           </div>
         </slot>
-
       </div>
       <slot
         v-if="!listInt.length"
@@ -55,7 +54,6 @@
           {{ $props.dropDownNoOptionsInfo }}
         </div>
       </slot>
-
     </div>
   </div>
 </template>

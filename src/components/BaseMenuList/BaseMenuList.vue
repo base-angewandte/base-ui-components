@@ -1,8 +1,7 @@
 <template>
   <div class="base-menu-list">
-    <base-menu-entry
-      v-for="(item, index) in list"
-      v-if="item"
+    <BaseMenuEntry
+      v-for="(item, index) in filteredList"
       ref="menuEntry"
       :key="item.id || item.title"
       :entry-id="item.id"
@@ -17,7 +16,8 @@
       :select-active="selectActive"
 
       @clicked="activateItem(index)"
-      @selected="selectItem(index, $event)"/>
+      @selected="selectItem(index, $event)"
+    />
   </div>
 </template>
 
@@ -72,6 +72,9 @@ export default {
   computed: {
     selectActive() {
       return this.selected;
+    },
+    filteredList() {
+      return this.list.filter(Boolean);
     },
   },
   watch: {

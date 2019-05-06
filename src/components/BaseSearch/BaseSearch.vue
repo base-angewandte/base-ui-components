@@ -1,10 +1,12 @@
 <template>
   <div
     :style="$props.styleProps"
-    class="base-search">
+    class="base-search"
+  >
     <label
       for="search"
-      class="hide">
+      class="hide"
+    >
       {{ $props.label }}
     </label>
     <input
@@ -16,7 +18,8 @@
       autocomplete="off"
       @focus.prevent="test"
       @click.prevent="test"
-      @keyup="$emit('input', input)" >
+      @keyup="$emit('input', input)"
+    >
   </div>
 </template>
 

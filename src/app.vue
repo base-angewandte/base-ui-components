@@ -73,7 +73,7 @@
                        {
                          value: 'Zeitungsartikel',
                          label: 'Zeitungsartikel',
-          }]" />
+                       }]" />
         </div>
       </base-multiline-text-input>
       <base-multiline-text-input
@@ -101,10 +101,10 @@
         type="daterange"
         format="date_year"/>
       <base-autocomplete-input
+        v-model="autocompleteInput"
         :list="dropDownInput"
         :placeholder="'Fetching from SkosMos'"
         :object-prop="'prefLabel'"
-        v-model="autocompleteInput"
         label="text input with dynamic autocomplete"
         @selected="fetchOther($event, 'this is my type')"/>
       <base-chips-input
@@ -150,8 +150,8 @@
         </template>
       </base-chips-input>
       <base-chips-below
-        :chips-inline="false"
         v-model="selectedList"
+        :chips-inline="false"
         :chips-editable="true"
         :allow-unknown-entries="true"
         :list="[{
@@ -165,7 +165,7 @@
                 {
                   id: '',
                   name: 'Georg Werth',
-        }]"
+                }]"
         :role-options="['Farmer', 'Magician', 'Priest']"
         :hoverbox-content="hoverboxContent"
         identifier="id"
@@ -211,7 +211,9 @@
       <ul>
         <li
           v-for="item in elements"
-          :key="item.id">{{ item.title }}</li>
+          :key="item.id">
+          {{ item.title }}
+        </li>
       </ul>
     </div>
 
@@ -266,9 +268,9 @@
 
     <!-- DROP DOWN TEST -->
     <base-drop-down
+      v-model="selectedVal"
       :label="'select type'"
       :show-label="true"
-      v-model="selectedVal"
       :options="selectionList" />
     <base-drop-down
       :options="selectionList" />
@@ -284,12 +286,9 @@ import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseDropDown from './components/BaseDropDown/BaseDropDown';
 import BaseInput from './components/BaseInput/BaseInput';
-import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
 import BaseButton from './components/BaseButton/BaseButton';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
-import BaseBox from './components/BaseBox/BaseBox';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
-import BaseMenuTableRow from './components/BaseMenuTableRow';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
@@ -297,7 +296,6 @@ import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 
@@ -306,7 +304,6 @@ export default {
   name: 'App',
   components: {
     BasePagination,
-    BaseHoverBox,
     BaseChipsBelow,
     BaseDateInput,
     BaseAutocompleteInput,
@@ -320,11 +317,8 @@ export default {
     BaseDropDown,
     BasePopUp,
     BaseInput,
-    BaseBoxButton,
     BaseButton,
     BaseDropBox,
-    BaseBox,
-    BaseMenuTableRow,
   },
   data() {
     return {
