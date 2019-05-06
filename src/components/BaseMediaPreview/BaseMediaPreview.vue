@@ -28,10 +28,11 @@
  *     in future it should also be possible to view videos or audio
   */
 import VueClickOutside from 'vue-click-outside';
+import SvgIcon from 'vue-svgicon';
 
 export default {
   components: {
-    SvgIcon: () => import('vue-svgicon'),
+    SvgIcon,
   },
   directives: {
     VueClickOutside,
