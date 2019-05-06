@@ -8,11 +8,13 @@
       @clicked-outside="insideInput = false"
       @input-focus="onInputFocus"
       @arrow-key="triggerArrowKey"
-      @enter="selectEntry()">
+      @enter="selectEntry()"
+    >
       <template slot="input-field-addition-after">
         <div
           v-if="isLoading"
-          class="base-input-loader">
+          class="base-input-loader"
+        >
           <BaseLoader />
         </div>
       </template>
@@ -24,7 +26,8 @@
       ref="dropdownContainer"
       v-click-outside="() => insideDropDown = false"
       class="base-autocomplete-drop-down"
-      @mouseleave="selectedMenuEntryIndex = -1">
+      @mouseleave="selectedMenuEntryIndex = -1"
+    >
       <div
         v-for="(entry, index) in listInt"
         ref="option"
@@ -34,12 +37,13 @@
         }"
         class="base-autocomplete-drop-down-entry-wrapper"
         @click="selectEntry(entry)"
-        @mouseover="selectedMenuEntryIndex = index">
-
+        @mouseover="selectedMenuEntryIndex = index"
+      >
         <!-- THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
           :item="entry"
-          name="drop-down-entry">
+          name="drop-down-entry"
+        >
           <!-- SLOT DEFAULT -->
           <div class="base-autocomplete-drop-down-entry">
             {{ entry[objectProp] }}
@@ -48,9 +52,11 @@
       </div>
       <slot
         v-if="!listInt.length"
-        name="no-options">
+        name="no-options"
+      >
         <div
-          class="base-autocomplete-drop-down-entry-wrapper">
+          class="base-autocomplete-drop-down-entry-wrapper"
+        >
           {{ $props.dropDownNoOptionsInfo }}
         </div>
       </slot>

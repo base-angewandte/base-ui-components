@@ -2,7 +2,8 @@
   <div
     :style="boxSizeInt"
     :class="['base-box', 'base-box-' + $props.boxRatio]"
-    @click="$emit('clicked')">
+    @click="$emit('clicked')"
+  >
     <slot />
   </div>
 </template>

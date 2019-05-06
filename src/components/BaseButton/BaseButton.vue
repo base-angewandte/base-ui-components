@@ -5,7 +5,8 @@
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
-    @click.prevent="$emit('clicked')" >
+    @click.prevent="$emit('clicked')"
+  >
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
     <svg-icon
@@ -14,7 +15,8 @@
       :class="['base-button-icon',
                'base-button-icon-left',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]" />
+               { 'base-button-icon-hide': hideIcon }]"
+    />
     <span class="base-button-text">{{ text }}</span>
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />

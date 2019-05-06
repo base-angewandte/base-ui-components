@@ -1,26 +1,31 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @click="$emit('clicked', label)" >
+    @click="$emit('clicked', label)"
+  >
     <input
       v-model="checkedInt"
       :name="label"
       :value="label"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]" >
+      :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]"
+    >
     <div
       :class="[
         'base-checkmark-container',
         'base-checkmark-container-' + checkBoxSize,
-        {'base-radiomark': markStyle === 'radio' && checkedInt === label }]" >
+        {'base-radiomark': markStyle === 'radio' && checkedInt === label }]"
+    >
       <svg-icon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
-        name="check-mark" />
+        name="check-mark"
+      />
     </div>
     <label
       :for="label"
-      :class="['base-checkbox-labeltext', { 'hide': !showLabel }]" >{{ label }}</label>
+      :class="['base-checkbox-labeltext', { 'hide': !showLabel }]"
+    >{{ label }}</label>
   </div>
 </template>
 
