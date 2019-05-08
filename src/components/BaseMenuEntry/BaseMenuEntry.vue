@@ -290,6 +290,7 @@ export default {
         .base-menu-entry-description {
           color: $font-color-second;
           font-size: $font-size-small;
+          white-space: nowrap;
         }
       }
     }
