@@ -258,21 +258,6 @@ export default {
     position: relative;
     background: white;
     overflow: hidden;
-
-    &.base-menu-entry-activatable {
-      cursor: pointer;
-
-      &.base-menu-entry-active {
-        box-shadow: inset $border-active-width 0 0 0 $app-color;
-      }
-
-      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title,
-      &:hover .base-menu-entry-subtext {
-        fill: $app-color;
-        color: $app-color;
-      }
-    }
-
     .base-menu-entry-icon {
       max-height: $icon-large;
       width: $icon-large;
@@ -305,17 +290,9 @@ export default {
         .base-menu-entry-description {
           color: $font-color-second;
           font-size: $font-size-small;
+          white-space: nowrap;
         }
       }
-    }
-
-    .base-menu-entry-subtext {
-      color: $font-color-second;
-      font-size: $font-size-small;
-      margin: 0 $spacing;
-      flex-grow: 99;
-      flex-shrink: 0;
-      padding-right: $spacing;
     }
 
     .base-menu-entry-title + .base-menu-entry-subtext {
@@ -329,7 +306,30 @@ export default {
     }
 
     .base-menu-entry-icon + .base-menu-entry-subtext {
-      margin-left: 16px;
+      margin-left: $spacing;
+    }
+
+    .base-menu-entry-subtext {
+      color: $font-color-second;
+      font-size: $font-size-small;
+      margin: 0 $spacing;
+      flex-grow: 99;
+      flex-shrink: 0;
+      padding-right: $spacing;
+    }
+
+    &.base-menu-entry-activatable {
+      cursor: pointer;
+
+      &.base-menu-entry-active {
+        box-shadow: inset $border-active-width 0 0 0 $app-color;
+      }
+
+      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title,
+      &:hover .base-menu-entry-subtext, &:hover .base-menu-entry-description {
+        fill: $app-color;
+        color: $app-color;
+      }
     }
 
     .base-menu-entry-right-group {

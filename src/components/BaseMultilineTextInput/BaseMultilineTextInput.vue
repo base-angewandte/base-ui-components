@@ -233,4 +233,13 @@ export default {
       }
     }
   }
+
+  @media screen and (max-width: $mobile) {
+    .base-multiline-text-input
+    .base-multiline-text-input-label-row
+    .base-multiline-text-input-additions {
+      align-items: center;
+      margin-bottom: -$spacing-small/2;
+    }
+  }
 </style>

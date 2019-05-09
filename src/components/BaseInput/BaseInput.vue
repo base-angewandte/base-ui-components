@@ -68,7 +68,7 @@ export default {
      * input field settable from outside
       */
     input: {
-      type: String,
+      type: [String, Number],
       default: '',
     },
     /** label for input field, required for usability purposes, handle
