@@ -349,7 +349,7 @@ export default {
         position: absolute;
         top: 0;
         left: -30px;
-        background: linear-gradient(to right, transparent , white);
+        background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
         z-index: 1;
       }
 
@@ -386,7 +386,7 @@ export default {
       position: absolute;
       right: 2 * $spacing-small + 2 * $spacing;
       top: 0;
-      background: linear-gradient(to right, transparent , white);
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
       z-index: 1;
     }
 

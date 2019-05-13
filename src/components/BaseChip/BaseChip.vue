@@ -180,13 +180,13 @@ export default {
     cursor: default;
 
     &.base-chip-edited {
-      background-color: transparent;
+      background-color: rgba(255, 255, 255, 0);
     }
 
     .base-chip-text {
       margin-right: $spacing-small;
       border: none;
-      background-color: transparent;
+      background-color: rgba(255, 255, 255, 0);
       color: $font-color;
       word-break: break-all;
 

@@ -108,7 +108,7 @@ export default {
       background-color: inherit;
       padding: $spacing-small/2 $spacing;
       position: relative;
-      border: 1px solid transparent;
+      border: 1px solid rgba(255, 255, 255, 0);
     }
 
     &.base-switch-button-input-active + .base-switch-button-label {
