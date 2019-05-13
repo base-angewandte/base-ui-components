@@ -473,8 +473,6 @@ export default {
   input[type='text'].base-input-field {
     border: none;
     overflow: hidden;
-    padding: 4px 0;
-    height: $line-height;
     max-width: 60%;
   }
 
