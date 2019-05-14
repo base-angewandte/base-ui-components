@@ -319,6 +319,14 @@ export default {
       type: String,
       default: 'Sort A – Z',
     },
+    /**
+     * if true sorting will consider the last string in a label or if a comma is
+     * present the string before the comma
+     */
+    sortName: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -601,14 +609,34 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        const compA = a[this.objectProp].toLowerCase();
-        const compB = b[this.objectProp].toLowerCase();
+        let compA = a[this.objectProp].toLowerCase();
+        let compB = b[this.objectProp].toLowerCase();
+        if (this.sortName) {
+          let firstA = '';
+          let firstB = '';
+          [compA, firstA] = this.getNameSortValue(compA);
+          [compB, firstB] = this.getNameSortValue(compB);
+
+          if (compA === compB) {
+            compA = firstA;
+            compB = firstB;
+          }
+        }
         if (compA > compB) {
           return 1;
         }
         return -1;
       });
       this.emitSelectedList();
+    },
+    getNameSortValue(compValue) {
+      const compValueSansNum = compValue.replace(/,? [0-9-]+/g, '');
+      if (compValueSansNum.includes(',')) {
+        const compArray = compValueSansNum.split(', ');
+        return [compArray[0], compArray.splice(1).join()];
+      }
+      const compArray = compValueSansNum.split(' ');
+      return [compArray.pop(), compValueSansNum];
     },
     setSelectedList(val) {
       if (val && val.length) {
@@ -691,7 +719,8 @@ export default {
           this.fired = false;
         }, 300);
       }
-      if (event.code === 'Comma' && this.input) {
+      // if user has input and uses semicolon add input
+      if (event.code === 'Comma' && event.shiftKey && this.input) {
         event.preventDefault();
         this.addSelected();
         this.input = '';
