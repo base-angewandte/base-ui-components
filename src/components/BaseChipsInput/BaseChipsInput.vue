@@ -728,8 +728,10 @@ export default {
       }
     },
     modifyChipValue(event, entry) {
-      if (event === entry[this.objectProp] && this.identifier) {
-        this.$set(entry, this.identifier, '');
+      if (event === entry[this.objectProp]) {
+        if (this.identifier) {
+          this.$set(entry, this.identifier, '');
+        }
         this.emitSelectedList();
       }
     },
