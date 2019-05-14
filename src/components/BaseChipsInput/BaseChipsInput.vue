@@ -47,7 +47,7 @@
               @mouse-down="chipActive = index"
               @remove-entry="removeEntry(entry, index)"
               @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-              @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
+              @value-changed="modifyChipValue($event, entry)" />
           </draggable>
         </div>
       </template>
@@ -509,6 +509,7 @@ export default {
         }
         /**
          * event triggered when an entry from the drop down was selected or enter was pressed
+         * or a chip was edited
          *
          * @event selected
          * @type {object}
@@ -724,6 +725,12 @@ export default {
         event.preventDefault();
         this.addSelected();
         this.input = '';
+      }
+    },
+    modifyChipValue(event, entry) {
+      if (event === entry[this.objectProp] && this.identifier) {
+        this.$set(entry, this.identifier, '');
+        this.emitSelectedList();
       }
     },
   },
