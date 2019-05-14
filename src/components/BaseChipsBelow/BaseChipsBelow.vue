@@ -8,6 +8,7 @@
       :sortable="true"
       :is-loading="isLoading"
       :sort-text="sortText"
+      :sort-name="sortName"
       @selected="addedEntry"
       @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
       <template
@@ -253,6 +254,14 @@ export default {
     sortText: {
       type: String,
       default: 'Sort A – Z',
+    },
+    /**
+     * if true sorting will consider the last string in a label or if a comma is
+     * present the string before the comma
+     */
+    sortName: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

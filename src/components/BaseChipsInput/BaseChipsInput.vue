@@ -319,6 +319,14 @@ export default {
       type: String,
       default: 'Sort A – Z',
     },
+    /**
+     * if true sorting will consider the last string in a label or if a comma is
+     * present the string before the comma
+     */
+    sortName: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -601,14 +609,25 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        const compA = a[this.objectProp].toLowerCase();
-        const compB = b[this.objectProp].toLowerCase();
+        let compA = a[this.objectProp].toLowerCase();
+        let compB = b[this.objectProp].toLowerCase();
+        if (this.sortName) {
+          compA = this.getNameSortValue(compA);
+          compB = this.getNameSortValue(compB);
+        }
         if (compA > compB) {
           return 1;
         }
         return -1;
       });
       this.emitSelectedList();
+    },
+    getNameSortValue(compValue) {
+      if (compValue.includes(',')) {
+        return compValue.split(',')[0];
+      }
+      const compArray = compValue.split(' ');
+      return compArray[compArray.length - 1];
     },
     setSelectedList(val) {
       if (val && val.length) {
