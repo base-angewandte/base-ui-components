@@ -42,7 +42,6 @@
               <div
                 :key="'chip-wrapper' + entry.idInt"
                 class="base-chips-below-list-item-chip-wrapper">
-                <!-- TODO: @valueChanged: this change needs to be propagated to parent! -->
                 <base-chip
                   ref="selectedChip"
                   :id="'chips-below' + index"
@@ -52,7 +51,7 @@
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
                   :hover-box-content="hoverboxContent"
                   class="base-chips-input-chip"
-                  @value-changed="$set(entry, 'edited', true)"
+                  @value-changed="modifyChipValue($event, index)"
                   @hoverbox-active="$emit('hoverbox-active', $event, entry)"
                   @remove-entry="removeEntry($event, index)"/>
               </div>
@@ -334,6 +333,15 @@ export default {
       val.forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
       sendArr.forEach(sel => this.$delete(sel, 'idInt'));
       this.$emit('list-change', sendArr);
+    },
+    modifyChipValue(event, index) {
+      const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
+      if (this.identifier) {
+        this.$set(modifiedEntry, this.identifier, '');
+      }
+      this.$set(modifiedEntry, this.objectProp, event);
+      this.$set(this.selectedBelowListInt, index, modifiedEntry);
+      this.emitInternalList(this.selectedBelowListInt);
     },
   },
 };
