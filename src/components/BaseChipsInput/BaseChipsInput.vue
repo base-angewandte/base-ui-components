@@ -612,8 +612,15 @@ export default {
         let compA = a[this.objectProp].toLowerCase();
         let compB = b[this.objectProp].toLowerCase();
         if (this.sortName) {
-          compA = this.getNameSortValue(compA);
-          compB = this.getNameSortValue(compB);
+          let firstA = '';
+          let firstB = '';
+          [compA, firstA] = this.getNameSortValue(compA);
+          [compB, firstB] = this.getNameSortValue(compB);
+
+          if (compA === compB) {
+            compA = firstA;
+            compB = firstB;
+          }
         }
         if (compA > compB) {
           return 1;
@@ -623,11 +630,13 @@ export default {
       this.emitSelectedList();
     },
     getNameSortValue(compValue) {
-      if (compValue.includes(',')) {
-        return compValue.split(',')[0];
+      const compValueSansNum = compValue.replace(/,? [0-9-]+/g, '');
+      if (compValueSansNum.includes(',')) {
+        const compArray = compValueSansNum.split(', ');
+        return [compArray[0], compArray.splice(1).join()];
       }
-      const compArray = compValue.split(' ');
-      return compArray[compArray.length - 1];
+      const compArray = compValueSansNum.split(' ');
+      return [compArray.pop(), compValueSansNum];
     },
     setSelectedList(val) {
       if (val && val.length) {
@@ -710,7 +719,8 @@ export default {
           this.fired = false;
         }, 300);
       }
-      if (event.code === 'Comma' && this.input) {
+      // if user has input and uses semicolon add input
+      if (event.code === 'Comma' && event.shiftKey && this.input) {
         event.preventDefault();
         this.addSelected();
         this.input = '';
