@@ -32,7 +32,8 @@
         slot="input-field-addition-before">
         <div class="base-chips-input-chips">
           <draggable
-            :options="{ disabled: !draggable, setData: setDragElement }"
+            :disabled="!draggable"
+            :set-data="setDragElement"
             v-model="selectedListInt"
             @end="onDragEnd">
             <base-chip

@@ -16,10 +16,8 @@
         slot-scope="props">
         <draggable
           v-model="props.list"
-          :options="{
-            group: 'people',
-            handle: '.base-chips-below-list-icon-wrapper'
-          }"
+          group="people"
+          handle=".base-chips-below-list-icon-wrapper"
           @end="updateList($event, props.list)">
           <div
             v-for="(entry,index) in props.list"
