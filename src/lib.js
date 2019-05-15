@@ -18,6 +18,7 @@ import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseLoader from './components/BaseLoader/BaseLoader';
+import 'normalize.css';
 import './styles/lib.scss';
 
 export {

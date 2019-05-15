@@ -16,10 +16,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "vue-axios": "2.0.2",
     "babel-upgrade": "0.0.23",
     "body-parser": "^1.18.3",
+    "normalize.css": "^8.0.1",
     "vue": "^2.5.17",
+    "vue-axios": "2.0.2",
     "vue-click-outside": "^1.0.7",
     "vuedraggable": "^2.16.0",
     "vuejs-datepicker": "^1.5.4"

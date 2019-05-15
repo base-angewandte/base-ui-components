@@ -17,6 +17,7 @@
       @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
       @input-keydown="checkKeyEvent"
+      @input-keypress="checkKeyEvent"
       @enter="addSelected()"
       @click-input-field="insideInput = true">
       <template
@@ -32,14 +33,15 @@
         slot="input-field-addition-before">
         <div class="base-chips-input-chips">
           <draggable
-            :options="{ disabled: !draggable, setData: setDragElement }"
+            :disabled="!draggable"
+            :set-data="setDragElement"
             v-model="selectedListInt"
             @end="onDragEnd">
             <base-chip
               v-for="(entry, index) in selectedListInt"
               ref="baseChip"
-              :id="'base-chip' + index"
-              :key="entry.idInt"
+              :id="entry[identifier] || entry.idInt"
+              :key="entry[identifier] || entry.idInt"
               v-model="entry[objectProp]"
               :chip-editable="chipsEditable"
               :hover-box-content="hoverboxContent"
@@ -701,6 +703,11 @@ export default {
       if (elem) {
         elem.parentNode.removeChild(elem);
       }
+      // check if dragging led to differently sorted list
+      // and inform parent if yes
+      if (JSON.stringify(this.selectedList) !== JSON.stringify(this.selectedListInt)) {
+        this.emitSelectedList(this.selectedListInt);
+      }
     },
     checkKeyEvent(event) {
       if (event.key === 'Backspace') {
@@ -725,6 +732,10 @@ export default {
         event.preventDefault();
         this.addSelected();
         this.input = '';
+      }
+      if (event.key === 'Tab') {
+        this.insideInput = false;
+        this.insideDropDown = false;
       }
     },
     modifyChipValue(event, entry) {
