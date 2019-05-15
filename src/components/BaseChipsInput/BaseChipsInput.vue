@@ -40,8 +40,8 @@
             <base-chip
               v-for="(entry, index) in selectedListInt"
               ref="baseChip"
-              :id="'base-chip' + index"
-              :key="entry.idInt"
+              :id="entry[identifier] || entry.idInt"
+              :key="entry[identifier] || entry.idInt"
               v-model="entry[objectProp]"
               :chip-editable="chipsEditable"
               :hover-box-content="hoverboxContent"
@@ -702,6 +702,11 @@ export default {
       const elem = document.getElementById('chip-inline-drag');
       if (elem) {
         elem.parentNode.removeChild(elem);
+      }
+      // check if dragging led to differently sorted list
+      // and inform parent if yes
+      if (JSON.stringify(this.selectedList) !== JSON.stringify(this.selectedListInt)) {
+        this.emitSelectedList(this.selectedListInt);
       }
     },
     checkKeyEvent(event) {
