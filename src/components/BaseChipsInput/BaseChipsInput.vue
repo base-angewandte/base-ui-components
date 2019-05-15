@@ -17,6 +17,7 @@
       @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
       @input-keydown="checkKeyEvent"
+      @input-keypress="checkKeyEvent"
       @enter="addSelected()"
       @click-input-field="insideInput = true">
       <template
@@ -726,6 +727,10 @@ export default {
         event.preventDefault();
         this.addSelected();
         this.input = '';
+      }
+      if (event.key === 'Tab') {
+        this.insideInput = false;
+        this.insideDropDown = false;
       }
     },
     modifyChipValue(event, entry) {
