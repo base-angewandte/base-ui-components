@@ -15,8 +15,17 @@
       <div class="base-media-preview-image-stage">
         <img
           v-vue-click-outside.prevent="clickOutside"
+          v-if="fileType === 'image'"
           :src="imageUrl"
           class="base-media-preview-image">
+        <video
+          v-else-if="fileType === 'video'"
+          ref="videoPlayer"
+          controls
+          autoplay
+          class="base-media-preview-image base-media-preview-video" >
+          Your browser does not support the video tag.
+        </video>
       </div>
     </transition>
   </div>
@@ -29,6 +38,7 @@
   */
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
+import Hls from 'hls.js';
 
 export default {
   components: {
@@ -52,6 +62,17 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * define the media type <br>
+     *     options: 'image'|'video'|'audio'|'pdf'
+     */
+    mediaType: {
+      type: String,
+      default: '',
+      validator(val) {
+        return ['image', 'video', 'audio', 'pdf', ''].includes(val);
+      },
+    },
   },
   data() {
     return {
@@ -59,10 +80,51 @@ export default {
       showPreviewInt: this.showPreview,
     };
   },
+  computed: {
+    fileType() {
+      if (this.mediaType) return this.mediaType;
+      const { fileEnding } = this.imageUrl.match(/\.(?<fileEnding>\w+)$/).groups;
+      // check if image
+      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding)) {
+        return 'image';
+      }
+      // check if video
+      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding)) {
+        return 'video';
+      }
+      // check if audio
+      if (['mp3', 'wav', 'mpeg'].includes(fileEnding)) {
+        return 'audio';
+      }
+      // check if pdf
+      if (['pdf'].includes(fileEnding)) {
+        return 'pdf';
+      }
+      /* eslint-disable-next line */
+      console.error(`The file type of "${this.imageUrl}" is not supported`);
+      return '';
+    },
+  },
   watch: {
     showPreview(val) {
       this.showPreviewInt = val;
     },
+  },
+  updated() {
+    if (this.showPreview) {
+      const video = this.$refs.videoPlayer;
+      if (video) {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(this.imageUrl);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = this.imageUrl;
+          video.addEventListener('loadedmetadata', () => video.play());
+        }
+      }
+    }
   },
   methods: {
     scrollAction(evt) {
@@ -125,9 +187,13 @@ export default {
       align-items: center;
 
       .base-media-preview-image {
-        max-height: calc(100% - #{$spacing }*4);
-        max-width: calc(100% - #{$spacing }*4);
+        max-height: calc(100% - #{$spacing}*4);
+        max-width: calc(100% - #{$spacing}*4);
         padding: $spacing;
+      }
+
+      .base-media-preview-video {
+        width: calc(100% - #{$spacing}*4);
       }
     }
   }
