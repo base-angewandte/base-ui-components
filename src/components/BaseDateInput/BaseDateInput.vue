@@ -454,7 +454,7 @@ export default {
       position: absolute;
       bottom: 4px;
       right: $spacing;
-      background: linear-gradient(to right, transparent , white);
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
     }
 
     .base-input-field {
@@ -471,8 +471,6 @@ export default {
   input[type='text'].base-input-field {
     border: none;
     overflow: hidden;
-    padding: 4px 0;
-    height: $line-height;
     max-width: 60%;
   }
 

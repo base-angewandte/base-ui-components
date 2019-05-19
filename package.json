@@ -16,8 +16,9 @@
   },
   "dependencies": {
     "autoprefixer": "^9.5.1",
-    "axios": "^0.18.0",
     "core-js": "^2.6.5",
+    "hls.js": "^0.12.4",
+    "normalize.css": "^8.0.1",
     "vue": "^2.5.21",
     "vue-click-outside": "^1.0.7",
     "vue-svg-loader": "^0.12.0",
@@ -49,5 +50,8 @@
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
   },
-  "license": "SEE LICENSE IN LICENSE.md"
+  "license": "SEE LICENSE IN LICENSE.md",
+  "files": [
+    "dist"
+  ]
 }

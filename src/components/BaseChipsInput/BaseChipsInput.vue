@@ -1,21 +1,23 @@
 <template>
   <div
     class="base-chips-input">
+
     <!-- INPUT LABEL AND FIELD -->
     <base-input
       ref="baseInput"
-      v-model="input"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="label"
       :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
       :is-active="showDropDown"
+      v-model="input"
       @clicked-outside="insideInput = false"
       @input-focus="onInputFocus"
       @input-blur="onInputBlur"
       @arrow-key="triggerArrowKey"
       @input-keydown="checkKeyEvent"
+      @input-keypress="checkKeyEvent"
       @enter="addSelected()"
       @click-input-field="insideInput = true">
       <template
@@ -24,23 +26,22 @@
         <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
-          @click="sort">
-          {{ sortText }}
-        </div>
+          @click="sort">{{ sortText }}</div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
         slot="input-field-addition-before">
         <div class="base-chips-input-chips">
           <draggable
+            :disabled="!draggable"
+            :set-data="setDragElement"
             v-model="selectedListInt"
-            :options="{ disabled: !draggable, setData: setDragElement }"
             @end="onDragEnd">
             <base-chip
               v-for="(entry, index) in selectedListInt"
-              :id="'base-chip' + index"
               ref="baseChip"
-              :key="entry.idInt"
+              :id="entry[identifier] || entry.idInt"
+              :key="entry[identifier] || entry.idInt"
               v-model="entry[objectProp]"
               :chip-editable="chipsEditable"
               :hover-box-content="hoverboxContent"
@@ -48,7 +49,7 @@
               @mouse-down="chipActive = index"
               @remove-entry="removeEntry(entry, index)"
               @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-              @valueChanged="$event === entry[objectProp] ? null : $set(entry, 'idInt', null)" />
+              @value-changed="modifyChipValue($event, entry)" />
           </draggable>
         </div>
       </template>
@@ -63,9 +64,9 @@
 
     <!-- DROP DOWN MENU -->
     <div
+      v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       ref="dropdownContainer"
-      v-click-outside="() => insideDropDown = false"
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
       @mouseleave="checkLeave">
@@ -78,6 +79,7 @@
         @click="addSelected()"
         @mouseover="selectedMenuEntryIndex = index"
         @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
+
         <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
         <slot
           :item="entry"
@@ -88,6 +90,7 @@
             {{ entry[objectProp] }}
           </div>
         </slot>
+
       </div>
       <!--
         @slot a slot to expand the drop down area (needed for "Expand Functionality"
@@ -117,13 +120,14 @@
         <!-- SLOT DEFAULT -->
         <base-chip
           v-for="(entry, index) in selectedListInt"
-          :key="entry.idInt"
           v-model="entry[objectProp]"
+          :key="entry.idInt"
           :chip-editable="chipsEditable"
           class="base-chips-input-chip"
-          @remove-entry="removeEntry($event, index)" />
+          @remove-entry="removeEntry($event, index)"/>
       </slot>
     </div>
+
   </div>
 </template>
 
@@ -317,6 +321,14 @@ export default {
       type: String,
       default: 'Sort A – Z',
     },
+    /**
+     * if true sorting will consider the last string in a label or if a comma is
+     * present the string before the comma
+     */
+    sortName: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -499,6 +511,7 @@ export default {
         }
         /**
          * event triggered when an entry from the drop down was selected or enter was pressed
+         * or a chip was edited
          *
          * @event selected
          * @type {object}
@@ -599,14 +612,34 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        const compA = a[this.objectProp].toLowerCase();
-        const compB = b[this.objectProp].toLowerCase();
+        let compA = a[this.objectProp].toLowerCase();
+        let compB = b[this.objectProp].toLowerCase();
+        if (this.sortName) {
+          let firstA = '';
+          let firstB = '';
+          [compA, firstA] = this.getNameSortValue(compA);
+          [compB, firstB] = this.getNameSortValue(compB);
+
+          if (compA === compB) {
+            compA = firstA;
+            compB = firstB;
+          }
+        }
         if (compA > compB) {
           return 1;
         }
         return -1;
       });
       this.emitSelectedList();
+    },
+    getNameSortValue(compValue) {
+      const compValueSansNum = compValue.replace(/,? [0-9-]+/g, '');
+      if (compValueSansNum.includes(',')) {
+        const compArray = compValueSansNum.split(', ');
+        return [compArray[0], compArray.splice(1).join()];
+      }
+      const compArray = compValueSansNum.split(' ');
+      return [compArray.pop(), compValueSansNum];
     },
     setSelectedList(val) {
       if (val && val.length) {
@@ -670,6 +703,11 @@ export default {
       if (elem) {
         elem.parentNode.removeChild(elem);
       }
+      // check if dragging led to differently sorted list
+      // and inform parent if yes
+      if (JSON.stringify(this.selectedList) !== JSON.stringify(this.selectedListInt)) {
+        this.emitSelectedList(this.selectedListInt);
+      }
     },
     checkKeyEvent(event) {
       if (event.key === 'Backspace') {
@@ -689,10 +727,23 @@ export default {
           this.fired = false;
         }, 300);
       }
-      if (event.code === 'Comma' && this.input) {
+      // if user has input and uses semicolon add input
+      if (event.code === 'Comma' && event.shiftKey && this.input) {
         event.preventDefault();
         this.addSelected();
         this.input = '';
+      }
+      if (event.key === 'Tab') {
+        this.insideInput = false;
+        this.insideDropDown = false;
+      }
+    },
+    modifyChipValue(event, entry) {
+      if (event === entry[this.objectProp]) {
+        if (this.identifier) {
+          this.$set(entry, this.identifier, '');
+        }
+        this.emitSelectedList();
       }
     },
   },

@@ -10,7 +10,7 @@
       :is-selected="entryProps[index].selected"
       :icon="getType(item.icon)"
       :thumbnails="getThumbnails(item)"
-      :description="item.type"
+      :description="item.description"
       :is-selectable="true"
       :is-draggable="true"
       :select-active="selectActive"
@@ -43,7 +43,7 @@ export default {
      * list of menu entries - array of objects <br>
      *   Entry properties that can be displayed: <br>
      *     required: 'id' <br>
-     *     optional: 'title', 'type', 'active', 'selected', 'icon',
+     *     optional: 'title', 'description', 'active', 'selected', 'icon',
      *     'shared', 'published', 'error'
      */
     list: {

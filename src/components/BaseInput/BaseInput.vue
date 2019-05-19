@@ -68,7 +68,7 @@ export default {
      * input field settable from outside
       */
     input: {
-      type: String,
+      type: [String, Number],
       default: '',
     },
     /** label for input field, required for usability purposes, handle
@@ -231,7 +231,7 @@ export default {
       position: absolute;
       bottom: 4px;
       right: $spacing;
-      background: linear-gradient(to right, transparent , white);
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
     }
 
     .base-input-field {
