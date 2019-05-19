@@ -17,9 +17,8 @@
     <div
       class="base-chip-icon"
       @click="$emit('remove-entry', entryInt)">
-      <img
-        class="base-chip-icon-img"
-        src="../../static/icons/remove.svg" >
+      <RemoveIcon
+        class="base-chip-icon-img" />
     </div>
     <base-hover-box
       ref="hoverBox"
@@ -42,6 +41,7 @@
  */
 import ClickOutside from 'vue-click-outside';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
+import RemoveIcon from '../../static/icons/remove.svg';
 
 export default {
   directives: {
@@ -49,6 +49,7 @@ export default {
   },
   components: {
     BaseHoverBox,
+    RemoveIcon,
   },
   model: {
     prop: 'entry',

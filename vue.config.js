@@ -32,6 +32,13 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
+    // add vue-svg-loader
+    const svgRule = config.module.rule('svg');
+    svgRule.uses.clear();
+    svgRule
+      .use('vue-svg-loader')
+      .loader('vue-svg-loader');
+
     // this is done so local fonts are found
     const types = ['vue-modules', 'vue', 'normal-modules', 'normal'];
     types.forEach(type => addStyleResource(config.module.rule('scss')
