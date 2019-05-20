@@ -14,8 +14,8 @@
     <transition name="grow">
       <div class="base-media-preview-image-stage">
         <img
-          v-if="fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
+          v-if="fileType === 'image'"
           :src="imageUrl"
           class="base-media-preview-image">
         <video
