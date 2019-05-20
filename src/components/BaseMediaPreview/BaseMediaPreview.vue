@@ -14,16 +14,17 @@
     <transition name="grow">
       <div class="base-media-preview-image-stage">
         <img
-          v-vue-click-outside.prevent="clickOutside"
           v-if="fileType === 'image'"
+          v-vue-click-outside.prevent="clickOutside"
           :src="imageUrl"
           class="base-media-preview-image">
         <video
           v-else-if="fileType === 'video'"
           ref="videoPlayer"
+          :style="displaySize"
           controls
           autoplay
-          class="base-media-preview-image base-media-preview-video" >
+          class="base-media-preview-image base-media-preview-video">
           Your browser does not support the video tag.
         </video>
       </div>
@@ -73,6 +74,15 @@ export default {
         return ['image', 'video', 'audio', 'pdf', ''].includes(val);
       },
     },
+    /**
+     * set height and with from outside
+     */
+    displaySize: {
+      type: Object,
+      default() {
+        return { height: '720px', width: '1280px' };
+      },
+    },
   },
   data() {
     return {
@@ -100,7 +110,7 @@ export default {
       if (['pdf'].includes(fileEnding)) {
         return 'pdf';
       }
-      /* eslint-disable-next line */
+      /* eslint-disable-next-line */
       console.error(`The file type of "${this.imageUrl}" is not supported`);
       return '';
     },
@@ -193,7 +203,8 @@ export default {
       }
 
       .base-media-preview-video {
-        width: calc(100% - #{$spacing}*4);
+        max-height: 720px;
+        max-width: 1280px;
       }
     }
   }
