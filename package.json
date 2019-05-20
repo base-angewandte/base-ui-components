@@ -18,6 +18,7 @@
     "axios": "^0.18.0",
     "babel-upgrade": "0.0.23",
     "body-parser": "^1.18.3",
+    "hls.js": "^0.12.4",
     "normalize.css": "^8.0.1",
     "vue": "^2.5.17",
     "vue-axios": "2.0.2",
@@ -91,5 +92,8 @@
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
   },
-  "license": "SEE LICENSE IN LICENSE.md"
+  "license": "SEE LICENSE IN LICENSE.md",
+  "files": [
+    "dist"
+  ]
 }

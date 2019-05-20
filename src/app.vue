@@ -1,5 +1,25 @@
 <template>
   <div id="app">
+    <!-- VIDEO TEST -->
+    <!-- <video
+      width="320"
+      height="240"
+      controls >
+      <source
+        src="/home/shauzmayer/index.m3u8"
+        type="application/x-mpegURL">
+      Your browser does not support the video tag.
+    </video> -->
+    <BaseMediaPreview
+      :show-preview="togglePreview"
+      image-url="https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8"
+      @hide-preview="togglePreview = false"
+    />
+    <BaseButton
+      text="Show Preview"
+      @clicked="togglePreview = !togglePreview"
+    />
+
     <!-- PAGINATION TEST -->
     <BasePagination :total="100" />
 
@@ -300,11 +320,13 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
+import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 
 
 export default {
   name: 'App',
   components: {
+    BaseMediaPreview,
     BasePagination,
     BaseHoverBox,
     BaseChipsBelow,
@@ -413,6 +435,7 @@ export default {
         },
       ],
       hoverboxContent: {},
+      togglePreview: false,
     };
   },
   computed: {
