@@ -14,8 +14,8 @@
     <transition name="grow">
       <div class="base-media-preview-image-stage">
         <img
-          v-vue-click-outside.prevent="clickOutside"
           v-if="fileType === 'image'"
+          v-vue-click-outside.prevent="clickOutside"
           :src="imageUrl"
           class="base-media-preview-image">
         <video
@@ -23,7 +23,7 @@
           ref="videoPlayer"
           controls
           autoplay
-          class="base-media-preview-image base-media-preview-video" >
+          class="base-media-preview-image base-media-preview-video">
           Your browser does not support the video tag.
         </video>
       </div>
@@ -100,7 +100,7 @@ export default {
       if (['pdf'].includes(fileEnding)) {
         return 'pdf';
       }
-      /* eslint-disable-next line */
+      /* eslint-disable-next-line */
       console.error(`The file type of "${this.imageUrl}" is not supported`);
       return '';
     },

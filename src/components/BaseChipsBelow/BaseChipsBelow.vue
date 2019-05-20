@@ -1,9 +1,9 @@
 <template>
   <div class="base-chips-below">
-    <base-chips-input
+    <BaseChipsInput
       ref="chipsInput"
-      v-bind="$props"
       v-model="selectedBelowListInt"
+      v-bind="$props"
       :chips-inline="false"
       :sortable="true"
       :is-loading="isLoading"
@@ -21,8 +21,8 @@
           @end="updateList($event, props.list)">
           <div
             v-for="(entry,index) in props.list"
-            :name="entry[objectProp]"
             :key="'item' + entry.idInt"
+            :name="entry[objectProp]"
             class="base-chips-below-list-item"
             @mousedown="chipActive = index">
             <div
@@ -34,30 +34,30 @@
                 <SvgIcon
                   :key="'icon' + entry.idInt"
                   name="drag-lines"
-                  class="svg-icon base-chips-below-list-icon"/>
+                  class="svg-icon base-chips-below-list-icon" />
               </div>
 
               <div
                 :key="'chip-wrapper' + entry.idInt"
                 class="base-chips-below-list-item-chip-wrapper">
                 <base-chip
-                  ref="selectedChip"
                   :id="'chips-below' + index"
+                  ref="selectedChip"
+                  :key="'chip' + entry.idInt"
                   v-model="entry[objectProp]"
                   :chip-editable="chipsEditable"
-                  :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
                   :hover-box-content="hoverboxContent"
                   class="base-chips-input-chip"
                   @value-changed="modifyChipValue($event, index)"
                   @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-                  @remove-entry="removeEntry($event, index)"/>
+                  @remove-entry="removeEntry($event, index)" />
               </div>
               <base-chips-input
-                :show-label="false"
-                :label="label + '-roles'"
                 :key="'input' + entry.idInt"
                 v-model="entry.roles"
+                :show-label="false"
+                :label="label + '-roles'"
                 :list="roleOptions"
                 :show-input-border="false"
                 :allow-dynamic-drop-down-entries="false"
@@ -66,7 +66,7 @@
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
-                @selected="updateRoles($event, index)"/>
+                @selected="updateRoles($event, index)" />
             </div>
           </div>
         </draggable>
@@ -78,7 +78,7 @@
           :item="props.item"
           name="below-drop-down-entry" />
       </template>
-    </base-chips-input>
+    </BaseChipsInput>
   </div>
 </template>
 
@@ -93,11 +93,9 @@ import Draggable from 'vuedraggable';
 import SvgIcon from 'vue-svgicon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
-import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 export default {
   components: {
-    BaseHoverBox,
     BaseChipsInput,
     Draggable,
     BaseChip,

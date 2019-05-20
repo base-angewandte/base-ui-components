@@ -299,7 +299,6 @@
 
 <script>
 import axios from 'axios';
-
 import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseDropDown from './components/BaseDropDown/BaseDropDown';
