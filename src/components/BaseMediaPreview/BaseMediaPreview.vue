@@ -21,6 +21,7 @@
         <video
           v-else-if="fileType === 'video'"
           ref="videoPlayer"
+          :style="displaySize"
           controls
           autoplay
           class="base-media-preview-image base-media-preview-video">
@@ -71,6 +72,15 @@ export default {
       default: '',
       validator(val) {
         return ['image', 'video', 'audio', 'pdf', ''].includes(val);
+      },
+    },
+    /**
+     * set height and with from outside
+     */
+    displaySize: {
+      type: Object,
+      default() {
+        return { height: '720px', width: '1280px' };
       },
     },
   },
@@ -193,7 +203,8 @@ export default {
       }
 
       .base-media-preview-video {
-        width: calc(100% - #{$spacing}*4);
+        max-height: 720px;
+        max-width: 1280px;
       }
     }
   }
