@@ -6,9 +6,9 @@
       id="base-switch-buttons-label"
       class="hide">{{ label }}</legend>
     <template
-      v-for="option in options">
+      v-for="(option, index) in options">
       <input
-        :id="option.value"
+        :id="optionIds[index]"
         :key="option.value + 'input'"
         :tabindex="option.value === selectedOption ? 0 : -1"
         v-model="selectedOption"
@@ -21,7 +21,7 @@
         type="radio">
       <label
         :key="option.value + 'label'"
-        :for="option.value"
+        :for="optionIds[index]"
         class="base-switch-button-label">
         {{ option.label }}
         <!-- TODO: add slot for icons etc -->
@@ -71,6 +71,12 @@ export default {
       selectedOption: this.activeTab,
     };
   },
+  computed: {
+    // to ensure a unique id (made problems on field duplication)
+    optionIds() {
+      return this.options.map(option => this.generateId(option.value));
+    },
+  },
   watch: {
     selectedOption(val) {
       /**
@@ -85,6 +91,11 @@ export default {
       if (val !== this.selectedOption) {
         this.selectedOption = val;
       }
+    },
+  },
+  methods: {
+    generateId(value) {
+      return `${value}${(Math.floor(Math.random() * 1000000)).toString()}`;
     },
   },
 };
