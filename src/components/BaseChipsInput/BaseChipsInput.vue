@@ -781,6 +781,8 @@ export default {
       .base-chips-drop-down-entry-wrapper {
         padding: 0 $spacing;
         line-height: $row-height-small;
+        display: flex;
+        justify-content: space-between;
 
         &.base-chips-drop-down-entry-wrapper-active {
           background: $background-color;
