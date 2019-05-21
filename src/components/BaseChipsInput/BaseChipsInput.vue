@@ -583,13 +583,6 @@ export default {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
-      if (!this.insideDropDown) {
-        if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
-          this.selectedListInt.push({ [this.objectProp]: this.input });
-          this.emitSelectedList();
-        }
-        this.input = '';
-      }
       this.insideInput = false;
     },
     onInputFocus() {
