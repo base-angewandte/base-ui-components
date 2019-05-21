@@ -172,7 +172,6 @@ export default {
     box-shadow: $pop-up-shadow;
     position: fixed;
     top: 20vh;
-    bottom: 10vh;
     left: 50%;
     z-index: 100;
     min-width: 288px;
