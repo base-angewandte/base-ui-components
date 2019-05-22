@@ -276,6 +276,7 @@ export default {
           overflow: hidden;
           display: block;
           text-overflow: ellipsis;
+          white-space: nowrap;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 1;
           line-height: $line-height;
