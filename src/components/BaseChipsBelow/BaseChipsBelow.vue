@@ -78,6 +78,12 @@
           :item="props.item"
           name="below-drop-down-entry" />
       </template>
+      <template
+        slot="no-options"
+        slot-scope="props">
+        <slot
+          name="no-options" />
+      </template>
     </base-chips-input>
   </div>
 </template>
