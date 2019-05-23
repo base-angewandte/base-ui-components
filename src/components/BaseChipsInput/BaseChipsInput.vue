@@ -97,17 +97,16 @@
       -->
       <slot
         name="drop-down-extended" />
-      <!--
-        @slot customize what is displayed when no drop down options are available
-      -->
-      <slot
+      <div
         v-if="!dropDownList.length"
-        name="no-options">
-        <div
-          class="base-chips-drop-down-entry-wrapper">
+        class="base-chips-drop-down-entry-wrapper">
+        <!--
+          @slot customize what is displayed when no drop down options are available
+        -->
+        <slot name="no-options">
           {{ dropDownNoOptionsInfo }}
-        </div>
-      </slot>
+        </slot>
+      </div>
     </div>
     <!-- CHIPS BELOW -->
     <div
