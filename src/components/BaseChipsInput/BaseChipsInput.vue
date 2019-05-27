@@ -42,7 +42,7 @@
               ref="baseChip"
               :id="entry[identifier] || entry.idInt"
               :key="entry[identifier] || entry.idInt"
-              v-model="entry[objectProp]"
+              :entry="getLangLabel(entry[objectProp])"
               :chip-editable="chipsEditable"
               :hover-box-content="hoverboxContent"
               :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
@@ -87,7 +87,7 @@
           <!-- SLOT DEFAULT -->
           <div
             class="base-chips-drop-down-entry">
-            {{ entry[objectProp] }}
+            {{ getLangLabel(entry[objectProp]) }}
           </div>
         </slot>
 
@@ -328,6 +328,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -519,7 +526,7 @@ export default {
         // if there is an input and unknown entries are allowed add an entry to selected list
       } else if (this.input && this.allowUnknownEntries) {
         this.selectedListInt.push({
-          [this.objectProp]: this.input,
+          [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
           idInt: this.getInternalId(this.input + this.selectedListInt.length),
         });
         // reset input
@@ -737,6 +744,9 @@ export default {
         }
         this.emitSelectedList();
       }
+    },
+    getLangLabel(value) {
+      return this.language ? value[this.language] : value;
     },
   },
 };

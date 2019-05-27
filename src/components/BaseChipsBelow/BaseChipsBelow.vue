@@ -63,6 +63,7 @@
                 :allow-dynamic-drop-down-entries="false"
                 :placeholder="rolesPlaceholder"
                 :always-linked="true"
+                :language="language"
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
@@ -266,6 +267,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -346,6 +354,9 @@ export default {
       this.$set(modifiedEntry, this.objectProp, event);
       this.$set(this.selectedBelowListInt, index, modifiedEntry);
       this.emitInternalList(this.selectedBelowListInt);
+    },
+    getLangLabel(value) {
+      return this.language ? value[this.language] : value;
     },
   },
 };
