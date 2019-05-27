@@ -1,15 +1,15 @@
 <template>
   <div class="base-drop-down">
-    <div :class="['base-drop-down-label-wrapper', { 'hide': !label || !showLabel }]">
+    <div :class="['base-drop-down-label-wrapper', { 'hide': !getLangLabel(label) || !showLabel }]">
       <label
-        :for="label"
+        :for="getLangLabel(label)"
         class="base-drop-down-label">
-        {{ label }}
+        {{ getLangLabel(label) }}
       </label>
     </div>
     <button
       ref="dropDownButton"
-      :id="label"
+      :id="getLangLabel(label)"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
       :class="['base-drop-down-head', { 'base-drop-down-head': !leftDropDown }]"
@@ -40,15 +40,15 @@
           <li
             v-for="(option, index) in options"
             ref="option"
-            :key="option.value"
+            :key="option[valueProp]"
             :class="[
               'base-drop-down-option',
-              { 'base-drop-down-option-selected': selectedOption.value
-                && option.value === selectedOption.value },
+              { 'base-drop-down-option-selected': getLangLabel(selectedOption.label)
+                && option[valueProp] === selectedOption[valueProp] },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
             @click="selectValue(option)">
-            {{ option.label }}
+            {{ getLangLabel(option.label) }}
           </li>
         </ul>
       </slot>
@@ -67,11 +67,11 @@ export default {
     prop: 'selectedOption',
     event: 'value-selected',
   },
-  /**
-   * specify options to choose from <br>
-   *   needs to be an array with label and value object
-   */
   props: {
+    /**
+     * specify options to choose from <br>
+     *   needs to be an array with label and value properties
+     */
     options: {
       type: Array,
       default() {
@@ -118,6 +118,20 @@ export default {
       type: String,
       default: 'inherit',
     },
+    /**
+     * set a language ()
+     */
+    language: {
+      type: String,
+      default: '',
+    },
+    /**
+     * set the name of the property that holds the value
+     */
+    valueProp: {
+      type: String,
+      default: 'value',
+    },
   },
   data() {
     return {
@@ -128,7 +142,7 @@ export default {
   },
   computed: {
     selectedOptionInt() {
-      return this.selectedOption.label || this.placeholder || '';
+      return this.getLangLabel(this.selectedOption.label) || this.placeholder || '';
     },
   },
   watch: {
@@ -177,6 +191,9 @@ export default {
         !== this.$refs.dropdownContainer.clientHeight) {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
+    },
+    getLangLabel(value) {
+      return this.language ? value[this.language] : value;
     },
   },
 };
