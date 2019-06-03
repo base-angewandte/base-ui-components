@@ -42,7 +42,7 @@
               ref="baseChip"
               :id="entry[identifier] || entry.idInt"
               :key="entry[identifier] || entry.idInt"
-              :entry="getLangLabel(entry[objectProp])"
+              :entry="getLangLabel(entry[objectProp], true)"
               :chip-editable="chipsEditable"
               :hover-box-content="hoverboxContent"
               :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
@@ -87,7 +87,7 @@
           <!-- SLOT DEFAULT -->
           <div
             class="base-chips-drop-down-entry">
-            {{ getLangLabel(entry[objectProp]) }}
+            {{ getLangLabel(entry[objectProp], true) }}
           </div>
         </slot>
 
@@ -141,6 +141,7 @@ import Draggable from 'vuedraggable';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
+import { setLanguageMixin } from '../../mixins/setLanguage';
 
 export default {
   components: {
@@ -152,6 +153,9 @@ export default {
   directives: {
     ClickOutside,
   },
+  mixins: [
+    setLanguageMixin,
+  ],
   model: {
     prop: 'selectedList',
     event: 'selected',
@@ -744,9 +748,6 @@ export default {
         }
         this.emitSelectedList();
       }
-    },
-    getLangLabel(value) {
-      return this.language ? value[this.language] : value;
     },
   },
 };

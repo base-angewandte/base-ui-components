@@ -355,9 +355,6 @@ export default {
       this.$set(this.selectedBelowListInt, index, modifiedEntry);
       this.emitInternalList(this.selectedBelowListInt);
     },
-    getLangLabel(value) {
-      return this.language ? value[this.language] : value;
-    },
   },
 };
 

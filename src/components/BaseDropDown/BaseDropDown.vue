@@ -58,11 +58,15 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import { setLanguageMixin } from '../../mixins/setLanguage';
 
 export default {
   components: {
     SvgIcon,
   },
+  mixins: [
+    setLanguageMixin,
+  ],
   model: {
     prop: 'selectedOption',
     event: 'value-selected',
@@ -191,9 +195,6 @@ export default {
         !== this.$refs.dropdownContainer.clientHeight) {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
-    },
-    getLangLabel(value) {
-      return this.language ? value[this.language] : value;
     },
   },
 };
