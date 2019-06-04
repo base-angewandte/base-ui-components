@@ -27,6 +27,14 @@
           class="base-media-preview-image base-media-preview-video">
           Your browser does not support the video tag.
         </video>
+        <audio
+          v-else-if="fileType === 'audio'"
+          controls>
+          Your browser does not support the audio tag.
+          <source
+            :src="imageUrl"
+            type="audio/mpeg">
+        </audio>
       </div>
     </transition>
   </div>
@@ -95,19 +103,19 @@ export default {
       if (this.mediaType) return this.mediaType;
       const { fileEnding } = this.imageUrl.match(/\.(?<fileEnding>\w+)$/).groups;
       // check if image
-      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding)) {
+      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding.toLowerCase())) {
         return 'image';
       }
       // check if video
-      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding)) {
+      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding.toLowerCase())) {
         return 'video';
       }
       // check if audio
-      if (['mp3', 'wav', 'mpeg'].includes(fileEnding)) {
+      if (['mp3', 'wav', 'mpeg'].includes(fileEnding.toLowerCase())) {
         return 'audio';
       }
       // check if pdf
-      if (['pdf'].includes(fileEnding)) {
+      if (['pdf'].includes(fileEnding.toLowerCase())) {
         return 'pdf';
       }
       /* eslint-disable-next-line */
