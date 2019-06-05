@@ -12,13 +12,21 @@
       :id="getLangLabel(label)"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
-      :class="['base-drop-down-head', { 'base-drop-down-head': !leftDropDown }]"
+      :class="['base-drop-down-head']"
       aria-haspopup="listbox"
       type="button"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
-      <span class="base-drop-down-head-text">{{ selectedOptionInt }}</span>
+      <div
+        :class="['base-drop-down-head-text-wrapper',
+                 {'base-drop-down-head-text-fade-out': showFadeOut }]">
+        <span
+          ref="headText"
+          class="base-drop-down-head-text">
+          {{ selectedOptionInt }}
+        </span>
+      </div>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
         <SvgIcon
@@ -141,7 +149,7 @@ export default {
     return {
       showDropDown: false,
       keySelectedIndex: -1,
-      leftDropDown: false,
+      showFadeOut: false,
     };
   },
   computed: {
@@ -156,6 +164,14 @@ export default {
         this.keySelectedIndex = -1;
       }
     },
+  },
+  mounted() {
+    this.setOverflow();
+  },
+  updated() {
+    if (!this.showDropDown) {
+      this.setOverflow();
+    }
   },
   methods: {
     // event triggered by clicking on option or Enter after
@@ -196,6 +212,11 @@ export default {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
+    setOverflow() {
+      const headerWidth = this.$refs.dropDownButton ? this.$refs.dropDownButton.offsetWidth : 0;
+      const textWidth = this.$refs.headText ? this.$refs.headText.offsetWidth : 0;
+      this.showFadeOut = textWidth > headerWidth;
+    },
   },
 };
 </script>
@@ -229,13 +250,31 @@ export default {
       fill: $font-color-second;
       background-color: $background-color;
 
-      .base-drop-down-head-text {
+      .base-drop-down-head-text-wrapper {
+        overflow: hidden;
+        position: relative;
         margin-right: $spacing;
-        white-space: nowrap;
+
+        .base-drop-down-head-text {
+          white-space: nowrap;
+          text-align: left;
+        }
+
+        &.base-drop-down-head-text-fade-out::after {
+          content: '';
+          height: 100%;
+          width: 30px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
+        }
       }
+
       .base-drop-down-icon {
         transition: all 0.5s ease;
         height: $icon-small;
+        flex-shrink: 0;
 
         &.base-drop-down-icon-rotated {
           transform: rotate(180deg);
@@ -254,12 +293,11 @@ export default {
 
     .base-drop-down-body {
       position: absolute;
-      display: flex;
-      flex-direction: column;
       background-color: white;
       z-index: 3;
       box-shadow: $drop-shadow;
       max-height: 300px;
+      max-width: calc(100vw - 3 * #{$spacing});
       min-width: 100%;
       overflow-y: auto;
       overflow-x: hidden;
@@ -268,10 +306,10 @@ export default {
       .base-drop-down-body-list {
 
         .base-drop-down-option {
-          padding: 0 $spacing;
-          line-height: $row-height-small;
+          min-height: $row-height-small;
+          padding: $spacing-small/2 $spacing;
+          line-height: $line-height;
           width: 100%;
-          white-space: nowrap;
 
           &.base-drop-down-option-selected {
             color: $app-color;
