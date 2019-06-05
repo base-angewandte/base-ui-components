@@ -16,7 +16,7 @@
         <img
           v-vue-click-outside.prevent="clickOutside"
           v-if="fileType === 'image'"
-          :src="imageUrl"
+          :src="mediaUrl"
           class="base-media-preview-image">
         <video
           v-else-if="fileType === 'video'"
@@ -32,7 +32,7 @@
           controls>
           Your browser does not support the audio tag.
           <source
-            :src="imageUrl"
+            :src="mediaUrl"
             type="audio/mpeg">
         </audio>
       </div>
@@ -67,7 +67,7 @@ export default {
     /**
      * url of the image to be displayed
      */
-    imageUrl: {
+    mediaUrl: {
       type: String,
       default: '',
     },
@@ -94,14 +94,13 @@ export default {
   },
   data() {
     return {
-      previewUrl: '',
       showPreviewInt: this.showPreview,
     };
   },
   computed: {
     fileType() {
       if (this.mediaType) return this.mediaType;
-      const { fileEnding } = this.imageUrl.match(/\.(?<fileEnding>\w+)$/).groups;
+      const { fileEnding } = this.mediaUrl.match(/\.(?<fileEnding>\w+)$/).groups;
       // check if image
       if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding.toLowerCase())) {
         return 'image';
@@ -119,7 +118,7 @@ export default {
         return 'pdf';
       }
       /* eslint-disable-next-line */
-      console.error(`The file type of "${this.imageUrl}" is not supported`);
+      console.error(`The file type of "${this.mediaUrl}" is not supported`);
       return '';
     },
   },
@@ -134,11 +133,11 @@ export default {
       if (video) {
         if (Hls.isSupported()) {
           const hls = new Hls();
-          hls.loadSource(this.imageUrl);
+          hls.loadSource(this.mediaUrl);
           hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = this.imageUrl;
+          video.src = this.mediaUrl;
           video.addEventListener('loadedmetadata', () => video.play());
         }
       }
