@@ -426,7 +426,7 @@ export default {
           ? this.dropDownListOrig
             .filter((entry) => {
               // cover case of options list being string or object array
-              const dropDownValue = entry[this.objectProp] || entry;
+              const dropDownValue = this.getLangLabel(entry[this.objectProp]) || entry;
               return dropDownValue.toLowerCase().includes(val.toLowerCase());
             })
           : this.dropDownListOrig;
@@ -615,8 +615,8 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        let compA = a[this.objectProp].toLowerCase();
-        let compB = b[this.objectProp].toLowerCase();
+        let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
+        let compB = this.getLangLabel(b[this.objectProp]).toLowerCase();
         if (this.sortName) {
           let firstA = '';
           let firstB = '';
