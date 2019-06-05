@@ -43,7 +43,7 @@
             :key="option[valueProp]"
             :class="[
               'base-drop-down-option',
-              { 'base-drop-down-option-selected': getLangLabel(selectedOption.label)
+              { 'base-drop-down-option-selected': selectedOption
                 && option[valueProp] === selectedOption[valueProp] },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
