@@ -1,5 +1,6 @@
 /* eslint-disable */
 import './arrow-left'
+import './attachment'
 import './attention'
 import './calendar-many'
 import './calendar-number'

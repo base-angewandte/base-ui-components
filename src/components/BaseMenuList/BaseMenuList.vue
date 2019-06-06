@@ -112,6 +112,9 @@ export default {
       if (val.error) {
         thumbnails.push('attention');
       }
+      if (val.has_media) {
+        thumbnails.push('attachment');
+      }
       return thumbnails;
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
