@@ -35,6 +35,19 @@
             :src="mediaUrl"
             type="audio/mpeg">
         </audio>
+        <div
+          v-else-if="fileType === 'document'"
+          class="base-media-preview-document-wrapper">
+          <iframe
+            :src="mediaUrl"
+            class="base-media-preview-document">
+            <p style="font-size: 110%;"><em><strong>ERROR: </strong>
+            An &#105;frame should be displayed here but your browser version
+            does not support &#105;frames. </em>Please update your browser to its most
+            recent version and try again.</p>
+          </iframe>
+
+        </div>
       </div>
     </transition>
   </div>
@@ -115,7 +128,7 @@ export default {
       }
       // check if pdf
       if (['pdf'].includes(fileEnding.toLowerCase())) {
-        return 'pdf';
+        return 'document';
       }
       /* eslint-disable-next-line */
       console.error(`The file type of "${this.mediaUrl}" is not supported`);
@@ -212,6 +225,16 @@ export default {
       .base-media-preview-video {
         max-height: 720px;
         max-width: 1280px;
+      }
+
+      .base-media-preview-document-wrapper {
+        height: 90%;
+        width: 90%;
+
+        .base-media-preview-document {
+          height: 100%;
+          width: 100%;
+        }
       }
     }
   }
