@@ -1,10 +1,12 @@
 <template>
   <div class="base-drop-down">
-    <div :class="['base-drop-down-label-wrapper', { 'hide': !getLangLabel(label) || !showLabel }]">
+    <div
+      :class="['base-drop-down-label-wrapper',
+               { 'hide': !getLangLabel(label, true) || !showLabel }]">
       <label
         :for="getLangLabel(label)"
         class="base-drop-down-label">
-        {{ getLangLabel(label) }}
+        {{ getLangLabel(label, true) }}
       </label>
     </div>
     <button
@@ -56,7 +58,7 @@
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
             @click="selectValue(option)">
-            {{ getLangLabel(option.label) }}
+            {{ getLangLabel(option.label, true) }}
           </li>
         </ul>
       </slot>
@@ -154,7 +156,7 @@ export default {
   },
   computed: {
     selectedOptionInt() {
-      return this.getLangLabel(this.selectedOption.label) || this.placeholder || '';
+      return this.getLangLabel(this.selectedOption.label, true) || this.placeholder || '';
     },
   },
   watch: {
