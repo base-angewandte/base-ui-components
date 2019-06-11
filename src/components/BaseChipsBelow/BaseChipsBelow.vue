@@ -2,7 +2,7 @@
   <div class="base-chips-below">
     <base-chips-input
       ref="chipsInput"
-      v-bind="$props"
+      v-bind="chipsInputProps"
       v-model="selectedBelowListInt"
       :chips-inline="false"
       :sortable="true"
@@ -281,6 +281,15 @@ export default {
       selectedBelowListInt: [],
       chipActive: -1,
     };
+  },
+  computed: {
+    // need to filter language from $props for chips input component since only needed for roles!
+    // leads to unwanted behaviour else (creating multilang object)
+    chipsInputProps() {
+      const newProps = Object.assign({}, this.$props);
+      delete newProps.language;
+      return newProps;
+    },
   },
   watch: {
     selectedList(val) {
