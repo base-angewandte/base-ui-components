@@ -1,4 +1,7 @@
+@import 'fonts';
 @import "variables";
+
+$font: "Source Sans Pro", serif;
 
 .box-shadow {
 
@@ -21,26 +24,6 @@ html {
   button {
     font-family: $font;
   }
-
-
-  /**
-  input[type=text], input[type=date] {
-    font-size: $font-size-regular;
-    font-family: $font;
-    border-radius: 0;
-    height: $row-height-large;
-    border: none;
-    width: 100%;
-    text-overflow: ellipsis;
-  }
-
-  input[type=text]:focus, input[type=date]:focus {
-    outline: none;
-  } **/
-
-
-
-
 
   .rotate-180 {
     -webkit-transform: rotate(180deg);
