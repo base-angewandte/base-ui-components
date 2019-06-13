@@ -420,6 +420,15 @@ export default {
          */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event text-input
+         * @type { string }
+         *
+         */
+        // still inform parent of the text input
+        this.$emit('text-input', val);
         const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
