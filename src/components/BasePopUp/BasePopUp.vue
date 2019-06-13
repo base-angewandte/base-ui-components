@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="showInt"
-    class="base-pop-up"
-    @wheel="scrollAction">
+    class="base-pop-up">
     <div class="base-pop-up-background" />
     <div
+      ref="popUpBody"
       class="popup-box">
 
       <!-- POP UP HEADER -->
@@ -76,6 +76,7 @@
  */
 
 import SvgIcon from 'vue-svgicon';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import BaseButton from '../BaseButton/BaseButton';
 import '../../assets/icons/index';
 
@@ -88,7 +89,7 @@ export default {
      */
     show: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * pop up header text
@@ -129,18 +130,34 @@ export default {
   data() {
     return {
       showInt: this.show,
+      targetElement: null,
     };
   },
   watch: {
     show(val) {
       this.showInt = val;
     },
+    showInt(val) {
+      this.targetElement = this.$refs.popUpBody;
+      if (val) {
+        disableBodyScroll(this.targetElement);
+      } else {
+        clearAllBodyScrollLocks();
+      }
+    },
+  },
+  mounted() {
+    this.targetElement = this.$refs.popUpBody;
+    if (this.showInt) {
+      disableBodyScroll(this.targetElement);
+    } else {
+      enableBodyScroll(this.targetElement);
+    }
+  },
+  destroyed() {
+    clearAllBodyScrollLocks();
   },
   methods: {
-    scrollAction(evt) {
-      // disable page scrolling
-      evt.preventDefault();
-    },
     close() {
       /**
        * Event triggered on right top corner close action
