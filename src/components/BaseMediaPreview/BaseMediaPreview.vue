@@ -15,9 +15,15 @@
       <div class="base-media-preview-image-stage">
         <img
           v-vue-click-outside.prevent="clickOutside"
-          v-if="fileType === 'image'"
+          v-if="displayImage && fileType === 'image'"
           :src="mediaUrl"
-          class="base-media-preview-image">
+          class="base-media-preview-image"
+          @error="displayImage = false">
+        <div
+          v-else-if="fileType === 'image' && !displayImage"
+          class="base-media-preview-error">
+          An error occured displaying this image.
+        </div>
         <video
           v-else-if="fileType === 'video'"
           ref="videoPlayer"
@@ -46,7 +52,12 @@
             does not support &#105;frames. </em>Please update your browser to its most
             recent version and try again.</p>
           </iframe>
-
+        </div>
+        <div class="base-media-preview-info">
+          <div class="base-media-preview-info-text">{{ fileName }}</div>
+          <BaseButton
+            :text="'Download'"
+          />
         </div>
       </div>
     </transition>
@@ -61,9 +72,11 @@
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import Hls from 'hls.js';
+import BaseButton from '../BaseButton/BaseButton';
 
 export default {
   components: {
+    BaseButton,
     SvgIcon,
   },
   directives: {
@@ -108,6 +121,7 @@ export default {
   data() {
     return {
       showPreviewInt: this.showPreview,
+      displayImage: true,
     };
   },
   computed: {
@@ -134,10 +148,15 @@ export default {
       console.error(`The file type of "${this.mediaUrl}" is not supported`);
       return '';
     },
+    fileName() {
+      const match = this.mediaUrl.match(/([^/]+)$/);
+      return match[1];
+    },
   },
   watch: {
     showPreview(val) {
       this.showPreviewInt = val;
+      this.displayImage = true;
     },
   },
   updated() {
@@ -213,6 +232,7 @@ export default {
       height: 100vh;
       width: 100vw;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
 
@@ -220,6 +240,10 @@ export default {
         max-height: calc(100% - #{$spacing}*4);
         max-width: calc(100% - #{$spacing}*4);
         padding: $spacing;
+      }
+
+      .base-media-preview-error {
+        color: whitesmoke;
       }
 
       .base-media-preview-video {
@@ -234,6 +258,23 @@ export default {
         .base-media-preview-document {
           height: 100%;
           width: 100%;
+        }
+      }
+
+      .base-media-preview-info {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        color: whitesmoke;
+        padding: $spacing-small;
+
+        .base-media-preview-info-text {
+          margin-right: $spacing;
         }
       }
     }
