@@ -61,6 +61,15 @@ export default {
       type: Number,
       default: -1,
     },
+    /**
+     * provide a list of entries that should appear selected
+     */
+    selectedList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
@@ -145,7 +154,7 @@ export default {
     },
     setInternalVar() {
       this.entryProps = this.list.map(entry => Object.assign({}, {
-        selected: entry.selected || false,
+        selected: entry.selected || this.selectedList.includes(entry.id),
         active: entry.active || false,
         error: entry.error || false,
       }));

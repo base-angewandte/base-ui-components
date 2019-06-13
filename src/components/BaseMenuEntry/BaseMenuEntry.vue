@@ -188,6 +188,7 @@ export default {
     },
   },
   mounted() {
+    this.isSelectedInt = this.isSelected;
     if (this.isDraggable) {
       this.dragAndDropCapable = this.determineDragAndDropCapable();
       if (this.dragAndDropCapable) {
