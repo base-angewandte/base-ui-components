@@ -725,7 +725,10 @@ export default {
       if (event.key === 'Backspace') {
         if (!this.fired && !this.input) {
           const lastIndex = this.selectedListInt.length - 1;
-          this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+          // check if there is actually anything left to remove
+          if (lastIndex >= 0) {
+            this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+          }
         }
         // necessary to prevent accidential delete of chips when user keeps backspace pressed
         // TODO: in a later version chips should be tabbable anyway and maybe it could work
