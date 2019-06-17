@@ -1,8 +1,7 @@
 <template>
   <div
     v-if="showPreviewInt"
-    class="base-media-preview-background"
-    @wheel="scrollAction">
+    class="base-media-preview-background">
     <div
       class="base-media-preview-close"
       @click="$emit('hide-preview')">
@@ -12,7 +11,9 @@
     </div>
     <!-- TODO_ add transition -->
     <transition name="grow">
-      <div class="base-media-preview-image-stage">
+      <div
+        ref="mediaStage"
+        class="base-media-preview-image-stage">
         <img
           v-vue-click-outside.prevent="clickOutside"
           v-if="displayImage && fileType === 'image'"
@@ -76,6 +77,7 @@
   */
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import Hls from 'hls.js';
 import BaseButton from '../BaseButton/BaseButton';
 
@@ -167,6 +169,22 @@ export default {
       this.showPreviewInt = val;
       this.displayImage = true;
     },
+    showPreviewInt(val) {
+      this.targetElement = this.$refs.mediaStage;
+      if (val) {
+        disableBodyScroll(this.targetElement);
+      } else {
+        clearAllBodyScrollLocks();
+      }
+    },
+  },
+  mounted() {
+    this.targetElement = this.$refs.mediaStage;
+    if (this.showPreviewInt) {
+      disableBodyScroll(this.targetElement);
+    } else {
+      enableBodyScroll(this.targetElement);
+    }
   },
   updated() {
     if (this.showPreview) {
@@ -184,12 +202,10 @@ export default {
       }
     }
   },
+  destroyed() {
+    clearAllBodyScrollLocks();
+  },
   methods: {
-    scrollAction(evt) {
-      // disable page scrolling
-      evt.preventDefault();
-      // TODO: image zoom?
-    },
     clickOutside(event) {
       // for some reason clickOutside is also triggered when opening the box
       // --> to prevent immediate closure
