@@ -20,6 +20,8 @@ drag by b farias from the Noun Project
 
 success by Trident from the Noun Project
 
+Download by scott desmond from the Noun Project
+
 
 The software of this project is licensed under the MIT license.
 
