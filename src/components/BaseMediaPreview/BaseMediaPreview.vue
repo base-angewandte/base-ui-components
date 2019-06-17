@@ -56,7 +56,12 @@
         <div class="base-media-preview-info">
           <div class="base-media-preview-info-text">{{ fileName }}</div>
           <BaseButton
+            v-if="allowDownload"
             :text="'Download'"
+            icon="download"
+            icon-position="right"
+            icon-size="large"
+            @clicked="download"
           />
         </div>
       </div>
@@ -116,6 +121,10 @@ export default {
       default() {
         return { height: '720px', width: '1280px' };
       },
+    },
+    allowDownload: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -186,6 +195,18 @@ export default {
       // --> to prevent immediate closure
       if (event.target.className === 'base-media-preview-image-stage') {
         this.$emit('hide-preview');
+      }
+    },
+    download() {
+      // check again if user is allowed to download
+      if (this.allowDownload) {
+        /**
+         * download button clicked
+         *
+         * @event download
+         *
+         */
+        this.$emit('download', { url: this.mediaUrl, name: this.fileName });
       }
     },
   },
