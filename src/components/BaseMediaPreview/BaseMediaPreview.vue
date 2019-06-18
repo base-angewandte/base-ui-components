@@ -284,8 +284,8 @@ export default {
       }
 
       .base-media-preview-video {
-        max-height: 720px;
-        max-width: 1280px;
+        max-height: 95%;
+        max-width: 95%;
       }
 
       .base-media-preview-document-wrapper {
