@@ -59,6 +59,13 @@
           class="base-chips-input-loader">
           <BaseLoader />
         </div>
+        <div
+          v-if="!allowMultipleEntries"
+          class="base-chips-input-single-dropdown">
+          <SvgIcon
+            :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+            name="drop-down"/>
+        </div>
       </template>
     </base-input>
 
@@ -138,6 +145,7 @@
 
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
+import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
@@ -149,6 +157,7 @@ export default {
     BaseInput,
     BaseChip,
     Draggable,
+    SvgIcon,
   },
   directives: {
     ClickOutside,
@@ -825,6 +834,10 @@ export default {
       display: flex;
       flex-direction: column;
       margin-bottom: $spacing;
+    }
+
+    .base-chips-input-single-dropdown {
+      margin: 0 $spacing;
     }
   }
 </style>
