@@ -122,7 +122,7 @@ export default {
     },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
-        this.entryInt = evt.target.innerText;
+        this.entryInt = evt.target.innerText.replace('\n', '');
 
         /**
          * event emitted when the chip content was edited

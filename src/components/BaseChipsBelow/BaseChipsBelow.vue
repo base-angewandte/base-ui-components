@@ -357,12 +357,16 @@ export default {
       this.$emit('list-change', sendArr);
     },
     modifyChipValue(event, index) {
-      const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
-      if (this.identifier) {
-        this.$set(modifiedEntry, this.identifier, '');
+      if (!event) {
+        this.selectedBelowListInt.splice(index, 1);
+      } else {
+        const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
+        if (this.identifier) {
+          this.$set(modifiedEntry, this.identifier, '');
+        }
+        this.$set(modifiedEntry, this.objectProp, event);
+        this.$set(this.selectedBelowListInt, index, modifiedEntry);
       }
-      this.$set(modifiedEntry, this.objectProp, event);
-      this.$set(this.selectedBelowListInt, index, modifiedEntry);
       this.emitInternalList(this.selectedBelowListInt);
     },
   },
