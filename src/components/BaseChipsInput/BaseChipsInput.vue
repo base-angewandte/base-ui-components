@@ -35,21 +35,29 @@
           <draggable
             :disabled="!draggable"
             :set-data="setDragElement"
+            :force-fallback="true"
+            :animation="200"
             v-model="selectedListInt"
+            @start="drag = true"
             @end="onDragEnd">
-            <base-chip
-              v-for="(entry, index) in selectedListInt"
-              ref="baseChip"
-              :id="entry[identifier] || entry.idInt"
-              :key="entry[identifier] || entry.idInt"
-              :entry="getLangLabel(entry[objectProp], true)"
-              :chip-editable="chipsEditable"
-              :hover-box-content="hoverboxContent"
-              :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-              @mouse-down="chipActive = index"
-              @remove-entry="removeEntry(entry, index)"
-              @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-              @value-changed="modifyChipValue($event, entry)" />
+            <transition-group
+              :name="!drag ? 'flip-list' : null"
+              type="transition">
+              <base-chip
+                v-for="(entry, index) in selectedListInt"
+                ref="baseChip"
+                :key="'chip-' + entry[identifier] || 'chip-' + entry.idInt"
+                :id="entry[identifier] || entry.idInt"
+                :entry="getLangLabel(entry[objectProp], true)"
+                :chip-editable="chipsEditable"
+                :hover-box-content="hoverboxContent"
+                :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+                @mouse-down="chipActive = index"
+                @remove-entry="removeEntry(entry, index)"
+                @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+                @value-changed="modifyChipValue($event, entry)" />
+            </transition-group>
+
           </draggable>
         </div>
       </template>
@@ -366,6 +374,7 @@ export default {
       chipActive: -1,
       timeout: null,
       fired: '',
+      drag: false,
     };
   },
   computed: {
@@ -720,6 +729,7 @@ export default {
       dataTransfer.setDragImage(img, 0, 0);
     },
     onDragEnd() {
+      this.drag = false;
       const elem = document.getElementById('chip-inline-drag');
       if (elem) {
         elem.parentNode.removeChild(elem);
