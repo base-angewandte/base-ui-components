@@ -30,7 +30,6 @@
         :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
-        :disabled="hideInputField"
         :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
         type="text"
         autocomplete="off"
@@ -240,9 +239,9 @@ export default {
     }
 
     .base-input-field-hidden {
-      width: 0;
+      width: 1px;
       overflow: hidden;
-      opacity:0;
+      opacity: 0;
       filter:alpha(opacity=0);
     }
 
