@@ -189,7 +189,7 @@ export default {
       border: none;
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
-      word-break: break-all;
+      word-break: break-word;
 
       &:active, &:focus {
         outline: none;
