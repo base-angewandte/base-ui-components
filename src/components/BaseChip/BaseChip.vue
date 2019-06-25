@@ -103,8 +103,8 @@ export default {
     },
   },
   watch: {
-    entry() {
-      this.entryInt = this.entry;
+    entry(val) {
+      this.entryInt = val;
     },
     isLinked(val) {
       if (!this.entryEdited) {

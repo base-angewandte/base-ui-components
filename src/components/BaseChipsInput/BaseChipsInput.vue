@@ -46,7 +46,7 @@
               <base-chip
                 v-for="(entry, index) in selectedListInt"
                 ref="baseChip"
-                :key="'chip-' + entry[identifier] || 'chip-' + entry.idInt"
+                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
                 :id="entry[identifier] || entry.idInt"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :chip-editable="chipsEditable"
@@ -463,7 +463,9 @@ export default {
     // watch selectedList prop for changes triggered from outside
     selectedList: {
       handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+        const outsideSelected = val.map(sel => sel[this.objectProp]);
+        const insideSelected = this.selectedListInt.map(sel => sel[this.objectProp]);
+        if (JSON.stringify(outsideSelected) !== JSON.stringify(insideSelected)) {
           this.setSelectedList(val);
         }
       },
@@ -678,7 +680,9 @@ export default {
             this.returnAsObject = true;
             return Object.assign({}, entry, {
               idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier] : entry.idInt,
+                ? entry[this.identifier]
+                : entry.idInt
+                || this.getInternalId(entry[this.objectProp] + this.list.length + index),
               [this.objectProp]: entry[this.objectProp],
             });
           }
@@ -773,12 +777,20 @@ export default {
       }
     },
     modifyChipValue(event, entry) {
-      if (event === entry[this.objectProp]) {
+      if (!event) {
+        this.selectedListInt = this.selectedListInt
+          .filter(selected => selected.idInt !== entry.idInt);
+      } else if (event !== entry[this.objectProp]) {
+        if (this.language) {
+          this.$set(entry[this.objectProp], this.language, event);
+        } else {
+          this.$set(entry, this.objectProp, event);
+        }
         if (this.identifier) {
           this.$set(entry, this.identifier, '');
         }
-        this.emitSelectedList();
       }
+      this.emitSelectedList();
     },
   },
 };
