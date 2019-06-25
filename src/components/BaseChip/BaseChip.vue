@@ -11,6 +11,7 @@
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
+      @keydown.enter.prevent="entryEditable = false"
       @keyup="entryEdited = true"
       v-html="content()" />
     <div
