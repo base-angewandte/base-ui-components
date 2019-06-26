@@ -3,7 +3,8 @@
     <div
       :class="['base-upload-bar-text', progressWidth > 80
       ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
-      {{ $props.filename }}
+      <span>{{ $props.filename }}</span>
+      <span class="base-upload-bar-file-size">{{ $props.filesize }}</span>
     </div>
     <div
       :style="{ 'width': progressWidth + '%'}"
@@ -16,6 +17,11 @@
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
       name="attention"/>
+    <SvgIcon
+      v-if="showRemove"
+      class="base-upload-bar-status-icon base-upload-bar-status-icon-remove"
+      name="remove"
+      @click="$emit('remove-item')"/>
   </div>
 </template>
 
@@ -38,6 +44,13 @@ export default {
       required: true,
     },
     /**
+     * filesize that will be displayed in the bar
+     */
+    filesize: {
+      type: String,
+      default: '',
+    },
+    /**
      * progress of the upload (percentage ratio)
      */
     progress: {
@@ -54,6 +67,13 @@ export default {
       validator(val) {
         return ['success', 'fail', ''].includes(val);
       },
+    },
+    /**
+     * show an remove icon
+     */
+    showRemove: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -89,6 +109,12 @@ export default {
       overflow: hidden;
       white-space: nowrap;
       z-index: 2;
+      display: flex;
+      justify-content: space-between;
+
+      .base-upload-bar-file-size {
+        margin: 0 20px 0 $spacing;
+      }
 
       &:after {
         content: '';
@@ -130,7 +156,12 @@ export default {
       }
 
       &.base-upload-bar-status-icon-fail {
-        fill: red;
+        fill: #ff4444;
+      }
+
+      &.base-upload-bar-status-icon-remove {
+        cursor: pointer;
+        fill: $font-color-third;
       }
     }
   }
