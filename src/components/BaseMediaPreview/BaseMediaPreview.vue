@@ -54,7 +54,9 @@
             recent version and try again.</p>
           </iframe>
         </div>
-        <div class="base-media-preview-info">
+        <div
+          v-if="!formatNotSupported"
+          class="base-media-preview-info">
           <div class="base-media-preview-info-text">{{ fileName }}</div>
           <BaseButton
             v-if="allowDownload"
@@ -62,6 +64,21 @@
             icon="download"
             icon-position="right"
             icon-size="large"
+            @clicked="download"
+          />
+        </div>
+        <div
+          v-else
+          class="base-media-preview-not-supported base-media-preview-error">
+          <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
+          <p>No preview available for this file type.</p>
+          <BaseButton
+            v-if="allowDownload"
+            :text="'Download'"
+            icon="download"
+            icon-position="right"
+            icon-size="large"
+            class="base-media-preview-not-supported-button"
             @clicked="download"
           />
         </div>
@@ -98,9 +115,23 @@ export default {
       default: false,
     },
     /**
-     * url of the image to be displayed
+     * url of the medium to be displayed
      */
     mediaUrl: {
+      type: String,
+      default: '',
+    },
+    /**
+     * filename that will be displayed for the medium
+     */
+    displayName: {
+      type: String,
+      default: '',
+    },
+    /**
+     * url for downloading the file
+     */
+    downloadUrl: {
       type: String,
       default: '',
     },
@@ -124,6 +155,9 @@ export default {
         return { height: '720px', width: '1280px' };
       },
     },
+    /**
+     * define if download button should be shown and download be enabled
+     */
     allowDownload: {
       type: Boolean,
       default: true,
@@ -155,13 +189,17 @@ export default {
       if (['pdf'].includes(fileEnding.toLowerCase())) {
         return 'document';
       }
-      /* eslint-disable-next-line */
-      console.error(`The file type of "${this.mediaUrl}" is not supported`);
       return '';
     },
     fileName() {
-      const match = this.mediaUrl.match(/([^/]+)$/);
+      if (this.displayName) {
+        return this.displayName;
+      }
+      const match = this.downloadUrl.match(/([^/]+)$/);
       return match[1];
+    },
+    formatNotSupported() {
+      return !this.fileType;
     },
   },
   watch: {
@@ -222,7 +260,7 @@ export default {
          * @event download
          *
          */
-        this.$emit('download', { url: this.mediaUrl, name: this.fileName });
+        this.$emit('download', { url: this.downloadUrl, name: this.fileName });
       }
     },
   },
@@ -281,6 +319,28 @@ export default {
 
       .base-media-preview-error {
         color: whitesmoke;
+      }
+
+      .base-media-preview-not-supported {
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        height: 20%;
+        min-height: 200px;
+        min-width: 200px;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: whitesmoke;
+
+        .base-media-preview-not-supported-file-name {
+          margin-bottom: $spacing-small;
+          font-weight: 600;
+        }
+
+        .base-media-preview-not-supported-button {
+          margin: $spacing auto;
+        }
       }
 
       .base-media-preview-video {
