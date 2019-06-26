@@ -15,6 +15,7 @@
         slot="chips-area"
         slot-scope="props">
         <draggable
+          :animation="200"
           v-model="props.list"
           group="people"
           handle=".base-chips-below-list-icon-wrapper"
@@ -356,12 +357,16 @@ export default {
       this.$emit('list-change', sendArr);
     },
     modifyChipValue(event, index) {
-      const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
-      if (this.identifier) {
-        this.$set(modifiedEntry, this.identifier, '');
+      if (!event) {
+        this.selectedBelowListInt.splice(index, 1);
+      } else {
+        const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
+        if (this.identifier) {
+          this.$set(modifiedEntry, this.identifier, '');
+        }
+        this.$set(modifiedEntry, this.objectProp, event);
+        this.$set(this.selectedBelowListInt, index, modifiedEntry);
       }
-      this.$set(modifiedEntry, this.objectProp, event);
-      this.$set(this.selectedBelowListInt, index, modifiedEntry);
       this.emitInternalList(this.selectedBelowListInt);
     },
   },
@@ -408,10 +413,14 @@ export default {
         .base-chips-below-list-item-chip-wrapper {
           width: 100%;
           margin-left: $spacing-small;
+          max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
+          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
         }
 
         .base-chips-below-chips-input {
           text-transform: capitalize;
+          max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
+          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
         }
       }
     }

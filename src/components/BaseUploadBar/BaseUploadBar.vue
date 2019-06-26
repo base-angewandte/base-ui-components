@@ -1,6 +1,8 @@
 <template>
   <div class="base-upload-bar">
-    <div class="base-upload-bar-text">
+    <div
+      :class="['base-upload-bar-text', progressWidth > 80
+      ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
       {{ $props.filename }}
     </div>
     <div
@@ -81,11 +83,28 @@ export default {
     line-height: $row-height-small;
 
     .base-upload-bar-text {
-      width: calc(100% - 2*#{$spacing-small});
+      width: calc(100% - 2*#{$spacing-small} - #{$icon-large} - #{$spacing});
       margin: 0 $spacing-small;
       position: absolute;
       overflow: hidden;
+      white-space: nowrap;
       z-index: 2;
+
+      &:after {
+        content: '';
+        height: 100%;
+        width: 30px;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+      &.base-upload-bar-text-incomplete:after {
+        background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
+      }
+      &.base-upload-bar-text-complete:after {
+        background: linear-gradient(to right, rgba(153, 153, 153, 0) , rgba(153, 153, 153, 1));
+      }
+
     }
 
     .base-upload-bar-progress {

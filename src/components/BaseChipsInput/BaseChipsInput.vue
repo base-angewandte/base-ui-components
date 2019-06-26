@@ -35,21 +35,29 @@
           <draggable
             :disabled="!draggable"
             :set-data="setDragElement"
+            :force-fallback="true"
+            :animation="200"
             v-model="selectedListInt"
+            @start="drag = true"
             @end="onDragEnd">
-            <base-chip
-              v-for="(entry, index) in selectedListInt"
-              ref="baseChip"
-              :id="entry[identifier] || entry.idInt"
-              :key="entry[identifier] || entry.idInt"
-              :entry="getLangLabel(entry[objectProp], true)"
-              :chip-editable="chipsEditable"
-              :hover-box-content="hoverboxContent"
-              :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-              @mouse-down="chipActive = index"
-              @remove-entry="removeEntry(entry, index)"
-              @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-              @value-changed="modifyChipValue($event, entry)" />
+            <transition-group
+              :name="!drag ? 'flip-list' : null"
+              type="transition">
+              <base-chip
+                v-for="(entry, index) in selectedListInt"
+                ref="baseChip"
+                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
+                :id="entry[identifier] || entry.idInt"
+                :entry="getLangLabel(entry[objectProp], true)"
+                :chip-editable="chipsEditable"
+                :hover-box-content="hoverboxContent"
+                :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+                @mouse-down="chipActive = index"
+                @remove-entry="removeEntry(entry, index)"
+                @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+                @value-changed="modifyChipValue($event, entry)" />
+            </transition-group>
+
           </draggable>
         </div>
       </template>
@@ -58,6 +66,13 @@
           v-if="isLoading"
           class="base-chips-input-loader">
           <BaseLoader />
+        </div>
+        <div
+          v-if="!allowMultipleEntries"
+          class="base-chips-input-single-dropdown">
+          <SvgIcon
+            :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+            name="drop-down"/>
         </div>
       </template>
     </base-input>
@@ -138,6 +153,7 @@
 
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
+import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
@@ -149,6 +165,7 @@ export default {
     BaseInput,
     BaseChip,
     Draggable,
+    SvgIcon,
   },
   directives: {
     ClickOutside,
@@ -357,6 +374,7 @@ export default {
       chipActive: -1,
       timeout: null,
       fired: '',
+      drag: false,
     };
   },
   computed: {
@@ -445,7 +463,9 @@ export default {
     // watch selectedList prop for changes triggered from outside
     selectedList: {
       handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+        const outsideSelected = val.map(sel => sel[this.objectProp]);
+        const insideSelected = this.selectedListInt.map(sel => sel[this.objectProp]);
+        if (JSON.stringify(outsideSelected) !== JSON.stringify(insideSelected)) {
           this.setSelectedList(val);
         }
       },
@@ -660,7 +680,9 @@ export default {
             this.returnAsObject = true;
             return Object.assign({}, entry, {
               idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier] : entry.idInt,
+                ? entry[this.identifier]
+                : entry.idInt
+                || this.getInternalId(entry[this.objectProp] + this.list.length + index),
               [this.objectProp]: entry[this.objectProp],
             });
           }
@@ -711,6 +733,7 @@ export default {
       dataTransfer.setDragImage(img, 0, 0);
     },
     onDragEnd() {
+      this.drag = false;
       const elem = document.getElementById('chip-inline-drag');
       if (elem) {
         elem.parentNode.removeChild(elem);
@@ -754,12 +777,20 @@ export default {
       }
     },
     modifyChipValue(event, entry) {
-      if (event === entry[this.objectProp]) {
+      if (!event) {
+        this.selectedListInt = this.selectedListInt
+          .filter(selected => selected.idInt !== entry.idInt);
+      } else if (event !== entry[this.objectProp]) {
+        if (this.language) {
+          this.$set(entry[this.objectProp], this.language, event);
+        } else {
+          this.$set(entry, this.objectProp, event);
+        }
         if (this.identifier) {
           this.$set(entry, this.identifier, '');
         }
-        this.emitSelectedList();
       }
+      this.emitSelectedList();
     },
   },
 };
@@ -825,6 +856,10 @@ export default {
       display: flex;
       flex-direction: column;
       margin-bottom: $spacing;
+    }
+
+    .base-chips-input-single-dropdown {
+      margin: 0 $spacing;
     }
   }
 </style>

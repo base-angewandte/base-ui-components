@@ -89,6 +89,16 @@ input::placeholder, textarea::placeholder {
   transform: rotate(-90deg);
 }
 
+.base-drop-down-icon {
+  transition: all 0.5s ease;
+  height: $icon-small;
+  flex-shrink: 0;
+
+  &.base-drop-down-icon-rotated {
+    transform: rotate(180deg);
+  }
+}
+
 input.base-input-datepicker-input {
   border: none;
   outline: none;

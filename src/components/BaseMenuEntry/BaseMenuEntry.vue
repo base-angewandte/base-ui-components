@@ -29,10 +29,10 @@
       name="slide-fade"
       class="slide-fade-group">
       <div
-        v-if="showThumbnails && !selectActive"
-        :key="entryId + 'rightGroup'"
+        :key="entryId + 'group'"
         class="base-menu-entry-right-group">
         <div
+          v-if="showThumbnails"
           :key="entryId + 'thumbnail'"
           class="base-menu-entry-thumbnail-container">
           <svg-icon
@@ -41,16 +41,16 @@
             :name="tn"
             class="base-menu-entry-thumbnail" />
         </div>
-      </div>
-      <div
-        v-if="isSelectable && selectActive"
-        :key="entryId + 'checkmark'"
-        class="base-menu-entry-checkbox">
-        <base-checkmark
-          :checked="isSelected"
-          title="checkbox"
-          mark-style="checkbox"
-          @clicked="selected"/>
+        <div
+          v-if="isSelectable && selectActive"
+          :key="entryId + 'checkmark'"
+          class="base-menu-entry-checkbox">
+          <base-checkmark
+            :checked="isSelected"
+            title="checkbox"
+            mark-style="checkbox"
+            @clicked="selected"/>
+        </div>
       </div>
     </transition-group>
   </div>
@@ -368,9 +368,6 @@ export default {
     .base-menu-entry-checkbox {
       height: 100%;
       padding: 0 $spacing;
-      top: 0;
-      position: absolute;
-      right: 0;
       background-color: white;
       display: flex;
       align-items: center;
@@ -391,6 +388,7 @@ export default {
       background-color: white;
       transition: all 0.5s ease;
     }
+
     .slide-fade-enter, .slide-fade-leave-to {
       opacity: 0;
       transform: translateX(#{$spacing});

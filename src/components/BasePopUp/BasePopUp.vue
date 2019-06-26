@@ -194,6 +194,7 @@ export default {
     min-width: 288px;
     width: 50%;
     max-width: 700px;
+    max-height: 75vh;
     display: flex;
     flex-direction: column;
     transform: translateX(-50%);
@@ -248,7 +249,7 @@ export default {
     .popup-box {
       max-width: 100%;
       width: 90%;
-      top: 10vh;
+      top: 15vh;
     }
 
     .popup-content {

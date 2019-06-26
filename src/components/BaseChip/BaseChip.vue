@@ -11,6 +11,7 @@
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
+      @keydown.enter.prevent="entryEditable = false"
       @keyup="entryEdited = true"
       v-html="content()" />
     <div
@@ -102,8 +103,8 @@ export default {
     },
   },
   watch: {
-    entry() {
-      this.entryInt = this.entry;
+    entry(val) {
+      this.entryInt = val;
     },
     isLinked(val) {
       if (!this.entryEdited) {
@@ -121,7 +122,7 @@ export default {
     },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
-        this.entryInt = evt.target.innerText;
+        this.entryInt = evt.target.innerText.replace('\n', '');
 
         /**
          * event emitted when the chip content was edited
@@ -188,7 +189,7 @@ export default {
       border: none;
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
-      word-break: break-all;
+      word-break: break-word;
 
       &:active, &:focus {
         outline: none;
