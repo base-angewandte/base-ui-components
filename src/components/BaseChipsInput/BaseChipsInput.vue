@@ -782,10 +782,11 @@ export default {
           .filter(selected => selected.idInt !== entry.idInt);
       } else if (event !== entry[this.objectProp]) {
         if (this.language) {
-          this.$set(entry[this.objectProp], this.language, event);
+          this.$set(entry, this.objectProp, { [this.language]: event });
         } else {
           this.$set(entry, this.objectProp, event);
         }
+        this.$set(entry, 'idInt', `${entry.idInt}_${Math.random()}_${this.selectedListInt.length}`);
         if (this.identifier) {
           this.$set(entry, this.identifier, '');
         }
