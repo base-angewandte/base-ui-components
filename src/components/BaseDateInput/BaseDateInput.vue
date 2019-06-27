@@ -27,7 +27,7 @@
 
     <div class="input-field-wrapper">
       <div
-        v-click-outside="() => selected('from')"
+        v-click-outside="() => activeFrom = false"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeFrom },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
@@ -46,35 +46,34 @@
           @input="$emit('autocomplete', inputInt)"
           @blur="blurInput()"
           @click="activeFrom = true">
-        <datepicker
+        <DatePicker
           v-else
-          id="dateFrom"
-          key="dateFrom"
           ref="datepickerFrom"
-          :monday-first="true"
-          :input-class="'base-input-datepicker-input'"
+          :type="minDateView"
           :format="dateFormat"
-          :placeholder="placeholder"
-          :minimum-view="minDateView"
+          :clearable="false"
+          :value-type="valueType"
           v-model="dateFrom"
-          calendar-class="calendar-class"
-          class="base-input-datepicker"
-          @opened="activeFrom = true"
-          @closed="selected('from')"
-          @click="openDatePicker('from')"/>
+          input-class="base-date-input-datepicker-input"
+          lang="de"
+          class="base-date-input-datepicker"
+          @focus="activeFrom = true"
+          @blur="blurInput()">
+          <template slot="calendar-icon">
+            <svg-icon
+              name="calendar-many"
+              class="base-input-date-icon"
+              @click="openDatePicker('from')"/>
+          </template>
+        </DatePicker>
         <svg-icon
           v-if="type === 'timerange'"
           name="clock"
           class="base-input-date-icon"/>
-        <svg-icon
-          v-else
-          name="calendar-many"
-          class="base-input-date-icon"
-          @click="openDatePicker('from')"/>
       </div>
       <span
         v-if="type === 'daterange' || type === 'timerange'"
-        class="separator">bis</span>
+        class="separator">{{ rangeSeparator }}</span>
       <div
         v-click-outside="() => selected('to')"
         v-if="type !== 'single'"
@@ -96,32 +95,31 @@
           @input="$emit('autocomplete', inputInt)"
           @blur="blurInput()"
           @click="activeTo = true">
-        <datepicker
+        <DatePicker
           v-else
-          id="dateTo"
-          key="dateTo"
           ref="datepickerTo"
-          :monday-first="true"
-          :input-class="'base-input-datepicker-input'"
+          :type="minDateView"
           :format="dateFormat"
-          :minimum-view="minDateView"
-          :placeholder="placeholder"
+          :clearable="false"
+          :value-type="valueType"
           v-model="inputInt.date_to"
-          calendar-class="calendar-class"
-          class="base-input-datepicker"
-          @opened="activeTo = true"
-          @closed="selected('to')"/>
+          input-class="base-date-input-datepicker-input"
+          lang="de"
+          class="base-date-input-datepicker"
+          @focus="activeTo = true"
+          @blur="blurInput()">
+          <template slot="calendar-icon">
+            <svg-icon
+              name="calendar-many"
+              class="base-input-date-icon"
+              @click="openDatePicker('from')"/>
+          </template>
+        </DatePicker>
 
         <svg-icon
           v-if="type === 'datetime' || type === 'timerange'"
           name="clock"
           class="base-input-date-icon"/>
-
-        <svg-icon
-          v-else
-          name="calendar-many"
-          class="base-input-date-icon"
-          @click="openDatePicker('to')"/>
       </div>
     </div>
 
@@ -139,6 +137,7 @@
 import ClickOutside from 'vue-click-outside';
 import Datepicker from 'vuejs-datepicker';
 import SvgIcon from 'vue-svgicon';
+import DatePicker from 'vue2-datepicker';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
 export default {
@@ -147,6 +146,7 @@ export default {
     Datepicker,
     SvgIcon,
     BaseSwitchButton,
+    DatePicker,
   },
   directives: {
     ClickOutside,
@@ -198,6 +198,13 @@ export default {
       default: 'Enter Text Here',
     },
     /**
+     * define the range separator
+     */
+    rangeSeparator: {
+      type: String,
+      default: '–',
+    },
+    /**
      * specify date format<br>
      * allowed values: 'day', 'month', 'year', 'date_year'<br>
      *   ('date_year': display tabs that allow for toggle between only choosing year
@@ -245,6 +252,23 @@ export default {
       // TODO: not working correctly at the moment (especially for datepicker)
       activeFrom: false,
       activeTo: false,
+      valueType: {
+        value2date: (value) => {
+          console.log(value);
+          if (value) {
+            console.log(new Date(value));
+            return new Date(value);
+          }
+          return null;
+        },
+        date2value: (date) => {
+          if (!date) return '';
+          if (this.minDateView === 'year') {
+            return date.getFullYear().toString();
+          }
+          return date.toString();
+        },
+      },
     };
   },
   computed: {
@@ -252,12 +276,12 @@ export default {
     // was specified in format and what date toggle tabs (via dateFormatInt) might say
     dateFormat() {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
-        return 'yyyy';
+        return 'YYYY';
       }
       if (this.format === 'month') {
-        return 'MM.yyyy';
+        return 'MM.YYYY';
       }
-      return 'dd.MM.yyyy';
+      return 'DD.MM.YYYY';
     },
     // if the format is settable this.format is date_year and can not be
     // used directly for the date picker component
@@ -315,6 +339,14 @@ export default {
     dateFormatInt() {
       this.emitData();
     },
+    inputInt: {
+      handler() {
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          this.emitData();
+        }
+      },
+      deep: true,
+    },
   },
   created() {
     this.inputInt = this.isSingleDate ? { date: this.input }
@@ -326,29 +358,14 @@ export default {
     blurInput() {
       this.activeFrom = false;
       this.activeTo = false;
-      this.emitData();
     },
-    selected(field) {
-      if (this.$refs.datepickerFrom && this.$refs.datepickerTo) {
-        if (field === 'from') {
-          this.activeFrom = false;
-          this.$refs.datepickerFrom.close();
-        } else if (field === 'to') {
-          this.activeTo = false;
-          this.$refs.datepickerTo.close();
-        } else {
-          this.activeFrom = false;
-          this.activeTo = false;
-          this.$refs.datepickerFrom.close();
-          this.$refs.datepickerTo.close();
-        }
-      }
+    selected() {
       this.emitData();
     },
     openDatePicker(type) {
       if (type === 'from') {
         this.activeFrom = true;
-        this.$refs.datepickerFrom.showCalendar();
+        this.$refs.datepickerFrom.showPopup();
       } else if (type === 'to') {
         this.activeTo = true;
         this.$refs.datepickerTo.showCalendar();
@@ -356,22 +373,17 @@ export default {
     },
     emitData() {
       this.convertDate();
-      if (this.isSingleDate) {
-        this.$emit('selected', this.inputInt.date);
-      } else {
-        const data = {};
-        this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
-        /**
-         * emit an event when focus leaves the input
-         *
-         * TODO: check again if this is needed???
-         *
-         * @event selected
-         * @event selected
-         * @type string|object
-         */
-        this.$emit('selected', data);
-      }
+      const data = this.getInputData();
+      /**
+       * emit an event when focus leaves the input
+       *
+       * TODO: check again if this is needed???
+       *
+       * @event selected
+       * @event selected
+       * @type string|object
+       */
+      this.$emit('selected', data);
     },
     isDateFormatYear() {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
@@ -390,6 +402,13 @@ export default {
             }
           }
         });
+    },
+    getInputData() {
+      if (this.isSingleDate) {
+        return this.inputInt.date;
+      }
+      const data = {};
+      return this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
     },
   },
 };
@@ -484,16 +503,18 @@ export default {
     outline: none;
   }
 
-  .base-input-datepicker {
+  .base-date-input-datepicker {
     flex-grow: 1;
-    width: 16px;
+    width: auto;
+    font-family: inherit;
+    font-size: inherit;
   }
 
   .base-input-date-icon {
     width: 24px;
     max-height: 24px;
     color: $font-color-second;
-    margin: 0 $spacing;
+    margin: auto;
   }
 
   .input-field-wrapper {
@@ -509,29 +530,46 @@ export default {
 <style module lang="scss">
   @import "../../styles/variables";
 
-  input.base-input-datepicker-input {
+  input.base-input-datepicker-input:focus {
+    outline: none;
+  }
+
+  .base-date-input-datepicker-input {
     border: none;
     outline: none;
     width: 100%;
   }
 
-  input.base-input-datepicker-input:focus {
-    outline: none;
+  .mx-calendar {
+    font: inherit !important;
+    color: $font-color !important;
   }
 
-  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
-  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
-  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-    border-color: $app-color !important;
+  .mx-panel-date td, .mx-panel-date th {
+    font-size: $font-size-regular !important;
   }
 
-  .calendar-class .cell.selected, .calendar-class .cell.selected:hover {
-    background: $app-color !important;
+  /* dont need special color for today */
+  .mx-panel-date td.today {
+    color: $font-color !important;
   }
 
-  .calendar-class {
-    left: -9px;
-    top: 2em;
+  .mx-calendar-content .cell.actived {
+    background-color: $app-color !important;
   }
 
+  .mx-calendar-content .cell:hover {
+    color: $app-color !important;
+    background-color: transparent !important;
+  }
+
+  /* icon placing */
+  .mx-input-append {
+    width: auto !important;
+    padding: 0 $spacing !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    background: white;
+  }
 </style>
