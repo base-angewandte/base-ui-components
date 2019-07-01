@@ -395,7 +395,10 @@ export default {
       selectable: false,
       progress: 0,
       autocompleteInput: 'testtttttttttttt',
-      inputDate: '2019',
+      inputDate: {
+        date_from: '2019',
+        date_to: '',
+      },
       multilineInputObj: {
         English: 'testeng',
         German: 'testger',

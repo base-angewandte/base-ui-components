@@ -412,7 +412,8 @@ export default {
         return this.inputInt.date;
       }
       const data = {};
-      return this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
+      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
+      return data;
     },
   },
 };
