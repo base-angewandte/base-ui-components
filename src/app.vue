@@ -114,6 +114,7 @@
     <div class="form-field">
       <base-date-input
         :type="'datetime'"
+        v-model="inputDateTime"
         :label="'unknown'"/>
       <base-date-input
         :label="'unknown'"
@@ -322,7 +323,6 @@ import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 
-
 export default {
   name: 'App',
   components: {
@@ -399,6 +399,10 @@ export default {
         date_from: '2019',
         date_to: '',
       },
+      inputDateTime: {
+        date: '12.12.2019',
+        time: '',
+      },
       multilineInputObj: {
         English: 'testeng',
         German: 'testger',
@@ -439,6 +443,7 @@ export default {
       ],
       hoverboxContent: {},
       togglePreview: false,
+      value12: '',
     };
   },
   computed: {
