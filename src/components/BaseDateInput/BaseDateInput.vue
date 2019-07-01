@@ -53,9 +53,10 @@
           :format="dateFormat"
           :clearable="false"
           :value-type="valueType"
+          :lang="language"
+          :placeholder="placeholder"
           v-model="dateFrom"
           input-class="base-date-input-datepicker-input"
-          lang="de"
           class="base-date-input-datepicker"
           @focus="activeFrom = true"
           @blur="blurInput()">
@@ -102,9 +103,9 @@
           :format="dateFormat"
           :clearable="false"
           :value-type="valueType"
+          :lang="language"
           v-model="inputInt.date_to"
           input-class="base-date-input-datepicker-input"
-          lang="de"
           class="base-date-input-datepicker"
           @focus="activeTo = true"
           @blur="blurInput()">
@@ -235,31 +236,34 @@ export default {
       type: String,
       default: 'Switch between date formats',
     },
+    /**
+     * set calendar language
+     */
+    language: {
+      type: String,
+      default: 'en',
+    },
   },
   data() {
     return {
       inputInt: {
-        date: null,
-        date_from: null,
-        date_to: null,
-        time: null,
-        time_from: null,
-        time_to: null,
+        date: '',
+        date_from: '',
+        date_to: '',
+        time: '',
+        time_from: '',
+        time_to: '',
       },
       // variable for toggling format
       dateFormatInt: 'DD.MM.YYY',
-      // attempt to control 'active' status of input field
-      // TODO: not working correctly at the moment (especially for datepicker)
       activeFrom: false,
       activeTo: false,
       valueType: {
         value2date: (value) => {
-          console.log(value);
           if (value) {
-            console.log(new Date(value));
             return new Date(value);
           }
-          return null;
+          return '';
         },
         date2value: (date) => {
           if (!date) return '';
@@ -554,11 +558,15 @@ export default {
     color: $font-color !important;
   }
 
+  .mx-calendar-content {
+    width: 250px !important;
+  }
+
   .mx-calendar-content .cell.actived {
     background-color: $app-color !important;
   }
 
-  .mx-calendar-content .cell:hover {
+  .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
     color: $app-color !important;
     background-color: transparent !important;
   }
@@ -571,5 +579,10 @@ export default {
     justify-content: flex-end !important;
     align-items: center !important;
     background: white;
+  }
+
+  .mx-datepicker-popup {
+    border: none !important;
+    box-shadow: $preview-box-shadow !important;
   }
 </style>
