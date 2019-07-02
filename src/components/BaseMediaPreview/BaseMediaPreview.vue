@@ -46,9 +46,13 @@
           v-else-if="fileType === 'document'"
           class="base-media-preview-document-wrapper">
           <iframe
+            ref="pdfFrame"
             :src="mediaUrl"
             class="base-media-preview-document">
-            <p style="font-size: 110%;"><em><strong>ERROR: </strong>
+            <p
+            ref="pdfError"
+            style="font-size: 110%;">
+            <em><strong>ERROR: </strong>
             An &#105;frame should be displayed here but your browser version
             does not support &#105;frames. </em>Please update your browser to its most
             recent version and try again.</p>
@@ -226,6 +230,12 @@ export default {
   },
   updated() {
     if (this.showPreview) {
+      // so far no solution found for mobile pdfs - too many inconsistencies between browsers
+      // just not display for now
+      if (window.innerWidth <= 640 && !!this.$refs.pdfError) {
+        this.$emit('hide-preview');
+        this.$emit('download', { url: this.downloadUrl, name: this.fileName });
+      }
       const video = this.$refs.videoPlayer;
       if (video) {
         if (Hls.isSupported()) {
@@ -361,7 +371,7 @@ export default {
       .base-media-preview-info {
         position: absolute;
         bottom: 0;
-        right: 0;
+        width: 100vw;
         left: 0;
         display: flex;
         justify-content: space-between;
