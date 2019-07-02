@@ -185,7 +185,6 @@ export default {
     }
 
     .base-chip-text {
-      margin-right: $spacing-small;
       border: none;
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
@@ -198,7 +197,7 @@ export default {
     }
 
     .base-chip-icon {
-      margin: 0 $spacing-small;
+      margin: 0 $spacing-small 0 $spacing;
       cursor: pointer;
       display: flex;
 
