@@ -118,7 +118,11 @@ export default {
   },
   methods: {
     content() {
-      return `<span>${this.entryInt}</span>`;
+      // escape '>' and '>' chars that lead to problem with v-html
+      const text = this.entryInt
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<span>${text}</span>`;
     },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
