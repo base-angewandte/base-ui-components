@@ -413,8 +413,9 @@ export default {
         .base-chips-below-list-item-chip-wrapper {
           width: 100%;
           margin-left: $spacing-small;
-          max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
-          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
+          margin-right: $spacing;
+          max-width: calc(50% - (2 * #{$spacing}));
+          flex: 1 0 calc(50% - (2 * #{$spacing}));
         }
 
         .base-chips-below-chips-input {

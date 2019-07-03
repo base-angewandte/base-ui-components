@@ -179,7 +179,6 @@ export default {
     flex: 0 0 auto;
     background-color: $background-color;
     line-height: $line-height;
-    max-width: calc(100% - #{$spacing-small});
     display: inline-flex;
     align-items: center;
     cursor: default;
