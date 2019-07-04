@@ -811,6 +811,8 @@ export default {
 
     .base-chips-input-sort {
       cursor: pointer;
+      margin-left: $spacing;
+      white-space: nowrap;
 
       &:hover {
         color: $app-color;
