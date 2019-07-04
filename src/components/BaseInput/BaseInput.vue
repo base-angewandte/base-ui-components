@@ -27,7 +27,6 @@
       <slot name="input-field-addition-before" />
       <input
         :id="label"
-        :title="label"
         :placeholder="placeholder"
         v-model="inputInt"
         :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
