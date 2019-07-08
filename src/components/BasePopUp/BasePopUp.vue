@@ -139,7 +139,7 @@ export default {
     },
     showInt(val) {
       this.targetElement = this.$refs.popUpBody;
-      if (val) {
+      if (this.targetElement && val) {
         disableBodyScroll(this.targetElement);
       } else {
         clearAllBodyScrollLocks();
@@ -148,10 +148,12 @@ export default {
   },
   mounted() {
     this.targetElement = this.$refs.popUpBody;
-    if (this.showInt) {
-      disableBodyScroll(this.targetElement);
-    } else {
-      enableBodyScroll(this.targetElement);
+    if (this.targetElement) {
+      if (this.showInt) {
+        disableBodyScroll(this.targetElement);
+      } else {
+        enableBodyScroll(this.targetElement);
+      }
     }
   },
   destroyed() {
