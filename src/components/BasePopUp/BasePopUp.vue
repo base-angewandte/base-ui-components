@@ -154,6 +154,8 @@ export default {
       } else {
         enableBodyScroll(this.targetElement);
       }
+    } else {
+      clearAllBodyScrollLocks();
     }
   },
   destroyed() {

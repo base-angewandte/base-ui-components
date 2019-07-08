@@ -213,7 +213,6 @@ export default {
     },
     showPreviewInt(val) {
       this.targetElement = this.$refs.mediaStage;
-      console.log(this.targetElement);
       if (val) {
         disableBodyScroll(this.targetElement);
       } else {
@@ -223,13 +222,14 @@ export default {
   },
   mounted() {
     this.targetElement = this.$refs.mediaStage;
-    console.log(this.targetElement);
     if (this.targetElement) {
       if (this.showPreviewInt) {
         disableBodyScroll(this.targetElement);
       } else {
         enableBodyScroll(this.targetElement);
       }
+    } else {
+      clearAllBodyScrollLocks();
     }
   },
   updated() {
