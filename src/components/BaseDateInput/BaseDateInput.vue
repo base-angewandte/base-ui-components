@@ -36,7 +36,7 @@
           v-if="type === 'timerange'"
           id="timeFrom"
           ref="timepickerFrom"
-          :placeholder="placeholder"
+          :placeholder="placeholder.time"
           :lang="language"
           :clearable="false"
           v-model="inputInt.time_from"
@@ -64,7 +64,7 @@
           :clearable="false"
           :value-type="dateType"
           :lang="language"
-          :placeholder="placeholder"
+          :placeholder="placeholder.date || placeholder"
           v-model="dateFrom"
           input-class="base-date-input-datepicker-input"
           class="base-date-input-datepicker"
@@ -93,7 +93,7 @@
           v-if="type === 'datetime' || type === 'timerange'"
           id="timeTo"
           ref="timepickerTo"
-          :placeholder="placeholder"
+          :placeholder="placeholder.time"
           :lang="language"
           :clearable="false"
           v-model="timeTo"
@@ -122,6 +122,7 @@
           :clearable="false"
           :value-type="dateType"
           :lang="language"
+          :placeholder="placeholder.date || placeholder"
           v-model="inputInt.date_to"
           input-class="base-date-input-datepicker-input"
           class="base-date-input-datepicker"
@@ -205,11 +206,13 @@ export default {
       default: true,
     },
     /**
-     * set a placeholder for the input field
+     * set a placeholder for the input field (object with date and time attribute respectively)
      */
     placeholder: {
-      type: String,
-      default: 'Enter Text Here',
+      type: [Object, String],
+      default() {
+        return { date: 'Select Date', time: 'Select Time' };
+      },
     },
     /**
      * define the range separator
