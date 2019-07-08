@@ -527,7 +527,6 @@ export default {
     width: 24px;
     max-height: 24px;
     color: $font-color-second;
-    margin: auto;
   }
 
   .input-field-wrapper {
@@ -591,7 +590,17 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 1);
+
+    &::before {
+      content: '';
+      height: 100%;
+      width: $spacing;
+      position: absolute;
+      top: 0;
+      left: -$spacing;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
+    }
   }
 
   .mx-datepicker-popup {
