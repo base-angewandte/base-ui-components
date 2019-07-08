@@ -76,7 +76,7 @@
  */
 
 import SvgIcon from 'vue-svgicon';
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+// import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import BaseButton from '../BaseButton/BaseButton';
 import '../../assets/icons/index';
 
@@ -139,25 +139,27 @@ export default {
     },
     showInt(val) {
       this.targetElement = this.$refs.popUpBody;
+      console.log(this.targetElement);
       if (this.targetElement && val) {
-        disableBodyScroll(this.targetElement);
+        // disableBodyScroll(this.targetElement);
       } else {
-        clearAllBodyScrollLocks();
+        // clearAllBodyScrollLocks();
       }
     },
   },
   mounted() {
     this.targetElement = this.$refs.popUpBody;
+    console.log(this.targetElement);
     if (this.targetElement) {
       if (this.showInt) {
-        disableBodyScroll(this.targetElement);
+        // disableBodyScroll(this.targetElement);
       } else {
-        enableBodyScroll(this.targetElement);
+        // enableBodyScroll(this.targetElement);
       }
     }
   },
   destroyed() {
-    clearAllBodyScrollLocks();
+    // clearAllBodyScrollLocks();
   },
   methods: {
     close() {
