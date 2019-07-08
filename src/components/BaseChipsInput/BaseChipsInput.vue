@@ -26,7 +26,7 @@
         <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
-          @click="sort">{{ sortText }}</div>
+          @click="sort(selectedListInt)">{{ sortText }}</div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
@@ -592,7 +592,7 @@ export default {
         if (item.idInt === 0 || item.idInt) {
           this.dropDownListInt.push(item);
           // sort all entries by id to restore the original order
-          this.sort();
+          this.sort(this.dropDownListInt);
         }
       }
       this.selectedListInt.splice(index, 1);
@@ -642,8 +642,8 @@ export default {
       }
       return this.getAllowUnknown();
     },
-    sort() {
-      this.selectedListInt.sort((a, b) => {
+    sort(list) {
+      list.sort((a, b) => {
         let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
         let compB = this.getLangLabel(b[this.objectProp]).toLowerCase();
         if (this.sortName) {
