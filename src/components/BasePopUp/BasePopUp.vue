@@ -159,7 +159,7 @@ export default {
     }
   },
   destroyed() {
-    // clearAllBodyScrollLocks();
+    clearAllBodyScrollLocks();
   },
   methods: {
     close() {
