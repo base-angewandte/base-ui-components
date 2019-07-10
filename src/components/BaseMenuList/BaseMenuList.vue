@@ -125,7 +125,6 @@ export default {
     this.setInternalVar();
     document.body.addEventListener('touchmove', (e) => {
       if (this.dragging) {
-        console.log('moved');
         e.preventDefault();
       }
       return false;
@@ -192,14 +191,12 @@ export default {
       }
     },
     dragStart() {
-      console.log(this.dragAndDropCapable);
       this.dragging = true;
     },
     dragEnd() {
       this.dragging = false;
     },
     modifyDragItem(dataTransfer, dragEl) {
-      console.log('modify drag item');
       const entryIcon = dragEl.getElementsByTagName('svg')[0];
       const size = `${(entryIcon.clientHeight * 2)}px`;
       // remove previous drag items from the body again if necessary
