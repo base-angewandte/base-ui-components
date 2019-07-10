@@ -13,8 +13,6 @@
         v-model="dragList"
         :sort="false"
         :group="dropElementName"
-        :force-fallback="true"
-        :fallback-on-body="true"
         ghost-class="base-drop-box-ghost"
         class="base-drop-box-drag-area"
         @add="addEntry">

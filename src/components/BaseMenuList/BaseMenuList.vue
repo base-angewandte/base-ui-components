@@ -5,6 +5,8 @@
       :sort="false"
       :group="{ name: dragName, pull: 'clone', put: false }"
       :set-data="modifyDragItem"
+      :force-fallback="!dragAndDropCapable"
+      :fallback-on-body="!dragAndDropCapable"
       @start="dragStart"
       @end="dragEnd">
       <base-menu-entry
@@ -99,6 +101,9 @@ export default {
     selectActive() {
       return this.selected;
     },
+    dragAndDropCapable() {
+      return ('DragEvent' in window);
+    },
   },
   watch: {
     list() {
@@ -186,15 +191,12 @@ export default {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },
-    dragStart(e) {
+    dragStart() {
+      console.log(this.dragAndDropCapable);
       this.dragging = true;
-      e.preventDefault();
-      e.originalEvent.preventDefault();
-      console.log(e);
     },
-    dragEnd(e) {
+    dragEnd() {
       this.dragging = false;
-      console.log(e);
     },
     modifyDragItem(dataTransfer, dragEl) {
       console.log('modify drag item');
