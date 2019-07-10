@@ -13,6 +13,8 @@
         v-model="dragList"
         :sort="false"
         :group="dropElementName"
+        :force-fallback="true"
+        :fallback-on-body="true"
         ghost-class="base-drop-box-ghost"
         class="base-drop-box-drag-area"
         @add="addEntry">
@@ -137,10 +139,10 @@ export default {
         /**
          * event emitted when a file or an element is dropped on the box, emitting the type of event
          *
-         * @event dropped
+         * @event dropped-file
          * @type { DragEvent }
          */
-        this.$emit('dropped', e);
+        this.$emit('dropped-file', e);
       });
       ['dragenter', 'dragleave'].forEach(((evt) => {
         this.$refs.fileform.addEventListener(evt, (() => {
@@ -162,10 +164,15 @@ export default {
      * method to get the dropped element id and emit it to parent
      */
     addEntry() {
-      const dragEvent = new DragEvent('drop', { dataTransfer: new DataTransfer() });
-      dragEvent.dataTransfer.setData('text/plain', this.dragList[0].id);
+      const draggedElementId = this.dragList[0].id;
       this.dragList = [];
-      this.$emit('dropped', dragEvent);
+      /**
+       * event emitted when an element is dropped on the box, emitting the element data id
+       *
+       * @event dropped-element
+       * @type String
+       */
+      this.$emit('dropped-element', draggedElementId);
     },
     dragEnter() {
       this.isDragOver = true;

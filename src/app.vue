@@ -225,7 +225,7 @@
         icon="camera"
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
-        @dropped="dropped($event)"
+        @dropped-element="dropped($event)"
         @clicked="boxClicked"/>
       <base-drop-box />
     </div>
@@ -515,11 +515,12 @@ export default {
       }
     },
     dropped(e) {
-      for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
-        this.files.push(e.dataTransfer.files[i]);
-      }
-      if (e.dataTransfer.items) {
-        const id = e.dataTransfer.getData('text');
+      if (e.dataTransfer && e.dataTransfer.files.length) {
+        for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
+          this.files.push(e.dataTransfer.files[i]);
+        }
+      } else {
+        const id = e;
         if (!this.elements.find(item => item.id === id)) {
           this.elements.push(this.list.find(item => item.id === id));
         }
