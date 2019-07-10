@@ -206,6 +206,10 @@ export default {
       padding: $spacing;
       margin: 0;
       height: 240px;
+      background: white;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
 
       &:active, &:focus {
         box-shadow: $input-shadow;
