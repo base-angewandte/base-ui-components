@@ -150,7 +150,6 @@
  * Time field is currently just a text input field
  */
 import ClickOutside from 'vue-click-outside';
-import Datepicker from 'vuejs-datepicker';
 import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
@@ -158,7 +157,6 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 export default {
   name: 'BaseDateInput',
   components: {
-    Datepicker,
     SvgIcon,
     BaseSwitchButton,
     DatePicker,
