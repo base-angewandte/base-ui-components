@@ -221,6 +221,7 @@
       <base-drop-box
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
+        drop-type="elements"
         icon="camera"
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"

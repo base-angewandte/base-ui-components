@@ -1,7 +1,6 @@
 <template>
   <div
     ref="menuEntry"
-    :draggable="isDraggable"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
@@ -155,13 +154,6 @@ export default {
       default: true,
     },
     /**
-     * define if item is draggable
-     */
-    isDraggable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * define if title should be displayed in bold constantly
      */
     titleBold: {
@@ -179,7 +171,6 @@ export default {
   data() {
     return {
       isSelectedInt: false,
-      dragAndDropCapable: true,
     };
   },
   watch: {
@@ -189,37 +180,6 @@ export default {
   },
   mounted() {
     this.isSelectedInt = this.isSelected;
-    if (this.isDraggable) {
-      this.dragAndDropCapable = this.determineDragAndDropCapable();
-      if (this.dragAndDropCapable) {
-        this.$refs.menuEntry.addEventListener('dragstart', ((e) => {
-          const size = `${(this.$refs.entryIcon.$el.clientHeight * 2)}px`;
-          e.stopPropagation();
-          // remove previous drag items from the body again if necessary
-          const elem = document.getElementById('drag-icon');
-          if (elem) {
-            elem.parentNode.removeChild(elem);
-          }
-          // clone the svg used in this entry
-          const pic = this.$refs.entryIcon.$el.cloneNode(true);
-          pic.id = 'drag-icon';
-          pic.style.height = size;
-          pic.style.maxHeight = size;
-          pic.style.width = size;
-          pic.style.backgroundColor = 'white';
-          pic.style.position = 'absolute';
-          pic.style.top = '-99999px';
-          pic.style.left = '-99999px';
-
-          // add the element to the dom
-          document.body.appendChild(pic);
-          e.dataTransfer.setDragImage(pic, 0, 0);
-
-          // add data to identify the entry on receiver side
-          e.dataTransfer.setData('text/plain', this.entryId);
-        }), false);
-      }
-    }
   },
   methods: {
     selected() {
@@ -231,11 +191,6 @@ export default {
        * @type Boolean
        */
       this.$emit('selected', this.isSelectedInt);
-    },
-    determineDragAndDropCapable() {
-      const div = document.createElement('div');
-      return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div))
-        && 'FormData' in window && 'FileReader' in window;
     },
   },
 

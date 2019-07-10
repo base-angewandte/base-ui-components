@@ -1,23 +1,30 @@
 <template>
   <div class="base-menu-list">
-    <base-menu-entry
-      v-for="(item, index) in list"
-      v-if="item"
-      ref="menuEntry"
-      :key="item.id || item.title"
-      :entry-id="item.id"
-      :title="item.title"
-      :is-active="entryProps[index].active"
-      :is-selected="entryProps[index].selected"
-      :icon="getType(item.icon)"
-      :thumbnails="getThumbnails(item)"
-      :description="item.description"
-      :is-selectable="true"
-      :is-draggable="true"
-      :select-active="selectActive"
+    <draggable
+      v-model="list"
+      :sort="false"
+      :group="{ name: dragName, pull: 'clone', put: false }"
+      :set-data="modifyDragItem"
+      @start="dragStart"
+      @end="dragEnd">
+      <base-menu-entry
+        v-for="(item, index) in list"
+        v-if="item"
+        ref="menuEntry"
+        :key="item.id || item.title"
+        :entry-id="item.id"
+        :title="item.title"
+        :is-active="entryProps[index].active"
+        :is-selected="entryProps[index].selected"
+        :icon="getType(item.icon)"
+        :thumbnails="getThumbnails(item)"
+        :description="item.description"
+        :is-selectable="true"
+        :select-active="selectActive"
 
-      @clicked="activateItem(index)"
-      @selected="selectItem(index, $event)"/>
+        @clicked="activateItem(index)"
+        @selected="selectItem(index, $event)"/>
+    </draggable>
   </div>
 </template>
 
@@ -26,11 +33,13 @@
  * Base Component for SideBar Menu Entries
   */
 
+import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 export default {
   components: {
     BaseMenuEntry,
+    Draggable,
   },
   props: {
     /**
@@ -70,12 +79,20 @@ export default {
         return [];
       },
     },
+    /**
+     * specify the group name for the drag receiver
+     */
+    dragName: {
+      type: String,
+      default: 'menuEntry',
+    },
   },
   data() {
     return {
       // have internally necessary props in separate array to prevent issues with
       // outside store mutations
       entryProps: [],
+      dragging: false,
     };
   },
   computed: {
@@ -101,6 +118,13 @@ export default {
   },
   created() {
     this.setInternalVar();
+    document.body.addEventListener('touchmove', (e) => {
+      if (this.dragging) {
+        console.log('moved');
+        e.preventDefault();
+      }
+      return false;
+    }, { passive: false });
   },
   methods: {
     // determines which icon should be shown for each menu entry
@@ -162,6 +186,40 @@ export default {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },
+    dragStart(e) {
+      this.dragging = true;
+      e.preventDefault();
+      e.originalEvent.preventDefault();
+      console.log(e);
+    },
+    dragEnd(e) {
+      this.dragging = false;
+      console.log(e);
+    },
+    modifyDragItem(dataTransfer, dragEl) {
+      console.log('modify drag item');
+      const entryIcon = dragEl.getElementsByTagName('svg')[0];
+      const size = `${(entryIcon.clientHeight * 2)}px`;
+      // remove previous drag items from the body again if necessary
+      const elem = document.getElementById('drag-icon');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
+      }
+      // clone the svg used in this entry
+      const pic = entryIcon.cloneNode(true);
+      pic.id = 'drag-icon';
+      pic.style.height = size;
+      pic.style.maxHeight = size;
+      pic.style.width = size;
+      pic.style.backgroundColor = 'white';
+      pic.style.position = 'absolute';
+      pic.style.top = '-99999px';
+      pic.style.left = '-99999px';
+
+      // add the element to the dom
+      document.body.appendChild(pic);
+      dataTransfer.setDragImage(pic, 0, 0);
+    },
   },
 };
 </script>
@@ -170,5 +228,4 @@ export default {
   .base-menu-list {
     position: relative;
   }
-
 </style>
