@@ -525,7 +525,7 @@ export default {
   },
   methods: {
     onEnter() {
-      if (this.input && this.dropDownListInt[this.selectedMenuEntryIndex]) {
+      if (this.input || this.dropDownListInt[this.selectedMenuEntryIndex]) {
         this.addSelected();
       } else {
         this.blurInput();
