@@ -18,7 +18,7 @@
       @arrow-key="triggerArrowKey"
       @input-keydown="checkKeyEvent"
       @input-keypress="checkKeyEvent"
-      @enter="addSelected()"
+      @enter="onEnter()"
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
@@ -524,6 +524,14 @@ export default {
     }
   },
   methods: {
+    onEnter() {
+      if (this.input && this.dropDownListInt[this.selectedMenuEntryIndex]) {
+        this.addSelected();
+      } else {
+        this.blurInput();
+        this.showDropDown = false;
+      }
+    },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
       this.showDropDown = true;
@@ -541,10 +549,7 @@ export default {
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
-          const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
-          if (inputElems && inputElems.length) {
-            inputElems[0].blur();
-          }
+          this.blurInput();
         } else {
           this.insideDropDown = true;
         }
@@ -792,6 +797,12 @@ export default {
         }
       }
       this.emitSelectedList();
+    },
+    blurInput() {
+      const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
+      if (inputElems && inputElems.length) {
+        inputElems[0].blur();
+      }
     },
   },
 };

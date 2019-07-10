@@ -47,6 +47,8 @@ fieldset {
 input[type=text], input[type=date], textarea {
   font-family: inherit;
   font-size: inherit;
+  background-color: transparent;
+  border-radius: 0;
 }
 
 input[type=text]:focus, input[type=date]:focus, textarea:focus, video:focus,
@@ -56,6 +58,10 @@ audio:focus {
 
 input::placeholder, textarea::placeholder {
   color: $font-color-third;
+}
+
+textarea {
+  box-shadow: none
 }
 
 /* recommended css code for vue-svgicon */
