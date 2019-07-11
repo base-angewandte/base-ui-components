@@ -46,7 +46,6 @@
           v-else
           class="base-media-preview-not-supported base-media-preview-error">
           <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
-          <p v-if="formatNotSupported">{{ infoTexts.noPreview }}</p>
           <div class="base-media-preview-not-supported-buttons">
             <BaseButton
               v-if="allowDownload"
@@ -170,7 +169,6 @@ export default {
         return {
           download: 'Download',
           view: 'View',
-          noPreview: 'No preview available for this file type.',
         };
       },
     },
@@ -286,7 +284,7 @@ export default {
       }
     },
     openPdf() {
-      window.open(this.downloadUrl);
+      window.open(this.mediaUrl);
     },
   },
 };
