@@ -43,46 +43,41 @@
             type="audio/mpeg">
         </audio>
         <div
-          v-else-if="fileType === 'document'"
-          class="base-media-preview-document-wrapper">
-          <iframe
-            ref="pdfFrame"
-            :src="mediaUrl"
-            class="base-media-preview-document">
-            <p
-            ref="pdfError"
-            style="font-size: 110%;">
-            <em><strong>ERROR: </strong>
-            An &#105;frame should be displayed here but your browser version
-            does not support &#105;frames. </em>Please update your browser to its most
-            recent version and try again.</p>
-          </iframe>
+          v-else
+          class="base-media-preview-not-supported base-media-preview-error">
+          <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
+          <p v-if="formatNotSupported">{{ infoTexts.noPreview }}</p>
+          <div class="base-media-preview-not-supported-buttons">
+            <BaseButton
+              v-if="allowDownload"
+              :text="infoTexts.download"
+              icon="download"
+              icon-position="right"
+              icon-size="large"
+              class="base-media-preview-not-supported-button"
+              @clicked="download"
+            />
+            <BaseButton
+              v-if="!isMobile && fileEnding === 'pdf'"
+              :text="infoTexts.view"
+              icon="eye"
+              icon-position="right"
+              icon-size="large"
+              class="base-media-preview-not-supported-button"
+              @clicked="openPdf()"
+            />
+          </div>
         </div>
         <div
-          v-if="!formatNotSupported"
+          v-if="fileEnding !== 'pdf' && !formatNotSupported"
           class="base-media-preview-info">
           <div class="base-media-preview-info-text">{{ fileName }}</div>
           <BaseButton
             v-if="allowDownload"
-            :text="'Download'"
+            :text="infoTexts.download"
             icon="download"
             icon-position="right"
             icon-size="large"
-            @clicked="download"
-          />
-        </div>
-        <div
-          v-else
-          class="base-media-preview-not-supported base-media-preview-error">
-          <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
-          <p>No preview available for this file type.</p>
-          <BaseButton
-            v-if="allowDownload"
-            :text="'Download'"
-            icon="download"
-            icon-position="right"
-            icon-size="large"
-            class="base-media-preview-not-supported-button"
             @clicked="download"
           />
         </div>
@@ -166,6 +161,19 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * define if download button should be shown and download be enabled
+     */
+    infoTexts: {
+      type: Object,
+      default() {
+        return {
+          download: 'Download',
+          view: 'View',
+          noPreview: 'No preview available for this file type.',
+        };
+      },
+    },
   },
   data() {
     return {
@@ -176,21 +184,21 @@ export default {
   computed: {
     fileType() {
       if (this.mediaType) return this.mediaType;
-      const { fileEnding } = this.mediaUrl.match(/\.(?<fileEnding>\w+)$/).groups;
+      const docType = this.fileEnding;
       // check if image
-      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding.toLowerCase())) {
+      if (['png', 'gif', 'jpeg', 'jpg'].includes(docType.toLowerCase())) {
         return 'image';
       }
       // check if video
-      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding.toLowerCase())) {
+      if (['mp4', 'm3u8', 'ogg'].includes(docType.toLowerCase())) {
         return 'video';
       }
       // check if audio
-      if (['mp3', 'wav', 'mpeg'].includes(fileEnding.toLowerCase())) {
+      if (['mp3', 'wav', 'mpeg'].includes(docType.toLowerCase())) {
         return 'audio';
       }
       // check if pdf
-      if (['pdf'].includes(fileEnding.toLowerCase())) {
+      if (['pdf'].includes(docType.toLowerCase())) {
         return 'document';
       }
       return '';
@@ -202,8 +210,14 @@ export default {
       const match = this.downloadUrl.match(/([^/]+)$/);
       return match[1];
     },
+    fileEnding() {
+      return this.mediaUrl.match(/\w+\.(\w{3,4})$/)[1] || '';
+    },
     formatNotSupported() {
       return !this.fileType;
+    },
+    isMobile() {
+      return window.innerWidth <= 640;
     },
   },
   watch: {
@@ -234,12 +248,6 @@ export default {
   },
   updated() {
     if (this.showPreview) {
-      // so far no solution found for mobile pdfs - too many inconsistencies between browsers
-      // just not display for now
-      if (window.innerWidth <= 640 && !!this.$refs.pdfError) {
-        this.$emit('hide-preview');
-        this.$emit('download', { url: this.downloadUrl, name: this.fileName });
-      }
       const video = this.$refs.videoPlayer;
       if (video) {
         if (Hls.isSupported()) {
@@ -276,6 +284,9 @@ export default {
          */
         this.$emit('download', { url: this.downloadUrl, name: this.fileName });
       }
+    },
+    openPdf() {
+      window.open(this.downloadUrl);
     },
   },
 };
@@ -352,8 +363,14 @@ export default {
           font-weight: 600;
         }
 
-        .base-media-preview-not-supported-button {
-          margin: $spacing auto;
+        .base-media-preview-not-supported-buttons {
+          display: flex;
+          justify-content: center;
+
+          .base-media-preview-not-supported-button {
+            margin: $spacing $spacing-small;
+            min-width: 200px;
+          }
         }
       }
 
@@ -387,6 +404,28 @@ export default {
         .base-media-preview-info-text {
           margin-right: $spacing;
         }
+      }
+    }
+  }
+
+  @media screen and (max-width: $tablet) {
+    .base-media-preview-background
+    .base-media-preview-image-stage
+    .base-media-preview-not-supported {
+      width: 75%;
+    }
+  }
+
+  @media screen and (max-width: $mobile) {
+    .base-media-preview-background
+    .base-media-preview-image-stage
+    .base-media-preview-not-supported
+    .base-media-preview-not-supported-buttons {
+      flex-wrap: wrap;
+
+      .base-media-preview-not-supported-button {
+        margin: $spacing-small;
+        min-width: 125px;
       }
     }
   }

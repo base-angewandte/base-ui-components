@@ -12,7 +12,8 @@
     </video> -->
     <BaseMediaPreview
       :show-preview="togglePreview"
-      image-url="https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8"
+      :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"
+      :download-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.pdf'"
       @hide-preview="togglePreview = false"
     />
     <BaseButton
