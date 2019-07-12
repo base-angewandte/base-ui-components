@@ -11,7 +11,7 @@
       :name="icon"
       class="base-menu-entry-icon" />
     <div
-      :class="['base-menu-entry-text-wrapper']">
+      class="base-menu-entry-text-wrapper">
       <div class="base-menu-entry-title-description-wrapper">
         <div
           v-if="title"
@@ -262,10 +262,11 @@ export default {
     position: relative;
     background: white;
     overflow: hidden;
+
     .base-menu-entry-icon {
       max-height: $icon-large;
       width: $icon-large;
-      margin-left: $spacing;
+      margin: 0 $spacing;
       flex: 0 0 #{$icon-large};
     }
 
@@ -274,17 +275,16 @@ export default {
       flex-shrink: 1;
       display: flex;
       align-items: baseline;
-      max-width: calc(100% - #{$icon-large} - #{$spacing} - #{$border-width}
+      max-width: calc(100% - #{$icon-large} - (2 * #{$spacing}) - #{$border-width}
       - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
 
       .base-menu-entry-title-description-wrapper {
-        padding-left: $spacing;
-        margin-right: $spacing;
         flex-shrink: 1;
         flex-grow: 1;
 
         .base-menu-entry-title {
+          margin-right: $spacing;
 
           &.base-menu-entry-title-bold {
             font-weight: bold;
@@ -309,14 +309,10 @@ export default {
       overflow: hidden;
     }
 
-    .base-menu-entry-icon + .base-menu-entry-subtext {
-      margin-left: $spacing;
-    }
-
     .base-menu-entry-subtext {
       color: $font-color-second;
       font-size: $font-size-small;
-      margin: 0 $spacing;
+      margin-right: $spacing;
       flex-grow: 99;
       flex-shrink: 0;
       padding-right: $spacing;

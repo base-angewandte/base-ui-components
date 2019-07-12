@@ -16,7 +16,7 @@
         <img
           v-if="fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
-          :src="imageUrl"
+          :src="mediaUrl"
           class="base-media-preview-image">
         <video
           v-else-if="fileType === 'video'"
@@ -27,6 +27,26 @@
           class="base-media-preview-image base-media-preview-video">
           Your browser does not support the video tag.
         </video>
+        <audio
+          v-else-if="fileType === 'audio'"
+          controls>
+          Your browser does not support the audio tag.
+          <source
+            :src="mediaUrl"
+            type="audio/mpeg">
+        </audio>
+        <div
+          v-else-if="fileType === 'document'"
+          class="base-media-preview-document-wrapper">
+          <iframe
+            :src="mediaUrl"
+            class="base-media-preview-document">
+            <p style="font-size: 110%;"><em><strong>ERROR: </strong>
+            An &#105;frame should be displayed here but your browser version
+            does not support &#105;frames. </em>Please update your browser to its most
+            recent version and try again.</p>
+          </iframe>
+        </div>
       </div>
     </transition>
   </div>
@@ -59,7 +79,7 @@ export default {
     /**
      * url of the image to be displayed
      */
-    imageUrl: {
+    mediaUrl: {
       type: String,
       default: '',
     },
@@ -86,32 +106,31 @@ export default {
   },
   data() {
     return {
-      previewUrl: '',
       showPreviewInt: this.showPreview,
     };
   },
   computed: {
     fileType() {
       if (this.mediaType) return this.mediaType;
-      const { fileEnding } = this.imageUrl.match(/\.(?<fileEnding>\w+)$/).groups;
+      const { fileEnding } = this.mediaUrl.match(/\.(?<fileEnding>\w+)$/).groups;
       // check if image
-      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding)) {
+      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding.toLowerCase())) {
         return 'image';
       }
       // check if video
-      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding)) {
+      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding.toLowerCase())) {
         return 'video';
       }
       // check if audio
-      if (['mp3', 'wav', 'mpeg'].includes(fileEnding)) {
+      if (['mp3', 'wav', 'mpeg'].includes(fileEnding.toLowerCase())) {
         return 'audio';
       }
       // check if pdf
-      if (['pdf'].includes(fileEnding)) {
-        return 'pdf';
+      if (['pdf'].includes(fileEnding.toLowerCase())) {
+        return 'document';
       }
       /* eslint-disable-next-line */
-      console.error(`The file type of "${this.imageUrl}" is not supported`);
+      console.error(`The file type of "${this.mediaUrl}" is not supported`);
       return '';
     },
   },
@@ -126,11 +145,11 @@ export default {
       if (video) {
         if (Hls.isSupported()) {
           const hls = new Hls();
-          hls.loadSource(this.imageUrl);
+          hls.loadSource(this.mediaUrl);
           hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = this.imageUrl;
+          video.src = this.mediaUrl;
           video.addEventListener('loadedmetadata', () => video.play());
         }
       }
@@ -205,6 +224,16 @@ export default {
       .base-media-preview-video {
         max-height: 720px;
         max-width: 1280px;
+      }
+
+      .base-media-preview-document-wrapper {
+        height: 90%;
+        width: 90%;
+
+        .base-media-preview-document {
+          height: 100%;
+          width: 100%;
+        }
       }
     }
   }

@@ -158,7 +158,7 @@ export default {
     top: 0;
     left: 0;
     height: 100%;
-    width: calc(100% - 2 * #{$spacing});
+    width: 100%;
     z-index: 99;
     overflow: hidden;
   }
@@ -185,6 +185,7 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
   }
 
   .popup-remove {
@@ -225,6 +226,7 @@ export default {
     .popup-box {
       max-width: 100%;
       width: 90%;
+      top: 10vh;
     }
 
     .popup-content {

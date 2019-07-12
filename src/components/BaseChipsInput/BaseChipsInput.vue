@@ -43,7 +43,7 @@
               :id="entry[identifier] || entry.idInt"
               ref="baseChip"
               :key="entry[identifier] || entry.idInt"
-              v-model="entry[objectProp]"
+              :entry="getLangLabel(entry[objectProp], true)"
               :chip-editable="chipsEditable"
               :hover-box-content="hoverboxContent"
               :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
@@ -87,7 +87,7 @@
           <!-- SLOT DEFAULT -->
           <div
             class="base-chips-drop-down-entry">
-            {{ entry[objectProp] }}
+            {{ getLangLabel(entry[objectProp], true) }}
           </div>
         </slot>
       </div>
@@ -96,17 +96,16 @@
       -->
       <slot
         name="drop-down-extended" />
-      <!--
-        @slot customize what is displayed when no drop down options are available
-      -->
-      <slot
+      <div
         v-if="!dropDownList.length"
-        name="no-options">
-        <div
-          class="base-chips-drop-down-entry-wrapper">
+        class="base-chips-drop-down-entry-wrapper">
+        <!--
+          @slot customize what is displayed when no drop down options are available
+        -->
+        <slot name="no-options">
           {{ dropDownNoOptionsInfo }}
-        </div>
-      </slot>
+        </slot>
+      </div>
     </div>
     <!-- CHIPS BELOW -->
     <div
@@ -140,6 +139,7 @@ import Draggable from 'vuedraggable';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
+import { setLanguageMixin } from '../../mixins/setLanguage';
 
 export default {
   components: {
@@ -151,6 +151,9 @@ export default {
   directives: {
     ClickOutside,
   },
+  mixins: [
+    setLanguageMixin,
+  ],
   model: {
     prop: 'selectedList',
     event: 'selected',
@@ -327,6 +330,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -414,7 +424,7 @@ export default {
           ? this.dropDownListOrig
             .filter((entry) => {
               // cover case of options list being string or object array
-              const dropDownValue = entry[this.objectProp] || entry;
+              const dropDownValue = this.getLangLabel(entry[this.objectProp]) || entry;
               return dropDownValue.toLowerCase().includes(val.toLowerCase());
             })
           : this.dropDownListOrig;
@@ -518,7 +528,7 @@ export default {
         // if there is an input and unknown entries are allowed add an entry to selected list
       } else if (this.input && this.allowUnknownEntries) {
         this.selectedListInt.push({
-          [this.objectProp]: this.input,
+          [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
           idInt: this.getInternalId(this.input + this.selectedListInt.length),
         });
         // reset input
@@ -581,13 +591,6 @@ export default {
       return this.$props.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
-      if (!this.insideDropDown) {
-        if (this.input && this.selectedMenuEntryIndex < 0 && this.allowUnknownEntries) {
-          this.selectedListInt.push({ [this.objectProp]: this.input });
-          this.emitSelectedList();
-        }
-        this.input = '';
-      }
       this.insideInput = false;
     },
     onInputFocus() {
@@ -610,8 +613,8 @@ export default {
     },
     sort() {
       this.selectedListInt.sort((a, b) => {
-        let compA = a[this.objectProp].toLowerCase();
-        let compB = b[this.objectProp].toLowerCase();
+        let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
+        let compB = this.getLangLabel(b[this.objectProp]).toLowerCase();
         if (this.sortName) {
           let firstA = '';
           let firstB = '';
@@ -786,6 +789,8 @@ export default {
       .base-chips-drop-down-entry-wrapper {
         padding: 0 $spacing;
         line-height: $row-height-small;
+        display: flex;
+        justify-content: space-between;
 
         &.base-chips-drop-down-entry-wrapper-active {
           background: $background-color;

@@ -13,12 +13,10 @@
     <BaseMediaPreview
       :show-preview="togglePreview"
       image-url="https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8"
-      @hide-preview="togglePreview = false"
-    />
+      @hide-preview="togglePreview = false" />
     <BaseButton
       text="Show Preview"
-      @clicked="togglePreview = !togglePreview"
-    />
+      @clicked="togglePreview = !togglePreview" />
 
     <!-- PAGINATION TEST -->
     <BasePagination :total="100" />

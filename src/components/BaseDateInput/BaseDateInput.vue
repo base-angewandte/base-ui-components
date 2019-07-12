@@ -524,7 +524,7 @@ export default {
   }
 
   .calendar-class .cell.selected, .calendar-class .cell.selected:hover {
-    background: $app-color;
+    background: $app-color !important;
   }
 
   .calendar-class {

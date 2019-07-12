@@ -1,24 +1,34 @@
 <template>
   <div class="base-drop-down">
-    <div :class="['base-drop-down-label-wrapper', { 'hide': !label || !showLabel }]">
+    <div
+      :class="['base-drop-down-label-wrapper',
+               { 'hide': !getLangLabel(label, true) || !showLabel }]">
       <label
-        :for="label"
+        :for="getLangLabel(label)"
         class="base-drop-down-label">
-        {{ label }}
+        {{ getLangLabel(label, true) }}
       </label>
     </div>
     <button
-      :id="label"
+      :id="getLangLabel(label)"
       ref="dropDownButton"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
-      :class="['base-drop-down-head', { 'base-drop-down-head': !leftDropDown }]"
+      :class="['base-drop-down-head']"
       aria-haspopup="listbox"
       type="button"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
-      <span class="base-drop-down-head-text">{{ selectedOptionInt }}</span>
+      <div
+        :class="['base-drop-down-head-text-wrapper',
+                 {'base-drop-down-head-text-fade-out': showFadeOut }]">
+        <span
+          ref="headText"
+          class="base-drop-down-head-text">
+          {{ selectedOptionInt }}
+        </span>
+      </div>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
         <SvgIcon
@@ -39,15 +49,15 @@
           <li
             v-for="(option, index) in options"
             ref="option"
-            :key="option.value"
+            :key="option[valueProp]"
             :class="[
               'base-drop-down-option',
-              { 'base-drop-down-option-selected': selectedOption.value
-                && option.value === selectedOption.value },
+              { 'base-drop-down-option-selected': selectedOption
+                && option[valueProp] === selectedOption[valueProp] },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
             @click="selectValue(option)">
-            {{ option.label }}
+            {{ getLangLabel(option.label, true) }}
           </li>
         </ul>
       </slot>
@@ -57,20 +67,24 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import { setLanguageMixin } from '../../mixins/setLanguage';
 
 export default {
   components: {
     SvgIcon,
   },
+  mixins: [
+    setLanguageMixin,
+  ],
   model: {
     prop: 'selectedOption',
     event: 'value-selected',
   },
-  /**
-   * specify options to choose from <br>
-   *   needs to be an array with label and value object
-   */
   props: {
+    /**
+     * specify options to choose from <br>
+     *   needs to be an array with label and value properties
+     */
     options: {
       type: Array,
       default() {
@@ -117,17 +131,31 @@ export default {
       type: String,
       default: 'inherit',
     },
+    /**
+     * set a language ()
+     */
+    language: {
+      type: String,
+      default: '',
+    },
+    /**
+     * set the name of the property that holds the value
+     */
+    valueProp: {
+      type: String,
+      default: 'value',
+    },
   },
   data() {
     return {
       showDropDown: false,
       keySelectedIndex: -1,
-      leftDropDown: false,
+      showFadeOut: false,
     };
   },
   computed: {
     selectedOptionInt() {
-      return this.selectedOption.label || this.placeholder || '';
+      return this.getLangLabel(this.selectedOption.label, true) || this.placeholder || '';
     },
   },
   watch: {
@@ -137,6 +165,14 @@ export default {
         this.keySelectedIndex = -1;
       }
     },
+  },
+  mounted() {
+    this.setOverflow();
+  },
+  updated() {
+    if (!this.showDropDown) {
+      this.setOverflow();
+    }
   },
   methods: {
     // event triggered by clicking on option or Enter after
@@ -177,6 +213,11 @@ export default {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
+    setOverflow() {
+      const headerWidth = this.$refs.dropDownButton ? this.$refs.dropDownButton.offsetWidth : 0;
+      const textWidth = this.$refs.headText ? this.$refs.headText.offsetWidth : 0;
+      this.showFadeOut = textWidth > headerWidth;
+    },
   },
 };
 </script>
@@ -210,13 +251,31 @@ export default {
       fill: $font-color-second;
       background-color: $background-color;
 
-      .base-drop-down-head-text {
+      .base-drop-down-head-text-wrapper {
+        overflow: hidden;
+        position: relative;
         margin-right: $spacing;
-        white-space: nowrap;
+
+        .base-drop-down-head-text {
+          white-space: nowrap;
+          text-align: left;
+        }
+
+        &.base-drop-down-head-text-fade-out::after {
+          content: '';
+          height: 100%;
+          width: 30px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
+        }
       }
+
       .base-drop-down-icon {
         transition: all 0.5s ease;
         height: $icon-small;
+        flex-shrink: 0;
 
         &.base-drop-down-icon-rotated {
           transform: rotate(180deg);
@@ -235,12 +294,11 @@ export default {
 
     .base-drop-down-body {
       position: absolute;
-      display: flex;
-      flex-direction: column;
       background-color: white;
       z-index: 3;
       box-shadow: $drop-shadow;
       max-height: 300px;
+      max-width: calc(100vw - 3 * #{$spacing});
       min-width: 100%;
       overflow-y: auto;
       overflow-x: hidden;
@@ -249,10 +307,10 @@ export default {
       .base-drop-down-body-list {
 
         .base-drop-down-option {
-          padding: 0 $spacing;
-          line-height: $row-height-small;
+          min-height: $row-height-small;
+          padding: $spacing-small/2 $spacing;
+          line-height: $line-height;
           width: 100%;
-          white-space: nowrap;
 
           &.base-drop-down-option-selected {
             color: $app-color;

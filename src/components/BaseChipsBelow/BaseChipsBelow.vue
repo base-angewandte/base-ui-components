@@ -63,6 +63,7 @@
                 :allow-dynamic-drop-down-entries="false"
                 :placeholder="rolesPlaceholder"
                 :always-linked="true"
+                :language="language"
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
@@ -77,6 +78,13 @@
         <slot
           :item="props.item"
           name="below-drop-down-entry" />
+      </template>
+      <template
+        slot="no-options"
+        slot-scope="props">
+        <slot
+          :item="props.item"
+          name="no-options"/>
       </template>
     </BaseChipsInput>
   </div>
@@ -257,6 +265,13 @@ export default {
     sortName: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
     },
   },
   data() {
