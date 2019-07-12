@@ -103,8 +103,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-switch-buttons {
     clear: both;
     display: inline-block;

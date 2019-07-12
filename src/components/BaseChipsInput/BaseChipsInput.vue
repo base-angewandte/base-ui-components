@@ -806,8 +806,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-chips-input {
     position: relative;
     width: 100%;

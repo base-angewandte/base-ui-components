@@ -136,8 +136,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-box-button {
     display: flex;
     cursor: pointer;

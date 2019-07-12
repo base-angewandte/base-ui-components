@@ -198,8 +198,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-input {
     display: flex;
     flex-direction: column;

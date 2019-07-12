@@ -115,8 +115,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-hover-box {
     box-shadow: $preview-box-shadow;
     position: absolute;

@@ -234,8 +234,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-image-box-content-wrapper {
     position: absolute;
     height: 100%;

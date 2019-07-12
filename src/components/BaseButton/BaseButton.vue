@@ -124,8 +124,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-button {
     padding: 0 $spacing;
     cursor: pointer;

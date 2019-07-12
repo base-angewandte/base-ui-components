@@ -141,8 +141,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../../styles/variables";
-
   .base-pagination {
     text-align: center;
     margin-top: $spacing;

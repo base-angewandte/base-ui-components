@@ -209,7 +209,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
   .base-menu-entry {
     display: flex;
     align-items: center;

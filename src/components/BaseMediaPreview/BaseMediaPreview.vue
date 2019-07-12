@@ -300,8 +300,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-media-preview-background{
     z-index: 10000000;
     position: fixed;

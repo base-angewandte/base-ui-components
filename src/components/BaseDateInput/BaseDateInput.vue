@@ -426,8 +426,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-input {
     display: flex;
     flex-direction: column;
@@ -478,40 +476,6 @@ export default {
     .base-input-field-container-multiple {
       max-width: calc(50% - 8px);
     }
-
-    &.base-input-field-show::after {
-      content: '';
-      height: $line-height;
-      width: 30px;
-      position: absolute;
-      bottom: 4px;
-      right: $spacing;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-    }
-
-    .base-input-field {
-      flex: 1 1 auto;
-      margin-right: $spacing;
-
-      &.base-date-input-field {
-        width: calc(100% - #{$icon-large} - (2 * #{$spacing}));
-        margin-right: 0;
-      }
-    }
-  }
-
-  input[type='text'].base-input-field {
-    border: none;
-    overflow: hidden;
-    max-width: 60%;
-  }
-
-  input[type='date'].base-input-field {
-    background: url('../../static/icons/magnifier-2.svg') right no-repeat;
-  }
-
-  input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
-    outline: none;
   }
 
   .base-date-input-datepicker {
@@ -534,87 +498,5 @@ export default {
   .separator {
     padding: 0 $spacing;
     line-height: $row-height-small;
-  }
-</style>
-
-<style module lang="scss">
-  @import "../../styles/variables";
-
-  .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
-    color: $app-color !important;
-    background-color: transparent !important;
-  }
-
-  input.base-input-datepicker-input:focus {
-    outline: none;
-  }
-
-  .base-date-input-datepicker-input {
-    border: none;
-    outline: none;
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-  }
-
-  .mx-calendar, .mx-datepicker {
-    font: inherit !important;
-    color: $font-color !important;
-    width: 100% !important;
-  }
-
-  .mx-panel-date td, .mx-panel-date th {
-    font-size: inherit !important;
-  }
-
-  /* dont need special color for today */
-  .mx-panel-date td.today {
-    color: $font-color !important;
-  }
-
-  .mx-calendar-content {
-    width: 250px !important;
-  }
-
-  .mx-calendar-content .cell.actived {
-    background-color: $app-color !important;
-    color: white !important;
-  }
-
-  /* icon placing */
-  .mx-input-append {
-    width: auto !important;
-    padding: 0 $spacing !important;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 1);
-
-    &::before {
-      content: '';
-      height: 100%;
-      width: $spacing;
-      position: absolute;
-      top: 0;
-      left: -$spacing;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
-    }
-  }
-
-  .mx-datepicker-popup {
-    border: none !important;
-    box-shadow: $preview-box-shadow !important;
-  }
-
-  .mx-time-list {
-    width: 50% !important;
-
-    &:last-of-type {
-      display: none !important;
-    }
-
-    .cell {
-      font-size: inherit !important;
-    }
   }
 </style>

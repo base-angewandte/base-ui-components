@@ -187,8 +187,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
-
   .base-drop-box {
     background-color: $background-color !important;
     display: flex;
@@ -229,18 +227,5 @@ export default {
 
   .base-drop-box-ghost {
     visibility: hidden !important;
-  }
-</style>
-
-<style module lang="scss">
-  @import "../../styles/variables";
-
-  .base-drop-box-drag-area {
-
-    .base-menu-entry {
-      position: absolute;
-      top: auto;
-      left: -99999px;
-    }
   }
 </style>
