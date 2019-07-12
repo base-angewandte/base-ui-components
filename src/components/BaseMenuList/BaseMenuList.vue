@@ -9,23 +9,24 @@
       :fallback-on-body="!dragAndDropCapable"
       @start="dragStart"
       @end="dragEnd">
-      <BaseMenuEntry
-        v-for="(item, index) in list"
-        v-if="item"
-        ref="menuEntry"
-        :key="item.id || item.title"
-        :entry-id="item.id"
-        :title="item.title"
-        :is-active="entryProps[index].active"
-        :is-selected="entryProps[index].selected"
-        :icon="getType(item.icon)"
-        :thumbnails="getThumbnails(item)"
-        :description="item.description"
-        :is-selectable="true"
-        :select-active="selectActive"
+      <template v-for="(item, index) in list">
+        <BaseMenuEntry
+          v-if="item"
+          ref="menuEntry"
+          :key="item.id || item.title"
+          :entry-id="item.id"
+          :title="item.title"
+          :is-active="entryProps[index].active"
+          :is-selected="entryProps[index].selected"
+          :icon="getType(item.icon)"
+          :thumbnails="getThumbnails(item)"
+          :description="item.description"
+          :is-selectable="true"
+          :select-active="selectActive"
 
-        @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)" />
+          @clicked="activateItem(index)"
+          @selected="selectItem(index, $event)" />
+      </template>
     </draggable>
   </div>
 </template>

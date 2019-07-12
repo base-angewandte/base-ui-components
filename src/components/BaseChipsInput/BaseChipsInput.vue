@@ -25,7 +25,9 @@
         <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
-          @click="sort(selectedListInt)">{{ sortText }}</div>
+          @click="sort(selectedListInt)">
+          {{ sortText }}
+        </div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
@@ -44,9 +46,9 @@
               type="transition">
               <BaseChip
                 v-for="(entry, index) in selectedListInt"
-                ref="baseChip"
-                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
                 :id="entry[identifier] || entry.idInt"
+                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
+                ref="baseChip"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :chip-editable="chipsEditable"
                 :hover-box-content="hoverboxContent"
@@ -56,7 +58,6 @@
                 @hoverbox-active="$emit('hoverbox-active', $event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
             </transition-group>
-
           </draggable>
         </div>
       </template>
@@ -71,7 +72,7 @@
           class="base-chips-input-single-dropdown">
           <SvgIcon
             :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-            name="drop-down"/>
+            name="drop-down" />
         </div>
       </template>
     </BaseInput>

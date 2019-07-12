@@ -2,7 +2,7 @@
   <div class="base-upload-bar">
     <div
       :class="['base-upload-bar-text', progressWidth > 80
-      ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
+        ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
       <span>{{ $props.filename }}</span>
       <span class="base-upload-bar-file-size">{{ $props.filesize }}</span>
     </div>

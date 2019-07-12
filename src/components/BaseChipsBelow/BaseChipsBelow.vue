@@ -2,8 +2,8 @@
   <div class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
-      v-bind="chipsInputProps"
       v-model="selectedBelowListInt"
+      v-bind="chipsInputProps"
       :chips-inline="false"
       :sortable="true"
       :is-loading="isLoading"
@@ -15,8 +15,8 @@
         slot="chips-area"
         slot-scope="props">
         <draggable
-          :animation="200"
           v-model="props.list"
+          :animation="200"
           group="people"
           handle=".base-chips-below-list-icon-wrapper"
           @end="updateList($event, props.list)">

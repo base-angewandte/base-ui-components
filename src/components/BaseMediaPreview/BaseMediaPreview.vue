@@ -45,7 +45,9 @@
         <div
           v-else
           class="base-media-preview-not-supported base-media-preview-error">
-          <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
+          <p class="base-media-preview-not-supported-file-name">
+            {{ fileName }}
+          </p>
           <div class="base-media-preview-not-supported-buttons">
             <BaseButton
               v-if="allowDownload"
@@ -54,8 +56,7 @@
               icon-position="right"
               icon-size="large"
               class="base-media-preview-not-supported-button"
-              @clicked="download"
-            />
+              @clicked="download" />
             <BaseButton
               v-if="!isMobile && fileEnding === 'pdf'"
               :text="infoTexts.view"
@@ -63,22 +64,22 @@
               icon-position="right"
               icon-size="large"
               class="base-media-preview-not-supported-button"
-              @clicked="openPdf()"
-            />
+              @clicked="openPdf()" />
           </div>
         </div>
         <div
           v-if="fileEnding !== 'pdf' && !formatNotSupported"
           class="base-media-preview-info">
-          <div class="base-media-preview-info-text">{{ fileName }}</div>
+          <div class="base-media-preview-info-text">
+            {{ fileName }}
+          </div>
           <BaseButton
             v-if="allowDownload"
             :text="infoTexts.download"
             icon="download"
             icon-position="right"
             icon-size="large"
-            @clicked="download"
-          />
+            @clicked="download" />
         </div>
       </div>
     </transition>
