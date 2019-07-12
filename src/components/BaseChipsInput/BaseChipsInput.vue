@@ -17,7 +17,7 @@
       @arrow-key="triggerArrowKey"
       @input-keydown="checkKeyEvent"
       @input-keypress="checkKeyEvent"
-      @enter="addSelected()"
+      @enter="onEnter()"
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
@@ -25,9 +25,7 @@
         <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
-          @click="sort">
-          {{ sortText }}
-        </div>
+          @click="sort(selectedListInt)">{{ sortText }}</div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
@@ -37,21 +35,29 @@
             v-model="selectedListInt"
             :disabled="!draggable"
             :set-data="setDragElement"
+            :force-fallback="true"
+            :animation="200"
+            @start="drag = true"
             @end="onDragEnd">
-            <BaseChip
-              v-for="(entry, index) in selectedListInt"
-              :id="entry[identifier] || entry.idInt"
-              ref="baseChip"
-              :key="entry[identifier] || entry.idInt"
-              :entry="getLangLabel(entry[objectProp], true)"
-              :chip-editable="chipsEditable"
-              :hover-box-content="hoverboxContent"
-              :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-              @mouse-down="chipActive = index"
-              @remove-entry="removeEntry(entry, index)"
-              @hoverbox-active="$emit('hoverbox-active', $event, entry)"
-              @value-changed="modifyChipValue($event, entry)" />
-          </Draggable>
+            <transition-group
+              :name="!drag ? 'flip-list' : null"
+              type="transition">
+              <BaseChip
+                v-for="(entry, index) in selectedListInt"
+                ref="baseChip"
+                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
+                :id="entry[identifier] || entry.idInt"
+                :entry="getLangLabel(entry[objectProp], true)"
+                :chip-editable="chipsEditable"
+                :hover-box-content="hoverboxContent"
+                :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+                @mouse-down="chipActive = index"
+                @remove-entry="removeEntry(entry, index)"
+                @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+                @value-changed="modifyChipValue($event, entry)" />
+            </transition-group>
+
+          </draggable>
         </div>
       </template>
       <template slot="input-field-addition-after">
@@ -59,6 +65,13 @@
           v-if="isLoading"
           class="base-chips-input-loader">
           <BaseLoader />
+        </div>
+        <div
+          v-if="!allowMultipleEntries"
+          class="base-chips-input-single-dropdown">
+          <SvgIcon
+            :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+            name="drop-down"/>
         </div>
       </template>
     </BaseInput>
@@ -136,6 +149,7 @@
 
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
+import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
@@ -147,6 +161,7 @@ export default {
     BaseInput,
     BaseChip,
     Draggable,
+    SvgIcon,
   },
   directives: {
     ClickOutside,
@@ -355,6 +370,7 @@ export default {
       chipActive: -1,
       timeout: null,
       fired: '',
+      drag: false,
     };
   },
   computed: {
@@ -418,6 +434,15 @@ export default {
          */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event text-input
+         * @type { string }
+         *
+         */
+        // still inform parent of the text input
+        this.$emit('text-input', val);
         const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
         // if content is static filter the existing entries for the ones matching input
         this.dropDownListInt = val
@@ -434,7 +459,9 @@ export default {
     // watch selectedList prop for changes triggered from outside
     selectedList: {
       handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+        const outsideSelected = val.map(sel => sel[this.objectProp]);
+        const insideSelected = this.selectedListInt.map(sel => sel[this.objectProp]);
+        if (JSON.stringify(outsideSelected) !== JSON.stringify(insideSelected)) {
           this.setSelectedList(val);
         }
       },
@@ -493,6 +520,14 @@ export default {
     }
   },
   methods: {
+    onEnter() {
+      if (this.input || this.dropDownListInt[this.selectedMenuEntryIndex]) {
+        this.addSelected();
+      } else {
+        this.blurInput();
+        this.showDropDown = false;
+      }
+    },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
       this.showDropDown = true;
@@ -510,10 +545,7 @@ export default {
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
-          const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
-          if (inputElems && inputElems.length) {
-            inputElems[0].blur();
-          }
+          this.blurInput();
         } else {
           this.insideDropDown = true;
         }
@@ -561,7 +593,7 @@ export default {
         if (item.idInt === 0 || item.idInt) {
           this.dropDownListInt.push(item);
           // sort all entries by id to restore the original order
-          this.sort();
+          this.sort(this.dropDownListInt);
         }
       }
       this.selectedListInt.splice(index, 1);
@@ -611,8 +643,8 @@ export default {
       }
       return this.getAllowUnknown();
     },
-    sort() {
-      this.selectedListInt.sort((a, b) => {
+    sort(list) {
+      list.sort((a, b) => {
         let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
         let compB = this.getLangLabel(b[this.objectProp]).toLowerCase();
         if (this.sortName) {
@@ -649,7 +681,9 @@ export default {
             this.returnAsObject = true;
             return Object.assign({}, entry, {
               idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier] : entry.idInt,
+                ? entry[this.identifier]
+                : entry.idInt
+                || this.getInternalId(entry[this.objectProp] + this.list.length + index),
               [this.objectProp]: entry[this.objectProp],
             });
           }
@@ -700,6 +734,7 @@ export default {
       dataTransfer.setDragImage(img, 0, 0);
     },
     onDragEnd() {
+      this.drag = false;
       const elem = document.getElementById('chip-inline-drag');
       if (elem) {
         elem.parentNode.removeChild(elem);
@@ -714,7 +749,10 @@ export default {
       if (event.key === 'Backspace') {
         if (!this.fired && !this.input) {
           const lastIndex = this.selectedListInt.length - 1;
-          this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+          // check if there is actually anything left to remove
+          if (lastIndex >= 0) {
+            this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+          }
         }
         // necessary to prevent accidential delete of chips when user keeps backspace pressed
         // TODO: in a later version chips should be tabbable anyway and maybe it could work
@@ -740,11 +778,26 @@ export default {
       }
     },
     modifyChipValue(event, entry) {
-      if (event === entry[this.objectProp]) {
+      if (!event) {
+        this.selectedListInt = this.selectedListInt
+          .filter(selected => selected.idInt !== entry.idInt);
+      } else if (event !== entry[this.objectProp]) {
+        if (this.language) {
+          this.$set(entry, this.objectProp, { [this.language]: event });
+        } else {
+          this.$set(entry, this.objectProp, event);
+        }
+        this.$set(entry, 'idInt', `${entry.idInt}_${Math.random()}_${this.selectedListInt.length}`);
         if (this.identifier) {
           this.$set(entry, this.identifier, '');
         }
-        this.emitSelectedList();
+      }
+      this.emitSelectedList();
+    },
+    blurInput() {
+      const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
+      if (inputElems && inputElems.length) {
+        inputElems[0].blur();
       }
     },
   },
@@ -765,6 +818,8 @@ export default {
 
     .base-chips-input-sort {
       cursor: pointer;
+      margin-left: $spacing;
+      white-space: nowrap;
 
       &:hover {
         color: $app-color;
@@ -811,6 +866,10 @@ export default {
       display: flex;
       flex-direction: column;
       margin-bottom: $spacing;
+    }
+
+    .base-chips-input-single-dropdown {
+      margin: 0 $spacing;
     }
   }
 </style>

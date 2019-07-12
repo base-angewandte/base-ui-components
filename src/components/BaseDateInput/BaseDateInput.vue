@@ -26,101 +26,113 @@
 
     <div class="input-field-wrapper">
       <div
-        v-click-outside="() => selected('from')"
+        v-click-outside="() => activeFrom = false"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeFrom },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
-        <input
+        <!-- TIME FROM -->
+        <DatePicker
           v-if="type === 'timerange'"
           id="timeFrom"
+          ref="timepickerFrom"
           v-model="inputInt.time_from"
-          :title="label + '-time'"
-          :placeholder="placeholder + ' Time'"
-          class="base-input-field base-date-input-field"
-          type="text"
-          autocomplete="off"
-          @focus="$emit('input-focus')"
-          @keypress.enter="$emit('enter', inputInt)"
-          @keyup.up.down.prevent="$emit('arrow-key', $event)"
-          @input="$emit('autocomplete', inputInt)"
-          @blur="blurInput()"
-          @click="activeFrom = true">
-        <datepicker
+          :placeholder="placeholder.time"
+          :lang="language"
+          :clearable="false"
+          type="time"
+          format="HH:mm"
+          value-type="format"
+          input-class="base-date-input-datepicker-input"
+          class="base-date-input-datepicker"
+          @focus="activeFrom = true"
+          @blur="blurInput()">
+          <template slot="calendar-icon">
+            <svg-icon
+              name="clock"
+              class="base-input-date-icon"
+              @click="openDatePicker('timepickerFrom')" />
+          </template>
+        </DatePicker>
+
+        <!-- DATE FROM -->
+        <DatePicker
           v-else
-          id="dateFrom"
-          key="dateFrom"
           ref="datepickerFrom"
           v-model="dateFrom"
-          :monday-first="true"
-          :input-class="'base-input-datepicker-input'"
+          :type="minDateView"
           :format="dateFormat"
-          :placeholder="placeholder"
-          :minimum-view="minDateView"
-          calendar-class="calendar-class"
-          class="base-input-datepicker"
-          @opened="activeFrom = true"
-          @closed="selected('from')"
-          @click="openDatePicker('from')" />
-        <svg-icon
-          v-if="type === 'timerange'"
-          name="clock"
-          class="base-input-date-icon" />
-        <svg-icon
-          v-else
-          name="calendar-many"
-          class="base-input-date-icon"
-          @click="openDatePicker('from')" />
+          :clearable="false"
+          :value-type="dateType"
+          :lang="language"
+          :placeholder="placeholder.date || placeholder"
+          input-class="base-date-input-datepicker-input"
+          class="base-date-input-datepicker"
+          @focus="activeFrom = true"
+          @blur="blurInput()">
+          <template slot="calendar-icon">
+            <svg-icon
+              name="calendar-many"
+              class="base-input-date-icon"
+              @click="openDatePicker('datepickerFrom')" />
+          </template>
+        </DatePicker>
       </div>
       <span
         v-if="type === 'daterange' || type === 'timerange'"
-        class="separator">bis</span>
+        class="separator">{{ rangeSeparator }}</span>
       <div
         v-if="type !== 'single'"
-        v-click-outside="() => selected('to')"
+        v-click-outside="() => activeTo = false"
         :class="['base-input-field-container',
                  { 'base-input-field-container-active': activeTo },
                  { 'base-input-field-container-multiple': type === 'datetime' }]">
-        <input
+        <!-- TIME TO -->
+        <DatePicker
           v-if="type === 'datetime' || type === 'timerange'"
           id="timeTo"
+          ref="timepickerTo"
           v-model="timeTo"
-          :title="label + '-time'"
-          :placeholder="placeholder + ' Time'"
-          class="base-input-field base-date-input-field"
-          type="text"
-          autocomplete="off"
-          @focus="$emit('input-focus')"
-          @keypress.enter="$emit('enter', inputInt)"
-          @keyup.up.down.prevent="$emit('arrow-key', $event)"
-          @input="$emit('autocomplete', inputInt)"
-          @blur="blurInput()"
-          @click="activeTo = true">
-        <datepicker
+          :placeholder="placeholder.time"
+          :lang="language"
+          :clearable="false"
+          type="time"
+          format="HH:mm"
+          value-type="format"
+          input-class="base-date-input-datepicker-input"
+          @focus="activeTo = true"
+          @blur="blurInput()">
+          <template slot="calendar-icon">
+            <svg-icon
+              name="clock"
+              class="base-input-date-icon"
+              @click="openDatePicker('timepickerTo')" />
+          </template>
+        </DatePicker>
+
+        <!-- DATE TO -->
+        <DatePicker
           v-else
           id="dateTo"
           key="dateTo"
           ref="datepickerTo"
           v-model="inputInt.date_to"
-          :monday-first="true"
-          :input-class="'base-input-datepicker-input'"
+          :type="minDateView"
           :format="dateFormat"
-          :minimum-view="minDateView"
-          :placeholder="placeholder"
-          calendar-class="calendar-class"
-          class="base-input-datepicker"
-          @opened="activeTo = true"
-          @closed="selected('to')" />
-
-        <svg-icon
-          v-if="type === 'datetime' || type === 'timerange'"
-          name="clock"
-          class="base-input-date-icon" />
-
-        <svg-icon
-          v-else
-          name="calendar-many"
-          class="base-input-date-icon"
-          @click="openDatePicker('to')" />
+          :clearable="false"
+          :value-type="dateType"
+          :lang="language"
+          :placeholder="placeholder.date || placeholder"
+          input-class="base-date-input-datepicker-input"
+          class="base-date-input-datepicker"
+          @focus="activeTo = true"
+          @blur="blurInput()">
+          <template slot="calendar-icon">
+            <svg-icon
+              name="calendar-many"
+              class="base-input-date-icon"
+              @click="openDatePicker('datepickerTo')" />
+          </template>
+        </DatePicker>
       </div>
     </div>
   </div>
@@ -135,16 +147,16 @@
  * Time field is currently just a text input field
  */
 import ClickOutside from 'vue-click-outside';
-import Datepicker from 'vuejs-datepicker';
 import SvgIcon from 'vue-svgicon';
+import DatePicker from 'vue2-datepicker';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
 export default {
   name: 'BaseDateInput',
   components: {
-    Datepicker,
     SvgIcon,
     BaseSwitchButton,
+    DatePicker,
   },
   directives: {
     ClickOutside,
@@ -189,11 +201,20 @@ export default {
       default: true,
     },
     /**
-     * set a placeholder for the input field
+     * set a placeholder for the input field (object with date and time attribute respectively)
      */
     placeholder: {
+      type: [Object, String],
+      default() {
+        return { date: 'Select Date', time: 'Select Time' };
+      },
+    },
+    /**
+     * define the range separator
+     */
+    rangeSeparator: {
       type: String,
-      default: 'Enter Text Here',
+      default: '–',
     },
     /**
      * specify date format<br>
@@ -226,23 +247,43 @@ export default {
       type: String,
       default: 'Switch between date formats',
     },
+    /**
+     * set calendar language
+     */
+    language: {
+      type: String,
+      default: 'en',
+    },
   },
   data() {
     return {
       inputInt: {
-        date: null,
-        date_from: null,
-        date_to: null,
-        time: null,
-        time_from: null,
-        time_to: null,
+        date: '',
+        date_from: '',
+        date_to: '',
+        time: '',
+        time_from: '',
+        time_to: '',
       },
       // variable for toggling format
       dateFormatInt: 'DD.MM.YYY',
-      // attempt to control 'active' status of input field
-      // TODO: not working correctly at the moment (especially for datepicker)
       activeFrom: false,
       activeTo: false,
+      dateType: {
+        value2date: (value) => {
+          if (value) {
+            return new Date(value);
+          }
+          return '';
+        },
+        date2value: (date) => {
+          if (!date) return '';
+          if (this.minDateView === 'year') {
+            return date.getFullYear().toString();
+          }
+          return date.toString();
+        },
+      },
     };
   },
   computed: {
@@ -250,12 +291,12 @@ export default {
     // was specified in format and what date toggle tabs (via dateFormatInt) might say
     dateFormat() {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
-        return 'yyyy';
+        return 'YYYY';
       }
       if (this.format === 'month') {
-        return 'MM.yyyy';
+        return 'MM.YYYY';
       }
-      return 'dd.MM.yyyy';
+      return 'DD.MM.YYYY';
     },
     // if the format is settable this.format is date_year and can not be
     // used directly for the date picker component
@@ -313,6 +354,14 @@ export default {
     dateFormatInt() {
       this.emitData();
     },
+    inputInt: {
+      handler() {
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          this.emitData();
+        }
+      },
+      deep: true,
+    },
   },
   created() {
     this.inputInt = this.isSingleDate ? { date: this.input }
@@ -324,52 +373,27 @@ export default {
     blurInput() {
       this.activeFrom = false;
       this.activeTo = false;
-      this.emitData();
     },
-    selected(field) {
-      if (this.$refs.datepickerFrom && this.$refs.datepickerTo) {
-        if (field === 'from') {
-          this.activeFrom = false;
-          this.$refs.datepickerFrom.close();
-        } else if (field === 'to') {
-          this.activeTo = false;
-          this.$refs.datepickerTo.close();
-        } else {
-          this.activeFrom = false;
-          this.activeTo = false;
-          this.$refs.datepickerFrom.close();
-          this.$refs.datepickerTo.close();
-        }
-      }
-      this.emitData();
-    },
-    openDatePicker(type) {
-      if (type === 'from') {
+    openDatePicker(ref) {
+      if (ref.toLowerCase().includes('from')) {
         this.activeFrom = true;
-        this.$refs.datepickerFrom.showCalendar();
-      } else if (type === 'to') {
+      } else {
         this.activeTo = true;
-        this.$refs.datepickerTo.showCalendar();
       }
     },
     emitData() {
       this.convertDate();
-      if (this.isSingleDate) {
-        this.$emit('selected', this.inputInt.date);
-      } else {
-        const data = {};
-        this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
-        /**
-         * emit an event when focus leaves the input
-         *
-         * TODO: check again if this is needed???
-         *
-         * @event selected
-         * @event selected
-         * @type string|object
-         */
-        this.$emit('selected', data);
-      }
+      const data = this.getInputData();
+      /**
+       * emit an event when focus leaves the input
+       *
+       * TODO: check again if this is needed???
+       *
+       * @event selected
+       * @event selected
+       * @type string|object
+       */
+      this.$emit('selected', data);
     },
     isDateFormatYear() {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
@@ -388,6 +412,14 @@ export default {
             }
           }
         });
+    },
+    getInputData() {
+      if (this.isSingleDate) {
+        return this.inputInt.date;
+      }
+      const data = {};
+      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
+      return data;
     },
   },
 };
@@ -482,16 +514,17 @@ export default {
     outline: none;
   }
 
-  .base-input-datepicker {
+  .base-date-input-datepicker {
     flex-grow: 1;
-    width: 16px;
+    width: auto;
+    font-family: inherit;
+    font-size: inherit;
   }
 
   .base-input-date-icon {
     width: 24px;
     max-height: 24px;
     color: $font-color-second;
-    margin: 0 $spacing;
   }
 
   .input-field-wrapper {
@@ -507,29 +540,81 @@ export default {
 <style module lang="scss">
   @import "../../styles/variables";
 
-  input.base-input-datepicker-input {
-    border: none;
-    outline: none;
-    width: 100%;
+  .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
+    color: $app-color !important;
+    background-color: transparent !important;
   }
 
   input.base-input-datepicker-input:focus {
     outline: none;
   }
 
-  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
-  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
-  .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-    border-color: $app-color !important;
+  .base-date-input-datepicker-input {
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
   }
 
-  .calendar-class .cell.selected, .calendar-class .cell.selected:hover {
-    background: $app-color !important;
+  .mx-calendar, .mx-datepicker {
+    font: inherit !important;
+    color: $font-color !important;
+    width: 100% !important;
   }
 
-  .calendar-class {
-    left: -9px;
-    top: 2em;
+  .mx-panel-date td, .mx-panel-date th {
+    font-size: inherit !important;
   }
 
+  /* dont need special color for today */
+  .mx-panel-date td.today {
+    color: $font-color !important;
+  }
+
+  .mx-calendar-content {
+    width: 250px !important;
+  }
+
+  .mx-calendar-content .cell.actived {
+    background-color: $app-color !important;
+    color: white !important;
+  }
+
+  /* icon placing */
+  .mx-input-append {
+    width: auto !important;
+    padding: 0 $spacing !important;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 1);
+
+    &::before {
+      content: '';
+      height: 100%;
+      width: $spacing;
+      position: absolute;
+      top: 0;
+      left: -$spacing;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
+    }
+  }
+
+  .mx-datepicker-popup {
+    border: none !important;
+    box-shadow: $preview-box-shadow !important;
+  }
+
+  .mx-time-list {
+    width: 50% !important;
+
+    &:last-of-type {
+      display: none !important;
+    }
+
+    .cell {
+      font-size: inherit !important;
+    }
+  }
 </style>

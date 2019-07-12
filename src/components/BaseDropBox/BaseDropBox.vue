@@ -4,10 +4,36 @@
     :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
     class="base-drop-box"
+    @dragenter="dragEnter"
     @clicked="$emit('clicked')">
     <div
       class="base-drop-box-inner">
-      <form ref="fileform" />
+      <draggable
+        v-if="dropType === 'elements'"
+        v-model="dragList"
+        :sort="false"
+        :group="dropElementName"
+        ghost-class="base-drop-box-ghost"
+        class="base-drop-box-drag-area"
+        @add="addEntry">
+        <div
+          class="base-drop-box-drag-area"
+          @dragenter="dragEnter"
+          @dragleave="dragLeave"
+          @mouseleave="dragLeave"
+          @pointerenter="dragEnter"
+          @pointerleave="dragLeave">
+          <div
+            v-for="item in dragList"
+            :key="item.id"
+            class="base-drop-box-cloned-items">
+            {{ item }}
+          </div>
+        </div>
+      </draggable>
+      <form
+        v-else
+        ref="fileform" />
     </div>
   </base-box-button>
 </template>
@@ -17,11 +43,13 @@
  * An Element for dropping files or other UI Elements into
   */
 
+import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 
 export default {
   components: {
     BaseBoxButton,
+    Draggable,
   },
   props: {
     /**
@@ -69,16 +97,35 @@ export default {
       type: String,
       default: '100',
     },
+    /**
+     * specify the type of drops <br>
+     *     valid options: 'files'|'elements'
+     */
+    dropType: {
+      type: String,
+      default: 'files',
+      validate(val) {
+        return ['files', 'elements'].includes(val);
+      },
+    },
+    /**
+     * if the dropType is 'element', specify the element group name
+     */
+    dropElementName: {
+      type: String,
+      default: 'menuEntry',
+    },
   },
   data() {
     return {
       dragAndDropCapable: false,
       isDragOver: false,
+      dragList: [],
     };
   },
   mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable) {
+    if (this.dragAndDropCapable && this.dropType === 'files') {
       ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(((evt) => {
         this.$refs.fileform.addEventListener(evt, ((e) => {
           e.preventDefault();
@@ -90,10 +137,10 @@ export default {
         /**
          * event emitted when a file or an element is dropped on the box, emitting the type of event
          *
-         * @event dropped
-         * @type {object}
+         * @event dropped-file
+         * @type { DragEvent }
          */
-        this.$emit('dropped', e);
+        this.$emit('dropped-file', e);
       });
       ['dragenter', 'dragleave'].forEach(((evt) => {
         this.$refs.fileform.addEventListener(evt, (() => {
@@ -107,6 +154,26 @@ export default {
       const div = document.createElement('div');
       return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div))
       && 'FormData' in window && 'FileReader' in window;
+    },
+    /**
+     * method to get the dropped element id and emit it to parent
+     */
+    addEntry() {
+      const draggedElementId = this.dragList[0].id;
+      this.dragList = [];
+      /**
+       * event emitted when an element is dropped on the box, emitting the element data id
+       *
+       * @event dropped-element
+       * @type String
+       */
+      this.$emit('dropped-element', draggedElementId);
+    },
+    dragEnter() {
+      this.isDragOver = true;
+    },
+    dragLeave() {
+      this.isDragOver = false;
     },
   },
 };
@@ -140,6 +207,10 @@ export default {
         border: $upload-border-hover;
       }
 
+      .base-drop-box-drag-area {
+        height: 100%;
+      }
+
       form{
         text-align: center;
         height: 100%;
@@ -153,6 +224,23 @@ export default {
 
     .base-drop-box-inner {
       border: $upload-border-hover;
+    }
+  }
+
+  .base-drop-box-ghost {
+    visibility: hidden !important;
+  }
+</style>
+
+<style module lang="scss">
+  @import "../../styles/variables";
+
+  .base-drop-box-drag-area {
+
+    .base-menu-entry {
+      position: absolute;
+      top: auto;
+      left: -99999px;
     }
   }
 </style>

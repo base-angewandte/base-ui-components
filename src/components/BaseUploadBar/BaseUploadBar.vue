@@ -1,7 +1,10 @@
 <template>
   <div class="base-upload-bar">
-    <div class="base-upload-bar-text">
-      {{ $props.filename }}
+    <div
+      :class="['base-upload-bar-text', progressWidth > 80
+      ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
+      <span>{{ $props.filename }}</span>
+      <span class="base-upload-bar-file-size">{{ $props.filesize }}</span>
     </div>
     <div
       :style="{ 'width': progressWidth + '%'}"
@@ -14,6 +17,11 @@
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
       name="attention" />
+    <SvgIcon
+      v-if="showRemove"
+      class="base-upload-bar-status-icon base-upload-bar-status-icon-remove"
+      name="remove"
+      @click="$emit('remove-item')" />
   </div>
 </template>
 
@@ -36,6 +44,13 @@ export default {
       required: true,
     },
     /**
+     * filesize that will be displayed in the bar
+     */
+    filesize: {
+      type: String,
+      default: '',
+    },
+    /**
      * progress of the upload (percentage ratio)
      */
     progress: {
@@ -52,6 +67,13 @@ export default {
       validator(val) {
         return ['success', 'fail', ''].includes(val);
       },
+    },
+    /**
+     * show an remove icon
+     */
+    showRemove: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -81,11 +103,34 @@ export default {
     line-height: $row-height-small;
 
     .base-upload-bar-text {
-      width: calc(100% - 2*#{$spacing-small});
+      width: calc(100% - 2*#{$spacing-small} - #{$icon-large} - #{$spacing});
       margin: 0 $spacing-small;
       position: absolute;
       overflow: hidden;
+      white-space: nowrap;
       z-index: 2;
+      display: flex;
+      justify-content: space-between;
+
+      .base-upload-bar-file-size {
+        margin: 0 20px 0 $spacing;
+      }
+
+      &:after {
+        content: '';
+        height: 100%;
+        width: 30px;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+      &.base-upload-bar-text-incomplete:after {
+        background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
+      }
+      &.base-upload-bar-text-complete:after {
+        background: linear-gradient(to right, rgba(153, 153, 153, 0) , rgba(153, 153, 153, 1));
+      }
+
     }
 
     .base-upload-bar-progress {
@@ -111,7 +156,12 @@ export default {
       }
 
       &.base-upload-bar-status-icon-fail {
-        fill: red;
+        fill: #ff4444;
+      }
+
+      &.base-upload-bar-status-icon-remove {
+        cursor: pointer;
+        fill: $font-color-third;
       }
     }
   }

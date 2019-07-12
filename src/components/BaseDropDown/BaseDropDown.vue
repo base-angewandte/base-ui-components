@@ -272,16 +272,6 @@ export default {
         }
       }
 
-      .base-drop-down-icon {
-        transition: all 0.5s ease;
-        height: $icon-small;
-        flex-shrink: 0;
-
-        &.base-drop-down-icon-rotated {
-          transform: rotate(180deg);
-        }
-      }
-
       &:hover {
         color: $app-color;
         fill: $app-color;

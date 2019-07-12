@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.0.15",
+  "version": "0.0.38",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve --port 9001",
@@ -12,20 +12,21 @@
     "build:wc": "vue-cli-service build --target wc-async --dest dist/lib-wc --name base-ui-components 'src/components/*/*.vue'",
     "lint": "vue-cli-service lint",
     "styleguide": "vue-cli-service styleguidist",
-    "styleguide:build": "vue-cli-service styleguidist:build"
+    "styleguide:build": "vue-cli-service styleguidist:build",
+    "postversion": "git push && git push --tags && git checkout master && git merge develop && git push && git push --tags && npm publish"
   },
   "dependencies": {
     "autoprefixer": "^9.5.1",
-    "axios": "^0.19.0",
+    "body-scroll-lock": "^2.6.1",
     "core-js": "^2.6.5",
     "hls.js": "^0.12.4",
     "normalize.css": "^8.0.1",
     "vue": "^2.5.21",
     "vue-click-outside": "^1.0.7",
+    "vue2-datepicker": "^2.12.0",
     "vue-svg-loader": "^0.12.0",
     "vue-svgicon": "^3.2.2",
-    "vuedraggable": "^2.17.0",
-    "vuejs-datepicker": "^1.5.4"
+    "vuedraggable": "^2.17.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.3.0",

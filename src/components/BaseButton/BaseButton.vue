@@ -138,7 +138,6 @@ export default {
     }
 
     .base-button-icon {
-      margin-right: $spacing;
       height: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;

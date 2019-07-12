@@ -12,7 +12,8 @@
     </video> -->
     <BaseMediaPreview
       :show-preview="togglePreview"
-      image-url="https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8"
+      :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"
+      :download-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.pdf'"
       @hide-preview="togglePreview = false" />
     <BaseButton
       text="Show Preview"
@@ -111,6 +112,7 @@
     <div class="form-field">
       <base-date-input
         :type="'datetime'"
+        v-model="inputDateTime"
         :label="'unknown'" />
       <base-date-input
         :label="'unknown'"
@@ -217,10 +219,11 @@
       <base-drop-box
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
+        drop-type="elements"
         icon="camera"
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
-        @dropped="dropped($event)"
+        @dropped-element="dropped($event)"
         @clicked="boxClicked" />
       <base-drop-box />
     </div>
@@ -315,7 +318,6 @@ import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 
-
 export default {
   name: 'App',
   components: {
@@ -384,7 +386,14 @@ export default {
       selectable: false,
       progress: 0,
       autocompleteInput: 'testtttttttttttt',
-      inputDate: '2019',
+      inputDate: {
+        date_from: '2019',
+        date_to: '',
+      },
+      inputDateTime: {
+        date: '12.12.2019',
+        time: '',
+      },
       multilineInputObj: {
         English: 'testeng',
         German: 'testger',
@@ -425,6 +434,7 @@ export default {
       ],
       hoverboxContent: {},
       togglePreview: false,
+      value12: '',
     };
   },
   computed: {
@@ -495,11 +505,12 @@ export default {
       }
     },
     dropped(e) {
-      for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
-        this.files.push(e.dataTransfer.files[i]);
-      }
-      if (e.dataTransfer.items) {
-        const id = e.dataTransfer.getData('text');
+      if (e.dataTransfer && e.dataTransfer.files.length) {
+        for (let i = 0; i < e.dataTransfer.files.length; i += 1) {
+          this.files.push(e.dataTransfer.files[i]);
+        }
+      } else {
+        const id = e;
         if (!this.elements.find(item => item.id === id)) {
           this.elements.push(this.list.find(item => item.id === id));
         }

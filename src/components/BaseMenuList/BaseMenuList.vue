@@ -1,22 +1,32 @@
 <template>
   <div class="base-menu-list">
-    <BaseMenuEntry
-      v-for="(item, index) in filteredList"
-      ref="menuEntry"
-      :key="item.id || item.title"
-      :entry-id="item.id"
-      :title="item.title"
-      :is-active="entryProps[index].active"
-      :is-selected="entryProps[index].selected"
-      :icon="getType(item.icon)"
-      :thumbnails="getThumbnails(item)"
-      :description="item.description"
-      :is-selectable="true"
-      :is-draggable="true"
-      :select-active="selectActive"
+    <draggable
+      v-model="list"
+      :sort="false"
+      :group="{ name: dragName, pull: 'clone', put: false }"
+      :set-data="modifyDragItem"
+      :force-fallback="!dragAndDropCapable"
+      :fallback-on-body="!dragAndDropCapable"
+      @start="dragStart"
+      @end="dragEnd">
+      <BaseMenuEntry
+        v-for="(item, index) in list"
+        v-if="item"
+        ref="menuEntry"
+        :key="item.id || item.title"
+        :entry-id="item.id"
+        :title="item.title"
+        :is-active="entryProps[index].active"
+        :is-selected="entryProps[index].selected"
+        :icon="getType(item.icon)"
+        :thumbnails="getThumbnails(item)"
+        :description="item.description"
+        :is-selectable="true"
+        :select-active="selectActive"
 
-      @clicked="activateItem(index)"
-      @selected="selectItem(index, $event)" />
+        @clicked="activateItem(index)"
+        @selected="selectItem(index, $event)" />
+    </draggable>
   </div>
 </template>
 
@@ -25,11 +35,13 @@
  * Base Component for SideBar Menu Entries
   */
 
+import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 export default {
   components: {
     BaseMenuEntry,
+    Draggable,
   },
   props: {
     /**
@@ -60,20 +72,37 @@ export default {
       type: Number,
       default: -1,
     },
+    /**
+     * provide a list of entries that should appear selected
+     */
+    selectedList: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
+    /**
+     * specify the group name for the drag receiver
+     */
+    dragName: {
+      type: String,
+      default: 'menuEntry',
+    },
   },
   data() {
     return {
       // have internally necessary props in separate array to prevent issues with
       // outside store mutations
       entryProps: [],
+      dragging: false,
     };
   },
   computed: {
     selectActive() {
       return this.selected;
     },
-    filteredList() {
-      return this.list.filter(Boolean);
+    dragAndDropCapable() {
+      return ('DragEvent' in window);
     },
   },
   watch: {
@@ -94,6 +123,12 @@ export default {
   },
   created() {
     this.setInternalVar();
+    document.body.addEventListener('touchmove', (e) => {
+      if (this.dragging) {
+        e.preventDefault();
+      }
+      return false;
+    }, { passive: false });
   },
   methods: {
     // determines which icon should be shown for each menu entry
@@ -147,13 +182,42 @@ export default {
     },
     setInternalVar() {
       this.entryProps = this.list.map(entry => Object.assign({}, {
-        selected: entry.selected || false,
+        selected: entry.selected || this.selectedList.includes(entry.id),
         active: entry.active || false,
         error: entry.error || false,
       }));
       if (this.entryProps.length && this.activeEntry >= 0) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
+    },
+    dragStart() {
+      this.dragging = true;
+    },
+    dragEnd() {
+      this.dragging = false;
+    },
+    modifyDragItem(dataTransfer, dragEl) {
+      const entryIcon = dragEl.getElementsByTagName('svg')[0];
+      const size = `${(entryIcon.clientHeight * 2)}px`;
+      // remove previous drag items from the body again if necessary
+      const elem = document.getElementById('drag-icon');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
+      }
+      // clone the svg used in this entry
+      const pic = entryIcon.cloneNode(true);
+      pic.id = 'drag-icon';
+      pic.style.height = size;
+      pic.style.maxHeight = size;
+      pic.style.width = size;
+      pic.style.backgroundColor = 'white';
+      pic.style.position = 'absolute';
+      pic.style.top = '-99999px';
+      pic.style.left = '-99999px';
+
+      // add the element to the dom
+      document.body.appendChild(pic);
+      dataTransfer.setDragImage(pic, 0, 0);
     },
   },
 };
@@ -163,5 +227,4 @@ export default {
   .base-menu-list {
     position: relative;
   }
-
 </style>

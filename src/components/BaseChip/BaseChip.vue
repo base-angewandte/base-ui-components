@@ -11,9 +11,9 @@
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
-      @keyup="entryEdited = true">
-      {{ entryInt }}
-    </div>
+      @keydown.enter.prevent="entryEditable = false"
+      @keyup="entryEdited = true"
+      v-html="content()" />
     <div
       class="base-chip-icon"
       @click="$emit('remove-entry', entryInt)">
@@ -104,8 +104,8 @@ export default {
     },
   },
   watch: {
-    entry() {
-      this.entryInt = this.entry;
+    entry(val) {
+      this.entryInt = val;
     },
     isLinked(val) {
       if (!this.entryEdited) {
@@ -118,9 +118,16 @@ export default {
     this.entryEdited = !this.isLinked;
   },
   methods: {
+    content() {
+      // escape '>' and '>' chars that lead to problem with v-html
+      const text = this.entryInt
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<span>${text}</span>`;
+    },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
-        this.entryInt = evt.target.innerText;
+        this.entryInt = evt.target.innerText.replace('\n', '');
 
         /**
          * event emitted when the chip content was edited
@@ -173,7 +180,6 @@ export default {
     flex: 0 0 auto;
     background-color: $background-color;
     line-height: $line-height;
-    max-width: calc(100% - #{$spacing-small});
     display: inline-flex;
     align-items: center;
     cursor: default;
@@ -183,11 +189,10 @@ export default {
     }
 
     .base-chip-text {
-      margin-right: $spacing-small;
       border: none;
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
-      word-break: break-all;
+      word-break: break-word;
 
       &:active, &:focus {
         outline: none;
@@ -196,7 +201,7 @@ export default {
     }
 
     .base-chip-icon {
-      margin: 0 $spacing-small;
+      margin: 0 $spacing-small 0 $spacing;
       cursor: pointer;
       display: flex;
 

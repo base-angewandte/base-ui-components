@@ -47,6 +47,8 @@ fieldset {
 input[type=text], input[type=date], textarea {
   font-family: inherit;
   font-size: inherit;
+  background-color: transparent;
+  border-radius: 0;
 }
 
 input[type=text]:focus, input[type=date]:focus, textarea:focus, video:focus,
@@ -56,6 +58,10 @@ audio:focus {
 
 input::placeholder, textarea::placeholder {
   color: $font-color-third;
+}
+
+textarea {
+  box-shadow: none
 }
 
 /* recommended css code for vue-svgicon */
@@ -89,22 +95,104 @@ input::placeholder, textarea::placeholder {
   transform: rotate(-90deg);
 }
 
-input.base-input-datepicker-input {
-  border: none;
-  outline: none;
-  width: 100%;
+.base-drop-down-icon {
+  transition: all 0.5s ease;
+  height: $icon-small;
+  flex-shrink: 0;
+
+  &.base-drop-down-icon-rotated {
+    transform: rotate(180deg);
+  }
+}
+
+// base-drop-box-area menu entry styling
+// TODO: this is not very general (--> every element other
+// than menu entry would be visible...) --> try to generalize at some point
+.base-drop-box-drag-area {
+
+  .base-menu-entry {
+    position: absolute;
+    top: auto;
+    left: -99999px;
+  }
+}
+
+// date picker stylings
+
+.mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
+  color: $app-color !important;
+  background-color: transparent !important;
 }
 
 input.base-input-datepicker-input:focus {
   outline: none;
 }
 
-.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
-.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
-.vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-  border-color: $app-color;
+.base-date-input-datepicker-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
 }
 
-.calendar-class .cell.selected, .calendar-class .cell.selected:hover {
-  background: $app-color;
+.mx-calendar, .mx-datepicker {
+  font: inherit !important;
+  color: $font-color !important;
+  width: 100% !important;
+}
+
+.mx-panel-date td, .mx-panel-date th {
+  font-size: inherit !important;
+}
+
+/* dont need special color for today */
+.mx-panel-date td.today {
+  color: $font-color !important;
+}
+
+.mx-calendar-content {
+  width: 250px !important;
+}
+
+.mx-calendar-content .cell.actived {
+  background-color: $app-color !important;
+  color: white !important;
+}
+
+/* icon placing */
+.mx-input-append {
+  width: auto !important;
+  padding: 0 $spacing !important;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 1);
+
+  &::before {
+    content: '';
+    height: 100%;
+    width: $spacing;
+    position: absolute;
+    top: 0;
+    left: -$spacing;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
+  }
+}
+
+.mx-datepicker-popup {
+  border: none !important;
+  box-shadow: $preview-box-shadow !important;
+}
+
+.mx-time-list {
+  width: 50% !important;
+
+  &:last-of-type {
+    display: none !important;
+  }
+
+  .cell {
+    font-size: inherit !important;
+  }
 }

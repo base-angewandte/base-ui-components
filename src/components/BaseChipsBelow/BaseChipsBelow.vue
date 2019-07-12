@@ -2,8 +2,8 @@
   <div class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
+      v-bind="chipsInputProps"
       v-model="selectedBelowListInt"
-      v-bind="$props"
       :chips-inline="false"
       :sortable="true"
       :is-loading="isLoading"
@@ -15,6 +15,7 @@
         slot="chips-area"
         slot-scope="props">
         <draggable
+          :animation="200"
           v-model="props.list"
           group="people"
           handle=".base-chips-below-list-icon-wrapper"
@@ -84,7 +85,7 @@
         slot-scope="props">
         <slot
           :item="props.item"
-          name="no-options"/>
+          name="no-options" />
       </template>
     </BaseChipsInput>
   </div>
@@ -281,6 +282,15 @@ export default {
       chipActive: -1,
     };
   },
+  computed: {
+    // need to filter language from $props for chips input component since only needed for roles!
+    // leads to unwanted behaviour else (creating multilang object)
+    chipsInputProps() {
+      const newProps = Object.assign({}, this.$props);
+      delete newProps.language;
+      return newProps;
+    },
+  },
   watch: {
     selectedList(val) {
       this.createInternalList(val);
@@ -346,12 +356,16 @@ export default {
       this.$emit('list-change', sendArr);
     },
     modifyChipValue(event, index) {
-      const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
-      if (this.identifier) {
-        this.$set(modifiedEntry, this.identifier, '');
+      if (!event) {
+        this.selectedBelowListInt.splice(index, 1);
+      } else {
+        const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
+        if (this.identifier) {
+          this.$set(modifiedEntry, this.identifier, '');
+        }
+        this.$set(modifiedEntry, this.objectProp, event);
+        this.$set(this.selectedBelowListInt, index, modifiedEntry);
       }
-      this.$set(modifiedEntry, this.objectProp, event);
-      this.$set(this.selectedBelowListInt, index, modifiedEntry);
       this.emitInternalList(this.selectedBelowListInt);
     },
   },
@@ -398,10 +412,15 @@ export default {
         .base-chips-below-list-item-chip-wrapper {
           width: 100%;
           margin-left: $spacing-small;
+          margin-right: $spacing;
+          max-width: calc(50% - (2 * #{$spacing}));
+          flex: 1 0 calc(50% - (2 * #{$spacing}));
         }
 
         .base-chips-below-chips-input {
           text-transform: capitalize;
+          max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
+          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
         }
       }
     }

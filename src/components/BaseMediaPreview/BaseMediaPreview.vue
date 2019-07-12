@@ -1,8 +1,7 @@
 <template>
   <div
     v-if="showPreviewInt"
-    class="base-media-preview-background"
-    @wheel="scrollAction">
+    class="base-media-preview-background">
     <div
       class="base-media-preview-close"
       @click="$emit('hide-preview')">
@@ -12,12 +11,20 @@
     </div>
     <!-- TODO_ add transition -->
     <transition name="grow">
-      <div class="base-media-preview-image-stage">
+      <div
+        ref="mediaStage"
+        class="base-media-preview-image-stage">
         <img
-          v-if="fileType === 'image'"
+          v-if="displayImage && fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
           :src="mediaUrl"
-          class="base-media-preview-image">
+          class="base-media-preview-image"
+          @error="displayImage = false">
+        <div
+          v-else-if="fileType === 'image' && !displayImage"
+          class="base-media-preview-error">
+          An error occured displaying this image.
+        </div>
         <video
           v-else-if="fileType === 'video'"
           ref="videoPlayer"
@@ -36,16 +43,42 @@
             type="audio/mpeg">
         </audio>
         <div
-          v-else-if="fileType === 'document'"
-          class="base-media-preview-document-wrapper">
-          <iframe
-            :src="mediaUrl"
-            class="base-media-preview-document">
-            <p style="font-size: 110%;"><em><strong>ERROR: </strong>
-            An &#105;frame should be displayed here but your browser version
-            does not support &#105;frames. </em>Please update your browser to its most
-            recent version and try again.</p>
-          </iframe>
+          v-else
+          class="base-media-preview-not-supported base-media-preview-error">
+          <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
+          <div class="base-media-preview-not-supported-buttons">
+            <BaseButton
+              v-if="allowDownload"
+              :text="infoTexts.download"
+              icon="download"
+              icon-position="right"
+              icon-size="large"
+              class="base-media-preview-not-supported-button"
+              @clicked="download"
+            />
+            <BaseButton
+              v-if="!isMobile && fileEnding === 'pdf'"
+              :text="infoTexts.view"
+              icon="eye"
+              icon-position="right"
+              icon-size="large"
+              class="base-media-preview-not-supported-button"
+              @clicked="openPdf()"
+            />
+          </div>
+        </div>
+        <div
+          v-if="fileEnding !== 'pdf' && !formatNotSupported"
+          class="base-media-preview-info">
+          <div class="base-media-preview-info-text">{{ fileName }}</div>
+          <BaseButton
+            v-if="allowDownload"
+            :text="infoTexts.download"
+            icon="download"
+            icon-position="right"
+            icon-size="large"
+            @clicked="download"
+          />
         </div>
       </div>
     </transition>
@@ -59,10 +92,13 @@
   */
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import Hls from 'hls.js';
+import BaseButton from '../BaseButton/BaseButton';
 
 export default {
   components: {
+    BaseButton,
     SvgIcon,
   },
   directives: {
@@ -77,9 +113,23 @@ export default {
       default: false,
     },
     /**
-     * url of the image to be displayed
+     * url of the medium to be displayed
      */
     mediaUrl: {
+      type: String,
+      default: '',
+    },
+    /**
+     * filename that will be displayed for the medium
+     */
+    displayName: {
+      type: String,
+      default: '',
+    },
+    /**
+     * url for downloading the file
+     */
+    downloadUrl: {
       type: String,
       default: '',
     },
@@ -103,41 +153,96 @@ export default {
         return { height: '720px', width: '1280px' };
       },
     },
+    /**
+     * define if download button should be shown and download be enabled
+     */
+    allowDownload: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define if download button should be shown and download be enabled
+     */
+    infoTexts: {
+      type: Object,
+      default() {
+        return {
+          download: 'Download',
+          view: 'View',
+        };
+      },
+    },
   },
   data() {
     return {
       showPreviewInt: this.showPreview,
+      displayImage: true,
     };
   },
   computed: {
     fileType() {
       if (this.mediaType) return this.mediaType;
-      const { fileEnding } = this.mediaUrl.match(/\.(?<fileEnding>\w+)$/).groups;
+      const docType = this.fileEnding;
       // check if image
-      if (['png', 'gif', 'jpeg', 'jpg'].includes(fileEnding.toLowerCase())) {
+      if (['png', 'gif', 'jpeg', 'jpg'].includes(docType.toLowerCase())) {
         return 'image';
       }
       // check if video
-      if (['mp4', 'm3u8', 'ogg'].includes(fileEnding.toLowerCase())) {
+      if (['mp4', 'm3u8', 'ogg'].includes(docType.toLowerCase())) {
         return 'video';
       }
       // check if audio
-      if (['mp3', 'wav', 'mpeg'].includes(fileEnding.toLowerCase())) {
+      if (['mp3', 'wav', 'mpeg'].includes(docType.toLowerCase())) {
         return 'audio';
       }
       // check if pdf
-      if (['pdf'].includes(fileEnding.toLowerCase())) {
+      if (['pdf'].includes(docType.toLowerCase())) {
         return 'document';
       }
-      /* eslint-disable-next-line */
-      console.error(`The file type of "${this.mediaUrl}" is not supported`);
       return '';
+    },
+    fileName() {
+      if (this.displayName) {
+        return this.displayName;
+      }
+      const match = this.downloadUrl.match(/([^/]+)$/);
+      return match[1];
+    },
+    fileEnding() {
+      return this.mediaUrl.match(/\w+\.(\w{3,4})$/)[1] || '';
+    },
+    formatNotSupported() {
+      return !this.fileType;
+    },
+    isMobile() {
+      return window.innerWidth <= 640;
     },
   },
   watch: {
     showPreview(val) {
       this.showPreviewInt = val;
+      this.displayImage = true;
     },
+    showPreviewInt(val) {
+      this.targetElement = this.$refs.mediaStage;
+      if (val) {
+        disableBodyScroll(this.targetElement);
+      } else {
+        clearAllBodyScrollLocks();
+      }
+    },
+  },
+  mounted() {
+    this.targetElement = this.$refs.mediaStage;
+    if (this.targetElement) {
+      if (this.showPreviewInt) {
+        disableBodyScroll(this.targetElement);
+      } else {
+        enableBodyScroll(this.targetElement);
+      }
+    } else {
+      clearAllBodyScrollLocks();
+    }
   },
   updated() {
     if (this.showPreview) {
@@ -155,18 +260,31 @@ export default {
       }
     }
   },
+  destroyed() {
+    clearAllBodyScrollLocks();
+  },
   methods: {
-    scrollAction(evt) {
-      // disable page scrolling
-      evt.preventDefault();
-      // TODO: image zoom?
-    },
     clickOutside(event) {
       // for some reason clickOutside is also triggered when opening the box
       // --> to prevent immediate closure
       if (event.target.className === 'base-media-preview-image-stage') {
         this.$emit('hide-preview');
       }
+    },
+    download() {
+      // check again if user is allowed to download
+      if (this.allowDownload) {
+        /**
+         * download button clicked
+         *
+         * @event download
+         *
+         */
+        this.$emit('download', { url: this.downloadUrl, name: this.fileName });
+      }
+    },
+    openPdf() {
+      window.open(this.mediaUrl);
     },
   },
 };
@@ -212,6 +330,7 @@ export default {
       height: 100vh;
       width: 100vw;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
 
@@ -221,9 +340,41 @@ export default {
         padding: $spacing;
       }
 
+      .base-media-preview-error {
+        color: whitesmoke;
+      }
+
+      .base-media-preview-not-supported {
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        height: 20%;
+        min-height: 200px;
+        min-width: 200px;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: whitesmoke;
+
+        .base-media-preview-not-supported-file-name {
+          margin-bottom: $spacing-small;
+          font-weight: 600;
+        }
+
+        .base-media-preview-not-supported-buttons {
+          display: flex;
+          justify-content: center;
+
+          .base-media-preview-not-supported-button {
+            margin: $spacing $spacing-small;
+            min-width: 200px;
+          }
+        }
+      }
+
       .base-media-preview-video {
-        max-height: 720px;
-        max-width: 1280px;
+        max-height: 95%;
+        max-width: 95%;
       }
 
       .base-media-preview-document-wrapper {
@@ -234,6 +385,45 @@ export default {
           height: 100%;
           width: 100%;
         }
+      }
+
+      .base-media-preview-info {
+        position: absolute;
+        bottom: 0;
+        width: 100vw;
+        left: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        color: whitesmoke;
+        padding: $spacing-small;
+
+        .base-media-preview-info-text {
+          margin-right: $spacing;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: $tablet) {
+    .base-media-preview-background
+    .base-media-preview-image-stage
+    .base-media-preview-not-supported {
+      width: 75%;
+    }
+  }
+
+  @media screen and (max-width: $mobile) {
+    .base-media-preview-background
+    .base-media-preview-image-stage
+    .base-media-preview-not-supported
+    .base-media-preview-not-supported-buttons {
+      flex-wrap: wrap;
+
+      .base-media-preview-not-supported-button {
+        margin: $spacing-small;
+        min-width: 125px;
       }
     }
   }
