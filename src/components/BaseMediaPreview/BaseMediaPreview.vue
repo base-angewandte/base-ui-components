@@ -94,7 +94,7 @@
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import Hls from 'hls.js';
+import Hls from '../../../node_modules/hls.js/dist/hls.light';
 import BaseButton from '../BaseButton/BaseButton';
 
 export default {
