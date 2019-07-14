@@ -41,7 +41,8 @@
  */
 import ClickOutside from 'vue-click-outside';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
-import RemoveIcon from '../../static/icons/remove.svg';
+// eslint-disable-next-line import/extensions
+import RemoveIcon from '../../static/icons/remove.svg?inline';
 
 export default {
   directives: {

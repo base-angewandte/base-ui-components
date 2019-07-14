@@ -70,14 +70,14 @@
  * @type none
  */
 
-import SvgIcon from 'vue-svgicon';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-import BaseButton from '../BaseButton/BaseButton';
-import '../../assets/icons/index';
 
 export default {
   name: 'BasePopUp',
-  components: { BaseButton, SvgIcon },
+  components: {
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    SvgIcon: () => import('vue-svgicon'),
+  },
   props: {
     /**
      * could be used to control visibility

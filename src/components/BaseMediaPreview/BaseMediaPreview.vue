@@ -91,19 +91,16 @@
  * Currently a component that shows a lightbox for images<br>
  *     in future it should also be possible to view videos or audio
   */
-import VueClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import Hls from '../../../node_modules/hls.js/dist/hls.light';
-import BaseButton from '../BaseButton/BaseButton';
 
 export default {
   components: {
-    BaseButton,
-    SvgIcon,
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    SvgIcon: () => import('vue-svgicon'),
   },
   directives: {
-    VueClickOutside,
+    VueClickOutside: () => import('vue-click-outside'),
   },
   props: {
     /**

@@ -11,11 +11,10 @@
  * A box for information display after mouse hover or click
  */
 
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
 export default {
   components: {
-    BaseImageBox,
+    BaseImageBox: () => import('../BaseImageBox/BaseImageBox'),
   },
   props: {
     /**
