@@ -1,7 +1,7 @@
 <template>
   <div
     :style="$props.styleProps"
-    class="base-search">
+    :class="['base-search', { 'base-search-fade-out': !active }]">
     <label
       for="search"
       class="hide">
@@ -14,8 +14,9 @@
       :class="['base-search-input', { 'base-search-input-img': showImage }]"
       type="text"
       autocomplete="off"
-      @focus.prevent="test"
-      @click.prevent="test"
+      @focus.prevent="inputFocus"
+      @blur="inputBlur"
+      @click.prevent="prevent"
       @keyup="$emit('input', input)" >
   </div>
 </template>
@@ -67,10 +68,17 @@ export default {
   data() {
     return {
       input: null,
+      active: false,
     };
   },
   methods: {
-    test() {
+    inputBlur() {
+      this.active = false;
+    },
+    inputFocus() {
+      this.active = true;
+    },
+    prevent() {
       return null;
     },
   },
@@ -87,6 +95,16 @@ export default {
     background: white;
     padding: 0 $spacing;
     height: $row-height-large;
+
+    &.base-search-fade-out::after {
+      content: '';
+      width: calc(30px + #{$spacing});
+      height: 100%;
+      position: absolute;
+      top: 0;
+      right: $spacing;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+    }
 
     .base-search-input {
       width: 100%;
