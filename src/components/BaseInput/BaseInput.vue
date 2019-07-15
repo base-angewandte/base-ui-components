@@ -235,6 +235,7 @@ export default {
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;
+      min-height: 1.45em;
     }
 
     .base-input-field-hidden {
@@ -255,6 +256,11 @@ export default {
         text-transform: capitalize;
       }
     }
+  }
+
+
+  input::-webkit-input-placeholder {
+    line-height:normal;
   }
 
   input[type='text'].base-input-field {
