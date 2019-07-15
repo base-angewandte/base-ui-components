@@ -18,7 +18,10 @@
           v-vue-click-outside.prevent="clickOutside"
           v-if="displayImage && fileType === 'image'"
           :src="mediaUrl"
-          class="base-media-preview-image"
+          :class="[
+            'base-media-preview-image',
+            'base-media-preview-rotation-' + orientation.toString()
+          ]"
           @error="displayImage = false">
         <div
           v-else-if="fileType === 'image' && !displayImage"
@@ -173,6 +176,13 @@ export default {
         };
       },
     },
+    /**
+     * define how the image should be rotated (EXIF orientation values)
+     */
+    orientation: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -318,6 +328,34 @@ export default {
         max-height: calc(100% - #{$spacing}*4);
         max-width: calc(100% - #{$spacing}*4);
         padding: $spacing;
+
+        &.base-media-preview-rotation-2 {
+          transform: scaleX(-1);
+        }
+
+        &.base-media-preview-rotation-3 {
+          transform: scale(-1);
+        }
+
+        &.base-media-preview-rotation-4 {
+          transform: scaleY(-1);
+        }
+
+        &.base-media-preview-rotation-5 {
+          transform: scaleX(-1) rotate(90deg);
+        }
+
+        &.base-media-preview-rotation-6 {
+          transform: scale(-1) rotate(-90deg);
+        }
+
+        &.base-media-preview-rotation-7 {
+          transform: scaleY(-1) rotate(90deg);
+        }
+
+        &.base-media-preview-rotation-8 {
+          transform: scale(-1) rotate(90deg);
+        }
       }
 
       .base-media-preview-error {
