@@ -230,6 +230,8 @@ export default {
       max-width: calc(100% - #{$icon-large} - (2 * #{$spacing}) - #{$border-width}
       - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
+      overflow: hidden;
+      margin-right: $spacing;
 
       .base-menu-entry-title-description-wrapper {
         flex-shrink: 1;
@@ -296,11 +298,11 @@ export default {
 
       &::before {
         content: '';
-        width: 30px;
+        width: calc(30px + #{$spacing});
         height: $row-height-large;
         position: absolute;
         top: 0;
-        left: -30px;
+        left: calc(-30px - #{$spacing});
         background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
         z-index: 1;
       }
