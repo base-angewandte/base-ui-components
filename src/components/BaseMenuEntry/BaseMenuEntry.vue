@@ -330,17 +330,6 @@ export default {
       align-items: center;
     }
 
-    .base-menu-entry-checkbox::before {
-      content: '';
-      width: 30px;
-      height: $row-height-large;
-      position: absolute;
-      right: 2 * $spacing-small + 2 * $spacing;
-      top: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-      z-index: 1;
-    }
-
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
       background-color: white;
       transition: all 0.5s ease;
