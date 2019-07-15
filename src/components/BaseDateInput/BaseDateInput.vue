@@ -482,16 +482,6 @@ export default {
       max-width: calc(50% - 8px);
     }
 
-    &.base-input-field-show::after {
-      content: '';
-      height: $line-height;
-      width: 30px;
-      position: absolute;
-      bottom: 4px;
-      right: $spacing;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-    }
-
     .base-input-field {
       flex: 1 1 auto;
       margin-right: $spacing;

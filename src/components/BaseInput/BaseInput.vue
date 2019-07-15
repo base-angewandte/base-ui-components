@@ -25,20 +25,23 @@
         (before \<input\>)
        -->
       <slot name="input-field-addition-before" />
-      <input
-        :id="label"
-        :placeholder="placeholder"
-        v-model="inputInt"
-        :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
-        type="text"
-        autocomplete="off"
-        @focus="$emit('input-focus')"
-        @keypress.enter="$emit('enter', inputInt)"
-        @keydown="$emit('input-keydown', $event)"
-        @keydown.up.down.prevent="$emit('arrow-key', $event)"
-        @input="$emit('autocomplete', inputInt)"
-        @blur="blurInput()"
-        @click="active = true">
+      <div :class="['base-input-field-wrapper', { 'base-input-field-wrapper-fade-out': !active }]">
+        <input
+          :id="label"
+          :placeholder="placeholder"
+          v-model="inputInt"
+          :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
+          type="text"
+          autocomplete="off"
+          @focus="$emit('input-focus')"
+          @keypress.enter="$emit('enter', inputInt)"
+          @keydown="$emit('input-keydown', $event)"
+          @keydown.up.down.prevent="$emit('arrow-key', $event)"
+          @input="$emit('autocomplete', inputInt)"
+          @blur="blurInput()"
+          @click="active = true">
+      </div>
+
       <slot name="input-field-addition-after" />
     </div>
   </div>
@@ -212,6 +215,34 @@ export default {
       padding-left: $spacing-small;
       min-height: $row-height-small;
       background: white;
+
+      .base-input-field-wrapper {
+        flex: 1 1 auto;
+        margin-right: $spacing;
+        position: relative;
+
+        &.base-input-field-wrapper-fade-out::after {
+          content: '';
+          width: calc(30px + #{$spacing});
+          height: $line-height;
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+        }
+
+        .base-input-field {
+          min-height: 1.45em;
+          width: 100%;
+        }
+
+        .base-input-field-hidden {
+          width: 1px;
+          overflow: hidden;
+          opacity: 0;
+          filter:alpha(opacity=0);
+        }
+      }
     }
 
     .base-input-field-container-border {
@@ -220,29 +251,6 @@ export default {
 
     .base-input-field-container-active {
       box-shadow: $input-shadow;
-    }
-
-    &.base-input-field-show::after {
-      content: '';
-      height: $line-height;
-      width: 30px;
-      position: absolute;
-      bottom: 4px;
-      right: $spacing;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-    }
-
-    .base-input-field {
-      flex: 1 1 auto;
-      margin-right: $spacing;
-      min-height: 1.45em;
-    }
-
-    .base-input-field-hidden {
-      width: 1px;
-      overflow: hidden;
-      opacity: 0;
-      filter:alpha(opacity=0);
     }
 
     .base-input-label-row {
