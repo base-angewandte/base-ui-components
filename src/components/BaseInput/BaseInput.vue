@@ -234,7 +234,7 @@ export default {
 
     .base-input-field {
       flex: 1 1 auto;
-      margin: auto $spacing auto 0;
+      margin-right: $spacing;
     }
 
     .base-input-field-hidden {

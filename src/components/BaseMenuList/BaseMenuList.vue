@@ -3,6 +3,7 @@
     <draggable
       v-model="list"
       :sort="false"
+      :disabled="!isMobile"
       :group="{ name: dragName, pull: 'clone', put: false }"
       :set-data="modifyDragItem"
       :force-fallback="!dragAndDropCapable"
@@ -104,6 +105,9 @@ export default {
     dragAndDropCapable() {
       return ('DragEvent' in window);
     },
+    isMobile() {
+      return window.innerWidth < 640;
+    },
   },
   watch: {
     list() {
@@ -123,6 +127,7 @@ export default {
   },
   created() {
     this.setInternalVar();
+    // TODO: check if drag is still working on tablet!
     /* document.body.addEventListener('touchmove', (e) => {
       if (this.dragging) {
         e.preventDefault();

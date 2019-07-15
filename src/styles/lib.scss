@@ -49,6 +49,7 @@ input[type=text], input[type=date], textarea {
   font-size: inherit;
   background-color: transparent;
   border-radius: 0;
+  padding: 0;
 }
 
 input[type=text]:focus, input[type=date]:focus, textarea:focus, video:focus,
@@ -58,10 +59,16 @@ audio:focus {
 
 input::placeholder, textarea::placeholder {
   color: $font-color-third;
+  padding: 0;
 }
 
 textarea {
   box-shadow: none
+}
+
+// to prevent safari strange padding
+input {
+  padding: 0;
 }
 
 /* recommended css code for vue-svgicon */
