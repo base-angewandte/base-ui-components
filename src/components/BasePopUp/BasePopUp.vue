@@ -76,13 +76,14 @@
  */
 
 import SvgIcon from 'vue-svgicon';
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import BaseButton from '../BaseButton/BaseButton';
 import '../../assets/icons/index';
+import popUpLock from '../../mixins/popUpLock';
 
 export default {
   name: 'BasePopUp',
   components: { BaseButton, SvgIcon },
+  mixins: [popUpLock],
   props: {
     /**
      * could be used to control visibility
@@ -130,36 +131,13 @@ export default {
   data() {
     return {
       showInt: this.show,
-      targetElement: null,
+      targetName: 'popUpBody',
     };
   },
   watch: {
     show(val) {
       this.showInt = val;
     },
-    showInt(val) {
-      this.targetElement = this.$refs.popUpBody;
-      if (this.targetElement && val) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        clearAllBodyScrollLocks();
-      }
-    },
-  },
-  mounted() {
-    this.targetElement = this.$refs.popUpBody;
-    if (this.targetElement) {
-      if (this.showInt) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        enableBodyScroll(this.targetElement);
-      }
-    } else {
-      clearAllBodyScrollLocks();
-    }
-  },
-  destroyed() {
-    clearAllBodyScrollLocks();
   },
   methods: {
     close() {

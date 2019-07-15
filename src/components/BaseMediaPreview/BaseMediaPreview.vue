@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="showPreviewInt"
+    v-if="showInt"
     class="base-media-preview-background">
     <div
       class="base-media-preview-close"
@@ -92,9 +92,9 @@
   */
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import Hls from 'hls.js';
 import BaseButton from '../BaseButton/BaseButton';
+import popUpLock from '../../mixins/popUpLock';
 
 export default {
   components: {
@@ -104,6 +104,7 @@ export default {
   directives: {
     VueClickOutside,
   },
+  mixins: [popUpLock],
   props: {
     /**
      * steer the display of the lightbox
@@ -175,9 +176,10 @@ export default {
   },
   data() {
     return {
-      showPreviewInt: this.showPreview,
+      showInt: this.showPreview,
       // variable for display image error handling
       displayImage: true,
+      targetName: 'mediaStage',
     };
   },
   computed: {
@@ -221,40 +223,12 @@ export default {
   },
   watch: {
     showPreview(val) {
-      this.showPreviewInt = val;
+      this.showInt = val;
       this.displayImage = true;
     },
-    showPreviewInt(val) {
-      console.log('show preview int');
-      this.targetElement = this.$refs.mediaStage;
-      console.log(this.targetElement);
-      console.log(val);
-      if (val) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        clearAllBodyScrollLocks();
-      }
-    },
-  },
-  mounted() {
-    console.log('mounted');
-    this.targetElement = this.$refs.mediaStage;
-    console.log(this.targetElement);
-    if (this.targetElement) {
-      if (this.showPreviewInt) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        enableBodyScroll(this.targetElement);
-      }
-    } else {
-      clearAllBodyScrollLocks();
-    }
   },
   updated() {
-    console.log('updated');
     if (this.showPreview) {
-      console.log('show preview update');
-      console.log(this.targetElement);
       const video = this.$refs.videoPlayer;
       if (video) {
         if (Hls.isSupported()) {
@@ -268,9 +242,6 @@ export default {
         }
       }
     }
-  },
-  destroyed() {
-    clearAllBodyScrollLocks();
   },
   methods: {
     clickOutside(event) {
