@@ -3,7 +3,7 @@
     <draggable
       v-model="list"
       :sort="false"
-      :disabled="!isMobile"
+      :disabled="isMobile"
       :group="{ name: dragName, pull: 'clone', put: false }"
       :set-data="modifyDragItem"
       :force-fallback="!dragAndDropCapable"
