@@ -41,19 +41,19 @@
       <base-image-box
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('./static/images/icons.png')"
+        :image-url="require('./images/icons.png')"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('./static/images/icons.png')"
+        :image-url="require('./images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
+        :image-url="require('./images/roboto_detail_fullscreen_12pt.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
@@ -299,46 +299,11 @@
 </template>
 
 <script>
+// eslint-disable-next-line import/no-extraneous-dependencies
 import axios from 'axios';
-import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
-import BasePopUp from './components/BasePopUp/BasePopUp';
-import BaseDropDown from './components/BaseDropDown/BaseDropDown';
-import BaseInput from './components/BaseInput/BaseInput';
-import BaseButton from './components/BaseButton/BaseButton';
-import BaseDropBox from './components/BaseDropBox/BaseDropBox';
-import BaseMenuList from './components/BaseMenuList/BaseMenuList';
-import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
-import BaseSearch from './components/BaseSearch/BaseSearch';
-import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
-import BaseImageBox from './components/BaseImageBox/BaseImageBox';
-import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
-import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
-import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseDateInput from './components/BaseDateInput/BaseDateInput';
-import BasePagination from './components/BasePagination/BasePagination';
-import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 
 export default {
   name: 'App',
-  components: {
-    BaseMediaPreview,
-    BasePagination,
-    BaseChipsBelow,
-    BaseDateInput,
-    BaseAutocompleteInput,
-    BaseUploadBar,
-    BaseImageBox,
-    BaseMultilineTextInput,
-    BaseSearch,
-    BaseChipsInput,
-    BaseMenuList,
-    BaseMenuEntry,
-    BaseDropDown,
-    BasePopUp,
-    BaseInput,
-    BaseButton,
-    BaseDropBox,
-  },
   data() {
     return {
       selectionList: [

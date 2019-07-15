@@ -1,10 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  pages: {
-    index: './src/main.js',
-    'base-ui-components': 'src/lib.js',
-  },
   pluginOptions: {
     // importing variables to all components
     'style-resources-loader': {
@@ -13,6 +9,30 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
+    config
+      .entry('app')
+      .clear()
+      .add('./demo/main.js');
+
+    config.module
+      .rule('vue')
+      .use('global-vue-loader')
+      .loader(path.resolve(__dirname, 'build-utils/global-vue-loader'))
+      .before('vue-loader');
+
+    // TODO: not sure if need these two
+    config.module
+      .rule('meta')
+      .resourceQuery(/blockType=meta/)
+      .use('null-loader')
+      .loader('null-loader');
+
+    config.module
+      .rule('example')
+      .resourceQuery(/blockType=example/)
+      .use('null-loader')
+      .loader('null-loader');
+
     // add vue-svg-loader
     const svgRule = config.module.rule('svg');
     svgRule.uses.clear();

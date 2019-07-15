@@ -1,6 +1,8 @@
 @import './variables';
 @import './lib';
 
+$font: "Source Sans Pro", serif;
+
 html {
   font-family: $font;
   font-size: $font-size-regular;
