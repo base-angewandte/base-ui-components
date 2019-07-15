@@ -123,12 +123,12 @@ export default {
   },
   created() {
     this.setInternalVar();
-    document.body.addEventListener('touchmove', (e) => {
+    /* document.body.addEventListener('touchmove', (e) => {
       if (this.dragging) {
         e.preventDefault();
       }
       return false;
-    }, { passive: false });
+    }, { passive: false }); */
   },
   methods: {
     // determines which icon should be shown for each menu entry

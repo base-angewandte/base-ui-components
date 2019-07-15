@@ -176,6 +176,7 @@ export default {
   data() {
     return {
       showPreviewInt: this.showPreview,
+      // variable for display image error handling
       displayImage: true,
     };
   },
@@ -224,7 +225,10 @@ export default {
       this.displayImage = true;
     },
     showPreviewInt(val) {
+      console.log('show preview int');
       this.targetElement = this.$refs.mediaStage;
+      console.log(this.targetElement);
+      console.log(val);
       if (val) {
         disableBodyScroll(this.targetElement);
       } else {
@@ -233,7 +237,9 @@ export default {
     },
   },
   mounted() {
+    console.log('mounted');
     this.targetElement = this.$refs.mediaStage;
+    console.log(this.targetElement);
     if (this.targetElement) {
       if (this.showPreviewInt) {
         disableBodyScroll(this.targetElement);
@@ -245,7 +251,10 @@ export default {
     }
   },
   updated() {
+    console.log('updated');
     if (this.showPreview) {
+      console.log('show preview update');
+      console.log(this.targetElement);
       const video = this.$refs.videoPlayer;
       if (video) {
         if (Hls.isSupported()) {
