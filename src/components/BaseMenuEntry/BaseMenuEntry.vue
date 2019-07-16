@@ -10,7 +10,10 @@
       :name="icon"
       class="base-menu-entry-icon"/>
     <div
-      class="base-menu-entry-text-wrapper">
+      :class="[
+        'base-menu-entry-text-wrapper',
+        { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
+    ]">
       <div class="base-menu-entry-title-description-wrapper">
         <div
           v-if="title"
@@ -233,6 +236,16 @@ export default {
       overflow: hidden;
       margin-right: $spacing;
 
+      &.base-menu-entry-text-slide-overlay::after {
+        content: '';
+        width: calc(#{$icon-medium} +  (2 * #{$spacing}));
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: -$spacing;
+        background-color: white;
+      }
+
       .base-menu-entry-title-description-wrapper {
         flex-shrink: 1;
         flex-grow: 1;
@@ -293,7 +306,7 @@ export default {
       top: 0;
       flex-direction: row;
       align-items: center;
-      right: 0;
+      right: $spacing;
       background: white;
 
       &::before {
@@ -312,7 +325,7 @@ export default {
         flex-direction: column;
         justify-content: space-evenly;
         height: $row-height-large;
-        margin: 0 $spacing;
+        margin-left: $spacing;
         width: $icon-small;
 
         .base-menu-entry-thumbnail {
@@ -324,7 +337,7 @@ export default {
 
     .base-menu-entry-checkbox {
       height: 100%;
-      padding: 0 $spacing;
+      padding-left: $spacing;
       background-color: white;
       display: flex;
       align-items: center;
