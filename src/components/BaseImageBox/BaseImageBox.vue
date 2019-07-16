@@ -347,6 +347,9 @@ export default {
     color: white;
     bottom: $spacing;
     left: $spacing;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    right: $spacing;
   }
 
   .base-image-box-checkbox {
