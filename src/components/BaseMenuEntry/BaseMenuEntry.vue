@@ -298,11 +298,11 @@ export default {
 
       &::before {
         content: '';
-        width: calc(30px + #{$spacing});
+        width: calc(#{$fade-out-width} + #{$spacing});
         height: $row-height-large;
         position: absolute;
         top: 0;
-        left: calc(-30px - #{$spacing});
+        left: calc(-#{$fade-out-width} - #{$spacing});
         background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
         z-index: 1;
       }

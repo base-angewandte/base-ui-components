@@ -98,7 +98,7 @@ export default {
 
     &.base-search-fade-out::after {
       content: '';
-      width: calc(30px + #{$spacing});
+      width: calc(#{$fade-out-width} + #{$spacing});
       height: 100%;
       position: absolute;
       top: 0;

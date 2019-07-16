@@ -223,8 +223,8 @@ export default {
 
         &.base-input-field-wrapper-fade-out::after {
           content: '';
-          width: calc(30px + #{$spacing});
-          height: $line-height;
+          width: calc(#{$fade-out-width} + #{$spacing});
+          height: $input-field-line-height;
           position: absolute;
           top: 0;
           right: 0;
@@ -232,7 +232,7 @@ export default {
         }
 
         .base-input-field {
-          min-height: 1.45em;
+          min-height: $input-field-line-height;
           width: 100%;
         }
 
@@ -268,7 +268,7 @@ export default {
 
 
   input::-webkit-input-placeholder {
-    line-height:normal;
+    line-height: $input-field-line-height;
   }
 
   input[type='text'].base-input-field {
