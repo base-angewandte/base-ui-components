@@ -287,6 +287,7 @@ export default {
           return date.toString();
         },
       },
+      tempDateStore: {},
     };
   },
   computed: {
@@ -349,18 +350,30 @@ export default {
   },
   watch: {
     input(val) {
-      this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
-      if (this.showFormatOptions && this.isDateFormatYear()) {
-        this.dateFormatInt = 'YYYY';
+      if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
+        this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
+        if (this.showFormatOptions && this.isDateFormatYear()) {
+          this.dateFormatInt = 'YYYY';
+        }
       }
     },
-    dateFormatInt() {
+    dateFormatInt(val) {
+      // in order to allow user to restore previous date after switching
+      // from date to year and back store in temp variable
+      if (val === 'YYYY') {
+        this.tempDateStore = { ...this.inputInt };
+      }
+      this.convertDate();
       this.emitData();
     },
     inputInt: {
       handler() {
         if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
           this.emitData();
+        }
+        // delete temp variable again if user is selecting a new year
+        if (this.dateFormatInt === 'YYYY') {
+          this.tempDateStore = {};
         }
       },
       deep: true,
@@ -385,7 +398,6 @@ export default {
       }
     },
     emitData() {
-      this.convertDate();
       const data = this.getInputData();
       /**
        * emit an event when focus leaves the input
@@ -411,7 +423,11 @@ export default {
               this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
                 .getFullYear().toString());
             } else {
-              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey]));
+              this.$set(
+                this.inputInt,
+                dateKey,
+                this.tempDateStore[dateKey] || new Date(this.inputInt[dateKey]),
+              );
             }
           }
         });
