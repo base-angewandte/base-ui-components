@@ -29,23 +29,29 @@
                @type none -->
           <!-- @slot custom button row -->
           <slot name="button-row">
-            <base-button
+            <BaseButton
               :text="buttonLeftText"
               :icon="buttonLeftIcon"
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-left')"
-            />
+              @clicked="$emit('button-left')" />
             <!-- @event buttonRight -->
-            <base-button
+            <BaseButton
               :text="buttonRightText"
-              :icon="buttonRightIcon"
+              :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-right')"
-            />
+              @clicked="$emit('button-right')">
+              <template
+                v-if="isLoading"
+                slot="right-of-text">
+                <span class="base-popup-button-loader">
+                  <BaseLoader />
+                </span>
+              </template>
+            </BaseButton>
           </slot>
         </div>
       </div>
@@ -77,12 +83,17 @@
 
 import SvgIcon from 'vue-svgicon';
 import BaseButton from '../BaseButton/BaseButton';
+import BaseLoader from '../BaseLoader/BaseLoader';
 import '../../assets/icons/index';
 import popUpLock from '../../mixins/popUpLock';
 
 export default {
   name: 'BasePopUp',
-  components: { BaseButton, SvgIcon },
+  components: {
+    BaseButton,
+    SvgIcon,
+    BaseLoader,
+  },
   mixins: [popUpLock],
   props: {
     /**
@@ -126,6 +137,13 @@ export default {
     buttonRightIcon: {
       type: String,
       default: 'check-mark',
+    },
+    /**
+     * if true button loader will be shown
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -209,10 +227,17 @@ export default {
     flex-direction: row;
 
     /* TODO: check if button size should just be adjustable via props in general" */
-    & .base-popup-button {
+    .base-popup-button {
       margin-right: $spacing;
       // width: calc(50% - 8px);
       flex-basis: 50%;
+
+      .base-popup-button-loader{
+        position: relative;
+        transform: scale(0.5);
+        margin-left: $spacing;
+        padding-left: $spacing;
+      }
     }
 
     & .base-popup-button:last-child {
