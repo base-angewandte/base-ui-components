@@ -19,7 +19,7 @@
       @input-keydown="checkKeyEvent"
       @input-keypress="checkKeyEvent"
       @enter="onEnter()"
-      @click-input-field="insideInput = true">
+      @click-input-field="setInputActive">
       <template
         v-if="sortable"
         slot="label-addition">
@@ -802,6 +802,11 @@ export default {
       const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
       if (inputElems && inputElems.length) {
         inputElems[0].blur();
+      }
+    },
+    setInputActive() {
+      if (this.chipActive < 0) {
+        this.insideInput = true;
       }
     },
   },
