@@ -25,6 +25,9 @@
         class="base-switch-button-label">
         {{ option.label }}
         <!-- TODO: add slot for icons etc -->
+        <slot
+          :value="option.value"
+          name="right-of-text" />
       </label>
     </template>
   </fieldset>
