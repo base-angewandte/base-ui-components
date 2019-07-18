@@ -45,6 +45,7 @@ Forbidden by Noah from the Noun Project<br>
 drag by b farias from the Noun Project<br>
 success by Trident from the Noun Project<br>
 Download by scott desmond from the Noun Project<br>
+text by Bohdan Burmich from the Noun Project<br>
 
 The software of this project is licensed under the MIT license.
 

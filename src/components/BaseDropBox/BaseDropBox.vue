@@ -202,6 +202,7 @@ export default {
       height: 100%;
       width: 100%;
       border: $upload-border;
+      transition: all 0.2s ease;
 
       &:hover {
         border: $upload-border-hover;

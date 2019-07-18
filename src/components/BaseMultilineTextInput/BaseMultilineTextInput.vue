@@ -16,7 +16,16 @@
           :label="tabsLegend"
           :active-tab="activeTab"
           v-model="activeTabInt"
-          class="base-multiline-text-input-tabs" />
+          class="base-multiline-text-input-tabs">
+          <template
+            slot="right-of-text"
+            slot-scope="tab">
+            <SvgIcon
+              v-if="hasText(tab.value)"
+              class="base-multiline-text-input-text-icon"
+              name="text" />
+          </template>
+        </BaseSwitchButton>
       </div>
     </div>
 
@@ -29,6 +38,7 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
 /**
  * A multiline textfield base component
  */
@@ -41,7 +51,7 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
  * @type object | string
  */
 export default {
-  components: { BaseSwitchButton },
+  components: { BaseSwitchButton, SvgIcon },
   model: {
     prop: 'input',
     event: 'text-input',
@@ -161,6 +171,9 @@ export default {
           val[tab]));
       }
     },
+    hasText(val) {
+      return !!this.fieldContent[val];
+    },
   },
 };
 </script>
@@ -195,6 +208,16 @@ export default {
         .base-multiline-text-input-tabs {
           align-self: center;
           flex-shrink: 0;
+
+          .base-multiline-text-input-text-icon {
+            margin-left: $spacing-small;
+            height: 10px;
+            width: 10px;
+            vertical-align: middle;
+            margin-bottom: $spacing-small/2;
+            color: $font-color-second;
+            fill: $font-color-second;
+          }
         }
       }
     }

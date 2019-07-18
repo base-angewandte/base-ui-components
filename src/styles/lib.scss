@@ -101,13 +101,3 @@ input {
 .svg-left {
   transform: rotate(-90deg);
 }
-
-.base-drop-down-icon {
-  transition: all 0.5s ease;
-  height: $icon-small;
-  flex-shrink: 0;
-
-  &.base-drop-down-icon-rotated {
-    transform: rotate(180deg);
-  }
-}

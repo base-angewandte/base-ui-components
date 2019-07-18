@@ -25,6 +25,9 @@
         class="base-switch-button-label">
         {{ option.label }}
         <!-- TODO: add slot for icons etc -->
+        <slot
+          :value="option.value"
+          name="right-of-text" />
       </label>
     </template>
   </fieldset>
@@ -124,6 +127,7 @@ export default {
 
     &.base-switch-button-input-active + .base-switch-button-label {
       border: $input-field-border;
+      transition: border 0.2s ease;
     }
 
     &:focus + .base-switch-button-label {

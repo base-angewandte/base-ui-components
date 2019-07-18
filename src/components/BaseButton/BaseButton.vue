@@ -133,6 +133,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
 
     .base-button-text {
       text-align: center;

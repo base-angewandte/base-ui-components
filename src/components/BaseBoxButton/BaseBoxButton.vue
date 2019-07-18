@@ -137,6 +137,7 @@ export default {
   .base-box-button {
     display: flex;
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:hover {
       color: $app-color;

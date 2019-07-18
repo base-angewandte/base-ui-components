@@ -165,6 +165,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.2s ease;
 
         &:last-child {
           margin-right: 0;

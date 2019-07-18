@@ -364,16 +364,11 @@ export default {
         this.tempDateStore = { ...this.inputInt };
       }
       this.convertDate();
-      this.emitData();
     },
     inputInt: {
       handler() {
         if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
           this.emitData();
-        }
-        // delete temp variable again if user is selecting a new year
-        if (this.dateFormatInt === 'YYYY') {
-          this.tempDateStore = {};
         }
       },
       deep: true,
@@ -423,10 +418,14 @@ export default {
               this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
                 .getFullYear().toString());
             } else {
+              // check if year was changed or is still the same
+              const yearIdent = new Date(this.tempDateStore[dateKey])
+                .getFullYear().toString() === this.inputInt[dateKey];
               this.$set(
                 this.inputInt,
                 dateKey,
-                this.tempDateStore[dateKey] || new Date(this.inputInt[dateKey]),
+                yearIdent && this.tempDateStore[dateKey]
+                  ? this.tempDateStore[dateKey] : new Date(this.inputInt[dateKey]),
               );
             }
           }
@@ -534,6 +533,7 @@ export default {
     width: 24px;
     max-height: 24px;
     color: $font-color-second;
+    cursor: pointer;
   }
 
   .input-field-wrapper {

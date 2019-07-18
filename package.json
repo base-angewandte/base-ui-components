@@ -15,15 +15,13 @@
     "styleguide": "vue-styleguidist server",
     "postversion": "git push && git push --tags && git checkout master && git merge develop && git push && git push --tags && npm publish"
   },
+  "peerDependencies": {
+    "vue": "^2.5.17"
+  },
   "dependencies": {
-    "axios": "^0.19.0",
-    "babel-upgrade": "0.0.23",
-    "body-parser": "^1.18.3",
     "body-scroll-lock": "^2.6.1",
     "hls.js": "^0.12.4",
     "normalize.css": "^8.0.1",
-    "vue": "^2.5.17",
-    "vue-axios": "2.0.2",
     "vue-click-outside": "^1.0.7",
     "vue2-datepicker": "^2.12.0",
     "vuedraggable": "^2.16.0"
@@ -43,8 +41,10 @@
     "@babel/preset-env": "^7.3.1",
     "@babel/register": "^7.0.0",
     "autoprefixer": "^8.6.5",
+    "axios": "^0.19.0",
     "babel-eslint": "^8.2.6",
     "babel-loader": "^8.0.4",
+    "body-parser": "^1.18.3",
     "chalk": "^2.0.1",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^1.0.1",

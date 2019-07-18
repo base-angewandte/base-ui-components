@@ -123,6 +123,7 @@ export default {
     user-select: none;
     display: flex;
     align-items: center;
+    transition: all 0.2s ease;
 
     .base-checkbox-container-small {
       width: $spacing-small*2;
