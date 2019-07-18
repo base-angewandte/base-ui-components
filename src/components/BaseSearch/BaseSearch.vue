@@ -110,6 +110,7 @@ export default {
       width: 100%;
       border: none;
       height: 100%;
+      transition: background 0.2s ease;
 
       &::placeholder {
         color: $font-color-third;

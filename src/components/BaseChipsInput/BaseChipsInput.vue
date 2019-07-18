@@ -829,6 +829,7 @@ export default {
       cursor: pointer;
       margin-left: $spacing;
       white-space: nowrap;
+      transition: all 0.2s ease;
 
       &:hover {
         color: $app-color;

@@ -533,6 +533,7 @@ export default {
     width: 24px;
     max-height: 24px;
     color: $font-color-second;
+    cursor: pointer;
   }
 
   .input-field-wrapper {

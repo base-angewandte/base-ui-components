@@ -223,6 +223,7 @@ export default {
       width: $icon-large;
       margin: 0 $spacing;
       flex: 0 0 #{$icon-large};
+      transition: fill 0.1s ease;
     }
 
     .base-menu-entry-text-wrapper {
@@ -262,6 +263,7 @@ export default {
           color: $font-color-second;
           font-size: $font-size-small;
           white-space: nowrap;
+          transition: color 0.1s ease;
         }
       }
     }
@@ -274,6 +276,7 @@ export default {
       position: relative;
       white-space: nowrap;
       overflow: hidden;
+      transition: color 0.1s ease;
     }
 
     .base-menu-entry-subtext {
@@ -287,6 +290,7 @@ export default {
 
     &.base-menu-entry-activatable {
       cursor: pointer;
+      transition: box-shadow 0.2s ease;
 
       &.base-menu-entry-active {
         box-shadow: inset $border-active-width 0 0 0 $app-color;

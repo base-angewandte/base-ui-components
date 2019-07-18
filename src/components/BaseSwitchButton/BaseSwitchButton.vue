@@ -124,6 +124,7 @@ export default {
 
     &.base-switch-button-input-active + .base-switch-button-label {
       border: $input-field-border;
+      transition: border 0.2s ease;
     }
 
     &:focus + .base-switch-button-label {
