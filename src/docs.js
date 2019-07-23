@@ -5,7 +5,6 @@ import SvgIcon from 'vue-svgicon';
 import App from './app';
 
 import './styles/app.scss';
-import './styles/main.scss';
 
 Vue.config.productionTip = false;
 

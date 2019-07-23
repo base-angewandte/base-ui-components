@@ -7,7 +7,7 @@
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
       @click="clickAction"
-      @mousedown="$emit('mouse-down')"
+      @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
@@ -16,10 +16,10 @@
       v-html="content()" />
     <div
       class="base-chip-icon"
-      @click="$emit('remove-entry', entryInt)">
+      @click="removeClicked">
       <img
-        class="base-chip-icon-img"
-        src="../../static/icons/remove.svg">
+        :src="require('../../static/icons/remove.svg')"
+        class="base-chip-icon-img">
     </div>
     <base-hover-box
       ref="hoverBox"
@@ -29,19 +29,12 @@
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
+import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
+
 /**
  * Basic Chip component
  */
-
-/**
- * triggered when the remove icon is clicked and returns the data behind the chip
- *
- * @event remove-entry
- * @type Object
- *
- */
-import ClickOutside from 'vue-click-outside';
-import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 export default {
   directives: {
@@ -84,9 +77,7 @@ export default {
      */
     hoverBoxContent: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
   },
   data() {
@@ -131,7 +122,7 @@ export default {
         /**
          * event emitted when the chip content was edited
          *
-         * @event valueChanged
+         * @event value-changed
          * @type String
          */
         this.$emit('value-changed', this.entryInt);
@@ -142,7 +133,7 @@ export default {
        * event emitted when chip is clicked
        *
        * @event clicked
-       * @type none
+       * @type {none}
        *
        */
       this.$emit('clicked');
@@ -162,9 +153,34 @@ export default {
     },
     hideBox() {
       if (this.hoverBoxEnabled) {
+        /**
+         * event indicating if hover box was set to show / hide
+         *
+         * @type {Boolean}
+         *
+         */
         this.$emit('hoverbox-active', false);
         this.showInfoBox = false;
       }
+    },
+    onMouseDown(event) {
+      /**
+       * event on mouse down, needed by base chips input to determine active chip
+       *
+       * @type {Event}
+       *
+       */
+      this.$emit('mouse-down', event);
+    },
+    removeClicked() {
+      /**
+       * triggered when the remove icon is clicked and returns the data behind the chip
+       *
+       * @event remove-entry
+       * @type {Object}
+       *
+       */
+      this.$emit('remove-entry', this.entryInt);
     },
   },
 };

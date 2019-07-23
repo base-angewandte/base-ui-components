@@ -9,7 +9,7 @@ A box with event firing on drop
           text="Drop a file here"
           subtext="Add more info"
           class="drop-box"
-          @dropped="handleFileSelect($event)"
+          @dropped-file="handleFileSelect($event)"
         />
   
         <base-drop-box

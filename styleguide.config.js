@@ -16,5 +16,19 @@ module.exports = {
   require: [
     path.join(__dirname, './src/styles/app.scss')
   ],
-  ignore: ['**/components/BaseMenuTableRow.vue', '**/components/ChipsArea.vue']
+  ignore: ['**/components/BaseMenuTableRow.vue', '**/components/ChipsArea.vue'],
+  dangerouslyUpdateWebpackConfig(webpackConfig) {
+    let filteredFirstHMR = false;
+
+    webpackConfig.plugins = webpackConfig.plugins.filter(plugin => {
+      if (plugin.constructor.name === 'HotModuleReplacementPlugin' && !filteredFirstHMR) {
+        filteredFirstHMR = true;
+        return false;
+      }
+
+      return true;
+    });
+
+    return webpackConfig;
+  }
 }
