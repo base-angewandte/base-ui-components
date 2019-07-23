@@ -23,7 +23,6 @@
       <template
         v-if="sortable"
         slot="label-addition">
-        <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
           @click="sort(selectedListInt)">{{ sortText }}</div>
@@ -54,7 +53,7 @@
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
                 @mouse-down="chipActive = index"
                 @remove-entry="removeEntry(entry, index)"
-                @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+                @hoverbox-active="hoverBoxActive($event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
             </transition-group>
 
@@ -146,11 +145,6 @@
 </template>
 
 <script>
-/**
- * Base Chips Input component with autocomplete function
- *
- */
-
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
 import SvgIcon from 'vue-svgicon';
@@ -158,6 +152,11 @@ import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import { setLanguageMixin } from '../../mixins/setLanguage';
+
+/**
+ * Base Chips Input component with autocomplete function
+ *
+ */
 
 export default {
   components: {
@@ -183,9 +182,7 @@ export default {
      */
     list: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * @model
@@ -194,9 +191,7 @@ export default {
      */
     selectedList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * if object array was passed - define the property that should be
@@ -322,9 +317,7 @@ export default {
      */
     hoverboxContent: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
     /**
      * show spinner to indicate that something is loading
@@ -429,13 +422,6 @@ export default {
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
-        /**
-         * event to fetch drop down entries with changing input
-         *
-         * @event fetch-dropdown-entries
-         * @type { object }
-         *
-         */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
         /**
@@ -483,6 +469,13 @@ export default {
     showDropDown(val) {
       // allow also for static drop down entries to be loaded on first drop down show only
       if (val && !this.allowDynamicDropDownEntries && !this.dropDownListInt.length) {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event fetch-dropdown-entries
+         * @type { object }
+         *
+         */
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
       }
       if (val) {
@@ -494,7 +487,7 @@ export default {
          * event triggered on show drop down
          *
          * @event show-dropdown
-         * @type None
+         * @type {none}
          *
          */
         this.$emit('show-dropdown');
@@ -503,7 +496,7 @@ export default {
          * event triggered on hide drop down
          *
          * @event hide-dropdown
-         * @type None
+         * @type {none}
          *
          */
         this.$emit('hide-dropdown');
@@ -722,6 +715,12 @@ export default {
         this.selectedListInt
           .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
         sendArr.forEach(sel => this.$delete(sel, 'idInt'));
+        /**
+         * event emitting selected list upon changes
+         *
+         * @type {Array}
+         *
+         */
         this.$emit('selected', sendArr);
       }
     },
@@ -808,6 +807,14 @@ export default {
       if (this.chipActive < 0) {
         this.insideInput = true;
       }
+    },
+    hoverBoxActive(value, entry) {
+      /**
+       * event emitted on show / hide hoverbox, emitting event and originating entry
+       *
+       * @type {Event, Object}
+       */
+      this.$emit('hoverbox-active', { value, entry });
     },
   },
 };

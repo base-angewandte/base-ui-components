@@ -1,7 +1,7 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @click="$emit('clicked', label)">
+    @click="clicked">
     <input
       v-model="checkedInt"
       :name="label"
@@ -25,18 +25,11 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
+
 /**
  * Checkbox and Radio Button Component
  */
-
-/**
- * when the box is clicked an event is triggered transmitting the
- * corresponding value
- *
- * @event clicked
- * @type String|Boolean
- */
-import SvgIcon from 'vue-svgicon';
 
 export default {
   components: {
@@ -83,9 +76,7 @@ export default {
      */
     checked: {
       type: [Boolean, String],
-      default() {
-        return this.type === 'checkbox' ? false : '';
-      },
+      default: false,
     },
     /**
      * set the size of the checkBox <br>
@@ -107,6 +98,18 @@ export default {
   watch: {
     checked(val) {
       this.checkedInt = val;
+    },
+  },
+  methods: {
+    clicked() {
+      this.checkedInt = !this.checkedInt;
+      /**
+       * event emitted on radio button / checkmark click,
+       * emitting input label
+       *
+       * @type {string | boolean}
+       */
+      this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.label);
     },
   },
 };

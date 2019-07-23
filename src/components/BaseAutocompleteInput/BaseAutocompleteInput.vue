@@ -2,8 +2,8 @@
   <div class="base-autocomplete-input">
     <BaseInput
       ref="baseInput"
-      :placeholder="!inputTextInt ? $props.placeholder : ''"
-      :label="$props.label"
+      :placeholder="!inputTextInt ? placeholder : ''"
+      :label="label"
       v-model="inputTextInt"
       @clicked-outside="insideInput = false"
       @input-focus="onInputFocus"
@@ -36,7 +36,7 @@
         @click="selectEntry(entry)"
         @mouseover="selectedMenuEntryIndex = index">
 
-        <!-- THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
+        <!-- @slot This slot enables you to provide more advanced drop down entries -->
         <slot
           :item="entry"
           name="drop-down-entry">
@@ -47,12 +47,14 @@
         </slot>
 
       </div>
+
+      <!-- @slot Customize the info displayed when no options are available -->
       <slot
         v-if="!listInt.length"
         name="no-options">
         <div
           class="base-autocomplete-drop-down-entry-wrapper">
-          {{ $props.dropDownNoOptionsInfo }}
+          {{ dropDownNoOptionsInfo }}
         </div>
       </slot>
 
@@ -61,12 +63,13 @@
 </template>
 
 <script>
-/**
- * Form Input Field Component with Autocomplete Functionality
- */
 import ClickOutside from 'vue-click-outside';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseLoader from '../BaseLoader/BaseLoader';
+
+/**
+ * Form Input Field Component with Autocomplete Functionality
+ */
 
 export default {
   components: {
@@ -170,7 +173,7 @@ export default {
     // watch for changes in the drop down list and set internal variable accordingly
     list(val) {
       this.listInt = val && val.length && typeof val[0] === 'string'
-        ? val.map(v => Object.assign({}, { [this.$props.objectProp]: v }))
+        ? val.map(v => Object.assign({}, { [this.objectProp]: v }))
         : val.map(v => Object.assign({}, v));
     },
     // watch for changes in the text input from outside and set internal value accordingly
@@ -180,39 +183,32 @@ export default {
     // when the internal input text variable changes this event also needs to be propagated
     // to the parent
     inputTextInt(val) {
-      /**
-       * emitting event on text input
-       *
-       * @event autocomplete
-       * @type string
-       */
       this.$emit('autocomplete', val);
     },
   },
   mounted() {
     // set internal text and list variables with values set in parent
-    this.listInt = this.$props.list && this.$props.list.length && typeof this.$props.list[0] === 'string'
-      ? this.$props.list.map(v => Object.assign({}, { [this.$props.objectProp]: v }))
-      : this.$props.list.map(v => Object.assign({}, v));
-    this.inputTextInt = this.$props.inputText;
+    this.listInt = this.list && this.list.length && typeof this.list[0] === 'string'
+      ? this.list.map(v => Object.assign({}, { [this.objectProp]: v }))
+      : this.list.map(v => Object.assign({}, v));
+    this.inputTextInt = this.inputText;
   },
   methods: {
     // add an entry selected from the drop down list
     selectEntry(entry) {
       // check if entry was selected by clicking in the dropdown
       if (entry) {
-        this.inputTextInt = entry[this.$props.objectProp];
-        /**
-         * event triggered when entry is selected from drop down menu
-         *
-         * @event selected
-         * @type object | string
-         */
+        this.inputTextInt = entry[this.objectProp];
         this.$emit('selected', entry);
         // or was selected by use of arrow keys
         // (else no explicit setting of inputTextInt and event emitting is needed)
       } else if (this.selectedMenuEntryIndex >= 0) {
-        this.inputTextInt = this.listInt[this.selectedMenuEntryIndex][this.$props.objectProp];
+        this.inputTextInt = this.listInt[this.selectedMenuEntryIndex][this.objectProp];
+        /**
+         * event triggered when entry is selected from drop down menu
+         *
+         * @type {object | string}
+         */
         this.$emit('selected', this.listInt[this.selectedMenuEntryIndex]);
       }
       // as soon as entry was selected, hide the drop down, blur input focus and reset the list
@@ -226,10 +222,9 @@ export default {
       // e.g. for fetching of initial list??
       if (this.inputTextInt) {
         /**
-         * emitting event on text input
+         * emitting event on text input.
          *
-         * @event autocomplete
-         * @type string
+         * @type {string}
          */
         this.$emit('autocomplete', this.inputTextInt);
       }

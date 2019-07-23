@@ -1,6 +1,6 @@
 <template>
   <div class="base-chips-below">
-    <base-chips-input
+    <BaseChipsInput
       ref="chipsInput"
       v-bind="chipsInputProps"
       v-model="selectedBelowListInt"
@@ -10,7 +10,7 @@
       :sort-text="sortText"
       :sort-name="sortName"
       @selected="addedEntry"
-      @fetch-dropdown-entries="$emit('fetch-dropdown-entries', $event)">
+      @fetch-dropdown-entries="fetchDropDownEntries">
       <template
         slot="chips-area"
         slot-scope="props">
@@ -41,7 +41,7 @@
               <div
                 :key="'chip-wrapper' + entry.idInt"
                 class="base-chips-below-list-item-chip-wrapper">
-                <base-chip
+                <BaseChip
                   ref="selectedChip"
                   :id="'chips-below' + index"
                   v-model="entry[objectProp]"
@@ -51,10 +51,10 @@
                   :hover-box-content="hoverboxContent"
                   class="base-chips-input-chip"
                   @value-changed="modifyChipValue($event, index)"
-                  @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+                  @hoverbox-active="hoverBoxActive($event, entry)"
                   @remove-entry="removeEntry($event, index)"/>
               </div>
-              <base-chips-input
+              <BaseChipsInput
                 :show-label="false"
                 :label="label + '-roles'"
                 :key="'input' + entry.idInt"
@@ -86,22 +86,25 @@
         <slot
           name="no-options" />
       </template>
-    </base-chips-input>
+    </BaseChipsInput>
   </div>
 </template>
 
 <script>
-/**
- * A very specialized component based on [BaseChipsInput](#basechipsinput)
- * in order to assign roles to selected entries)]
- *
- */
-
 import Draggable from 'vuedraggable';
 import SvgIcon from 'vue-svgicon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
+
+/**
+ * A very specialized component based on [BaseChipsInput](#basechipsinput)
+ * in order to assign roles to selected entries)]
+ *
+ * slots 'drop-down-entry' and 'no-options' of component [BaseChipsInput](#basechipsinput)
+ * are available here as well
+ *
+ */
 
 export default {
   components: {
@@ -121,9 +124,7 @@ export default {
      */
     list: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * @model
@@ -132,9 +133,7 @@ export default {
      */
     selectedList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * if object array was passed - define the property that should be
@@ -224,9 +223,7 @@ export default {
      */
     roleOptions: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * specify a placeholder of the roles input field
@@ -241,9 +238,7 @@ export default {
      */
     hoverboxContent: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
     /**
      * show spinner to indicate that something is loading
@@ -321,13 +316,6 @@ export default {
       if (elem) {
         // elem.parentNode.removeChild(elem);
       }
-      /**
-       * propagate list change from dragging event to parent
-       *
-       * @event list-change
-       * @type {object}
-       *
-       */
       this.emitInternalList(list);
     },
     updateRoles(evt, index) {
@@ -354,6 +342,13 @@ export default {
       const sendArr = [];
       val.forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
       sendArr.forEach(sel => this.$delete(sel, 'idInt'));
+      /**
+       * propagate list change from dragging event to parent
+       *
+       * @event list-change
+       * @type {object}
+       *
+       */
       this.$emit('list-change', sendArr);
     },
     modifyChipValue(event, index) {
@@ -369,16 +364,27 @@ export default {
       }
       this.emitInternalList(this.selectedBelowListInt);
     },
+    fetchDropDownEntries(event) {
+      /**
+       * if drop down entries dynamically set - fetch new entries on input
+       *
+       * @event fetch-dropdown-entries
+       * @type {object}
+       *
+       */
+      this.$emit('fetch-dropdown-entries', event);
+    },
+    hoverBoxActive(value, entry) {
+      /**
+       * event emitted on show / hide hoverbox, emitting event and originating entry
+       *
+       * @type {Event, Object}
+       */
+      this.$emit('hoverbox-active', { value, entry });
+    },
   },
 };
 
-/**
- * if drop down entries dynamically set - fetch new entries on input
- *
- * @event fetch-dropdown-entries
- * @type {object}
- *
- */
 </script>
 
 <style lang="scss">

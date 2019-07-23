@@ -2,7 +2,9 @@
 <template>
   <div class="background">
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }">
+        <p class="example-text">Example Content</p>
+      </base-box>
       <base-box
         :box-size="{ width: 'calc(25% - 12px)' }"/>
       <base-box
@@ -25,8 +27,20 @@ export default {
     padding: 16px;
   }
 
-  .base-box:not(:last-of-type) {
+  .base-box {
     margin-right: 16px;
+  }
+  
+  .base-box:nth-of-type(4n) {
+    margin-right: 0;
+  }
+  
+  .example-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
   }
 </style>
 

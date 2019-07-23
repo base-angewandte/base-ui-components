@@ -3,7 +3,7 @@
     :box-size="boxSize"
     :box-ratio="boxRatio"
     class="base-box-button"
-    @clicked="$emit('clicked')">
+    @clicked="clicked">
     <div
       v-if="boxStyle === 'large'"
       class="button-box-content">
@@ -45,20 +45,13 @@
 </template>
 
 <script>
-/**
- * A Base Box Shaped Button
- */
-
-/**
- * event triggered on click
- *
- * @event clicked
- * @type None
- *
- */
 import SvgIcon from 'vue-svgicon';
 import BaseBox from '../BaseBox/BaseBox';
 import '../../assets/icons/index';
+
+/**
+ * A Base Box Shaped Button
+ */
 
 export default {
   components: {
@@ -115,9 +108,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '25%' };
-      },
+      default: () => ({ width: '25%' }),
     },
     /**
      * define the ratio of width and height of the box
@@ -126,6 +117,16 @@ export default {
     boxRatio: {
       type: String,
       default: '100',
+    },
+  },
+  methods: {
+    clicked(event) {
+      /**
+       * event emitted on box click
+       *
+       * @type {Event}
+       */
+      this.$emit('clicked', event);
     },
   },
 };

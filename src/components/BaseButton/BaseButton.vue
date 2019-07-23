@@ -5,7 +5,7 @@
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
-    @click.prevent="$emit('clicked')">
+    @click.prevent="clicked">
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text"/>
     <svg-icon
@@ -33,6 +33,9 @@
 import SvgIcon from 'vue-svgicon';
 import '../../assets/icons/index';
 
+/**
+ * Standard buttons
+ */
 export default {
   name: 'BaseButton',
   components: {
@@ -119,6 +122,16 @@ export default {
     buttonType: {
       type: String,
       default: 'button',
+    },
+  },
+  methods: {
+    clicked(event) {
+      /**
+       * triggered on button click
+       *
+       * @type {Event}
+       */
+      this.$emit('clicked', event);
     },
   },
 };
