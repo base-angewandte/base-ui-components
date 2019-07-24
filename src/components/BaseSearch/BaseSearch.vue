@@ -1,23 +1,22 @@
 <template>
   <div
-    :style="$props.styleProps"
+    :style="styleProps"
     :class="['base-search', { 'base-search-fade-out': !active }]">
     <label
       for="search"
       class="hide">
-      {{ $props.label }}
+      {{ label }}
     </label>
     <input
       id="search"
-      v-model="input"
-      :placeholder="$props.placeholder"
+      v-model="inputInt"
+      :placeholder="placeholder"
       :class="['base-search-input', { 'base-search-input-img': showImage }]"
-      type="text"
+      type="search"
       autocomplete="off"
       @focus.prevent="inputFocus"
       @blur="inputBlur"
-      @click.prevent="prevent"
-      @keyup="$emit('input', input)" >
+      @keyup="onKeyUp">
   </div>
 </template>
 
@@ -25,15 +24,21 @@
 /**
  * A basic text search to filter entries or files
   */
-
-/**
- * Event emitted on keyup
- *
- * @event input
- * @type String
- */
 export default {
+  model: {
+    prop: 'input',
+    event: 'input-change',
+  },
   props: {
+    /**
+     * set input value from outside
+     *
+     * @model
+     */
+    input: {
+      type: String,
+      default: '',
+    },
     /**
      * placeholder to show for input
      */
@@ -67,9 +72,19 @@ export default {
   },
   data() {
     return {
-      input: null,
+      inputInt: null,
       active: false,
     };
+  },
+  watch: {
+    input(val) {
+      if (this.inputInt !== val) {
+        this.inputInt = val;
+      }
+    },
+  },
+  mounted() {
+    this.inputInt = this.input;
   },
   methods: {
     inputBlur() {
@@ -78,8 +93,14 @@ export default {
     inputFocus() {
       this.active = true;
     },
-    prevent() {
-      return null;
+    onKeyUp() {
+      /**
+       * Event emitted on keyup
+       *
+       * @event input
+       * @type String
+       */
+      this.$emit('input-change', this.inputInt);
     },
   },
 };
