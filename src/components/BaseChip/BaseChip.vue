@@ -19,6 +19,7 @@
       @click="removeClicked">
       <img
         :src="require('../../static/icons/remove.svg')"
+        alt="remove"
         class="base-chip-icon-img">
     </div>
     <base-hover-box
