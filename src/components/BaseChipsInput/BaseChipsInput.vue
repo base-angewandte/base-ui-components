@@ -70,7 +70,10 @@
           v-if="!allowMultipleEntries"
           class="base-chips-input-single-dropdown">
           <SvgIcon
-            :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+            :class="[
+              'base-chips-input-single-dropdown-icon',
+              { 'base-chips-input-single-dropdown-icon-rotated': showDropDown }
+            ]"
             name="drop-down"/>
         </div>
       </template>
@@ -887,6 +890,16 @@ export default {
 
     .base-chips-input-single-dropdown {
       margin: 0 $spacing;
+
+      .base-chips-input-single-dropdown-icon {
+        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+        height: $icon-small;
+        flex-shrink: 0;
+
+        &.base-chips-input-single-dropdown-icon-rotated {
+          transform: rotate(180deg);
+        }
+      }
     }
   }
 </style>
