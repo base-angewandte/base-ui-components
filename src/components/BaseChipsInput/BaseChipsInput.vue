@@ -42,10 +42,10 @@
             <transition-group
               :name="!drag ? 'flip-list' : null"
               type="transition">
-              <base-chip
+              <BaseChip
                 v-for="(entry, index) in selectedListInt"
                 ref="baseChip"
-                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
+                :key="'chip-' + entry.idInt"
                 :id="entry[identifier] || entry.idInt"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :chip-editable="chipsEditable"
@@ -538,6 +538,12 @@ export default {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
           if (this.addSelectedEntryDirectly) {
+            // check if an entry was already added once and modified after (means it would have
+            // the same idInt which should not be the case since it will lead to duplicate keys
+            if (this.chipsEditable
+              && this.selectedListInt.some(chip => chip.idInt === selected.idInt)) {
+              this.$set(selected, 'idInt', `${selected.idInt}_${Math.random()}_${this.selectedListInt.length}`);
+            }
             this.selectedListInt.push(selected);
           }
         } else {
@@ -783,17 +789,20 @@ export default {
         this.insideDropDown = false;
       }
     },
-    modifyChipValue(event, entry) {
-      if (!event) {
+    modifyChipValue(newString, entry) {
+      // if the string was completely deleted remove the chip from the array
+      if (!newString) {
         this.selectedListInt = this.selectedListInt
           .filter(selected => selected.idInt !== entry.idInt);
-      } else if (event !== entry[this.objectProp]) {
+        // check if the string was modified
+      } else if (newString !== entry[this.objectProp]) {
         if (this.language) {
-          this.$set(entry, this.objectProp, { [this.language]: event });
+          this.$set(entry, this.objectProp, { [this.language]: newString });
         } else {
-          this.$set(entry, this.objectProp, event);
+          this.$set(entry, this.objectProp, newString);
         }
-        this.$set(entry, 'idInt', `${entry.idInt}_${Math.random()}_${this.selectedListInt.length}`);
+        // if the entry has an identifier, remove it to indicate this is not the entry fetched from
+        // external sources anymore
         if (this.identifier) {
           this.$set(entry, this.identifier, '');
         }
