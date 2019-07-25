@@ -17,14 +17,23 @@
       @focus.prevent="inputFocus"
       @blur="inputBlur"
       @keyup="onKeyUp">
+    <SvgIcon
+      v-if="inputInt"
+      name="remove"
+      class="base-search__remove-icon"
+      @click="clearInput"/>
   </div>
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
 /**
  * A basic text search to filter entries or files
   */
 export default {
+  components: {
+    SvgIcon,
+  },
   model: {
     prop: 'input',
     event: 'input-change',
@@ -94,6 +103,10 @@ export default {
       this.active = true;
     },
     onKeyUp() {
+      this.$emit('input-change', this.inputInt);
+    },
+    clearInput() {
+      this.inputInt = '';
       /**
        * Event emitted on keyup
        *
@@ -123,12 +136,12 @@ export default {
       height: 100%;
       position: absolute;
       top: 0;
-      right: $spacing;
+      right: calc(2 * #{$spacing} + #{$icon-medium});
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
     }
 
     .base-search-input {
-      width: 100%;
+      width: calc(100% - #{$spacing} - #{$icon-medium} - #{$spacing-small} / 2);
       border: none;
       height: 100%;
       transition: background 0.2s ease;
@@ -149,6 +162,14 @@ export default {
         background-size: $icon-large;
         padding-left: calc(#{$icon-large} + #{$spacing});
       }
+    }
+
+    .base-search__remove-icon {
+      cursor: pointer;
+      margin-left: $spacing;
+      height: $icon-medium;
+      width: $icon-medium;
+      fill: $font-color-second;
     }
   }
 </style>
