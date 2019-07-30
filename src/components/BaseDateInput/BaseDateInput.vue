@@ -456,7 +456,6 @@ export default {
         color: $font-color-second;
         margin-bottom: $spacing-small/2;
         text-align: left;
-        text-transform: capitalize;
         align-self: flex-end;
       }
 
