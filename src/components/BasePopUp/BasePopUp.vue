@@ -28,7 +28,7 @@
                @type none -->
           <!-- @slot custom button row -->
           <slot name="button-row">
-            <base-button
+            <BaseButton
               :text="buttonLeftText"
               :icon="buttonLeftIcon"
               :icon-position="'right'"
@@ -36,13 +36,21 @@
               class="base-popup-button"
               @clicked="$emit('button-left')" />
             <!-- @event buttonRight -->
-            <base-button
+            <BaseButton
               :text="buttonRightText"
-              :icon="buttonRightIcon"
+              :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-right')" />
+              @clicked="$emit('button-right')">
+              <template
+                v-if="isLoading"
+                slot="right-of-text">
+                <span class="base-popup-button-loader">
+                  <BaseLoader />
+                </span>
+              </template>
+            </BaseButton>
           </slot>
         </div>
       </div>
@@ -70,14 +78,18 @@
  * @type none
  */
 
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import BaseLoader from '../BaseLoader/BaseLoader';
+import '../../assets/icons/index';
+import popUpLock from '../../mixins/popUpLock';
 
 export default {
   name: 'BasePopUp',
   components: {
     BaseButton: () => import('../BaseButton/BaseButton'),
     SvgIcon: () => import('vue-svgicon'),
+    BaseLoader,
   },
+  mixins: [popUpLock],
   props: {
     /**
      * could be used to control visibility
@@ -121,40 +133,24 @@ export default {
       type: String,
       default: 'check-mark',
     },
+    /**
+     * if true button loader will be shown
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       showInt: this.show,
-      targetElement: null,
+      targetName: 'popUpBody',
     };
   },
   watch: {
     show(val) {
       this.showInt = val;
     },
-    showInt(val) {
-      this.targetElement = this.$refs.popUpBody;
-      if (this.targetElement && val) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        clearAllBodyScrollLocks();
-      }
-    },
-  },
-  mounted() {
-    this.targetElement = this.$refs.popUpBody;
-    if (this.targetElement) {
-      if (this.showInt) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        enableBodyScroll(this.targetElement);
-      }
-    } else {
-      clearAllBodyScrollLocks();
-    }
-  },
-  destroyed() {
-    clearAllBodyScrollLocks();
   },
   methods: {
     close() {
@@ -224,10 +220,17 @@ export default {
     flex-direction: row;
 
     /* TODO: check if button size should just be adjustable via props in general" */
-    & .base-popup-button {
+    .base-popup-button {
       margin-right: $spacing;
       // width: calc(50% - 8px);
       flex-basis: 50%;
+
+      .base-popup-button-loader{
+        position: relative;
+        transform: scale(0.5);
+        margin-left: $spacing;
+        padding-left: $spacing;
+      }
     }
 
     & .base-popup-button:last-child {

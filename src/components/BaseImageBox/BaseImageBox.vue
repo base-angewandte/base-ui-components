@@ -25,14 +25,14 @@
           </div>
         </div>
         <div
-          v-if="imageUrl"
+          v-if="imageUrl && displayImage"
           class="base-image-box-img-wrapper">
-          <!-- TODO: image display error handling -->
           <img
             ref="image"
             :src="imageUrl"
             :style="imageStyle"
-            class="base-image-box-image">
+            class="base-image-box-image"
+            @error="displayImage = false">
         </div>
         <!-- @slot to display more advanced text -->
         <slot
@@ -40,7 +40,7 @@
           name="text">
           <!-- default -->
           <div
-            v-if="!imageUrl && boxText.length"
+            v-if="!(imageUrl && displayImage) && boxText.length"
             ref="boxText"
             :style="boxTextStyle"
             class="base-image-box-text">
@@ -160,6 +160,7 @@ export default {
       selectedInt: false,
       boxTextStyle: {},
       imageStyle: {},
+      displayImage: true,
     };
   },
   computed: {
@@ -347,6 +348,9 @@ export default {
     color: white;
     bottom: $spacing;
     left: $spacing;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    right: $spacing;
   }
 
   .base-image-box-checkbox {

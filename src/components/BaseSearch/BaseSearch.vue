@@ -1,38 +1,53 @@
 <template>
   <div
-    :style="$props.styleProps"
-    class="base-search">
+    :style="styleProps"
+    :class="['base-search', { 'base-search-fade-out': !active }]">
     <label
       for="search"
       class="hide">
-      {{ $props.label }}
+      {{ label }}
     </label>
     <input
       id="search"
-      v-model="input"
-      :placeholder="$props.placeholder"
+      v-model="inputInt"
+      :placeholder="placeholder"
       :class="['base-search-input', { 'base-search-input-img': showImage }]"
-      type="text"
+      type="search"
       autocomplete="off"
-      @focus.prevent="test"
-      @click.prevent="test"
-      @keyup="$emit('input', input)">
+      @focus.prevent="inputFocus"
+      @blur="inputBlur"
+      @keyup="onKeyUp">
+    <SvgIcon
+      v-if="inputInt"
+      name="remove"
+      class="base-search__remove-icon"
+      @click="clearInput" />
   </div>
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
 /**
  * A basic text search to filter entries or files
   */
-
-/**
- * Event emitted on keyup
- *
- * @event input
- * @type String
- */
 export default {
+  components: {
+    SvgIcon,
+  },
+  model: {
+    prop: 'input',
+    event: 'input-change',
+  },
   props: {
+    /**
+     * set input value from outside
+     *
+     * @model
+     */
+    input: {
+      type: String,
+      default: '',
+    },
     /**
      * placeholder to show for input
      */
@@ -66,12 +81,39 @@ export default {
   },
   data() {
     return {
-      input: null,
+      inputInt: null,
+      active: false,
     };
   },
+  watch: {
+    input(val) {
+      if (this.inputInt !== val) {
+        this.inputInt = val;
+      }
+    },
+  },
+  mounted() {
+    this.inputInt = this.input;
+  },
   methods: {
-    test() {
-      return null;
+    inputBlur() {
+      this.active = false;
+    },
+    inputFocus() {
+      this.active = true;
+    },
+    onKeyUp() {
+      this.$emit('input-change', this.inputInt);
+    },
+    clearInput() {
+      this.inputInt = '';
+      /**
+       * Event emitted on keyup
+       *
+       * @event input
+       * @type String
+       */
+      this.$emit('input-change', this.inputInt);
     },
   },
 };
@@ -86,10 +128,21 @@ export default {
     padding: 0 $spacing;
     height: $row-height-large;
 
+    &.base-search-fade-out::after {
+      content: '';
+      width: calc(#{$fade-out-width} + #{$spacing});
+      height: 100%;
+      position: absolute;
+      top: 0;
+      right: calc(2 * #{$spacing} + #{$icon-medium});
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+    }
+
     .base-search-input {
-      width: 100%;
+      width: calc(100% - #{$spacing} - #{$icon-medium} - #{$spacing-small} / 2);
       border: none;
       height: 100%;
+      transition: background 0.2s ease;
 
       &::placeholder {
         color: $font-color-third;
@@ -107,6 +160,14 @@ export default {
         background-size: $icon-large;
         padding-left: calc(#{$icon-large} + #{$spacing});
       }
+    }
+
+    .base-search__remove-icon {
+      cursor: pointer;
+      margin-left: $spacing;
+      height: $icon-medium;
+      width: $icon-medium;
+      fill: $font-color-second;
     }
   }
 </style>

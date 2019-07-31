@@ -18,11 +18,10 @@
       @input-keydown="checkKeyEvent"
       @input-keypress="checkKeyEvent"
       @enter="onEnter()"
-      @click-input-field="insideInput = true">
+      @click-input-field="setInputActive">
       <template
         v-if="sortable"
         slot="label-addition">
-        <!-- TODO: this should be language specific!! -->
         <div
           class="base-chips-input-sort"
           @click="sort(selectedListInt)">
@@ -47,7 +46,7 @@
               <BaseChip
                 v-for="(entry, index) in selectedListInt"
                 :id="entry[identifier] || entry.idInt"
-                :key="'chip-' + (entry[identifier] ? entry[identifier] : entry.idInt)"
+                :key="'chip-' + entry.idInt"
                 ref="baseChip"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :chip-editable="chipsEditable"
@@ -55,7 +54,7 @@
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
                 @mouse-down="chipActive = index"
                 @remove-entry="removeEntry(entry, index)"
-                @hoverbox-active="$emit('hoverbox-active', $event, entry)"
+                @hoverbox-active="hoverBoxActive($event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
             </transition-group>
           </draggable>
@@ -71,7 +70,10 @@
           v-if="!allowMultipleEntries"
           class="base-chips-input-single-dropdown">
           <SvgIcon
-            :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+            :class="[
+              'base-chips-input-single-dropdown-icon',
+              { 'base-chips-input-single-dropdown-icon-rotated': showDropDown }
+            ]"
             name="drop-down" />
         </div>
       </template>
@@ -143,11 +145,6 @@
 </template>
 
 <script>
-/**
- * Base Chips Input component with autocomplete function
- *
- */
-
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
 import SvgIcon from 'vue-svgicon';
@@ -155,6 +152,11 @@ import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import { setLanguageMixin } from '../../mixins/setLanguage';
+
+/**
+ * Base Chips Input component with autocomplete function
+ *
+ */
 
 export default {
   components: {
@@ -180,9 +182,7 @@ export default {
      */
     list: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * @model
@@ -191,9 +191,7 @@ export default {
      */
     selectedList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * if object array was passed - define the property that should be
@@ -319,9 +317,7 @@ export default {
      */
     hoverboxContent: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
     /**
      * show spinner to indicate that something is loading
@@ -426,13 +422,6 @@ export default {
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
-        /**
-         * event to fetch drop down entries with changing input
-         *
-         * @event fetch-dropdown-entries
-         * @type { object }
-         *
-         */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
         /**
@@ -480,6 +469,13 @@ export default {
     showDropDown(val) {
       // allow also for static drop down entries to be loaded on first drop down show only
       if (val && !this.allowDynamicDropDownEntries && !this.dropDownListInt.length) {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event fetch-dropdown-entries
+         * @type { object }
+         *
+         */
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
       }
       if (val) {
@@ -491,7 +487,7 @@ export default {
          * event triggered on show drop down
          *
          * @event show-dropdown
-         * @type None
+         * @type {none}
          *
          */
         this.$emit('show-dropdown');
@@ -500,7 +496,7 @@ export default {
          * event triggered on hide drop down
          *
          * @event hide-dropdown
-         * @type None
+         * @type {none}
          *
          */
         this.$emit('hide-dropdown');
@@ -539,6 +535,12 @@ export default {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
           if (this.addSelectedEntryDirectly) {
+            // check if an entry was already added once and modified after (means it would have
+            // the same idInt which should not be the case since it will lead to duplicate keys
+            if (this.chipsEditable
+              && this.selectedListInt.some(chip => chip.idInt === selected.idInt)) {
+              this.$set(selected, 'idInt', `${selected.idInt}_${Math.random()}_${this.selectedListInt.length}`);
+            }
             this.selectedListInt.push(selected);
           }
         } else {
@@ -719,6 +721,12 @@ export default {
         this.selectedListInt
           .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
         sendArr.forEach(sel => this.$delete(sel, 'idInt'));
+        /**
+         * event emitting selected list upon changes
+         *
+         * @type {Array}
+         *
+         */
         this.$emit('selected', sendArr);
       }
     },
@@ -778,17 +786,20 @@ export default {
         this.insideDropDown = false;
       }
     },
-    modifyChipValue(event, entry) {
-      if (!event) {
+    modifyChipValue(newString, entry) {
+      // if the string was completely deleted remove the chip from the array
+      if (!newString) {
         this.selectedListInt = this.selectedListInt
           .filter(selected => selected.idInt !== entry.idInt);
-      } else if (event !== entry[this.objectProp]) {
+        // check if the string was modified
+      } else if (newString !== entry[this.objectProp]) {
         if (this.language) {
-          this.$set(entry, this.objectProp, { [this.language]: event });
+          this.$set(entry, this.objectProp, { [this.language]: newString });
         } else {
-          this.$set(entry, this.objectProp, event);
+          this.$set(entry, this.objectProp, newString);
         }
-        this.$set(entry, 'idInt', `${entry.idInt}_${Math.random()}_${this.selectedListInt.length}`);
+        // if the entry has an identifier, remove it to indicate this is not the entry fetched from
+        // external sources anymore
         if (this.identifier) {
           this.$set(entry, this.identifier, '');
         }
@@ -800,6 +811,19 @@ export default {
       if (inputElems && inputElems.length) {
         inputElems[0].blur();
       }
+    },
+    setInputActive() {
+      if (this.chipActive < 0) {
+        this.insideInput = true;
+      }
+    },
+    hoverBoxActive(value, entry) {
+      /**
+       * event emitted on show / hide hoverbox, emitting event and originating entry
+       *
+       * @type {Event, Object}
+       */
+      this.$emit('hoverbox-active', { value, entry });
     },
   },
 };
@@ -819,6 +843,7 @@ export default {
       cursor: pointer;
       margin-left: $spacing;
       white-space: nowrap;
+      transition: all 0.2s ease;
 
       &:hover {
         color: $app-color;
@@ -869,6 +894,16 @@ export default {
 
     .base-chips-input-single-dropdown {
       margin: 0 $spacing;
+
+      .base-chips-input-single-dropdown-icon {
+        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+        height: $icon-small;
+        flex-shrink: 0;
+
+        &.base-chips-input-single-dropdown-icon-rotated {
+          transform: rotate(180deg);
+        }
+      }
     }
   }
 </style>

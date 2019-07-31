@@ -38,7 +38,7 @@ Multiple Entries Example with fixed dropdown, no unknown, editable and draggable
     :always-linked="true"
     :draggable="true"
     :chips-editable="true"
-    label="Single Choice with fixed DropDown"
+    label="Multipe Choice with fixed DropDown"
     placeholder="Select Quote Snippet"
     />
 </template>

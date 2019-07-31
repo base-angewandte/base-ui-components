@@ -139,17 +139,17 @@
 </template>
 
 <script>
-/**
- * Form Input Field Component for Date, Date - Date or Date - Time
- *
- * Date/Time is always saved as { from:, to: }
- *
- * Time field is currently just a text input field
- */
 import ClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
+
+/**
+ * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
+ *
+ * for date also a format switch between date | year is available
+ *
+ */
 
 export default {
   name: 'BaseDateInput',
@@ -167,7 +167,7 @@ export default {
   },
   props: {
   /**
-   * selecte date or datetime
+   * selecte date or datetime <br>
    * values: 'daterange'|'datetime' | 'single' | 'timerange'
    */
     type: {
@@ -205,9 +205,7 @@ export default {
      */
     placeholder: {
       type: [Object, String],
-      default() {
-        return { date: 'Select Date', time: 'Select Time' };
-      },
+      default: () => ({ date: 'Select Date', time: 'Select Time' }),
     },
     /**
      * define the range separator
@@ -235,14 +233,15 @@ export default {
      */
     dateFormatLabels: {
       type: Object,
-      default() {
-        return { date: 'DD.MM.YYYY', year: 'YYYY' };
-      },
+      default: () => ({ date: 'DD.MM.YYYY', year: 'YYYY' }),
       validator(val) {
         const labelKeys = Object.keys(val);
         return labelKeys.includes('date') && labelKeys.includes('year');
       },
     },
+    /**
+     * a legend for the date format switch buttons
+     */
     formatTabsLegend: {
       type: String,
       default: 'Switch between date formats',
@@ -284,6 +283,7 @@ export default {
           return date.toString();
         },
       },
+      tempDateStore: {},
     };
   },
   computed: {
@@ -346,13 +346,20 @@ export default {
   },
   watch: {
     input(val) {
-      this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
-      if (this.showFormatOptions && this.isDateFormatYear()) {
-        this.dateFormatInt = 'YYYY';
+      if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
+        this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
+        if (this.showFormatOptions && this.isDateFormatYear()) {
+          this.dateFormatInt = 'YYYY';
+        }
       }
     },
-    dateFormatInt() {
-      this.emitData();
+    dateFormatInt(val) {
+      // in order to allow user to restore previous date after switching
+      // from date to year and back store in temp variable
+      if (val === 'YYYY') {
+        this.tempDateStore = { ...this.inputInt };
+      }
+      this.convertDate();
     },
     inputInt: {
       handler() {
@@ -382,16 +389,11 @@ export default {
       }
     },
     emitData() {
-      this.convertDate();
       const data = this.getInputData();
       /**
        * emit an event when focus leaves the input
        *
-       * TODO: check again if this is needed???
-       *
-       * @event selected
-       * @event selected
-       * @type string|object
+       * @type { string | object }
        */
       this.$emit('selected', data);
     },
@@ -408,7 +410,15 @@ export default {
               this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
                 .getFullYear().toString());
             } else {
-              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey]));
+              // check if year was changed or is still the same
+              const yearIdent = new Date(this.tempDateStore[dateKey])
+                .getFullYear().toString() === this.inputInt[dateKey];
+              this.$set(
+                this.inputInt,
+                dateKey,
+                yearIdent && this.tempDateStore[dateKey]
+                  ? this.tempDateStore[dateKey] : new Date(this.inputInt[dateKey]),
+              );
             }
           }
         });
@@ -441,7 +451,6 @@ export default {
         color: $font-color-second;
         margin-bottom: $spacing-small/2;
         text-align: left;
-        text-transform: capitalize;
         align-self: flex-end;
       }
 
@@ -476,6 +485,30 @@ export default {
     .base-input-field-container-multiple {
       max-width: calc(50% - 8px);
     }
+
+    .base-input-field {
+      flex: 1 1 auto;
+      margin-right: $spacing;
+
+      &.base-date-input-field {
+        width: calc(100% - #{$icon-large} - (2 * #{$spacing}));
+        margin-right: 0;
+      }
+    }
+  }
+
+  input[type='text'].base-input-field {
+    border: none;
+    overflow: hidden;
+    max-width: 60%;
+  }
+
+  input[type='date'].base-input-field {
+    background: url('../../static/icons/magnifier-2.svg') right no-repeat;
+  }
+
+  input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
+    outline: none;
   }
 
   .base-date-input-datepicker {
@@ -489,6 +522,7 @@ export default {
     width: 24px;
     max-height: 24px;
     color: $font-color-second;
+    cursor: pointer;
   }
 
   .input-field-wrapper {

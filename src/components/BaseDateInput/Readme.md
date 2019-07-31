@@ -8,7 +8,7 @@ Date range input fields
         :format="'day'"
         :showLabel="true"
         v-model="datepicked"
-        type="range"
+        type="daterange"
         placeholder="enter a date"
         />
       <div>{{ datepicked }}</div>
@@ -20,7 +20,10 @@ Date range input fields
 export default {
   data() {
     return {
-      datepicked: {},
+      datepicked: {
+        date_from: '',
+        date_to: '',
+      },
     }
   }
 }
@@ -28,13 +31,13 @@ export default {
 
 ```
 
-Single date input with format year
+Single date input with format date_year, enabling switching the format
 
 ```vue
 <template>
   <base-date-input
     :label="'Enter A Year'"
-    :format="'year'"
+    :format="'date_year'"
     :showLabel="true"
     v-model="datepicked"
     type="single"
@@ -46,7 +49,9 @@ Single date input with format year
 export default {
   data() {
     return {
-      datepicked: {},
+      datepicked: {
+        date: '2017',
+      },
     }
   }
 }
@@ -75,7 +80,10 @@ Date Time Input
 export default {
   data() {
     return {
-      datepicked: {},
+      datepicked: {
+        date: '',
+        time: '',
+      },
     }
   }
 }

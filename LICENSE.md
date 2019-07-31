@@ -22,6 +22,8 @@ success by Trident from the Noun Project
 
 Download by scott desmond from the Noun Project
 
+text by Bohdan Burmich from the Noun Project
+
 
 The software of this project is licensed under the MIT license.
 

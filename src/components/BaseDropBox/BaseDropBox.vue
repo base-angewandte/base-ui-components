@@ -5,7 +5,7 @@
     :box-ratio="boxRatio"
     class="base-drop-box"
     @dragenter="dragEnter"
-    @clicked="$emit('clicked')">
+    @clicked="onClicked">
     <div
       class="base-drop-box-inner">
       <draggable
@@ -39,12 +39,13 @@
 </template>
 
 <script>
-/**
- * An Element for dropping files or other UI Elements into
-  */
-
 import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+
+/**
+ * An Element for dropping files or other UI Elements into
+ */
+
 
 export default {
   components: {
@@ -85,9 +86,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '250px' };
-      },
+      default: () => ({ width: '250px' }),
     },
     /**
      * define the ratio of width and height of the box
@@ -165,7 +164,7 @@ export default {
        * event emitted when an element is dropped on the box, emitting the element data id
        *
        * @event dropped-element
-       * @type String
+       * @type { String }
        */
       this.$emit('dropped-element', draggedElementId);
     },
@@ -175,15 +174,19 @@ export default {
     dragLeave() {
       this.isDragOver = false;
     },
+    onClicked(event) {
+      /**
+       * Triggered when the box is clicked
+       *
+       * @event clicked
+       * @type {Event}
+       */
+      this.$emit('clicked', event);
+    },
   },
 };
 
-/**
- * Triggered when the box is clicked
- *
- * @event clicked
- * @type None
- */
+
 </script>
 
 <style lang="scss" scoped>
@@ -200,6 +203,7 @@ export default {
       height: 100%;
       width: 100%;
       border: $upload-border;
+      transition: all 0.2s ease;
 
       &:hover {
         border: $upload-border-hover;

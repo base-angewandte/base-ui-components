@@ -10,7 +10,10 @@
       :name="icon"
       class="base-menu-entry-icon" />
     <div
-      class="base-menu-entry-text-wrapper">
+      :class="[
+        'base-menu-entry-text-wrapper',
+        { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
+      ]">
       <div class="base-menu-entry-title-description-wrapper">
         <div
           v-if="title"
@@ -223,6 +226,7 @@ export default {
       width: $icon-large;
       margin: 0 $spacing;
       flex: 0 0 #{$icon-large};
+      transition: fill 0.1s ease;
     }
 
     .base-menu-entry-text-wrapper {
@@ -233,6 +237,18 @@ export default {
       max-width: calc(100% - #{$icon-large} - (2 * #{$spacing}) - #{$border-width}
       - 2 * #{$spacing-small} + 2 * #{$spacing});
       position: relative;
+      overflow: hidden;
+      margin-right: $spacing;
+
+      &.base-menu-entry-text-slide-overlay::after {
+        content: '';
+        width: calc(#{$icon-medium} +  (2 * #{$spacing}));
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: -$spacing;
+        background-color: white;
+      }
 
       .base-menu-entry-title-description-wrapper {
         flex-shrink: 1;
@@ -250,6 +266,7 @@ export default {
           color: $font-color-second;
           font-size: $font-size-small;
           white-space: nowrap;
+          transition: color 0.1s ease;
         }
       }
     }
@@ -262,6 +279,7 @@ export default {
       position: relative;
       white-space: nowrap;
       overflow: hidden;
+      transition: color 0.1s ease;
     }
 
     .base-menu-entry-subtext {
@@ -275,6 +293,7 @@ export default {
 
     &.base-menu-entry-activatable {
       cursor: pointer;
+      transition: box-shadow 0.2s ease;
 
       &.base-menu-entry-active {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
@@ -294,16 +313,16 @@ export default {
       top: 0;
       flex-direction: row;
       align-items: center;
-      right: 0;
+      right: $spacing;
       background: white;
 
       &::before {
         content: '';
-        width: 30px;
+        width: calc(#{$fade-out-width} + #{$spacing});
         height: $row-height-large;
         position: absolute;
         top: 0;
-        left: -30px;
+        left: calc(-#{$fade-out-width} - #{$spacing});
         background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
         z-index: 1;
       }
@@ -313,7 +332,7 @@ export default {
         flex-direction: column;
         justify-content: space-evenly;
         height: $row-height-large;
-        margin: 0 $spacing;
+        margin-left: $spacing;
         width: $icon-small;
 
         .base-menu-entry-thumbnail {
@@ -325,26 +344,15 @@ export default {
 
     .base-menu-entry-checkbox {
       height: 100%;
-      padding: 0 $spacing;
+      padding-left: $spacing;
       background-color: white;
       display: flex;
       align-items: center;
     }
 
-    .base-menu-entry-checkbox::before {
-      content: '';
-      width: 30px;
-      height: $row-height-large;
-      position: absolute;
-      right: 2 * $spacing-small + 2 * $spacing;
-      top: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-      z-index: 1;
-    }
-
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
       background-color: white;
-      transition: all 0.5s ease;
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
     .slide-fade-enter, .slide-fade-leave-to {

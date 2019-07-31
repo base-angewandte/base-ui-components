@@ -20,7 +20,7 @@ export {\n  ${componentNames.map(componentName => componentName).join(',\n  ')},
 function install(Vue) {
 ${componentNames
     .map(componentName => `  Vue.component('${componentName}', ${componentName})`)
-    .join(';\n')}
+    .join(';\n')};
 }
 
 // Export the library as a plugin

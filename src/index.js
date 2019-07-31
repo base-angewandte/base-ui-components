@@ -82,7 +82,7 @@ function install(Vue) {
   Vue.component('BasePopUp', BasePopUp);
   Vue.component('BaseSearch', BaseSearch);
   Vue.component('BaseSwitchButton', BaseSwitchButton);
-  Vue.component('BaseUploadBar', BaseUploadBar)
+  Vue.component('BaseUploadBar', BaseUploadBar);
 }
 
 // Export the library as a plugin

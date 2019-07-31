@@ -117,7 +117,7 @@ export default {
       &:after {
         content: '';
         height: 100%;
-        width: 30px;
+        width: $fade-out-width;
         position: absolute;
         top: 0;
         right: 0;

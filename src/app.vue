@@ -111,8 +111,8 @@
     <!-- FORM FIELD TESTING -->
     <div class="form-field">
       <base-date-input
-        :type="'datetime'"
         v-model="inputDateTime"
+        :type="'datetime'"
         :label="'unknown'" />
       <base-date-input
         :label="'unknown'"

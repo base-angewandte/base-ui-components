@@ -253,6 +253,7 @@ export default {
         overflow: hidden;
         position: relative;
         margin-right: $spacing;
+        transition: all 0.2s ease;
 
         .base-drop-down-head-text {
           white-space: nowrap;
@@ -262,7 +263,7 @@ export default {
         &.base-drop-down-head-text-fade-out::after {
           content: '';
           height: 100%;
-          width: 30px;
+          width: $fade-out-width;
           position: absolute;
           top: 0;
           right: 0;
@@ -277,6 +278,16 @@ export default {
 
       &:active .base-drop-down-icon, &:focus .base-drop-down-icon {
         fill: $app-color;
+      }
+
+      .base-drop-down-icon {
+        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+        height: $icon-small;
+        flex-shrink: 0;
+
+        &.base-drop-down-icon-rotated {
+          transform: rotate(180deg);
+        }
       }
     }
 
@@ -299,6 +310,7 @@ export default {
           padding: $spacing-small/2 $spacing;
           line-height: $line-height;
           width: 100%;
+          transition: all 0.2s ease;
 
           &.base-drop-down-option-selected {
             color: $app-color;

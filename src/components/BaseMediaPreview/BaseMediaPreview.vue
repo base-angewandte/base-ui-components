@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="showPreviewInt"
+    v-if="showInt"
     class="base-media-preview-background">
     <div
       class="base-media-preview-close"
@@ -18,7 +18,10 @@
           v-if="displayImage && fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
           :src="mediaUrl"
-          class="base-media-preview-image"
+          :class="[
+            'base-media-preview-image',
+            'base-media-preview-rotation-' + orientation.toString()
+          ]"
           @error="displayImage = false">
         <div
           v-else-if="fileType === 'image' && !displayImage"
@@ -91,8 +94,8 @@
  * Currently a component that shows a lightbox for images<br>
  *     in future it should also be possible to view videos or audio
   */
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import Hls from '../../../node_modules/hls.js/dist/hls.light';
+import popUpLock from '../../mixins/popUpLock';
 
 export default {
   components: {
@@ -102,6 +105,7 @@ export default {
   directives: {
     VueClickOutside: () => import('vue-click-outside'),
   },
+  mixins: [popUpLock],
   props: {
     /**
      * steer the display of the lightbox
@@ -170,11 +174,20 @@ export default {
         };
       },
     },
+    /**
+     * define how the image should be rotated (EXIF orientation values)
+     */
+    orientation: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
-      showPreviewInt: this.showPreview,
+      showInt: this.showPreview,
+      // variable for display image error handling
       displayImage: true,
+      targetName: 'mediaStage',
     };
   },
   computed: {
@@ -218,29 +231,9 @@ export default {
   },
   watch: {
     showPreview(val) {
-      this.showPreviewInt = val;
+      this.showInt = val;
       this.displayImage = true;
     },
-    showPreviewInt(val) {
-      this.targetElement = this.$refs.mediaStage;
-      if (val) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        clearAllBodyScrollLocks();
-      }
-    },
-  },
-  mounted() {
-    this.targetElement = this.$refs.mediaStage;
-    if (this.targetElement) {
-      if (this.showPreviewInt) {
-        disableBodyScroll(this.targetElement);
-      } else {
-        enableBodyScroll(this.targetElement);
-      }
-    } else {
-      clearAllBodyScrollLocks();
-    }
   },
   updated() {
     if (this.showPreview) {
@@ -257,9 +250,6 @@ export default {
         }
       }
     }
-  },
-  destroyed() {
-    clearAllBodyScrollLocks();
   },
   methods: {
     clickOutside(event) {
@@ -334,6 +324,34 @@ export default {
         max-height: calc(100% - #{$spacing}*4);
         max-width: calc(100% - #{$spacing}*4);
         padding: $spacing;
+
+        &.base-media-preview-rotation-2 {
+          transform: scaleX(-1);
+        }
+
+        &.base-media-preview-rotation-3 {
+          transform: scale(-1);
+        }
+
+        &.base-media-preview-rotation-4 {
+          transform: scaleY(-1);
+        }
+
+        &.base-media-preview-rotation-5 {
+          transform: scaleX(-1) rotate(90deg);
+        }
+
+        &.base-media-preview-rotation-6 {
+          transform: scale(-1) rotate(-90deg);
+        }
+
+        &.base-media-preview-rotation-7 {
+          transform: scaleY(-1) rotate(90deg);
+        }
+
+        &.base-media-preview-rotation-8 {
+          transform: scale(-1) rotate(90deg);
+        }
       }
 
       .base-media-preview-error {

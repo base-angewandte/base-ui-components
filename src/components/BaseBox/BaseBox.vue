@@ -2,7 +2,8 @@
   <div
     :style="boxSizeInt"
     :class="['base-box', 'base-box-' + $props.boxRatio]"
-    @click="$emit('clicked')">
+    @click="clicked">
+    <!-- @slot slot for box contents -->
     <slot />
   </div>
 </template>
@@ -25,9 +26,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '200px' };
-      },
+      default: () => ({ width: '200px' }),
     },
     /**
      * define the ratio of width and height of the box
@@ -42,6 +41,16 @@ export default {
     // TODO: do i need this?? why not use prop directly again??
     boxSizeInt() {
       return Object.assign({}, this.$props.boxSize);
+    },
+  },
+  methods: {
+    clicked(event) {
+      /**
+       * event emitted upon box click
+       *
+       * @type {Event}
+       */
+      this.$emit('clicked', event);
     },
   },
 };
