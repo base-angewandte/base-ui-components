@@ -261,7 +261,6 @@ export default {
         color: $font-color-second;
         text-align: left;
         flex-grow: 1;
-        text-transform: capitalize;
       }
     }
   }

@@ -349,7 +349,7 @@ export default {
 
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
       background-color: white;
-      transition: all 0.5s ease;
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
     .slide-fade-enter, .slide-fade-leave-to {

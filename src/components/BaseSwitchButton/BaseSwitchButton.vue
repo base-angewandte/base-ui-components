@@ -118,7 +118,6 @@ export default {
 
     & + .base-switch-button-label {
       cursor: pointer;
-      text-transform: capitalize;
       background-color: inherit;
       padding: $spacing-small/2 $spacing;
       position: relative;
