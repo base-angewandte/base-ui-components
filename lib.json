@@ -1,0 +1,11 @@
+{
+  "name": "base-ui-components",
+  "description": "The component library for base.uni-ak.ac.at vue applications",
+  "author": {
+    "name": "base dev team",
+    "email": "base"
+  },
+  "peerDependencies": {
+    "vue": ">=2.0.0"
+  }
+}
