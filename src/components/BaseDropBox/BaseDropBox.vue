@@ -4,7 +4,6 @@
     :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
     class="base-drop-box"
-    @dragenter="dragEnter"
     @clicked="onClicked">
     <div
       class="base-drop-box-inner">
@@ -13,12 +12,12 @@
         v-model="dragList"
         :sort="false"
         :group="dropElementName"
+        :on-change="onDragChange"
         ghost-class="base-drop-box-ghost"
         class="base-drop-box-drag-area"
         @add="addEntry">
         <div
           class="base-drop-box-drag-area"
-          @dragenter="dragEnter"
           @dragleave="dragLeave"
           @mouseleave="dragLeave"
           @pointerenter="dragEnter"
@@ -33,7 +32,7 @@
       </draggable>
       <form
         v-else
-        ref="fileform" />
+        ref="fileform"/>
     </div>
   </base-box-button>
 </template>
@@ -109,10 +108,19 @@ export default {
     },
     /**
      * if the dropType is 'element', specify the element group name
+     * this needs to match the group name of the draggable element that should
+     * be dragged into this element
      */
     dropElementName: {
       type: String,
-      default: 'menuEntry',
+      default: '',
+    },
+    /**
+     * if the dropType is 'element' specify a class name to limit interactions to a certain element
+     */
+    dragItemClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -142,13 +150,31 @@ export default {
         this.$emit('dropped-file', e);
       });
       ['dragenter', 'dragleave'].forEach(((evt) => {
-        this.$refs.fileform.addEventListener(evt, (() => {
-          this.isDragOver = !this.isDragOver;
+        this.$refs.fileform.addEventListener(evt, ((originalEvent) => {
+          // kind of hacky solution to prevent target element to change color
+          // only works when draggable prop is set on every draggable element on site
+          // otherwise it will light up on file drop boxes!
+          if (!originalEvent.dataTransfer.types.includes('draggable')) {
+            this.isDragOver = !this.isDragOver;
+          }
         }));
       }));
     }
   },
   methods: {
+    onDragChange(evt) {
+      if (!this.isDragOver) {
+        // check if a drag item class was specified otherwise always
+        // set dragging true
+        if (!this.dragItemClass) {
+          this.isDragOver = true;
+          // else check if cloned element contains class name
+        } else if (evt.clone.className.includes(this.dragItemClass)) {
+          this.isDragOver = true;
+        }
+      }
+      return evt.newIndex;
+    },
     determineDragAndDropCapable() {
       const div = document.createElement('div');
       return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div))
@@ -158,15 +184,17 @@ export default {
      * method to get the dropped element id and emit it to parent
      */
     addEntry() {
-      const draggedElementId = this.dragList[0].id;
-      this.dragList = [];
-      /**
-       * event emitted when an element is dropped on the box, emitting the element data id
-       *
-       * @event dropped-element
-       * @type { String }
-       */
-      this.$emit('dropped-element', draggedElementId);
+      if (this.dropType === 'elements') {
+        const draggedElementId = this.dragList[0].id;
+        this.dragList = [];
+        /**
+         * event emitted when an element is dropped on the box, emitting the element data id
+         *
+         * @event dropped-element
+         * @type { String }
+         */
+        this.$emit('dropped-element', draggedElementId);
+      }
     },
     dragEnter() {
       this.isDragOver = true;
@@ -195,6 +223,7 @@ export default {
   .base-drop-box {
     background-color: $background-color !important;
     display: flex;
+    cursor: text;
 
     &:hover {
       color: $app-color !important;
@@ -209,6 +238,7 @@ export default {
 
       &:hover {
         border: $upload-border-hover;
+        cursor: pointer;
       }
 
       .base-drop-box-drag-area {
@@ -225,6 +255,11 @@ export default {
 
   .is-drag-over {
     color: $app-color;
+    cursor: move;
+
+    &:hover {
+      cursor: pointer;
+    }
 
     .base-drop-box-inner {
       border: $upload-border-hover;
