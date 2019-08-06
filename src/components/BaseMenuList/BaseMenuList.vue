@@ -223,6 +223,7 @@ export default {
       // add the element to the dom
       document.body.appendChild(pic);
       dataTransfer.setDragImage(pic, 0, 0);
+      dataTransfer.setData('draggable', '');
     },
   },
 };

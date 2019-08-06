@@ -223,12 +223,15 @@
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
         drop-type="elements"
+        drop-element-name="menuEntry"
+        drag-item-class="base-menu-entry"
         icon="camera"
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
         @dropped-element="dropped($event)"
         @clicked="boxClicked"/>
-      <base-drop-box />
+      <base-drop-box
+        drop-type="files"/>
     </div>
     <div>
       <ul>

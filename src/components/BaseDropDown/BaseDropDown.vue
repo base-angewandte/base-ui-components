@@ -184,7 +184,7 @@ export default {
        * Event emitted when an option is selected
        *
        * @event value-selected
-       * @type String
+       * @type { Object }
        */
       this.$emit('value-selected', option);
     },
