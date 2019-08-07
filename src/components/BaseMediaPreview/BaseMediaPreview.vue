@@ -89,15 +89,16 @@
 </template>
 
 <script>
-/**
- * Currently a component that shows a lightbox for images<br>
- *     in future it should also be possible to view videos or audio
-  */
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import Hls from 'hls.js';
 import BaseButton from '../BaseButton/BaseButton';
 import popUpLock from '../../mixins/popUpLock';
+
+/**
+ * Component allowing for the display of images or streaming of
+ * audio and video (currently only hls format) and by using browser pdf viewer also pdfs
+ */
 
 export default {
   components: {
@@ -153,9 +154,7 @@ export default {
      */
     displaySize: {
       type: Object,
-      default() {
-        return { height: '720px', width: '1280px' };
-      },
+      default: () => ({ height: '720px', width: '1280px' }),
     },
     /**
      * define if download button should be shown and download be enabled
@@ -165,16 +164,14 @@ export default {
       default: true,
     },
     /**
-     * define if download button should be shown and download be enabled
+     * define information texts for download and view (for pdfs) buttons
      */
     infoTexts: {
       type: Object,
-      default() {
-        return {
-          download: 'Download',
-          view: 'View',
-        };
-      },
+      default: () => ({
+        download: 'Download',
+        view: 'View',
+      }),
     },
     /**
      * define how the image should be rotated (EXIF orientation values)
@@ -219,10 +216,11 @@ export default {
         return this.displayName;
       }
       const match = this.downloadUrl.match(/([^/]+)$/);
-      return match[1];
+      return match ? match[1] : '';
     },
     fileEnding() {
-      return this.mediaUrl.match(/\w+\.(\w{3,4})$/)[1] || '';
+      const match = this.mediaUrl.match(/\w+\.(\w{2,4})$/);
+      return match ? match[1] : '';
     },
     formatNotSupported() {
       return !this.fileType;
@@ -258,6 +256,13 @@ export default {
       // for some reason clickOutside is also triggered when opening the box
       // --> to prevent immediate closure
       if (event.target.className === 'base-media-preview-image-stage') {
+        /**
+         * triggered on clicking outside image area
+         *
+         * @event hide-preview
+         * @type { None }
+         *
+         */
         this.$emit('hide-preview');
       }
     },
@@ -268,9 +273,10 @@ export default {
          * download button clicked
          *
          * @event download
+         * @type { Object }
          *
          */
-        this.$emit('download', { url: this.downloadUrl, name: this.fileName });
+        this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
       }
     },
     openPdf() {

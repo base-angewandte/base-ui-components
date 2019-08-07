@@ -15,6 +15,10 @@
 </template>
 
 <script>
+/**
+ * Minimal loader component to be reused in other components
+ */
+
 export default {
   props: {
     /**

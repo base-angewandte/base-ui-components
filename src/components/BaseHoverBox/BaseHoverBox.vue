@@ -7,11 +7,11 @@
 </template>
 
 <script>
+import BaseImageBox from '../BaseImageBox/BaseImageBox';
+
 /**
  * A box for information display after mouse hover or click
  */
-
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
 export default {
   components: {
@@ -76,9 +76,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '212px', height: '212px' };
-      },
+      default: () => ({ width: '212px', height: '212px' }),
     },
   },
   data() {

@@ -7,7 +7,7 @@
       <label
         :class="['base-input-label']"
         :for="label"
-        @click.prevent="$emit('clicked-outside')">
+        @click.prevent.stop="clickedOutsideInput">
         {{ label }}
       </label>
       <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
@@ -16,11 +16,11 @@
       <slot name="label-addition" />
     </div>
     <div
-      v-click-outside="() => $emit('clicked-outside')"
+      v-click-outside="clickedOutsideInput"
       :class="['base-input-field-container',
                { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active || isActive }]"
-      @click="$emit('click-input-field')">
+      @click="insideInput">
       <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
         (before \<input\>)
        -->
@@ -30,16 +30,12 @@
           :id="label"
           :placeholder="placeholder"
           v-model="inputInt"
-          :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
+          :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
           type="text"
           autocomplete="off"
-          @focus="$emit('input-focus')"
-          @keypress.enter="$emit('enter', inputInt)"
-          @keydown="$emit('input-keydown', $event)"
-          @keydown.up.down.prevent="$emit('arrow-key', $event)"
-          @input="$emit('autocomplete', inputInt)"
-          @blur="blurInput()"
-          @click="active = true">
+          @blur="clickedOutsideInput"
+          @click="active = true"
+          v-on="inputListeners">
       </div>
 
       <slot name="input-field-addition-after" />
@@ -48,10 +44,11 @@
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
+
 /**
  * Form Input Field Component
  */
-import ClickOutside from 'vue-click-outside';
 
 export default {
   name: 'BaseInput',
@@ -60,7 +57,7 @@ export default {
   },
   model: {
     prop: 'input',
-    event: 'autocomplete',
+    event: 'input',
   },
   props: {
     /**
@@ -121,6 +118,28 @@ export default {
       active: false,
     };
   },
+  computed: {
+    // add all input event listeners to component
+    // https://vuejs.org/v2/guide/components-custom-events.html
+    inputListeners() {
+      return Object.assign({},
+        // add all the listeners from the parent
+        this.$listeners,
+        // and add custom listeners
+        {
+          input: (event) => {
+            /**
+             * Event emitted on input, passing input string
+             *
+             * @event input
+             * @type { String }
+             *
+             */
+            this.$emit('input', event.target.value);
+          },
+        });
+    },
+  },
   watch: {
     input(val) {
       this.inputInt = val;
@@ -136,67 +155,31 @@ export default {
     }
   },
   methods: {
-    blurInput() {
-      this.active = false;
+    clickedOutsideInput() {
+      if (this.active || this.isActive) {
+        this.active = false;
+        /**
+         * Event emitted when click outside input field \<div\> is registered
+         *
+         * @event clicked-outside
+         * @type { None }
+         *
+         */
+        this.$emit('clicked-outside');
+      }
+    },
+    insideInput() {
       /**
-       * emit an event when focus leaves the input
+       * Event emitted on click on input field \<div\>
        *
-       * @event input-blur
-       * @type string
+       * @event click-input-field
+       * @type { None }
+       *
        */
-      this.$emit('input-blur', this.inputInt);
+      this.$emit('click-input-field');
     },
   },
 };
-
-/**
- * Event emitted on input focus
- *
- * @event input-focus
- * @type None
- *
- */
-
-/**
- * Event emitted on arrow key up or down (in base project needed for
- * autocomplete / chips input)
- *
- * @event arrow-key
- * @type {Event}
- *
- */
-
-/**
- * Event emitted on keypress, emitting input string
- *
- * @event enter
- * @type String
- *
- */
-
-/**
- * Event emitted on input, passing input string
- *
- * @event autocomplete
- * @type String
- *
- */
-
-/**
- * Event emitted on click on input field \<div\>
- *
- * @event click-input-field
- * @type None
- *
- */
-
-/**
- * Event emitted when click outside input field \<div\> is registered
- *
- * @event clicked-outside
- * @type None
- *
- */
 </script>
 
 <style lang="scss" scoped>
@@ -241,6 +224,7 @@ export default {
           overflow: hidden;
           opacity: 0;
           filter:alpha(opacity=0);
+          animation: all 500ms ease;
         }
       }
     }

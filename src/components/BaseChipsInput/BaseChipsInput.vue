@@ -3,7 +3,7 @@
     class="base-chips-input">
 
     <!-- INPUT LABEL AND FIELD -->
-    <base-input
+    <BaseInput
       ref="baseInput"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="label"
@@ -13,12 +13,11 @@
       :is-active="showDropDown"
       v-model="input"
       @clicked-outside="insideInput = false"
-      @input-focus="onInputFocus"
-      @input-blur="onInputBlur"
-      @arrow-key="triggerArrowKey"
-      @input-keydown="checkKeyEvent"
-      @input-keypress="checkKeyEvent"
-      @enter="onEnter()"
+      @focus="onInputFocus"
+      @blur="onInputBlur"
+      @keydown.up.down.prevent="triggerArrowKey"
+      @keydown="checkKeyEvent"
+      @keypress.enter="onEnter()"
       @click-input-field="setInputActive">
       <template
         v-if="sortable"
@@ -77,7 +76,7 @@
             name="drop-down"/>
         </div>
       </template>
-    </base-input>
+    </BaseInput>
 
     <!-- DROP DOWN MENU -->
     <div
@@ -547,7 +546,7 @@ export default {
             this.selectedListInt.push(selected);
           }
         } else {
-          this.selectedListInt = [selected];
+          this.selectedListInt = [].concat(selected);
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;

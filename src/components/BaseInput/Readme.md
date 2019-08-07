@@ -39,7 +39,7 @@ A example with label and slot demonstrations
       <div>Add elements here</div>
     </template>
     <template slot="input-field-addition-before">
-      <div class="input-field-addition-before">Or here</div>
+      <span class="input-field-addition-before">Or here</span>
     </template>
   </BaseInput>
 </template>
@@ -47,8 +47,9 @@ A example with label and slot demonstrations
 export default{};
 </script>
 <style>
-.input-field-addition {
+.input-field-addition-before {
   margin-right: 16px;
+  background-color: lightblue;
 }
 </style>
 
