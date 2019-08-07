@@ -30,9 +30,10 @@
           :id="label"
           :placeholder="placeholder"
           v-model="inputInt"
-          :class="['base-input-field', { 'base-input-field-hidden': hideInputField}]"
+          :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
           type="text"
           autocomplete="off"
+          @blur="clickedOutsideInput"
           @click="active = true"
           v-on="inputListeners">
       </div>
@@ -223,6 +224,7 @@ export default {
           overflow: hidden;
           opacity: 0;
           filter:alpha(opacity=0);
+          animation: all 500ms ease;
         }
       }
     }
