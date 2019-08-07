@@ -703,7 +703,7 @@ export default {
       this.dropDownListInt = this.list;
     },
     checkLeave(e) {
-      if (e.relatedTarget.closest('.base-chips-input')
+      if (e.relatedTarget && e.relatedTarget.closest('.base-chips-input')
         !== e.target.parentElement) {
         this.insideDropDown = false;
       }
