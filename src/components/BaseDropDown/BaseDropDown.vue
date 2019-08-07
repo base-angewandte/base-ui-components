@@ -70,6 +70,9 @@
 import SvgIcon from 'vue-svgicon';
 import { setLanguageMixin } from '../../mixins/setLanguage';
 
+/**
+ * Accessible drop down component
+ */
 export default {
   components: {
     SvgIcon,

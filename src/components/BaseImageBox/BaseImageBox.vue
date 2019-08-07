@@ -8,7 +8,7 @@
       :class="['base-image-box-content-wrapper',
                { 'base-image-box-selected': selectable && selectedInt }]">
       <div :class="['base-image-box-content', imageShadowClass]">
-        <!-- @SLOT for published icon of files -->
+        <!-- @slot for published icon of files -->
         <slot name="top" />
         <div
           v-if="showTitle"
@@ -68,12 +68,13 @@
   </BaseBox>
 </template>
 <script>
+import BaseBox from '../BaseBox/BaseBox';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+
 /**
  * A component with the primary purpose to display
  * images in responsive boxes but also allowing for text only
-  */
-import BaseBox from '../BaseBox/BaseBox';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+ */
 
 export default {
   components: {
@@ -174,7 +175,7 @@ export default {
        * event triggered when box is selectable and clicked upon
        *
        * @event select-triggered
-       * @type Boolean
+       * @type { Boolean }
        */
       this.$emit('select-triggered', val);
     },
@@ -223,7 +224,7 @@ export default {
          * event triggered when selectable is false and box is clicked
          *
          * @event clicked
-         * @type None
+         * @type { None }
          */
         this.$emit('clicked');
       }

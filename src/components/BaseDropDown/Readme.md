@@ -5,8 +5,12 @@ Drop Down Single Style without label
   <div>
       <base-drop-down
         :showLabel="false"
-        :selected="selected"
-        :selectionList="['Red', 'Blue', 'Green', 'Turquoise']"
+        v-model="selected"
+        :options="[
+          { label: 'Red', value: 'red' },
+          { label: 'Blue', value: 'Blue' },
+          { label: 'Green', value: 'Green' },
+          { label: 'Turquoise', value: 'Turquoise' }]"
         header-style="single"
         label="Select a Color"
         placeholder="Select A Color"
@@ -19,7 +23,7 @@ Drop Down Single Style without label
 export default {
   data() {
     return {
-      selected: '',
+      selected: {},
     }
   }
 }
@@ -27,26 +31,34 @@ export default {
 
 ```
 
-Drop Down Inline and Single Style comparison with custom background color
+Drop Down with label and with custom background color
 
 ```vue
 <template>
   <div class="drop-down-wrapper">
       <base-drop-down
         :showLabel="true"
-        :selected="selected1"
-        :selectionList="['Red', 'Blue', 'Green', 'Turquoise']"
-        header-style="inline"
-        background-color="rgb(240, 240, 240)"
+        v-model="selected1"
+        :options="[
+                  { label: 'Red', value: 'red' },
+                  { label: 'Blue', value: 'Blue' },
+                  { label: 'Green', value: 'Green' },
+                  { label: 'Turquoise', value: 'Turquoise' }]"
+        header-background-color="rgb(240, 240, 240)"
         label="Select a Color"
+        class="drop-down"
         />
     <base-drop-down
         :showLabel="true"
-        :selected="selected2"
-        :selectionList="['Red', 'Blue', 'Green', 'Turquoise']"
-        header-style="single"
-        background-color="rgb(240, 240, 240)"
+        v-model="selected2"
+        :options="[
+                  { label: 'Red', value: 'red' },
+                  { label: 'Blue', value: 'Blue' },
+                  { label: 'Green', value: 'Green' },
+                  { label: 'Turquoise', value: 'Turquoise' }]"
+        header-background-color="rgb(240, 240, 240)"
         label="Select a Color"
+        class="drop-down"
         />
   </div>
 
@@ -56,19 +68,15 @@ Drop Down Inline and Single Style comparison with custom background color
 export default {
   data() {
     return {
-      selected1: '',
-      selected2: 'Blue',
+      selected1: { label: '', value: '' },
+      selected2: { label: 'Blue', value: 'Blue' },
     }
   }
 }
 </script>
 
 <style>
-.drop-down-wrapper {
-  display: flex;
-}
-
-.drop-down-wrapper.div {
+.drop-down {
   margin: 8px;
 }
 </style>

@@ -3,7 +3,7 @@
     class="base-chips-input">
 
     <!-- INPUT LABEL AND FIELD -->
-    <base-input
+    <BaseInput
       ref="baseInput"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="label"
@@ -12,13 +12,13 @@
       :show-input-border="showInputBorder"
       :is-active="showDropDown"
       v-model="input"
+      @input="inputChange"
       @clicked-outside="insideInput = false"
-      @input-focus="onInputFocus"
-      @input-blur="onInputBlur"
-      @arrow-key="triggerArrowKey"
-      @input-keydown="checkKeyEvent"
-      @input-keypress="checkKeyEvent"
-      @enter="onEnter()"
+      @focus="onInputFocus"
+      @blur="onInputBlur"
+      @keydown.up.down.prevent="triggerArrowKey"
+      @keydown="checkKeyEvent"
+      @keypress.enter="onEnter()"
       @click-input-field="setInputActive">
       <template
         v-if="sortable"
@@ -77,7 +77,7 @@
             name="drop-down"/>
         </div>
       </template>
-    </base-input>
+    </BaseInput>
 
     <!-- DROP DOWN MENU -->
     <div
@@ -422,33 +422,6 @@ export default {
     },
   },
   watch: {
-    input(val) {
-      // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
-      if (this.allowDynamicDropDownEntries) {
-        this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
-      } else {
-        /**
-         * event to fetch drop down entries with changing input
-         *
-         * @event text-input
-         * @type { string }
-         *
-         */
-        // still inform parent of the text input
-        this.$emit('text-input', val);
-        const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
-        // if content is static filter the existing entries for the ones matching input
-        this.dropDownListInt = val
-          ? this.dropDownListOrig
-            .filter((entry) => {
-              // cover case of options list being string or object array
-              const dropDownValue = this.getLangLabel(entry[this.objectProp]) || entry;
-              return dropDownValue.toLowerCase().includes(val.toLowerCase());
-            })
-          : this.dropDownListOrig;
-        this.selectedMenuEntryIndex = this.getIndex(oldEntry);
-      }
-    },
     // watch selectedList prop for changes triggered from outside
     selectedList: {
       handler(val) {
@@ -520,6 +493,33 @@ export default {
     }
   },
   methods: {
+    inputChange(val) {
+      // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
+      if (this.allowDynamicDropDownEntries) {
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
+      } else {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event text-input
+         * @type { string }
+         *
+         */
+        // still inform parent of the text input
+        this.$emit('text-input', val);
+        const oldEntry = this.dropDownListInt[this.selectedMenuEntryIndex];
+        // if content is static filter the existing entries for the ones matching input
+        this.dropDownListInt = val
+          ? this.dropDownListOrig
+            .filter((entry) => {
+              // cover case of options list being string or object array
+              const dropDownValue = this.getLangLabel(entry[this.objectProp]) || entry;
+              return dropDownValue.toLowerCase().includes(val.toLowerCase());
+            })
+          : this.dropDownListOrig;
+        this.selectedMenuEntryIndex = this.getIndex(oldEntry);
+      }
+    },
     onEnter() {
       if (this.input || this.dropDownListInt[this.selectedMenuEntryIndex]) {
         this.addSelected();

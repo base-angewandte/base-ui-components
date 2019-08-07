@@ -6,9 +6,10 @@
       :label="label"
       v-model="inputTextInt"
       @clicked-outside="insideInput = false"
-      @input-focus="onInputFocus"
-      @arrow-key="triggerArrowKey"
-      @enter="selectEntry()">
+      @focus="onInputFocus"
+      @keydown.up.down.prevent="triggerArrowKey"
+      @keypress.enter="selectEntry()"
+      @input="$emit('autocomplete', val)">
       <template slot="input-field-addition-after">
         <div
           v-if="isLoading"
@@ -179,11 +180,6 @@ export default {
     // watch for changes in the text input from outside and set internal value accordingly
     inputText(val) {
       this.inputTextInt = val;
-    },
-    // when the internal input text variable changes this event also needs to be propagated
-    // to the parent
-    inputTextInt(val) {
-      this.$emit('autocomplete', val);
     },
   },
   mounted() {
