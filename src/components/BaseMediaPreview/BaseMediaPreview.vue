@@ -219,10 +219,11 @@ export default {
         return this.displayName;
       }
       const match = this.downloadUrl.match(/([^/]+)$/);
-      return match[1];
+      return match ? match[1] : '';
     },
     fileEnding() {
-      return this.mediaUrl.match(/\w+\.(\w{3,4})$/)[1] || '';
+      const match = this.mediaUrl.match(/\w+\.(\w{2,4})$/);
+      return match ? match[1] : '';
     },
     formatNotSupported() {
       return !this.fileType;
