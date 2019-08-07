@@ -123,6 +123,10 @@ export default {
   },
   mounted() {
     this.setStartEnd();
+    window.addEventListener('resize', this.setStartEnd);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.setStartEnd);
   },
   methods: {
     setStartEnd() {
