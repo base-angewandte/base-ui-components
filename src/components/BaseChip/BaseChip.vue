@@ -12,8 +12,9 @@
       @mouseleave="hideBox"
       @blur="editText"
       @keydown.enter.prevent="entryEditable = false"
-      @keyup="entryEdited = true"
-      v-html="content()" />
+      @keyup="entryEdited = true">
+      {{ entryInt }}
+    </div>
     <div
       class="base-chip-icon"
       @click="removeClicked">
@@ -109,13 +110,6 @@ export default {
     this.entryEdited = !this.isLinked;
   },
   methods: {
-    content() {
-      // escape '>' and '>' chars that lead to problem with v-html
-      const text = this.entryInt
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      return `<span>${text}</span>`;
-    },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
         this.entryInt = evt.target.innerText.replace('\n', '');
