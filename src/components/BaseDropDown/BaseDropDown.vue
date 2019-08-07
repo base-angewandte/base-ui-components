@@ -91,9 +91,7 @@ export default {
      */
     options: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * label for the drop down, recommended to define for accessibility
@@ -117,9 +115,7 @@ export default {
      */
     selectedOption: {
       type: Object,
-      default() {
-        return { value: '', label: '' };
-      },
+      default: () => ({ value: '', label: '' }),
     },
     /**
      * define if label should be shown

@@ -76,9 +76,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '212px', height: '212px' };
-      },
+      default: () => ({ width: '212px', height: '212px' }),
     },
   },
   data() {

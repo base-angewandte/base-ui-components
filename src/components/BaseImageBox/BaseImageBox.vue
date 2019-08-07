@@ -139,9 +139,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '200px', height: '200px' };
-      },
+      default: () => ({ width: '200px', height: '200px' }),
     },
     /**
      * specify any text that should be displayed instead of an image;
@@ -149,9 +147,7 @@ export default {
      */
     boxText: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
   },
   data() {
