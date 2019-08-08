@@ -4,7 +4,7 @@
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
-    @click="selectActive ? selected() : $emit('clicked')">
+    @click="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
@@ -15,17 +15,19 @@
         { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
     ]">
       <div class="base-menu-entry-title-description-wrapper">
-        <div
-          v-if="title"
-          :class="['base-menu-entry-title',
-                   { 'base-menu-entry-title-bold': isActive || titleBold }]">
-          {{ title }}
+        <div class="base-menu-entry__title-subtext-wrapper">
+          <div
+            v-if="title"
+            :class="['base-menu-entry-title',
+                     { 'base-menu-entry-title-bold': isActive || titleBold }]">
+            {{ title }}
+          </div>
+          <div
+            v-if="subtext"
+            class="base-menu-entry-subtext">{{ subtext }}</div>
         </div>
         <div class="base-menu-entry-description">{{ description }}</div>
       </div>
-      <div
-        v-if="subtext"
-        class="base-menu-entry-subtext">{{ subtext }}</div>
     </div>
     <transition-group
       name="slide-fade"
@@ -51,7 +53,7 @@
             :checked="isSelected"
             title="checkbox"
             mark-style="checkbox"
-            @clicked="selected"/>
+            @clicked="clicked"/>
         </div>
       </div>
     </transition-group>
@@ -59,13 +61,13 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+
 /**
  * Component to be used in Menu Entry List or as a sort of header element
  * with possibility to specify title description and more
  */
-
-import SvgIcon from 'vue-svgicon';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
@@ -124,9 +126,8 @@ export default {
      */
     thumbnails: {
       type: Array,
-      default() {
-        return [];
-      },
+      // eslint-disable-next-line no-unused-expressions
+      default: () => [],
     },
     /**
      * Text displayed at the end of the item
@@ -185,26 +186,29 @@ export default {
     this.isSelectedInt = this.isSelected;
   },
   methods: {
-    selected() {
-      this.isSelectedInt = !this.isSelectedInt;
-      /**
-       * Event emitted when selectActive is true and the entry is clicked
-       *
-       * @event selected
-       * @type Boolean
-       */
-      this.$emit('selected', this.isSelectedInt);
+    clicked() {
+      if (this.selectActive) {
+        this.isSelectedInt = !this.isSelectedInt;
+        /**
+         * Event emitted when selectActive is true and the entry is clicked
+         *
+         * @event selected
+         * @type { Boolean }
+         */
+        this.$emit('selected', this.isSelectedInt);
+      } else {
+        /**
+         * Event emitted when entry is clicked and selectActive is false (=checkbox not shown)
+         *
+         * @event clicked
+         * @type { None }
+         */
+        this.$emit('clicked');
+      }
     },
   },
 
 };
-
-/**
- * Event emitted when entry is clicked and selectActive is false (=checkbox not shown)
- *
- * @event clicked
- * @type None
- */
 </script>
 
 <style lang="scss" scoped>
@@ -251,11 +255,16 @@ export default {
         flex-shrink: 1;
         flex-grow: 1;
 
-        .base-menu-entry-title {
-          margin-right: $spacing;
+        .base-menu-entry__title-subtext-wrapper {
+          display: flex;
+          align-items: baseline;
 
-          &.base-menu-entry-title-bold {
-            font-weight: bold;
+          .base-menu-entry-title {
+            margin-right: $spacing;
+
+            &.base-menu-entry-title-bold {
+              font-weight: bold;
+            }
           }
         }
 
