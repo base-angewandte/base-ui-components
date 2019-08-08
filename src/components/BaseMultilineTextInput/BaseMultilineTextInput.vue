@@ -39,17 +39,12 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
+
 /**
  * A multiline textfield base component
  */
 
-import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
-/**
- * Event emitted on keyup (text input change)
- *
- * @event text-input
- * @type object | string
- */
 export default {
   components: { BaseSwitchButton, SvgIcon },
   model: {
@@ -94,18 +89,14 @@ export default {
      */
     tabs: {
       type: Array,
-      default() {
-        return ['default'];
-      },
+      default: () => ['default'],
     },
     /**
      * give the possibility to specify what should be displayed in the tabs
      */
     tabLabels: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * set the currently active tab (specify the property of the object not the label)
@@ -151,6 +142,12 @@ export default {
         if (typeof this.input === 'object' && JSON.stringify(val) !== JSON.stringify(this.input)) {
           this.$emit('text-input', val);
         } else if (typeof this.input === 'string' && val[this.activeTabInt] !== this.input) {
+          /**
+           * Event emitted on keyup (text input change)
+           *
+           * @event text-input
+           * @type { Object | String }
+           */
           this.$emit('text-input', val[this.activeTabInt]);
         }
       },

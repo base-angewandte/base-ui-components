@@ -4,10 +4,10 @@ A simple Search Component
 <template>
   <div class="searchcontainer">
     <BaseSearch
+        v-model="searchText"
         label="Search your Entries"
         placeholder="Search your Entries"
         showImage
-        @input="searchText = $event"
         />
     <div class="searchtext">{{ 'Your Search Text: ' + searchText }}</div>    
   </div>  

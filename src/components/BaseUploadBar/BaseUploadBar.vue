@@ -21,7 +21,7 @@
       v-if="showRemove"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-remove"
       name="remove"
-      @click="$emit('remove-item')"/>
+      @click="remove"/>
   </div>
 </template>
 
@@ -84,6 +84,17 @@ export default {
   watch: {
     progress(val) {
       this.progressWidth = val * 100;
+    },
+  },
+  methods: {
+    remove() {
+      /**
+       * event triggered on remove icon click
+       *
+       * @event remove-item
+       * @type { none }
+       */
+      this.$emit('remove-item');
     },
   },
 };
