@@ -33,29 +33,23 @@
       name="slide-fade"
       class="slide-fade-group">
       <div
-        :key="entryId + 'group'"
-        class="base-menu-entry-right-group">
-        <div
-          v-if="showThumbnails"
-          :key="entryId + 'thumbnail'"
-          class="base-menu-entry-thumbnail-container">
-          <svg-icon
-            v-for="tn in thumbnails"
-            :key="tn"
-            :name="tn"
-            class="base-menu-entry-thumbnail" />
-        </div>
-        <div
-          v-if="isSelectable && selectActive"
-          :key="entryId + 'checkmark'"
-          class="base-menu-entry-checkbox">
-          <base-checkmark
-            :checked="isSelected"
-            title="checkbox"
-            mark-style="checkbox"
-            @clicked="clicked"/>
-        </div>
+        v-if="showThumbnails"
+        :key="entryId + 'thumbnail'"
+        class="base-menu-entry-thumbnail-container">
+        <svg-icon
+          v-for="tn in thumbnails"
+          :key="tn"
+          :name="tn"
+          class="base-menu-entry-thumbnail" />
       </div>
+      <base-checkmark
+        v-if="isSelectable && selectActive"
+        :key="entryId + 'checkmark'"
+        :checked="isSelected"
+        title="checkbox"
+        mark-style="checkbox"
+        class="base-menu-entry-checkbox"
+        @clicked="clicked" />
     </transition-group>
   </div>
 </template>
@@ -312,15 +306,14 @@ export default {
       }
     }
 
-    .base-menu-entry-right-group {
-      transition: 0.3s ease;
+    .base-menu-entry-thumbnail-container {
       display: flex;
-      position: absolute;
-      top: 0;
-      flex-direction: row;
-      align-items: center;
-      right: $spacing;
-      background: white;
+      flex-direction: column;
+      justify-content: space-evenly;
+      height: $row-height-large;
+      padding: 0 $spacing;
+      width: $icon-small;
+      background-color: white;
 
       &::before {
         content: '';
@@ -333,37 +326,38 @@ export default {
         z-index: 1;
       }
 
-      .base-menu-entry-thumbnail-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        height: $row-height-large;
-        margin-left: $spacing;
+      .base-menu-entry-thumbnail {
+        max-height: $icon-small;
         width: $icon-small;
-
-        .base-menu-entry-thumbnail {
-          max-height: $icon-small;
-          width: $icon-small;
-        }
       }
     }
 
     .base-menu-entry-checkbox {
-      height: 100%;
       padding-left: $spacing;
       background-color: white;
+    }
+
+    .slide-fade-group {
+      position: absolute;
+      right: 0;
+      margin-right: $spacing;
       display: flex;
       align-items: center;
     }
 
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
-      background-color: white;
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
     .slide-fade-enter, .slide-fade-leave-to {
       opacity: 0;
       transform: translateX(#{$spacing});
+    }
+
+    .slide-fade-leave-active {
+      position: absolute;
+      top: 50%;
+      transform: translate(#{$spacing}, -#{$icon-medium/2});
     }
   }
 
