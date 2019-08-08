@@ -6,7 +6,7 @@ Example Entry with all available features
     <BaseMenuEntry
       :thumbnails="['eye', 'attention']"
       entryId="single" 
-      description="asdfasdfasdfasdfDescription"
+      description="Description"
       title="Title"
       subtext="Subtext"
       icon="sheet-empty"/>
