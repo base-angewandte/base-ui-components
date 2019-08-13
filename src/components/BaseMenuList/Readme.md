@@ -3,8 +3,9 @@
   <div class="listcontainer">
     <BaseMenuList 
         :list="list"
+        :selected-list="selectedArray"
         :selected="selectActive"
-        @selected="$event.selected ? selectedArray.push($event.index) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
+        @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
         @clicked="activeEntry = $event"
         />
     <BaseButton
@@ -55,6 +56,11 @@ export default {
       activeEntry: '0',
       selectedArray: [],
     };
+  },
+  methods: {
+    toggleSelect() {
+      
+    },
   },
 };
 </script>

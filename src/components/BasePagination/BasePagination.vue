@@ -61,13 +61,17 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 
+/**
+ * Pagination component
+ */
+
 export default {
   components: {
     SvgIcon,
   },
   model: {
     prop: 'current',
-    event: 'clicked',
+    event: 'set-page',
   },
   props: {
     /**
@@ -79,6 +83,8 @@ export default {
     },
     /**
      * currently active page number
+     *
+     * @model
      */
     current: {
       type: Number,

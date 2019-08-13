@@ -24,7 +24,6 @@
         :description="item.description"
         :is-selectable="true"
         :select-active="selectActive"
-
         @clicked="activateItem(index)"
         @selected="selectItem(index, $event)"/>
     </draggable>
@@ -32,12 +31,12 @@
 </template>
 
 <script>
-/**
- * Base Component for SideBar Menu Entries
-  */
-
 import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
+
+/**
+ * Base Component for SideBar Menu Entries
+ */
 
 export default {
   components: {
@@ -61,9 +60,7 @@ export default {
      */
     list: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * index of the entry that should currently be active
@@ -78,9 +75,7 @@ export default {
      */
     selectedList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * specify the group name for the drag receiver
@@ -122,6 +117,8 @@ export default {
     selectActive(val) {
       if (!val) {
         this.entryProps.forEach(entry => this.$set(entry, 'selected', false));
+      } else {
+        this.setInternalVar();
       }
     },
   },
@@ -170,7 +167,7 @@ export default {
        * - returning the index of the respective entry
        *
        * @event clicked
-       * @type string
+       * @type { String }
        */
       this.$emit('clicked', index);
     },
@@ -181,7 +178,7 @@ export default {
        * - returns the index and selected (true/false)
        *
        * @event selected
-       * @type {object}
+       * @type { Object }
        */
       this.$emit('selected', { index, selected });
     },

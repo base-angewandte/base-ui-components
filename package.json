@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.0.53",
+  "version": "0.0.54",
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
@@ -89,7 +89,12 @@
   ],
   "main": "dist/lib/base-ui-components.min.js",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
+  "homepage": "https://base.uni-ak.ac.at",
   "description": "base Angewandte Component Library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/base-angewandte/ui-components.git"
+  },
   "engines": {
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"

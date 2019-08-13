@@ -24,7 +24,7 @@
         :for="optionIds[index]"
         class="base-switch-button-label">
         {{ option.label }}
-        <!-- TODO: add slot for icons etc -->
+        <!-- @slot slot to display something right of text (e.g. icon) -->
         <slot
           :value="option.value"
           name="right-of-text" />
@@ -35,6 +35,9 @@
 </template>
 
 <script>
+/**
+ * accessible tab switch buttons
+ */
 export default {
   model: {
     prop: 'activeTab',
@@ -46,9 +49,7 @@ export default {
      */
     options: {
       type: Array,
-      default() {
-        return [{ label: 'tab', value: 'tab' }];
-      },
+      default: () => [{ label: 'tab', value: 'tab' }],
     },
     /**
      * set the currently active tab (specify the value of the object not the label)
@@ -86,7 +87,7 @@ export default {
        * Event emitted on options switch, value of options object is emitted
        *
        * @event switch
-       * @type string
+       * @type { string }
        */
       this.$emit('switch', val);
     },

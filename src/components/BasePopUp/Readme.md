@@ -8,7 +8,7 @@ A basic example
       text="Click me"
       @clicked="showPopUp = true" />
     <base-pop-up
-      v-if="showPopUp"
+      :show="showPopUp"
       title="An Example Pop Up"
       button-right-text="Custom Submit"
       @close="showPopUp = false"

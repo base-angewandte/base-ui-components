@@ -440,7 +440,7 @@ export default {
         },
         {
           id: '4',
-          title: 'Allons-y!!',
+          title: 'Allons-y!eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!',
           active: false,
           type: 'Bild',
           selected: false,
