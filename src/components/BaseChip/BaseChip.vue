@@ -2,7 +2,8 @@
   <div
     v-click-outside="() => entryEditable = false"
     :class="['base-chip',
-             { 'base-chip-edited': entryEdited }]">
+             { 'base-chip-edited': entryEdited },
+             { 'base-chip__active': chipActive }]">
     <div
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
@@ -80,6 +81,13 @@ export default {
     hoverBoxContent: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * set chip active (set color)
+     */
+    chipActive: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -193,9 +201,24 @@ export default {
     display: inline-flex;
     align-items: center;
     cursor: default;
+    position: relative;
 
     &.base-chip-edited {
       background-color: rgba(255, 255, 255, 0);
+    }
+
+    &.base-chip__active {
+
+      &:after {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: $app-color;
+        opacity: 0.5;
+      }
     }
 
     .base-chip-text {
@@ -203,6 +226,7 @@ export default {
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
       word-break: break-word;
+      z-index: 1;
 
       &:active, &:focus {
         outline: none;

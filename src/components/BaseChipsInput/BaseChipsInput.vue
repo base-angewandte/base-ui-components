@@ -12,7 +12,7 @@
       :show-input-border="showInputBorder"
       :is-active="showDropDown"
       v-model="input"
-      @clicked-outside="insideInput = false"
+      @clicked-outside="onInputBlur"
       @focus="onInputFocus"
       @blur="onInputBlur"
       @keydown.up.down.prevent="triggerArrowKey"
@@ -50,6 +50,7 @@
                 :chip-editable="chipsEditable"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
+                :chip-active="chipActiveForRemove === index"
                 @mouse-down="chipActive = index"
                 @remove-entry="removeEntry(entry, index)"
                 @hoverbox-active="hoverBoxActive($event, entry)"
@@ -370,6 +371,7 @@ export default {
       timeout: null,
       fired: '',
       drag: false,
+      chipActiveForRemove: -1,
     };
   },
   computed: {
@@ -424,6 +426,7 @@ export default {
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
+        this.selectedMenuEntryIndex = -1;
         this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
         /**
@@ -593,8 +596,6 @@ export default {
       this.insideInput = true;
       if (!this.allowDynamicDropDownEntries) {
         // check if item has an id (= is not an custom entry)
-        // TODO: is this the desired behaviour?? (or should unknown entry also appear
-        // in drop down?
         if (item.idInt === 0 || item.idInt) {
           this.dropDownListInt.push(item);
           // sort all entries by id to restore the original order
@@ -629,6 +630,7 @@ export default {
     },
     onInputBlur() {
       this.insideInput = false;
+      this.chipActiveForRemove = -1;
     },
     onInputFocus() {
       this.insideInput = true;
@@ -758,16 +760,19 @@ export default {
     },
     checkKeyEvent(event) {
       if (event.key === 'Backspace') {
-        if (!this.fired && !this.input) {
-          const lastIndex = this.selectedListInt.length - 1;
+        const lastIndex = this.selectedListInt.length - 1;
+        if (!this.fired && !this.input && this.chipActiveForRemove < 0) {
+          // on first backspace make chip active
+          this.chipActiveForRemove = lastIndex;
+          // on second backspace set timeout for delete
+        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.input) {
           // check if there is actually anything left to remove
           if (lastIndex >= 0) {
             this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+            this.chipActiveForRemove = -1;
           }
         }
         // necessary to prevent accidential delete of chips when user keeps backspace pressed
-        // TODO: in a later version chips should be tabbable anyway and maybe it could work
-        // in a way that first backspace makes last chip active second backspace removes
         this.fired = true;
         if (this.timeout) {
           clearTimeout(this.timeout);
@@ -775,7 +780,9 @@ export default {
         }
         this.timeout = setTimeout(() => {
           this.fired = false;
-        }, 300);
+        }, 200);
+      } else {
+        this.chipActiveForRemove = -1;
       }
       // if user has input and uses semicolon add input
       if (event.code === 'Comma' && event.shiftKey && this.input) {
