@@ -18,7 +18,7 @@
       @keydown.up.down.prevent="triggerArrowKey"
       @keydown="checkKeyEvent"
       @keypress.enter="onEnter()"
-      @click-input-field="setInputActive">
+      @click-input-field="insideInput = true">
       <template
         v-if="sortable"
         slot="label-addition">
@@ -51,7 +51,6 @@
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
                 :chip-active="chipActiveForRemove === index"
-                @mouse-down="chipActive = index"
                 @remove-entry="removeEntry(entry, index)"
                 @hoverbox-active="hoverBoxActive($event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
@@ -367,7 +366,6 @@ export default {
       insideDropDown: false,
       insideInput: false,
       returnAsObject: false,
-      chipActive: -1,
       timeout: null,
       fired: '',
       drag: false,
@@ -819,11 +817,6 @@ export default {
       const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
       if (inputElems && inputElems.length) {
         inputElems[0].blur();
-      }
-    },
-    setInputActive() {
-      if (this.chipActive < 0) {
-        this.insideInput = true;
       }
     },
     hoverBoxActive(value, entry) {

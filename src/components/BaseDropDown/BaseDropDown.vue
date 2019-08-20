@@ -1,5 +1,7 @@
 <template>
-  <div class="base-drop-down">
+  <div
+    v-click-outside="() => showDropDown = false"
+    class="base-drop-down">
     <div
       :class="['base-drop-down-label-wrapper',
                { 'hide': !getLangLabel(label, true) || !showLabel }]">
@@ -14,9 +16,10 @@
       :id="getLangLabel(label)"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
-      :class="['base-drop-down-head']"
+      :disabled="isDisabled"
       aria-haspopup="listbox"
       type="button"
+      class="base-drop-down-head"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
@@ -68,6 +71,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import ClickOutside from 'vue-click-outside';
 import { setLanguageMixin } from '../../mixins/setLanguage';
 
 /**
@@ -76,6 +80,9 @@ import { setLanguageMixin } from '../../mixins/setLanguage';
 export default {
   components: {
     SvgIcon,
+  },
+  directives: {
+    ClickOutside,
   },
   mixins: [
     setLanguageMixin,
@@ -144,6 +151,13 @@ export default {
     valueProp: {
       type: String,
       default: 'value',
+    },
+    /**
+     * flag to set drop down inactive
+     */
+    isDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -280,6 +294,16 @@ export default {
 
       &:active .base-drop-down-icon, &:focus .base-drop-down-icon {
         fill: $app-color;
+      }
+
+      &:disabled {
+        cursor: default;
+        color: graytext;
+        fill: graytext;
+
+        .base-drop-down-icon {
+          fill: graytext;
+        }
       }
 
       .base-drop-down-icon {

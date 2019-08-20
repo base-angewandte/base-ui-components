@@ -7,7 +7,7 @@
     <div
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
-      @click="clickAction"
+      @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox"
