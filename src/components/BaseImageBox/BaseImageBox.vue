@@ -15,11 +15,13 @@
           ref="headerBox"
           class="base-image-box-header">
           <div
+            :title="title"
             class="base-image-box-title">
             {{ title }}
           </div>
           <div
             v-if="subtext"
+            :title="subtext"
             class="base-image-box-subtext">{{ subtext }}</div>
         </div>
         <div
