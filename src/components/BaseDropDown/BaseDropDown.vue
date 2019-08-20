@@ -14,9 +14,10 @@
       :id="getLangLabel(label)"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
-      :class="['base-drop-down-head']"
+      :disabled="isDisabled"
       aria-haspopup="listbox"
       type="button"
+      class="base-drop-down-head"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
@@ -144,6 +145,13 @@ export default {
     valueProp: {
       type: String,
       default: 'value',
+    },
+    /**
+     * flag to set drop down inactive
+     */
+    isDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -280,6 +288,16 @@ export default {
 
       &:active .base-drop-down-icon, &:focus .base-drop-down-icon {
         fill: $app-color;
+      }
+
+      &:disabled {
+        cursor: default;
+        color: graytext;
+        fill: graytext;
+
+        .base-drop-down-icon {
+          fill: graytext;
+        }
       }
 
       .base-drop-down-icon {
