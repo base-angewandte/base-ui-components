@@ -62,7 +62,8 @@
           :checked="selectedInt"
           mark-style="checkbox"
           check-box-size="large"
-          class="base-image-box-checkbox" />
+          class="base-image-box-checkbox"
+          @clicked="boxSelect"/>
       </transition>
     </div>
   </BaseBox>
