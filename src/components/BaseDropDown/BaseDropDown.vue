@@ -1,5 +1,7 @@
 <template>
-  <div class="base-drop-down">
+  <div
+    v-click-outside="() => showDropDown = false"
+    class="base-drop-down">
     <div
       :class="['base-drop-down-label-wrapper',
                { 'hide': !getLangLabel(label, true) || !showLabel }]">
@@ -69,6 +71,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import ClickOutside from 'vue-click-outside';
 import { setLanguageMixin } from '../../mixins/setLanguage';
 
 /**
@@ -77,6 +80,9 @@ import { setLanguageMixin } from '../../mixins/setLanguage';
 export default {
   components: {
     SvgIcon,
+  },
+  directives: {
+    ClickOutside,
   },
   mixins: [
     setLanguageMixin,
