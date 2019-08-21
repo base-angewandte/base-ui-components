@@ -158,10 +158,6 @@ export default {
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
     activateItem(index) {
-      this.entryProps.forEach((entry) => { this.$set(entry, 'active', false); });
-      if (this.entryProps.length) {
-        this.$set(this.entryProps[index], 'active', true);
-      }
       /**
        * event emitted when a menu entry is clicked
        * - returning the index of the respective entry
