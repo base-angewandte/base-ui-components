@@ -184,9 +184,10 @@ export default {
      * method to get the dropped element id and emit it to parent
      */
     addEntry() {
-      if (this.dropType === 'elements') {
+      // also checking for isDragOver since otherwise drop also works if element is dropped
+      // outside of drop area (if it touched drop area before)
+      if (this.isDragOver && this.dropType === 'elements') {
         const draggedElementId = this.dragList[0].id;
-        this.dragList = [];
         /**
          * event emitted when an element is dropped on the box, emitting the element data id
          *
@@ -195,6 +196,7 @@ export default {
          */
         this.$emit('dropped-element', draggedElementId);
       }
+      this.dragList = [];
     },
     dragEnter() {
       this.isDragOver = true;
