@@ -547,6 +547,10 @@ export default {
             this.selectedListInt.push(selected);
           }
         } else {
+          // check if an entry is present - if yes - remove it first
+          if (this.selectedListInt.length) {
+            this.removeEntry(this.selectedListInt[0], 0);
+          }
           this.selectedListInt = [].concat(selected);
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
@@ -614,17 +618,22 @@ export default {
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
-          ? this.selectedMenuEntryIndex + 1 : 0;
+          ? this.selectedMenuEntryIndex + 1 : this.getAllowUnknown();
       } else if (event.key === 'ArrowUp') {
-        this.selectedMenuEntryIndex = this.selectedMenuEntryIndex > 0
-          ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
+        if (this.selectedMenuEntryIndex > 0) {
+          this.selectedMenuEntryIndex -= 1;
+        } else {
+          this.selectedMenuEntryIndex = this.allowUnknownEntries
+            ? -1 : this.dropDownListInt.length - 1;
+        }
       }
       if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
-        this.$refs.option[this.selectedMenuEntryIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        this.$refs.option[this.selectedMenuEntryIndex >= 0
+          ? this.selectedMenuEntryIndex : 0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
     getAllowUnknown() {
-      return this.$props.allowUnknownEntries ? -1 : 0;
+      return this.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
       this.insideInput = false;
