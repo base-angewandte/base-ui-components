@@ -283,7 +283,7 @@ export default {
           if (this.minDateView === 'year') {
             return date.getFullYear().toString();
           }
-          return date.toString();
+          return date.toJSON();
         },
       },
       tempDateStore: {},
