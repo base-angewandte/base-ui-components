@@ -614,17 +614,22 @@ export default {
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
-          ? this.selectedMenuEntryIndex + 1 : 0;
+          ? this.selectedMenuEntryIndex + 1 : this.getAllowUnknown();
       } else if (event.key === 'ArrowUp') {
-        this.selectedMenuEntryIndex = this.selectedMenuEntryIndex > 0
-          ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
+        if (this.selectedMenuEntryIndex > 0) {
+          this.selectedMenuEntryIndex -= 1;
+        } else {
+          this.selectedMenuEntryIndex = this.allowUnknownEntries
+            ? -1 : this.dropDownListInt.length - 1;
+        }
       }
       if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
-        this.$refs.option[this.selectedMenuEntryIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        this.$refs.option[this.selectedMenuEntryIndex >= 0
+          ? this.selectedMenuEntryIndex : 0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
     getAllowUnknown() {
-      return this.$props.allowUnknownEntries ? -1 : 0;
+      return this.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
       this.insideInput = false;
