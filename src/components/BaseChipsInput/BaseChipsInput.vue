@@ -547,6 +547,10 @@ export default {
             this.selectedListInt.push(selected);
           }
         } else {
+          // check if an entry is present - if yes - remove it first
+          if (this.selectedListInt.length) {
+            this.removeEntry(this.selectedListInt[0], 0);
+          }
           this.selectedListInt = [].concat(selected);
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
