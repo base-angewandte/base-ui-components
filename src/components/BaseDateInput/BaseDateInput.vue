@@ -283,7 +283,8 @@ export default {
           if (this.minDateView === 'year') {
             return date.getFullYear().toString();
           }
-          return date.toJSON();
+          // to get date in format YYYY-MM-DD
+          return date.toLocaleDateString('fr-CA');
         },
       },
       tempDateStore: {},
@@ -358,8 +359,11 @@ export default {
     },
     dateFormatInt(val) {
       // in order to allow user to restore previous date after switching
-      // from date to year and back store in temp variable
-      if (val === 'YYYY') {
+      // from date to year and back store in temp variable (but only if previous date was full date
+      // (check necessary for starting with year where format is switched to 'YYYY'
+      // but no previous full date avaliable))
+      if (val === 'YYYY' && Object.keys(this.inputInt)
+        .some(key => this.inputInt[key] && this.inputInt[key].length > 4)) {
         this.tempDateStore = { ...this.inputInt };
       }
       this.convertDate();
@@ -419,8 +423,8 @@ export default {
               this.$set(
                 this.inputInt,
                 dateKey,
-                yearIdent && this.tempDateStore[dateKey]
-                  ? this.tempDateStore[dateKey] : new Date(this.inputInt[dateKey]),
+                (yearIdent && this.tempDateStore[dateKey]
+                  ? this.tempDateStore[dateKey] : new Date(this.inputInt[dateKey]).toLocaleDateString('fr-CA')),
               );
             }
           }
