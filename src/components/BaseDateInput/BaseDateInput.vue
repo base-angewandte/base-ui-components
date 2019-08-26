@@ -260,9 +260,9 @@ export default {
   data() {
     return {
       inputInt: {
-        date: '',
-        date_from: '',
-        date_to: '',
+        date: null,
+        date_from: null,
+        date_to: null,
         time: '',
         time_from: '',
         time_to: '',
@@ -274,17 +274,18 @@ export default {
       dateType: {
         value2date: (value) => {
           if (value) {
-            return new Date(value);
+            // set date to zero hours in current time zone
+            return this.convertToDate(value);
           }
-          return '';
+          return null;
         },
         date2value: (date) => {
-          if (!date) return '';
+          if (!date) return null;
           if (this.minDateView === 'year') {
             return date.getFullYear().toString();
           }
           // to get date in format YYYY-MM-DD
-          return date.toLocaleDateString('fr-CA');
+          return this.getDateString(date);
         },
       },
       tempDateStore: {},
@@ -414,7 +415,7 @@ export default {
         .forEach((dateKey) => {
           if (this.inputInt[dateKey]) {
             if (this.minDateView === 'year') {
-              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
+              this.$set(this.inputInt, dateKey, this.convertToDate(this.inputInt[dateKey])
                 .getFullYear().toString());
             } else {
               // check if year was changed or is still the same
@@ -424,7 +425,8 @@ export default {
                 this.inputInt,
                 dateKey,
                 (yearIdent && this.tempDateStore[dateKey]
-                  ? this.tempDateStore[dateKey] : new Date(this.inputInt[dateKey]).toLocaleDateString('fr-CA')),
+                  ? this.tempDateStore[dateKey]
+                  : this.getDateString(this.convertToDate(this.inputInt[dateKey]))),
               );
             }
           }
@@ -437,6 +439,14 @@ export default {
       const data = {};
       this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
       return data;
+    },
+    convertToDate(value) {
+      return new Date(`${value}T00:00:00.000`);
+    },
+    getDateString(date) {
+      const month = (date.getMonth() + 1).toString();
+      const day = date.getDate().toString();
+      return `${date.getFullYear().toString()}-${month.length < 2 ? '0' : ''}${month}-${day.length < 2 ? '0' : ''}${day}`;
     },
   },
 };
