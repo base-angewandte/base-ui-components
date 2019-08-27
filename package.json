@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.0.58",
+  "version": "0.0.60",
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
@@ -13,7 +13,7 @@
     "build:lib": "node build/build-lib.js",
     "svg": "npx vsvg -s ./src/static/icons/ -t ./src/assets/icons/ --es6",
     "styleguide": "vue-styleguidist server",
-    "postversion": "git push && git push --tags && git checkout master && git merge develop && git push && git push --tags && npm publish"
+    "postversion": "./postversion.sh"
   },
   "peerDependencies": {
     "vue": "^2.5.17"
