@@ -162,6 +162,7 @@
         :object-prop="'title'"
         :chips-editable="true"
         :label="'single choice with special drop down body'"
+        :allow-unknown-entries="false"
         :allow-multiple-entries="false">
         <template
           slot="drop-down-entry"

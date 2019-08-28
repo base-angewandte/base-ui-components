@@ -5,8 +5,8 @@
     <div
       :class="['base-input-label-row', { 'hide': !showLabel }]">
       <label
-        :class="['base-input-label']"
         :for="label"
+        class="base-input-label"
         @click.prevent.stop="clickedOutsideInput">
         {{ label }}
       </label>
