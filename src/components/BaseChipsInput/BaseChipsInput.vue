@@ -83,6 +83,7 @@
       v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       ref="dropdownContainer"
+      :style="{ 'min-width': dropDownMinWidth }"
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
       @mouseleave="checkLeave">
@@ -370,6 +371,7 @@ export default {
       fired: '',
       drag: false,
       chipActiveForRemove: -1,
+      dropDownMinWidth: '100%',
     };
   },
   computed: {
@@ -482,6 +484,7 @@ export default {
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
       }
       if (val) {
+        this.calcDropDownMinWidth();
         this.selectedMenuEntryIndex = this.getAllowUnknown();
         if (!this.chipsEditable) {
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
@@ -840,6 +843,12 @@ export default {
        */
       this.$emit('hoverbox-active', { value, entry });
     },
+    calcDropDownMinWidth() {
+      const inputElement = this.$refs.baseInput;
+      if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
+        this.dropDownMinWidth = `${this.$parent.$el.clientWidth}px`;
+      }
+    },
   },
 };
 </script>
@@ -848,7 +857,6 @@ export default {
   @import "../../styles/variables";
 
   .base-chips-input {
-    position: relative;
     width: 100%;
     text-align: left;
 
@@ -875,7 +883,6 @@ export default {
     .base-chips-drop-down {
       position: absolute;
       background: white;
-      width: 100%;
       max-height: 10 * $row-height-small;
       overflow-y: auto;
       z-index: 2;
