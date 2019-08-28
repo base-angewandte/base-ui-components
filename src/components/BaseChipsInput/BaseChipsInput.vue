@@ -495,6 +495,10 @@ export default {
          */
         this.$emit('show-dropdown');
       } else {
+        // clear input on drop down close if unknown entries are not allowed
+        if (document.activeElement.tagName === 'BODY') {
+          this.input = '';
+        }
         /**
          * event triggered on hide drop down
          *
