@@ -890,10 +890,11 @@ export default {
       cursor: pointer;
 
       .base-chips-drop-down-entry-wrapper {
-        padding: 0 $spacing;
-        line-height: $row-height-small;
+        padding: $spacing-small/2 $spacing;
+        min-height: $row-height-small;
         display: flex;
         justify-content: space-between;
+        line-height: $line-height;
 
         &.base-chips-drop-down-entry-wrapper-active {
           background: $background-color;
@@ -908,6 +909,8 @@ export default {
           float: right;
         }
       }
+
+
     }
 
     .base-chips-input-chips-container {
