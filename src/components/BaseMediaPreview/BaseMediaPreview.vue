@@ -17,7 +17,8 @@
         <img
           v-vue-click-outside.prevent="clickOutside"
           v-if="displayImage && fileType === 'image'"
-          :src="mediaUrl"
+          :srcset="imageSourceSet"
+          :src="sourceUrl"
           :class="[
             'base-media-preview-image',
             'base-media-preview-rotation-' + orientation.toString()
@@ -180,6 +181,14 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * specify an image srcset as an array of objects in the form <br>
+     *     { 'mediawidth': 'url' }
+     */
+    previews: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -219,7 +228,7 @@ export default {
       return match ? match[1] : '';
     },
     fileEnding() {
-      const match = this.mediaUrl.match(/\w+\.(\w{2,4})$/);
+      const match = this.sourceUrl.match(/\w+\.(\w{2,4})$/);
       return match ? match[1] : '';
     },
     formatNotSupported() {
@@ -227,6 +236,15 @@ export default {
     },
     isMobile() {
       return window.innerWidth <= 640;
+    },
+    imageSourceSet() {
+      return this.previews.length ? this.previews.map(size => Object.keys(size)
+        .map(width => `${size[width]} ${width}`)).join(', ') : '';
+    },
+    sourceUrl() {
+      const last = this.previews.length - 1;
+      return this.previews && this.previews[last]
+        ? Object.values(this.previews[last])[0] : this.mediaUrl;
     },
   },
   watch: {
