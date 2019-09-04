@@ -16,9 +16,9 @@
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
       :disabled="isDisabled"
+      :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing}]"
       aria-haspopup="listbox"
       type="button"
-      class="base-drop-down-head"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
@@ -269,10 +269,13 @@ export default {
       width: 100%;
       line-height: $row-height-small;
       cursor: pointer;
-      padding: 0 $spacing;
       color: $font-color-second;
       fill: $font-color-second;
       background-color: $background-color;
+
+      &.base-drop-down-head-spacing {
+        padding: 0 $spacing;
+      }
 
       .base-drop-down-head-text-wrapper {
         overflow: hidden;
