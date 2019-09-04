@@ -12,7 +12,6 @@
       </label>
     </div>
     <button
-      ref="dropDownButton"
       :id="getLangLabel(label)"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
@@ -24,6 +23,7 @@
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
       <div
+        ref="dropDownButton"
         :class="['base-drop-down-head-text-wrapper',
                  {'base-drop-down-head-text-fade-out': showFadeOut }]">
         <span
@@ -159,6 +159,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * flag to disable spacing left and right
+     * (needed for sidebar drop downs)
+     */
+    withSpacing: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -242,6 +250,7 @@ export default {
   .base-drop-down {
     display: inline-block;
     position: relative;
+    max-width: 100%;
 
     .base-drop-down-label-wrapper {
       margin-bottom: $spacing-small;
@@ -270,6 +279,8 @@ export default {
         position: relative;
         margin-right: $spacing;
         transition: all 0.2s ease;
+        width: 100%;
+        text-align: left;
 
         .base-drop-down-head-text {
           white-space: nowrap;
@@ -282,7 +293,7 @@ export default {
           width: $fade-out-width;
           position: absolute;
           top: 0;
-          right: 0;
+          right: -1px;
           background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
         }
       }
