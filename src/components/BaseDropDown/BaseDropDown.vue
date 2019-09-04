@@ -250,7 +250,6 @@ export default {
   .base-drop-down {
     display: inline-block;
     position: relative;
-    max-width: 100%;
 
     .base-drop-down-label-wrapper {
       margin-bottom: $spacing-small;
@@ -272,6 +271,7 @@ export default {
       color: $font-color-second;
       fill: $font-color-second;
       background-color: $background-color;
+      padding: 0;
 
       &.base-drop-down-head-spacing {
         padding: 0 $spacing;
