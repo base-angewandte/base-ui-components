@@ -1,5 +1,7 @@
 <template>
-  <div class="base-menu-list">
+  <ul
+    role="list"
+    class="base-menu-list">
     <draggable
       v-model="list"
       :sort="false"
@@ -10,24 +12,27 @@
       :fallback-on-body="!dragAndDropCapable"
       @start="dragStart"
       @end="dragEnd">
-      <base-menu-entry
+      <li
         v-for="(item, index) in list"
         v-if="item"
-        ref="menuEntry"
         :key="item.id || item.title"
-        :entry-id="item.id"
-        :title="item.title"
-        :is-active="entryProps[index].active"
-        :is-selected="entryProps[index].selected"
-        :icon="getType(item.icon)"
-        :thumbnails="getThumbnails(item)"
-        :description="item.description"
-        :is-selectable="true"
-        :select-active="selectActive"
-        @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)"/>
+        class="base-menu-list__list-entry">
+        <base-menu-entry
+          ref="menuEntry"
+          :entry-id="item.id"
+          :title="item.title"
+          :is-active="entryProps[index].active"
+          :is-selected="entryProps[index].selected"
+          :icon="getType(item.icon)"
+          :thumbnails="getThumbnails(item)"
+          :description="item.description"
+          :is-selectable="true"
+          :select-active="selectActive"
+          @clicked="activateItem(index)"
+          @selected="selectItem(index, $event)"/>
+      </li>
     </draggable>
-  </div>
+  </ul>
 </template>
 
 <script>
@@ -223,7 +228,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import "../../styles/variables";
+
   .base-menu-list {
     position: relative;
+
+    .base-menu-list__list-entry {
+      &:not(:last-of-type) {
+        border-bottom: $separation-line;
+      }
+
+      &:focus-within {
+        color: $app-color;
+      }
+    }
   }
 </style>

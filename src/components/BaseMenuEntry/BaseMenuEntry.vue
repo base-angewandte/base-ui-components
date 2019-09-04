@@ -1,10 +1,12 @@
 <template>
-  <div
+  <a
     ref="menuEntry"
+    :tabindex="isActivatable || isSelectable ? 0 :-1"
+    :href="'#' + title"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
-    @click="clicked">
+    @click.prevent="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
@@ -51,7 +53,7 @@
         class="base-menu-entry-checkbox"
         @clicked="clicked" />
     </transition-group>
-  </div>
+  </a>
 </template>
 
 <script>
@@ -216,6 +218,10 @@ export default {
     background: white;
     overflow: hidden;
 
+    &:active {
+      border-bottom: 1px solid $app-color;
+    }
+
     .base-menu-entry-icon {
       max-height: $icon-large;
       width: $icon-large;
@@ -359,9 +365,5 @@ export default {
       top: 50%;
       transform: translate(#{$spacing}, -#{$icon-medium/2});
     }
-  }
-
-  .base-menu-entry + .base-menu-entry {
-    border-top: $separation-line;
   }
 </style>

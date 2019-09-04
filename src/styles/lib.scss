@@ -14,7 +14,11 @@
 
 a {
   text-decoration: none;
-  color: $app-color;
+  color: inherit;
+
+  &:focus {
+    outline: 0;
+  }
 }
 
 button {

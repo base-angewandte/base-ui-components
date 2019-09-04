@@ -206,6 +206,10 @@ export default {
       color: $app-color;
     }
 
+    &:active .base-button-icon, &:focus .base-button-icon {
+      color: $app-color;
+    }
+
     &:disabled {
       cursor: default;
 
