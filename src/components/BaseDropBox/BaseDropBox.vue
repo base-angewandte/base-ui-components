@@ -184,16 +184,21 @@ export default {
      * method to get the dropped element id and emit it to parent
      */
     addEntry() {
+      // check if box is for receiving elements (not files)
       if (this.dropType === 'elements') {
-        const draggedElementId = this.dragList[0].id;
+        // and check if item is currently still dragged over box (draggable event will also
+        // fire if item was dragged outside again)
+        if (this.isDragOver) {
+          const draggedElementId = this.dragList[0].id;
+          /**
+           * event emitted when an element is dropped on the box, emitting the element data id
+           *
+           * @event dropped-element
+           * @type { String }
+           */
+          this.$emit('dropped-element', draggedElementId);
+        }
         this.dragList = [];
-        /**
-         * event emitted when an element is dropped on the box, emitting the element data id
-         *
-         * @event dropped-element
-         * @type { String }
-         */
-        this.$emit('dropped-element', draggedElementId);
       }
     },
     dragEnter() {
