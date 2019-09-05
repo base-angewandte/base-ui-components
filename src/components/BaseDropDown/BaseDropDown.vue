@@ -43,6 +43,7 @@
     <div
       v-if="showDropDown"
       ref="dropdownContainer"
+      :style="{ [alignDropDown]: 0}"
       class="base-drop-down-body">
       <!-- @slot create custom drop down body -->
       <slot>
@@ -166,6 +167,16 @@ export default {
     withSpacing: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * align drop down with left or right border
+     */
+    alignDropDown: {
+      type: String,
+      default: 'left',
+      validator(val) {
+        return ['left', 'right'].includes(val);
+      },
     },
   },
   data() {
