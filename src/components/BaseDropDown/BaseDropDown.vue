@@ -43,7 +43,7 @@
     <div
       v-if="showDropDown"
       ref="dropdownContainer"
-      :style="{ [alignDropDown]: 0}"
+      :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight}"
       class="base-drop-down-body">
       <!-- @slot create custom drop down body -->
       <slot>
@@ -184,6 +184,7 @@ export default {
       showDropDown: false,
       keySelectedIndex: -1,
       showFadeOut: false,
+      maxDropDownHeight: '0',
     };
   },
   computed: {
@@ -193,6 +194,11 @@ export default {
   },
   watch: {
     showDropDown(val) {
+      if (val) {
+        // dont let drop down size be larger than window
+        const maxHeight = window.innerHeight - this.$el.offsetTop - 120;
+        this.maxDropDownHeight = `${maxHeight < 300 ? maxHeight : 300}px`;
+      }
       // reset index on close
       if (!val) {
         this.keySelectedIndex = -1;
