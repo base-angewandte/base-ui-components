@@ -222,10 +222,4 @@ export default {
       visibility: hidden;
     }
   }
-
-  @media screen and (max-width: $mobile) {
-    button {
-      font-size: $font-size-mobile;
-    }
-  }
 </style>
