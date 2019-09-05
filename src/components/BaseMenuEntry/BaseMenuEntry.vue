@@ -218,10 +218,6 @@ export default {
     background: white;
     overflow: hidden;
 
-    &:active {
-      border-bottom: 1px solid $app-color;
-    }
-
     .base-menu-entry-icon {
       max-height: $icon-large;
       width: $icon-large;
