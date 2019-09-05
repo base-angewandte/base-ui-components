@@ -19,6 +19,7 @@
           v-if="displayImage && fileType === 'image'"
           :srcset="imageSourceSet"
           :src="sourceUrl"
+          :style="displaySize"
           :class="[
             'base-media-preview-image',
             'base-media-preview-rotation-' + orientation.toString()
