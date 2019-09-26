@@ -8,18 +8,20 @@
       :class="['base-image-box-content-wrapper',
                { 'base-image-box-selected': selectable && selectedInt }]">
       <div :class="['base-image-box-content', imageShadowClass]">
-        <!-- @SLOT for published icon of files -->
+        <!-- @slot for published icon of files -->
         <slot name="top" />
         <div
           v-if="showTitle"
           ref="headerBox"
           class="base-image-box-header">
           <div
+            :title="title"
             class="base-image-box-title">
             {{ title }}
           </div>
           <div
             v-if="subtext"
+            :title="subtext"
             class="base-image-box-subtext">
             {{ subtext }}
           </div>
@@ -64,18 +66,20 @@
           :checked="selectedInt"
           mark-style="checkbox"
           check-box-size="large"
-          class="base-image-box-checkbox" />
+          class="base-image-box-checkbox"
+          @clicked="boxSelect" />
       </transition>
     </div>
   </BaseBox>
 </template>
 <script>
+import BaseBox from '../BaseBox/BaseBox';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+
 /**
  * A component with the primary purpose to display
  * images in responsive boxes but also allowing for text only
-  */
-import BaseBox from '../BaseBox/BaseBox';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+ */
 
 export default {
   components: {
@@ -140,9 +144,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default() {
-        return { width: '200px', height: '200px' };
-      },
+      default: () => ({ width: '200px', height: '200px' }),
     },
     /**
      * specify any text that should be displayed instead of an image;
@@ -150,9 +152,7 @@ export default {
      */
     boxText: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
   },
   data() {
@@ -176,7 +176,7 @@ export default {
        * event triggered when box is selectable and clicked upon
        *
        * @event select-triggered
-       * @type Boolean
+       * @type { Boolean }
        */
       this.$emit('select-triggered', val);
     },
@@ -225,7 +225,7 @@ export default {
          * event triggered when selectable is false and box is clicked
          *
          * @event clicked
-         * @type None
+         * @type { None }
          */
         this.$emit('clicked');
       }

@@ -1,10 +1,12 @@
 <template>
-  <div
+  <a
     ref="menuEntry"
+    :tabindex="isActivatable || isSelectable ? 0 :-1"
+    :href="'#' + title"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
-    @click="selectActive ? selected() : $emit('clicked')">
+    @click.prevent="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
@@ -15,61 +17,53 @@
         { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
       ]">
       <div class="base-menu-entry-title-description-wrapper">
-        <div
-          v-if="title"
-          :class="['base-menu-entry-title',
-                   { 'base-menu-entry-title-bold': isActive || titleBold }]">
-          {{ title }}
+        <div class="base-menu-entry__title-subtext-wrapper">
+          <div
+            v-if="title"
+            :class="['base-menu-entry-title',
+                     { 'base-menu-entry-title-bold': isActive || titleBold }]">
+            {{ title }}
+          </div>
+          <div
+            v-if="subtext"
+            class="base-menu-entry-subtext">{{ subtext }}</div>
         </div>
-        <div class="base-menu-entry-description">
-          {{ description }}
-        </div>
-      </div>
-      <div
-        v-if="subtext"
-        class="base-menu-entry-subtext">
-        {{ subtext }}
+        <div class="base-menu-entry-description">{{ description }}</div>
       </div>
     </div>
     <transition-group
       name="slide-fade"
       class="slide-fade-group">
       <div
-        :key="entryId + 'group'"
-        class="base-menu-entry-right-group">
-        <div
-          v-if="showThumbnails"
-          :key="entryId + 'thumbnail'"
-          class="base-menu-entry-thumbnail-container">
-          <svg-icon
-            v-for="tn in thumbnails"
-            :key="tn"
-            :name="tn"
-            class="base-menu-entry-thumbnail" />
-        </div>
-        <div
-          v-if="isSelectable && selectActive"
-          :key="entryId + 'checkmark'"
-          class="base-menu-entry-checkbox">
-          <base-checkmark
-            :checked="isSelected"
-            title="checkbox"
-            mark-style="checkbox"
-            @clicked="selected" />
-        </div>
+        v-if="showThumbnails"
+        :key="entryId + 'thumbnail'"
+        class="base-menu-entry-thumbnail-container">
+        <svg-icon
+          v-for="tn in thumbnails"
+          :key="tn"
+          :name="tn"
+          class="base-menu-entry-thumbnail" />
       </div>
+      <base-checkmark
+        v-if="isSelectable && selectActive"
+        :key="entryId + 'checkmark'"
+        :checked="isSelected"
+        title="checkbox"
+        mark-style="checkbox"
+        class="base-menu-entry-checkbox"
+        @clicked="clicked" />
     </transition-group>
-  </div>
+  </a>
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+
 /**
  * Component to be used in Menu Entry List or as a sort of header element
  * with possibility to specify title description and more
  */
-
-import SvgIcon from 'vue-svgicon';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
@@ -128,9 +122,8 @@ export default {
      */
     thumbnails: {
       type: Array,
-      default() {
-        return [];
-      },
+      // eslint-disable-next-line no-unused-expressions
+      default: () => [],
     },
     /**
      * Text displayed at the end of the item
@@ -189,26 +182,29 @@ export default {
     this.isSelectedInt = this.isSelected;
   },
   methods: {
-    selected() {
-      this.isSelectedInt = !this.isSelectedInt;
-      /**
-       * Event emitted when selectActive is true and the entry is clicked
-       *
-       * @event selected
-       * @type Boolean
-       */
-      this.$emit('selected', this.isSelectedInt);
+    clicked() {
+      if (this.selectActive) {
+        this.isSelectedInt = !this.isSelectedInt;
+        /**
+         * Event emitted when selectActive is true and the entry is clicked
+         *
+         * @event selected
+         * @type { Boolean }
+         */
+        this.$emit('selected', this.isSelectedInt);
+      } else {
+        /**
+         * Event emitted when entry is clicked and selectActive is false (=checkbox not shown)
+         *
+         * @event clicked
+         * @type { None }
+         */
+        this.$emit('clicked');
+      }
     },
   },
 
 };
-
-/**
- * Event emitted when entry is clicked and selectActive is false (=checkbox not shown)
- *
- * @event clicked
- * @type None
- */
 </script>
 
 <style lang="scss" scoped>
@@ -254,11 +250,16 @@ export default {
         flex-shrink: 1;
         flex-grow: 1;
 
-        .base-menu-entry-title {
-          margin-right: $spacing;
+        .base-menu-entry__title-subtext-wrapper {
+          display: flex;
+          align-items: baseline;
 
-          &.base-menu-entry-title-bold {
-            font-weight: bold;
+          .base-menu-entry-title {
+            margin-right: $spacing;
+
+            &.base-menu-entry-title-bold {
+              font-weight: bold;
+            }
           }
         }
 
@@ -306,15 +307,14 @@ export default {
       }
     }
 
-    .base-menu-entry-right-group {
-      transition: 0.3s ease;
+    .base-menu-entry-thumbnail-container {
       display: flex;
-      position: absolute;
-      top: 0;
-      flex-direction: row;
-      align-items: center;
-      right: $spacing;
-      background: white;
+      flex-direction: column;
+      justify-content: space-evenly;
+      height: $row-height-large;
+      padding: 0 $spacing;
+      width: $icon-small;
+      background-color: white;
 
       &::before {
         content: '';
@@ -327,31 +327,26 @@ export default {
         z-index: 1;
       }
 
-      .base-menu-entry-thumbnail-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        height: $row-height-large;
-        margin-left: $spacing;
+      .base-menu-entry-thumbnail {
+        max-height: $icon-small;
         width: $icon-small;
-
-        .base-menu-entry-thumbnail {
-          max-height: $icon-small;
-          width: $icon-small;
-        }
       }
     }
 
     .base-menu-entry-checkbox {
-      height: 100%;
       padding-left: $spacing;
       background-color: white;
+    }
+
+    .slide-fade-group {
+      position: absolute;
+      right: 0;
+      margin-right: $spacing;
       display: flex;
       align-items: center;
     }
 
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
-      background-color: white;
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
@@ -359,9 +354,11 @@ export default {
       opacity: 0;
       transform: translateX(#{$spacing});
     }
-  }
 
-  .base-menu-entry + .base-menu-entry {
-    border-top: $separation-line;
+    .slide-fade-leave-active {
+      position: absolute;
+      top: 50%;
+      transform: translate(#{$spacing}, -#{$icon-medium/2});
+    }
   }
 </style>

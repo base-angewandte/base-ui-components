@@ -256,6 +256,8 @@ export default {
   },
   data() {
     return {
+      // internal input representation with all possible values for
+      // date and time
       inputInt: {
         date: '',
         date_from: '',
@@ -265,24 +267,30 @@ export default {
         time_to: '',
       },
       // variable for toggling format
-      dateFormatInt: 'DD.MM.YYY',
+      dateFormatInt: 'DD.MM.YYYY',
+      // handle input fields active
       activeFrom: false,
       activeTo: false,
+      // function to provide to datepicker for correct date/string conversion
       dateType: {
         value2date: (value) => {
           if (value) {
-            return new Date(value);
+            // set date to zero hours in current time zone
+            return this.convertToDate(value);
           }
-          return '';
+          return null;
         },
         date2value: (date) => {
           if (!date) return '';
           if (this.minDateView === 'year') {
             return date.getFullYear().toString();
           }
-          return date.toString();
+          // to get date in format YYYY-MM-DD
+          return this.getDateString(date);
         },
       },
+      // variable to store the date when switching from date to year in order to be
+      // able to restore exact date when switching back
       tempDateStore: {},
     };
   },
@@ -313,16 +321,21 @@ export default {
     inputProperties() {
       return Object.keys(this.input);
     },
+    // check if format switch tabs should be shown
     showFormatOptions() {
       return this.format === 'date_year';
     },
+    // check if input is just a single date or an object
     isSingleDate() {
       return typeof this.input === 'string' || !this.inputProperties.length;
     },
+    // get first datepicker date either from single date ('date' variable) or from
+    // date_from variable
     dateFrom: {
       get() {
         return this.inputInt.date || this.inputInt.date_from;
       },
+      // also assign them again accordingly
       set(val) {
         if (this.inputProperties.includes('date_from')) {
           this.inputInt.date_from = val;
@@ -331,6 +344,8 @@ export default {
         }
       },
     },
+    // as above - if there is only a single time field get value from 'time' variable
+    // if it is a range use 'time_to''
     timeTo: {
       get() {
         return this.inputInt.time || this.inputInt.time_to;
@@ -343,26 +358,40 @@ export default {
         }
       },
     },
+    isDateFormatYear() {
+      return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
+        || this.inputProperties.some(key => !!key.includes('date')
+          && this.inputInt[key] && this.inputInt[key].length <= 4));
+    },
   },
   watch: {
-    input(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-        this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
-        if (this.showFormatOptions && this.isDateFormatYear()) {
-          this.dateFormatInt = 'YYYY';
+    input: {
+      handler(val) {
+        // check if input string is different from inputInt
+        if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
+          this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
+          // check if external input was year format and set internal format accordingly
+          if (this.showFormatOptions && this.isDateFormatYear) {
+            this.dateFormatInt = 'YYYY';
+          }
         }
-      }
+      },
+      // to not need to do extra assignment in created()
+      immediate: true,
     },
     dateFormatInt(val) {
       // in order to allow user to restore previous date after switching
-      // from date to year and back store in temp variable
-      if (val === 'YYYY') {
+      // from date to year and back store in temp variable (but only if previous date was full date
+      // (check necessary for starting with year where format is switched to 'YYYY'
+      // but no previous full date avaliable))
+      if (val === 'YYYY' && !this.isDateFormatYear) {
         this.tempDateStore = { ...this.inputInt };
       }
       this.convertDate();
     },
     inputInt: {
       handler() {
+        // also watch inputInt for differences to input and notify parent in case
         if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
           this.emitData();
         }
@@ -370,17 +399,18 @@ export default {
       deep: true,
     },
   },
-  created() {
-    this.inputInt = this.isSingleDate ? { date: this.input }
-      : Object.assign({}, this.input);
-    this.dateFormatInt = this.showFormatOptions && this.isDateFormatYear()
-      ? 'YYYY' : 'DD.MM.YYYY';
-  },
   methods: {
+    /**
+     * on date picker emitting blur event
+     */
     blurInput() {
       this.activeFrom = false;
       this.activeTo = false;
     },
+    /**
+     * on clicking on calendar icon
+     * @param ref: param to know which element event is coming from
+     */
     openDatePicker(ref) {
       if (ref.toLowerCase().includes('from')) {
         this.activeFrom = true;
@@ -388,7 +418,12 @@ export default {
         this.activeTo = true;
       }
     },
+    /**
+     * data emit function
+     */
     emitData() {
+      // get a data object that only contains fields that were also present
+      // in external input
       const data = this.getInputData();
       /**
        * emit an event when focus leaves the input
@@ -397,32 +432,38 @@ export default {
        */
       this.$emit('selected', data);
     },
-    isDateFormatYear() {
-      return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
-        || this.inputProperties.some(key => !!key.includes('date')
-        && this.inputInt[key] && this.inputInt[key].length <= 4));
-    },
+    /**
+     * convert function triggered on format tab switch
+     */
     convertDate() {
       Object.keys(this.inputInt).filter(key => !!key.includes('date'))
         .forEach((dateKey) => {
           if (this.inputInt[dateKey]) {
             if (this.minDateView === 'year') {
-              this.$set(this.inputInt, dateKey, new Date(this.inputInt[dateKey])
+              // convert date string to real date in order to get year and convert back to string
+              this.$set(this.inputInt, dateKey, this.convertToDate(this.inputInt[dateKey])
                 .getFullYear().toString());
             } else {
               // check if year was changed or is still the same
               const yearIdent = new Date(this.tempDateStore[dateKey])
                 .getFullYear().toString() === this.inputInt[dateKey];
+              // if there is a stored value set this, otherwise convert year string to date
+              // and then to date string in correct format
               this.$set(
                 this.inputInt,
                 dateKey,
-                yearIdent && this.tempDateStore[dateKey]
-                  ? this.tempDateStore[dateKey] : new Date(this.inputInt[dateKey]),
+                (yearIdent && this.tempDateStore[dateKey]
+                  ? this.tempDateStore[dateKey]
+                  : this.getDateString(this.convertToDate(this.inputInt[dateKey]))),
               );
             }
           }
         });
     },
+    /**
+     * if input was just a single string return that otherwise
+     * only return the properties provided by external input
+     */
     getInputData() {
       if (this.isSingleDate) {
         return this.inputInt.date;
@@ -430,6 +471,26 @@ export default {
       const data = {};
       this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
       return data;
+    },
+    /**
+     * convert a value to a date in local time at zero hours
+     *
+     * @param value: the date string stored in db
+     * @returns {Date}
+     */
+    convertToDate(value) {
+      return new Date(`${value}T00:00:00.000`);
+    },
+    /**
+     * a function to convert a date to a string in the format YYYY-MM-DD
+     *
+     * @param date
+     * @returns {string}
+     */
+    getDateString(date) {
+      const month = (date.getMonth() + 1).toString();
+      const day = date.getDate().toString();
+      return `${date.getFullYear().toString()}-${month.length < 2 ? '0' : ''}${month}-${day.length < 2 ? '0' : ''}${day}`;
     },
   },
 };
@@ -444,6 +505,7 @@ export default {
     .base-input-label-row {
       display: flex;
       width: 100%;
+      height: 100%;
       margin-bottom: $spacing-small/2;
       justify-content: space-between;
 

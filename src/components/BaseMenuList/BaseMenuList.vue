@@ -1,5 +1,7 @@
 <template>
-  <div class="base-menu-list">
+  <ul
+    role="list"
+    class="base-menu-list">
     <draggable
       v-model="list"
       :sort="false"
@@ -10,11 +12,13 @@
       :fallback-on-body="!dragAndDropCapable"
       @start="dragStart"
       @end="dragEnd">
-      <template v-for="(item, index) in list">
-        <BaseMenuEntry
-          v-if="item"
+      <li
+        v-for="(item, index) in list"
+        v-if="item"
+        :key="item.id || item.title"
+        class="base-menu-list__list-entry">
+        <base-menu-entry
           ref="menuEntry"
-          :key="item.id || item.title"
           :entry-id="item.id"
           :title="item.title"
           :is-active="entryProps[index].active"
@@ -24,21 +28,20 @@
           :description="item.description"
           :is-selectable="true"
           :select-active="selectActive"
-
           @clicked="activateItem(index)"
           @selected="selectItem(index, $event)" />
-      </template>
+      </li>
     </draggable>
-  </div>
+  </ul>
 </template>
 
 <script>
-/**
- * Base Component for SideBar Menu Entries
-  */
-
 import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
+
+/**
+ * Base Component for SideBar Menu Entries
+ */
 
 export default {
   components: {
@@ -62,9 +65,7 @@ export default {
      */
     list: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * index of the entry that should currently be active
@@ -79,9 +80,7 @@ export default {
      */
     selectedList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * specify the group name for the drag receiver
@@ -123,6 +122,8 @@ export default {
     selectActive(val) {
       if (!val) {
         this.entryProps.forEach(entry => this.$set(entry, 'selected', false));
+      } else {
+        this.setInternalVar();
       }
     },
   },
@@ -162,16 +163,12 @@ export default {
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
     activateItem(index) {
-      this.entryProps.forEach((entry) => { this.$set(entry, 'active', false); });
-      if (this.entryProps.length) {
-        this.$set(this.entryProps[index], 'active', true);
-      }
       /**
        * event emitted when a menu entry is clicked
        * - returning the index of the respective entry
        *
        * @event clicked
-       * @type string
+       * @type { String }
        */
       this.$emit('clicked', index);
     },
@@ -182,7 +179,7 @@ export default {
        * - returns the index and selected (true/false)
        *
        * @event selected
-       * @type {object}
+       * @type { Object }
        */
       this.$emit('selected', { index, selected });
     },
@@ -224,13 +221,26 @@ export default {
       // add the element to the dom
       document.body.appendChild(pic);
       dataTransfer.setDragImage(pic, 0, 0);
+      dataTransfer.setData('draggable', '');
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+  @import "../../styles/variables";
+
   .base-menu-list {
     position: relative;
+
+    .base-menu-list__list-entry {
+      &:not(:last-of-type) {
+        border-bottom: $separation-line;
+      }
+
+      &:focus-within {
+        color: $app-color;
+      }
+    }
   }
 </style>

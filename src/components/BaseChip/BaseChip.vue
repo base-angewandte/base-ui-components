@@ -2,18 +2,20 @@
   <div
     v-click-outside="() => entryEditable = false"
     :class="['base-chip',
-             { 'base-chip-edited': entryEdited }]">
+             { 'base-chip-edited': entryEdited },
+             { 'base-chip__active': chipActive }]">
     <div
       :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
-      @click="clickAction"
+      @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox"
       @blur="editText"
       @keydown.enter.prevent="entryEditable = false"
-      @keyup="entryEdited = true"
-      v-html="content()" />
+      @keyup="entryEdited = true">
+      {{ entryInt }}
+    </div>
     <div
       class="base-chip-icon"
       @click="removeClicked">
@@ -81,6 +83,13 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * set chip active (set color)
+     */
+    chipActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -110,13 +119,6 @@ export default {
     this.entryEdited = !this.isLinked;
   },
   methods: {
-    content() {
-      // escape '>' and '>' chars that lead to problem with v-html
-      const text = this.entryInt
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      return `<span>${text}</span>`;
-    },
     editText(evt) {
       if (this.entryInt !== evt.target.innerText) {
         this.entryInt = evt.target.innerText.replace('\n', '');
@@ -198,9 +200,24 @@ export default {
     display: inline-flex;
     align-items: center;
     cursor: default;
+    position: relative;
 
     &.base-chip-edited {
       background-color: rgba(255, 255, 255, 0);
+    }
+
+    &.base-chip__active {
+
+      &:after {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: $app-color;
+        opacity: 0.5;
+      }
     }
 
     .base-chip-text {
@@ -208,6 +225,7 @@ export default {
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
       word-break: break-word;
+      z-index: 1;
 
       &:active, &:focus {
         outline: none;
@@ -228,6 +246,6 @@ export default {
   }
 
   .hidden {
-    visibility: hidden;
+    display: none;
   }
 </style>

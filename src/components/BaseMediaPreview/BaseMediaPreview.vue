@@ -17,7 +17,9 @@
         <img
           v-if="displayImage && fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
-          :src="mediaUrl"
+          :srcset="imageSourceSet"
+          :src="sourceUrl"
+          :style="displaySize"
           :class="[
             'base-media-preview-image',
             'base-media-preview-rotation-' + orientation.toString()
@@ -90,12 +92,13 @@
 </template>
 
 <script>
-/**
- * Currently a component that shows a lightbox for images<br>
- *     in future it should also be possible to view videos or audio
-  */
 import Hls from '../../../node_modules/hls.js/dist/hls.light';
 import popUpLock from '../../mixins/popUpLock';
+
+/**
+ * Component allowing for the display of images or streaming of
+ * audio and video (currently only hls format) and by using browser pdf viewer also pdfs
+ */
 
 export default {
   components: {
@@ -151,9 +154,7 @@ export default {
      */
     displaySize: {
       type: Object,
-      default() {
-        return { height: '720px', width: '1280px' };
-      },
+      default: () => ({ height: '720px', width: '1280px' }),
     },
     /**
      * define if download button should be shown and download be enabled
@@ -163,16 +164,14 @@ export default {
       default: true,
     },
     /**
-     * define if download button should be shown and download be enabled
+     * define information texts for download and view (for pdfs) buttons
      */
     infoTexts: {
       type: Object,
-      default() {
-        return {
-          download: 'Download',
-          view: 'View',
-        };
-      },
+      default: () => ({
+        download: 'Download',
+        view: 'View',
+      }),
     },
     /**
      * define how the image should be rotated (EXIF orientation values)
@@ -180,6 +179,14 @@ export default {
     orientation: {
       type: Number,
       default: 0,
+    },
+    /**
+     * specify an image srcset as an array of objects in the form <br>
+     *     { 'mediawidth': 'url' }
+     */
+    previews: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
@@ -217,16 +224,26 @@ export default {
         return this.displayName;
       }
       const match = this.downloadUrl.match(/([^/]+)$/);
-      return match[1];
+      return match ? match[1] : '';
     },
     fileEnding() {
-      return this.mediaUrl.match(/\w+\.(\w{3,4})$/)[1] || '';
+      const match = this.sourceUrl.match(/\w+\.(\w{2,4})$/);
+      return match ? match[1] : '';
     },
     formatNotSupported() {
       return !this.fileType;
     },
     isMobile() {
       return window.innerWidth <= 640;
+    },
+    imageSourceSet() {
+      return this.previews.length ? this.previews.map(size => Object.keys(size)
+        .map(width => `${size[width]} ${width}`)).join(', ') : '';
+    },
+    sourceUrl() {
+      const last = this.previews.length - 1;
+      return this.previews && this.previews[last]
+        ? Object.values(this.previews[last])[0] : this.mediaUrl;
     },
   },
   watch: {
@@ -256,6 +273,13 @@ export default {
       // for some reason clickOutside is also triggered when opening the box
       // --> to prevent immediate closure
       if (event.target.className === 'base-media-preview-image-stage') {
+        /**
+         * triggered on clicking outside image area
+         *
+         * @event hide-preview
+         * @type { None }
+         *
+         */
         this.$emit('hide-preview');
       }
     },
@@ -266,9 +290,10 @@ export default {
          * download button clicked
          *
          * @event download
+         * @type { Object }
          *
          */
-        this.$emit('download', { url: this.downloadUrl, name: this.fileName });
+        this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
       }
     },
     openPdf() {
@@ -313,8 +338,8 @@ export default {
 
     .base-media-preview-image-stage {
       margin: auto;
-      height: 100vh;
-      width: 100vw;
+      height: 100%;
+      width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;

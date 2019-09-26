@@ -24,8 +24,6 @@
         <!-- @slot slot to fill the body of the box with custom content -->
         <slot />
         <div class="popup-button-row">
-          <!-- @event buttonLeft
-               @type none -->
           <!-- @slot custom button row -->
           <slot name="button-row">
             <BaseButton
@@ -34,7 +32,7 @@
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-left')" />
+              @clicked="buttonLeft" />
             <!-- @event buttonRight -->
             <BaseButton
               :text="buttonRightText"
@@ -42,7 +40,7 @@
               :icon-position="'right'"
               :icon-size="'small'"
               class="base-popup-button"
-              @clicked="$emit('button-right')">
+              @clicked="buttonRight">
               <template
                 v-if="isLoading"
                 slot="right-of-text">
@@ -59,28 +57,13 @@
 </template>
 
 <script>
-/**
- * A component in fixed position to display messages
- *
- */
-
-/**
- * Event triggered with right button
- *
- * @event button-right
- * @type none
- */
-
-/**
- * Event triggered with left button
- *
- * @event button-left
- * @type none
- */
-
 import BaseLoader from '../BaseLoader/BaseLoader';
-import '../../assets/icons/index';
 import popUpLock from '../../mixins/popUpLock';
+
+/**
+ * A component as overlay to display messages
+ *
+ */
 
 export default {
   name: 'BasePopUp',
@@ -158,10 +141,28 @@ export default {
        * Event triggered on right top corner close action
        *
        * @event close
-       * @type none
+       * @type { none }
        */
       this.$emit('close');
       this.showInt = false;
+    },
+    buttonRight() {
+      /**
+       * Event triggered with right button
+       *
+       * @event button-right
+       * @type { none }
+       */
+      this.$emit('button-right');
+    },
+    buttonLeft() {
+      /**
+       * Event triggered with left button
+       *
+       * @event button-left
+       * @type { none }
+       */
+      this.$emit('button-left');
     },
   },
 };

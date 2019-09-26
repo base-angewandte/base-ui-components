@@ -1,4 +1,4 @@
-A basic example
+Image View Box
 
 ```vue
 <template>
@@ -10,7 +10,7 @@ A basic example
       @clicked="showPreview = true"/>
     <BaseMediaPreview
           :show-preview="showPreview"
-          :image-url="getImgUrl"
+          :media-url="getImgUrl"
           @hide-preview="showPreview = false"/>
 </div>
 </template>
@@ -42,5 +42,97 @@ export default {
     position: relative;
   }
 </style>
+
+```
+
+An audio example
+
+```vue
+<template>
+  <div>
+      <BaseButton 
+        text="Show Audio File"
+        @clicked="showPreview = true"/>
+        
+      <BaseMediaPreview 
+        :show-preview="showPreview"
+        :allow-download="false"
+        display-name="Taken from http://www.hochmuth.com/mp3-samples.htm"
+        media-url="http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3"
+        @hide-preview="showPreview = false"/>
+  </div>
+</template>
+
+<script>
+export default{
+  data() {
+    return {
+      showPreview: false,
+    };
+  },
+};
+</script>
+
+
+```
+
+An audio example
+
+```vue
+<template>
+  <div>
+      <BaseButton 
+        text="Show Video File"
+        @clicked="showPreview = true"/>
+        
+      <BaseMediaPreview 
+        :show-preview="showPreview"
+        :allow-download="false"
+        display-name="Taken from https://bitmovin.com/mpeg-dash-hls-examples-sample-streams/"
+        media-url="https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+        @hide-preview="showPreview = false"/>
+  </div>
+</template>
+
+<script>
+export default{
+  data() {
+    return {
+      showPreview: false,
+    };
+  },
+};
+</script>
+
+
+```
+
+An pdf example
+
+```vue
+<template>
+  <div>
+      <BaseButton 
+        text="Show PDF File"
+        @clicked="showPreview = true"/>
+        
+      <BaseMediaPreview 
+        :show-preview="showPreview"
+        display-name="Taken from http://www.africau.edu/images/default/sample.pdf"
+        media-url="http://www.africau.edu/images/default/sample.pdf"
+        @hide-preview="showPreview = false"/>
+  </div>
+</template>
+
+<script>
+export default{
+  data() {
+    return {
+      showPreview: false,
+    };
+  },
+};
+</script>
+
 
 ```

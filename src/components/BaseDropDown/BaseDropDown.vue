@@ -1,5 +1,7 @@
 <template>
-  <div class="base-drop-down">
+  <div
+    v-click-outside="() => showDropDown = false"
+    class="base-drop-down">
     <div
       :class="['base-drop-down-label-wrapper',
                { 'hide': !getLangLabel(label, true) || !showLabel }]">
@@ -14,13 +16,15 @@
       ref="dropDownButton"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
-      :class="['base-drop-down-head']"
+      :disabled="isDisabled"
+      :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing}]"
       aria-haspopup="listbox"
       type="button"
       @click.prevent="showDropDown = !showDropDown"
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
       <div
+        ref="dropDownButton"
         :class="['base-drop-down-head-text-wrapper',
                  {'base-drop-down-head-text-fade-out': showFadeOut }]">
         <span
@@ -39,6 +43,7 @@
     <div
       v-if="showDropDown"
       ref="dropdownContainer"
+      :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight}"
       class="base-drop-down-body">
       <!-- @slot create custom drop down body -->
       <slot>
@@ -67,11 +72,18 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import ClickOutside from 'vue-click-outside';
 import { setLanguageMixin } from '../../mixins/setLanguage';
 
+/**
+ * Accessible drop down component
+ */
 export default {
   components: {
     SvgIcon,
+  },
+  directives: {
+    ClickOutside,
   },
   mixins: [
     setLanguageMixin,
@@ -87,9 +99,7 @@ export default {
      */
     options: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * label for the drop down, recommended to define for accessibility
@@ -113,9 +123,7 @@ export default {
      */
     selectedOption: {
       type: Object,
-      default() {
-        return { value: '', label: '' };
-      },
+      default: () => ({ value: '', label: '' }),
     },
     /**
      * define if label should be shown
@@ -145,12 +153,38 @@ export default {
       type: String,
       default: 'value',
     },
+    /**
+     * flag to set drop down inactive
+     */
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * flag to disable spacing left and right
+     * (needed for sidebar drop downs)
+     */
+    withSpacing: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * align drop down with left or right border
+     */
+    alignDropDown: {
+      type: String,
+      default: 'left',
+      validator(val) {
+        return ['left', 'right'].includes(val);
+      },
+    },
   },
   data() {
     return {
       showDropDown: false,
       keySelectedIndex: -1,
       showFadeOut: false,
+      maxDropDownHeight: '0',
     };
   },
   computed: {
@@ -160,6 +194,11 @@ export default {
   },
   watch: {
     showDropDown(val) {
+      if (val) {
+        // dont let drop down size be larger than window
+        const maxHeight = window.innerHeight - this.$el.offsetTop - 120;
+        this.maxDropDownHeight = `${maxHeight < 300 ? maxHeight : 300}px`;
+      }
       // reset index on close
       if (!val) {
         this.keySelectedIndex = -1;
@@ -183,7 +222,7 @@ export default {
        * Event emitted when an option is selected
        *
        * @event value-selected
-       * @type String
+       * @type { Object }
        */
       this.$emit('value-selected', option);
     },
@@ -244,16 +283,22 @@ export default {
       width: 100%;
       line-height: $row-height-small;
       cursor: pointer;
-      padding: 0 $spacing;
       color: $font-color-second;
       fill: $font-color-second;
       background-color: $background-color;
+      padding: 0;
+
+      &.base-drop-down-head-spacing {
+        padding: 0 $spacing;
+      }
 
       .base-drop-down-head-text-wrapper {
         overflow: hidden;
         position: relative;
         margin-right: $spacing;
         transition: all 0.2s ease;
+        width: 100%;
+        text-align: left;
 
         .base-drop-down-head-text {
           white-space: nowrap;
@@ -266,7 +311,7 @@ export default {
           width: $fade-out-width;
           position: absolute;
           top: 0;
-          right: 0;
+          right: -1px;
           background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
         }
       }
@@ -278,6 +323,16 @@ export default {
 
       &:active .base-drop-down-icon, &:focus .base-drop-down-icon {
         fill: $app-color;
+      }
+
+      &:disabled {
+        cursor: default;
+        color: graytext;
+        fill: graytext;
+
+        .base-drop-down-icon {
+          fill: graytext;
+        }
       }
 
       .base-drop-down-icon {

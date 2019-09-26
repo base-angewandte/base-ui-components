@@ -41,19 +41,19 @@
       <base-image-box
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('./images/icons.png')"
+        :image-url="require('../src/static/images/icons.png')"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('./images/icons.png')"
+        :image-url="require('../src/static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('./images/roboto_detail_fullscreen_12pt.png')"
+        :image-url="require('../src/static/images/roboto_detail_fullscreen_12pt.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
@@ -111,8 +111,8 @@
     <!-- FORM FIELD TESTING -->
     <div class="form-field">
       <base-date-input
-        :type="'datetime'"
         v-model="inputDateTime"
+        :type="'datetime'"
         :label="'unknown'" />
       <base-date-input
         :label="'unknown'"
@@ -159,6 +159,7 @@
         :object-prop="'title'"
         :chips-editable="true"
         :label="'single choice with special drop down body'"
+        :allow-unknown-entries="false"
         :allow-multiple-entries="false">
         <template
           slot="drop-down-entry"
@@ -220,12 +221,15 @@
         :show-plus="true"
         :box-size="{ width: 'calc(25% - 16px)' }"
         drop-type="elements"
+        drop-element-name="menuEntry"
+        drag-item-class="base-menu-entry"
         icon="camera"
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
         @dropped-element="dropped($event)"
         @clicked="boxClicked" />
-      <base-drop-box />
+      <base-drop-box
+        drop-type="files" />
     </div>
     <div>
       <ul>
@@ -299,11 +303,46 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/no-extraneous-dependencies
 import axios from 'axios';
+import BaseMenuEntry from '../src/components/BaseMenuEntry/BaseMenuEntry';
+import BasePopUp from '../src/components/BasePopUp/BasePopUp';
+import BaseDropDown from '../src/components/BaseDropDown/BaseDropDown';
+import BaseInput from '../src/components/BaseInput/BaseInput';
+import BaseButton from '../src/components/BaseButton/BaseButton';
+import BaseDropBox from '../src/components/BaseDropBox/BaseDropBox';
+import BaseMenuList from '../src/components/BaseMenuList/BaseMenuList';
+import BaseChipsInput from '../src/components/BaseChipsInput/BaseChipsInput';
+import BaseSearch from '../src/components/BaseSearch/BaseSearch';
+import BaseMultilineTextInput from '../src/components/BaseMultilineTextInput/BaseMultilineTextInput';
+import BaseImageBox from '../src/components/BaseImageBox/BaseImageBox';
+import BaseUploadBar from '../src/components/BaseUploadBar/BaseUploadBar';
+import BaseAutocompleteInput from '../src/components/BaseAutocompleteInput/BaseAutocompleteInput';
+import BaseChipsBelow from '../src/components/BaseChipsBelow/BaseChipsBelow';
+import BaseDateInput from '../src/components/BaseDateInput/BaseDateInput';
+import BasePagination from '../src/components/BasePagination/BasePagination';
+import BaseMediaPreview from '../src/components/BaseMediaPreview/BaseMediaPreview';
 
 export default {
   name: 'App',
+  components: {
+    BaseMediaPreview,
+    BasePagination,
+    BaseChipsBelow,
+    BaseDateInput,
+    BaseAutocompleteInput,
+    BaseUploadBar,
+    BaseImageBox,
+    BaseMultilineTextInput,
+    BaseSearch,
+    BaseChipsInput,
+    BaseMenuList,
+    BaseMenuEntry,
+    BaseDropDown,
+    BasePopUp,
+    BaseInput,
+    BaseButton,
+    BaseDropBox,
+  },
   data() {
     return {
       selectionList: [

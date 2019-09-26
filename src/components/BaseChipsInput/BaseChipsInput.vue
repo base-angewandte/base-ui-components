@@ -11,14 +11,13 @@
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
       :is-active="showDropDown"
-      @clicked-outside="insideInput = false"
-      @input-focus="onInputFocus"
-      @input-blur="onInputBlur"
-      @arrow-key="triggerArrowKey"
-      @input-keydown="checkKeyEvent"
-      @input-keypress="checkKeyEvent"
-      @enter="onEnter()"
-      @click-input-field="setInputActive">
+      @clicked-outside="onInputBlur"
+      @focus="onInputFocus"
+      @blur="onInputBlur"
+      @keydown.up.down.prevent="triggerArrowKey"
+      @keydown="checkKeyEvent"
+      @keypress.enter="onEnter()"
+      @click-input-field="insideInput = true">
       <template
         v-if="sortable"
         slot="label-addition">
@@ -52,7 +51,7 @@
                 :chip-editable="chipsEditable"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-                @mouse-down="chipActive = index"
+                :chip-active="chipActiveForRemove === index"
                 @remove-entry="removeEntry(entry, index)"
                 @hoverbox-active="hoverBoxActive($event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
@@ -84,6 +83,7 @@
       v-if="showDropDown"
       ref="dropdownContainer"
       v-click-outside="() => insideDropDown = false"
+      :style="{ 'min-width': dropDownMinWidth }"
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
       @mouseleave="checkLeave">
@@ -364,10 +364,11 @@ export default {
       insideDropDown: false,
       insideInput: false,
       returnAsObject: false,
-      chipActive: -1,
       timeout: null,
       fired: '',
       drag: false,
+      chipActiveForRemove: -1,
+      dropDownMinWidth: '100%',
     };
   },
   computed: {
@@ -422,6 +423,7 @@ export default {
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
+        this.selectedMenuEntryIndex = -1;
         this.$emit('fetch-dropdown-entries', { value: val, type: this.objectProp });
       } else {
         /**
@@ -479,6 +481,7 @@ export default {
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
       }
       if (val) {
+        this.calcDropDownMinWidth();
         this.selectedMenuEntryIndex = this.getAllowUnknown();
         if (!this.chipsEditable) {
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
@@ -492,6 +495,10 @@ export default {
          */
         this.$emit('show-dropdown');
       } else {
+        // clear input on drop down close if unknown entries are not allowed
+        if (document.activeElement.tagName === 'BODY') {
+          this.input = '';
+        }
         /**
          * event triggered on hide drop down
          *
@@ -544,7 +551,11 @@ export default {
             this.selectedListInt.push(selected);
           }
         } else {
-          this.selectedListInt = [selected];
+          // check if an entry is present - if yes - remove it first
+          if (this.selectedListInt.length) {
+            this.removeEntry(this.selectedListInt[0], 0);
+          }
+          this.selectedListInt = [].concat(selected);
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
@@ -591,8 +602,6 @@ export default {
       this.insideInput = true;
       if (!this.allowDynamicDropDownEntries) {
         // check if item has an id (= is not an custom entry)
-        // TODO: is this the desired behaviour?? (or should unknown entry also appear
-        // in drop down?
         if (item.idInt === 0 || item.idInt) {
           this.dropDownListInt.push(item);
           // sort all entries by id to restore the original order
@@ -613,20 +622,26 @@ export default {
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
-          ? this.selectedMenuEntryIndex + 1 : 0;
+          ? this.selectedMenuEntryIndex + 1 : this.getAllowUnknown();
       } else if (event.key === 'ArrowUp') {
-        this.selectedMenuEntryIndex = this.selectedMenuEntryIndex > 0
-          ? this.selectedMenuEntryIndex - 1 : this.dropDownListInt.length - 1;
+        if (this.selectedMenuEntryIndex > 0) {
+          this.selectedMenuEntryIndex -= 1;
+        } else {
+          this.selectedMenuEntryIndex = this.allowUnknownEntries
+            ? -1 : this.dropDownListInt.length - 1;
+        }
       }
       if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
-        this.$refs.option[this.selectedMenuEntryIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        this.$refs.option[this.selectedMenuEntryIndex >= 0
+          ? this.selectedMenuEntryIndex : 0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
     getAllowUnknown() {
-      return this.$props.allowUnknownEntries ? -1 : 0;
+      return this.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
       this.insideInput = false;
+      this.chipActiveForRemove = -1;
     },
     onInputFocus() {
       this.insideInput = true;
@@ -701,7 +716,7 @@ export default {
       this.dropDownListInt = this.list;
     },
     checkLeave(e) {
-      if (e.relatedTarget.closest('.base-chips-input')
+      if (e.relatedTarget && e.relatedTarget.closest('.base-chips-input')
         !== e.target.parentElement) {
         this.insideDropDown = false;
       }
@@ -756,16 +771,19 @@ export default {
     },
     checkKeyEvent(event) {
       if (event.key === 'Backspace') {
-        if (!this.fired && !this.input) {
-          const lastIndex = this.selectedListInt.length - 1;
+        const lastIndex = this.selectedListInt.length - 1;
+        if (!this.fired && !this.input && this.chipActiveForRemove < 0) {
+          // on first backspace make chip active
+          this.chipActiveForRemove = lastIndex;
+          // on second backspace set timeout for delete
+        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.input) {
           // check if there is actually anything left to remove
           if (lastIndex >= 0) {
             this.removeEntry(this.selectedListInt[lastIndex], lastIndex);
+            this.chipActiveForRemove = -1;
           }
         }
         // necessary to prevent accidential delete of chips when user keeps backspace pressed
-        // TODO: in a later version chips should be tabbable anyway and maybe it could work
-        // in a way that first backspace makes last chip active second backspace removes
         this.fired = true;
         if (this.timeout) {
           clearTimeout(this.timeout);
@@ -773,7 +791,9 @@ export default {
         }
         this.timeout = setTimeout(() => {
           this.fired = false;
-        }, 300);
+        }, 200);
+      } else {
+        this.chipActiveForRemove = -1;
       }
       // if user has input and uses semicolon add input
       if (event.code === 'Comma' && event.shiftKey && this.input) {
@@ -812,11 +832,6 @@ export default {
         inputElems[0].blur();
       }
     },
-    setInputActive() {
-      if (this.chipActive < 0) {
-        this.insideInput = true;
-      }
-    },
     hoverBoxActive(value, entry) {
       /**
        * event emitted on show / hide hoverbox, emitting event and originating entry
@@ -825,13 +840,18 @@ export default {
        */
       this.$emit('hoverbox-active', { value, entry });
     },
+    calcDropDownMinWidth() {
+      const inputElement = this.$refs.baseInput;
+      if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
+        this.dropDownMinWidth = `${this.$parent.$el.clientWidth}px`;
+      }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
   .base-chips-input {
-    position: relative;
     width: 100%;
     text-align: left;
 
@@ -858,7 +878,6 @@ export default {
     .base-chips-drop-down {
       position: absolute;
       background: white;
-      width: 100%;
       max-height: 10 * $row-height-small;
       overflow-y: auto;
       z-index: 2;
@@ -866,10 +885,11 @@ export default {
       cursor: pointer;
 
       .base-chips-drop-down-entry-wrapper {
-        padding: 0 $spacing;
-        line-height: $row-height-small;
+        padding: $spacing-small/2 $spacing;
+        min-height: $row-height-small;
         display: flex;
         justify-content: space-between;
+        line-height: $line-height;
 
         &.base-chips-drop-down-entry-wrapper-active {
           background: $background-color;
@@ -884,6 +904,8 @@ export default {
           float: right;
         }
       }
+
+
     }
 
     .base-chips-input-chips-container {

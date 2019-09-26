@@ -2,6 +2,7 @@
   <button
     :disabled="disabled"
     :type="buttonType"
+    :style="{ justifyContent: alignText }"
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
@@ -122,6 +123,17 @@ export default {
       type: String,
       default: 'button',
     },
+    /**
+     * define alignment of button content<br>
+     * allowed values: 'center', 'left', 'right'
+     */
+    alignText: {
+      type: String,
+      default: 'center',
+      validator(val) {
+        return ['center', 'left', 'right'].includes(val);
+      },
+    },
   },
   methods: {
     clicked(event) {
@@ -203,6 +215,10 @@ export default {
       color: $app-color;
     }
 
+    &:active .base-button-icon, &:focus .base-button-icon {
+      color: $app-color;
+    }
+
     &:disabled {
       cursor: default;
 
@@ -213,12 +229,6 @@ export default {
 
     .base-button-icon-hide {
       visibility: hidden;
-    }
-  }
-
-  @media screen and (max-width: $mobile) {
-    button {
-      font-size: $font-size-mobile;
     }
   }
 </style>

@@ -1,8 +1,11 @@
 <template>
   <div class="base-pagination">
     <SvgIcon
+      :class="[
+        'base-pagination-arrow',
+        'base-pagination-arrow-left',
+        { 'base-pagination-arrow-inactive': active <= 1 }]"
       name="arrow-left"
-      class="base-pagination-arrow"
       @click="active = active - 1 > 0 ? active - 1 : 1" />
     <div
       v-if="total > maxNumbers"
@@ -46,8 +49,11 @@
       </span>
     </div>
     <SvgIcon
+      :class="[
+        'base-pagination-arrow',
+        'base-pagination-arrow-right',
+        { 'base-pagination-arrow-inactive': active >= total }]"
       name="arrow-left"
-      class="base-pagination-arrow base-pagination-arrow-right"
       @click="active = active + 1 <= total ? active + 1 : total" />
   </div>
 </template>
@@ -55,13 +61,17 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 
+/**
+ * Pagination component
+ */
+
 export default {
   components: {
     SvgIcon,
   },
   model: {
     prop: 'current',
-    event: 'clicked',
+    event: 'set-page',
   },
   props: {
     /**
@@ -73,6 +83,8 @@ export default {
     },
     /**
      * currently active page number
+     *
+     * @model
      */
     current: {
       type: Number,
@@ -100,13 +112,13 @@ export default {
   },
   watch: {
     active(val) {
-      /**
-       * triggered on page select
-       *
-       * @event set-page
-       * @type Number
-       */
       if (this.current !== val) {
+        /**
+         * triggered on page select
+         *
+         * @event set-page
+         * @type { Number }
+         */
         this.$emit('set-page', val);
       }
       this.setStartEnd();
@@ -117,6 +129,10 @@ export default {
   },
   mounted() {
     this.setStartEnd();
+    window.addEventListener('resize', this.setStartEnd);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.setStartEnd);
   },
   methods: {
     setStartEnd() {
@@ -195,6 +211,11 @@ export default {
 
       &.base-pagination-arrow-right {
         transform: rotate(180deg);
+      }
+
+      &.base-pagination-arrow-inactive {
+        color: graytext;
+        cursor: default;
       }
     }
 

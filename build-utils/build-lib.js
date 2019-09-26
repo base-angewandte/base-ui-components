@@ -2,6 +2,7 @@
 /* eslint-disable-next-line */
 const fs = require('fs-extra');
 const path = require('path');
+/* eslint-disable import/no-extraneous-dependencies */
 const _ = require('lodash');
 const parseComponent = require('@vue/component-compiler-utils').parse;
 const { execSync } = require('child_process');
@@ -25,6 +26,114 @@ function generatePackageJson(packageName) {
   );
 }
 
+function generateReadme(pack) {
+  if (!pack.example) {
+    return `
+# ${pack.name}
+
+> ${pack.description}
+
+## Installation
+
+### Directly in the browser
+
+Drop the library in with a \`<script\` tag alongside Vue:
+
+\`\`\`html
+<div id="app">
+    <!-- ... use components here -->
+</div>
+
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/${pack.name}"></script>
+<script>
+    new Vue({ el: '#app' })
+</script>
+\`\`\`
+
+Or, if you only want to use a small subset of components, drop them in individually
+
+\`\`\`html
+<div id="app">
+  <!-- ... use component here ... -->
+</div>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/${pack.name}/HelloA"></script>
+<script>
+  new Vue({ el: '#app' })
+</script>
+\`\`\`
+
+### In a module system
+
+Install the library with NPM
+
+\`\`\`bash
+npm install ${pack.name}
+\`\`\`
+Then either import the library and either globally register all components with:
+\`\`\`js
+import ${pack.moduleName} from '${pack.name}'
+Vue.use(${pack.moduleName})
+\`\`\`
+or import and locally register a single component with:
+\`\`\`js
+import { HelloA } from '${pack.name}'
+export default {
+    components: { ${pack.moduleName} }
+}
+\`\`\`
+#### Individually packaged components
+If you only want to use a small subset of components, import only individually packaged components to reduce the size of your application:
+\`\`\`js
+import HelloA from 'hello-vue-components/HelloA'
+import HelloB from 'hello-vue-components/HelloB'
+\`\`\`
+    `;
+  }
+  return `\
+# ${pack.name}
+> ${pack.description}
+## Installation
+### Directly in the browser
+Drop the component in with a \`<script>\` tag alongside Vue:
+\`\`\`html
+<div id="app">
+<!-- ... use component here ... -->
+</div>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/${pack.name}"></script>
+<script>
+new Vue({ el: '#app' })
+</script>
+\`\`\`
+### In a module system
+Install the component with NPM:
+\`\`\`bash
+npm install ${pack.name}
+\`\`\`
+Then import the component:
+\`\`\`js
+import ${pack.moduleName} from '${pack.name}'
+\`\`\`
+And either globally register it for use in all components:
+\`\`\`js
+Vue.component(${pack.moduleName}, '${pack.name}')
+\`\`\`
+or locally register it for use in an individual component:
+\`\`\`js
+export default {
+components: { ${pack.moduleName} }
+}
+\`\`\`
+## Usage
+\`\`\`html
+${pack.example}
+\`\`\`
+`;
+}
+
+
 function renameIndex(componentName) {
   const builds = [
     {
@@ -47,7 +156,7 @@ function renameIndex(componentName) {
   const destPackageFolder = getPath(`../packages/${packageName}`);
 
   builds.forEach((build) => {
-    const oldIndexPath = getPath(`../dist/${componentName || ''}/index.${build.type}.js`);
+    const oldIndexPath = getPath(`../dist/lib/${componentName || ''}/${componentName ? 'index' : 'base-ui-components'}.${build.type}.js`);
     const [buildTypeBase, buildModifier] = build.type.split('.');
     const destFolder = path.resolve(destPackageFolder, build.dest ? build.dest : buildTypeBase);
 
@@ -80,12 +189,10 @@ function renameIndex(componentName) {
 
     fs.writeFileSync(
       path.resolve(destPackageFolder, 'index.js'),
-      `\
-        export * from './src${componentName ? `/${componentName}.vue` : ''};
-      `,
+      `export * from './src${componentName ? `/components/${componentName}/${componentName}.vue` : ''}';`,
     );
 
-    let description = libConfig.description;
+    let { description } = libConfig;
     let example;
     if (componentName) {
       const srcFilePath = getPath(`../src/components/${componentName}/${componentName}.vue`);
@@ -96,7 +203,7 @@ function renameIndex(componentName) {
         compiler: templateCompiler,
       });
       const script = extract(result.script.content).filter(comment => comment.type === 'BlockComment');
-      description = script && script.length ? doctrine.parse(script[0].raw) : '';
+      description = script && script.length ? doctrine.parse(script[0].raw).description.replace('\n', '') : '';
 
       const packageConfig = {
         name: packageName,
@@ -108,11 +215,34 @@ function renameIndex(componentName) {
       console.info(`Writing package.json for ${packageConfig.moduleName}`);
       fs.writeFileSync(
         path.resolve(destPackageFolder, 'package.json'),
-        generatePackageJson(packageConf),
+        generatePackageJson(packageConfig),
       );
+      console.info(`Writing readme file for ${packageConfig.moduleName}`);
+      fs.writeFileSync(
+        path.resolve(destPackageFolder, 'README.md'),
+        generateReadme(packageConfig),
+      );
+      console.info(`Adding license for ${packageConfig.moduleName}`);
+      const licenseStr = fs.readFileSync(path.resolve('', 'LICENSE.md')).toString('utf8');
+      fs.writeFileSync(
+        path.resolve(destPackageFolder, 'LICENSE.md'),
+        licenseStr,
+      );
+
+      if (componentName) {
+        const componentPackageFolder = path.resolve(
+          __dirname,
+          `../packages/${libConfig.name}/${componentName}`,
+        );
+        fs.copySync(destPackageFolder, componentPackageFolder, {
+          filter: filePath => !/(LICENSE|README\.md|src)$/.test(filePath),
+        });
+        fs.writeFileSync(
+          path.resolve(componentPackageFolder, 'index.js'),
+          `export * from '${path.join('../src', componentName || '')}`,
+        );
+      }
     }
-
-
   });
 }
 
@@ -123,17 +253,17 @@ console.info('Updating index file');
 require('./update-index-file');
 
 // Get the names of all components in the src directory
-const componentNames = require('./component-names');
+// const componentNames = require('./component-names');
 
 // Get the binary for vue-cli-service
 const vueCliServicePath = getPath('../node_modules/.bin/vue-cli-service');
 
 fs.emptyDirSync(getPath('../packages'));
-/*
+
 // build main library
 console.info('Building main library');
 execSync(
-  `${vueCliServicePath} build src/index.js --target lib --name index --dest dist/`,
+  `${vueCliServicePath} build src/index.js --target lib --name base-ui-components --dest dist/lib`,
   { stdio: 'inherit' },
 );
 console.info('library built!');
@@ -141,19 +271,18 @@ console.info('library built!');
 // Rename the CommonJS build so that it can be imported with
 // ${libConfig}/dist
 renameIndex();
-*/
 
-const testComp = [].concat(componentNames.slice(0, 1));
-console.log(testComp);
+/*
 // for each component in the src/components directory...
-testComp.forEach((componentName) => {
+componentNames.forEach((componentName) => {
   // Build the component individually
   console.info(`Building ${componentName}`);
   execSync(
-    `${vueCliServicePath} build src/components/${componentName}/${componentName}.vue --target lib --name index --dest dist/${componentName}`,
+    `${vueCliServicePath} build src/components/${componentName}/${componentName}.vue
+    --target lib --name index --dest dist/lib/${componentName}`,
   );
 
   // Rename the CommonJS build so that it can be imported with
   // $${libConfig/dist/componentName
   renameIndex(componentName);
-});
+}); */

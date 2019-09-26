@@ -1,7 +1,7 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @click="clicked">
+    @click.stop="clicked">
     <input
       v-model="checkedInt"
       :name="label"
@@ -92,12 +92,15 @@ export default {
   },
   data() {
     return {
-      checkedInt: this.checked,
+      checkedInt: false,
     };
   },
   watch: {
-    checked(val) {
-      this.checkedInt = val;
+    checked: {
+      handler(val) {
+        this.checkedInt = val;
+      },
+      immediate: true,
     },
   },
   methods: {

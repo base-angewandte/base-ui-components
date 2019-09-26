@@ -74,9 +74,7 @@ export default {
      */
     styleProps: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
   },
   data() {
@@ -110,8 +108,8 @@ export default {
       /**
        * Event emitted on keyup
        *
-       * @event input
-       * @type String
+       * @event input-change
+       * @type { String }
        */
       this.$emit('input-change', this.inputInt);
     },
@@ -127,6 +125,11 @@ export default {
     background: white;
     padding: 0 $spacing;
     height: $row-height-large;
+
+    input[type='search'] {
+      font-family: inherit;
+      font-size: inherit;
+    }
 
     &.base-search-fade-out::after {
       content: '';

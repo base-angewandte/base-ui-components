@@ -1,14 +1,7 @@
-@import 'fonts';
-@import '../../src/styles/lib';
+@import '../../src/styles/fonts';
+@import '../../src/styles/variables';
 
 $font: "Source Sans Pro", serif;
-
-.box-shadow {
-
-}
-
-.box-shadow:hover, box-shadow:focus-within {
-}
 
 html {
   font-family: $font;
@@ -20,6 +13,10 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
+
+  &:root {
+    font-size: 19px;
+  }
 
   button {
     font-family: $font;
@@ -41,7 +38,7 @@ html {
 }
 
 @media screen and (max-width: $mobile) {
-  html {
-    font-size: $font-size-mobile;
+  html:root {
+    font-size: 16px;
   }
 }

@@ -12,6 +12,8 @@ const indexFileContent = `\
 ${componentNames
     .map(componentName => `import ${componentName} from './components/${componentName}/${componentName}'`)
     .join(';\n')};
+import 'normalize.css';
+import './styles/lib.scss';
 
 // Export components individually
 export {\n  ${componentNames.map(componentName => componentName).join(',\n  ')},\n};

@@ -14,7 +14,11 @@
 
 a {
   text-decoration: none;
-  color: $app-color;
+  color: inherit;
+
+  &:focus {
+    outline: 0;
+  }
 }
 
 button {
@@ -36,6 +40,10 @@ ul {
   &:focus {
     outline: 0;
   }
+}
+
+li {
+  list-style: none;
 }
 
 fieldset {
@@ -72,6 +80,10 @@ textarea {
 
 // to prevent safari strange padding
 input {
+  padding: 0;
+}
+
+button {
   padding: 0;
 }
 

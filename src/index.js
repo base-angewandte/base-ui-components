@@ -28,6 +28,8 @@ import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseSwitchButton from './components/BaseSwitchButton/BaseSwitchButton';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
+import 'normalize.css';
+import './styles/lib.scss';
 
 // Export components individually
 export {
