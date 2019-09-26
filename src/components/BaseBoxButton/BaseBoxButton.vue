@@ -1,5 +1,6 @@
 <template>
   <base-box
+    ref="baseBox"
     :box-size="boxSize"
     :box-ratio="boxRatio"
     class="base-box-button"
@@ -28,7 +29,11 @@
         <div class="button-box-text">{{ text }}</div>
       </div>
 
-      <div class="button-box-subtext">{{ subtext }}</div>
+      <div
+        ref="baseBoxSubtext"
+        :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
+        {{ subtext }}
+      </div>
 
     </div>
     <div
@@ -119,6 +124,18 @@ export default {
       default: '100',
     },
   },
+  data() {
+    return {
+      // to hide subtext if box is to small
+      showSubtext: true,
+    };
+  },
+  mounted() {
+    this.setShowSubtext();
+    window.addEventListener('resize', () => {
+      this.setShowSubtext();
+    });
+  },
   methods: {
     clicked(event) {
       /**
@@ -127,6 +144,15 @@ export default {
        * @type {Event}
        */
       this.$emit('clicked', event);
+    },
+    setShowSubtext() {
+      const subtextRef = this.$refs.baseBoxSubtext;
+      if (subtextRef) {
+        const subtextBottomPosition = subtextRef.offsetTop
+          + subtextRef.offsetHeight;
+        const boxHeight = this.$refs.baseBox.$el.offsetHeight;
+        this.showSubtext = boxHeight >= subtextBottomPosition;
+      }
     },
   },
 };
@@ -194,10 +220,15 @@ export default {
 
       .button-box-subtext {
         margin-top: $spacing-small;
+        padding-bottom: $spacing;
         font-size: $font-size-small;
         position: absolute;
         width: calc(100% - (2 * #{$spacing}));
         top: calc(50% + 52px);
+
+        &.base-button-box__subtext-hidden {
+          visibility: hidden;
+        }
       }
     }
 
