@@ -2,7 +2,7 @@
   <button
     :disabled="disabled"
     :type="buttonType"
-    :style="{ justifyContent: alignText }"
+    :style="{ justifyContent: alignText, background: backgroundColor }"
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
              {'base-button-active': active }]"
@@ -135,6 +135,13 @@ export default {
         return ['center', 'left', 'right'].includes(val);
       },
     },
+    /**
+     * set the background color of the button
+     */
+    backgroundColor: {
+      type: String,
+      default: '',
+    },
   },
   methods: {
     clicked(event) {
@@ -194,7 +201,7 @@ export default {
     }
 
     &.base-button-single {
-      background-color: $button-header-color;
+      background-color: transparent;
       min-height: $row-height-small;
 
       .base-button-icon-large {
