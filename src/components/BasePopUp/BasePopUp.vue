@@ -191,11 +191,10 @@ export default {
     position: fixed;
     top: 20vh;
     left: 50%;
-    z-index: 100;
+    z-index: 1060;
     min-width: 288px;
     width: 50%;
     max-width: 700px;
-    max-height: 75vh;
     display: flex;
     flex-direction: column;
     transform: translateX(-50%);
@@ -257,7 +256,7 @@ export default {
     .popup-box {
       max-width: 100%;
       width: 90%;
-      top: 15vh;
+      top: 10vh;
     }
 
     .popup-content {
@@ -275,6 +274,18 @@ export default {
       & .base-popup-button:last-child {
         margin-top: $spacing-small;
       }
+    }
+  }
+
+  @media screen and (max-height: 1042px) {
+    .popup-box {
+      top: 10vh;
+    }
+  }
+
+  @media screen and (max-height: 500px) {
+    .popup-box {
+      top: 2vh;
     }
   }
 </style>
