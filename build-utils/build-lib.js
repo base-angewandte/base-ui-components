@@ -22,7 +22,25 @@ function generatePackageJson(packageName) {
     {
       name: packageName.name,
       description: packageName.description,
+      version: packageName.version,
+      author: libConfig.author,
+      license: 'MIT',
+      homepage: `https://www.npmjs.com/package/${packageName.name}`,
+      repository: {
+        type: 'git',
+        url: `git+https://github.com/${repoName}.git`,
+      },
+      bugs: {
+        url: `https://github.com/${repoName}/issues`,
+      },
+      module: 'index.js',
+      main: 'cjs/index.js',
+      unpkg: 'umd/index.min.js',
+      jsdelivr: 'umd/index.min.js',
+      peerDependencies: libConfig.peerDependencies,
     },
+    null,
+    2,
   );
 }
 
@@ -182,68 +200,93 @@ function renameIndex(componentName) {
         .readFileSync(newIndexPath, { encoding: 'utf8' })
         .replace(path.basename(oldMapPath), path.basename(newMapPath)),
     );
+  });
 
-    fs.copySync(getPath('../src'), path.resolve(destPackageFolder, 'scr'), {
-      filter: filePath => !/\.unit\.js$/.test(filePath),
+  fs.copySync(getPath('../src'), path.resolve(destPackageFolder, 'scr'), {
+    filter: filePath => !/\.unit\.js$/.test(filePath),
+  });
+
+  // for main library export everything
+  let exportStatement = 'export * from \'./src/components\';';
+
+  // if this is for component use export default
+  if (componentName) {
+    exportStatement = `\
+import ${componentName} from './src/components/${componentName}/${componentName}.vue';
+
+export default ${componentName};
+`;
+  }
+  fs.writeFileSync(
+    path.resolve(destPackageFolder, 'index.js'),
+    exportStatement,
+  );
+
+  // get main library description
+  let { description } = libConfig;
+  let example;
+  // if component, extract description from component documentation
+  if (componentName) {
+    const srcFilePath = getPath(`../src/components/${componentName}/${componentName}.vue`);
+    const result = parseComponent({
+      source: fs.readFileSync(srcFilePath, { encoding: 'utf8' }),
+      filename: srcFilePath,
+      // eslint-disable-next-line import/no-extraneous-dependencies
+      compiler: templateCompiler,
+    });
+    const script = extract(result.script.content).filter(comment => comment.type === 'BlockComment');
+    description = script && script.length ? doctrine.parse(script[0].raw).description.replace('\n', '') : '';
+  }
+  const packageConfig = {
+    name: packageName,
+    moduleName: componentName || _.upperFirst(_.camelCase(packageName)),
+    description,
+    example,
+  };
+
+  console.info(`Writing package.json for ${packageConfig.moduleName}`);
+  fs.writeFileSync(
+    path.resolve(destPackageFolder, 'package.json'),
+    generatePackageJson(packageConfig),
+  );
+  console.info(`Writing readme file for ${packageConfig.moduleName}`);
+  fs.writeFileSync(
+    path.resolve(destPackageFolder, 'README.md'),
+    generateReadme(packageConfig),
+  );
+  console.info(`Adding license for ${packageConfig.moduleName}`);
+  const licenseStr = fs.readFileSync(path.resolve('', 'LICENSE.md')).toString('utf8');
+  fs.writeFileSync(
+    path.resolve(destPackageFolder, 'LICENSE.md'),
+    licenseStr,
+  );
+
+  if (componentName) {
+    const componentPackageFolder = path.resolve(
+      __dirname,
+      `../packages/${libConfig.name}/${componentName}`,
+    );
+    fs.copySync(destPackageFolder, componentPackageFolder, {
+      filter: filePath => !/(LICENSE|README\.md|src)$/.test(filePath),
     });
 
-    fs.writeFileSync(
-      path.resolve(destPackageFolder, 'index.js'),
-      `export * from './src${componentName ? `/components/${componentName}/${componentName}.vue` : ''}';`,
-    );
+    // for main library export everything
+    let exportStatement2 = 'export * from \'../src\';';
 
-    let { description } = libConfig;
-    let example;
+    // if this is for component use export default
     if (componentName) {
-      const srcFilePath = getPath(`../src/components/${componentName}/${componentName}.vue`);
-      const result = parseComponent({
-        source: fs.readFileSync(srcFilePath, { encoding: 'utf8' }),
-        filename: srcFilePath,
-        // eslint-disable-next-line import/no-extraneous-dependencies
-        compiler: templateCompiler,
-      });
-      const script = extract(result.script.content).filter(comment => comment.type === 'BlockComment');
-      description = script && script.length ? doctrine.parse(script[0].raw).description.replace('\n', '') : '';
+      exportStatement2 = `\
+import ${componentName} from '../src/${componentName}.vue';
 
-      const packageConfig = {
-        name: packageName,
-        moduleName: componentName || _.upperFirst(_.camelCase(packageName)),
-        description,
-        example,
-      };
-
-      console.info(`Writing package.json for ${packageConfig.moduleName}`);
-      fs.writeFileSync(
-        path.resolve(destPackageFolder, 'package.json'),
-        generatePackageJson(packageConfig),
-      );
-      console.info(`Writing readme file for ${packageConfig.moduleName}`);
-      fs.writeFileSync(
-        path.resolve(destPackageFolder, 'README.md'),
-        generateReadme(packageConfig),
-      );
-      console.info(`Adding license for ${packageConfig.moduleName}`);
-      const licenseStr = fs.readFileSync(path.resolve('', 'LICENSE.md')).toString('utf8');
-      fs.writeFileSync(
-        path.resolve(destPackageFolder, 'LICENSE.md'),
-        licenseStr,
-      );
-
-      if (componentName) {
-        const componentPackageFolder = path.resolve(
-          __dirname,
-          `../packages/${libConfig.name}/${componentName}`,
-        );
-        fs.copySync(destPackageFolder, componentPackageFolder, {
-          filter: filePath => !/(LICENSE|README\.md|src)$/.test(filePath),
-        });
-        fs.writeFileSync(
-          path.resolve(componentPackageFolder, 'index.js'),
-          `export * from '${path.join('../src', componentName || '')}`,
-        );
-      }
+export default ${componentName};
+`;
     }
-  });
+
+    fs.writeFileSync(
+      path.resolve(componentPackageFolder, 'index.js'),
+      exportStatement2,
+    );
+  }
 }
 
 console.info('Lets build!');
@@ -253,7 +296,7 @@ console.info('Updating index file');
 require('./update-index-file');
 
 // Get the names of all components in the src directory
-// const componentNames = require('./component-names');
+const componentNames = require('./component-names');
 
 // Get the binary for vue-cli-service
 const vueCliServicePath = getPath('../node_modules/.bin/vue-cli-service');
@@ -272,17 +315,19 @@ console.info('library built!');
 // ${libConfig}/dist
 renameIndex();
 
-/*
+const testComp = [].concat(componentNames.slice(0, 1));
+console.log(testComp);
 // for each component in the src/components directory...
-componentNames.forEach((componentName) => {
+testComp.forEach((componentName) => {
   // Build the component individually
   console.info(`Building ${componentName}`);
   execSync(
-    `${vueCliServicePath} build src/components/${componentName}/${componentName}.vue
+    `${vueCliServicePath} build src/components/${componentName}/${componentName}.vue \
     --target lib --name index --dest dist/lib/${componentName}`,
+    { stdio: 'inherit' },
   );
 
   // Rename the CommonJS build so that it can be imported with
   // $${libConfig/dist/componentName
   renameIndex(componentName);
-}); */
+});
