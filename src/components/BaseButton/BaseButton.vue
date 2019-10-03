@@ -2,9 +2,10 @@
   <button
     :disabled="disabled"
     :type="buttonType"
-    :style="{ justifyContent: alignText, background: backgroundColor }"
+    :style="{ justifyContent: alignText }"
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
+             { 'base-button-background': hasBackgroundColor },
              {'base-button-active': active }]"
     @click.prevent="clicked">
     <!-- @slot create custom content (e.g. icon) left of text -->
@@ -136,11 +137,12 @@ export default {
       },
     },
     /**
-     * set the background color of the button
+     * background color is fixed however at least possibility to
+     * display transparent instead
      */
-    backgroundColor: {
-      type: String,
-      default: '',
+    hasBackgroundColor: {
+      type: Boolean,
+      default: true,
     },
   },
   methods: {
@@ -203,6 +205,10 @@ export default {
     &.base-button-single {
       background-color: transparent;
       min-height: $row-height-small;
+
+      &.base-button-background {
+        background-color: $button-header-color;
+      }
 
       .base-button-icon-large {
         height: $icon-medium;
