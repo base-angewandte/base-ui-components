@@ -7,7 +7,8 @@
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
     role="link"
-    @click.prevent="clicked">
+    @keydown.enter="clicked"
+    @click="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
@@ -218,6 +219,10 @@ export default {
     position: relative;
     background: white;
     overflow: hidden;
+
+    &:focus {
+      outline: 0;
+    }
 
     .base-menu-entry-icon {
       max-height: $icon-large;
