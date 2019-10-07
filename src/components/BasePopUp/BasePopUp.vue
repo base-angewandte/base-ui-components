@@ -182,7 +182,7 @@ export default {
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 99;
+    z-index: 99999;
     overflow: hidden;
   }
 
