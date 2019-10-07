@@ -1,59 +1,62 @@
 <template>
-  <a
-    ref="menuEntry"
-    :tabindex="isActivatable || isSelectable ? 0 :-1"
-    :href="'#' + title"
-    :class="['base-menu-entry',
-             {'base-menu-entry-activatable': isActivatable,
-              'base-menu-entry-active': isActive }]"
-    @click.prevent="clicked">
-    <svg-icon
-      ref="entryIcon"
-      :name="icon"
-      class="base-menu-entry-icon"/>
-    <div
-      :class="[
-        'base-menu-entry-text-wrapper',
-        { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
-    ]">
-      <div class="base-menu-entry-title-description-wrapper">
-        <div class="base-menu-entry__title-subtext-wrapper">
-          <div
-            v-if="title"
-            :class="['base-menu-entry-title',
-                     { 'base-menu-entry-title-bold': isActive || titleBold }]">
-            {{ title }}
-          </div>
-          <div
-            v-if="subtext"
-            class="base-menu-entry-subtext">{{ subtext }}</div>
-        </div>
-        <div class="base-menu-entry-description">{{ description }}</div>
-      </div>
-    </div>
-    <transition-group
-      name="slide-fade"
-      class="slide-fade-group">
+  <div
+    @click.prevent.stop="clicked">
+    <router-link
+      ref="menuEntry"
+      :tabindex="isActivatable || isSelectable ? 0 :-1"
+      :to="'#' + title"
+      :class="['base-menu-entry',
+               {'base-menu-entry-activatable': isActivatable,
+                'base-menu-entry-active': isActive }]"
+      event="">
+      <svg-icon
+        ref="entryIcon"
+        :name="icon"
+        class="base-menu-entry-icon"/>
       <div
-        v-if="showThumbnails"
-        :key="entryId + 'thumbnail'"
-        class="base-menu-entry-thumbnail-container">
-        <svg-icon
-          v-for="tn in thumbnails"
-          :key="tn"
-          :name="tn"
-          class="base-menu-entry-thumbnail" />
+        :class="[
+          'base-menu-entry-text-wrapper',
+          { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
+      ]">
+        <div class="base-menu-entry-title-description-wrapper">
+          <div class="base-menu-entry__title-subtext-wrapper">
+            <div
+              v-if="title"
+              :class="['base-menu-entry-title',
+                       { 'base-menu-entry-title-bold': isActive || titleBold }]">
+              {{ title }}
+            </div>
+            <div
+              v-if="subtext"
+              class="base-menu-entry-subtext">{{ subtext }}</div>
+          </div>
+          <div class="base-menu-entry-description">{{ description }}</div>
+        </div>
       </div>
-      <base-checkmark
-        v-if="isSelectable && selectActive"
-        :key="entryId + 'checkmark'"
-        :checked="isSelected"
-        title="checkbox"
-        mark-style="checkbox"
-        class="base-menu-entry-checkbox"
-        @clicked="clicked" />
-    </transition-group>
-  </a>
+      <transition-group
+        name="slide-fade"
+        class="slide-fade-group">
+        <div
+          v-if="showThumbnails"
+          :key="entryId + 'thumbnail'"
+          class="base-menu-entry-thumbnail-container">
+          <svg-icon
+            v-for="tn in thumbnails"
+            :key="tn"
+            :name="tn"
+            class="base-menu-entry-thumbnail" />
+        </div>
+        <base-checkmark
+          v-if="isSelectable && selectActive"
+          :key="entryId + 'checkmark'"
+          :checked="isSelected"
+          title="checkbox"
+          mark-style="checkbox"
+          class="base-menu-entry-checkbox"
+          @clicked="clicked" />
+      </transition-group>
+    </router-link>
+  </div>
 </template>
 
 <script>
