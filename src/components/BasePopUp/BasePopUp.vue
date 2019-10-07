@@ -182,7 +182,8 @@ export default {
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 99999;
+    /* specific to be higher than base header */
+    z-index: 1041;
     overflow: hidden;
   }
 
