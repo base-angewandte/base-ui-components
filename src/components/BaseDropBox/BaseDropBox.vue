@@ -18,10 +18,9 @@
         @add="addEntry">
         <div
           class="base-drop-box-drag-area"
-          @dragleave="dragLeave"
-          @mouseleave="dragLeave"
+          @dragleave="dragLeave('c', $event)"
           @pointerenter="dragEnter"
-          @pointerleave="dragLeave">
+          @pointerleave="dragLeave('x', $event)">
           <div
             v-for="item in dragList"
             :key="item.id"
@@ -183,7 +182,7 @@ export default {
     /**
      * method to get the dropped element id and emit it to parent
      */
-    addEntry() {
+    addEntry(event) {
       // check if box is for receiving elements (not files)
       if (this.dropType === 'elements') {
         // and check if item is currently still dragged over box (draggable event will also
@@ -199,13 +198,20 @@ export default {
           this.$emit('dropped-element', draggedElementId);
         }
         this.dragList = [];
+        // otherwise box stays highlighted on touch
+        if (event.originalEvent.type === 'touchend') {
+          this.isDragOver = false;
+        }
       }
     },
     dragEnter() {
       this.isDragOver = true;
     },
-    dragLeave() {
-      this.isDragOver = false;
+    dragLeave(d, event) {
+      // to prevent trigger when it is touch device and element was just dropped into box
+      if (!(event.pointerType === 'touch' && !event.relatedTarget)) {
+        this.isDragOver = false;
+      }
     },
     onClicked(event) {
       /**
