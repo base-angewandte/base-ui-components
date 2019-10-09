@@ -21,23 +21,30 @@
                { 'base-input-field-container-border': showInputBorder },
                { 'base-input-field-container-active': active || isActive }]"
       @click="insideInput">
-      <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
+      <div
+        :class="['base-input-field__addition-container',
+                 { 'base-input-field__addition-container-wrap': !hideInputField}]">
+        <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
         (before \<input\>)
        -->
-      <slot name="input-field-addition-before" />
-      <div :class="['base-input-field-wrapper', { 'base-input-field-wrapper-fade-out': !active }]">
-        <input
-          :id="label"
-          :placeholder="placeholder"
-          v-model="inputInt"
-          :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
-          type="text"
-          autocomplete="off"
-          @blur="clickedOutsideInput"
-          @click="active = true"
-          v-on="inputListeners">
+        <slot name="input-field-addition-before" />
+        <div
+          :class="[
+            'base-input-field-wrapper',
+            { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
+        ]">
+          <input
+            :id="label"
+            :placeholder="placeholder"
+            v-model="inputInt"
+            :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
+            type="text"
+            autocomplete="off"
+            @blur="clickedOutsideInput"
+            @click="active = true"
+            v-on="inputListeners">
+        </div>
       </div>
-
       <slot name="input-field-addition-after" />
     </div>
   </div>
@@ -194,37 +201,45 @@ export default {
       position: relative;
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
       padding-left: $spacing-small;
       min-height: $row-height-small;
       background: white;
 
-      .base-input-field-wrapper {
+      .base-input-field__addition-container {
+        display: flex;
         flex: 1 1 auto;
-        margin-right: $spacing;
-        position: relative;
 
-        &.base-input-field-wrapper-fade-out::after {
-          content: '';
-          width: calc(#{$fade-out-width} + #{$spacing});
-          height: $input-field-line-height;
-          position: absolute;
-          top: 0;
-          right: 0;
-          background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+        &.base-input-field__addition-container-wrap {
+          flex-wrap: wrap;
         }
 
-        .base-input-field {
-          min-height: $input-field-line-height;
-          width: 100%;
-        }
+        .base-input-field-wrapper {
+          flex: 1 1 auto;
+          margin-right: $spacing;
+          position: relative;
 
-        .base-input-field-hidden {
-          width: 1px;
-          overflow: hidden;
-          opacity: 0;
-          filter:alpha(opacity=0);
-          animation: all 500ms ease;
+          &.base-input-field-wrapper-fade-out::after {
+            content: '';
+            width: calc(#{$fade-out-width} + #{$spacing});
+            height: $input-field-line-height;
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+          }
+
+          .base-input-field {
+            min-height: $input-field-line-height;
+            width: 100%;
+          }
+
+          .base-input-field-hidden {
+            width: 1px;
+            overflow: hidden;
+            opacity: 0;
+            filter:alpha(opacity=0);
+            animation: all 500ms ease;
+          }
         }
       }
     }
