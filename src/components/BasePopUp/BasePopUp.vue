@@ -19,10 +19,15 @@
           {{ title }}
         </div>
         <!-- @event close -->
-        <svg-icon
-          class="popup-remove"
-          name="remove"
-          @click="close" />
+        <button
+          type="button"
+          aria-label="close pop up"
+          class="base-popup__close-button">
+          <svg-icon
+            class="popup-remove"
+            name="remove"
+            @click="close" />
+        </button>
       </div>
 
       <!-- POP UP CONTENT -->
@@ -33,6 +38,7 @@
           <!-- @slot custom button row -->
           <slot name="button-row">
             <BaseButton
+              id="popup-left-button"
               :text="buttonLeftText"
               :icon="buttonLeftIcon"
               :icon-position="'right'"
@@ -41,6 +47,7 @@
               @clicked="buttonLeft" />
             <!-- @event buttonRight -->
             <BaseButton
+              id="popup-right-button"
               :text="buttonRightText"
               :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
@@ -223,6 +230,13 @@ export default {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+
+    .base-popup__close-button {
+      &:active, &:focus {
+        color: $app-color;
+        fill: $app-color;
+      }
+    }
   }
 
   .popup-remove {
