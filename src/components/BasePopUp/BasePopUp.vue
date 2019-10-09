@@ -5,11 +5,16 @@
     <div class="base-pop-up-background" />
     <div
       ref="popUpBody"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="popup-title"
+      aria-describedby="descriptionElementId"
       class="popup-box">
 
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
+          id="popup-title"
           class="popup-title">
           {{ title }}
         </div>
@@ -94,6 +99,13 @@ export default {
       default: 'Pop Up',
     },
     /**
+     * specify the id of the element containing a description - for acessibility only
+     */
+    descriptionElementId: {
+      type: String,
+      default: '',
+    },
+    /**
      * text shown in left button
      */
     buttonLeftText: {
@@ -132,6 +144,7 @@ export default {
   data() {
     return {
       showInt: this.show,
+      // this is needed for popUpLock mixin!
       targetName: 'popUpBody',
     };
   },
