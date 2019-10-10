@@ -205,10 +205,11 @@ export default {
     setActivePage(page) {
       this.active = page;
     },
-    getLinkPath(page) {
+    getLinkPath() {
       // check if router in project and set link path accordingly if yes
+      // TODO: think about adding pagination query to route
       return this.$route && this.useLinkElement
-        ? { path: this.$route.path, query: Object.assign({}, this.$route.query, { page }) } : '';
+        ? { path: this.$route.fullPath } : '';
     },
   },
 };
