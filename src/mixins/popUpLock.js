@@ -41,5 +41,6 @@ export default {
   },
   destroyed() {
     clearAllBodyScrollLocks();
+    this.enableBodyScrollIosSafari();
   },
 };
