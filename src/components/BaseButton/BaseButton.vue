@@ -1,6 +1,7 @@
 <template>
   <button
     :disabled="disabled"
+    :aria-disabled="disabled"
     :type="buttonType"
     :style="{ justifyContent: alignText }"
     :class="['base-button',
