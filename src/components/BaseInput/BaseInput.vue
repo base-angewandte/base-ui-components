@@ -217,18 +217,21 @@ export default {
           flex: 1 1 auto;
           margin-right: $spacing;
           position: relative;
+          display: flex;
 
           &.base-input-field-wrapper-fade-out::after {
             content: '';
             width: calc(#{$fade-out-width} + #{$spacing});
             height: $input-field-line-height;
             position: absolute;
-            top: 0;
+            top: 50%;
+            transform: translateY(-50%);
             right: 0;
             background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
           }
 
           .base-input-field {
+            padding: $spacing-small/2 0;
             min-height: $input-field-line-height;
             width: 100%;
           }
