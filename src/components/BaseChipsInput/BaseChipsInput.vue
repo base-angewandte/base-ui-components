@@ -17,7 +17,7 @@
       @blur="onInputBlur"
       @keydown.up.down.prevent="triggerArrowKey"
       @keydown="checkKeyEvent"
-      @keypress.enter="onEnter()"
+      @keypress.enter.prevent="onEnter()"
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
