@@ -317,10 +317,12 @@ export default {
     .base-menu-entry-thumbnail-container {
       display: flex;
       flex-direction: column;
+      // added for IE
+      justify-content: space-around;
+      // however this is the value it should take
       justify-content: space-evenly;
       height: $row-height-large;
-      padding: 0 $spacing;
-      width: $icon-small;
+      padding-left:$spacing;
       background-color: white;
 
       &::before {
@@ -342,7 +344,6 @@ export default {
 
     .base-menu-entry-checkbox {
       padding-left: $spacing;
-      background-color: white;
     }
 
     .slide-fade-group {
@@ -366,6 +367,16 @@ export default {
       position: absolute;
       top: 50%;
       transform: translate(#{$spacing}, -#{$icon-medium/2});
+    }
+  }
+
+  @supports (-ms-ime-align:auto) {
+    /* Edge only - space-around instead of justify-evenly since
+    they "forgot" that (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15947692/) */
+    .base-menu-entry {
+      .base-menu-entry-thumbnail-container {
+        justify-content: space-around;
+      }
     }
   }
 </style>
