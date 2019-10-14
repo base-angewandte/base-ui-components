@@ -307,10 +307,14 @@ export default {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
-      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title,
-      &:hover .base-menu-entry-subtext, &:hover .base-menu-entry-description {
-        fill: $app-color;
-        color: $app-color;
+      &:hover, &:focus {
+        .base-menu-entry-icon,
+        .base-menu-entry-title,
+        .base-menu-entry-subtext,
+        .base-menu-entry-description {
+          fill: $app-color;
+          color: $app-color;
+        }
       }
     }
 

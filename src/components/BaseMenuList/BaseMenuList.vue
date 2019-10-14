@@ -240,10 +240,6 @@ export default {
       &:not(:last-of-type) {
         border-bottom: $separation-line;
       }
-
-      &:focus-within {
-        color: $app-color;
-      }
     }
   }
 </style>
