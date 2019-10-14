@@ -101,7 +101,9 @@ export default {
       this.active = true;
     },
     onKeyUp() {
-      this.$emit('input-change', this.inputInt);
+      if (this.input !== this.inputInt) {
+        this.$emit('input-change', this.inputInt);
+      }
     },
     clearInput() {
       this.inputInt = '';
