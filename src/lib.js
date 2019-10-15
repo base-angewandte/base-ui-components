@@ -20,6 +20,8 @@ import BasePagination from './components/BasePagination/BasePagination';
 import BaseLoader from './components/BaseLoader/BaseLoader';
 import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseToggleGroup from './components/BaseToggleGroup/BaseToggleGroup';
+import BaseOptions from './components/BaseOptions/BaseOptions';
+import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -46,4 +48,6 @@ export {
   BaseLoader,
   BaseToggle,
   BaseToggleGroup,
+  BaseOptions,
+  BaseResultBoxSection,
 };
