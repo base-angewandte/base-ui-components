@@ -288,17 +288,6 @@ export default {
   .base-drop-box-ghost {
     visibility: hidden !important;
   }
-
-  .btnTest {
-    position: relative;
-    z-index: 1000;
-    border: 1px dotted red;
-
-    &:hover {
-      border: 1px solid green;
-    }
-
-  }
 </style>
 
 <style module lang="scss">
