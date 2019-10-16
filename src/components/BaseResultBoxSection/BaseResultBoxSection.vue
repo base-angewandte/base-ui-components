@@ -307,6 +307,10 @@ export default {
         this.currentPageNumber = val;
       }
     },
+    currentPageNumber() {
+      // if attachedList changes scroll back to top
+      window.scrollTo(0, this.$el.offsetTop);
+    },
   },
   methods: {
     setAction(act) {
