@@ -22,11 +22,11 @@
         <button
           type="button"
           aria-label="close pop up"
-          class="base-popup__close-button">
+          class="base-popup__close-button"
+          @click="close">
           <svg-icon
             class="popup-remove"
-            name="remove"
-            @click="close" />
+            name="remove"/>
         </button>
       </div>
 
@@ -157,8 +157,19 @@ export default {
   },
   watch: {
     show(val) {
+      if (!this.showInt && !this.prevActiveElement) {
+        this.prevActiveElement = document.activeElement;
+      }
       this.showInt = val;
     },
+  },
+  updated() {
+    if (this.showInt && this.$el.querySelector('input') !== null) {
+      this.$el.querySelector('input').focus();
+    } else if (this.prevActiveElement) {
+      this.prevActiveElement.focus();
+      this.prevActiveElement = false;
+    }
   },
   methods: {
     close() {
