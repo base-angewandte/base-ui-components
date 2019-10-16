@@ -79,11 +79,12 @@
         <div
           :key="headerText + '_boxArea'"
           class="base-attachments-section__box-area">
-          <template v-for="(attached, index) of attachedList">
+          <template v-for="(attached, index) of visibleBoxes">
             <slot
               :item="attached"
               :index="index"
               :select-active="selectActive"
+              refs="boxSlot"
               name="attached-box">
               <BaseImageBox
                 :key="attached.id"
@@ -103,6 +104,13 @@
             class="linked-base-box"
             @clicked="submitAction" />
         </div>
+        <component
+          v-if="maxRows && pages > 1"
+          key="pagination"
+          :total="pages"
+          :current="currentPageNumber"
+          :is="paginationComponent"
+          @set-page="setPage"/>
       </transition-group>
     </div>
   </div>
@@ -231,6 +239,15 @@ export default {
       type: Number,
       default: null,
     },
+    /**
+     * specifiy if filling the attachedList will be fetched from outside on page
+     * change or list is complete and can be done by slicing relevant items from
+     * attachedList
+     */
+    fetchItemsExternally: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -238,11 +255,36 @@ export default {
       showActions: false,
       // internally saved action
       actionInt: '',
+      // how many items do fit in one row
+      itemsPerRow: 4,
+      // current page number
+      currentPageNumber: 1,
     };
   },
   computed: {
     selectActive() {
       return !!this.actionInt;
+    },
+    // computed property to lazy load base pagination if max rows was specified
+    paginationComponent() {
+      if (this.maxRows) {
+        return () => import('../BasePagination/BasePagination');
+      }
+      return null;
+    },
+    visibleNumberOfItems() {
+      return this.itemsPerRow * this.maxRows;
+    },
+    pages() {
+      return Math.ceil(this.attachedList.length / this.visibleNumberOfItems);
+    },
+    visibleBoxes() {
+      if (this.maxRows && !this.fetchItemsExternally) {
+        return this.attachedList
+          .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
+            this.currentPageNumber * this.visibleNumberOfItems);
+      }
+      return this.attachedList;
     },
   },
   watch: {
@@ -254,6 +296,13 @@ export default {
         }
       },
       immediate: true,
+    },
+    // watch pages in case of deletion of items and take care
+    // current page is not higher than total page number
+    pages(val) {
+      if (this.currentPageNumber > val) {
+        this.currentPageNumber = val;
+      }
     },
   },
   methods: {
@@ -290,6 +339,16 @@ export default {
     optionsToggle(actionsVisible) {
       this.actionInt = '';
       this.showActions = actionsVisible;
+    },
+    setPage(number) {
+      this.currentPageNumber = number;
+      /**
+       * event triggered on page number change
+       *
+       * @event fetch-items
+       * @type { Number }
+       */
+      this.$emit('fetch-items', number);
     },
   },
 };
