@@ -22,6 +22,7 @@ import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseToggleGroup from './components/BaseToggleGroup/BaseToggleGroup';
 import BaseOptions from './components/BaseOptions/BaseOptions';
 import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
+import BaseFormFieldCreator from './components/BaseFormFieldCreator/BaseFormFieldCreator';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -50,4 +51,5 @@ export {
   BaseToggleGroup,
   BaseOptions,
   BaseResultBoxSection,
+  BaseFormFieldCreator,
 };
