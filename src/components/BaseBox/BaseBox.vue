@@ -1,11 +1,13 @@
 <template>
-  <div
+  <compontent
+    :is="boxType"
     :style="boxSizeInt"
     :class="['base-box', 'base-box-' + $props.boxRatio]"
+    type="button"
     @click="clicked">
     <!-- @slot slot for box contents -->
     <slot />
-  </div>
+  </compontent>
 </template>
 
 <script>
@@ -20,6 +22,13 @@ export default {
    * @type None
    */
   props: {
+    /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
+    },
     /**
      * define the size of the box
      * should be an object with width and / or height

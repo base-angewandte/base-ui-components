@@ -3,6 +3,7 @@
     v-bind="$props"
     :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
+    :box-type="boxType"
     class="base-drop-box"
     @clicked="onClicked">
     <div
@@ -93,6 +94,13 @@ export default {
     boxRatio: {
       type: String,
       default: '100',
+    },
+    /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
     },
     /**
      * specify the type of drops <br>
@@ -279,6 +287,17 @@ export default {
 
   .base-drop-box-ghost {
     visibility: hidden !important;
+  }
+
+  .btnTest {
+    position: relative;
+    z-index: 1000;
+    border: 1px dotted red;
+
+    &:hover {
+      border: 1px solid green;
+    }
+
   }
 </style>
 

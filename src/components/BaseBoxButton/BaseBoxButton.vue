@@ -1,6 +1,7 @@
 <template>
   <base-box
     ref="baseBox"
+    :box-type="boxType"
     :box-size="boxSize"
     :box-ratio="boxRatio"
     class="base-box-button"
@@ -64,6 +65,13 @@ export default {
     BaseBox,
   },
   props: {
+    /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
+    },
     /**
      * Define type of button box style: <br>'large' | 'small'
      */
@@ -165,7 +173,9 @@ export default {
     display: flex;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-align: left;
 
+    &:focus,
     &:hover {
       color: $app-color;
     }
@@ -245,6 +255,16 @@ export default {
         width: $icon-large;
         max-height: $icon-large;
       }
+    }
+  }
+</style>
+
+<style lang="scss">
+  @import "../../styles/variables";
+
+  .file-select {
+    &:focus-within {
+      color: $app-color;
     }
   }
 </style>
