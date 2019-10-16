@@ -61,7 +61,9 @@
       </div>
 
       <!-- ACTION AREA -->
-      <transition-group name="slide">
+      <transition-group
+        tag="div"
+        name="slide">
         <div
           v-if="selectActive"
           :key="headerText + '_messageArea'"
@@ -110,6 +112,7 @@
           :total="pages"
           :current="currentPageNumber"
           :is="paginationComponent"
+          :use-link-element="false"
           @set-page="setPage"/>
       </transition-group>
     </div>
