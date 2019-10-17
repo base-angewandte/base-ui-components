@@ -11,6 +11,15 @@ const extract = require('extract-comments');
 const doctrine = require('doctrine');
 const libConfig = require('../lib');
 
+console.info('Lets build!');
+
+// Update the index file
+console.info('Updating index file');
+require('./update-index-file');
+
+// Get the names of all components in the src directory
+const componentNames = require('./component-names');
+
 
 function getPath(...args) {
   return path.resolve(__dirname, ...args);
@@ -22,9 +31,9 @@ function generatePackageJson(packageName) {
     {
       name: packageName.name,
       description: packageName.description,
-      version: packageName.version,
+      version: libConfig.version,
       author: libConfig.author,
-      license: 'MIT',
+      license: 'SEE LICENSE IN LICENSE.md',
       homepage: `https://www.npmjs.com/package/${packageName.name}`,
       repository: {
         type: 'git',
@@ -33,11 +42,12 @@ function generatePackageJson(packageName) {
       bugs: {
         url: `https://github.com/${repoName}/issues`,
       },
-      module: 'index.js',
+      module: 'umd/index.js',
       main: 'cjs/index.js',
       unpkg: 'umd/index.min.js',
       jsdelivr: 'umd/index.min.js',
       peerDependencies: libConfig.peerDependencies,
+      dependencies: libConfig.dependencies,
     },
     null,
     2,
@@ -178,8 +188,10 @@ function renameIndex(componentName) {
     const [buildTypeBase, buildModifier] = build.type.split('.');
     const destFolder = path.resolve(destPackageFolder, build.dest ? build.dest : buildTypeBase);
 
-    console.log(destFolder);
-    const newIndexPath = path.resolve(destFolder, `index${buildModifier ? '.' : ''}.js`);
+    const newIndexPath = path.resolve(
+      destFolder,
+      `index${buildModifier ? `.${buildModifier}` : ''}.js`,
+    );
 
     if (!fs.existsSync(destPackageFolder)) {
       fs.mkdirSync(destPackageFolder);
@@ -202,12 +214,14 @@ function renameIndex(componentName) {
     );
   });
 
-  fs.copySync(getPath('../src'), path.resolve(destPackageFolder, 'scr'), {
+  fs.copySync(getPath('../src'), path.resolve(destPackageFolder, 'src'), {
     filter: filePath => !/\.unit\.js$/.test(filePath),
   });
 
   // for main library export everything
-  let exportStatement = 'export * from \'./src/components\';';
+  let exportStatement = componentNames
+    .map(comp => `export * from './src/components/${comp}/${comp}';`)
+    .join('\n');
 
   // if this is for component use export default
   if (componentName) {
@@ -270,17 +284,11 @@ export default ${componentName};
       filter: filePath => !/(LICENSE|README\.md|src)$/.test(filePath),
     });
 
-    // for main library export everything
-    let exportStatement2 = 'export * from \'../src\';';
-
-    // if this is for component use export default
-    if (componentName) {
-      exportStatement2 = `\
-import ${componentName} from '../src/${componentName}.vue';
+    const exportStatement2 = `\
+import ${componentName} from '../src/components/${componentName}/${componentName}.vue';
 
 export default ${componentName};
 `;
-    }
 
     fs.writeFileSync(
       path.resolve(componentPackageFolder, 'index.js'),
@@ -288,15 +296,6 @@ export default ${componentName};
     );
   }
 }
-
-console.info('Lets build!');
-
-// Update the index file
-console.info('Updating index file');
-require('./update-index-file');
-
-// Get the names of all components in the src directory
-const componentNames = require('./component-names');
 
 // Get the binary for vue-cli-service
 const vueCliServicePath = getPath('../node_modules/.bin/vue-cli-service');
@@ -315,10 +314,8 @@ console.info('library built!');
 // ${libConfig}/dist
 renameIndex();
 
-const testComp = [].concat(componentNames.slice(0, 1));
-console.log(testComp);
 // for each component in the src/components directory...
-testComp.forEach((componentName) => {
+componentNames.forEach((componentName) => {
   // Build the component individually
   console.info(`Building ${componentName}`);
   execSync(

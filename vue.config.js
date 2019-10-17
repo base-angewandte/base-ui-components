@@ -5,7 +5,8 @@ module.exports = {
     // importing variables to all components
     'style-resources-loader': {
       preProcessor: 'scss',
-      patterns: [path.resolve(__dirname, './src/styles/variables.scss')],
+      patterns: [path.resolve(__dirname, './src/styles/variables.scss'),
+        path.resolve(__dirname, './src/styles/lib.scss')],
     },
   },
   chainWebpack: (config) => {
@@ -50,5 +51,10 @@ module.exports = {
       .options({
         name: 'assets/[name].[hash:8].[ext]',
       });
+  },
+  css: {
+    // Optionally set this to true if you want CSS
+    // to be extracted into separate CSS files.
+    extract: false,
   },
 };

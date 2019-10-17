@@ -27,9 +27,9 @@ import BasePagination from './components/BasePagination/BasePagination';
 import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseSwitchButton from './components/BaseSwitchButton/BaseSwitchButton';
-import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseToggleGroup from './components/BaseToggleGroup/BaseToggleGroup';
+import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -58,10 +58,9 @@ export {
   BasePopUp,
   BaseSearch,
   BaseSwitchButton,
-  BaseUploadBar,
-  BaseLoader,
   BaseToggle,
   BaseToggleGroup,
+  BaseUploadBar,
 };
 
 // What should happen if the user installs the library as a plugin
@@ -89,6 +88,8 @@ function install(Vue) {
   Vue.component('BasePopUp', BasePopUp);
   Vue.component('BaseSearch', BaseSearch);
   Vue.component('BaseSwitchButton', BaseSwitchButton);
+  Vue.component('BaseToggle', BaseToggle);
+  Vue.component('BaseToggleGroup', BaseToggleGroup);
   Vue.component('BaseUploadBar', BaseUploadBar);
 }
 
