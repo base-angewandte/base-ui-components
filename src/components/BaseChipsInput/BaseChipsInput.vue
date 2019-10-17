@@ -16,7 +16,7 @@
       @blur="onInputBlur"
       @keydown.up.down.prevent="triggerArrowKey"
       @keydown="checkKeyEvent"
-      @keypress.enter="onEnter()"
+      @keypress.enter.prevent="onEnter()"
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
@@ -889,7 +889,7 @@ export default {
         min-height: $row-height-small;
         display: flex;
         justify-content: space-between;
-        line-height: $line-height;
+        align-items: center;
 
         &.base-chips-drop-down-entry-wrapper-active {
           background: $background-color;

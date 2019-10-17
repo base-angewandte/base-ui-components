@@ -8,7 +8,7 @@
       @clicked-outside="insideInput = false"
       @focus="onInputFocus"
       @keydown.up.down.prevent="triggerArrowKey"
-      @keypress.enter="selectEntry()"
+      @keypress.enter.prevent="selectEntry()"
       @input="$emit('autocomplete', val)">
       <template slot="input-field-addition-after">
         <div

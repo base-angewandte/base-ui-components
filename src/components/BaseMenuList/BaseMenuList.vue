@@ -220,7 +220,10 @@ export default {
 
       // add the element to the dom
       document.body.appendChild(pic);
-      dataTransfer.setDragImage(pic, 0, 0);
+      // Edge does not support setDragImage
+      if (typeof DataTransfer.prototype.setDragImage === 'function') {
+        dataTransfer.setDragImage(pic, 0, 0);
+      }
       dataTransfer.setData('draggable', '');
     },
   },
@@ -236,10 +239,6 @@ export default {
     .base-menu-list__list-entry {
       &:not(:last-of-type) {
         border-bottom: $separation-line;
-      }
-
-      &:focus-within {
-        color: $app-color;
       }
     }
   }

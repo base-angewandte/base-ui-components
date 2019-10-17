@@ -1,60 +1,99 @@
 <template>
   <div class="base-pagination">
-    <SvgIcon
-      :class="[
-        'base-pagination-arrow',
-        'base-pagination-arrow-left',
-        { 'base-pagination-arrow-inactive': active <= 1 }]"
-      name="arrow-left"
-      @click="active = active - 1 > 0 ? active - 1 : 1" />
+    <element
+      :is="numberElement"
+      :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
+      :aria-disabled="active <= 1"
+      :tabindex="active <= 1 ? -1 : 0"
+      aria-label="Previous page"
+      class="base-pagination__arrow-wrapper"
+      @click.native="setActivePage(active - 1 > 0 ? active - 1 : 1)"
+      @click="setActivePage(active - 1 > 0 ? active - 1 : 1)"
+      @keypress.enter="setActivePage(active - 1 > 0 ? active - 1 : 1)">
+      <SvgIcon
+        :class="[
+          'base-pagination-arrow',
+          'base-pagination-arrow-left',
+          { 'base-pagination-arrow-inactive': active <= 1 }]"
+        name="arrow-left" />
+    </element>
     <div
       v-if="total > maxNumbers"
       class="base-pagination-row">
-      <span
+      <element
         v-if="start !== 1"
-        :class="{ 'base-pagination-number-active': active === 1}"
-        class="base-pagination-number"
-        @click="active = 1">{{ 1 }}
-      </span>
+        :is="numberElement"
+        :to="getLinkPath(1)"
+        :tabindex="active === 1 ? -1 : 0"
+        :class="['base-pagination-number', { 'base-pagination-number-active': active === 1}]"
+        aria-label="page 1"
+        @click.native="setActivePage(1)"
+        @click="setActivePage(1)"
+        @keypress.enter="setActivePage(1)">{{ 1 }}
+      </element>
       <span
         v-if="start > 2"
         class="base-pagination-more">&#8943;</span>
-      <span
+      <element
         v-for="n in subset"
         :key="n"
-        :class="{ 'base-pagination-number-active': active === n}"
-        class="base-pagination-number"
-
-        @click="active = n">{{ n }}</span>
+        :is="numberElement"
+        :to="getLinkPath(n)"
+        :tabindex="active === n ? -1 : 0"
+        :aria-label="`Page ${n}`"
+        :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
+        @click.native="setActivePage(n)"
+        @click="setActivePage(n)"
+        @keypress.enter="setActivePage(n)">{{ n }}</element>
       <span
         v-if="(end) < (total - 1) && (end) !== (total - 1)"
         class="base-pagination-more">&#8943;</span>
-      <span
+      <element
         v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
-        :class="{ 'base-pagination-number-active': active === total}"
-        class="base-pagination-number"
-        @click="active = total">{{ total }}
-      </span>
+        :is="numberElement"
+        :to="getLinkPath(total)"
+        :tabindex="active === total ? -1 : 0"
+        :aria-label="`Page ${total}`"
+        :class="['base-pagination-number', { 'base-pagination-number-active': active === total}]"
+        @click.native="setActivePage(total)"
+        @click="setActivePage(total)"
+        @keypress.enter="setActivePage(total)">{{ total }}
+      </element>
     </div>
     <div
       v-else
       class="base-pagination-row">
-      <span
+      <element
         v-for="n in total"
+        :is="numberElement"
         :key="n"
-        :class="{ 'base-pagination-number-active': active === n}"
-        class="base-pagination-number"
-        @click="active = n">
+        :to="getLinkPath(n)"
+        :tabindex="active === n ? -1 : 0"
+        :aria-label="`Page ${n}`"
+        :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
+        @click.native="setActivePage(n)"
+        @click="setActivePage(n)"
+        @keypress.enter="setActivePage(n)">
         {{ n }}
-      </span>
+      </element>
     </div>
-    <SvgIcon
-      :class="[
-        'base-pagination-arrow',
-        'base-pagination-arrow-right',
-        { 'base-pagination-arrow-inactive': active >= total }]"
-      name="arrow-left"
-      @click="active = active + 1 <= total ? active + 1 : total" />
+    <element
+      :is="numberElement"
+      :to="getLinkPath(active + 1 <= total ? active + 1 : total)"
+      :aria-disabled="active >= total"
+      :tabindex="active >= total ? -1 : 0"
+      aria-label="Next Page"
+      class="base-pagination__arrow-wrapper"
+      @click.native="setActivePage(active + 1 <= total ? active + 1 : total)"
+      @click="setActivePage(active + 1 <= total ? active + 1 : total)"
+      @keypress.enter="setActivePage(active + 1 <= total ? active + 1 : total)">
+      <SvgIcon
+        :class="[
+          'base-pagination-arrow',
+          'base-pagination-arrow-right',
+          { 'base-pagination-arrow-inactive': active >= total }]"
+        name="arrow-left" />
+    </element>
   </div>
 </template>
 
@@ -90,6 +129,14 @@ export default {
       type: Number,
       default: 1,
     },
+    /**
+     * specify if pagination elements should be links
+     * (this needs vue-router)
+     */
+    useLinkElement: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -108,6 +155,9 @@ export default {
         ? this.total - this.subsetNumber + 1 : this.start;
       return Array.from({ length: this.subsetNumber },
         (v, k) => k + subsetStart);
+    },
+    numberElement() {
+      return this.$route && this.useLinkElement ? 'router-link' : 'span';
     },
   },
   watch: {
@@ -152,6 +202,15 @@ export default {
       this.end = this.active + this.subsetNumber / 2 < this.total
         ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
     },
+    setActivePage(page) {
+      this.active = page;
+    },
+    getLinkPath() {
+      // check if router in project and set link path accordingly if yes
+      // TODO: think about adding pagination query to route
+      return this.$route && this.useLinkElement
+        ? { path: this.$route.fullPath } : '';
+    },
   },
 };
 </script>
@@ -185,13 +244,14 @@ export default {
           margin-right: 0;
         }
 
-        &:hover {
+        &:hover, &:focus, &:active {
           color: $app-color;
         }
 
         &.base-pagination-number-active {
           color: white;
           background-color: $app-color;
+          cursor: default;
 
           &:hover {
             color: white;
@@ -204,18 +264,26 @@ export default {
       }
     }
 
-    .base-pagination-arrow {
-      height: $icon-medium;
-      width: $icon-medium;
-      margin: 0 $spacing;
-
-      &.base-pagination-arrow-right {
-        transform: rotate(180deg);
+    .base-pagination__arrow-wrapper {
+      &:hover .base-pagination-arrow,
+      &:active .base-pagination-arrow,
+      &:focus .base-pagination-arrow {
+        fill: $app-color;
       }
 
-      &.base-pagination-arrow-inactive {
-        color: graytext;
-        cursor: default;
+      .base-pagination-arrow {
+        height: $icon-medium;
+        width: $icon-medium;
+        margin: 0 $spacing;
+
+        &.base-pagination-arrow-right {
+          transform: rotate(180deg);
+        }
+
+        &.base-pagination-arrow-inactive {
+          color: graytext;
+          cursor: default;
+        }
       }
     }
 
@@ -225,6 +293,10 @@ export default {
 
     .base-pagination-arrow, .base-pagination-number {
       cursor: pointer;
+    }
+
+    .base-pagination__arrow-wrapper, .base-pagination-number {
+      outline: none;
     }
   }
 

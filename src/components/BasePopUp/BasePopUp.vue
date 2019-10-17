@@ -5,18 +5,28 @@
     <div class="base-pop-up-background" />
     <div
       ref="popUpBody"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="popup-title"
+      aria-describedby="descriptionElementId"
       class="popup-box">
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
+          id="popup-title"
           class="popup-title">
           {{ title }}
         </div>
         <!-- @event close -->
-        <svg-icon
-          class="popup-remove"
-          name="remove"
-          @click="close" />
+        <button
+          type="button"
+          aria-label="close pop up"
+          class="base-popup__close-button">
+          <svg-icon
+            class="popup-remove"
+            name="remove"
+            @click="close" />
+        </button>
       </div>
 
       <!-- POP UP CONTENT -->
@@ -27,6 +37,7 @@
           <!-- @slot custom button row -->
           <slot name="button-row">
             <BaseButton
+              id="popup-left-button"
               :text="buttonLeftText"
               :icon="buttonLeftIcon"
               :icon-position="'right'"
@@ -35,6 +46,7 @@
               @clicked="buttonLeft" />
             <!-- @event buttonRight -->
             <BaseButton
+              id="popup-right-button"
               :text="buttonRightText"
               :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
@@ -89,6 +101,13 @@ export default {
       default: 'Pop Up',
     },
     /**
+     * specify the id of the element containing a description - for acessibility only
+     */
+    descriptionElementId: {
+      type: String,
+      default: '',
+    },
+    /**
      * text shown in left button
      */
     buttonLeftText: {
@@ -127,6 +146,7 @@ export default {
   data() {
     return {
       showInt: this.show,
+      // this is needed for popUpLock mixin!
       targetName: 'popUpBody',
     };
   },
@@ -175,7 +195,8 @@ export default {
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 99;
+    /* specific to be higher than base header */
+    z-index: 1041;
     overflow: hidden;
   }
 
@@ -184,11 +205,10 @@ export default {
     position: fixed;
     top: 20vh;
     left: 50%;
-    z-index: 100;
+    z-index: 1060;
     min-width: 288px;
     width: 50%;
     max-width: 700px;
-    max-height: 75vh;
     display: flex;
     flex-direction: column;
     transform: translateX(-50%);
@@ -203,6 +223,13 @@ export default {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+
+    .base-popup__close-button {
+      &:active, &:focus {
+        color: $app-color;
+        fill: $app-color;
+      }
+    }
   }
 
   .popup-remove {
@@ -250,7 +277,7 @@ export default {
     .popup-box {
       max-width: 100%;
       width: 90%;
-      top: 15vh;
+      top: 10vh;
     }
 
     .popup-content {
@@ -268,6 +295,18 @@ export default {
       & .base-popup-button:last-child {
         margin-top: $spacing-small;
       }
+    }
+  }
+
+  @media screen and (max-height: 1042px) {
+    .popup-box {
+      top: 10vh;
+    }
+  }
+
+  @media screen and (max-height: 500px) {
+    .popup-box {
+      top: 2vh;
     }
   }
 </style>

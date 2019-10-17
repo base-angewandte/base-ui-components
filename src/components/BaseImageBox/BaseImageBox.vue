@@ -188,16 +188,6 @@ export default {
   },
   mounted() {
     this.selectedInt = this.selected;
-    if (this.$refs.image) {
-      const imageEl = this.$refs.image;
-      imageEl.addEventListener('load', () => {
-        if (imageEl.naturalHeight > imageEl.naturalWidth) {
-          this.imageStyle = { width: '100%', 'min-height': '100%' };
-        } else {
-          this.imageStyle = { height: '100%', 'min-width': '100%' };
-        }
-      });
-    }
     if (!this.imageUrl && this.boxText.length) {
       const elem = this.$refs.boxText;
       let boxHeight = window.getComputedStyle(elem, null)
@@ -292,11 +282,16 @@ export default {
 
       .base-image-box-img-wrapper {
         flex: 1 1 auto;
-        height: 66%;
+        position: relative;
+        overflow: hidden;
 
         .base-image-box-image {
           display: block;
           margin: auto;
+          max-width: 100%;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
         }
       }
 

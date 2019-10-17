@@ -28,6 +28,8 @@ import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseSwitchButton from './components/BaseSwitchButton/BaseSwitchButton';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
+import BaseToggle from './components/BaseToggle/BaseToggle';
+import BaseToggleGroup from './components/BaseToggleGroup/BaseToggleGroup';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -57,6 +59,9 @@ export {
   BaseSearch,
   BaseSwitchButton,
   BaseUploadBar,
+  BaseLoader,
+  BaseToggle,
+  BaseToggleGroup,
 };
 
 // What should happen if the user installs the library as a plugin

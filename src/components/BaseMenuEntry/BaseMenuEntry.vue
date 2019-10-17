@@ -1,12 +1,14 @@
 <template>
-  <a
+  <div
     ref="menuEntry"
     :tabindex="isActivatable || isSelectable ? 0 :-1"
     :href="'#' + title"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
-    @click.prevent="clicked">
+    role="link"
+    @keydown.enter="clicked"
+    @click="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
@@ -53,7 +55,7 @@
         class="base-menu-entry-checkbox"
         @clicked="clicked" />
     </transition-group>
-  </a>
+  </div>
 </template>
 
 <script>
@@ -217,6 +219,10 @@ export default {
     background: white;
     overflow: hidden;
 
+    &:focus {
+      outline: 0;
+    }
+
     .base-menu-entry-icon {
       max-height: $icon-large;
       width: $icon-large;
@@ -300,20 +306,26 @@ export default {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
-      &:hover .base-menu-entry-icon, &:hover .base-menu-entry-title,
-      &:hover .base-menu-entry-subtext, &:hover .base-menu-entry-description {
-        fill: $app-color;
-        color: $app-color;
+      &:hover, &:focus {
+        .base-menu-entry-icon,
+        .base-menu-entry-title,
+        .base-menu-entry-subtext,
+        .base-menu-entry-description {
+          fill: $app-color;
+          color: $app-color;
+        }
       }
     }
 
     .base-menu-entry-thumbnail-container {
       display: flex;
       flex-direction: column;
+      // added for IE
+      justify-content: space-around;
+      // however this is the value it should take
       justify-content: space-evenly;
       height: $row-height-large;
-      padding: 0 $spacing;
-      width: $icon-small;
+      padding-left:$spacing;
       background-color: white;
 
       &::before {
@@ -335,7 +347,6 @@ export default {
 
     .base-menu-entry-checkbox {
       padding-left: $spacing;
-      background-color: white;
     }
 
     .slide-fade-group {
@@ -359,6 +370,16 @@ export default {
       position: absolute;
       top: 50%;
       transform: translate(#{$spacing}, -#{$icon-medium/2});
+    }
+  }
+
+  @supports (-ms-ime-align:auto) {
+    /* Edge only - space-around instead of justify-evenly since
+    they "forgot" that (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15947692/) */
+    .base-menu-entry {
+      .base-menu-entry-thumbnail-container {
+        justify-content: space-around;
+      }
     }
   }
 </style>

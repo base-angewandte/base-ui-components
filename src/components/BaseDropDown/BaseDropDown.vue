@@ -253,8 +253,9 @@ export default {
       }
     },
     setOverflow() {
-      const headerWidth = this.$refs.dropDownButton ? this.$refs.dropDownButton.offsetWidth : 0;
-      const textWidth = this.$refs.headText ? this.$refs.headText.offsetWidth : 0;
+      // eslint-disable-next-line max-len
+      const headerWidth = this.$refs.dropDownButton ? this.$refs.dropDownButton.getBoundingClientRect().width : 0;
+      const textWidth = this.$refs.headText ? this.$refs.headText.getBoundingClientRect().width : 0;
       this.showFadeOut = textWidth > headerWidth;
     },
   },
