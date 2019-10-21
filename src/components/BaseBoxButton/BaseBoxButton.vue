@@ -37,6 +37,9 @@
         {{ subtext }}
       </div>
 
+      <BaseBoxTooltip
+        v-if="showTooltip"
+        @clicked="clicked" />
     </div>
     <div
       v-else
@@ -54,6 +57,7 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 import BaseBox from '../BaseBox/BaseBox';
+import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 import '../../assets/icons/index';
 
 /**
@@ -64,6 +68,7 @@ export default {
   components: {
     SvgIcon,
     BaseBox,
+    BaseBoxTooltip,
   },
   props: {
     /**
@@ -133,9 +138,16 @@ export default {
       default: '100',
     },
     /**
-     * sset button inactive
+     * set button inactive
      */
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * show tooltip
+     */
+    showTooltip: {
       type: Boolean,
       default: false,
     },

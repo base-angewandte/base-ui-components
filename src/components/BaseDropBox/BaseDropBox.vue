@@ -37,12 +37,16 @@
         v-else
         ref="fileform"/>
     </div>
+    <BaseBoxTooltip
+      v-if="showTooltip"
+      @clicked="onTooltip" />
   </base-box-button>
 </template>
 
 <script>
 import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
 /**
  * An Element for dropping files or other UI Elements into
@@ -53,6 +57,7 @@ export default {
   components: {
     BaseBoxButton,
     Draggable,
+    BaseBoxTooltip,
   },
   props: {
     /**
@@ -136,6 +141,13 @@ export default {
      * set button inactive
      */
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * show tooltip
+     */
+    showTooltip: {
       type: Boolean,
       default: false,
     },
@@ -241,6 +253,15 @@ export default {
       if (!this.disabled) {
         this.$emit('clicked', event);
       }
+    },
+    onTooltip(event) {
+      /**
+       * Triggered when the box is clicked
+       *
+       * @event clicked
+       * @type {Event}
+       */
+      this.$emit('clicked', event);
     },
   },
 };
