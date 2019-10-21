@@ -219,9 +219,8 @@ function renameIndex(componentName) {
   });
 
   // for main library export everything
-  let exportStatement = componentNames
-    .map(comp => `export * from './src/components/${comp}/${comp}';`)
-    .join('\n');
+  let exportStatement = `export * from './src';
+export { default } from './src';`;
 
   // if this is for component use export default
   if (componentName) {
@@ -284,11 +283,11 @@ export default ${componentName};
       filter: filePath => !/(LICENSE|README\.md|src)$/.test(filePath),
     });
 
-    const exportStatement2 = `\
+    const exportStatement2 = componentName ? `\
 import ${componentName} from '../src/components/${componentName}/${componentName}.vue';
 
 export default ${componentName};
-`;
+` : 'export * from \'../src\';';
 
     fs.writeFileSync(
       path.resolve(componentPackageFolder, 'index.js'),
