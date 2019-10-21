@@ -1,10 +1,13 @@
 <template>
   <base-box-button
     v-bind="$props"
-    :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
     :box-type="boxType"
-    class="base-drop-box"
+    :disabled="disabled"
+    :class="[
+      'base-drop-box',
+      { 'base-box-button-disabled': disabled },
+      { 'is-drag-over': isDragOver }]"
     @clicked="onClicked">
     <div
       class="base-drop-box-inner">
@@ -129,6 +132,13 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * set button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -139,7 +149,7 @@ export default {
   },
   mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable && this.dropType === 'files') {
+    if (this.dragAndDropCapable && this.dropType === 'files' && !this.disabled) {
       ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(((evt) => {
         this.$refs.fileform.addEventListener(evt, ((e) => {
           e.preventDefault();
@@ -228,7 +238,9 @@ export default {
        * @event clicked
        * @type {Event}
        */
-      this.$emit('clicked', event);
+      if (!this.disabled) {
+        this.$emit('clicked', event);
+      }
     },
   },
 };
@@ -268,6 +280,19 @@ export default {
         text-align: center;
         height: 100%;
         width: 100%;
+      }
+    }
+
+    &.base-box-button-disabled {
+
+      .base-drop-box-inner {
+        border-color: graytext;
+
+        &:hover {
+          border-color: graytext;
+          cursor: default;
+          box-shadow: none;
+        }
       }
     }
   }

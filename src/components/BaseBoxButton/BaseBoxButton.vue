@@ -4,6 +4,7 @@
     :box-type="boxType"
     :box-size="boxSize"
     :box-ratio="boxRatio"
+    :disabled="disabled"
     class="base-box-button"
     @clicked="clicked">
     <div
@@ -131,6 +132,13 @@ export default {
       type: String,
       default: '100',
     },
+    /**
+     * sset button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -171,13 +179,13 @@ export default {
 
   .base-box-button {
     display: flex;
-    cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
 
     &:focus,
-    &:hover {
+    &:hover:not([disabled]) {
       color: $app-color;
+      cursor: pointer;
     }
 
     .button-box-content {
@@ -254,6 +262,16 @@ export default {
         margin-right: $spacing;
         width: $icon-large;
         max-height: $icon-large;
+      }
+    }
+
+    &.base-box-button-disabled {
+      cursor: default;
+      color: graytext;
+
+      &:hover {
+        color: graytext !important;
+        box-shadow: none !important;
       }
     }
   }
