@@ -19,5 +19,6 @@ module.exports = {
   require: [
     path.join(__dirname, './src/styles/variables.scss'),
     path.join(__dirname, './src/styles/styleguide.scss'),
+    path.join(__dirname, './src/styles/fonts.scss'),
   ],
 };

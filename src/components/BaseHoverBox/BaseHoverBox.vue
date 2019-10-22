@@ -7,8 +7,6 @@
 </template>
 
 <script>
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
-
 /**
  * A box for information display after mouse hover or click
  */
@@ -113,6 +111,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-hover-box {
     box-shadow: $preview-box-shadow;
     position: absolute;

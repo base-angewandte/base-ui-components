@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-beta.6",
   "description": "The component library for base Angewandte vue applications",
   "author": {
     "name": "base Angewandte",
@@ -12,31 +12,87 @@
   },
   "dependencies": {
     "autoprefixer": "^9.5.1",
-    "body-scroll-lock": "^2.6.4",
-    "hls.js": "^0.12.4",
-    "normalize.css": "^8.0.1",
-    "vue-click-outside": "^1.0.7",
-    "vue2-datepicker": "^2.12.0",
-    "vuedraggable": "^2.23.1"
+    "normalize.css": "^8.0.1"
   },
   "packageDependencies": {
-    "base-input": {
-      "vue-click-outside": "^1.0.7"
-    },
     "base-autocomplete-input": {
       "vue-click-outside": "^1.0.7"
     },
-    "base-date-input": {
-      "vue2-datepicker": "^2.12.0"
+    "base-box-button": {
+      "vue-svgicon": "^3.2.2"
     },
-    "base-chips-input": {
-      "vuedraggable": "^2.23.1"
+    "base-button": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-checkmark": {
+      "vue-svgicon": "^3.2.2"
     },
     "base-chips-below": {
-      "vuedraggable": "^2.23.1"
+      "vuedraggable": "^2.23.1",
+      "vue-click-outside": "^1.0.7",
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-chips-input": {
+      "vuedraggable": "^2.23.1",
+      "vue-click-outside": "^1.0.7",
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-date-input": {
+      "vue-click-outside": "^1.0.7",
+      "vue-svgicon": "^3.2.2",
+      "vue2-datepicker": "^2.12.0"
+    },
+    "base-drop-box": {
+      "vuedraggable": "^2.23.1",
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-drop-down": {
+      "vue-click-outside": "^1.0.7",
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-hover-box": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-image-box": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-input": {
+      "vue-click-outside": "^1.0.7"
+    },
+    "base-media-preview": {
+      "hls.js": "^0.12.4",
+      "vue-click-outside": "^1.0.7",
+      "vue-svgicon": "^3.2.2",
+      "body-scroll-lock": "^2.6.4"
+    },
+    "base-menu-entry": {
+      "vue-svgicon": "^3.2.2"
     },
     "base-menu-list": {
-      "vuedraggable": "^2.23.1"
+      "vue-svgicon": "^3.2.2",
+      "vue2-datepicker": "^2.12.0"
+    },
+    "base-mulitline-text-input": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-pagination": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-pop-up": {
+      "body-scroll-lock": "^2.6.4",
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-search": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-toggle": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-toggle-group": {
+      "vue-svgicon": "^3.2.2"
+    },
+    "base-upload-bar": {
+      "vue-svgicon": "^3.2.2"
     }
   }
 }

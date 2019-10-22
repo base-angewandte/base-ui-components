@@ -102,6 +102,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-upload-bar {
     font-family: inherit;
     font-size: inherit;

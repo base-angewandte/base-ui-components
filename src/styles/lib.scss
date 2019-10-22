@@ -118,3 +118,82 @@ button {
 .svg-left {
   transform: rotate(-90deg);
 }
+
+/* base-date-picker styling */
+.mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
+  color: $app-color !important;
+  background-color: transparent !important;
+}
+
+input.base-input-datepicker-input:focus {
+  outline: none;
+}
+
+.base-date-input-datepicker-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+.mx-calendar, .mx-datepicker {
+  font: inherit !important;
+  color: $font-color !important;
+  width: 100% !important;
+}
+
+.mx-panel-date td, .mx-panel-date th {
+  font-size: inherit !important;
+}
+
+/* dont need special color for today */
+.mx-panel-date td.today {
+  color: $font-color !important;
+}
+
+.mx-calendar-content {
+  width: 250px !important;
+}
+
+.mx-calendar-content .cell.actived {
+  background-color: $app-color !important;
+  color: white !important;
+}
+
+/* icon placing */
+.mx-input-append {
+  width: auto !important;
+  padding: 0 $spacing !important;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 1);
+
+  &::before {
+    content: '';
+    height: 100%;
+    width: $spacing;
+    position: absolute;
+    top: 0;
+    left: -$spacing;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
+  }
+}
+
+.mx-datepicker-popup {
+  border: none !important;
+  box-shadow: $preview-box-shadow !important;
+}
+
+.mx-time-list {
+  width: 50% !important;
+
+  &:last-of-type {
+    display: none !important;
+  }
+
+  .cell {
+    font-size: inherit !important;
+  }
+}

@@ -851,6 +851,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-chips-input {
     width: 100%;
     text-align: left;

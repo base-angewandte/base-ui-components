@@ -14,7 +14,6 @@
       @end="dragEnd">
       <li
         v-for="(item, index) in list"
-        v-if="item"
         :key="item.id || item.title"
         class="base-menu-list__list-entry">
         <base-menu-entry

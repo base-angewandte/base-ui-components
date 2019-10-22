@@ -243,6 +243,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-autocomplete-input {
     position: relative;
     font-family: inherit;

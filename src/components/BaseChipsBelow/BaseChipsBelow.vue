@@ -387,6 +387,8 @@ export default {
 </script>
 
 <style lang="scss">
+  @import '../../styles/variables.scss';
+
   .base-chips-below {
     .base-chips-below-list-item {
       padding: $spacing-small/2 0;

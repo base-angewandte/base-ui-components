@@ -176,6 +176,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-multiline-text-input {
     position: relative;
     width: 100%;

@@ -16,10 +16,10 @@
       <span class="base-switch">
         <svg-icon
           v-if="checkedInt"
-          name="check-mark"/>
+          name="check-mark" />
         <svg-icon
           v-if="!checkedInt"
-          name="remove"/>
+          name="remove" />
       </span>
     </div>
 

@@ -229,6 +229,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-drop-box {
     background-color: $background-color !important;
     display: flex;

@@ -263,6 +263,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-drop-down {
     display: inline-block;
     position: relative;

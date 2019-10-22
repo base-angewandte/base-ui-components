@@ -191,6 +191,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-chip, .base-chip-inline {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
     padding: $chips-spacing 0 $chips-spacing $spacing-small;

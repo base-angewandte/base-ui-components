@@ -119,6 +119,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-checkbox-container {
     position: relative;
     -webkit-user-select: none;

@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import Hls from '../../../node_modules/hls.js/dist/hls.light';
+import Hls from 'hls.js/dist/hls.light';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -312,6 +312,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-media-preview-background{
     z-index: 10000000;
     position: fixed;

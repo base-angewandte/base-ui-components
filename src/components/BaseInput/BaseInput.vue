@@ -32,7 +32,7 @@
           :class="[
             'base-input-field-wrapper',
             { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
-        ]">
+          ]">
           <input
             :id="label"
             v-model="inputInt"
@@ -190,6 +190,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-input {
     display: flex;
     flex-direction: column;

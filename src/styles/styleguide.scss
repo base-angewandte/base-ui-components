@@ -1,9 +1,13 @@
-@import './variables';
-@import './lib';
+@import 'lib';
 
 $font: "Source Sans Pro", serif;
+$font-root-regular: 19px;
 
 html {
   font-family: $font;
   font-size: $font-size-regular;
+
+  &:root {
+    font-size: $font-root-regular;
+  }
 }

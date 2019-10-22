@@ -28,9 +28,13 @@
           </div>
           <div
             v-if="subtext"
-            class="base-menu-entry-subtext">{{ subtext }}</div>
+            class="base-menu-entry-subtext">
+            {{ subtext }}
+          </div>
         </div>
-        <div class="base-menu-entry-description">{{ description }}</div>
+        <div class="base-menu-entry-description">
+          {{ description }}
+        </div>
       </div>
     </div>
     <transition-group
@@ -210,6 +214,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-menu-entry {
     display: flex;
     align-items: center;

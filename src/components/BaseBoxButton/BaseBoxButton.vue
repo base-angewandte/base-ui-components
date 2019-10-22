@@ -35,7 +35,6 @@
         :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
         {{ subtext }}
       </div>
-
     </div>
     <div
       v-else
@@ -162,6 +161,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../../styles/variables.scss';
+
   .base-box-button {
     display: flex;
     cursor: pointer;

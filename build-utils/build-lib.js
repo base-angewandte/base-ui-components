@@ -9,13 +9,18 @@ const { execSync } = require('child_process');
 const templateCompiler = require('vue-template-compiler');
 const extract = require('extract-comments');
 const doctrine = require('doctrine');
-const libConfig = require('../lib');
 
 console.info('Lets build!');
 
 // Update the index file
 console.info('Updating index file');
 require('./update-index-file');
+
+// Update the library dependencies
+console.info('Updating dependencies');
+require('./update-dependencies');
+
+const libConfig = require('../lib');
 
 // Get the names of all components in the src directory
 const componentNames = require('./component-names');
@@ -42,12 +47,12 @@ function generatePackageJson(packageName) {
       bugs: {
         url: `https://github.com/${repoName}/issues`,
       },
-      module: 'umd/index.js',
+      module: 'index.js',
       main: 'cjs/index.js',
       unpkg: 'umd/index.min.js',
       jsdelivr: 'umd/index.min.js',
       peerDependencies: libConfig.peerDependencies,
-      dependencies: libConfig.dependencies,
+      dependencies: packageName.dependencies,
     },
     null,
     2,
@@ -237,6 +242,7 @@ export default ${componentName};
 
   // get main library description
   let { description } = libConfig;
+  let { dependencies } = libConfig;
   let example;
   // if component, extract description from component documentation
   if (componentName) {
@@ -249,11 +255,19 @@ export default ${componentName};
     });
     const script = extract(result.script.content).filter(comment => comment.type === 'BlockComment');
     description = script && script.length ? doctrine.parse(script[0].raw).description.replace('\n', '') : '';
+    dependencies = Object.assign({},
+      dependencies,
+      libConfig.packageDependencies[_.kebabCase(componentName)]);
+  } else {
+    const packageDependencies = Object.values(libConfig.packageDependencies)
+      .reduce((prev, curr) => Object.assign({}, prev, curr), {});
+    dependencies = Object.assign({}, dependencies, packageDependencies);
   }
   const packageConfig = {
     name: packageName,
     moduleName: componentName || _.upperFirst(_.camelCase(packageName)),
     description,
+    dependencies,
     example,
   };
 

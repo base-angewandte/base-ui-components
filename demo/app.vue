@@ -552,6 +552,8 @@ export default {
 </script>
 
 <style lang="scss">
+  @import '../src/styles/variables.scss';
+
   .dropdown-extended {
     border-top: $separation-line;
     padding: $spacing;

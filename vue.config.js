@@ -1,12 +1,11 @@
 const path = require('path');
 
 module.exports = {
-  pluginOptions: {
-    // importing variables to all components
-    'style-resources-loader': {
-      preProcessor: 'scss',
-      patterns: [path.resolve(__dirname, './src/styles/variables.scss'),
-        path.resolve(__dirname, './src/styles/lib.scss')],
+  configureWebpack: {
+    resolve: {
+      alias: {
+        '~': path.resolve(__dirname, ''),
+      },
     },
   },
   chainWebpack: (config) => {
