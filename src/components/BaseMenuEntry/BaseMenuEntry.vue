@@ -1,12 +1,12 @@
 <template>
   <div
     ref="menuEntry"
-    :tabindex="isActivatable || isSelectable ? 0 :-1"
+    :tabindex="isSelectable && selectActive ? -1 : 0"
     :href="'#' + title"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive }]"
-    role="link"
+    :role="isSelectable && selectActive ? '' : 'link'"
     @keydown.enter="clicked"
     @click="clicked">
     <svg-icon
@@ -307,7 +307,7 @@ export default {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
-      &:hover, &:focus {
+      &:hover, &:focus-within {
         .base-menu-entry-icon,
         .base-menu-entry-title,
         .base-menu-entry-subtext,
