@@ -9,7 +9,7 @@
       @focus="onInputFocus"
       @keydown.up.down.prevent="triggerArrowKey"
       @keypress.enter.prevent="selectEntry()"
-      @input="$emit('autocomplete', val)">
+      @input="$emit('autocomplete', inputTextInt)">
       <template slot="input-field-addition-after">
         <div
           v-if="isLoading"
