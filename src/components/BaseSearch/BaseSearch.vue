@@ -16,7 +16,8 @@
       autocomplete="off"
       @focus.prevent="inputFocus"
       @blur="inputBlur"
-      @keyup="onKeyUp">
+      @keyup="onKeyUp"
+      @keydown.enter.prevent="">
     <SvgIcon
       v-if="inputInt"
       name="remove"
