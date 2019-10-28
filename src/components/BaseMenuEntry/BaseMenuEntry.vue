@@ -5,7 +5,8 @@
     :href="'#' + title"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
-              'base-menu-entry-active': isActive }]"
+              'base-menu-entry-active': isActive,
+              'base-menu-entry-text-fade-out' : !showThumbnails }]"
     role="link"
     @keydown.enter="clicked"
     @click="clicked">
@@ -39,7 +40,7 @@
       <div
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
-        class="base-menu-entry-thumbnail-container">
+        class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
         <svg-icon
           v-for="tn in thumbnails"
           :key="tn"
@@ -318,6 +319,13 @@ export default {
       }
     }
 
+    &.base-menu-entry-text-fade-out {
+      &::before {
+        left: inherit;
+        right: $spacing;
+      }
+    }
+
     .base-menu-entry-thumbnail-container {
       display: flex;
       flex-direction: column;
@@ -328,17 +336,7 @@ export default {
       height: $row-height-large;
       padding-left:$spacing;
       background-color: white;
-
-      &::before {
-        content: '';
-        width: calc(#{$fade-out-width} + #{$spacing});
-        height: $row-height-large;
-        position: absolute;
-        top: 0;
-        left: calc(-#{$fade-out-width} - #{$spacing});
-        background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-        z-index: 1;
-      }
+      min-width: 30px;
 
       .base-menu-entry-thumbnail {
         max-height: $icon-small;
@@ -371,6 +369,19 @@ export default {
       position: absolute;
       top: 50%;
       transform: translate(#{$spacing}, -#{$icon-medium/2});
+    }
+  }
+
+  .base-menu-entry-text-fade-out {
+    &::before {
+      content: '';
+      width: calc(#{$fade-out-width} + #{$spacing});
+      height: $row-height-large;
+      position: absolute;
+      top: 0;
+      left: calc(-#{$fade-out-width} - #{$spacing});
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+      z-index: 1;
     }
   }
 
