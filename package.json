@@ -12,8 +12,7 @@
     "build:wc": "vue-cli-service build --target wc-async --dest dist/lib-wc --name base-ui-components 'src/components/*/*.vue'",
     "lint": "vue-cli-service lint",
     "styleguide": "vue-cli-service styleguidist",
-    "styleguide:build": "vue-cli-service styleguidist:build",
-    "postversion": "./postversion.sh"
+    "styleguide:build": "vue-cli-service styleguidist:build"
   },
   "peerDependencies": {
     "vue": "^2.6.10"

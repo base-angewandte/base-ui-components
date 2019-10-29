@@ -186,20 +186,27 @@ function renameIndex(componentName) {
     _.kebabCase(componentName),
   ]).join('.');
 
-  const destPackageFolder = getPath(`../packages/${packageName}`);
+  // modified this so that components are only placed withing base-ui-components package for now
+  // needs to be changed back in case we ever want a different packages structure
+  const componentPackageFolder = path.resolve(
+    __dirname, componentName
+      ? `../packages/${libConfig.name}/${componentName}`
+      : getPath(`../packages/${packageName}`),
+  );
 
   builds.forEach((build) => {
     const oldIndexPath = getPath(`../dist/lib/${componentName || ''}/${componentName ? 'index' : 'base-ui-components'}.${build.type}.js`);
     const [buildTypeBase, buildModifier] = build.type.split('.');
-    const destFolder = path.resolve(destPackageFolder, build.dest ? build.dest : buildTypeBase);
+    const destFolder = path.resolve(componentPackageFolder, build.dest
+      ? build.dest : buildTypeBase);
 
     const newIndexPath = path.resolve(
       destFolder,
       `index${buildModifier ? `.${buildModifier}` : ''}.js`,
     );
 
-    if (!fs.existsSync(destPackageFolder)) {
-      fs.mkdirSync(destPackageFolder);
+    if (!fs.existsSync(componentPackageFolder)) {
+      fs.mkdirSync(componentPackageFolder);
     }
 
     if (!fs.existsSync(destFolder)) {
@@ -219,7 +226,7 @@ function renameIndex(componentName) {
     );
   });
 
-  fs.copySync(getPath('../src'), path.resolve(destPackageFolder, 'src'), {
+  fs.copySync(getPath('../src'), path.resolve(componentPackageFolder, 'src'), {
     filter: filePath => !/\.unit\.js$/.test(filePath),
   });
 
@@ -236,7 +243,7 @@ export default ${componentName};
 `;
   }
   fs.writeFileSync(
-    path.resolve(destPackageFolder, 'index.js'),
+    path.resolve(componentPackageFolder, 'index.js'),
     exportStatement,
   );
 
@@ -273,30 +280,22 @@ export default ${componentName};
 
   console.info(`Writing package.json for ${packageConfig.moduleName}`);
   fs.writeFileSync(
-    path.resolve(destPackageFolder, 'package.json'),
+    path.resolve(componentPackageFolder, 'package.json'),
     generatePackageJson(packageConfig),
   );
   console.info(`Writing readme file for ${packageConfig.moduleName}`);
   fs.writeFileSync(
-    path.resolve(destPackageFolder, 'README.md'),
+    path.resolve(componentPackageFolder, 'README.md'),
     generateReadme(packageConfig),
   );
   console.info(`Adding license for ${packageConfig.moduleName}`);
   const licenseStr = fs.readFileSync(path.resolve('', 'LICENSE.md')).toString('utf8');
   fs.writeFileSync(
-    path.resolve(destPackageFolder, 'LICENSE.md'),
+    path.resolve(componentPackageFolder, 'LICENSE.md'),
     licenseStr,
   );
 
   if (componentName) {
-    const componentPackageFolder = path.resolve(
-      __dirname,
-      `../packages/${libConfig.name}/${componentName}`,
-    );
-    fs.copySync(destPackageFolder, componentPackageFolder, {
-      filter: filePath => !/(LICENSE|README\.md|src)$/.test(filePath),
-    });
-
     const exportStatement2 = componentName ? `\
 import ${componentName} from '../src/components/${componentName}/${componentName}.vue';
 
