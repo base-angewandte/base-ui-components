@@ -308,7 +308,7 @@ export default {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
-      &:hover, &:focus-within {
+      &:hover, &:focus {
         .base-menu-entry-icon,
         .base-menu-entry-title,
         .base-menu-entry-subtext,
