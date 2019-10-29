@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.8",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve --port 9001",
