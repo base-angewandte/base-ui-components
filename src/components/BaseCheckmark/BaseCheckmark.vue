@@ -149,6 +149,14 @@ export default {
       border: 1.5px solid $app-color;
     }
 
+    & input:focus ~ .base-checkmark-container-small {
+      border: 1.5px solid $app-color;
+    }
+
+    & .base-checkbox-checked:focus ~ .base-checkmark-container-small svg {
+     fill: $app-color;
+    }
+
     .base-checkbox-input {
       position: absolute;
       opacity: 0;

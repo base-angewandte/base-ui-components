@@ -223,6 +223,14 @@ export default {
 
     &:focus {
       outline: 0;
+
+      .base-menu-entry-icon,
+      .base-menu-entry-title,
+      .base-menu-entry-subtext,
+      .base-menu-entry-description {
+        fill: $app-color;
+        color: $app-color;
+      }
     }
 
     .base-menu-entry-icon {
