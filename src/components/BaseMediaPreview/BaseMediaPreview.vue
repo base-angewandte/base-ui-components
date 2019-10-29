@@ -41,7 +41,8 @@
         </video>
         <audio
           v-else-if="fileType === 'audio'"
-          controls>
+          controls
+          class="base-media-preview__audio">
           Your browser does not support the audio tag.
           <source
             :src="mediaUrl"
@@ -353,6 +354,7 @@ export default {
         max-height: calc(100% - #{$spacing}*4);
         max-width: calc(100% - #{$spacing}*4);
         padding: $spacing;
+        margin-top: auto;
 
         &.base-media-preview-rotation-2 {
           transform: scaleX(-1);
@@ -387,6 +389,10 @@ export default {
         color: whitesmoke;
       }
 
+      .base-media-preview__audio {
+        margin-top: auto;
+      }
+
       .base-media-preview-not-supported {
         text-align: center;
         background-color: rgba(0, 0, 0, 0.3);
@@ -418,6 +424,7 @@ export default {
       .base-media-preview-video {
         max-height: 95%;
         max-width: 95%;
+        margin-top: auto;
       }
 
       .base-media-preview-document-wrapper {
@@ -431,16 +438,14 @@ export default {
       }
 
       .base-media-preview-info {
-        position: absolute;
-        bottom: 0;
         width: 100vw;
-        left: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
         background-color: rgba(0, 0, 0, 0.3);
         color: whitesmoke;
         padding: $spacing-small;
+        margin-top: auto;
 
         .base-media-preview-info-text {
           margin-right: $spacing;
