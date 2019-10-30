@@ -65,6 +65,7 @@
           :value-type="dateType"
           :lang="language"
           :placeholder="placeholder.date || placeholder"
+          :input-attr="{id: label}"
           v-model="dateFrom"
           input-class="base-date-input-datepicker-input"
           class="base-date-input-datepicker"
