@@ -1,14 +1,9 @@
 <template>
   <div class="base-input">
-    <div
-      class="base-input-label-row">
-      <label
-        :class="{ 'hide': !showLabel }"
-        :for="label"
-        class="base-input-label"
-        @click.prevent="">
+    <div class="base-input-label-row">
+      <legend class="base-input-label">
         {{ label }}
-      </label>
+      </legend>
       <div
         v-if="showFormatOptions"
         class="base-date-input-format-tabs">
@@ -26,119 +21,137 @@
     </div>
 
     <div class="input-field-wrapper">
-      <div
-        v-click-outside="() => activeFrom = false"
-        :class="['base-input-field-container',
-                 { 'base-input-field-container-active': activeFrom },
-                 { 'base-input-field-container-multiple': type === 'datetime' }]">
-        <!-- TIME FROM -->
-        <DatePicker
-          v-if="type === 'timerange'"
-          id="timeFrom"
-          ref="timepickerFrom"
-          :placeholder="placeholder.time"
-          :lang="language"
-          :clearable="false"
-          v-model="inputInt.time_from"
-          type="time"
-          format="HH:mm"
-          value-type="format"
-          input-class="base-date-input-datepicker-input"
-          class="base-date-input-datepicker"
-          @focus="activeFrom = true"
-          @blur="blurInput()">
-          <template slot="calendar-icon">
-            <svg-icon
-              name="clock"
-              class="base-input-date-icon"
-              @click="openDatePicker('timepickerFrom')"/>
-          </template>
-        </DatePicker>
+      <div class="base-form-field-container">
+        <label
+          :for="label + '-' + id"
+          class="base-input-label hide"
+          @click.prevent="">
+          {{ label }}
+        </label>
+        <div
+          v-click-outside="() => activeFrom = false"
+          :class="['base-input-field-container',
+                   {'base-input-field-container-active': activeFrom },
+                   {'base-input-field-container-multiple': type === 'datetime' }]">
+          <!-- TIME FROM -->
+          <DatePicker
+            v-if="type === 'timerange'"
 
-        <!-- DATE FROM -->
-        <DatePicker
-          v-else
-          ref="datepickerFrom"
-          :type="minDateView"
-          :format="dateFormat"
-          :clearable="false"
-          :value-type="dateType"
-          :lang="language"
-          :placeholder="placeholder.date || placeholder"
-          :input-attr="{id: label}"
-          v-model="dateFrom"
-          input-class="base-date-input-datepicker-input"
-          class="base-date-input-datepicker"
-          @focus="activeFrom = true"
-          @blur="blurInput()">
-          <template slot="calendar-icon">
-            <svg-icon
-              name="calendar-many"
-              class="base-input-date-icon"
-              @click="openDatePicker('datepickerFrom')"/>
-          </template>
-        </DatePicker>
+            ref="timepickerFrom"
+            :input-attr="{id: label + '-' + id}"
+            :placeholder="placeholder.time"
+            :lang="language"
+            :clearable="false"
+            v-model="inputInt.time_from"
+            type="time"
+            format="HH:mm"
+            value-type="format"
+            input-class="base-date-input-datepicker-input"
+            class="base-date-input-datepicker"
+            @focus="activeFrom = true"
+            @blur="blurInput()">
+            <template slot="calendar-icon">
+              <svg-icon
+                name="clock"
+                class="base-input-date-icon"
+                @click="openDatePicker('timepickerFrom')"/>
+            </template>
+          </DatePicker>
+
+          <!-- DATE FROM -->
+          <DatePicker
+            v-else
+            ref="datepickerFrom"
+            :input-attr="{id: label + '-' + id}"
+            :type="minDateView"
+            :format="dateFormat"
+            :clearable="false"
+            :value-type="dateType"
+            :lang="language"
+            :placeholder="placeholder.date || placeholder"
+            v-model="dateFrom"
+            input-class="base-date-input-datepicker-input"
+            class="base-date-input-datepicker"
+            @focus="activeFrom = true"
+            @blur="blurInput()">
+            <template slot="calendar-icon">
+              <svg-icon
+                name="calendar-many"
+                class="base-input-date-icon"
+                @click="openDatePicker('datepickerFrom')"/>
+            </template>
+          </DatePicker>
+        </div>
       </div>
       <span
         v-if="type === 'daterange' || type === 'timerange'"
         class="separator">{{ rangeSeparator }}</span>
+
       <div
-        v-click-outside="() => activeTo = false"
         v-if="type !== 'single'"
-        :class="['base-input-field-container',
-                 { 'base-input-field-container-active': activeTo },
-                 { 'base-input-field-container-multiple': type === 'datetime' }]">
+        class="base-form-field-container">
+        <label
+          :for="(type === 'datetime' || type === 'timerange')? 'timeTo-' + id : 'dateTo-' + id"
+          class="base-input-label hide">
+          {{ label }}
+        </label>
+        <div
+          v-click-outside="() => activeTo = false"
+          v-if="type !== 'single'"
+          :class="['base-input-field-container',
+                   {'base-input-field-container-active': activeTo },
+                   {'base-input-field-container-multiple': type === 'datetime' }]">
 
-        <!-- TIME TO -->
-        <DatePicker
-          v-if="type === 'datetime' || type === 'timerange'"
-          id="timeTo"
-          ref="timepickerTo"
-          :placeholder="placeholder.time"
-          :lang="language"
-          :clearable="false"
-          v-model="timeTo"
-          type="time"
-          format="HH:mm"
-          value-type="format"
-          input-class="base-date-input-datepicker-input"
-          @focus="activeTo = true"
-          @blur="blurInput()">
-          <template slot="calendar-icon">
-            <svg-icon
-              name="clock"
-              class="base-input-date-icon"
-              @click="openDatePicker('timepickerTo')"/>
-          </template>
-        </DatePicker>
+          <!-- TIME TO -->
+          <DatePicker
+            v-if="type === 'datetime' || type === 'timerange'"
+            ref="timepickerTo"
+            :input-attr="{id: 'timeTo-' + id}"
+            :placeholder="placeholder.time"
+            :lang="language"
+            :clearable="false"
+            v-model="timeTo"
+            type="time"
+            format="HH:mm"
+            value-type="format"
+            input-class="base-date-input-datepicker-input"
+            @focus="activeTo = true"
+            @blur="blurInput()">
+            <template slot="calendar-icon">
+              <svg-icon
+                name="clock"
+                class="base-input-date-icon"
+                @click="openDatePicker('timepickerTo')"/>
+            </template>
+          </DatePicker>
 
-        <!-- DATE TO -->
-        <DatePicker
-          v-else
-          id="dateTo"
-          key="dateTo"
-          ref="datepickerTo"
-          :type="minDateView"
-          :format="dateFormat"
-          :clearable="false"
-          :value-type="dateType"
-          :lang="language"
-          :placeholder="placeholder.date || placeholder"
-          v-model="inputInt.date_to"
-          input-class="base-date-input-datepicker-input"
-          class="base-date-input-datepicker"
-          @focus="activeTo = true"
-          @blur="blurInput()">
-          <template slot="calendar-icon">
-            <svg-icon
-              name="calendar-many"
-              class="base-input-date-icon"
-              @click="openDatePicker('datepickerTo')"/>
-          </template>
-        </DatePicker>
+          <!-- DATE TO -->
+          <DatePicker
+            v-else
+            key="dateTo"
+            ref="datepickerTo"
+            :input-attr="{id: 'dateTo-' + id}"
+            :type="minDateView"
+            :format="dateFormat"
+            :clearable="false"
+            :value-type="dateType"
+            :lang="language"
+            :placeholder="placeholder.date || placeholder"
+            v-model="inputInt.date_to"
+            input-class="base-date-input-datepicker-input"
+            class="base-date-input-datepicker"
+            @focus="activeTo = true"
+            @blur="blurInput()">
+            <template slot="calendar-icon">
+              <svg-icon
+                name="calendar-many"
+                class="base-input-date-icon"
+                @click="openDatePicker('datepickerTo')"/>
+            </template>
+          </DatePicker>
+        </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -256,6 +269,13 @@ export default {
     language: {
       type: String,
       default: 'en',
+    },
+    /**
+     * set id
+     */
+    id: {
+      type: Number,
+      default: 1,
     },
   },
   data() {
@@ -600,6 +620,11 @@ export default {
   .separator {
     padding: 0 $spacing;
     line-height: $row-height-small;
+  }
+
+  .base-form-field-container {
+    flex: 1 1 auto;
+    max-width: 100%;
   }
 </style>
 
