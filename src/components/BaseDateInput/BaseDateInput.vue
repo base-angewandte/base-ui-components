@@ -1,7 +1,9 @@
 <template>
   <div class="base-input">
     <div class="base-input-label-row">
-      <legend class="base-input-label">
+      <legend
+        v-if="showLabel"
+        class="base-input-label">
         {{ label }}
       </legend>
       <div
@@ -36,7 +38,6 @@
           <!-- TIME FROM -->
           <DatePicker
             v-if="type === 'timerange'"
-
             ref="timepickerFrom"
             :input-attr="{id: label + '-' + id}"
             :placeholder="placeholder.time"
