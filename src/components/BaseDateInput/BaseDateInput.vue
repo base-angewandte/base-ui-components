@@ -644,7 +644,7 @@ export default {
   .base-date-input-datepicker-input {
     border: none;
     outline: none;
-    width: 100%;
+    width: calc(100% - #{$spacing});
     height: 100%;
     background-color: transparent;
   }
@@ -676,7 +676,9 @@ export default {
   /* icon placing */
   .mx-input-append {
     width: auto !important;
-    padding: 0 $spacing !important;
+    padding: 0 0 0 $spacing !important;
+    // needs to be margin on right side for input shadow
+    margin-right: $spacing;
     display: flex;
     justify-content: flex-end;
     align-items: center;
