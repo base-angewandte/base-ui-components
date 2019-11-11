@@ -10,9 +10,9 @@ $spacing-small: 8rem/19;
 $spacing-large: 32rem/19;
 /* new styleguide: font size + relative spacing! */
 $row-height-large: 1rem +  2*1rem;
-$row-height-small: 1rem +  2*$spacing-small;
+$row-height-small: 1.1rem +  2*$spacing-small;
 $header-height: 55px;
-$chips-spacing: 0.04rem;
+$chips-spacing: 0.05rem;
 $chips-list-height: 1rem + 2*$spacing;
 $input-field-line-height: 27rem/19;
 $fade-out-width: 30px;
@@ -28,6 +28,11 @@ $background-color: #f0f0f0;
 $box-color: white;
 /* self defined for now! */
 $uploadbar-color: #999999;
+$switch-container-color: $input-field-color;
+$switch-color: $background-color;
+$switch-checked-color: #4d4d4d;
+$switch-svg-color: $font-color-third;
+$switch-svg-checked-color: #fff;
 
 /* shadows and borders */
 $border-width: 2px;
@@ -61,5 +66,6 @@ $icon-small: 12px;
 $icon-min: 8px;
 
 /* break-points */
-$mobile: 640px;
+$mobile: 639px;
+$mobile-min-width: 640px;
 $tablet: 1024px;

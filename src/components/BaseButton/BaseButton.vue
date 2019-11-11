@@ -1,12 +1,15 @@
 <template>
   <button
     :disabled="disabled"
+    :aria-disabled="disabled"
     :type="buttonType"
-    :style="{ justifyContent: alignText, background: backgroundColor }"
+    :style="{ justifyContent: alignText }"
     :class="['base-button',
              buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
+             { 'base-button-background': hasBackgroundColor },
              {'base-button-active': active }]"
     @click.prevent="clicked">
+
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text"/>
     <svg-icon
@@ -27,11 +30,15 @@
                'base-button-icon-' + iconSize,
                { 'base-button-icon-hide': hideIcon }]"
     />
+    <BaseBoxTooltip
+      v-if="showTooltip"
+      @clicked="clicked" />
   </button>
 </template>
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 import '../../assets/icons/index';
 
 /**
@@ -41,6 +48,7 @@ export default {
   name: 'BaseButton',
   components: {
     SvgIcon,
+    BaseBoxTooltip,
   },
   props: {
     /**
@@ -136,11 +144,19 @@ export default {
       },
     },
     /**
-     * set the background color of the button
+     * background color is fixed however at least possibility to
+     * display transparent instead
      */
-    backgroundColor: {
-      type: String,
-      default: '',
+    hasBackgroundColor: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * show tooltip
+     */
+    showTooltip: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {
@@ -160,6 +176,7 @@ export default {
   @import "../../styles/variables";
 
   .base-button {
+    position: relative;
     padding: 0 $spacing;
     cursor: pointer;
     display: flex;
@@ -203,6 +220,10 @@ export default {
     &.base-button-single {
       background-color: transparent;
       min-height: $row-height-small;
+
+      &.base-button-background {
+        background-color: $button-header-color;
+      }
 
       .base-button-icon-large {
         height: $icon-medium;

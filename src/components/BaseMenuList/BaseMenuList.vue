@@ -141,7 +141,7 @@ export default {
     // determines which icon should be shown for each menu entry
     // TODO: this should probably also be definable per entry dynamically on the long run...
     getType(val) {
-      return val && val.includes('calendar-number') ? 'calendar-number' : 'sheet-empty';
+      return val && val.includes('calendar-many') ? 'calendar-many' : 'sheet-empty';
     },
     // define which thumbnails should be shown for each item
     // TODO: currently hardcoded here but needs dynamic solution!
@@ -220,7 +220,10 @@ export default {
 
       // add the element to the dom
       document.body.appendChild(pic);
-      dataTransfer.setDragImage(pic, 0, 0);
+      // Edge does not support setDragImage
+      if (typeof DataTransfer.prototype.setDragImage === 'function') {
+        dataTransfer.setDragImage(pic, 0, 0);
+      }
       dataTransfer.setData('draggable', '');
     },
   },
@@ -236,10 +239,6 @@ export default {
     .base-menu-list__list-entry {
       &:not(:last-of-type) {
         border-bottom: $separation-line;
-      }
-
-      &:focus-within {
-        color: $app-color;
       }
     }
   }

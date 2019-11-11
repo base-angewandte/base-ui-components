@@ -1,9 +1,13 @@
 <template>
   <base-box-button
     v-bind="$props"
-    :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
-    class="base-drop-box"
+    :box-type="boxType"
+    :disabled="disabled"
+    :class="[
+      'base-drop-box',
+      { 'base-box-button-disabled': disabled },
+      { 'is-drag-over': isDragOver }]"
     @clicked="onClicked">
     <div
       class="base-drop-box-inner">
@@ -18,10 +22,9 @@
         @add="addEntry">
         <div
           class="base-drop-box-drag-area"
-          @dragleave="dragLeave"
-          @mouseleave="dragLeave"
+          @dragleave="dragLeave('c', $event)"
           @pointerenter="dragEnter"
-          @pointerleave="dragLeave">
+          @pointerleave="dragLeave('x', $event)">
           <div
             v-for="item in dragList"
             :key="item.id"
@@ -34,12 +37,16 @@
         v-else
         ref="fileform"/>
     </div>
+    <BaseBoxTooltip
+      v-if="showTooltip"
+      @clicked="onTooltip" />
   </base-box-button>
 </template>
 
 <script>
 import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
 /**
  * An Element for dropping files or other UI Elements into
@@ -50,6 +57,7 @@ export default {
   components: {
     BaseBoxButton,
     Draggable,
+    BaseBoxTooltip,
   },
   props: {
     /**
@@ -96,6 +104,13 @@ export default {
       default: '100',
     },
     /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
+    },
+    /**
      * specify the type of drops <br>
      *     valid options: 'files'|'elements'
      */
@@ -122,6 +137,20 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * set button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * show tooltip
+     */
+    showTooltip: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -132,7 +161,7 @@ export default {
   },
   mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable && this.dropType === 'files') {
+    if (this.dragAndDropCapable && this.dropType === 'files' && !this.disabled) {
       ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(((evt) => {
         this.$refs.fileform.addEventListener(evt, ((e) => {
           e.preventDefault();
@@ -183,7 +212,7 @@ export default {
     /**
      * method to get the dropped element id and emit it to parent
      */
-    addEntry() {
+    addEntry(event) {
       // check if box is for receiving elements (not files)
       if (this.dropType === 'elements') {
         // and check if item is currently still dragged over box (draggable event will also
@@ -199,15 +228,33 @@ export default {
           this.$emit('dropped-element', draggedElementId);
         }
         this.dragList = [];
+        // otherwise box stays highlighted on touch
+        if (event.originalEvent.type === 'touchend') {
+          this.isDragOver = false;
+        }
       }
     },
     dragEnter() {
       this.isDragOver = true;
     },
-    dragLeave() {
-      this.isDragOver = false;
+    dragLeave(d, event) {
+      // to prevent trigger when it is touch device and element was just dropped into box
+      if (!(event.pointerType === 'touch' && !event.relatedTarget)) {
+        this.isDragOver = false;
+      }
     },
     onClicked(event) {
+      /**
+       * Triggered when the box is clicked
+       *
+       * @event clicked
+       * @type {Event}
+       */
+      if (!this.disabled) {
+        this.$emit('clicked', event);
+      }
+    },
+    onTooltip(event) {
       /**
        * Triggered when the box is clicked
        *
@@ -254,6 +301,19 @@ export default {
         text-align: center;
         height: 100%;
         width: 100%;
+      }
+    }
+
+    &.base-box-button-disabled {
+
+      .base-drop-box-inner {
+        border-color: graytext;
+
+        &:hover {
+          border-color: graytext;
+          cursor: default;
+          box-shadow: none;
+        }
       }
     }
   }

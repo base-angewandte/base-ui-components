@@ -7,7 +7,8 @@
       :name="label"
       :value="label"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]">
+      :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]"
+      @keydown.enter.prevent="">
     <div
       :class="[
         'base-checkmark-container',
@@ -146,6 +147,14 @@ export default {
 
     & input:checked ~ .base-checkmark-container-small {
       border: 1.5px solid $app-color;
+    }
+
+    & input:focus ~ .base-checkmark-container-small {
+      border: 1.5px solid $app-color;
+    }
+
+    & .base-checkbox-checked:focus ~ .base-checkmark-container-small svg {
+     fill: $app-color;
     }
 
     .base-checkbox-input {

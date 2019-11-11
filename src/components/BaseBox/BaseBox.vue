@@ -1,11 +1,14 @@
 <template>
-  <div
+  <compontent
+    :is="boxType"
     :style="boxSizeInt"
     :class="['base-box', 'base-box-' + $props.boxRatio]"
+    :disabled="disabled"
+    :type="(boxType === 'button') ? 'button' : ''"
     @click="clicked">
     <!-- @slot slot for box contents -->
     <slot />
-  </div>
+  </compontent>
 </template>
 
 <script>
@@ -21,6 +24,13 @@ export default {
    */
   props: {
     /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
+    },
+    /**
      * define the size of the box
      * should be an object with width and / or height
      */
@@ -35,6 +45,13 @@ export default {
     boxRatio: {
       type: String,
       default: '100',
+    },
+    /**
+     * set button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -84,6 +101,10 @@ export default {
 
     &:hover {
       box-shadow: $box-shadow-hov;
+    }
+
+    &:disabled {
+      box-shadow: none;
     }
   }
 </style>

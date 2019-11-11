@@ -5,19 +5,29 @@
     <div class="base-pop-up-background" />
     <div
       ref="popUpBody"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="popup-title"
+      aria-describedby="descriptionElementId"
       class="popup-box">
 
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
+          id="popup-title"
           class="popup-title">
           {{ title }}
         </div>
         <!-- @event close -->
-        <svg-icon
-          class="popup-remove"
-          name="remove"
-          @click="close" />
+        <button
+          type="button"
+          aria-label="close pop up"
+          class="base-popup__close-button"
+          @click="close">
+          <svg-icon
+            class="popup-remove"
+            name="remove"/>
+        </button>
       </div>
 
       <!-- POP UP CONTENT -->
@@ -28,6 +38,7 @@
           <!-- @slot custom button row -->
           <slot name="button-row">
             <BaseButton
+              id="popup-left-button"
               :text="buttonLeftText"
               :icon="buttonLeftIcon"
               :icon-position="'right'"
@@ -36,6 +47,7 @@
               @clicked="buttonLeft" />
             <!-- @event buttonRight -->
             <BaseButton
+              id="popup-right-button"
               :text="buttonRightText"
               :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
@@ -94,6 +106,13 @@ export default {
       default: 'Pop Up',
     },
     /**
+     * specify the id of the element containing a description - for acessibility only
+     */
+    descriptionElementId: {
+      type: String,
+      default: '',
+    },
+    /**
      * text shown in left button
      */
     buttonLeftText: {
@@ -132,13 +151,25 @@ export default {
   data() {
     return {
       showInt: this.show,
+      // this is needed for popUpLock mixin!
       targetName: 'popUpBody',
     };
   },
   watch: {
     show(val) {
+      if (!this.showInt && !this.prevActiveElement) {
+        this.prevActiveElement = document.activeElement;
+      }
       this.showInt = val;
     },
+  },
+  updated() {
+    if (this.showInt && this.$el.querySelector('input') !== null) {
+      this.$el.querySelector('input').focus();
+    } else if (this.prevActiveElement) {
+      this.prevActiveElement.focus();
+      this.prevActiveElement = false;
+    }
   },
   methods: {
     close() {
@@ -182,7 +213,8 @@ export default {
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 99;
+    /* specific to be higher than base header */
+    z-index: 1041;
     overflow: hidden;
   }
 
@@ -209,6 +241,13 @@ export default {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+
+    .base-popup__close-button {
+      &:active, &:focus {
+        color: $app-color;
+        fill: $app-color;
+      }
+    }
   }
 
   .popup-remove {

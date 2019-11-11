@@ -16,7 +16,8 @@
       autocomplete="off"
       @focus.prevent="inputFocus"
       @blur="inputBlur"
-      @keyup="onKeyUp">
+      @keyup="onKeyUp"
+      @keydown.enter.prevent="">
     <SvgIcon
       v-if="inputInt"
       name="remove"
@@ -101,7 +102,9 @@ export default {
       this.active = true;
     },
     onKeyUp() {
-      this.$emit('input-change', this.inputInt);
+      if (this.input !== this.inputInt) {
+        this.$emit('input-change', this.inputInt);
+      }
     },
     clearInput() {
       this.inputInt = '';

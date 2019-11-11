@@ -16,3 +16,4 @@ styleguide/
 /index.html
 config/dev.env.js
 config/prod.env.js
+.history/
