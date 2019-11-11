@@ -198,6 +198,7 @@ export default {
       // variable for display image error handling
       displayImage: true,
       targetName: 'mediaStage',
+      isMobile: false,
     };
   },
   computed: {
@@ -236,9 +237,6 @@ export default {
     formatNotSupported() {
       return !this.fileType;
     },
-    isMobile() {
-      return window.innerWidth <= 640;
-    },
     imageSourceSet() {
       return this.previews.length ? this.previews.map(size => Object.keys(size)
         .map(width => `${size[width]} ${width}`)).join(', ') : '';
@@ -254,6 +252,9 @@ export default {
       this.showInt = val;
       this.displayImage = true;
     },
+  },
+  mounted() {
+    this.isMobile = window.innerWidth <= 640;
   },
   updated() {
     if (this.showPreview) {
@@ -300,6 +301,7 @@ export default {
       }
     },
     openPdf() {
+      console.log('open pdf');
       window.open(this.mediaUrl);
     },
   },
