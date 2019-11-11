@@ -38,6 +38,11 @@
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
           name="drop-down"
         />
+        <!--
+        <img
+          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+          svg-inline
+          src="../../static/icons/drop-down.svg"> -->
       </slot>
     </button>
     <div

@@ -1,11 +1,11 @@
-<svg data-name="Layer 1"
+<svg id="Layer_1" data-name="Layer 1"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
      viewBox="0 0 70.87 70.87">
   <defs>
     <style>.cls-1{fill:none;}.cls-2{clip-path:url(#clip-path);}.cls-3{fill:#1d1d1b;}
     </style>
-    <clipPath>
+    <clipPath id="clip-path">
       <rect class="cls-1" x="6.45" width="57.96" height="70.84"/>
     </clipPath>
   </defs>
