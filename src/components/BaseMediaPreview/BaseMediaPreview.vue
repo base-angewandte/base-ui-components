@@ -5,7 +5,7 @@
     <div
       class="base-media-preview-close"
       @click="$emit('hide-preview')">
-      <SvgIcon
+      <base-svg-icon
         name="remove"
         class="base-media-preview-close-icon" />
     </div>
@@ -92,9 +92,9 @@
 
 <script>
 import VueClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import Hls from 'hls.js';
 import BaseButton from '../BaseButton/BaseButton';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -105,7 +105,7 @@ import popUpLock from '../../mixins/popUpLock';
 export default {
   components: {
     BaseButton,
-    SvgIcon,
+    BaseSvgIcon,
   },
   directives: {
     VueClickOutside,
@@ -336,6 +336,8 @@ export default {
       cursor: pointer;
 
       .base-media-preview-close-icon {
+        width: 24px;
+        height: 24px;
         fill: white;
       }
     }

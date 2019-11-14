@@ -10,10 +10,9 @@
     :role="isSelectable && selectActive ? '' : 'link'"
     @keydown.enter="clicked"
     @click="clicked">
-    <img
-      :src="'../../static/icons/sheet-empty.svg'"
-      svg-inline
-      class="base-menu-entry-icon">
+    <base-svg-icon
+      name="sheet-empty"
+      class="base-menu-entry-icon" />
     <div
       :class="[
         'base-menu-entry-text-wrapper',
@@ -41,11 +40,11 @@
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
         class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
-        <svg-icon
+        <base-svg-icon
           v-for="tn in thumbnails"
-          :key="tn"
+          :key="tn + 1"
           :name="tn"
-          class="base-menu-entry-thumbnail" />
+          class="base-menu-entry-thumbnail"/>
       </div>
       <base-checkmark
         v-if="isSelectable && selectActive"
@@ -60,7 +59,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 /**
@@ -70,7 +69,7 @@ import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
-    SvgIcon,
+    BaseSvgIcon,
     BaseCheckmark,
   },
   props: {
@@ -175,11 +174,6 @@ export default {
     return {
       isSelectedInt: false,
     };
-  },
-  computed: {
-    iconSrc() {
-      return `../../assets/icons/${this.icon}.svg`;
-    },
   },
   watch: {
     isSelected(val) {
@@ -314,10 +308,8 @@ export default {
 
       &:hover, &:focus-within {
         .base-menu-entry-icon,
-        .base-menu-entry-icon path,
-        .base-menu-entry-icon use svg,
-        .base-menu-entry-icon use svg g,
-        .base-menu-entry-icon use svg g path,
+        .base-menu-entry-icon symbol,
+        .base-menu-entry-icon svg use symbol,
         .base-menu-entry-title,
         .base-menu-entry-subtext,
         .base-menu-entry-description {
@@ -341,6 +333,7 @@ export default {
       justify-content: space-around;
       // however this is the value it should take
       justify-content: space-evenly;
+      align-items: flex-end;
       height: $row-height-large;
       padding-left:$spacing;
       background-color: white;

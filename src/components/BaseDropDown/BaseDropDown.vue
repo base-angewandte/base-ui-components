@@ -34,15 +34,9 @@
       </div>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
-        <SvgIcon
+        <BaseSvgIcon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          name="drop-down"
-        />
-        <!--
-        <img
-          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          svg-inline
-          src="../../static/icons/drop-down.svg"> -->
+          name="drop-down"/>
       </slot>
     </button>
     <div
@@ -76,8 +70,8 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
 import ClickOutside from 'vue-click-outside';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import { setLanguageMixin } from '../../mixins/setLanguage';
 
 /**
@@ -85,7 +79,7 @@ import { setLanguageMixin } from '../../mixins/setLanguage';
  */
 export default {
   components: {
-    SvgIcon,
+    BaseSvgIcon,
   },
   directives: {
     ClickOutside,
@@ -347,6 +341,8 @@ export default {
         transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
         height: $icon-small;
         flex-shrink: 0;
+        width: 12px;
+        height: 12px;
 
         &.base-drop-down-icon-rotated {
           transform: rotate(180deg);

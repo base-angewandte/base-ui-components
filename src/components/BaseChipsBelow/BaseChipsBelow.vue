@@ -32,7 +32,7 @@
               <div
                 :key="'iconwrapper' + entry.idInt"
                 class="base-chips-below-list-icon-wrapper">
-                <SvgIcon
+                <BaseSvgIcon
                   :key="'icon' + entry.idInt"
                   name="drag-lines"
                   class="svg-icon base-chips-below-list-icon"/>
@@ -92,7 +92,7 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
@@ -112,7 +112,7 @@ export default {
     BaseChipsInput,
     Draggable,
     BaseChip,
-    SvgIcon,
+    BaseSvgIcon,
   },
   model: {
     prop: 'selectedList',

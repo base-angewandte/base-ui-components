@@ -52,7 +52,7 @@
             @focus="activeFrom = true"
             @blur="blurInput()">
             <template slot="calendar-icon">
-              <svg-icon
+              <base-svg-icon
                 name="clock"
                 class="base-input-date-icon"
                 @click="openDatePicker('timepickerFrom')"/>
@@ -76,7 +76,7 @@
             @focus="activeFrom = true"
             @blur="blurInput()">
             <template slot="calendar-icon">
-              <svg-icon
+              <base-svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
                 @click="openDatePicker('datepickerFrom')"/>
@@ -119,7 +119,7 @@
             @focus="activeTo = true"
             @blur="blurInput()">
             <template slot="calendar-icon">
-              <svg-icon
+              <base-svg-icon
                 name="clock"
                 class="base-input-date-icon"
                 @click="openDatePicker('timepickerTo')"/>
@@ -144,7 +144,7 @@
             @focus="activeTo = true"
             @blur="blurInput()">
             <template slot="calendar-icon">
-              <svg-icon
+              <base-svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
                 @click="openDatePicker('datepickerTo')"/>
@@ -158,8 +158,8 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
 /**
@@ -172,7 +172,7 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 export default {
   name: 'BaseDateInput',
   components: {
-    SvgIcon,
+    BaseSvgIcon,
     BaseSwitchButton,
     DatePicker,
   },
@@ -612,6 +612,7 @@ export default {
     max-height: 24px;
     color: $font-color-second;
     cursor: pointer;
+    fill: $font-color-second;
   }
 
   .input-field-wrapper {

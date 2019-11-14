@@ -1,14 +1,14 @@
 <template>
   <tr class="base-menu-table-row">
     <td>
-      <svg-icon
+      <base-svg-icon
         :name="icon"
         class="base-menu-entry-icon"/>
     </td>
     <td>{{ title }}</td>
     <td>{{ subtext }}</td>
     <td class="base-menu-entry-thumbnail-container">
-      <svg-icon
+      <base-svg-icon
         v-for="tn in thumbnails"
         :key="tn"
         :name="tn"
@@ -33,13 +33,13 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from './BaseSvgIcon/BaseSvgIcon';
 import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
     BaseCheckmark,
-    SvgIcon,
+    BaseSvgIcon,
   },
   props: {
     title: {
@@ -98,6 +98,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    align-items: flex-end;
     height: 100%;
     margin-right: $spacing;
     min-width: $icon-small;

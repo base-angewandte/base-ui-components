@@ -14,17 +14,17 @@
         <div
           class="button-box-image-row">
           <div class="button-box-plus-container">
-            <svg-icon
+            <base-svg-icon
               v-if="showPlus"
               name="plus"
               alt="add"
-              class="button-box-plus"/>
+              class="button-box-plus svg-icon svg-fill"/>
           </div>
           <div class="button-box-icon-container">
-            <svg-icon
+            <base-svg-icon
               v-if="icon"
               :name="icon"
-              class="button-box-icon"/>
+              class="button-box-icon svg-icon svg-fill"/>
           </div>
 
         </div>
@@ -44,10 +44,10 @@
     <div
       v-else
       class="button-box-content-small">
-      <svg-icon
+      <base-svg-icon
         v-if="icon"
         :name="icon"
-        class="button-box-icon-small"/>
+        class="button-box-icon-small svg-icon svg-fill"/>
       <div class="button-box-text-small">{{ text }}</div>
     </div>
     <slot />
@@ -55,10 +55,9 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index';
 
 /**
  * A Base Box Shaped Button
@@ -66,7 +65,7 @@ import '../../assets/icons/index';
 
 export default {
   components: {
-    SvgIcon,
+    BaseSvgIcon,
     BaseBox,
     BaseBoxTooltip,
   },
@@ -194,10 +193,18 @@ export default {
     transition: all 0.2s ease;
     text-align: left;
 
+    svg {
+      transition: fill 0.2s ease;
+    }
+
     &:focus,
     &:hover:not([disabled]) {
       color: $app-color;
       cursor: pointer;
+
+      svg {
+        fill: $app-color;
+      }
     }
 
     .button-box-content {
