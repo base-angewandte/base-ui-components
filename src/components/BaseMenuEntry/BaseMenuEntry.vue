@@ -11,7 +11,8 @@
     @keydown.enter="clicked"
     @click="clicked">
     <base-svg-icon
-      name="sheet-empty"
+      v-if="icon"
+      :name="icon"
       class="base-menu-entry-icon" />
     <div
       :class="[
