@@ -10,10 +10,11 @@
     :role="isSelectable && selectActive ? '' : 'link'"
     @keydown.enter="clicked"
     @click="clicked">
-    <img
-      :src="'../../static/icons/sheet-empty.svg'"
-      svg-inline
-      class="base-menu-entry-icon">
+    <svg-icon
+      ref="entryIcon"
+      :name="icon"
+      class="base-menu-entry-icon"/>
+
     <div
       :class="[
         'base-menu-entry-text-wrapper',
