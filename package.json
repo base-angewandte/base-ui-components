@@ -106,6 +106,7 @@
   },
   "license": "SEE LICENSE IN LICENSE.md",
   "files": [
-    "dist"
+    "dist",
+    "src/static"
   ]
 }
