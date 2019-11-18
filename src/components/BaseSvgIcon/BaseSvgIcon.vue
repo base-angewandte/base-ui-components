@@ -1,11 +1,15 @@
 <template>
-  <svg>
+  <svg
+    :aria-labelledby="title || desc ? setAriaAttribute : false">
     <title
-      v-if="title">{{ title }}</title>
+      v-if="title"
+      :id="'title_' + id">{{ title }}</title>
     <desc
-      v-if="desc">{{ desc }}</desc>
+      v-if="desc"
+      :id="'desc_' + id">{{ desc }}</desc>
     <use
-      :xlink:href="'/static/icons/sprite.svg#' + name" />
+      :xlink:href="'/static/icons/sprite.svg#' + name"
+      :href="'/static/icons/sprite.svg#' + name"/>
   </svg>
 </template>
 
@@ -29,12 +33,30 @@ export default {
       default: '',
     },
     /**
-     * descripton tag
+     * description tag
      */
     desc: {
       type: String,
       default: '',
     },
+  },
+  computed: {
+    id() {
+      // eslint-disable-next-line no-underscore-dangle
+      return this._uid;
+    },
+    setAriaAttribute() {
+      const aria = [];
+      if (this.title) {
+        aria.push(`title_${this.id}`);
+      }
+      if (this.desc) {
+        aria.push(`desc_${this.id}`);
+      }
+      return aria.join(' ');
+    },
+  },
+  methods: {
   },
 };
 </script>
