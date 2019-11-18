@@ -171,6 +171,17 @@ export default {
       this.prevActiveElement = false;
     }
   },
+  mounted() {
+    document.onkeyup = (e) => {
+      const event = e || window.event;
+      if (document.querySelector('.popup-box')) {
+        if (event.keyCode === 27) { // 27 === ESC
+          const btn = document.querySelector('.popup-box .base-popup__close-button');
+          btn.dispatchEvent(new Event('click'));
+        }
+      }
+    };
+  },
   methods: {
     close() {
       /**

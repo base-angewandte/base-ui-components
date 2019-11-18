@@ -14,6 +14,7 @@
       ref="entryIcon"
       :name="icon"
       class="base-menu-entry-icon"/>
+
     <div
       :class="[
         'base-menu-entry-text-wrapper',
@@ -176,6 +177,11 @@ export default {
       isSelectedInt: false,
     };
   },
+  computed: {
+    iconSrc() {
+      return `../../assets/icons/${this.icon}.svg`;
+    },
+  },
   watch: {
     isSelected(val) {
       this.isSelectedInt = val;
@@ -206,7 +212,6 @@ export default {
       }
     },
   },
-
 };
 </script>
 
@@ -318,6 +323,10 @@ export default {
 
       &:hover, &:focus-within {
         .base-menu-entry-icon,
+        .base-menu-entry-icon path,
+        .base-menu-entry-icon use svg,
+        .base-menu-entry-icon use svg g,
+        .base-menu-entry-icon use svg g path,
         .base-menu-entry-title,
         .base-menu-entry-subtext,
         .base-menu-entry-description {

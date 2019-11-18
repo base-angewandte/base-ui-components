@@ -137,6 +137,20 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * Parent list element
+    */
+    parentListElement: {
+      type: String,
+      default: '.menu-sidebar',
+    },
+    /**
+     * Parent list element to focus after pagination change
+    */
+    parentListElementFocus: {
+      type: String,
+      default: '#search',
+    },
   },
   data() {
     return {
@@ -204,12 +218,18 @@ export default {
     },
     setActivePage(page) {
       this.active = page;
+      this.setFocus();
     },
     getLinkPath() {
       // check if router in project and set link path accordingly if yes
       // TODO: think about adding pagination query to route
       return this.$route && this.useLinkElement
         ? { path: this.$route.fullPath } : '';
+    },
+    setFocus() {
+      if (this.$el.closest(this.parentListElement).querySelector(this.parentListElementFocus)) {
+        this.$el.closest(this.parentListElement).querySelector(this.parentListElementFocus).focus();
+      }
     },
   },
 };

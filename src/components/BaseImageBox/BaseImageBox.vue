@@ -31,6 +31,7 @@
             ref="image"
             :src="imageUrl"
             :style="imageStyle"
+            :alt="title"
             class="base-image-box-image"
             @error="displayImage = false">
         </div>

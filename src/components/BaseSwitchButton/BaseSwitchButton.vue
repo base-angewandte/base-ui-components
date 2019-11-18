@@ -3,7 +3,6 @@
   <fieldset
     class="base-switch-buttons">
     <legend
-      id="base-switch-buttons-label"
       class="hide">{{ label }}</legend>
     <template
       v-for="(option, index) in options">
