@@ -19,10 +19,10 @@
     <div
       class="base-chip-icon"
       @click="removeClicked">
-      <img
-        :src="require('../../static/icons/remove.svg')"
-        alt="remove"
-        class="base-chip-icon-img">
+      <base-svg-icon
+        name="remove"
+        title="remove"
+        class="base-chip-icon-img" />
     </div>
     <base-hover-box
       ref="hoverBox"
@@ -34,6 +34,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 
 /**
  * Basic Chip component
@@ -45,6 +46,7 @@ export default {
   },
   components: {
     BaseHoverBox,
+    BaseSvgIcon,
   },
   model: {
     prop: 'entry',
@@ -240,6 +242,7 @@ export default {
       display: flex;
 
       .base-chip-icon-img {
+        width: $icon-min;
         height: $icon-min;
         vertical-align: middle;
       }

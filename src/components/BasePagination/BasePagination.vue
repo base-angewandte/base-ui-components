@@ -10,7 +10,7 @@
       @click.native="setActivePage(active - 1 > 0 ? active - 1 : 1)"
       @click="setActivePage(active - 1 > 0 ? active - 1 : 1)"
       @keypress.enter="setActivePage(active - 1 > 0 ? active - 1 : 1)">
-      <SvgIcon
+      <base-svg-icon
         :class="[
           'base-pagination-arrow',
           'base-pagination-arrow-left',
@@ -87,7 +87,7 @@
       @click.native="setActivePage(active + 1 <= total ? active + 1 : total)"
       @click="setActivePage(active + 1 <= total ? active + 1 : total)"
       @keypress.enter="setActivePage(active + 1 <= total ? active + 1 : total)">
-      <SvgIcon
+      <base-svg-icon
         :class="[
           'base-pagination-arrow',
           'base-pagination-arrow-right',
@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 
 /**
  * Pagination component
@@ -106,7 +106,7 @@ import SvgIcon from 'vue-svgicon';
 
 export default {
   components: {
-    SvgIcon,
+    BaseSvgIcon,
   },
   model: {
     prop: 'current',
@@ -303,14 +303,15 @@ export default {
         }
 
         &.base-pagination-arrow-inactive {
-          color: graytext;
           cursor: default;
+          fill: graytext;
         }
       }
     }
 
     .base-pagination-row, .base-pagination-arrow {
       flex: 0 0 auto;
+      vertical-align: middle;
     }
 
     .base-pagination-arrow, .base-pagination-number {

@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
 import BaseToggle from '../BaseToggle/BaseToggle';
 
 /**
@@ -27,7 +26,6 @@ import BaseToggle from '../BaseToggle/BaseToggle';
  */
 export default {
   components: {
-    SvgIcon,
     BaseToggle,
   },
   props: {

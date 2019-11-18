@@ -68,7 +68,7 @@
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input-single-dropdown">
-          <SvgIcon
+          <BaseSvgIcon
             :class="[
               'base-chips-input-single-dropdown-icon',
               { 'base-chips-input-single-dropdown-icon-rotated': showDropDown }
@@ -150,7 +150,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
@@ -167,7 +167,7 @@ export default {
     BaseInput,
     BaseChip,
     Draggable,
-    SvgIcon,
+    BaseSvgIcon,
   },
   directives: {
     ClickOutside,
@@ -926,6 +926,7 @@ export default {
         transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
         height: $icon-small;
         flex-shrink: 0;
+        width: 12px;
 
         &.base-chips-input-single-dropdown-icon-rotated {
           transform: rotate(180deg);

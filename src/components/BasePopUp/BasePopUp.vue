@@ -24,7 +24,7 @@
           aria-label="close pop up"
           class="base-popup__close-button"
           @click="close">
-          <svg-icon
+          <base-svg-icon
             class="popup-remove"
             name="remove"/>
         </button>
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseSvgIcon from '../BaseSvgIcon/BaseSvgIcon';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import popUpLock from '../../mixins/popUpLock';
@@ -86,7 +86,7 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseButton,
-    SvgIcon,
+    BaseSvgIcon,
     BaseLoader,
   },
   mixins: [popUpLock],
@@ -263,6 +263,8 @@ export default {
 
   .popup-remove {
     width: 16px;
+    height: 16px;
+    vertical-align: bottom;
     cursor: pointer;
   }
 

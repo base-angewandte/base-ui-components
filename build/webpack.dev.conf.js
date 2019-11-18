@@ -22,7 +22,19 @@ module.exports = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
   },
   module: {
-    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
+    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap }).concat(
+      {
+        test: /\.svg?$/,
+        use: [{
+            loader: 'file-loader',
+            options: {
+                name: '[name].[ext]',
+                outputPath: 'static/icons/',
+                publicPath: '../'
+            }
+        }]
+      }
+    )
   },
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
