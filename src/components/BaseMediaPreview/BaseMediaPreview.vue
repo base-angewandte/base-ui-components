@@ -227,7 +227,7 @@ export default {
         return this.displayName;
       }
       const match = this.downloadUrl.match(/([^/]+)$/);
-      return match ? match[1] : '';
+      return match ? decodeURI(match[1]) : '';
     },
     fileEnding() {
       const match = this.sourceUrl.match(/\w+\.(\w{2,4})$/);
