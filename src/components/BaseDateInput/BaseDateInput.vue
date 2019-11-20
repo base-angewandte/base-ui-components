@@ -70,7 +70,7 @@
             :clearable="false"
             :value-type="dateType"
             :lang="language"
-            :first-day-of-week="1"
+            :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             v-model="dateFrom"
             input-class="base-date-input-datepicker-input"
@@ -139,7 +139,7 @@
             :clearable="false"
             :value-type="dateType"
             :lang="language"
-            :first-day-of-week="1"
+            :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             v-model="inputInt.date_to"
             input-class="base-date-input-datepicker-input"
@@ -163,6 +163,7 @@
 import ClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
+import { getWeekStartByLocale } from 'weekstart';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
 /**
@@ -273,6 +274,15 @@ export default {
     language: {
       type: String,
       default: 'en',
+    },
+    /**
+     * set first day<br>
+     *   (define array index of ['Sunday', 'Monday', 'Tuesday', ...]<br>
+     *     --> for Sunday: 0, for Monday: 1 etc.
+     */
+    firstWeekDay: {
+      type: Number,
+      default: undefined,
     },
     /**
      * set id
@@ -390,6 +400,14 @@ export default {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && this.inputInt[key].length <= 4));
+    },
+    firstDayOfWeek() {
+      // check if first week day is defined externally and prefer this if yes
+      // otherwise use locale to determine first week day
+      const weekDayIndex = this.firstWeekDay >= 0
+        ? this.firstWeekDay : getWeekStartByLocale(this.language);
+      // datepicker only takes 7 not 0 for Sunday
+      return weekDayIndex || 7;
     },
   },
   watch: {
