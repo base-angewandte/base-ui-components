@@ -8,7 +8,7 @@
               'base-menu-entry-active': isActive,
               'base-menu-entry-text-fade-out' : !showThumbnails }]"
     :role="isSelectable && selectActive ? '' : 'link'"
-    @keydown.enter="clicked"
+    @keyup.enter.prevent="clicked"
     @click="clicked">
     <svg-icon
       ref="entryIcon"
