@@ -72,11 +72,27 @@
               @clicked="openPdf()"
             />
           </div>
+          <p
+            v-for="textline in additionalInfo"
+            :key="textline"
+            class="base-media-preview__not-supported-additional">
+            {{ textline }}
+          </p>
         </div>
         <div
           v-if="fileEnding !== 'pdf' && !formatNotSupported"
           class="base-media-preview-info">
-          <div class="base-media-preview-info-text">{{ fileName }}</div>
+          <div class="base-media-preview__info-text-wrapper">
+            <p class="base-media-preview-info-text">{{ fileName }}</p>
+            <template v-if="additionalInfo.length">
+              <p
+                v-for="textline in additionalInfo"
+                :key="textline"
+                class="base-media-preview__info-text-additional">
+                {{ textline }}
+              </p>
+            </template>
+          </div>
           <BaseButton
             v-if="allowDownload"
             :text="infoTexts.download"
@@ -188,6 +204,13 @@ export default {
      *     { 'mediawidth': 'url' }
      */
     previews: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * Additional info text below file name
+     */
+    additionalInfo: {
       type: Array,
       default: () => [],
     },
@@ -419,6 +442,10 @@ export default {
             min-width: 200px;
           }
         }
+
+        .base-media-preview__not-supported-additional {
+          font-size: $font-size-small;
+        }
       }
 
       .base-media-preview-video {
@@ -447,8 +474,17 @@ export default {
         padding: $spacing-small;
         margin-top: auto;
 
-        .base-media-preview-info-text {
+        .base-media-preview__info-text-wrapper {
           margin-right: $spacing;
+
+          .base-media-preview-info-text {
+            padding-bottom: $spacing-small/2;
+          }
+
+          .base-media-preview__info-text-additional {
+            font-size: $font-size-small;
+            padding-bottom: $spacing-small/2;
+          }
         }
       }
     }
