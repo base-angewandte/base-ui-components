@@ -351,7 +351,6 @@ export default {
 
   .base-image-box-checkbox {
     position: absolute;
-    z-index: 1;
     bottom: $spacing;
     right: $spacing;
   }
