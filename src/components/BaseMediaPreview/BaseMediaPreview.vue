@@ -483,7 +483,6 @@ export default {
 
           .base-media-preview__info-text-additional {
             font-size: $font-size-small;
-            padding-bottom: $spacing-small/2;
           }
         }
       }
