@@ -65,6 +65,7 @@
                 :placeholder="rolesPlaceholder"
                 :always-linked="true"
                 :language="language"
+                :draggable="true"
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
