@@ -164,6 +164,10 @@ export default {
       width: 100%;
       height: 100%;
       z-index: 1;
+
+      &:focus ~ .base-checkmark-container {
+        border-color: $app-color;
+      }
     }
 
     .base-checkmark-container {
