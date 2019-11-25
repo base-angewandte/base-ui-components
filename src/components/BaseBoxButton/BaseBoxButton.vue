@@ -193,6 +193,7 @@ export default {
     display: flex;
     transition: all 0.2s ease;
     text-align: left;
+    align-items: center;
 
     &:focus,
     &:hover:not([disabled]) {
