@@ -1,6 +1,6 @@
 <template>
   <div class="base-pagination">
-    <element
+    <component
       :is="numberElement"
       :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
       :aria-disabled="active <= 1"
@@ -16,11 +16,11 @@
           'base-pagination-arrow-left',
           { 'base-pagination-arrow-inactive': active <= 1 }]"
         name="arrow-left" />
-    </element>
+    </component>
     <div
       v-if="total > maxNumbers"
       class="base-pagination-row">
-      <element
+      <component
         v-if="start !== 1"
         :is="numberElement"
         :to="getLinkPath(1)"
@@ -30,11 +30,11 @@
         @click.native="setActivePage(1)"
         @click="setActivePage(1)"
         @keypress.enter="setActivePage(1)">{{ 1 }}
-      </element>
+      </component>
       <span
         v-if="start > 2"
         class="base-pagination-more">&#8943;</span>
-      <element
+      <component
         v-for="n in subset"
         :key="n"
         :is="numberElement"
@@ -44,11 +44,11 @@
         :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
         @click.native="setActivePage(n)"
         @click="setActivePage(n)"
-        @keypress.enter="setActivePage(n)">{{ n }}</element>
+        @keypress.enter="setActivePage(n)">{{ n }}</component>
       <span
         v-if="(end) < (total - 1) && (end) !== (total - 1)"
         class="base-pagination-more">&#8943;</span>
-      <element
+      <component
         v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
         :is="numberElement"
         :to="getLinkPath(total)"
@@ -58,12 +58,12 @@
         @click.native="setActivePage(total)"
         @click="setActivePage(total)"
         @keypress.enter="setActivePage(total)">{{ total }}
-      </element>
+      </component>
     </div>
     <div
       v-else
       class="base-pagination-row">
-      <element
+      <component
         v-for="n in total"
         :is="numberElement"
         :key="n"
@@ -75,9 +75,9 @@
         @click="setActivePage(n)"
         @keypress.enter="setActivePage(n)">
         {{ n }}
-      </element>
+      </component>
     </div>
-    <element
+    <component
       :is="numberElement"
       :to="getLinkPath(active + 1 <= total ? active + 1 : total)"
       :aria-disabled="active >= total"
@@ -93,7 +93,7 @@
           'base-pagination-arrow-right',
           { 'base-pagination-arrow-inactive': active >= total }]"
         name="arrow-left" />
-    </element>
+    </component>
   </div>
 </template>
 
