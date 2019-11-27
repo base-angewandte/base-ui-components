@@ -303,7 +303,7 @@ export default {
         }
 
         &.base-pagination-arrow-inactive {
-          color: graytext;
+          color: $graytext-color;
           cursor: default;
         }
       }

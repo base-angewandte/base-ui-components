@@ -254,7 +254,7 @@ export default {
       cursor: default;
 
       &:hover {
-        color: graytext;
+        color: $graytext-color;
       }
     }
 

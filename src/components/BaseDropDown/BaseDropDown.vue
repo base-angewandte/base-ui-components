@@ -335,11 +335,11 @@ export default {
 
       &:disabled {
         cursor: default;
-        color: graytext;
-        fill: graytext;
+        color: $graytext-color;
+        fill: $graytext-color;
 
         .base-drop-down-icon {
-          fill: graytext;
+          fill: $graytext-color;
         }
       }
 

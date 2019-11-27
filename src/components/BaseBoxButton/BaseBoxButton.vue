@@ -280,10 +280,10 @@ export default {
 
     &.base-box-button-disabled {
       cursor: default;
-      color: graytext;
+      color: $graytext-color;
 
       &:hover {
-        color: graytext !important;
+        color: $graytext-color !important;
         box-shadow: none !important;
       }
     }

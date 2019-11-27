@@ -307,10 +307,10 @@ export default {
     &.base-box-button-disabled {
 
       .base-drop-box-inner {
-        border-color: graytext;
+        border-color: $graytext-color;
 
         &:hover {
-          border-color: graytext;
+          border-color: $graytext-color;
           cursor: default;
           box-shadow: none;
         }
