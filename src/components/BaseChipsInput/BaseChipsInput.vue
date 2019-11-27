@@ -356,7 +356,7 @@ export default {
   data() {
     return {
       // the current text input
-      input: null,
+      input: '',
       // list of selected entries
       selectedListInt: [],
       // create a original list from text or object with internal id
@@ -580,9 +580,9 @@ export default {
           [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
           idInt: this.getInternalId(this.input + this.selectedListInt.length),
         });
-        // reset input
         this.emitSelectedList();
       }
+      // reset input
       this.input = '';
       // reset the drop down list
       if (!this.allowDynamicDropDownEntries) {

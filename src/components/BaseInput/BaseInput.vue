@@ -36,7 +36,7 @@
           <input
             :id="label"
             :placeholder="placeholder"
-            v-model="inputInt"
+            :value="inputInt"
             :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
             type="text"
             autocomplete="off"
