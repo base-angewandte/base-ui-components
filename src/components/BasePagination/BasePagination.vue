@@ -137,13 +137,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    /**
-     * Parent list element
-    */
-    parentListElement: {
-      type: String,
-      default: '.menu-sidebar',
-    },
   },
   data() {
     return {
