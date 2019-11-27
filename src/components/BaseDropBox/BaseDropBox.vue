@@ -37,9 +37,6 @@
         v-else
         ref="fileform"/>
     </div>
-    <BaseBoxTooltip
-      v-if="showTooltip"
-      @clicked="onTooltip" />
   </base-box-button>
 </template>
 
