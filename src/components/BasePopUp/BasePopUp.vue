@@ -147,6 +147,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /*
+     * Selector to focus if popup is open
+     */
+    isOpenFocus: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -164,12 +171,16 @@ export default {
     },
   },
   updated() {
-    if (this.showInt && this.$el.querySelector('input') !== null) {
-      this.$el.querySelector('input').focus();
-    } else if (this.prevActiveElement) {
-      this.prevActiveElement.focus();
-      this.prevActiveElement = false;
-    }
+    setTimeout(() => {
+      if (this.showInt) {
+        if (this.isOpenFocus !== '' && this.$el.querySelector(this.isOpenFocus)) {
+          this.$el.querySelector(this.isOpenFocus).focus();
+        }
+      } else if (this.prevActiveElement) {
+        this.prevActiveElement.focus();
+        this.prevActiveElement = false;
+      }
+    }, 250);
   },
   mounted() {
     document.onkeyup = (e) => {
