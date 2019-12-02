@@ -247,9 +247,7 @@ export default {
        * @event clicked
        * @type {Event}
        */
-      if (!this.disabled) {
-        this.$emit('clicked', event);
-      }
+      this.$emit('clicked', event);
     },
     onTooltip(event) {
       /**
