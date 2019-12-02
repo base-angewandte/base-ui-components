@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
