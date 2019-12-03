@@ -8,7 +8,8 @@
       'base-drop-box',
       { 'base-box-button-disabled': disabled },
       { 'is-drag-over': isDragOver }]"
-    @clicked="onClicked">
+    @clicked="onClicked"
+    @onTooltip="onTooltip">
     <div
       class="base-drop-box-inner">
       <draggable
@@ -247,7 +248,9 @@ export default {
        * @event clicked
        * @type {Event}
        */
-      this.$emit('clicked', event);
+      if (!this.disabled) {
+        this.$emit('clicked', event);
+      }
     },
     onTooltip(event) {
       /**

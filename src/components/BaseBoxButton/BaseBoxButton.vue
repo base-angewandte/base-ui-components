@@ -39,7 +39,7 @@
 
       <BaseBoxTooltip
         v-if="showTooltip"
-        @clicked="clicked" />
+        @clicked="onTooltip" />
     </div>
     <div
       v-else
@@ -172,6 +172,14 @@ export default {
        * @type {Event}
        */
       this.$emit('clicked', event);
+    },
+    onTooltip(event) {
+      /**
+       * event emitted on tooltip click
+       *
+       * @type {Event}
+       */
+      this.$emit('onTooltip', event);
     },
     setShowSubtext() {
       const subtextRef = this.$refs.baseBoxSubtext;
