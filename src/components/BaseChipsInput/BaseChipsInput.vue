@@ -560,12 +560,7 @@ export default {
   },
   methods: {
     onEnter() {
-      if (this.input || this.dropDownListInt[this.selectedMenuEntryIndex]) {
-        this.addSelected();
-      } else {
-        this.blurInput();
-        this.showDropDown = false;
-      }
+      this.addSelected();
     },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
@@ -666,6 +661,9 @@ export default {
     onInputBlur() {
       this.insideInput = false;
       this.chipActiveForRemove = -1;
+      if (!this.insideDropDown && document.activeElement.tagName === 'BODY') {
+        this.input = '';
+      }
     },
     onInputFocus() {
       this.insideInput = true;
