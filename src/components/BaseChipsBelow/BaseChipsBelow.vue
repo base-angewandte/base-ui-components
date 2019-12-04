@@ -66,6 +66,7 @@
                 :always-linked="true"
                 :language="language"
                 :draggable="true"
+                :drop-down-no-options-info="dropDownNoOptionsInfo"
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"

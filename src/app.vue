@@ -149,21 +149,23 @@
       <base-chips-input
         :list="[
           { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '***' },
+            additional: 'part1', remark: '***', source: '1' },
           { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '**' },
+            additional: 'part1', remark: '**', source: '2' },
           { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '*' },
-          { title: 'in denen der Mensch' },
-          { title: 'ein erniedrigtes, ein geknechtetes' },
-          { title: 'ein verlassenes, ein verächtliches' },
-          { title: 'Wesen ist' }]"
+            additional: 'part1', remark: '*', source: '3' },
+          { title: 'in denen der Mensch', source: '4' },
+          { title: 'ein erniedrigtes, ein geknechtetes', source: '5' },
+          { title: 'ein verlassenes, ein verächtliches', source: '6' },
+          { title: 'Wesen ist', source: '7' }]"
         :placeholder="'Select your Marx'"
         :object-prop="'title'"
         :chips-editable="true"
+        :identifier="'source'"
         :label="'single choice with special drop down body'"
-        :allow-unknown-entries="false"
-        :allow-multiple-entries="false">
+        :allow-unknown-entries="true"
+        :add-new-chip-text="'asdfasdfasdfasdf'"
+        :allow-multiple-entries="true">
         <template
           slot="drop-down-entry"
           slot-scope="props">

@@ -79,7 +79,7 @@
     </BaseInput>
 
     <!-- DROP DOWN MENU -->
-    <div
+    <ul
       v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       ref="dropdownContainer"
@@ -87,28 +87,41 @@
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
       @mouseleave="checkLeave">
-      <div
-        v-for="(entry, index) in dropDownListInt"
-        ref="option"
-        :key="index"
-        :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
-        class="base-chips-drop-down-entry-wrapper"
-        @click="addSelected()"
-        @mouseover="selectedMenuEntryIndex = index"
-        @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
+      <template v-for="(entry, index) in dropDownListInt">
+        <li
+          v-if="allowUnknownEntries && !entry[identifier]"
+          ref="option"
+          :key="index"
+          :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
+          class="base-chips-drop-down-entry-wrapper"
+          @click="addSelected()"
+          @mouseover="selectedMenuEntryIndex = index">
+          {{ addNewChipText ? `${addNewChipText} ${getLangLabel(entry[objectProp], true)}`
+          : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
+          + ' ' + ' ...' }}
+        </li>
+        <li
+          v-else
+          ref="option"
+          :key="index"
+          :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
+          class="base-chips-drop-down-entry-wrapper"
+          @click="addSelected()"
+          @mouseover="selectedMenuEntryIndex = index">
 
-        <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
-        <slot
-          :item="entry"
-          name="drop-down-entry">
-          <!-- SLOT DEFAULT -->
-          <div
-            class="base-chips-drop-down-entry">
-            {{ getLangLabel(entry[objectProp], true) }}
-          </div>
-        </slot>
+          <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
+          <slot
+            :item="entry"
+            name="drop-down-entry">
+            <!-- SLOT DEFAULT -->
+            <div
+              class="base-chips-drop-down-entry">
+              {{ getLangLabel(entry[objectProp], true) }}
+            </div>
+          </slot>
 
-      </div>
+        </li>
+      </template>
       <!--
         @slot a slot to expand the drop down area (needed for "Expand Functionality"
       -->
@@ -124,7 +137,7 @@
           {{ dropDownNoOptionsInfo }}
         </slot>
       </div>
-    </div>
+    </ul>
     <!-- CHIPS BELOW -->
     <div
       v-if="$props.allowMultipleEntries && !$props.chipsInline && selectedListInt.length"
@@ -352,6 +365,14 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * set a chips text for adding a new chip
+     * (alternatively add a 'form.Add' value to your localization files)
+     */
+    addNewChipText: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -363,7 +384,7 @@ export default {
       dropDownListOrig: [],
       // list of selectable entries received from parent component
       dropDownList: [],
-      selectedMenuEntryIndex: this.getAllowUnknown(),
+      selectedMenuEntryIndex: 0,
       insideDropDown: false,
       insideInput: false,
       returnAsObject: false,
@@ -404,12 +425,23 @@ export default {
         }
         // filter already selected entries from the drop down
         if (this.identifier) {
-          this.dropDownList = list.filter(entry => !this.selectedListInt
+          list = list.filter(entry => !this.selectedListInt
             .map(selected => selected[this.identifier]).includes(entry[this.identifier]));
         } else {
-          this.dropDownList = list.filter(entry => !this.selectedListInt
+          list = list.filter(entry => !this.selectedListInt
             .map(selected => selected.idInt).includes(entry.idInt));
         }
+        // if unknown entries are allowed and a string is in input field and if the string
+        // was not added already add a option to add this string as chip
+        if (this.allowUnknownEntries && this.input
+          && !this.selectedList.some(entry => !entry[this.identifier]
+            && this.getLangLabel(entry[this.objectProp]) === this.input)) {
+          list.unshift({
+            [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
+            idInt: this.getInternalId(this.input + this.selectedListInt.length),
+          });
+        }
+        this.dropDownList = [].concat(list);
       },
     },
     showDropDown: {
@@ -485,7 +517,7 @@ export default {
       }
       if (val) {
         this.calcDropDownMinWidth();
-        this.selectedMenuEntryIndex = this.getAllowUnknown();
+        this.selectedMenuEntryIndex = 0;
         if (!this.chipsEditable) {
           this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
         }
@@ -574,13 +606,6 @@ export default {
          * @type {object}
          */
         this.emitSelectedList();
-        // if there is an input and unknown entries are allowed add an entry to selected list
-      } else if (this.input && this.allowUnknownEntries) {
-        this.selectedListInt.push({
-          [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
-          idInt: this.getInternalId(this.input + this.selectedListInt.length),
-        });
-        this.emitSelectedList();
       }
       // reset input
       this.input = '';
@@ -625,22 +650,18 @@ export default {
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
         this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
-          ? this.selectedMenuEntryIndex + 1 : this.getAllowUnknown();
+          ? this.selectedMenuEntryIndex + 1 : 0;
       } else if (event.key === 'ArrowUp') {
         if (this.selectedMenuEntryIndex > 0) {
           this.selectedMenuEntryIndex -= 1;
         } else {
-          this.selectedMenuEntryIndex = this.allowUnknownEntries
-            ? -1 : this.dropDownListInt.length - 1;
+          this.selectedMenuEntryIndex = this.dropDownListInt.length - 1;
         }
       }
       if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
         this.$refs.option[this.selectedMenuEntryIndex >= 0
           ? this.selectedMenuEntryIndex : 0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
-    },
-    getAllowUnknown() {
-      return this.allowUnknownEntries ? -1 : 0;
     },
     onInputBlur() {
       this.insideInput = false;
@@ -658,11 +679,11 @@ export default {
       if (oldEntry) {
         const index = this.dropDownListInt.map(e => e.idInt).indexOf(oldEntry.idInt);
         if (index < 0) {
-          return this.getAllowUnknown();
+          return 0;
         }
         return index;
       }
-      return this.getAllowUnknown();
+      return 0;
     },
     sort(list) {
       list.sort((a, b) => {
