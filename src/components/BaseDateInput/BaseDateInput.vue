@@ -68,11 +68,11 @@
             :type="minDateView"
             :format="dateFormat"
             :clearable="false"
-            :value-type="dateType"
             :lang="language"
             :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             v-model="dateFrom"
+            value-type="format"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
@@ -135,13 +135,13 @@
             ref="datepickerTo"
             :input-attr="{id: 'dateTo-' + id}"
             :type="minDateView"
-            :format="dateFormat"
             :clearable="false"
-            :value-type="dateType"
+            :format="dateType"
             :lang="language"
             :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             v-model="inputInt.date_to"
+            value-type="format"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeTo = true"
@@ -163,6 +163,7 @@
 import ClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 import { getWeekStartByLocale } from 'weekstart';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
@@ -653,9 +654,37 @@ export default {
 <style module lang="scss">
   @import "../../styles/variables";
 
+  // change font and font size
+  .mx-calendar, .mx-datepicker-main, .mx-calendar-header-label, .mx-btn,
+  .mx-table-date td, .mx-table-date th {
+    font: inherit !important;
+    color: $font-color !important;
+  }
+
+  /* dont need special color for today */
+  .mx-table-date td.today {
+    color: $font-color !important;
+  }
+
+  // calendar width
+  .mx-calendar {
+    width: 250px !important;
+  }
+
+  .mx-btn {
+    display: inline !important;
+  }
+
+  // hover color
   .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
     color: $app-color !important;
     background-color: transparent !important;
+  }
+
+  // selected color
+  .mx-calendar-content .cell.active {
+    background-color: $app-color !important;
+    color: white !important;
   }
 
   input.base-input-datepicker-input:focus {
@@ -668,30 +697,6 @@ export default {
     width: calc(100% - #{$spacing});
     height: 100%;
     background-color: transparent;
-  }
-
-  .mx-calendar, .mx-datepicker {
-    font: inherit !important;
-    color: $font-color !important;
-    width: 100% !important;
-  }
-
-  .mx-panel-date td, .mx-panel-date th {
-    font-size: inherit !important;
-  }
-
-  /* dont need special color for today */
-  .mx-panel-date td.today {
-    color: $font-color !important;
-  }
-
-  .mx-calendar-content {
-    width: 250px !important;
-  }
-
-  .mx-calendar-content .cell.actived {
-    background-color: $app-color !important;
-    color: white !important;
   }
 
   /* icon placing */
