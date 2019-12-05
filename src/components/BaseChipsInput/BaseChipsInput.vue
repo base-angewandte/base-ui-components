@@ -36,6 +36,7 @@
             :force-fallback="true"
             :animation="200"
             v-model="selectedListInt"
+            handle=".base-chip-text"
             @start="drag = true"
             @end="onDragEnd">
             <transition-group

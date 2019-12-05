@@ -235,9 +235,10 @@ export default {
     }
 
     .base-chip-icon {
-      margin: 0 $spacing-small 0 $spacing;
+      margin: 0 0 0 $spacing-small;
       cursor: pointer;
       display: flex;
+      padding: $spacing-small;
 
       .base-chip-icon-img {
         height: $icon-min;
