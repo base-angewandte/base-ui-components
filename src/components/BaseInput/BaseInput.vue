@@ -35,10 +35,11 @@
         ]">
           <input
             :id="label"
+            :name="label"
             :placeholder="placeholder"
             :value="inputInt"
+            :type="fieldType"
             :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
-            type="text"
             autocomplete="off"
             @blur="clickedOutsideInput"
             @click="active = true"
@@ -117,6 +118,14 @@ export default {
     isActive: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify if field should be of type text, number
+     */
+    fieldType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'number'].includes(val),
     },
   },
   data() {
