@@ -10,6 +10,9 @@
         type="application/x-mpegURL">
       Your browser does not support the video tag.
     </video> -->
+    <BaseInput
+      field-type="number"
+      label="number" />
     <BaseMediaPreview
       :show-preview="togglePreview"
       :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"

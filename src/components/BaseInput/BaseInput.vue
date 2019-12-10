@@ -143,6 +143,14 @@ export default {
         this.$listeners,
         // and add custom listeners
         {
+          // for number fields: prevent the event if type is number (or e) but input is not
+          keydown: (event) => {
+            if (this.fieldType === 'number' && (event.keyCode.range < 48 || event.keyCode > 57) && event.keyCode !== 69) {
+              event.preventDefault();
+            } else {
+              this.$emit('keydown', event);
+            }
+          },
           input: (event) => {
             /**
              * Event emitted on input, passing input string
@@ -194,6 +202,13 @@ export default {
        */
       this.$emit('click-input-field');
     },
+    checkInputForNumber(event) {
+      if (this.fieldType === 'number' && (event.keyCode.range < 48 || event.keyCode > 57)) {
+        event.preventDefault();
+      } else {
+        this.$emit('keydown', event);
+      }
+    },
   },
 };
 </script>
@@ -243,6 +258,10 @@ export default {
             padding: $spacing-small/2 0;
             min-height: $input-field-line-height;
             width: 100%;
+
+            &:invalid {
+              box-shadow: none;
+            }
           }
 
           .base-input-field-hidden {
