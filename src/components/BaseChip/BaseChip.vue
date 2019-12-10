@@ -1,19 +1,14 @@
 <template>
   <div
-    v-click-outside="() => entryEditable = false"
     :class="['base-chip',
              { 'base-chip-edited': entryEdited },
              { 'base-chip__active': chipActive }]">
     <div
-      :contenteditable="chipEditable && entryEditable"
       class="base-chip-text"
       @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
-      @mouseleave="hideBox"
-      @blur="editText"
-      @keydown.enter.prevent="entryEditable = false"
-      @keyup="entryEdited = true">
+      @mouseleave="hideBox">
       {{ entryInt }}
     </div>
     <div
@@ -32,7 +27,6 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 /**
@@ -40,9 +34,6 @@ import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
  */
 
 export default {
-  directives: {
-    ClickOutside,
-  },
   components: {
     BaseHoverBox,
   },
@@ -51,13 +42,6 @@ export default {
     event: 'value-changed',
   },
   props: {
-    /**
-     * defines if chips can be edited
-     */
-    chipEditable: {
-      type: Boolean,
-      default: false,
-    },
     /**
      * @model
      *
@@ -93,7 +77,6 @@ export default {
   data() {
     return {
       entryInt: {},
-      entryEditable: false,
       entryEdited: false,
       showInfoBox: false,
     };
@@ -118,19 +101,6 @@ export default {
     this.entryEdited = !this.isLinked;
   },
   methods: {
-    editText(evt) {
-      if (this.entryInt !== evt.target.innerText) {
-        this.entryInt = evt.target.innerText.replace('\n', '');
-
-        /**
-         * event emitted when the chip content was edited
-         *
-         * @event value-changed
-         * @type String
-         */
-        this.$emit('value-changed', this.entryInt);
-      }
-    },
     clickAction(e) {
       /**
        * event emitted when chip is clicked
@@ -144,9 +114,6 @@ export default {
         this.$emit('hoverbox-active', true);
         this.$refs.hoverBox.setPosition(e);
         this.showInfoBox = !this.showInfoBox;
-      }
-      if (this.chipEditable) {
-        this.entryEditable = true;
       }
     },
     moveBox(e) {

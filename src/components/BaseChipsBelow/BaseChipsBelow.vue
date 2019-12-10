@@ -45,7 +45,6 @@
                   ref="selectedChip"
                   :id="'chips-below' + index"
                   v-model="entry[objectProp]"
-                  :chip-editable="chipsEditable"
                   :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
                   :hover-box-content="hoverboxContent"
@@ -194,13 +193,6 @@ export default {
      * list passed in the beginning is used
      */
     allowDynamicDropDownEntries: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * define if chips should be editable
-     */
-    chipsEditable: {
       type: Boolean,
       default: false,
     },
@@ -430,6 +422,10 @@ export default {
           max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
           flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
         }
+      }
+
+      &.sortable-chosen {
+        border-bottom: 0;
       }
     }
 
