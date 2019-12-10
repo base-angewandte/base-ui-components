@@ -36,6 +36,7 @@
             :force-fallback="true"
             :animation="200"
             v-model="selectedListInt"
+            handle=".base-chip-text"
             @start="drag = true"
             @end="onDragEnd">
             <transition-group
@@ -47,7 +48,6 @@
                 :key="'chip-' + entry.idInt"
                 :id="entry[identifier] || entry.idInt"
                 :entry="getLangLabel(entry[objectProp], true)"
-                :chip-editable="chipsEditable"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
                 :chip-active="chipActiveForRemove === index"
@@ -151,7 +151,6 @@
           v-for="(entry, index) in selectedListInt"
           v-model="entry[objectProp]"
           :key="entry.idInt"
-          :chip-editable="chipsEditable"
           class="base-chips-input-chip"
           @remove-entry="removeEntry($event, index)"/>
       </slot>
@@ -275,13 +274,6 @@ export default {
     chipsInline: {
       type: Boolean,
       default: true,
-    },
-    /**
-     * define if chips should be editable
-     */
-    chipsEditable: {
-      type: Boolean,
-      default: false,
     },
     /**
      * this prop was added because there was some action needed to be done before entry was added
@@ -518,9 +510,7 @@ export default {
       if (val) {
         this.calcDropDownMinWidth();
         this.selectedMenuEntryIndex = 0;
-        if (!this.chipsEditable) {
-          this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
-        }
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
         /**
          * event triggered on show drop down
          *
@@ -569,12 +559,6 @@ export default {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
           if (this.addSelectedEntryDirectly) {
-            // check if an entry was already added once and modified after (means it would have
-            // the same idInt which should not be the case since it will lead to duplicate keys
-            if (this.chipsEditable
-              && this.selectedListInt.some(chip => chip.idInt === selected.idInt)) {
-              this.$set(selected, 'idInt', `${selected.idInt}_${Math.random()}_${this.selectedListInt.length}`);
-            }
             this.selectedListInt.push(selected);
           }
         } else {
@@ -592,7 +576,6 @@ export default {
         }
         /**
          * event triggered when an entry from the drop down was selected or enter was pressed
-         * or a chip was edited
          *
          * @event selected
          * @type {object}
