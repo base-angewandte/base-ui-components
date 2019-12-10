@@ -44,6 +44,7 @@
             :placeholder="placeholder.time"
             :lang="language"
             :clearable="false"
+            :append-to-body="false"
             v-model="inputInt.time_from"
             type="time"
             format="HH:mm"
@@ -52,7 +53,7 @@
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
             @blur="blurInput()">
-            <template slot="calendar-icon">
+            <template slot="icon-calendar">
               <svg-icon
                 name="clock"
                 class="base-input-date-icon"
@@ -71,13 +72,14 @@
             :lang="language"
             :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
+            :append-to-body="false"
             v-model="dateFrom"
             value-type="format"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
             @blur="blurInput()">
-            <template slot="calendar-icon">
+            <template slot="icon-calendar">
               <svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
@@ -113,6 +115,7 @@
             :placeholder="placeholder.time"
             :lang="language"
             :clearable="false"
+            :append-to-body="false"
             v-model="timeTo"
             type="time"
             format="HH:mm"
@@ -120,7 +123,7 @@
             input-class="base-date-input-datepicker-input"
             @focus="activeTo = true"
             @blur="blurInput()">
-            <template slot="calendar-icon">
+            <template slot="icon-calendar">
               <svg-icon
                 name="clock"
                 class="base-input-date-icon"
@@ -140,13 +143,14 @@
             :lang="language"
             :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
+            :append-to-body="false"
             v-model="inputInt.date_to"
             value-type="format"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeTo = true"
             @blur="blurInput()">
-            <template slot="calendar-icon">
+            <template slot="icon-calendar">
               <svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
@@ -631,7 +635,7 @@ export default {
 
   .base-input-date-icon {
     width: 24px;
-    max-height: 24px;
+    height: 24px;
     color: $font-color-second;
     cursor: pointer;
   }
@@ -654,11 +658,26 @@ export default {
 <style module lang="scss">
   @import "../../styles/variables";
 
+  .mx-datepicker {
+    width: 100%;
+  }
+
   // change font and font size
   .mx-calendar, .mx-datepicker-main, .mx-calendar-header-label, .mx-btn,
-  .mx-table-date td, .mx-table-date th {
+  .mx-table-date .cell:not(.not-current-month), .mx-table-date th {
     font: inherit !important;
     color: $font-color !important;
+
+    .not-current-month {
+      font: inherit !important;
+    }
+  }
+
+  // change font size for time
+  .mx-time-column .mx-time-item {
+    font-size: $font-size-regular !important;
+    height: $row-height-small !important;
+    line-height: $row-height-small;
   }
 
   /* dont need special color for today */
@@ -676,15 +695,22 @@ export default {
   }
 
   // hover color
-  .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover {
+  .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover,
+  .mx-time-column .mx-time-item:hover {
     color: $app-color !important;
     background-color: transparent !important;
   }
 
   // selected color
-  .mx-calendar-content .cell.active {
+  .mx-calendar-content .cell.active,
+  .mx-time-column .mx-time-item.active {
     background-color: $app-color !important;
     color: white !important;
+  }
+
+  // remove space in the end in time column
+  .mx-time-column .mx-time-list::after{
+    height: 0 !important;
   }
 
   input.base-input-datepicker-input:focus {
@@ -699,42 +725,8 @@ export default {
     background-color: transparent;
   }
 
-  /* icon placing */
-  .mx-input-append {
-    width: auto !important;
-    padding: 0 0 0 $spacing !important;
-    // needs to be margin on right side for input shadow
-    margin-right: $spacing;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 1);
-
-    &::before {
-      content: '';
-      height: 100%;
-      width: $spacing;
-      position: absolute;
-      top: 0;
-      left: -$spacing;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
-    }
-  }
-
   .mx-datepicker-popup {
     border: none !important;
     box-shadow: $preview-box-shadow !important;
-  }
-
-  .mx-time-list {
-    width: 50% !important;
-
-    &:last-of-type {
-      display: none !important;
-    }
-
-    .cell {
-      font-size: inherit !important;
-    }
   }
 </style>
