@@ -17,7 +17,7 @@
       @blur="onInputBlur"
       @keydown.up.down.prevent="triggerArrowKey"
       @keydown="checkKeyEvent"
-      @keypress.enter.prevent="onEnter()"
+      @keypress.enter.prevent="addSelected()"
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
@@ -559,9 +559,6 @@ export default {
     }
   },
   methods: {
-    onEnter() {
-      this.addSelected();
-    },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
       this.showDropDown = true;
@@ -601,23 +598,23 @@ export default {
          * @type {object}
          */
         this.emitSelectedList();
-      }
-      // reset input
-      this.input = '';
-      // reset the drop down list
-      if (!this.allowDynamicDropDownEntries) {
-        // filter the selected entry from the list of drop down menu entries
-        this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
-          ? this.dropDownListOrig
-            .filter((entry) => {
-              const origEntry = entry[this.objectProp] || entry;
-              return origEntry.toLowerCase()
-                !== selected[this.objectProp].toLowerCase();
-            })
-          : this.dropDownListOrig;
-      } else {
-        this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
-          .map(sel => sel.idInt).includes(entry.idInt));
+        // reset input
+        this.input = '';
+        // reset the drop down list
+        if (!this.allowDynamicDropDownEntries) {
+          // filter the selected entry from the list of drop down menu entries
+          this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
+            ? this.dropDownListOrig
+              .filter((entry) => {
+                const origEntry = entry[this.objectProp] || entry;
+                return origEntry.toLowerCase()
+                  !== selected[this.objectProp].toLowerCase();
+              })
+            : this.dropDownListOrig;
+        } else {
+          this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
+            .map(sel => sel.idInt).includes(entry.idInt));
+        }
       }
     },
     // remove an entry from the list of selected entries
