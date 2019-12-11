@@ -321,7 +321,6 @@ import BaseButton from './components/BaseButton/BaseButton';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseBox from './components/BaseBox/BaseBox';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
-import BaseMenuTableRow from './components/BaseMenuTableRow';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
@@ -357,7 +356,6 @@ export default {
     BaseButton,
     BaseDropBox,
     BaseBox,
-    BaseMenuTableRow,
   },
   data() {
     return {
