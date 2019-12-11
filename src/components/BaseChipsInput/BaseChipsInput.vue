@@ -845,7 +845,7 @@ export default {
     calcDropDownMinWidth() {
       const inputElement = this.$refs.baseInput;
       if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
-        this.dropDownMinWidth = `${this.$parent.$el.clientWidth}px`;
+        this.dropDownMinWidth = `${inputElement.$el.closest('.base-input').clientWidth}px`;
       }
     },
   },
