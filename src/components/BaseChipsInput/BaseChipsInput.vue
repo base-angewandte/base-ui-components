@@ -385,6 +385,7 @@ export default {
       drag: false,
       chipActiveForRemove: -1,
       dropDownMinWidth: '100%',
+      dropDownYPosition: 0,
     };
   },
   computed: {
@@ -510,6 +511,7 @@ export default {
       if (val) {
         this.calcDropDownMinWidth();
         this.selectedMenuEntryIndex = 0;
+        this.dropDownYPosition = 0;
         this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
         /**
          * event triggered on show drop down
@@ -624,19 +626,25 @@ export default {
     // allow for navigation with arrow keys
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
-        this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
-          ? this.selectedMenuEntryIndex + 1 : 0;
+        if (this.selectedMenuEntryIndex < this.dropDownListInt.length - 1) {
+          this.selectedMenuEntryIndex += 1;
+        }
+        if (this.$refs.option[this.selectedMenuEntryIndex].offsetTop
+          >= this.$refs.dropdownContainer.clientHeight) {
+          this.dropDownYPosition += this.$refs.option[this.selectedMenuEntryIndex].clientHeight;
+        }
       } else if (event.key === 'ArrowUp') {
         if (this.selectedMenuEntryIndex > 0) {
           this.selectedMenuEntryIndex -= 1;
+        }
+        if (this.$refs.option[this.selectedMenuEntryIndex].offsetTop
+          >= this.$refs.dropdownContainer.clientHeight) {
+          this.dropDownYPosition -= this.$refs.option[this.selectedMenuEntryIndex].clientHeight;
         } else {
-          this.selectedMenuEntryIndex = this.dropDownListInt.length - 1;
+          this.dropDownYPosition = 0;
         }
       }
-      if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
-        this.$refs.option[this.selectedMenuEntryIndex >= 0
-          ? this.selectedMenuEntryIndex : 0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      }
+      this.$refs.dropdownContainer.scrollTop = this.dropDownYPosition;
     },
     onInputBlur() {
       this.insideInput = false;
