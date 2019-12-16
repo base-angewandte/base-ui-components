@@ -16,7 +16,7 @@ module.exports = {
   require: [
     path.join(__dirname, './src/styles/app.scss')
   ],
-  ignore: ['**/components/BaseMenuTableRow.vue', '**/components/ChipsArea.vue'],
+  ignore: [],
   dangerouslyUpdateWebpackConfig(webpackConfig) {
     let filteredFirstHMR = false;
 
