@@ -6,13 +6,13 @@
       :class="['base-drop-down-label-wrapper',
                { 'hide': !getLangLabel(label, true) || !showLabel }]">
       <label
-        :for="getLangLabel(label)"
+        :for="getLangLabel(label) + '-' + id"
         class="base-drop-down-label">
         {{ getLangLabel(label, true) }}
       </label>
     </div>
     <button
-      :id="getLangLabel(label)"
+      :id="getLangLabel(label) + '-' + id"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
       :disabled="isDisabled"
@@ -182,6 +182,13 @@ export default {
       validator(val) {
         return ['left', 'right'].includes(val);
       },
+    },
+    /**
+     * set id if drop down with this label appears more than once
+     */
+    id: {
+      type: [String, Number],
+      default: '',
     },
   },
   data() {

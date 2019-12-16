@@ -56,7 +56,8 @@
               <BaseChipsInput
                 :show-label="false"
                 :label="label + '-roles'"
-                :key="'input' + entry.idInt"
+                :key="'input_' + entry.idInt"
+                :id="label + '_' + (entry.idInt || entry.identifier)"
                 v-model="entry.roles"
                 :list="roleOptions"
                 :show-input-border="false"
@@ -278,6 +279,9 @@ export default {
     chipsInputProps() {
       const newProps = Object.assign({}, this.$props);
       delete newProps.language;
+      // also remove role related props since unknown to chips input component
+      delete newProps.roleOptions;
+      delete newProps.rolesPlaceholder;
       return newProps;
     },
   },

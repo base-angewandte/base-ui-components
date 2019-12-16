@@ -5,7 +5,7 @@
     <div
       :class="['base-input-label-row', { 'hide': !showLabel }]">
       <label
-        :for="label"
+        :for="label + '_' + id"
         class="base-input-label"
         @click.prevent.stop="clickedOutsideInput">
         {{ label }}
@@ -34,7 +34,7 @@
             { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
         ]">
           <input
-            :id="label"
+            :id="label + '_' + id"
             :name="label"
             :placeholder="placeholder"
             :value="inputInt"
@@ -126,6 +126,13 @@ export default {
       type: String,
       default: 'text',
       validator: val => ['text', 'number'].includes(val),
+    },
+    /**
+     if field is occuring more then once - set an id
+     */
+    id: {
+      type: String,
+      default: '',
     },
   },
   data() {

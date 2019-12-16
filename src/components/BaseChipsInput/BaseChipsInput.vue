@@ -5,6 +5,7 @@
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
       ref="baseInput"
+      :id="id"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -306,7 +307,8 @@ export default {
       default: false,
     },
     /**
-     * for dynamic drop down entries a unique identifier (id, uuid) is needed
+     * for dynamic drop down entries a unique identifier (id, uuid)
+     * is needed - specify the attribute name here
      */
     identifier: {
       type: String,
@@ -362,6 +364,13 @@ export default {
      * (alternatively add a 'form.Add' value to your localization files)
      */
     addNewChipText: {
+      type: String,
+      default: '',
+    },
+    /**
+    if field is occuring more then once - set an id
+     */
+    id: {
       type: String,
       default: '',
     },
