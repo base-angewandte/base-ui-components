@@ -67,14 +67,14 @@
             ref="datepickerFrom"
             :input-attr="{id: label + '-' + id}"
             :type="minDateView"
-            :format="dateFormat"
+            :format="dateFormatDisplay"
             :clearable="false"
             :lang="language"
             :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
+            :value-type="datePickerValueFormat"
             v-model="dateFrom"
-            value-type="format"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
@@ -138,14 +138,14 @@
             ref="datepickerTo"
             :input-attr="{id: 'dateTo-' + id}"
             :type="minDateView"
+            :format="dateFormatDisplay"
             :clearable="false"
-            :format="dateType"
             :lang="language"
             :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
+            :value-type="datePickerValueFormat"
             v-model="inputInt.date_to"
-            value-type="format"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeTo = true"
@@ -314,40 +314,26 @@ export default {
       // handle input fields active
       activeFrom: false,
       activeTo: false,
-      // function to provide to datepicker for correct date/string conversion
-      dateType: {
-        value2date: (value) => {
-          if (value) {
-            // set date to zero hours in current time zone
-            return this.convertToDate(value);
-          }
-          return null;
-        },
-        date2value: (date) => {
-          if (!date) return '';
-          if (this.minDateView === 'year') {
-            return date.getFullYear().toString();
-          }
-          // to get date in format YYYY-MM-DD
-          return this.getDateString(date);
-        },
-      },
       // variable to store the date when switching from date to year in order to be
       // able to restore exact date when switching back
       tempDateStore: {},
     };
   },
   computed: {
-    // compute the date format needed for the date picker based on what
+    // this is the format we want to store computed based on what
     // was specified in format and what date toggle tabs (via dateFormatInt) might say
-    dateFormat() {
+    datePickerValueFormat() {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
         return 'YYYY';
       }
       if (this.format === 'month') {
-        return 'MM.YYYY';
+        return 'YYYY-MM';
       }
-      return 'DD.MM.YYYY';
+      return 'YYYY-MM-DD';
+    },
+    // compute the date format needed for the date picker (display!)
+    dateFormatDisplay() {
+      return this.datePickerValueFormat.split('-').reverse().join('.');
     },
     // if the format is settable this.format is date_year and can not be
     // used directly for the date picker component
