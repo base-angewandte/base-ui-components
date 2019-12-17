@@ -32,7 +32,7 @@
           :class="[
             'base-input-field-wrapper',
             { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
-        ]">
+          ]">
           <input
             :id="label + '_' + id"
             :name="label"

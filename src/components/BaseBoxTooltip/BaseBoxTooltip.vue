@@ -6,7 +6,7 @@
     <svg-icon
       name="information"
       alt="information"
-      class="base-box-tooltip-icon"/>
+      class="base-box-tooltip-icon" />
   </span>
 </template>
 

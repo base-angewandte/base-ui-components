@@ -14,12 +14,12 @@
     <div
       :class="['base-switch-container']">
       <span class="base-switch">
-        <svg-icon
+        <SvgIcon
           v-if="checkedInt"
-          name="check-mark"/>
-        <svg-icon
+          name="check-mark" />
+        <SvgIcon
           v-if="!checkedInt"
-          name="remove"/>
+          name="remove" />
       </span>
     </div>
 

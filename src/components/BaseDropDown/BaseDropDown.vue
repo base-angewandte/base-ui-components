@@ -36,8 +36,7 @@
       <slot name="header-right">
         <SvgIcon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          name="drop-down"
-        />
+          name="drop-down" />
         <!--
         <img
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"

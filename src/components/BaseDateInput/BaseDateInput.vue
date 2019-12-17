@@ -11,15 +11,14 @@
         v-if="showFormatOptions"
         class="base-date-input-format-tabs">
         <BaseSwitchButton
+          v-model="dateFormatInt"
           :options="[
             { label: dateFormatLabels.date, value: 'DD.MM.YYYY' },
             { label: dateFormatLabels.year, value: 'YYYY' },
           ]"
           :label="formatTabsLegend"
           :active-tab="dateFormatInt"
-          v-model="dateFormatInt"
-          class="base-multiline-text-input-tabs"
-        />
+          class="base-multiline-text-input-tabs" />
       </div>
     </div>
 
@@ -40,12 +39,12 @@
           <DatePicker
             v-if="type === 'timerange'"
             ref="timepickerFrom"
+            v-model="inputInt.time_from"
             :input-attr="{id: label + '-' + id}"
             :placeholder="placeholder.time"
             :lang="language"
             :clearable="false"
             :append-to-body="false"
-            v-model="inputInt.time_from"
             type="time"
             format="HH:mm"
             value-type="format"
@@ -57,7 +56,7 @@
               <svg-icon
                 name="clock"
                 class="base-input-date-icon"
-                @click="openDatePicker('timepickerFrom')"/>
+                @click="openDatePicker('timepickerFrom')" />
             </template>
           </DatePicker>
 
@@ -65,6 +64,7 @@
           <DatePicker
             v-else
             ref="datepickerFrom"
+            v-model="dateFrom"
             :input-attr="{id: label + '-' + id}"
             :type="minDateView"
             :format="dateFormatDisplay"
@@ -74,7 +74,6 @@
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
             :value-type="datePickerValueFormat"
-            v-model="dateFrom"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
@@ -83,7 +82,7 @@
               <svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
-                @click="openDatePicker('datepickerFrom')"/>
+                @click="openDatePicker('datepickerFrom')" />
             </template>
           </DatePicker>
         </div>
@@ -101,22 +100,21 @@
           {{ label }}
         </label>
         <div
-          v-click-outside="() => activeTo = false"
           v-if="type !== 'single'"
+          v-click-outside="() => activeTo = false"
           :class="['base-input-field-container',
                    { 'base-input-field-container-active': activeTo },
                    { 'base-input-field-container-multiple': type === 'datetime' }]">
-
           <!-- TIME TO -->
           <DatePicker
             v-if="type === 'datetime' || type === 'timerange'"
             ref="timepickerTo"
+            v-model="timeTo"
             :input-attr="{id: 'timeTo-' + id}"
             :placeholder="placeholder.time"
             :lang="language"
             :clearable="false"
             :append-to-body="false"
-            v-model="timeTo"
             type="time"
             format="HH:mm"
             value-type="format"
@@ -127,7 +125,7 @@
               <svg-icon
                 name="clock"
                 class="base-input-date-icon"
-                @click="openDatePicker('timepickerTo')"/>
+                @click="openDatePicker('timepickerTo')" />
             </template>
           </DatePicker>
 
@@ -136,6 +134,7 @@
             v-else
             key="dateTo"
             ref="datepickerTo"
+            v-model="inputInt.date_to"
             :input-attr="{id: 'dateTo-' + id}"
             :type="minDateView"
             :format="dateFormatDisplay"
@@ -145,7 +144,6 @@
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
             :value-type="datePickerValueFormat"
-            v-model="inputInt.date_to"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeTo = true"
@@ -154,7 +152,7 @@
               <svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
-                @click="openDatePicker('datepickerTo')"/>
+                @click="openDatePicker('datepickerTo')" />
             </template>
           </DatePicker>
         </div>

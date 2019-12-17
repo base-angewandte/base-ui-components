@@ -17,12 +17,10 @@
       :show-preview="togglePreview"
       :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"
       :download-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.pdf'"
-      @hide-preview="togglePreview = false"
-    />
+      @hide-preview="togglePreview = false" />
     <BaseButton
       text="Show Preview"
-      @clicked="togglePreview = !togglePreview"
-    />
+      @clicked="togglePreview = !togglePreview" />
 
     <!-- PAGINATION TEST -->
     <BasePagination :total="100" />
@@ -32,17 +30,16 @@
       <!-- UPLOAD BAR TEST -->
       <base-upload-bar
         :progress="progress"
-        :filename="'testfile.jpg'"/>
+        :filename="'testfile.jpg'" />
       <base-button
         :active="false"
         :text="'Change Progress'"
         icon-size="large"
         button-style="row"
-        @clicked="changeProgress"/>
+        @clicked="changeProgress" />
     </div>
 
     <div class="canvas flex">
-
       <!-- BASE IMAGE BOX TEST -->
       <base-image-box
         :selectable="selectable"
@@ -50,25 +47,25 @@
         :image-url="require('./static/images/icons.png')"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
-        class="image-box"/>
+        class="image-box" />
       <base-image-box
         :selectable="selectable"
         :image-url="require('./static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
-        class="image-box"/>
+        class="image-box" />
       <base-image-box
         :selectable="selectable"
         :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
-        class="image-box"/>
+        class="image-box" />
       <base-button
         :active="false"
         :text="'Activate Select'"
         icon-size="large"
         button-style="row"
-        @clicked="enableSelect()"/>
+        @clicked="enableSelect()" />
     </div>
 
     <div class="canvas">
@@ -97,41 +94,41 @@
                        {
                          value: 'Zeitungsartikel',
                          label: 'Zeitungsartikel',
-          }]" />
+                       }]" />
         </div>
       </base-multiline-text-input>
       <base-multiline-text-input
         :input="multilineTest"
         :label="'Label'"
         :placeholder="'Enter Text'"
-        @text-input="handleMultilineInput"/>
+        @text-input="handleMultilineInput" />
     </div>
 
     <!-- SEARCH TEST -->
     <div class="canvas">
       <base-search
         :show-image="true"
-        @input="triggerInput"/>
+        @input="triggerInput" />
     </div>
 
     <!-- FORM FIELD TESTING -->
     <div class="form-field">
       <base-date-input
-        :type="'datetime'"
         v-model="inputDateTime"
-        :label="'unknown'"/>
+        :type="'datetime'"
+        :label="'unknown'" />
       <base-date-input
         :label="'unknown'"
         :input="inputDate"
         type="daterange"
-        format="date_year"/>
+        format="date_year" />
       <base-autocomplete-input
+        v-model="autocompleteInput"
         :list="dropDownInput"
         :placeholder="'Fetching from SkosMos'"
         :object-prop="'prefLabel'"
-        v-model="autocompleteInput"
         label="text input with dynamic autocomplete"
-        @selected="fetchOther($event, 'this is my type')"/>
+        @selected="fetchOther($event, 'this is my type')" />
       <base-chips-input
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
@@ -144,7 +141,7 @@
         :identifier="'id'"
         draggable
         label="A label"
-        @fetchDropDownEntries="fetch"/>
+        @fetchDropDownEntries="fetch" />
       <base-button
         text="change input"
         icon="remove"
@@ -178,8 +175,8 @@
         </template>
       </base-chips-input>
       <base-chips-below
-        :chips-inline="false"
         v-model="selectedList"
+        :chips-inline="false"
         :chips-editable="true"
         :allow-unknown-entries="true"
         :list="[{
@@ -193,20 +190,20 @@
                 {
                   id: '',
                   name: 'Georg Werth',
-        }]"
+                }]"
         :role-options="['Farmer', 'Magician', 'Priest']"
         :hoverbox-content="hoverboxContent"
         identifier="id"
         object-prop="name"
         label="chips-below-test"
-        @hoverbox-active="setHoverBox"/>
+        @hoverbox-active="setHoverBox" />
     </div>
 
     <!-- MENU LIST TEST -->
     <base-menu-list
       :selected="showCheckbox"
       :list="list"
-      @clicked="activateMenuEntry"/>
+      @clicked="activateMenuEntry" />
     <base-menu-entry
       :entry-id="'asingleentry'"
       :icon="'sheet-empty'"
@@ -217,11 +214,11 @@
       title="Poesie oh Poesisssssssssssssssssssssssssssssssssse"
       subtext="Aus einer anderen Weltsssssssssssssssssssssssssss"
       description="Gemälde"
-      @clicked="menuEntryActive = true"/>
+      @clicked="menuEntryActive = true" />
     <base-button
       text="toggle checkboxes"
       button-style="row"
-      @clicked="showCheckbox = !showCheckbox"/>
+      @clicked="showCheckbox = !showCheckbox" />
 
     <!-- DROP BOX TEST -->
     <div class="flex row">
@@ -235,15 +232,17 @@
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
         @dropped-element="dropped($event)"
-        @clicked="boxClicked"/>
+        @clicked="boxClicked" />
       <base-drop-box
-        drop-type="files"/>
+        drop-type="files" />
     </div>
     <div>
       <ul>
         <li
           v-for="item in elements"
-          :key="item.id">{{ item.title }}</li>
+          :key="item.id">
+          {{ item.title }}
+        </li>
       </ul>
     </div>
 
@@ -251,7 +250,7 @@
     <base-button
       draggable="true"
       icon="options-menu"
-      @clicked="showPopUp = true"/>
+      @clicked="showPopUp = true" />
     <base-pop-up
       :show="showPopUp"
       title="Bild entfernen"
@@ -266,7 +265,7 @@
         <base-input
           :label="'Test1'"
           type="text"
-          placeholder="Enter your Name"/>
+          placeholder="Enter your Name" />
         <base-input
           :label="'Test'"
           type="text"
@@ -282,7 +281,7 @@
             { label: 'Publikation', value: 'publication' },
             { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
           ]"
-          :header-background-color="'rgb(240, 240, 240)'"/>
+          :header-background-color="'rgb(240, 240, 240)'" />
         <base-drop-down
           :label="'select type'"
           :option-selected="{ label: 'Alle Typen', value: '' }"
@@ -292,21 +291,20 @@
             { label: 'Publikation', value: 'publication' },
             { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
           ]"
-          :header-background-color="'rgb(240, 240, 240)'"/>
+          :header-background-color="'rgb(240, 240, 240)'" />
       </div>
     </base-pop-up>
 
     <!-- DROP DOWN TEST -->
     <base-drop-down
+      v-model="selectedVal"
       :label="'select type'"
       :show-label="true"
-      v-model="selectedVal"
       :options="selectionList" />
     <base-drop-down
       :options="selectionList" />
     <div class="spacer" />
   </div>
-
 </template>
 
 <script>
@@ -316,10 +314,8 @@ import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseDropDown from './components/BaseDropDown/BaseDropDown';
 import BaseInput from './components/BaseInput/BaseInput';
-import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
 import BaseButton from './components/BaseButton/BaseButton';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
-import BaseBox from './components/BaseBox/BaseBox';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
@@ -328,7 +324,6 @@ import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
@@ -338,7 +333,6 @@ export default {
   components: {
     BaseMediaPreview,
     BasePagination,
-    BaseHoverBox,
     BaseChipsBelow,
     BaseDateInput,
     BaseAutocompleteInput,
@@ -352,10 +346,8 @@ export default {
     BaseDropDown,
     BasePopUp,
     BaseInput,
-    BaseBoxButton,
     BaseButton,
     BaseDropBox,
-    BaseBox,
   },
   data() {
     return {

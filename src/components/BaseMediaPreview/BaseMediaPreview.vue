@@ -15,8 +15,8 @@
         ref="mediaStage"
         class="base-media-preview-image-stage">
         <img
-          v-vue-click-outside.prevent="clickOutside"
           v-if="displayImage && fileType === 'image'"
+          v-vue-click-outside.prevent="clickOutside"
           :srcset="imageSourceSet"
           :src="sourceUrl"
           :style="displaySize"
@@ -51,7 +51,9 @@
         <div
           v-else
           class="base-media-preview-not-supported base-media-preview-error">
-          <p class="base-media-preview-not-supported-file-name">{{ fileName }}</p>
+          <p class="base-media-preview-not-supported-file-name">
+            {{ fileName }}
+          </p>
           <div class="base-media-preview-not-supported-buttons">
             <BaseButton
               v-if="allowDownload"
@@ -60,8 +62,7 @@
               icon-position="right"
               icon-size="large"
               class="base-media-preview-not-supported-button"
-              @clicked="download"
-            />
+              @clicked="download" />
             <BaseButton
               v-if="!isMobile && fileEnding === 'pdf'"
               :text="infoTexts.view"
@@ -69,8 +70,7 @@
               icon-position="right"
               icon-size="large"
               class="base-media-preview-not-supported-button"
-              @clicked="openPdf()"
-            />
+              @clicked="openPdf()" />
           </div>
           <p
             v-for="textline in additionalInfo"
@@ -83,7 +83,9 @@
           v-if="fileEnding !== 'pdf' && !formatNotSupported"
           class="base-media-preview-info">
           <div class="base-media-preview__info-text-wrapper">
-            <p class="base-media-preview-info-text">{{ fileName }}</p>
+            <p class="base-media-preview-info-text">
+              {{ fileName }}
+            </p>
             <template v-if="additionalInfo.length">
               <p
                 v-for="textline in additionalInfo"
@@ -99,8 +101,7 @@
             icon="download"
             icon-position="right"
             icon-size="large"
-            @clicked="download"
-          />
+            @clicked="download" />
         </div>
       </div>
     </transition>

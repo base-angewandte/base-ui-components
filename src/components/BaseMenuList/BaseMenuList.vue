@@ -13,7 +13,6 @@
     @end="dragEnd">
     <li
       v-for="(item, index) in list"
-      v-if="item"
       :key="item.id || item.title"
       class="base-menu-list__list-entry">
       <base-menu-entry
@@ -28,7 +27,7 @@
         :is-selectable="true"
         :select-active="selectActive"
         @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)"/>
+        @selected="selectItem(index, $event)" />
     </li>
   </draggable>
 </template>

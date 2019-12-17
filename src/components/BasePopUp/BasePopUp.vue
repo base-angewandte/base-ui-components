@@ -10,7 +10,6 @@
       aria-labelledby="popup-title"
       aria-describedby="descriptionElementId"
       class="popup-box">
-
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
@@ -26,7 +25,7 @@
           @click="close">
           <svg-icon
             class="popup-remove"
-            name="remove"/>
+            name="remove" />
         </button>
       </div>
 
@@ -65,10 +64,8 @@
           </slot>
         </div>
       </div>
-
     </div>
   </div>
-
 </template>
 
 <script>

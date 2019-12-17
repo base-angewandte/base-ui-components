@@ -22,7 +22,7 @@
       v-if="inputInt"
       name="remove"
       class="base-search__remove-icon"
-      @click="clearInput"/>
+      @click="clearInput" />
   </div>
 </template>
 
