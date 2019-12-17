@@ -565,6 +565,8 @@ export default {
       this.showDropDown = true;
       // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
+      // set focus back to input-field
+      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus();
       // add selected to the selected list
       if (selected) {
         if (this.allowMultipleEntries) {
