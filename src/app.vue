@@ -44,19 +44,19 @@
       <base-image-box
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('./static/images/icons.png')"
+        :image-url="'assets/images/img1.png'"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('./static/images/icons.png')"
+        :image-url="'./static/images/icons.png'"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('./static/images/roboto_detail_fullscreen_12pt.png')"
+        :image-url="'./static/images/roboto_detail_fullscreen_12pt.png'"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
