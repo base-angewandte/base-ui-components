@@ -1,12 +1,12 @@
 Toggle Button
 
 ```vue
-
-<BaseToggle
-  name="BaseToggle"
-  label="Zeige Einträge anderen Benutzer*innen auf meinem Showroom-Profil an."
-/>
-
+<template>
+    <BaseToggle
+      name="BaseToggle"
+      label="Zeige Einträge anderen Benutzer*innen auf meinem Showroom-Profil an."
+    />
+</template>
 <script>
 export default {};
 </script>

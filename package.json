@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
@@ -41,6 +41,8 @@
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.6",
     "@babel/register": "^7.7.4",
+    "@babel/traverse": "^7.7.4",
+    "@babel/types": "^7.7.4",
     "autoprefixer": "^9.7.3",
     "axios": "^0.19.0",
     "babel-eslint": "^10.0.3",
@@ -75,7 +77,7 @@
     "url-loader": "^1.1.2",
     "vue-loader": "^15.8.3",
     "vue-style-loader": "^4.1.2",
-    "vue-styleguidist": "^3.26.2",
+    "vue-styleguidist": "^4.2.1",
     "vue-svgicon": "^3.2.1",
     "vue-template-compiler": "^2.6.11",
     "vue2-datepicker": "^3.2.2",
