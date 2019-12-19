@@ -83,8 +83,7 @@
       <template
         v-slot:no-options>
         <slot
-          name="no-options">
-        </slot>
+          name="no-options" />
       </template>
     </BaseChipsInput>
   </div>
