@@ -21,7 +21,7 @@
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
-        slot="label-addition">
+        v-slot:label-addition>
         <div
           class="base-chips-input-sort"
           @click="sort(selectedListInt)">
@@ -30,7 +30,7 @@
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
-        slot="input-field-addition-before">
+        v-slot:input-field-addition-before>
         <div class="base-chips-input-chips">
           <draggable
             v-model="selectedListInt"
@@ -60,7 +60,7 @@
           </draggable>
         </div>
       </template>
-      <template slot="input-field-addition-after">
+      <template v-slot:input-field-addition-after>
         <div
           v-if="isLoading"
           class="base-chips-input-loader">

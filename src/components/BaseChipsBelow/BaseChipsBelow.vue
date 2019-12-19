@@ -12,8 +12,7 @@
       @selected="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
-        slot="chips-area"
-        slot-scope="props">
+        v-slot:chips-area="props">
         <draggable
           v-model="props.list"
           :animation="200"
@@ -76,17 +75,16 @@
         </draggable>
       </template>
       <template
-        slot="drop-down-entry"
-        slot-scope="props">
+        v-slot:drop-down-entry="props">
         <slot
           :item="props.item"
           name="below-drop-down-entry" />
       </template>
       <template
-        slot="no-options"
-        slot-scope="props">
+        v-slot:no-options>
         <slot
-          name="no-options" />
+          name="no-options">
+        </slot>
       </template>
     </BaseChipsInput>
   </div>

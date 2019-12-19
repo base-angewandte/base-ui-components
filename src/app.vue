@@ -167,8 +167,7 @@
         :add-new-chip-text="'asdfasdfasdfasdf'"
         :allow-multiple-entries="true">
         <template
-          slot="drop-down-entry"
-          slot-scope="props">
+          v-slot:drop-down-entry="props">
           <span>{{ props.item.title }}</span>
           <span>{{ props.item.additional }}</span>
           <span>{{ props.item.remark }}</span>
@@ -178,7 +177,7 @@
         v-model="selectedList"
         :chips-inline="false"
         :chips-editable="true"
-        :allow-unknown-entries="true"
+        :allow-unknown-entries="false"
         :list="[{
                   id: '1',
                   name: 'Herbert Marcuse'

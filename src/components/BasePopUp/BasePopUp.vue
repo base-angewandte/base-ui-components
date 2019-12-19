@@ -55,7 +55,7 @@
               @clicked="buttonRight">
               <template
                 v-if="isLoading"
-                slot="right-of-text">
+                v-slot:right-of-text>
                 <span class="base-popup-button-loader">
                   <BaseLoader />
                 </span>

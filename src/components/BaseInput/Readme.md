@@ -35,10 +35,10 @@ A example with label and slot demonstrations
   <BaseInput
     label="This label says Specify any text below"
     placeholder="A custom placeholder">
-    <template slot="label-addition">
+    <template v-slot:label-addition>
       <div>Add elements here</div>
     </template>
-    <template slot="input-field-addition-before">
+    <template v-slot:input-field-addition-before>
       <span class="input-field-addition-before">Or here</span>
     </template>
   </BaseInput>

@@ -18,8 +18,7 @@
           :active-tab="activeTab"
           class="base-multiline-text-input-tabs">
           <template
-            slot="right-of-text"
-            slot-scope="tab">
+            v-slot:right-of-text="tab">
             <SvgIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input-text-icon"

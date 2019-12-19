@@ -10,7 +10,7 @@
       @keydown.up.down.prevent="triggerArrowKey"
       @keypress.enter.prevent="selectEntry()"
       @input="$emit('autocomplete', inputTextInt)">
-      <template slot="input-field-addition-after">
+      <template v-slot:input-field-addition-after>
         <div
           v-if="isLoading"
           class="base-input-loader">

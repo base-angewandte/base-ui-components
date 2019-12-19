@@ -52,7 +52,7 @@
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
             @blur="blurInput()">
-            <template slot="icon-calendar">
+            <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
                 class="base-input-date-icon"
@@ -78,7 +78,7 @@
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
             @blur="blurInput()">
-            <template slot="icon-calendar">
+            <template v-slot:icon-calendar>
               <svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
@@ -121,7 +121,7 @@
             input-class="base-date-input-datepicker-input"
             @focus="activeTo = true"
             @blur="blurInput()">
-            <template slot="icon-calendar">
+            <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
                 class="base-input-date-icon"
@@ -148,7 +148,7 @@
             class="base-date-input-datepicker"
             @focus="activeTo = true"
             @blur="blurInput()">
-            <template slot="icon-calendar">
+            <template v-slot:icon-calendar>
               <svg-icon
                 name="calendar-many"
                 class="base-input-date-icon"
