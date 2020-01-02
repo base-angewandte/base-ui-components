@@ -36,7 +36,7 @@ export default {
 
   .base-box-tooltip {
     position: relative;
-    z-index: 1200;
+    z-index: 1020;
     margin-left: auto;
     color: $font-color;
     transition: color 250ms ease-in-out;

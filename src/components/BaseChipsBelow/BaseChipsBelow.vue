@@ -45,7 +45,6 @@
                   ref="selectedChip"
                   :id="'chips-below' + index"
                   v-model="entry[objectProp]"
-                  :chip-editable="chipsEditable"
                   :key="'chip' + entry.idInt"
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
                   :hover-box-content="hoverboxContent"
@@ -57,7 +56,8 @@
               <BaseChipsInput
                 :show-label="false"
                 :label="label + '-roles'"
-                :key="'input' + entry.idInt"
+                :key="'input_' + entry.idInt"
+                :id="label + '_' + (entry.idInt || entry.identifier)"
                 v-model="entry.roles"
                 :list="roleOptions"
                 :show-input-border="false"
@@ -66,6 +66,7 @@
                 :always-linked="true"
                 :language="language"
                 :draggable="true"
+                :drop-down-no-options-info="dropDownNoOptionsInfo"
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
@@ -197,13 +198,6 @@ export default {
       default: false,
     },
     /**
-     * define if chips should be editable
-     */
-    chipsEditable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * this prop was added because there was some action needed to be done before entry was added
      * so this is possible if entry is not added to selectedList directly but only in parent
      * component
@@ -285,6 +279,9 @@ export default {
     chipsInputProps() {
       const newProps = Object.assign({}, this.$props);
       delete newProps.language;
+      // also remove role related props since unknown to chips input component
+      delete newProps.roleOptions;
+      delete newProps.rolesPlaceholder;
       return newProps;
     },
   },
@@ -429,6 +426,10 @@ export default {
           max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
           flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
         }
+      }
+
+      &.sortable-chosen {
+        border-bottom: 0;
       }
     }
 
