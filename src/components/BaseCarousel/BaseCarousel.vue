@@ -43,6 +43,7 @@
 <script>
 import '@/../node_modules/swiper/css/swiper.css';
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
+import lozad from 'lozad';
 import BaseCarouselList from './BaseCarouselList';
 import BaseCarouselItem from './BaseCarouselItem';
 
@@ -65,10 +66,10 @@ export default {
           additional: '07.05.2020 - 21.05.2020',
           media: [
             {
-              '455w': '/path/preview-455.jpg',
+              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
             },
             {
-              '640w': '/path/preview-640.jpg',
+              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
             },
           ],
         },
@@ -80,10 +81,10 @@ export default {
           additional: '07.05.2020 - 21.05.2020',
           media: [
             {
-              '455w': '/path/preview-455.jpg',
+              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/HTZ44aDyhQT6T4FPrEfEyJ/preview-640.jpg',
             },
             {
-              '640w': '/path/preview-640.jpg',
+              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/HTZ44aDyhQT6T4FPrEfEyJ/preview-640.jpg',
             },
           ],
         },
@@ -95,10 +96,10 @@ export default {
           additional: '07.05.2020 - 21.05.2020',
           media: [
             {
-              '455w': '/path/preview-455.jpg',
+              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/WMDAxwgKRU94iHg4dfubFo/preview-640.jpg',
             },
             {
-              '640w': '/path/preview-640.jpg',
+              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/WMDAxwgKRU94iHg4dfubFo/preview-640.jpg',
             },
           ],
         },
@@ -110,10 +111,10 @@ export default {
           additional: '07.05.2020 - 21.05.2020',
           media: [
             {
-              '455w': '/path/preview-455.jpg',
+              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
             },
             {
-              '640w': '/path/preview-640.jpg',
+              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
             },
           ],
         },
@@ -139,6 +140,16 @@ export default {
       };
     },
   },
+  mounted() {
+    // We initialize Lozad.js on the root
+    // element of our component.
+    const observer = lozad('.lazy', {
+      loaded: (el) => {
+        el.classList.remove('lazy');
+      },
+    });
+    observer.observe();
+  },
 };
 </script>
 
@@ -146,7 +157,8 @@ export default {
   @import "../../styles/variables";
 
   .base-carousel {
-    height: 300px;
+    margin-top: 1000px;
+    // height: 300px;
     border: 1px dotted $app-color;
 
     @media screen and (max-width: 1024px) {
@@ -160,5 +172,11 @@ export default {
     @media screen and (max-width: 1024px) {
       display: block;
     }
+  }
+
+  .swiper-pagination {
+    position: inherit;
+    bottom: inherit;
+    left: inherit;
   }
 </style>
