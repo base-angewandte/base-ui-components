@@ -165,7 +165,13 @@ import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 import { getWeekStartByLocale } from 'weekstart';
+
+// languages needed for datepicker locale
+import de from 'vue2-datepicker/locale/de';
+import en from 'vue2-datepicker/locale/en';
+
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
+
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -435,10 +441,11 @@ export default {
   },
   async mounted() {
     // if the language is not english - import from correct locale from datepicker
-    if (this.language !== 'en') {
-      // eslint-disable-next-line global-require
-      const lang = await import(`vue2-datepicker/locale/${this.language}`);
-      this.langObject = lang.default;
+    // TODO: this is not sufficient for other languages!!
+    if (this.language !== 'en' && de) {
+      this.langObject = de;
+    } else {
+      this.langObject = en;
     }
   },
   methods: {
