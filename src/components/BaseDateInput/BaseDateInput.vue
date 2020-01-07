@@ -42,9 +42,9 @@
             v-model="inputInt.time_from"
             :input-attr="{id: label + '-' + id}"
             :placeholder="placeholder.time"
-            :lang="language"
             :clearable="false"
             :append-to-body="false"
+            :lang="langObject"
             type="time"
             format="HH:mm"
             value-type="format"
@@ -69,11 +69,10 @@
             :type="minDateView"
             :format="dateFormatDisplay"
             :clearable="false"
-            :lang="language"
-            :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
             :value-type="datePickerValueFormat"
+            :lang="langObject"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeFrom = true"
@@ -112,9 +111,9 @@
             v-model="timeTo"
             :input-attr="{id: 'timeTo-' + id}"
             :placeholder="placeholder.time"
-            :lang="language"
             :clearable="false"
             :append-to-body="false"
+            :lang="langObject"
             type="time"
             format="HH:mm"
             value-type="format"
@@ -139,11 +138,10 @@
             :type="minDateView"
             :format="dateFormatDisplay"
             :clearable="false"
-            :lang="language"
-            :first-day-of-week="firstDayOfWeek"
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
             :value-type="datePickerValueFormat"
+            :lang="langObject"
             input-class="base-date-input-datepicker-input"
             class="base-date-input-datepicker"
             @focus="activeTo = true"
@@ -315,6 +313,7 @@ export default {
       // variable to store the date when switching from date to year in order to be
       // able to restore exact date when switching back
       tempDateStore: {},
+      langObject: {},
     };
   },
   computed: {
@@ -433,6 +432,14 @@ export default {
       },
       deep: true,
     },
+  },
+  async mounted() {
+    // if the language is not english - import from correct locale from datepicker
+    if (this.language !== 'en') {
+      // eslint-disable-next-line global-require
+      const lang = await import(`vue2-datepicker/locale/${this.language}`);
+      this.langObject = lang.default;
+    }
   },
   methods: {
     /**
