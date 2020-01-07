@@ -1,26 +1,26 @@
 <template>
   <div class="base-pagination">
-    <element
+    <component
       :is="numberElement"
       :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
       :aria-disabled="active <= 1"
       :tabindex="active <= 1 ? -1 : 0"
+      :class="[
+        'base-pagination__arrow-wrapper',
+        { 'base-pagination-arrow-inactive': active <= 1 }
+      ]"
       aria-label="Previous page"
-      class="base-pagination__arrow-wrapper"
-      @click.native="setActivePage(active - 1 > 0 ? active - 1 : 1)"
-      @click="setActivePage(active - 1 > 0 ? active - 1 : 1)"
-      @keypress.enter="setActivePage(active - 1 > 0 ? active - 1 : 1)">
+      @click.native="active - 1 > 0 ? setActivePage(active - 1) : false"
+      @click="active - 1 > 0 ? setActivePage(active - 1) : false"
+      @keypress.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
       <SvgIcon
-        :class="[
-          'base-pagination-arrow',
-          'base-pagination-arrow-left',
-          { 'base-pagination-arrow-inactive': active <= 1 }]"
+        class="base-pagination-arrow base-pagination-arrow-left"
         name="arrow-left" />
-    </element>
+    </component>
     <div
       v-if="total > maxNumbers"
       class="base-pagination-row">
-      <element
+      <component
         v-if="start !== 1"
         :is="numberElement"
         :to="getLinkPath(1)"
@@ -30,11 +30,11 @@
         @click.native="setActivePage(1)"
         @click="setActivePage(1)"
         @keypress.enter="setActivePage(1)">{{ 1 }}
-      </element>
+      </component>
       <span
         v-if="start > 2"
         class="base-pagination-more">&#8943;</span>
-      <element
+      <component
         v-for="n in subset"
         :key="n"
         :is="numberElement"
@@ -44,11 +44,11 @@
         :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
         @click.native="setActivePage(n)"
         @click="setActivePage(n)"
-        @keypress.enter="setActivePage(n)">{{ n }}</element>
+        @keypress.enter="setActivePage(n)">{{ n }}</component>
       <span
         v-if="(end) < (total - 1) && (end) !== (total - 1)"
         class="base-pagination-more">&#8943;</span>
-      <element
+      <component
         v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
         :is="numberElement"
         :to="getLinkPath(total)"
@@ -58,12 +58,12 @@
         @click.native="setActivePage(total)"
         @click="setActivePage(total)"
         @keypress.enter="setActivePage(total)">{{ total }}
-      </element>
+      </component>
     </div>
     <div
       v-else
       class="base-pagination-row">
-      <element
+      <component
         v-for="n in total"
         :is="numberElement"
         :key="n"
@@ -75,25 +75,25 @@
         @click="setActivePage(n)"
         @keypress.enter="setActivePage(n)">
         {{ n }}
-      </element>
+      </component>
     </div>
-    <element
+    <component
       :is="numberElement"
       :to="getLinkPath(active + 1 <= total ? active + 1 : total)"
       :aria-disabled="active >= total"
       :tabindex="active >= total ? -1 : 0"
+      :class="[
+        'base-pagination__arrow-wrapper',
+        { 'base-pagination-arrow-inactive': active >= total }
+      ]"
       aria-label="Next Page"
-      class="base-pagination__arrow-wrapper"
-      @click.native="setActivePage(active + 1 <= total ? active + 1 : total)"
-      @click="setActivePage(active + 1 <= total ? active + 1 : total)"
-      @keypress.enter="setActivePage(active + 1 <= total ? active + 1 : total)">
+      @click.native="active + 1 <= total ? setActivePage(active + 1) : false"
+      @click="active + 1 <= total ? setActivePage(active + 1) : false"
+      @keypress.enter="active + 1 <= total ? setActivePage(active + 1) : false">
       <SvgIcon
-        :class="[
-          'base-pagination-arrow',
-          'base-pagination-arrow-right',
-          { 'base-pagination-arrow-inactive': active >= total }]"
+        class="base-pagination-arrow base-pagination-arrow-right"
         name="arrow-left" />
-    </element>
+    </component>
   </div>
 </template>
 
@@ -225,6 +225,10 @@ export default {
     align-items: center;
     justify-content: center;
 
+    .base-pagination_arrow-wrapper, .base-pagination-number {
+      cursor: pointer;
+    }
+
     .base-pagination-row {
       display: flex;
       align-items: center;
@@ -281,20 +285,26 @@ export default {
         &.base-pagination-arrow-right {
           transform: rotate(180deg);
         }
+      }
 
-        &.base-pagination-arrow-inactive {
-          color: graytext;
-          cursor: default;
+      &.base-pagination-arrow-inactive {
+        cursor: default;
+
+        .base-pagination-arrow,
+        &:hover .base-pagination-arrow,
+        &:active .base-pagination-arrow,
+        &:focus .base-pagination-arrow {
+          fill: $graytext-color;
         }
+      }
+
+      &:disabled .base-pagination-arrow {
+        fill: red;
       }
     }
 
     .base-pagination-row, .base-pagination-arrow {
       flex: 0 0 auto;
-    }
-
-    .base-pagination-arrow, .base-pagination-number {
-      cursor: pointer;
     }
 
     .base-pagination__arrow-wrapper, .base-pagination-number {

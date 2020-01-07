@@ -22,11 +22,11 @@
         <button
           type="button"
           aria-label="close pop up"
-          class="base-popup__close-button">
+          class="base-popup__close-button"
+          @click="close">
           <svg-icon
             class="popup-remove"
-            name="remove"
-            @click="close" />
+            name="remove"/>
         </button>
       </div>
 
@@ -147,6 +147,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /*
+     * Selector to focus if popup is open
+     */
+    isOpenFocus: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -157,8 +164,34 @@ export default {
   },
   watch: {
     show(val) {
+      if (!this.showInt && !this.prevActiveElement) {
+        this.prevActiveElement = document.activeElement;
+      }
       this.showInt = val;
     },
+  },
+  updated() {
+    setTimeout(() => {
+      if (this.showInt) {
+        if (this.isOpenFocus !== '' && this.$el.querySelector(this.isOpenFocus)) {
+          this.$el.querySelector(this.isOpenFocus).focus();
+        }
+      } else if (this.prevActiveElement) {
+        this.prevActiveElement.focus();
+        this.prevActiveElement = false;
+      }
+    }, 250);
+  },
+  mounted() {
+    document.onkeyup = (e) => {
+      const event = e || window.event;
+      if (document.querySelector('.popup-box')) {
+        if (event.keyCode === 27) { // 27 === ESC
+          const btn = document.querySelector('.popup-box .base-popup__close-button');
+          btn.dispatchEvent(new Event('click'));
+        }
+      }
+    };
   },
   methods: {
     close() {

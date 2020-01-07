@@ -3,7 +3,7 @@
     <div class="base-multiline-text-input-label-row">
       <label
         :class="{ 'hide': !showLabel }"
-        :for="label"
+        :for="label + '-' + id"
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
@@ -30,6 +30,7 @@
     </div>
 
     <textarea
+      :id="label + '-' + id"
       :placeholder="placeholder"
       v-model="fieldContent[activeTabInt]"
       rows="10"
@@ -113,6 +114,13 @@ export default {
     tabsLegend: {
       type: String,
       default: 'Radiogroup',
+    },
+    /**
+     * set id which is used for label + id
+     */
+    id: {
+      type: [String, Number],
+      default: '',
     },
   },
   data() {

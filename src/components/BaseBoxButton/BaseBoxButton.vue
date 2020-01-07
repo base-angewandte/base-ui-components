@@ -1,8 +1,10 @@
 <template>
   <base-box
     ref="baseBox"
+    :box-type="boxType"
     :box-size="boxSize"
     :box-ratio="boxRatio"
+    :disabled="disabled"
     class="base-box-button"
     @clicked="clicked">
     <div
@@ -35,6 +37,9 @@
         {{ subtext }}
       </div>
 
+      <BaseBoxTooltip
+        v-if="showTooltip"
+        @clicked="onTooltip" />
     </div>
     <div
       v-else
@@ -52,6 +57,7 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 import BaseBox from '../BaseBox/BaseBox';
+import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 import '../../assets/icons/index';
 
 /**
@@ -62,8 +68,16 @@ export default {
   components: {
     SvgIcon,
     BaseBox,
+    BaseBoxTooltip,
   },
   props: {
+    /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
+    },
     /**
      * Define type of button box style: <br>'large' | 'small'
      */
@@ -123,6 +137,20 @@ export default {
       type: String,
       default: '100',
     },
+    /**
+     * set button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * show tooltip
+     */
+    showTooltip: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -145,6 +173,14 @@ export default {
        */
       this.$emit('clicked', event);
     },
+    onTooltip(event) {
+      /**
+       * event emitted on tooltip click
+       *
+       * @type {Event}
+       */
+      this.$emit('onTooltip', event);
+    },
     setShowSubtext() {
       const subtextRef = this.$refs.baseBoxSubtext;
       if (subtextRef) {
@@ -163,11 +199,14 @@ export default {
 
   .base-box-button {
     display: flex;
-    cursor: pointer;
     transition: all 0.2s ease;
+    text-align: left;
+    align-items: center;
 
-    &:hover {
+    &:focus,
+    &:hover:not([disabled]) {
       color: $app-color;
+      cursor: pointer;
     }
 
     .button-box-content {
@@ -245,6 +284,26 @@ export default {
         width: $icon-large;
         max-height: $icon-large;
       }
+    }
+
+    &.base-box-button-disabled {
+      cursor: default;
+      color: $graytext-color;
+
+      &:hover {
+        color: $graytext-color !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+</style>
+
+<style lang="scss">
+  @import "../../styles/variables";
+
+  .file-select {
+    &:focus-within {
+      color: $app-color;
     }
   }
 </style>

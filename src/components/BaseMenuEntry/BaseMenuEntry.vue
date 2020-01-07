@@ -1,18 +1,20 @@
 <template>
   <div
     ref="menuEntry"
-    :tabindex="isActivatable || isSelectable ? 0 :-1"
+    :tabindex="isSelectable && selectActive ? -1 : 0"
     :href="'#' + title"
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
-              'base-menu-entry-active': isActive }]"
-    role="link"
-    @keydown.enter="clicked"
+              'base-menu-entry-active': isActive,
+              'base-menu-entry-text-fade-out' : !showThumbnails }]"
+    :role="isSelectable && selectActive ? '' : 'link'"
+    @keyup.enter.prevent="clicked"
     @click="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
       class="base-menu-entry-icon"/>
+
     <div
       :class="[
         'base-menu-entry-text-wrapper',
@@ -39,7 +41,7 @@
       <div
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
-        class="base-menu-entry-thumbnail-container">
+        class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
         <svg-icon
           v-for="tn in thumbnails"
           :key="tn"
@@ -175,6 +177,11 @@ export default {
       isSelectedInt: false,
     };
   },
+  computed: {
+    iconSrc() {
+      return `../../assets/icons/${this.icon}.svg`;
+    },
+  },
   watch: {
     isSelected(val) {
       this.isSelectedInt = val;
@@ -205,7 +212,6 @@ export default {
       }
     },
   },
-
 };
 </script>
 
@@ -222,6 +228,14 @@ export default {
 
     &:focus {
       outline: 0;
+
+      .base-menu-entry-icon,
+      .base-menu-entry-title,
+      .base-menu-entry-subtext,
+      .base-menu-entry-description {
+        fill: $app-color;
+        color: $app-color;
+      }
     }
 
     .base-menu-entry-icon {
@@ -307,14 +321,25 @@ export default {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
-      &:hover, &:focus {
+      &:hover, &:focus-within {
         .base-menu-entry-icon,
+        .base-menu-entry-icon path,
+        .base-menu-entry-icon use svg,
+        .base-menu-entry-icon use svg g,
+        .base-menu-entry-icon use svg g path,
         .base-menu-entry-title,
         .base-menu-entry-subtext,
         .base-menu-entry-description {
           fill: $app-color;
           color: $app-color;
         }
+      }
+    }
+
+    &.base-menu-entry-text-fade-out {
+      &::before {
+        left: inherit;
+        right: $spacing;
       }
     }
 
@@ -328,17 +353,7 @@ export default {
       height: $row-height-large;
       padding-left:$spacing;
       background-color: white;
-
-      &::before {
-        content: '';
-        width: calc(#{$fade-out-width} + #{$spacing});
-        height: $row-height-large;
-        position: absolute;
-        top: 0;
-        left: calc(-#{$fade-out-width} - #{$spacing});
-        background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-        z-index: 1;
-      }
+      min-width: 30px;
 
       .base-menu-entry-thumbnail {
         max-height: $icon-small;
@@ -371,6 +386,19 @@ export default {
       position: absolute;
       top: 50%;
       transform: translate(#{$spacing}, -#{$icon-medium/2});
+    }
+  }
+
+  .base-menu-entry-text-fade-out {
+    &::before {
+      content: '';
+      width: calc(#{$fade-out-width} + #{$spacing});
+      height: $row-height-large;
+      position: absolute;
+      top: 0;
+      left: calc(-#{$fade-out-width} - #{$spacing});
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+      z-index: 1;
     }
   }
 

@@ -31,6 +31,7 @@
             ref="image"
             :src="imageUrl"
             :style="imageStyle"
+            :alt="title"
             class="base-image-box-image"
             @error="displayImage = false">
         </div>
@@ -350,7 +351,6 @@ export default {
 
   .base-image-box-checkbox {
     position: absolute;
-    z-index: 1;
     bottom: $spacing;
     right: $spacing;
   }

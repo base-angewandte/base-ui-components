@@ -1,10 +1,15 @@
 <template>
   <base-box-button
     v-bind="$props"
-    :class="{ 'is-drag-over': isDragOver }"
     :box-ratio="boxRatio"
-    class="base-drop-box"
-    @clicked="onClicked">
+    :box-type="boxType"
+    :disabled="disabled"
+    :class="[
+      'base-drop-box',
+      { 'base-box-button-disabled': disabled },
+      { 'is-drag-over': isDragOver }]"
+    @clicked="onClicked"
+    @onTooltip="onTooltip">
     <div
       class="base-drop-box-inner">
       <draggable
@@ -39,6 +44,7 @@
 <script>
 import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
 /**
  * An Element for dropping files or other UI Elements into
@@ -49,6 +55,7 @@ export default {
   components: {
     BaseBoxButton,
     Draggable,
+    BaseBoxTooltip,
   },
   props: {
     /**
@@ -95,6 +102,13 @@ export default {
       default: '100',
     },
     /**
+     * specify the tag of the button
+     */
+    boxType: {
+      type: String,
+      default: 'div',
+    },
+    /**
      * specify the type of drops <br>
      *     valid options: 'files'|'elements'
      */
@@ -121,6 +135,20 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * set button inactive
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * show tooltip
+     */
+    showTooltip: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -131,7 +159,7 @@ export default {
   },
   mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable && this.dropType === 'files') {
+    if (this.dragAndDropCapable && this.dropType === 'files' && !this.disabled) {
       ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(((evt) => {
         this.$refs.fileform.addEventListener(evt, ((e) => {
           e.preventDefault();
@@ -220,6 +248,17 @@ export default {
        * @event clicked
        * @type {Event}
        */
+      if (!this.disabled) {
+        this.$emit('clicked', event);
+      }
+    },
+    onTooltip(event) {
+      /**
+       * Triggered when the box is clicked
+       *
+       * @event clicked
+       * @type {Event}
+       */
       this.$emit('clicked', event);
     },
   },
@@ -260,6 +299,19 @@ export default {
         text-align: center;
         height: 100%;
         width: 100%;
+      }
+    }
+
+    &.base-box-button-disabled {
+
+      .base-drop-box-inner {
+        border-color: $graytext-color;
+
+        &:hover {
+          border-color: $graytext-color;
+          cursor: default;
+          box-shadow: none;
+        }
       }
     }
   }

@@ -1,38 +1,36 @@
 <template>
-  <ul
-    role="list"
-    class="base-menu-list">
-    <draggable
-      v-model="list"
-      :sort="false"
-      :disabled="isMobile"
-      :group="{ name: dragName, pull: 'clone', put: false }"
-      :set-data="modifyDragItem"
-      :force-fallback="!dragAndDropCapable"
-      :fallback-on-body="!dragAndDropCapable"
-      @start="dragStart"
-      @end="dragEnd">
-      <li
-        v-for="(item, index) in list"
-        v-if="item"
-        :key="item.id || item.title"
-        class="base-menu-list__list-entry">
-        <base-menu-entry
-          ref="menuEntry"
-          :entry-id="item.id"
-          :title="item.title"
-          :is-active="entryProps[index].active"
-          :is-selected="entryProps[index].selected"
-          :icon="getType(item.icon)"
-          :thumbnails="getThumbnails(item)"
-          :description="item.description"
-          :is-selectable="true"
-          :select-active="selectActive"
-          @clicked="activateItem(index)"
-          @selected="selectItem(index, $event)"/>
-      </li>
-    </draggable>
-  </ul>
+  <draggable
+    v-model="list"
+    :sort="false"
+    :disabled="isMobile"
+    :group="{ name: dragName, pull: 'clone', put: false }"
+    :set-data="modifyDragItem"
+    :force-fallback="!dragAndDropCapable"
+    :fallback-on-body="!dragAndDropCapable"
+    tag="ul"
+    class="base-menu-list"
+    @start="dragStart"
+    @end="dragEnd">
+    <li
+      v-for="(item, index) in list"
+      v-if="item"
+      :key="item.id || item.title"
+      class="base-menu-list__list-entry">
+      <base-menu-entry
+        ref="menuEntry"
+        :entry-id="item.id"
+        :title="item.title"
+        :is-active="entryProps[index].active"
+        :is-selected="entryProps[index].selected"
+        :icon="getType(item.icon)"
+        :thumbnails="getThumbnails(item)"
+        :description="item.description"
+        :is-selectable="true"
+        :select-active="selectActive"
+        @clicked="activateItem(index)"
+        @selected="selectItem(index, $event)"/>
+    </li>
+  </draggable>
 </template>
 
 <script>
@@ -141,7 +139,7 @@ export default {
     // determines which icon should be shown for each menu entry
     // TODO: this should probably also be definable per entry dynamically on the long run...
     getType(val) {
-      return val && val.includes('calendar-number') ? 'calendar-number' : 'sheet-empty';
+      return val && val.includes('calendar-many') ? 'calendar-many' : 'sheet-empty';
     },
     // define which thumbnails should be shown for each item
     // TODO: currently hardcoded here but needs dynamic solution!
