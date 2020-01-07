@@ -152,10 +152,11 @@ export default {
         {
           // for number fields: prevent the event if type is number (or e) but input is not
           keydown: (event) => {
-            if (this.fieldType === 'number' && (event.keyCode.range < 48 || event.keyCode > 57) && event.keyCode !== 69) {
-              event.preventDefault();
-            } else {
+            if (this.fieldType !== 'number' || (this.fieldType === 'number' && (event.key >= 0 || event.key === 'e'
+              || event.key === '.' || event.key === ','))) {
               this.$emit('keydown', event);
+            } else {
+              event.preventDefault();
             }
           },
           input: (event) => {
@@ -208,13 +209,6 @@ export default {
        *
        */
       this.$emit('click-input-field');
-    },
-    checkInputForNumber(event) {
-      if (this.fieldType === 'number' && (event.keyCode.range < 48 || event.keyCode > 57)) {
-        event.preventDefault();
-      } else {
-        this.$emit('keydown', event);
-      }
     },
   },
 };

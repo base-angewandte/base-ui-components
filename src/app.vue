@@ -264,11 +264,11 @@
       <div class="popup-text">
         <base-input
           :label="'Test1'"
-          type="text"
+          field-type="number"
           placeholder="Enter your Name" />
         <base-input
           :label="'Test'"
-          type="text"
+          field-type="text"
           placeholder="Enter your Name" />
       </div>
       <div class="popup-text">
