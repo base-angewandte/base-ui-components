@@ -152,11 +152,11 @@ export default {
         {
           // for number fields: prevent the event if type is number (or e) but input is not
           keydown: (event) => {
-            if (this.fieldType !== 'number' || (this.fieldType === 'number' && (event.key >= 0 || event.key === 'e'
-              || event.key === '.' || event.key === ','))) {
-              this.$emit('keydown', event);
-            } else {
+            if (this.fieldType === 'number' && Number.isNaN(Number(event.key)) && event.key !== 'e'
+              && event.key !== 'Backspace' && event.key !== 'Delete') {
               event.preventDefault();
+            } else {
+              this.$emit('keydown', event);
             }
           },
           input: (event) => {
