@@ -2,14 +2,20 @@
   <div>
     <base-carousel-list
       class="base-carousel-list">
-      <base-carousel-item
+      <base-image-box
         v-for="item in items"
         :key="item.uid"
+        :href="item.href"
         :title="item.title"
-        :subtitle="item.subtitle"
-        :type="item.type"
+        :subtext="item.subtext"
+        :description="item.type"
         :additional="item.additional"
-        :media="item.media"
+        :image-url="item.imageUrl"
+        :box-size="{}"
+        :lazyload="true"
+        :image-first="false"
+        :center-header="true"
+        box-type="a"
       />
     </base-carousel-list>
 
@@ -22,13 +28,20 @@
         v-for="item in items"
         :key="item.uid"
       >
-        <base-carousel-item
+        <base-image-box
+          :href="item.href"
           :title="item.title"
-          :subtitle="item.subtitle"
-          :type="item.type"
+          :subtext="item.subtext"
+          :description="item.type"
           :additional="item.additional"
-          :media="item.media"
+          :image-url="item.imageUrl"
+          :box-size="{}"
+          :lazyload="true"
+          :image-first="false"
+          :center-header="true"
+          box-type="a"
         />
+        <!-- router-link -->
       </swiper-slide>
 
       <!-- Optional controls -->
@@ -45,13 +58,14 @@ import '@/../node_modules/swiper/css/swiper.css';
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
 import lozad from 'lozad';
 import BaseCarouselList from './BaseCarouselList';
-import BaseCarouselItem from './BaseCarouselItem';
+import BaseImageBox from '../BaseImageBox/BaseImageBox';
+
 
 export default {
   name: 'BaseCarousel',
   components: {
+    BaseImageBox,
     BaseCarouselList,
-    BaseCarouselItem,
     swiper,
     swiperSlide,
   },
@@ -61,60 +75,68 @@ export default {
         {
           uid: '1',
           title: 'Title',
-          subtitle: 'Subtitle',
+          subtext: 'Subtitle',
           type: 'Austellung',
-          additional: '07.05.2020 - 21.05.2020',
+          description: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/600/arch',
+          href: 'http://base.uni-ak.ac.at',
           media: [
             {
-              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
+              '455w': 'https://placeimg.com/455/341/arch',
             },
             {
-              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
+              '640w': 'https://placeimg.com/640/500/arch',
             },
           ],
         },
         {
           uid: '2',
           title: 'Title',
-          subtitle: 'Subtitle',
+          subtext: 'Subtitle',
           type: 'Austellung',
-          additional: '07.05.2020 - 21.05.2020',
+          description: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/600/tech',
+          href: 'http://base.uni-ak.ac.at',
           media: [
             {
-              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/HTZ44aDyhQT6T4FPrEfEyJ/preview-640.jpg',
+              '455w': 'https://placeimg.com/455/341/arch',
             },
             {
-              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/HTZ44aDyhQT6T4FPrEfEyJ/preview-640.jpg',
+              '640w': 'https://placeimg.com/640/500/arch',
             },
           ],
         },
         {
           uid: '3',
           title: 'Title',
-          subtitle: 'Subtitle',
+          subtext: 'Subtitle',
           type: 'Austellung',
-          additional: '07.05.2020 - 21.05.2020',
+          description: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/600/nature',
+          href: 'http://base.uni-ak.ac.at',
           media: [
             {
-              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/WMDAxwgKRU94iHg4dfubFo/preview-640.jpg',
+              '455w': 'https://placeimg.com/455/341/arch',
             },
             {
-              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/WMDAxwgKRU94iHg4dfubFo/preview-640.jpg',
+              '640w': 'https://placeimg.com/640/500/arch',
             },
           ],
         },
         {
           uid: '4',
           title: 'Title',
-          subtitle: 'Subtitle',
+          subtext: 'Subtitle',
           type: 'Austellung',
-          additional: '07.05.2020 - 21.05.2020',
+          description: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/600/animal',
+          href: 'http://base.uni-ak.ac.at',
           media: [
             {
-              '455w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
+              '455w': 'https://placeimg.com/455/341/arch',
             },
             {
-              '640w': 'https://basedev.uni-ak.ac.at/portfolio/p/A9yNn4ZG9GHgOoEkDywdiZgZbLmegpsvaNQw1QaPHeMxRLpaXnIAxp/Qi9gitY3CBS4A7BMhkUrL3/preview-640.jpg',
+              '640w': 'https://placeimg.com/640/500/arch',
             },
           ],
         },
@@ -141,8 +163,6 @@ export default {
     },
   },
   mounted() {
-    // We initialize Lozad.js on the root
-    // element of our component.
     const observer = lozad('.lazy', {
       loaded: (el) => {
         el.classList.remove('lazy');
@@ -157,11 +177,10 @@ export default {
   @import "../../styles/variables";
 
   .base-carousel {
-    margin-top: 1000px;
-    // height: 300px;
-    border: 1px dotted $app-color;
+    max-width: 1400px;
+    margin: 1000px auto;
 
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 680px) {
       display: none;
     }
   }
@@ -169,7 +188,7 @@ export default {
   .base-carousel-list {
     display: none;
 
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 680px) {
       display: block;
     }
   }
