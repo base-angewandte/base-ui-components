@@ -64,7 +64,14 @@
           </slot>
 
           <div class="base-image-box-description">
-            {{ description }}
+            <div
+              v-if="description"
+              :class="[
+                'base-image-box-description-title',
+                { 'bold': !additional }]">{{ description }}</div>
+            <div
+              v-if="additional"
+              class="base-image-box-description-subtext bold">{{ additional }}</div>
           </div>
         </div>
       </div>
@@ -133,6 +140,13 @@ export default {
      * descriptive element displayed at bottom of box (e.g. item type like "Bilderserie")
      */
     description: {
+      type: String,
+      default: null,
+    },
+    /**
+     * descriptive element displayed at bottom of box (e.g. item type like "Bilderserie")
+     */
+    additional: {
       type: String,
       default: null,
     },
@@ -399,7 +413,6 @@ export default {
 
   .base-image-box-description {
     position: absolute;
-    font-weight: bold;
     color: white;
     bottom: $spacing;
     left: $spacing;
@@ -407,6 +420,10 @@ export default {
     overflow: hidden;
     right: $spacing;
     z-index: 1;
+
+    .bold {
+      font-weight: bold;
+    }
   }
 
   .base-image-box-checkbox {
