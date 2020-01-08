@@ -1,18 +1,17 @@
 <template>
   <div
     class="base-chips-input">
-
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
-      ref="baseInput"
       :id="id"
+      ref="baseInput"
+      v-model="input"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="label"
       :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
       :is-active="showDropDown"
-      v-model="input"
       @clicked-outside="onInputBlur"
       @focus="onInputFocus"
       @blur="onInputBlur"
@@ -22,21 +21,23 @@
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
-        slot="label-addition">
+        v-slot:label-addition>
         <div
           class="base-chips-input-sort"
-          @click="sort(selectedListInt)">{{ sortText }}</div>
+          @click="sort(selectedListInt)">
+          {{ sortText }}
+        </div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
-        slot="input-field-addition-before">
+        v-slot:input-field-addition-before>
         <div class="base-chips-input-chips">
           <draggable
+            v-model="selectedListInt"
             :disabled="!draggable"
             :set-data="setDragElement"
             :force-fallback="true"
             :animation="200"
-            v-model="selectedListInt"
             handle=".base-chip-text"
             @start="drag = true"
             @end="onDragEnd">
@@ -45,9 +46,9 @@
               type="transition">
               <BaseChip
                 v-for="(entry, index) in selectedListInt"
+                :id="entry[identifier] || entry.idInt"
                 ref="baseChip"
                 :key="'chip-' + entry.idInt"
-                :id="entry[identifier] || entry.idInt"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
@@ -56,11 +57,10 @@
                 @hoverbox-active="hoverBoxActive($event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
             </transition-group>
-
           </draggable>
         </div>
       </template>
-      <template slot="input-field-addition-after">
+      <template v-slot:input-field-addition-after>
         <div
           v-if="isLoading"
           class="base-chips-input-loader">
@@ -74,16 +74,16 @@
               'base-chips-input-single-dropdown-icon',
               { 'base-chips-input-single-dropdown-icon-rotated': showDropDown }
             ]"
-            name="drop-down"/>
+            name="drop-down" />
         </div>
       </template>
     </BaseInput>
 
     <!-- DROP DOWN MENU -->
     <ul
-      v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       ref="dropdownContainer"
+      v-click-outside="() => insideDropDown = false"
       :style="{ 'min-width': dropDownMinWidth }"
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
@@ -98,8 +98,8 @@
           @click="addSelected()"
           @mouseover="selectedMenuEntryIndex = index">
           {{ addNewChipText ? `${addNewChipText} ${getLangLabel(entry[objectProp], true)}`
-          : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
-          + ' ' + ' ...' }}
+            : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
+              + ' ' + ' ...' }}
         </li>
         <li
           v-else
@@ -109,7 +109,6 @@
           class="base-chips-drop-down-entry-wrapper"
           @click="addSelected()"
           @mouseover="selectedMenuEntryIndex = index">
-
           <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
           <slot
             :item="entry"
@@ -120,7 +119,6 @@
               {{ getLangLabel(entry[objectProp], true) }}
             </div>
           </slot>
-
         </li>
       </template>
       <!--
@@ -150,13 +148,12 @@
         <!-- SLOT DEFAULT -->
         <base-chip
           v-for="(entry, index) in selectedListInt"
-          v-model="entry[objectProp]"
           :key="entry.idInt"
+          v-model="entry[objectProp]"
           class="base-chips-input-chip"
-          @remove-entry="removeEntry($event, index)"/>
+          @remove-entry="removeEntry($event, index)" />
       </slot>
     </div>
-
   </div>
 </template>
 

@@ -2,15 +2,15 @@
   <div class="base-autocomplete-input">
     <BaseInput
       ref="baseInput"
+      v-model="inputTextInt"
       :placeholder="!inputTextInt ? placeholder : ''"
       :label="label"
-      v-model="inputTextInt"
       @clicked-outside="insideInput = false"
       @focus="onInputFocus"
       @keydown.up.down.prevent="triggerArrowKey"
       @keypress.enter.prevent="selectEntry()"
       @input="$emit('autocomplete', inputTextInt)">
-      <template slot="input-field-addition-after">
+      <template v-slot:input-field-addition-after>
         <div
           v-if="isLoading"
           class="base-input-loader">
@@ -21,9 +21,9 @@
 
     <!-- DROP DOWN MENU -->
     <div
-      v-click-outside="() => insideDropDown = false"
       v-if="showDropDown"
       ref="dropdownContainer"
+      v-click-outside="() => insideDropDown = false"
       class="base-autocomplete-drop-down"
       @mouseleave="selectedMenuEntryIndex = -1">
       <div
@@ -36,7 +36,6 @@
         class="base-autocomplete-drop-down-entry-wrapper"
         @click="selectEntry(entry)"
         @mouseover="selectedMenuEntryIndex = index">
-
         <!-- @slot This slot enables you to provide more advanced drop down entries -->
         <slot
           :item="entry"
@@ -46,7 +45,6 @@
             {{ entry[objectProp] }}
           </div>
         </slot>
-
       </div>
 
       <!-- @slot Customize the info displayed when no options are available -->
@@ -58,7 +56,6 @@
           {{ dropDownNoOptionsInfo }}
         </div>
       </slot>
-
     </div>
   </div>
 </template>

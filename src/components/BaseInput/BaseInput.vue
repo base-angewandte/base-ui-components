@@ -32,7 +32,7 @@
           :class="[
             'base-input-field-wrapper',
             { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
-        ]">
+          ]">
           <input
             :id="label + '_' + id"
             :name="label"
@@ -152,7 +152,8 @@ export default {
         {
           // for number fields: prevent the event if type is number (or e) but input is not
           keydown: (event) => {
-            if (this.fieldType === 'number' && (event.keyCode.range < 48 || event.keyCode > 57) && event.keyCode !== 69) {
+            if (this.fieldType === 'number' && Number.isNaN(Number(event.key)) && event.key !== 'e'
+              && event.key !== 'Backspace' && event.key !== 'Delete') {
               event.preventDefault();
             } else {
               this.$emit('keydown', event);
@@ -208,13 +209,6 @@ export default {
        *
        */
       this.$emit('click-input-field');
-    },
-    checkInputForNumber(event) {
-      if (this.fieldType === 'number' && (event.keyCode.range < 48 || event.keyCode > 57)) {
-        event.preventDefault();
-      } else {
-        this.$emit('keydown', event);
-      }
     },
   },
 };

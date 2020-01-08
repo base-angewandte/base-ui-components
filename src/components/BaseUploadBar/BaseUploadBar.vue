@@ -2,7 +2,7 @@
   <div class="base-upload-bar">
     <div
       :class="['base-upload-bar-text', progressWidth > 80
-      ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
+        ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
       <span>{{ $props.filename }}</span>
       <span class="base-upload-bar-file-size">{{ $props.filesize }}</span>
     </div>
@@ -12,16 +12,16 @@
     <SvgIcon
       v-if="status === 'success'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-success"
-      name="success"/>
+      name="success" />
     <SvgIcon
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
-      name="attention"/>
+      name="attention" />
     <SvgIcon
       v-if="showRemove"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-remove"
       name="remove"
-      @click="remove"/>
+      @click="remove" />
   </div>
 </template>
 

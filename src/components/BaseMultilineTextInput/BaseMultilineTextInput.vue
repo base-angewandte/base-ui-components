@@ -12,14 +12,13 @@
         <slot />
         <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
+          v-model="activeTabInt"
           :options="switchTabs"
           :label="tabsLegend"
           :active-tab="activeTab"
-          v-model="activeTabInt"
           class="base-multiline-text-input-tabs">
           <template
-            slot="right-of-text"
-            slot-scope="tab">
+            v-slot:right-of-text="tab">
             <SvgIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input-text-icon"
@@ -31,8 +30,8 @@
 
     <textarea
       :id="label + '-' + id"
-      :placeholder="placeholder"
       v-model="fieldContent[activeTabInt]"
+      :placeholder="placeholder"
       rows="10"
       class="base-multiline-text-input-textarea" />
   </div>

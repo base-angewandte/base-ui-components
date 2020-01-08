@@ -5,15 +5,14 @@
     :disabled="isMobile"
     :group="{ name: dragName, pull: 'clone', put: false }"
     :set-data="modifyDragItem"
-    :force-fallback="!dragAndDropCapable"
-    :fallback-on-body="!dragAndDropCapable"
+    :force-fallback="!isDragAndDropCapable"
+    :fallback-on-body="!isDragAndDropCapable"
     tag="ul"
     class="base-menu-list"
     @start="dragStart"
     @end="dragEnd">
     <li
       v-for="(item, index) in list"
-      v-if="item"
       :key="item.id || item.title"
       class="base-menu-list__list-entry">
       <base-menu-entry
@@ -28,7 +27,7 @@
         :is-selectable="true"
         :select-active="selectActive"
         @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)"/>
+        @selected="selectItem(index, $event)" />
     </li>
   </draggable>
 </template>
@@ -94,17 +93,13 @@ export default {
       // outside store mutations
       entryProps: [],
       dragging: false,
+      isMobile: false,
+      isDragAndDropCapable: false,
     };
   },
   computed: {
     selectActive() {
       return this.selected;
-    },
-    dragAndDropCapable() {
-      return ('DragEvent' in window);
-    },
-    isMobile() {
-      return window.innerWidth < 640;
     },
   },
   watch: {
@@ -134,6 +129,10 @@ export default {
       }
       return false;
     }, { passive: false }); */
+  },
+  mounted() {
+    this.isMobile = window.innerWidth <= 640;
+    this.isDragAndDropCapable = ('DragEvent' in window);
   },
   methods: {
     // determines which icon should be shown for each menu entry

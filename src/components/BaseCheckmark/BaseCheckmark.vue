@@ -17,7 +17,7 @@
       <svg-icon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
-        name="check-mark"/>
+        name="check-mark" />
     </div>
     <label
       :for="label"
