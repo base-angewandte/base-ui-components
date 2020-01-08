@@ -16,7 +16,13 @@ module.exports = {
   require: [
     path.join(__dirname, './src/styles/app.scss')
   ],
-  ignore: [],
+  // these are components used internally however not included in the package
+  ignore: [
+    'src/components/BaseBox/*',
+    'src/components/BaseCheckBox/*',
+    'src/components/BaseToolTip/*',
+    'src/components/BaseChip/*',
+  ],
   dangerouslyUpdateWebpackConfig(webpackConfig) {
     let filteredFirstHMR = false;
 

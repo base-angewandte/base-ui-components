@@ -325,7 +325,6 @@ export default {
       }
     },
     openPdf() {
-      console.log('open pdf');
       window.open(this.mediaUrl);
     },
   },
