@@ -10,7 +10,6 @@
       aria-labelledby="popup-title"
       aria-describedby="descriptionElementId"
       class="popup-box">
-
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
@@ -26,7 +25,7 @@
           @click="close">
           <svg-icon
             class="popup-remove"
-            name="remove"/>
+            name="remove" />
         </button>
       </div>
 
@@ -56,7 +55,7 @@
               @clicked="buttonRight">
               <template
                 v-if="isLoading"
-                slot="right-of-text">
+                v-slot:right-of-text>
                 <span class="base-popup-button-loader">
                   <BaseLoader />
                 </span>
@@ -65,10 +64,8 @@
           </slot>
         </div>
       </div>
-
     </div>
   </div>
-
 </template>
 
 <script>
@@ -147,6 +144,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /*
+     * Selector to focus if popup is open
+     */
+    isOpenFocus: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -164,12 +168,27 @@ export default {
     },
   },
   updated() {
-    if (this.showInt && this.$el.querySelector('input') !== null) {
-      this.$el.querySelector('input').focus();
-    } else if (this.prevActiveElement) {
-      this.prevActiveElement.focus();
-      this.prevActiveElement = false;
-    }
+    setTimeout(() => {
+      if (this.showInt) {
+        if (this.isOpenFocus !== '' && this.$el.querySelector(this.isOpenFocus)) {
+          this.$el.querySelector(this.isOpenFocus).focus();
+        }
+      } else if (this.prevActiveElement) {
+        this.prevActiveElement.focus();
+        this.prevActiveElement = false;
+      }
+    }, 250);
+  },
+  mounted() {
+    document.onkeyup = (e) => {
+      const event = e || window.event;
+      if (document.querySelector('.popup-box')) {
+        if (event.keyCode === 27 || event.key === 'Escape') { // 27 === ESC
+          const btn = document.querySelector('.popup-box .base-popup__close-button');
+          btn.dispatchEvent(new Event('click'));
+        }
+      }
+    };
   },
   methods: {
     close() {

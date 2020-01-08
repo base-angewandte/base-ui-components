@@ -88,10 +88,6 @@ export default {
     /**
      * to set the position of the box from outside
      * @param {MouseEvent} e
-     *
-     * @public
-     *
-     * @returns void
      */
     setPosition(e) {
       let x = e.layerX;

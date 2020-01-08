@@ -6,13 +6,13 @@
       :class="['base-drop-down-label-wrapper',
                { 'hide': !getLangLabel(label, true) || !showLabel }]">
       <label
-        :for="getLangLabel(label)"
+        :for="getLangLabel(label) + '-' + id"
         class="base-drop-down-label">
         {{ getLangLabel(label, true) }}
       </label>
     </div>
     <button
-      :id="getLangLabel(label)"
+      :id="getLangLabel(label) + '-' + id"
       :aria-expanded="showDropDown"
       :style="{ 'background-color': headerBackgroundColor }"
       :disabled="isDisabled"
@@ -36,8 +36,12 @@
       <slot name="header-right">
         <SvgIcon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          name="drop-down"
-        />
+          name="drop-down" />
+        <!--
+        <img
+          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+          svg-inline
+          src="../../static/icons/drop-down.svg"> -->
       </slot>
     </button>
     <div
@@ -177,6 +181,13 @@ export default {
       validator(val) {
         return ['left', 'right'].includes(val);
       },
+    },
+    /**
+     * set id if drop down with this label appears more than once
+     */
+    id: {
+      type: [String, Number],
+      default: '',
     },
   },
   data() {
@@ -330,11 +341,11 @@ export default {
 
       &:disabled {
         cursor: default;
-        color: graytext;
-        fill: graytext;
+        color: $graytext-color;
+        fill: $graytext-color;
 
         .base-drop-down-icon {
-          fill: graytext;
+          fill: $graytext-color;
         }
       }
 

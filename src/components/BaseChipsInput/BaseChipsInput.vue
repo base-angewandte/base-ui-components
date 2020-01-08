@@ -1,41 +1,44 @@
 <template>
   <div
     class="base-chips-input">
-
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
+      :id="id"
       ref="baseInput"
+      v-model="input"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
       :label="label"
       :show-label="showLabel"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :show-input-border="showInputBorder"
       :is-active="showDropDown"
-      v-model="input"
       @clicked-outside="onInputBlur"
       @focus="onInputFocus"
       @blur="onInputBlur"
       @keydown.up.down.prevent="triggerArrowKey"
       @keydown="checkKeyEvent"
-      @keypress.enter.prevent="onEnter()"
+      @keypress.enter.prevent="addSelected()"
       @click-input-field="insideInput = true">
       <template
         v-if="sortable"
-        slot="label-addition">
+        v-slot:label-addition>
         <div
           class="base-chips-input-sort"
-          @click="sort(selectedListInt)">{{ sortText }}</div>
+          @click="sort(selectedListInt)">
+          {{ sortText }}
+        </div>
       </template>
       <template
         v-if="!allowMultipleEntries || chipsInline"
-        slot="input-field-addition-before">
+        v-slot:input-field-addition-before>
         <div class="base-chips-input-chips">
           <draggable
+            v-model="selectedListInt"
             :disabled="!draggable"
             :set-data="setDragElement"
             :force-fallback="true"
             :animation="200"
-            v-model="selectedListInt"
+            handle=".base-chip-text"
             @start="drag = true"
             @end="onDragEnd">
             <transition-group
@@ -43,11 +46,10 @@
               type="transition">
               <BaseChip
                 v-for="(entry, index) in selectedListInt"
+                :id="entry[identifier] || entry.idInt"
                 ref="baseChip"
                 :key="'chip-' + entry.idInt"
-                :id="entry[identifier] || entry.idInt"
                 :entry="getLangLabel(entry[objectProp], true)"
-                :chip-editable="chipsEditable"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
                 :chip-active="chipActiveForRemove === index"
@@ -55,11 +57,10 @@
                 @hoverbox-active="hoverBoxActive($event, entry)"
                 @value-changed="modifyChipValue($event, entry)" />
             </transition-group>
-
           </draggable>
         </div>
       </template>
-      <template slot="input-field-addition-after">
+      <template v-slot:input-field-addition-after>
         <div
           v-if="isLoading"
           class="base-chips-input-loader">
@@ -73,42 +74,53 @@
               'base-chips-input-single-dropdown-icon',
               { 'base-chips-input-single-dropdown-icon-rotated': showDropDown }
             ]"
-            name="drop-down"/>
+            name="drop-down" />
         </div>
       </template>
     </BaseInput>
 
     <!-- DROP DOWN MENU -->
-    <div
-      v-click-outside="() => insideDropDown = false"
+    <ul
       v-if="showDropDown"
       ref="dropdownContainer"
+      v-click-outside="() => insideDropDown = false"
       :style="{ 'min-width': dropDownMinWidth }"
       class="base-chips-drop-down"
       @mouseenter="insideDropDown = true"
       @mouseleave="checkLeave">
-      <div
-        v-for="(entry, index) in dropDownListInt"
-        ref="option"
-        :key="index"
-        :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
-        class="base-chips-drop-down-entry-wrapper"
-        @click="addSelected()"
-        @mouseover="selectedMenuEntryIndex = index"
-        @mouseleave="allowUnknownEntries ? selectedMenuEntryIndex = -1 : null">
-
-        <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
-        <slot
-          :item="entry"
-          name="drop-down-entry">
-          <!-- SLOT DEFAULT -->
-          <div
-            class="base-chips-drop-down-entry">
-            {{ getLangLabel(entry[objectProp], true) }}
-          </div>
-        </slot>
-
-      </div>
+      <template v-for="(entry, index) in dropDownListInt">
+        <li
+          v-if="allowUnknownEntries && !entry[identifier]"
+          ref="option"
+          :key="index"
+          :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
+          class="base-chips-drop-down-entry-wrapper"
+          @click="addSelected()"
+          @mouseover="selectedMenuEntryIndex = index">
+          {{ addNewChipText ? `${addNewChipText} ${getLangLabel(entry[objectProp], true)}`
+            : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
+              + ' ' + ' ...' }}
+        </li>
+        <li
+          v-else
+          ref="option"
+          :key="index"
+          :class="{ 'base-chips-drop-down-entry-wrapper-active': index === selectedMenuEntryIndex }"
+          class="base-chips-drop-down-entry-wrapper"
+          @click="addSelected()"
+          @mouseover="selectedMenuEntryIndex = index">
+          <!-- @slot THIS IS A SLOT TO PROVIDE MORE ADVANCED DROP DOWN ENTRIES -->
+          <slot
+            :item="entry"
+            name="drop-down-entry">
+            <!-- SLOT DEFAULT -->
+            <div
+              class="base-chips-drop-down-entry">
+              {{ getLangLabel(entry[objectProp], true) }}
+            </div>
+          </slot>
+        </li>
+      </template>
       <!--
         @slot a slot to expand the drop down area (needed for "Expand Functionality"
       -->
@@ -124,7 +136,7 @@
           {{ dropDownNoOptionsInfo }}
         </slot>
       </div>
-    </div>
+    </ul>
     <!-- CHIPS BELOW -->
     <div
       v-if="$props.allowMultipleEntries && !$props.chipsInline && selectedListInt.length"
@@ -136,14 +148,12 @@
         <!-- SLOT DEFAULT -->
         <base-chip
           v-for="(entry, index) in selectedListInt"
-          v-model="entry[objectProp]"
           :key="entry.idInt"
-          :chip-editable="chipsEditable"
+          v-model="entry[objectProp]"
           class="base-chips-input-chip"
-          @remove-entry="removeEntry($event, index)"/>
+          @remove-entry="removeEntry($event, index)" />
       </slot>
     </div>
-
   </div>
 </template>
 
@@ -264,13 +274,6 @@ export default {
       default: true,
     },
     /**
-     * define if chips should be editable
-     */
-    chipsEditable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * this prop was added because there was some action needed to be done before entry was added
      * so this is possible if entry is not added to selectedList directly but only in parent
      * component
@@ -301,7 +304,8 @@ export default {
       default: false,
     },
     /**
-     * for dynamic drop down entries a unique identifier (id, uuid) is needed
+     * for dynamic drop down entries a unique identifier (id, uuid)
+     * is needed - specify the attribute name here
      */
     identifier: {
       type: String,
@@ -352,18 +356,33 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * set a chips text for adding a new chip
+     * (alternatively add a 'form.Add' value to your localization files)
+     */
+    addNewChipText: {
+      type: String,
+      default: '',
+    },
+    /**
+    if field is occuring more then once - set an id
+     */
+    id: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
       // the current text input
-      input: null,
+      input: '',
       // list of selected entries
       selectedListInt: [],
       // create a original list from text or object with internal id
       dropDownListOrig: [],
       // list of selectable entries received from parent component
       dropDownList: [],
-      selectedMenuEntryIndex: this.getAllowUnknown(),
+      selectedMenuEntryIndex: 0,
       insideDropDown: false,
       insideInput: false,
       returnAsObject: false,
@@ -372,6 +391,7 @@ export default {
       drag: false,
       chipActiveForRemove: -1,
       dropDownMinWidth: '100%',
+      dropDownYPosition: 0,
     };
   },
   computed: {
@@ -404,12 +424,23 @@ export default {
         }
         // filter already selected entries from the drop down
         if (this.identifier) {
-          this.dropDownList = list.filter(entry => !this.selectedListInt
+          list = list.filter(entry => !this.selectedListInt
             .map(selected => selected[this.identifier]).includes(entry[this.identifier]));
         } else {
-          this.dropDownList = list.filter(entry => !this.selectedListInt
+          list = list.filter(entry => !this.selectedListInt
             .map(selected => selected.idInt).includes(entry.idInt));
         }
+        // if unknown entries are allowed and a string is in input field and if the string
+        // was not added already add a option to add this string as chip
+        if (this.allowUnknownEntries && this.input
+          && !this.selectedList.some(entry => !entry[this.identifier]
+            && this.getLangLabel(entry[this.objectProp]) === this.input)) {
+          list.unshift({
+            [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
+            idInt: this.getInternalId(this.input + this.selectedListInt.length),
+          });
+        }
+        this.dropDownList = [].concat(list);
       },
     },
     showDropDown: {
@@ -485,10 +516,9 @@ export default {
       }
       if (val) {
         this.calcDropDownMinWidth();
-        this.selectedMenuEntryIndex = this.getAllowUnknown();
-        if (!this.chipsEditable) {
-          this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
-        }
+        this.selectedMenuEntryIndex = 0;
+        this.dropDownYPosition = 0;
+        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
         /**
          * event triggered on show drop down
          *
@@ -527,30 +557,18 @@ export default {
     }
   },
   methods: {
-    onEnter() {
-      if (this.input || this.dropDownListInt[this.selectedMenuEntryIndex]) {
-        this.addSelected();
-      } else {
-        this.blurInput();
-        this.showDropDown = false;
-      }
-    },
     // add an entry from the drop down to the list of selected entries
     addSelected() {
       this.showDropDown = true;
       // check if entry was selected in drop down
       const selected = this.dropDownListInt[this.selectedMenuEntryIndex];
+      // set focus back to input-field
+      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus();
       // add selected to the selected list
       if (selected) {
         if (this.allowMultipleEntries) {
           // this adds the entry who's index is currently set
           if (this.addSelectedEntryDirectly) {
-            // check if an entry was already added once and modified after (means it would have
-            // the same idInt which should not be the case since it will lead to duplicate keys
-            if (this.chipsEditable
-              && this.selectedListInt.some(chip => chip.idInt === selected.idInt)) {
-              this.$set(selected, 'idInt', `${selected.idInt}_${Math.random()}_${this.selectedListInt.length}`);
-            }
             this.selectedListInt.push(selected);
           }
         } else {
@@ -568,36 +586,28 @@ export default {
         }
         /**
          * event triggered when an entry from the drop down was selected or enter was pressed
-         * or a chip was edited
          *
          * @event selected
          * @type {object}
          */
         this.emitSelectedList();
-        // if there is an input and unknown entries are allowed add an entry to selected list
-      } else if (this.input && this.allowUnknownEntries) {
-        this.selectedListInt.push({
-          [this.objectProp]: this.language ? { [this.language]: this.input } : this.input,
-          idInt: this.getInternalId(this.input + this.selectedListInt.length),
-        });
         // reset input
-        this.emitSelectedList();
-      }
-      this.input = '';
-      // reset the drop down list
-      if (!this.allowDynamicDropDownEntries) {
-        // filter the selected entry from the list of drop down menu entries
-        this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
-          ? this.dropDownListOrig
-            .filter((entry) => {
-              const origEntry = entry[this.objectProp] || entry;
-              return origEntry.toLowerCase()
-                !== selected[this.objectProp].toLowerCase();
-            })
-          : this.dropDownListOrig;
-      } else {
-        this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
-          .map(sel => sel.idInt).includes(entry.idInt));
+        this.input = '';
+        // reset the drop down list
+        if (!this.allowDynamicDropDownEntries) {
+          // filter the selected entry from the list of drop down menu entries
+          this.dropDownListInt = selected && selected[this.objectProp] && !this.returnAsObject
+            ? this.dropDownListOrig
+              .filter((entry) => {
+                const origEntry = entry[this.objectProp] || entry;
+                return origEntry.toLowerCase()
+                  !== selected[this.objectProp].toLowerCase();
+              })
+            : this.dropDownListOrig;
+        } else {
+          this.dropDownListInt = this.dropDownListInt.filter(entry => !this.selectedListInt
+            .map(sel => sel.idInt).includes(entry.idInt));
+        }
       }
     },
     // remove an entry from the list of selected entries
@@ -624,27 +634,32 @@ export default {
     // allow for navigation with arrow keys
     triggerArrowKey(event) {
       if (event.key === 'ArrowDown') {
-        this.selectedMenuEntryIndex = this.selectedMenuEntryIndex < this.dropDownListInt.length - 1
-          ? this.selectedMenuEntryIndex + 1 : this.getAllowUnknown();
+        if (this.selectedMenuEntryIndex < this.dropDownListInt.length - 1) {
+          this.selectedMenuEntryIndex += 1;
+        }
+        if (this.$refs.option[this.selectedMenuEntryIndex].offsetTop
+          >= this.$refs.dropdownContainer.clientHeight) {
+          this.dropDownYPosition += this.$refs.option[this.selectedMenuEntryIndex].clientHeight;
+        }
       } else if (event.key === 'ArrowUp') {
         if (this.selectedMenuEntryIndex > 0) {
           this.selectedMenuEntryIndex -= 1;
+        }
+        if (this.$refs.option[this.selectedMenuEntryIndex].offsetTop
+          >= this.$refs.dropdownContainer.clientHeight) {
+          this.dropDownYPosition -= this.$refs.option[this.selectedMenuEntryIndex].clientHeight;
         } else {
-          this.selectedMenuEntryIndex = this.allowUnknownEntries
-            ? -1 : this.dropDownListInt.length - 1;
+          this.dropDownYPosition = 0;
         }
       }
-      if (this.$refs.dropdownContainer.scrollHeight !== this.$refs.dropdownContainer.clientHeight) {
-        this.$refs.option[this.selectedMenuEntryIndex >= 0
-          ? this.selectedMenuEntryIndex : 0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      }
-    },
-    getAllowUnknown() {
-      return this.allowUnknownEntries ? -1 : 0;
+      this.$refs.dropdownContainer.scrollTop = this.dropDownYPosition;
     },
     onInputBlur() {
       this.insideInput = false;
       this.chipActiveForRemove = -1;
+      if (!this.insideDropDown && document.activeElement.tagName === 'BODY') {
+        this.input = '';
+      }
     },
     onInputFocus() {
       this.insideInput = true;
@@ -658,11 +673,11 @@ export default {
       if (oldEntry) {
         const index = this.dropDownListInt.map(e => e.idInt).indexOf(oldEntry.idInt);
         if (index < 0) {
-          return this.getAllowUnknown();
+          return 0;
         }
         return index;
       }
-      return this.getAllowUnknown();
+      return 0;
     },
     sort(list) {
       list.sort((a, b) => {
@@ -846,7 +861,7 @@ export default {
     calcDropDownMinWidth() {
       const inputElement = this.$refs.baseInput;
       if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
-        this.dropDownMinWidth = `${this.$parent.$el.clientWidth}px`;
+        this.dropDownMinWidth = `${inputElement.$el.closest('.base-input').clientWidth}px`;
       }
     },
   },

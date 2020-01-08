@@ -8,17 +8,18 @@
               'base-menu-entry-active': isActive,
               'base-menu-entry-text-fade-out' : !showThumbnails }]"
     :role="isSelectable && selectActive ? '' : 'link'"
-    @keydown.enter="clicked"
+    @keyup.enter.prevent="clicked"
     @click="clicked">
     <svg-icon
       ref="entryIcon"
       :name="icon"
-      class="base-menu-entry-icon"/>
+      class="base-menu-entry-icon" />
+
     <div
       :class="[
         'base-menu-entry-text-wrapper',
         { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
-    ]">
+      ]">
       <div class="base-menu-entry-title-description-wrapper">
         <div class="base-menu-entry__title-subtext-wrapper">
           <div
@@ -29,9 +30,13 @@
           </div>
           <div
             v-if="subtext"
-            class="base-menu-entry-subtext">{{ subtext }}</div>
+            class="base-menu-entry-subtext">
+            {{ subtext }}
+          </div>
         </div>
-        <div class="base-menu-entry-description">{{ description }}</div>
+        <div class="base-menu-entry-description">
+          {{ description }}
+        </div>
       </div>
     </div>
     <transition-group
@@ -176,6 +181,11 @@ export default {
       isSelectedInt: false,
     };
   },
+  computed: {
+    iconSrc() {
+      return `../../assets/icons/${this.icon}.svg`;
+    },
+  },
   watch: {
     isSelected(val) {
       this.isSelectedInt = val;
@@ -206,7 +216,6 @@ export default {
       }
     },
   },
-
 };
 </script>
 
@@ -318,6 +327,10 @@ export default {
 
       &:hover, &:focus-within {
         .base-menu-entry-icon,
+        .base-menu-entry-icon path,
+        .base-menu-entry-icon use svg,
+        .base-menu-entry-icon use svg g,
+        .base-menu-entry-icon use svg g path,
         .base-menu-entry-title,
         .base-menu-entry-subtext,
         .base-menu-entry-description {

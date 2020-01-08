@@ -3,7 +3,7 @@
     <div class="base-multiline-text-input-label-row">
       <label
         :class="{ 'hide': !showLabel }"
-        :for="label"
+        :for="label + '-' + id"
         class="base-multiline-text-input-label">
         {{ label }}
       </label>
@@ -12,14 +12,13 @@
         <slot />
         <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
+          v-model="activeTabInt"
           :options="switchTabs"
           :label="tabsLegend"
           :active-tab="activeTab"
-          v-model="activeTabInt"
           class="base-multiline-text-input-tabs">
           <template
-            slot="right-of-text"
-            slot-scope="tab">
+            v-slot:right-of-text="tab">
             <SvgIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input-text-icon"
@@ -30,8 +29,9 @@
     </div>
 
     <textarea
-      :placeholder="placeholder"
+      :id="label + '-' + id"
       v-model="fieldContent[activeTabInt]"
+      :placeholder="placeholder"
       rows="10"
       class="base-multiline-text-input-textarea" />
   </div>
@@ -113,6 +113,13 @@ export default {
     tabsLegend: {
       type: String,
       default: 'Radiogroup',
+    },
+    /**
+     * set id which is used for label + id
+     */
+    id: {
+      type: [String, Number],
+      default: '',
     },
   },
   data() {

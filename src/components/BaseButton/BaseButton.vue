@@ -9,27 +9,25 @@
              { 'base-button-background': hasBackgroundColor },
              {'base-button-active': active }]"
     @click.prevent="clicked">
-
     <!-- @slot create custom content (e.g. icon) left of text -->
-    <slot name="left-of-text"/>
+    <slot name="left-of-text" />
     <svg-icon
       v-if="iconPosition === 'left' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-left',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]"/>
+               { 'base-button-icon-hide': hideIcon }]" />
     <span class="base-button-text">{{ text }}</span>
     <!-- @slot create custom content (e.g. icon) right of text -->
-    <slot name="right-of-text"/>
+    <slot name="right-of-text" />
     <svg-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-right',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]"
-    />
+               { 'base-button-icon-hide': hideIcon }]" />
     <BaseBoxTooltip
       v-if="showTooltip"
       @clicked="clicked" />
@@ -254,7 +252,7 @@ export default {
       cursor: default;
 
       &:hover {
-        color: graytext;
+        color: $graytext-color;
       }
     }
 

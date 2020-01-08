@@ -13,5 +13,12 @@ export const setLanguageMixin = {
       }
       return value;
     },
+    getI18nString(val, sub, valueObject) {
+      const accessString = sub ? `${sub}.${val}` : val;
+      if (this.$i18n && this.$te(accessString)) {
+        return this.$t(accessString, valueObject);
+      }
+      return val;
+    },
   },
 };

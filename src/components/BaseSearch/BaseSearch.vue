@@ -16,13 +16,13 @@
       autocomplete="off"
       @focus.prevent="inputFocus"
       @blur="inputBlur"
-      @keyup="onKeyUp"
+      @input="onInput"
       @keydown.enter.prevent="">
     <SvgIcon
       v-if="inputInt"
       name="remove"
       class="base-search__remove-icon"
-      @click="clearInput"/>
+      @click="clearInput" />
   </div>
 </template>
 
@@ -101,7 +101,8 @@ export default {
     inputFocus() {
       this.active = true;
     },
-    onKeyUp() {
+    onInput(event) {
+      this.inputInt = event.target.value;
       if (this.input !== this.inputInt) {
         this.$emit('input-change', this.inputInt);
       }

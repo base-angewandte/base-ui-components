@@ -22,7 +22,9 @@
           <div
             v-if="subtext"
             :title="subtext"
-            class="base-image-box-subtext">{{ subtext }}</div>
+            class="base-image-box-subtext">
+            {{ subtext }}
+          </div>
         </div>
         <div
           v-if="imageUrl && displayImage"
@@ -31,6 +33,7 @@
             ref="image"
             :src="imageUrl"
             :style="imageStyle"
+            :alt="title"
             class="base-image-box-image"
             @error="displayImage = false">
         </div>
@@ -65,7 +68,7 @@
           mark-style="checkbox"
           check-box-size="large"
           class="base-image-box-checkbox"
-          @clicked="boxSelect"/>
+          @clicked="boxSelect" />
       </transition>
     </div>
   </BaseBox>
@@ -350,7 +353,6 @@ export default {
 
   .base-image-box-checkbox {
     position: absolute;
-    z-index: 1;
     bottom: $spacing;
     right: $spacing;
   }
