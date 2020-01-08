@@ -107,13 +107,13 @@
             @clicked="submitAction" />
         </div>
         <component
+          :is="paginationComponent"
           v-if="maxRows && pages > 1"
           key="pagination"
           :total="pages"
           :current="currentPageNumber"
-          :is="paginationComponent"
           :use-link-element="false"
-          @set-page="setPage"/>
+          @set-page="setPage" />
       </transition-group>
     </div>
   </div>

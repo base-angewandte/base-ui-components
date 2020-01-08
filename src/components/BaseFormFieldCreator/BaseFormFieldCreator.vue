@@ -4,9 +4,9 @@
     <!-- AUTOCOMPLETE -->
     <!-- MULTILINE -->
     <component
-      v-if="fieldType !== 'date' && fieldType !== 'chips'
-      && fieldType !== 'chips-below' && fieldType !== 'group'"
       :is="fieldElement"
+      v-if="fieldType !== 'date' && fieldType !== 'chips'
+        && fieldType !== 'chips-below' && fieldType !== 'group'"
       :id="fieldKey"
       :key="fieldKey"
       :label="labelInt"
@@ -26,13 +26,13 @@
         value: $event,
         name: field.name,
         source: field['x-attrs'].source
-    })">
+      })">
       <template
         v-if="fieldType === 'multiline' && field.items
-        && field.items.properties && field.items.properties.type">
+          && field.items.properties && field.items.properties.type">
         <BaseDropDown
           :selected-option="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
-          ? fieldValueInt.type : textTypeDefault"
+            ? fieldValueInt.type : textTypeDefault"
           :options="textTypeOptions"
           :label="getI18nTerm('form.texttype')"
           :language="language"
@@ -55,7 +55,7 @@
         :range-separator="getI18nTerm('form.until')"
         :format="field['x-attrs'].date_format"
         :type="dateType.includes('timerange') ? dateType.includes('daterange')
-        ? 'daterange' : 'single' : dateType"
+          ? 'daterange' : 'single' : dateType"
         :date-format-labels="{date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
         :format-tabs-legend="getI18nTerm('form.dateTabsLegend')"
         :language="language"

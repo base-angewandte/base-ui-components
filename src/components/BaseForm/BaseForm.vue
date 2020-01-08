@@ -1,7 +1,6 @@
 <template>
   <div class="base-form">
     <template v-for="(element, index) in formFieldListInt">
-
       <!-- SINGLE FORM FIELD -->
       <BaseFormFieldCreator
         v-if="!allowMultiply(element)"
@@ -14,7 +13,7 @@
                    ? 'base-form-field-half' : 'base-form-field-full',
                  { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
         @field-value-changed="setFieldValue($event, element.name)"
-        @fetch-autocomplete="this.$emit('fetch-autocomplete')" /> 
+        @fetch-autocomplete="this.$emit('fetch-autocomplete')" />
 
       <!-- ALLOW FOR MULTIPLE VALUES PER FIELD -->
       <template v-else>
@@ -42,16 +41,18 @@
           <!-- if there is field content show a 'remove all content' button -->
           <div
             v-if="checkFieldContent(valueList[element.name])
-            || valueListInt[element.name].length > 1"
+              || valueListInt[element.name].length > 1"
             :key="index + '-button-' + valueIndex"
             class="group-add">
             <button
               class="field-group-button"
               type="button"
               @click.prevent="removeField(element, valueIndex)">
-              <span>{{ valueListInt[element.name].length === 1
-                ? getI18nTerm('form.clearField') || 'Clear'
-              : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}</span>
+              <span>
+                {{ valueListInt[element.name].length === 1
+                  ? getI18nTerm('form.clearField') || 'Clear'
+                  : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}
+              </span>
               <span>
                 <RemoveIcon
                   class="field-group-icon" />
@@ -67,9 +68,11 @@
             class="field-group-button"
             type="button"
             @click.prevent="multiplyField(element)">
-            <span>{{ getI18nTerm('form.addGroup', -1, {
-              fieldType: getFieldName(element)
-            }) }}</span>
+            <span>
+              {{ getI18nTerm('form.addGroup', -1, {
+                fieldType: getFieldName(element)
+              }) }}
+            </span>
             <span>
               <PlusIcon
                 class="field-group-icon" />
