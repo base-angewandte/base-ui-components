@@ -161,7 +161,7 @@
 <script>
 import i18n from '../../mixins/i18n';
 import { setLanguageMixin } from '../../mixins/setLanguage';
-import BaseForm from '../BaseForm/BaseForm';
+// import BaseForm from '../BaseForm/BaseForm';
 
 /**
  * A component for easy form field creation
@@ -172,7 +172,7 @@ export default {
   components: {
     BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
-    BaseForm,
+    // BaseForm,
   },
   mixins: [i18n, setLanguageMixin],
   props: {
@@ -365,6 +365,13 @@ export default {
         && this.field['x-attrs'].field_type.includes('chips')
         && this.field.type === 'object');
     },
+    // check if label was specified - if not defer from title or check if there is a localized term
+    labelInt() {
+      if (this.label) {
+        return this.label;
+      }
+      return this.field.title || this.getI18nTerm(`form.${this.field.name}` || this.field.name);
+    },
     // check if placeholder was specified - if not defer from
     // title or check if there is a localized term
     placeholderInt() {
@@ -373,15 +380,7 @@ export default {
       }
       const internalPlaceholder = this.field['x-attrs'] && this.field['x-attrs'].placeholder
         ? this.field['x-attrs'].placeholder : '';
-      const fieldName = this.getFieldName(this.field);
-      return internalPlaceholder || `${this.hasI18n ? this.getI18nTerm('form.select') : 'Select'} ${fieldName}`;
-    },
-    // check if label was specified - if not defer from title or check if there is a localized term
-    labelInt() {
-      if (this.label) {
-        return this.label;
-      }
-      return this.field.title || this.getI18nTerm(`form.${this.field.name}` || this.field.name);
+      return internalPlaceholder || `${this.hasI18n ? this.getI18nTerm('form.select') : 'Select'} ${this.labelInt}`;
     },
     // compute field type
     fieldType() {

@@ -4,16 +4,18 @@
       <!-- SINGLE FORM FIELD -->
       <BaseFormFieldCreator
         v-if="!allowMultiply(element)"
-        :key="`${element.name}_${index}`"
-        :field-key="`${element.name}_${index}`"
+        :key="`${element.name}_${index}_${formId}`"
+        :field-key="`${element.name}_${index}_${formId}`"
         :field-value="valueListInt[element.name]"
+        :field="element"
         :autocomplete-loading="fieldIsLoading === element.name"
         :class="['base-form-field',
                  formFieldsHalf.indexOf(element) >= 0
                    ? 'base-form-field-half' : 'base-form-field-full',
                  { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
+        v-bind="formFieldComponentProps(element)"
         @field-value-changed="setFieldValue($event, element.name)"
-        @fetch-autocomplete="this.$emit('fetch-autocomplete')" />
+        @fetch-autocomplete="fetchAutocomplete" />
 
       <!-- ALLOW FOR MULTIPLE VALUES PER FIELD -->
       <template v-else>
@@ -21,28 +23,30 @@
         <div
           v-for="(value, valueIndex) in valueListInt[element.name]"
           :ref="element.name"
-          :key="`${element.name}_${index}_${valueIndex}_wrapper`"
+          :key="`${element.name}_${index}_${valueIndex}_${formId}_wrapper`"
           :class="['base-form-field',
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
                    { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
           <BaseFormFieldCreator
-            :key="`${element.name}_${index}_${valueIndex}`"
-            :field-key="`${element.name}_${index}_${valueIndex}`"
+            :key="`${element.name}_${index}_${valueIndex}_${formId}`"
+            :field-key="`${element.name}_${index}_${valueIndex}_${formId}`"
             :field-value="value"
+            :field="element"
+            v-bind="formFieldComponentProps(element)"
             @field-value-changed="setFieldValue(
               $event,
               element.name,
               valueIndex,
               (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
-            @fetch-autocomplete="this.$emit('fetch-autocomplete')"
+            @fetch-autocomplete="fetchAutocomplete"
             @subform-input="setFieldValue($event, element.name, valueIndex)" />
 
           <!-- if there is field content show a 'remove all content' button -->
           <div
             v-if="checkFieldContent(valueList[element.name])
               || valueListInt[element.name].length > 1"
-            :key="index + '-button-' + valueIndex"
+            :key="`${index}_button_${valueIndex}_${formId}`"
             class="group-add">
             <button
               class="field-group-button"
@@ -54,8 +58,9 @@
                   : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}
               </span>
               <span>
-                <RemoveIcon
-                  class="field-group-icon" />
+                <SvgIcon
+                  class="field-group-icon"
+                  name="remove" />
               </span>
             </button>
           </div>
@@ -74,8 +79,9 @@
               }) }}
             </span>
             <span>
-              <PlusIcon
-                class="field-group-icon" />
+              <SvgIcon
+                class="field-group-icon"
+                name="plus" />
             </span>
           </button>
         </div>
@@ -85,17 +91,19 @@
 </template>
 
 <script>
+import SvgIcon from 'vue-svgicon';
 import BaseFormFieldCreator from '../BaseFormFieldCreator/BaseFormFieldCreator';
 import i18n from '../../mixins/i18n';
-import RemoveIcon from '../../static/icons/remove.svg';
-import PlusIcon from '../../static/icons/plus.svg';
+
+/**
+ * Component creating a form
+ */
 
 export default {
-  name: 'BaseForm',
+  name: 'BaseFormNew',
   components: {
     BaseFormFieldCreator,
-    RemoveIcon,
-    PlusIcon,
+    SvgIcon,
   },
   mixins: [i18n],
   props: {
@@ -125,22 +133,32 @@ export default {
         return {};
       },
     },
+    /**
+     * set current language
+     */
     language: {
       type: String,
       default: 'en',
     },
+    /**
+     * provide information about all available languages
+     */
     availableLocales: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * an id for field groups to still have unique field ids
+     */
+    formId: {
+      type: String,
+      default: '',
     },
   },
   data() {
     return {
       // the drop down lists necessary for form fields with drop downs
       dropdownLists: {},
-      // TODO: remove since only necessary for autocomplete fetch
-      // (moved to parent)
-      timeout: null,
       // variable to specify a field that is currently loading autocomplete data
       fieldIsLoading: '',
       // variable to be able to focus to the field after multipy
@@ -148,12 +166,13 @@ export default {
     };
   },
   computed: {
-    // get a list of all form fields that are taking have of the
+    // get a list of all form fields that are taking half of the
     // width of a form
     formFieldsHalf() {
       return this.formFieldListInt.filter(field => field['x-attrs'] && field['x-attrs'].field_format === 'half');
     },
     formFieldListInt() {
+      console.log(this.formFieldJson);
       return Object.keys(this.formFieldJson)
         // filter out hidden properties and $ref property from JSON
         .filter(key => !this.formFieldJson[key].$ref
@@ -207,7 +226,7 @@ export default {
       Object.keys(val).forEach((dropDown) => {
         if ((val[dropDown] && val[dropDown].length)
           && (!this.dropdownLists[dropDown] || !this.dropdownLists[dropDown].length)) {
-          this.setDropDown(val[dropDown], '', '', dropDown);
+          // this.setDropDown(val[dropDown], '', '', dropDown);
         }
       });
     },
@@ -227,6 +246,16 @@ export default {
     }
   },
   methods: {
+    fetchAutocomplete(params) {
+      /**
+       * triggered if field has an autocomplete functionality
+       * (chips-input, autocomplete-input, chips-below-input)
+       *
+       * @event fetch-autocomplete
+       * @type Object
+       */
+      this.$emit('fetch-autocomplete', params);
+    },
     // check if field can be multiplied
     allowMultiply(el) {
       // field can be multiplied if it is an array and not a chips or chips-below
@@ -242,12 +271,16 @@ export default {
     },
     // remove multiplied field again
     removeField(field, index) {
-      if (index) {
-        this.valueListInt[field.name].splice(index, 1);
-        this.$emit('values-changed', this.valueListInt);
+      const fieldGroupValues = this.valueListInt[field.name];
+      // only splice off group if more than one field visible
+      if (fieldGroupValues && fieldGroupValues.length > 1) {
+        fieldGroupValues.splice(index, 1);
+        // else just clear the fields
       } else {
-        this.$set(this.valueList, field.name, this.getInitialFieldValue(field.items));
+        this.$set(fieldGroupValues, index, this.getInitialFieldValue(field.items));
       }
+      // inform parent of changes
+      this.$emit('values-changed', this.valueListInt);
     },
     // check if field is half field and the second of two halves
     isHalfFieldSecond(field) {
@@ -259,7 +292,6 @@ export default {
     },
     formFieldComponentProps(element) {
       return {
-        field: element,
         tabs: this.availableLocales,
         dropDownList: this.dropdownLists[element.name],
         secondaryDropdown: this.dropdownLists[`${element.name}_secondary`],
@@ -335,6 +367,25 @@ export default {
       // if it is not a array or object simply return value from list or empty string
       return (typeof value === 'string' ? value : '');
     },
+    checkFieldContent(fieldValues) {
+      let hasContent = false;
+      if (fieldValues && typeof fieldValues === 'object') {
+        if (fieldValues.length >= 0) {
+          fieldValues.forEach((values) => {
+            hasContent = this.checkFieldContent(values) || hasContent;
+          });
+        } else {
+          const objectKeys = Object.keys(fieldValues);
+          objectKeys
+            .forEach((key) => {
+              hasContent = this.checkFieldContent(fieldValues[key]) || hasContent;
+            });
+        }
+      } else {
+        hasContent = fieldValues === 0 || !!fieldValues || hasContent;
+      }
+      return hasContent;
+    },
   },
 };
 </script>
@@ -342,7 +393,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables.scss";
 
-.base-form {
+  .base-form {
     background-color: white;
     display: flex;
     align-items: baseline;
@@ -377,7 +428,9 @@ export default {
     .field-group-button {
       color: $font-color-second;
       cursor: pointer;
-      display: inline;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 0;
       background-color: inherit;
       border: none;
@@ -388,6 +441,7 @@ export default {
       }
 
       .field-group-icon {
+        flex: 0 0 auto;
         margin-left: $spacing;
         height: $icon-small;
         width: $icon-small;
@@ -429,6 +483,46 @@ export default {
 
       .group-multiply {
         margin-bottom: $spacing-small + ($spacing-small/2);
+      }
+    }
+  }
+</style>
+
+<style lang="scss">
+  @import "../../styles/variables.scss";
+
+  .base-chips-below-chips-input {
+    .base-chips-drop-down {
+      right: $spacing-small;
+    }
+  }
+
+  @media screen and (min-width: $mobile) {
+    .base-chips-drop-down {
+      max-width: calc(100% - #{$spacing} * 2);
+    }
+
+    .base-form-field-left-margin {
+      .base-chips-drop-down {
+        right: $spacing;
+      }
+    }
+
+    .base-form-subform-wrapper {
+      .base-chips-drop-down {
+        max-width: calc(100% - #{$spacing} * 4.5 - 3px);
+      }
+
+      .base-form-field-left-margin {
+        .base-chips-drop-down {
+          right: calc(#{$spacing} * 2.5 - 3px);
+        }
+      }
+    }
+
+    .base-chips-below-chips-input {
+      .base-chips-drop-down {
+        right: calc(#{$spacing} + #{$spacing-small} / 2);
       }
     }
   }

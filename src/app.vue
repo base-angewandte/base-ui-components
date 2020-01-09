@@ -10,9 +10,11 @@
         type="application/x-mpegURL">
       Your browser does not support the video tag.
     </video> -->
-    <BaseInput
-      field-type="number"
-      label="number" />
+    <div>
+      <BaseFormNew
+        :value-list="formValueList"
+        :form-field-json="json" />
+    </div>
     <BaseMediaPreview
       :show-preview="togglePreview"
       :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"
@@ -327,10 +329,12 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
+import BaseFormNew from './components/BaseForm/BaseForm';
 
 export default {
   name: 'App',
   components: {
+    BaseFormNew,
     BaseMediaPreview,
     BasePagination,
     BaseChipsBelow,
@@ -351,6 +355,514 @@ export default {
   },
   data() {
     return {
+      formValueList: {
+        id: 'JVKyWKTr8pit772AQKMW5V',
+        parents: [
+        ],
+        relations: [
+        ],
+        icon: '/s/img/sheet-empty.svg',
+        has_media: false,
+        date_created: '2020-01-09T14:34:05.815419+01:00',
+        date_changed: '2020-01-09T14:34:55.747568+01:00',
+        title: '<ycsaasd',
+        subtitle: '',
+        type: null,
+        notes: '',
+        reference: null,
+        keywords: [
+        ],
+        texts: [
+          {
+            data: [
+              {
+                text: 'aaa',
+                language: {
+                  source: 'http://base.uni-ak.ac.at/portfolio/languages/en',
+                },
+              },
+            ],
+          },
+          {
+            data: [
+              {
+                text: 'asdfsdf',
+                language: {
+                  source: 'http://base.uni-ak.ac.at/portfolio/languages/en',
+                },
+              },
+            ],
+            type: {
+              label: {
+                de: 'Beschreibung',
+                en: 'description',
+              },
+              source: 'http://base.uni-ak.ac.at/portfolio/vocabulary/description',
+            },
+          },
+        ],
+        published: false,
+        data: {
+        },
+      },
+      json: {
+        id: {
+          title: 'Id',
+          type: 'string',
+          readOnly: true,
+          minLength: 1,
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+        parents: {
+          $ref: '#/definitions/Parent',
+        },
+        relations: {
+          $ref: '#/definitions/Relations',
+        },
+        icon: {
+          title: 'Icon',
+          type: 'string',
+          readOnly: true,
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+        has_media: {
+          title: 'Has media',
+          type: 'boolean',
+          readOnly: true,
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+        date_created: {
+          title: 'Date created',
+          type: 'string',
+          format: 'date-time',
+          readOnly: true,
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+        date_changed: {
+          title: 'Date changed',
+          type: 'string',
+          format: 'date-time',
+          readOnly: true,
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+        title: {
+          title: 'Title',
+          type: 'string',
+          maxLength: 255,
+          minLength: 1,
+          'x-attrs': {
+            field_type: 'text',
+            field_format: 'half',
+            order: 1,
+            placeholder: 'Enter title',
+          },
+        },
+        subtitle: {
+          title: 'Subtitle',
+          type: 'string',
+          maxLength: 255,
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'text',
+            field_format: 'half',
+            order: 2,
+            placeholder: 'Enter subtitle',
+          },
+        },
+        type: {
+          title: 'Type',
+          type: 'object',
+          properties: {
+            source: {
+              type: 'string',
+              'x-attrs': {
+                hidden: true,
+              },
+            },
+            label: {
+              type: 'object',
+              properties: {
+                de: {
+                  type: 'string',
+                },
+                en: {
+                  type: 'string',
+                },
+                fr: {
+                  type: 'string',
+                },
+              },
+              additionalProperties: false,
+            },
+          },
+          additionalProperties: false,
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'chips',
+            source: '/api/v1/jsonschema/',
+            order: 3,
+            placeholder: 'Enter type',
+            set_label_language: true,
+          },
+        },
+        notes: {
+          title: 'Notes',
+          type: 'string',
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'multiline',
+            order: 6,
+            placeholder: 'Enter notes (will not be published)',
+          },
+        },
+        reference: {
+          title: 'Reference',
+          type: 'string',
+          maxLength: 255,
+          'x-nullable': true,
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+        keywords: {
+          title: 'Keywords',
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              source: {
+                type: 'string',
+                'x-attrs': {
+                  hidden: true,
+                },
+              },
+              label: {
+                type: 'object',
+                properties: {
+                  de: {
+                    type: 'string',
+                  },
+                  en: {
+                    type: 'string',
+                  },
+                  fr: {
+                    type: 'string',
+                  },
+                },
+                additionalProperties: false,
+              },
+            },
+            additionalProperties: false,
+          },
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'chips',
+            source: '/autosuggest/v1/keywords/',
+            prefetch: [
+              'source',
+            ],
+            order: 5,
+            allow_unknown_entries: true,
+            dynamic_autosuggest: true,
+            set_label_language: true,
+            placeholder: 'Enter keywords',
+          },
+        },
+        texts: {
+          title: 'Text',
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              type: {
+                type: 'object',
+                properties: {
+                  source: {
+                    type: 'string',
+                    'x-attrs': {
+                      hidden: true,
+                    },
+                  },
+                  label: {
+                    type: 'object',
+                    properties: {
+                      de: {
+                        type: 'string',
+                      },
+                      en: {
+                        type: 'string',
+                      },
+                      fr: {
+                        type: 'string',
+                      },
+                    },
+                    additionalProperties: false,
+                  },
+                },
+                additionalProperties: false,
+                title: 'type',
+              },
+              data: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    language: {
+                      type: 'object',
+                      properties: {
+                        source: {
+                          type: 'string',
+                          enum: [
+                            'http://base.uni-ak.ac.at/portfolio/languages/ab',
+                            'http://base.uni-ak.ac.at/portfolio/languages/aa',
+                            'http://base.uni-ak.ac.at/portfolio/languages/af',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ak',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sq',
+                            'http://base.uni-ak.ac.at/portfolio/languages/am',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ar',
+                            'http://base.uni-ak.ac.at/portfolio/languages/an',
+                            'http://base.uni-ak.ac.at/portfolio/languages/hy',
+                            'http://base.uni-ak.ac.at/portfolio/languages/as',
+                            'http://base.uni-ak.ac.at/portfolio/languages/av',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ae',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ay',
+                            'http://base.uni-ak.ac.at/portfolio/languages/az',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bm',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ba',
+                            'http://base.uni-ak.ac.at/portfolio/languages/eu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/be',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bh',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/nb',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bs',
+                            'http://base.uni-ak.ac.at/portfolio/languages/br',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bg',
+                            'http://base.uni-ak.ac.at/portfolio/languages/my',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ca',
+                            'http://base.uni-ak.ac.at/portfolio/languages/km',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ch',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ce',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ny',
+                            'http://base.uni-ak.ac.at/portfolio/languages/zh',
+                            'http://base.uni-ak.ac.at/portfolio/languages/cu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/cv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kw',
+                            'http://base.uni-ak.ac.at/portfolio/languages/co',
+                            'http://base.uni-ak.ac.at/portfolio/languages/cr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/hr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/cs',
+                            'http://base.uni-ak.ac.at/portfolio/languages/da',
+                            'http://base.uni-ak.ac.at/portfolio/languages/dv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/nl',
+                            'http://base.uni-ak.ac.at/portfolio/languages/dz',
+                            'http://base.uni-ak.ac.at/portfolio/languages/en',
+                            'http://base.uni-ak.ac.at/portfolio/languages/eo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/et',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ee',
+                            'http://base.uni-ak.ac.at/portfolio/languages/fo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/fj',
+                            'http://base.uni-ak.ac.at/portfolio/languages/fi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/fr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ff',
+                            'http://base.uni-ak.ac.at/portfolio/languages/gd',
+                            'http://base.uni-ak.ac.at/portfolio/languages/gl',
+                            'http://base.uni-ak.ac.at/portfolio/languages/lg',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ka',
+                            'http://base.uni-ak.ac.at/portfolio/languages/de',
+                            'http://base.uni-ak.ac.at/portfolio/languages/el',
+                            'http://base.uni-ak.ac.at/portfolio/languages/gn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/gu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ht',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ha',
+                            'http://base.uni-ak.ac.at/portfolio/languages/he',
+                            'http://base.uni-ak.ac.at/portfolio/languages/hz',
+                            'http://base.uni-ak.ac.at/portfolio/languages/hi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ho',
+                            'http://base.uni-ak.ac.at/portfolio/languages/hu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/is',
+                            'http://base.uni-ak.ac.at/portfolio/languages/io',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ig',
+                            'http://base.uni-ak.ac.at/portfolio/languages/id',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ia',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ie',
+                            'http://base.uni-ak.ac.at/portfolio/languages/iu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ik',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ga',
+                            'http://base.uni-ak.ac.at/portfolio/languages/it',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ja',
+                            'http://base.uni-ak.ac.at/portfolio/languages/jv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kl',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ks',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kk',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ki',
+                            'http://base.uni-ak.ac.at/portfolio/languages/rw',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ky',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kg',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ko',
+                            'http://base.uni-ak.ac.at/portfolio/languages/kj',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ku',
+                            'http://base.uni-ak.ac.at/portfolio/languages/lo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/la',
+                            'http://base.uni-ak.ac.at/portfolio/languages/lv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/li',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ln',
+                            'http://base.uni-ak.ac.at/portfolio/languages/lt',
+                            'http://base.uni-ak.ac.at/portfolio/languages/lu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/lb',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mk',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mg',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ms',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ml',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mt',
+                            'http://base.uni-ak.ac.at/portfolio/languages/gv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mh',
+                            'http://base.uni-ak.ac.at/portfolio/languages/mn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/na',
+                            'http://base.uni-ak.ac.at/portfolio/languages/nv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/nd',
+                            'http://base.uni-ak.ac.at/portfolio/languages/nr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ng',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ne',
+                            'http://base.uni-ak.ac.at/portfolio/languages/se',
+                            'http://base.uni-ak.ac.at/portfolio/languages/no',
+                            'http://base.uni-ak.ac.at/portfolio/languages/nn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/oc',
+                            'http://base.uni-ak.ac.at/portfolio/languages/oj',
+                            'http://base.uni-ak.ac.at/portfolio/languages/or',
+                            'http://base.uni-ak.ac.at/portfolio/languages/om',
+                            'http://base.uni-ak.ac.at/portfolio/languages/os',
+                            'http://base.uni-ak.ac.at/portfolio/languages/pi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/pa',
+                            'http://base.uni-ak.ac.at/portfolio/languages/fa',
+                            'http://base.uni-ak.ac.at/portfolio/languages/pl',
+                            'http://base.uni-ak.ac.at/portfolio/languages/pt',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ps',
+                            'http://base.uni-ak.ac.at/portfolio/languages/qu',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ro',
+                            'http://base.uni-ak.ac.at/portfolio/languages/rm',
+                            'http://base.uni-ak.ac.at/portfolio/languages/rn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ru',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sm',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sg',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sa',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sc',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ii',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sd',
+                            'http://base.uni-ak.ac.at/portfolio/languages/si',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sk',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sl',
+                            'http://base.uni-ak.ac.at/portfolio/languages/so',
+                            'http://base.uni-ak.ac.at/portfolio/languages/st',
+                            'http://base.uni-ak.ac.at/portfolio/languages/es',
+                            'http://base.uni-ak.ac.at/portfolio/languages/su',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sw',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ss',
+                            'http://base.uni-ak.ac.at/portfolio/languages/sv',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tl',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ty',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tg',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ta',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tt',
+                            'http://base.uni-ak.ac.at/portfolio/languages/te',
+                            'http://base.uni-ak.ac.at/portfolio/languages/th',
+                            'http://base.uni-ak.ac.at/portfolio/languages/bo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ti',
+                            'http://base.uni-ak.ac.at/portfolio/languages/to',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ts',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tn',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tr',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tk',
+                            'http://base.uni-ak.ac.at/portfolio/languages/tw',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ug',
+                            'http://base.uni-ak.ac.at/portfolio/languages/uk',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ur',
+                            'http://base.uni-ak.ac.at/portfolio/languages/uz',
+                            'http://base.uni-ak.ac.at/portfolio/languages/ve',
+                            'http://base.uni-ak.ac.at/portfolio/languages/vi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/vo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/wa',
+                            'http://base.uni-ak.ac.at/portfolio/languages/cy',
+                            'http://base.uni-ak.ac.at/portfolio/languages/fy',
+                            'http://base.uni-ak.ac.at/portfolio/languages/wo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/xh',
+                            'http://base.uni-ak.ac.at/portfolio/languages/yi',
+                            'http://base.uni-ak.ac.at/portfolio/languages/yo',
+                            'http://base.uni-ak.ac.at/portfolio/languages/za',
+                            'http://base.uni-ak.ac.at/portfolio/languages/zu',
+                          ],
+                          'x-attrs': {
+                            hidden: true,
+                          },
+                        },
+                        label: {
+                          type: 'object',
+                          properties: {
+                            de: {
+                              type: 'string',
+                            },
+                            en: {
+                              type: 'string',
+                            },
+                            fr: {
+                              type: 'string',
+                            },
+                          },
+                          additionalProperties: false,
+                        },
+                      },
+                      additionalProperties: false,
+                    },
+                    text: {
+                      type: 'string',
+                      title: 'text',
+                    },
+                  },
+                  required: [
+                    'text',
+                  ],
+                  additionalProperties: false,
+                },
+              },
+            },
+            additionalProperties: false,
+          },
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'multiline',
+            source_type: '/autosuggest/v1/texttypes/',
+            prefetch: [
+              'source_type',
+            ],
+            order: 4,
+            placeholder: 'Enter text',
+          },
+        },
+        published: {
+          title: 'Published',
+          type: 'boolean',
+          'x-attrs': {
+            hidden: true,
+          },
+        },
+      },
       selectionList: [
         { label: 'Option 1', value: 'option 1' },
         { label: 'Option 2', value: 'option 2' },

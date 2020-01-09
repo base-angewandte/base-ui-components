@@ -12,7 +12,8 @@ export default {
         }
         return this.$t(term, variables);
       }
-      return null;
+      const termPath = term.split('.');
+      return termPath.pop();
     },
     setLangLabels(key, locales) {
       return locales
