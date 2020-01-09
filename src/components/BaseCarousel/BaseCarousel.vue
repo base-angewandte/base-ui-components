@@ -1,23 +1,10 @@
 <template>
   <div>
     <base-carousel-list
-      class="base-carousel-list">
-      <base-image-box
-        v-for="item in items"
-        :key="item.uid"
-        :href="item.href"
-        :title="item.title"
-        :subtext="item.subtext"
-        :description="item.description"
-        :additional="item.additional"
-        :image-url="item.previews['768w']"
-        :box-size="{}"
-        :lazyload="true"
-        :image-first="true"
-        :center-header="true"
-        box-type="a"
-      />
-    </base-carousel-list>
+      :items="items"
+      :box-size="{ 'min-height': '250px', 'max-height': '350px'}"
+      :lazyload="true"
+      class="base-carousel-list"/>
 
     <swiper
       ref="baseCarousel"
@@ -45,7 +32,7 @@
 
       <!-- Optional controls -->
       <div
-        v-if="items.length > 3"
+        v-if="items.length > 2"
         slot="pagination"
         class="swiper-pagination"/>
     </swiper>
@@ -77,17 +64,17 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/600/arch',
+          imageUrl: 'https://placeimg.com/640/480/arch',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '455w': 'https://placeimg.com/455/341/arch',
+              '460w': 'https://placeimg.com/460/341/arch',
             },
             {
-              '640w': 'https://placeimg.com/640/500/arch',
+              '640w': 'https://placeimg.com/640/480/arch',
             },
             {
-              '768w': 'https://placeimg.com/768/520/arch',
+              '768w': 'https://placeimg.com/768/576/arch',
             },
           ],
         },
@@ -97,57 +84,77 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/600/tech',
+          imageUrl: 'https://placeimg.com/640/480/tech',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '455w': 'https://placeimg.com/455/341/tech',
+              '460w': 'https://placeimg.com/460/341/tech',
             },
             {
-              '640w': 'https://placeimg.com/640/500/tech',
+              '640w': 'https://placeimg.com/640/480/tech',
             },
             {
-              '768w': 'https://placeimg.com/768/520/tech',
+              '768w': 'https://placeimg.com/768/576/tech',
             },
           ],
         },
-        // {
-        //   uid: '3',
-        //   title: 'Title',
-        //   subtext: 'Subtitle',
-        //   description: 'Austellung',
-        //   // additional: '07.05.2020 - 21.05.2020',
-        //   imageUrl: 'https://placeimg.com/640/600/nature',
-        //   href: 'http://base.uni-ak.ac.at',
-        //   previews: [
-        //     {
-        //       '455w': 'https://placeimg.com/455/341/arch',
-        //     },
-        //     {
-        //       '640w': 'https://placeimg.com/640/500/arch',
-        //     },
-        //     {
-        //       '768w': 'https://placeimg.com/768/520/arch',
-        //     },
-        //   ],
-        // },
+        {
+          uid: '3',
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung',
+          // additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/nature',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/nature',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/nature',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/nature',
+            },
+          ],
+        },
         // {
         //   uid: '4',
         //   title: 'Title',
         //   subtext: 'Subtitle',
         //   description: 'Austellung',
         //   additional: '07.05.2020 - 21.05.2020',
-        //   imageUrl: 'https://placeimg.com/640/600/animal',
+        //   imageUrl: 'https://placeimg.com/640/480/animal',
         //   href: 'http://base.uni-ak.ac.at',
         //   previews: [
         //     {
-        //       '455w': 'https://placeimg.com/455/341/animal',
+        //       '460w': 'https://placeimg.com/460/341/animal',
         //     },
         //     {
-        //       '640w': 'https://placeimg.com/640/500/animal',
+        //       '640w': 'https://placeimg.com/640/480/animal',
         //     },
         //     {
-        //       '768w': 'https://placeimg.com/640/500/animal',
+        //       '768w': 'https://placeimg.com/768/576/animal',
+        //     },
+        //   ],
+        // },
+        // {
+        //   uid: '5',
+        //   title: 'Title',
+        //   subtext: 'Subtitle',
+        //   description: 'Austellung',
+        //   additional: '07.05.2020 - 21.05.2020',
+        //   imageUrl: 'https://placeimg.com/640/480/people',
+        //   href: 'http://base.uni-ak.ac.at',
+        //   previews: [
+        //     {
+        //       '460w': 'https://placeimg.com/460/341/people',
+        //     },
+        //     {
+        //       '640w': 'https://placeimg.com/640/480/people',
+        //     },
+        //     {
+        //       '768w': 'https://placeimg.com/768/576/people',
         //     },
         //   ],
         // },
@@ -160,7 +167,7 @@ export default {
         autoplay: this.items.length > 6,
         slidesPerView: this.items.length < 3 ? 2 : 3,
         slidesPerGroup: this.items.length < 3 ? 2 : 3,
-        spaceBetween: 10,
+        spaceBetween: 15,
         loop: this.items.length > 3,
         speed: 750,
         keyboard: {
@@ -170,11 +177,18 @@ export default {
           el: '.swiper-pagination',
           clickable: true,
         },
+        breakpoints: {
+          1024: {
+            slidesPerView: 2,
+            slidesPerGroup: 2,
+          },
+        },
       };
     },
   },
   mounted() {
     const observer = lozad('.lazy', {
+      rootMargin: '50%',
       loaded: (el) => {
         el.classList.remove('lazy');
       },
@@ -183,7 +197,7 @@ export default {
   },
   methods: {
     getImageSrc(object) {
-      let value = '640w';
+      let value = '460w';
       if (this.items.length < 3) {
         value = '768w';
       }
@@ -202,16 +216,21 @@ export default {
     max-width: 1400px;
     margin: 10px auto;
 
-    @media screen and (max-width: 680px) {
+    @media screen and (max-width: 640px) {
       display: none;
     }
   }
+</style>
 
+<style lang="scss">
+  @import "../../styles/variables";
+
+  .base-carousel,
   .base-carousel-list {
-    display: none;
-
-    @media screen and (max-width: 680px) {
-      display: block;
+    .base-image-box-image {
+      max-width: inherit !important;
+      left: 50%;
+      transform: translate(-50%, -50%) !important;
     }
   }
 
@@ -219,5 +238,22 @@ export default {
     position: inherit;
     bottom: inherit;
     left: inherit;
+    margin: $spacing 0;
+  }
+
+  .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background: #000;
+    opacity: 0.6;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .swiper-pagination-bullet-active {
+    opacity: 1;
+    background: $app-color;
   }
 </style>

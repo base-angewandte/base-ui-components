@@ -37,12 +37,26 @@
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
+
+            <!-- image lazyloaded -->
             <img
+              v-if="lazyload"
+              ref="image"
+              :data-src="imageUrl"
+              :style="imageStyle"
+              :alt="title"
+              :class="['base-image-box-image', 'lazy']"
+              myoption="myoption"
+              @error="displayImage = false">
+
+            <!-- image native -->
+            <img
+              v-if="!lazyload"
               ref="image"
               :src="imageUrl"
               :style="imageStyle"
               :alt="title"
-              :class="['base-image-box-image', { 'lazy': lazyload }]"
+              class="base-image-box-image"
               @error="displayImage = false">
           </div>
           <!-- @slot to display more advanced text -->
