@@ -11,16 +11,15 @@
       :key="fieldKey"
       :label="labelInt"
       :placeholder="placeholderInt"
-      :tabs="tabs"
-      :tab-labels="tabs.map(tab => getI18nTerm(tab))"
-      :tabs-legend="getI18nTerm('form.textTabsLegend')"
-      :active-tab="activeTab"
-      :list="dropDownList"
-      :object-prop="'label'"
+      :tabs="fieldType === 'multiline' ? tabs : false"
+      :tab-labels="fieldType === 'multiline' ? tabs.map(tab => getI18nTerm(tab)) : false"
+      :tabs-legend="fieldType === 'multiline' ? getI18nTerm('form.textTabsLegend') : false"
+      :active-tab="fieldType === 'multiline' ? activeTab : false"
+      :list="fieldType === 'autocomplete' ? dropDownList : false"
+      :object-prop="fieldType === 'autocomplete' ? 'label' : false"
       :is-loading="autocompleteLoading"
       :input="fieldValueInt"
       :field-type="field.type === 'integer' ? 'number' : 'text'"
-      :class="['base-form-field']"
       @keydown.enter.prevent=""
       @text-input="setMultilineValue($event)"
       @input="fieldValueInt = $event"
@@ -39,7 +38,7 @@
           :label="getI18nTerm('form.texttype')"
           :language="language"
           value-prop="source"
-          class="multiline-dropdown"
+          class="base-form-field-creator__multiline-dropdown"
           @value-selected="setMultilineDropDown" />
       </template>
     </component>
@@ -47,11 +46,11 @@
     <!-- DATE FIELD -->
     <fieldset
       v-else-if="fieldType === 'date'"
-      class="date-field-fieldset">
-      <div class="date-field">
+      class="base-form-field-creator__date-fieldset">
+      <div class="base-form-field-creator__date-field-wrapper">
         <BaseDateInput
           :id="fieldKey"
-          :key="fieldKey + 'date'"
+          :key="fieldKey + '_date'"
           v-model="fieldValueInt"
           :label="label"
           :placeholder="placeholderInt"
@@ -62,18 +61,18 @@
           :date-format-labels="{date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
           :format-tabs-legend="getI18nTerm('form.dateTabsLegend')"
           :language="language"
-          :class="['base-form-field']" />
+          class="'base-form-field-creator__date-field" />
         <BaseDateInput
           v-if="dateType.includes('timerange')"
           :id="fieldKey"
-          :key="fieldKey + 'time'"
+          :key="fieldKey + '_time'"
           v-model="fieldValueInt"
           :label="field.properties.time_from.title"
           :show-label="false"
           :placeholder="placeholderInt"
           :range-separator="getI18nTerm('form.until')"
-          :type="'timerange'"
-          :class="['base-form-field']" />
+          type="timerange"
+          class="base-form-field-creator__date-field" />
       </div>
     </fieldset>
 
@@ -99,9 +98,8 @@
       :language="(field['x-attrs'] && field['x-attrs'].set_label_language)
         || fieldType === 'chips-below' ? language : ''"
       :drop-down-no-options-info="getI18nTerm('form.noMatch')"
-      :role-options="secondaryDropdown"
-      :roles-placeholder="getI18nTerm('form.selectRoles')"
-      :class="['base-form-field']"
+      :role-options="fieldType === 'chips-below' ? secondaryDropdown : false"
+      :roles-placeholder="fieldType === 'chips-below' ? getI18nTerm('form.selectRoles') : false"
       identifier="source"
       object-prop="label"
       @fetch-dropdown-entries="fetchAutocomplete"
@@ -112,8 +110,12 @@
         <span>
           {{ getLabel(props.item.label) }}
         </span>
-        <span class="chips-dropdown-second">{{ props.item.additional }}</span>
-        <span class="chips-dropdown-third">{{ props.item.source_name }}</span>
+        <span class="base-form-field-creator__chips-dropdown-second">
+          {{ props.item.additional }}
+        </span>
+        <span class="base-form-field-creator__chips-dropdown-third">
+          {{ props.item.source_name }}
+        </span>
       </template>
       <template slot="no-options">
         <span v-if="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest && !fieldInput">
@@ -136,20 +138,20 @@
     <div
       v-else-if="fieldType === 'group'"
       :key="fieldKey"
-      class="base-form-field base-form-field-array">
+      class="base-form-field-creator__field-array">
       <div
         v-if="field['x-attrs'] && field['x-attrs'].show_label"
-        class="base-form-field-array-label">
+        class="base-form-field-creator__field-array-label">
         {{ getI18nTerm('form.' + field.name) + ':' }}
       </div>
       <div
         :key="fieldKey"
-        class="base-form-subform-wrapper">
+        class="base-form-field-creator__subform-wrapper">
         <BaseForm
           :form-field-json="groupFormFields"
           :value-list="fieldValueInt"
           :form-id="fieldKey + '_' + field.name"
-          class="base-form-subform"
+          class="base-form-field-creator__subform"
           @values-changed="$emit('subform-input', $event)" />
       </div>
     </div> -->
@@ -159,22 +161,17 @@
 <script>
 import i18n from '../../mixins/i18n';
 import { setLanguageMixin } from '../../mixins/setLanguage';
-import BaseDropDown from '../BaseDropDown/BaseDropDown';
-import BaseDateInput from '../BaseDateInput/BaseDateInput';
-import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
-import BaseChipsBelow from '../BaseChipsBelow/BaseChipsBelow';
 import BaseForm from '../BaseForm/BaseForm';
 
 /**
- * A component for easy form creation
+ * A component for easy form field creation
  */
+
 export default {
   name: 'BaseFormFieldCreator',
   components: {
-    BaseDropDown,
-    BaseDateInput,
-    BaseChipsBelow,
-    BaseChipsInput,
+    BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
+    BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
     BaseForm,
   },
   mixins: [i18n, setLanguageMixin],
@@ -295,11 +292,10 @@ export default {
     };
   },
   computed: {
+    // import the relevant component
     fieldElement() {
       if (this.fieldType === 'text') {
         return () => import('../BaseInput/BaseInput');
-      } if (this.fieldType === 'date') {
-        return () => import('../BaseDateInput/BaseDateInput');
       } if (this.fieldType === 'multiline') {
         return () => import('../BaseMultilineTextInput/BaseMultilineTextInput');
       } if (this.fieldType === 'autocomplete') {
@@ -320,7 +316,6 @@ export default {
         return 'single';
       }
       const props = Object.keys(this.field.properties);
-
       if (props.includes('date_to') && props.includes('time_to')) {
         return 'daterangetimerange';
       }
@@ -343,6 +338,7 @@ export default {
       }
       return this.field.properties;
     },
+    // the type default for texts field
     textTypeDefault() {
       return {
         // map the language specific labels for no value selected to the default
@@ -350,9 +346,11 @@ export default {
         source: '',
       };
     },
+    // compute the texts type drop down list specific for texts
     textTypeOptions() {
       return [this.textTypeDefault].concat(this.secondaryDropdown);
     },
+    // for chips input fields - check if it is a contributors field
     isContributorOrEquivalent() {
       return this.field.name === 'contributors'
         || (this.field['x-attrs'] && this.field['x-attrs'].equivalent === 'contributors');
@@ -361,11 +359,14 @@ export default {
     fieldInput() {
       return this.textInput && this.textInput.length > 2;
     },
+    // check if chips input is a single select field
     isChipsSingleSelect() {
       return (this.field['x-attrs'] && this.field['x-attrs'].field_type
         && this.field['x-attrs'].field_type.includes('chips')
         && this.field.type === 'object');
     },
+    // check if placeholder was specified - if not defer from
+    // title or check if there is a localized term
     placeholderInt() {
       if (this.placeholder) {
         return this.placeholder;
@@ -375,12 +376,14 @@ export default {
       const fieldName = this.getFieldName(this.field);
       return internalPlaceholder || `${this.hasI18n ? this.getI18nTerm('form.select') : 'Select'} ${fieldName}`;
     },
+    // check if label was specified - if not defer from title or check if there is a localized term
     labelInt() {
       if (this.label) {
         return this.label;
       }
       return this.field.title || this.getI18nTerm(`form.${this.field.name}` || this.field.name);
     },
+    // compute field type
     fieldType() {
       return this.field['x-attrs'] && this.field['x-attrs'].field_type ? this.field['x-attrs'].field_type : 'text';
     },
@@ -400,6 +403,12 @@ export default {
       handler(val) {
         // prevent event being fired when change comes from outside
         if (val !== undefined && JSON.stringify(this.fieldValue) !== JSON.stringify(val)) {
+          /**
+           * Event emitted when field value changed internally
+           *
+           * @event field-value-changed
+           * @type Object|Array|String|Number
+           */
           this.$emit('field-value-changed', val);
         }
       },
@@ -410,33 +419,49 @@ export default {
     },
   },
   mounted() {
+    // the first time the field is mounted set the initial field value
+    // and tabs (if applicable)
     this.setFieldValue(this.fieldValue);
     if (this.tabs && this.tabs.length) {
       this.activeTab = this.setActiveTab();
     }
   },
   methods: {
+    // function for setting internal field value breaking all potential links to
+    // value passed from parent
     setFieldValue(val) {
       if (val && typeof val === 'object') {
+        // check if it is array
         if (val.length >= 0) {
           this.fieldValueInt = [].concat(JSON.parse(JSON.stringify(val)));
+          // else assume it is object
         } else {
-          this.fieldValueInt = Object.assign({}, JSON.parse(JSON.stringify(val)));
+          this.fieldValueInt = { ...JSON.parse(JSON.stringify(val)) };
         }
+        // or simply assign directly if string
       } else {
         this.fieldValueInt = val;
       }
     },
+    // as above but specific for multiline text input field
     setMultilineValue(val) {
       if (!val || typeof val === 'string') {
         this.fieldValueInt = val;
       } else {
-        this.fieldValueInt = Object.assign({}, this.fieldValueInt, JSON.parse(JSON.stringify(val)));
+        this.fieldValueInt = { ...this.fieldValueInt, ...JSON.parse(JSON.stringify(val)) };
       }
     },
+    // called by chips-input and chips-below input on field text input
     fetchAutocomplete(event) {
       this.fetchingData = true;
       this.textInput = event.value;
+      /**
+       * Event emitted for text input on autocomplete fields (autocomplete-input,
+       * chips-input, chips-below-input)
+       *
+       * @event fetch-autocomplete
+       * @type Object
+       */
       this.$emit('fetch-autocomplete', {
         value: event.value,
         name: this.field.name,
@@ -444,9 +469,12 @@ export default {
         equivalent: this.field['x-attrs'].equivalent,
       });
     },
+    // function getting label from all possible label structures (lang object (--> get
+    // correct lang) or simple string)
     getLabel(value) {
       return this.getLangLabel(value, this.language, true);
     },
+    // functionality for multiline text input with language tabs
     setActiveTab() {
       // check which locales have content
       const localesWithContent = this.availableLocales.filter(lang => !!this.fieldValueInt[lang]);
@@ -455,6 +483,7 @@ export default {
       return !localesWithContent.length || this.fieldValueInt[this.language]
         ? this.language : localesWithContent[0];
     },
+    // function for mulitline text input to set drop down field correctly
     setMultilineDropDown(val) {
       // set texts type value if present - otherwise set empty
       this.$set(this.fieldValueInt, 'type', val.source ? val : null);
@@ -466,65 +495,58 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-form-field-array {
+  .base-form-field-creator__field-array {
     margin-top: $spacing-small;
     display: flex;
     flex-direction: column;
 
-    .base-form-field-array-label {
+    .base-form-field-creator__field-array-label {
       color: $font-color-second;
       margin-bottom: $spacing-small;
       z-index: 1;
     }
 
-    .base-form-subform-wrapper {
+    .base-form-field-creator__subform-wrapper {
       border-right: 3px solid rgb(240, 240, 240);
       border-left: 3px solid rgb(240, 240, 240);
 
-      .base-form-subform {
+      .base-form-field-creator__subform {
         margin: -16px auto;
         width: calc(100% - 6px);
       }
     }
   }
 
-  .date-field-fieldset-legend {
-    color: $font-color-second;
-    margin-bottom: $spacing-small;
-  }
-
-  .date-field {
+  .base-form-field-creator__date-field-wrapper {
     display: flex;
-    .base-form-field + .base-form-field {
+    .base-form-field-creator__date-field + .base-form-field-creator__date-field {
       margin-left: $spacing;
     }
   }
 
-  .multiline-dropdown {
+  .base-form-field-creator__multiline-dropdown {
     text-transform: capitalize;
   }
 
-  .base-form-field {
-    .chips-dropdown-second {
-      margin-left: $spacing;
-      color: $font-color-second;
-      font-size: $font-size-small;
-      margin-top: 1px;
-      flex-grow: 2;
-    }
+  .base-form-field-creator__chips-dropdown-second {
+    margin-left: $spacing;
+    color: $font-color-second;
+    font-size: $font-size-small;
+    margin-top: 1px;
+    flex-grow: 2;
+  }
 
-    .chips-dropdown-third {
-      color: $font-color-third;
-      font-size: $font-size-small;
-      margin-top: auto;
-      white-space: nowrap;
-    }
+  .base-form-field-creator__chips-dropdown-third {
+    color: $font-color-third;
+    font-size: $font-size-small;
+    margin-top: auto;
+    white-space: nowrap;
   }
 
   @media screen and (max-width: 1260px) {
-    .date-field {
+    .base-form-field-creator__date-field-wrapper {
       display: block;
-      .base-form-field + .base-form-field {
+      .base-form-field-creator__date-field + .base-form-field-creator__date-field {
         margin-top: $spacing;
         margin-left: 0;
       }
