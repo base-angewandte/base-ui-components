@@ -19,9 +19,11 @@
       :object-prop="'label'"
       :is-loading="autocompleteLoading"
       :input="fieldValueInt"
+      :field-type="field.type === 'integer' ? 'number' : 'text'"
       :class="['base-form-field']"
       @keydown.enter.prevent=""
       @text-input="setMultilineValue($event)"
+      @input="fieldValueInt = $event"
       @autocomplete="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
@@ -38,44 +40,48 @@
           :language="language"
           value-prop="source"
           class="multiline-dropdown"
-          @value-selected="$set(fieldValueInt, 'type', $event)" />
+          @value-selected="setMultilineDropDown" />
       </template>
     </component>
 
     <!-- DATE FIELD -->
-    <div
+    <fieldset
       v-else-if="fieldType === 'date'"
-      class="date-field">
-      <BaseDateInput
-        :id="fieldKey"
-        :key="fieldKey + 'date'"
-        v-model="fieldValueInt"
-        :label="label"
-        :placeholder="placeholderInt"
-        :range-separator="getI18nTerm('form.until')"
-        :format="field['x-attrs'].date_format"
-        :type="dateType.includes('timerange') ? dateType.includes('daterange')
-          ? 'daterange' : 'single' : dateType"
-        :date-format-labels="{date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
-        :format-tabs-legend="getI18nTerm('form.dateTabsLegend')"
-        :language="language"
-        :class="['base-form-field']" />
-      <BaseDateInput
-        v-if="dateType.includes('timerange')"
-        :id="fieldKey"
-        :key="fieldKey + 'time'"
-        v-model="fieldValueInt"
-        :label="field.properties.time_from.title"
-        :show-label="false"
-        :placeholder="placeholderInt"
-        :range-separator="getI18nTerm('form.until')"
-        :type="'timerange'"
-        :class="['base-form-field']" />
-    </div>
+      class="date-field-fieldset">
+      <div class="date-field">
+        <BaseDateInput
+          :id="fieldKey"
+          :key="fieldKey + 'date'"
+          v-model="fieldValueInt"
+          :label="label"
+          :placeholder="placeholderInt"
+          :range-separator="getI18nTerm('form.until')"
+          :format="field['x-attrs'].date_format"
+          :type="dateType.includes('timerange') ? dateType.includes('daterange')
+            ? 'daterange' : 'single' : dateType"
+          :date-format-labels="{date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
+          :format-tabs-legend="getI18nTerm('form.dateTabsLegend')"
+          :language="language"
+          :class="['base-form-field']" />
+        <BaseDateInput
+          v-if="dateType.includes('timerange')"
+          :id="fieldKey"
+          :key="fieldKey + 'time'"
+          v-model="fieldValueInt"
+          :label="field.properties.time_from.title"
+          :show-label="false"
+          :placeholder="placeholderInt"
+          :range-separator="getI18nTerm('form.until')"
+          :type="'timerange'"
+          :class="['base-form-field']" />
+      </div>
+    </fieldset>
 
     <!-- CHIPS INPUT -->
-    <BaseChipsInput
-      v-else-if="fieldType === 'chips'"
+    <component
+      :is="fieldElement"
+      v-else-if="fieldType === 'chips' || fieldType === 'chips-below'"
+      :id="fieldKey"
       :key="fieldKey"
       v-model="fieldValueInt"
       :placeholder="placeholderInt"
@@ -84,23 +90,25 @@
       :allow-dynamic-drop-down-entries="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest"
       :allow-multiple-entries="!isChipsSingleSelect"
       :allow-unknown-entries="field['x-attrs'] && field['x-attrs'].allow_unknown_entries"
-      :chips-editable="field['x-attrs'] && field['x-attrs'].allow_unknown_entries"
-      :class="['base-form-field']"
-      :draggable="true"
+      :draggable="!isChipsSingleSelect"
       :hoverbox-content="hoverBoxData"
       :sortable="field.name === 'keywords' || (field['x-attrs'] && field['x-attrs'].sortable)"
       :is-loading="autocompleteLoading"
       :sort-text="sortText"
       :sort-name="isContributorOrEquivalent"
-      :language="field['x-attrs'] && field['x-attrs'].set_label_language ? language : ''"
+      :language="(field['x-attrs'] && field['x-attrs'].set_label_language)
+        || fieldType === 'chips-below' ? language : ''"
+      :drop-down-no-options-info="getI18nTerm('form.noMatch')"
+      :role-options="secondaryDropdown"
+      :roles-placeholder="getI18nTerm('form.selectRoles')"
+      :class="['base-form-field']"
       identifier="source"
       object-prop="label"
       @fetch-dropdown-entries="fetchAutocomplete"
       @text-input="textInput = $event"
       @hoverbox-active="$emit('fetch-info-data')">
       <template
-        slot="drop-down-entry"
-        slot-scope="props">
+        v-slot:drop-down-entry="props">
         <span>
           {{ getLabel(props.item.label) }}
         </span>
@@ -121,52 +129,10 @@
           {{ getI18nTerm('form.fetchingResults') }}
         </span>
       </template>
-    </BaseChipsInput>
-
-    <!-- CHIPS-BELOW -->
-    <BaseChipsBelow
-      v-else-if="fieldType === 'chips-below'"
-      :key="fieldKey"
-      v-model="fieldValueInt"
-      :label="label"
-      :placeholder="placeholderInt"
-      :list="dropDownList"
-      :allow-unknown-entries="true"
-      :allow-dynamic-drop-down-entries="true"
-      :identifier="'source'"
-      :hoverbox-content="hoverBoxData"
-      :object-prop="'label'"
-      :role-options="secondaryDropdown"
-      :is-loading="autocompleteLoading"
-      :sort-text="sortText"
-      :sort-name="true"
-      :chips-editable="true"
-      :roles-placeholder="getI18nTerm('form.selectRoles')"
-      :language="language"
-      class="base-form-field base-form-field-full"
-      @fetch-dropdown-entries="fetchAutocomplete"
-      @hoverbox-active="$emit('fetch-info-data')">
-      <template
-        slot="below-drop-down-entry"
-        slot-scope="props">
-        <span>{{ props.item.label }}</span>
-        <span class="chips-dropdown-second">{{ props.item.additional }}</span>
-        <span class="chips-dropdown-third">{{ props.item.source_name }}</span>
-      </template>
-      <template slot="no-options">
-        <span v-if="!fieldInput">
-          {{ getI18nTerm('form.startTyping') }}
-        </span>
-        <span v-else-if="fieldInput && !fetchingData && !autocompleteLoading">
-          {{ getI18nTerm('form.noResult') }}
-        </span>
-        <span v-else>
-          {{ getI18nTerm('form.fetchingResults') }}
-        </span>
-      </template>
-    </BaseChipsBelow>
+    </component>
 
     <!-- FIELD GROUPS -->
+    <!--
     <div
       v-else-if="fieldType === 'group'"
       :key="fieldKey"
@@ -182,10 +148,11 @@
         <BaseForm
           :form-field-json="groupFormFields"
           :value-list="fieldValueInt"
+          :form-id="fieldKey + '_' + field.name"
           class="base-form-subform"
           @values-changed="$emit('subform-input', $event)" />
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -392,7 +359,7 @@ export default {
     },
     // to determine text display for chips input
     fieldInput() {
-      return this.textInput && this.textInput.length > 3;
+      return this.textInput && this.textInput.length > 2;
     },
     isChipsSingleSelect() {
       return (this.field['x-attrs'] && this.field['x-attrs'].field_type
@@ -428,7 +395,6 @@ export default {
           }
         }
       },
-      immediate: true,
     },
     fieldValueInt: {
       handler(val) {
@@ -442,6 +408,12 @@ export default {
     dropDownList() {
       this.fetchingData = false;
     },
+  },
+  mounted() {
+    this.setFieldValue(this.fieldValue);
+    if (this.tabs && this.tabs.length) {
+      this.activeTab = this.setActiveTab();
+    }
   },
   methods: {
     setFieldValue(val) {
@@ -483,6 +455,10 @@ export default {
       return !localesWithContent.length || this.fieldValueInt[this.language]
         ? this.language : localesWithContent[0];
     },
+    setMultilineDropDown(val) {
+      // set texts type value if present - otherwise set empty
+      this.$set(this.fieldValueInt, 'type', val.source ? val : null);
+    },
   },
 };
 </script>
@@ -510,6 +486,11 @@ export default {
         width: calc(100% - 6px);
       }
     }
+  }
+
+  .date-field-fieldset-legend {
+    color: $font-color-second;
+    margin-bottom: $spacing-small;
   }
 
   .date-field {
