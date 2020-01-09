@@ -2,7 +2,7 @@
   <div>
     <base-image-box
       v-for="(item, index) in items"
-      v-show="index < 3 || showAll"
+      v-show="index < minItems || showAll"
       :key="item.uid"
       :href="item.href"
       :title="item.title"
@@ -19,11 +19,11 @@
     />
 
     <div
-      v-if="!showAll"
+      v-if="items.length > minItems && !showAll"
       class="base-carousel-list-more">
       <base-button
+        :text="showMoreText"
         icon="plus"
-        text="Show more"
         class="base-carousel-list-more-button"
         @clicked="showMore"/>
     </div>
@@ -56,7 +56,13 @@ export default {
     items: {
       type: Array,
       default: () => ([]),
-      required: true,
+    },
+    /**
+     * specify number of initial displayed items
+     */
+    minItems: {
+      type: Number,
+      default: 3,
     },
     /**
      * specify lazy image loading
@@ -64,6 +70,13 @@ export default {
     lazyload: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify text of button to show more items
+     */
+    showMoreText: {
+      type: String,
+      default: 'Show more',
     },
   },
   data() {

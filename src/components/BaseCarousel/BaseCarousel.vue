@@ -4,6 +4,7 @@
       :items="items"
       :box-size="{ 'min-height': '250px', 'max-height': '350px'}"
       :lazyload="true"
+      show-more-text="Show more"
       class="base-carousel-list"/>
 
     <swiper
@@ -21,7 +22,7 @@
           :subtext="item.subtext"
           :description="item.description"
           :additional="item.additional"
-          :image-url="getImageSrc(item.previews)"
+          :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '460w')"
           :box-size="{ height: '400px' }"
           :lazyload="true"
           :image-first="true"
@@ -30,7 +31,6 @@
         />
       </swiper-slide>
 
-      <!-- Optional controls -->
       <div
         v-if="items.length > 2"
         slot="pagination"
@@ -40,12 +40,13 @@
 </template>
 
 <script>
+import lazySizes from 'lazysizes';
 import '@/../node_modules/swiper/css/swiper.css';
 import { swiper, swiperSlide } from 'vue-awesome-swiper';
-import lozad from 'lozad';
 import BaseCarouselList from './BaseCarouselList';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
+lazySizes.cfg.lazyClass = 'lazyload';
 
 export default {
   name: 'BaseCarousel',
@@ -118,26 +119,26 @@ export default {
             },
           ],
         },
-        // {
-        //   uid: '4',
-        //   title: 'Title',
-        //   subtext: 'Subtitle',
-        //   description: 'Austellung',
-        //   additional: '07.05.2020 - 21.05.2020',
-        //   imageUrl: 'https://placeimg.com/640/480/animal',
-        //   href: 'http://base.uni-ak.ac.at',
-        //   previews: [
-        //     {
-        //       '460w': 'https://placeimg.com/460/341/animal',
-        //     },
-        //     {
-        //       '640w': 'https://placeimg.com/640/480/animal',
-        //     },
-        //     {
-        //       '768w': 'https://placeimg.com/768/576/animal',
-        //     },
-        //   ],
-        // },
+        {
+          uid: '4',
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/animal',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/animal',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/animal',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/animal',
+            },
+          ],
+        },
         // {
         //   uid: '5',
         //   title: 'Title',
@@ -186,22 +187,11 @@ export default {
       };
     },
   },
-  mounted() {
-    const observer = lozad('.lazy', {
-      rootMargin: '50%',
-      loaded: (el) => {
-        el.classList.remove('lazy');
-      },
-    });
-    observer.observe();
-  },
   methods: {
-    getImageSrc(object) {
-      let value = '460w';
-      if (this.items.length < 3) {
-        value = '768w';
-      }
-
+    getImageWidth() {
+      return this.items.length < 3 ? '768w' : '460w';
+    },
+    getImageSrc(object, value) {
       return object.map(obj => ((Object.keys(obj)[0] === value) ? Object.values(obj)[0] : ''))
         .filter(obj => obj !== '').toString();
     },

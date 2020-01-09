@@ -45,8 +45,8 @@
               :data-src="imageUrl"
               :style="imageStyle"
               :alt="title"
-              :class="['base-image-box-image', 'lazy']"
-              myoption="myoption"
+              :class="['base-image-box-image', 'lazyload']"
+              :src="clearPng"
               @error="displayImage = false">
 
             <!-- image native -->
@@ -231,6 +231,9 @@ export default {
     // determine if shadow should cover half or third of box
     imageShadowClass() {
       return this.showTitle ? 'base-image-box-img-third' : 'base-image-box-img-half';
+    },
+    clearPng() {
+      return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';
     },
   },
   watch: {
