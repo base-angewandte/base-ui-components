@@ -21,7 +21,7 @@
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
     "hls.js": "^0.12.4",
-    "lozad": "^1.14.0",
+    "lazysizes": "^5.2.0",
     "normalize.css": "^8.0.1",
     "swiper": "^5.2.1",
     "vue": "^2.6.10",
