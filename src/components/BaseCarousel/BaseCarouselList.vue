@@ -51,7 +51,7 @@ export default {
       default: () => ({}),
     },
     /**
-     * specify object of items to render
+     * specify array of items to render
      */
     items: {
       type: Array,

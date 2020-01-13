@@ -378,8 +378,14 @@ export default {
           transform: translateY(-50%);
           transition: opacity 250ms ease-in-out;
 
-          &.lazy {
+          &.lazyload,
+          &.lazyloading {
             opacity: 0;
+            transition: opacity 400ms;
+          }
+
+          &.lazyloaded {
+            opacity: 1;
           }
         }
       }
