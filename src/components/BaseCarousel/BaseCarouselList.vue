@@ -15,8 +15,7 @@
       :image-first="true"
       :center-header="true"
       class="base-carousel-list-item"
-      box-type="a"
-    />
+      box-type="a" />
 
     <div
       v-if="items.length > minItems && !showAll"
@@ -25,7 +24,7 @@
         :text="showMoreText"
         icon="plus"
         class="base-carousel-list-more-button"
-        @clicked="showMore"/>
+        @clicked="showMore" />
     </div>
   </div>
 </template>
@@ -33,12 +32,10 @@
 <script>
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
-import BaseAutocompleteInput from '../BaseAutocompleteInput/BaseAutocompleteInput';
 
 export default {
   name: 'BaseCarouselList',
   components: {
-    BaseAutocompleteInput,
     BaseButton,
     BaseImageBox,
   },

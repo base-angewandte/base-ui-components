@@ -5,17 +5,15 @@
       :box-size="{ 'min-height': '250px', 'max-height': '350px'}"
       :lazyload="true"
       show-more-text="Show more"
-      class="base-carousel-list"/>
+      class="base-carousel-list" />
 
     <swiper
       ref="baseCarousel"
       :options="swiperOptions"
       class="base-carousel">
-
       <swiper-slide
         v-for="item in items"
-        :key="item.uid"
-      >
+        :key="item.uid">
         <base-image-box
           :href="item.href"
           :title="item.title"
@@ -27,8 +25,7 @@
           :lazyload="true"
           :image-first="true"
           :center-header="true"
-          box-type="a"
-        />
+          box-type="a" />
       </swiper-slide>
 
       <div
