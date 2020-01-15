@@ -5,15 +5,11 @@
       <BaseFormFieldCreator
         v-if="!allowMultiply(element)"
         :key="`${element.name}_${index}_${formId}`"
-        :field-key="`${element.name}_${index}_${formId}`"
-        :field-value="valueListInt[element.name]"
-        :field="element"
-        :autocomplete-loading="fieldIsLoading === element.name"
         :class="['base-form-field',
                  formFieldsHalf.indexOf(element) >= 0
                    ? 'base-form-field-half' : 'base-form-field-full',
                  { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
-        v-bind="formFieldComponentProps(element)"
+        v-bind="formFieldComponentProps(element, index)"
         @field-value-changed="setFieldValue($event, element.name)"
         @fetch-autocomplete="fetchAutocomplete" />
 
@@ -30,10 +26,7 @@
                    { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
           <BaseFormFieldCreator
             :key="`${element.name}_${index}_${valueIndex}_${formId}`"
-            :field-key="`${element.name}_${index}_${valueIndex}_${formId}`"
-            :field-value="value"
-            :field="element"
-            v-bind="formFieldComponentProps(element)"
+            v-bind="formFieldComponentProps(element, index, valueIndex)"
             @field-value-changed="setFieldValue(
               $event,
               element.name,
@@ -94,6 +87,7 @@
 import SvgIcon from 'vue-svgicon';
 import BaseFormFieldCreator from '../BaseFormFieldCreator/BaseFormFieldCreator';
 import i18n from '../../mixins/i18n';
+import setLanguage from '../../mixins/setLanguage';
 
 /**
  * Component creating a form
@@ -105,7 +99,7 @@ export default {
     BaseFormFieldCreator,
     SvgIcon,
   },
-  mixins: [i18n],
+  mixins: [i18n, setLanguage],
   props: {
     /**
      * the json object containing all the field information incl. x-attributes
@@ -154,15 +148,44 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * define fields (specify field name!) for which tabs should be shown
+     */
+    fieldsWithTabs: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * provide an autocomplete Result
+     */
+    dynamicDropDownLists: {
+      type: Object,
+      default: () => {},
+    },
+    /**
+     * set default values displayed in the drop down - as object { [fieldName]: [list] }
+     */
+    defaultDropDownValues: {
+      type: Object,
+      default: () => {},
+    },
+    /**
+     * enter the field name of a field that is currently fetching autocomplete
+     * results
+     */
+    fieldIsLoading: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
       // the drop down lists necessary for form fields with drop downs
-      dropdownLists: {},
-      // variable to specify a field that is currently loading autocomplete data
-      fieldIsLoading: '',
+      dropDownListsInt: {},
       // variable to be able to focus to the field after multipy
       multiplyParams: null,
+      // remember the field for which autocomplete is fetching
+      fetchingAutocompleteFor: '',
     };
   },
   computed: {
@@ -172,7 +195,7 @@ export default {
       return this.formFieldListInt.filter(field => field['x-attrs'] && field['x-attrs'].field_format === 'half');
     },
     formFieldListInt() {
-      console.log(this.formFieldJson);
+      console.log('compute form field list');
       return Object.keys(this.formFieldJson)
         // filter out hidden properties and $ref property from JSON
         .filter(key => !this.formFieldJson[key].$ref
@@ -190,6 +213,7 @@ export default {
         });
     },
     valueListInt() {
+      console.log('compute value list');
       const valueListTemp = {};
       // set an initial field value according to the field type
       this.formFieldListInt.forEach((field) => {
@@ -225,11 +249,33 @@ export default {
     prefetchedDropDownLists(val) {
       Object.keys(val).forEach((dropDown) => {
         if ((val[dropDown] && val[dropDown].length)
-          && (!this.dropdownLists[dropDown] || !this.dropdownLists[dropDown].length)) {
-          // this.setDropDown(val[dropDown], '', '', dropDown);
+          && (!this.dropDownListsInt[dropDown] || !this.dropDownListsInt[dropDown].length)) {
+          this.setDropDown(val[dropDown], '', '', dropDown);
         }
       });
     },
+    dynamicDropDownLists: {
+      handler(val) {
+        console.log(val);
+        console.log('dynamic drop down change');
+        const changedValues = val[this.fetchingAutocompleteFor];
+        if (this.fetchingAutocompleteFor && changedValues) {
+          console.log(this.formFieldJson);
+          console.log(this.dropDownListsInt);
+          const { equivalent } = this.formFieldJson[this.fetchingAutocompleteFor]['x-attrs'];
+          this.setDropDown(
+            changedValues,
+            '',
+            equivalent,
+            this.fetchingAutocompleteFor,
+          );
+        }
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    this.initializeDropDownLists();
   },
   updated() {
     if (this.multiplyParams && this.multiplyParams.name) {
@@ -247,14 +293,25 @@ export default {
   },
   methods: {
     fetchAutocomplete(params) {
-      /**
-       * triggered if field has an autocomplete functionality
-       * (chips-input, autocomplete-input, chips-below-input)
-       *
-       * @event fetch-autocomplete
-       * @type Object
-       */
-      this.$emit('fetch-autocomplete', params);
+      if (params.value && params.value.length > 2) {
+        console.log('fetch autocomplete');
+        console.log(params.name);
+        this.fetchingAutocompleteFor = params.name;
+        /**
+         * triggered if field has an autocomplete functionality
+         * (chips-input, autocomplete-input, chips-below-input)
+         *
+         * @event fetch-autocomplete
+         * @type Object
+         */
+        this.$emit('fetch-autocomplete', params);
+      } else {
+        // check if there is a preset list for dynamic chips input fields (e.g. keywords)
+        const prefetchedValues = this.prefetchedDropDownLists[params.name]
+          .filter(option => this.getLangLabel(option.label, true).toLowerCase()
+            .includes(params.value.toLowerCase()));
+        this.setDropDown(prefetchedValues || [], params.value, params.equivalent, params.name);
+      }
     },
     // check if field can be multiplied
     allowMultiply(el) {
@@ -290,18 +347,32 @@ export default {
     getFieldName(val) {
       return val.title || this.getI18nTerm(`form.${val.name}` || val.name);
     },
-    formFieldComponentProps(element) {
-      return {
-        tabs: this.availableLocales,
-        dropDownList: this.dropdownLists[element.name],
-        secondaryDropdown: this.dropdownLists[`${element.name}_secondary`],
+    formFieldComponentProps(element, index, valueIndex) {
+      let componentProps = {};
+      const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
+      // only set tabs for fields specified in component props
+      // (currently just mulitline)
+      if (this.fieldsWithTabs.includes(element.name)) {
+        componentProps = { ...componentProps,
+          tabs: this.availableLocales,
+        };
+      }
+      return { ...componentProps,
+        field: element,
+        label: this.getFieldName(element),
+        dropDownList: this.dropDownListsInt[element.name],
+        secondaryDropdown: this.dropDownListsInt[`${element.name}_secondary`],
         language: this.language,
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
+        fieldKey: `${element.name}_${comboIndex}_${this.formId}`,
+        fieldValue: valueIndex >= 0 ? this.valueListInt[element.name][valueIndex]
+          : this.valueListInt[element.name],
+        autocompleteLoading: this.fieldIsLoading === element.name,
       };
     },
     setFieldValue(value, fieldName, index) {
-      if (this.dropdownLists[fieldName]) {
+      if (this.dropDownListsInt[fieldName]) {
         // TODO: move this to parent!
         // cancel a potentially still ongoing autocomplete search as soon as
         // a value was selected
@@ -385,6 +456,78 @@ export default {
         hasContent = fieldValues === 0 || !!fieldValues || hasContent;
       }
       return hasContent;
+    },
+    initializeDropDownLists() {
+      console.log('initialize drop down list');
+      this.formFieldListInt.forEach((field) => {
+        // check if a source is specified in the 'x-attrs'
+        const sources = field['x-attrs']
+          ? Object.keys(field['x-attrs']).filter(key => !!key.includes('source')) : [];
+        if (sources.length) {
+          sources.forEach(async (source) => {
+            // TODO: check if this can be refactored to allow for custom drop down values
+            // but for now leave like this
+            // check if values were provided in prop
+            const name = source.includes('_') ? `${field.name}_secondary` : field.name;
+            const prefetched = this.prefetchedDropDownLists[name];
+            console.log('initial');
+            if (prefetched && prefetched.length) {
+              this.setDropDown(prefetched, '', field['x-attrs'].equivalent, name);
+              // for all others just set to an empty array in the beginning
+            } else if (source === 'source') {
+              this.setDropDown([], '', field['x-attrs'].equivalent, name);
+            }
+          });
+        }
+      });
+    },
+    setDropDown(data, value, equivalent, name) {
+      console.log('setdropdownlist');
+      console.log(name);
+      if (data) {
+        const modifiedData = data.map((entry) => {
+          if (!['GND', 'VIAF'].includes(entry.source_name)) return entry;
+          // regex to filter additional info from GND and VIAF
+          const pattern = new RegExp([
+            '^(',
+            '([^(*)*?[^0-9,|(]*?,[^0-9,|(]*|[^0-9|,(]*)$|',
+            '([^0-9|(]*|[^0-9,|]*?, [^0-9,(|]*|[^0-9|,(]*)',
+            '(, | \\| | )',
+            '(.*)$',
+            ')',
+          ].join(''));
+
+          const match = pattern.exec(entry.label);
+          if (match && match[1]) {
+            return Object.assign({}, entry, match[3] && match[5]
+              ? { label: match[3], additional: this.removeDoubleEntries(match[5]) } : { label: match[1], additional: '' });
+          }
+          return entry;
+        });
+        let dropDownList = [].concat(modifiedData);
+        // if input does not trigger search (> 2 char) set defaults
+        if (this.defaultDropDownValues && this.defaultDropDownValues[name]
+          && (!value || value.length <= 2)) {
+          dropDownList = this.setDropDownDefaults(
+            this.defaultDropDownValues[name],
+            value,
+          ).concat(dropDownList);
+        }
+        this.$set(this.dropDownListsInt, name, dropDownList);
+      } else {
+        this.$set(this.dropDownListsInt, name, []);
+      }
+    },
+    setDropDownDefaults(defaults, input) {
+      if (defaults && defaults.length) {
+        if (!input.length) {
+          return defaults;
+        }
+        return defaults
+          .filter(defaultOption => this.getLangLabel(defaultOption.label, true).toLowerCase()
+            .includes(input.toLowerCase()));
+      }
+      return [];
     },
   },
 };

@@ -160,7 +160,7 @@
 
 <script>
 import i18n from '../../mixins/i18n';
-import { setLanguageMixin } from '../../mixins/setLanguage';
+import setLanguage from '../../mixins/setLanguage';
 // import BaseForm from '../BaseForm/BaseForm';
 
 /**
@@ -174,7 +174,7 @@ export default {
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
     // BaseForm,
   },
-  mixins: [i18n, setLanguageMixin],
+  mixins: [i18n, setLanguage],
   props: {
     /**
      * a key to uniquely identify the field
@@ -277,6 +277,13 @@ export default {
     sortText: {
       type: String,
       default: 'Sort A - Z',
+    },
+    /**
+     * define if multiline tabs should be shown
+     */
+    showTabs: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

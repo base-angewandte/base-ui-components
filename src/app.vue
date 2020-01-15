@@ -13,6 +13,8 @@
     <div>
       <BaseFormNew
         :value-list="formValueList"
+        :fields-with-tabs="['texts']"
+        :form-id="'xjlaödsjfadlskj'"
         :form-field-json="json" />
     </div>
     <BaseMediaPreview

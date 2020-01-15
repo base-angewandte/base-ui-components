@@ -1,5 +1,5 @@
 /* eslint-disable-next-line */
-export const setLanguageMixin = {
+export default {
   methods: {
     getLangLabel(value, useAny = false) {
       if (typeof value === 'string') return value;
