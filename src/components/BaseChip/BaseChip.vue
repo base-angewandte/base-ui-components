@@ -22,7 +22,7 @@
     <base-hover-box
       ref="hoverBox"
       v-bind="hoverBoxContent"
-      :class="{ 'hidden': !hoverBoxEnabled || !showInfoBox }"/>
+      :class="{ 'hidden': !hoverBoxEnabled || !showInfoBox }" />
   </div>
 </template>
 

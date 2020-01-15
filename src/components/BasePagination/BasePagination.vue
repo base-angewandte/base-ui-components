@@ -21,51 +21,55 @@
       v-if="total > maxNumbers"
       class="base-pagination-row">
       <component
-        v-if="start !== 1"
         :is="numberElement"
+        v-if="start !== 1"
         :to="getLinkPath(1)"
         :tabindex="active === 1 ? -1 : 0"
         :class="['base-pagination-number', { 'base-pagination-number-active': active === 1}]"
         aria-label="page 1"
         @click.native="setActivePage(1)"
         @click="setActivePage(1)"
-        @keypress.enter="setActivePage(1)">{{ 1 }}
+        @keypress.enter="setActivePage(1)">
+        {{ 1 }}
       </component>
       <span
         v-if="start > 2"
         class="base-pagination-more">&#8943;</span>
       <component
+        :is="numberElement"
         v-for="n in subset"
         :key="n"
-        :is="numberElement"
         :to="getLinkPath(n)"
         :tabindex="active === n ? -1 : 0"
         :aria-label="`Page ${n}`"
         :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
         @click.native="setActivePage(n)"
         @click="setActivePage(n)"
-        @keypress.enter="setActivePage(n)">{{ n }}</component>
+        @keypress.enter="setActivePage(n)">
+        {{ n }}
+      </component>
       <span
         v-if="(end) < (total - 1) && (end) !== (total - 1)"
         class="base-pagination-more">&#8943;</span>
       <component
-        v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
         :is="numberElement"
+        v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
         :to="getLinkPath(total)"
         :tabindex="active === total ? -1 : 0"
         :aria-label="`Page ${total}`"
         :class="['base-pagination-number', { 'base-pagination-number-active': active === total}]"
         @click.native="setActivePage(total)"
         @click="setActivePage(total)"
-        @keypress.enter="setActivePage(total)">{{ total }}
+        @keypress.enter="setActivePage(total)">
+        {{ total }}
       </component>
     </div>
     <div
       v-else
       class="base-pagination-row">
       <component
-        v-for="n in total"
         :is="numberElement"
+        v-for="n in total"
         :key="n"
         :to="getLinkPath(n)"
         :tabindex="active === n ? -1 : 0"

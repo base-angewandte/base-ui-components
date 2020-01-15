@@ -3,22 +3,18 @@
     <div
       v-for="item in data"
       :key="item.value">
-
       <BaseToggle
         ref="baseToggle"
         :name="name"
         :label="item.label"
         :checked="item.checked"
         type="radio"
-        @clicked="updateCheckedStatus"
-      />
-
+        @clicked="updateCheckedStatus" />
     </div>
   </div>
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
 import BaseToggle from '../BaseToggle/BaseToggle';
 
 /**
@@ -27,7 +23,6 @@ import BaseToggle from '../BaseToggle/BaseToggle';
  */
 export default {
   components: {
-    SvgIcon,
     BaseToggle,
   },
   props: {
