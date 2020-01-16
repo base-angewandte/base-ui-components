@@ -98,7 +98,7 @@
           @click="addSelected()"
           @mouseover="selectedMenuEntryIndex = index">
           {{ addNewChipText ? `${addNewChipText} ${getLangLabel(entry[objectProp], true)}`
-            : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
+            : getI18nTerm('form.Add', -1, { value: getLangLabel(entry[objectProp], true) })
               + ' ' + ' ...' }}
         </li>
         <li
@@ -164,7 +164,7 @@ import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
-import setLanguage from '../../mixins/setLanguage';
+import i18n from '../../mixins/i18n';
 
 /**
  * Base Chips Input component with autocomplete function
@@ -183,7 +183,7 @@ export default {
     ClickOutside,
   },
   mixins: [
-    setLanguage,
+    i18n,
   ],
   model: {
     prop: 'selectedList',

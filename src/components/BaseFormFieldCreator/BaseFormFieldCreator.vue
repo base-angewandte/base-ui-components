@@ -160,7 +160,6 @@
 
 <script>
 import i18n from '../../mixins/i18n';
-import setLanguage from '../../mixins/setLanguage';
 // import BaseForm from '../BaseForm/BaseForm';
 
 /**
@@ -174,7 +173,7 @@ export default {
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
     // BaseForm,
   },
-  mixins: [i18n, setLanguage],
+  mixins: [i18n],
   props: {
     /**
      * a key to uniquely identify the field
@@ -459,6 +458,7 @@ export default {
     },
     // called by chips-input and chips-below input on field text input
     fetchAutocomplete(event) {
+      console.log(this.field);
       this.fetchingData = true;
       this.textInput = event.value;
       /**
