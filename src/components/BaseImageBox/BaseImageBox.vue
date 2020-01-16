@@ -39,7 +39,6 @@
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
-
             <!-- image lazyloaded -->
             <img
               v-if="lazyload"
@@ -84,10 +83,14 @@
               v-if="description"
               :class="[
                 'base-image-box-description-title',
-                { 'bold': !additional }]">{{ description }}</div>
+                { 'bold': !additional }]">
+              {{ description }}
+            </div>
             <div
               v-if="additional"
-              class="base-image-box-description-subtext bold">{{ additional }}</div>
+              class="base-image-box-description-subtext bold">
+              {{ additional }}
+            </div>
           </div>
         </div>
       </div>
@@ -380,7 +383,7 @@ export default {
           transform: translateY(-50%);
           transition: opacity 250ms ease-in-out;
 
-          &.lazyload,
+          // &.lazyload,
           &.lazyloading {
             opacity: 0;
             transition: opacity 400ms;

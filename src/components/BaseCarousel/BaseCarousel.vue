@@ -7,32 +7,32 @@
       show-more-text="Show more"
       class="base-carousel-list" />
 
-    <swiper
-      ref="baseCarousel"
-      :options="swiperOptions"
-      class="base-carousel">
-      <swiper-slide
-        v-for="item in items"
-        :key="item.uid">
-        <base-image-box
-          :href="item.href"
-          :title="item.title"
-          :subtext="item.subtext"
-          :description="item.description"
-          :additional="item.additional"
-          :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '460w')"
-          :box-size="{ height: '400px' }"
-          :lazyload="true"
-          :image-first="true"
-          :center-header="true"
-          box-type="a" />
-      </swiper-slide>
+    <div
+      class="base-carousel swiper-container">
+      <div class="swiper-wrapper">
+        <div
+          v-for="item in items"
+          :key="item.uid"
+          class="swiper-slide">
+          <base-image-box
+            :href="item.href"
+            :title="item.title"
+            :subtext="item.subtext"
+            :description="item.description"
+            :additional="item.additional"
+            :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '460w')"
+            :box-size="{ height: '400px' }"
+            :lazyload="true"
+            :image-first="true"
+            :center-header="true"
+            box-type="a" />
+        </div>
+      </div>
 
       <div
         v-if="items.length > 2"
-        slot="pagination"
-        class="swiper-pagination"/>
-    </swiper>
+        class="swiper-pagination" />
+    </div>
   </div>
 </template>
 
@@ -40,7 +40,7 @@
 // eslint-disable-next-line
 import lazySizes from 'lazysizes';
 import '@/../node_modules/swiper/css/swiper.css';
-import { swiper, swiperSlide } from 'vue-awesome-swiper';
+import Swiper from 'swiper';
 import BaseCarouselList from './BaseCarouselList';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
@@ -49,8 +49,8 @@ export default {
   components: {
     BaseImageBox,
     BaseCarouselList,
-    swiper,
-    swiperSlide,
+    // swiper,
+    // swiperSlide,
   },
   props: {
     /**
@@ -68,6 +68,12 @@ export default {
       type: Object,
       default: () => ({}),
     },
+  },
+  mounted() {
+    if (process.browser) {
+      // eslint-disable-next-line
+      const swiper = new Swiper('.base-carousel', this.swiperOptions);
+    }
   },
   methods: {
     getImageSrc(object, value) {
@@ -101,6 +107,15 @@ export default {
       left: 50%;
       transform: translate(-50%, -50%) !important;
     }
+  }
+
+  .swiper-container {
+    opacity: 0;
+    transition: opacity 250ms ease-in-out;
+  }
+
+  .swiper-container-initialized {
+    opacity: 1;
   }
 
   .swiper-pagination {
