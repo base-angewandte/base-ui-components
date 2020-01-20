@@ -114,7 +114,7 @@ export default {
   .base-hover-box {
     box-shadow: $preview-box-shadow;
     position: absolute;
-    z-index: 10;
+    z-index: map-get($zindex, hoverbox);
     margin: $spacing;
   }
 </style>

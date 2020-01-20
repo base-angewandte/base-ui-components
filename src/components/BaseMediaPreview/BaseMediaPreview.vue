@@ -343,7 +343,7 @@ export default {
   @import "../../styles/variables";
 
   .base-media-preview-background{
-    z-index: 10000000;
+    z-index: map-get($zindex, overlay);
     position: fixed;
     overflow: hidden;
     top: 0;
@@ -358,7 +358,7 @@ export default {
       right: $spacing;
       height: $icon-large;
       width: $icon-large;
-      z-index: 10000001;
+      z-index: map-get($zindex, overlay) + 20;
       cursor: pointer;
 
       .base-media-preview-close-icon {
