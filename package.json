@@ -25,8 +25,7 @@
     "vue": "2.6.10",
     "vue-click-outside": "^1.0.7",
     "vue2-datepicker": "^3.2.2",
-    "vuedraggable": "^2.23.2",
-    "weekstart": "^1.0.1"
+    "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
