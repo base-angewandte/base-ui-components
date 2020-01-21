@@ -12,7 +12,6 @@ yarn-error.log*
 *.sln
 
 dist/
-styleguide/
 /index.html
 config/dev.env.js
 config/prod.env.js
