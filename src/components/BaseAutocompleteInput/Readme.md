@@ -53,13 +53,4 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  @import "../../styles/variables";
-
-  .base-styling {
-    font-family: $font !important;
-  }
-</style>
-
 ```
