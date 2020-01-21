@@ -5,9 +5,10 @@ module.exports = {
   build: {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../index.html'),
-    assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'docs',
-    assetsPublicPath: '/base-components/dist',
+    // Paths
+    assetsRoot: path.resolve(__dirname, '../styleguide'),
+    assetsSubDirectory: '',
+    assetsPublicPath: '/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
