@@ -233,7 +233,7 @@ export default {
     height: 100%;
     width: 100%;
     /* specific to be higher than base header */
-    z-index: map-get($zindex, popup);
+    z-index: map-get($zindex, modal_bg);
     overflow: hidden;
   }
 
@@ -242,7 +242,7 @@ export default {
     position: fixed;
     top: 20vh;
     left: 50%;
-    z-index: map-get($zindex, popup) + 20;
+    z-index: map-get($zindex, modal);
     min-width: 288px;
     width: 50%;
     max-width: 700px;

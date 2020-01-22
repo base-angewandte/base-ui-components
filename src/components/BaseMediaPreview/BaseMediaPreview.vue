@@ -343,7 +343,7 @@ export default {
   @import "../../styles/variables";
 
   .base-media-preview-background{
-    z-index: map-get($zindex, overlay);
+    z-index: map-get($zindex, modal_bg);
     position: fixed;
     overflow: hidden;
     top: 0;
@@ -358,7 +358,7 @@ export default {
       right: $spacing;
       height: $icon-large;
       width: $icon-large;
-      z-index: map-get($zindex, overlay) + 20;
+      z-index: map-get($zindex, modal);
       cursor: pointer;
 
       .base-media-preview-close-icon {
