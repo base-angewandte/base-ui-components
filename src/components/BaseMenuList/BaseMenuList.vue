@@ -119,6 +119,9 @@ export default {
         this.setInternalVar();
       }
     },
+    selectedList() {
+      this.setInternalVar();
+    },
   },
   created() {
     this.setInternalVar();
