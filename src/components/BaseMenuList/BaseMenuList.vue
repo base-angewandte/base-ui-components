@@ -5,8 +5,8 @@
     :disabled="isMobile"
     :group="{ name: dragName, pull: 'clone', put: false }"
     :set-data="modifyDragItem"
-    :force-fallback="!isDragAndDropCapable"
-    :fallback-on-body="!isDragAndDropCapable"
+    :force-fallback="!dragAndDropCapable"
+    :fallback-on-body="!dragAndDropCapable"
     tag="ul"
     class="base-menu-list"
     @start="dragStart"
@@ -37,7 +37,8 @@ import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 /**
- * Base Component for SideBar Menu Entries
+ * Base Component for SideBar Menu Entries<br>
+ *   (this component is currently not ssr-capable)
  */
 
 export default {
@@ -93,13 +94,17 @@ export default {
       // outside store mutations
       entryProps: [],
       dragging: false,
-      isMobile: false,
-      isDragAndDropCapable: false,
     };
   },
   computed: {
     selectActive() {
       return this.selected;
+    },
+    dragAndDropCapable() {
+      return ('DragEvent' in window);
+    },
+    isMobile() {
+      return window.innerWidth < 640;
     },
   },
   watch: {
@@ -129,10 +134,6 @@ export default {
       }
       return false;
     }, { passive: false }); */
-  },
-  mounted() {
-    this.isMobile = window.innerWidth <= 640;
-    this.isDragAndDropCapable = ('DragEvent' in window);
   },
   methods: {
     // determines which icon should be shown for each menu entry
