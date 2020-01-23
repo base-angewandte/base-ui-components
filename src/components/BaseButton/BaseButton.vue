@@ -5,7 +5,7 @@
     :type="buttonType"
     :style="{ justifyContent: alignText }"
     :class="['base-button',
-             buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
+             `base-button-${buttonStyle}`,
              { 'base-button-background': hasBackgroundColor },
              {'base-button-active': active }]"
     @click.prevent="clicked">
@@ -96,13 +96,13 @@ export default {
     },
     /**
      * specify a button style <br>
-     * valid values: 'single' | 'row'
+     * valid values: 'single' | 'row' | 'secondary'
      */
     buttonStyle: {
       type: String,
       default: 'single',
       validator(val) {
-        return val === 'single' || val === 'row';
+        return val === 'single' || val === 'row' || val === 'secondary';
       },
     },
     /**
@@ -232,6 +232,11 @@ export default {
         height: $icon-small;
         max-width: $icon-small;
       }
+    }
+
+    &.base-button-secondary {
+      font-size: $font-size-small;
+      color: $font-color-second;
     }
 
     &.base-button-active {

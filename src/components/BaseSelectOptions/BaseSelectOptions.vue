@@ -8,7 +8,7 @@
       :icon="selectedInt ? 'unchecked' : 'checked'"
       icon-size="small"
       icon-position="right"
-      button-style="single"
+      button-style="secondary"
       class="base-select-options__select-button"
       @clicked="select" />
   </div>
@@ -37,11 +37,17 @@ export default {
       type: String,
       default: 'entries selected',
     },
+    /**
+     * the text displayed for select / deselect all
+     */
     selectText: {
       type: String,
-      default: 'select all',
+      default: 'all',
     },
-    selected: {
+    /**
+     * set from outside if all values were selected
+     */
+    allSelected: {
       type: Boolean,
       default: false,
     },
@@ -52,10 +58,13 @@ export default {
     };
   },
   watch: {
-    selected(val) {
-      if (val !== this.selectedInt) {
-        this.selectedInt = val;
-      }
+    allSelected: {
+      handler(val) {
+        if (val !== this.selectedInt) {
+          this.selectedInt = val;
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -82,15 +91,6 @@ export default {
       font-size: $font-size-small;
       color: $font-color-second;
       margin: $spacing-small/2 $spacing-small;
-    }
-
-    .base-select-options__select-button {
-      font-size: $font-size-small !important;
-      color: $font-color-second !important;
-
-      &:hover {
-        color: $app-color !important;
-      }
     }
   }
 </style>
