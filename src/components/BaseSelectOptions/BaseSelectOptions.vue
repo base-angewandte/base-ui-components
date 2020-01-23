@@ -17,6 +17,10 @@
 <script>
 import BaseButton from '../BaseButton/BaseButton';
 
+/**
+ * component to enable display of selected items and a select all
+ */
+
 export default {
   components: {
     BaseButton,
@@ -70,6 +74,12 @@ export default {
   methods: {
     select() {
       this.selectedInt = !this.selectedInt;
+      /**
+       * emitted on select all button click
+       *
+       * @event selected
+       * @type {Boolean}
+       */
       this.$emit('selected', this.selectedInt);
     },
   },

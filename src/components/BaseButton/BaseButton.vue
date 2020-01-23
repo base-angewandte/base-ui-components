@@ -63,7 +63,9 @@ export default {
      * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
      * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
      * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin'
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'checked' | 'unchecked' | 'attachment' |
+     * 'drag-lines' | 'download' | 'duplicate' | 'forbidden' | 'information' | 'sort' |
+     * 'success' | 'text'
      */
     icon: {
       type: String,
@@ -107,7 +109,8 @@ export default {
     },
     /**
      * specify icon size <br>
-     * valid values: 'large' | 'small'
+     * valid values: 'large' | 'small'<br>
+     *   this will have no effect on button-style: secondary - icon will always be small
      */
     iconSize: {
       type: String,
