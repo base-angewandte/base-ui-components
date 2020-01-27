@@ -173,13 +173,15 @@ export default {
   watch: {
     // TODO: could probably just be added to boxSelect method?
     selectedInt(val) {
-      /**
-       * event triggered when box is selectable and clicked upon
-       *
-       * @event select-triggered
-       * @type { Boolean }
-       */
-      this.$emit('select-triggered', val);
+      if (val !== this.selected) {
+        /**
+         * event triggered when box is selectable and clicked upon
+         *
+         * @event select-triggered
+         * @type { Boolean }
+         */
+        this.$emit('select-triggered', val);
+      }
     },
     selected(val) {
       if (this.selectedInt !== val) {
