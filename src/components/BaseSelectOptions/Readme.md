@@ -5,8 +5,8 @@ Example with a BaseMenuList with BaseSelectOptions above.
 <template>
   <div class="container">
         <BaseSelectOptions
-          :number-selected="numberSelected"
-          :all-selected="allSelected"
+          :list="list"
+          :selected-list="selectedArray"
           select-text="All"
           selected-number-text="entries selected"
           @selected="selectAll" />

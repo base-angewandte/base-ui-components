@@ -4,10 +4,7 @@
       {{ `${numberSelected} ${selectedNumberText}` }}
     </div>
     <BaseButton
-      :text="selectText"
-      :icon="selectedInt ? 'unchecked' : 'checked'"
-      icon-size="small"
-      icon-position="right"
+      :text="allSelectedX ? deselectText : selectText"
       button-style="secondary"
       class="base-select-options__select-button"
       @clicked="select" />
@@ -27,13 +24,6 @@ export default {
   },
   props: {
     /**
-     * specify the number of selected entries
-     */
-    numberSelected: {
-      type: Number,
-      default: 0,
-    },
-    /**
      * specify the text displayed for number of selected entries
      * x {selectText}
      */
@@ -46,14 +36,28 @@ export default {
      */
     selectText: {
       type: String,
-      default: 'all',
+      default: 'All',
     },
     /**
-     * set from outside if all values were selected
+     * the text displayed for select / deselect all
      */
-    allSelected: {
-      type: Boolean,
-      default: false,
+    deselectText: {
+      type: String,
+      default: 'None',
+    },
+    /**
+     * provide a list of currently visible entries
+     */
+    list: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * provide a list of selected entries
+     */
+    selectedList: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
@@ -61,8 +65,22 @@ export default {
       selectedInt: false,
     };
   },
+  computed: {
+    numberSelected() {
+      return this.selectedList.length;
+    },
+    allSelectedX() {
+      // not just calc comparing selectedList with list because with pagination
+      // selectedList can contain entries that are currently not incluced in list
+      const idList = this.selectedList.length && this.selectedList[0].id
+        ? this.selectedList.map(entry => entry.id) : this.selectedList;
+      const unselectedLength = this.list
+        .filter(entry => !idList.includes(entry.id)).length;
+      return unselectedLength === 0;
+    },
+  },
   watch: {
-    allSelected: {
+    allSelectedX: {
       handler(val) {
         if (val !== this.selectedInt) {
           this.selectedInt = val;
