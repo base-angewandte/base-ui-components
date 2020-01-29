@@ -596,8 +596,8 @@ export default {
       }
 
       .base-date-input__date-icon {
-        width: 24px;
-        height: 24px;
+        width: $icon-large;
+        height: $icon-large;
         color: $font-color-second;
         cursor: pointer;
       }
@@ -606,6 +606,12 @@ export default {
         padding: 0 $spacing;
         line-height: $row-height-small;
       }
+    }
+  }
+  @media screen and (max-width: $mobile) {
+    .base-date-input .base-date-input__field-wrapper .base-date-input__date-icon {
+      height: $icon-medium;
+      width: $icon-medium;
     }
   }
 </style>

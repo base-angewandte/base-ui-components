@@ -40,5 +40,3 @@ Download by scott desmond from the Noun Project
 text by Bohdan Burmich from the Noun Project
 
 Information by Arfan Khan Kamol from the Noun Project
-
-checked by hans draiman from the Noun Project
