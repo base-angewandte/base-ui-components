@@ -2,7 +2,7 @@
   <draggable
     v-model="list"
     :sort="false"
-    :disabled="isMobile"
+    :disabled="isMobile || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
     :set-data="modifyDragItem"
     :force-fallback="!dragAndDropCapable"
