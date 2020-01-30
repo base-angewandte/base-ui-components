@@ -43,7 +43,7 @@
             :placeholder="placeholder.time"
             :clearable="false"
             :append-to-body="false"
-            :lang="langObject"
+            :lang="language"
             type="time"
             format="HH:mm"
             value-type="format"
@@ -71,7 +71,7 @@
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
             :value-type="datePickerValueFormat"
-            :lang="langObject"
+            :lang="language"
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
             @focus="activeFrom = true"
@@ -112,7 +112,7 @@
             :placeholder="placeholder.time"
             :clearable="false"
             :append-to-body="false"
-            :lang="langObject"
+            :lang="language"
             type="time"
             format="HH:mm"
             value-type="format"
@@ -140,7 +140,7 @@
             :placeholder="placeholder.date || placeholder"
             :append-to-body="false"
             :value-type="datePickerValueFormat"
-            :lang="langObject"
+            :lang="language"
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
             @focus="activeTo = true"
@@ -165,8 +165,9 @@ import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 
 // languages needed for datepicker locale
-import de from 'vue2-datepicker/locale/de';
-import en from 'vue2-datepicker/locale/en';
+import 'vue2-datepicker/locale/de';
+import 'vue2-datepicker/locale/en';
+import 'vue2-datepicker/locale/fr';
 
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
@@ -308,7 +309,6 @@ export default {
       // variable to store the date when switching from date to year in order to be
       // able to restore exact date when switching back
       tempDateStore: {},
-      langObject: {},
     };
   },
   computed: {
@@ -419,15 +419,6 @@ export default {
       },
       deep: true,
     },
-  },
-  async mounted() {
-    // if the language is not english - import from correct locale from datepicker
-    // TODO: this is not sufficient for other languages!!
-    if (this.language !== 'en' && de) {
-      this.langObject = de;
-    } else {
-      this.langObject = en;
-    }
   },
   methods: {
     /**
