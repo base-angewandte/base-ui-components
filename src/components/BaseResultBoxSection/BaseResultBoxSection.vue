@@ -76,7 +76,19 @@
           </div>
           <slot name="options-message-area-after" />
         </div>
-
+        <slot name="below-action-area" />
+        <BaseSelectOptions
+          v-if="selectActive"
+          :key="headerText + '_selectOptions'"
+          :selected-number-text="$t(
+            'entriesSelected',
+            { type: $tc(`notify.${entryType}`, selectedList.length) }
+          )"
+          :select-text="$t('selectAll')"
+          :deselect-text="$t('selectNone')"
+          :list="attachedList"
+          :selected-list="selectedList"
+          @selected="$emit('selected', $event)" />
         <!-- BOXAREA -->
         <div
           :key="headerText + '_boxArea'"
@@ -103,6 +115,7 @@
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon="save-file"
             box-style="small"
+            box-type="button"
             class="linked-base-box"
             @clicked="submitAction" />
         </div>
@@ -125,6 +138,7 @@ import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+import BaseSelectOptions from '../BaseSelectOptions/BaseSelectOptions';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -137,6 +151,7 @@ export default {
     BaseOptions,
     BaseImageBox,
     BaseBoxButton,
+    BaseSelectOptions,
   },
   props: {
     /**
@@ -212,6 +227,20 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * provide a list of selected entries for select options
+     */
+    selectedList: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * define entry type (currently media or entry
+     */
+    entryType: {
+      type: String,
+      default: 'entry',
     },
     /**
      * if specified residual items will be available via pagination
@@ -371,7 +400,7 @@ export default {
       position: absolute;
       height: 100%;
       width: 100%;
-      z-index: 2;
+      z-index: map-get($zindex, loader);
       background-color: rgba(255,255,255, 0.50);
 
       .base-attachments-section__loader {
@@ -413,7 +442,8 @@ export default {
         text-align: center;
         color: $font-color-second;
         backface-visibility: hidden;
-        z-index: 1;
+        z-index: map-get($zindex, boxcontent);
+        position: relative;
 
         .base-attachments-section__message-area-text {
           font-size: $font-size-large;
