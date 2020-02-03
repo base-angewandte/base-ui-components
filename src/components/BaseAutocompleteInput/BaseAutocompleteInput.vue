@@ -261,7 +261,7 @@ export default {
       max-height: 10 * $row-height-small;
       overflow-y: auto;
       width: 100%;
-      z-index: 2;
+      z-index: map-get($zindex, dropdown);
       box-shadow: $drop-shadow;
       cursor: pointer;
 

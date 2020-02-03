@@ -363,7 +363,7 @@ export default {
     .base-drop-down-body {
       position: absolute;
       background-color: white;
-      z-index: 3;
+      z-index: map-get($zindex, dropdown);
       box-shadow: $drop-shadow;
       max-height: 300px;
       max-width: calc(100vw - 3 * #{$spacing});

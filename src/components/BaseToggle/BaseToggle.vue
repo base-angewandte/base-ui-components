@@ -134,7 +134,7 @@ export default {
     .base-toggle-input {
       position: absolute;
       opacity: 0;
-      z-index: 1;
+      z-index: map-get($zindex, boxcontent);
     }
 
     .base-switch-container {

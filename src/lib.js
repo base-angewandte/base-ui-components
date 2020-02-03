@@ -24,6 +24,7 @@ import BaseOptions from './components/BaseOptions/BaseOptions';
 import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseFormFieldCreator from './components/BaseFormFieldCreator/BaseFormFieldCreator';
 import BaseFormNew from './components/BaseForm/BaseForm';
+import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -54,4 +55,5 @@ export {
   BaseResultBoxSection,
   BaseFormFieldCreator,
   BaseFormNew,
+  BaseSelectOptions,
 };

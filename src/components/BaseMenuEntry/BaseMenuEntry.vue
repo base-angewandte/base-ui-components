@@ -402,7 +402,7 @@ export default {
       top: 0;
       left: calc(-#{$fade-out-width} - #{$spacing});
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-      z-index: 1;
+      z-index: map-get($zindex, fadeout);
     }
   }
 

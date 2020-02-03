@@ -900,7 +900,7 @@ export default {
       background: white;
       max-height: 10 * $row-height-small;
       overflow-y: auto;
-      z-index: 2;
+      z-index: map-get($zindex, dropdown);
       box-shadow: $drop-shadow;
       cursor: pointer;
 

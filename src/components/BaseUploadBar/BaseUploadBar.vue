@@ -119,7 +119,7 @@ export default {
       position: absolute;
       overflow: hidden;
       white-space: nowrap;
-      z-index: 2;
+      z-index: map-get($zindex, uploadbar-content);
       display: flex;
       justify-content: space-between;
 
@@ -148,7 +148,7 @@ export default {
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
+      z-index: map-get($zindex, uploadbar);
       height: 100%;
       background-color: $uploadbar-color;
     }
@@ -160,7 +160,7 @@ export default {
       position: absolute;
       top: 50%;
       transform: translate(0, -50%);
-      z-index: 2;
+      z-index: map-get($zindex, uploadbar-content);
 
       &.base-upload-bar-status-icon-success {
         fill: white;
