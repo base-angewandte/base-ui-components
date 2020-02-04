@@ -99,7 +99,8 @@ export default {
       padding-bottom: calc(50% - #{$spacing-small});
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
       box-shadow: $box-shadow-hov;
     }
 

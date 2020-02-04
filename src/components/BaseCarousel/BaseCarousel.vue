@@ -207,5 +207,10 @@ export default {
   .swiper-pagination-bullet-active {
     opacity: 1;
     background: $app-color;
+
+    &:hover,
+    &:focus {
+      box-shadow: $box-shadow-hov;
+    }
   }
 </style>
