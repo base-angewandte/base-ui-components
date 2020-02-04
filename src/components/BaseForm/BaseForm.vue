@@ -85,7 +85,6 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
-import BaseFormFieldCreator from '../BaseFormFieldCreator/BaseFormFieldCreator';
 import i18n from '../../mixins/i18n';
 
 /**
@@ -93,9 +92,9 @@ import i18n from '../../mixins/i18n';
  */
 
 export default {
-  name: 'BaseFormNew',
+  name: 'BaseForm',
   components: {
-    BaseFormFieldCreator,
+    BaseFormFieldCreator: () => import('../BaseFormFieldCreator/BaseFormFieldCreator'),
     SvgIcon,
   },
   mixins: [i18n],
@@ -113,18 +112,7 @@ export default {
      */
     valueList: {
       type: Object,
-      default() {
-        return {};
-      },
-    },
-    /**
-     * any drop down lists that already have values
-     */
-    prefetchedDropDownLists: {
-      type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
     /**
      * set current language
@@ -159,14 +147,14 @@ export default {
      */
     dynamicDropDownLists: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     /**
      * set default values displayed in the drop down - as object { [fieldName]: [list] }
      */
     defaultDropDownValues: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     /**
      * enter the field name of a field that is currently fetching autocomplete
@@ -178,7 +166,14 @@ export default {
     },
     dropDownLists: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
+    },
+    /**
+     * provide a autocomplete function, otherwise an event will be emitted
+     */
+    autocomplete: {
+      type: Function,
+      default: null,
     },
   },
   data() {
@@ -190,6 +185,7 @@ export default {
       // variable saving the current field input string during
       // autocomplete functionality
       currentInputString: '',
+      valueListInt: [],
     };
   },
   computed: {
@@ -215,18 +211,6 @@ export default {
           return -1;
         });
     },
-    valueListInt() {
-      const valueListTemp = {};
-      // set an initial field value according to the field type
-      this.formFieldListInt.forEach((field) => {
-        this.$set(
-          valueListTemp,
-          field.name,
-          this.getInitialFieldValue(field),
-        );
-      });
-      return valueListTemp;
-    },
   },
   watch: {
     valueList: {
@@ -234,7 +218,7 @@ export default {
         const changedValues = Object.keys(this.valueListInt)
           .some(key => JSON.stringify(this.valueListInt[key]) !== JSON.stringify(val[key]));
         if (changedValues) {
-          console.log('values changed');
+          this.initializeValueObject();
         }
       },
       deep: true,
@@ -242,9 +226,9 @@ export default {
     formFieldJson: {
       handler() {
         // if new field specifications were set - also reset the properties of the value object
-        // this.valueListInt = {};
+        this.valueListInt = {};
         // initialize value object with new properties
-        // this.initializeValueObject();
+        this.initializeValueObject();
       },
       immediate: true,
     },
@@ -264,7 +248,7 @@ export default {
     }
   },
   methods: {
-    fetchAutocomplete(params) {
+    async fetchAutocomplete(params) {
       this.currentInputString = params.value;
       this.fetchingAutocompleteFor = params.name;
       /**
@@ -274,7 +258,7 @@ export default {
        * @event fetch-autocomplete
        * @type Object
        */
-      this.$emit('fetch-autocomplete', params);
+      await this.$emit('fetch-autocomplete', params);
     },
     // check if field can be multiplied
     allowMultiply(el) {
@@ -311,20 +295,8 @@ export default {
       return val.title || this.getI18nTerm(`form.${val.name}` || val.name);
     },
     formFieldComponentProps(element, index, valueIndex) {
-      let componentProps = {};
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
-      // only set tabs for fields specified in component props
-      // (currently just mulitline)
-      if (this.fieldsWithTabs.includes(element.name)) {
-        componentProps = { ...componentProps,
-          tabs: this.availableLocales,
-        };
-      }
-      console.log(element.name);
-      if (element.name === 'contributors') {
-        console.log(this.dropDownLists[`${element.name}_secondary`]);
-      }
-      return { ...componentProps,
+      return {
         field: element,
         label: this.getFieldName(element),
         dropDownList: this.dropDownLists[element.name],
@@ -360,6 +332,15 @@ export default {
         this.$set(this.valueListInt, fieldName, value ? JSON.parse(JSON.stringify(value)) : value);
       }
       this.$emit('values-changed', this.valueListInt);
+    },
+    initializeValueObject() {
+      this.formFieldListInt.forEach((field) => {
+        this.$set(
+          this.valueListInt,
+          field.name,
+          this.getInitialFieldValue(field),
+        );
+      });
     },
     getInitialFieldValue(field) {
       const value = this.valueList[field.name];

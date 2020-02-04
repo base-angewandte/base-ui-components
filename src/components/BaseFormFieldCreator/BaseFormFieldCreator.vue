@@ -61,7 +61,7 @@
           :date-format-labels="{date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
           :format-tabs-legend="getI18nTerm('form.dateTabsLegend')"
           :language="language"
-          class="'base-form-field-creator__date-field" />
+          class="base-form-field-creator__date-field" />
         <BaseDateInput
           v-if="dateType.includes('timerange')"
           :id="fieldKey"
@@ -134,7 +134,6 @@
     </component>
 
     <!-- FIELD GROUPS -->
-    <!--
     <div
       v-else-if="fieldType === 'group'"
       :key="fieldKey"
@@ -154,13 +153,12 @@
           class="base-form-field-creator__subform"
           @values-changed="$emit('subform-input', $event)" />
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script>
 import i18n from '../../mixins/i18n';
-// import BaseForm from '../BaseForm/BaseForm';
 
 /**
  * A component for easy form field creation
@@ -171,7 +169,7 @@ export default {
   components: {
     BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
-    // BaseForm,
+    BaseForm: () => import('../BaseForm/BaseForm'),
   },
   mixins: [i18n],
   props: {
@@ -183,7 +181,7 @@ export default {
       required: true,
     },
     /**
-     * field information as provided by swagger
+     * field information as provided by swagger standard
      */
     field: {
       type: Object,
@@ -211,15 +209,6 @@ export default {
     placeholder: {
       type: [String, Object],
       default: '',
-    },
-    /**
-     * provide tabs for multiline text field
-     */
-    tabs: {
-      type: Array,
-      default() {
-        return [];
-      },
     },
     /**
      * provide a options list for autocomplete, chips or chips-below fields
@@ -276,13 +265,6 @@ export default {
     sortText: {
       type: String,
       default: 'Sort A - Z',
-    },
-    /**
-     * define if multiline tabs should be shown
-     */
-    showTabs: {
-      type: Boolean,
-      default: false,
     },
   },
   data() {
@@ -392,6 +374,18 @@ export default {
     fieldType() {
       return this.field['x-attrs'] && this.field['x-attrs'].field_type ? this.field['x-attrs'].field_type : 'text';
     },
+    tabs() {
+      if (this.field.items && this.field.items.properties && this.field.items.properties.data
+        && this.field.items.properties.data.items
+        && this.field.items.properties.data.items.properties
+        && this.field.items.properties.data.items.properties.language) {
+        return Object.keys(this.field.items.properties
+          .data.items.properties
+          .language.properties
+          .label.properties).filter(lang => this.availableLocales.includes(lang));
+      }
+      return [];
+    },
   },
   watch: {
     fieldValue: {
@@ -403,6 +397,7 @@ export default {
           }
         }
       },
+      immediate: true,
     },
     fieldValueInt: {
       handler(val) {
@@ -458,7 +453,6 @@ export default {
     },
     // called by chips-input and chips-below input on field text input
     fetchAutocomplete(event) {
-      console.log(this.field);
       this.fetchingData = true;
       this.textInput = event.value;
       /**
@@ -525,6 +519,7 @@ export default {
 
   .base-form-field-creator__date-field-wrapper {
     display: flex;
+
     .base-form-field-creator__date-field + .base-form-field-creator__date-field {
       margin-left: $spacing;
     }
