@@ -153,7 +153,7 @@
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
           @values-changed="$emit('field-value-changed', $event)"
-          @fetch-autocomplete="test"/>
+          @fetch-autocomplete="test" />
       </div>
     </div>
   </div>

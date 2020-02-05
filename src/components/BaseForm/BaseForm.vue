@@ -88,7 +88,7 @@ import SvgIcon from 'vue-svgicon';
 import i18n from '../../mixins/i18n';
 
 /**
- * Component creating a form
+ * Component creating a form according to a provided [swagger](swagger.io) standard
  */
 
 export default {
@@ -150,16 +150,13 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * provide a object that contains the options list for all
+     * fields with autocomplete / chips input
+     */
     dropDownLists: {
       type: Object,
       default: () => ({}),
-    },
-    /**
-     * provide a autocomplete function, otherwise an event will be emitted
-     */
-    autocomplete: {
-      type: Function,
-      default: null,
     },
   },
   data() {
@@ -270,6 +267,13 @@ export default {
         this.$set(fieldGroupValues, index, this.getInitialFieldValue(field.items));
       }
       // inform parent of changes
+      /**
+       * event triggered when the values of a field were altered or a form
+       * field was added or removed
+       *
+       * @event values-changed
+       * @type Array
+       */
       this.$emit('values-changed', this.valueListInt);
     },
     // check if field is half field and the second of two halves

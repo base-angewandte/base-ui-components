@@ -3,6 +3,7 @@ A simple example without label
 ```vue
 <template>
   <BaseInput
+    id="simpleexample"
     :show-label="false"
     label="This label says Specify any text below"
     placeholder="A custom placeholder"/>
@@ -18,6 +19,7 @@ A simple example without border
 ```vue
 <template>
   <BaseInput
+    id="noborder"
     :show-input-border="false"
     label="Specify any text here"
     placeholder="A custom placeholder"/>
@@ -33,6 +35,7 @@ A example with label and slot demonstrations
 ```vue
 <template>
   <BaseInput
+    id="withslot"
     label="This label says Specify any text below"
     placeholder="A custom placeholder">
     <template v-slot:label-addition>

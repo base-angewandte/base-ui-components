@@ -8,6 +8,8 @@ With the FormFieldCreator component you can create any of the following form inp
 * [Date Input](#basedateinput)
 * Nested Field Groups (a subform)
 
+For description of 'x-attributes' this field creation relies on please see [BaseForm](#baseform)
+
 Example for a MultilineTextInput:
 
 ```vue
@@ -315,7 +317,7 @@ Example for a field group:
           :field="field"
           :field-value="value"
           @field-value-changed="value = {...$event}" />
-    <div>{{ value }}</div>
+    <div class="value-display">{{ value }}</div>
   </div>
 </template>
 
@@ -368,4 +370,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.value-display {
+    margin-top: 16px;
+}
+</style>
 ```
