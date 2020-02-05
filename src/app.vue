@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <h1>BaseDetailBox</h1>
+    <base-detail-box />
+
     <!-- VIDEO TEST -->
     <!-- <video
       width="320"
@@ -327,6 +330,7 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
+import BaseDetailBox from './components/BaseDetailBox/BaseDetailBox';
 
 export default {
   name: 'App',
@@ -348,6 +352,7 @@ export default {
     BaseInput,
     BaseButton,
     BaseDropBox,
+    BaseDetailBox,
   },
   data() {
     return {
