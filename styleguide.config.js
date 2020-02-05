@@ -3,7 +3,20 @@ const path = require('path');
 module.exports = {
   // set your styleguidist configuration here
   title: 'Base Components',
-  defaultExample: true,
+  defaultExample: false,
+  theme: {
+    fontFamily: {
+      base: 'Source Sans Pro, sans-serif',
+    },
+    fontSize: {
+      base: 17,
+      text: 19,
+      small: 15,
+    },
+    mq: {
+      small: '@media (max-width: 640px)',
+    },
+  },
   components: 'src/components/**/Base[A-Z]*.vue',
   // sections: [
   //   {

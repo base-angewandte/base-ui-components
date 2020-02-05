@@ -18,7 +18,7 @@ export default {
     setLangLabels(key, locales) {
       return locales
         .reduce((prev, curr) => {
-          this.$set(prev, curr, this.$i18n ? this.$t(key, curr) : key);
+          this.$set(prev, curr, this.$i18n ? this.$t(key, curr) : key.split('.').pop());
           return prev;
         }, {});
     },

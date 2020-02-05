@@ -151,7 +151,7 @@
           :value-list="fieldValueInt"
           :form-id="fieldKey + '_' + field.name"
           class="base-form-field-creator__subform"
-          @values-changed="$emit('subform-input', $event)" />
+          @values-changed="$emit('field-value-changed', $event)" />
       </div>
     </div>
   </div>
@@ -161,7 +161,7 @@
 import i18n from '../../mixins/i18n';
 
 /**
- * A component for easy form field creation
+ * A component for form field creation via [swagger](swagger.io) standard
  */
 
 export default {
@@ -215,9 +215,7 @@ export default {
      */
     dropDownList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * provide a second options list (needed e.g. for texts field (text type) or
@@ -225,18 +223,14 @@ export default {
      */
     secondaryDropdown: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * provide data for elements that have a hover box (chips)
      */
     hoverBoxData: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => ({}),
     },
     /**
      * possibility to steer field loading (chips, autocomplete) from outside
