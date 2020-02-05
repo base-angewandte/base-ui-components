@@ -150,8 +150,10 @@
           :form-field-json="groupFormFields"
           :value-list="fieldValueInt"
           :form-id="fieldKey + '_' + field.name"
+          v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
-          @values-changed="$emit('field-value-changed', $event)" />
+          @values-changed="$emit('field-value-changed', $event)"
+          @fetch-autocomplete="test"/>
       </div>
     </div>
   </div>
@@ -259,6 +261,14 @@ export default {
     sortText: {
       type: String,
       default: 'Sort A - Z',
+    },
+    /**
+     * pass down all necessary options for potential subform<br>
+     *   @see [BaseForm props](#baseform)
+     */
+    fieldGroupParams: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -421,6 +431,9 @@ export default {
     }
   },
   methods: {
+    test(event) {
+      this.$emit('fetch-autocomplete', event);
+    },
     // function for setting internal field value breaking all potential links to
     // value passed from parent
     setFieldValue(val) {
@@ -505,6 +518,7 @@ export default {
       border-left: 3px solid rgb(240, 240, 240);
 
       .base-form-field-creator__subform {
+        position: relative;
         margin: -16px auto;
         width: calc(100% - 6px);
       }

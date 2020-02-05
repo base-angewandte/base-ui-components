@@ -143,20 +143,6 @@ export default {
       default: () => [],
     },
     /**
-     * provide an autocomplete Result
-     */
-    dynamicDropDownLists: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
-     * set default values displayed in the drop down - as object { [fieldName]: [list] }
-     */
-    defaultDropDownValues: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
      * enter the field name of a field that is currently fetching autocomplete
      * results
      */
@@ -308,24 +294,14 @@ export default {
         fieldValue: valueIndex >= 0 ? this.valueListInt[element.name][valueIndex]
           : this.valueListInt[element.name],
         autocompleteLoading: this.fieldIsLoading === element.name,
+        // add component props to form fields creator props if list contains a field_type 'group'
+        fieldGroupParams: this.formFieldListInt
+          .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')
+          ? this.$props : null,
       };
     },
     setFieldValue(value, fieldName, index) {
       this.currentInputString = '';
-      /*
-      if (this.dropDownLists[fieldName]) {
-        const fieldAttrs = this.formFieldJson[fieldName]['x-attrs'];
-        // reset the dropdownlist for dynamic autosuggest
-        if (fieldAttrs.dynamic_autosuggest) {
-          this.setDropDown([], '', fieldAttrs.equivalent, fieldName);
-        }
-        // if the field has contributors as equivalent set the role!
-        if (fieldAttrs.equivalent === 'contributors') {
-          const fieldRole = this.$store.state.data.prefetchedTypes.contributors_role
-            .find(role => role.source === fieldAttrs.default_role);
-          value.forEach(entry => this.$set(entry, 'roles', [fieldRole]));
-        }
-      } */
       if (index >= 0) {
         this.$set(this.valueListInt[fieldName], index, JSON.parse(JSON.stringify(value)));
       } else {
