@@ -220,12 +220,17 @@ export default {
     if (this.multiplyParams && this.multiplyParams.name) {
       const elements = this.$refs[this.multiplyParams.name];
       if (elements.length) {
-        const inputs = elements[this.multiplyParams.index].getElementsByTagName('textarea').length
-          ? elements[this.multiplyParams.index].getElementsByTagName('textarea')
-          : elements[this.multiplyParams.index].getElementsByTagName('input');
-        if (inputs.length) {
-          inputs[0].focus();
-        }
+        // this seems like a stupid hack however had to do this because if 'getElementsByTagName'
+        // was evaluated immediately it came back empty for 'textarea' since for some reason
+        // this was not in the DOM tree yet... (no problems for input fields / subforms tho)
+        setTimeout((params) => {
+          const inputs = elements[params.index].getElementsByTagName('textarea').length
+            ? elements[params.index].getElementsByTagName('textarea')
+            : elements[params.index].getElementsByTagName('input');
+          if (inputs.length) {
+            inputs[0].focus();
+          }
+        }, 50, this.multiplyParams);
       }
       this.multiplyParams = null;
     }
