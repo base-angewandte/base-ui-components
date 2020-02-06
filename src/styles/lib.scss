@@ -133,3 +133,11 @@ button {
 .svg-left {
   transform: rotate(-90deg);
 }
+
+h1, h2, h3 {
+  font-size: $font-size-regular;
+  font-weight: bold;
+  line-height: $line-height;
+  margin-top: 0;
+  margin-bottom: $headline-margin-bottom;
+}
