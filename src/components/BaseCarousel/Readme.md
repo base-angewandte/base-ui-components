@@ -8,6 +8,8 @@ Base Carousel
        slidesPerView: 2,
        slidesPerGroup: 2,
        spaceBetween: 15,
+       autoplay: false,
+       autoPlayDelay: 5000,
        loop: true,
        speed: 750,
        keyboard: {

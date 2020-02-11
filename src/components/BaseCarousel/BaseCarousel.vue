@@ -1,14 +1,14 @@
 <template>
   <div>
     <div
-      :class="['base-carousel', {'swiper-container': swiperisActive}]">
+      :class="['base-carousel', {'swiper-container': swiperIsActive}]">
       <div
         class="swiper-wrapper">
         <div
           v-for="(item, index) in items"
-          v-show="swiperisActive || (!swiperisActive && index < minItems || showAll)"
+          v-show="swiperIsActive || (!swiperIsActive && index < minItems || showAll)"
           :key="item.uid"
-          :class="['base-carousel-slide', {'swiper-slide': swiperisActive}]">
+          :class="['base-carousel-slide', {'swiper-slide': swiperIsActive}]">
           <base-image-box
             :href="item.href"
             :title="item.title"
@@ -29,7 +29,7 @@
         class="swiper-pagination" />
 
       <div
-        v-if="(!swiperisActive && items.length > minItems && !showAll)"
+        v-if="(!swiperIsActive && items.length > minItems && !showAll)"
         class="base-carousel-more">
         <base-button
           :text="showMoreText"
@@ -89,14 +89,14 @@ export default {
   data() {
     return {
       swiper: undefined,
-      swiperisActive: false,
+      swiperIsActive: false,
       showAll: false,
       breakpoint: null,
     };
   },
   computed: {
     boxSize() {
-      return this.swiperisActive ? { height: '400px' } : { 'min-height': '250px', 'max-height': '350px' };
+      return this.swiperIsActive ? { height: '400px' } : { 'min-height': '250px', 'max-height': '350px' };
     },
   },
   mounted() {
@@ -116,22 +116,29 @@ export default {
       if (this.breakpoint.matches === false) {
         if (this.swiper !== undefined) {
           this.swiper.destroy(true, true);
-          this.swiperisActive = false;
+          this.swiperIsActive = false;
         }
       }
 
       // init swiper on larger devices
       if (this.breakpoint.matches === true) {
-        this.swiperisActive = true;
         this.enableSwiper();
       }
     },
     enableSwiper() {
-      this.swiper = new Swiper('.base-carousel', this.swiperOptions);
+      this.swiperIsActive = true;
+
+      this.swiperOptions.init = false;
+      if (this.swiperOptions.autoplay) {
+        this.swiperOptions.autoplay = {};
+        this.swiperOptions.autoplay.delay = this.swiperOptions.autoplayDelay || 3000;
+        this.swiperOptions.autoplay.disableOnInteraction = true;
+      }
 
       setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-      }, 0);
+        this.swiper = new Swiper('.swiper-container', this.swiperOptions);
+        this.swiper.init();
+      }, 250);
     },
     showMore() {
       this.showAll = true;
@@ -179,39 +186,47 @@ export default {
       left: 50%;
       transform: translate(-50%, -50%) !important;
     }
-  }
 
-  .swiper-pagination {
-    display: none;
-    position: inherit;
-    bottom: inherit;
-    left: inherit;
-    margin: $spacing 0;
+    &.swiper-container {
+      opacity: 0;
 
-    @media screen and (min-width: 640px) {
-      display: block;
+      &.swiper-container-initialized {
+        opacity: 1;
+      }
     }
-  }
 
-  .swiper-pagination-bullet {
-    width: 10px;
-    height: 10px;
-    background: #000;
-    opacity: 0.6;
-    margin: 0 $spacing-small;
+    .swiper-pagination {
+      display: none;
+      position: inherit;
+      bottom: 0;
+      left: inherit;
+      margin: $spacing 0;
 
-    &:focus {
-      outline: none;
+      @media screen and (min-width: 640px) {
+        display: block;
+      }
     }
-  }
 
-  .swiper-pagination-bullet-active {
-    opacity: 1;
-    background: $app-color;
+    .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      background: #000;
+      opacity: 0.6;
+      margin: 0 $spacing-small;
 
-    &:hover,
-    &:focus {
-      box-shadow: $box-shadow-hov;
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .swiper-pagination-bullet-active {
+      opacity: 1;
+      background: $app-color;
+
+      &:hover,
+      &:focus {
+        box-shadow: $box-shadow-hov;
+      }
     }
   }
 </style>
