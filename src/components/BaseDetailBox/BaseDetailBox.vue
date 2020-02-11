@@ -5,25 +5,16 @@
     box-ratio="0"
     class="base-detail-box">
     <dl class="base-detail-box-dl">
-      <dt>Telefon</dt>
-      <dd>01234455767</dd>
-
-      <dt>Fax</dt>
-      <dd>-</dd>
-
-      <dt>Mobile</dt>
-      <dd>098012345678</dd>
-
-      <dt>Email</dt>
-      <dd>florian.bettel@uni-ak.ac.at</dd>
-
-      <dt>Organisationseinheiten</dt>
-      <dd>Kulturwissenschaften, Support Kunst und Kultur</dd>
-
-      <dt>Standort</dt>
-      <dd>Vordere Zollamtsstraße 7, 4 St.</dd>
+      <template
+        v-for="(item, index) in data">
+        <dt :key="'dt' + index">
+          {{ item.label }}
+        </dt>
+        <dd :key="'dd' + index">
+          {{ item.value }}
+        </dd>
+      </template>
     </dl>
-    <slot />
   </base-box>
 </template>
 
@@ -37,8 +28,8 @@ export default {
   },
   props: {
     data: {
-      type: Object,
-      default: () => {},
+      type: Array,
+      default: () => [],
     },
   },
 };
