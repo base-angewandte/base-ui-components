@@ -1,4 +1,4 @@
-A component to display expandable text and list additional data
+A component to display expandable text, unordered list, datalist elements
 
 ```vue
 <template>
@@ -16,11 +16,29 @@ export default {
       data: {
         descriptions: [{
           label: 'Description',
-          text: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
             At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
 
             At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`,
-        }],
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+              {
+                label: 'Labore',
+                value: 'Dolore magna aliquyam erat',
+              },
+              {
+                label: 'Labore',
+                value: 'Dolore magna aliquyam erat',
+              },
+              {
+                label: 'Labore',
+                value: 'Dolore magna aliquyam erat',
+              },
+            ],
+          },
+        ],
         furtherDetails: [{
             label: 'Vero eos et accusam',
             data: 'no sea takimata sanctus est Lorem ipsum dolor sit amet.',

@@ -9,24 +9,9 @@
         {'base-expand-box-inner-fade-out': (!isOpen && showButton)}]">
       <div class="base-expand-box-columns">
         <div class="base-expand-box-column">
-          <div
-            v-for="(description, index) in data.descriptions"
-            :key="index"
-            class="base-expand-box-column-item">
-            <component
-              :is="renderLabelAs"
-              v-if="description.label"
-              class="base-expand-box-label">
-              {{ description.label }}
-            </component>
-
-            <!-- eslint-disable -->
-            <div
-              v-if="description.text"
-              class="base-expand-box-text">{{ description.text }}
-            </div>
-            <!-- eslint-enable -->
-          </div>
+          <base-text-list
+            :render-label-as="renderLabelAs"
+            :data="data.descriptions" />
         </div>
         <div class="base-expand-box-column">
           <base-text-list
@@ -157,36 +142,21 @@ export default {
     }
 
     .base-expand-box-columns {
-      column-count: 2;
-      column-gap: $spacing-large;
+      display: flex;
+      justify-content: space-between;
+
+      .base-expand-box-column {
+        width: calc(50% - #{$spacing-large});
+      }
 
       @media screen and (max-width: $mobile) {
-        column-count: 1;
-      }
-    }
+        display: block;
+        justify-content: inherit;
 
-    .base-expand-box-column {
-      break-inside: avoid;
-      page-break-inside: avoid;
-      -moz-column-break-inside: avoid;
-    }
-
-    .base-expand-box-column-item {
-      &:last-of-type {
-        break-inside: avoid;
-        page-break-inside: avoid;
-        -moz-column-break-inside: avoid;
-      }
-
-      &:not(:first-of-type) {
-        .base-expand-box-label {
-          margin-top: $line-height;
+        .base-expand-box-column {
+          width: 100%;
         }
       }
-    }
-
-    .base-expand-box-text {
-      white-space: pre-line;
     }
 
     .base-expand-box-button {

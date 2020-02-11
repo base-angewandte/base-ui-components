@@ -11,11 +11,11 @@
       </component>
 
       <!-- String as text -->
+      <!-- eslint-disable -->
       <p
         v-if="typeof item.data === 'string'"
-        class="base-text-list-content">
-        {{ item.data }}
-      </p>
+        class="base-text-list-content base-text-list-content-pre-line">{{ item.data }}</p>
+      <!-- eslint-enable -->
 
       <!-- Array as unordered list -->
       <ul
@@ -75,19 +75,29 @@ export default {
 
     .base-text-list-group {
 
+      &:first-of-type {
+        .base-text-list-label {
+          margin-top: 0;
+        }
+      }
+
       .base-text-list-label {
         margin-top: $line-height;
       }
 
       @media screen and (max-width: $mobile) {
         &:first-of-type {
-          margin-top: 0;
+          margin-top: $line-height;
         }
       }
     }
 
     .base-text-list-content {
       color: $font-color-second;
+    }
+
+    .base-text-list-content-pre-line {
+      white-space: pre-line;
     }
 
     dt,
