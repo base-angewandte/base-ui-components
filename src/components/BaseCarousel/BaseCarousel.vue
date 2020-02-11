@@ -91,7 +91,7 @@ export default {
       swiper: undefined,
       swiperisActive: false,
       showAll: false,
-      breakpoint: window.matchMedia('(min-width: 640px)'),
+      breakpoint: null,
     };
   },
   computed: {
@@ -101,6 +101,7 @@ export default {
   },
   mounted() {
     if (process.browser) {
+      this.breakpoint = window.matchMedia('(min-width: 640px)');
       this.breakpoint.addListener(this.breakpointChecker);
       this.breakpointChecker();
     }
