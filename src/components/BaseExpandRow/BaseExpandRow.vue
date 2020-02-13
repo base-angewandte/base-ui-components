@@ -98,7 +98,7 @@ export default {
       return !!this.$slots.icon;
     },
   },
-  mounted() {
+  created() {
     // eslint-disable-next-line
     this.id = this._uid;
   },
