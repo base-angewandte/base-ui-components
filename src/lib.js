@@ -4,6 +4,7 @@ import BaseButton from './components/BaseButton/BaseButton';
 import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
 import BaseInput from './components/BaseInput/BaseInput';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
+import BaseExpandRow from './components/BaseExpandRow/BaseExpandRow';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
@@ -31,6 +32,7 @@ export {
   BaseBoxButton,
   BaseInput,
   BaseDateInput,
+  BaseExpandRow,
   BaseChipsInput,
   BaseSearch,
   BaseMenuList,
