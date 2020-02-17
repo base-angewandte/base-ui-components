@@ -73,7 +73,7 @@ export default {
       default: '',
     },
     /**
-     * set the background color of collapsed expand-row-body
+     * set the background of collapsed expand-row-body
      */
     bodyHasBackground: {
       type: Boolean,
