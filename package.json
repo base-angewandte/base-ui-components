@@ -21,10 +21,12 @@
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
     "hls.js": "^0.13.1",
+    "leaflet": "^1.6.0",
     "normalize.css": "^8.0.1",
     "vue": "2.6.10",
     "vue-click-outside": "^1.0.7",
     "vue2-datepicker": "^3.2.2",
+    "vue2-leaflet": "^2.5.2",
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
