@@ -134,7 +134,7 @@ export default {
     .base-toggle-input {
       position: absolute;
       opacity: 0;
-      z-index: 1;
+      z-index: 0;
 
       &:focus ~ .base-switch-container {
         border: 1px solid $app-color;
@@ -164,6 +164,7 @@ export default {
         height: 16px;
         border-radius: 50%;
         background-color: $switch-color;
+        cursor: pointer;
         transition: all 250ms ease-in-out;
 
         svg {
