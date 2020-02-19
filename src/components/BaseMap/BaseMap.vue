@@ -1,6 +1,5 @@
 <template>
   <div
-    :id="id"
     ref="mapElement" />
 </template>
 
@@ -55,15 +54,6 @@ export default {
       type: Number,
       default: 18,
     },
-  },
-  data() {
-    return {
-      id: 'map',
-    };
-  },
-  created() {
-    // eslint-disable-next-line
-    this.id = 'map_' + this._uid;
   },
   mounted() {
     if (process.browser) {
