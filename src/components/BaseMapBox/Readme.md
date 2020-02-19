@@ -1,9 +1,9 @@
-A component to display a Leaflet-map and a expandable address block
+Displays a Leaflet-map and an expandable address block
 
 ```vue
 <template>
   <div>
-    <baseMapBox
+    <BaseMapBox
       :location="location"
       render-label-as="h2"
       show-more-text="Show Map and Address"
@@ -29,3 +29,35 @@ export default {
   }
 }
 </script>
+```
+
+Displays an address block if latitude/longitude is not set
+
+```vue
+<template>
+  <div>
+    <BaseMapBox
+      :location="location"
+      render-label-as="h2"
+      show-more-text="Show Map and Address"
+      show-less-text="Collapse Map and Address"
+    />
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      location: {
+        city: 'Vienna',
+        postalCode: '1030',
+        street: 'Vordere Zollamtsstrasse',
+        number: '7',
+        country: 'Austria',
+      }
+    };
+  }
+}
+</script>
+```

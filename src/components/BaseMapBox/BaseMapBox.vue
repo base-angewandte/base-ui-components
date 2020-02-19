@@ -2,23 +2,18 @@
   <base-box
     :box-size="{width: '100%'}"
     box-ratio="0"
-    :class="['base-map-box', {'base-map-box-expanded': isExpanded}]">
+    :class="[
+      'base-map-box',
+      {
+        'base-map-box-expanded': isExpanded,
+        'base-map-box-text-only': !showMap
+      }]">
     <div
       class="base-map-box-inner">
-      <l-map
-        ref="maps"
-        :zoom="16"
-        :center="[location.latitude, location.longitude]"
-        class="base-map-box-map">
-        <l-tile-layer
-          url="https://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png"
-          subdomains="abc"
-          max-zoom="18"
-          attribution="Source: <a href=https://openstreetmap.se/>OpenStreetMap Sverige</a>,
-          <a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"/>
-        <l-marker
-          :lat-lng="[location.latitude, location.longitude]" />
-      </l-map>
+      <base-map
+        v-if="showMap"
+        :lat-long="[location.latitude, location.longitude]"
+        class="base-map-box-map" />
       <div
         class="base-map-box-text">
         <compontent
@@ -39,6 +34,7 @@
     </div>
 
     <base-button
+      v-if="showMap"
       class="base-map-box-button"
       :text="isExpanded ? showLessText : showMoreText"
       :has-background-color="false"
@@ -49,48 +45,31 @@
 </template>
 
 <script>
-import L from 'leaflet';
-import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
-import 'leaflet/dist/leaflet.css';
+import BaseMap from '../BaseMap/BaseMap';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseBox from '../BaseBox/BaseBox';
-
-if (process.browser) {
-  /* eslint-disable */
-  delete L.Icon.Default.prototype._getIconUrl;
-  L.Icon.Default.imagePath = '';
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-  });
-  L.Map.mergeOptions({scrollWheelZoom: false});
-  /* eslint-enable */
-}
 
 export default {
   name: 'BaseMapBox',
   components: {
+    BaseMap,
     BaseButton,
     BaseBox,
-    LMap,
-    LTileLayer,
-    LMarker,
   },
   props: {
-    /**
-     * Location data to display map and address text block
-     */
-    location: {
-      type: Object,
-      default: () => ({}),
-    },
     /**
      * Label for address block
      */
     label: {
       type: String,
       default: 'Address',
+    },
+    /**
+     * Location data to display map and address text block
+     */
+    location: {
+      type: Object,
+      default: () => ({}),
     },
     /**
      * Render label as e.g.: 'h2' | 'h3'
@@ -119,6 +98,14 @@ export default {
       isExpanded: false,
     };
   },
+  computed: {
+    /**
+     * Check if latitude/longitude are set
+     */
+    showMap() {
+      return this.location.latitude !== undefined && this.location.longitude !== undefined;
+    },
+  },
   methods: {
     /**
      * event emitted on button click to toggle box
@@ -141,6 +128,16 @@ export default {
     &.base-map-box-expanded {
       .base-map-box-inner {
         height: 100%;
+      }
+    }
+
+    &.base-map-box-text-only {
+      .base-map-box-inner {
+        height: auto;
+      }
+
+      .base-map-box-text {
+        margin: 0;
       }
     }
 
