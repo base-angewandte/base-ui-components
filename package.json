@@ -24,6 +24,7 @@
     "lazysizes": "^5.2.0",
     "normalize.css": "^8.0.1",
     "swiper": "^5.3.1",
+    "vue": "2.6.10",
     "vue-click-outside": "^1.0.7",
     "vue2-datepicker": "^3.2.2",
     "vuedraggable": "^2.23.2"
