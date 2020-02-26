@@ -157,7 +157,7 @@ export default {
     .base-carousel-slide {
       margin-bottom: 0;
 
-      @media screen and (max-width: 640px) {
+      @media screen and (max-width: $mobile) {
         margin-bottom: $spacing;
       }
     }
@@ -165,14 +165,18 @@ export default {
     .swiper-wrapper {
       display: flex;
 
-      @media screen and (max-width: 640px) {
+      @media screen and (max-width: $mobile) {
         display: block;
       }
     }
 
     .base-carousel-more {
-      display: flex;
-      justify-content: center;
+      display: none;
+
+      @media screen and (max-width: $mobile) {
+        display: flex;
+        justify-content: center;
+      }
     }
   }
 </style>
@@ -202,7 +206,7 @@ export default {
       left: inherit;
       margin: $spacing 0;
 
-      @media screen and (min-width: 640px) {
+      @media screen and (min-width: $mobile-min-width) {
         display: block;
       }
     }
