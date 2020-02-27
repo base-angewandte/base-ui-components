@@ -1,14 +1,14 @@
 <template>
   <label
-    :class="['base-toggle-container', {'base-toggle-container-checked': checkedInt }]"
-    @click.stop="clicked">
+    :class="['base-toggle-container', {'base-toggle-container-checked': checkedInt }]">
 
     <input
       v-model="checkedInt"
       :name="name"
-      :value="true"
-      :checked="checked"
-      :type="type === 'checkbox' ? 'checkbox' : 'radio'"
+      :checked="checkedInt"
+      :aria-checked="checkedInt"
+      :type="'checkbox'"
+      value=""
       class="base-toggle-input">
 
     <div
@@ -22,7 +22,6 @@
           name="remove" />
       </span>
     </div>
-
     {{ label }}
   </label>
 </template>
@@ -39,24 +38,9 @@ export default {
   },
   model: {
     prop: 'checked',
+    event: 'clicked',
   },
   props: {
-    /**
-     * choose the style <br>
-     * valid values: 'radio' | 'checkbox'
-     */
-    type: {
-      type: String,
-      default: 'checkbox',
-      /**
-       * @description
-       * @param {any} val
-       * @returns {any}
-       */
-      validator(val) {
-        return (val === 'radio' || val === 'checkbox');
-      },
-    },
     /**
      * specify a discriptive name <br>
      * this will not be displayed but is only there for usability purposes
@@ -91,28 +75,20 @@ export default {
   watch: {
     checked: {
       handler(val) {
-        this.checkedInt = val;
+        if (val !== this.checkedInt) {
+          this.checkedInt = val;
+        }
       },
       immediate: true,
     },
-  },
-  methods: {
-    clicked() {
+    checkedInt(val) {
       /**
        * event emitted on radio button / checkmark click, <br>
        * emitting input value
        *
        * @type {string | boolean}
        */
-      this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.value);
-    },
-    /**
-       * event set checkedInt from parent components
-       *
-       * @param {boolean} value
-       */
-    setCheckedInt(value) {
-      this.checkedInt = value;
+      this.$emit('clicked', val);
     },
   },
 };
