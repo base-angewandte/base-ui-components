@@ -5,31 +5,29 @@
     :type="buttonType"
     :style="{ justifyContent: alignText }"
     :class="['base-button',
-             buttonStyle === 'single' ? 'base-button-single' : 'base-button-row',
+             `base-button-${buttonStyle}`,
              { 'base-button-background': hasBackgroundColor },
              {'base-button-active': active }]"
     @click.prevent="clicked">
-
     <!-- @slot create custom content (e.g. icon) left of text -->
-    <slot name="left-of-text"/>
+    <slot name="left-of-text" />
     <svg-icon
       v-if="iconPosition === 'left' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-left',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]"/>
+               { 'base-button-icon-hide': hideIcon }]" />
     <span class="base-button-text">{{ text }}</span>
     <!-- @slot create custom content (e.g. icon) right of text -->
-    <slot name="right-of-text"/>
+    <slot name="right-of-text" />
     <svg-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
                'base-button-icon-right',
                'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]"
-    />
+               { 'base-button-icon-hide': hideIcon }]" />
     <BaseBoxTooltip
       v-if="showTooltip"
       @clicked="clicked" />
@@ -65,7 +63,9 @@ export default {
      * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
      * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
      * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin'
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'checked' | 'unchecked' | 'attachment' |
+     * 'drag-lines' | 'download' | 'duplicate' | 'forbidden' | 'information' | 'sort' |
+     * 'success' | 'text'
      */
     icon: {
       type: String,
@@ -98,18 +98,19 @@ export default {
     },
     /**
      * specify a button style <br>
-     * valid values: 'single' | 'row'
+     * valid values: 'single' | 'row' | 'secondary'
      */
     buttonStyle: {
       type: String,
       default: 'single',
       validator(val) {
-        return val === 'single' || val === 'row';
+        return val === 'single' || val === 'row' || val === 'secondary';
       },
     },
     /**
      * specify icon size <br>
-     * valid values: 'large' | 'small'
+     * valid values: 'large' | 'small'<br>
+     *   this will have no effect on button-style: secondary - icon will always be small
      */
     iconSize: {
       type: String,
@@ -236,10 +237,15 @@ export default {
       }
     }
 
+    &.base-button-secondary {
+      font-size: $font-size-small;
+      color: $font-color-second;
+    }
+
     &.base-button-active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
-      z-index: 1;
+      z-index: map-get($zindex, button-active);
     }
 
     &:hover {

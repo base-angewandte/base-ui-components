@@ -2,8 +2,8 @@
   <div class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
-      v-bind="chipsInputProps"
       v-model="selectedBelowListInt"
+      v-bind="chipsInputProps"
       :chips-inline="false"
       :sortable="true"
       :is-loading="isLoading"
@@ -12,18 +12,17 @@
       @selected="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
-        slot="chips-area"
-        slot-scope="props">
+        v-slot:chips-area="props">
         <draggable
-          :animation="200"
           v-model="props.list"
+          :animation="200"
           group="people"
           handle=".base-chips-below-list-icon-wrapper"
           @end="updateList($event, props.list)">
           <div
             v-for="(entry,index) in props.list"
-            :name="entry[objectProp]"
             :key="'item' + entry.idInt"
+            :name="entry[objectProp]"
             class="base-chips-below-list-item"
             @mousedown="chipActive = index">
             <div
@@ -35,30 +34,30 @@
                 <SvgIcon
                   :key="'icon' + entry.idInt"
                   name="drag-lines"
-                  class="svg-icon base-chips-below-list-icon"/>
+                  class="svg-icon base-chips-below-list-icon" />
               </div>
 
               <div
                 :key="'chip-wrapper' + entry.idInt"
                 class="base-chips-below-list-item-chip-wrapper">
                 <BaseChip
-                  ref="selectedChip"
                   :id="'chips-below' + index"
-                  v-model="entry[objectProp]"
-                  :chip-editable="chipsEditable"
+                  ref="selectedChip"
                   :key="'chip' + entry.idInt"
+                  v-model="entry[objectProp]"
                   :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
                   :hover-box-content="hoverboxContent"
                   class="base-chips-input-chip"
                   @value-changed="modifyChipValue($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)"
-                  @remove-entry="removeEntry($event, index)"/>
+                  @remove-entry="removeEntry($event, index)" />
               </div>
               <BaseChipsInput
+                :id="label + '_' + (entry.idInt || entry.identifier)"
+                :key="'input_' + entry.idInt"
+                v-model="entry.roles"
                 :show-label="false"
                 :label="label + '-roles'"
-                :key="'input' + entry.idInt"
-                v-model="entry.roles"
                 :list="roleOptions"
                 :show-input-border="false"
                 :allow-dynamic-drop-down-entries="false"
@@ -66,24 +65,23 @@
                 :always-linked="true"
                 :language="language"
                 :draggable="true"
+                :drop-down-no-options-info="dropDownNoOptionsInfo"
                 identifier="source"
                 object-prop="label"
                 class="base-chips-below-chips-input"
-                @selected="updateRoles($event, index)"/>
+                @selected="updateRoles($event, index)" />
             </div>
           </div>
         </draggable>
       </template>
       <template
-        slot="drop-down-entry"
-        slot-scope="props">
+        v-slot:drop-down-entry="props">
         <slot
           :item="props.item"
           name="below-drop-down-entry" />
       </template>
       <template
-        slot="no-options"
-        slot-scope="props">
+        v-slot:no-options>
         <slot
           name="no-options" />
       </template>
@@ -96,7 +94,6 @@ import Draggable from 'vuedraggable';
 import SvgIcon from 'vue-svgicon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
-import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 /**
  * A very specialized component based on [BaseChipsInput](#basechipsinput)
@@ -109,7 +106,6 @@ import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 export default {
   components: {
-    BaseHoverBox,
     BaseChipsInput,
     Draggable,
     BaseChip,
@@ -197,13 +193,6 @@ export default {
       default: false,
     },
     /**
-     * define if chips should be editable
-     */
-    chipsEditable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * this prop was added because there was some action needed to be done before entry was added
      * so this is possible if entry is not added to selectedList directly but only in parent
      * component
@@ -285,6 +274,9 @@ export default {
     chipsInputProps() {
       const newProps = Object.assign({}, this.$props);
       delete newProps.language;
+      // also remove role related props since unknown to chips input component
+      delete newProps.roleOptions;
+      delete newProps.rolesPlaceholder;
       return newProps;
     },
   },
@@ -429,6 +421,10 @@ export default {
           max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
           flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
         }
+      }
+
+      &.sortable-chosen {
+        border-bottom: 0;
       }
     }
 

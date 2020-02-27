@@ -6,16 +6,16 @@ const executeFire = function(){
     alert('button clicked!');
 }
 <div style="display: flex;">
-  <base-button 
+  <base-button
     text="No Icon"
-    style="margin-right: 16px;" 
+    style="margin-right: 16px;"
     @clicked="executeFire"/>
-  <base-button 
+  <base-button
     style="margin-right: 16px;"
     icon="waste-bin"
     text="Small Icon"
     @clicked="executeFire"/>
-  <base-button 
+  <base-button
     style="margin-right: 16px;"
     icon="waste-bin"
     icon-size="large"
@@ -38,7 +38,7 @@ const executeFire = function(){
     style="margin-right: 16px;"
     icon="save-file"
     icon-position="right"
-    button-style="row" 
+    button-style="row"
     @clicked="executeFire"/>
   <base-button
       text="Large Icon"
@@ -57,3 +57,22 @@ const executeFire = function(){
 </div>
 
 ```
+Button Secondary Style
+
+```js
+
+const executeFire = function(){
+    alert('button clicked!');
+}
+<div style="display: flex;">
+  <base-button
+    button-style="secondary"
+    style="margin-right: 16px;"
+    icon="waste-bin"
+    text="With Icon"
+    @clicked="executeFire"/>
+</div>
+
+```
+
+

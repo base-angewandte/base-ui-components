@@ -14,12 +14,12 @@
     <div
       :class="['base-switch-container']">
       <span class="base-switch">
-        <svg-icon
+        <SvgIcon
           v-if="checkedInt"
-          name="check-mark"/>
-        <svg-icon
+          name="check-mark" />
+        <SvgIcon
           v-if="!checkedInt"
-          name="remove"/>
+          name="remove" />
       </span>
     </div>
 
@@ -134,7 +134,7 @@ export default {
     .base-toggle-input {
       position: absolute;
       opacity: 0;
-      z-index: 0;
+      z-index: map-get($zindex, boxcontent);
 
       &:focus ~ .base-switch-container {
         border: 1px solid $app-color;

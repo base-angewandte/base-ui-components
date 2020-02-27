@@ -3,14 +3,16 @@
   <fieldset
     class="base-switch-buttons">
     <legend
-      class="hide">{{ label }}</legend>
+      class="hide">
+      {{ label }}
+    </legend>
     <template
       v-for="(option, index) in options">
       <input
         :id="optionIds[index]"
         :key="option.value + 'input'"
-        :tabindex="option.value === selectedOption ? 0 : -1"
         v-model="selectedOption"
+        :tabindex="option.value === selectedOption ? 0 : -1"
         :checked="option.value === selectedOption"
         :aria-checked="option.value === selectedOption"
         :value="option.value"
@@ -30,7 +32,6 @@
       </label>
     </template>
   </fieldset>
-
 </template>
 
 <script>

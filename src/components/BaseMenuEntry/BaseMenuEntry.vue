@@ -13,13 +13,13 @@
     <svg-icon
       ref="entryIcon"
       :name="icon"
-      class="base-menu-entry-icon"/>
+      class="base-menu-entry-icon" />
 
     <div
       :class="[
         'base-menu-entry-text-wrapper',
         { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
-    ]">
+      ]">
       <div class="base-menu-entry-title-description-wrapper">
         <div class="base-menu-entry__title-subtext-wrapper">
           <div
@@ -30,9 +30,13 @@
           </div>
           <div
             v-if="subtext"
-            class="base-menu-entry-subtext">{{ subtext }}</div>
+            class="base-menu-entry-subtext">
+            {{ subtext }}
+          </div>
         </div>
-        <div class="base-menu-entry-description">{{ description }}</div>
+        <div class="base-menu-entry-description">
+          {{ description }}
+        </div>
       </div>
     </div>
     <transition-group
@@ -398,7 +402,7 @@ export default {
       top: 0;
       left: calc(-#{$fade-out-width} - #{$spacing});
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-      z-index: 1;
+      z-index: map-get($zindex, fadeout);
     }
   }
 

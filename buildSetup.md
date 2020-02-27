@@ -4,13 +4,13 @@
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:9000
+# serve with hot reload at localhost:6060
 npm run dev
 
 # build library components with watcher
 npm run dev:lib
 
-# build for serving on localhost:9000 with hot reload
+# build for serving on localhost:6060 with hot reload
 npm run dev:docs
 
 # run styleguide for development purposes
@@ -22,7 +22,7 @@ npm run build
 # build components
 npm run build:lib
 
-# build documentation website 
+# build documentation website
 npm run build:docs
 
 # build for production and view the bundle analyzer report
@@ -44,5 +44,5 @@ npm link base-ui-components
 
 ## Base Components
 
-for a list of components included in the build and their options run ```npm run styleguide``` 
-or see deployed styleguide at ...
+for a list of components included in the build and their options run ```npm run styleguide```
+or see [styleguide](https://base-angewandte.github.io/base-ui-components/).

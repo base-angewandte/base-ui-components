@@ -19,6 +19,8 @@ import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseLoader from './components/BaseLoader/BaseLoader';
 import BaseToggle from './components/BaseToggle/BaseToggle';
+import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions';
+import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -44,4 +46,6 @@ export {
   BasePagination,
   BaseLoader,
   BaseToggle,
+  BaseSelectOptions,
+  BaseCarousel,
 };

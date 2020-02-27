@@ -2,7 +2,7 @@
   <div class="base-upload-bar">
     <div
       :class="['base-upload-bar-text', progressWidth > 80
-      ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
+        ? 'base-upload-bar-text-complete' : 'base-upload-bar-text-incomplete']">
       <span>{{ $props.filename }}</span>
       <span class="base-upload-bar-file-size">{{ $props.filesize }}</span>
     </div>
@@ -12,16 +12,16 @@
     <SvgIcon
       v-if="status === 'success'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-success"
-      name="success"/>
+      name="success" />
     <SvgIcon
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
-      name="attention"/>
+      name="attention" />
     <SvgIcon
       v-if="showRemove"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-remove"
       name="remove"
-      @click="remove"/>
+      @click="remove" />
   </div>
 </template>
 
@@ -119,7 +119,7 @@ export default {
       position: absolute;
       overflow: hidden;
       white-space: nowrap;
-      z-index: 2;
+      z-index: map-get($zindex, uploadbar-content);
       display: flex;
       justify-content: space-between;
 
@@ -148,7 +148,7 @@ export default {
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
+      z-index: map-get($zindex, uploadbar);
       height: 100%;
       background-color: $uploadbar-color;
     }
@@ -160,7 +160,7 @@ export default {
       position: absolute;
       top: 50%;
       transform: translate(0, -50%);
-      z-index: 2;
+      z-index: map-get($zindex, uploadbar-content);
 
       &.base-upload-bar-status-icon-success {
         fill: white;

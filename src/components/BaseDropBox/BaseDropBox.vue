@@ -8,7 +8,8 @@
       'base-drop-box',
       { 'base-box-button-disabled': disabled },
       { 'is-drag-over': isDragOver }]"
-    @clicked="onClicked">
+    @clicked="onClicked"
+    @onTooltip="onTooltip">
     <div
       class="base-drop-box-inner">
       <draggable
@@ -35,7 +36,7 @@
       </draggable>
       <form
         v-else
-        ref="fileform"/>
+        ref="fileform" />
     </div>
   </base-box-button>
 </template>
@@ -43,7 +44,6 @@
 <script>
 import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
-import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
 /**
  * An Element for dropping files or other UI Elements into
@@ -54,7 +54,6 @@ export default {
   components: {
     BaseBoxButton,
     Draggable,
-    BaseBoxTooltip,
   },
   props: {
     /**

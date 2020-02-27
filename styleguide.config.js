@@ -14,9 +14,16 @@ module.exports = {
   webpackConfig: process.env.NODE_ENV === 'production' ? require('./build/webpack.prod.conf.js') : require('./build/webpack.dev.conf.js'),
   usageMode: 'expand',
   require: [
-    path.join(__dirname, './src/styles/app.scss')
+    path.join(__dirname, './src/styles/app.scss'),
   ],
-  ignore: ['**/components/BaseMenuTableRow.vue', '**/components/ChipsArea.vue'],
+  // these are components used internally however not included in the package
+  ignore: [
+    'src/components/BaseBox/*',
+    'src/components/BaseCheckBox/*',
+    'src/components/BaseToolTip/*',
+    'src/components/BaseChip/*',
+  ],
+  // https://github.com/vue-styleguidist/vue-styleguidist/issues/290
   dangerouslyUpdateWebpackConfig(webpackConfig) {
     let filteredFirstHMR = false;
 

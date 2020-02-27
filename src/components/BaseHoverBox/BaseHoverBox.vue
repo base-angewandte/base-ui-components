@@ -88,10 +88,6 @@ export default {
     /**
      * to set the position of the box from outside
      * @param {MouseEvent} e
-     *
-     * @public
-     *
-     * @returns void
      */
     setPosition(e) {
       let x = e.layerX;
@@ -118,7 +114,7 @@ export default {
   .base-hover-box {
     box-shadow: $preview-box-shadow;
     position: absolute;
-    z-index: 10;
+    z-index: map-get($zindex, hoverbox);
     margin: $spacing;
   }
 </style>

@@ -18,17 +18,18 @@
               v-if="showPlus"
               name="plus"
               alt="add"
-              class="button-box-plus"/>
+              class="button-box-plus" />
           </div>
           <div class="button-box-icon-container">
             <svg-icon
               v-if="icon"
               :name="icon"
-              class="button-box-icon"/>
+              class="button-box-icon" />
           </div>
-
         </div>
-        <div class="button-box-text">{{ text }}</div>
+        <div class="button-box-text">
+          {{ text }}
+        </div>
       </div>
 
       <div
@@ -39,7 +40,7 @@
 
       <BaseBoxTooltip
         v-if="showTooltip"
-        @clicked="clicked" />
+        @clicked="onTooltip" />
     </div>
     <div
       v-else
@@ -47,8 +48,10 @@
       <svg-icon
         v-if="icon"
         :name="icon"
-        class="button-box-icon-small"/>
-      <div class="button-box-text-small">{{ text }}</div>
+        class="button-box-icon-small" />
+      <div class="button-box-text-small">
+        {{ text }}
+      </div>
     </div>
     <slot />
   </base-box>
@@ -172,6 +175,14 @@ export default {
        * @type {Event}
        */
       this.$emit('clicked', event);
+    },
+    onTooltip(event) {
+      /**
+       * event emitted on tooltip click
+       *
+       * @type {Event}
+       */
+      this.$emit('onTooltip', event);
     },
     setShowSubtext() {
       const subtextRef = this.$refs.baseBoxSubtext;

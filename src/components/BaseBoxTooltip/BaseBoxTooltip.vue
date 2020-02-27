@@ -6,7 +6,7 @@
     <svg-icon
       name="information"
       alt="information"
-      class="base-box-tooltip-icon"/>
+      class="base-box-tooltip-icon" />
   </span>
 </template>
 
@@ -36,7 +36,7 @@ export default {
 
   .base-box-tooltip {
     position: relative;
-    z-index: 1200;
+    z-index: map-get($zindex, boxcontent);
     margin-left: auto;
     color: $font-color;
     transition: color 250ms ease-in-out;

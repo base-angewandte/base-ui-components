@@ -17,7 +17,7 @@
       <svg-icon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
-        name="check-mark"/>
+        name="check-mark" />
     </div>
     <label
       :for="label"
@@ -163,7 +163,7 @@ export default {
       cursor: pointer;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: map-get($zindex, boxcontent);
 
       &:focus ~ .base-checkmark-container {
         border-color: $app-color;

@@ -10,7 +10,6 @@
       aria-labelledby="popup-title"
       aria-describedby="descriptionElementId"
       class="popup-box">
-
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <div
@@ -26,7 +25,7 @@
           @click="close">
           <svg-icon
             class="popup-remove"
-            name="remove"/>
+            name="remove" />
         </button>
       </div>
 
@@ -56,7 +55,7 @@
               @clicked="buttonRight">
               <template
                 v-if="isLoading"
-                slot="right-of-text">
+                v-slot:right-of-text>
                 <span class="base-popup-button-loader">
                   <BaseLoader />
                 </span>
@@ -65,10 +64,8 @@
           </slot>
         </div>
       </div>
-
     </div>
   </div>
-
 </template>
 
 <script>
@@ -186,7 +183,7 @@ export default {
     document.onkeyup = (e) => {
       const event = e || window.event;
       if (document.querySelector('.popup-box')) {
-        if (event.keyCode === 27) { // 27 === ESC
+        if (event.keyCode === 27 || event.key === 'Escape') { // 27 === ESC
           const btn = document.querySelector('.popup-box .base-popup__close-button');
           btn.dispatchEvent(new Event('click'));
         }
@@ -236,7 +233,7 @@ export default {
     height: 100%;
     width: 100%;
     /* specific to be higher than base header */
-    z-index: 1041;
+    z-index: map-get($zindex, modal_bg);
     overflow: hidden;
   }
 
@@ -245,7 +242,7 @@ export default {
     position: fixed;
     top: 20vh;
     left: 50%;
-    z-index: 1060;
+    z-index: map-get($zindex, modal);
     min-width: 288px;
     width: 50%;
     max-width: 700px;

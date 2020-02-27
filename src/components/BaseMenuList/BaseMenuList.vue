@@ -2,7 +2,7 @@
   <draggable
     v-model="list"
     :sort="false"
-    :disabled="isMobile"
+    :disabled="isMobile || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
     :set-data="modifyDragItem"
     :force-fallback="!dragAndDropCapable"
@@ -13,7 +13,6 @@
     @end="dragEnd">
     <li
       v-for="(item, index) in list"
-      v-if="item"
       :key="item.id || item.title"
       class="base-menu-list__list-entry">
       <base-menu-entry
@@ -28,7 +27,7 @@
         :is-selectable="true"
         :select-active="selectActive"
         @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)"/>
+        @selected="selectItem(index, $event)" />
     </li>
   </draggable>
 </template>
@@ -38,7 +37,8 @@ import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 /**
- * Base Component for SideBar Menu Entries
+ * Base Component for SideBar Menu Entries<br>
+ *   (this component is currently not ssr-capable)
  */
 
 export default {
@@ -123,6 +123,9 @@ export default {
       } else {
         this.setInternalVar();
       }
+    },
+    selectedList() {
+      this.setInternalVar();
     },
   },
   created() {
