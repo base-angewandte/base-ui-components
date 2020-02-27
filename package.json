@@ -21,7 +21,9 @@
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
     "hls.js": "^0.13.1",
+    "lazysizes": "^5.2.0",
     "normalize.css": "^8.0.1",
+    "swiper": "^5.3.1",
     "vue": "2.6.10",
     "vue-click-outside": "^1.0.7",
     "vue2-datepicker": "^3.2.2",

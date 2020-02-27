@@ -19,12 +19,12 @@ import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseLoader from './components/BaseLoader/BaseLoader';
 import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseToggleGroup from './components/BaseToggleGroup/BaseToggleGroup';
 import BaseOptions from './components/BaseOptions/BaseOptions';
 import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseFormFieldCreator from './components/BaseFormFieldCreator/BaseFormFieldCreator';
 import BaseForm from './components/BaseForm/BaseForm';
 import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions';
+import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -50,10 +50,10 @@ export {
   BasePagination,
   BaseLoader,
   BaseToggle,
-  BaseToggleGroup,
   BaseOptions,
   BaseResultBoxSection,
   BaseFormFieldCreator,
   BaseForm,
   BaseSelectOptions,
+  BaseCarousel,
 };
