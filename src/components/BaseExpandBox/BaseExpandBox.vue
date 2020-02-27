@@ -1,5 +1,5 @@
 <template>
-  <base-box
+  <BaseBox
     box-ratio="0"
     :box-size="{width: '100%', margin: '0 auto', 'max-width': '1400px' }"
     :class="['base-expand-box', {'base-expand-box-open': isOpen }]">
@@ -9,19 +9,19 @@
         {'base-expand-box-inner-fade-out': (!isOpen && showButton)}]">
       <div class="base-expand-box-columns">
         <div class="base-expand-box-column">
-          <base-text-list
+          <BaseTextList
             :render-label-as="renderLabelAs"
             :data="data.descriptions" />
         </div>
         <div class="base-expand-box-column">
-          <base-text-list
+          <BaseTextList
             :render-label-as="renderLabelAs"
             :data="data.furtherDetails" />
         </div>
       </div>
     </div>
 
-    <base-button
+    <BaseButton
       v-if="showButton"
       :text="isOpen ? showLessText : showMoreText"
       :has-background-color="false"
@@ -30,7 +30,7 @@
       icon-position="right"
       class="base-expand-box-button"
       @clicked="clicked" />
-  </base-box>
+  </BaseBox>
 </template>
 
 <script>

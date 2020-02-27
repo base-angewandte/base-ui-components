@@ -1,8 +1,8 @@
 <template>
   <div class="base-text-list">
     <div
-      v-for="(item, k) in data"
-      :key="k"
+      v-for="(item, index) in data"
+      :key="index"
       class="base-text-list-group">
       <component
         :is="renderLabelAs"
@@ -11,34 +11,36 @@
       </component>
 
       <!-- String as text -->
-      <!-- eslint-disable -->
       <p
         v-if="typeof item.data === 'string'"
-        class="base-text-list-content base-text-list-content-pre-line">{{ item.data }}</p>
-      <!-- eslint-enable -->
+        class="base-text-list-content base-text-list-content-pre-line">
+        {{ item.data }}
+      </p>
 
       <!-- Array as unordered list -->
       <ul
-        v-if="typeof item.data === 'object' && typeof item.data[0] === 'string'"
+        v-else-if="typeof item.data === 'object'
+          && item.data.length && typeof item.data[0] === 'string'"
         class="base-text-list-content">
         <li
-          v-for="(a, l) in item.data"
-          :key="l">
-          {{ a }}
+          v-for="(arrayItem, listIndex) in item.data"
+          :key="listIndex">
+          {{ arrayItem }}
         </li>
       </ul>
 
       <!-- Array/Objects as data list -->
       <dl
-        v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
+        v-if="typeof item.data === 'object'
+          && item.data.length && typeof item.data[0] === 'object'"
         class="base-text-list-content">
         <template
-          v-for="(o, l) in item.data">
-          <dt :key="'l' + l">
-            {{ o.label }}:
+          v-for="(objectItem, objectIndex) in item.data">
+          <dt :key="'l' + objectIndex">
+            {{ objectItem.label }}:
           </dt>
-          <dd :key="'v' + l">
-            {{ o.value }}
+          <dd :key="'v' + objectIndex">
+            {{ objectItem.value }}
           </dd>
         </template>
       </dl>

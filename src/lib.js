@@ -21,6 +21,7 @@ import BaseLoader from './components/BaseLoader/BaseLoader';
 import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseToggleGroup from './components/BaseToggleGroup/BaseToggleGroup';
 import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions';
+import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -48,4 +49,5 @@ export {
   BaseToggle,
   BaseToggleGroup,
   BaseSelectOptions,
+  BaseExpandBox,
 };
