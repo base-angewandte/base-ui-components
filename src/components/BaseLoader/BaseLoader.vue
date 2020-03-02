@@ -1,5 +1,7 @@
 <template>
-  <div class="base-loader">
+  <div
+    :style="position"
+    class="base-loader">
     <svg class="base-loader-circular">
       <circle
         :style="loaderColorInt"
@@ -27,6 +29,10 @@ export default {
     loaderColor: {
       type: String,
       default: '',
+    },
+    position: {
+      type: Object,
+      default: () => ({ top: '20%', left: '50%' }),
     },
   },
   computed: {

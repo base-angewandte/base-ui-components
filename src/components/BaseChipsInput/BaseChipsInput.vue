@@ -64,7 +64,8 @@
         <div
           v-if="isLoading"
           class="base-chips-input-loader">
-          <BaseLoader />
+          <BaseLoader
+            :position="{ top: '50%', left: '50%' }" />
         </div>
         <div
           v-if="!allowMultipleEntries"
