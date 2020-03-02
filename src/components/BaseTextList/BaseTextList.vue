@@ -38,7 +38,17 @@
             {{ o.label }}:
           </dt>
           <dd :key="'v' + l">
-            {{ o.value }}
+            <template
+              v-if="o.url">
+              <a
+                :href="o.url"
+                :title="o.value">{{ o.value }}</a>
+            </template>
+
+            <template
+              v-else>
+              {{ o.value }}
+            </template>
           </dd>
         </template>
       </dl>
@@ -94,6 +104,14 @@ export default {
 
     .base-text-list-content {
       color: $font-color-second;
+
+      a {
+        color: $app-color;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .base-text-list-content-pre-line {
