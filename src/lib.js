@@ -7,7 +7,6 @@ import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMap from './components/BaseMap/BaseMap';
-import BaseMapBox from './components/BaseMapBox/BaseMapBox';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
@@ -39,7 +38,6 @@ export {
   BaseMenuEntry,
   BaseAutocompleteInput,
   BaseMap,
-  BaseMapBox,
   BaseMultilineTextInput,
   BaseDropBox,
   BaseChipsBelow,
