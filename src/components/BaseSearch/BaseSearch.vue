@@ -7,9 +7,11 @@
       class="hide">
       {{ label }}
     </label>
+    <slot name="before-input" />
     <input
       id="search"
       v-model="inputInt"
+      :list="dropDownListId || false"
       :placeholder="placeholder"
       :class="['base-search-input', { 'base-search-input-img': showImage }]"
       type="search"
@@ -17,12 +19,15 @@
       @focus.prevent="inputFocus"
       @blur="inputBlur"
       @input="onInput"
-      @keydown.enter.prevent="">
-    <SvgIcon
-      v-if="inputInt"
-      name="remove"
-      class="base-search__remove-icon"
-      @click="clearInput" />
+      @keydown.enter.prevent=""
+      v-on="$listeners">
+    <slot>
+      <SvgIcon
+        v-if="inputInt"
+        name="remove"
+        class="base-search__remove-icon"
+        @click="clearInput" />
+    </slot>
   </div>
 </template>
 
@@ -77,6 +82,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    dropDownListId: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -126,16 +135,12 @@ export default {
 
   .base-search {
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
     background: white;
     padding: 0 $spacing;
     height: $row-height-large;
-
-    input[type='search'] {
-      font-family: inherit;
-      font-size: inherit;
-    }
 
     &.base-search-fade-out::after {
       content: '';

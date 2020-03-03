@@ -1,6 +1,7 @@
 <template>
   <div
     :class="['base-chip',
+             { 'base-chip__removable': isRemovable },
              { 'base-chip-edited': entryEdited },
              { 'base-chip__active': chipActive }]">
     <div
@@ -12,6 +13,7 @@
       {{ entryInt }}
     </div>
     <div
+      v-if="isRemovable"
       class="base-chip-icon"
       @click="removeClicked">
       <img
@@ -72,6 +74,13 @@ export default {
     chipActive: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * flag to specify if chip can be removed
+     */
+    isRemovable: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -161,7 +170,7 @@ export default {
 
   .base-chip, .base-chip-inline {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
-    padding: $chips-spacing 0 $chips-spacing $spacing-small;
+    padding: $chips-spacing $spacing-small;
     flex: 0 0 auto;
     background-color: $background-color;
     line-height: $line-height;
@@ -172,6 +181,10 @@ export default {
 
     &.base-chip-edited {
       background-color: rgba(255, 255, 255, 0);
+    }
+
+    &.base-chip__removable {
+      padding-right: calc(#{$spacing} + #{$icon-min});
     }
 
     &.base-chip__active {
@@ -202,10 +215,11 @@ export default {
     }
 
     .base-chip-icon {
-      margin: 0 0 0 $spacing-small;
+      position: absolute;
+      padding: $spacing-small;
+      right: 0;
       cursor: pointer;
       display: flex;
-      padding: $spacing-small;
 
       .base-chip-icon-img {
         height: $icon-min;

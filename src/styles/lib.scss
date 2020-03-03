@@ -53,10 +53,20 @@ fieldset {
   margin: 0;
 }
 
+datalist {
+
+}
+
+input[type='search'] {
+  font-family: inherit;
+  font-size: inherit;
+}
+
 input[type=text], input[type=date], textarea, input[type=number] {
   font-family: inherit;
   font-size: inherit;
   background-color: transparent;
+  border: none;
   border-radius: 0;
   padding: 0;
 }
