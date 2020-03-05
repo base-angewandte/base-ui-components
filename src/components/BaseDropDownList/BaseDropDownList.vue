@@ -1,5 +1,8 @@
 <template>
-  <div class="base-drop-down-list-container">
+  <div
+    :class="['base-drop-down-list__container',
+             { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
+    class="base-drop-down-list__container">
     <slot name="before-list" />
     <ul
       :id="listId"
@@ -12,12 +15,14 @@
           v-if="optionHasData(option[valueName])"
           :key="option[identifierName] || optionIndex"
           :value="valueIsString ? option[valueName] : option[identifierName]"
-          :aria-selected="option[identifierName] === selectedOption"
+          :aria-selected="hoverAndSelectStyled && option[identifierName] === selectedOption"
           :class="[
             'base-drop-down-list__option',
-            { 'base-drop-down-list__option-selected': selectedOption
+            { 'base-drop-down-list__option-hovered': hoverAndSelectStyled },
+            { 'base-drop-down-list__option-selected': hoverAndSelectStyled && selectedOption
               && option[identifierName] === selectedOption },
-            { 'base-drop-down-list__option-active': option[identifierName] === activeOption }]"
+            { 'base-drop-down-list__option-active': hoverAndSelectStyled
+              && option[identifierName] === activeOption }]"
           role="option"
           @click="selected(option)">
           <slot
@@ -51,8 +56,8 @@ export default {
       default: null,
     },
     selectedOption: {
-      type: String,
-      default: null,
+      type: Object,
+      default: () => ({}),
     },
     /**
      * in order to link the drop down body to an input element specify a list
@@ -69,6 +74,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    hoverAndSelectStyled: {
+      type: Boolean,
+      default: true,
+    },
+    displayAsDropDown: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     valueIsString() {
@@ -78,8 +91,7 @@ export default {
   },
   methods: {
     selected(option) {
-      console.log(option);
-      this.$emit('update:selected-option', option[this.identifierName]);
+      this.$emit('update:selected-option', option);
     },
     optionHasData(option) {
       if (typeof option === 'string') {
@@ -97,11 +109,14 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-drop-down-list-container {
-    z-index: map-get($zindex, dropdown);
+  .base-drop-down-list__container {
     background: white;
-    box-shadow: $drop-shadow;
-    padding-bottom: $spacing;
+    width: 100%;
+
+    &.base-drop-down-list__container-drop-down-style {
+      box-shadow: $drop-shadow;
+      z-index: map-get($zindex, dropdown);
+    }
 
     .base-drop-down-list {
       overflow-y: auto;
