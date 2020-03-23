@@ -32,7 +32,8 @@
         <div
           v-click-outside="() => activeFrom = false"
           :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': activeFrom },
+                   { 'base-date-input__field-container-border': useFormFieldStyling },
+                   { 'base-date-input__field-container-active': useFormFieldStyling && activeFrom },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
           <!-- TIME FROM -->
           <DatePicker
@@ -101,7 +102,8 @@
           v-if="type !== 'single'"
           v-click-outside="() => activeTo = false"
           :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': activeTo },
+                   { 'base-date-input__field-container-border': useFormFieldStyling },
+                   { 'base-date-input__field-container-active': useFormFieldStyling && activeTo },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
           <!-- TIME TO -->
           <DatePicker
@@ -287,6 +289,14 @@ export default {
     id: {
       type: [Number, String],
       default: 1,
+    },
+    /**
+     * define if standard form field styling should be
+     * used (otherwise no border, no box shadow)
+     */
+    useFormFieldStyling: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -560,10 +570,13 @@ export default {
           justify-content: space-between;
           padding-left: $spacing-small;
           min-height: $row-height-small;
-          border: $input-field-border;
           background: white;
           flex: 1 1 auto;
           max-width: 100%;
+
+          &.base-date-input__field-container-border {
+            border: $input-field-border;
+          }
 
           .base-date-input__datepicker {
             flex-grow: 1;
