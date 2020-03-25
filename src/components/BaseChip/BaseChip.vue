@@ -39,14 +39,8 @@ export default {
   components: {
     BaseHoverBox,
   },
-  model: {
-    prop: 'entry',
-    event: 'value-changed',
-  },
   props: {
     /**
-     * @model
-     *
      * pass the text for the chip
      */
     entry: {
