@@ -24,7 +24,7 @@
         v-slot:label-addition>
         <div
           class="base-chips-input-sort"
-          @click="sort(selectedListInt)">
+          @click="sortSelectedList">
           {{ sortText }}
         </div>
       </template>
@@ -572,11 +572,7 @@ export default {
             this.selectedListInt.push(selected);
           }
         } else {
-          // check if an entry is present - if yes - remove it first
-          if (this.selectedListInt.length) {
-            this.removeEntry(this.selectedListInt[0], 0);
-          }
-          this.selectedListInt = [].concat(selected);
+          this.$set(this.selectedListInt, 0, selected);
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
@@ -679,6 +675,10 @@ export default {
       }
       return 0;
     },
+    sortSelectedList() {
+      this.sort(this.selectedListInt);
+      this.emitSelectedList();
+    },
     sort(list) {
       list.sort((a, b) => {
         let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
@@ -699,7 +699,6 @@ export default {
         }
         return -1;
       });
-      this.emitSelectedList();
     },
     getNameSortValue(compValue) {
       const compValueSansNum = compValue.replace(/,? [0-9-]+/g, '');
