@@ -77,7 +77,7 @@
 <script>
 import SvgIcon from 'vue-svgicon';
 import ClickOutside from 'vue-click-outside';
-import { setLanguageMixin } from '../../mixins/setLanguage';
+import i18n from '../../mixins/i18n';
 
 /**
  * Accessible drop down component
@@ -90,7 +90,7 @@ export default {
     ClickOutside,
   },
   mixins: [
-    setLanguageMixin,
+    i18n,
   ],
   model: {
     prop: 'selectedOption',

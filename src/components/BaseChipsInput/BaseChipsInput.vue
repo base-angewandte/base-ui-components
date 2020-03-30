@@ -26,7 +26,7 @@
         v-slot:label-addition>
         <div
           class="base-chips-input-sort"
-          @click="sort(selectedListInt)">
+          @click="sortSelectedList">
           {{ sortText }}
         </div>
       </template>
@@ -99,7 +99,7 @@
           @click="addSelected()"
           @mouseover="selectedMenuEntryIndex = index">
           {{ addNewChipText ? `${addNewChipText} ${getLangLabel(entry[objectProp], true)}`
-            : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
+            : getI18nTerm('form.Add', -1, { value: getLangLabel(entry[objectProp], true) })
               + ' ' + ' ...' }}
         </li>
         <li
@@ -165,7 +165,7 @@ import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
-import { setLanguageMixin } from '../../mixins/setLanguage';
+import i18n from '../../mixins/i18n';
 
 /**
  * Base Chips Input component with autocomplete function
@@ -184,7 +184,7 @@ export default {
     ClickOutside,
   },
   mixins: [
-    setLanguageMixin,
+    i18n,
   ],
   model: {
     prop: 'selectedList',
@@ -697,6 +697,10 @@ export default {
       }
       return 0;
     },
+    sortSelectedList() {
+      this.sort(this.selectedListInt);
+      this.emitSelectedList();
+    },
     sort(list) {
       list.sort((a, b) => {
         let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
@@ -717,7 +721,6 @@ export default {
         }
         return -1;
       });
-      this.emitSelectedList();
     },
     getNameSortValue(compValue) {
       const compValueSansNum = compValue.replace(/,? [0-9-]+/g, '');

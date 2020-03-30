@@ -91,7 +91,7 @@ import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
-import { setLanguageMixin } from '../../mixins/setLanguage';
+import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
 import { sort } from '../../utils/utils';
 
@@ -107,7 +107,7 @@ export default {
     ClickOutside,
   },
   mixins: [
-    setLanguageMixin,
+    i18n,
     navigateMixin,
   ],
   props: {
