@@ -210,7 +210,10 @@ export default {
     /**
      * @model
      *
-     * input field settable from outside
+     * input field settable from outside<br>
+     *   attention: if this is an object it needs to contain all the
+     *   properties (e.g. date_from, time_to) already otherwise only
+     *   a string will be returned
      */
     input: {
       type: [Object, String, Date],

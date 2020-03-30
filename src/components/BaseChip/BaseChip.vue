@@ -39,8 +39,14 @@ export default {
   components: {
     BaseHoverBox,
   },
+  model: {
+    prop: 'entry',
+    event: 'value-changed',
+  },
   props: {
     /**
+     * @model
+     *
      * pass the text for the chip
      */
     entry: {
@@ -198,7 +204,6 @@ export default {
     .base-chip-text {
       border: none;
       background-color: rgba(255, 255, 255, 0);
-      color: $font-color;
       word-break: break-word;
       z-index: map-get($zindex, boxcontent);
 

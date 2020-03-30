@@ -1,29 +1,57 @@
 <template>
   <div
     :style="styleProps"
-    :class="['base-search', { 'base-search-fade-out': !active }]">
+    :class="['base-search', { 'base-search-fade-out': !active && type === 'text' }]">
     <label
-      for="search"
+      :for="fieldId"
       class="hide">
       {{ label }}
     </label>
-    <slot name="before-input" />
+    <!-- @slot to add things before the input e.g. chips -->
+    <slot name="before-input">
+      <SvgIcon
+        name="magnifier-2"
+        :class="[{ 'base-search__magnifier-icon': showImage },
+                 { 'base-search__magnifier-icon-active': active }]" />
+    </slot>
     <input
-      id="search"
+      v-if="type === 'text'"
+      :id="fieldId"
       v-model="inputInt"
       :list="dropDownListId || false"
       :placeholder="placeholder"
-      :class="['base-search-input', { 'base-search-input-img': showImage }]"
+      :aria-activedescendant="linkedListOption"
       type="search"
       autocomplete="off"
+      class="base-search-input"
       @focus.prevent="inputFocus"
       @blur="inputBlur"
-      @input="onInput"
       @keydown.enter.prevent=""
       v-on="$listeners">
+    <BaseDateInput
+      v-else-if="type === 'date' || type === 'daterange'"
+      v-model="inputInt"
+      :show-label="false"
+      :type="type === 'date' ? 'single' : 'daterange'"
+      :use-form-field-styling="false"
+      label="date-input" />
+    <BaseChipsInputField
+      v-else-if="type === 'chips'"
+      id="main-select"
+      :selected-list.sync="selectedChipsInt"
+      :show-label="false"
+      :use-form-field-styling="false"
+      :allow-unknown-entries="true"
+      :drop-down-list-id="dropDownListId"
+      :linked-list-option="linkedListOption"
+      label="chips-input"
+      identifier="id"
+      @input="inputInt = $event"
+      v-on="$listeners" />
+    <!-- @slot for icon after input field -->
     <slot>
       <SvgIcon
-        v-if="inputInt"
+        v-if="inputInt && type === 'text'"
         name="remove"
         class="base-search__remove-icon"
         @click="clearInput" />
@@ -33,11 +61,15 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+
 /**
  * A basic text search to filter entries or files
   */
 export default {
   components: {
+    // lazy load components that might not be required!
+    BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField'),
+    BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
     SvgIcon,
   },
   model: {
@@ -51,7 +83,7 @@ export default {
      * @model
      */
     input: {
-      type: String,
+      type: [String, Object],
       default: '',
     },
     /**
@@ -82,26 +114,82 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * specify the id of a linked drop down list
+     */
     dropDownListId: {
       type: String,
       default: '',
     },
+    fieldId: {
+      type: String,
+      default: 'search',
+    },
+    /**
+     * specify the type of input field
+     */
+    type: {
+      type: String,
+      default: 'text',
+    },
+    /**
+     * if input type is chips this is the prop to
+     * pass selected options (chips)
+     */
+    selectedChips: {
+      type: Array,
+      default: () => ([]),
+    },
+    /**
+     * specify a linked list option (e.g. drop down) <br>
+     *   (will be used in aria-activedescendant attribute)
+     */
+    linkedListOption: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
-      inputInt: null,
       active: false,
     };
   },
-  watch: {
-    input(val) {
-      if (this.inputInt !== val) {
-        this.inputInt = val;
-      }
+  computed: {
+    inputInt: {
+      // this is actually just emitting the value to parent so it
+      // is kept in sync
+      set(val) {
+        // check if it is object or string
+        if (JSON.stringify(this.inputInt) !== JSON.stringify(val)) {
+          let tempInput = null;
+          if (typeof val === 'object') {
+            tempInput = { ...val };
+          } else {
+            tempInput = val;
+          }
+          /**
+           * Event emitted on keyup
+           *
+           * @event input-change
+           * @type { String }
+           */
+          this.$emit('input-change', tempInput);
+        }
+      },
+      get() {
+        return this.input;
+      },
     },
-  },
-  mounted() {
-    this.inputInt = this.input;
+    selectedChipsInt: {
+      set(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
+          this.$emit('update:selected-chips', val);
+        }
+      },
+      get() {
+        return this.selectedChips;
+      },
+    },
   },
   methods: {
     inputBlur() {
@@ -110,21 +198,8 @@ export default {
     inputFocus() {
       this.active = true;
     },
-    onInput(event) {
-      this.inputInt = event.target.value;
-      if (this.input !== this.inputInt) {
-        this.$emit('input-change', this.inputInt);
-      }
-    },
     clearInput() {
-      this.inputInt = '';
-      /**
-       * Event emitted on keyup
-       *
-       * @event input-change
-       * @type { String }
-       */
-      this.$emit('input-change', this.inputInt);
+      this.inputInt = null;
     },
   },
 };
@@ -152,6 +227,17 @@ export default {
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
     }
 
+    .base-search__magnifier-icon {
+      height: $icon-large;
+      width: $icon-large;
+      margin-right: $spacing;
+
+      &.base-search__magnifier-icon-active {
+        color: grey;
+        fill: grey;
+      }
+    }
+
     .base-search-input {
       width: calc(100% - #{$spacing} - #{$icon-medium} - #{$spacing-small} / 2);
       border: none;
@@ -161,18 +247,6 @@ export default {
       &::placeholder {
         color: $font-color-third;
         opacity: 1;
-      }
-
-      &.base-search-input-img {
-        background: url(../../static/icons/magnifier.svg) left no-repeat;
-        background-size: $icon-large;
-        padding-left: calc(#{$icon-large} + #{$spacing});
-      }
-
-      &:active.base-search-input-img, &:focus.base-search-input-img {
-        background: url(../../static/icons/magnifier-2.svg) left no-repeat;
-        background-size: $icon-large;
-        padding-left: calc(#{$icon-large} + #{$spacing});
       }
     }
 

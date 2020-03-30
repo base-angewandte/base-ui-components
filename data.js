@@ -19,11 +19,11 @@ module.exports = {
     },
     {
       label: 'date range',
-      type: 'dateRange',
+      type: 'daterange',
     },
     {
       label: 'date',
-      type: 'singleDate',
+      type: 'date',
     },
     {
       label: 'type',

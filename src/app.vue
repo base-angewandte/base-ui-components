@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <BaseMenuList
+      :list="list" />
+    <!--
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -21,27 +24,91 @@
             slidesPerGroup: carousel.length < 3 ? 2 : 3,
           },
         },
-      }" />
-    <BaseAdvancedSearchRow
-      :filter-list="filters" />
+      }" /> -->
+    <base-menu-entry
+      ref="menuEntry"
+      entry-id="sssssss"
+      title="test"
+      :is-active="false"
+      :is-selected="false"
+      icon="sheet-empty"
+      :thumbnails="[]"
+      description="more test"
+      :is-selectable="true"
+      :select-active="false" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
-import BaseCarousel from './components/BaseCarousel/BaseCarousel';
-import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+// import BaseCarousel from './components/BaseCarousel/BaseCarousel';
+// import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
+import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 
 export default {
   name: 'App',
   components: {
-    BaseCarousel,
-    BaseAdvancedSearchRow,
+    BaseMenuEntry,
+    // BaseCarousel,
+    // BaseAdvancedSearchRow,
+    BaseMenuList,
   },
   data() {
     return {
       filters: [],
+      list: [
+        {
+          id: '1',
+          title: 'On a lovely Summers Day',
+          active: false,
+          type: 'Wissenschaftliche Abhandlungggggggggggggggggg',
+          selected: false,
+          shared: true,
+          error: true,
+        },
+        {
+          id: '2',
+          title: 'Oh this hot hot heat',
+          active: false,
+          type: '',
+          selected: false,
+        },
+        {
+          id: '3',
+          title: 'And then again a different title',
+          active: false,
+          type: 'Ausstellung',
+          selected: false,
+          shared: true,
+        },
+        {
+          id: '4',
+          title: 'Allons-y!eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!',
+          active: false,
+          type: 'Bild',
+          selected: false,
+        },
+      ],
+      selectedFilter: {
+        type: 'text',
+        values: '',
+      },
+      selectedListX: [
+        {
+          id: '1',
+          label: 'test1',
+        },
+        {
+          id: '3',
+          label: 'test2',
+        },
+        {
+          id: '2',
+          label: 'test3',
+        },
+      ],
       carousel: [
         {
           uid: '1',
@@ -169,6 +236,10 @@ export default {
   computed: {
   },
   watch: {
+    selectedFilter(val) {
+      console.log('filter changed');
+      console.log(val);
+    },
   },
   async created() {
     const result = await axios.get('http://localhost:9900/fetchFilters');

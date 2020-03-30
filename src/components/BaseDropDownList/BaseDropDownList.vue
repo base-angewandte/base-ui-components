@@ -9,7 +9,8 @@
       ref="dropDownContainer"
       :style="listBodyStyle"
       role="listbox"
-      class="base-drop-down-list">
+      class="base-drop-down-list"
+      @mouseleave="removeActive">
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
           v-if="optionHasData(option[valueName])"
@@ -19,11 +20,12 @@
           :class="[
             'base-drop-down-list__option',
             { 'base-drop-down-list__option-hovered': hoverAndSelectStyled },
-            { 'base-drop-down-list__option-selected': hoverAndSelectStyled && selectedOption
-              && option[identifierName] === selectedOption },
+            { 'base-drop-down-list__option-selected': hoverAndSelectStyled
+              && option === selectedOption },
             { 'base-drop-down-list__option-active': hoverAndSelectStyled
-              && option[identifierName] === activeOption }]"
+              && option[identifierName] === activeOptionInt }]"
           role="option"
+          @mouseenter="setActive(option)"
           @click="selected(option)">
           <slot
             name="option"
@@ -33,6 +35,7 @@
         </li>
       </template>
     </ul>
+    <slot name="after-list" />
   </div>
 </template>
 
@@ -52,8 +55,8 @@ export default {
       default: 'value',
     },
     activeOption: {
-      type: String,
-      default: null,
+      type: Object,
+      default: () => ({}),
     },
     selectedOption: {
       type: Object,
@@ -83,10 +86,25 @@ export default {
       default: true,
     },
   },
+  data() {
+    return {
+      activeOptionInt: null,
+    };
+  },
   computed: {
     valueIsString() {
       return this.dropDownOptions[this.valueName] && this.dropDownOptions[this.valueName].length
         && typeof this.dropDownOptions[this.valueName] === 'string';
+    },
+  },
+  watch: {
+    activeOption: {
+      handler(val) {
+        if (val !== this.activeOptionInt) {
+          this.activeOptionInt = val ? val[this.identifierName] : '';
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -101,6 +119,16 @@ export default {
         return !!option.length;
       }
       return !!(option && Object.keys(option).length);
+    },
+    setActive(option) {
+      this.activeOptionInt = option[this.identifierName];
+      if (this.activeOptionInt !== this.activeOption) {
+        this.$emit('update:active-option', option);
+      }
+    },
+    removeActive() {
+      this.activeOptionInt = null;
+      this.$emit('update:active-option', null);
     },
   },
 };
@@ -133,7 +161,7 @@ export default {
           color: $app-color;
         }
 
-        &:hover, &.base-drop-down-list__option-active {
+        &.base-drop-down-list__option-active {
           background-color: $button-header-color;
         }
       }
