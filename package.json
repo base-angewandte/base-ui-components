@@ -81,7 +81,7 @@
     "vue-svgicon": "^3.2.1",
     "vue-template-compiler": "2.6.10",
     "webpack": "^4.41.5",
-    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "^3.3.10",
     "webpack-merge": "^4.2.2"
   },
