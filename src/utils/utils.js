@@ -5,10 +5,7 @@ export const capitalizeString = (string) => {
     .map(partialString => partialString.slice(0, 1).toUpperCase() + partialString.slice(1)).join(' ');
 };
 
-export const xxx = (string) => {
-  console.log('X');
-  console.log(string);
-};
+export const createId = () => Math.random().toString(36).substr(2, 9);
 
 /**
  * function taking a string and returning returning any name format in an array

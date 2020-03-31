@@ -1,8 +1,5 @@
 <template>
   <div id="app">
-    <BaseMenuList
-      :list="list" />
-    <!--
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -24,39 +21,38 @@
             slidesPerGroup: carousel.length < 3 ? 2 : 3,
           },
         },
-      }" /> -->
-    <base-menu-entry
-      ref="menuEntry"
-      entry-id="sssssss"
-      title="test"
-      :is-active="false"
-      :is-selected="false"
-      icon="sheet-empty"
-      :thumbnails="[]"
-      description="more test"
-      :is-selectable="true"
-      :select-active="false" />
+      }" />
+    <BaseSearch
+      v-model="input"
+      :show-image="true"
+      :use-label="false"
+      :style-props="{ height: '32px'}"
+      :type="'daterange'"
+      :selected-chips.sync="selectedListX"
+      class="base-advanced-search__base-search"
+      drop-down-list-id="autocomplete-options" />
+    <BaseAdvancedSearchRow
+      :filter-list="filters" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
-// import BaseCarousel from './components/BaseCarousel/BaseCarousel';
-// import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
-import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
-import BaseMenuList from './components/BaseMenuList/BaseMenuList';
+import BaseCarousel from './components/BaseCarousel/BaseCarousel';
+import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import BaseSearch from './components/BaseSearch/BaseSearch';
 
 export default {
   name: 'App',
   components: {
-    BaseMenuEntry,
-    // BaseCarousel,
-    // BaseAdvancedSearchRow,
-    BaseMenuList,
+    BaseSearch,
+    BaseCarousel,
+    BaseAdvancedSearchRow,
   },
   data() {
     return {
+      input: '',
       filters: [],
       list: [
         {

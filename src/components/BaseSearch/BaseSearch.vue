@@ -3,20 +3,20 @@
     :style="styleProps"
     :class="['base-search', { 'base-search-fade-out': !active && type === 'text' }]">
     <label
-      :for="fieldId"
+      :for="internalFieldId"
       class="hide">
       {{ label }}
     </label>
     <!-- @slot to add things before the input e.g. chips -->
     <slot name="before-input">
       <SvgIcon
-        name="magnifier-2"
+        name="magnifier"
         :class="[{ 'base-search__magnifier-icon': showImage },
                  { 'base-search__magnifier-icon-active': active }]" />
     </slot>
     <input
       v-if="type === 'text'"
-      :id="fieldId"
+      :id="internalFieldId"
       v-model="inputInt"
       :list="dropDownListId || false"
       :placeholder="placeholder"
@@ -27,26 +27,29 @@
       @focus.prevent="inputFocus"
       @blur="inputBlur"
       @keydown.enter.prevent=""
-      v-on="$listeners">
+      v-on="inputListeners">
     <BaseDateInput
       v-else-if="type === 'date' || type === 'daterange'"
-      v-model="inputInt"
+      :id="'date' + internalFieldId"
+      v-model="dateInputInt"
       :show-label="false"
       :type="type === 'date' ? 'single' : 'daterange'"
       :use-form-field-styling="false"
       label="date-input" />
     <BaseChipsInputField
       v-else-if="type === 'chips'"
-      id="main-select"
+      :id="internalFieldId"
+      v-model="inputInt"
       :selected-list.sync="selectedChipsInt"
       :show-label="false"
       :use-form-field-styling="false"
       :allow-unknown-entries="true"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
+      :placeholder="placeholder"
       label="chips-input"
+      object-prop="label"
       identifier="id"
-      @input="inputInt = $event"
       v-on="$listeners" />
     <!-- @slot for icon after input field -->
     <slot>
@@ -61,6 +64,7 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+import { createId } from '../../utils/utils';
 
 /**
  * A basic text search to filter entries or files
@@ -74,11 +78,13 @@ export default {
   },
   model: {
     prop: 'input',
-    event: 'input-change',
+    event: 'input',
   },
   props: {
     /**
-     * set input value from outside
+     * set input value from outside <br>
+     *   for type daterange this needs to be an object with
+     *   date_from and date_to properties!
      *
      * @model
      */
@@ -123,7 +129,7 @@ export default {
     },
     fieldId: {
       type: String,
-      default: 'search',
+      default: '',
     },
     /**
      * specify the type of input field
@@ -152,16 +158,16 @@ export default {
   data() {
     return {
       active: false,
+      inputInt: '',
     };
   },
   computed: {
-    inputInt: {
-      // this is actually just emitting the value to parent so it
-      // is kept in sync
+    dateInputInt: {
+      // sync setter and getter for date input
       set(val) {
-        // check if it is object or string
         if (JSON.stringify(this.inputInt) !== JSON.stringify(val)) {
           let tempInput = null;
+          // check if it is object or string
           if (typeof val === 'object') {
             tempInput = { ...val };
           } else {
@@ -173,13 +179,20 @@ export default {
            * @event input-change
            * @type { String }
            */
-          this.$emit('input-change', tempInput);
+          this.$emit('input', tempInput);
         }
       },
       get() {
-        return this.input;
+        // just in case for some reason the correct format is not provided
+        return this.type === 'daterange' && typeof this.input === 'string'
+          ? {
+            date_from: this.input || '',
+            date_to: this.input || '',
+          }
+          : this.input;
       },
     },
+    // keep selected chips in sync
     selectedChipsInt: {
       set(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
@@ -190,8 +203,59 @@ export default {
         return this.selectedChips;
       },
     },
+    // this is needed for native input element to only provide values
+    // to parent (as it is the case for chips input)
+    inputListeners() {
+      return ({
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          input: (event) => {
+            /**
+             * Event emitted on input, passing input string
+             *
+             * @event input
+             * @type { String }
+             *
+             */
+            this.$emit('input', event.target.value);
+          },
+        },
+      });
+    },
+    internalFieldId() {
+      return this.fieldId || createId();
+    },
+  },
+  watch: {
+    input(val) {
+      console.log('input changed in base search');
+      if (JSON.stringify(val) !== JSON.stringify(this.inputInt)) {
+        this.inputInt = JSON.parse(JSON.stringify(val));
+      }
+    },
   },
   methods: {
+    setDateInput(val) {
+      console.log(val);
+      // check if it is object or string
+      if (JSON.stringify(this.inputInt) !== JSON.stringify(val)) {
+        let tempInput = null;
+        if (typeof val === 'object') {
+          tempInput = { ...val };
+        } else {
+          tempInput = val;
+        }
+        /**
+         * Event emitted on keyup
+         *
+         * @event input-change
+         * @type { String }
+         */
+        this.$emit('input', tempInput);
+      }
+    },
     inputBlur() {
       this.active = false;
     },

@@ -26,17 +26,12 @@
         :show-image="true"
         :use-label="false"
         :style-props="{ height: 'inherit'}"
-        :type="filter.type"
+        :type="filter.type === 'text' ? 'chips' : filter.type"
         :selected-chips.sync="selectedOptions"
         class="base-advanced-search__base-search"
         drop-down-list-id="autocomplete-options"
         @keydown.up.down.right.left="navigateDropDown"
-        @keydown.enter="selectOption">
-        <template v-slot:before-input>
-          <SvgIcon name="eye" />
-          test
-        </template>
-      </BaseSearch>
+        @keydown.enter="selectOption" />
       <img
         src="../../static/icons/plus.svg"
         class="base-advanced-search__plus-icon">
@@ -134,16 +129,15 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
 import BaseSearch from '../BaseSearch/BaseSearch';
 import BaseDropDownList from '../BaseDropDownList/BaseDropDownList';
 import BaseChip from '../BaseChip/BaseChip';
 import navigateMixin from '../../mixins/navigateList';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
+import { createId } from '../../utils/utils';
 
 export default {
   components: {
-    SvgIcon,
     BaseChipsInputField,
     BaseChip,
     BaseDropDownList,
@@ -252,7 +246,7 @@ export default {
   },
   created() {
     // set the currently active collection
-    this.activeCollection = this.resultList.length ? this.resultList[0].collection : null;
+    // this.activeCollection = this.resultList.length ? this.resultList[0].collection : null;
     // if the active collection has entries - set the first one active
     if (this.consolidatedResultList[this.activeCollection]
       && this.consolidatedResultList[this.activeCollection].length) {
@@ -280,11 +274,26 @@ export default {
       this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
     },
     selectOption() {
+      debugger;
+      let valueToAdd = null;
       // TODO: complete value needs to be passed!
-      const valueToAdd = this.type === 'text' ? this.activeEntry.header
-        : this.activeOption;
+      if (this.filter.type === 'text') {
+        valueToAdd = this.activeEntry ? this.activeEntry.header : this.currentInput;
+      } else if (this.filter.type === 'chips') {
+        valueToAdd = this.activeOption ? this.activeOption : this.currentInput;
+      }
+      if (valueToAdd) {
+        const valueObject = {
+          name: valueToAdd,
+          id: createId(),
+        };
+        if (this.filter.values) {
+          this.filter.values.push(valueObject);
+        } else {
+          this.$set(this.filter, 'values', [valueObject]);
+        }
+      }
       this.currentInput = '';
-      this.filter.values.push({ name: valueToAdd });
     },
     selectFilterOption(val) {
       this.filter.values.push(val);

@@ -11,7 +11,7 @@
     <BaseInput
       :id="id"
       ref="baseInput"
-      v-model="input"
+      v-model="inputInt"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -93,7 +93,7 @@ import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
-import { sort } from '../../utils/utils';
+import { sort, createId } from '../../utils/utils';
 
 export default {
   components: {
@@ -110,6 +110,10 @@ export default {
     i18n,
     navigateMixin,
   ],
+  model: {
+    prop: 'input',
+    event: 'input',
+  },
   props: {
     /**
      if field is occuring more then once - set an id
@@ -124,6 +128,15 @@ export default {
     selectedList: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * @model
+     *
+     * input string
+     */
+    input: {
+      type: String,
+      default: '',
     },
     /**
      * for dynamic drop down entries a unique identifier (id, uuid)
@@ -194,13 +207,11 @@ export default {
       default: false,
     },
     /**
-     * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to selectedList directly but only in parent
-     * component
+     * this means typed input will be added as chip directly
      */
     addSelectedEntryDirectly: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * if true a button with that functionality will be visible
@@ -304,8 +315,6 @@ export default {
     return {
       // internal representation of selectedList
       selectedListInt: [],
-      // to have base input string available here
-      input: '',
       // for removing chips via backspace
       timeout: null,
       // for removing chips via backspace
@@ -316,6 +325,17 @@ export default {
       // (for arrow key use)
       chipActiveForRemove: -1,
     };
+  },
+  computed: {
+    // to have base input string available here
+    inputInt: {
+      get() {
+        return this.input;
+      },
+      set(val) {
+        this.$emit('input', val);
+      },
+    },
   },
   watch: {
     selectedList: {
@@ -342,10 +362,10 @@ export default {
       if (key === 'Backspace' || key === 'Delete') {
         // if backspace (once) is used make last chip active
         if (key === 'Backspace' && !this.fired
-          && !this.input && this.chipActiveForRemove < 0) {
+          && !this.inputInt && this.chipActiveForRemove < 0) {
           this.chipActiveForRemove = this.selectedListInt.length - 1;
           // on second backspace set timeout for delete
-        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.input) {
+        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.inputInt) {
           // check if there is actually anything left to remove
           this.removeEntry(
             this.selectedListInt[this.chipActiveForRemove],
@@ -362,7 +382,7 @@ export default {
         this.timeout = setTimeout(() => {
           this.fired = false;
         }, 200);
-      } else if (!this.input && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+      } else if (!this.inputInt && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
         const isIndexUp = event.key === 'ArrowRight';
         const activeChip = this.navigate(
           this.selectedListInt,
@@ -389,10 +409,10 @@ export default {
     addEntry() {
       // if there is input, unknown entries are allowed and direct entry addtion
       // is enabled - we can add the entry to the selected list directly
-      if (this.input && this.allowUnknownEntries && this.addSelectedEntryDirectly) {
+      if (this.inputInt && this.allowUnknownEntries && this.addSelectedEntryDirectly) {
         // check for duplicates
         const duplicate = this.selectedListInt
-          .find(option => option[this.objectProp] === this.input);
+          .find(option => option[this.objectProp] === this.inputInt);
         // if no duplicate was found add the entry
         if (!duplicate) {
           // where should new item be placed (added at the end or replacing old entry
@@ -401,7 +421,7 @@ export default {
           // create object to add
           const newEntry = {
             idInt: this.getIdInt(),
-            [this.objectProp]: this.input,
+            [this.objectProp]: this.inputInt,
           };
           console.log(newEntry);
           // set entry in selectedList
@@ -413,7 +433,7 @@ export default {
           this.$emit('duplicate', duplicate);
         }
         // reset the input
-        this.input = '';
+        this.inputInt = '';
       }
     },
     updateParentList(newSelectedListInt) {
@@ -442,7 +462,7 @@ export default {
         }
       }
       // else return a new internal id
-      return Math.random().toString(36).substr(2, 9);
+      return createId();
     },
 
     /** sorting */
