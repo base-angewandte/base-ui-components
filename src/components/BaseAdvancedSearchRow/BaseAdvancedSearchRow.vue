@@ -48,6 +48,7 @@
       class="base-advanced-search__drop-down-body">
       <template v-slot:before-list>
         <div class="base-advanced-search__above-list-area">
+
           <!-- FILTER SELECT LIST -->
           <div class="base-advanced-search__filter-area">
             <div
@@ -82,7 +83,8 @@
       <!-- AUTOCOMPLETE OPTIONS LIST -->
       <template
         v-slot:option="slotProps">
-        <div class="base-advanced-search__autocomplete-collection">
+        <div
+          class="base-advanced-search__autocomplete-collection">
           <div
             v-if="slotProps.option.data.length"
             :class="['base-advanced-search__first-column',
@@ -103,8 +105,10 @@
         </div>
       </template>
 
-      <!-- CHIPS (FILTER OPTIONS) AREA -->
-      <template v-slot:after-list>
+      <!-- CHIPS (CONTROLLED VOCABULARY OPTIONS) AREA -->
+      <template
+        v-if="filter.type === 'chips'"
+        v-slot:after-list>
         <div class="base-advanced-search__above-list-area">
           <div class="base-advanced-search__chips-row">
             <div class="base-advanced-search__first-column" />
@@ -117,8 +121,8 @@
                 <BaseChip
                   :is-removable="false"
                   :entry="chip"
-                  :chip-active="chip === activeOption"
-                  @clicked="selectFilterOption(chip)" />
+                  :chip-active="chip === activeControlledVocabularyEntry"
+                  @clicked="selectControlledVocabularyOption(chip)" />
               </li>
             </ul>
           </div>
@@ -136,6 +140,11 @@ import navigateMixin from '../../mixins/navigateList';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import { createId } from '../../utils/utils';
 
+/** Search Row Component for Advanced Search
+ *
+ * An example is currently visible in Recherche (base.uni-ak.ac.at/recherche)
+ */
+
 export default {
   components: {
     BaseChipsInputField,
@@ -145,47 +154,99 @@ export default {
   },
   mixins: [navigateMixin],
   props: {
+    /**
+     * property to distinguish between one of multiple filter rows
+     * and the main search field (where new filters are added) that has
+     * a slightly different design and functionality
+     */
     isMainSearch: {
       type: Boolean,
       default: true,
     },
+    /**
+     * list of available filters
+     */
     filterList: {
       type: Array,
+      default: () => ([]),
+    },
+    /**
+     * provide the component with the fetched autocomplete results
+     * (drop down options)
+     */
+    // TODO: check if this is correctly displayed in styleguide
+    autocompleteResults: {
+      type: [String, Object][Array],
       default: () => ([]),
     },
   },
   data() {
     return {
-      // variable containing search text
+      /**
+       * variable containing search text
+       * @type {?string}
+       */
       currentInput: '',
       // current filter
       // TODO: a) adjust to actual filter structure
       // b) should probably be set from outside
+      /**
+       * the currently selected filter
+       * @typedef {Object} filter
+       * @property {string} filter.label
+       * @property {string} filter.type
+       * @property {*[]} [filter.values]
+       * @property {Object[]} [filter.options]
+       */
       filter: {
         label: '',
         type: 'text',
+        values: [],
+        options: [],
       },
-      // selected controlled vocabulary or autocomplete options
-      selectedOptions: [],
-      // for autocomplete drop down navigation - option level
+      /**
+       * for autocomplete drop down navigation - single autocomplete option level
+       * @type {?Object}
+       */
       activeEntry: null,
-      // for autocomplete drop down navigation - collection level
+      /**
+       * for autocomplete drop down navigation - collection level
+       * @type {?string}
+       */
       activeCollection: '',
-      // switch between arrow use on collection or entry
+      /**
+       * switch between arrow use on collection or entry level
+       * (true for collection level)
+       * @type {boolean}
+       */
       collectionSelect: false,
-      // for chips options
-      activeOption: null,
-      // for filter control
+      /**
+       * the currently active controlled vocabulary entry
+       * @type {?Object}
+       */
+      activeControlledVocabularyEntry: null,
+      /**
+       * the currently active filter
+       * @type {?Object}
+       */
       activeFilter: null,
-      // autcomplete result list
-      resultList: [{ collection: 'Institution', data: [{ id: 'i:AtyPMbCGvo87shMwRZikwQ', score: 13.0, header: 'Zebra - Zentrum für Klassische und Moderne Fotografie', subtext: ['Wien, Austria'] }, { id: 'i:kK2kZPzffLknjWhuHxU6sa', score: 13.0, header: 'Zentrum für Erwachsenenbildung', subtext: ['Strobl'] }, { id: 'i:QpNo2ZUPzPKM7wJDSy7F4h', score: 13.0, header: 'H2 - Zentrum für Gegenwartskunst', subtext: ['Augsburg'] }, { id: 'i:A6iu4gLU7bGS5kpAE9pTUf', score: 13.0, header: 'Tomi Ungerer Museum - Internationales Zentrum für Illustration', subtext: ['Strasbourg'] }, { id: 'i:FmHikVmyQJuyynSx7NCsNe', score: 13.0, header: 'Zentrum für Interdisziplinäre Forschnung', subtext: ['ZIF', 'Bielefeld'] }, { id: 'i:R4YjbtHGNsbKzfwyRDF5XJ', score: 13.0, header: 'BrotfabrikGalerie', subtext: ['Zentrum für Kunst & Kultur', 'Berlin, AT'] }, { id: 'i:PYqY6pTrmUgZpnRRhmkgY6', score: 13.0, header: 'Zentrum für Kunst und Kommunikation', subtext: ['Z.K.K.', 'Wien, Austria'] }, { id: 'i:gpptGbzV9f7uYAmxTjyjMg', score: 13.0, header: 'Zentrum für Kunst und Medientechnologie', subtext: ['ZKM', 'Karlsruhe'] }, { id: 'i:Q4AAfWUC6GkHUdRxc7ChxC', score: 13.0, header: 'Open Space - Zentrum für Kunstprojekte', subtext: ['Wien, Austria'] }, { id: 'i:SxX6iZszMJv7M7n54ej6BK', score: 13.0, header: 'Zentrum für Literatur- und Kulturforschung Berlin', subtext: ['Geisteswissenschaftliche Zentren Berlin e.V.', 'Berlin'] }] }, { collection: 'Preis', data: [{ id: 'i:qQCn2jtewXhKnLVsFaHgk6', score: 13.0, header: 'Artist-in-Residenz, Zentrum für Kunst und Medien, Institut für Visuelle Medien, Karlsruhe', subtext: [] }, { id: 'i:X44M8fjtLCXfYvhVMo4gRP', score: 13.0, header: 'Ankauf "Interactive Plant Growing", Zentrum für Medientechnologie Karlsruhe, Germany', subtext: [] }] }, { collection: 'Einzelperson', data: [] }, { collection: 'Kunstgruppe', data: [{ id: 'p:3WU9EBchgTFjE9g5zjUciF', score: 13.0, header: 'Zentrum für politische Schönheit ZPS', subtext: [], description1: { type: 'placedate', value: 'Berlin' } }] }, { collection: 'Event', data: [] }, { collection: 'Projekt', data: [] }, { collection: 'Nachlass', data: [] }, { collection: 'Werk', data: [] }, { collection: 'Archivalie', data: [{ id: 'o:EyZZcmBi6NvBfap2934mah', score: 13.0, header: 'Informationsfolder: Donau-Universität Krems/ Zentrum für Bildwissenschaften. Neuer Lehrgang Bildmanagement, Bildwissenschaft', subtext: [], description2: { text_german: ['Neu startende Universitätslehrgänge Bildmanagement und Bildwissenschaft an der Donau Universität Krems.'], text_english: '' } }] }, { collection: 'Medienbeitrag', data: [] }, { collection: 'Publikation', data: [{ id: 'o:i5aAZLd7APjjhMML55Bi89', score: 13.0, header: 'Museum Gugging als kommendes Zentrum für Art Brut', subtext: ['Text', '', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:fobdG7rNBQ2QDvvaQhJ2mN', score: 13.0, header: 'Neues Zentrum für visuelle Kultur', subtext: ['Text', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:CXQMydrwsUKnf8uDS3KduV', score: 13.0, header: 'Neues Zentrum für zeitgenössische Kunstgeschichte', subtext: ['Text', 'Henriette Horny', ''], description2: { text_german: '', text_english: '' } }] }],
     };
   },
   computed: {
+    /**
+     * the actually displayed autocomplete options
+     * (filtered for already selected and for the current input string)
+     *
+     * @returns Object[]
+     */
     displayedOptions() {
       if (this.filter.options) {
+        // TODO: eventually this should be filtered by id not by label!
+        // remove already selected options
         let options = [].concat(this.filter.options)
-          .filter(filter => !this.filter.values.includes(filter));
+          .filter(filter => !this.filter.values
+            .map(value => value.label).includes(filter));
+        // only display options matching the current input string
         if (this.currentInput) {
           options = options.filter(filter => filter
             .toLowerCase().includes(this.currentInput.toLowerCase()));
@@ -194,6 +255,9 @@ export default {
       }
       return [];
     },
+    // the actually displayed filters (currently only sorted)
+    // TODO: check if there should actually be a functionality where input
+    // filters the displayed filters
     displayedFilters() {
       const displayed = [...this.filterList];
       return displayed.sort((a, b) => {
@@ -203,9 +267,27 @@ export default {
         return -1;
       });
     },
+    // selected controlled vocabulary or autocomplete options
+    selectedOptions() {
+      // this variable should only contain values for chips and text filters
+      // not for date or daterange (should be array)
+      if (this.filter.type === 'chips' || this.filter.type === 'text') {
+        return this.filter.values;
+      }
+      return [];
+    },
     resultListInt() {
       if (!this.displayedOptions.length) {
-        return this.resultList.filter(section => section.data && section.data.length);
+        const resultsToDisplay = this.autocompleteResults
+          .filter(section => section.data && section.data.length);
+        if (this.selectedOptions && this.selectedOptions.length) {
+          const selectedOptionIds = this.selectedOptions.map(option => option.id);
+          return resultsToDisplay.map(({ data, collection }) => ({
+            data: data.filter(entry => !selectedOptionIds.includes(entry.id)),
+            collection,
+          }));
+        }
+        return resultsToDisplay;
       }
       return [];
     },
@@ -232,31 +314,40 @@ export default {
   },
   watch: {
     filter(val) {
-      // set current input according to filter type (empty string or date object)
+      // when a filter type changes set current input
+      // according to filter type (empty string or date object)
       this.currentInput = this.setFilterValues(val.type, null, false);
     },
-    selectedOptions(val) {
-      this.$set(this.filter, 'values', val);
-    },
-    /*
+    // when current input changes emit this to parent component which should
+    // do the fetching of autocomplete results
     currentInput(val) {
-      console.log('input changed');
-      this.$set(this.filter, 'values', this.setFilterValues(this.filter.type, val));
-    }, */
-  },
-  created() {
-    // set the currently active collection
-    // this.activeCollection = this.resultList.length ? this.resultList[0].collection : null;
-    // if the active collection has entries - set the first one active
-    if (this.consolidatedResultList[this.activeCollection]
-      && this.consolidatedResultList[this.activeCollection].length) {
-      // eslint-disable-next-line prefer-destructuring
-      this.activeEntry = this.consolidatedResultList[this.activeCollection][0];
-    } else {
-      this.activeEntry = null;
-    }
+      this.$emit('fetch-autocomplete-results', val);
+    },
   },
   methods: {
+    /** FILTER RELATED METHODS */
+
+    /**
+     * @param {KeyboardEvent} event - keyboard event bubbled from
+     * filter input field
+     */
+    navigateFilters(event) {
+      if (this.displayedFilters.length) {
+        const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
+        // determine if arrow was up or down - true if down, false for up
+        const isArrowDown = event.code === 'ArrowDown';
+        this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
+      }
+    },
+
+    /**
+     * set the via click or navigation selected filter as currently
+     * active filter
+     *
+     * @param {Object} selectedFilter - the selected filter object
+     * @param {string} selectedFilter.type - the type of the filter needed
+     * to set the default filter values accordingly (array, string, object)
+     */
     selectFilter(selectedFilter) {
       this.filter = { ...selectedFilter,
         ...{
@@ -264,28 +355,54 @@ export default {
         } };
       this.activeFilter = null;
     },
+
+    /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
+
+    /**
+     * set the controlled vocabulary option selected via click
+     * @param {string} val - the provided option
+     * TODO: check if this can be integrated into 'selectOption'!
+     */
+    selectControlledVocabularyOption(val) {
+      // TODO: add complete object not only string
+      // especially probably already existing id!
+      this.filter.values.push({
+        label: val,
+        id: createId(),
+      });
+    },
+    /**
+     * function for setting the currently active collection
+     *
+     * @param {string} collection - the collection string to set
+     * as active collection (triggered when active entry changes)
+     */
     setCollection(collection) {
       this.activeCollection = this.activeEntry ? collection : '';
     },
-    navigateFilters(event) {
-      const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
-      // determine if arrow was up or down - true if down, false for up
-      const isArrowDown = event.code === 'ArrowDown';
-      this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
-    },
+    /**
+     * add a selected option to the list of selected
+     * TODO: this is currently not completely coherent:
+     * a) only string is added as 'label'
+     * b) onclick also sets activeEntry??
+     * c) used for autocomplete key navigation (enter) and click but
+     * for controlled vocabulary only for key navigation
+     */
     selectOption() {
-      debugger;
       let valueToAdd = null;
       // TODO: complete value needs to be passed!
       if (this.filter.type === 'text') {
         valueToAdd = this.activeEntry ? this.activeEntry.header : this.currentInput;
       } else if (this.filter.type === 'chips') {
-        valueToAdd = this.activeOption ? this.activeOption : this.currentInput;
+        valueToAdd = this.activeControlledVocabularyEntry
+          ? this.activeControlledVocabularyEntry : this.currentInput;
       }
       if (valueToAdd) {
         const valueObject = {
-          name: valueToAdd,
-          id: createId(),
+          label: valueToAdd,
+          // TODO: can internally created id's go to parent??
+          // (probably not ...)
+          id: this.activeEntry ? this.activeEntry.id : createId(),
         };
         if (this.filter.values) {
           this.filter.values.push(valueObject);
@@ -293,72 +410,119 @@ export default {
           this.$set(this.filter, 'values', [valueObject]);
         }
       }
+      // reset everything
       this.currentInput = '';
+      this.activeEntry = null;
+      this.activeCollection = '';
     },
-    selectFilterOption(val) {
-      this.filter.values.push(val);
-    },
+
+    /** DROP DOWN NAVIGATION */
+
+    /**
+     * primary drop down navigation deciding what arrow keys are used for
+     * --> could be used for controlled vocabulary or autocomplete options
+     * @param {KeyboardEvent} event - the keydown event bubbled from search input field
+     */
     navigateDropDown(event) {
       // determine if arrow was up or down - true if down, false for up
       const isArrowDown = event.code === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
       // option specified in the filter?) only use arrow up and down
       if (this.filter.options && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
-        const currentIndex = this.displayedOptions.indexOf(this.activeOption);
-        this.activeOption = this.navigate(this.displayedOptions, isArrowDown, currentIndex, true);
+        const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
+        this.activeControlledVocabularyEntry = this.navigate(
+          this.displayedOptions,
+          isArrowDown, currentIndex,
+          true,
+        );
+      // else navigation is used for autocomplete options
       } else {
-        this.navigateAutocomplete(event);
+        this.navigateAutocomplete(event, isArrowDown);
       }
     },
-    navigateAutocomplete(event) {
-      // actions for arrow up or down
-      if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
-        // determine if arrow was up or down - true if down, false for up
-        const isArrowDown = event.code === 'ArrowDown';
-        // if there is no active Collection (could happen due to hover)
-        // set the first item in array
-        if (!this.activeCollection) {
-          this.activeCollection = this.resultListInt[0].collection;
-        }
-        // get the index of the currently active collection
-        const currentCollectionIndex = this.resultListInt
-          .map(section => section.collection).indexOf(this.activeCollection);
-        let currentCollectionArray = this.consolidatedResultList[this.activeCollection];
-        // depending if arrow was up or down set +/- one to add or subtract
-        // generically
-        const numberToAdd = isArrowDown ? 1 : -1;
-        // get the index of the currently active entry within a collection
-        const currentEntryIndex = currentCollectionArray.indexOf(this.activeEntry);
-        // check if collection select is active and if not if the arrow action is
-        // within the limits of the array
-        if (!this.collectionSelect
-          && this.isWithinArrayLimit(
-            currentCollectionArray, isArrowDown, currentEntryIndex + numberToAdd,
+    /**
+     * navigation handling complexe autocomplete navigation with possibilities to
+     * navigate single entries or collections (switch between collections and entries
+     * by using left/right arrow key)
+     *
+     * @param {KeyboardEvent} event - the keydown event bubbled from search input field
+     * @param {boolean} isArrowDown - param passed from navigateDropDown so no need to newly assign
+     */
+    navigateAutocomplete(event, isArrowDown) {
+      if (this.resultListInt.length) {
+        // store key stroked in variable
+        const key = event.code;
+        // actions for arrow up or down
+        if (key === 'ArrowDown' || key === 'ArrowUp') {
+          // if there is no active Collection (could happen due to hover)
+          // set the first item in array
+          if (!this.activeCollection) {
+            this.activeCollection = this.resultListInt[0].collection;
+          }
+          // get the index of the currently active collection
+          const currentCollectionIndex = this.resultListInt
+            .map(section => section.collection).indexOf(this.activeCollection);
+          let currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+          // depending if arrow was up or down set +/- one to add or subtract
+          // generically
+          const numberToAdd = isArrowDown ? 1 : -1;
+          // get the index of the currently active entry within a collection
+          const currentEntryIndex = currentCollectionArray.indexOf(this.activeEntry);
+          // check if collection select is active and if not if the arrow action is
+          // within the limits of the array
+          if (!this.collectionSelect
+            && this.isWithinArrayLimit(
+              currentCollectionArray, isArrowDown, currentEntryIndex + numberToAdd,
+            )) {
+            // set new active entry
+            this.activeEntry = this.navigate(
+              currentCollectionArray,
+              isArrowDown,
+              currentEntryIndex,
+            );
+            // if collection select is active or first/last element of the current collection
+            // is reached - switch to next/previous collection
+          } else if (this.isWithinArrayLimit(
+            this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
           )) {
-          // set new active entry
-          this.activeEntry = this.navigate(currentCollectionArray, isArrowDown, currentEntryIndex);
-          // if collection select is active or first/last element of the current collection
-          // is reached - switch to next/previous collection
-        } else if (this.isWithinArrayLimit(
-          this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
-        )) {
-          // set the new active collection
-          this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd]
-            .collection;
-          currentCollectionArray = this.consolidatedResultList[this.activeCollection];
-          // define which element in the newly active collection should appear active
-          // if collection select or arrow up - first one otherwise last
-          const newItemIndex = isArrowDown || this.collectionSelect ? 0
-            : currentCollectionArray.length - 1;
-          // set the active entry of the newly set collection
-          this.activeEntry = currentCollectionArray[newItemIndex];
+            // set the new active collection
+            this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd]
+              .collection;
+            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            // define which element in the newly active collection should appear active
+            // if collection select or arrow up - first one otherwise last
+            const newItemIndex = isArrowDown || this.collectionSelect ? 0
+              : currentCollectionArray.length - 1;
+            // set the active entry of the newly set collection
+            this.activeEntry = currentCollectionArray[newItemIndex];
+          }
+        } else if (key === 'ArrowLeft') {
+          this.collectionSelect = true;
+        } else if (key === 'ArrowRight') {
+          this.collectionSelect = false;
         }
-      } else if (event.code === 'ArrowLeft') {
-        this.collectionSelect = true;
-      } else if (event.code === 'ArrowRight') {
-        this.collectionSelect = false;
       }
     },
+
+    /** OTHERS */
+
+    /**
+     * function to set the correct values for
+     * a) filter.values attribute
+     * b) search input (currentInput)
+     *
+     * @param {string} type - the filter type
+     * @param {?string|Array|Object} [val=null] - the values already present in a filter
+     * to set (otherwise emtpy values (null, [], { date: '' },
+     * { date_from: '', date_to: ''}) will be used)
+     * @param {string} [val.date] - for filter type 'date'
+     * @param {string} [val.date_from] - for filter type 'daterange' - from value
+     * @param {string} [val.date_to] - for filter type 'daterange' - to value
+     * @param {boolean} [useArrayDefault=true] - for search input it should only be an
+     * object (date, daterange) or string (text, chips) never Array - this is only
+     * needed for filter.values
+     * @returns {?string|Array|Object} the correct value type for the filter type
+     */
     setFilterValues(type, val = null, useArrayDefault = true) {
       let tempValues = val;
       if (type === 'date') {
