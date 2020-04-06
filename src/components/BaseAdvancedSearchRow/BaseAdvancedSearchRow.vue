@@ -428,7 +428,8 @@ export default {
       const isArrowDown = event.code === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
       // option specified in the filter?) only use arrow up and down
-      if (this.filter.options && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
+      if (this.filter.options && this.filter.options.length
+        && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(
           this.displayedOptions,
@@ -480,6 +481,11 @@ export default {
               isArrowDown,
               currentEntryIndex,
             );
+            // since it is allowed to add unknown entries it must be possible to
+            // have no active entry when navigating beyond list
+            // TODO: if this is a use case more often this could also go to navigate()
+          } else if (!this.collectionSelect && currentEntryIndex === 0) {
+            this.activeEntry = null;
             // if collection select is active or first/last element of the current collection
             // is reached - switch to next/previous collection
           } else if (this.isWithinArrayLimit(

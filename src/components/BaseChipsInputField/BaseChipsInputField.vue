@@ -340,14 +340,18 @@ export default {
   watch: {
     selectedList: {
       handler(val) {
-        const tempList = val.map(option => ({
-          ...option,
-          // adding an internal id
-          ...{ idInt: option[this.identifier] || this.getIdInt(option) },
-        }));
-        // only update if internal list is different from outside list
-        if (JSON.stringify(tempList) !== JSON.stringify(this.selectedListInt)) {
-          this.selectedListInt = tempList;
+        if (val) {
+          const tempList = val.map(option => ({
+            ...option,
+            // adding an internal id
+            ...{ idInt: option[this.identifier] || this.getIdInt(option) },
+          }));
+          // only update if internal list is different from outside list
+          if (JSON.stringify(tempList) !== JSON.stringify(this.selectedListInt)) {
+            this.selectedListInt = tempList;
+          } else {
+            this.selectedListInt = [];
+          }
         }
       },
       deep: true,
