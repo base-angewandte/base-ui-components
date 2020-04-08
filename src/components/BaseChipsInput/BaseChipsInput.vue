@@ -48,7 +48,7 @@
                 v-for="(entry, index) in selectedListInt"
                 :id="entry[identifier] || entry.idInt"
                 ref="baseChip"
-                :key="'chip-' + entry.idInt"
+                :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
