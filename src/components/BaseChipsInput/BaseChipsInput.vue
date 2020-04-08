@@ -660,6 +660,14 @@ export default {
     onInputFocus() {
       this.insideInput = true;
       this.insideDropDown = false;
+      /**
+       * event triggered on input focus
+       *
+       * @event focused
+       * @type {none}
+       *
+       */
+      this.$emit('focused');
     },
     getIndex(oldEntry) {
       if (!this.dropDownListInt.length) {
