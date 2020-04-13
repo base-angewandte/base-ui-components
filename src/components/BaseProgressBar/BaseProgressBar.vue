@@ -12,7 +12,7 @@
       <div
         ref="progressBarFileName"
         class="base-progress-bar__file-name">
-        {{ filename }}
+        {{ fileName }}
         <div
           v-if="showFadeOut"
           ref="progressBarFadeOut"
@@ -31,21 +31,21 @@
         </div>
       </div>
       <span
-        v-if="filesize"
+        v-if="fileSize"
         class="base-progress-bar__file-size">
-        {{ filesize }}
+        {{ fileSize }}
       </span>
       <SvgIcon
         v-if="status === 'success'"
-        class="base-progress-bar__status-icon base-upload-bar__status-icon-success"
+        class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
         name="success" />
       <SvgIcon
         v-if="status === 'fail'"
-        class="base-progress-bar__status-icon base-upload-bar-status-icon-fail"
+        class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
         name="attention" />
       <SvgIcon
         v-if="showRemove"
-        class="base-progress-bar__status-icon base-upload-bar-status-icon-remove"
+        class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
         name="remove"
         @click="remove" />
     </div>
@@ -54,6 +54,11 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
+
+/**
+ * Progress bar including file upload features (display filename or file size)
+ * and remove functionality
+ */
 
 export default {
   name: 'BaseProgressBar',
@@ -64,29 +69,31 @@ export default {
     /**
      * filename that will be displayed in the bar
      */
-    filename: {
+    fileName: {
       type: String,
-      default: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        + 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        + 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+      default: '',
     },
     /**
      * filesize that will be displayed in the bar
      */
-    filesize: {
+    fileSize: {
       type: String,
-      default: '22kb',
+      default: '',
     },
     /**
-     * progress of the upload (percentashowFadeOutge ratio)
+     * progress of the upload (percentage ratio, e.g. 0.5)
+     * @values 0-1
      */
     progress: {
       type: [Number, String],
       default: 0,
+      validator(val) {
+        return val >= 0 && val <= 1;
+      },
     },
     /**
      * indicate the success or fail of an upload <br>
-     *   allowed values: 'sucess' | 'fail' | ''
+     *   @values success, fail, ''
      */
     status: {
       type: String,
@@ -100,7 +107,7 @@ export default {
      */
     showRemove: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
@@ -116,33 +123,36 @@ export default {
   },
   watch: {
     progressWidth(val) {
-      // get the fade out with (currently set with 30px but be flexible)
-      const fadeOutWidth = this.$refs.progressBarFadeOut.clientWidth;
-      // get the width of the progress bar
-      const progressInPixels = Math.ceil(this.$refs.progressBar.clientWidth / 100 * val);
-      // get content padding
-      const progressContent = this.$refs.progressBarContent;
-      const contentStyle = window.getComputedStyle(progressContent);
-      const contentPadding = Number(contentStyle.getPropertyValue('padding-left')
-        .replace('px', ''));
-      // get the position of the fade out element
-      const fadeOutPosition = this.$refs.progressBarFadeOut.offsetLeft + contentPadding;
-      // check if the progress is bigger than fade out position
-      if (progressInPixels >= fadeOutPosition) {
-        // if yes calculate how much is the overlap
-        const fadeOutOverlap = progressInPixels - fadeOutPosition;
-        // if the overlap is bigger than the actual fade-out element size
-        // - assume the actual width of fade out element - else set calculated size
-        this.fadeOutDarkWidth = fadeOutOverlap > fadeOutWidth ? 0 : fadeOutWidth - fadeOutOverlap;
-      } else {
-        this.fadeOutDarkWidth = fadeOutWidth;
+      // check if all of this is even necessary --> fade out is displayed
+      if (this.showFadeOut) {
+        // get the fade out with (currently set with 30px but be flexible)
+        const fadeOutWidth = this.$refs.progressBarFadeOut.clientWidth;
+        // get the width of the progress bar
+        const progressInPixels = Math.ceil(this.$refs.progressBar.clientWidth / 100 * val);
+        // get content padding
+        const progressContent = this.$refs.progressBarContent;
+        const contentStyle = window.getComputedStyle(progressContent);
+        const contentPadding = Number(contentStyle.getPropertyValue('padding-left')
+          .replace('px', ''));
+        // get the position of the fade out element
+        const fadeOutPosition = this.$refs.progressBarFadeOut.offsetLeft + contentPadding;
+        // check if the progress is bigger than fade out position
+        if (progressInPixels >= fadeOutPosition) {
+          // if yes calculate how much is the overlap
+          const fadeOutOverlap = progressInPixels - fadeOutPosition;
+          // if the overlap is bigger than the actual fade-out element size
+          // - assume the actual width of fade out element - else set calculated size
+          this.fadeOutDarkWidth = fadeOutOverlap > fadeOutWidth ? 0 : fadeOutWidth - fadeOutOverlap;
+        } else {
+          this.fadeOutDarkWidth = fadeOutWidth;
+        }
       }
     },
   },
   mounted() {
     if (this.$refs && this.$refs.progressBarFileName) {
       this.showFadeOut = this.$refs.progressBarFileName.scrollWidth
-        >= this.$refs.progressBarFileName.clientWidth;
+        > this.$refs.progressBarFileName.clientWidth;
     }
   },
   methods: {
@@ -151,7 +161,6 @@ export default {
        * event triggered on remove icon click
        *
        * @event remove-item
-       * @type { none }
        */
       this.$emit('remove-item');
     },
