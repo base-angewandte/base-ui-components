@@ -47,10 +47,10 @@
                 :id="entry.idInt"
                 ref="baseChip"
                 :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                :entry="getLangLabel(entry[valueProperty], true)"
+                :entry="getLangLabel(entry[valuePropertyName], true)"
                 :hover-box-content="hoverboxContent"
-                :is-linked="alwaysLinked || entry[identifierProperty] === 0
-                  || !!entry[identifierProperty]"
+                :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                  || !!entry[identifierPropertyName]"
                 :chip-active="chipActiveForRemove === index"
                 @remove-entry="removeEntry(entry, index)"
                 @hoverbox-active="hoverBoxActive($event, entry)" />
@@ -307,7 +307,7 @@ export default {
      * // TODO: this should replace prop 'identifier' in future versions
      * (better naming)
      */
-    identifierProperty: {
+    identifierPropertyName: {
       type: String,
       default: '',
     },
@@ -316,7 +316,7 @@ export default {
      * // TODO: this should replace prop 'objectProp' in future versions
      * (better naming)
      */
-    valueProperty: {
+    valuePropertyName: {
       type: String,
       default: '',
     },
@@ -359,7 +359,7 @@ export default {
           const tempList = val.map(option => ({
             ...option,
             // adding an internal id
-            ...{ idInt: option[this.identifierProperty] || this.getIdInt(option) },
+            ...{ idInt: option[this.identifierPropertyName] || this.getIdInt(option) },
           }));
           // only update if internal list is different from outside list
           if (JSON.stringify(tempList) !== JSON.stringify(this.selectedListInt)) {
@@ -455,7 +455,7 @@ export default {
       if (this.inputInt && this.allowUnknownEntries && this.addSelectedEntryDirectly) {
         // check for duplicates
         const duplicate = this.selectedListInt
-          .find(option => option[this.valueProperty] === this.inputInt);
+          .find(option => option[this.valuePropertyName] === this.inputInt);
         // if no duplicate was found add the entry
         if (!duplicate) {
           // where should new item be placed (added at the end or replacing old entry
@@ -464,7 +464,7 @@ export default {
           // create object to add
           const newEntry = {
             idInt: this.getIdInt(),
-            [this.valueProperty]: this.inputInt,
+            [this.valuePropertyName]: this.inputInt,
           };
           // set entry in selectedList
           this.$set(this.selectedListInt, setIndex, newEntry);
@@ -513,16 +513,16 @@ export default {
      * every selected option needs an internal id to be uniquely identifyable
      * by draggablejs
      *
-     * @param {Object} option - the option the internal id is created for
+     * @param {Object} [option=null] - the option the internal id is determined for
      */
-    getIdInt(option) {
+    getIdInt(option = null) {
       // check if the selected option already has an internal identifier
       // not applicable for newly created entries so check if option was provided
       if (option) {
         // get matching option by value (this is only for options that dont have an
         // external id provided anyways (also duplicates are excluded in 'addOption()'
         const matchingOption = this.selectedListInt
-          .find(opt => opt[this.valueProperty] === option[this.valueProperty]);
+          .find(opt => opt[this.valuePropertyName] === option[this.valuePropertyName]);
         // check if there was exactly one matching result
         if (matchingOption) {
           return matchingOption.idInt;

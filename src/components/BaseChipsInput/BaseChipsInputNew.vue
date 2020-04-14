@@ -7,8 +7,10 @@
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
-      :linked-list-option="activeOption ? activeOption[identifierProperty] : null"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyNameInt] : null"
       :drop-down-active="isDropDownActive"
+      :value-property-name="valuePropertyNameInt"
+      :identifier-property-name="identifierPropertyNameInt"
       @focus="onInputFocus"
       @clicked-outside="onInputBlur"
       @keydown="checkKeyEvent"
@@ -17,25 +19,25 @@
       v-on="$listeners" />
 
     <BaseDropDownList
-      v-if="useDefaultDropDown && inputFieldActive"
+      v-if="true"
       ref="dropDownList"
       :drop-down-options="listInt"
       :active-option.sync="activeOption"
       :selected-option.sync="selectedOption"
-      :identifier-property="identifierProperty"
-      :value-property="valueProperty"
+      :identifier-property-name="identifierPropertyNameInt"
+      :value-property-name="valuePropertyNameInt"
       :list-id="id"
       :select-styled="!allowMultipleEntries"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
         <span
-          v-if="allowUnknownEntries && !entry.option[identifierProperty]"
+          v-if="allowUnknownEntries && !entry.option[identifierPropertyNameInt]"
           ref="option"
-          :key="entry.option[identifierProperty]">
+          :key="entry.option[identifierPropertyNameInt]">
           {{ addNewChipText
-            ? `${addNewChipText} ${getLangLabel(entry.option[valueProperty], true)} ...`
+            ? `${addNewChipText} ${getLangLabel(entry.option[valuePropertyNameInt], true)} ...`
             : `${getI18nTerm('form.Add', -1, {
-              value: getLangLabel(entry.option[valueProperty], true)
+              value: getLangLabel(entry.option[valuePropertyNameInt], true)
             })} ...` }}
         </span>
         <slot
@@ -43,7 +45,7 @@
           :item="entry.option"
           name="drop-down-entry">
           <!-- SLOT DEFAULT -->
-          {{ getLangLabel(entry.option[valueProperty], true) }}
+          {{ getLangLabel(entry.option[valuePropertyNameInt], true) }}
         </slot>
       </template>
     </BaseDropDownList>
@@ -273,7 +275,7 @@ export default {
      * // TODO: this should replace prop 'identifier' in future versions
      * (better naming)
      */
-    identifierProperty: {
+    identifierPropertyName: {
       type: String,
       default: '',
     },
@@ -282,7 +284,7 @@ export default {
      * // TODO: this should replace prop 'objectProp' in future versions
      * (better naming)
      */
-    valueProperty: {
+    valuePropertyName: {
       type: String,
       default: '',
     },
@@ -311,6 +313,8 @@ export default {
       inputFieldActive: false,
       // variable for checking if cursor is withing drop down
       isWithinDropDown: false,
+      // variable for storing if external list was array of strings
+      returnAsString: false,
     };
   },
   computed: {
@@ -322,25 +326,33 @@ export default {
      * @returns {*[]}
      */
     listInt() {
-      let tempList = [].concat(this.list);
+      let tempList = [];
+      if (this.list && this.list.length && typeof this.list[0] === 'string') {
+        tempList = this.list.map(option => ({
+          [this.valuePropertyNameInt]: option,
+        }));
+      } else {
+        tempList = [...this.list];
+      }
       // if unknown entries are allowed add a "Add InputSting ..." as first option
       if (this.allowUnknownEntries && this.input) {
         tempList.unshift({
-          [this.valueProperty]: this.language ? { [this.language]: this.input } : this.input,
+          [this.valuePropertyNameInt]: this.language ? { [this.language]: this.input } : this.input,
         });
       }
       // filter entries that were already selected, if no identifier
       // compare by object property
       if (this.selectedListInt && this.selectedListInt.length) {
         tempList = tempList.filter(option => !this.selectedListInt
-          .map(selected => (selected[this.identifierProperty] || selected[this.valueProperty]))
-          .includes(option[this.identifierProperty] || option[this.valueProperty]));
+          .map(selected => (selected[this.identifierPropertyNameInt]
+            || selected[this.valuePropertyNameInt]))
+          .includes(option[this.identifierPropertyNameInt] || option[this.valuePropertyNameInt]));
       }
       // in case of no dynamic autocomplete fetching match the input string
       // with the options list and only show matching options
       if (!this.allowDynamicDropDownEntries) {
         // also only return entries matching the input string
-        return tempList.filter(option => option[this.valueProperty].toLowerCase()
+        return tempList.filter(option => option[this.valuePropertyNameInt].toLowerCase()
           .includes(this.input.toLowerCase()));
       }
       return tempList;
@@ -355,6 +367,12 @@ export default {
        */
       get() {
         if (this.selectedList) {
+          // check if selected list consists of array of strings
+          if (this.selectedList.length && typeof this.selectedList[0] === 'string') {
+            return this.selectedList.map(selected => ({
+              [this.valuePropertyNameInt]: selected,
+            }));
+          }
           return this.selectedList;
         }
         return [];
@@ -379,6 +397,14 @@ export default {
         return this.listInt[this.activeOptionIndex];
       },
     },
+    // TODO: this is temporary for backwards compatibility - remove for next major version
+    identifierPropertyNameInt() {
+      return this.identifierPropertyName || this.identifier;
+    },
+    // TODO: this is temporary for backwards compatibility - remove for next major version
+    valuePropertyNameInt() {
+      return this.valuePropertyName || this.objectProp;
+    },
   },
   watch: {
     selectedOption(val) {
@@ -395,10 +421,19 @@ export default {
       },
       immediate: true,
     },
+    list: {
+      handler(val) {
+        // check if list should be returned as array of strings
+        if (!this.returnAsString && val && val.length && typeof val[0] === 'string') {
+          this.returnAsString = true;
+        }
+      },
+      immediate: true,
+    },
     input(val) {
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
-        this.$emit('fetch-dropdown-entries', { value: val, type: this.valueProperty });
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.valuePropertyNameInt });
         // TODO: code there for backwards compatibility - event not necessary anymore
         // since now all input events are forwarded! remove for v2!
       } else {
@@ -423,7 +458,7 @@ export default {
          * @type { object }
          *
          */
-        this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
+        this.$emit('fetch-dropdown-entries', { value: this.input, type: this.valuePropertyNameInt });
       }
       if (val) {
         this.activeOptionIndex = 0;
@@ -450,19 +485,6 @@ export default {
         this.$emit('hide-dropdown');
       }
     },
-  },
-  created() {
-    // TODO: this is for backwards compatibility - remove for next major version
-    // if the $prop identifierProperty is not set take the value
-    // of $prop identifier
-    if (!this.identifierProperty) {
-      this.identifierProperty = this.identifier;
-    }
-    // if the $prop valueProperty is not set take the value
-    // of $prop objectProp
-    if (!this.valueProperty) {
-      this.valueProperty = this.objectProp;
-    }
   },
   methods: {
     /** CHIPS (ADDING) FUNCTIONALITIES */
@@ -494,7 +516,12 @@ export default {
     updateParentSelectedList(updatedList) {
       // only emit if updated list is different from parent list
       if (JSON.stringify(this.selectedList) !== JSON.stringify(updatedList)) {
-        this.$emit('selected', updatedList);
+        let tempList = [...updatedList];
+        // if list was provided as string also return selected list as string
+        if (this.returnAsString) {
+          tempList = tempList.map(selected => selected[this.valuePropertyNameInt]);
+        }
+        this.$emit('selected', tempList);
       }
     },
 

@@ -14,12 +14,12 @@
       class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
-          v-if="optionHasData(option[valueProperty])"
+          v-if="optionHasData(option[valuePropertyName])"
           ref="option"
-          :key="option[identifierProperty] || optionIndex"
-          :value="valueIsString ? getLangLabel(option[valueProperty], true)
-            : option[identifierProperty]"
-          :aria-selected="selectStyled && option[identifierProperty] === selectedOption"
+          :key="option[identifierPropertyName] || optionIndex"
+          :value="valueIsString ? getLangLabel(option[valuePropertyName], true)
+            : option[identifierPropertyName]"
+          :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
           :class="[
             'base-drop-down-list__option',
             { 'base-drop-down-list__option-selected': selectStyled
@@ -32,7 +32,7 @@
           <slot
             name="option"
             :option="option">
-            {{ getLangLabel(option[valueProperty], true) }}
+            {{ getLangLabel(option[valuePropertyName], true) }}
           </slot>
         </li>
       </template>
@@ -68,20 +68,20 @@ export default {
      */
     dropDownOptions: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
     /**
      * specify the name of a property that can be used as identifier
      * // TODO: need handling if no identifier provided!!
      */
-    identifierProperty: {
+    identifierPropertyName: {
       type: String,
       default: 'id',
     },
     /**
      * specify the name of the property that should be displayed
      */
-    valueProperty: {
+    valuePropertyName: {
       type: String,
       default: 'value',
     },
@@ -92,7 +92,7 @@ export default {
      *   the .sync modifier can be used here
      */
     activeOption: {
-      type: Object,
+      type: [Object, String],
       default: () => ({}),
     },
     /**
@@ -101,7 +101,7 @@ export default {
      *   the .sync modifier can be used here
      */
     selectedOption: {
-      type: Object,
+      type: [Object, String],
       default: () => ({}),
     },
     /**
@@ -161,9 +161,9 @@ export default {
     // variable to store if values provided in the list are strings
     // (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
     valueIsString() {
-      return this.dropDownOptions[this.valueProperty]
-        && this.dropDownOptions[this.valueProperty].length
-        && typeof this.getLangLabel(this.dropDownOptions[this.valueProperty] === 'string', true);
+      return this.dropDownOptions[this.valuePropertyName]
+        && this.dropDownOptions[this.valuePropertyName].length
+        && typeof this.getLangLabel(this.dropDownOptions[this.valuePropertyName] === 'string', true);
     },
     // the index of the currently active option provided by parent
     activeOptionIndex() {
@@ -246,7 +246,7 @@ export default {
      * @param {Object} option - the hovered option
      */
     setActive(option) {
-      if (option[this.identifierProperty] !== this.activeOption) {
+      if (option[this.identifierPropertyName] !== this.activeOption) {
         /**
          * an option is set active on mouse enter - parent is informed
          * (the .sync modifier on prop activeOption can be used)
