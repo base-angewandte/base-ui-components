@@ -1,119 +1,75 @@
 <template>
   <div
     class="base-chips-input">
-    <!-- INPUT LABEL AND FIELD -->
-    <BaseInput
-      :id="id"
-      ref="baseInput"
+    <BaseChipsInputField
       v-model="input"
-      :placeholder="allowMultipleEntries || !selectedListInt.length ? $props.placeholder : ''"
-      :label="label"
-      :show-label="showLabel"
-      :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
-      :show-input-border="showInputBorder"
-      :use-form-field-styling="useFormFieldStyling"
-      :is-active="inputFieldActive"
-      @clicked-outside="onInputBlur"
+      v-bind="$props"
+      :add-selected-entry-directly="false"
+      :selected-list.sync="selectedListInt"
+      :drop-down-list-id="id"
+      :linked-list-option="activeOption ? activeOption[identifierProperty] : null"
+      :drop-down-active="isDropDownActive"
       @focus="onInputFocus"
-      @blur="onInputBlur"
+      @clicked-outside="onInputBlur"
       @keydown="checkKeyEvent"
-      @keypress.enter.prevent="addSelected()"
-      @click-input-field="insideInput = true"
-      v-on="$listeners">
-      <template
-        v-if="sortable"
-        v-slot:label-addition>
-        <div
-          class="base-chips-input-sort"
-          @click="sortSelectedList(selectedListInt)">
-          {{ sortText }}
-        </div>
+      @keydown.enter.prevent="onEnter"
+      @keydown.up.down.prevent="onArrowKey"
+      v-on="$listeners" />
+
+    <BaseDropDownList
+      v-if="useDefaultDropDown && inputFieldActive"
+      ref="dropDownList"
+      :drop-down-options="listInt"
+      :active-option.sync="activeOption"
+      :selected-option.sync="selectedOption"
+      :identifier-property="identifierProperty"
+      :value-property="valueProperty"
+      :list-id="id"
+      :select-styled="!allowMultipleEntries"
+      @within-drop-down="isWithinDropDown = $event">
+      <template v-slot:option="entry">
+        <span
+          v-if="allowUnknownEntries && !entry.option[identifierProperty]"
+          ref="option"
+          :key="entry.option[identifierProperty]">
+          {{ addNewChipText
+            ? `${addNewChipText} ${getLangLabel(entry.option[valueProperty], true)} ...`
+            : `${getI18nTerm('form.Add', -1, {
+              value: getLangLabel(entry.option[valueProperty], true)
+            })} ...` }}
+        </span>
+        <slot
+          v-else
+          :item="entry.option"
+          name="drop-down-entry">
+          <!-- SLOT DEFAULT -->
+          {{ getLangLabel(entry.option[valueProperty], true) }}
+        </slot>
       </template>
-      <template
-        v-if="!allowMultipleEntries || chipsInline"
-        v-slot:input-field-addition-before>
-        <div class="base-chips-input-chips">
-          <draggable
-            v-model="selectedListInt"
-            :disabled="!draggable"
-            :set-data="setDragElement"
-            :force-fallback="true"
-            :animation="200"
-            handle=".base-chip-text"
-            @start="drag = true"
-            @end="onDragEnd">
-            <transition-group
-              :name="!drag ? 'flip-list' : null"
-              type="transition">
-              <BaseChip
-                v-for="(entry, index) in selectedListInt"
-                :id="entry[identifier] || entry.idInt"
-                ref="baseChip"
-                :key="'chip-' + entry.idInt"
-                :entry="getLangLabel(entry[objectProp], true)"
-                :hover-box-content="hoverboxContent"
-                :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
-                :chip-active="chipActiveForRemove === index"
-                @remove-entry="removeEntry(entry, index)"
-                @hoverbox-active="hoverBoxActive($event, entry)" />
-            </transition-group>
-          </draggable>
-        </div>
-      </template>
-      <template v-slot:input-field-addition-after>
-        <div
-          v-if="isLoading"
-          class="base-chips-input-loader">
-          <BaseLoader />
-        </div>
-        <div
-          v-if="!allowMultipleEntries && useFormFieldStyling"
-          class="base-chips-input-single-dropdown">
-          <SvgIcon
-            :class="[
-              'base-chips-input-single-dropdown-icon',
-              { 'base-chips-input-single-dropdown-icon-rotated': dropDownActive }
-            ]"
-            name="drop-down" />
-        </div>
-      </template>
-    </BaseInput>
+    </BaseDropDownList>
   </div>
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
-import Draggable from 'vuedraggable';
-import SvgIcon from 'vue-svgicon';
-import BaseInput from '../BaseInput/BaseInput';
-import BaseChip from '../BaseChip/BaseChip';
-import BaseLoader from '../BaseLoader/BaseLoader';
-import { setLanguageMixin } from '../../mixins/setLanguage';
-import { sort } from '../../utils/utils';
-
-/**
- * Base Chips Input component with autocomplete function
- *
- */
+import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
+import i18n from '../../mixins/i18n';
+import navigateMixin from '../../mixins/navigateList';
 
 export default {
   components: {
-    BaseLoader,
-    BaseInput,
-    BaseChip,
-    Draggable,
-    SvgIcon,
-  },
-  directives: {
-    ClickOutside,
+    BaseDropDownList: () => import('../BaseDropDownList/BaseDropDownList'),
+    BaseChipsInputField,
   },
   mixins: [
-    setLanguageMixin,
+    i18n,
+    navigateMixin,
   ],
   model: {
     prop: 'selectedList',
     event: 'selected',
   },
+  // currently this has all the props from BaseChipsInput v1 to ensure
+  // backwards compatibility
   props: {
     /**
      * list of selectable options (strings or objects)
@@ -129,7 +85,7 @@ export default {
      */
     selectedList: {
       type: Array,
-      default: () => [],
+      default: () => ([]),
     },
     /**
      * if object array was passed - define the property that should be
@@ -284,13 +240,14 @@ export default {
     /**
      * set a chips text for adding a new chip
      * (alternatively add a 'form.Add' value to your localization files)
+     * if allowUnknownEntries is true please add this in one form or another!
      */
     addNewChipText: {
       type: String,
       default: '',
     },
     /**
-    if field is occuring more then once - set an id
+     if field is occuring more then once - set an id
      */
     id: {
       type: String,
@@ -311,252 +268,300 @@ export default {
       type: Boolean,
       default: true,
     },
-    dropDownActive: {
-      type: Boolean,
-      default: false,
+    /**
+     * specify the object property that should be used as identifier
+     * // TODO: this should replace prop 'identifier' in future versions
+     * (better naming)
+     */
+    identifierProperty: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify the object property that should be used as value to be displayed
+     * // TODO: this should replace prop 'objectProp' in future versions
+     * (better naming)
+     */
+    valueProperty: {
+      type: String,
+      default: '',
     },
   },
   data() {
     return {
-      // the current text input
+      /**
+       * the current input field string
+       * @type {string}
+       */
       input: '',
-      // list of selected entries
-      selectedListInt: [],
-      selectedMenuEntryIndex: 0,
-      insideInput: false,
-      returnAsObject: false,
-      timeout: null,
-      fired: '',
-      drag: false,
-      chipActiveForRemove: -1,
+      /**
+       * the currently active option, styled with grey background
+       * (by mouse hovering or keyboard use)
+       *
+       * @type {number}
+       */
+      activeOptionIndex: 0,
+      /**
+       * the currently selected option after mouse click or keyboard enter
+       *
+       * @type {?Object}
+       */
+      selectedOption: null,
+      // dropdown handling
+      inputFieldActive: false,
+      // variable for checking if cursor is withing drop down
+      isWithinDropDown: false,
     };
   },
   computed: {
-    inputFieldActive() {
-      return this.insideInput || this.dropDownActive;
+    /**
+     * internal representation of options list, filtered for already selected entries
+     * and also handling input string matching with options list in case of
+     * no dynamic autocomplete fetching
+     *
+     * @returns {*[]}
+     */
+    listInt() {
+      let tempList = [].concat(this.list);
+      // if unknown entries are allowed add a "Add InputSting ..." as first option
+      if (this.allowUnknownEntries && this.input) {
+        tempList.unshift({
+          [this.valueProperty]: this.language ? { [this.language]: this.input } : this.input,
+        });
+      }
+      // filter entries that were already selected, if no identifier
+      // compare by object property
+      if (this.selectedListInt && this.selectedListInt.length) {
+        tempList = tempList.filter(option => !this.selectedListInt
+          .map(selected => (selected[this.identifierProperty] || selected[this.valueProperty]))
+          .includes(option[this.identifierProperty] || option[this.valueProperty]));
+      }
+      // in case of no dynamic autocomplete fetching match the input string
+      // with the options list and only show matching options
+      if (!this.allowDynamicDropDownEntries) {
+        // also only return entries matching the input string
+        return tempList.filter(option => option[this.valueProperty].toLowerCase()
+          .includes(this.input.toLowerCase()));
+      }
+      return tempList;
+    },
+    /**
+     * internal representation of selected options list
+     */
+    selectedListInt: {
+      /**
+       * getter function of selectedListInt
+       * @returns {*[]}
+       */
+      get() {
+        if (this.selectedList) {
+          return this.selectedList;
+        }
+        return [];
+      },
+      /**
+       * setter function of selectedListInt
+       * @param {*[]} val - setter is just informing parent about change
+       * and selected list needs to be updated there!
+       */
+      set(val) {
+        this.updateParentSelectedList(val);
+      },
+    },
+    isDropDownActive() {
+      return this.inputFieldActive || this.isWithinDropDown;
+    },
+    activeOption: {
+      set(val) {
+        this.activeOptionIndex = this.listInt.indexOf(val);
+      },
+      get() {
+        return this.listInt[this.activeOptionIndex];
+      },
     },
   },
   watch: {
-    input(val) {
-      /**
-       * event to fetch drop down entries with changing input
-       *
-       * @event text-input
-       * @type { string }
-       *
-       */
-      // still inform parent of the text input
-      this.$emit('text-input', val);
+    selectedOption(val) {
+      this.addSelectedOption(val);
     },
-    // watch selectedList prop for changes triggered from outside
-    selectedList: {
+    listInt: {
       handler(val) {
-        const outsideSelected = val.map(sel => sel[this.objectProp]);
-        const insideSelected = this.selectedListInt.map(sel => sel[this.objectProp]);
-        if (JSON.stringify(outsideSelected) !== JSON.stringify(insideSelected)) {
-          this.setSelectedList(val);
+        if (val.length && !this.activeOption) {
+          // set first option in list as active option
+          this.activeOptionIndex = 0;
+        } else if (!val.length) {
+          this.activeOptionIndex = -1;
         }
       },
-      deep: true,
+      immediate: true,
+    },
+    input(val) {
+      // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
+      if (this.allowDynamicDropDownEntries) {
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.valueProperty });
+        // TODO: code there for backwards compatibility - event not necessary anymore
+        // since now all input events are forwarded! remove for v2!
+      } else {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event text-input
+         * @type { string }
+         *
+         */
+        // still inform parent of the text input
+        this.$emit('text-input', val);
+      }
+    },
+    isDropDownActive(val) {
+      // allow also for static drop down entries to be loaded on first drop down show only
+      if (val && !this.allowDynamicDropDownEntries && !this.listInt.length) {
+        /**
+         * event to fetch drop down entries with changing input
+         *
+         * @event fetch-dropdown-entries
+         * @type { object }
+         *
+         */
+        this.$emit('fetch-dropdown-entries', { value: this.input, type: this.objectProp });
+      }
+      if (val) {
+        this.activeOptionIndex = 0;
+        // TODO: check function below for functionality! (take from chips input)
+        // this.calcDropDownMinWidth();
+        // reset the active option index to first item
+        // this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        /**
+         * event triggered on show drop down
+         *
+         * @event show-dropdown
+         * @type {none}
+         *
+         */
+        this.$emit('show-dropdown');
+      } else {
+        /**
+         * event triggered on hide drop down
+         *
+         * @event hide-dropdown
+         * @type {none}
+         *
+         */
+        this.$emit('hide-dropdown');
+      }
     },
   },
-  mounted() {
-    // initialize the internal selected list with props.selectedList
-    this.setSelectedList(this.selectedList);
+  created() {
+    // TODO: this is for backwards compatibility - remove for next major version
+    // if the $prop identifierProperty is not set take the value
+    // of $prop identifier
+    if (!this.identifierProperty) {
+      this.identifierProperty = this.identifier;
+    }
+    // if the $prop valueProperty is not set take the value
+    // of $prop objectProp
+    if (!this.valueProperty) {
+      this.valueProperty = this.objectProp;
+    }
   },
   methods: {
-    /** selected list manipulations and related functionalities */
-    // add an entry from the drop down to the list of selected entries
-    addSelected() {
-      // check if entry was selected in drop down
-      const selected = {
-        label: this.input,
-        idInt: this.createIdInt(),
-      };
-      // set focus back to input-field
-      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus();
-      // add selected to the selected list
-      if (selected) {
-        if (this.allowMultipleEntries) {
-          // this adds the entry who's index is currently set
-          if (this.addSelectedEntryDirectly) {
-            this.selectedListInt.push(selected);
-          }
-        } else {
-          // replace the existing entry or set new one
-          console.log('TriggeredÄ');
-          this.$set(this.selectedListInt, 0, selected);
-        }
-        /**
-         * event triggered when an entry from the drop down was selected or enter was pressed
-         *
-         * @event selected
-         * @type {object}
-         */
-        this.emitSelectedList();
-        // reset input
-        this.input = '';
+    /** CHIPS (ADDING) FUNCTIONALITIES */
+
+    /**
+     * method for adding a selected option to selected option list
+     * (remove works via setter - does not need a separate method)
+     *
+     * @param selected
+     */
+    addSelectedOption(selected) {
+      let newSelectedList = [];
+      if (this.allowMultipleEntries) {
+        newSelectedList = this.selectedListInt.concat(selected);
+      } else {
+        this.$set(newSelectedList, 0, selected);
+        this.isWithinDropDown = false;
       }
+      this.updateParentSelectedList(newSelectedList);
+      // clear input
+      this.input = '';
     },
-    // remove an entry from the list of selected entries
-    removeEntry(item, index) {
-      this.insideInput = true;
-      this.selectedListInt.splice(index, 1);
-      // for single entries focus on input again
-      // TODO: not working!
-      if (!this.allowMultipleEntries) {
-        this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+    /**
+     * method for emitting selected list changes to parent
+     * (called after adding or deleting an option to / from selected list)
+     *
+     * @param {*[]} updatedList - the list that should be emitted in the event
+     */
+    updateParentSelectedList(updatedList) {
+      // only emit if updated list is different from parent list
+      if (JSON.stringify(this.selectedList) !== JSON.stringify(updatedList)) {
+        this.$emit('selected', updatedList);
       }
-      this.emitSelectedList();
-    },
-    createIdInt() {
-      return Math.random().toString(36).substr(2, 9);
     },
 
-    onInputBlur() {
-      this.insideInput = false;
-      this.chipActiveForRemove = -1;
-      if (!this.insideDropDown && document.activeElement.tagName === 'BODY') {
-        this.input = '';
-      }
-    },
+    /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
+
     onInputFocus() {
-      this.insideInput = true;
-      this.insideDropDown = false;
+      this.inputFieldActive = true;
     },
-    getIndex(oldEntry) {
-      if (!this.dropDownListInt.length) {
-        return -1;
+    onInputBlur() {
+      if (!this.isWithinDropDown) {
+        this.inputFieldActive = false;
       }
-      // set the index to the entry previously selected (if any)
-      if (oldEntry) {
-        const index = this.dropDownListInt.map(e => e.idInt).indexOf(oldEntry.idInt);
-        if (index < 0) {
-          return 0;
-        }
-        return index;
-      }
-      return 0;
-    },
-    setSelectedList(val) {
-      if (val && val.length) {
-        this.selectedListInt = val.map((entry) => {
-          if (typeof entry === 'object') {
-            this.returnAsObject = true;
-            return Object.assign({}, entry, {
-              idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier]
-                : entry.idInt
-                || this.createIdInt(),
-              [this.objectProp]: entry[this.objectProp],
-            });
-          }
-          return Object.assign({}, {
-            idInt: this.createIdInt(),
-            [this.objectProp]: entry,
-          });
-        });
-      } else {
-        this.selectedListInt = [];
-      }
-    },
-    emitSelectedList() {
-      console.log('emit');
-      if (!this.returnAsObject) {
-        this.$emit('selected', this.selectedListInt.map(sel => sel[this.objectProp]));
-      } else {
-        const sendArr = [];
-        this.selectedListInt
-          .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
-        sendArr.forEach(sel => this.$delete(sel, 'idInt'));
-        /**
-         * event emitting selected list upon changes
-         *
-         * @type {Array}
-         *
-         */
-        this.$emit('selected', sendArr);
+      // if the focus goes to somewhere else on the page - remove input string
+      if (!this.isWithinDropDown && document.activeElement.tagName === 'BODY') {
+        this.input = '';
       }
     },
 
-    /** draggable functionalities */
-    // need to set custom due to some strange effects not showing correct element in some cases
-    setDragElement(dataTransfer, dragEl) {
-      const img = dragEl.cloneNode(true);
-      img.id = 'chip-inline-drag';
-      img.style.position = 'absolute';
-      img.style.top = '-99999px';
-      img.style.left = '-99999px';
+    /** KEYBOARD FUNCTIONALITIES */
 
-      // add the element to the dom
-      document.body.appendChild(img);
-      dataTransfer.setDragImage(img, 0, 0);
-    },
-    onDragEnd() {
-      this.drag = false;
-      const elem = document.getElementById('chip-inline-drag');
-      if (elem) {
-        elem.parentNode.removeChild(elem);
-      }
-      // check if dragging led to differently sorted list
-      // and inform parent if yes
-      if (JSON.stringify(this.selectedList) !== JSON.stringify(this.selectedListInt)) {
-        this.emitSelectedList(this.selectedListInt);
-      }
-    },
-
-    /** sorting */
-    sortSelectedList() {
-      sort(this.selectedListInt, 'label');
-      this.updateParentList(this.selectedListInt);
-    },
-
-    /** keyboard handling for chips */
+    /**
+     * general function for checking key events like semicolon or tab
+     * @param {KeyboardEvent} event - the keydown event
+     */
     checkKeyEvent(event) {
-      const key = event.code;
-      // if event was Delete check if a chip should be deleted
-      if (key === 'Backspace' || key === 'Delete') {
-        // if backspace (once) is used make last chip active
-        if (key === 'Backspace' && !this.fired
-          && !this.input && this.chipActiveForRemove < 0) {
-          this.chipActiveForRemove = this.selectedListInt.length - 1;
-          // on second backspace set timeout for delete
-        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.input) {
-          // check if there is actually anything left to remove
-          this.removeEntry(
-            this.selectedListInt[this.chipActiveForRemove],
-            this.chipActiveForRemove,
-          );
-          this.chipActiveForRemove = -1;
-        }
-        // necessary to prevent accidential delete of chips when user keeps backspace pressed
-        this.fired = true;
-        if (this.timeout) {
-          clearTimeout(this.timeout);
-          this.timeout = null;
-        }
-        this.timeout = setTimeout(() => {
-          this.fired = false;
-        }, 200);
-      } else if (!this.input && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
-        const isIndexUp = event.key === 'ArrowRight';
-        const activeChip = this.navigate(
-          this.selectedListInt,
-          isIndexUp,
-          this.chipActiveForRemove,
+      // if user has input and uses semicolon add input
+      if (event.code === 'Comma' && event.shiftKey && this.input) {
+        event.preventDefault();
+        this.addSelected();
+      }
+      // if tab this will trigger moving forward to next input field
+      // --> this one should be inactive
+      if (event.key === 'Tab') {
+        this.inputFieldActive = false;
+        this.isWithinDropDown = false;
+      }
+    },
+    /**
+     * triggered on keydown enter event and will add
+     * a selected option
+     */
+    onEnter() {
+      // check if there is a currently active option
+      if (this.activeOption) {
+        this.addSelectedOption(this.activeOption);
+      }
+    },
+    /**
+     * event for keydown arrow (up, down) key use
+     *
+     * @param {KeyboardEvent} event - the keydown event
+     */
+    onArrowKey(event) {
+      // check if the list has any options
+      if (this.listInt.length) {
+        // if yes trigger the navigate function
+        this.activeOption = this.navigate(
+          this.listInt,
+          event.code === 'ArrowDown',
+          this.activeOptionIndex,
           true,
         );
-        this.chipActiveForRemove = this.selectedListInt.indexOf(activeChip);
-      } else {
-        this.chipActiveForRemove = -1;
       }
     },
-    blurInput() {
-      const inputElems = this.$refs.baseInput.$el.getElementsByTagName('input');
-      if (inputElems && inputElems.length) {
-        inputElems[0].blur();
-      }
-    },
+
+    /** OTHER FUNCTIONALITIES */
+
     hoverBoxActive(value, entry) {
       /**
        * event emitted on show / hide hoverbox, emitting event and originating entry
@@ -570,83 +575,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
 
-  .base-chips-input {
-    width: 100%;
-    text-align: left;
-
-    .base-chips-input-chips {
-      max-width: 100%;
-    }
-
-    .base-chips-input-sort {
-      cursor: pointer;
-      margin-left: $spacing;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-
-      &:hover {
-        color: $app-color;
-      }
-    }
-
-    .base-chips-input-loader {
-      transform: scale(0.5);
-      margin-right: $spacing-large;
-    }
-
-    .base-chips-drop-down {
-      position: absolute;
-      background: white;
-      max-height: 10 * $row-height-small;
-      overflow-y: auto;
-      z-index: map-get($zindex, dropdown);
-      box-shadow: $drop-shadow;
-      cursor: pointer;
-
-      .base-chips-drop-down-entry-wrapper {
-        padding: $spacing-small/2 $spacing;
-        min-height: $row-height-small;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        &.base-chips-drop-down-entry-wrapper-active {
-          background: $background-color;
-        }
-
-        .base-chips-drop-down-entry-additional {
-          color: $font-color-second;
-          margin-left: $spacing-small;
-        }
-
-        .base-chips-drop-down-entry-remark {
-          float: right;
-        }
-      }
-
-
-    }
-
-    .base-chips-input-chips-container {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: $spacing;
-    }
-
-    .base-chips-input-single-dropdown {
-      margin: 0 $spacing;
-
-      .base-chips-input-single-dropdown-icon {
-        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
-        height: $icon-small;
-        flex-shrink: 0;
-
-        &.base-chips-input-single-dropdown-icon-rotated {
-          transform: rotate(180deg);
-        }
-      }
-    }
-  }
 </style>

@@ -1,5 +1,40 @@
 <template>
   <div id="app">
+    <!-- CHIPS INPUT -->
+    <BaseChipsInputNew
+      id="fieldKey"
+      key="fieldKey"
+      v-model="fieldValueInt"
+      :list="fetchDropDownList"
+      :allow-dynamic-drop-down-entries="false"
+      :allow-multiple-entries="true"
+      :allow-unknown-entries="true"
+      :draggable="false"
+      :sortable="false"
+      :is-loading="isLoading"
+      :sort-name="false"
+      :add-new-chip-text="'Add'"
+      identifier-property="source"
+      value-property="label"
+      placeholder="a test"
+      label="a test"
+      sort-text="Sort this thing"
+      @fetch-dropdown-entries="fetchAutocompleteChips"
+      @text-input="textInput = $event"
+      @hoverbox-active="$emit('fetch-info-data')">
+      <template
+        v-slot:drop-down-entry="props">
+        <span>
+          {{ props.item.label }}
+        </span>
+        <span class="base-form-field-creator__chips-dropdown-second">
+          {{ props.item.additional }}
+        </span>
+        <span class="base-form-field-creator__chips-dropdown-third">
+          {{ props.item.source_name }}
+        </span>
+      </template>
+    </BaseChipsInputNew>
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -34,15 +69,69 @@ import axios from 'axios';
 
 import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import BaseChipsInputNew from './components/BaseChipsInput/BaseChipsInputNew';
 
 export default {
   name: 'App',
   components: {
+    BaseChipsInputNew,
     BaseCarousel,
     BaseAdvancedSearchRow,
   },
   data() {
     return {
+      fieldValueInt: [],
+      fetchDropDownList: [],
+      dropDownList: [
+        {
+          source: '1',
+          label: 'First Entry',
+        },
+        {
+          source: '2',
+          label: 'Second Entry',
+        },
+        {
+          source: '3',
+          label: 'Third Entry',
+        },
+        {
+          source: '4',
+          label: 'Fourth Entry',
+        },
+        {
+          source: '11',
+          label: 'First Entry',
+        },
+        {
+          source: '21',
+          label: 'Second Entry',
+        },
+        {
+          source: '31',
+          label: 'Third Entry',
+        },
+        {
+          source: '41',
+          label: 'Fourth Entry',
+        },
+        {
+          source: '12',
+          label: 'First Entry',
+        },
+        {
+          source: '23',
+          label: 'Second Entry',
+        },
+        {
+          source: '34',
+          label: 'Third Entry',
+        },
+        {
+          source: '45',
+          label: 'Fourth Entry',
+        },
+      ],
       filters: [],
       // autcomplete result list
       resultListOriginal: [{ collection: 'Institution', data: [{ id: 'i:AtyPMbCGvo87shMwRZikwQ', score: 13.0, header: 'Zebra - Zentrum für Klassische und Moderne Fotografie', subtext: ['Wien, Austria'] }, { id: 'i:kK2kZPzffLknjWhuHxU6sa', score: 13.0, header: 'Zentrum für Erwachsenenbildung', subtext: ['Strobl'] }, { id: 'i:QpNo2ZUPzPKM7wJDSy7F4h', score: 13.0, header: 'H2 - Zentrum für Gegenwartskunst', subtext: ['Augsburg'] }, { id: 'i:A6iu4gLU7bGS5kpAE9pTUf', score: 13.0, header: 'Tomi Ungerer Museum - Internationales Zentrum für Illustration', subtext: ['Strasbourg'] }, { id: 'i:FmHikVmyQJuyynSx7NCsNe', score: 13.0, header: 'Zentrum für Interdisziplinäre Forschnung', subtext: ['ZIF', 'Bielefeld'] }, { id: 'i:R4YjbtHGNsbKzfwyRDF5XJ', score: 13.0, header: 'BrotfabrikGalerie', subtext: ['Zentrum für Kunst & Kultur', 'Berlin, AT'] }, { id: 'i:PYqY6pTrmUgZpnRRhmkgY6', score: 13.0, header: 'Zentrum für Kunst und Kommunikation', subtext: ['Z.K.K.', 'Wien, Austria'] }, { id: 'i:gpptGbzV9f7uYAmxTjyjMg', score: 13.0, header: 'Zentrum für Kunst und Medientechnologie', subtext: ['ZKM', 'Karlsruhe'] }, { id: 'i:Q4AAfWUC6GkHUdRxc7ChxC', score: 13.0, header: 'Open Space - Zentrum für Kunstprojekte', subtext: ['Wien, Austria'] }, { id: 'i:SxX6iZszMJv7M7n54ej6BK', score: 13.0, header: 'Zentrum für Literatur- und Kulturforschung Berlin', subtext: ['Geisteswissenschaftliche Zentren Berlin e.V.', 'Berlin'] }] }, { collection: 'Preis', data: [{ id: 'i:qQCn2jtewXhKnLVsFaHgk6', score: 13.0, header: 'Artist-in-Residenz, Zentrum für Kunst und Medien, Institut für Visuelle Medien, Karlsruhe', subtext: [] }, { id: 'i:X44M8fjtLCXfYvhVMo4gRP', score: 13.0, header: 'Ankauf "Interactive Plant Growing", Zentrum für Medientechnologie Karlsruhe, Germany', subtext: [] }] }, { collection: 'Einzelperson', data: [] }, { collection: 'Kunstgruppe', data: [{ id: 'p:3WU9EBchgTFjE9g5zjUciF', score: 13.0, header: 'Zentrum für politische Schönheit ZPS', subtext: [], description1: { type: 'placedate', value: 'Berlin' } }] }, { collection: 'Event', data: [] }, { collection: 'Projekt', data: [] }, { collection: 'Nachlass', data: [] }, { collection: 'Werk', data: [] }, { collection: 'Archivalie', data: [{ id: 'o:EyZZcmBi6NvBfap2934mah', score: 13.0, header: 'Informationsfolder: Donau-Universität Krems/ Zentrum für Bildwissenschaften. Neuer Lehrgang Bildmanagement, Bildwissenschaft', subtext: [], description2: { text_german: ['Neu startende Universitätslehrgänge Bildmanagement und Bildwissenschaft an der Donau Universität Krems.'], text_english: '' } }] }, { collection: 'Medienbeitrag', data: [] }, { collection: 'Publikation', data: [{ id: 'o:i5aAZLd7APjjhMML55Bi89', score: 13.0, header: 'Museum Gugging als kommendes Zentrum für Art Brut', subtext: ['Text', '', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:fobdG7rNBQ2QDvvaQhJ2mN', score: 13.0, header: 'Neues Zentrum für visuelle Kultur', subtext: ['Text', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:CXQMydrwsUKnf8uDS3KduV', score: 13.0, header: 'Neues Zentrum für zeitgenössische Kunstgeschichte', subtext: ['Text', 'Henriette Horny', ''], description2: { text_german: '', text_english: '' } }] }],
@@ -220,6 +309,7 @@ export default {
           ],
         },
       ],
+      isLoading: false,
     };
   },
   computed: {
@@ -249,6 +339,14 @@ export default {
       } else {
         this.resultList = [];
       }
+    },
+    fetchAutocompleteChips() {
+      this.isLoading = true;
+      setTimeout(() => {
+        console.log('timeout over');
+        this.fetchDropDownList = this.dropDownList;
+        this.isLoading = false;
+      }, 3000);
     },
   },
 };

@@ -48,8 +48,8 @@
       :linked-list-option="linkedListOption"
       :placeholder="placeholder"
       label="chips-input"
-      object-prop="label"
-      identifier="id"
+      value-property="label"
+      identifier-property="id"
       v-on="$listeners" />
     <!-- @slot for icon after input field -->
     <slot>

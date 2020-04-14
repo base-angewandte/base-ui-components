@@ -50,7 +50,7 @@
                 v-for="(entry, index) in selectedListInt"
                 :id="entry[identifier] || entry.idInt"
                 ref="baseChip"
-                :key="'chip-' + entry.idInt"
+                :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
@@ -589,9 +589,11 @@ export default {
               this.selectedListInt.push(selected);
             }
           } else {
-            // replace the existing entry or set new one
-            console.log('TriggeredÄ');
-            this.$set(this.selectedListInt, 0, selected);
+            // check if an entry is present - if yes - remove it first
+            if (this.selectedListInt.length) {
+              this.removeEntry(this.selectedListInt[0], 0);
+            }
+            this.selectedListInt = [].concat(selected);
           }
           if (!this.allowMultipleEntries || !this.chipsInline) {
             this.showDropDown = false;

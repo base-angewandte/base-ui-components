@@ -1,63 +1,105 @@
 <template>
   <div
+    ref="dropDownContainer"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
-    class="base-drop-down-list__container">
+    class="base-drop-down-list__container"
+    @mouseenter="withinDropDown = true"
+    @mouseleave="withinDropDown = false">
     <slot name="before-list" />
     <ul
       :id="listId"
-      ref="dropDownContainer"
       :style="listBodyStyle"
       role="listbox"
-      class="base-drop-down-list"
-      @mouseleave="removeActive">
+      class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
-          v-if="optionHasData(option[valueName])"
-          :key="option[identifierName] || optionIndex"
-          :value="valueIsString ? option[valueName] : option[identifierName]"
-          :aria-selected="hoverAndSelectStyled && option[identifierName] === selectedOption"
+          v-if="optionHasData(option[valueProperty])"
+          ref="option"
+          :key="option[identifierProperty] || optionIndex"
+          :value="valueIsString ? getLangLabel(option[valueProperty], true)
+            : option[identifierProperty]"
+          :aria-selected="selectStyled && option[identifierProperty] === selectedOption"
           :class="[
             'base-drop-down-list__option',
-            { 'base-drop-down-list__option-hovered': hoverAndSelectStyled },
-            { 'base-drop-down-list__option-selected': hoverAndSelectStyled
+            { 'base-drop-down-list__option-selected': selectStyled
               && option === selectedOption },
-            { 'base-drop-down-list__option-active': hoverAndSelectStyled
-              && option[identifierName] === activeOptionInt }]"
+            { 'base-drop-down-list__option-active': activeStyled
+              && optionIndex === activeOptionIndex }]"
           role="option"
           @mouseenter="setActive(option)"
           @click="selected(option)">
           <slot
             name="option"
             :option="option">
-            {{ option[valueName] }}
+            {{ getLangLabel(option[valueProperty], true) }}
           </slot>
         </li>
       </template>
+      <div
+        v-if="!dropDownOptions.length"
+        class="base-drop-down-list__option base-drop-down-list__no-options">
+        <!--
+          @slot customize what is displayed when no drop down options are available
+        -->
+        <slot name="no-options">
+          {{ dropDownNoOptionsInfo }}
+        </slot>
+      </div>
     </ul>
     <slot name="after-list" />
   </div>
 </template>
 
 <script>
+import i18n from '../../mixins/i18n';
+
+/** a multipurpose drop down list */
+
+// TODO: currently only taking objects not strings??
+
 export default {
+  mixins: [
+    i18n,
+  ],
   props: {
+    /**
+     * list of options to select from
+     */
     dropDownOptions: {
       type: Array,
       default: () => ([]),
     },
-    identifierName: {
+    /**
+     * specify the name of a property that can be used as identifier
+     * // TODO: need handling if no identifier provided!!
+     */
+    identifierProperty: {
       type: String,
       default: 'id',
     },
-    valueName: {
+    /**
+     * specify the name of the property that should be displayed
+     */
+    valueProperty: {
       type: String,
       default: 'value',
     },
+    /**
+     * specify the currently active option (will have gray background
+     * if not disabled by setting activeStyled false, also used to control drop
+     * down container scrolling behaviour on keyboard use)<br>
+     *   the .sync modifier can be used here
+     */
     activeOption: {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * specify the currently selected option (will appear in app color if not disabled
+     * by setting selectStyled false, but also used for aria-selected)<br>
+     *   the .sync modifier can be used here
+     */
     selectedOption: {
       type: Object,
       default: () => ({}),
@@ -77,40 +119,118 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    hoverAndSelectStyled: {
+    /**
+     * flag if the currently active element should be styled
+     * (gray background)
+     */
+    activeStyled: {
       type: Boolean,
       default: true,
     },
+    /**
+     * flag if the currently selected entry should be styled
+     * (only makes sense for single select, color: app-color)
+     */
+    selectStyled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if true the element will be styled as a drop down element with
+     * box-shadow
+     */
     displayAsDropDown: {
       type: Boolean,
       default: true,
     },
+    /**
+     * message displayed when no selectable options are available
+     */
+    dropDownNoOptionsInfo: {
+      type: String,
+      default: 'No options available',
+    },
   },
   data() {
     return {
-      activeOptionInt: null,
+      // variable to store if variable is within dropdown
+      withinDropDown: false,
     };
   },
   computed: {
+    // variable to store if values provided in the list are strings
+    // (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
     valueIsString() {
-      return this.dropDownOptions[this.valueName] && this.dropDownOptions[this.valueName].length
-        && typeof this.dropDownOptions[this.valueName] === 'string';
+      return this.dropDownOptions[this.valueProperty]
+        && this.dropDownOptions[this.valueProperty].length
+        && typeof this.getLangLabel(this.dropDownOptions[this.valueProperty] === 'string', true);
+    },
+    // the index of the currently active option provided by parent
+    activeOptionIndex() {
+      return this.dropDownOptions.indexOf(this.activeOption);
     },
   },
   watch: {
-    activeOption: {
-      handler(val) {
-        if (val !== this.activeOptionInt) {
-          this.activeOptionInt = val ? val[this.identifierName] : '';
+    // keep track of the active option index to adjust drop down scroll container
+    // accordingly (TODO: this is not needed for non drop down style containers???)
+    activeOptionIndex(val, previous) {
+      // check if it is necessary to adjust scrolltop of container (to
+      // always have entry steered to with arrow keys in view)
+      if (this.$refs.option && this.$refs.option[val]) {
+        // if active option index is 0 - return to top
+        if (!val) {
+          this.$refs.dropDownContainer.scrollTop = 0;
+          // else if index is last entry of options list - bring last item into view
+        } else if (val === this.dropDownOptions.length - 1) {
+          this.$refs.dropDownContainer.scrollTop = this.$refs.option[val].offsetTop
+            + this.$refs.option[val].clientHeight;
+          // else if index is greater than previous index (navigating down) and the option
+          // position is larger then container height
+          // add the height of one option row to scroll top
+        } else if (val > previous
+          && this.$refs.option[val].offsetTop >= this.$refs.dropDownContainer.clientHeight) {
+          this.$refs.dropDownContainer.scrollTop += this.$refs.option[val].clientHeight;
+          // else if index is smaller than previous index (navigating up) and the container
+          // top position is larger than the option top position subtract one option row height
+        } else if (val < previous
+          && this.$refs.dropDownContainer.offsetTop > this.$refs.option[val].offsetTop) {
+          this.$refs.dropDownContainer.scrollTop -= this.$refs.option[val].clientHeight;
         }
-      },
-      immediate: true,
+      }
+    },
+    // emit withinDropDown when it has changed
+    withinDropDown(val) {
+      /**
+       * inform parent of changes of mouse cursor within drop down
+       *
+       * @event within-drop-down
+       * @property {boolean} val
+       */
+      this.$emit('within-drop-down', val);
     },
   },
   methods: {
+    /**
+     * triggered if option was selected by click
+     *
+     * @param {Object} option - the selected option
+     */
     selected(option) {
+      /**
+       * inform parent if option was selected by mouse click
+       * (the .sync modifier on prop selectedOption can be used)
+       *
+       * @event update:selected-option
+       * @property {Object} option - the selected option
+       */
       this.$emit('update:selected-option', option);
     },
+    /**
+     * check if an option has data (and should be displayed)
+     *
+     * @param {Object} option - the option in question
+     * @returns {boolean}
+     */
     optionHasData(option) {
       if (typeof option === 'string') {
         return !!option;
@@ -120,15 +240,22 @@ export default {
       }
       return !!(option && Object.keys(option).length);
     },
+    /**
+     * on mouse enter - set an option active
+     *
+     * @param {Object} option - the hovered option
+     */
     setActive(option) {
-      this.activeOptionInt = option[this.identifierName];
-      if (this.activeOptionInt !== this.activeOption) {
+      if (option[this.identifierProperty] !== this.activeOption) {
+        /**
+         * an option is set active on mouse enter - parent is informed
+         * (the .sync modifier on prop activeOption can be used)
+         *
+         * @event update:active-option
+         * @property {Object} option - the option set active
+         */
         this.$emit('update:active-option', option);
       }
-    },
-    removeActive() {
-      this.activeOptionInt = null;
-      this.$emit('update:active-option', null);
     },
   },
 };
@@ -144,6 +271,9 @@ export default {
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;
       z-index: map-get($zindex, dropdown);
+      max-height: 10 * $row-height-small;
+      overflow-y: auto;
+      position: absolute;
     }
 
     .base-drop-down-list {
@@ -156,6 +286,10 @@ export default {
         width: 100%;
         transition: all 0.2s ease;
         cursor: pointer;
+
+        &.base-drop-down-list__no-options {
+          cursor: default;
+        }
 
         &.base-drop-down-list__option-selected {
           color: $app-color;

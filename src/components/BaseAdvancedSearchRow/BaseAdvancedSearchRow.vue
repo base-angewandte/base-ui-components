@@ -15,8 +15,8 @@
           :always-linked="true"
           label="use filter"
           drop-down-list-id="filter-options"
-          identifier="label"
-          object-prop="label"
+          identifier-property="label"
+          value-property="label"
           class="base-advanced-search__filter-input"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters" />
@@ -40,15 +40,14 @@
     <!-- DROP DOWN BODY -->
     <BaseDropDownList
       :drop-down-options="resultListInt"
-      :hover-and-select-styled="false"
+      :active-styled="false"
       :active-option="{ collection: activeCollection }"
-      identifier-name="collection"
-      value-name="data"
+      identifier-property="collection"
+      value-property="data"
       list-id="autocomplete-options"
       class="base-advanced-search__drop-down-body">
       <template v-slot:before-list>
         <div class="base-advanced-search__above-list-area">
-
           <!-- FILTER SELECT LIST -->
           <div class="base-advanced-search__filter-area">
             <div
@@ -98,8 +97,8 @@
             :active-option.sync="activeEntry"
             :display-as-drop-down="false"
             list-id="autocomplete-options"
-            identifier-name="id"
-            value-name="header"
+            identifier-property="id"
+            value-property="header"
             @update:active-option="setCollection(slotProps.option.collection)"
             @update:selected-option="selectOption" />
         </div>
