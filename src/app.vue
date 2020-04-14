@@ -1,5 +1,120 @@
 <template>
   <div id="app">
+    <!-- VIDEO TEST -->
+    <!-- <video
+      width="320"
+      height="240"
+      controls >
+      <source
+        src="/home/shauzmayer/index.m3u8"
+        type="application/x-mpegURL">
+      Your browser does not support the video tag.
+    </video> -->
+    <div>
+      <BaseFormNew
+        :value-list="formValueList"
+        :fields-with-tabs="['texts']"
+        :form-id="'xjlaödsjfadlskj'"
+        :form-field-json="json" />
+    </div>
+    <BaseMediaPreview
+      :show-preview="togglePreview"
+      :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"
+      :download-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.pdf'"
+      @hide-preview="togglePreview = false" />
+    <BaseButton
+      text="Show Preview"
+      @clicked="togglePreview = !togglePreview" />
+
+    <!-- PAGINATION TEST -->
+    <BasePagination :total="100" />
+
+    <!-- CHIPS BELOW TEST -->
+    <div class="form-field">
+      <!-- UPLOAD BAR TEST -->
+      <base-upload-bar
+        :progress="progress"
+        :filename="'testfile.jpg'" />
+      <base-button
+        :active="false"
+        :text="'Change Progress'"
+        icon-size="large"
+        button-style="row"
+        @clicked="changeProgress" />
+    </div>
+
+    <div class="canvas flex">
+      <!-- BASE IMAGE BOX TEST -->
+      <base-image-box
+        :selectable="selectable"
+        :show-title="false"
+        :image-url="require('@/assets/images/img1.png')"
+        description="Bildserie"
+        title="Afterlife II Ausstellungsansichten"
+        class="image-box" />
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('@/static/images/icons.png')"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box" />
+      <base-image-box
+        :selectable="selectable"
+        :image-url="require('@/static/images/roboto_detail_fullscreen_12pt.png')"
+        title="Afterlife II Ausstellungsansichten"
+        description="Bildserie"
+        class="image-box" />
+      <base-button
+        :active="false"
+        :text="'Activate Select'"
+        icon-size="large"
+        button-style="row"
+        @clicked="enableSelect()" />
+    </div>
+
+    <div class="canvas">
+      <!-- MULTILINE WITH TABS TEST -->
+      <base-multiline-text-input
+        v-model="multilineInputObj"
+        :label="'Label'"
+        :tabs="['German', 'English']"
+        :placeholder="'Enter Text'"
+        @tab-switch="tabSwitched">
+        <div class="multiline-dropdown">
+          <base-drop-down
+            :selected-option="{ label: 'Textart', value: '' }"
+            :options="[{
+                         value: 'Beschreibung',
+                         label: 'Beschreibung',
+                       },
+                       {
+                         value: 'Ausstellungseinladung',
+                         label: 'Ausstellungseinladung',
+                       },
+                       {
+                         label: 'Textart',
+                         value: '',
+                       },
+                       {
+                         value: 'Zeitungsartikel',
+                         label: 'Zeitungsartikel',
+                       }]" />
+        </div>
+      </base-multiline-text-input>
+      <base-multiline-text-input
+        :input="multilineTest"
+        :label="'Label'"
+        :placeholder="'Enter Text'"
+        @text-input="handleMultilineInput" />
+    </div>
+
+    <!-- SEARCH TEST -->
+    <div class="canvas">
+      <base-search
+        :show-image="true"
+        @input="triggerInput" />
+    </div>
+
     <!-- FORM FIELD TESTING -->
     <div class="form-field">
       <base-date-input
@@ -19,14 +134,16 @@
         :object-prop="'prefLabel'"
         label="text input with dynamic autocomplete"
         @selected="fetchOther($event, 'this is my type')" />
-      <BaseChipsInputNew
-        v-model="chipsInput"
+      <base-chips-input
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
+        :selected-list="chipsInput"
         :allow-multiple-entries="true"
         :allow-dynamic-drop-down-entries="true"
+        :object-prop="'value'"
         :chips-inline="true"
         :chips-editable="true"
+        :identifier="'id'"
         draggable
         label="A label"
         @fetchDropDownEntries="fetch" />
@@ -34,7 +151,7 @@
         text="change input"
         icon="remove"
         @clicked="changeInput" />
-      <BaseChipsInputNew
+      <base-chips-input
         :list="[
           { title: '...alle Verhältnisse umzuwerfen',
             additional: 'part1', remark: '***', source: '1' },
@@ -60,7 +177,7 @@
           <span>{{ props.item.additional }}</span>
           <span>{{ props.item.remark }}</span>
         </template>
-      </BaseChipsInputNew>
+      </base-chips-input>
       <base-chips-below
         v-model="selectedList"
         :chips-inline="false"
@@ -85,26 +202,158 @@
         label="chips-below-test"
         @hoverbox-active="setHoverBox" />
     </div>
+
+    <!-- MENU LIST TEST -->
+    <base-menu-list
+      :selected="showCheckbox"
+      :list="list"
+      @clicked="activateMenuEntry" />
+    <base-menu-entry
+      :entry-id="'asingleentry'"
+      :icon="'sheet-empty'"
+      :active="menuEntryActive"
+      :select-active="showCheckbox"
+      :is-selectable="true"
+      :thumbnails="['attention', 'people']"
+      title="Poesie oh Poesisssssssssssssssssssssssssssssssssse"
+      subtext="Aus einer anderen Weltsssssssssssssssssssssssssss"
+      description="Gemälde"
+      @clicked="menuEntryActive = true" />
+    <base-button
+      text="toggle checkboxes"
+      button-style="row"
+      @clicked="showCheckbox = !showCheckbox" />
+
+    <!-- DROP BOX TEST -->
+    <div class="flex row">
+      <base-drop-box
+        :show-plus="true"
+        :box-size="{ width: 'calc(25% - 16px)' }"
+        drop-type="elements"
+        drop-element-name="menuEntry"
+        drag-item-class="base-menu-entry"
+        icon="camera"
+        text="Datei hinzufügen"
+        subtext="(Click oder durch drag'n drop hinzufügen)"
+        @dropped-element="dropped($event)"
+        @clicked="boxClicked" />
+      <base-drop-box
+        drop-type="files" />
+    </div>
+    <div>
+      <ul>
+        <li
+          v-for="item in elements"
+          :key="item.id">
+          {{ item.title }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- POP UP TEST -->
+    <base-button
+      draggable="true"
+      icon="options-menu"
+      @clicked="showPopUp = true" />
+    <base-pop-up
+      :show="showPopUp"
+      title="Bild entfernen"
+      button-left-text="Cancel"
+      button-right-text="Submit"
+      @clicked="buttonTriggered"
+      @close="showPopUp = false">
+      <div>
+        Test Create Entity
+      </div>
+      <div class="popup-text">
+        <base-input
+          :label="'Test1'"
+          field-type="number"
+          placeholder="Enter your Name" />
+        <base-input
+          :label="'Test'"
+          field-type="text"
+          placeholder="Enter your Name" />
+      </div>
+      <div class="popup-text">
+        <base-drop-down
+          :label="'select type'"
+          :option-selected="{ label: 'Alle Typen', value: '' }"
+          :options="[
+            { label: 'Alle Typen', value: '' },
+            { label: 'Bild', value: 'picture' },
+            { label: 'Publikation', value: 'publication' },
+            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
+          ]"
+          :header-background-color="'rgb(240, 240, 240)'" />
+        <base-drop-down
+          :label="'select type'"
+          :option-selected="{ label: 'Alle Typen', value: '' }"
+          :options="[
+            { label: 'Alle Typen', value: '' },
+            { label: 'Bild', value: 'picture' },
+            { label: 'Publikation', value: 'publication' },
+            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
+          ]"
+          :header-background-color="'rgb(240, 240, 240)'" />
+      </div>
+    </base-pop-up>
+
+    <!-- DROP DOWN TEST -->
+    <base-drop-down
+      v-model="selectedVal"
+      :label="'select type'"
+      :show-label="true"
+      :options="selectionList" />
+    <base-drop-down
+      :options="selectionList" />
+    <div class="spacer" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
-import BaseChipsInputNew from './components/BaseChipsInput/BaseChipsInputNew';
+import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
+import BasePopUp from './components/BasePopUp/BasePopUp';
+import BaseDropDown from './components/BaseDropDown/BaseDropDown';
+import BaseInput from './components/BaseInput/BaseInput';
+import BaseButton from './components/BaseButton/BaseButton';
+import BaseDropBox from './components/BaseDropBox/BaseDropBox';
+import BaseMenuList from './components/BaseMenuList/BaseMenuList';
+import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
+import BaseSearch from './components/BaseSearch/BaseSearch';
+import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
+import BaseImageBox from './components/BaseImageBox/BaseImageBox';
+import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
-import BaseButton from './components/BaseButton/BaseButton';
+import BasePagination from './components/BasePagination/BasePagination';
+import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
+import BaseFormNew from './components/BaseForm/BaseForm';
 
 export default {
   name: 'App',
   components: {
+    BaseFormNew,
+    BaseMediaPreview,
+    BasePagination,
     BaseChipsBelow,
     BaseDateInput,
     BaseAutocompleteInput,
-    BaseChipsInputNew,
+    BaseUploadBar,
+    BaseImageBox,
+    BaseMultilineTextInput,
+    BaseSearch,
+    BaseChipsInput,
+    BaseMenuList,
+    BaseMenuEntry,
+    BaseDropDown,
+    BasePopUp,
+    BaseInput,
     BaseButton,
+    BaseDropBox,
   },
   data() {
     return {

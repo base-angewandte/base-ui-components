@@ -266,7 +266,6 @@ export default {
 
   .base-drop-down-list__container {
     background: white;
-    width: 100%;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;

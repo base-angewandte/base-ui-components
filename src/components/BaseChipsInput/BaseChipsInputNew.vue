@@ -2,6 +2,7 @@
   <div
     class="base-chips-input">
     <BaseChipsInputField
+      ref="baseInput"
       v-model="input"
       v-bind="$props"
       :add-selected-entry-directly="false"
@@ -16,10 +17,11 @@
       @keydown="checkKeyEvent"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
+      @click-input-field="onInputFocus"
       v-on="$listeners" />
 
     <BaseDropDownList
-      v-if="true"
+      v-if="useDefaultDropDown && inputFieldActive"
       ref="dropDownList"
       :drop-down-options="listInt"
       :active-option.sync="activeOption"
@@ -28,6 +30,7 @@
       :value-property-name="valuePropertyNameInt"
       :list-id="id"
       :select-styled="!allowMultipleEntries"
+      :style="{ 'min-width': dropDownMinWidth }"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
         <span
@@ -315,6 +318,8 @@ export default {
       isWithinDropDown: false,
       // variable for storing if external list was array of strings
       returnAsString: false,
+      // minimal width of drop down element
+      dropDownMinWidth: '100%',
     };
   },
   computed: {
@@ -352,8 +357,8 @@ export default {
       // with the options list and only show matching options
       if (!this.allowDynamicDropDownEntries) {
         // also only return entries matching the input string
-        return tempList.filter(option => option[this.valuePropertyNameInt].toLowerCase()
-          .includes(this.input.toLowerCase()));
+        return tempList.filter(option => this.getLangLabel(option[this.valuePropertyNameInt])
+          .toLowerCase().includes(this.input.toLowerCase()));
       }
       return tempList;
     },
@@ -460,12 +465,10 @@ export default {
          */
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.valuePropertyNameInt });
       }
-      if (val) {
-        this.activeOptionIndex = 0;
-        // TODO: check function below for functionality! (take from chips input)
-        // this.calcDropDownMinWidth();
+      if (val && this.useDefaultDropDown) {
+        this.calcDropDownMinWidth();
         // reset the active option index to first item
-        // this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+        this.activeOptionIndex = 0;
         /**
          * event triggered on show drop down
          *
@@ -597,10 +600,18 @@ export default {
        */
       this.$emit('hoverbox-active', { value, entry });
     },
+    /**
+     * calculate the minimum width of the drop down element by getting the
+     * width of this element
+     */
+    calcDropDownMinWidth() {
+      // get the base input element
+      const inputElement = this.$refs.baseInput;
+      // see if it exists and has a width - if yes set drop down min width to the same
+      if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
+        this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
+      }
+    },
   },
 };
 </script>
-
-<style lang="scss" scoped>
-
-</style>

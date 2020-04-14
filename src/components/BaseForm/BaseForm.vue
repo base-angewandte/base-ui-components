@@ -491,29 +491,29 @@ export default {
   @import "../../styles/variables.scss";
 
   .base-chips-below-chips-input {
-    .base-chips-drop-down {
+    .base-drop-down-list__container {
       right: $spacing-small;
     }
   }
 
   @media screen and (min-width: $mobile) {
-    .base-chips-drop-down {
+    .base-drop-down-list__container {
       max-width: calc(100% - #{$spacing} * 2);
     }
 
     .base-form-field-left-margin {
-      .base-chips-drop-down {
+      .base-drop-down-list__container {
         right: $spacing;
       }
     }
 
     .base-form-subform-wrapper {
-      .base-chips-drop-down {
+      .base-drop-down-list__container {
         max-width: calc(100% - #{$spacing} * 4.5 - 3px);
       }
 
       .base-form-field-left-margin {
-        .base-chips-drop-down {
+        .base-drop-down-list__container {
           right: calc(#{$spacing} * 2.5 - 3px);
         }
       }

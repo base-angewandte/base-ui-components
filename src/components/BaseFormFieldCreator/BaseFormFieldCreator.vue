@@ -293,7 +293,7 @@ export default {
       } if (this.fieldType === 'autocomplete') {
         return () => import('../BaseAutocompleteInput/BaseAutocompleteInput');
       } if (this.fieldType === 'chips') {
-        return () => import('../BaseChipsInput/BaseChipsInput');
+        return () => import('../BaseChipsInput/BaseChipsInputNew');
       } if (this.fieldType === 'chips-below') {
         return () => import('../BaseChipsBelow/BaseChipsBelow');
       } if (this.fieldType === 'group') {

@@ -16,7 +16,8 @@
       :linked-list-option="linkedListOption"
       @clicked-outside="onInputBlur"
       @keydown.enter.prevent="addOption"
-      @keydown="checkKeyEvent"
+      @keydown.prevent="checkKeyEvent"
+      @click-input-field="onInputFocus"
       v-on="$listeners">
       <template
         v-if="sortable"
@@ -570,7 +571,7 @@ export default {
       }
     },
 
-    /** INPUT FIELD STYLING */
+    /** INPUT FIELD FOCUS/BLUR EVENTS */
     onInputBlur() {
       /**
        * propagate to parent that click event happened outside of input field
@@ -579,6 +580,12 @@ export default {
        * @property {none}
        */
       this.$emit('clicked-outside');
+    },
+    onInputFocus() {
+      // lay the focus on the input field
+      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+      // inform parent of input field click
+      this.$emit('click-input-field');
     },
 
     /** HOVER BOX FUNCTIONALITY */
