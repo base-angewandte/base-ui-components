@@ -115,7 +115,7 @@ export default {
   props: {
     // TODO: check if really all the props from parent are needed here
     /**
-     if field is occuring more then once - set an id
+     if field is occurring more then once - set an id
      */
     id: {
       type: String,
@@ -137,22 +137,6 @@ export default {
     input: {
       type: String,
       default: '',
-    },
-    /**
-     * for dynamic drop down entries a unique identifier (id, uuid)
-     * is needed - specify the attribute name here
-     */
-    identifier: {
-      type: String,
-      default: '',
-    },
-    /**
-     * if object array was passed - define the property that should be
-     * displayed in the chip
-     */
-    objectProp: {
-      type: String,
-      default: 'name',
     },
     /**
      * input field label
@@ -319,7 +303,14 @@ export default {
      */
     valuePropertyName: {
       type: String,
-      default: '',
+      default: 'label',
+    },
+    /**
+     * specify true if selectedList array is a array of strings
+     */
+    isStringArray: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -358,7 +349,8 @@ export default {
       handler(val) {
         if (val) {
           const tempList = val.map(option => ({
-            ...option,
+            ...(this.isStringArray ? { [this.valuePropertyName]: option }
+              : option),
             // adding an internal id
             ...{ idInt: option[this.identifierPropertyName] || this.getIdInt(option) },
           }));
@@ -494,7 +486,10 @@ export default {
      */
     updateParentList(newSelectedListInt) {
       let tempList = JSON.parse(JSON.stringify(newSelectedListInt));
-      if (newSelectedListInt.length) {
+      // if provided selected list consisted of strings - return this way
+      if (this.isStringArray) {
+        tempList = tempList.map(selected => selected[this.valuePropertyName]);
+      } else if (newSelectedListInt.length) {
         // remove internal ids again
         tempList = tempList.map((selected) => {
           this.$delete(selected, 'idInt');
@@ -506,7 +501,8 @@ export default {
        * (you can use the .sync modifier on prop selectedList)
        *
        * @event update:selected-list
-       * @property {Object[]} tempList - the modified list
+       * @property {Object[], String[]} tempList - the modified list - array
+       * of strings is returned if isStringArray was set to true
        */
       this.$emit('update:selected-list', tempList);
     },
@@ -523,7 +519,8 @@ export default {
         // get matching option by value (this is only for options that dont have an
         // external id provided anyways (also duplicates are excluded in 'addOption()'
         const matchingOption = this.selectedListInt
-          .find(opt => opt[this.valuePropertyName] === option[this.valuePropertyName]);
+          .find(opt => opt[this.valuePropertyName] === option[this.valuePropertyName]
+            || opt[this.valuePropertyName] === option);
         // check if there was exactly one matching result
         if (matchingOption) {
           return matchingOption.idInt;
@@ -536,7 +533,7 @@ export default {
     /** SORTING */
     /** function called when the 'sort' button is clicked */
     sortSelectedList() {
-      sort(this.selectedListInt, 'label');
+      sort(this.selectedListInt, this.valuePropertyName);
       this.updateParentList(this.selectedListInt);
     },
 
@@ -585,6 +582,12 @@ export default {
       // lay the focus on the input field
       this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
       // inform parent of input field click
+      /**
+       * inform parent that input field was clicked
+       *
+       * @event click-input-field
+       * @property {none}
+       */
       this.$emit('click-input-field');
     },
 
