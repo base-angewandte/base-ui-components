@@ -16,7 +16,7 @@
       :linked-list-option="linkedListOption"
       @clicked-outside="onInputBlur"
       @keydown.enter.prevent="addOption"
-      @keydown.prevent="checkKeyEvent"
+      @keydown="checkKeyEvent"
       @click-input-field="onInputFocus"
       v-on="$listeners">
       <template
