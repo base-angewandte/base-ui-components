@@ -6,6 +6,7 @@
     class="base-drop-down-list__container"
     @mouseenter="withinDropDown = true"
     @mouseleave="withinDropDown = false">
+    <!-- @slot for adding elements before the options list -->
     <slot name="before-list" />
     <ul
       :id="listId"
@@ -29,6 +30,8 @@
           role="option"
           @mouseenter="setActive(option)"
           @click="selected(option)">
+          <!-- @slot a slot to customize every single option (e.g. display of
+          information other than [valuePorpoertyName]) -->
           <slot
             name="option"
             :option="option">
@@ -47,6 +50,7 @@
         </slot>
       </div>
     </ul>
+    <!-- @slot to add elements after the options list -->
     <slot name="after-list" />
   </div>
 </template>
