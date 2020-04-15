@@ -80,6 +80,7 @@ An example connected with an input field (displayAsDropDown: false)
       v-model="input"
       :show-label="false"
       :selected-list.sync="selectedList"
+      drop-down-list-id="aSimpleTestList"
       identifier-property-name="id"
       value-property-name="value"
       placeholder="Add new chips via enter"
@@ -90,7 +91,8 @@ An example connected with an input field (displayAsDropDown: false)
         :drop-down-options="optionsListInt"
         :display-as-drop-down="false"
         list-id="aSimpleTestList"
-        class="base-drop-down-list-example">
+        class="base-drop-down-list-example"
+        @update:selected-option="addChip">
       <template v-slot:before-list>
           <div class="slot">
             This is a slot before the list
