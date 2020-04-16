@@ -14,6 +14,7 @@
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
+      :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       @clicked-outside="onInputBlur"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
