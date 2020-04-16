@@ -113,7 +113,6 @@ export default {
     event: 'input',
   },
   props: {
-    // TODO: check if really all the props from parent are needed here
     /**
      if field is occurring more then once - set an id
      */
@@ -174,14 +173,6 @@ export default {
     allowMultipleEntries: {
       type: Boolean,
       default: true,
-    },
-    /**
-     * define if selectable list options should be fetched every time of if the
-     * list passed in the beginning is used
-     */
-    allowDynamicDropDownEntries: {
-      type: Boolean,
-      default: false,
     },
     /**
      * this means typed input will be added as chip directly
@@ -315,43 +306,76 @@ export default {
   },
   data() {
     return {
-      // internal representation of selectedList
+      /**
+       * internal representation of selectedList
+       * @type {(String[]|Object[])}
+       */
       selectedListInt: [],
-      // for removing chips via backspace
+      /**
+       * for removing chips via backspace, to get delay after
+       * keydown event
+       * @type {?number}
+       */
       timeout: null,
-      // for removing chips via backspace
-      fired: '',
-      // for dragging functionality (transition)
+      /**
+       * for removing chips via backspace, to no accidentally delete
+       * chips on multiple backspace keydown events
+       * @type {boolean}
+       */
+      fired: false,
+      /**
+       * for dragging functionality (transition)
+       * @type {boolean}
+       */
       drag: false,
-      // variable for the currently active chip
-      // (for arrow key use)
+      /**
+       * variable for the currently active chip (for arrow key use)
+       * @type {number}
+       */
       chipActiveForRemove: -1,
     };
   },
   computed: {
-    // to have base input string available here
+    /**
+     * to have base input string available here
+     */
     inputInt: {
+      /**
+       * getter function for inputInt
+       * @returns {string}
+       */
       get() {
         return this.input;
       },
+      /**
+       * setter function for inputInt
+       * @param {string} val - the value to set
+       */
       set(val) {
         /**
          * emitting the input string if changed internally
          * @event input
-         * @property {string} val - the input string
+         * @property {string} val - the new input string
          */
         this.$emit('input', val);
       },
     },
   },
   watch: {
+    // selectedList is watched to also change selectedListInt if necessary
+    // was thinking of making this a computed property however if you do
+    // list manipulations (e.g. push, splice) the setter is not triggered
+    // --> more complicated to inform parent (because sometimes setter triggered sometimes not)
     selectedList: {
       handler(val) {
+        // check that new value is not undefined (would throw error with map)
         if (val) {
+          // create a temporary list object and add an internal id
           const tempList = val.map(option => ({
             ...(this.isStringArray ? { [this.valuePropertyName]: option }
               : option),
-            // adding an internal id
+            // adding an internal id - either the one given by identifierProperty or
+            // if not available - assign a previously assigned one or a new id
             ...{ idInt: option[this.identifierPropertyName] || this.getIdInt(option) },
           }));
           // only update if internal list is different from outside list
@@ -400,13 +424,17 @@ export default {
         // if there is no input and arrow right or left was pressed
         // navigate between the chips
       } else if (!this.inputInt && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+        // determine if index should be increased or decreased
         const isIndexUp = event.key === 'ArrowRight';
+        // do the navigation in the chips list, returns the chip that should be
+        // active after navigation
         const activeChip = this.navigate(
           this.selectedListInt,
           isIndexUp,
           this.chipActiveForRemove,
           true,
         );
+        // set the chip active for removal (currently active one)
         this.chipActiveForRemove = this.selectedListInt.indexOf(activeChip);
         // in any other key event reset the chip active for remove
       } else {
@@ -501,7 +529,7 @@ export default {
        * (you can use the .sync modifier on prop selectedList)
        *
        * @event update:selected-list
-       * @property {Object[], String[]} tempList - the modified list - array
+       * @property {(Object[]|String[])} tempList - the modified list - array
        * of strings is returned if isStringArray was set to true
        */
       this.$emit('update:selected-list', tempList);

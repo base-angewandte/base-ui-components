@@ -157,19 +157,28 @@ export default {
   },
   data() {
     return {
-      // variable to store if variable is within dropdown
+      /**
+       * variable to store if cursor is within dropdown
+       * @type {boolean}
+       */
       withinDropDown: false,
     };
   },
   computed: {
-    // variable to store if values provided in the list are strings
-    // (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
+    /**
+     * variable to store if values provided in the list are strings
+     * (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
+     * @returns {boolean}
+     */
     valueIsString() {
       return this.dropDownOptions[this.valuePropertyName]
         && this.dropDownOptions[this.valuePropertyName].length
         && typeof this.getLangLabel(this.dropDownOptions[this.valuePropertyName] === 'string', true);
     },
-    // the index of the currently active option provided by parent
+    /**
+     * the index of the currently active option provided by parent
+     * @returns {number}
+     */
     activeOptionIndex() {
       return this.dropDownOptions.indexOf(this.activeOption);
     },
