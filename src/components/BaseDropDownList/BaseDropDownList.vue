@@ -18,7 +18,7 @@
         <li
           v-if="optionHasData(option[valuePropertyName])"
           ref="option"
-          :key="option[identifierPropertyName] || optionIndex"
+          :key="optionIndex"
           :value="valueIsString ? getLangLabel(option[valuePropertyName], true)
             : option[identifierPropertyName]"
           :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
@@ -297,6 +297,7 @@ export default {
       overflow-y: auto;
 
       .base-drop-down-list__option {
+        display: flex;
         min-height: $row-height-small;
         padding: $spacing-small/2 $spacing;
         line-height: $line-height;
