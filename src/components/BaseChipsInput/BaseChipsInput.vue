@@ -464,6 +464,15 @@ export default {
       immediate: true,
     },
     /**
+     * watch for changes to selectedListInt and propagate to parent if necessary
+     * @param {(string[]|Object[])} val
+     */
+    selectedListInt(val) {
+      if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
+        this.updateParentSelectedList(val);
+      }
+    },
+    /**
      * input is watched for follow up actions needed after input
      * --> fetch autocomplete entries
      * --> inform parent of input (this however is not needed anymore since

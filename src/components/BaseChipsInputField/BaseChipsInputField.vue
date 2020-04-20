@@ -562,7 +562,12 @@ export default {
     /** SORTING */
     /** function called when the 'sort' button is clicked */
     sortSelectedList() {
-      sort(this.selectedListInt, this.valuePropertyName);
+      sort(
+        this.selectedListInt,
+        this.valuePropertyName,
+        this.sortName,
+        this.language ? this.getLangLabel : null,
+      );
       this.updateParentList(this.selectedListInt);
     },
 
