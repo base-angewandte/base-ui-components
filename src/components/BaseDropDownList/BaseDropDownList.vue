@@ -1,6 +1,7 @@
 <template>
   <div
     ref="dropDownContainer"
+    v-click-outside="() => withinDropDown = false"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
     class="base-drop-down-list__container"
@@ -56,6 +57,7 @@
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
 import i18n from '../../mixins/i18n';
 
 /** a multipurpose drop down list */
@@ -63,6 +65,9 @@ import i18n from '../../mixins/i18n';
 // TODO: currently only taking objects not strings??
 
 export default {
+  directives: {
+    ClickOutside,
+  },
   mixins: [
     i18n,
   ],
