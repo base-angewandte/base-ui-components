@@ -44,7 +44,6 @@
             :aria-activedescendant="linkedListOption"
             :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
             autocomplete="off"
-            @blur="clickedOutsideInput"
             @click="active = true"
             v-on="inputListeners">
         </div>

@@ -372,7 +372,7 @@ export default {
       }
       // in case of no dynamic autocomplete fetching match the input string
       // with the options list and only show matching options
-      if (!this.allowDynamicDropDownEntries) {
+      if (this.input && !this.allowDynamicDropDownEntries) {
         // also only return entries matching the input string
         return tempList.filter(option => this.getLangLabel(option[this.valuePropertyNameInt])
           .toLowerCase().includes(this.input.toLowerCase()));
