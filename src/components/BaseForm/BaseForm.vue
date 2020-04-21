@@ -490,38 +490,42 @@ export default {
 <style lang="scss">
   @import "../../styles/variables.scss";
 
-  .base-chips-below-chips-input {
-    .base-drop-down-list__container {
-      right: $spacing-small;
+  .base-form-field {
+    .base-chips-below-chips-input {
+      .base-drop-down-list__container {
+        right: $spacing-small;
+      }
     }
   }
 
   @media screen and (min-width: $mobile) {
-    .base-drop-down-list__container {
-      max-width: calc(100% - #{$spacing} * 2);
-    }
-
-    .base-form-field-left-margin {
+    .base-form-field {
       .base-drop-down-list__container {
-        right: $spacing;
-      }
-    }
-
-    .base-form-subform-wrapper {
-      .base-drop-down-list__container {
-        max-width: calc(100% - #{$spacing} * 4.5 - 3px);
+        max-width: calc(100% - #{$spacing} * 2);
       }
 
       .base-form-field-left-margin {
         .base-drop-down-list__container {
-          right: calc(#{$spacing} * 2.5 - 3px);
+          right: $spacing;
         }
       }
-    }
 
-    .base-chips-below-chips-input {
-      .base-chips-drop-down {
-        right: calc(#{$spacing} + #{$spacing-small} / 2);
+      .base-form-subform-wrapper {
+        .base-drop-down-list__container {
+          max-width: calc(100% - #{$spacing} * 4.5 - 3px);
+        }
+
+        .base-form-field-left-margin {
+          .base-drop-down-list__container {
+            right: calc(#{$spacing} * 2.5 - 3px);
+          }
+        }
+      }
+
+      .base-chips-below-chips-input {
+        .base-chips-drop-down {
+          right: calc(#{$spacing} + #{$spacing-small} / 2);
+        }
       }
     }
   }
