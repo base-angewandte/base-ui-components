@@ -45,6 +45,8 @@
             :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
             autocomplete="off"
             @click="active = true"
+            @keydown.tab.enter="active = false"
+            @focus="active = true"
             v-on="inputListeners">
         </div>
       </div>
