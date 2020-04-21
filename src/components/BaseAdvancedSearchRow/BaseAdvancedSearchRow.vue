@@ -15,8 +15,8 @@
           :always-linked="true"
           label="use filter"
           drop-down-list-id="filter-options"
-          identifier-property="label"
-          value-property="label"
+          identifier-property-name="label"
+          value-property-name="label"
           class="base-advanced-search__filter-input"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters" />
@@ -42,8 +42,9 @@
       :drop-down-options="resultListInt"
       :active-styled="false"
       :active-option="{ collection: activeCollection }"
-      identifier-property="collection"
-      value-property="data"
+      :display-as-drop-down="false"
+      identifier-property-name="collection"
+      value-property-name="data"
       list-id="autocomplete-options"
       class="base-advanced-search__drop-down-body">
       <template v-slot:before-list>
@@ -582,6 +583,7 @@ export default {
 
     .base-advanced-search__drop-down-body {
       border-top: $separation-line;
+      width: 100%;
 
       .base-advanced-search__above-list-area {
         margin: $spacing;
