@@ -622,11 +622,6 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     checkKeyEvent(event) {
-      // if user has input and uses semicolon add input
-      if (event.code === 'Comma' && event.shiftKey && this.input) {
-        event.preventDefault();
-        this.addSelected();
-      }
       // if tab this will trigger moving forward to next input field
       // --> this one should be inactive
       if (event.key === 'Tab') {
