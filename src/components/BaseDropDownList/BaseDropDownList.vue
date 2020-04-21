@@ -1,11 +1,13 @@
 <template>
   <div
     ref="dropDownContainer"
+    v-click-outside="() => withinDropDown = false"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
     class="base-drop-down-list__container"
     @mouseenter="withinDropDown = true"
     @mouseleave="withinDropDown = false">
+    <!-- @slot for adding elements before the options list -->
     <slot name="before-list" />
     <ul
       :id="listId"
@@ -14,12 +16,12 @@
       class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
-          v-if="optionHasData(option[valueProperty])"
+          v-if="optionHasData(option[valuePropertyName])"
           ref="option"
-          :key="option[identifierProperty] || optionIndex"
-          :value="valueIsString ? getLangLabel(option[valueProperty], true)
-            : option[identifierProperty]"
-          :aria-selected="selectStyled && option[identifierProperty] === selectedOption"
+          :key="optionIndex"
+          :value="valueIsString ? getLangLabel(option[valuePropertyName], true)
+            : option[identifierPropertyName]"
+          :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
           :class="[
             'base-drop-down-list__option',
             { 'base-drop-down-list__option-selected': selectStyled
@@ -29,10 +31,12 @@
           role="option"
           @mouseenter="setActive(option)"
           @click="selected(option)">
+          <!-- @slot a slot to customize every single option (e.g. display of
+          information other than [valuePorpoertyName]) -->
           <slot
             name="option"
             :option="option">
-            {{ getLangLabel(option[valueProperty], true) }}
+            {{ getLangLabel(option[valuePropertyName], true) }}
           </slot>
         </li>
       </template>
@@ -47,11 +51,13 @@
         </slot>
       </div>
     </ul>
+    <!-- @slot to add elements after the options list -->
     <slot name="after-list" />
   </div>
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
 import i18n from '../../mixins/i18n';
 
 /** a multipurpose drop down list */
@@ -59,6 +65,9 @@ import i18n from '../../mixins/i18n';
 // TODO: currently only taking objects not strings??
 
 export default {
+  directives: {
+    ClickOutside,
+  },
   mixins: [
     i18n,
   ],
@@ -68,20 +77,20 @@ export default {
      */
     dropDownOptions: {
       type: Array,
-      default: () => ([]),
+      default: () => [],
     },
     /**
      * specify the name of a property that can be used as identifier
      * // TODO: need handling if no identifier provided!!
      */
-    identifierProperty: {
+    identifierPropertyName: {
       type: String,
       default: 'id',
     },
     /**
      * specify the name of the property that should be displayed
      */
-    valueProperty: {
+    valuePropertyName: {
       type: String,
       default: 'value',
     },
@@ -92,7 +101,7 @@ export default {
      *   the .sync modifier can be used here
      */
     activeOption: {
-      type: Object,
+      type: [Object, String],
       default: () => ({}),
     },
     /**
@@ -101,7 +110,7 @@ export default {
      *   the .sync modifier can be used here
      */
     selectedOption: {
-      type: Object,
+      type: [Object, String],
       default: () => ({}),
     },
     /**
@@ -153,19 +162,28 @@ export default {
   },
   data() {
     return {
-      // variable to store if variable is within dropdown
+      /**
+       * variable to store if cursor is within dropdown
+       * @type {boolean}
+       */
       withinDropDown: false,
     };
   },
   computed: {
-    // variable to store if values provided in the list are strings
-    // (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
+    /**
+     * variable to store if values provided in the list are strings
+     * (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
+     * @returns {boolean}
+     */
     valueIsString() {
-      return this.dropDownOptions[this.valueProperty]
-        && this.dropDownOptions[this.valueProperty].length
-        && typeof this.getLangLabel(this.dropDownOptions[this.valueProperty] === 'string', true);
+      return this.dropDownOptions[this.valuePropertyName]
+        && this.dropDownOptions[this.valuePropertyName].length
+        && typeof this.getLangLabel(this.dropDownOptions[this.valuePropertyName] === 'string', true);
     },
-    // the index of the currently active option provided by parent
+    /**
+     * the index of the currently active option provided by parent
+     * @returns {number}
+     */
     activeOptionIndex() {
       return this.dropDownOptions.indexOf(this.activeOption);
     },
@@ -246,7 +264,7 @@ export default {
      * @param {Object} option - the hovered option
      */
     setActive(option) {
-      if (option[this.identifierProperty] !== this.activeOption) {
+      if (option[this.identifierPropertyName] !== this.activeOption) {
         /**
          * an option is set active on mouse enter - parent is informed
          * (the .sync modifier on prop activeOption can be used)
@@ -266,7 +284,6 @@ export default {
 
   .base-drop-down-list__container {
     background: white;
-    width: 100%;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;
@@ -280,6 +297,7 @@ export default {
       overflow-y: auto;
 
       .base-drop-down-list__option {
+        display: flex;
         min-height: $row-height-small;
         padding: $spacing-small/2 $spacing;
         line-height: $line-height;

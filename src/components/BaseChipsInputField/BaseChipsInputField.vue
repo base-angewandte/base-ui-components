@@ -14,9 +14,11 @@
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
+      :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       @clicked-outside="onInputBlur"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
+      @click-input-field="onInputFocus"
       v-on="$listeners">
       <template
         v-if="sortable"
@@ -47,10 +49,10 @@
                 :id="entry.idInt"
                 ref="baseChip"
                 :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                :entry="getLangLabel(entry[valueProperty], true)"
+                :entry="getLangLabel(entry[valuePropertyName], true)"
                 :hover-box-content="hoverboxContent"
-                :is-linked="alwaysLinked || entry[identifierProperty] === 0
-                  || !!entry[identifierProperty]"
+                :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                  || !!entry[identifierPropertyName]"
                 :chip-active="chipActiveForRemove === index"
                 @remove-entry="removeEntry(entry, index)"
                 @hoverbox-active="hoverBoxActive($event, entry)" />
@@ -112,9 +114,8 @@ export default {
     event: 'input',
   },
   props: {
-    // TODO: check if really all the props from parent are needed here
     /**
-     if field is occuring more then once - set an id
+     if field is occurring more then once - set an id
      */
     id: {
       type: String,
@@ -136,22 +137,6 @@ export default {
     input: {
       type: String,
       default: '',
-    },
-    /**
-     * for dynamic drop down entries a unique identifier (id, uuid)
-     * is needed - specify the attribute name here
-     */
-    identifier: {
-      type: String,
-      default: '',
-    },
-    /**
-     * if object array was passed - define the property that should be
-     * displayed in the chip
-     */
-    objectProp: {
-      type: String,
-      default: 'name',
     },
     /**
      * input field label
@@ -189,14 +174,6 @@ export default {
     allowMultipleEntries: {
       type: Boolean,
       default: true,
-    },
-    /**
-     * define if selectable list options should be fetched every time of if the
-     * list passed in the beginning is used
-     */
-    allowDynamicDropDownEntries: {
-      type: Boolean,
-      default: false,
     },
     /**
      * this means typed input will be added as chip directly
@@ -307,7 +284,7 @@ export default {
      * // TODO: this should replace prop 'identifier' in future versions
      * (better naming)
      */
-    identifierProperty: {
+    identifierPropertyName: {
       type: String,
       default: '',
     },
@@ -316,50 +293,91 @@ export default {
      * // TODO: this should replace prop 'objectProp' in future versions
      * (better naming)
      */
-    valueProperty: {
+    valuePropertyName: {
       type: String,
-      default: '',
+      default: 'label',
+    },
+    /**
+     * specify true if selectedList array is a array of strings
+     */
+    isStringArray: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
     return {
-      // internal representation of selectedList
+      /**
+       * internal representation of selectedList
+       * @type {(String[]|Object[])}
+       */
       selectedListInt: [],
-      // for removing chips via backspace
+      /**
+       * for removing chips via backspace, to get delay after
+       * keydown event
+       * @type {?number}
+       */
       timeout: null,
-      // for removing chips via backspace
-      fired: '',
-      // for dragging functionality (transition)
+      /**
+       * for removing chips via backspace, to no accidentally delete
+       * chips on multiple backspace keydown events
+       * @type {boolean}
+       */
+      fired: false,
+      /**
+       * for dragging functionality (transition)
+       * @type {boolean}
+       */
       drag: false,
-      // variable for the currently active chip
-      // (for arrow key use)
+      /**
+       * variable for the currently active chip (for arrow key use)
+       * @type {number}
+       */
       chipActiveForRemove: -1,
     };
   },
   computed: {
-    // to have base input string available here
+    /**
+     * to have base input string available here
+     */
     inputInt: {
+      /**
+       * getter function for inputInt
+       * @returns {string}
+       */
       get() {
         return this.input;
       },
+      /**
+       * setter function for inputInt
+       * @param {string} val - the value to set
+       */
       set(val) {
         /**
          * emitting the input string if changed internally
          * @event input
-         * @property {string} val - the input string
+         * @property {string} val - the new input string
          */
         this.$emit('input', val);
       },
     },
   },
   watch: {
+    // selectedList is watched to also change selectedListInt if necessary
+    // was thinking of making this a computed property however if you do
+    // list manipulations (e.g. push, splice) the setter is not triggered
+    // --> more complicated to inform parent (because sometimes setter triggered sometimes not)
     selectedList: {
       handler(val) {
+        // check that new value is not undefined (would throw error with map)
         if (val) {
+          // create a temporary list object and add an internal id
           const tempList = val.map(option => ({
-            ...option,
-            // adding an internal id
-            ...{ idInt: option[this.identifierProperty] || this.getIdInt(option) },
+            ...(this.isStringArray ? { [this.valuePropertyName]: option }
+              : option),
+            // adding an internal id - either the one given by identifierProperty or
+            // if not available - assign a previously assigned one or a new id
+            ...{ idInt: option[this.identifierPropertyName] || this.getIdInt(option) },
           }));
           // only update if internal list is different from outside list
           if (JSON.stringify(tempList) !== JSON.stringify(this.selectedListInt)) {
@@ -407,13 +425,17 @@ export default {
         // if there is no input and arrow right or left was pressed
         // navigate between the chips
       } else if (!this.inputInt && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+        // determine if index should be increased or decreased
         const isIndexUp = event.key === 'ArrowRight';
+        // do the navigation in the chips list, returns the chip that should be
+        // active after navigation
         const activeChip = this.navigate(
           this.selectedListInt,
           isIndexUp,
           this.chipActiveForRemove,
           true,
         );
+        // set the chip active for removal (currently active one)
         this.chipActiveForRemove = this.selectedListInt.indexOf(activeChip);
         // in any other key event reset the chip active for remove
       } else {
@@ -455,7 +477,7 @@ export default {
       if (this.inputInt && this.allowUnknownEntries && this.addSelectedEntryDirectly) {
         // check for duplicates
         const duplicate = this.selectedListInt
-          .find(option => option[this.valueProperty] === this.inputInt);
+          .find(option => option[this.valuePropertyName] === this.inputInt);
         // if no duplicate was found add the entry
         if (!duplicate) {
           // where should new item be placed (added at the end or replacing old entry
@@ -464,7 +486,7 @@ export default {
           // create object to add
           const newEntry = {
             idInt: this.getIdInt(),
-            [this.valueProperty]: this.inputInt,
+            [this.valuePropertyName]: this.inputInt,
           };
           // set entry in selectedList
           this.$set(this.selectedListInt, setIndex, newEntry);
@@ -493,7 +515,10 @@ export default {
      */
     updateParentList(newSelectedListInt) {
       let tempList = JSON.parse(JSON.stringify(newSelectedListInt));
-      if (newSelectedListInt.length) {
+      // if provided selected list consisted of strings - return this way
+      if (this.isStringArray) {
+        tempList = tempList.map(selected => selected[this.valuePropertyName]);
+      } else if (newSelectedListInt.length) {
         // remove internal ids again
         tempList = tempList.map((selected) => {
           this.$delete(selected, 'idInt');
@@ -505,7 +530,8 @@ export default {
        * (you can use the .sync modifier on prop selectedList)
        *
        * @event update:selected-list
-       * @property {Object[]} tempList - the modified list
+       * @property {(Object[]|String[])} tempList - the modified list - array
+       * of strings is returned if isStringArray was set to true
        */
       this.$emit('update:selected-list', tempList);
     },
@@ -513,16 +539,17 @@ export default {
      * every selected option needs an internal id to be uniquely identifyable
      * by draggablejs
      *
-     * @param {Object} option - the option the internal id is created for
+     * @param {Object} [option=null] - the option the internal id is determined for
      */
-    getIdInt(option) {
+    getIdInt(option = null) {
       // check if the selected option already has an internal identifier
       // not applicable for newly created entries so check if option was provided
       if (option) {
         // get matching option by value (this is only for options that dont have an
         // external id provided anyways (also duplicates are excluded in 'addOption()'
         const matchingOption = this.selectedListInt
-          .find(opt => opt[this.valueProperty] === option[this.valueProperty]);
+          .find(opt => opt[this.valuePropertyName] === option[this.valuePropertyName]
+            || opt[this.valuePropertyName] === option);
         // check if there was exactly one matching result
         if (matchingOption) {
           return matchingOption.idInt;
@@ -535,7 +562,12 @@ export default {
     /** SORTING */
     /** function called when the 'sort' button is clicked */
     sortSelectedList() {
-      sort(this.selectedListInt, 'label');
+      sort(
+        this.selectedListInt,
+        this.valuePropertyName,
+        this.sortName,
+        this.language ? this.getLangLabel : null,
+      );
       this.updateParentList(this.selectedListInt);
     },
 
@@ -570,7 +602,7 @@ export default {
       }
     },
 
-    /** INPUT FIELD STYLING */
+    /** INPUT FIELD FOCUS/BLUR EVENTS */
     onInputBlur() {
       /**
        * propagate to parent that click event happened outside of input field
@@ -579,6 +611,18 @@ export default {
        * @property {none}
        */
       this.$emit('clicked-outside');
+    },
+    onInputFocus() {
+      // lay the focus on the input field
+      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+      // inform parent of input field click
+      /**
+       * inform parent that input field was clicked
+       *
+       * @event click-input-field
+       * @property {none}
+       */
+      this.$emit('click-input-field');
     },
 
     /** HOVER BOX FUNCTIONALITY */
@@ -625,8 +669,9 @@ export default {
     }
 
     .base-chips-input-field__loader {
-      transform: scale(0.5);
-      margin-right: $spacing-large;
+      margin: 0 $spacing-large;
+      align-self: flex-end;
+      transform: translate(0px, -#{$spacing}) scale(0.5);
     }
 
     .base-chips-input-field__single-dropdown {
