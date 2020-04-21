@@ -182,7 +182,7 @@ export default {
   updated() {
     const elems = this.$el.getElementsByTagName('input');
     if (this.active && elems && elems.length) {
-      this.$el.getElementsByTagName('input')[0].focus();
+      elems[0].focus();
     }
   },
   methods: {
