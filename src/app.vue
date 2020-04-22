@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- CHIPS INPUT -->
-    <BaseChipsInputNew
+    <BaseChipsInput
       id="fieldKey"
       key="fieldKey"
       v-model="fieldValueInt"
@@ -34,7 +34,7 @@
           {{ props.item.source_name }}
         </span>
       </template>
-    </BaseChipsInputNew>
+    </BaseChipsInput>
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -69,12 +69,12 @@ import axios from 'axios';
 
 import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
-import BaseChipsInputNew from './components/BaseChipsInput/BaseChipsInputNew';
+import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 
 export default {
   name: 'App',
   components: {
-    BaseChipsInputNew,
+    BaseChipsInput,
     BaseCarousel,
     BaseAdvancedSearchRow,
   },

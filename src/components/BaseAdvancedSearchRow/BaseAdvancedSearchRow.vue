@@ -2,7 +2,11 @@
   <div class="base-advanced-search">
     <div class="base-advanced-search__search-field">
       <div
-        :class="['base-advanced-search__first-column', { 'hide': !filter.label }]">
+        :class="[
+          'base-advanced-search__first-column',
+          'base-advanced-search__first-column-filter',
+          { 'hide': !filter.label }
+        ]">
         <BaseChipsInputField
           id="filter-select"
           :selected-list.sync="selectedFilter"
@@ -58,22 +62,20 @@
             <ul
               id="filter-options"
               role="listbox"
-              class="base-advanced-search__filter-list">
+              class="base-advanced-search__filter-list base-advanced-search__columns">
               <li
                 v-for="(singleFilter, index) in displayedFilters"
                 :id="`filter-option-${singleFilter.label}`"
                 :key="index"
                 :aria-selected="filter && filter.label === singleFilter.label"
-                tabindex="0"
-                class="base-advanced-search__filter"
+                tabindex="-1"
+                class="base-advanced-search__filter base-advanced-search__column-item"
                 :class="[{ 'base-advanced-search__filter-active': activeFilter === singleFilter },
                          { 'base-advanced-search__filter-selected':
                            filter && filter.label === singleFilter.label }]"
                 role="option"
                 @click="selectFilter(singleFilter)">
-                <span class="base-advanced-search__filter-content">
-                  {{ singleFilter.label }}
-                </span>
+                {{ singleFilter.label }}
               </li>
             </ul>
           </div>
@@ -114,14 +116,16 @@
             <div class="base-advanced-search__first-column" />
             <ul
               v-if="filter && filter.options"
-              class="base-advanced-search__chips-area">
+              class="base-advanced-search__columns">
               <li
                 v-for="chip in displayedOptions"
-                :key="chip">
+                :key="chip"
+                class="base-advanced-search__column-item">
                 <BaseChip
                   :is-removable="false"
                   :entry="chip"
                   :chip-active="chip === activeControlledVocabularyEntry"
+                  class="base-advanced-search__option-chip"
                   @clicked="selectControlledVocabularyOption(chip)" />
               </li>
             </ul>
@@ -571,14 +575,18 @@ export default {
 
     .base-advanced-search__first-column {
       margin-right: $spacing;
-      flex: 0 0 20%;
-      min-width: 20%;
-    }
+      flex: 0 0 25%;
+      min-width: 25%;
 
-    .base-advanced-search__filter-input {
-      color: $app-color;
-      line-height: $row-height-large;
-      margin-left: -$spacing-small;
+      &.base-advanced-search__first-column-filter {
+        display: flex;
+        align-items: center;
+
+        .base-advanced-search__filter-input {
+          color: $app-color;
+          margin-left: -$spacing-small;
+        }
+      }
     }
 
     .base-advanced-search__drop-down-body {
@@ -594,66 +602,79 @@ export default {
 
         .base-advanced-search__chips-row {
           margin-bottom: $spacing;
+
+          .base-advanced-search__option-chip {
+            cursor: pointer;
+          }
         }
 
         .base-advanced-search__filter-list {
           .base-advanced-search__filter {
             cursor: pointer;
-            position: relative;
             color: $app-color;
+            padding-bottom: $spacing-small;
 
-            .base-advanced-search__filter-content {
-              // box-shadow: inset 0 0 0 1px $app-color;
-              column-rule: 1px solid $app-color;
+
+            &:focus {
+              outline: none;
             }
 
-            &.base-advanced-search__filter-active {
-              text-decoration: underline;
-            }
+          &.base-advanced-search__filter-active {
+            text-decoration: underline;
+          }
 
-            &.base-advanced-search__filter-selected {
+          &.base-advanced-search__filter-selected {
 
-            }
           }
         }
       }
+    }
+
+    .base-advanced-search__autocomplete-collection {
+      display: flex;
+      flex-direction: row;
 
       .base-advanced-search__autocomplete-collection {
-        display: flex;
-        flex-direction: row;
+        color: $app-color;
+      }
 
-        .base-advanced-search__autocomplete-collection {
-          color: $app-color;
-        }
-
-        .base-advanced-search__result-column-active {
-          text-decoration: underline;
-        }
+      .base-advanced-search__result-column-active {
+        text-decoration: underline;
       }
     }
-
-    .base-advanced-search__plus-icon {
-      margin-left: $spacing;
-      height: $icon-medium;
-      width: $icon-medium;
-    }
   }
 
-  .base-advanced-search__chips-area, .base-advanced-search__filter-list {
-    column-count: 4;
-    column-gap: $spacing;
-    width: 100%;
+  .base-advanced-search__plus-icon {
+    margin-left: $spacing;
+    height: $icon-medium;
+    width: $icon-medium;
+  }
+}
+
+.base-advanced-search__columns, .base-advanced-search__filter-list {
+  column-count: 4;
+  column-gap: $spacing;
+  display: block;
+  width: 100%;
+
+  .base-advanced-search__column-item {
+    // for chrome columns not aligned properly and
+    // last item bleeding into next column
+    -webkit-column-break-inside: avoid;
+    backface-visibility: hidden;
   }
 
-  @media screen and (max-width: $tablet) {
-    .base-advanced-search__chips-area, .base-advanced-search__filter-list {
-      column-count: 3;
-    }
-  }
+}
 
-  @media screen and (max-width: $mobile) {
-    .base-advanced-search__chips-area, .base-advanced-search__filter-list {
-      column-count: 2;
-    }
+@media screen and (max-width: $tablet) {
+  .base-advanced-search__columns {
+    column-count: 3;
   }
+}
+
+@media screen and (max-width: $mobile) {
+  .base-advanced-search__columns {
+    column-count: 2;
+  }
+}
 </style>

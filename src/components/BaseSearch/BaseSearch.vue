@@ -295,6 +295,7 @@ export default {
       height: $icon-large;
       width: $icon-large;
       margin-right: $spacing;
+      flex-shrink: 0;
 
       &.base-search__magnifier-icon-active {
         color: grey;
