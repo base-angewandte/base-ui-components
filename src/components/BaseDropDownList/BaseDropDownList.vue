@@ -24,6 +24,7 @@
           :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
           :class="[
             'base-drop-down-list__option',
+            { 'base-drop-down-list__option-drop-down-styling': displayAsDropDown },
             { 'base-drop-down-list__option-selected': selectStyled
               && option === selectedOption },
             { 'base-drop-down-list__option-active': activeStyled
@@ -40,16 +41,22 @@
           </slot>
         </li>
       </template>
-      <div
+      <!--
+        @slot customize what is displayed when no drop down options are available
+      -->
+      <slot
         v-if="!dropDownOptions.length"
-        class="base-drop-down-list__option base-drop-down-list__no-options">
-        <!--
-          @slot customize what is displayed when no drop down options are available
-        -->
-        <slot name="no-options">
+        name="no-options">
+        <div
+          v-if="!dropDownOptions.length"
+          :class="[
+            'base-drop-down-list__option',
+            'base-drop-down-list__no-options',
+            { 'base-drop-down-list__option-drop-down-styling': displayAsDropDown },
+          ]">
           {{ dropDownNoOptionsInfo }}
-        </slot>
-      </div>
+        </div>
+      </slot>
     </ul>
     <!-- @slot to add elements after the options list -->
     <slot name="after-list" />
@@ -299,11 +306,15 @@ export default {
       .base-drop-down-list__option {
         display: flex;
         min-height: $row-height-small;
-        padding: $spacing-small/2 $spacing;
+        padding: $spacing-small/2 0;
         line-height: $line-height;
         width: 100%;
         transition: all 0.2s ease;
         cursor: pointer;
+
+        &.base-drop-down-list__option-drop-down-styling {
+          padding: $spacing-small/2 $spacing;
+        }
 
         &.base-drop-down-list__no-options {
           cursor: default;
