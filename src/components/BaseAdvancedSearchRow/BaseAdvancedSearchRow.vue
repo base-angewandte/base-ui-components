@@ -57,7 +57,12 @@
           <div class="base-advanced-search__filter-area">
             <div
               class="base-advanced-search__first-column">
-              Filter for
+              <div class="base-advanced-search__filter-text">
+                Advanced Search
+              </div>
+              <div class="base-advanced-search__filter-subtext">
+                Select a filter
+              </div>
             </div>
             <ul
               id="filter-options"
@@ -86,6 +91,7 @@
       <template
         v-slot:option="slotProps">
         <div
+          v-if="!filter || filter.type === 'text'"
           class="base-advanced-search__autocomplete-collection">
           <div
             v-if="slotProps.option.data.length"
@@ -100,8 +106,8 @@
             :active-option.sync="activeEntry"
             :display-as-drop-down="false"
             list-id="autocomplete-options"
-            identifier-property="id"
-            value-property="header"
+            identifier-property-name="id"
+            value-property-name="header"
             @update:active-option="setCollection(slotProps.option.collection)"
             @update:selected-option="selectOption" />
         </div>
@@ -113,7 +119,9 @@
         v-slot:after-list>
         <div class="base-advanced-search__above-list-area">
           <div class="base-advanced-search__chips-row">
-            <div class="base-advanced-search__first-column" />
+            <div class="base-advanced-search__first-column">
+              Available options
+            </div>
             <ul
               v-if="filter && filter.options"
               class="base-advanced-search__columns">
@@ -130,6 +138,19 @@
               </li>
             </ul>
           </div>
+        </div>
+      </template>
+      <template
+        v-slot:no-options>
+        <div
+          :class="[
+            'base-advanced-search__no-options',
+            { 'base-advanced-search__no-options-hidden': filter.type !== 'text' }
+          ]">
+          <div v-if="!currentInput">
+            Please start typing or select a filter to see options
+          </div>
+          <div v-else>No matching options found</div>
         </div>
       </template>
     </BaseDropDownList>
@@ -182,6 +203,13 @@ export default {
     autocompleteResults: {
       type: [String, Object][Array],
       default: () => ([]),
+    },
+    /**
+     * the filter currently applied
+     */
+    appliedFilter: {
+      type: [Object, null],
+      default: null,
     },
   },
   data() {
@@ -272,13 +300,18 @@ export default {
       });
     },
     // selected controlled vocabulary or autocomplete options
-    selectedOptions() {
-      // this variable should only contain values for chips and text filters
-      // not for date or daterange (should be array)
-      if (this.filter.type === 'chips' || this.filter.type === 'text') {
-        return this.filter.values;
-      }
-      return [];
+    selectedOptions: {
+      set(val) {
+        this.$set(this.filter, 'values', val);
+      },
+      get() {
+        // this variable should only contain values for chips and text filters
+        // not for date or daterange (should be array)
+        if (this.filter.type === 'chips' || this.filter.type === 'text') {
+          return this.filter.values;
+        }
+        return [];
+      },
     },
     resultListInt() {
       if (!this.displayedOptions.length) {
@@ -309,6 +342,8 @@ export default {
           : {
             label: '',
             type: 'text',
+            values: [],
+            options: [],
           };
       },
       get() {
@@ -322,10 +357,20 @@ export default {
       // according to filter type (empty string or date object)
       this.currentInput = this.setFilterValues(val.type, null, false);
     },
+    appliedFilter: {
+      handler(val) {
+        if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
+          this.filter = { ...val };
+        }
+      },
+      immediate: true,
+    },
     // when current input changes emit this to parent component which should
     // do the fetching of autocomplete results
     currentInput(val) {
-      this.$emit('fetch-autocomplete-results', val);
+      if (typeof val === 'string') {
+        this.$emit('fetch-autocomplete-results', val);
+      }
     },
   },
   methods: {
@@ -406,7 +451,7 @@ export default {
           label: valueToAdd,
           // TODO: can internally created id's go to parent??
           // (probably not ...)
-          id: this.activeEntry ? this.activeEntry.id : createId(),
+          id: this.activeEntry ? this.activeEntry.id : '',
         };
         if (this.filter.values) {
           this.filter.values.push(valueObject);
@@ -592,19 +637,40 @@ export default {
     .base-advanced-search__drop-down-body {
       border-top: $separation-line;
       width: 100%;
+      padding: $spacing $spacing $spacing-small;
 
       .base-advanced-search__above-list-area {
-        margin: $spacing;
+
+        .base-advanced-search__filter-area {
+
+          .base-advanced-search__filter-text {
+            color: $font-color-second;
+          }
+          .base-advanced-search__filter-subtext {
+            color: $font-color-second;
+            font-size: $font-size-small;
+          }
+        }
 
         .base-advanced-search__chips-row, .base-advanced-search__filter-area {
           display: flex;
         }
 
         .base-advanced-search__chips-row {
-          margin-bottom: $spacing;
 
           .base-advanced-search__option-chip {
             cursor: pointer;
+
+            &:hover::after {
+              content: '';
+              width: 100%;
+              height: 100%;
+              position: absolute;
+              top: 0;
+              right: 0;
+              background: $app-color;
+              opacity: 0.5;
+            }
           }
         }
 
@@ -619,62 +685,82 @@ export default {
               outline: none;
             }
 
-          &.base-advanced-search__filter-active {
-            text-decoration: underline;
-          }
+            &.base-advanced-search__filter-active, &:hover {
+              text-decoration: underline;
+            }
 
-          &.base-advanced-search__filter-selected {
+            &.base-advanced-search__filter-selected {
 
+            }
           }
         }
       }
-    }
-
-    .base-advanced-search__autocomplete-collection {
-      display: flex;
-      flex-direction: row;
 
       .base-advanced-search__autocomplete-collection {
-        color: $app-color;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+
+        .base-advanced-search__autocomplete-collection {
+          color: $app-color;
+        }
+
+        .base-advanced-search__result-column-active {
+          text-decoration: underline;
+        }
       }
 
-      .base-advanced-search__result-column-active {
-        text-decoration: underline;
+      .base-advanced-search__no-options {
+        min-height: $row-height-small;
+        line-height: $line-height;
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        &.base-advanced-search__no-options-hidden {
+          display: none;
+        }
+      }
+
+
+    }
+
+    .base-advanced-search__plus-icon {
+      margin-left: $spacing;
+      height: $icon-medium;
+      width: $icon-medium;
+      cursor: pointer;
+    }
+
+    .base-advanced-search__columns, .base-advanced-search__filter-list {
+      column-count: 4;
+      column-gap: $spacing;
+      display: block;
+      width: 100%;
+
+      .base-advanced-search__column-item {
+        // for chrome columns not aligned properly and
+        // last item bleeding into next column
+        -webkit-column-break-inside: avoid;
+        backface-visibility: hidden;
+      }
+
+    }
+  }
+
+  @media screen and (max-width: $tablet) {
+    .base-advanced-search {
+      .base-advanced-search__columns {
+        column-count: 3;
       }
     }
   }
 
-  .base-advanced-search__plus-icon {
-    margin-left: $spacing;
-    height: $icon-medium;
-    width: $icon-medium;
+  @media screen and (max-width: $mobile) {
+    .base-advanced-search {
+      .base-advanced-search__columns {
+        column-count: 2;
+      }
+    }
   }
-}
-
-.base-advanced-search__columns, .base-advanced-search__filter-list {
-  column-count: 4;
-  column-gap: $spacing;
-  display: block;
-  width: 100%;
-
-  .base-advanced-search__column-item {
-    // for chrome columns not aligned properly and
-    // last item bleeding into next column
-    -webkit-column-break-inside: avoid;
-    backface-visibility: hidden;
-  }
-
-}
-
-@media screen and (max-width: $tablet) {
-  .base-advanced-search__columns {
-    column-count: 3;
-  }
-}
-
-@media screen and (max-width: $mobile) {
-  .base-advanced-search__columns {
-    column-count: 2;
-  }
-}
 </style>
