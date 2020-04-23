@@ -9,71 +9,9 @@
       :is-loading="isLoading"
       :sort-text="sortText"
       :sort-name="sortName"
+      :display-chips-inline="false"
       @selected="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
-      <template
-        v-slot:chips-area="props">
-        <draggable
-          v-model="props.list"
-          :animation="200"
-          group="people"
-          handle=".base-chips-below-list-icon-wrapper"
-          @end="updateList($event, props.list)">
-          <div
-            v-for="(entry,index) in props.list"
-            :key="'item' + entry.idInt"
-            :name="entry[objectProp]"
-            class="base-chips-below-list-item"
-            @mousedown="chipActive = index">
-            <div
-              :key="'line' + entry.idInt"
-              class="base-chips-below-list-item-line">
-              <div
-                :key="'iconwrapper' + entry.idInt"
-                class="base-chips-below-list-icon-wrapper">
-                <SvgIcon
-                  :key="'icon' + entry.idInt"
-                  name="drag-lines"
-                  class="svg-icon base-chips-below-list-icon" />
-              </div>
-
-              <div
-                :key="'chip-wrapper' + entry.idInt"
-                class="base-chips-below-list-item-chip-wrapper">
-                <BaseChip
-                  :id="'chips-below' + index"
-                  ref="selectedChip"
-                  :key="'chip' + entry.idInt"
-                  v-model="entry[objectProp]"
-                  :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
-                  :hover-box-content="hoverboxContent"
-                  class="base-chips-input-chip"
-                  @value-changed="modifyChipValue($event, index)"
-                  @hoverbox-active="hoverBoxActive($event, entry)"
-                  @remove-entry="removeEntry($event, index)" />
-              </div>
-              <BaseChipsInput
-                :id="label + '_' + (entry.idInt || entry.identifier)"
-                :key="'input_' + entry.idInt"
-                v-model="entry.roles"
-                :show-label="false"
-                :label="label + '-roles'"
-                :list="roleOptions"
-                :show-input-border="false"
-                :allow-dynamic-drop-down-entries="false"
-                :placeholder="rolesPlaceholder"
-                :always-linked="true"
-                :language="language"
-                :draggable="true"
-                :drop-down-no-options-info="dropDownNoOptionsInfo"
-                identifier="source"
-                object-prop="label"
-                class="base-chips-below-chips-input"
-                @selected="updateRoles($event, index)" />
-            </div>
-          </div>
-        </draggable>
-      </template>
       <template
         v-slot:drop-down-entry="props">
         <slot
@@ -86,6 +24,66 @@
           name="no-options" />
       </template>
     </BaseChipsInput>
+    <draggable
+      v-model="selectedBelowListInt"
+      :animation="200"
+      group="people"
+      handle=".base-chips-below-list-icon-wrapper"
+      @end="updateList($event, selectedBelowListInt)">
+      <div
+        v-for="(entry,index) in selectedBelowListInt"
+        :key="'item' + entry.idInt"
+        :name="entry[objectProp]"
+        class="base-chips-below-list-item"
+        @mousedown="chipActive = index">
+        <div
+          :key="'line' + entry.idInt"
+          class="base-chips-below-list-item-line">
+          <div
+            :key="'iconwrapper' + entry.idInt"
+            class="base-chips-below-list-icon-wrapper">
+            <SvgIcon
+              :key="'icon' + entry.idInt"
+              name="drag-lines"
+              class="svg-icon base-chips-below-list-icon" />
+          </div>
+
+          <div
+            :key="'chip-wrapper' + entry.idInt"
+            class="base-chips-below-list-item-chip-wrapper">
+            <BaseChip
+              :id="'chips-below' + index"
+              ref="selectedChip"
+              :key="'chip' + entry.idInt"
+              v-model="entry[objectProp]"
+              :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
+              :hover-box-content="hoverboxContent"
+              class="base-chips-input-chip"
+              @value-changed="modifyChipValue($event, index)"
+              @hoverbox-active="hoverBoxActive($event, entry)"
+              @remove-entry="removeEntry($event, index)" />
+          </div>
+          <BaseChipsInput
+            :id="label + '_' + (entry.idInt || entry.identifier)"
+            :key="'input_' + entry.idInt"
+            v-model="entry.roles"
+            :show-label="false"
+            :label="label + '-roles'"
+            :list="roleOptions"
+            :show-input-border="false"
+            :allow-dynamic-drop-down-entries="false"
+            :placeholder="rolesPlaceholder"
+            :always-linked="true"
+            :language="language"
+            :draggable="true"
+            :drop-down-no-options-info="dropDownNoOptionsInfo"
+            identifier="source"
+            object-prop="label"
+            class="base-chips-below-chips-input"
+            @selected="updateRoles($event, index)" />
+        </div>
+      </div>
+    </draggable>
   </div>
 </template>
 
