@@ -1,14 +1,22 @@
 <template>
-  <div class="base-advanced-search">
-    <div class="base-advanced-search__search-field">
+  <div
+    v-click-outside="() => showDropDown = false"
+    class="base-advanced-search">
+
+    <!-- SEARCH FIELD -->
+    <div
+      class="base-advanced-search-row__search-field"
+      @click="activateDropDown">
+
+      <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <div
         :class="[
-          'base-advanced-search__first-column',
-          'base-advanced-search__first-column-filter',
-          { 'hide': !filter.label }
+          'base-advanced-search-row__first-column',
+          'base-advanced-search-row__first-column-filter',
+          { 'hide': isMainSearch && filter.label === 'Fulltext' }
         ]">
         <BaseChipsInputField
-          id="filter-select"
+          :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-unknown-entries="false"
           :allow-multiple-entries="false"
@@ -21,28 +29,39 @@
           drop-down-list-id="filter-options"
           identifier-property-name="label"
           value-property-name="label"
-          class="base-advanced-search__filter-input"
+          class="base-advanced-search-row__filter-input"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters" />
       </div>
+
+      <!-- SECOND COLUMN OF SEARCH FIELD (BASE SEARCH) -->
       <BaseSearch
         v-model="currentInput"
-        :show-image="true"
+        :field-id="'search-input-' + internalRowId"
+        :show-image="isMainSearch"
         :use-label="false"
         :style-props="{ height: 'inherit'}"
         :type="filter.type === 'text' ? 'chips' : filter.type"
         :selected-chips.sync="selectedOptions"
-        class="base-advanced-search__base-search"
+        class="base-advanced-search-row__base-search"
         drop-down-list-id="autocomplete-options"
         @keydown.up.down.right.left="navigateDropDown"
         @keydown.enter="selectOption" />
       <img
+        v-if="isMainSearch"
         src="../../static/icons/plus.svg"
-        class="base-advanced-search__plus-icon">
+        class="base-advanced-search-row__plus-icon"
+        @click.stop="addFilter">
+      <img
+        v-else
+        src="../../static/icons/remove.svg"
+        class="base-advanced-search-row__plus-icon"
+        @click.stop="removeFilter">
     </div>
 
     <!-- DROP DOWN BODY -->
     <BaseDropDownList
+      v-if="showDropDown"
       :drop-down-options="resultListInt"
       :active-styled="false"
       :active-option="{ collection: activeCollection }"
@@ -50,34 +69,35 @@
       identifier-property-name="collection"
       value-property-name="data"
       list-id="autocomplete-options"
-      class="base-advanced-search__drop-down-body">
+      class="base-advanced-search-row__drop-down-body">
       <template v-slot:before-list>
-        <div class="base-advanced-search__above-list-area">
+        <div class="base-advanced-search-row__above-list-area">
           <!-- FILTER SELECT LIST -->
-          <div class="base-advanced-search__filter-area">
+          <div class="base-advanced-search-row__filter-area">
             <div
-              class="base-advanced-search__first-column">
-              <div class="base-advanced-search__filter-text">
+              class="base-advanced-search-row__first-column">
+              <div class="base-advanced-search-row__filter-text">
                 Advanced Search
               </div>
-              <div class="base-advanced-search__filter-subtext">
+              <div class="base-advanced-search-row__filter-subtext">
                 Select a filter
               </div>
             </div>
             <ul
               id="filter-options"
               role="listbox"
-              class="base-advanced-search__filter-list base-advanced-search__columns">
+              class="base-advanced-search-row__filter-list base-advanced-search-row__columns">
               <li
                 v-for="(singleFilter, index) in displayedFilters"
                 :id="`filter-option-${singleFilter.label}`"
                 :key="index"
                 :aria-selected="filter && filter.label === singleFilter.label"
                 tabindex="-1"
-                class="base-advanced-search__filter base-advanced-search__column-item"
-                :class="[{ 'base-advanced-search__filter-active': activeFilter === singleFilter },
-                         { 'base-advanced-search__filter-selected':
-                           filter && filter.label === singleFilter.label }]"
+                class="base-advanced-search-row__filter base-advanced-search-row__column-item"
+                :class="[
+                  { 'base-advanced-search-row__filter-active': activeFilter === singleFilter },
+                  { 'base-advanced-search-row__filter-selected':
+                    filter && filter.label === singleFilter.label }]"
                 role="option"
                 @click="selectFilter(singleFilter)">
                 {{ singleFilter.label }}
@@ -92,12 +112,12 @@
         v-slot:option="slotProps">
         <div
           v-if="!filter || filter.type === 'text'"
-          class="base-advanced-search__autocomplete-collection">
+          class="base-advanced-search-row__autocomplete-body">
           <div
             v-if="slotProps.option.data.length"
-            :class="['base-advanced-search__first-column',
-                     'base-advanced-search__autocomplete-collection',
-                     { 'base-advanced-search__result-column-active':
+            :class="['base-advanced-search-row__first-column',
+                     'base-advanced-search-row__autocomplete-collection',
+                     { 'base-advanced-search-row__result-column-active':
                        slotProps.option.collection === activeCollection }]">
             {{ slotProps.option.collection }}
           </div>
@@ -108,6 +128,7 @@
             list-id="autocomplete-options"
             identifier-property-name="id"
             value-property-name="header"
+            class="base-advanced-search-row__autocomplete-options"
             @update:active-option="setCollection(slotProps.option.collection)"
             @update:selected-option="selectOption" />
         </div>
@@ -117,24 +138,27 @@
       <template
         v-if="filter.type === 'chips'"
         v-slot:after-list>
-        <div class="base-advanced-search__above-list-area">
-          <div class="base-advanced-search__chips-row">
-            <div class="base-advanced-search__first-column">
+        <div class="base-advanced-search-row__above-list-area">
+          <div class="base-advanced-search-row__chips-row">
+            <div class="base-advanced-search-row__first-column">
               Available options
             </div>
             <ul
               v-if="filter && filter.options"
-              class="base-advanced-search__columns">
+              class="base-advanced-search-row__columns">
               <li
                 v-for="chip in displayedOptions"
-                :key="chip"
-                class="base-advanced-search__column-item">
+                :key="chip.id"
+                class="base-advanced-search-row__column-item"
+                @mouseenter="activeControlledVocabularyEntry = chip"
+                @mouseleave="activeControlledVocabularyEntry = null">
                 <BaseChip
                   :is-removable="false"
-                  :entry="chip"
-                  :chip-active="chip === activeControlledVocabularyEntry"
-                  class="base-advanced-search__option-chip"
-                  @clicked="selectControlledVocabularyOption(chip)" />
+                  :entry="getLabel(chip.label)"
+                  :chip-active="activeControlledVocabularyEntry
+                    && chip.id === activeControlledVocabularyEntry.id"
+                  class="base-advanced-search-row__option-chip"
+                  @clicked="selectOption" />
               </li>
             </ul>
           </div>
@@ -144,8 +168,8 @@
         v-slot:no-options>
         <div
           :class="[
-            'base-advanced-search__no-options',
-            { 'base-advanced-search__no-options-hidden': filter.type !== 'text' }
+            'base-advanced-search-row__no-options',
+            { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
           ]">
           <div v-if="!currentInput">
             Please start typing or select a filter to see options
@@ -158,12 +182,14 @@
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside';
 import BaseSearch from '../BaseSearch/BaseSearch';
 import BaseDropDownList from '../BaseDropDownList/BaseDropDownList';
 import BaseChip from '../BaseChip/BaseChip';
 import navigateMixin from '../../mixins/navigateList';
+import i18n from '../../mixins/i18n';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
-import { createId } from '../../utils/utils';
+import { createId, sort } from '../../utils/utils';
 
 /** Search Row Component for Advanced Search
  *
@@ -177,8 +203,18 @@ export default {
     BaseDropDownList,
     BaseSearch,
   },
-  mixins: [navigateMixin],
+  directives: {
+    ClickOutside,
+  },
+  mixins: [navigateMixin, i18n],
   props: {
+    /**
+     * provide an id for each search row
+     */
+    searchRowId: {
+      type: String,
+      default: '',
+    },
     /**
      * property to distinguish between one of multiple filter rows
      * and the main search field (where new filters are added) that has
@@ -186,7 +222,7 @@ export default {
      */
     isMainSearch: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * list of available filters
@@ -211,6 +247,23 @@ export default {
       type: [Object, null],
       default: null,
     },
+    /**
+     * specify a default value for a filter that is set when none of the
+     * available filters is selected
+     * @property {string} defaultFilter.label - the label of the filter (displayed
+     * if not main search)
+     * @property {('text'|'chips'|'date'|'daterange')} defaultFilter.type - the filter type
+     * @property {Object[]} defaultFilter.options - for filter type 'chips' the controlled
+     * vocabulary options
+     */
+    defaultFilter: {
+      type: Object,
+      default: () => ({
+        label: 'Fulltext',
+        type: 'text',
+        options: [],
+      }),
+    },
   },
   data() {
     return {
@@ -230,12 +283,7 @@ export default {
        * @property {*[]} [filter.values]
        * @property {Object[]} [filter.options]
        */
-      filter: {
-        label: '',
-        type: 'text',
-        values: [],
-        options: [],
-      },
+      filter: { ...this.defaultFilter },
       /**
        * for autocomplete drop down navigation - single autocomplete option level
        * @type {?Object}
@@ -254,7 +302,7 @@ export default {
       collectionSelect: false,
       /**
        * the currently active controlled vocabulary entry
-       * @type {?Object}
+       * @type {?Object|?string}
        */
       activeControlledVocabularyEntry: null,
       /**
@@ -262,6 +310,11 @@ export default {
        * @type {?Object}
        */
       activeFilter: null,
+      /**
+       * steer drop down showing
+       * @type {boolean}
+       */
+      showDropDown: false,
     };
   },
   computed: {
@@ -276,14 +329,14 @@ export default {
         // TODO: eventually this should be filtered by id not by label!
         // remove already selected options
         let options = [].concat(this.filter.options)
-          .filter(filter => !this.filter.values
-            .map(value => value.label).includes(filter));
+          .filter(option => !this.filter.values
+            .map(value => value.id).includes(option.id));
         // only display options matching the current input string
         if (this.currentInput) {
-          options = options.filter(filter => filter
+          options = options.filter(filter => filter.label
             .toLowerCase().includes(this.currentInput.toLowerCase()));
         }
-        return options;
+        return sort(options, 'label', false, this.getLangLabel);
       }
       return [];
     },
@@ -339,16 +392,14 @@ export default {
     selectedFilter: {
       set(val) {
         this.filter = val.length ? val.pop()
-          : {
-            label: '',
-            type: 'text',
-            values: [],
-            options: [],
-          };
+          : { ...this.defaultFilter };
       },
       get() {
         return [this.filter];
       },
+    },
+    internalRowId() {
+      return this.searchRowId || createId();
     },
   },
   watch: {
@@ -374,7 +425,25 @@ export default {
     },
   },
   methods: {
+    activateDropDown() {
+      this.showDropDown = true;
+    },
+
     /** FILTER RELATED METHODS */
+
+    // inform parent of click on plus or remove respectively
+    addFilter() {
+      this.$emit('add-filter', this.filter);
+      // reset everything
+      this.resetAllInput();
+      // reset filter
+      this.filter = { ...this.defaultFilter };
+      // close drop down
+      this.showDropDown = false;
+    },
+    removeFilter() {
+      this.$emit('remove-filter', this.filter);
+    },
 
     /**
      * @param {KeyboardEvent} event - keyboard event bubbled from
@@ -408,19 +477,6 @@ export default {
     /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
 
     /**
-     * set the controlled vocabulary option selected via click
-     * @param {string} val - the provided option
-     * TODO: check if this can be integrated into 'selectOption'!
-     */
-    selectControlledVocabularyOption(val) {
-      // TODO: add complete object not only string
-      // especially probably already existing id!
-      this.filter.values.push({
-        label: val,
-        id: createId(),
-      });
-    },
-    /**
      * function for setting the currently active collection
      *
      * @param {string} collection - the collection string to set
@@ -441,28 +497,33 @@ export default {
       let valueToAdd = null;
       // TODO: complete value needs to be passed!
       if (this.filter.type === 'text') {
-        valueToAdd = this.activeEntry ? this.activeEntry.header : this.currentInput;
+        if (this.activeEntry) {
+          valueToAdd = this.activeEntry;
+        } else if (this.currentInput) {
+          valueToAdd = {
+            label: this.currentInput,
+          };
+        }
       } else if (this.filter.type === 'chips') {
-        valueToAdd = this.activeControlledVocabularyEntry
-          ? this.activeControlledVocabularyEntry : this.currentInput;
+        valueToAdd = this.activeControlledVocabularyEntry;
       }
       if (valueToAdd) {
-        const valueObject = {
-          label: valueToAdd,
-          // TODO: can internally created id's go to parent??
-          // (probably not ...)
-          id: this.activeEntry ? this.activeEntry.id : '',
-        };
         if (this.filter.values) {
-          this.filter.values.push(valueObject);
+          this.filter.values.push(valueToAdd);
         } else {
-          this.$set(this.filter, 'values', [valueObject]);
+          this.$set(this.filter, 'values', [valueToAdd]);
         }
+      } else if (this.isMainSearch && !this.currentInput && this.filter.values.length) {
+        this.addFilter();
       }
       // reset everything
+      this.resetAllInput();
+    },
+    resetAllInput() {
       this.currentInput = '';
       this.activeEntry = null;
       this.activeCollection = '';
+      this.activeControlledVocabularyEntry = null;
     },
 
     /** DROP DOWN NAVIGATION */
@@ -594,6 +655,10 @@ export default {
       }
       return tempValues;
     },
+
+    getLabel(label) {
+      return this.getLangLabel(label, true);
+    },
   },
 };
 </script>
@@ -604,8 +669,9 @@ export default {
   .base-advanced-search {
     width: 100%;
     background: white;
+    position: relative;
 
-    .base-advanced-search__search-field {
+    .base-advanced-search-row__search-field {
       display: flex;
       align-items: center;
       width: 100%;
@@ -613,52 +679,57 @@ export default {
       min-height: $row-height-large;
       padding: 0 $spacing;
 
-      .base-advanced-search__base-search {
+      .base-advanced-search-row__base-search {
         margin-left: -$spacing;
       }
     }
 
-    .base-advanced-search__first-column {
+    .base-advanced-search-row__first-column {
       margin-right: $spacing;
       flex: 0 0 25%;
       min-width: 25%;
 
-      &.base-advanced-search__first-column-filter {
+      &.base-advanced-search-row__first-column-filter {
         display: flex;
         align-items: center;
 
-        .base-advanced-search__filter-input {
+        .base-advanced-search-row__filter-input {
           color: $app-color;
           margin-left: -$spacing-small;
         }
       }
     }
 
-    .base-advanced-search__drop-down-body {
+    .base-advanced-search-row__drop-down-body {
       border-top: $separation-line;
       width: 100%;
       padding: $spacing $spacing $spacing-small;
+      position: absolute;
+      box-shadow: $drop-shadow;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: map-get($zindex, dropdown);
 
-      .base-advanced-search__above-list-area {
+      .base-advanced-search-row__above-list-area {
 
-        .base-advanced-search__filter-area {
+        .base-advanced-search-row__filter-area {
 
-          .base-advanced-search__filter-text {
+          .base-advanced-search-row__filter-text {
             color: $font-color-second;
           }
-          .base-advanced-search__filter-subtext {
+          .base-advanced-search-row__filter-subtext {
             color: $font-color-second;
             font-size: $font-size-small;
           }
         }
 
-        .base-advanced-search__chips-row, .base-advanced-search__filter-area {
+        .base-advanced-search-row__chips-row, .base-advanced-search-row__filter-area {
           display: flex;
         }
 
-        .base-advanced-search__chips-row {
+        .base-advanced-search-row__chips-row {
 
-          .base-advanced-search__option-chip {
+          .base-advanced-search-row__option-chip {
             cursor: pointer;
 
             &:hover::after {
@@ -674,50 +745,54 @@ export default {
           }
         }
 
-        .base-advanced-search__filter-list {
-          .base-advanced-search__filter {
+        .base-advanced-search-row__filter-list {
+          .base-advanced-search-row__filter {
             cursor: pointer;
             color: $app-color;
-            padding-bottom: $spacing-small;
+            padding: $spacing-small/2 $spacing;
 
 
             &:focus {
               outline: none;
             }
 
-            &.base-advanced-search__filter-active, &:hover {
-              text-decoration: underline;
+            &.base-advanced-search-row__filter-active, &:hover {
+              box-shadow: 0 0 0 1px $app-color;
             }
 
-            &.base-advanced-search__filter-selected {
+            &.base-advanced-search-row__filter-selected {
 
             }
           }
         }
       }
 
-      .base-advanced-search__autocomplete-collection {
+      .base-advanced-search-row__autocomplete-body {
         display: flex;
         flex-direction: row;
         width: 100%;
 
-        .base-advanced-search__autocomplete-collection {
+        .base-advanced-search-row__autocomplete-collection {
           color: $app-color;
         }
 
-        .base-advanced-search__result-column-active {
-          text-decoration: underline;
+        .base-advanced-search-row__result-column-active {
+          box-shadow: inset 0 0 0 1px $app-color;
+        }
+
+        .base-advanced-search-row__autocomplete-options {
+          width: 100%;
         }
       }
 
-      .base-advanced-search__no-options {
+      .base-advanced-search-row__no-options {
         min-height: $row-height-small;
         line-height: $line-height;
         width: 100%;
         display: flex;
         align-items: center;
 
-        &.base-advanced-search__no-options-hidden {
+        &.base-advanced-search-row__no-options-hidden {
           display: none;
         }
       }
@@ -725,20 +800,20 @@ export default {
 
     }
 
-    .base-advanced-search__plus-icon {
+    .base-advanced-search-row__plus-icon {
       margin-left: $spacing;
       height: $icon-medium;
       width: $icon-medium;
       cursor: pointer;
     }
 
-    .base-advanced-search__columns, .base-advanced-search__filter-list {
+    .base-advanced-search-row__columns, .base-advanced-search-row__filter-list {
       column-count: 4;
       column-gap: $spacing;
       display: block;
       width: 100%;
 
-      .base-advanced-search__column-item {
+      .base-advanced-search-row__column-item {
         // for chrome columns not aligned properly and
         // last item bleeding into next column
         -webkit-column-break-inside: avoid;
@@ -750,7 +825,7 @@ export default {
 
   @media screen and (max-width: $tablet) {
     .base-advanced-search {
-      .base-advanced-search__columns {
+      .base-advanced-search-row__columns {
         column-count: 3;
       }
     }
@@ -758,7 +833,7 @@ export default {
 
   @media screen and (max-width: $mobile) {
     .base-advanced-search {
-      .base-advanced-search__columns {
+      .base-advanced-search-row__columns {
         column-count: 2;
       }
     }

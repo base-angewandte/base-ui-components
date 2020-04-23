@@ -4,7 +4,6 @@
     v-click-outside="() => withinDropDown = false"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
-    class="base-drop-down-list__container"
     @mouseenter="withinDropDown = true"
     @mouseleave="withinDropDown = false">
     <!-- @slot for adding elements before the options list -->

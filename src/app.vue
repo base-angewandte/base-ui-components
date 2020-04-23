@@ -1,40 +1,5 @@
 <template>
   <div id="app">
-    <!-- CHIPS INPUT -->
-    <BaseChipsInput
-      id="fieldKey"
-      key="fieldKey"
-      v-model="fieldValueInt"
-      :list="fetchDropDownList"
-      :allow-dynamic-drop-down-entries="false"
-      :allow-multiple-entries="true"
-      :allow-unknown-entries="true"
-      :draggable="false"
-      :sortable="false"
-      :is-loading="isLoading"
-      :sort-name="false"
-      :add-new-chip-text="'Add'"
-      identifier-property="source"
-      value-property="label"
-      placeholder="a test"
-      label="a test"
-      sort-text="Sort this thing"
-      @fetch-dropdown-entries="fetchAutocompleteChips"
-      @text-input="textInput = $event"
-      @hoverbox-active="$emit('fetch-info-data')">
-      <template
-        v-slot:drop-down-entry="props">
-        <span>
-          {{ props.item.label }}
-        </span>
-        <span class="base-form-field-creator__chips-dropdown-second">
-          {{ props.item.additional }}
-        </span>
-        <span class="base-form-field-creator__chips-dropdown-third">
-          {{ props.item.source_name }}
-        </span>
-      </template>
-    </BaseChipsInput>
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -57,7 +22,7 @@
           },
         },
       }" />
-    <BaseAdvancedSearchRow
+    <BaseAdvancedSearch
       :filter-list="filters"
       :autocomplete-results="resultList"
       @fetch-autocomplete-results="fetchAutocomplete" />
@@ -68,15 +33,13 @@
 import axios from 'axios';
 
 import BaseCarousel from './components/BaseCarousel/BaseCarousel';
-import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
-import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
+import BaseAdvancedSearch from './components/BaseAdvancedSearch/BaseAdvancedSearch';
 
 export default {
   name: 'App',
   components: {
-    BaseChipsInput,
     BaseCarousel,
-    BaseAdvancedSearchRow,
+    BaseAdvancedSearch,
   },
   data() {
     return {

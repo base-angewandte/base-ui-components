@@ -15,7 +15,15 @@ module.exports = {
     {
       label: 'keywords',
       type: 'chips',
-      options: ['AAAAAA', 'BBBBBB'],
+      options: [
+        {
+          label: 'AAAAAA',
+          id: 'AAAAAA',
+        },
+        {
+          label: 'BBBBBB',
+          id: 'BBBBBB',
+        }],
     },
     {
       label: 'date range',
@@ -28,12 +36,40 @@ module.exports = {
     {
       label: 'type',
       type: 'chips',
-      options: ['Publication', 'Musical', 'Performance', 'Exhibition', 'Architecture'],
+      options: [
+        {
+          label: 'Publication',
+          id: 'Publication',
+        },
+        {
+          label: 'Musical',
+          id: 'Musical',
+        },
+        {
+          label: 'Performance',
+          id: 'Performance',
+        },
+        {
+          label: 'Exhibition',
+          id: 'Exhibition',
+        },
+        {
+          label: 'Architecture',
+          id: 'Architecture',
+        }],
     },
     {
       label: 'collection',
       type: 'chips',
-      options: ['Current Art Works', 'Newest Events'],
+      options: [
+        {
+          label: 'Current Art Works',
+          id: 'Current_Art_Works',
+        },
+        {
+          label: 'Newest Events',
+          id: 'Newest_Events',
+        }],
     },
   ],
 };
