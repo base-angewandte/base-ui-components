@@ -490,14 +490,6 @@ export default {
 <style lang="scss">
   @import "../../styles/variables.scss";
 
-  .base-form-field {
-    .base-chips-below-chips-input {
-      .base-drop-down-list__container {
-        right: $spacing-small;
-      }
-    }
-  }
-
   @media screen and (min-width: $mobile) {
     .base-form-field {
       .base-drop-down-list__container {
@@ -519,12 +511,6 @@ export default {
           .base-drop-down-list__container {
             right: calc(#{$spacing} * 2.5 - 3px);
           }
-        }
-      }
-
-      .base-chips-below-chips-input {
-        .base-chips-drop-down {
-          right: calc(#{$spacing} + #{$spacing-small} / 2);
         }
       }
     }

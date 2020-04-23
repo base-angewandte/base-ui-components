@@ -30,6 +30,7 @@
         </div>
       </template>
       <template
+        v-if="displayChipsInline"
         v-slot:input-field-addition-before>
         <div class="base-chips-input-field__chips">
           <draggable
@@ -303,6 +304,14 @@ export default {
     isStringArray: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * property for special case 'chips-below' - if false in this case chips will
+     * not be displayed in the input field
+     */
+    displayChipsInline: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {

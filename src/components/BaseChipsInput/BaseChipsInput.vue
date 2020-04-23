@@ -291,6 +291,14 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * property for special case 'chips-below' - if false in this case chips will
+     * not be displayed in the input field
+     */
+    displayChipsInline: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
