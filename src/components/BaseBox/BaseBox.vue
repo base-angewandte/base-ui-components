@@ -57,7 +57,7 @@ export default {
   computed: {
     // TODO: do i need this?? why not use prop directly again??
     boxSizeInt() {
-      return Object.assign({}, this.$props.boxSize);
+      return { ...this.boxSize };
     },
   },
   methods: {

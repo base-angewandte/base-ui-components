@@ -145,11 +145,11 @@ export default {
     // add all input event listeners to component
     // https://vuejs.org/v2/guide/components-custom-events.html
     inputListeners() {
-      return Object.assign({},
+      return {
         // add all the listeners from the parent
-        this.$listeners,
+        ...this.$listeners,
         // and add custom listeners
-        {
+        ...{
           // for number fields: prevent the event if type is number (or e) but input is not
           keydown: (event) => {
             if (this.fieldType === 'number' && Number.isNaN(Number(event.key)) && event.key !== 'e'
@@ -169,7 +169,8 @@ export default {
              */
             this.$emit('input', event.target.value);
           },
-        });
+        },
+      };
     },
   },
   watch: {

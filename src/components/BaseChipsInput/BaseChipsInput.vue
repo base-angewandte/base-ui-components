@@ -410,16 +410,16 @@ export default {
                 id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
                   ? entry[this.identifier] : entry[this.objectProp] + index;
               }
-              return Object.assign({}, entry, {
+              return { ...{
                 idInt: id,
                 [this.objectProp]: entry[this.objectProp],
-              });
+              } };
             }
             // TODO: this could still cause issues with duplicate keys!!
-            return Object.assign({}, {
+            return { ...{
               idInt: entry + index,
               [this.objectProp]: entry,
-            });
+            } };
           });
         }
         // filter already selected entries from the drop down
@@ -714,18 +714,18 @@ export default {
         this.selectedListInt = val.map((entry, index) => {
           if (typeof entry === 'object') {
             this.returnAsObject = true;
-            return Object.assign({}, entry, {
+            return { ...{
               idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
                 ? entry[this.identifier]
                 : entry.idInt
                 || this.getInternalId(entry[this.objectProp] + this.list.length + index),
               [this.objectProp]: entry[this.objectProp],
-            });
+            } };
           }
-          return Object.assign({}, {
+          return { ...{
             idInt: this.getInternalId(entry + this.list.length + index),
             [this.objectProp]: entry,
-          });
+          } };
         });
       } else {
         this.selectedListInt = [];
@@ -751,7 +751,7 @@ export default {
       } else {
         const sendArr = [];
         this.selectedListInt
-          .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
+          .forEach((sel, index) => this.$set(sendArr, index, { ...sel }));
         sendArr.forEach(sel => this.$delete(sel, 'idInt'));
         /**
          * event emitting selected list upon changes
