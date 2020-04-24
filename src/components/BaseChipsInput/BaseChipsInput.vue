@@ -410,10 +410,13 @@ export default {
                 id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
                   ? entry[this.identifier] : entry[this.objectProp] + index;
               }
-              return { ...{
-                idInt: id,
-                [this.objectProp]: entry[this.objectProp],
-              } };
+              return {
+                ...entry,
+                ...{
+                  idInt: id,
+                  [this.objectProp]: entry[this.objectProp],
+                },
+              };
             }
             // TODO: this could still cause issues with duplicate keys!!
             return { ...{
@@ -714,13 +717,16 @@ export default {
         this.selectedListInt = val.map((entry, index) => {
           if (typeof entry === 'object') {
             this.returnAsObject = true;
-            return { ...{
-              idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier]
-                : entry.idInt
-                || this.getInternalId(entry[this.objectProp] + this.list.length + index),
-              [this.objectProp]: entry[this.objectProp],
-            } };
+            return {
+              ...entry,
+              ...{
+                idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+                  ? entry[this.identifier]
+                  : entry.idInt
+                  || this.getInternalId(entry[this.objectProp] + this.list.length + index),
+                [this.objectProp]: entry[this.objectProp],
+              },
+            };
           }
           return { ...{
             idInt: this.getInternalId(entry + this.list.length + index),
