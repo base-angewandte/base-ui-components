@@ -51,7 +51,7 @@
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
             @open="setActiveState('time', 'From', true)"
-            @change="closeTimePicker('to', ...arguments, $event)">
+            @change="closeTimePicker('from', ...arguments, $event)">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
@@ -430,7 +430,7 @@ export default {
      * a function to have the time picker close automatically as soon as minutes
      * are selected
      * @param {string} origin - is it from the 'from' or 'to' part of the picker
-     * @param {string} time - the selected time (not needed here but passed by event)
+     * @param {any} time - the selected time (not needed here but passed by event)
      * @param {string} type - was 'hour' or 'minute' selected
      */
     closeTimePicker(origin, time, type) {
