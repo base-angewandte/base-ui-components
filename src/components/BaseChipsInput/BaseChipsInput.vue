@@ -24,7 +24,7 @@
         v-slot:label-addition>
         <div
           class="base-chips-input-sort"
-          @click="sort(selectedListInt)">
+          @click="sortSelectedList">
           {{ sortText }}
         </div>
       </template>
@@ -48,7 +48,7 @@
                 v-for="(entry, index) in selectedListInt"
                 :id="entry[identifier] || entry.idInt"
                 ref="baseChip"
-                :key="'chip-' + entry.idInt"
+                :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                 :entry="getLangLabel(entry[objectProp], true)"
                 :hover-box-content="hoverboxContent"
                 :is-linked="alwaysLinked || entry[identifier] === 0 || !!entry[identifier]"
@@ -410,16 +410,19 @@ export default {
                 id = this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
                   ? entry[this.identifier] : entry[this.objectProp] + index;
               }
-              return Object.assign({}, entry, {
-                idInt: id,
-                [this.objectProp]: entry[this.objectProp],
-              });
+              return {
+                ...entry,
+                ...{
+                  idInt: id,
+                  [this.objectProp]: entry[this.objectProp],
+                },
+              };
             }
             // TODO: this could still cause issues with duplicate keys!!
-            return Object.assign({}, {
+            return { ...{
               idInt: entry + index,
               [this.objectProp]: entry,
-            });
+            } };
           });
         }
         // filter already selected entries from the drop down
@@ -572,11 +575,7 @@ export default {
             this.selectedListInt.push(selected);
           }
         } else {
-          // check if an entry is present - if yes - remove it first
-          if (this.selectedListInt.length) {
-            this.removeEntry(this.selectedListInt[0], 0);
-          }
-          this.selectedListInt = [].concat(selected);
+          this.$set(this.selectedListInt, 0, selected);
         }
         if (!this.allowMultipleEntries || !this.chipsInline) {
           this.showDropDown = false;
@@ -679,6 +678,10 @@ export default {
       }
       return 0;
     },
+    sortSelectedList() {
+      this.sort(this.selectedListInt);
+      this.emitSelectedList();
+    },
     sort(list) {
       list.sort((a, b) => {
         let compA = this.getLangLabel(a[this.objectProp]).toLowerCase();
@@ -699,7 +702,6 @@ export default {
         }
         return -1;
       });
-      this.emitSelectedList();
     },
     getNameSortValue(compValue) {
       const compValueSansNum = compValue.replace(/,? [0-9-]+/g, '');
@@ -715,18 +717,21 @@ export default {
         this.selectedListInt = val.map((entry, index) => {
           if (typeof entry === 'object') {
             this.returnAsObject = true;
-            return Object.assign({}, entry, {
-              idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-                ? entry[this.identifier]
-                : entry.idInt
-                || this.getInternalId(entry[this.objectProp] + this.list.length + index),
-              [this.objectProp]: entry[this.objectProp],
-            });
+            return {
+              ...entry,
+              ...{
+                idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
+                  ? entry[this.identifier]
+                  : entry.idInt
+                  || this.getInternalId(entry[this.objectProp] + this.list.length + index),
+                [this.objectProp]: entry[this.objectProp],
+              },
+            };
           }
-          return Object.assign({}, {
+          return { ...{
             idInt: this.getInternalId(entry + this.list.length + index),
             [this.objectProp]: entry,
-          });
+          } };
         });
       } else {
         this.selectedListInt = [];
@@ -752,7 +757,7 @@ export default {
       } else {
         const sendArr = [];
         this.selectedListInt
-          .forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
+          .forEach((sel, index) => this.$set(sendArr, index, { ...sel }));
         sendArr.forEach(sel => this.$delete(sel, 'idInt'));
         /**
          * event emitting selected list upon changes

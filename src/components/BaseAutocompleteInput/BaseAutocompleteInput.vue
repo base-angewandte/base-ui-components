@@ -171,8 +171,8 @@ export default {
     // watch for changes in the drop down list and set internal variable accordingly
     list(val) {
       this.listInt = val && val.length && typeof val[0] === 'string'
-        ? val.map(v => Object.assign({}, { [this.objectProp]: v }))
-        : val.map(v => Object.assign({}, v));
+        ? val.map(v => ({ ...{ [this.objectProp]: v } }))
+        : val.map(v => ({ ...v }));
     },
     // watch for changes in the text input from outside and set internal value accordingly
     inputText(val) {
@@ -182,8 +182,8 @@ export default {
   mounted() {
     // set internal text and list variables with values set in parent
     this.listInt = this.list && this.list.length && typeof this.list[0] === 'string'
-      ? this.list.map(v => Object.assign({}, { [this.objectProp]: v }))
-      : this.list.map(v => Object.assign({}, v));
+      ? this.list.map(v => ({ ...{ [this.objectProp]: v } }))
+      : this.list.map(v => ({ ...v }));
     this.inputTextInt = this.inputText;
   },
   methods: {

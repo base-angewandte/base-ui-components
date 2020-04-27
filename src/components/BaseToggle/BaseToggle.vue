@@ -9,7 +9,7 @@
       :value="true"
       :checked="checked"
       :type="type === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-toggle-input']">
+      class="base-toggle-input">
 
     <div
       :class="['base-switch-container']">
@@ -135,6 +135,10 @@ export default {
       position: absolute;
       opacity: 0;
       z-index: map-get($zindex, boxcontent);
+
+      &:focus ~ .base-switch-container {
+        border: 1px solid $app-color;
+      }
     }
 
     .base-switch-container {
@@ -149,6 +153,7 @@ export default {
       border-radius: 9px;
       border: 1px solid $switch-container-color;
       cursor: pointer;
+      transition: border-color 250ms ease-in-out;
 
       .base-switch {
         position: absolute;
@@ -159,6 +164,7 @@ export default {
         height: 16px;
         border-radius: 50%;
         background-color: $switch-color;
+        cursor: pointer;
         transition: all 250ms ease-in-out;
 
         svg {

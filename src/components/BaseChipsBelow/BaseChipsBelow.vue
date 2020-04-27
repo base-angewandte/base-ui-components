@@ -272,7 +272,7 @@ export default {
     // need to filter language from $props for chips input component since only needed for roles!
     // leads to unwanted behaviour else (creating multilang object)
     chipsInputProps() {
-      const newProps = Object.assign({}, this.$props);
+      const newProps = { ...this.$props };
       delete newProps.language;
       // also remove role related props since unknown to chips input component
       delete newProps.roleOptions;
@@ -292,9 +292,9 @@ export default {
     addedEntry(list) {
       this.emitInternalList(list.map((entry) => {
         if (typeof entry === 'object') {
-          return Object.assign({}, entry, { roles: entry.roles || [] });
+          return { ...entry, ...{ roles: entry.roles || [] } };
         }
-        return Object.assign({}, { [this.objectProp]: entry, roles: entry.roles || [] });
+        return { ...{ [this.objectProp]: entry, roles: entry.roles || [] } };
       }));
     },
     removeEntry(evt, index) {
@@ -318,22 +318,24 @@ export default {
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
-          return Object.assign({}, {
+          return { ...{
             roles: [],
             idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
               ? entry[this.identifier] : entry[this.objectProp] + index,
-          }, entry);
+          },
+          ...entry,
+          };
         }
-        return Object.assign({}, {
+        return { ...{
           [this.objectProp]: entry,
           idInt: this.list.length + index,
           roles: [],
-        });
+        } };
       });
     },
     emitInternalList(val) {
       const sendArr = [];
-      val.forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
+      val.forEach((sel, index) => this.$set(sendArr, index, { ...sel }));
       sendArr.forEach(sel => this.$delete(sel, 'idInt'));
       /**
        * propagate list change from dragging event to parent
@@ -348,7 +350,7 @@ export default {
       if (!event) {
         this.selectedBelowListInt.splice(index, 1);
       } else {
-        const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
+        const modifiedEntry = { ...this.selectedBelowListInt[index] };
         if (this.identifier) {
           this.$set(modifiedEntry, this.identifier, '');
         }
