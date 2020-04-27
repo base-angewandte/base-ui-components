@@ -1,25 +1,25 @@
 <template>
-  <div class="base-attachments-section">
+  <div class="base-result-box-section">
     <!-- LOADER -->
     <div
-      v-if="attachedList.length && isLoading"
-      class="base-attachments-section__loading">
-      <BaseLoader class="base-attachments-section__loader" />
+      v-if="entryList.length && isLoading"
+      class="base-result-box-section__loading">
+      <BaseLoader class="base-result-box-section__loader" />
     </div>
 
-    <!-- ATTACHMENTS AREA -->
+    <!-- RESULT BOX SECTION AREA -->
     <div
-      v-if="attachedList.length"
-      class="base-attachments-section__area">
+      v-if="entryList.length"
+      class="base-result-box-section__area">
       <!-- HEADER ROW -->
-      <div class="base-attachments-section__header-row">
+      <div class="base-result-box-section__header-row">
         <BaseOptions
           :show-options="showActions"
           @options-toggle="optionsToggle">
           <template slot="beforeOptions">
             <h3
               v-if="headerText"
-              class="base-attachments-section__header">
+              class="base-result-box-section__header">
               {{ headerText }}
             </h3>
           </template>
@@ -28,7 +28,7 @@
             slot="options">
             <div
               v-if="!selectActive"
-              class="base-attachments-section__attachment-options">
+              class="base-result-box-section__result-options">
               <slot
                 :set-action="setAction"
                 name="option-buttons">
@@ -42,7 +42,7 @@
             </div>
             <div
               v-else
-              class="base-attachments-section__attachment-options">
+              class="base-result-box-section__result-options">
               <BaseButton
                 :text="cancelText"
                 icon-size="large"
@@ -67,11 +67,11 @@
         <div
           v-if="selectActive"
           :key="headerText + '_messageArea'"
-          class="base-attachments-section__message-area">
-          <div class="base-attachments-section__message-area-text">
+          class="base-result-box-section__message-area">
+          <div class="base-result-box-section__message-area-text">
             {{ messageText }}
           </div>
-          <div class="base-attachments-section__message-area-subtext">
+          <div class="base-result-box-section__message-area-subtext">
             {{ messageSubtext }}
           </div>
           <slot name="options-message-area-after" />
@@ -80,25 +80,27 @@
         <BaseSelectOptions
           v-if="selectActive"
           :key="headerText + '_selectOptions'"
-          :selected-number-text="$t(
+          :selected-number-text="getI18nString(
             'entriesSelected',
-            { type: $tc(`notify.${entryType}`, selectedList.length) }
+            selectedList.length,
+            { type: getI18nString(`notify.${entryType}`) }
           )"
-          :select-text="$t('selectAll')"
-          :deselect-text="$t('selectNone')"
-          :list="attachedList"
+          :select-text="getI18nString('selectAll')"
+          :deselect-text="getI18nString('selectNone')"
+          :list="entryList"
           :selected-list="selectedList"
           @selected="$emit('selected', $event)" />
         <!-- BOXAREA -->
         <div
           :key="headerText + '_boxArea'"
-          class="base-attachments-section__box-area">
-          <template v-for="(attached, index) of visibleBoxes">
+          ref="resultBoxesArea"
+          class="base-result-box-section__box-area">
+          <template
+            v-for="(attached, index) of visibleBoxes">
             <slot
               :item="attached"
               :index="index"
               :select-active="selectActive"
-              refs="boxSlot"
               name="attached-box">
               <BaseImageBox
                 :key="attached.id"
@@ -139,6 +141,7 @@ import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 import BaseSelectOptions from '../BaseSelectOptions/BaseSelectOptions';
+import i18n from '../../mixins/i18n';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -153,6 +156,7 @@ export default {
     BaseBoxButton,
     BaseSelectOptions,
   },
+  mixins: [i18n],
   props: {
     /**
      * title of section
@@ -164,11 +168,9 @@ export default {
     /**
      * actual entries list
      */
-    attachedList: {
+    entryList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * if slot (options-message-area) is not used this variable
@@ -272,9 +274,9 @@ export default {
       default: null,
     },
     /**
-     * specifiy if filling the attachedList will be fetched from outside on page
+     * specifiy if filling the entryList will be fetched from outside on page
      * change or list is complete and can be done by slicing relevant items from
-     * attachedList
+     * entryList
      */
     fetchItemsExternally: {
       type: Boolean,
@@ -291,6 +293,8 @@ export default {
       itemsPerRow: 4,
       // current page number
       currentPageNumber: 1,
+      // a timeout for resize listener
+      resizeTimeout: null,
     };
   },
   computed: {
@@ -308,15 +312,15 @@ export default {
       return this.itemsPerRow * this.maxRows;
     },
     pages() {
-      return Math.ceil(this.attachedList.length / this.visibleNumberOfItems);
+      return Math.ceil(this.entryList.length / this.visibleNumberOfItems);
     },
     visibleBoxes() {
       if (this.maxRows && !this.fetchItemsExternally) {
-        return this.attachedList
+        return this.entryList
           .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
             this.currentPageNumber * this.visibleNumberOfItems);
       }
-      return this.attachedList;
+      return this.entryList;
     },
   },
   watch: {
@@ -337,9 +341,27 @@ export default {
       }
     },
     currentPageNumber() {
-      // if attachedList changes scroll back to top
+      // if entryList changes scroll back to top
       window.scrollTo(0, this.$el.offsetTop);
     },
+  },
+  mounted() {
+    // need to get the correct number of boxes per row to calculate the visible
+    // number of items correctly
+    window.addEventListener('resize', () => {
+      // check if there is a timeout already set and clear it if yes
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = null;
+      }
+      if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
+        this.resizeTimeout = setTimeout(() => {
+          const totalWidth = this.$refs.resultBoxesArea.clientWidth;
+          const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
+          this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+        }, 500);
+      }
+    });
   },
   methods: {
     setAction(act) {
@@ -386,6 +408,9 @@ export default {
        */
       this.$emit('fetch-items', number);
     },
+    getI18nString(string, count, variables) {
+      return this.getI18nTerm(string, count, variables);
+    },
   },
 };
 </script>
@@ -393,24 +418,24 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-attachments-section {
+  .base-result-box-section {
     position: relative;
 
-    .base-attachments-section__loading {
+    .base-result-box-section__loading {
       position: absolute;
       height: 100%;
       width: 100%;
       z-index: map-get($zindex, loader);
       background-color: rgba(255,255,255, 0.50);
 
-      .base-attachments-section__loader {
+      .base-result-box-section__loader {
         top: 50%;
       }
     }
 
-    .base-attachments-section__area {
+    .base-result-box-section__area {
 
-      .base-attachments-section__header {
+      .base-result-box-section__header {
         font-size: $font-size-regular;
         color: $font-color-second;
         font-weight: normal;
@@ -418,26 +443,26 @@ export default {
 
       }
 
-      .base-attachments-section__header-row {
+      .base-result-box-section__header-row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
 
-        .base-attachments-section__attachment-options {
+        .base-result-box-section__result-options {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
         }
       }
 
-      .base-attachments-section__box-area {
+      .base-result-box-section__box-area {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
       }
 
-      .base-attachments-section__message-area {
+      .base-result-box-section__message-area {
         margin-bottom: $spacing-large;
         text-align: center;
         color: $font-color-second;
@@ -445,11 +470,11 @@ export default {
         z-index: map-get($zindex, boxcontent);
         position: relative;
 
-        .base-attachments-section__message-area-text {
+        .base-result-box-section__message-area-text {
           font-size: $font-size-large;
         }
 
-        .base-attachments-section__message-area-subtext {
+        .base-result-box-section__message-area-subtext {
           font-size: $font-size-small;
         }
       }
