@@ -37,6 +37,7 @@
           :options="textTypeOptions"
           :label="getI18nTerm('form.texttype')"
           :language="language"
+          :id="fieldKey"
           value-prop="source"
           class="base-form-field-creator__multiline-dropdown"
           @value-selected="setMultilineDropDown" />

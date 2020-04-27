@@ -182,7 +182,7 @@ export default {
         // filter out hidden properties and $ref property from JSON
         .filter(key => !this.formFieldJson[key].$ref
           && !(this.formFieldJson[key]['x-attrs'] && this.formFieldJson[key]['x-attrs'].hidden))
-        .map(key => Object.assign({}, { name: key }, this.formFieldJson[key]))
+        .map(key => ({ ...{ name: key }, ...this.formFieldJson[key] }))
         // sort the fields according to their x-attribute (order)
         .sort((a, b) => {
           if (a['x-attrs'] && b['x-attrs']) {
@@ -361,7 +361,7 @@ export default {
         Object.keys(field.properties).forEach((key) => {
           this.$set(initObj, key, this.getInitialFieldValue(field.properties[key]));
         });
-        return Object.assign({}, initObj, value);
+        return ({ ...initObj, ...value });
       }
       // if it is not a array or object simply return value from list or empty string
       return (typeof value === 'string' ? value : '');

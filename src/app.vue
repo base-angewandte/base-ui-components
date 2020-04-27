@@ -11,7 +11,7 @@
       Your browser does not support the video tag.
     </video> -->
     <div>
-      <BaseFormNew
+      <BaseForm
         :value-list="formValueList"
         :fields-with-tabs="['texts']"
         :form-id="'xjlaödsjfadlskj'"
@@ -32,7 +32,7 @@
     <!-- CHIPS BELOW TEST -->
     <div class="form-field">
       <!-- UPLOAD BAR TEST -->
-      <base-upload-bar
+      <BaseUploadBar
         :progress="progress"
         :filename="'testfile.jpg'" />
       <base-button
@@ -183,15 +183,17 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
-import BaseFormNew from './components/BaseForm/BaseForm';
+import BaseForm from './components/BaseForm/BaseForm';
 import BaseButton from './components/BaseButton/BaseButton';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseToggle from './components/BaseToggle/BaseToggle';
+import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 
 export default {
   name: 'App',
   components: {
-    BaseFormNew,
+    BaseUploadBar,
+    BaseForm,
     BaseMediaPreview,
     BasePagination,
     BaseImageBox,
