@@ -161,22 +161,50 @@ export default {
   },
   data() {
     return {
-      // variable to be able to focus to the field after multipy
+      /**
+       * variable to be able to focus to the field after multipy
+       * @type {?Object}
+       * @property {number} index - the index of the new field in the array
+       * @property {string} name - the name of the field
+       */
       multiplyParams: null,
-      // remember the field for which autocomplete is fetching
+      /**
+       * remember the field for which autocomplete is fetching
+       * @type {string}
+       */
       fetchingAutocompleteFor: '',
-      // variable saving the current field input string during
-      // autocomplete functionality
+      /**
+       * variable saving the current field input string during
+       * autocomplete functionality
+       * @type {string}
+       */
       currentInputString: '',
-      valueListInt: [],
+      /**
+       * internal representation of valueList (containing values for all input fields)
+       * @type {Object}
+       * @property {?string|?Array|?Object} [the name of the input field]
+       */
+      valueListInt: {},
     };
   },
   computed: {
-    // get a list of all form fields that are taking half of the
-    // width of a form
+    /**
+     * get a list of all form fields that are taking half of the
+     * width of a form
+     * @returns {Object[]}
+     */
     formFieldsHalf() {
       return this.formFieldListInt.filter(field => field['x-attrs'] && field['x-attrs'].field_format === 'half');
     },
+    /**
+     * internal form field list, sorted and with additional name property to save
+     * the name of the input field in a variable, also filtered from fields that
+     * should not be shown
+     *
+     * @returns {Object[]}
+     * @property {string} name - the name of the input field
+     * @property {*} [*] all other properties contained in the swagger
+     */
     formFieldListInt() {
       return Object.keys(this.formFieldJson)
         // filter out hidden properties and $ref property from JSON
@@ -236,7 +264,7 @@ export default {
     }
   },
   methods: {
-    async fetchAutocomplete(params) {
+    fetchAutocomplete(params) {
       this.currentInputString = params.value;
       this.fetchingAutocompleteFor = params.name;
       /**
@@ -244,9 +272,15 @@ export default {
        * (chips-input, autocomplete-input, chips-below-input)
        *
        * @event fetch-autocomplete
-       * @type Object
+       *
+       * @param {Object} params - the spread object with following properties
+       * @property {string} value - the string to autocomplete
+       * @property {string} name - the name of the field
+       * @property {string} source]- the url to request the data from
+       * @property {?string} equivalent - string specified for related fields
+       * e.g. for contributor roles equivalent is 'contributor'
        */
-      await this.$emit('fetch-autocomplete', params);
+      this.$emit('fetch-autocomplete', params);
     },
     // check if field can be multiplied
     allowMultiply(el) {
@@ -277,7 +311,7 @@ export default {
        * field was added or removed
        *
        * @event values-changed
-       * @type Array
+       * @param {Object[]} valueListInt
        */
       this.$emit('values-changed', this.valueListInt);
     },

@@ -118,7 +118,7 @@
           {{ props.item.source_name }}
         </span>
       </template>
-      <template slot="no-options">
+      <template v-slot:no-options>
         <span v-if="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest && !fieldInput">
           {{ getI18nTerm('form.startTyping') }}
         </span>
