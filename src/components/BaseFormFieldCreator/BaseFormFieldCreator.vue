@@ -32,12 +32,12 @@
         v-if="fieldType === 'multiline' && field.items
           && field.items.properties && field.items.properties.type">
         <BaseDropDown
+          :id="fieldKey"
           :selected-option="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
             ? fieldValueInt.type : textTypeDefault"
           :options="textTypeOptions"
           :label="getI18nTerm('form.texttype')"
           :language="language"
-          :id="fieldKey"
           value-prop="source"
           class="base-form-field-creator__multiline-dropdown"
           @value-selected="setMultilineDropDown" />
@@ -154,7 +154,7 @@
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
           @values-changed="$emit('field-value-changed', $event)"
-          @fetch-autocomplete="test" />
+          @fetch-autocomplete="subFormFetchAutocomplete" />
       </div>
     </div>
   </div>
@@ -274,18 +274,33 @@ export default {
   },
   data() {
     return {
-      // internal representation of field value
-      fieldValueInt: JSON.parse(JSON.stringify(this.fieldValue)),
-      // variable for current text input in chips fields
+      /**
+       * internal representation of field value
+       * @type {any}
+       */
+      fieldValueInt: null,
+      /**
+       * variable for current text input in chips fields
+       * @type {string}
+       */
       textInput: '',
-      // internal loading indicator
+      /**
+       * internal loading indicator
+       * @type {boolean}
+       */
       fetchingData: false,
-      // internal active tab for multiline text field
+      /**
+       * internal active tab for multiline text field
+       * @type {string}
+       */
       activeTab: '',
     };
   },
   computed: {
-    // import the relevant component
+    /**
+     * import the relevant component
+     * @returns {(function(): *)|null|}
+     */
     fieldElement() {
       if (this.fieldType === 'text') {
         return () => import('../BaseInput/BaseInput');
@@ -297,12 +312,13 @@ export default {
         return () => import('../BaseChipsInput/BaseChipsInput');
       } if (this.fieldType === 'chips-below') {
         return () => import('../BaseChipsBelow/BaseChipsBelow');
-      } if (this.fieldType === 'group') {
-        return () => import('../BaseForm/BaseForm');
       }
       return null;
     },
-    // check which date field type was provided and set type accordingly
+    /**
+     * check which date field type was provided and set type accordingly
+     * @returns {string}
+     */
     dateType() {
       // check if date is an Object with properties or just string (= single date)
       if (!this.field.properties) {
@@ -323,7 +339,10 @@ export default {
       }
       return 'single';
     },
-    // get field properties from swagger info
+    /**
+     * get field properties from swagger info - necessary for subforms
+     * @returns {Object}
+     */
     groupFormFields() {
       // check if field group is a list (=multiplyable) or not
       if (this.field.type === 'array') {
@@ -412,7 +431,7 @@ export default {
            * Event emitted when field value changed internally
            *
            * @event field-value-changed
-           * @type Object|Array|String|Number
+           * @property {Object | Array | String | Number} val
            */
           this.$emit('field-value-changed', val);
         }
@@ -432,9 +451,6 @@ export default {
     }
   },
   methods: {
-    test(event) {
-      this.$emit('fetch-autocomplete', event);
-    },
     // function for setting internal field value breaking all potential links to
     // value passed from parent
     setFieldValue(val) {
@@ -459,26 +475,48 @@ export default {
         this.fieldValueInt = { ...this.fieldValueInt, ...JSON.parse(JSON.stringify(val)) };
       }
     },
-    // called by chips-input and chips-below input on field text input
-    fetchAutocomplete(event) {
+    /**
+     * called by chips input autocomplete
+     * @param {Object} event - the spread object emitted
+     * @property {string} event.value - the string in the input field
+     */
+    fetchAutocomplete({ value }) {
       this.fetchingData = true;
-      this.textInput = event.value;
+      this.textInput = value;
       /**
        * Event emitted for text input on autocomplete fields (autocomplete-input,
        * chips-input, chips-below-input)
        *
        * @event fetch-autocomplete
-       * @type Object
+       * @param {Object} valObject - the spread object which has the following properties
+       * @property {string} value - the string to autocomplete
+       * @property {string} name - the name of the field
+       * @property {string} source]- the url to request the data from
+       * @property {?string} equivalent - string specified for related fields
+       * e.g. for contributor roles equivalent is 'contributor'
        */
       this.$emit('fetch-autocomplete', {
-        value: event.value,
+        value,
         name: this.field.name,
         source: this.field['x-attrs'].source,
         equivalent: this.field['x-attrs'].equivalent,
       });
     },
-    // function getting label from all possible label structures (lang object (--> get
-    // correct lang) or simple string)
+    /**
+     * called from subform - already contains all the information to pass
+     * to parent (see above for details)
+     * @param {Object} autocompleteInformation
+     */
+    subFormFetchAutocomplete(autocompleteInformation) {
+      this.$emit('fetch-autocomplete', autocompleteInformation);
+    },
+    /**
+     * function getting label from all possible label structures (lang object (--> get
+     // correct lang) or simple string)
+     * @param {string|Object} value - the language string or object - if object it contains
+     * all the languages e.g. { de: '', en: '' }
+     * @returns {string}
+     */
     getLabel(value) {
       return this.getLangLabel(value, this.language, true);
     },
