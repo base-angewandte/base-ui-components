@@ -16,7 +16,7 @@
         <BaseOptions
           :show-options="showActions"
           @options-toggle="optionsToggle">
-          <template slot="beforeOptions">
+          <template v-slot:beforeOptions>
             <h3
               v-if="headerText"
               class="base-result-box-section__header">
@@ -25,10 +25,11 @@
           </template>
           <template
             v-if="showOptions"
-            slot="options">
+            v-slot:options>
             <div
               v-if="!selectActive"
               class="base-result-box-section__result-options">
+              <!-- @slot options-buttons to add custom options buttons -->
               <slot
                 :set-action="setAction"
                 name="option-buttons">
@@ -74,9 +75,9 @@
           <div class="base-result-box-section__message-area-subtext">
             {{ messageSubtext }}
           </div>
+          <!-- @slot options-message-area-after - add a custom element after the message area -->
           <slot name="options-message-area-after" />
         </div>
-        <slot name="below-action-area" />
         <BaseSelectOptions
           v-if="selectActive"
           :key="headerText + '_selectOptions'"
@@ -89,24 +90,32 @@
           :deselect-text="getI18nString('selectNone')"
           :list="entryList"
           :selected-list="selectedList"
-          @selected="$emit('selected', $event)" />
+          @selected="selectAllTriggered" />
         <!-- BOXAREA -->
         <div
           :key="headerText + '_boxArea'"
           ref="resultBoxesArea"
           class="base-result-box-section__box-area">
           <template
-            v-for="(attached, index) of visibleBoxes">
+            v-for="(entry, index) of visibleBoxes">
+            <!-- @slot result-box - for custom result boxes -->
             <slot
-              :item="attached"
+              :item="entry"
               :index="index"
               :select-active="selectActive"
-              name="attached-box">
+              name="result-box">
               <BaseImageBox
-                :key="attached.id"
+                :key="entry.id"
                 :selectable="selectActive"
                 :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
-                :box-ratio="100" />
+                :box-ratio="100"
+                :title="entry.title"
+                :subtext="entry.subtitle"
+                :description="entry.description"
+                :image-url="entry.imageUrl"
+                :box-text="entry.text"
+                class="base-result-box-section__result-box"
+                @select-triggered="entrySelected(entry.id, $event)" />
             </slot>
           </template>
 
@@ -118,7 +127,7 @@
             icon="save-file"
             box-style="small"
             box-type="button"
-            class="linked-base-box"
+            class="base-result-box-section__action-button"
             @clicked="submitAction" />
         </div>
         <component
@@ -166,7 +175,16 @@ export default {
       default: '',
     },
     /**
-     * actual entries list
+     * actual entries list - if slot result-box is not used to use custom elements this
+     * object array should have the following properties to be displayed
+     * in a [BaseImageBox](#baseimagebox):<br>
+     *    * id {string} - a unique identifier
+     *    * title {?string} - the title of the box<br>
+     *    * subtitle {?string} - a subtitle<br>
+     *    * description {?string} - text displayed at the bottom of the box<br>
+     *    * imageUrl {?string} - url to display an image<br>
+     *    * text {?string[]} - an array with strings that will be
+     *    displayed if no image is provided<br>
      */
     entryList: {
       type: Array,
@@ -231,7 +249,8 @@ export default {
       default: false,
     },
     /**
-     * provide a list of selected entries for select options
+     * provide a list of selected entries for select options (can
+     * be entry objects or entry ids)
      */
     selectedList: {
       type: Array,
@@ -371,7 +390,7 @@ export default {
        * are ready to be selected)
        *
        * @event set-action
-       * @type { String }
+       * @param {string} act - the action type
        */
       this.$emit('set-action', act);
     },
@@ -379,8 +398,8 @@ export default {
       /**
        * event triggered when an action is triggered (after selecting boxes)
        *
-       * @event set-action
-       * @type { String }
+       * @event submit-action
+       * @param {string} actionInt - the action type
        */
       this.$emit('submit-action', this.actionInt);
     },
@@ -389,8 +408,7 @@ export default {
       /**
        * event triggered when an action cancelled
        *
-       * @event set-action
-       * @type { String }
+       * @event cancel-action
        */
       this.$emit('cancel-action');
     },
@@ -404,12 +422,28 @@ export default {
        * event triggered on page number change
        *
        * @event fetch-items
-       * @type { Number }
+       * @param {number} number - the new page number
        */
       this.$emit('fetch-items', number);
     },
     getI18nString(string, count, variables) {
       return this.getI18nTerm(string, count, variables);
+    },
+    entrySelected(entryId, selected) {
+      /**
+       * event emitted from default image box when clicked
+       * @event entry-selected
+       * @param {Object} entry
+       */
+      this.$emit('entry-selected', { entryId, selected });
+    },
+    selectAllTriggered(selectAll) {
+      /**
+       * event emitted on 'select all' button click
+       * @event selected
+       * @param {boolean} selectAll - was select all or select none triggered
+       */
+      this.$emit('selected', selectAll);
     },
   },
 };
@@ -460,6 +494,10 @@ export default {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+
+        .base-result-box-section__result-box {
+          margin-right: $spacing;
+        }
       }
 
       .base-result-box-section__message-area {
@@ -506,28 +544,28 @@ export default {
     }
   }
 
-  .linked-base-box:nth-of-type(n + 5) {
+  .base-result-box-section__action-button:nth-of-type(n + 5) {
     margin-top: $spacing;
   }
 
-  .linked-base-box:not(:nth-child(4n)) {
+  .base-result-box-section__action-button:not(:nth-child(4n)) {
     margin-right: $spacing;
   }
 
   @media screen and (max-width: $tablet) {
-    .linked-base-box {
+    .base-result-box-section__action-button {
       flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
     }
 
-    .linked-base-box:nth-of-type(n + 3) {
+    .base-result-box-section__action-button:nth-of-type(n + 3) {
       margin-top: $spacing;
     }
 
-    .linked-base-box:not(:nth-child(4n)) {
+    .base-result-box-section__action-button:not(:nth-child(4n)) {
       margin-right: 0;
     }
 
-    .linked-base-box:not(:nth-child(2n)) {
+    .base-result-box-section__action-button:not(:nth-child(2n)) {
       margin-right: $spacing;
     }
   }

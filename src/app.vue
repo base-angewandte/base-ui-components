@@ -1,15 +1,35 @@
 <template>
   <div id="app">
-    <!-- VIDEO TEST -->
-    <!-- <video
-      width="320"
-      height="240"
-      controls >
-      <source
-        src="/home/shauzmayer/index.m3u8"
-        type="application/x-mpegURL">
-      Your browser does not support the video tag.
-    </video> -->
+    <BaseResultBoxSection
+      :entry-list="entriesList"
+      :action="activeAction"
+      :is-loading="false"
+      :selected-list="selectedBoxes"
+      message-text="delete linked"
+      message-subtext="delete linked"
+      option-button-text="delete linked"
+      action-button-text="delete"
+      cancel-text="cancel"
+      header-text="header"
+      @selected="selectEntries($event)"
+      @cancel-action="activeAction = ''"
+      @set-action="activeAction = $event">
+      <template
+        v-slot:result-box="props">
+        <BaseImageBox
+          :key="props.item.id"
+          :selectable="props.selectActive"
+          :selected="selectedBoxes.map(entry => entry.id || entry).includes(props.item.id)"
+          :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
+          :title="props.item.parent.title"
+          :subtext="props.item.parent.subtitle"
+          :description="props.item.description"
+          :image-url="props.item.parent.image"
+          class="result-box"
+          show-title
+          @select-triggered="entrySelected(props.item.id, $event)" />
+      </template>
+    </BaseResultBoxSection>
     <div>
       <BaseForm
         :value-list="formValueList"
@@ -132,7 +152,7 @@
         :placeholder="'Fetching from SkosMos'"
         :object-prop="'prefLabel'"
         label="text input with dynamic autocomplete"
-        @selected="fetchOther($event, 'this is my type')"/>
+        @selected="fetchOther($event, 'this is my type')" />
       <BaseChipsBelow
         v-model="selectedList"
         :chips-inline="false"
@@ -188,10 +208,12 @@ import BaseButton from './components/BaseButton/BaseButton';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
+import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 
 export default {
   name: 'App',
   components: {
+    BaseResultBoxSection,
     BaseUploadBar,
     BaseForm,
     BaseMediaPreview,
@@ -208,6 +230,58 @@ export default {
   },
   data() {
     return {
+      activeAction: '',
+      entriesList: [
+        {
+          id: 'pCSLggvdsi8b3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          parent: {
+            id: '8MuVSYmDy5wdRAvxpqrKsV',
+            title: 'gdgdfgsdfgsdfg',
+            type: {
+              label: {
+                de: 'Album',
+                en: 'album',
+              },
+              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+            },
+            image: null,
+          },
+        },
+        {
+          id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          parent: {
+            id: '8MuVSYmDy5wdRAddddvxpqrKsV',
+            title: 'gdgdfgsdfgsdfg',
+            type: {
+              label: {
+                de: 'Album',
+                en: 'album',
+              },
+              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+            },
+            image: null,
+          },
+        },
+        {
+          id: 'pCSLggvdsi8b3fffzRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          parent: {
+            id: '8MuVSYmDy5wdhhhhRAvxpqrKsV',
+            title: 'gdgdfgsdfgsdfg',
+            type: {
+              label: {
+                de: 'Album',
+                en: 'album',
+              },
+              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+            },
+            image: null,
+          },
+        },
+      ],
+      selectedBoxes: [],
       formValueList: {
         id: 'JVKyWKTr8pit772AQKMW5V',
         parents: [
@@ -840,8 +914,19 @@ export default {
     },
   },
   methods: {
-    handleMultilineInput(val) {
-      console.log(val);
+    entrySelected(id, selected) {
+      if (selected && !this.selectedBoxes.includes(id)) {
+        this.selectedBoxes.push(id);
+      } else if (!selected) {
+        this.selectedBoxes = this.selectedBoxes.filter(boxId => boxId !== id);
+      }
+    },
+    selectEntries(selectAll) {
+      if (selectAll) {
+        this.selectedBoxes = this.entriesList.map(entry => entry.id);
+      } else {
+        this.selectedBoxes = [];
+      }
     },
     setHoverBox(val, entry) {
       if (val) {
@@ -978,5 +1063,13 @@ export default {
   }
   .spacer {
     height: 300px;
+  }
+
+  .result-box {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  .result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
+    margin-left: 16px;
   }
 </style>
