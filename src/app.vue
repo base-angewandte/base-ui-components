@@ -1,5 +1,28 @@
 <template>
   <div id="app">
+    <!-- BaseDatePanel -->
+    <div style="max-width: 1000px; margin: 50px auto;
+      display: flex; justify-content: space-between;">
+      <BaseDatePanel
+        label="Select a date"
+        type="date"
+        @selected="baseDatePanelSelected($event)" />
+
+      <base-date-panel
+        label="Select a date"
+        type="week"
+        :input="new Date('2020-04-29')"
+        :show-label="false"
+        :is-inline="true"
+        @selected="baseDatePanelSelected($event)" />
+
+      <base-date-panel
+        label="Select a date"
+        type="week"
+        :icon-position="'right'"
+        @selected="baseDatePanelSelected($event)" />
+    </div>
+
     <!-- VIDEO TEST -->
     <!-- <video
       width="320"
@@ -329,6 +352,7 @@ import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
+import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import BaseFormNew from './components/BaseForm/BaseForm';
@@ -341,6 +365,7 @@ export default {
     BasePagination,
     BaseChipsBelow,
     BaseDateInput,
+    BaseDatePanel,
     BaseAutocompleteInput,
     BaseUploadBar,
     BaseImageBox,
@@ -989,6 +1014,9 @@ export default {
     },
   },
   methods: {
+    baseDatePanelSelected(val) {
+      console.log('baseDatePanelSelected', val);
+    },
     handleMultilineInput(val) {
       console.log(val);
     },
