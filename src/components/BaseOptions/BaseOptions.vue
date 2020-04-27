@@ -4,13 +4,14 @@
       <div
         v-if="alignOptions === 'right' || beforeSlotHasData"
         class="base-options-before">
+        <!-- @slot add an element before the options -->
         <slot name="beforeOptions" />
       </div>
 
       <BaseButton
         v-if="useOptionsButton"
         ref="options"
-        :text="$t('options')"
+        :text="buttonLabel"
         :icon="'options-menu'"
         :disabled="optionsHidden"
         :has-background-color="false"
@@ -20,11 +21,13 @@
       <div
         v-else-if="!optionsHidden && !isMobile"
         class="base-options-inline">
+        <!-- @slot add the actual options -->
         <slot name="options" />
       </div>
       <div
         v-if="showAfterOptionsInline && afterSlotHasData"
         class="base-options-after">
+        <!-- @slot add elements after the options element -->
         <slot name="afterOptions" />
       </div>
     </div>
@@ -32,13 +35,14 @@
       <div
         v-if="showOptionsToggle && !optionsHidden"
         class="base-options-below">
+        <!-- @slot add the actual options -->
         <slot name="options" />
       </div>
-      <slot name="animations" />
     </transition>
     <div
       v-if="!showAfterOptionsInline && afterSlotHasData"
       class="base-options-after">
+      <!-- @slot add elements after the options element -->
       <slot name="afterOptions" />
     </div>
   </div>
@@ -46,16 +50,29 @@
 
 <script>
 import BaseButton from '../BaseButton/BaseButton';
+import i18n from '../../mixins/i18n';
 
+/**
+ * element for providing form options with animation
+ */
 export default {
   components: {
     BaseButton,
   },
+  mixins: [i18n],
   props: {
+    /**
+     * define if options button should always be shown (and actual options hidden)
+     * if false options are only hidden on mobile
+     */
     alwaysShowOptionsButton: {
       type: Boolean,
       default: false,
     },
+    /**
+     * define where options should be aligned<br>
+     *   valid values: 'left', 'right'
+     */
     alignOptions: {
       type: String,
       default: 'right',
@@ -63,25 +80,50 @@ export default {
         return ['left', 'right'].includes(val);
       },
     },
+    /**
+     * set showing of options from outside
+     */
     showOptions: {
       type: Boolean,
       default: false,
     },
+    /**
+     * just generally hide options and options button
+     */
     optionsHidden: {
       type: Boolean,
       default: false,
     },
+    /**
+     * define if slot after-options should be shown inline
+     */
     showAfterOptionsInline: {
       type: Boolean,
       default: true,
     },
+    /**
+     * define a button text (either plain text or a string leading to a localization file
+     */
+    buttonText: {
+      type: String,
+      default: 'options',
+    },
   },
   data() {
     return {
+      /**
+       * variable for mobile
+       * @type {boolean}
+       */
       isMobile: false,
     };
   },
   computed: {
+    /**
+     * determine if options button should be shown
+     * (if specified in parent or if is mobile)
+     * @returns {boolean}
+     */
     useOptionsButton() {
       return this.alwaysShowOptionsButton || this.isMobile;
     },
@@ -93,11 +135,19 @@ export default {
     },
     showOptionsToggle: {
       set(val) {
+        /**
+         * emitted when options button is toggled
+         * @event 'options-toggle'
+         * @param {boolean} val
+         */
         this.$emit('options-toggle', val);
       },
       get() {
         return this.showOptions;
       },
+    },
+    buttonLabel() {
+      return this.getI18nTerm(this.buttonText);
     },
   },
   mounted() {
