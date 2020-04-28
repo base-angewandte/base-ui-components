@@ -116,7 +116,8 @@
                 :image-url="entry.imageUrl"
                 :box-text="entry.text"
                 class="base-result-box-section__result-box"
-                @select-triggered="entrySelected(entry.id, $event)" />
+                @select-triggered="entrySelected(entry.id, $event)"
+                @clicked="entrySelected(entry.id)" />
             </slot>
           </template>
 
@@ -430,21 +431,24 @@ export default {
     getI18nString(string, count, variables) {
       return this.getI18nTerm(string, count, variables);
     },
-    entrySelected(entryId, selected) {
+    entrySelected(entryId, selected = undefined) {
       /**
        * event emitted from default image box when clicked
        * @event entry-selected
-       * @param {Object} entry
+       * @param {Object} obj - an object with the following properties:
+       * @property {string} entryId - the id of the clicked entry
+       * @property {?boolean} selected - was it selected or deselected - if undefined then
+       * the select mode was not active but the box was clicked
        */
       this.$emit('entry-selected', { entryId, selected });
     },
     selectAllTriggered(selectAll) {
       /**
        * event emitted on 'select all' button click
-       * @event selected
+       * @event all-selected
        * @param {boolean} selectAll - was select all or select none triggered
        */
-      this.$emit('selected', selectAll);
+      this.$emit('all-selected', selectAll);
     },
   },
 };

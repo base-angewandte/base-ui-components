@@ -15,7 +15,7 @@ An example without using any slots
       action-button-text="This is the action button text"
       cancel-text="this is the cancel text"
       header-text="This is the header text"
-      @selected="selectEntries($event)"
+      @all-selected="selectEntries($event)"
       @cancel-action="activeAction = ''"
       @set-action="activeAction = $event"
       @entry-selected="entrySelected" />

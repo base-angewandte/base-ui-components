@@ -431,7 +431,7 @@ export default {
            * Event emitted when field value changed internally
            *
            * @event field-value-changed
-           * @property {Object | Array | String | Number} val
+           * @property {Object | Array | String | Number} val - the changed field value
            */
           this.$emit('field-value-changed', val);
         }

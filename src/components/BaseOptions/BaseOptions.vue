@@ -137,8 +137,8 @@ export default {
       set(val) {
         /**
          * emitted when options button is toggled
-         * @event 'options-toggle'
-         * @param {boolean} val
+         * @event options-toggle
+         * @param {boolean} val - was show value set true or false
          */
         this.$emit('options-toggle', val);
       },

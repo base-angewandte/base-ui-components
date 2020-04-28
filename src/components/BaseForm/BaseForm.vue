@@ -276,7 +276,7 @@ export default {
        * @param {Object} params - the spread object with following properties
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
-       * @property {string} source]- the url to request the data from
+       * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields
        * e.g. for contributor roles equivalent is 'contributor'
        */

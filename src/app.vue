@@ -12,7 +12,7 @@
       cancel-text="cancel"
       header-text="header"
       @entry-selected="entrySelected"
-      @selected="selectEntries($event)"
+      @all-selected="selectEntries($event)"
       @cancel-action="activeAction = ''"
       @set-action="activeAction = $event">
     </BaseResultBoxSection>
