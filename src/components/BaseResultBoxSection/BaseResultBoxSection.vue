@@ -107,6 +107,7 @@
               <BaseImageBox
                 :key="entry.id"
                 :selectable="selectActive"
+                :selected="selectedList.map(entry => entry.id || entry).includes(entry.id)"
                 :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
                 :box-ratio="100"
                 :title="entry.title"

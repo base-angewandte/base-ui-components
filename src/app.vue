@@ -11,24 +11,10 @@
       action-button-text="delete"
       cancel-text="cancel"
       header-text="header"
+      @entry-selected="entrySelected"
       @selected="selectEntries($event)"
       @cancel-action="activeAction = ''"
       @set-action="activeAction = $event">
-      <template
-        v-slot:result-box="props">
-        <BaseImageBox
-          :key="props.item.id"
-          :selectable="props.selectActive"
-          :selected="selectedBoxes.map(entry => entry.id || entry).includes(props.item.id)"
-          :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
-          :title="props.item.parent.title"
-          :subtext="props.item.parent.subtitle"
-          :description="props.item.description"
-          :image-url="props.item.parent.image"
-          class="result-box"
-          show-title
-          @select-triggered="entrySelected(props.item.id, $event)" />
-      </template>
     </BaseResultBoxSection>
     <div>
       <BaseForm
@@ -235,50 +221,26 @@ export default {
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
           date_created: '2020-04-27T11:01:37.246606Z',
-          parent: {
-            id: '8MuVSYmDy5wdRAvxpqrKsV',
-            title: 'gdgdfgsdfgsdfg',
-            type: {
-              label: {
-                de: 'Album',
-                en: 'album',
-              },
-              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-            },
-            image: null,
-          },
+          title: 'An extra extra long title',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          imageUrl: '@/assets/images/img1.png',
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
           date_created: '2020-04-27T11:01:37.246606Z',
-          parent: {
-            id: '8MuVSYmDy5wdRAddddvxpqrKsV',
-            title: 'gdgdfgsdfgsdfg',
-            type: {
-              label: {
-                de: 'Album',
-                en: 'album',
-              },
-              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-            },
-            image: null,
-          },
+          title: 'Unknown',
+          subtitle: 'Lets find it out and look deeper',
+          description: 'Novel',
+          imageUrl: '@/assets/images/img1.png',
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
           date_created: '2020-04-27T11:01:37.246606Z',
-          parent: {
-            id: '8MuVSYmDy5wdhhhhRAvxpqrKsV',
-            title: 'gdgdfgsdfgsdfg',
-            type: {
-              label: {
-                de: 'Album',
-                en: 'album',
-              },
-              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-            },
-            image: null,
-          },
+          title: 'TBD',
+          subtitle: 'Misterious',
+          text: ['Random text 1', 'Random text 2'],
         },
       ],
       selectedBoxes: [],
@@ -914,11 +876,12 @@ export default {
     },
   },
   methods: {
-    entrySelected(id, selected) {
-      if (selected && !this.selectedBoxes.includes(id)) {
-        this.selectedBoxes.push(id);
+    entrySelected({ entryId, selected }) {
+      console.log('entry select app');
+      if (selected && !this.selectedBoxes.includes(entryId)) {
+        this.selectedBoxes.push(entryId);
       } else if (!selected) {
-        this.selectedBoxes = this.selectedBoxes.filter(boxId => boxId !== id);
+        this.selectedBoxes = this.selectedBoxes.filter(boxId => boxId !== entryId);
       }
     },
     selectEntries(selectAll) {
