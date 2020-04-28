@@ -28,25 +28,27 @@
         (before \<input\>)
        -->
         <slot name="input-field-addition-before" />
-        <div
-          :class="[
+        <div class="base-input__input-line">
+          <div
+            :class="[
             'base-input-field-wrapper',
             { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
           ]">
-          <input
-            :id="label + '_' + id"
-            :name="label"
-            :placeholder="placeholder"
-            :value="inputInt"
-            :type="fieldType"
-            :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
-            autocomplete="off"
-            @blur="clickedOutsideInput"
-            @click="active = true"
-            v-on="inputListeners">
+            <input
+              :id="label + '_' + id"
+              :name="label"
+              :placeholder="placeholder"
+              :value="inputInt"
+              :type="fieldType"
+              :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
+              autocomplete="off"
+              @blur="clickedOutsideInput"
+              @click="active = true"
+              v-on="inputListeners">
+          </div>
+          <slot name="input-field-addition-after" />
         </div>
       </div>
-      <slot name="input-field-addition-after" />
     </div>
   </div>
 </template>
@@ -239,39 +241,44 @@ export default {
           flex-wrap: wrap;
         }
 
-        .base-input-field-wrapper {
-          flex: 1 1 auto;
-          margin-right: $spacing;
-          position: relative;
+        .base-input__input-line {
           display: flex;
+          flex: 1 1 auto;
 
-          &.base-input-field-wrapper-fade-out::after {
-            content: '';
-            width: calc(#{$fade-out-width} + #{$spacing});
-            height: $input-field-line-height;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            right: 0;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-          }
+          .base-input-field-wrapper {
+            flex: 1 1 auto;
+            margin-right: $spacing;
+            position: relative;
+            display: flex;
 
-          .base-input-field {
-            padding: $spacing-small/2 0;
-            min-height: $input-field-line-height;
-            width: 100%;
-
-            &:invalid {
-              box-shadow: none;
+            &.base-input-field-wrapper-fade-out::after {
+              content: '';
+              width: calc(#{$fade-out-width} + #{$spacing});
+              height: $input-field-line-height;
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              right: 0;
+              background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
             }
-          }
 
-          .base-input-field-hidden {
-            width: 1px;
-            overflow: hidden;
-            opacity: 0;
-            filter:alpha(opacity=0);
-            animation: all 500ms ease;
+            .base-input-field {
+              padding: $spacing-small/2 0;
+              min-height: $input-field-line-height;
+              width: 100%;
+
+              &:invalid {
+                box-shadow: none;
+              }
+            }
+
+            .base-input-field-hidden {
+              width: 1px;
+              overflow: hidden;
+              opacity: 0;
+              filter:alpha(opacity=0);
+              animation: all 500ms ease;
+            }
           }
         }
       }

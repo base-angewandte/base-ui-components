@@ -64,7 +64,8 @@
         <div
           v-if="isLoading"
           class="base-chips-input-loader">
-          <BaseLoader />
+          <BaseLoader
+            :position="{ top: '50%', left: '50%' }" />
         </div>
         <div
           v-if="!allowMultipleEntries"
@@ -98,7 +99,7 @@
           @click="addSelected()"
           @mouseover="selectedMenuEntryIndex = index">
           {{ addNewChipText ? `${addNewChipText} ${getLangLabel(entry[objectProp], true)}`
-            : getI18nString('Add', 'form', { value: getLangLabel(entry[objectProp], true) })
+            : getI18nTerm('form.Add', -1, { value: getLangLabel(entry[objectProp], true) })
               + ' ' + ' ...' }}
         </li>
         <li
@@ -164,7 +165,7 @@ import SvgIcon from 'vue-svgicon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
-import { setLanguageMixin } from '../../mixins/setLanguage';
+import i18n from '../../mixins/i18n';
 
 /**
  * Base Chips Input component with autocomplete function
@@ -183,7 +184,7 @@ export default {
     ClickOutside,
   },
   mixins: [
-    setLanguageMixin,
+    i18n,
   ],
   model: {
     prop: 'selectedList',
