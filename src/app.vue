@@ -877,7 +877,6 @@ export default {
   },
   methods: {
     entrySelected({ entryId, selected }) {
-      console.log('entry select app');
       if (selected && !this.selectedBoxes.includes(entryId)) {
         this.selectedBoxes.push(entryId);
       } else if (!selected) {

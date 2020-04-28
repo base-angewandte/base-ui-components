@@ -58,8 +58,6 @@ export default {
   },
   methods: {
     entrySelected({ entryId, selected }) {
-      console.log(entryId);
-      console.log(selected);
       if (selected && !this.selectedBoxes.includes(entryId)) {
         this.selectedBoxes.push(entryId);
       } else if (!selected) {
