@@ -44,6 +44,7 @@ module.exports = {
     }],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+    'no-console': process.env.NODE_ENV === 'production' ? 2 : 0,
     // legacy from air-bnb-config v13 - would have to fix all otherwise
     'arrow-parens': ['error', 'as-needed', {
       requireForBlockBody: true,
