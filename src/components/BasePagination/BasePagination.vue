@@ -183,7 +183,7 @@ export default {
          * triggered on page select
          *
          * @event set-page
-         * @type { Number }
+         * @param {number} val - the new page number
          */
         this.$emit('set-page', val);
       }

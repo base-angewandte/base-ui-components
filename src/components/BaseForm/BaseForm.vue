@@ -88,7 +88,7 @@ import SvgIcon from 'vue-svgicon';
 import i18n from '../../mixins/i18n';
 
 /**
- * Component creating a form according to a provided [swagger](swagger.io) standard
+ * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard
  */
 
 export default {

@@ -50,6 +50,7 @@
               @focus="active = true"
               v-on="inputListeners">
           </div>
+          <!-- @slot for adding elements after input (e.g. used to add loader -->
           <slot name="input-field-addition-after" />
         </div>
       </div>
@@ -185,6 +186,14 @@ export default {
               && event.key !== 'Backspace' && event.key !== 'Delete') {
               event.preventDefault();
             } else {
+              /**
+               * keydown event, modified to have identical behaviour
+               * across browsers for number input
+               *
+               * @event keydown
+               * @param {KeyboardEvent} event
+               *
+               */
               this.$emit('keydown', event);
             }
           },
@@ -193,7 +202,7 @@ export default {
              * Event emitted on input, passing input string
              *
              * @event input
-             * @type { String }
+             * @param {string} - the input event - passing only the event.target.value
              *
              */
             this.$emit('input', event.target.value);
@@ -224,7 +233,7 @@ export default {
          * Event emitted when click outside input field \<div\> is registered
          *
          * @event clicked-outside
-         * @type { None }
+         * @param {none}
          *
          */
         this.$emit('clicked-outside');
@@ -235,7 +244,7 @@ export default {
        * Event emitted on click on input field \<div\>
        *
        * @event click-input-field
-       * @type { None }
+       * @param {none}
        *
        */
       this.$emit('click-input-field');

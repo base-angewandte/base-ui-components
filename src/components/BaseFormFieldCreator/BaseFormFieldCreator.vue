@@ -164,7 +164,7 @@
 import i18n from '../../mixins/i18n';
 
 /**
- * A component for form field creation via [swagger](swagger.io) standard
+ * A component for form field creation via [openAPI](https://www.openapis.org/) standard
  */
 
 export default {
