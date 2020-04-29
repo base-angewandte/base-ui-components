@@ -32,7 +32,7 @@ export default {
     },
     position: {
       type: Object,
-      default: () => ({ top: '20%', left: '50%' }),
+      default: () => ({}),
     },
   },
   computed: {

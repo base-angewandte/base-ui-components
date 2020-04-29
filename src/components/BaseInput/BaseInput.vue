@@ -18,8 +18,9 @@
     <div
       v-click-outside="clickedOutsideInput"
       :class="['base-input-field-container',
-               { 'base-input-field-container-border': showInputBorder },
-               { 'base-input-field-container-active': active || isActive }]"
+               { 'base-input-field-container-border': useFormFieldStyling && showInputBorder },
+               { 'base-input-field-container-active': useFormFieldStyling
+                 && (active || isActive) }]"
       @click="insideInput">
       <div
         :class="['base-input-field__addition-container',
@@ -31,21 +32,25 @@
         <div class="base-input__input-line">
           <div
             :class="[
-            'base-input-field-wrapper',
-            { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
-          ]">
+              'base-input-field-wrapper',
+              { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
+            ]">
             <input
               :id="label + '_' + id"
               :name="label"
               :placeholder="placeholder"
               :value="inputInt"
               :type="fieldType"
+              :list="dropDownListId || false"
+              :aria-activedescendant="linkedListOption"
               :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
               autocomplete="off"
-              @blur="clickedOutsideInput"
               @click="active = true"
+              @keydown.tab.enter="active = false"
+              @focus="active = true"
               v-on="inputListeners">
           </div>
+          <!-- @slot for adding elements after input (e.g. used to add loader -->
           <slot name="input-field-addition-after" />
         </div>
       </div>
@@ -136,6 +141,29 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * define if standard form field styling should be
+     * used (otherwise no border, no box shadow)
+     */
+    useFormFieldStyling: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * specify the id of a linked drop down list
+     */
+    dropDownListId: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify a linked list option (e.g. drop down) <br>
+     *   (will be used in aria-activedescendant attribute)
+     */
+    linkedListOption: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
@@ -158,6 +186,14 @@ export default {
               && event.key !== 'Backspace' && event.key !== 'Delete') {
               event.preventDefault();
             } else {
+              /**
+               * keydown event, modified to have identical behaviour
+               * across browsers for number input
+               *
+               * @event keydown
+               * @param {KeyboardEvent} event
+               *
+               */
               this.$emit('keydown', event);
             }
           },
@@ -166,7 +202,7 @@ export default {
              * Event emitted on input, passing input string
              *
              * @event input
-             * @type { String }
+             * @param {string} - the input event - passing only the event.target.value
              *
              */
             this.$emit('input', event.target.value);
@@ -186,7 +222,7 @@ export default {
   updated() {
     const elems = this.$el.getElementsByTagName('input');
     if (this.active && elems && elems.length) {
-      this.$el.getElementsByTagName('input')[0].focus();
+      elems[0].focus();
     }
   },
   methods: {
@@ -197,7 +233,7 @@ export default {
          * Event emitted when click outside input field \<div\> is registered
          *
          * @event clicked-outside
-         * @type { None }
+         * @param {none}
          *
          */
         this.$emit('clicked-outside');
@@ -208,7 +244,7 @@ export default {
        * Event emitted on click on input field \<div\>
        *
        * @event click-input-field
-       * @type { None }
+       * @param {none}
        *
        */
       this.$emit('click-input-field');
@@ -244,6 +280,7 @@ export default {
         .base-input__input-line {
           display: flex;
           flex: 1 1 auto;
+          align-items: center;
 
           .base-input-field-wrapper {
             flex: 1 1 auto;

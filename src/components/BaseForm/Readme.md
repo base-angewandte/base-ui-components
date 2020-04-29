@@ -1,4 +1,4 @@
-This is a basic (autocomplete functionality not working here) example how a form created from a [swagger](swagger.io) standard could look like
+This is a basic (autocomplete functionality not working here) example how a form created from a [openAPI](https://www.openapis.org/) standard could look like
 (to see the structure click 'view code')
 
 ```vue

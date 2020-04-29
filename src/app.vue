@@ -14,8 +14,7 @@
       @entry-selected="entrySelected"
       @all-selected="selectEntries($event)"
       @cancel-action="activeAction = ''"
-      @set-action="activeAction = $event">
-    </BaseResultBoxSection>
+      @set-action="activeAction = $event" />
     <div>
       <BaseForm
         :value-list="formValueList"
@@ -225,7 +224,8 @@ export default {
           subtitle: 'A test',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: '@/assets/images/img1.png',
+          // eslint-disable-next-line global-require
+          imageUrl: require('@/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -233,7 +233,8 @@ export default {
           title: 'Unknown',
           subtitle: 'Lets find it out and look deeper',
           description: 'Novel',
-          imageUrl: '@/assets/images/img1.png',
+          // eslint-disable-next-line global-require
+          imageUrl: require('@/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',

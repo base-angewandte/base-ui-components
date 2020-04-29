@@ -88,7 +88,7 @@ import SvgIcon from 'vue-svgicon';
 import i18n from '../../mixins/i18n';
 
 /**
- * Component creating a form according to a provided [swagger](swagger.io) standard
+ * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard
  */
 
 export default {
@@ -524,38 +524,28 @@ export default {
 <style lang="scss">
   @import "../../styles/variables.scss";
 
-  .base-chips-below-chips-input {
-    .base-chips-drop-down {
-      right: $spacing-small;
-    }
-  }
-
   @media screen and (min-width: $mobile) {
-    .base-chips-drop-down {
-      max-width: calc(100% - #{$spacing} * 2);
-    }
-
-    .base-form-field-left-margin {
-      .base-chips-drop-down {
-        right: $spacing;
-      }
-    }
-
-    .base-form-subform-wrapper {
-      .base-chips-drop-down {
-        max-width: calc(100% - #{$spacing} * 4.5 - 3px);
+    .base-form-field {
+      .base-drop-down-list__container {
+        max-width: calc(100% - #{$spacing} * 2);
       }
 
       .base-form-field-left-margin {
-        .base-chips-drop-down {
-          right: calc(#{$spacing} * 2.5 - 3px);
+        .base-drop-down-list__container {
+          right: $spacing;
         }
       }
-    }
 
-    .base-chips-below-chips-input {
-      .base-chips-drop-down {
-        right: calc(#{$spacing} + #{$spacing-small} / 2);
+      .base-form-subform-wrapper {
+        .base-drop-down-list__container {
+          max-width: calc(100% - #{$spacing} * 4.5 - 3px);
+        }
+
+        .base-form-field-left-margin {
+          .base-drop-down-list__container {
+            right: calc(#{$spacing} * 2.5 - 3px);
+          }
+        }
       }
     }
   }
