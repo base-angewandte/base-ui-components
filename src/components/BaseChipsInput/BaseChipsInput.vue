@@ -431,6 +431,12 @@ export default {
      */
     selectedOption(val) {
       this.addSelectedOption(val);
+      // get the input element
+      const elems = this.$el.getElementsByTagName('input');
+      // if input element was found - focus after chips select
+      if (elems && elems.length) {
+        elems[0].focus();
+      }
     },
     listInt: {
       /**

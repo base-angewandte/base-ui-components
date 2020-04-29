@@ -271,6 +271,7 @@ export default {
         .base-input__input-line {
           display: flex;
           flex: 1 1 auto;
+          align-items: center;
 
           .base-input-field-wrapper {
             flex: 1 1 auto;
