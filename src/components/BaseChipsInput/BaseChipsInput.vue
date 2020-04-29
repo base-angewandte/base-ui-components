@@ -31,7 +31,6 @@
       :identifier-property-name="identifierPropertyNameInt"
       :value-property-name="valuePropertyNameInt"
       :list-id="id"
-      :select-styled="!allowMultipleEntries"
       :style="{ 'min-width': dropDownMinWidth }"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
@@ -430,12 +429,14 @@ export default {
      * @param {?Object} val
      */
     selectedOption(val) {
-      this.addSelectedOption(val);
-      // get the input element
-      const elems = this.$el.getElementsByTagName('input');
-      // if input element was found - focus after chips select
-      if (elems && elems.length) {
-        elems[0].focus();
+      if (val) {
+        this.addSelectedOption(val);
+        // get the input element
+        const elems = this.$el.getElementsByTagName('input');
+        // if input element was found - focus after chips select
+        if (elems && elems.length) {
+          elems[0].focus();
+        }
       }
     },
     listInt: {
@@ -590,6 +591,8 @@ export default {
       this.updateParentSelectedList(this.selectedListInt);
       // clear input
       this.input = '';
+      // reset selected option
+      this.selectedOption = null;
     },
     /**
      * method for emitting selected list changes to parent
