@@ -551,7 +551,6 @@ export default {
          * event triggered on show drop down
          *
          * @event show-dropdown
-         * @property {none}
          *
          */
         this.$emit('show-dropdown');
@@ -560,7 +559,6 @@ export default {
          * event triggered on hide drop down
          *
          * @event hide-dropdown
-         * @property {none}
          *
          */
         this.$emit('hide-dropdown');

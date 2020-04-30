@@ -202,7 +202,8 @@ export default {
              * Event emitted on input, passing input string
              *
              * @event input
-             * @param {string} - the input event - passing only the event.target.value
+             * @param {string} value - the input event value however
+             * passing only the event.target.value
              *
              */
             this.$emit('input', event.target.value);
@@ -233,7 +234,6 @@ export default {
          * Event emitted when click outside input field \<div\> is registered
          *
          * @event clicked-outside
-         * @param {none}
          *
          */
         this.$emit('clicked-outside');
@@ -244,7 +244,6 @@ export default {
        * Event emitted on click on input field \<div\>
        *
        * @event click-input-field
-       * @param {none}
        *
        */
       this.$emit('click-input-field');
