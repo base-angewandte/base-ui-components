@@ -289,7 +289,6 @@ export default {
          * event triggered when selectable is false and box is clicked
          *
          * @event clicked
-         * @type { None }
          */
         this.$emit('clicked');
       }

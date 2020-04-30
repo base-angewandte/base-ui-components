@@ -96,7 +96,7 @@ export default {
        * emitted on select all button click
        *
        * @event selected
-       * @type {Boolean}
+       * @param {boolean} selectedInt
        */
       this.$emit('selected', this.selectedInt);
     },

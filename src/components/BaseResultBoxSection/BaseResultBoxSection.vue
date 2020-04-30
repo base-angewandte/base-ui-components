@@ -1,34 +1,35 @@
 <template>
-  <div class="base-attachments-section">
+  <div class="base-result-box-section">
     <!-- LOADER -->
     <div
-      v-if="attachedList.length && isLoading"
-      class="base-attachments-section__loading">
-      <BaseLoader class="base-attachments-section__loader" />
+      v-if="entryList.length && isLoading"
+      class="base-result-box-section__loading">
+      <BaseLoader class="base-result-box-section__loader" />
     </div>
 
-    <!-- ATTACHMENTS AREA -->
+    <!-- RESULT BOX SECTION AREA -->
     <div
-      v-if="attachedList.length"
-      class="base-attachments-section__area">
+      v-if="entryList.length"
+      class="base-result-box-section__area">
       <!-- HEADER ROW -->
-      <div class="base-attachments-section__header-row">
+      <div class="base-result-box-section__header-row">
         <BaseOptions
           :show-options="showActions"
           @options-toggle="optionsToggle">
-          <template slot="beforeOptions">
+          <template v-slot:beforeOptions>
             <h3
               v-if="headerText"
-              class="base-attachments-section__header">
+              class="base-result-box-section__header">
               {{ headerText }}
             </h3>
           </template>
           <template
             v-if="showOptions"
-            slot="options">
+            v-slot:options>
             <div
               v-if="!selectActive"
-              class="base-attachments-section__attachment-options">
+              class="base-result-box-section__result-options">
+              <!-- @slot options-buttons to add custom options buttons -->
               <slot
                 :set-action="setAction"
                 name="option-buttons">
@@ -42,7 +43,7 @@
             </div>
             <div
               v-else
-              class="base-attachments-section__attachment-options">
+              class="base-result-box-section__result-options">
               <BaseButton
                 :text="cancelText"
                 icon-size="large"
@@ -67,44 +68,56 @@
         <div
           v-if="selectActive"
           :key="headerText + '_messageArea'"
-          class="base-attachments-section__message-area">
-          <div class="base-attachments-section__message-area-text">
+          class="base-result-box-section__message-area">
+          <div class="base-result-box-section__message-area-text">
             {{ messageText }}
           </div>
-          <div class="base-attachments-section__message-area-subtext">
+          <div class="base-result-box-section__message-area-subtext">
             {{ messageSubtext }}
           </div>
+          <!-- @slot options-message-area-after - add a custom element after the message area -->
           <slot name="options-message-area-after" />
         </div>
-        <slot name="below-action-area" />
         <BaseSelectOptions
           v-if="selectActive"
           :key="headerText + '_selectOptions'"
-          :selected-number-text="$t(
+          :selected-number-text="getI18nString(
             'entriesSelected',
-            { type: $tc(`notify.${entryType}`, selectedList.length) }
+            selectedList.length,
+            { type: getI18nString(`notify.${entryType}`) }
           )"
-          :select-text="$t('selectAll')"
-          :deselect-text="$t('selectNone')"
-          :list="attachedList"
+          :select-text="getI18nString('selectAll')"
+          :deselect-text="getI18nString('selectNone')"
+          :list="entryList"
           :selected-list="selectedList"
-          @selected="$emit('selected', $event)" />
+          @selected="selectAllTriggered" />
         <!-- BOXAREA -->
         <div
           :key="headerText + '_boxArea'"
-          class="base-attachments-section__box-area">
-          <template v-for="(attached, index) of visibleBoxes">
+          ref="resultBoxesArea"
+          class="base-result-box-section__box-area">
+          <template
+            v-for="(entry, index) of visibleBoxes">
+            <!-- @slot result-box - for custom result boxes -->
             <slot
-              :item="attached"
+              :item="entry"
               :index="index"
               :select-active="selectActive"
-              refs="boxSlot"
-              name="attached-box">
+              name="result-box">
               <BaseImageBox
-                :key="attached.id"
+                :key="entry.id"
                 :selectable="selectActive"
+                :selected="selectedList.map(entry => entry.id || entry).includes(entry.id)"
                 :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
-                :box-ratio="100" />
+                :box-ratio="100"
+                :title="entry.title"
+                :subtext="entry.subtitle"
+                :description="entry.description"
+                :image-url="entry.imageUrl"
+                :box-text="entry.text"
+                class="base-result-box-section__result-box"
+                @select-triggered="entrySelected(entry.id, $event)"
+                @clicked="entrySelected(entry.id)" />
             </slot>
           </template>
 
@@ -116,7 +129,7 @@
             icon="save-file"
             box-style="small"
             box-type="button"
-            class="linked-base-box"
+            class="base-result-box-section__action-button"
             @clicked="submitAction" />
         </div>
         <component
@@ -139,6 +152,7 @@ import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 import BaseSelectOptions from '../BaseSelectOptions/BaseSelectOptions';
+import i18n from '../../mixins/i18n';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -153,6 +167,7 @@ export default {
     BaseBoxButton,
     BaseSelectOptions,
   },
+  mixins: [i18n],
   props: {
     /**
      * title of section
@@ -162,13 +177,20 @@ export default {
       default: '',
     },
     /**
-     * actual entries list
+     * actual entries list - if slot result-box is not used to use custom elements this
+     * object array should have the following properties to be displayed
+     * in a [BaseImageBox](#baseimagebox):<br>
+     *    * id {string} - a unique identifier
+     *    * title {?string} - the title of the box<br>
+     *    * subtitle {?string} - a subtitle<br>
+     *    * description {?string} - text displayed at the bottom of the box<br>
+     *    * imageUrl {?string} - url to display an image<br>
+     *    * text {?string[]} - an array with strings that will be
+     *    displayed if no image is provided<br>
      */
-    attachedList: {
+    entryList: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
     },
     /**
      * if slot (options-message-area) is not used this variable
@@ -229,7 +251,8 @@ export default {
       default: false,
     },
     /**
-     * provide a list of selected entries for select options
+     * provide a list of selected entries for select options (can
+     * be entry objects or entry ids)
      */
     selectedList: {
       type: Array,
@@ -272,9 +295,9 @@ export default {
       default: null,
     },
     /**
-     * specifiy if filling the attachedList will be fetched from outside on page
+     * specifiy if filling the entryList will be fetched from outside on page
      * change or list is complete and can be done by slicing relevant items from
-     * attachedList
+     * entryList
      */
     fetchItemsExternally: {
       type: Boolean,
@@ -291,6 +314,8 @@ export default {
       itemsPerRow: 4,
       // current page number
       currentPageNumber: 1,
+      // a timeout for resize listener
+      resizeTimeout: null,
     };
   },
   computed: {
@@ -308,15 +333,15 @@ export default {
       return this.itemsPerRow * this.maxRows;
     },
     pages() {
-      return Math.ceil(this.attachedList.length / this.visibleNumberOfItems);
+      return Math.ceil(this.entryList.length / this.visibleNumberOfItems);
     },
     visibleBoxes() {
       if (this.maxRows && !this.fetchItemsExternally) {
-        return this.attachedList
+        return this.entryList
           .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
             this.currentPageNumber * this.visibleNumberOfItems);
       }
-      return this.attachedList;
+      return this.entryList;
     },
   },
   watch: {
@@ -337,9 +362,27 @@ export default {
       }
     },
     currentPageNumber() {
-      // if attachedList changes scroll back to top
+      // if entryList changes scroll back to top
       window.scrollTo(0, this.$el.offsetTop);
     },
+  },
+  mounted() {
+    // need to get the correct number of boxes per row to calculate the visible
+    // number of items correctly
+    window.addEventListener('resize', () => {
+      // check if there is a timeout already set and clear it if yes
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = null;
+      }
+      if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
+        this.resizeTimeout = setTimeout(() => {
+          const totalWidth = this.$refs.resultBoxesArea.clientWidth;
+          const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
+          this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+        }, 500);
+      }
+    });
   },
   methods: {
     setAction(act) {
@@ -349,7 +392,7 @@ export default {
        * are ready to be selected)
        *
        * @event set-action
-       * @type { String }
+       * @param {string} act - the action type
        */
       this.$emit('set-action', act);
     },
@@ -357,8 +400,8 @@ export default {
       /**
        * event triggered when an action is triggered (after selecting boxes)
        *
-       * @event set-action
-       * @type { String }
+       * @event submit-action
+       * @param {string} actionInt - the action type
        */
       this.$emit('submit-action', this.actionInt);
     },
@@ -367,8 +410,7 @@ export default {
       /**
        * event triggered when an action cancelled
        *
-       * @event set-action
-       * @type { String }
+       * @event cancel-action
        */
       this.$emit('cancel-action');
     },
@@ -382,9 +424,31 @@ export default {
        * event triggered on page number change
        *
        * @event fetch-items
-       * @type { Number }
+       * @param {number} number - the new page number
        */
       this.$emit('fetch-items', number);
+    },
+    getI18nString(string, count, variables) {
+      return this.getI18nTerm(string, count, variables);
+    },
+    entrySelected(entryId, selected = undefined) {
+      /**
+       * event emitted from default image box when clicked
+       * @event entry-selected
+       * @param {Object} obj - an object with the following properties:
+       * @property {string} entryId - the id of the clicked entry
+       * @property {?boolean} selected - was it selected or deselected - if undefined then
+       * the select mode was not active but the box was clicked
+       */
+      this.$emit('entry-selected', { entryId, selected });
+    },
+    selectAllTriggered(selectAll) {
+      /**
+       * event emitted on 'select all' button click
+       * @event all-selected
+       * @param {boolean} selectAll - was select all or select none triggered
+       */
+      this.$emit('all-selected', selectAll);
     },
   },
 };
@@ -393,24 +457,24 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-attachments-section {
+  .base-result-box-section {
     position: relative;
 
-    .base-attachments-section__loading {
+    .base-result-box-section__loading {
       position: absolute;
       height: 100%;
       width: 100%;
       z-index: map-get($zindex, loader);
       background-color: rgba(255,255,255, 0.50);
 
-      .base-attachments-section__loader {
+      .base-result-box-section__loader {
         top: 50%;
       }
     }
 
-    .base-attachments-section__area {
+    .base-result-box-section__area {
 
-      .base-attachments-section__header {
+      .base-result-box-section__header {
         font-size: $font-size-regular;
         color: $font-color-second;
         font-weight: normal;
@@ -418,26 +482,30 @@ export default {
 
       }
 
-      .base-attachments-section__header-row {
+      .base-result-box-section__header-row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
 
-        .base-attachments-section__attachment-options {
+        .base-result-box-section__result-options {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
         }
       }
 
-      .base-attachments-section__box-area {
+      .base-result-box-section__box-area {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+
+        .base-result-box-section__result-box {
+          margin-right: $spacing;
+        }
       }
 
-      .base-attachments-section__message-area {
+      .base-result-box-section__message-area {
         margin-bottom: $spacing-large;
         text-align: center;
         color: $font-color-second;
@@ -445,11 +513,11 @@ export default {
         z-index: map-get($zindex, boxcontent);
         position: relative;
 
-        .base-attachments-section__message-area-text {
+        .base-result-box-section__message-area-text {
           font-size: $font-size-large;
         }
 
-        .base-attachments-section__message-area-subtext {
+        .base-result-box-section__message-area-subtext {
           font-size: $font-size-small;
         }
       }
@@ -481,28 +549,28 @@ export default {
     }
   }
 
-  .linked-base-box:nth-of-type(n + 5) {
+  .base-result-box-section__action-button:nth-of-type(n + 5) {
     margin-top: $spacing;
   }
 
-  .linked-base-box:not(:nth-child(4n)) {
+  .base-result-box-section__action-button:not(:nth-child(4n)) {
     margin-right: $spacing;
   }
 
   @media screen and (max-width: $tablet) {
-    .linked-base-box {
+    .base-result-box-section__action-button {
       flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
     }
 
-    .linked-base-box:nth-of-type(n + 3) {
+    .base-result-box-section__action-button:nth-of-type(n + 3) {
       margin-top: $spacing;
     }
 
-    .linked-base-box:not(:nth-child(4n)) {
+    .base-result-box-section__action-button:not(:nth-child(4n)) {
       margin-right: 0;
     }
 
-    .linked-base-box:not(:nth-child(2n)) {
+    .base-result-box-section__action-button:not(:nth-child(2n)) {
       margin-right: $spacing;
     }
   }
