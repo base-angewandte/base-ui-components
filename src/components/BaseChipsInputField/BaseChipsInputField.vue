@@ -617,7 +617,6 @@ export default {
        * propagate to parent that click event happened outside of input field
        *
        * @event clicked-outside
-       * @property {none}
        */
       this.$emit('clicked-outside');
     },
@@ -629,7 +628,6 @@ export default {
        * inform parent that input field was clicked
        *
        * @event click-input-field
-       * @property {none}
        */
       this.$emit('click-input-field');
     },
