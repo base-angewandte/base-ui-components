@@ -44,7 +44,7 @@
 <script>
 // eslint-disable-next-line
 import lazySizes from 'lazysizes';
-import '@/../node_modules/swiper/css/swiper.css';
+import 'swiper/css/swiper.css';
 import Swiper from 'swiper';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
