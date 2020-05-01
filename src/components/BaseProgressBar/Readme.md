@@ -7,7 +7,7 @@ A simple progress bar
       :progress="progress" />
     <div class="spacer"></div>
     <BaseButton
-      text="changeProgress"
+      text="Change Upload State"
       @clicked="changeProgress" />
   </div>
 </template>
@@ -26,11 +26,8 @@ export default {
   },
   methods: {
     changeProgress() {
-      if (this.progress <= 0.75) {
-        this.progress += 0.25;
-      } else {
-        this.progress = 0;
-      }
+      // simply switch between complete upload and zero upload
+      this.progress = this.progress === 0 ? 100 : 0;
     },
   }
 
@@ -49,7 +46,7 @@ A file upload bar
 <template>
   <div>
     <BaseProgressBar
-      :progress="1"
+      :progress="100"
       :show-remove="false"
       status="success"
       file-name="myFileToUploadSucceeded.txt"
@@ -57,7 +54,7 @@ A file upload bar
     <div
       class="spacer" />
     <BaseProgressBar
-      :progress="1"
+      :progress="100"
       :show-remove="false"
       status="fail"
       file-name="myFileToUploadFailed.txt"
@@ -68,15 +65,15 @@ A file upload bar
     <BaseProgressBar
       v-if="showSecondBar"
       :progress="progress"
-      :show-remove="true"
-      file-name="myFileToUploadWithAReallyReallyReallyReallyReallyReallyReallyLongFileName.txt"
+      :show-remove="progress === 0"
+      file-name="myFileToUploadWithAReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFileName.txt"
       file-size="22kB"
       @remove-item="showSecondBar = false" />
     <div
       class="spacer" />
     <BaseButton
       v-if="showSecondBar"
-      text="change Progress"
+      text="Change Upload State"
       @clicked="changeProgress" />
     <BaseButton
       v-if="!showSecondBar"
@@ -100,11 +97,8 @@ export default {
   },
   methods: {
     changeProgress() {
-      if (this.progress <= 0.75) {
-        this.progress += 0.25;
-      } else {
-        this.progress = 0;
-      }
+      // simply switch between complete upload and zero upload
+      this.progress = this.progress === 0 ? 100 : 0;
     },
   }
 

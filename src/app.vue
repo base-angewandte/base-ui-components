@@ -34,12 +34,14 @@
     <!-- PAGINATION TEST -->
     <BasePagination :total="100" />
 
-    <!-- CHIPS BELOW TEST -->
     <div class="form-field">
-      <!-- UPLOAD BAR TEST -->
-      <BaseUploadBar
+      <BaseProgressBar
         :progress="progress"
-        :filename="'testfile.jpg'" />
+        file-name="looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        ooooooooooooooooong" />
+      <div :style="{ height: '30px' }"></div>
+      <!-- UPLOAD BAR TEST -->
       <base-button
         :active="false"
         :text="'Change Progress'"
@@ -47,6 +49,7 @@
         button-style="row"
         @clicked="changeProgress" />
     </div>
+    <div class="spacer" />
 
     <div class="canvas flex">
       <!-- BASE IMAGE BOX TEST -->
@@ -195,6 +198,7 @@ import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
+import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
 
 export default {
   name: 'App',
@@ -213,6 +217,7 @@ export default {
     BaseMenuList,
     BaseInput,
     BaseToggle,
+    BaseProgressBar,
   },
   data() {
     return {
@@ -797,7 +802,7 @@ export default {
       multilineInput: 'test',
       multilineTest: '',
       selectable: false,
-      progress: 0,
+      progress: 90,
       autocompleteInput: 'testtttttttttttt',
       inputDate: {
         date_from: '2019',
@@ -901,10 +906,10 @@ export default {
       }
     },
     changeProgress() {
-      if (this.progress <= 0.75) {
-        this.progress += 0.25;
+      if (this.progress < 100) {
+        this.progress += 5;
       } else {
-        this.progress = 0;
+        this.progress = 80;
       }
     },
     enableSelect() {

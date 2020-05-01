@@ -1,10 +1,14 @@
 <template>
   <div
     ref="progressBar"
+    :aria-valuenow="progress"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
     class="base-progress-bar">
     <div
       ref="progressBarProgress"
-      :style="{ width: `${progressWidth}%` }"
+      :style="{ width: `${progress}%` }"
       class="base-progress-bar__progress" />
     <div
       ref="progressBarContent"
@@ -20,13 +24,16 @@
                    { 'base-progress-bar__fade-out-hide': fadeOutDarkWidth === 0 }]" />
         <div
           v-if="showFadeOut"
-          class="base-progress-bar__fade-out-dark-window">
+          :class="[
+            'base-progress-bar__fade-out-dark-window',
+            { 'base-progress-bar__fade-out-dark-window-show': showDarkFadeOut },
+          ]">
           <div
             :style="{ transform: `translateX(-${fadeOutDarkWidth}px)` }"
             class="base-progress-bar__fade-out-dark-cover">
             <div
               :style="{ transform: `translateX(${fadeOutDarkWidth}px)` }"
-              class="base-progress-bar__fade-out-dark"></div>
+              class="base-progress-bar__fade-out-dark" />
           </div>
         </div>
       </div>
@@ -81,14 +88,14 @@ export default {
       default: '',
     },
     /**
-     * progress of the upload (percentage ratio, e.g. 0.5)
-     * @values 0-1
+     * progress of the upload (percentage)
+     * @values 0-100
      */
     progress: {
       type: [Number, String],
       default: 0,
       validator(val) {
-        return val >= 0 && val <= 1;
+        return val >= 0 && val <= 100;
       },
     },
     /**
@@ -114,15 +121,11 @@ export default {
     return {
       fadeOutDarkWidth: 30,
       showFadeOut: true,
+      showDarkFadeOut: false,
     };
   },
-  computed: {
-    progressWidth() {
-      return this.progress * 100;
-    },
-  },
   watch: {
-    progressWidth(val) {
+    progress(val) {
       // check if all of this is even necessary --> fade out is displayed
       if (this.showFadeOut) {
         // get the fade out with (currently set with 30px but be flexible)
@@ -138,6 +141,7 @@ export default {
         const fadeOutPosition = this.$refs.progressBarFadeOut.offsetLeft + contentPadding;
         // check if the progress is bigger than fade out position
         if (progressInPixels >= fadeOutPosition) {
+          this.showDarkFadeOut = true;
           // if yes calculate how much is the overlap
           const fadeOutOverlap = progressInPixels - fadeOutPosition;
           // if the overlap is bigger than the actual fade-out element size
@@ -145,6 +149,7 @@ export default {
           this.fadeOutDarkWidth = fadeOutOverlap > fadeOutWidth ? 0 : fadeOutWidth - fadeOutOverlap;
         } else {
           this.fadeOutDarkWidth = fadeOutWidth;
+          this.showDarkFadeOut = false;
         }
       }
     },
@@ -229,6 +234,12 @@ export default {
           height: 100%;
           overflow: hidden;
           z-index: 200;
+          opacity: 0;
+          transition: opacity 1s;
+
+          &.base-progress-bar__fade-out-dark-window-show {
+            opacity: 1;
+          }
         }
 
         .base-progress-bar__fade-out-dark-cover {
@@ -239,7 +250,7 @@ export default {
           width: $fade-out-width;
           height: 100%;
           overflow: hidden;
-          transition: transform 0.3s;
+          transition: transform 0.8s;
 
           .base-progress-bar__fade-out-dark {
             position: absolute;
@@ -249,7 +260,7 @@ export default {
             width: $fade-out-width;
             height: 100%;
             background: linear-gradient(to right, rgba(153, 153, 153, 0) , rgba(153, 153, 153, 1));
-            transition: transform 0.3s;
+            transition: transform 0.8s;
           }
         }
       }
