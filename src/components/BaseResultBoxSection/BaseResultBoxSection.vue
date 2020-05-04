@@ -12,7 +12,9 @@
       v-if="entryList.length"
       class="base-result-box-section__area">
       <!-- HEADER ROW -->
-      <div class="base-result-box-section__header-row">
+      <div
+        v-if="showHeader"
+        class="base-result-box-section__header-row">
         <BaseOptions
           :show-options="showActions"
           @options-toggle="optionsToggle">
@@ -303,6 +305,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * if false the header row (title and options) will not be available
+     */
+    showHeader: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define if the section should scroll to top on page change
+     */
+    jumpToTop: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -362,8 +378,9 @@ export default {
       }
     },
     currentPageNumber() {
-      // if entryList changes scroll back to top
-      window.scrollTo(0, this.$el.offsetTop);
+      if (this.jumpToTop) {
+        window.scrollTo(0, this.$el.offsetTop);
+      }
     },
   },
   mounted() {
