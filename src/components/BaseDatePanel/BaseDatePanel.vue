@@ -119,10 +119,6 @@ export default {
         return ['date', 'week'].includes(val);
       },
     },
-    datePickerValueFormat: {
-      type: String,
-      default: 'YYYY-MM-DD',
-    },
   },
   data() {
     return {
