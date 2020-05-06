@@ -101,6 +101,7 @@
             icon="download"
             icon-position="right"
             icon-size="large"
+            class="base-media-preview__button"
             @clicked="download" />
         </div>
       </div>
@@ -111,7 +112,7 @@
 <script>
 import VueClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
-import Hls from 'hls.js';
+import Hls from 'hls.js/dist/hls.light';
 import BaseButton from '../BaseButton/BaseButton';
 import popUpLock from '../../mixins/popUpLock';
 
@@ -467,7 +468,7 @@ export default {
       }
 
       .base-media-preview-info {
-        width: 100vw;
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -481,11 +482,17 @@ export default {
 
           .base-media-preview-info-text {
             padding-bottom: $spacing-small/2;
+            margin-bottom: 0;
           }
 
           .base-media-preview__info-text-additional {
             font-size: $font-size-small;
+            margin-bottom: 0;
           }
+        }
+
+        .base-media-preview__button {
+          color: $font-color;
         }
       }
     }
