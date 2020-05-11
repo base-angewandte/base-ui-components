@@ -61,7 +61,7 @@
               icon="download"
               icon-position="right"
               icon-size="large"
-              class="base-media-preview-not-supported-button"
+              class="base-media-preview__button base-media-preview-not-supported-button"
               @clicked="download" />
             <BaseButton
               v-if="!isMobile && fileEnding === 'pdf'"
@@ -69,7 +69,7 @@
               icon="eye"
               icon-position="right"
               icon-size="large"
-              class="base-media-preview-not-supported-button"
+              class="base-media-preview__button base-media-preview-not-supported-button"
               @clicked="openPdf()" />
           </div>
           <p
@@ -490,9 +490,17 @@ export default {
             margin-bottom: 0;
           }
         }
+      }
 
-        .base-media-preview__button {
-          color: $font-color;
+      .base-media-preview__button {
+        color: $font-color;
+
+        &:hover {
+          color: $app-color;
+        }
+
+        &:active, &:focus {
+          fill: $app-color;
         }
       }
     }

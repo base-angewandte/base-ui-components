@@ -384,6 +384,7 @@ export default {
     },
   },
   mounted() {
+    this.calcBoxNumber();
     // need to get the correct number of boxes per row to calculate the visible
     // number of items correctly
     window.addEventListener('resize', () => {
@@ -394,9 +395,7 @@ export default {
       }
       if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
         this.resizeTimeout = setTimeout(() => {
-          const totalWidth = this.$refs.resultBoxesArea.clientWidth;
-          const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
-          this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+          this.calcBoxNumber();
         }, 500);
       }
     });
@@ -466,6 +465,13 @@ export default {
        * @param {boolean} selectAll - was select all or select none triggered
        */
       this.$emit('all-selected', selectAll);
+    },
+    calcBoxNumber() {
+      if (this.$refs && this.$refs.resultBoxesArea) {
+        const totalWidth = this.$refs.resultBoxesArea.clientWidth;
+        const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
+        this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+      }
     },
   },
 };
