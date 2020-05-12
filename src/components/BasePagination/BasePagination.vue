@@ -7,7 +7,7 @@
       ]"
       @click="active - 1 > 0 ? setActivePage(active - 1) : false">
       <component
-        :is="'a'"
+        :is="numberElement"
         :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
         :aria-disabled="active <= 1"
         :tabindex="active <= 1 ? -1 : 0"

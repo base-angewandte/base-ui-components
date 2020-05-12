@@ -12,7 +12,9 @@
       v-if="entryList.length"
       class="base-result-box-section__area">
       <!-- HEADER ROW -->
-      <div class="base-result-box-section__header-row">
+      <div
+        v-if="showHeader"
+        class="base-result-box-section__header-row">
         <BaseOptions
           :show-options="showActions"
           @options-toggle="optionsToggle">
@@ -303,6 +305,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * if false the header row (title and options) will not be available
+     */
+    showHeader: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define if the section should scroll to top on page change
+     */
+    jumpToTop: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -362,11 +378,13 @@ export default {
       }
     },
     currentPageNumber() {
-      // if entryList changes scroll back to top
-      window.scrollTo(0, this.$el.offsetTop);
+      if (this.jumpToTop) {
+        window.scrollTo(0, this.$el.offsetTop);
+      }
     },
   },
   mounted() {
+    this.calcBoxNumber();
     // need to get the correct number of boxes per row to calculate the visible
     // number of items correctly
     window.addEventListener('resize', () => {
@@ -377,9 +395,7 @@ export default {
       }
       if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
         this.resizeTimeout = setTimeout(() => {
-          const totalWidth = this.$refs.resultBoxesArea.clientWidth;
-          const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
-          this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+          this.calcBoxNumber();
         }, 500);
       }
     });
@@ -449,6 +465,13 @@ export default {
        * @param {boolean} selectAll - was select all or select none triggered
        */
       this.$emit('all-selected', selectAll);
+    },
+    calcBoxNumber() {
+      if (this.$refs && this.$refs.resultBoxesArea) {
+        const totalWidth = this.$refs.resultBoxesArea.clientWidth;
+        const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
+        this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+      }
     },
   },
 };
