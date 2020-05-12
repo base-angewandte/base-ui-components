@@ -4,7 +4,7 @@
     class="base-date-panel">
     <div
       class="base-date-panel-label"
-      @click="isOpen = !isOpen">
+      @click.stop="isOpen = !isOpen">
       <svg-icon
         v-if="!isInline"
         name="calendar-many"
@@ -13,8 +13,7 @@
                  { 'base-date-panel-icon-right': iconPosition === 'right' }]" />
 
       <label
-        v-if="showLabel || !isInline"
-        @click.prevent="">
+        v-if="showLabel || !isInline">
         {{ label }}
       </label>
     </div>
@@ -29,6 +28,8 @@
       :input="input"
       :lang="language"
       :type="type"
+      :format="'YYYY-MM-DD'"
+      value-type="format"
       :open="isOpen" />
   </div>
 </template>
@@ -73,11 +74,14 @@ export default {
       },
     },
     /**
-     * set Input field from outside <br>
+     * @model
+     *
+     * set input field from outside<br>
+     * format: { date: 'yyyy-MM-dd' }
      */
     input: {
-      type: Date,
-      default: () => new Date(),
+      type: Object,
+      default: () => {},
     },
     /**
      * show panel permanently
@@ -130,8 +134,8 @@ export default {
     input: {
       handler(val) {
         // check if input string is different from inputInt
-        if (val && val.toString() !== this.inputInt.toString()) {
-          this.inputInt = val;
+        if (val && this.inputInt && val.date !== this.inputInt) {
+          this.inputInt = val.date;
         }
       },
       // to not need to do extra assignment in created()
@@ -139,7 +143,7 @@ export default {
     },
     inputInt: {
       handler(val, before) {
-        if (val && val.toString() !== before.toString()) {
+        if (val && val !== before) {
           this.emitData(val);
           this.isOpen = false;
         }
@@ -169,7 +173,8 @@ export default {
      */
     emitData(value) {
       /**
-       * emit event when date or week is selected
+       * emit event when date or week is selected<br>
+       * format: { date: 'yyyy-MM-dd' }
        *
        * @param { object } value
        * @type { object }
@@ -194,7 +199,7 @@ export default {
     display: flex;
     align-items: center;
     color: $font-color-second;
-    margin-bottom: $spacing-small;
+    margin: $spacing-small 0;
 
     &:hover {
       color: $app-color;

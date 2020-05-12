@@ -3,8 +3,9 @@ Date Panel
 <template>
   <div>
     <BaseDatePanel
-      label="Select a date"
-      @selected="selected" />
+      v-model="datePicked"
+      :input="datePicked"
+      label="Select a date" />
     <br>
     <div>{{ datePicked }}</div>
   </div>
@@ -19,13 +20,8 @@ export default {
   },
   data() {
     return {
-      datePicked: '',
+      datePicked: { date: '2020-05-12' },
     }
-  },
-  methods: {
-    selected(value) {
-      this.datePicked = value;
-    },
   },
 }
 </script>
@@ -38,6 +34,7 @@ Date Panel: type week, displayed inline
     <BaseDatePanel
       label="Select a date"
       type="week"
+      :input="datePicked"
       :is-inline="true"
       @selected="selected" />
     <br>
@@ -54,7 +51,7 @@ export default {
   },
   data() {
     return {
-      datePicked: '',
+      datePicked: {},
     }
   },
   methods: {
