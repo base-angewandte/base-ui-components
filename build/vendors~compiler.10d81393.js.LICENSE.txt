@@ -1,16 +1,14 @@
-/*! https://mths.be/regenerate v1.3.3 by @mathias | MIT license */
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
 
 /*!
  * regjsgen 0.5.1
  * Copyright 2014-2019 Benjamin Tan <https://bnjmnt4n.now.sh/>
  * Available under MIT license <https://github.com/bnjmnt4n/regjsgen/blob/master/LICENSE>
- */
-
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
  */
 
 /*! *****************************************************************************
@@ -27,3 +25,5 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
+
+/*! https://mths.be/regenerate v1.3.3 by @mathias | MIT license */
