@@ -46,7 +46,9 @@
               :data-src="imageUrl"
               :style="imageStyle"
               :alt="title"
-              :class="['base-image-box-image', 'lazyload']"
+              :class="['base-image-box-image',
+                       'lazyload',
+                       { 'base-image-box-no-title': !showTitle }]"
               :src="clearPng"
               @error="displayImage = false">
 
@@ -57,7 +59,8 @@
               :src="imageUrl"
               :style="imageStyle"
               :alt="title"
-              class="base-image-box-image"
+              :class="['base-image-box-image',
+                       { 'base-image-box-no-title': !showTitle }]"
               @error="displayImage = false">
           </div>
           <!-- @slot to display more advanced text -->
@@ -289,7 +292,6 @@ export default {
          * event triggered when selectable is false and box is clicked
          *
          * @event clicked
-         * @type { None }
          */
         this.$emit('clicked');
       }
@@ -384,6 +386,11 @@ export default {
           top: 50%;
           transform: translateY(-50%);
           transition: opacity 250ms ease-in-out;
+
+          &.base-image-box-no-title {
+            max-width: none;
+            height: 100%;
+          }
 
           // &.lazyload,
           &.lazyloading {

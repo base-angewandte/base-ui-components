@@ -9,83 +9,84 @@
       :is-loading="isLoading"
       :sort-text="sortText"
       :sort-name="sortName"
+      :display-chips-inline="false"
       @selected="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
-        v-slot:chips-area="props">
-        <draggable
-          v-model="props.list"
-          :animation="200"
-          group="people"
-          handle=".base-chips-below-list-icon-wrapper"
-          @end="updateList($event, props.list)">
-          <div
-            v-for="(entry,index) in props.list"
-            :key="'item' + entry.idInt"
-            :name="entry[objectProp]"
-            class="base-chips-below-list-item"
-            @mousedown="chipActive = index">
-            <div
-              :key="'line' + entry.idInt"
-              class="base-chips-below-list-item-line">
-              <div
-                :key="'iconwrapper' + entry.idInt"
-                class="base-chips-below-list-icon-wrapper">
-                <SvgIcon
-                  :key="'icon' + entry.idInt"
-                  name="drag-lines"
-                  class="svg-icon base-chips-below-list-icon" />
-              </div>
-
-              <div
-                :key="'chip-wrapper' + entry.idInt"
-                class="base-chips-below-list-item-chip-wrapper">
-                <BaseChip
-                  :id="'chips-below' + index"
-                  ref="selectedChip"
-                  :key="'chip' + entry.idInt"
-                  v-model="entry[objectProp]"
-                  :is-linked="!entry.edited && (entry[identifier] === 0 || !!entry[identifier])"
-                  :hover-box-content="hoverboxContent"
-                  class="base-chips-input-chip"
-                  @value-changed="modifyChipValue($event, index)"
-                  @hoverbox-active="hoverBoxActive($event, entry)"
-                  @remove-entry="removeEntry($event, index)" />
-              </div>
-              <BaseChipsInput
-                :id="label + '_' + (entry.idInt || entry.identifier)"
-                :key="'input_' + entry.idInt"
-                v-model="entry.roles"
-                :show-label="false"
-                :label="label + '-roles'"
-                :list="roleOptions"
-                :show-input-border="false"
-                :allow-dynamic-drop-down-entries="false"
-                :placeholder="rolesPlaceholder"
-                :always-linked="true"
-                :language="language"
-                :draggable="true"
-                :drop-down-no-options-info="dropDownNoOptionsInfo"
-                identifier="source"
-                object-prop="label"
-                class="base-chips-below-chips-input"
-                @selected="updateRoles($event, index)" />
-            </div>
-          </div>
-        </draggable>
-      </template>
-      <template
         v-slot:drop-down-entry="props">
+        <!-- @slot a slot to provide customized drop down options -->
         <slot
           :item="props.item"
           name="below-drop-down-entry" />
       </template>
       <template
         v-slot:no-options>
+        <!-- @slot a slot to customize messages in case of no options present in drop down -->
         <slot
           name="no-options" />
       </template>
     </BaseChipsInput>
+    <draggable
+      v-model="selectedBelowListInt"
+      :animation="200"
+      group="people"
+      handle=".base-chips-below-list-icon-wrapper"
+      @end="updateList($event, selectedBelowListInt)">
+      <div
+        v-for="(entry,index) in selectedBelowListInt"
+        :key="'item' + entry.idInt"
+        :name="entry[valuePropertyNameInt]"
+        class="base-chips-below-list-item"
+        @mousedown="chipActive = index">
+        <div
+          :key="'line' + entry.idInt"
+          class="base-chips-below-list-item-line">
+          <div
+            :key="'iconwrapper' + entry.idInt"
+            class="base-chips-below-list-icon-wrapper">
+            <SvgIcon
+              :key="'icon' + entry.idInt"
+              name="drag-lines"
+              class="svg-icon base-chips-below-list-icon" />
+          </div>
+
+          <div
+            :key="'chip-wrapper' + entry.idInt"
+            class="base-chips-below-list-item-chip-wrapper">
+            <BaseChip
+              :id="'chips-below' + index"
+              ref="selectedChip"
+              :key="'chip' + entry.idInt"
+              v-model="entry[valuePropertyNameInt]"
+              :is-linked="!entry.edited && (entry[identifierPropertyNameInt] === 0
+                || !!entry[identifierPropertyNameInt])"
+              :hover-box-content="hoverboxContent"
+              class="base-chips-input-chip"
+              @value-changed="modifyChipValue($event, index)"
+              @hoverbox-active="hoverBoxActive($event, entry)"
+              @remove-entry="removeEntry($event, index)" />
+          </div>
+          <BaseChipsInput
+            :id="label + '_' + (entry.idInt || entry.identifier)"
+            :key="'input_' + entry.idInt"
+            v-model="entry.roles"
+            :show-label="false"
+            :label="label + '-roles'"
+            :list="roleOptions"
+            :show-input-border="false"
+            :allow-dynamic-drop-down-entries="false"
+            :placeholder="rolesPlaceholder"
+            :always-linked="true"
+            :language="language"
+            :draggable="true"
+            :drop-down-no-options-info="dropDownNoOptionsInfo"
+            :identifier-property-name="identifierPropertyNameInt"
+            :value-property-name="valuePropertyNameInt"
+            class="base-chips-below-chips-input"
+            @selected="updateRoles($event, index)" />
+        </div>
+      </div>
+    </draggable>
   </div>
 </template>
 
@@ -260,6 +261,24 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * specify the object property that should be used as identifier
+     * // TODO: this should replace prop 'identifier' in future versions
+     * (better naming)
+     */
+    identifierPropertyName: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify the object property that should be used as value to be displayed
+     * // TODO: this should replace prop 'objectProp' in future versions
+     * (better naming)
+     */
+    valuePropertyName: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -272,12 +291,20 @@ export default {
     // need to filter language from $props for chips input component since only needed for roles!
     // leads to unwanted behaviour else (creating multilang object)
     chipsInputProps() {
-      const newProps = Object.assign({}, this.$props);
+      const newProps = { ...this.$props };
       delete newProps.language;
       // also remove role related props since unknown to chips input component
       delete newProps.roleOptions;
       delete newProps.rolesPlaceholder;
       return newProps;
+    },
+    // TODO: this is temporary for backwards compatibility - remove for next major version
+    identifierPropertyNameInt() {
+      return this.identifierPropertyName || this.identifier;
+    },
+    // TODO: this is temporary for backwards compatibility - remove for next major version
+    valuePropertyNameInt() {
+      return this.valuePropertyName || this.objectProp;
     },
   },
   watch: {
@@ -292,9 +319,9 @@ export default {
     addedEntry(list) {
       this.emitInternalList(list.map((entry) => {
         if (typeof entry === 'object') {
-          return Object.assign({}, entry, { roles: entry.roles || [] });
+          return { ...entry, ...{ roles: entry.roles || [] } };
         }
-        return Object.assign({}, { [this.objectProp]: entry, roles: entry.roles || [] });
+        return { ...{ [this.valuePropertyNameInt]: entry, roles: entry.roles || [] } };
       }));
     },
     removeEntry(evt, index) {
@@ -318,28 +345,31 @@ export default {
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
-          return Object.assign({}, {
+          return { ...{
             roles: [],
-            idInt: this.identifier && (entry[this.identifier] === 0 || entry[this.identifier])
-              ? entry[this.identifier] : entry[this.objectProp] + index,
-          }, entry);
+            idInt: this.identifierPropertyNameInt && (entry[this.identifierPropertyNameInt] === 0
+              || entry[this.identifierPropertyNameInt])
+              ? entry[this.identifierPropertyNameInt] : entry[this.valuePropertyNameInt] + index,
+          },
+          ...entry,
+          };
         }
-        return Object.assign({}, {
-          [this.objectProp]: entry,
+        return { ...{
+          [this.valuePropertyNameInt]: entry,
           idInt: this.list.length + index,
           roles: [],
-        });
+        } };
       });
     },
     emitInternalList(val) {
       const sendArr = [];
-      val.forEach((sel, index) => this.$set(sendArr, index, Object.assign({}, sel)));
+      val.forEach((sel, index) => this.$set(sendArr, index, { ...sel }));
       sendArr.forEach(sel => this.$delete(sel, 'idInt'));
       /**
        * propagate list change from dragging event to parent
        *
        * @event list-change
-       * @type {object}
+       * @param {Object} sendArr - the altered list
        *
        */
       this.$emit('list-change', sendArr);
@@ -348,30 +378,34 @@ export default {
       if (!event) {
         this.selectedBelowListInt.splice(index, 1);
       } else {
-        const modifiedEntry = Object.assign({}, this.selectedBelowListInt[index]);
-        if (this.identifier) {
-          this.$set(modifiedEntry, this.identifier, '');
+        const modifiedEntry = { ...this.selectedBelowListInt[index] };
+        if (this.identifierPropertyNameInt) {
+          this.$set(modifiedEntry, this.identifierPropertyNameInt, '');
         }
-        this.$set(modifiedEntry, this.objectProp, event);
+        this.$set(modifiedEntry, this.valuePropertyNameInt, event);
         this.$set(this.selectedBelowListInt, index, modifiedEntry);
       }
       this.emitInternalList(this.selectedBelowListInt);
     },
-    fetchDropDownEntries(event) {
+    fetchDropDownEntries(params) {
       /**
        * if drop down entries dynamically set - fetch new entries on input
        *
        * @event fetch-dropdown-entries
-       * @type {object}
+       * @param {Object} params - an Object with the following properties:
+       * @property {string} value - the input string
+       * @property {string} type - the valuePropertyName/objectProp that was specified
        *
        */
-      this.$emit('fetch-dropdown-entries', event);
+      this.$emit('fetch-dropdown-entries', params);
     },
     hoverBoxActive(value, entry) {
       /**
-       * event emitted on show / hide hoverbox, emitting event and originating entry
+       * event emitted on show / hide hoverbox
        *
-       * @type {Event, Object}
+       * @param {Object} obj - an object with the following properties:
+       * @property {boolean} value - value describing if hoverbox active is true or false
+       * @property {Object} option - the option for which the hoverbox was activated
        */
       this.$emit('hoverbox-active', { value, entry });
     },

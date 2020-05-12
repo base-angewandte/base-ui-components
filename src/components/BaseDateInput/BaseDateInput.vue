@@ -30,9 +30,9 @@
           {{ label }}
         </label>
         <div
-          v-click-outside="() => activeFrom = false"
+          v-click-outside="() => clickedOutside('From')"
           :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': activeFrom },
+                   { 'base-date-input__field-container-active': timeFromOpen || dateFromOpen },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
           <!-- TIME FROM -->
           <DatePicker
@@ -44,18 +44,18 @@
             :clearable="false"
             :append-to-body="false"
             :lang="language"
+            :open="timeFromOpen"
             type="time"
             format="HH:mm"
             value-type="format"
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
-            @focus="activeFrom = true"
-            @blur="blurInput()">
+            @open="setActiveState('time', 'From', true)"
+            @change="closeTimePicker('from', ...arguments, $event)">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
-                class="base-date-input__date-icon"
-                @click="openDatePicker('timepickerFrom')" />
+                class="base-date-input__date-icon" />
             </template>
           </DatePicker>
 
@@ -72,15 +72,15 @@
             :append-to-body="false"
             :value-type="datePickerValueFormat"
             :lang="language"
+            :open="dateFromOpen"
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
-            @focus="activeFrom = true"
-            @blur="blurInput()">
+            @open="setActiveState('date', 'From', true)"
+            @pick="setActiveState('date', 'From', false)">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="calendar-many"
-                class="base-date-input__date-icon"
-                @click="openDatePicker('datepickerFrom')" />
+                class="base-date-input__date-icon" />
             </template>
           </DatePicker>
         </div>
@@ -99,9 +99,9 @@
         </label>
         <div
           v-if="type !== 'single'"
-          v-click-outside="() => activeTo = false"
+          v-click-outside="() => clickedOutside('To')"
           :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': activeTo },
+                   { 'base-date-input__field-container-active': timeToOpen || dateToOpen },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
           <!-- TIME TO -->
           <DatePicker
@@ -113,17 +113,17 @@
             :clearable="false"
             :append-to-body="false"
             :lang="language"
+            :open="timeToOpen"
             type="time"
             format="HH:mm"
             value-type="format"
             input-class="base-date-input__datepicker-input"
-            @focus="activeTo = true"
-            @blur="blurInput()">
+            @open="setActiveState('time', 'To', true)"
+            @change="closeTimePicker('to', ...arguments, $event)">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
-                class="base-date-input__date-icon"
-                @click="openDatePicker('timepickerTo')" />
+                class="base-date-input__date-icon" />
             </template>
           </DatePicker>
 
@@ -141,15 +141,15 @@
             :append-to-body="false"
             :value-type="datePickerValueFormat"
             :lang="language"
+            :open="dateToOpen"
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
-            @focus="activeTo = true"
-            @blur="blurInput()">
+            @open="setActiveState('date', 'To', true)"
+            @pick="setActiveState('date', 'To', false)">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="calendar-many"
-                class="base-date-input__date-icon"
-                @click="openDatePicker('datepickerTo')" />
+                class="base-date-input__date-icon" />
             </template>
           </DatePicker>
         </div>
@@ -303,12 +303,17 @@ export default {
       },
       // variable for toggling format
       dateFormatInt: 'DD.MM.YYYY',
-      // handle input fields active
-      activeFrom: false,
-      activeTo: false,
       // variable to store the date when switching from date to year in order to be
       // able to restore exact date when switching back
       tempDateStore: {},
+      // to steer closing of datepicker date / date_from once date is selected
+      dateFromOpen: false,
+      // to steer closing of datepicker date_to once date is selected
+      dateToOpen: false,
+      // to steer closing of datepicker time / time_from once date is selected
+      timeFromOpen: false,
+      // to steer closing of datepicker time_to once date is selected
+      timeToOpen: false,
     };
   },
   computed: {
@@ -390,7 +395,7 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          this.inputInt = this.isSingleDate ? { date: val } : Object.assign({}, val);
+          this.inputInt = this.isSingleDate ? { date: val } : { ...val };
           // check if external input was year format and set internal format accordingly
           if (this.showFormatOptions) {
             this.dateFormatInt = this.isDateFormatYear ? 'YYYY' : 'DD.MM.YYYY';
@@ -422,22 +427,33 @@ export default {
   },
   methods: {
     /**
-     * on date picker emitting blur event
+     * a function to have the time picker close automatically as soon as minutes
+     * are selected
+     * @param {string} origin - is it from the 'from' or 'to' part of the picker
+     * @param {any} time - the selected time (not needed here but passed by event)
+     * @param {string} type - was 'hour' or 'minute' selected
      */
-    blurInput() {
-      this.activeFrom = false;
-      this.activeTo = false;
+    closeTimePicker(origin, time, type) {
+      if (type === 'minute') {
+        this[`time${origin.charAt(0).toUpperCase() + origin.slice(1)}Open`] = false;
+      }
     },
     /**
-     * on clicking on calendar icon
-     * @param ref: param to know which element event is coming from
+     * function called as soon as a click outside the input field occurred
+     * @param {string} origin - is it from the 'from' or 'to' part of the picker
      */
-    openDatePicker(ref) {
-      if (ref.toLowerCase().includes('from')) {
-        this.activeFrom = true;
-      } else {
-        this.activeTo = true;
-      }
+    clickedOutside(origin) {
+      this[`time${origin}Open`] = false;
+      this[`date${origin}Open`] = false;
+    },
+    /**
+     * a more generalized function to flexibly set close/open state of the respective picker
+     * @param {string} type - 'date' or 'time'
+     * @param {string} origin - 'From' or 'To'
+     * @param {boolean} value - open (true) or close (false)
+     */
+    setActiveState(type, origin, value) {
+      this[`${type}${origin}Open`] = value;
     },
     /**
      * data emit function

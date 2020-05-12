@@ -7,7 +7,7 @@ Basic example with no extra settings
       label="Simple Multiline Label"
       placeholder="Enter Text here"
       v-model="textInput"/>
-    <div>{{ 'Your text was: ' + textInput }}</div>  
+    <div>{{ 'Your text was: ' + textInput }}</div>
   </div>
 </template>
 <script>
@@ -32,9 +32,11 @@ Example with Tabs
       label="Multiline Label Tabs"
       placeholder="Enter Text here"
       v-model="textInput"/>
-    <div v-for="item of Object.keys(textInput)">
+    <div
+        v-for="item of Object.keys(textInput)"
+        :key="item">
       <span>{{ item + ': ' + textInput[item] }}</span>
-    </div>  
+    </div>
   </div>
 </template>
 <script>

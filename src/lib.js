@@ -26,6 +26,8 @@ import BaseFormFieldCreator from './components/BaseFormFieldCreator/BaseFormFiel
 import BaseForm from './components/BaseForm/BaseForm';
 import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions';
 import BaseCarousel from './components/BaseCarousel/BaseCarousel';
+import BaseDropDownList from './components/BaseDropDownList/BaseDropDownList';
+import BaseChipsInputField from './components/BaseChipsInputField/BaseChipsInputField';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -58,4 +60,6 @@ export {
   BaseForm,
   BaseSelectOptions,
   BaseCarousel,
+  BaseDropDownList,
+  BaseChipsInputField,
 };
