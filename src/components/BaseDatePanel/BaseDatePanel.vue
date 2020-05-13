@@ -5,8 +5,8 @@
     <div
       :class="[
         'base-date-panel__label',
-        {'base-date-panel__label--hover': !this.isInline },
-        ]"
+        {'base-date-panel__label--hover': !isInline },
+      ]"
       @click.stop="isOpen = !isOpen">
       <svg-icon
         v-if="!isInline"

@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <!-- BaseDatePanel -->
-    <div style="max-width: 1000px; margin: 50px auto;
+    <div
+      style="max-width: 1000px; margin: 50px auto;
       display: flex; justify-content: space-between;">
       <BaseDatePanel
         label="Select a date"
