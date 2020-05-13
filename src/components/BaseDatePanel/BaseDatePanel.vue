@@ -3,14 +3,17 @@
     v-click-outside="() => isOpen = false"
     class="base-date-panel">
     <div
-      class="base-date-panel-label"
+      :class="[
+        'base-date-panel__label',
+        {'base-date-panel__label--hover': !this.isInline },
+        ]"
       @click.stop="isOpen = !isOpen">
       <svg-icon
         v-if="!isInline"
         name="calendar-many"
-        :class="['base-date-panel-icon',
-                 { 'base-date-panel-icon-active': isOpen },
-                 { 'base-date-panel-icon-right': iconPosition === 'right' }]" />
+        :class="['base-date-panel__icon',
+                 { 'base-date-panel__icon--active': isOpen },
+                 { 'base-date-panel__icon--right': iconPosition === 'right' }]" />
 
       <label
         v-if="showLabel || !isInline">
@@ -197,13 +200,13 @@ export default {
     right: 0;
   }
 
-  .base-date-panel-label {
+  .base-date-panel__label {
     display: flex;
     align-items: center;
     color: $font-color-second;
     margin: $spacing-small 0;
 
-    &:hover {
+    &.base-date-panel__label--hover:hover {
       color: $app-color;
       cursor: pointer;
 
@@ -211,23 +214,23 @@ export default {
         cursor: pointer;
       }
 
-      .base-date-panel-icon {
+      .base-date-panel__icon {
         color: inherit;
       }
     }
   }
 
-  .base-date-panel-icon {
+  .base-date-panel__icon {
     width: $icon-large;
     height: $icon-large;
     color: $font-color-second;
     margin-right: $spacing-small;
 
-    &.base-date-panel-icon-active {
+    &.base-date-panel__icon--active {
       color: $app-color;
     }
 
-    &.base-date-panel-icon-right {
+    &.base-date-panel__icon--right {
       order: 1;
       margin-left: $spacing-small;
       margin-right: 0;
