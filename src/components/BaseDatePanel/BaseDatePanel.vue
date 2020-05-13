@@ -18,19 +18,21 @@
       </label>
     </div>
 
-    <date-picker
-      ref="datePanel"
-      v-model="inputInt"
-      :append-to-body="false"
-      :clearable="false"
-      :editable="false"
-      :inline="isInline"
-      :input="input"
-      :lang="language"
-      :type="type"
-      :format="'YYYY-MM-DD'"
-      value-type="format"
-      :open="isOpen" />
+    <div @click.stop="">
+      <date-picker
+        ref="datePanel"
+        v-model="inputInt"
+        :append-to-body="false"
+        :clearable="false"
+        :editable="false"
+        :inline="isInline"
+        :input="input"
+        :lang="language"
+        :type="type"
+        :format="'YYYY-MM-DD'"
+        value-type="format"
+        :open="isOpen" />
+    </div>
   </div>
 </template>
 
