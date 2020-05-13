@@ -86,7 +86,7 @@ export default {
      */
     input: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     /**
      * show panel permanently
@@ -181,8 +181,10 @@ export default {
        * emit event when date or week is selected<br>
        * format: { date: 'yyyy-MM-dd' }
        *
-       * @param { object } value
-       * @type { object }
+       * @event selected
+       * @param {Object} value - an object with the following properties:
+       * @property {string} date - the date string in format 'YYYY-MM-DD'
+       * @property {string} week - if type is 'week' also the week is emitted
        */
       this.$emit('selected', this.emitObject(value));
     },
