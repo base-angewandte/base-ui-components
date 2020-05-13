@@ -4,7 +4,6 @@ Date Panel
   <div>
     <BaseDatePanel
       v-model="datePicked"
-      :input="datePicked"
       label="Select a date" />
     <br>
     <div>{{ datePicked }}</div>
