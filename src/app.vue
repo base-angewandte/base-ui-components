@@ -59,6 +59,7 @@
         class="image-box" />
       <BaseImageBox
         :selectable="selectable"
+        :show-title="false"
         :image-url="require('@/static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
