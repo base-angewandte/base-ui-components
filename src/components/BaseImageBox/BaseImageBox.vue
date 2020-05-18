@@ -34,8 +34,7 @@
             :src="imageUrl"
             :style="imageStyle"
             :alt="title"
-            :class="['base-image-box-image',
-                     { 'base-image-box-no-title': !showTitle }]"
+            class="base-image-box-image"
             @error="displayImage = false">
         </div>
         <!-- @slot to display more advanced text -->
@@ -293,15 +292,10 @@ export default {
         .base-image-box-image {
           display: block;
           margin: auto;
-          max-width: 100%;
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-
-          &.base-image-box-no-title {
-            max-width: none;
-            height: 100%;
-          }
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+          object-position: top;
         }
       }
 

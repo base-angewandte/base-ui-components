@@ -30,7 +30,7 @@
           {{ label }}
         </label>
         <div
-          v-click-outside="() => clickedOutside('From')"
+          v-click-outside="(event) => clickedOutside('From')"
           :class="['base-date-input__field-container',
                    { 'base-date-input__field-container-active': timeFromOpen || dateFromOpen },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
@@ -60,29 +60,32 @@
           </DatePicker>
 
           <!-- DATE FROM -->
-          <DatePicker
+          <div
             v-else
-            ref="datepickerFrom"
-            v-model="dateFrom"
-            :input-attr="{id: label + '-' + id}"
-            :type="minDateView"
-            :format="dateFormatDisplay"
-            :clearable="false"
-            :placeholder="placeholder.date || placeholder"
-            :append-to-body="false"
-            :value-type="datePickerValueFormat"
-            :lang="language"
-            :open="dateFromOpen"
-            input-class="base-date-input__datepicker-input"
-            class="base-date-input__datepicker"
-            @open="setActiveState('date', 'From', true)"
-            @pick="setActiveState('date', 'From', false)">
-            <template v-slot:icon-calendar>
-              <svg-icon
-                name="calendar-many"
-                class="base-date-input__date-icon" />
-            </template>
-          </DatePicker>
+            class="base-date-input__datepicker-wrapper"
+            @click.stop="">
+            <DatePicker
+              ref="datepickerFrom"
+              v-model="dateFrom"
+              :input-attr="{id: label + '-' + id}"
+              :type="minDateView"
+              :format="dateFormatDisplay"
+              :clearable="false"
+              :placeholder="placeholder.date || placeholder"
+              :append-to-body="false"
+              :value-type="datePickerValueFormat"
+              :lang="language"
+              :open="dateFromOpen"
+              input-class="base-date-input__datepicker-input"
+              @open="setActiveState('date', 'From', true)"
+              @pick="setActiveState('date', 'From', false)">
+              <template v-slot:icon-calendar>
+                <svg-icon
+                  name="calendar-many"
+                  class="base-date-input__date-icon" />
+              </template>
+            </DatePicker>
+          </div>
         </div>
       </div>
       <span
@@ -128,30 +131,33 @@
           </DatePicker>
 
           <!-- DATE TO -->
-          <DatePicker
+          <div
             v-else
-            key="dateTo"
-            ref="datepickerTo"
-            v-model="inputInt.date_to"
-            :input-attr="{id: 'dateTo-' + id}"
-            :type="minDateView"
-            :format="dateFormatDisplay"
-            :clearable="false"
-            :placeholder="placeholder.date || placeholder"
-            :append-to-body="false"
-            :value-type="datePickerValueFormat"
-            :lang="language"
-            :open="dateToOpen"
-            input-class="base-date-input__datepicker-input"
-            class="base-date-input__datepicker"
-            @open="setActiveState('date', 'To', true)"
-            @pick="setActiveState('date', 'To', false)">
-            <template v-slot:icon-calendar>
-              <svg-icon
-                name="calendar-many"
-                class="base-date-input__date-icon" />
-            </template>
-          </DatePicker>
+            class="base-date-input__datepicker-wrapper"
+            @click.stop="">
+            <DatePicker
+              key="dateTo"
+              ref="datepickerTo"
+              v-model="inputInt.date_to"
+              :input-attr="{id: 'dateTo-' + id}"
+              :type="minDateView"
+              :format="dateFormatDisplay"
+              :clearable="false"
+              :placeholder="placeholder.date || placeholder"
+              :append-to-body="false"
+              :value-type="datePickerValueFormat"
+              :lang="language"
+              :open="dateToOpen"
+              input-class="base-date-input__datepicker-input"
+              @open="setActiveState('date', 'To', true)"
+              @pick="setActiveState('date', 'To', false)">
+              <template v-slot:icon-calendar>
+                <svg-icon
+                  name="calendar-many"
+                  class="base-date-input__date-icon" />
+              </template>
+            </DatePicker>
+          </div>
         </div>
       </div>
     </div>
@@ -581,7 +587,7 @@ export default {
           flex: 1 1 auto;
           max-width: 100%;
 
-          .base-date-input__datepicker {
+          .base-date-input__datepicker-wrapper {
             flex-grow: 1;
             width: auto;
             font-family: inherit;

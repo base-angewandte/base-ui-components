@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
@@ -96,7 +96,7 @@
   "description": "base Angewandte Component Library",
   "repository": {
     "type": "git",
-    "url": "https://github.com/base-angewandte/ui-components.git"
+    "url": "https://github.com/base-angewandte/base-ui-components.git"
   },
   "engines": {
     "node": ">= 4.0.0",
