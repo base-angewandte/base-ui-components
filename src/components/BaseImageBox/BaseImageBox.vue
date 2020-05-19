@@ -8,8 +8,7 @@
     <div
       :class="['base-image-box-content-wrapper',
                { 'base-image-box-selected': selectable && selectedInt }]">
-      <div
-        :class="['base-image-box-content', 'base-image-box-inner-shadow']">
+      <div class="base-image-box-content">
         <!-- @slot for published icon of files -->
         <slot name="top" />
         <div
@@ -34,7 +33,9 @@
         <div
           :class="[
             'base-image-box-body',
-            {'base-image-box-order-first': imageFirst }]">
+            'base-image-box-inner-shadow',
+            {'base-image-box-order-first': imageFirst },
+            imageShadowClass]">
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
@@ -46,6 +47,7 @@
               :style="imageStyle"
               :alt="title"
               :class="['base-image-box-image',
+                       { 'base-image-box__image-second': !imageFirst },
                        'lazyload',
                        { 'base-image-box-no-title': !showTitle }]"
               :src="clearPng"
@@ -59,6 +61,7 @@
               :style="imageStyle"
               :alt="title"
               :class="['base-image-box-image',
+                       { 'base-image-box__image-second': !imageFirst },
                        { 'base-image-box-no-title': !showTitle }]"
               @error="displayImage = false">
           </div>
@@ -235,6 +238,10 @@ export default {
     };
   },
   computed: {
+    // determine if shadow should cover half or third of box
+    imageShadowClass() {
+      return this.imageFirst ? 'base-image-box-img-third' : 'base-image-box-img-half';
+    },
     clearPng() {
       return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';
     },
@@ -262,6 +269,8 @@ export default {
     this.selectedInt = this.selected;
     if (!this.imageUrl && this.boxText.length) {
       const elem = this.$refs.boxText;
+      const boxMargin = window.getComputedStyle(elem, null)
+        .getPropertyValue('margin-bottom').replace('px', '');
       let boxHeight = window.getComputedStyle(elem, null)
         .getPropertyValue('height').replace('px', '');
       const lineHeight = window.getComputedStyle(elem, null)
@@ -271,7 +280,7 @@ export default {
       if (this.description) {
         boxHeight -= lineHeight;
       }
-      const lines = Math.floor(boxHeight / lineHeight);
+      const lines = Math.floor((boxHeight - boxMargin) / lineHeight);
       this.boxTextStyle = {
         height: `${lineHeight * lines}px`,
         '-webkit-line-clamp': lines,
@@ -325,29 +334,6 @@ export default {
       height: 100%;
       width: 100%;
 
-      &.base-image-box-inner-shadow {
-        &:after {
-          content: "";
-          width: 100%;
-          height: 33%;
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          background: linear-gradient(
-              to bottom, hsla(0, 0%, 0%, 0) 0%,
-              hsla(0, 0%, 0%, 0.017) 11.9%,
-              hsla(0, 0%, 0%, 0.062) 22.5%,
-              hsla(0, 0%, 0%, 0.13) 32.2%,
-              hsla(0, 0%, 0%, 0.211) 41.2%,
-              hsla(0, 0%, 0%, 0.3) 50%,
-              hsla(0, 0%, 0%, 0.389) 58.8%,
-              hsla(0, 0%, 0%, 0.47) 67.8%,
-              hsla(0, 0%, 0%, 0.538) 77.5%,
-              hsla(0, 0%, 0%, 0.583) 88.1%,
-              hsla(0, 0%, 0%, 0.6) 100%);
-        }
-      }
-
       .base-image-box-header {
         overflow: hidden;
         display: block;
@@ -399,11 +385,18 @@ export default {
         .base-image-box-image {
           display: block;
           margin: auto;
-          height: 100%;
-          width: 100%;
-          object-fit: cover;
-          object-position: top;
+          max-width: 100%;
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
           transition: opacity 250ms ease-in-out;
+
+          &.base-image-box__image-second {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            object-position: top;
+          }
 
           // &.lazyload,
           &.lazyloading {
@@ -414,6 +407,28 @@ export default {
           &.lazyloaded {
             opacity: 1;
           }
+        }
+      }
+
+      .base-image-box-inner-shadow {
+        &:after {
+          content: "";
+          width: 100%;
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          background: linear-gradient(
+              to bottom, hsla(0, 0%, 0%, 0) 0%,
+              hsla(0, 0%, 0%, 0.017) 11.9%,
+              hsla(0, 0%, 0%, 0.062) 22.5%,
+              hsla(0, 0%, 0%, 0.13) 32.2%,
+              hsla(0, 0%, 0%, 0.211) 41.2%,
+              hsla(0, 0%, 0%, 0.3) 50%,
+              hsla(0, 0%, 0%, 0.389) 58.8%,
+              hsla(0, 0%, 0%, 0.47) 67.8%,
+              hsla(0, 0%, 0%, 0.538) 77.5%,
+              hsla(0, 0%, 0%, 0.583) 88.1%,
+              hsla(0, 0%, 0%, 0.6) 100%);
         }
       }
 
@@ -428,6 +443,14 @@ export default {
         height: 100%;
         line-height: $line-height;          /* fallback */
       }
+    }
+
+    .base-image-box-img-third:after {
+      height: 33%;
+    }
+
+    .base-image-box-img-half:after {
+      height: 50%;
     }
   }
 
