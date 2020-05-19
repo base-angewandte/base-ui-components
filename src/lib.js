@@ -13,6 +13,8 @@ import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMult
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
+// TODO: remove and replace with base progress bar
+import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
@@ -45,6 +47,7 @@ export {
   BaseDropBox,
   BaseChipsBelow,
   BaseProgressBar,
+  BaseUploadBar,
   BaseImageBox,
   BaseHoverBox,
   BaseMediaPreview,
