@@ -381,16 +381,11 @@ export default {
         .base-image-box-image {
           display: block;
           margin: auto;
-          max-width: 100%;
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+          object-position: top;
           transition: opacity 250ms ease-in-out;
-
-          &.base-image-box-no-title {
-            max-width: none;
-            height: 100%;
-          }
 
           // &.lazyload,
           &.lazyloading {
