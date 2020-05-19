@@ -12,7 +12,7 @@ import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutoco
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
+import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
@@ -44,7 +44,7 @@ export {
   BaseMultilineTextInput,
   BaseDropBox,
   BaseChipsBelow,
-  BaseUploadBar,
+  BaseProgressBar,
   BaseImageBox,
   BaseHoverBox,
   BaseMediaPreview,

@@ -40,7 +40,7 @@
         file-name="looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
         ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
         ooooooooooooooooong" />
-      <div :style="{ height: '30px' }"></div>
+      <div :style="{ height: '30px' }" />
       <!-- UPLOAD BAR TEST -->
       <base-button
         :active="false"
@@ -196,7 +196,6 @@ import BaseForm from './components/BaseForm/BaseForm';
 import BaseButton from './components/BaseButton/BaseButton';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
 
@@ -204,7 +203,6 @@ export default {
   name: 'App',
   components: {
     BaseResultBoxSection,
-    BaseUploadBar,
     BaseForm,
     BaseMediaPreview,
     BasePagination,
