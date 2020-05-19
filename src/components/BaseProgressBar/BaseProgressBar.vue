@@ -131,7 +131,7 @@ export default {
         // get the fade out with (currently set with 30px but be flexible)
         const fadeOutWidth = this.$refs.progressBarFadeOut.clientWidth;
         // get the width of the progress bar
-        const progressInPixels = Math.ceil((this.$refs.progressBar.clientWidth / 100) * val);
+        const progressInPixels = Math.ceil(this.$refs.progressBar.clientWidth / 100 * val);
         // get content padding
         const progressContent = this.$refs.progressBarContent;
         const contentStyle = window.getComputedStyle(progressContent);

@@ -1,42 +1,5 @@
 <template>
   <div id="app">
-    <base-carousel
-      :items="carousel"
-      :swiper-options="{
-        slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 15,
-        loop: carousel.length > 3,
-        speed: 750,
-        keyboard: {
-          enabled: true,
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-        breakpoints: {
-          1024: {
-            slidesPerView: carousel.length < 3 ? 2 : 3,
-            slidesPerGroup: carousel.length < 3 ? 2 : 3,
-          },
-        },
-      }" />
-    <BaseResultBoxSection
-      :entry-list="entriesList"
-      :action="activeAction"
-      :is-loading="false"
-      :selected-list="selectedBoxes"
-      message-text="delete linked"
-      message-subtext="delete linked"
-      option-button-text="delete linked"
-      action-button-text="delete"
-      cancel-text="cancel"
-      header-text="header"
-      @entry-selected="entrySelected"
-      @all-selected="selectEntries($event)"
-      @cancel-action="activeAction = ''"
-      @set-action="activeAction = $event" />
     <!-- BaseDatePanel -->
     <div
       style="max-width: 1000px; margin: 50px auto;
@@ -397,14 +360,11 @@ import BaseForm from './components/BaseForm/BaseForm';
 import BaseButton from './components/BaseButton/BaseButton';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
-import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 
 export default {
   name: 'App',
   components: {
-    BaseResultBoxSection,
     BaseForm,
     BaseMediaPreview,
     BasePagination,
@@ -425,40 +385,9 @@ export default {
     BaseDropBox,
     BaseToggle,
     BaseProgressBar,
-    BaseCarousel,
   },
   data() {
     return {
-      activeAction: '',
-      entriesList: [
-        {
-          id: 'pCSLggvdsi8b3zRTLM4dJR',
-          date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'An extra extra long title',
-          subtitle: 'A test',
-          description: 'Performance',
-          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          // eslint-disable-next-line global-require
-          imageUrl: require('@/assets/images/img1.png'),
-        },
-        {
-          id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
-          date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'Unknown',
-          subtitle: 'Lets find it out and look deeper',
-          description: 'Novel',
-          // eslint-disable-next-line global-require
-          imageUrl: require('@/assets/images/img1.png'),
-        },
-        {
-          id: 'pCSLggvdsi8b3fffzRTLM4dJR',
-          date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'TBD',
-          subtitle: 'Misterious',
-          text: ['Random text 1', 'Random text 2'],
-        },
-      ],
-      selectedBoxes: [],
       baseDatePanelInput: { date: '' },
       formValueList: {
         id: 'JVKyWKTr8pit772AQKMW5V',
@@ -1062,132 +991,6 @@ export default {
       hoverboxContent: {},
       togglePreview: false,
       value12: '',
-      carousel: [
-        {
-          uid: '1',
-          title: 'Title',
-          subtext: 'Subtitle',
-          description: 'Austellung 1',
-          additional: '07.05.2020 - 21.05.2020',
-          // eslint-disable-next-line global-require
-          imageUrl: require('@/static/images/icons.png'),
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              // eslint-disable-next-line global-require
-              '460w': require('@/static/images/icons.png'),
-            },
-            {
-              // eslint-disable-next-line global-require
-              '640w': require('@/static/images/icons.png'),
-            },
-            {
-              // eslint-disable-next-line global-require
-              '768w': require('@/static/images/icons.png'),
-            },
-          ],
-        },
-        {
-          uid: '2',
-          title: 'Title',
-          subtext: 'Subtitle',
-          description: 'Austellung 2',
-          additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/tech',
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/460/341/tech',
-            },
-            {
-              '640w': 'https://placeimg.com/640/480/tech',
-            },
-            {
-              '768w': 'https://placeimg.com/768/576/tech',
-            },
-          ],
-        },
-        {
-          uid: '3',
-          title: 'Title',
-          subtext: 'Subtitle',
-          description: 'Austellung 3',
-          // additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/nature',
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/460/341/nature',
-            },
-            {
-              '640w': 'https://placeimg.com/640/480/nature',
-            },
-            {
-              '768w': 'https://placeimg.com/768/576/nature',
-            },
-          ],
-        },
-        {
-          uid: '4',
-          title: 'Title',
-          subtext: 'Subtitle',
-          description: 'Austellung 4',
-          additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/animal',
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/460/341/animal',
-            },
-            {
-              '640w': 'https://placeimg.com/640/480/animal',
-            },
-            {
-              '768w': 'https://placeimg.com/768/576/animal',
-            },
-          ],
-        },
-        {
-          uid: '5',
-          title: 'Title',
-          subtext: 'Subtitle',
-          description: 'Austellung',
-          additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/people',
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/460/341/people',
-            },
-            {
-              '640w': 'https://placeimg.com/640/480/people',
-            },
-            {
-              '768w': 'https://placeimg.com/768/576/people',
-            },
-          ],
-        },
-        {
-          uid: '6',
-          title: 'Title',
-          subtext: 'Subtitle',
-          description: 'Austellung',
-          additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/641/480/arch',
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/461/341/arch',
-            },
-            {
-              '640w': 'https://placeimg.com/641/480/arch',
-            },
-            {
-              '768w': 'https://placeimg.com/769/576/arch',
-            },
-          ],
-        },
-      ],
     };
   },
   computed: {
@@ -1218,20 +1021,6 @@ export default {
     },
   },
   methods: {
-    entrySelected({ entryId, selected }) {
-      if (selected && !this.selectedBoxes.includes(entryId)) {
-        this.selectedBoxes.push(entryId);
-      } else if (!selected) {
-        this.selectedBoxes = this.selectedBoxes.filter(boxId => boxId !== entryId);
-      }
-    },
-    selectEntries(selectAll) {
-      if (selectAll) {
-        this.selectedBoxes = this.entriesList.map(entry => entry.id);
-      } else {
-        this.selectedBoxes = [];
-      }
-    },
     baseDatePanelSelected(val) {
       console.log('baseDatePanelSelected', val);
     },
@@ -1373,13 +1162,5 @@ export default {
   }
   .spacer {
     height: 300px;
-  }
-
-  .result-box {
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-  .result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
-    margin-left: 16px;
   }
 </style>
