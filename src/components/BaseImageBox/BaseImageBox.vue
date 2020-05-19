@@ -34,8 +34,7 @@
           :class="[
             'base-image-box-body',
             'base-image-box-inner-shadow',
-            {'base-image-box-order-first': imageFirst },
-            imageShadowClass]">
+            {'base-image-box-order-first': imageFirst }]">
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
@@ -236,10 +235,6 @@ export default {
     };
   },
   computed: {
-    // determine if shadow should cover half or third of box
-    imageShadowClass() {
-      return this.showTitle ? 'base-image-box-img-third' : 'base-image-box-img-half';
-    },
     clearPng() {
       return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';
     },
@@ -403,6 +398,7 @@ export default {
         &:after {
           content: "";
           width: 100%;
+          height: 50%;
           position: absolute;
           bottom: 0;
           right: 0;
@@ -432,14 +428,6 @@ export default {
         height: 100%;
         line-height: $line-height;          /* fallback */
       }
-    }
-
-    .base-image-box-img-third:after {
-      height: 33%;
-    }
-
-    .base-image-box-img-half:after {
-      height: 50%;
     }
   }
 
