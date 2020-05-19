@@ -85,7 +85,7 @@
         class="image-box" />
       <base-image-box
         :selectable="selectable"
-        :image-url="require('@/static/images/roboto_detail_fullscreen_12pt.png')"
+        :image-url="require('@/static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />

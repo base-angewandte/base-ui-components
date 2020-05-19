@@ -8,7 +8,8 @@
     <div
       :class="['base-image-box-content-wrapper',
                { 'base-image-box-selected': selectable && selectedInt }]">
-      <div class="base-image-box-content">
+      <div
+        :class="['base-image-box-content', 'base-image-box-inner-shadow']">
         <!-- @slot for published icon of files -->
         <slot name="top" />
         <div
@@ -33,7 +34,6 @@
         <div
           :class="[
             'base-image-box-body',
-            'base-image-box-inner-shadow',
             {'base-image-box-order-first': imageFirst }]">
           <div
             v-if="imageUrl && displayImage"
@@ -325,6 +325,29 @@ export default {
       height: 100%;
       width: 100%;
 
+      &.base-image-box-inner-shadow {
+        &:after {
+          content: "";
+          width: 100%;
+          height: 33%;
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          background: linear-gradient(
+              to bottom, hsla(0, 0%, 0%, 0) 0%,
+              hsla(0, 0%, 0%, 0.017) 11.9%,
+              hsla(0, 0%, 0%, 0.062) 22.5%,
+              hsla(0, 0%, 0%, 0.13) 32.2%,
+              hsla(0, 0%, 0%, 0.211) 41.2%,
+              hsla(0, 0%, 0%, 0.3) 50%,
+              hsla(0, 0%, 0%, 0.389) 58.8%,
+              hsla(0, 0%, 0%, 0.47) 67.8%,
+              hsla(0, 0%, 0%, 0.538) 77.5%,
+              hsla(0, 0%, 0%, 0.583) 88.1%,
+              hsla(0, 0%, 0%, 0.6) 100%);
+        }
+      }
+
       .base-image-box-header {
         overflow: hidden;
         display: block;
@@ -391,29 +414,6 @@ export default {
           &.lazyloaded {
             opacity: 1;
           }
-        }
-      }
-
-      .base-image-box-inner-shadow {
-        &:after {
-          content: "";
-          width: 100%;
-          height: 50%;
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          background: linear-gradient(
-              to bottom, hsla(0, 0%, 0%, 0) 0%,
-              hsla(0, 0%, 0%, 0.017) 11.9%,
-              hsla(0, 0%, 0%, 0.062) 22.5%,
-              hsla(0, 0%, 0%, 0.13) 32.2%,
-              hsla(0, 0%, 0%, 0.211) 41.2%,
-              hsla(0, 0%, 0%, 0.3) 50%,
-              hsla(0, 0%, 0%, 0.389) 58.8%,
-              hsla(0, 0%, 0%, 0.47) 67.8%,
-              hsla(0, 0%, 0%, 0.538) 77.5%,
-              hsla(0, 0%, 0%, 0.583) 88.1%,
-              hsla(0, 0%, 0%, 0.6) 100%);
         }
       }
 
