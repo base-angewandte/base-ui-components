@@ -35,7 +35,7 @@
       Your browser does not support the video tag.
     </video> -->
     <div>
-      <BaseFormNew
+      <BaseForm
         :value-list="formValueList"
         :fields-with-tabs="['texts']"
         :form-id="'xjlaödsjfadlskj'"
@@ -53,12 +53,14 @@
     <!-- PAGINATION TEST -->
     <BasePagination :total="100" />
 
-    <!-- CHIPS BELOW TEST -->
     <div class="form-field">
-      <!-- UPLOAD BAR TEST -->
-      <base-upload-bar
+      <BaseProgressBar
         :progress="progress"
-        :filename="'testfile.jpg'" />
+        file-name="looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        ooooooooooooooooong" />
+      <div :style="{ height: '30px' }" />
+      <!-- UPLOAD BAR TEST -->
       <base-button
         :active="false"
         :text="'Change Progress'"
@@ -66,30 +68,31 @@
         button-style="row"
         @clicked="changeProgress" />
     </div>
+    <div class="spacer" />
 
     <div class="canvas flex">
       <!-- BASE IMAGE BOX TEST -->
-      <base-image-box
+      <BaseImageBox
         :selectable="selectable"
         :show-title="false"
         :image-url="require('@/assets/images/img1.png')"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
-      <base-image-box
+      <BaseImageBox
         :selectable="selectable"
         :show-title="false"
         :image-url="require('@/static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
-      <base-image-box
+      <BaseImageBox
         :selectable="selectable"
         :image-url="require('@/static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
-      <base-button
+      <BaseButton
         :active="false"
         :text="'Activate Select'"
         icon-size="large"
@@ -146,20 +149,16 @@
         v-model="inputDateTime"
         :type="'datetime'"
         :label="'unknown'" />
-      <base-date-input
+      <BaseDateInput
         :label="'unknown'"
         :input="inputDate"
         language="de"
         type="daterange"
         format="date_year" />
-      <base-autocomplete-input
-        v-model="autocompleteInput"
-        :list="dropDownInput"
-        :placeholder="'Fetching from SkosMos'"
-        :object-prop="'prefLabel'"
-        label="text input with dynamic autocomplete"
-        @selected="fetchOther($event, 'this is my type')" />
-      <base-chips-input
+      <BaseToggle
+        name="BaseToggle"
+        label="Zeige Einträge anderen Benutzer*innen auf meinem Showroom-Profil an." />
+      <BaseChipsInput
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
         :selected-list="chipsInput"
@@ -172,11 +171,7 @@
         draggable
         label="A label"
         @fetchDropDownEntries="fetch" />
-      <base-button
-        text="change input"
-        icon="remove"
-        @clicked="changeInput" />
-      <base-chips-input
+      <BaseChipsInput
         :list="[
           { title: '...alle Verhältnisse umzuwerfen',
             additional: 'part1', remark: '***', source: '1' },
@@ -202,8 +197,15 @@
           <span>{{ props.item.additional }}</span>
           <span>{{ props.item.remark }}</span>
         </template>
-      </base-chips-input>
-      <base-chips-below
+      </BaseChipsInput>
+      <BaseAutocompleteInput
+        v-model="autocompleteInput"
+        :list="dropDownInput"
+        :placeholder="'Fetching from SkosMos'"
+        :object-prop="'prefLabel'"
+        label="text input with dynamic autocomplete"
+        @selected="fetchOther($event, 'this is my type')" />
+      <BaseChipsBelow
         v-model="selectedList"
         :chips-inline="false"
         :chips-editable="true"
@@ -343,33 +345,33 @@ import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from './components/BasePopUp/BasePopUp';
 import BaseDropDown from './components/BaseDropDown/BaseDropDown';
 import BaseInput from './components/BaseInput/BaseInput';
-import BaseButton from './components/BaseButton/BaseButton';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
-import BaseImageBox from './components/BaseImageBox/BaseImageBox';
-import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
-import BaseFormNew from './components/BaseForm/BaseForm';
+import BaseForm from './components/BaseForm/BaseForm';
+import BaseButton from './components/BaseButton/BaseButton';
+import BaseImageBox from './components/BaseImageBox/BaseImageBox';
+import BaseToggle from './components/BaseToggle/BaseToggle';
+import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
 
 export default {
   name: 'App',
   components: {
-    BaseFormNew,
+    BaseForm,
     BaseMediaPreview,
     BasePagination,
     BaseChipsBelow,
     BaseDateInput,
     BaseDatePanel,
     BaseAutocompleteInput,
-    BaseUploadBar,
     BaseImageBox,
     BaseMultilineTextInput,
     BaseSearch,
@@ -381,10 +383,12 @@ export default {
     BaseInput,
     BaseButton,
     BaseDropBox,
+    BaseToggle,
+    BaseProgressBar,
   },
   data() {
     return {
-      baseDatePanelInput: '',
+      baseDatePanelInput: { date: '' },
       formValueList: {
         id: 'JVKyWKTr8pit772AQKMW5V',
         parents: [
@@ -1032,10 +1036,10 @@ export default {
       }
     },
     changeProgress() {
-      if (this.progress <= 0.75) {
-        this.progress += 0.25;
+      if (this.progress < 100) {
+        this.progress += 5;
       } else {
-        this.progress = 0;
+        this.progress = 80;
       }
     },
     enableSelect() {
