@@ -5,14 +5,14 @@
       style="max-width: 1000px; margin: 50px auto;
       display: flex; justify-content: space-between;">
       <BaseDatePanel
+        v-model="baseDatePanelInput"
         label="Select a date"
-        type="date"
-        @selected="baseDatePanelSelected($event)" />
+        type="date" />
 
       <base-date-panel
         label="Select a date"
         type="week"
-        :input="new Date('2020-04-29')"
+        :input="{ date: '2020-04-29' }"
         :show-label="false"
         :is-inline="true"
         @selected="baseDatePanelSelected($event)" />
@@ -384,6 +384,7 @@ export default {
   },
   data() {
     return {
+      baseDatePanelInput: '',
       formValueList: {
         id: 'JVKyWKTr8pit772AQKMW5V',
         parents: [
