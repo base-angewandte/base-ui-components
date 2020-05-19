@@ -12,6 +12,8 @@ import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutoco
 import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
+import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
+// TODO: remove and replace with base progress bar
 import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
@@ -44,6 +46,7 @@ export {
   BaseMultilineTextInput,
   BaseDropBox,
   BaseChipsBelow,
+  BaseProgressBar,
   BaseUploadBar,
   BaseImageBox,
   BaseHoverBox,
