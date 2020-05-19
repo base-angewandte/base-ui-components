@@ -1,20 +1,39 @@
 <template>
   <div id="app">
-    <BaseResultBoxSection
-      :entry-list="entriesList"
-      :action="activeAction"
-      :is-loading="false"
-      :selected-list="selectedBoxes"
-      message-text="delete linked"
-      message-subtext="delete linked"
-      option-button-text="delete linked"
-      action-button-text="delete"
-      cancel-text="cancel"
-      header-text="header"
-      @entry-selected="entrySelected"
-      @all-selected="selectEntries($event)"
-      @cancel-action="activeAction = ''"
-      @set-action="activeAction = $event" />
+    <!-- BaseDatePanel -->
+    <div
+      style="max-width: 1000px; margin: 50px auto;
+      display: flex; justify-content: space-between;">
+      <BaseDatePanel
+        v-model="baseDatePanelInput"
+        label="Select a date"
+        type="date" />
+
+      <base-date-panel
+        label="Select a date"
+        type="week"
+        :input="{ date: '2020-04-29' }"
+        :show-label="false"
+        :is-inline="true"
+        @selected="baseDatePanelSelected($event)" />
+
+      <base-date-panel
+        label="Select a date"
+        type="week"
+        :icon-position="'right'"
+        @selected="baseDatePanelSelected($event)" />
+    </div>
+
+    <!-- VIDEO TEST -->
+    <!-- <video
+      width="320"
+      height="240"
+      controls >
+      <source
+        src="/home/shauzmayer/index.m3u8"
+        type="application/x-mpegURL">
+      Your browser does not support the video tag.
+    </video> -->
     <div>
       <BaseForm
         :value-list="formValueList"
@@ -69,7 +88,7 @@
         class="image-box" />
       <BaseImageBox
         :selectable="selectable"
-        :image-url="require('@/static/images/roboto_detail_fullscreen_12pt.png')"
+        :image-url="require('@/static/images/icons.png')"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
@@ -80,9 +99,53 @@
         button-style="row"
         @clicked="enableSelect()" />
     </div>
-    <div class="form-field canvas">
-      <!-- testing all the altered componenents here -->
-      <BaseDateInput
+
+    <div class="canvas">
+      <!-- MULTILINE WITH TABS TEST -->
+      <base-multiline-text-input
+        v-model="multilineInputObj"
+        :label="'Label'"
+        :tabs="['German', 'English']"
+        :placeholder="'Enter Text'"
+        @tab-switch="tabSwitched">
+        <div class="multiline-dropdown">
+          <base-drop-down
+            :selected-option="{ label: 'Textart', value: '' }"
+            :options="[{
+                         value: 'Beschreibung',
+                         label: 'Beschreibung',
+                       },
+                       {
+                         value: 'Ausstellungseinladung',
+                         label: 'Ausstellungseinladung',
+                       },
+                       {
+                         label: 'Textart',
+                         value: '',
+                       },
+                       {
+                         value: 'Zeitungsartikel',
+                         label: 'Zeitungsartikel',
+                       }]" />
+        </div>
+      </base-multiline-text-input>
+      <base-multiline-text-input
+        :input="multilineTest"
+        :label="'Label'"
+        :placeholder="'Enter Text'"
+        @text-input="handleMultilineInput" />
+    </div>
+
+    <!-- SEARCH TEST -->
+    <div class="canvas">
+      <base-search
+        :show-image="true"
+        @input="triggerInput" />
+    </div>
+
+    <!-- FORM FIELD TESTING -->
+    <div class="form-field">
+      <base-date-input
         v-model="inputDateTime"
         :type="'datetime'"
         :label="'unknown'" />
@@ -127,7 +190,7 @@
         :label="'single choice with special drop down body'"
         :allow-unknown-entries="true"
         :add-new-chip-text="'asdfasdfasdfasdf'"
-        :allow-multiple-entries="false">
+        :allow-multiple-entries="true">
         <template
           v-slot:drop-down-entry="props">
           <span>{{ props.item.title }}</span>
@@ -165,90 +228,167 @@
         object-prop="name"
         label="chips-below-test"
         @hoverbox-active="setHoverBox" />
-      <BaseInput
-        :show-label="false"
-        label="This label says Specify any text below"
-        placeholder="A custom placeholder" />
-      <BaseMenuList
-        :selected="showCheckbox"
-        :list="list"
-        @clicked="activateMenuEntry" />
-      <BaseButton
-        text="toggle checkboxes"
-        button-style="row"
-        @clicked="showCheckbox = !showCheckbox" />
     </div>
+
+    <!-- MENU LIST TEST -->
+    <base-menu-list
+      :selected="showCheckbox"
+      :list="list"
+      @clicked="activateMenuEntry" />
+    <base-menu-entry
+      :entry-id="'asingleentry'"
+      :icon="'sheet-empty'"
+      :active="menuEntryActive"
+      :select-active="showCheckbox"
+      :is-selectable="true"
+      :thumbnails="['attention', 'people']"
+      title="Poesie oh Poesisssssssssssssssssssssssssssssssssse"
+      subtext="Aus einer anderen Weltsssssssssssssssssssssssssss"
+      description="Gemälde"
+      @clicked="menuEntryActive = true" />
+    <base-button
+      text="toggle checkboxes"
+      button-style="row"
+      @clicked="showCheckbox = !showCheckbox" />
+
+    <!-- DROP BOX TEST -->
+    <div class="flex row">
+      <base-drop-box
+        :show-plus="true"
+        :box-size="{ width: 'calc(25% - 16px)' }"
+        drop-type="elements"
+        drop-element-name="menuEntry"
+        drag-item-class="base-menu-entry"
+        icon="camera"
+        text="Datei hinzufügen"
+        subtext="(Click oder durch drag'n drop hinzufügen)"
+        @dropped-element="dropped($event)"
+        @clicked="boxClicked" />
+      <base-drop-box
+        drop-type="files" />
+    </div>
+    <div>
+      <ul>
+        <li
+          v-for="item in elements"
+          :key="item.id">
+          {{ item.title }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- POP UP TEST -->
+    <base-button
+      draggable="true"
+      icon="options-menu"
+      @clicked="showPopUp = true" />
+    <base-pop-up
+      :show="showPopUp"
+      title="Bild entfernen"
+      button-left-text="Cancel"
+      button-right-text="Submit"
+      @clicked="buttonTriggered"
+      @close="showPopUp = false">
+      <div>
+        Test Create Entity
+      </div>
+      <div class="popup-text">
+        <base-input
+          :label="'Test1'"
+          field-type="number"
+          placeholder="Enter your Name" />
+        <base-input
+          :label="'Test'"
+          field-type="text"
+          placeholder="Enter your Name" />
+      </div>
+      <div class="popup-text">
+        <base-drop-down
+          :label="'select type'"
+          :option-selected="{ label: 'Alle Typen', value: '' }"
+          :options="[
+            { label: 'Alle Typen', value: '' },
+            { label: 'Bild', value: 'picture' },
+            { label: 'Publikation', value: 'publication' },
+            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
+          ]"
+          :header-background-color="'rgb(240, 240, 240)'" />
+        <base-drop-down
+          :label="'select type'"
+          :option-selected="{ label: 'Alle Typen', value: '' }"
+          :options="[
+            { label: 'Alle Typen', value: '' },
+            { label: 'Bild', value: 'picture' },
+            { label: 'Publikation', value: 'publication' },
+            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
+          ]"
+          :header-background-color="'rgb(240, 240, 240)'" />
+      </div>
+    </base-pop-up>
+
+    <!-- DROP DOWN TEST -->
+    <base-drop-down
+      v-model="selectedVal"
+      :label="'select type'"
+      :show-label="true"
+      :options="selectionList" />
+    <base-drop-down
+      :options="selectionList" />
+    <div class="spacer" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
+import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
+import BasePopUp from './components/BasePopUp/BasePopUp';
+import BaseDropDown from './components/BaseDropDown/BaseDropDown';
 import BaseInput from './components/BaseInput/BaseInput';
+import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
+import BaseSearch from './components/BaseSearch/BaseSearch';
+import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
+import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
 import BaseForm from './components/BaseForm/BaseForm';
 import BaseButton from './components/BaseButton/BaseButton';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
 
 export default {
   name: 'App',
   components: {
-    BaseResultBoxSection,
     BaseForm,
     BaseMediaPreview,
     BasePagination,
-    BaseImageBox,
-    BaseButton,
     BaseChipsBelow,
     BaseDateInput,
+    BaseDatePanel,
     BaseAutocompleteInput,
+    BaseImageBox,
+    BaseMultilineTextInput,
+    BaseSearch,
     BaseChipsInput,
     BaseMenuList,
+    BaseMenuEntry,
+    BaseDropDown,
+    BasePopUp,
     BaseInput,
+    BaseButton,
+    BaseDropBox,
     BaseToggle,
     BaseProgressBar,
   },
   data() {
     return {
-      activeAction: '',
-      entriesList: [
-        {
-          id: 'pCSLggvdsi8b3zRTLM4dJR',
-          date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'An extra extra long title',
-          subtitle: 'A test',
-          description: 'Performance',
-          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          // eslint-disable-next-line global-require
-          imageUrl: require('@/assets/images/img1.png'),
-        },
-        {
-          id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
-          date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'Unknown',
-          subtitle: 'Lets find it out and look deeper',
-          description: 'Novel',
-          // eslint-disable-next-line global-require
-          imageUrl: require('@/assets/images/img1.png'),
-        },
-        {
-          id: 'pCSLggvdsi8b3fffzRTLM4dJR',
-          date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'TBD',
-          subtitle: 'Misterious',
-          text: ['Random text 1', 'Random text 2'],
-        },
-      ],
-      selectedBoxes: [],
+      baseDatePanelInput: { date: '' },
       formValueList: {
         id: 'JVKyWKTr8pit772AQKMW5V',
         parents: [
@@ -800,7 +940,7 @@ export default {
       multilineInput: 'test',
       multilineTest: '',
       selectable: false,
-      progress: 90,
+      progress: 0,
       autocompleteInput: 'testtttttttttttt',
       inputDate: {
         date_from: '2019',
@@ -881,19 +1021,11 @@ export default {
     },
   },
   methods: {
-    entrySelected({ entryId, selected }) {
-      if (selected && !this.selectedBoxes.includes(entryId)) {
-        this.selectedBoxes.push(entryId);
-      } else if (!selected) {
-        this.selectedBoxes = this.selectedBoxes.filter(boxId => boxId !== entryId);
-      }
+    baseDatePanelSelected(val) {
+      console.log('baseDatePanelSelected', val);
     },
-    selectEntries(selectAll) {
-      if (selectAll) {
-        this.selectedBoxes = this.entriesList.map(entry => entry.id);
-      } else {
-        this.selectedBoxes = [];
-      }
+    handleMultilineInput(val) {
+      console.log(val);
     },
     setHoverBox(val, entry) {
       if (val) {
@@ -1030,13 +1162,5 @@ export default {
   }
   .spacer {
     height: 300px;
-  }
-
-  .result-box {
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-  .result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
-    margin-left: 16px;
   }
 </style>

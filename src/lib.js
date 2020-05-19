@@ -4,6 +4,7 @@ import BaseButton from './components/BaseButton/BaseButton';
 import BaseBoxButton from './components/BaseBoxButton/BaseBoxButton';
 import BaseInput from './components/BaseInput/BaseInput';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
+import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from './components/BaseSearch/BaseSearch';
 import BaseMenuList from './components/BaseMenuList/BaseMenuList';
@@ -13,8 +14,6 @@ import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMult
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
-// TODO: remove and replace with base progress bar
-import BaseUploadBar from './components/BaseUploadBar/BaseUploadBar';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
 import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
@@ -26,6 +25,7 @@ import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBo
 import BaseFormFieldCreator from './components/BaseFormFieldCreator/BaseFormFieldCreator';
 import BaseForm from './components/BaseForm/BaseForm';
 import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions';
+import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import BaseDropDownList from './components/BaseDropDownList/BaseDropDownList';
 import BaseChipsInputField from './components/BaseChipsInputField/BaseChipsInputField';
 import 'normalize.css';
@@ -38,6 +38,7 @@ export {
   BaseBoxButton,
   BaseInput,
   BaseDateInput,
+  BaseDatePanel,
   BaseChipsInput,
   BaseSearch,
   BaseMenuList,
@@ -47,7 +48,6 @@ export {
   BaseDropBox,
   BaseChipsBelow,
   BaseProgressBar,
-  BaseUploadBar,
   BaseImageBox,
   BaseHoverBox,
   BaseMediaPreview,
@@ -59,6 +59,7 @@ export {
   BaseFormFieldCreator,
   BaseForm,
   BaseSelectOptions,
+  BaseCarousel,
   BaseDropDownList,
   BaseChipsInputField,
 };

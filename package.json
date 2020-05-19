@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "0.4.5",
+  "version": "0.5.0",
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
@@ -21,7 +21,9 @@
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
     "hls.js": "^0.13.1",
+    "lazysizes": "^5.2.0",
     "normalize.css": "^8.0.1",
+    "swiper": "^5.3.1",
     "vue": "^2.6.11",
     "vue-click-outside": "^1.1.0",
     "vue2-datepicker": "^3.5.0",
