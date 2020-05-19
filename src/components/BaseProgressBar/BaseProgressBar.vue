@@ -268,13 +268,13 @@ export default {
       .base-progress-bar__file-size {
         margin-left: auto;
         flex-shrink: 0;
-        padding-left: $spacing;
+        left: $spacing;
       }
 
       .base-progress-bar__status-icon {
         height: $icon-medium;
         flex-shrink: 0;
-        padding-left: $spacing;
+        margin-left: $spacing;
 
         &.base-progress-bar__status-icon-success {
           fill: white;
