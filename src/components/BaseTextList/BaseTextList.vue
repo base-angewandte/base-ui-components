@@ -1,8 +1,8 @@
 <template>
   <div class="base-text-list">
     <div
-      v-for="(item, index) in data"
-      :key="index"
+      v-for="(item, k) in data"
+      :key="k"
       class="base-text-list-group">
       <component
         :is="renderLabelAs"
@@ -11,36 +11,44 @@
       </component>
 
       <!-- String as text -->
+      <!-- eslint-disable -->
       <p
         v-if="typeof item.data === 'string'"
-        class="base-text-list-content base-text-list-content-pre-line">
-        {{ item.data }}
-      </p>
+        class="base-text-list-content base-text-list-content-pre-line">{{ item.data }}</p>
+      <!-- eslint-enable -->
 
       <!-- Array as unordered list -->
       <ul
-        v-else-if="typeof item.data === 'object'
-          && item.data.length && typeof item.data[0] === 'string'"
+        v-if="typeof item.data === 'object' && typeof item.data[0] === 'string'"
         class="base-text-list-content">
         <li
-          v-for="(arrayItem, listIndex) in item.data"
-          :key="listIndex">
-          {{ arrayItem }}
+          v-for="(a, l) in item.data"
+          :key="l">
+          {{ a }}
         </li>
       </ul>
 
       <!-- Array/Objects as data list -->
       <dl
-        v-if="typeof item.data === 'object'
-          && item.data.length && typeof item.data[0] === 'object'"
+        v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
         class="base-text-list-content">
         <template
-          v-for="(objectItem, objectIndex) in item.data">
-          <dt :key="'l' + objectIndex">
-            {{ objectItem.label }}:
+          v-for="(o, l) in item.data">
+          <dt :key="'l' + l">
+            {{ o.label }}:
           </dt>
-          <dd :key="'v' + objectIndex">
-            {{ objectItem.value }}
+          <dd :key="'v' + l">
+            <template
+              v-if="o.url">
+              <a
+                :href="o.url"
+                :title="o.value">{{ o.value }}</a>
+            </template>
+
+            <template
+              v-else>
+              {{ o.value }}
+            </template>
           </dd>
         </template>
       </dl>
@@ -96,6 +104,14 @@ export default {
 
     .base-text-list-content {
       color: $font-color-second;
+
+      a {
+        color: $app-color;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     .base-text-list-content-pre-line {

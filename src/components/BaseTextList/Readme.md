@@ -3,14 +3,18 @@ A component to render data in p | ul | dt tags depending on fieldtype
 ```vue
 <template>
   <div>
-    <baseTextList
+    <BaseTextList
       render-label-as="h2"
       :data="data" />
   </div>
 </template>
 
 <script>
+import BaseTextList from './BaseTextList';
 export default {
+  components: {
+    BaseTextList,
+  },
   data() {
     return {
       data: [{
@@ -27,13 +31,16 @@ export default {
         },
         {
           label: 'Vero eos et accusam',
-          data: [{
-              label: 'Labore',
-              value: 'Dolore magna aliquyam erat',
+          data: [
+            {
+              label: 'www',
+              value: 'http://base.uni-ak.ac.at',
+              url: 'http://base.uni-ak.ac.at',
             },
             {
-              label: 'Labore',
-              value: 'Dolore magna aliquyam erat',
+              label: 'email',
+              value: 'base@uni-ak.ac.at',
+              url: 'mailto:base@uni-ak.ac.at',
             },
             {
               label: 'Labore',

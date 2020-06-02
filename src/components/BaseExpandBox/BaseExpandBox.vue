@@ -1,27 +1,22 @@
 <template>
-  <BaseBox
+  <base-box
     box-ratio="0"
-    :box-size="{width: '100%', margin: '0 auto', 'max-width': '1400px' }"
+    :box-size="{width: '100%'}"
     :class="['base-expand-box', {'base-expand-box-open': isOpen }]">
     <div
       :class="[
-        'base-expand-box-inner',
-        {'base-expand-box-inner-fade-out': (!isOpen && showButton)}]">
-      <div class="base-expand-box-columns">
-        <div class="base-expand-box-column">
-          <BaseTextList
-            :render-label-as="renderLabelAs"
-            :data="data.descriptions" />
-        </div>
-        <div class="base-expand-box-column">
-          <BaseTextList
-            :render-label-as="renderLabelAs"
-            :data="data.furtherDetails" />
-        </div>
+        'base-expand-box-content',
+        {'base-expand-box-content-fade-out': (!isOpen && showButton)}]">
+      <div
+        class="base-expand-box-content-inner">
+        <!--
+          @slot default slot
+        -->
+        <slot />
       </div>
     </div>
 
-    <BaseButton
+    <base-button
       v-if="showButton"
       :text="isOpen ? showLessText : showMoreText"
       :has-background-color="false"
@@ -30,36 +25,20 @@
       icon-position="right"
       class="base-expand-box-button"
       @clicked="clicked" />
-  </BaseBox>
+  </base-box>
 </template>
 
 <script>
 import BaseBox from '../BaseBox/BaseBox';
 import BaseButton from '../BaseButton/BaseButton';
-import BaseTextList from '../BaseTextList/BaseTextList';
 
 export default {
   name: 'BaseExpandBox',
   components: {
     BaseBox,
     BaseButton,
-    BaseTextList,
   },
   props: {
-    /**
-     * Data to display
-     */
-    data: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
-     * Render component as e.g.: 'h2' | 'h3'
-     */
-    renderLabelAs: {
-      type: String,
-      default: 'div',
-    },
     /**
      * Button text to show more content
      */
@@ -82,25 +61,20 @@ export default {
     };
   },
   mounted() {
-    this.showButton = this.maxColumnHeight() > this.columnHeight();
+    this.showButton = this.contentInnerHeight() > this.contentHeight();
   },
   methods: {
     /**
-     * Calculate height of content column
+     * Calculate height of content
      */
-    columnHeight() {
-      return this.$el.querySelector('.base-expand-box-inner').offsetHeight;
+    contentHeight() {
+      return this.$el.querySelector('.base-expand-box-content').offsetHeight;
     },
     /**
-     * Calculate max height of content columns
+     * Calculate height of content inner
      */
-    maxColumnHeight() {
-      const heights = [];
-      this.$el.querySelectorAll('.base-expand-box-column')
-        .forEach((item) => {
-          heights.push(item.offsetHeight);
-        });
-      return Math.max(...heights);
+    contentInnerHeight() {
+      return this.$el.querySelector('.base-expand-box-content-inner').offsetHeight;
     },
     /**
      * event emitted on button click, <br>
@@ -123,13 +97,13 @@ export default {
   .base-expand-box {
     padding: $spacing;
 
-    .base-expand-box-inner {
+    .base-expand-box-content {
       position: relative;
       overflow: hidden;
       line-height: $line-height;
       height: $line-height * $initial-text-rows + $headline-margin-bottom;
 
-      &.base-expand-box-inner-fade-out::after {
+      &.base-expand-box-content-fade-out::after {
         content: '';
         width: 100%;
         height: $line-height * 2;
@@ -141,31 +115,13 @@ export default {
       }
     }
 
-    .base-expand-box-columns {
-      display: flex;
-      justify-content: space-between;
-
-      .base-expand-box-column {
-        width: calc(50% - #{$spacing-large});
-      }
-
-      @media screen and (max-width: $mobile) {
-        display: block;
-        justify-content: inherit;
-
-        .base-expand-box-column {
-          width: 100%;
-        }
-      }
-    }
-
     .base-expand-box-button {
       margin-top: $spacing;
       padding-left: 0;
     }
 
     &.base-expand-box-open {
-      .base-expand-box-inner {
+      .base-expand-box-content {
         height: auto;
       }
     }
@@ -173,15 +129,44 @@ export default {
 </style>
 
 <style lang="scss">
+  @import "../../styles/variables";
+
   .base-expand-box-button {
     .base-button-icon {
       transition: transform 250ms ease-in-out;
     }
   }
+
   .base-expand-box-open {
     .base-expand-box-button {
       .base-button-icon {
         transform: rotate(180deg);
+      }
+    }
+  }
+
+  .base-expand-box-columns {
+    display: flex;
+    justify-content: space-between;
+
+    .base-expand-box-column {
+      width: calc(50% - #{$spacing-large});
+    }
+
+    @media screen and (max-width: $mobile) {
+      display: block;
+      justify-content: inherit;
+
+      .base-expand-box-column {
+        width: 100%;
+
+        &:first-of-type {
+          .base-text-list-group {
+            &:first-of-type {
+              margin-top: 0;
+            }
+          }
+        }
       }
     }
   }

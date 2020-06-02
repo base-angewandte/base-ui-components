@@ -1,3 +1,19 @@
+/* Overwrite colors in your App with css vars defined in your app root css */
+/*:root {
+  --app-color: #FF9800;
+  --font-color: rgb(0, 0, 0);
+  --font-color-second: rgb(107, 107, 107);
+  --button-header-color: rgb(240, 240, 240);
+  --input-field-color: rgb(200, 200, 200);
+  --background-color: #f0f0f0;
+  --box-color: #ffffff;
+
+  --uploadbar-color: #999999;
+  --switch-checked-color: #4d4d4d;
+  --switch-svg-checked-color: #ffffff;
+  --graytext-color: #808080;
+}*/
+
 /* fonts */
 $font-size-regular: 1rem;
 $font-size-small: 16rem/19;
@@ -18,22 +34,22 @@ $input-field-line-height: 27rem/19;
 $fade-out-width: 30px;
 
 /* colors */
-$app-color: #FF9800 !default;
-$font-color: rgb(0, 0, 0);
-$font-color-second: rgb(107, 107, 107);
-$font-color-third: rgb(160, 160, 160);
-$button-header-color: rgb(240, 240, 240);
-$input-field-color: rgb(200, 200, 200);
-$background-color: #f0f0f0;
-$box-color: white;
+$app-color: var(--app-color, #FF9800);
+$font-color: var(--font-color, rgb(0, 0, 0));
+$font-color-second: var(--font-color-second, rgb(107, 107, 107));
+$font-color-third: var(font-color-third, rgb(160, 160, 160));
+$button-header-color: var(--button-header-color, rgb(240, 240, 240));
+$input-field-color: var(--input-field-color, rgb(200, 200, 200));
+$background-color: var(--background-color, #f0f0f0);
+$box-color: var(--box-color, white);
 /* self defined for now! */
-$uploadbar-color: #999999;
+$uploadbar-color: var(--uploadbar-color, #999999);
 $switch-container-color: $input-field-color;
 $switch-color: $background-color;
-$switch-checked-color: #4d4d4d;
+$switch-checked-color: var(--switch-checked-color, #4d4d4d);
 $switch-svg-color: $font-color-third;
-$switch-svg-checked-color: #fff;
-$graytext-color: #808080;
+$switch-svg-checked-color: var(--switch-svg-checked-color, #ffffff);
+$graytext-color: var(--graytext-color, #808080);
 
 /* shadows and borders */
 $border-width: 2px;
