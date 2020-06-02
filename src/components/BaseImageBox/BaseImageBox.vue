@@ -65,24 +65,30 @@
                        { 'base-image-box-no-title': !showTitle }]"
               @error="displayImage = false">
           </div>
-          <!-- @slot to display more advanced text -->
-          <slot
-            :text="boxText"
-            name="text">
-            <!-- default -->
-            <div
-              v-if="!(imageUrl && displayImage) && boxText.length"
-              ref="boxText"
-              :style="boxTextStyle"
-              class="base-image-box-text">
+          <div
+            v-if="!imageUrl || !displayImage"
+            ref="boxText"
+            class="base-image-box__text-wrapper">
+            <!-- @slot to display more advanced text - if you use this please specify the
+            ref attribute with 'textLine' for a single line - so the text display height
+            can be calculated correctly! -->
+            <slot
+              :text="boxText"
+              name="text">
+              <!-- default -->
               <div
-                v-for="(entry, index) in boxText"
-                :key="index">
-                {{ entry }}
+                v-if="!(imageUrl && displayImage) && boxText.length"
+                :style="boxTextStyle"
+                class="base-image-box-text">
+                <div
+                  v-for="(entry, index) in boxText"
+                  ref="textLine"
+                  :key="index">
+                  {{ entry }}
+                </div>
               </div>
-            </div>
-          </slot>
-
+            </slot>
+          </div>
           <div class="base-image-box-description">
             <div
               v-if="description"
@@ -235,6 +241,7 @@ export default {
       boxTextStyle: {},
       imageStyle: {},
       displayImage: true,
+      resizeTimeout: null,
     };
   },
   computed: {
@@ -267,25 +274,13 @@ export default {
   },
   mounted() {
     this.selectedInt = this.selected;
-    if (!this.imageUrl && this.boxText.length) {
-      const elem = this.$refs.boxText;
-      const boxMargin = window.getComputedStyle(elem, null)
-        .getPropertyValue('margin-bottom').replace('px', '');
-      let boxHeight = window.getComputedStyle(elem, null)
-        .getPropertyValue('height').replace('px', '');
-      const lineHeight = window.getComputedStyle(elem, null)
-        .getPropertyValue('line-height').replace('px', '');
-      // if there is a descrption also leave space for that so its not overlapping
-      // TODO: check if this is wanted
-      if (this.description) {
-        boxHeight -= lineHeight;
-      }
-      const lines = Math.floor((boxHeight - boxMargin) / lineHeight);
-      this.boxTextStyle = {
-        height: `${lineHeight * lines}px`,
-        '-webkit-line-clamp': lines,
-      };
+    this.calcTextHeight();
+    if (window) {
+      window.addEventListener('resize', this.resizeTriggered);
     }
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.resizeTriggered);
   },
   methods: {
     boxSelect() {
@@ -298,6 +293,57 @@ export default {
          * @event clicked
          */
         this.$emit('clicked');
+      }
+    },
+    resizeTriggered() {
+      // check if there is a timeout already set and clear it if yes
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = null;
+      }
+      this.resizeTimeout = setTimeout(() => {
+        this.calcTextHeight();
+      }, 500);
+    },
+    calcTextHeight() {
+      // only do this if no image is present and the boxText variable has items
+      // and all the ui elements are there
+      if (!this.imageUrl && this.boxText.length
+        && this.$refs.baseBox && this.$refs.boxText) {
+        let headerHeight = 0;
+        if (this.$refs.headerBox) {
+          const headerElem = this.$refs.headerBox;
+          const elemInnerHeight = headerElem.clientHeight;
+          const boxMargin = headerElem.offsetTop;
+          headerHeight = elemInnerHeight + (2 * boxMargin);
+        }
+        // get text-wrapper element
+        const elem = this.$refs.boxText;
+        // get single text line in the text element (for line height only)
+        const lineElement = this.$refs.textLine[0];
+        // get the height of the complete box
+        const boxHeight = this.$refs.baseBox.$el.clientHeight;
+        // get the line height proporty
+        const lineHeight = window.getComputedStyle(lineElement, null)
+          .getPropertyValue('line-height').replace('px', '');
+        // get the box margin
+        const boxMargin = window.getComputedStyle(elem, null)
+          .getPropertyValue('margin-bottom').replace('px', '');
+        // caclucate the actual text box height from
+        // complete box height - header height - box margin (bottom)
+        let textBoxHeight = boxHeight - headerHeight - boxMargin;
+        // if there is a descrption also leave space for that so its not overlapping
+        // TODO: check if this is wanted
+        if (this.description) {
+          textBoxHeight -= lineHeight;
+        }
+        // calculate how many lines can be displayed
+        const lines = Math.floor(textBoxHeight / lineHeight);
+        // set the style of the text box
+        this.boxTextStyle = {
+          height: `${lineHeight * lines}px`,
+          '-webkit-line-clamp': lines,
+        };
       }
     },
   },
@@ -414,6 +460,7 @@ export default {
         &:after {
           content: "";
           width: 100%;
+          min-height: $row-height-large;
           position: absolute;
           bottom: 0;
           right: 0;
@@ -432,9 +479,13 @@ export default {
         }
       }
 
-      .base-image-box-text {
+      .base-image-box__text-wrapper {
         display: flex;
         margin: 0 $spacing $spacing;
+        width: calc(100% - 2 * #{$spacing});
+      }
+
+      .base-image-box-text {
         overflow-wrap: break-word;
         overflow: hidden;
         display: -webkit-box;
