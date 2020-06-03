@@ -1,7 +1,7 @@
 <template>
   <div
-    class="base-map"
-    ref="mapElement" />
+    ref="mapElement"
+    class="base-map" />
 </template>
 
 <script>
