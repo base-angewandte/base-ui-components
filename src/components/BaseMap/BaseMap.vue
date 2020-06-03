@@ -1,5 +1,6 @@
 <template>
   <div
+    class="base-map"
     ref="mapElement" />
 </template>
 
@@ -90,3 +91,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .base-map {
+    min-height: 200px;
+  }
+</style>

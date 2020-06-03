@@ -4,7 +4,6 @@ A component to display a Leaflet-map
 <template>
   <BaseMap
     :lat-long="latLong"
-    class="base-map"
   />
 </template>
 
@@ -20,9 +19,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-  .base-map {
-    height: 368px;
-  }
-</style>
