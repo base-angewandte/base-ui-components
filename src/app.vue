@@ -22,6 +22,27 @@
           },
         },
       }" />
+    <BaseMap
+      :lat-long="[
+        '48.208370',
+        '16.384510',
+      ]"
+      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      class="base-map" />
+    <BaseExpandBox>
+      <div class="base-expand-box-columns">
+        <div class="base-expand-box-column">
+          <BaseTextList
+            render-label-as="h2"
+            :data="data.column1" />
+        </div>
+        <div class="base-expand-box-column">
+          <BaseTextList
+            render-label-as="h2"
+            :data="data.column2" />
+        </div>
+      </div>
+    </BaseExpandBox>
     <BaseResultBoxSection
       :entry-list="entriesList"
       :action="activeAction"
@@ -400,6 +421,9 @@ import BaseToggle from './components/BaseToggle/BaseToggle';
 import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
 import BaseCarousel from './components/BaseCarousel/BaseCarousel';
+import BaseMap from './components/BaseMap/BaseMap';
+import BaseTextList from './components/BaseTextList/BaseTextList';
+import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
 
 export default {
   name: 'App',
@@ -426,10 +450,52 @@ export default {
     BaseToggle,
     BaseProgressBar,
     BaseCarousel,
+    BaseMap,
+    BaseExpandBox,
+    BaseTextList,
   },
   data() {
     return {
       activeAction: '',
+      data: {
+        column1: [{
+          label: 'Description',
+          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+            `,
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            {
+              label: 'www',
+              value: 'http://base.uni-ak.ac.at',
+              url: 'http://base.uni-ak.ac.at',
+            },
+            {
+              label: 'email',
+              value: 'base@uni-ak.ac.at',
+              url: 'mailto:base@uni-ak.ac.at',
+            },
+          ],
+        },
+        ],
+        column2: [{
+          label: 'Vero eos et accusam',
+          data: 'no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            'Lorem ipsum dolor sit amet',
+            'Consetetur sadipscing elitr, sed diam nonumy',
+            'Eirmod tempor invidunt',
+            'Eirmod tempor invidunt',
+            'Eirmod tempor invidunt',
+            'Eirmod tempor invidunt',
+          ],
+        },
+        ],
+      },
       entriesList: [
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
@@ -1381,5 +1447,9 @@ export default {
   }
   .result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
     margin-left: 16px;
+  }
+
+  .base-map {
+    height: 400px;
   }
 </style>
