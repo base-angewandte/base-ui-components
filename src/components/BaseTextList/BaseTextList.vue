@@ -1,8 +1,8 @@
 <template>
   <div class="base-text-list">
     <div
-      v-for="(item, k) in data"
-      :key="k"
+      v-for="(item, index) in data"
+      :key="index"
       class="base-text-list-group">
       <component
         :is="renderLabelAs"
@@ -22,9 +22,9 @@
         v-if="typeof item.data === 'object' && typeof item.data[0] === 'string'"
         class="base-text-list-content">
         <li
-          v-for="(a, l) in item.data"
-          :key="l">
-          {{ a }}
+          v-for="(arrayItem, listIndex) in item.data"
+          :key="listIndex">
+          {{ arrayItem }}
         </li>
       </ul>
 
@@ -33,21 +33,21 @@
         v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
         class="base-text-list-content">
         <template
-          v-for="(o, l) in item.data">
-          <dt :key="'l' + l">
-            {{ o.label }}:
+          v-for="(objectItem, objectIndex) in item.data">
+          <dt :key="'l' + objectIndex">
+            {{ objectItem.label }}:
           </dt>
-          <dd :key="'v' + l">
+          <dd :key="'v' + objectIndex">
             <template
-              v-if="o.url">
+              v-if="objectItem.url">
               <a
-                :href="o.url"
-                :title="o.value">{{ o.value }}</a>
+                :href="objectItem.url"
+                :title="objectItem.value">{{ objectItem.value }}</a>
             </template>
 
             <template
               v-else>
-              {{ o.value }}
+              {{ objectItem.value }}
             </template>
           </dd>
         </template>
