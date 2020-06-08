@@ -1,5 +1,25 @@
 <template>
   <div id="app">
+    <h1>BaseDetailBox</h1>
+    <BaseDetailBox
+      :data="[{
+                label: 'Telefon',
+                value: '01234455767',
+              },
+              {
+                label: 'Fax',
+                value: '01234455767 123',
+              },
+              {
+                label: 'Mobile',
+                value: '098012345678',
+              },
+              {
+                label: 'Email',
+                value: 'name@domain.com',
+              },
+      ]" />
+
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -424,6 +444,7 @@ import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import BaseMap from './components/BaseMap/BaseMap';
 import BaseTextList from './components/BaseTextList/BaseTextList';
 import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
+import BaseDetailBox from './components/BaseDetailBox/BaseDetailBox';
 
 export default {
   name: 'App',
@@ -447,6 +468,7 @@ export default {
     BaseInput,
     BaseButton,
     BaseDropBox,
+    BaseDetailBox,
     BaseToggle,
     BaseProgressBar,
     BaseCarousel,
