@@ -1,7 +1,24 @@
 <template>
   <div id="app">
     <h1>BaseDetailBox</h1>
-    <base-detail-box />
+    <BaseDetailBox
+      :data="[{
+                label: 'Telefon',
+                value: '01234455767',
+              },
+              {
+                label: 'Fax',
+                value: '01234455767 123',
+              },
+              {
+                label: 'Mobile',
+                value: '098012345678',
+              },
+              {
+                label: 'Email',
+                value: 'name@domain.com',
+              },
+      ]" />
 
     <!-- VIDEO TEST -->
     <!-- <video

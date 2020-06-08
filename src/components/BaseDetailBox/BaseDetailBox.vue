@@ -8,10 +8,11 @@
       <template
         v-for="(item, index) in data">
         <dt :key="'dt' + index">
-          {{ item.label }}
+          {{ getLangLabel(item[labelPropertyName], true) }}
         </dt>
         <dd :key="'dd' + index">
-          {{ item.value }}
+          <!-- TODO: if necessary also add language specific function here! -->
+          {{ item[valuePropertyName] }}
         </dd>
       </template>
     </dl>
@@ -20,16 +21,38 @@
 
 <script>
 import BaseBox from '../BaseBox/BaseBox';
-
+import { setLanguageMixin } from '../../mixins/setLanguage';
 
 export default {
   components: {
     BaseBox,
   },
+  mixins: [
+    setLanguageMixin,
+  ],
   props: {
+    /**
+     * an array with objects to pass the data to be displayed, expecting an object with
+     * 'label' and 'value' properties - if different please use valuePropertyName
+     * and LabelPropertyName respectively!
+     */
     data: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * customize the value property displayed
+     */
+    valuePropertyName: {
+      type: String,
+      default: 'value',
+    },
+    /**
+     * customize the label property displayed
+     */
+    labelPropertyName: {
+      type: String,
+      default: 'label',
     },
   },
 };

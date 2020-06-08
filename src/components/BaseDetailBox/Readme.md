@@ -32,3 +32,39 @@ export default {
 };
 </script>
 ```
+Example with custom properties
+
+```vue
+<template>
+  <BaseDetailBox
+    :data="data"
+    label-property-name="name"
+    value-property-name="text" />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      data: [{
+          name: 'Telefon',
+          text: '01234455767',
+        },
+        {
+          name: 'Fax',
+          text: '01234455767 123',
+        },
+        {
+          name: 'Mobile',
+          text: '098012345678',
+        },
+        {
+          name: 'Email',
+          text: 'name@domain.com',
+        },
+      ]
+    };
+  },
+};
+</script>
+```
