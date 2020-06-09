@@ -23,7 +23,7 @@ export default {
         }, {});
     },
     getLangLabel(value, useAny = false) {
-      const language = this.language || this.$i18n.locale;
+      const language = this.hasI18n ? this.language || this.$i18n.locale : this.language;
       if (typeof value === 'string') return value;
       if (value && language && value[language]) {
         return value[language];
