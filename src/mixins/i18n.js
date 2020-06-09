@@ -23,14 +23,15 @@ export default {
         }, {});
     },
     getLangLabel(value, useAny = false) {
+      const language = this.language || this.$i18n.locale;
       if (typeof value === 'string') return value;
-      if (value && this.language && value[this.language]) {
-        return value[this.language];
+      if (value && language && value[language]) {
+        return value[language];
       }
-      if (value && this.language && useAny) {
-        const lang = Object.keys(value).find(key => !!value[key]);
+      if (value && language && useAny) {
+        const availableLang = Object.keys(value).find(key => !!value[key]);
         // return the first one that has content
-        return value[lang] || value[this.language];
+        return value[availableLang] || value[language];
       }
       return value;
     },
