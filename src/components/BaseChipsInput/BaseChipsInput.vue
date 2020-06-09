@@ -32,6 +32,7 @@
       :value-property-name="valuePropertyNameInt"
       :list-id="id"
       :style="{ 'min-width': dropDownMinWidth }"
+      :language="language"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
         <span
