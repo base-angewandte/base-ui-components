@@ -289,11 +289,12 @@ export default {
     this.filters = result.data || [];
   },
   methods: {
-    fetchAutocomplete(val) {
-      if (val) {
+    fetchAutocomplete(valObject) {
+      if (valObject.stringValue) {
         this.resultList = this.resultListOriginal.map(({ collection, data }) => {
           const filteredResults = data
-            .filter(entry => entry.header.toLowerCase().includes(val.toLowerCase()));
+            .filter(entry => entry.header.toLowerCase()
+              .includes(valObject.stringValue.toLowerCase()));
           return {
             collection,
             data: filteredResults,

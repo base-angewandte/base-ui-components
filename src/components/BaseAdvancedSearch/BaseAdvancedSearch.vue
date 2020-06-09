@@ -15,6 +15,7 @@
       :is-main-search="true"
       :applied-filter="currentFilter"
       :filter-list="filterList"
+      :autocomplete-results="autocompleteResults"
       @add-filter="addFilter"
       @fetch-autocomplete-results="fetchAutocomplete($event, currentFilter)" />
   </div>
@@ -37,6 +38,10 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    autocompleteResults: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   data() {
     return {
@@ -52,7 +57,7 @@ export default {
       this.filters.splice(index, 1);
     },
     fetchAutocomplete(stringValue, filter) {
-      this.$emit('fetch-autocomplete', { stringValue, filter });
+      this.$emit('fetch-autocomplete-results', { stringValue, filter });
     },
   },
 };
