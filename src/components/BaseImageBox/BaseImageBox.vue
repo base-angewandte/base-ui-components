@@ -291,6 +291,7 @@ export default {
 
         .base-image-box-image {
           display: block;
+          position: absolute;
           margin: auto;
           height: 100%;
           width: 100%;
