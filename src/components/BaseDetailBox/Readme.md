@@ -32,34 +32,68 @@ export default {
 };
 </script>
 ```
-Example with custom properties
+Example with custom properties and language specific label
 
 ```vue
 <template>
-  <BaseDetailBox
-    :data="data"
-    label-property-name="name"
-    value-property-name="text" />
+  <div>
+      <BaseDetailBox
+        :data="data"
+        :language="lang"
+        label-property-name="name"
+        value-property-name="text" />
+      <div class="button-row">
+        <BaseButton
+          :active="lang === 'en'"
+          text="English"
+          class="language-button"
+          @clicked="lang = 'en'" />
+        <BaseButton
+          :active="lang === 'de'"
+          text="German"
+          class="language-button"
+          @clicked="lang = 'de'" />
+      </div>
+
+  </div>
+
 </template>
 
 <script>
+import BaseButton from '../../components/BaseButton/BaseButton';
+
 export default {
+components: { BaseButton } ,
+
   data() {
     return {
+      lang: 'en',
       data: [{
-          name: 'Telefon',
+          name: {
+            de: 'Telefon',
+            en: 'Telephone',
+          },
           text: '01234455767',
         },
         {
-          name: 'Fax',
+          name: {
+            de: 'Fax',
+            en: 'Fax',
+          },
           text: '01234455767 123',
         },
         {
-          name: 'Mobile',
+          name: {
+            de: 'Mobil',
+            en: 'Mobile',
+          },
           text: '098012345678',
         },
         {
-          name: 'Email',
+          name: {
+            de: 'Email',
+            en: 'Email',
+          },
           text: 'name@domain.com',
         },
       ]
@@ -67,4 +101,15 @@ export default {
   },
 };
 </script>
+
+<style>
+  .button-row {
+    display: flex;
+    margin-top: 16px;
+  }
+  .language-button {
+    margin-right: 16px;
+  }
+
+</style>
 ```

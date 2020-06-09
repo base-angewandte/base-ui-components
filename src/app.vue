@@ -3,7 +3,10 @@
     <h1>BaseDetailBox</h1>
     <BaseDetailBox
       :data="[{
-                label: 'Telefon',
+                label: {
+                  de: 'Telefon',
+                  en: 'Telephone',
+                },
                 value: '01234455767',
               },
               {
@@ -18,7 +21,8 @@
                 label: 'Email',
                 value: 'name@domain.com',
               },
-      ]" />
+      ]"
+      language="en" />
 
     <base-carousel
       :items="carousel"

@@ -21,14 +21,14 @@
 
 <script>
 import BaseBox from '../BaseBox/BaseBox';
-import { setLanguageMixin } from '../../mixins/setLanguage';
+import setLanguage from '../../mixins/i18n';
 
 export default {
   components: {
     BaseBox,
   },
   mixins: [
-    setLanguageMixin,
+    setLanguage,
   ],
   props: {
     /**
@@ -53,6 +53,14 @@ export default {
     labelPropertyName: {
       type: String,
       default: 'label',
+    },
+    /**
+     * specify a language (ISO 639-1) (used for label if label is language specific object
+     * e.g. { de: 'xxx', en: 'yyy' })
+     */
+    language: {
+      type: String,
+      default: 'en',
     },
   },
 };
