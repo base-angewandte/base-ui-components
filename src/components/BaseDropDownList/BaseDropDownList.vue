@@ -178,13 +178,14 @@ export default {
   computed: {
     /**
      * variable to store if values provided in the list are strings
-     * (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' })
+     * (or an object with language specific strings e.g. { de: 'xxx', en: 'yyy' }) or
+     * if list contains other objects (e.g. for AdvancedSearch)
      * @returns {boolean}
      */
     valueIsString() {
-      return this.dropDownOptions[this.valuePropertyName]
-        && this.dropDownOptions[this.valuePropertyName].length
-        && typeof this.getLangLabel(this.dropDownOptions[this.valuePropertyName] === 'string', true);
+      return this.dropDownOptions
+        && this.dropDownOptions.length
+        && typeof this.getLangLabel(this.dropDownOptions[0][this.valuePropertyName], true) === 'string';
     },
     /**
      * the index of the currently active option provided by parent
