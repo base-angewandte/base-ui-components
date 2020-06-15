@@ -938,7 +938,7 @@ export default {
       margin: 0 $spacing;
 
       .base-chips-input-single-dropdown-icon {
-        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+        transition: $drop-down-arrow-animation;
         height: $icon-small;
         flex-shrink: 0;
 

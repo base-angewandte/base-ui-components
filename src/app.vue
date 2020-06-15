@@ -1,5 +1,16 @@
 <template>
   <div id="app">
+    <!-- BASE EXPAND ROW TEST -->
+    <BaseExpandRow
+      :is-expanded="true"
+      icon="camera"
+      class="base-expand-row">
+      <p>
+        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam,
+        quis nostrud exercitation ullamco labos
+      </p>
+    </BaseExpandRow>
+
     <!-- VIDEO TEST -->
     <!-- <video
       width="320"
@@ -327,10 +338,12 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
 import BasePagination from './components/BasePagination/BasePagination';
 import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
+import BaseExpandRow from './components/BaseExpandRow/BaseExpandRow';
 
 export default {
   name: 'App',
   components: {
+    BaseExpandRow,
     BaseMediaPreview,
     BasePagination,
     BaseChipsBelow,
@@ -613,5 +626,9 @@ export default {
   }
   .spacer {
     height: 300px;
+  }
+
+  .base-expand-row {
+    margin: 16px;
   }
 </style>

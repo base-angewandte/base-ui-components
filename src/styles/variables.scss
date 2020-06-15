@@ -82,6 +82,9 @@ $icon-medium: 16px;
 $icon-small: 12px;
 $icon-min: 8px;
 
+/* animations */
+$drop-down-arrow-animation: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+
 /* break-points */
 $mobile: 639px;
 $mobile-min-width: 640px;
