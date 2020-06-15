@@ -41,7 +41,6 @@
 
 <script>
 import SvgIcon from 'vue-svgicon';
-import '../../assets/icons/index';
 
 export default {
   name: 'BaseExpandRow',
