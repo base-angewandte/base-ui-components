@@ -120,18 +120,18 @@ export default {
 
   .base-expand-row {
     margin-bottom: $spacing;
+    background-color: $background-color;
 
     .base-expand-row-header {
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      height: 3em;
+      height: $row-height-large;
       width: 100%;
       padding: 0 $spacing;
       background: $box-color;
       box-shadow: $box-shadow-reg;
       transition: $box-transition;
-      color: $font-color-second;
 
       .base-expand-row-title {
         flex: auto;
@@ -145,8 +145,8 @@ export default {
       .base-expand-row-icon {
         display: flex;
         align-items: center;
-        height: 24px;
-        width: 24px;
+        height: $icon-large;
+        width: $icon-large;
         margin-right: $spacing;
         color: currentColor;
 
@@ -157,11 +157,11 @@ export default {
       }
 
       .base-expand-row-collapse-icon {
-        color: currentColor;
-        width: 12px;
-        min-width: 12px;
-        height: 12px;
-        transition: all 250ms ease-in-out;
+        transition: $drop-down-arrow-animation;
+        height: $icon-small;
+        width: $icon-small;
+        min-width: $icon-small;
+        color: $font-color;
       }
 
       &:focus,
@@ -183,7 +183,7 @@ export default {
       padding: $spacing;
 
       &.base-expand-row-body-bg {
-        margin-top: 2px;
+        margin-top: $border-width;
         background-color: $box-color;
       }
     }
