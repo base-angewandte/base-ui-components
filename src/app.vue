@@ -106,6 +106,19 @@
         @selected="baseDatePanelSelected($event)" />
     </div>
 
+    <!-- BASE EXPAND ROW TEST -->
+    <BaseExpandRow
+      :is-expanded="true"
+      label="looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        ooooooooooooooooooooooooooooooooooooooooooooooooooooooong"
+      icon="camera"
+      class="base-expand-row">
+      <p>
+        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam,
+        quis nostrud exercitation ullamco labos
+      </p>
+    </BaseExpandRow>
+
     <!-- VIDEO TEST -->
     <!-- <video
       width="320"
@@ -449,12 +462,14 @@ import BaseMap from './components/BaseMap/BaseMap';
 import BaseTextList from './components/BaseTextList/BaseTextList';
 import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
 import BaseDetailBox from './components/BaseDetailBox/BaseDetailBox';
+import BaseExpandRow from './components/BaseExpandRow/BaseExpandRow';
 
 export default {
   name: 'App',
   components: {
     BaseResultBoxSection,
     BaseForm,
+    BaseExpandRow,
     BaseMediaPreview,
     BasePagination,
     BaseChipsBelow,
@@ -1477,5 +1492,9 @@ export default {
 
   .base-map {
     height: 400px;
+  }
+
+  .base-expand-row {
+    margin: 16px;
   }
 </style>
