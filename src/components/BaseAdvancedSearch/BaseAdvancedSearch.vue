@@ -19,7 +19,6 @@
       @add-filter="addFilter"
       @fetch-autocomplete-results="fetchAutocomplete($event, currentFilter)" />
   </div>
-
 </template>
 
 <script>
