@@ -115,7 +115,6 @@ export default {
        * event emitted when chip is clicked
        *
        * @event clicked
-       * @type {none}
        *
        */
       this.$emit('clicked');

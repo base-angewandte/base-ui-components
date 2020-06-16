@@ -2,7 +2,7 @@
   <compontent
     :is="boxType"
     :style="boxSizeInt"
-    :class="['base-box', 'base-box-' + $props.boxRatio]"
+    :class="['base-box', 'base-box-' + $props.boxRatio, {'base-box-hover': boxHover}]"
     :disabled="disabled"
     :type="(boxType === 'button') ? 'button' : ''"
     @click="clicked">
@@ -47,6 +47,13 @@ export default {
       default: '100',
     },
     /**
+     *  set hover class
+     */
+    boxHover: {
+      type: Boolean,
+      default: true,
+    },
+    /**
      * set button inactive
      */
     disabled: {
@@ -57,7 +64,7 @@ export default {
   computed: {
     // TODO: do i need this?? why not use prop directly again??
     boxSizeInt() {
-      return Object.assign({}, this.$props.boxSize);
+      return { ...this.boxSize };
     },
   },
   methods: {

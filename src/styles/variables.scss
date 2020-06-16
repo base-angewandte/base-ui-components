@@ -61,7 +61,7 @@ $pop-up-shadow: 0px 0px 36px 0px rgba(0,0,0,0.5);
 $pop-up-drop-shadow: 0px 10px 46px 0px rgba(0,0,0,0.25);
 $input-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.2);
 $preview-box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.25);
-$box-transition: box-shadow 0.3s ease-in-out;
+$box-transition: box-shadow 0.2s ease-in-out;
 $separation-line: $border-width solid $button-header-color;
 $list-border: 5px solid rgba(76, 175, 80, 1);
 $list-border-transparent-50: 5px solid rgba(76, 175, 80, 0.5);
@@ -82,6 +82,9 @@ $icon-medium: 16px;
 $icon-small: 12px;
 $icon-min: 8px;
 
+/* animations */
+$drop-down-arrow-animation: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+
 /* break-points */
 $mobile: 639px;
 $mobile-min-width: 640px;
@@ -96,6 +99,10 @@ $zindex: (
   dropdown: 200,
   uploadbar-content: 200,
   hoverbox: 500,
+  loader: 5000,
   modal_bg: 10000,
   modal: 10020,
-)
+);
+
+/* headlines */
+$headline-margin-bottom: $line-height / 2;

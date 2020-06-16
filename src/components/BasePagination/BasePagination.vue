@@ -1,103 +1,115 @@
 <template>
   <div class="base-pagination">
-    <component
-      :is="numberElement"
-      :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
-      :aria-disabled="active <= 1"
-      :tabindex="active <= 1 ? -1 : 0"
+    <div
       :class="[
         'base-pagination__arrow-wrapper',
-        { 'base-pagination-arrow-inactive': active <= 1 }
+        { 'base-pagination__arrow-icon-inactive': active <= 1 }
       ]"
-      aria-label="Previous page"
-      @click.native="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @click="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @keypress.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
-      <SvgIcon
-        class="base-pagination-arrow base-pagination-arrow-left"
-        name="arrow-left" />
-    </component>
+      @click="active - 1 > 0 ? setActivePage(active - 1) : false">
+      <component
+        :is="numberElement"
+        :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
+        :aria-disabled="active <= 1"
+        :tabindex="active <= 1 ? -1 : 0"
+        aria-label="Previous page"
+        class="base-pagination__arrow"
+        @keypress.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
+        <SvgIcon
+          class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
+          name="arrow-left" />
+      </component>
+    </div>
     <div
       v-if="total > maxNumbers"
-      class="base-pagination-row">
-      <component
-        :is="numberElement"
+      class="base-pagination__row">
+      <div
         v-if="start !== 1"
-        :to="getLinkPath(1)"
-        :tabindex="active === 1 ? -1 : 0"
-        :class="['base-pagination-number', { 'base-pagination-number-active': active === 1}]"
-        aria-label="page 1"
-        @click.native="setActivePage(1)"
-        @click="setActivePage(1)"
-        @keypress.enter="setActivePage(1)">
-        {{ 1 }}
-      </component>
+        :class="['base-pagination__number', { 'base-pagination__number-active': active === 1}]"
+        @click="setActivePage(1)">
+        <component
+          :is="numberElement"
+          :to="useLinkElement ? getLinkPath(1) : false"
+          :tabindex="active === 1 ? -1 : 0"
+          aria-label="page 1"
+          class="base-pagination__number-inner"
+          @keypress.enter="setActivePage(1)">
+          {{ 1 }}
+        </component>
+      </div>
       <span
         v-if="start > 2"
-        class="base-pagination-more">&#8943;</span>
-      <component
-        :is="numberElement"
+        class="base-pagination__more">&#8943;</span>
+      <div
         v-for="n in subset"
         :key="n"
-        :to="getLinkPath(n)"
-        :tabindex="active === n ? -1 : 0"
-        :aria-label="`Page ${n}`"
-        :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
-        @click.native="setActivePage(n)"
-        @click="setActivePage(n)"
-        @keypress.enter="setActivePage(n)">
-        {{ n }}
-      </component>
+        :class="['base-pagination__number', { 'base-pagination__number-active': active === n}]"
+        @click="setActivePage(n)">
+        <component
+          :is="numberElement"
+          :to="getLinkPath(n)"
+          :tabindex="active === n ? -1 : 0"
+          :aria-label="`Page ${n}`"
+          class="base-pagination__number-inner"
+          @keypress.enter="setActivePage(n)">
+          {{ n }}
+        </component>
+      </div>
       <span
         v-if="(end) < (total - 1) && (end) !== (total - 1)"
-        class="base-pagination-more">&#8943;</span>
-      <component
-        :is="numberElement"
+        class="base-pagination__more">&#8943;</span>
+      <div
         v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
-        :to="getLinkPath(total)"
-        :tabindex="active === total ? -1 : 0"
-        :aria-label="`Page ${total}`"
-        :class="['base-pagination-number', { 'base-pagination-number-active': active === total}]"
-        @click.native="setActivePage(total)"
-        @click="setActivePage(total)"
-        @keypress.enter="setActivePage(total)">
-        {{ total }}
-      </component>
+        :class="['base-pagination__number', { 'base-pagination__number-active': active === total}]"
+        @click="setActivePage(total)">
+        <component
+          :is="numberElement"
+          :to="getLinkPath(total)"
+          :tabindex="active === total ? -1 : 0"
+          :aria-label="`Page ${total}`"
+          class="base-pagination__number-inner"
+          @keypress.enter="setActivePage(total)">
+          {{ total }}
+        </component>
+      </div>
     </div>
     <div
       v-else
-      class="base-pagination-row">
-      <component
-        :is="numberElement"
+      class="base-pagination__row">
+      <div
         v-for="n in total"
         :key="n"
-        :to="getLinkPath(n)"
-        :tabindex="active === n ? -1 : 0"
-        :aria-label="`Page ${n}`"
-        :class="['base-pagination-number', { 'base-pagination-number-active': active === n}]"
-        @click.native="setActivePage(n)"
-        @click="setActivePage(n)"
-        @keypress.enter="setActivePage(n)">
-        {{ n }}
-      </component>
+        :class="['base-pagination__number', { 'base-pagination__number-active': active === n}]"
+        @click="setActivePage(n)">
+        <component
+          :is="numberElement"
+          :to="useLinkElement ? getLinkPath(n) : false"
+          :tabindex="active === n ? -1 : 0"
+          :aria-label="`Page ${n}`"
+          class="base-pagination__number-inner"
+          @keypress.enter="setActivePage(n)">
+          {{ n }}
+        </component>
+      </div>
     </div>
-    <component
-      :is="numberElement"
-      :to="getLinkPath(active + 1 <= total ? active + 1 : total)"
-      :aria-disabled="active >= total"
-      :tabindex="active >= total ? -1 : 0"
+    <div
       :class="[
         'base-pagination__arrow-wrapper',
-        { 'base-pagination-arrow-inactive': active >= total }
+        { 'base-pagination__arrow-icon-inactive': active >= total }
       ]"
-      aria-label="Next Page"
-      @click.native="active + 1 <= total ? setActivePage(active + 1) : false"
-      @click="active + 1 <= total ? setActivePage(active + 1) : false"
-      @keypress.enter="active + 1 <= total ? setActivePage(active + 1) : false">
-      <SvgIcon
-        class="base-pagination-arrow base-pagination-arrow-right"
-        name="arrow-left" />
-    </component>
+      @click="active + 1 <= total ? setActivePage(active + 1) : false">
+      <component
+        :is="numberElement"
+        :to="getLinkPath(active + 1 <= total ? active + 1 : total)"
+        :aria-disabled="active >= total"
+        :tabindex="active >= total ? -1 : 0"
+        aria-label="Next Page"
+        class="base-pagination__arrow"
+        @keypress.enter="active + 1 <= total ? setActivePage(active + 1) : false">
+        <SvgIcon
+          class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
+          name="arrow-left" />
+      </component>
+    </div>
   </div>
 </template>
 
@@ -171,7 +183,7 @@ export default {
          * triggered on page select
          *
          * @event set-page
-         * @type { Number }
+         * @param {number} val - the new page number
          */
         this.$emit('set-page', val);
       }
@@ -229,16 +241,16 @@ export default {
     align-items: center;
     justify-content: center;
 
-    .base-pagination_arrow-wrapper, .base-pagination-number {
+    .base-pagination__arrow-wrapper, .base-pagination__number {
       cursor: pointer;
     }
 
-    .base-pagination-row {
+    .base-pagination__row {
       display: flex;
       align-items: center;
       justify-content: center;
 
-      .base-pagination-number {
+      .base-pagination__number {
         font-weight: bold;
         background-color: $box-color;
         padding: 0 $spacing-small;
@@ -254,11 +266,11 @@ export default {
           margin-right: 0;
         }
 
-        &:hover, &:focus, &:active {
+        &:hover, &:focus, &:active, &:focus-within {
           color: $app-color;
         }
 
-        &.base-pagination-number-active {
+        &.base-pagination__number-active {
           color: white;
           background-color: $app-color;
           cursor: default;
@@ -269,55 +281,49 @@ export default {
         }
       }
 
-      .base-pagination-more {
+      .base-pagination__more {
         margin-right: $spacing-small;
       }
     }
 
     .base-pagination__arrow-wrapper {
-      &:hover .base-pagination-arrow,
-      &:active .base-pagination-arrow,
-      &:focus .base-pagination-arrow {
+      &:hover .base-pagination__arrow .base-pagination__arrow-icon,
+      .base-pagination__arrow:active .base-pagination__arrow-icon,
+      .base-pagination__arrow:focus .base-pagination__arrow-icon {
         fill: $app-color;
       }
 
-      .base-pagination-arrow {
+      .base-pagination__arrow-icon {
         height: $icon-medium;
         width: $icon-medium;
         margin: 0 $spacing;
 
-        &.base-pagination-arrow-right {
+        &.base-pagination__arrow-icon-right {
           transform: rotate(180deg);
         }
       }
 
-      &.base-pagination-arrow-inactive {
+      &.base-pagination__arrow-icon-inactive {
         cursor: default;
 
-        .base-pagination-arrow,
-        &:hover .base-pagination-arrow,
-        &:active .base-pagination-arrow,
-        &:focus .base-pagination-arrow {
+        .base-pagination__arrow .base-pagination__arrow-icon,
+        &:hover .base-pagination__arrow .base-pagination__arrow-icon {
           fill: $graytext-color;
         }
       }
-
-      &:disabled .base-pagination-arrow {
-        fill: red;
-      }
     }
 
-    .base-pagination-row, .base-pagination-arrow {
+    .base-pagination__row, .base-pagination__arrow-icon {
       flex: 0 0 auto;
     }
 
-    .base-pagination__arrow-wrapper, .base-pagination-number {
+    .base-pagination__arrow, .base-pagination__number-inner {
       outline: none;
     }
   }
 
   @media screen and (max-width: $mobile) {
-    .base-pagination-arrow {
+    .base-pagination__arrow-icon {
       margin: 0 $spacing-small;
     }
   }

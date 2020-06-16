@@ -1,4 +1,4 @@
-With the FormFieldCreator component you can create any of the following form input fields with a [swagger](https://swagger.io/) specification:
+With the FormFieldCreator component you can create any of the following form input fields with a [openAPI](https://www.openapis.org/) specification:
 
 * [Plain Text](#baseinput) (type String or Number)
 * [Autocomplete](#baseautocompleteinput)

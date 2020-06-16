@@ -29,28 +29,31 @@
         (before \<input\>)
        -->
         <slot name="input-field-addition-before" />
-        <div
-          :class="[
-            'base-input-field-wrapper',
-            { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
-          ]">
-          <input
-            :id="label + '_' + id"
-            :name="label"
-            :placeholder="placeholder"
-            :value="inputInt"
-            :type="fieldType"
-            :list="dropDownListId || false"
-            :aria-activedescendant="linkedListOption"
-            :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
-            autocomplete="off"
-            @click="active = true"
-            @keydown.tab.enter="active = false"
-            @focus="active = true"
-            v-on="inputListeners">
+        <div class="base-input__input-line">
+          <div
+            :class="[
+              'base-input-field-wrapper',
+              { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
+            ]">
+            <input
+              :id="label + '_' + id"
+              :name="label"
+              :placeholder="placeholder"
+              :value="inputInt"
+              :type="fieldType"
+              :list="dropDownListId || false"
+              :aria-activedescendant="linkedListOption"
+              :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
+              autocomplete="off"
+              @click="active = true"
+              @keydown.tab.enter="active = false"
+              @focus="active = true"
+              v-on="inputListeners">
+          </div>
+          <!-- @slot for adding elements after input (e.g. used to add loader -->
+          <slot name="input-field-addition-after" />
         </div>
       </div>
-      <slot name="input-field-addition-after" />
     </div>
   </div>
 </template>
@@ -172,17 +175,25 @@ export default {
     // add all input event listeners to component
     // https://vuejs.org/v2/guide/components-custom-events.html
     inputListeners() {
-      return Object.assign({},
+      return {
         // add all the listeners from the parent
-        this.$listeners,
+        ...this.$listeners,
         // and add custom listeners
-        {
+        ...{
           // for number fields: prevent the event if type is number (or e) but input is not
           keydown: (event) => {
             if (this.fieldType === 'number' && Number.isNaN(Number(event.key)) && event.key !== 'e'
               && event.key !== 'Backspace' && event.key !== 'Delete') {
               event.preventDefault();
             } else {
+              /**
+               * keydown event, modified to have identical behaviour
+               * across browsers for number input
+               *
+               * @event keydown
+               * @param {KeyboardEvent} event
+               *
+               */
               this.$emit('keydown', event);
             }
           },
@@ -191,12 +202,14 @@ export default {
              * Event emitted on input, passing input string
              *
              * @event input
-             * @type { String }
+             * @param {string} value - the input event value however
+             * passing only the event.target.value
              *
              */
             this.$emit('input', event.target.value);
           },
-        });
+        },
+      };
     },
   },
   watch: {
@@ -221,7 +234,6 @@ export default {
          * Event emitted when click outside input field \<div\> is registered
          *
          * @event clicked-outside
-         * @type { None }
          *
          */
         this.$emit('clicked-outside');
@@ -232,7 +244,6 @@ export default {
        * Event emitted on click on input field \<div\>
        *
        * @event click-input-field
-       * @type { None }
        *
        */
       this.$emit('click-input-field');
@@ -265,39 +276,45 @@ export default {
           flex-wrap: wrap;
         }
 
-        .base-input-field-wrapper {
-          flex: 1 1 auto;
-          margin-right: $spacing;
-          position: relative;
+        .base-input__input-line {
           display: flex;
+          flex: 1 1 auto;
+          align-items: center;
 
-          &.base-input-field-wrapper-fade-out::after {
-            content: '';
-            width: calc(#{$fade-out-width} + #{$spacing});
-            height: $input-field-line-height;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            right: 0;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-          }
+          .base-input-field-wrapper {
+            flex: 1 1 auto;
+            margin-right: $spacing;
+            position: relative;
+            display: flex;
 
-          .base-input-field {
-            padding: $spacing-small/2 0;
-            min-height: $input-field-line-height;
-            width: 100%;
-
-            &:invalid {
-              box-shadow: none;
+            &.base-input-field-wrapper-fade-out::after {
+              content: '';
+              width: calc(#{$fade-out-width} + #{$spacing});
+              height: $input-field-line-height;
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              right: 0;
+              background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
             }
-          }
 
-          .base-input-field-hidden {
-            width: 1px;
-            overflow: hidden;
-            opacity: 0;
-            filter:alpha(opacity=0);
-            animation: all 500ms ease;
+            .base-input-field {
+              padding: $spacing-small/2 0;
+              min-height: $input-field-line-height;
+              width: 100%;
+
+              &:invalid {
+                box-shadow: none;
+              }
+            }
+
+            .base-input-field-hidden {
+              width: 1px;
+              overflow: hidden;
+              opacity: 0;
+              filter:alpha(opacity=0);
+              animation: all 500ms ease;
+            }
           }
         }
       }

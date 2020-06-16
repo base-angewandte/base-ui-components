@@ -29,44 +29,45 @@ export const getNameSortValue = (compareString) => {
  * function for sorting also allowing special sorting of objects for specified
  * attribute
  *
- * @param {Array} list - the list to sort
- * @param {String} [objectProp] - the property to sort an object by
- * @param {Boolean} [sortByName=false] - does it require special name sorting
- * @param {Function} [valueFunction] - possibility to apply a special function to
+ * @param list {Array}: the list to sort
+ * @param objectProp {String}: the property to sort an object by
+ * @param sortByName {Boolean}: does it require special name sorting
+ * @param valueFunction {Function}: possibility to apply a special function to
  * the value before any further handling (e.g. used for getting language specific
  * label
- * @returns {[*]}
  */
-export const sort = (list, objectProp = '', sortByName = false, valueFunction = null) => list.sort((a, b) => {
-  // assign respective list values to variables
-  let compareValueA = a;
-  let compareValueB = b;
-  // if a property name was passed use its value for comparison
-  if (objectProp) {
-    compareValueA = compareValueA[objectProp];
-    compareValueB = compareValueB[objectProp];
-  }
-  // if a special function was provided apply it to the value
-  if (valueFunction) {
-    compareValueA = valueFunction(compareValueA);
-    compareValueB = valueFunction(compareValueB);
-  }
-  // if sortByName was specified, get the respective compare values
-  if (sortByName) {
-    let secondaryCompareValueA = '';
-    let secondaryCompareValueB = '';
-    [compareValueA, secondaryCompareValueA] = getNameSortValue(compareValueA);
-    [compareValueB, secondaryCompareValueB] = getNameSortValue(compareValueB);
-
-    // if primary compare values are equal - use secondary compare value
-    if (compareValueA.toLowerCase() === compareValueB.toLowerCase()) {
-      compareValueA = secondaryCompareValueA;
-      compareValueB = secondaryCompareValueB;
+export const sort = (list, objectProp = '', sortByName = false, valueFunction = null) => {
+  list.sort((a, b) => {
+    // assign respective list values to variables
+    let compareValueA = a;
+    let compareValueB = b;
+    // if a property name was passed use its value for comparison
+    if (objectProp) {
+      compareValueA = compareValueA[objectProp];
+      compareValueB = compareValueB[objectProp];
     }
-  }
-  // now do the actual value comparison
-  if (compareValueA.toLowerCase() > compareValueB.toLowerCase()) {
-    return 1;
-  }
-  return -1;
-});
+    // if a special function was provided apply it to the value
+    if (valueFunction) {
+      compareValueA = valueFunction(compareValueA);
+      compareValueB = valueFunction(compareValueB);
+    }
+    // if sortByName was specified, get the respective compare values
+    if (sortByName) {
+      let secondaryCompareValueA = '';
+      let secondaryCompareValueB = '';
+      [compareValueA, secondaryCompareValueA] = getNameSortValue(compareValueA);
+      [compareValueB, secondaryCompareValueB] = getNameSortValue(compareValueB);
+
+      // if primary compare values are equal - use secondary compare value
+      if (compareValueA.toLowerCase() === compareValueB.toLowerCase()) {
+        compareValueA = secondaryCompareValueA;
+        compareValueB = secondaryCompareValueB;
+      }
+    }
+    // now do the actual value comparison
+    if (compareValueA.toLowerCase() > compareValueB.toLowerCase()) {
+      return 1;
+    }
+    return -1;
+  });
+};

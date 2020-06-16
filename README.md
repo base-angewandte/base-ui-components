@@ -49,7 +49,7 @@ new Vue({
 });
 ```
 
-The code base is available at [github](https://github.com/base-angewandte/ui-components).
+The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
 
 There is a [styleguide](https://base-angewandte.github.io/base-ui-components/) listing all available components and their usage.
 

@@ -185,11 +185,11 @@ export default {
       this.$emit('selected', { index, selected });
     },
     setInternalVar() {
-      this.entryProps = this.list.map(entry => Object.assign({}, {
+      this.entryProps = this.list.map(entry => ({ ...{
         selected: entry.selected || this.selectedList.includes(entry.id),
         active: entry.active || false,
         error: entry.error || false,
-      }));
+      } }));
       if (this.entryProps.length && this.activeEntry >= 0) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }

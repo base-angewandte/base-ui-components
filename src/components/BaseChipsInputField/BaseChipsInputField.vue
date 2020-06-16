@@ -617,7 +617,6 @@ export default {
        * propagate to parent that click event happened outside of input field
        *
        * @event clicked-outside
-       * @property {none}
        */
       this.$emit('clicked-outside');
     },
@@ -629,7 +628,6 @@ export default {
        * inform parent that input field was clicked
        *
        * @event click-input-field
-       * @property {none}
        */
       this.$emit('click-input-field');
     },
@@ -687,7 +685,7 @@ export default {
       margin: 0 $spacing;
 
       .base-chips-input-field__single-dropdown-icon {
-        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+        transition:  $drop-down-arrow-animation;
         height: $icon-small;
         flex-shrink: 0;
 

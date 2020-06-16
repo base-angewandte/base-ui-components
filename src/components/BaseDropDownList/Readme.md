@@ -108,7 +108,7 @@ An example connected with an input field (displayAsDropDown: false)
         are available via 'no-options' slot
       </template>
       <template v-slot:option="items">
-        <div>
+        <div class="option">
           {{ items.option.value }}<span class="customized-option">this is customized via option slot!'</span>
         </div>
       </template>
@@ -180,6 +180,9 @@ export default {
     background: lightblue;
     padding: 0 16px;
     line-height: 32px;
+  }
+  .option {
+    padding: 0 16px;
   }
   .customized-option {
     color: red;

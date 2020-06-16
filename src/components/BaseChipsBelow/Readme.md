@@ -8,7 +8,19 @@ and default (base project specific) role selection
       v-model="selectedList"
       :chips-editable="true"
       :list="['Herbert Marcuse', 'Erich From', 'Georg Weerth']"
-      :role-options="['Actor', 'Magician', 'Priest', 'Farmer']"
+      :role-options="[
+        {
+          name: 'Actor',
+        },
+        {
+          name: 'Magician',
+        },
+        {
+          name: 'Priest',
+        },
+        {
+          name: 'ActFarmeror',
+        }]"
       label="Select a Person"/>
   </div>
 </template>

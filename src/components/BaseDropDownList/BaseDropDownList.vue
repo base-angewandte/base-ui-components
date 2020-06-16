@@ -4,6 +4,7 @@
     v-click-outside="() => withinDropDown = false"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
+    class="base-drop-down-list__container"
     @mouseenter="withinDropDown = true"
     @mouseleave="withinDropDown = false">
     <!-- @slot for adding elements before the options list -->
@@ -165,6 +166,14 @@ export default {
       type: String,
       default: 'No options available',
     },
+    /**
+     * specify a language (ISO 639-1) (used for label if label is language specific object
+     * e.g. { de: 'xxx', en: 'yyy' }
+     */
+    language: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -196,33 +205,6 @@ export default {
     },
   },
   watch: {
-    // keep track of the active option index to adjust drop down scroll container
-    // accordingly (TODO: this is not needed for non drop down style containers???)
-    activeOptionIndex(val, previous) {
-      // check if it is necessary to adjust scrolltop of container (to
-      // always have entry steered to with arrow keys in view)
-      if (this.$refs.option && this.$refs.option[val]) {
-        // if active option index is 0 - return to top
-        if (!val) {
-          this.$refs.dropDownContainer.scrollTop = 0;
-          // else if index is last entry of options list - bring last item into view
-        } else if (val === this.dropDownOptions.length - 1) {
-          this.$refs.dropDownContainer.scrollTop = this.$refs.option[val].offsetTop
-            + this.$refs.option[val].clientHeight;
-          // else if index is greater than previous index (navigating down) and the option
-          // position is larger then container height
-          // add the height of one option row to scroll top
-        } else if (val > previous
-          && this.$refs.option[val].offsetTop >= this.$refs.dropDownContainer.clientHeight) {
-          this.$refs.dropDownContainer.scrollTop += this.$refs.option[val].clientHeight;
-          // else if index is smaller than previous index (navigating up) and the container
-          // top position is larger than the option top position subtract one option row height
-        } else if (val < previous
-          && this.$refs.dropDownContainer.offsetTop > this.$refs.option[val].offsetTop) {
-          this.$refs.dropDownContainer.scrollTop -= this.$refs.option[val].clientHeight;
-        }
-      }
-    },
     // emit withinDropDown when it has changed
     withinDropDown(val) {
       /**
@@ -233,6 +215,47 @@ export default {
        */
       this.$emit('within-drop-down', val);
     },
+  },
+  mounted() {
+    // check if this element is associated with an input element
+    const inputElement = this.$parent.$el.getElementsByTagName('input');
+    // check if an input element exists
+    if (inputElement && inputElement.length) {
+      const elementListId = inputElement[0].getAttribute('list');
+      // if the parent also has a input field that should be connected - it will need to
+      // have the same id! (input attribute 'list') (this is to avoid unwanted side effects
+      if (this.listId === elementListId) {
+        inputElement[0].addEventListener('keydown', (event) => {
+          // check if it is necessary to adjust scrolltop of container (to
+          // always have entry steered to with arrow keys in view)
+          if (this.$refs.option && this.$refs.option[this.activeOptionIndex]) {
+            // if active option index is 0 - return to top
+            if (!this.activeOptionIndex) {
+              this.$refs.dropDownContainer.scrollTop = 0;
+              // else if index is last entry of options list - bring last item into view
+            } else if (this.activeOptionIndex === this.dropDownOptions.length - 1) {
+              this.$refs.dropDownContainer.scrollTop = this
+                .$refs.option[this.activeOptionIndex].offsetTop
+                + this.$refs.option[this.activeOptionIndex].clientHeight;
+              // else if index is greater than previous index (navigating down) and the option
+              // position is larger then container height
+              // add the height of one option row to scroll top
+            } else if (event.code === 'ArrowDown'
+              && this.$refs.option[this.activeOptionIndex].offsetTop
+              >= this.$refs.dropDownContainer.clientHeight) {
+              this.$refs.dropDownContainer.scrollTop += this
+                .$refs.option[this.activeOptionIndex].clientHeight;
+              // else if index is smaller than previous index (navigating up) and the container
+              // top position is larger than the option top position subtract one option row height
+            } else if (event.code === 'ArrowUp' && this.$refs.dropDownContainer.offsetTop
+              > this.$refs.option[this.activeOptionIndex].offsetTop) {
+              this.$refs.dropDownContainer.scrollTop -= this
+                .$refs.option[this.activeOptionIndex].clientHeight;
+            }
+          }
+        });
+      }
+    }
   },
   methods: {
     /**
