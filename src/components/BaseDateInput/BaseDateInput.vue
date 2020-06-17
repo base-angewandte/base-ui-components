@@ -32,7 +32,8 @@
         <div
           v-click-outside="(event) => clickedOutside('From')"
           :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': timeFromOpen || dateFromOpen },
+                   { 'base-date-input__field-container-active': useFormFieldStyling
+                     && (timeFromOpen || dateFromOpen) },
                    { 'base-date-input__field-container-border': useFormFieldStyling },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
           <!-- TIME FROM -->
@@ -79,6 +80,7 @@
               :open="dateFromOpen"
               input-class="base-date-input__datepicker-input"
               @open="setActiveState('date', 'From', true)"
+              @close="setActiveState('date', 'From', false)"
               @pick="setActiveState('date', 'From', false)">
               <template v-slot:icon-calendar>
                 <svg-icon
@@ -105,7 +107,8 @@
           v-if="type !== 'single'"
           v-click-outside="() => clickedOutside('To')"
           :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': timeToOpen || dateToOpen },
+                   { 'base-date-input__field-container-active': useFormFieldStyling
+                     && (timeToOpen || dateToOpen) },
                    { 'base-date-input__field-container-border': useFormFieldStyling },
                    { 'base-date-input__field-container-multiple': type === 'datetime' }]">
           <!-- TIME TO -->
@@ -152,6 +155,7 @@
               :open="dateToOpen"
               input-class="base-date-input__datepicker-input"
               @open="setActiveState('date', 'To', true)"
+              @close="setActiveState('date', 'To', false)"
               @pick="setActiveState('date', 'To', false)">
               <template v-slot:icon-calendar>
                 <svg-icon
