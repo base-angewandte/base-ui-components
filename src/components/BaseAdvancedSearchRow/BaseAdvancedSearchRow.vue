@@ -119,7 +119,9 @@
                      'base-advanced-search-row__autocomplete-collection',
                      { 'base-advanced-search-row__result-column-active':
                        slotProps.option.collection === activeCollection }]">
-            {{ slotProps.option.collection }}
+            <div class="base-advanced-search-row__autocomplete-collection-text">
+              {{ slotProps.option.collection }}
+            </div>
           </div>
           <BaseDropDownList
             :drop-down-options="slotProps.option.data"
@@ -774,10 +776,17 @@ export default {
 
         .base-advanced-search-row__autocomplete-collection {
           color: $app-color;
+
+          .base-advanced-search-row__autocomplete-collection-text {
+            min-height: $row-height-small;
+            line-height: $row-height-small;
+          }
         }
 
         .base-advanced-search-row__result-column-active {
-          box-shadow: inset 0 0 0 1px $app-color;
+          .base-advanced-search-row__autocomplete-collection-text {
+            background-color: rgb(240, 240, 240);
+          }
         }
 
         .base-advanced-search-row__autocomplete-options {
