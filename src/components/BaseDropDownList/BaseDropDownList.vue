@@ -225,33 +225,13 @@ export default {
       // if the parent also has a input field that should be connected - it will need to
       // have the same id! (input attribute 'list') (this is to avoid unwanted side effects
       if (this.listId === elementListId) {
-        inputElement[0].addEventListener('keydown', (event) => {
-          // check if it is necessary to adjust scrolltop of container (to
-          // always have entry steered to with arrow keys in view)
-          if (this.$refs.option && this.$refs.option[this.activeOptionIndex]) {
-            // if active option index is 0 - return to top
-            if (!this.activeOptionIndex) {
-              this.$refs.dropDownContainer.scrollTop = 0;
-              // else if index is last entry of options list - bring last item into view
-            } else if (this.activeOptionIndex === this.dropDownOptions.length - 1) {
-              this.$refs.dropDownContainer.scrollTop = this
-                .$refs.option[this.activeOptionIndex].offsetTop
-                + this.$refs.option[this.activeOptionIndex].clientHeight;
-              // else if index is greater than previous index (navigating down) and the option
-              // position is larger then container height
-              // add the height of one option row to scroll top
-            } else if (event.code === 'ArrowDown'
-              && this.$refs.option[this.activeOptionIndex].offsetTop
-              >= this.$refs.dropDownContainer.clientHeight) {
-              this.$refs.dropDownContainer.scrollTop += this
-                .$refs.option[this.activeOptionIndex].clientHeight;
-              // else if index is smaller than previous index (navigating up) and the container
-              // top position is larger than the option top position subtract one option row height
-            } else if (event.code === 'ArrowUp' && this.$refs.dropDownContainer.offsetTop
-              > this.$refs.option[this.activeOptionIndex].offsetTop) {
-              this.$refs.dropDownContainer.scrollTop -= this
-                .$refs.option[this.activeOptionIndex].clientHeight;
-            }
+        inputElement[0].addEventListener('keydown', () => {
+          // if active option index is 0 - return to top
+          if (!this.activeOptionIndex) {
+            this.$refs.dropDownContainer.scrollTop = 0;
+            // else if index is last entry of options list - bring last item into view
+          } else if (this.activeOptionIndex) {
+            this.$refs.option[this.activeOptionIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
           }
         });
       }
