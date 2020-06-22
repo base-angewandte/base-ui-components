@@ -66,6 +66,7 @@
       :active-styled="false"
       :active-option="{ collection: activeCollection }"
       :display-as-drop-down="false"
+      :has-sub-options="true"
       identifier-property-name="collection"
       value-property-name="data"
       list-id="autocomplete-options"
@@ -596,7 +597,7 @@ export default {
             // since it is allowed to add unknown entries it must be possible to
             // have no active entry when navigating beyond list
             // TODO: if this is a use case more often this could also go to navigate()
-          } else if (!this.collectionSelect && currentEntryIndex === 0) {
+          } else if (!this.collectionSelect && currentEntryIndex < 0) {
             this.activeEntry = null;
             // if collection select is active or first/last element of the current collection
             // is reached - switch to next/previous collection

@@ -174,6 +174,10 @@ export default {
       type: String,
       default: '',
     },
+    hasSubOptions: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -206,6 +210,13 @@ export default {
      * @returns {number}
      */
     activeOptionIndex() {
+      // check if options has submenu
+      if (this.hasSubOptions && (!this.activeOption
+        || this.activeOption[this.identifierPropertyName] !== undefined)) {
+        return this.dropDownOptions
+          .findIndex(opt => opt[this.identifierPropertyName]
+            === this.activeOption[this.identifierPropertyName]);
+      }
       return this.dropDownOptions.indexOf(this.activeOption);
     },
   },
@@ -223,21 +234,24 @@ export default {
   },
   mounted() {
     // check if this element is associated with an input element
-    this.inputElement = this.$parent.$el.getElementsByTagName('input');
+    const htmlInputElements = this.$parent.$el.getElementsByTagName('input');
     // check if an input element exists
-    if (this.inputElement && this.inputElement.length) {
-      const elementListId = this.inputElement[0].getAttribute('list');
+    if (htmlInputElements && htmlInputElements.length) {
+      const inputElementsArray = Array.from(htmlInputElements);
+      // get the element that has the equal list id
+      this.inputElement = inputElementsArray
+        .find(el => el.getAttribute('list') === this.listId);
       // if the parent also has a input field that should be connected - it will need to
-      // have the same id! (input attribute 'list') (this is to avoid unwanted side effects
-      if (this.listId === elementListId) {
-        this.inputElement[0].addEventListener('keydown', this.scrollDropDown);
+      // have the same id! (input attribute 'list') (this is to avoid unwanted side effects)
+      if (this.inputElement) {
+        this.inputElement.addEventListener('keydown', this.scrollDropDown);
       }
     }
   },
   destroyed() {
     // remove the event listener again
-    if (this.inputElement && this.inputElement.length) {
-      this.inputElement[0].removeEventListener('keydown', this.scrollDropDown);
+    if (this.inputElement) {
+      this.inputElement.removeEventListener('keydown', this.scrollDropDown);
     }
   },
   methods: {
@@ -292,12 +306,12 @@ export default {
      * scroll the active option into view
      */
     scrollDropDown() {
-      // if active option index is 0 - return to top
-      if (!this.activeOptionIndex) {
-        this.$refs.dropDownContainer.scrollTop = 0;
-        // else if index is last entry of options list - bring last item into view
-      } else if (this.activeOptionIndex) {
+      // see if active option is set (index > -1)
+      if (this.activeOptionIndex >= 0) {
         this.$refs.option[this.activeOptionIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        // else return to top
+      } else {
+        this.$refs.dropDownContainer.scrollTop = 0;
       }
     },
   },
