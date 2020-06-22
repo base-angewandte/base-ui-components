@@ -182,6 +182,11 @@ export default {
        * @type {boolean}
        */
       withinDropDown: false,
+      /**
+       * store the input element associated with the drop down list
+       * @type {HTMLElement}
+       */
+      inputElement: null,
     };
   },
   computed: {
@@ -218,23 +223,21 @@ export default {
   },
   mounted() {
     // check if this element is associated with an input element
-    const inputElement = this.$parent.$el.getElementsByTagName('input');
+    this.inputElement = this.$parent.$el.getElementsByTagName('input');
     // check if an input element exists
-    if (inputElement && inputElement.length) {
-      const elementListId = inputElement[0].getAttribute('list');
+    if (this.inputElement && this.inputElement.length) {
+      const elementListId = this.inputElement[0].getAttribute('list');
       // if the parent also has a input field that should be connected - it will need to
       // have the same id! (input attribute 'list') (this is to avoid unwanted side effects
       if (this.listId === elementListId) {
-        inputElement[0].addEventListener('keydown', () => {
-          // if active option index is 0 - return to top
-          if (!this.activeOptionIndex) {
-            this.$refs.dropDownContainer.scrollTop = 0;
-            // else if index is last entry of options list - bring last item into view
-          } else if (this.activeOptionIndex) {
-            this.$refs.option[this.activeOptionIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
-          }
-        });
+        this.inputElement[0].addEventListener('keydown', this.scrollDropDown);
       }
+    }
+  },
+  destroyed() {
+    // remove the event listener again
+    if (this.inputElement && this.inputElement.length) {
+      this.inputElement[0].removeEventListener('keydown', this.scrollDropDown);
     }
   },
   methods: {
@@ -283,6 +286,18 @@ export default {
          * @property {Object} option - the option set active
          */
         this.$emit('update:active-option', option);
+      }
+    },
+    /**
+     * scroll the active option into view
+     */
+    scrollDropDown() {
+      // if active option index is 0 - return to top
+      if (!this.activeOptionIndex) {
+        this.$refs.dropDownContainer.scrollTop = 0;
+        // else if index is last entry of options list - bring last item into view
+      } else if (this.activeOptionIndex) {
+        this.$refs.option[this.activeOptionIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
   },
