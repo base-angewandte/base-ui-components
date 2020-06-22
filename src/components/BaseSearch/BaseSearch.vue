@@ -35,7 +35,9 @@
       :show-label="false"
       :type="type === 'date' ? 'single' : 'daterange'"
       :use-form-field-styling="false"
-      label="date-input" />
+      label="date-input"
+      @focus="inputFocus"
+      @blur="inputBlur" />
     <BaseChipsInputField
       v-else-if="type === 'chips'"
       :id="internalFieldId"
@@ -50,6 +52,8 @@
       label="chips-input"
       value-property-name="label"
       identifier-property-name="id"
+      @focus="inputFocus"
+      @blur="inputBlur"
       v-on="$listeners" />
     <!-- @slot for icon after input field -->
     <slot>

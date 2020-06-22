@@ -53,7 +53,9 @@
             input-class="base-date-input__datepicker-input"
             class="base-date-input__datepicker"
             @open="setActiveState('time', 'From', true)"
-            @change="closeTimePicker('from', ...arguments, $event)">
+            @change="closeTimePicker('from', ...arguments, $event)"
+            @focus="emitFocusEvent"
+            @blur="emitBlurEvent">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
@@ -81,7 +83,9 @@
               input-class="base-date-input__datepicker-input"
               @open="setActiveState('date', 'From', true)"
               @close="setActiveState('date', 'From', false)"
-              @pick="setActiveState('date', 'From', false)">
+              @pick="setActiveState('date', 'From', false)"
+              @focus="emitFocusEvent"
+              @blur="emitBlurEvent">
               <template v-slot:icon-calendar>
                 <svg-icon
                   name="calendar-many"
@@ -127,7 +131,9 @@
             value-type="format"
             input-class="base-date-input__datepicker-input"
             @open="setActiveState('time', 'To', true)"
-            @change="closeTimePicker('to', ...arguments, $event)">
+            @change="closeTimePicker('to', ...arguments, $event)"
+            @focus="emitFocusEvent"
+            @blur="emitBlurEvent">
             <template v-slot:icon-calendar>
               <svg-icon
                 name="clock"
@@ -156,7 +162,9 @@
               input-class="base-date-input__datepicker-input"
               @open="setActiveState('date', 'To', true)"
               @close="setActiveState('date', 'To', false)"
-              @pick="setActiveState('date', 'To', false)">
+              @pick="setActiveState('date', 'To', false)"
+              @focus="emitFocusEvent"
+              @blur="emitBlurEvent">
               <template v-slot:icon-calendar>
                 <svg-icon
                   name="calendar-many"
@@ -488,7 +496,8 @@ export default {
       /**
        * emit an event when focus leaves the input
        *
-       * @type { string | object }
+       * @event selected
+       * @type {string | Object}
        */
       this.$emit('selected', data);
     },
@@ -551,6 +560,24 @@ export default {
       const month = (date.getMonth() + 1).toString();
       const day = date.getDate().toString();
       return `${date.getFullYear().toString()}-${month.length < 2 ? '0' : ''}${month}-${day.length < 2 ? '0' : ''}${day}`;
+    },
+    emitBlurEvent(event) {
+      /**
+       * emit blur event to parent
+       *
+       * @event blur
+       * @type {Event}
+       */
+      this.$emit('blur', event);
+    },
+    emitFocusEvent(event) {
+      /**
+       * emit focus event to parent
+       *
+       * @event focus
+       * @type {Event}
+       */
+      this.$emit('focus', event);
     },
   },
 };
