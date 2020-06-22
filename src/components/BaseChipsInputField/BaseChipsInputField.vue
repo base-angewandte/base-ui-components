@@ -392,6 +392,8 @@ export default {
           if (JSON.stringify(tempList) !== JSON.stringify(this.selectedListInt)) {
             this.selectedListInt = tempList;
           }
+        } else {
+          this.selectedListInt = [];
         }
       },
       deep: true,
