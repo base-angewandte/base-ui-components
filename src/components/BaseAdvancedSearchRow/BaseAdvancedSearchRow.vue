@@ -1,13 +1,11 @@
 <template>
   <div
-    v-click-outside="() => showDropDown = false"
+    v-click-outside="() => checkDropDownClose()"
     class="base-advanced-search">
-
     <!-- SEARCH FIELD -->
     <div
       class="base-advanced-search-row__search-field"
       @click="activateDropDown">
-
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <div
         :class="[
@@ -50,11 +48,13 @@
       <img
         v-if="isMainSearch"
         src="../../static/icons/plus.svg"
+        alt="Add filter"
         class="base-advanced-search-row__plus-icon"
         @click.stop="addFilter">
       <img
         v-else
         src="../../static/icons/remove.svg"
+        alt="remove filter"
         class="base-advanced-search-row__plus-icon"
         @click.stop="removeFilter">
     </div>
@@ -70,7 +70,8 @@
       identifier-property-name="collection"
       value-property-name="data"
       list-id="autocomplete-options"
-      class="base-advanced-search-row__drop-down-body">
+      class="base-advanced-search-row__drop-down-body"
+      @within-drop-down="isWithinDropDown = $event">
       <template v-slot:before-list>
         <div class="base-advanced-search-row__above-list-area">
           <!-- FILTER SELECT LIST -->
@@ -177,7 +178,9 @@
           <div v-if="!currentInput">
             Please start typing or select a filter to see options
           </div>
-          <div v-else>No matching options found</div>
+          <div v-else>
+            No matching options found
+          </div>
         </div>
       </template>
     </BaseDropDownList>
@@ -318,6 +321,12 @@ export default {
        * @type {boolean}
        */
       showDropDown: false,
+      /**
+       * variable to store if cursor is within drop down
+       * (needed for v-clickoutside which does not recognize drop down as 'within')
+       * @type {boolean}
+       */
+      isWithinDropDown: false,
     };
   },
   computed: {
@@ -428,6 +437,21 @@ export default {
     },
   },
   methods: {
+    /** DROP DOWN FUNCTIONALITY */
+
+    /**
+     * triggered on v-clickoutside to close drop down when cursor
+     * is not within drop down
+     */
+    checkDropDownClose() {
+      // only close drop down if cursor is not within drop down
+      if (!this.isWithinDropDown) {
+        this.showDropDown = false;
+      }
+    },
+    /**
+     * open drop down - triggered on search field click
+     */
     activateDropDown() {
       this.showDropDown = true;
     },
@@ -498,15 +522,27 @@ export default {
      */
     selectOption() {
       let valueToAdd = null;
-      // TODO: complete value needs to be passed!
+      // if filter type is text
       if (this.filter.type === 'text') {
+        // check if activeEntry is present = the autocomplete functionality was used!
         if (this.activeEntry) {
-          valueToAdd = this.activeEntry;
-        } else if (this.currentInput) {
+          // TODO: adjust to actual entry structure or make
+          // configurable respectively
+          valueToAdd = {
+            ...{
+              label: this.activeEntry.header,
+            },
+            ...this.activeEntry,
+          };
+          // check if currentInput is present and if this text was added already
+          // do not add freetext a second time
+        } else if (this.currentInput && (!this.selectedOptions || !this.selectedOptions
+          .some(option => (!option.id && option.label === this.currentInput)))) {
           valueToAdd = {
             label: this.currentInput,
           };
         }
+        // else if only controlled vocabulary is allowed
       } else if (this.filter.type === 'chips') {
         valueToAdd = this.activeControlledVocabularyEntry;
       }
@@ -655,6 +691,9 @@ export default {
       }
       if (useArrayDefault && type === 'chips') {
         tempValues = val && val.length ? [].concat(val) : [];
+      }
+      if (type === 'text' && !val) {
+        tempValues = '';
       }
       return tempValues;
     },
