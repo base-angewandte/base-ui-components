@@ -34,7 +34,7 @@
 
       <!-- SECOND COLUMN OF SEARCH FIELD (BASE SEARCH) -->
       <BaseSearch
-        v-model="currentInput"
+        v-model="searchInput"
         :field-id="'search-input-' + internalRowId"
         :show-image="isMainSearch"
         :use-label="false"
@@ -44,7 +44,8 @@
         class="base-advanced-search-row__base-search"
         drop-down-list-id="autocomplete-options"
         @keydown.up.down.right.left="navigateDropDown"
-        @keydown.enter="selectOption" />
+        @keydown.enter="selectOption"
+        @date-input-changed="filter.values = setFilterValues(filter.type, $event)" />
       <img
         v-if="isMainSearch"
         src="../../static/icons/plus.svg"
@@ -330,6 +331,17 @@ export default {
     };
   },
   computed: {
+    searchInput: {
+      get() {
+        if (this.filter.type === 'date' || this.filter.type === 'daterange') {
+          return this.filter.values;
+        }
+        return this.currentInput;
+      },
+      set(val) {
+        this.currentInput = val;
+      },
+    },
     /**
      * the actually displayed autocomplete options
      * (filtered for already selected and for the current input string)
@@ -415,10 +427,17 @@ export default {
     },
   },
   watch: {
-    filter(val) {
-      // when a filter type changes set current input
-      // according to filter type (empty string or date object)
-      this.currentInput = this.setFilterValues(val.type, null, false);
+    filter: {
+      handler(val) {
+        // when a filter type changes set current input
+        // according to filter type (empty string or date object)
+        this.currentInput = this.setFilterValues(val.type, null, false);
+        // also propagate change to parent if necessary
+        if (val && JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
+          this.$emit('update:applied-filter', val);
+        }
+      },
+      deep: true,
     },
     appliedFilter: {
       handler(val) {
@@ -447,6 +466,9 @@ export default {
       // only close drop down if cursor is not within drop down
       if (!this.isWithinDropDown) {
         this.showDropDown = false;
+        if (this.filter.type === 'text') {
+          // this.$emit('fetch-autocomplete-results', this.currentInput);
+        }
       }
     },
     /**
@@ -454,6 +476,9 @@ export default {
      */
     activateDropDown() {
       this.showDropDown = true;
+      if (this.filter.type === 'text') {
+        this.$emit('fetch-autocomplete-results', this.currentInput);
+      }
     },
 
     /** FILTER RELATED METHODS */
@@ -498,6 +523,7 @@ export default {
         ...{
           values: this.setFilterValues(selectedFilter.type),
         } };
+      this.$emit('update:applied-filter', this.filter);
       this.activeFilter = null;
     },
 
@@ -681,7 +707,7 @@ export default {
     setFilterValues(type, val = null, useArrayDefault = true) {
       let tempValues = val;
       if (type === 'date') {
-        tempValues = { date: val || '' };
+        tempValues = { date: val ? val.date : '' };
       }
       if (type === 'daterange') {
         tempValues = {
@@ -692,7 +718,7 @@ export default {
       if (useArrayDefault && type === 'chips') {
         tempValues = val && val.length ? [].concat(val) : [];
       }
-      if (type === 'text' && !val) {
+      if (!useArrayDefault && type === 'text' && !val) {
         tempValues = '';
       }
       return tempValues;

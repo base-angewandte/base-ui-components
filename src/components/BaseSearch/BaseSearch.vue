@@ -177,13 +177,17 @@ export default {
           } else {
             tempInput = val;
           }
+          console.log(tempInput);
           /**
            * Event emitted on keyup
            *
-           * @event input-change
-           * @type { String }
+           * @event date-input-changed
+           * @type { Object }
+           * @property { string } date - if type is date
+           * @property { string } date_from - if type is daterange
+           * @property { string } date_to - if type is daterange
            */
-          this.$emit('input', tempInput);
+          this.$emit('date-input-changed', tempInput);
         }
       },
       get() {
@@ -234,32 +238,12 @@ export default {
   },
   watch: {
     input(val) {
-      console.log('input changed in base search');
       if (JSON.stringify(val) !== JSON.stringify(this.inputInt)) {
         this.inputInt = JSON.parse(JSON.stringify(val));
       }
     },
   },
   methods: {
-    setDateInput(val) {
-      console.log(val);
-      // check if it is object or string
-      if (JSON.stringify(this.inputInt) !== JSON.stringify(val)) {
-        let tempInput = null;
-        if (typeof val === 'object') {
-          tempInput = { ...val };
-        } else {
-          tempInput = val;
-        }
-        /**
-         * Event emitted on keyup
-         *
-         * @event input-change
-         * @type { String }
-         */
-        this.$emit('input', tempInput);
-      }
-    },
     inputBlur() {
       this.active = false;
     },
