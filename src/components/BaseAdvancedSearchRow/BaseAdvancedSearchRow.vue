@@ -34,6 +34,7 @@
 
       <!-- SECOND COLUMN OF SEARCH FIELD (BASE SEARCH) -->
       <BaseSearch
+        ref="searchField"
         v-model="searchInput"
         :field-id="'search-input-' + internalRowId"
         :show-image="isMainSearch"
@@ -526,6 +527,7 @@ export default {
         } };
       this.$emit('update:applied-filter', this.filter);
       this.activeFilter = null;
+      this.focusInputField();
     },
 
     /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
@@ -584,12 +586,20 @@ export default {
       }
       // reset everything
       this.resetAllInput();
+      // return focus to input field after select
+      this.focusInputField();
     },
     resetAllInput() {
       this.currentInput = '';
       this.activeEntry = null;
       this.activeCollection = '';
       this.activeControlledVocabularyEntry = null;
+    },
+    focusInputField() {
+      const inputElems = this.$refs.searchField.$el.getElementsByTagName('input');
+      if (inputElems && inputElems.length) {
+        inputElems[0].focus();
+      }
     },
 
     /** DROP DOWN NAVIGATION */
