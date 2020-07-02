@@ -45,6 +45,7 @@
         drop-down-list-id="autocomplete-options"
         @keydown.up.down.right.left="navigateDropDown"
         @keydown.enter="selectOption"
+        @datepicker-open="showDropDown = true"
         @date-input-changed="filter.values = setFilterValues(filter.type, $event)" />
       <img
         v-if="isMainSearch"

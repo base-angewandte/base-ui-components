@@ -30,7 +30,7 @@
       v-on="inputListeners">
     <BaseDateInput
       v-else-if="type === 'date' || type === 'daterange'"
-      :id="'date' + internalFieldId"
+      :id="internalFieldId"
       v-model="dateInputInt"
       :show-label="false"
       :type="type === 'date' ? 'single' : 'daterange'"
@@ -88,7 +88,7 @@ export default {
     /**
      * set input value from outside <br>
      *   for type daterange this needs to be an object with
-     *   date_from and date_to properties!
+     *   date`_`from and date`_`to properties!
      *
      * @model
      */
@@ -131,12 +131,17 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * specify a field id for identification of the input field
+     * if none is specified an internal id will be assigned
+     */
     fieldId: {
       type: String,
       default: '',
     },
     /**
-     * specify the type of input field
+     * specify the type of input field<br>
+     *   possible values: text|chips|date|daterange
      */
     type: {
       type: String,
@@ -177,9 +182,8 @@ export default {
           } else {
             tempInput = val;
           }
-          console.log(tempInput);
           /**
-           * Event emitted on keyup
+           * event to inform parent of picked date if type date or daterange
            *
            * @event date-input-changed
            * @type { Object }
@@ -204,6 +208,12 @@ export default {
     selectedChipsInt: {
       set(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
+          /**
+           * inform parent of changes in chips selected if type is chips<br>
+           *   (the .sync modifier can be used here)
+           * @event update:selected-chips
+           * @type { Array }
+           */
           this.$emit('update:selected-chips', val);
         }
       },
@@ -249,6 +259,14 @@ export default {
     },
     inputFocus() {
       this.active = true;
+      // below was introduced for base advanced search row because @click
+      // event is not triggered when clicking on datepicker
+      /**
+       * event to inform parent when datepicker was opened
+       *
+       * @event datepicker-open
+       */
+      this.$emit('datepicker-open');
     },
     clearInput() {
       this.inputInt = null;
