@@ -220,12 +220,6 @@ export default {
   mounted() {
     this.inputInt = this.input;
   },
-  updated() {
-    const elems = this.$el.getElementsByTagName('input');
-    if (this.active && elems && elems.length) {
-      elems[0].focus();
-    }
-  },
   methods: {
     clickedOutsideInput() {
       if (this.active || this.isActive) {
