@@ -15,6 +15,7 @@
       :identifier-property-name="identifierPropertyNameInt"
       :return-as-string="returnAsString"
       @focus="onInputFocus"
+      @blur="onInputBlur"
       @clicked-outside="onInputBlur"
       @keydown="checkKeyEvent"
       @keydown.enter.prevent="onEnter"
@@ -346,6 +347,11 @@ export default {
        * @type {string}
        */
       dropDownMinWidth: '100%',
+      /**
+       * the input element
+       * @type {HTMLElement}
+       */
+      inputElem: null,
     };
   },
   computed: {
@@ -432,11 +438,9 @@ export default {
     selectedOption(val) {
       if (val) {
         this.addSelectedOption(val);
-        // get the input element
-        const elems = this.$el.getElementsByTagName('input');
         // if input element was found - focus after chips select
-        if (elems && elems.length) {
-          elems[0].focus();
+        if (this.inputElem) {
+          this.inputElem.focus();
         }
       }
     },
@@ -462,6 +466,8 @@ export default {
        * @param {Object[]} val
        */
       handler(val) {
+        // if list changed externally - reset index to 0
+        this.activeOptionIndex = val.length ? 0 : -1;
         // check if list should be returned as array of strings
         if (!this.returnAsString && val && val.length && typeof val[0] === 'string') {
           this.returnAsString = true;
@@ -566,6 +572,13 @@ export default {
       }
     },
   },
+  mounted() {
+    // get the input element(s) and store them for later
+    const elems = this.$el.getElementsByTagName('input');
+    if (elems && elems.length) {
+      [this.inputElem] = elems;
+    }
+  },
   methods: {
     /** CHIPS (ADDING) FUNCTIONALITIES */
 
@@ -592,6 +605,10 @@ export default {
       this.input = '';
       // reset selected option
       this.selectedOption = null;
+      // remove focus from input if element is single select
+      if (!this.allowMultipleEntries) {
+        this.inputElem.blur();
+      }
     },
     /**
      * method for emitting selected list changes to parent

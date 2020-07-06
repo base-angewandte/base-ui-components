@@ -216,6 +216,11 @@ export default {
     input(val) {
       this.inputInt = val;
     },
+    isActive(val) {
+      if (val !== this.active) {
+        this.active = val;
+      }
+    },
   },
   mounted() {
     this.inputInt = this.input;
