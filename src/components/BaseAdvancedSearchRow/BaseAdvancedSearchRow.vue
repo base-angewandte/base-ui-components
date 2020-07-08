@@ -1,7 +1,6 @@
 <template>
   <div
-    v-click-outside="() => checkDropDownClose()"
-    class="base-advanced-search">
+    class="base-advanced-search-row">
     <!-- SEARCH FIELD -->
     <div
       class="base-advanced-search-row__search-field"
@@ -23,11 +22,13 @@
           :use-form-field-styling="false"
           :show-label="false"
           :always-linked="true"
-          label="use filter"
+          label="Select a Filter"
           drop-down-list-id="filter-options"
           identifier-property-name="label"
           value-property-name="label"
           class="base-advanced-search-row__filter-input"
+          @focus="activateDropDown"
+          @blur="checkDropDownClose"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters" />
       </div>
@@ -44,22 +45,31 @@
         :selected-chips.sync="selectedOptions"
         class="base-advanced-search-row__base-search"
         drop-down-list-id="autocomplete-options"
+        @focus="activateDropDown"
+        @blur="checkDropDownClose"
         @keydown.up.down.right.left="navigateDropDown"
         @keydown.enter="selectOption"
-        @datepicker-open="showDropDown = true"
         @date-input-changed="filter.values = setFilterValues(filter.type, $event)" />
-      <img
+      <button
         v-if="isMainSearch"
-        src="../../static/icons/plus.svg"
-        alt="Add filter"
-        class="base-advanced-search-row__plus-icon"
+        class="base-advanced-search-row__icon-button"
         @click.stop="addFilter">
-      <img
+        <SvgIcon
+          name="plus"
+          title="Add filter"
+          alt="Add Filter"
+          class="base-advanced-search-row__plus-icon" />
+      </button>
+      <button
         v-else
-        src="../../static/icons/remove.svg"
-        alt="remove filter"
-        class="base-advanced-search-row__plus-icon"
+        class="base-advanced-search-row__icon-button"
         @click.stop="removeFilter">
+        <SvgIcon
+          name="remove"
+          title="Remove filter"
+          alt="Remove filter"
+          class="base-advanced-search-row__plus-icon" />
+      </button>
     </div>
 
     <!-- DROP DOWN BODY -->
@@ -192,13 +202,14 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
+import SvgIcon from 'vue-svgicon';
 import BaseSearch from '../BaseSearch/BaseSearch';
 import BaseDropDownList from '../BaseDropDownList/BaseDropDownList';
 import BaseChip from '../BaseChip/BaseChip';
 import navigateMixin from '../../mixins/navigateList';
 import i18n from '../../mixins/i18n';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
-import { createId, sort } from '../../utils/utils';
+import { createId, hasData, sort } from '../../utils/utils';
 
 /** Search Row Component for Advanced Search
  *
@@ -211,6 +222,7 @@ export default {
     BaseChip,
     BaseDropDownList,
     BaseSearch,
+    SvgIcon,
   },
   directives: {
     ClickOutside,
@@ -466,11 +478,8 @@ export default {
      */
     checkDropDownClose() {
       // only close drop down if cursor is not within drop down
-      if (!this.isWithinDropDown) {
+      if (!this.isWithinDropDown && document.activeElement.tagName === 'BODY') {
         this.showDropDown = false;
-        if (this.filter.type === 'text') {
-          // this.$emit('fetch-autocomplete-results', this.currentInput);
-        }
       }
     },
     /**
@@ -487,13 +496,15 @@ export default {
 
     // inform parent of click on plus or remove respectively
     addFilter() {
+      // emit event in any case (so frontend can inform user to add values if empty)
       this.$emit('add-filter', this.filter);
-      // reset everything
-      this.resetAllInput();
-      // reset filter
-      this.filter = { ...this.defaultFilter };
-      // close drop down
-      this.showDropDown = false;
+      // check if filter has any data
+      if (hasData(this.filter.values)) {
+        // reset everything
+        this.resetAllInput();
+        // reset filter
+        this.filter = { ...this.defaultFilter };
+      }
     },
     removeFilter() {
       this.$emit('remove-filter', this.filter);
@@ -527,7 +538,9 @@ export default {
         } };
       this.$emit('update:applied-filter', this.filter);
       this.activeFilter = null;
-      this.focusInputField();
+      // delay focus in case type is different and new component needs to be
+      // rendered first
+      this.$nextTick(() => this.focusInputField());
     },
 
     /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
@@ -581,7 +594,8 @@ export default {
         } else {
           this.$set(this.filter, 'values', [valueToAdd]);
         }
-      } else if (this.isMainSearch && !this.currentInput && this.filter.values.length) {
+      } else if (this.isMainSearch && !this.currentInput && this.filter.values
+        && this.filter.values.length) {
         this.addFilter();
       }
       // reset everything
@@ -745,7 +759,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-advanced-search {
+  .base-advanced-search-row {
     width: 100%;
     background: white;
     position: relative;
@@ -886,11 +900,21 @@ export default {
 
     }
 
-    .base-advanced-search-row__plus-icon {
-      margin-left: $spacing;
-      height: $icon-medium;
-      width: $icon-medium;
-      cursor: pointer;
+    .base-advanced-search-row__icon-button {
+      .base-advanced-search-row__plus-icon {
+        margin-left: $spacing;
+        height: $icon-medium;
+        width: $icon-medium;
+        cursor: pointer;
+        flex: 0 0 auto;
+        outline: none;
+      }
+
+      &:hover .base-advanced-search-row__plus-icon,
+      &:active .base-advanced-search-row__plus-icon,
+      &:focus .base-advanced-search-row__plus-icon {
+        fill: $app-color;
+      }
     }
 
     .base-advanced-search-row__columns, .base-advanced-search-row__filter-list {
@@ -910,7 +934,7 @@ export default {
   }
 
   @media screen and (max-width: $tablet) {
-    .base-advanced-search {
+    .base-advanced-search-row {
       .base-advanced-search-row__columns {
         column-count: 3;
       }
@@ -918,7 +942,7 @@ export default {
   }
 
   @media screen and (max-width: $mobile) {
-    .base-advanced-search {
+    .base-advanced-search-row {
       .base-advanced-search-row__columns {
         column-count: 2;
       }

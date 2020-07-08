@@ -10,8 +10,9 @@
     <!-- @slot to add things before the input e.g. chips -->
     <slot name="before-input">
       <SvgIcon
+        v-if="showImage"
         name="magnifier"
-        :class="[{ 'base-search__magnifier-icon': showImage },
+        :class="['base-search__magnifier-icon',
                  { 'base-search__magnifier-icon-active': active }]" />
     </slot>
     <input
@@ -37,7 +38,8 @@
       :use-form-field-styling="false"
       label="date-input"
       @focus="inputFocus"
-      @blur="inputBlur" />
+      @blur="inputBlur"
+      v-on="$listeners" />
     <BaseChipsInputField
       v-else-if="type === 'chips'"
       :id="internalFieldId"
@@ -54,6 +56,7 @@
       identifier-property-name="id"
       @focus="inputFocus"
       @blur="inputBlur"
+      @keydown.up.down.prevent=""
       v-on="$listeners" />
     <!-- @slot for icon after input field -->
     <slot>
@@ -259,14 +262,6 @@ export default {
     },
     inputFocus() {
       this.active = true;
-      // below was introduced for base advanced search row because @click
-      // event is not triggered when clicking on datepicker
-      /**
-       * event to inform parent when datepicker was opened
-       *
-       * @event datepicker-open
-       */
-      this.$emit('datepicker-open');
     },
     clearInput() {
       this.inputInt = null;

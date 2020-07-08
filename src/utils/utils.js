@@ -70,3 +70,19 @@ export const sort = (list, objectProp = '', sortByName = false, valueFunction = 
   }
   return -1;
 });
+
+export const hasData = (fieldValues) => {
+  let hasContent = false;
+  if (fieldValues && typeof fieldValues === 'object') {
+    if (fieldValues.length >= 0) {
+      fieldValues.forEach((values) => { hasContent = hasData(values) || hasContent; });
+    } else {
+      const objectKeys = Object.keys(fieldValues);
+      objectKeys
+        .forEach((key) => { hasContent = hasData(fieldValues[key]) || hasContent; });
+    }
+  } else {
+    hasContent = fieldValues === 0 || !!fieldValues || hasContent;
+  }
+  return hasContent;
+};
