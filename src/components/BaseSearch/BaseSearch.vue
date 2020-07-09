@@ -55,9 +55,10 @@
       value-property-name="label"
       identifier-property-name="id"
       @focus="inputFocus"
-      @blur="inputBlur"
+      @clicked-outside="inputBlur"
       @keydown.up.down.prevent=""
-      v-on="$listeners" />
+      @keydown.tab="active = false"
+      v-on="chipsInputListeners" />
     <!-- @slot for icon after input field -->
     <slot>
       <SvgIcon
@@ -143,8 +144,8 @@ export default {
       default: '',
     },
     /**
-     * specify the type of input field<br>
-     *   possible values: text|chips|date|daterange
+     * specify the type of input field <br>
+     * @values: text, chips, date, daterange
      */
     type: {
       type: String,
@@ -189,7 +190,7 @@ export default {
            * event to inform parent of picked date if type date or daterange
            *
            * @event date-input-changed
-           * @type { Object }
+           * @property {Object} tempInput - an object with the following properties:
            * @property { string } date - if type is date
            * @property { string } date_from - if type is daterange
            * @property { string } date_to - if type is daterange
@@ -215,7 +216,7 @@ export default {
            * inform parent of changes in chips selected if type is chips<br>
            *   (the .sync modifier can be used here)
            * @event update:selected-chips
-           * @type { Array }
+           * @property {Object[]} val - the array with selected chips
            */
           this.$emit('update:selected-chips', val);
         }
@@ -237,10 +238,25 @@ export default {
              * Event emitted on input, passing input string
              *
              * @event input
-             * @type { String }
+             * @property {string} value 'event.target.value' of the input event
              *
              */
             this.$emit('input', event.target.value);
+          },
+        },
+      });
+    },
+    chipsInputListeners() {
+      return ({
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          blur: (event) => {
+            event.stopPropagation();
+          },
+          'clicked-outside': () => {
+            this.$emit('blur');
           },
         },
       });

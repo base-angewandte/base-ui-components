@@ -49,6 +49,7 @@
         @blur="checkDropDownClose"
         @keydown.up.down.right.left="navigateDropDown"
         @keydown.enter="selectOption"
+        @keydown.tab="showDropDown = false"
         @date-input-changed="filter.values = setFilterValues(filter.type, $event)" />
       <button
         v-if="isMainSearch"
@@ -114,7 +115,7 @@
                   { 'base-advanced-search-row__filter-selected':
                     filter && filter.label === singleFilter.label }]"
                 role="option"
-                @click="selectFilter(singleFilter)">
+                @click.stop="selectFilter(singleFilter)">
                 {{ singleFilter.label }}
               </li>
             </ul>
@@ -259,7 +260,7 @@ export default {
     // TODO: check if this is correctly displayed in styleguide
     autocompleteResults: {
       type: [String, Object][Array],
-      default: () => ([]),
+      default: () => [],
     },
     /**
      * the filter currently applied
@@ -295,7 +296,6 @@ export default {
       currentInput: '',
       // current filter
       // TODO: a) adjust to actual filter structure
-      // b) should probably be set from outside
       /**
        * the currently selected filter
        * @typedef {Object} filter
@@ -345,6 +345,11 @@ export default {
     };
   },
   computed: {
+    /**
+     * the text input for input fields - needs special handling for
+     * datepicker
+     * @type {string|Object}
+     */
     searchInput: {
       get() {
         if (this.filter.type === 'date' || this.filter.type === 'daterange') {
@@ -378,9 +383,11 @@ export default {
       }
       return [];
     },
-    // the actually displayed filters (currently only sorted)
-    // TODO: check if there should actually be a functionality where input
-    // filters the displayed filters
+    /**
+     * the actually displayed filters (currently only sorted)
+     * TODO: check if there should actually be a functionality where input
+     * filters the displayed filters
+     */
     displayedFilters() {
       const displayed = [...this.filterList];
       return displayed.sort((a, b) => {
@@ -390,7 +397,9 @@ export default {
         return -1;
       });
     },
-    // selected controlled vocabulary or autocomplete options
+    /**
+     * selected controlled vocabulary or autocomplete options
+    */
     selectedOptions: {
       set(val) {
         this.$set(this.filter, 'values', val);
@@ -404,10 +413,17 @@ export default {
         return [];
       },
     },
+    /**
+     * filtered autocomplete list, e.g. removing collections with no results
+     * and options that were already selected
+     * @type {Object[]} resultListInt
+     */
     resultListInt() {
       if (!this.displayedOptions.length) {
+        // filter empty collections
         const resultsToDisplay = this.autocompleteResults
           .filter(section => section.data && section.data.length);
+        // filter options already selected previously
         if (this.selectedOptions && this.selectedOptions.length) {
           const selectedOptionIds = this.selectedOptions.map(option => option.id);
           return resultsToDisplay.map(({ data, collection }) => ({
@@ -419,6 +435,11 @@ export default {
       }
       return [];
     },
+    /**
+     * list of autocomplete results used for determining currently active
+     * collection // activity
+     * @type {Object} consolidatedResultList
+     */
     consolidatedResultList() {
       const resultObject = {};
       this.resultListInt.forEach((section) => {
@@ -436,6 +457,10 @@ export default {
         return [this.filter];
       },
     },
+    /**
+     * create a row id either taken from externally specified id or
+     * via createId function
+     */
     internalRowId() {
       return this.searchRowId || createId();
     },
@@ -452,7 +477,9 @@ export default {
         }
       },
       deep: true,
+      immediate: true,
     },
+    // watch if applied filter changes from outside
     appliedFilter: {
       handler(val) {
         if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
@@ -465,6 +492,12 @@ export default {
     // do the fetching of autocomplete results
     currentInput(val) {
       if (typeof val === 'string') {
+        /**
+         * event emitted when input string for text or chips filter changes
+         *
+         * @event fetch-autocomplete-results
+         * @property {Object} val - the input string
+         */
         this.$emit('fetch-autocomplete-results', val);
       }
     },
@@ -497,6 +530,12 @@ export default {
     // inform parent of click on plus or remove respectively
     addFilter() {
       // emit event in any case (so frontend can inform user to add values if empty)
+      /**
+       * event emitted when user took action to add filter
+       *
+       * @event add-filter
+       * @property {Object} filter - the filter object in question
+       */
       this.$emit('add-filter', this.filter);
       // check if filter has any data
       if (hasData(this.filter.values)) {
@@ -507,6 +546,12 @@ export default {
       }
     },
     removeFilter() {
+      /**
+       * event emitted when user triggered remove icon on filter row
+       *
+       * @event remove-filter
+       * @property {Object} filter - the filter to be removed
+       */
       this.$emit('remove-filter', this.filter);
     },
 
@@ -536,11 +581,21 @@ export default {
         ...{
           values: this.setFilterValues(selectedFilter.type),
         } };
+      /**
+       * event emitted when the applied filter changes<br>
+       *   (possible to use .sync modifier on prop appliedFilter)
+       * @event update:applied-filter
+       * @property {Object} val - the new currently applied filter
+       */
       this.$emit('update:applied-filter', this.filter);
       this.activeFilter = null;
-      // delay focus in case type is different and new component needs to be
-      // rendered first
-      this.$nextTick(() => this.focusInputField());
+      // do not focus input field if filter type is date or daterange
+      // because this immediately opens datepicker and is in the way
+      if (this.filter.type !== 'date' && this.filter.type !== 'daterange') {
+        // delay focus in case type is different and new component needs to be
+        // rendered first
+        this.$nextTick(() => this.focusInputField());
+      }
     },
 
     /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
