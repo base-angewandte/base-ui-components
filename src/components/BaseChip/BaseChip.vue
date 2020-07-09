@@ -3,11 +3,10 @@
     :class="['base-chip',
              { 'base-chip__removable': isRemovable },
              { 'base-chip-edited': entryEdited },
-             { 'base-chip__active': chipActive }]">
+             { 'base-chip__active': chipActive }]"
+    @click.stop="clickAction">
     <div
       class="base-chip-text"
-      @click.stop="clickAction"
-      @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox">
       {{ entryInt }}
@@ -15,7 +14,7 @@
     <div
       v-if="isRemovable"
       class="base-chip-icon"
-      @click="removeClicked">
+      @click.stop="removeClicked">
       <img
         :src="require('../../static/icons/remove.svg')"
         alt="remove"
@@ -140,15 +139,6 @@ export default {
         this.$emit('hoverbox-active', false);
         this.showInfoBox = false;
       }
-    },
-    onMouseDown(event) {
-      /**
-       * event on mouse down, needed by base chips input to determine active chip
-       *
-       * @type {Event}
-       *
-       */
-      this.$emit('mouse-down', event);
     },
     removeClicked() {
       /**
