@@ -31,6 +31,7 @@ import BaseCarousel from './components/BaseCarousel/BaseCarousel';
 import BaseDropDownList from './components/BaseDropDownList/BaseDropDownList';
 import BaseChipsInputField from './components/BaseChipsInputField/BaseChipsInputField';
 import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
+import BaseAdvancedSearchRow from './components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
 import 'normalize.css';
 import './styles/lib.scss';
 
@@ -68,4 +69,5 @@ export {
   BaseDropDownList,
   BaseChipsInputField,
   BaseExpandBox,
+  BaseAdvancedSearchRow,
 };
