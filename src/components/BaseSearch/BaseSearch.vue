@@ -51,6 +51,7 @@
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
       :placeholder="placeholder"
+      :is-loading="isLoading"
       label="chips-input"
       value-property-name="label"
       identifier-property-name="id"
@@ -166,6 +167,10 @@ export default {
     linkedListOption: {
       type: String,
       default: null,
+    },
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

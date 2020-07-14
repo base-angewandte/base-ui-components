@@ -43,6 +43,7 @@
         :style-props="{ height: 'inherit'}"
         :type="filter.type === 'text' ? 'chips' : filter.type"
         :selected-chips.sync="selectedOptions"
+        :is-loading="isLoading"
         class="base-advanced-search-row__base-search"
         drop-down-list-id="autocomplete-options"
         @focus="activateDropDown"
@@ -158,11 +159,12 @@
         v-slot:after-list>
         <div class="base-advanced-search-row__above-list-area">
           <div class="base-advanced-search-row__chips-row">
-            <div class="base-advanced-search-row__first-column">
+            <div
+              class="base-advanced-search-row__first-column">
               Available options
             </div>
             <ul
-              v-if="filter && filter.options"
+              v-if="filter && filter.options && displayedOptions.length"
               class="base-advanced-search-row__columns">
               <li
                 v-for="chip in displayedOptions"
@@ -179,6 +181,12 @@
                   @clicked="selectOption" />
               </li>
             </ul>
+            <div v-else-if="isLoading">
+              Options are being loaded...
+            </div>
+            <div v-else-if="!displayedOptions.length">
+              No more options available
+            </div>
           </div>
         </div>
       </template>
@@ -191,6 +199,10 @@
           ]">
           <div v-if="!currentInput">
             Please start typing or select a filter to see options
+          </div>
+          <div
+            v-else-if="isLoading">
+            Autocomplete is being fetched...
           </div>
           <div v-else>
             No matching options found
@@ -285,6 +297,13 @@ export default {
         type: 'text',
         options: [],
       }),
+    },
+    /**
+     * flag to set if loader should be shown (for autocomplete requests
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -876,6 +895,7 @@ export default {
         }
 
         .base-advanced-search-row__chips-row {
+          line-height: $row-height-small;
 
           .base-advanced-search-row__option-chip {
             cursor: pointer;
