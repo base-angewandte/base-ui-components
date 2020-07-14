@@ -679,8 +679,7 @@ export default {
 
     .base-chips-input-field__loader {
       margin: 0 $spacing-large;
-      align-self: flex-end;
-      transform: translate(0px, -#{$spacing}) scale(0.5);
+      transform: scale(0.5);
     }
 
     .base-chips-input-field__single-dropdown {
