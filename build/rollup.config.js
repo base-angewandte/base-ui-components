@@ -1,80 +1,74 @@
 // rollup.config.js
 import fs from 'fs';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import path from 'path';
+// to be able to process vue files with rollup
 import vue from 'rollup-plugin-vue';
+// Alias modules in a build (like webpack)
 import alias from '@rollup/plugin-alias';
+// Convert CommonJS modules to ES Modules.
 import commonjs from '@rollup/plugin-commonjs';
+// Replace occurrences of a set of strings.
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
+// Import JPG, PNG, GIF and SVG images.
 import image from '@rollup/plugin-image';
 import postcss from 'rollup-plugin-postcss';
+// show generated bundle sizes
 import bundleSize from 'rollup-plugin-bundle-size';
+// for css extraction
 import css from 'rollup-plugin-css-only';
 import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
 
+// access package.json e.g. for version information
 import pack from '../package.json';
+// make sure every component has a index file
+import './generate-index-files';
+
+console.info('Lets build!');
 
 // Get browserslist config and remove ie from es build targets
 const esbrowserslist = pack.browserslist
-  .toString()
-  .split('\n')
-  .filter((entry) => entry && entry.substring(0, 2) !== 'ie');
+  .filter(entry => entry && entry.substring(0, 2) !== 'ie');
 
 const argv = minimist(process.argv.slice(2));
 const projectRoot = path.resolve(__dirname, '..');
+
+// from buefy - define base folder and components folder
 const baseFolder = './src/';
 const componentsFolder = 'components/';
 
+// set a banner line for each generated file
 const bannerTxt = `/*! base UI components v${pack.version} | Apache License, Version 2.0 | github.com/base-angewandte/base-ui-components */`;
 
+// from buefy - get all component names directly from components folder
 const components = fs
   .readdirSync(baseFolder + componentsFolder)
-  .filter((f) =>
-    fs.statSync(path.join(baseFolder + componentsFolder, f))
-      .isDirectory()
-  );
+  .filter(f => fs.statSync(path.join(baseFolder + componentsFolder, f)).isDirectory());
 
+// get a list of all entries to consider in bundle generation
 const entries = {
-  'index': './src/entry.js',
+  index: './src/entry.js',
   ...components.reduce((obj, name) => {
-    obj[name] = (baseFolder + componentsFolder + name);
-    return obj;
-  }, {})
+    return ({ ...obj, ...{ name: `${baseFolder}${componentsFolder}${name}`} });
+  }, {}),
 };
 
-components.forEach((component) => {
-  fs.writeFileSync(
-    path.resolve(`${baseFolder}/${componentsFolder}/${component}`, 'index.js'),
-    `import ${component} from './${component}';
+// generate a index.js file for every single component
+console.info('Generating index file');
 
-import { use, registerComponent } from '../../utils/plugins';
-import '../../styles/lib.scss';
-
-const Plugin = {
-    install(Vue) {
-        registerComponent(Vue, ${component})
-    }
-};
-
-use(Plugin);
-
-export default Plugin;
-
-export {
-    ${component}
-};`,
-  );
-});
-
+// from sfc-template - base config for all formats
 const baseConfig = {
   input: entries,
   plugins: {
+    // allow for skipping file extensions
     resolve: {
       extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
     },
     preVue: [
+      // plugin for aliases (to work in webpack and rollup)
       alias({
         resolve: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
         entries: {
@@ -86,13 +80,15 @@ const baseConfig = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       'process.env.ES_BUILD': JSON.stringify('false'),
     },
+    // define file name for separate css file
+    // TODO: do we want extracted css?
     css: {
-      output: 'dist/base-ui-components.css',
+      output: 'dist/src-rollup-test.css',
     },
     vue: {
+      // Setting { css: false } converts <style> blocks to import statements
       css: false,
       postcss: {
-        plugins: require('../postcss.config.js')().plugins,
       },
       template: {
         isProduction: true,
@@ -127,47 +123,50 @@ const globals = {
   'vue2-datepicker': 'Datepicker',
 };
 
-function mapComponent(name) {
-  return [
-    {
-      ...baseConfig,
-      external,
-      input: baseFolder + componentsFolder + `${name}/index.js`,
+/**
+ *
+ * @param {string} name - the component name string
+ * @returns {Object} - a rollup config objects in iife format for a component
+ */
+const mapComponent = name => ({
+  ...baseConfig,
+  external,
+  input: `${baseFolder + componentsFolder}${name}/index.js`,
+  output: {
+    format: 'iife',
+    name,
+    file: `dist/components/${name}/index.js`,
+    banner: bannerTxt,
+    exports: 'named',
+    globals,
+    compact: true,
+  },
+  inlineDynamicImports: true,
+  plugins: [
+    resolve(baseConfig.plugins.resolve),
+    replace(baseConfig.plugins.replace),
+    ...baseConfig.plugins.preVue,
+    vue({
+      ...baseConfig.plugins.vue,
+      ...{ css: true },
+    }),
+    babel(baseConfig.plugins.babel),
+    commonjs(),
+    image(),
+    terser({
       output: {
-        format: 'iife',
-        name: name,
-        file: `dist/components/${name}/index.js`,
-        banner: bannerTxt,
-        exports: 'named',
-        globals,
-        compact: true,
+        ecma: 5,
       },
-      inlineDynamicImports: true,
-      plugins: [
-        resolve(baseConfig.plugins.resolve),
-        replace(baseConfig.plugins.replace),
-        ...baseConfig.plugins.preVue,
-        vue({
-          ...baseConfig.plugins.vue,
-          ...{ css: true }
-        }),
-        babel(baseConfig.plugins.babel),
-        commonjs(),
-        image(),
-        terser({
-          output: {
-            ecma: 5,
-          },
-        }),
-        postcss(),
-        bundleSize(),
-      ],
-    }
-  ];
-}
+    }),
+    postcss(),
+    bundleSize(),
+  ],
+});
 
 // Customize configs for individual targets
 let buildFormats = [];
+
+// ESM build to be used with webpack/rollup
 if (!argv.format || argv.format === 'es') {
   const esConfig = {
     ...baseConfig,
@@ -205,6 +204,7 @@ if (!argv.format || argv.format === 'es') {
   buildFormats.push(esConfig);
 }
 
+// SSR build
 if (!argv.format || argv.format === 'cjs') {
   const umdConfig = {
     ...baseConfig,
@@ -237,6 +237,7 @@ if (!argv.format || argv.format === 'cjs') {
   buildFormats.push(umdConfig);
 }
 
+// Browser build
 if (!argv.format || argv.format === 'iife') {
   const unpkgConfig = {
     ...baseConfig,
@@ -244,7 +245,7 @@ if (!argv.format || argv.format === 'iife') {
     input: 'src/entry.js',
     output: {
       compact: true,
-      file: 'dist/base-ui-components.min.js',
+      file: 'dist/src-rollup-test.min.js',
       format: 'iife',
       name: 'SrcRollupTest',
       exports: 'named',
@@ -272,8 +273,7 @@ if (!argv.format || argv.format === 'iife') {
 }
 
 if (!argv.format || argv.format === 'components') {
-  const componentConfig = components.map((f) => mapComponent(f))
-    .reduce((r, a) => r.concat(a), []);
+  const componentConfig = components.map(f => mapComponent(f));
   buildFormats = buildFormats.concat(componentConfig);
 }
 
