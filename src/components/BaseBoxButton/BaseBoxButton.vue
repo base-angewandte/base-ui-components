@@ -37,7 +37,6 @@
         :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
         {{ subtext }}
       </div>
-
       <BaseBoxTooltip
         v-if="showTooltip"
         @clicked="onTooltip" />
@@ -61,13 +60,14 @@
 import SvgIcon from 'vue-svgicon';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index';
+import '../../assets/icons/index.js';
 
 /**
  * A Base Box Shaped Button
  */
 
 export default {
+  name: 'BaseBoxButton',
   components: {
     SvgIcon,
     BaseBox,
@@ -198,7 +198,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-box-button {
     display: flex;

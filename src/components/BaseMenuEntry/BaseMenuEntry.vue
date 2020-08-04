@@ -74,6 +74,7 @@ import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
  */
 
 export default {
+  name: 'BaseMenuEntry',
   components: {
     SvgIcon,
     BaseCheckmark,
@@ -220,7 +221,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
+
   .base-menu-entry {
     display: flex;
     align-items: center;

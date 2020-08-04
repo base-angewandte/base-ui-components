@@ -27,7 +27,7 @@ A list in drop down style. Click the button to display!
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
+import BaseButton from './BaseButton';
 
 export default {
     components: {

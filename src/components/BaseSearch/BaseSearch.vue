@@ -32,6 +32,7 @@ import SvgIcon from 'vue-svgicon';
  * A basic text search to filter entries or files
   */
 export default {
+  name: 'BaseSearch',
   components: {
     SvgIcon,
   },
@@ -122,7 +123,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-search {
     position: relative;
@@ -165,7 +166,6 @@ export default {
       }
 
       &:active.base-search-input-img, &:focus.base-search-input-img {
-        background: url(../../static/icons/magnifier-2.svg) left no-repeat;
         background-size: $icon-large;
         padding-left: calc(#{$icon-large} + #{$spacing});
       }

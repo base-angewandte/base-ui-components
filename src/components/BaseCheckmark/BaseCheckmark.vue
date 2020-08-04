@@ -33,6 +33,7 @@ import SvgIcon from 'vue-svgicon';
  */
 
 export default {
+  name: 'BaseCheckmark',
   components: {
     SvgIcon,
   },
@@ -120,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-checkbox-container {
     position: relative;

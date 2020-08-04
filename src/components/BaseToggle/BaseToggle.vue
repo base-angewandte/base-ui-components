@@ -33,6 +33,7 @@ import SvgIcon from 'vue-svgicon';
  * Toggle Component
  */
 export default {
+  name: 'BaseToggle',
   components: {
     SvgIcon,
   },

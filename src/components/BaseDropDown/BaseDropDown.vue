@@ -37,11 +37,6 @@
         <SvgIcon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
           name="drop-down" />
-        <!--
-        <img
-          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          svg-inline
-          src="../../static/icons/drop-down.svg"> -->
       </slot>
     </button>
     <div
@@ -83,6 +78,7 @@ import i18n from '../../mixins/i18n';
  * Accessible drop down component
  */
 export default {
+  name: 'BaseDropDown',
   components: {
     SvgIcon,
   },
@@ -274,7 +270,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-drop-down {
     display: inline-block;
@@ -350,7 +346,7 @@ export default {
       }
 
       .base-drop-down-icon {
-        transition: $drop-down-arrow-animation;
+        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
         height: $icon-small;
         flex-shrink: 0;
 

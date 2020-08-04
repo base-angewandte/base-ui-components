@@ -2,7 +2,7 @@
   <compontent
     :is="boxType"
     :style="boxSizeInt"
-    :class="['base-box', 'base-box-' + $props.boxRatio, {'base-box-hover': boxHover}]"
+    :class="['base-box', 'base-box-' + $props.boxRatio]"
     :disabled="disabled"
     :type="(boxType === 'button') ? 'button' : ''"
     @click="clicked">
@@ -16,6 +16,7 @@
  * Base Component for everything Box shaped
  */
 export default {
+  name: 'BaseBox',
   /**
    * event emitted when clicked on box
    *
@@ -47,13 +48,6 @@ export default {
       default: '100',
     },
     /**
-     *  set hover class
-     */
-    boxHover: {
-      type: Boolean,
-      default: true,
-    },
-    /**
      * set button inactive
      */
     disabled: {
@@ -81,7 +75,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-box {
     background: white;
@@ -90,7 +84,7 @@ export default {
     min-height: 100%;
     position: relative;
     overflow: hidden;
-    display: flex;
+
 
     &:after {
       content:  '';
@@ -106,8 +100,7 @@ export default {
       padding-bottom: calc(50% - #{$spacing-small});
     }
 
-    &:hover,
-    &:focus {
+    &:hover {
       box-shadow: $box-shadow-hov;
     }
 

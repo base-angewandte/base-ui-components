@@ -70,6 +70,7 @@ import BaseLoader from '../BaseLoader/BaseLoader';
  */
 
 export default {
+  name: 'BaseAutocompleteInput',
   components: {
     BaseInput,
     BaseLoader,
@@ -243,7 +244,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-autocomplete-input {
     position: relative;

@@ -32,6 +32,7 @@ import SvgIcon from 'vue-svgicon';
  * The status bar displayed during file upload
   */
 export default {
+  name: 'BaseUploadBar',
   components: {
     SvgIcon,
   },
@@ -102,7 +103,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-upload-bar {
     font-family: inherit;

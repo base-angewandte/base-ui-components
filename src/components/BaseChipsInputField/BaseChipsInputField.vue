@@ -96,6 +96,7 @@ import { sort, createId } from '../../utils/utils';
 /** input field with chips functionalities */
 
 export default {
+  name: 'BaseChipsInputField',
   components: {
     BaseLoader,
     BaseInput,
@@ -685,7 +686,7 @@ export default {
       margin: 0 $spacing;
 
       .base-chips-input-field__single-dropdown-icon {
-        transition:  $drop-down-arrow-animation;
+        transition: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
         height: $icon-small;
         flex-shrink: 0;
 

@@ -110,10 +110,7 @@
 </template>
 
 <script>
-import VueClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import Hls from 'hls.js/dist/hls.light';
-import BaseButton from '../BaseButton/BaseButton';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -122,12 +119,13 @@ import popUpLock from '../../mixins/popUpLock';
  */
 
 export default {
+  name: 'BaseMediaPreview',
   components: {
-    BaseButton,
-    SvgIcon,
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    SvgIcon: () => import('vue-svgicon'),
   },
   directives: {
-    VueClickOutside,
+    VueClickOutside: () => import('vue-click-outside'),
   },
   mixins: [popUpLock],
   props: {
@@ -341,7 +339,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-media-preview-background{
     z-index: map-get($zindex, modal_bg);

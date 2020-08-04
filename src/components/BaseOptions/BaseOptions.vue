@@ -56,6 +56,7 @@ import i18n from '../../mixins/i18n';
  * element for providing form options with animation
  */
 export default {
+  name: 'BaseOptions',
   components: {
     BaseButton,
   },

@@ -7,15 +7,14 @@
 </template>
 
 <script>
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
-
 /**
  * A box for information display after mouse hover or click
  */
 
 export default {
+  name: 'BaseHoverBox',
   components: {
-    BaseImageBox,
+    BaseImageBox: () => import('../BaseImageBox/BaseImageBox'),
   },
   props: {
     /**
@@ -109,7 +108,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-hover-box {
     box-shadow: $preview-box-shadow;

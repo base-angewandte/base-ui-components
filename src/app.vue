@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <h1>BaseDetailBox</h1>
+    <h1>BaseDetailBox bbb</h1>
     <BaseDetailBox
       :data="[{
                 label: {
@@ -436,33 +436,33 @@
 <script>
 import axios from 'axios';
 
-import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
-import BasePopUp from './components/BasePopUp/BasePopUp';
-import BaseDropDown from './components/BaseDropDown/BaseDropDown';
-import BaseInput from './components/BaseInput/BaseInput';
-import BaseDropBox from './components/BaseDropBox/BaseDropBox';
-import BaseMenuList from './components/BaseMenuList/BaseMenuList';
-import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
-import BaseSearch from './components/BaseSearch/BaseSearch';
-import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
-import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
-import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseDateInput from './components/BaseDateInput/BaseDateInput';
-import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
-import BasePagination from './components/BasePagination/BasePagination';
-import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
-import BaseForm from './components/BaseForm/BaseForm';
-import BaseButton from './components/BaseButton/BaseButton';
-import BaseImageBox from './components/BaseImageBox/BaseImageBox';
-import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
-import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
-import BaseCarousel from './components/BaseCarousel/BaseCarousel';
-import BaseMap from './components/BaseMap/BaseMap';
-import BaseTextList from './components/BaseTextList/BaseTextList';
-import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
-import BaseDetailBox from './components/BaseDetailBox/BaseDetailBox';
-import BaseExpandRow from './components/BaseExpandRow/BaseExpandRow';
+import BaseMenuEntry from '@/entry';
+import BasePopUp from '@/entry';
+import BaseDropDown from '@/entry';
+import BaseInput from '@/entry';
+import BaseDropBox from '@/entry';
+import BaseMenuList from '@/entry';
+import BaseChipsInput from '@/entry';
+import BaseSearch from '@/entry';
+import BaseMultilineTextInput from '@/entry';
+import BaseAutocompleteInput from '@/entry';
+import BaseChipsBelow from '@/entry';
+import BaseDateInput from '@/entry';
+import BaseDatePanel from '@/entry';
+import BasePagination from '@/entry';
+import BaseMediaPreview from '@/entry';
+import BaseForm from '@/entry';
+import BaseButton from '@/entry';
+import BaseImageBox from '@/entry';
+import BaseToggle from '@/entry';
+import BaseResultBoxSection from '@/entry';
+import BaseProgressBar from '@/entry';
+import BaseCarousel from '@/entry';
+import BaseMap from '@/entry';
+import BaseTextList from '@/entry';
+import BaseExpandBox from '@/entry';
+import BaseDetailBox from '@/entry';
+import BaseExpandRow from '@/entry';
 
 export default {
   name: 'App',

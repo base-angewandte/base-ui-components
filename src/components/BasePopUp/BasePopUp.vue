@@ -69,8 +69,6 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
-import BaseButton from '../BaseButton/BaseButton';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import popUpLock from '../../mixins/popUpLock';
 
@@ -82,8 +80,8 @@ import popUpLock from '../../mixins/popUpLock';
 export default {
   name: 'BasePopUp',
   components: {
-    BaseButton,
-    SvgIcon,
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    SvgIcon: () => import('vue-svgicon'),
     BaseLoader,
   },
   mixins: [popUpLock],
@@ -224,7 +222,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-pop-up-background {
     position: fixed;

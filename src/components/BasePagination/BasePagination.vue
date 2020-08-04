@@ -121,6 +121,7 @@ import SvgIcon from 'vue-svgicon';
  */
 
 export default {
+  name: 'BasePagination',
   components: {
     SvgIcon,
   },
@@ -232,7 +233,7 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-pagination {
     text-align: center;

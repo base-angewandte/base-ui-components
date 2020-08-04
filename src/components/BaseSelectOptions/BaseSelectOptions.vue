@@ -19,6 +19,7 @@ import BaseButton from '../BaseButton/BaseButton';
  */
 
 export default {
+  name: 'BaseSelectOptions',
   components: {
     BaseButton,
   },

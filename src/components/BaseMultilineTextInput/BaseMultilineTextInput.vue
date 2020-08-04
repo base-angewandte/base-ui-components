@@ -46,6 +46,7 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
  */
 
 export default {
+  name: 'BaseMultilineTextInput',
   components: { BaseSwitchButton, SvgIcon },
   model: {
     prop: 'input',
@@ -183,7 +184,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-multiline-text-input {
     position: relative;

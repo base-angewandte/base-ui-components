@@ -15,9 +15,8 @@
       class="base-chip-icon"
       @click="removeClicked">
       <img
-        :src="require('../../static/icons/remove.svg')"
-        alt="remove"
-        class="base-chip-icon-img">
+        src="RemoveIcon"
+        class="base-chip-icon-img" />
     </div>
     <base-hover-box
       ref="hoverBox"
@@ -28,14 +27,18 @@
 
 <script>
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
+// eslint-disable-next-line import/extensions
+import RemoveIcon from '../../static/icons/remove.svg';
 
 /**
  * Basic Chip component
  */
 
 export default {
+  name: 'BaseChip',
   components: {
     BaseHoverBox,
+    RemoveIcon,
   },
   model: {
     prop: 'entry',
@@ -79,6 +82,7 @@ export default {
       entryInt: {},
       entryEdited: false,
       showInfoBox: false,
+      RemoveIcon,
     };
   },
   computed: {
@@ -156,7 +160,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-chip, .base-chip-inline {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
