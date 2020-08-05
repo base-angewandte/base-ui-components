@@ -1,8 +1,11 @@
 const fs = require('fs');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const path = require('path');
+const minimist = require('minimist');
 
-export default () => {
+const { force } = minimist(process.argv.slice(2));
+
+const generate = () => {
   console.info('Generating index file');
   // from buefy - define base folder and components folder
   const baseFolder = './src/';
@@ -16,14 +19,13 @@ export default () => {
   components.forEach((component) => {
     const indexFilePath = path.resolve(`${baseFolder}${componentsFolder}${component}`, 'index.js');
     // check if index file exists already
-    if (!fs.existsSync(indexFilePath)) {
+    if (force || !fs.existsSync(indexFilePath)) {
       console.info(`index.js generated for ${component}`);
       fs.writeFileSync(
         indexFilePath,
         `import ${component} from './${component}';
 
 import { use, registerComponent } from '../../utils/plugins';
-import '../../styles/lib.scss';
 
 const Plugin = {
   install(Vue) {
@@ -43,3 +45,6 @@ export {
     }
   });
 }
+generate();
+
+module.exports = generate;

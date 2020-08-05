@@ -4,9 +4,9 @@ import { use, registerComponent } from '../../utils/plugins';
 import '../../styles/lib.scss';
 
 const Plugin = {
-    install(Vue) {
-        registerComponent(Vue, BaseMap)
-    }
+  install(Vue) {
+    registerComponent(Vue, BaseMap);
+  },
 };
 
 use(Plugin);
@@ -14,5 +14,5 @@ use(Plugin);
 export default Plugin;
 
 export {
-    BaseMap
+  BaseMap,
 };

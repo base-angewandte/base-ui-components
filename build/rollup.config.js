@@ -24,7 +24,7 @@ import minimist from 'minimist';
 
 // access package.json e.g. for version information
 import pack from '../package.json';
-import generateIndexFile from './generate-index-files';
+const generateIndexFile = require('./generate-index-files');
 
 // make sure every component has a index file
 generateIndexFile();

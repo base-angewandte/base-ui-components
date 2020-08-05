@@ -26,6 +26,7 @@
     "build:docs": "vue-styleguidist build",
     "svg": "npx vsvg -s ./src/static/icons/ -t ./src/assets/icons/ --es6",
     "updateindex": "node build/generate-index-files.js",
+    "updateindex:all": "node build/generate-index-files.js --force true",
     "styleguide": "vue-styleguidist server",
     "postversion": "./postversion.sh"
   },

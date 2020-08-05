@@ -4,9 +4,9 @@ import { use, registerComponent } from '../../utils/plugins';
 import '../../styles/lib.scss';
 
 const Plugin = {
-    install(Vue) {
-        registerComponent(Vue, BaseFormFieldCreator)
-    }
+  install(Vue) {
+    registerComponent(Vue, BaseFormFieldCreator);
+  },
 };
 
 use(Plugin);
@@ -14,5 +14,5 @@ use(Plugin);
 export default Plugin;
 
 export {
-    BaseFormFieldCreator
+  BaseFormFieldCreator,
 };
