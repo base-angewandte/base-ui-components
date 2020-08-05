@@ -244,7 +244,7 @@ if (!argv.format || argv.format === 'iife') {
     input: 'src/entry.js',
     output: {
       compact: true,
-      file: 'dist/src-rollup-test.min.js',
+      file: 'dist/base-ui-components.min.js',
       format: 'iife',
       name: 'SrcRollupTest',
       exports: 'named',
