@@ -54,7 +54,7 @@ const components = fs
 const entries = {
   index: './src/entry.js',
   ...components.reduce((obj, name) => {
-    return ({ ...obj, ...{ name: `${baseFolder}${componentsFolder}${name}`} });
+    return ({ ...obj, ...{ [name]: `${baseFolder}${componentsFolder}${name}`} });
   }, {}),
 };
 
@@ -111,6 +111,8 @@ const external = [
   'vue',
   // /@babel\/runtime/,
   'vue2-datepicker',
+  'lazysizes',
+  'swiper',
 ];
 
 // UMD/IIFE shared settings: output.globals
@@ -120,6 +122,8 @@ const globals = {
   // eg. jquery: '$'
   vue: 'Vue',
   'vue2-datepicker': 'Datepicker',
+  'lazysizes': 'lazysizes',
+  'swiper': 'Swiper',
 };
 
 /**
