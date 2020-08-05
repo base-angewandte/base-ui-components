@@ -82,7 +82,7 @@ const baseConfig = {
     // define file name for separate css file
     // TODO: do we want extracted css?
     css: {
-      output: 'dist/src-rollup-test.css',
+      output: 'dist/base-ui-components.css',
     },
     vue: {
       // Setting { css: false } converts <style> blocks to import statements
