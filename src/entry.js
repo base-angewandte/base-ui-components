@@ -1,55 +1,71 @@
 // Import vue components
 import * as components from './components';
-import { use, registerComponentProgrammatic } from './utils/plugins'
+import { use } from './utils/plugins';
 import './styles/lib.scss';
 
+/* eslint-disable-next-line no-unused-vars */
 let VueInstance;
 let config;
 
-const isObject = (item) => typeof item === 'object' && !Array.isArray(item)
+const isObject = item => typeof item === 'object' && !Array.isArray(item);
 const merge = (target, source, deep = false) => {
   if (deep || !Object.assign) {
-    const isDeep = (prop) =>
-      isObject(source[prop]) &&
-      target !== null &&
-      target.hasOwnProperty(prop) &&
-      isObject(target[prop])
+    const isDeep = prop => isObject(source[prop])
+      && target !== null
+      // eslint-disable-next-line no-prototype-builtins
+      && target.hasOwnProperty(prop)
+      && isObject(target[prop]);
     const replaced = Object.getOwnPropertyNames(source)
-      .map((prop) => ({ [prop]: isDeep(prop)
+      .map(prop => ({
+        [prop]: isDeep(prop)
           ? merge(target[prop], source[prop], deep)
-          : source[prop] }))
-      .reduce((a, b) => ({ ...a, ...b }), {})
+          : source[prop],
+      }))
+      .reduce((a, b) => ({ ...a, ...b }), {});
 
     return {
       ...target,
-      ...replaced
-    }
-  } else {
-    return Object.assign(target, source)
+      ...replaced,
+    };
   }
-}
+  return Object.assign(target, source);
+};
 
-export const setVueInstance = (Vue) => { VueInstance = Vue }
+export const setVueInstance = (Vue) => { VueInstance = Vue; };
 
-export const setOptions = (options) => { config = options }
+export const setOptions = (options) => { config = options; };
 
-const SrcPackageTest = {
+const BaseUiComponents = {
   install(Vue, options = {}) {
-    setVueInstance(Vue)
+    setVueInstance(Vue);
     // Options
-    setOptions(merge(config, options, true))
+    setOptions(merge(config, options, true));
     // Components
-    for (let componentKey in components) {
-      Vue.use(components[componentKey])
+    // eslint-disable-next-line guard-for-in,no-restricted-syntax
+    for (const componentKey in components) {
+      // eslint-disable-next-line import/namespace
+      Vue.use(components[componentKey]);
     }
+  },
+};
+
+// To auto-install on non-es builds, when vue is found
+// eslint-disable-next-line no-redeclare
+/* global window, global */
+if (process.env.ES_BUILD === 'false') {
+  let GlobalVue = null;
+  if (typeof window !== 'undefined') {
+    GlobalVue = window.Vue;
+  } else if (typeof global !== 'undefined') {
+    GlobalVue = global.Vue;
+  }
+  if (GlobalVue) {
+    use(BaseUiComponents);
   }
 }
 
-use(SrcPackageTest);
-
-console.log(SrcPackageTest);
-
-export default SrcPackageTest;
+// Default export is library as a whole, registered via Vue.use()
+export default BaseUiComponents;
 
 
 /*
@@ -68,20 +84,6 @@ const plugin = {
   install,
 };
 
-// To auto-install on non-es builds, when vue is found
-// eslint-disable-next-line no-redeclare
-/* global window, global */ /*
-if ('false' === process.env.ES_BUILD) {
-  let GlobalVue = null;
-  if (typeof window !== 'undefined') {
-    GlobalVue = window.Vue;
-  } else if (typeof global !== 'undefined') {
-    GlobalVue = global.Vue;
-  }
-  if (GlobalVue) {
-    GlobalVue.use(plugin);
-  }
-}
 // Default export is library as a whole, registered via Vue.use()
 export default plugin; */
 
