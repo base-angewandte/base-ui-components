@@ -24,8 +24,10 @@ import minimist from 'minimist';
 
 // access package.json e.g. for version information
 import pack from '../package.json';
+import generateIndexFile from './generate-index-files';
+
 // make sure every component has a index file
-import './generate-index-files';
+generateIndexFile();
 
 console.info('Lets build!');
 
@@ -55,9 +57,6 @@ const entries = {
     return ({ ...obj, ...{ name: `${baseFolder}${componentsFolder}${name}`} });
   }, {}),
 };
-
-// generate a index.js file for every single component
-console.info('Generating index file');
 
 // from sfc-template - base config for all formats
 const baseConfig = {
