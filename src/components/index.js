@@ -5,6 +5,7 @@ import BaseBox from './BaseBox';
 import BaseBoxButton from './BaseBoxButton';
 import BaseBoxTooltip from './BaseBoxTooltip';
 import BaseButton from './BaseButton';
+import BaseCarousel from './BaseCarousel';
 import BaseChip from './BaseChip';
 import BaseChipsBelow from './BaseChipsBelow';
 import BaseChipsInput from './BaseChipsInput';
@@ -40,6 +41,7 @@ export {
   BaseBoxButton,
   BaseBoxTooltip,
   BaseButton,
+  BaseCarousel,
   BaseChip,
   BaseChipsBelow,
   BaseChipsInput,
