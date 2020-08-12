@@ -60,7 +60,7 @@
 import SvgIcon from 'vue-svgicon';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index.js';
+import '../../assets/icons/index';
 
 /**
  * A Base Box Shaped Button
