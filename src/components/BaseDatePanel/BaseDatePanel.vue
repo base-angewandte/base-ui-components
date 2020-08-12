@@ -43,7 +43,6 @@
 import ClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
 
 // languages needed for datepicker locale
 import 'vue2-datepicker/locale/de';
@@ -240,8 +239,8 @@ export default {
   }
 </style>
 
-<style module lang="scss">
-  @import "../../styles/variables";
+<style lang="scss">
+  @import '../../styles/_datepicker.scss';
 
   .base-date-panel {
     position: relative;
@@ -291,14 +290,6 @@ export default {
           }
         }
       }
-    }
-
-    .mx-datepicker-main {
-      border: none;
-    }
-
-    .mx-datepicker-popup {
-      box-shadow: $preview-box-shadow !important;
     }
   }
 </style>

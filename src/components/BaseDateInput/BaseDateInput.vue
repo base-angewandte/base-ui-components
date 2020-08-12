@@ -162,7 +162,6 @@
 import ClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
 
 // languages needed for datepicker locale
 import 'vue2-datepicker/locale/de';
@@ -621,4 +620,8 @@ export default {
       width: $icon-medium;
     }
   }
+</style>
+
+<style lang="scss">
+  @import '../../styles/_datepicker.scss';
 </style>
