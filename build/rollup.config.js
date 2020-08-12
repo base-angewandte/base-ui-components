@@ -15,6 +15,7 @@ import babel from '@rollup/plugin-babel';
 // Import JPG, PNG, GIF and SVG images.
 import image from '@rollup/plugin-image';
 import postcss from 'rollup-plugin-postcss';
+import copy from 'rollup-plugin-copy';
 // show generated bundle sizes
 import bundleSize from 'rollup-plugin-bundle-size';
 // for css extraction
@@ -79,6 +80,14 @@ const baseConfig = {
       // allow for skipping file extensions
       resolve({
         extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
+      }),
+      copy({
+        targets: [
+          // import images used as background-image from leaflet
+          {
+            src: 'node_modules/leaflet/dist/images', dest: 'dist',
+          }
+        ]
       }),
       postcss({
         plugins: require('../postcss.config.js')().plugins,
@@ -184,7 +193,6 @@ if (!argv.format || argv.format === 'es') {
       }),
       css(baseConfig.plugins.css),
       ...baseConfig.plugins.preVue,
-
       vue({
         ...baseConfig.plugins.vue,
         // Setting { css: false } converts <style> blocks to import statements
