@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import 'leaflet/dist/leaflet.css';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -96,4 +95,8 @@ export default {
   .base-map {
     min-height: 200px;
   }
+</style>
+
+<style>
+  @import '../../../node_modules/leaflet/dist/leaflet.css';
 </style>

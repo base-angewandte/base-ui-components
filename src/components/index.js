@@ -33,6 +33,7 @@ import SwitchButton from './BaseSwitchButton';
 import Toggle from './BaseToggle';
 import UploadBar from './BaseUploadBar';
 import Checkmark from './BaseCheckmark';
+import Map from './BaseMap';
 
 export {
   Loader as BaseLoader,
@@ -70,4 +71,5 @@ export {
   Toggle as BaseToggle,
   UploadBar as BaseUploadBar,
   Checkmark as BaseCheckmark,
+  Map as BaseMap,
 };
