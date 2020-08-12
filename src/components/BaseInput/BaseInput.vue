@@ -349,11 +349,4 @@ export default {
     border: none;
     overflow: hidden;
   }
-
-  input[type='date'].base-input-field {
-  }
-
-  input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
-    outline: none;
-  }
 </style>
