@@ -19,6 +19,8 @@ import postcss from 'rollup-plugin-postcss';
 import bundleSize from 'rollup-plugin-bundle-size';
 // for css extraction
 import css from 'rollup-plugin-css-only';
+// make sure external dependencies are not included in bundle
+import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
 
@@ -62,11 +64,9 @@ const entries = {
 const baseConfig = {
   input: entries,
   plugins: {
-    // allow for skipping file extensions
-    resolve: {
-      extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
-    },
     preVue: [
+      // Preferably set as first plugin.
+      peerDepsExternal(),
       // plugin for aliases (to work in webpack and rollup)
       alias({
         resolve: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
@@ -74,20 +74,24 @@ const baseConfig = {
           '@': path.resolve(projectRoot, 'src'),
         },
       }),
+      image(),
+      commonjs(),
+      // allow for skipping file extensions
+      resolve({
+        extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
+      }),
+      postcss({
+        plugins: require('../postcss.config.js')().plugins,
+      }),
     ],
-    replace: {
-      'process.env.NODE_ENV': JSON.stringify('production'),
-      'process.env.ES_BUILD': JSON.stringify('false'),
-    },
     // define file name for separate css file
-    // TODO: do we want extracted css?
+    // only for esm build with css-extract!
     css: {
       output: 'dist/base-ui-components.css',
     },
     vue: {
-      // Setting { css: false } converts <style> blocks to import statements
-      css: false,
-      postcss: {
+      style: {
+        postcssPlugins: require('../postcss.config.js')().plugins,
       },
       template: {
         isProduction: true,
@@ -109,7 +113,6 @@ const external = [
   // list external dependencies, exactly the way it is written in the import statement.
   // eg. 'jquery'
   'vue',
-  // /@babel\/runtime/,
   'vue2-datepicker',
   'lazysizes',
   'swiper',
@@ -146,23 +149,18 @@ const mapComponent = name => ({
   },
   inlineDynamicImports: true,
   plugins: [
-    resolve(baseConfig.plugins.resolve),
     replace(baseConfig.plugins.replace),
     ...baseConfig.plugins.preVue,
+    bundleSize(),
     vue({
       ...baseConfig.plugins.vue,
-      ...{ css: true },
     }),
     babel(baseConfig.plugins.babel),
-    commonjs(),
-    image(),
     terser({
       output: {
         ecma: 5,
       },
     }),
-    postcss(),
-    bundleSize(),
   ],
 });
 
@@ -180,14 +178,18 @@ if (!argv.format || argv.format === 'es') {
       exports: 'named',
     },
     plugins: [
-      resolve(baseConfig.plugins.resolve),
       replace({
         ...baseConfig.plugins.replace,
         'process.env.ES_BUILD': JSON.stringify('true'),
       }),
-      ...baseConfig.plugins.preVue,
       css(baseConfig.plugins.css),
-      vue(baseConfig.plugins.vue),
+      ...baseConfig.plugins.preVue,
+
+      vue({
+        ...baseConfig.plugins.vue,
+        // Setting { css: false } converts <style> blocks to import statements
+        css: false,
+      }),
       babel({
         ...baseConfig.plugins.babel,
         presets: [
@@ -199,9 +201,6 @@ if (!argv.format || argv.format === 'es') {
           ],
         ],
       }),
-      commonjs(),
-      image(),
-      postcss(),
     ],
   };
   buildFormats.push(esConfig);
@@ -220,10 +219,8 @@ if (!argv.format || argv.format === 'cjs') {
       globals,
     },
     plugins: [
-      resolve(baseConfig.plugins.resolve),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      css(baseConfig.plugins.css),
       vue({
         ...baseConfig.plugins.vue,
         template: {
@@ -232,9 +229,6 @@ if (!argv.format || argv.format === 'cjs') {
         },
       }),
       babel(baseConfig.plugins.babel),
-      commonjs(),
-      image(),
-      postcss(),
     ],
   };
   buildFormats.push(umdConfig);
@@ -256,20 +250,15 @@ if (!argv.format || argv.format === 'iife') {
     },
     plugins: [
       bundleSize(),
-      resolve(baseConfig.plugins.resolve),
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
-      css(baseConfig.plugins.css),
       vue(baseConfig.plugins.vue),
       babel(baseConfig.plugins.babel),
-      commonjs(),
-      image(),
       terser({
         output: {
           ecma: 5,
         },
       }),
-      postcss(),
     ],
   };
   buildFormats.push(unpkgConfig);
