@@ -85,7 +85,7 @@
     "body-parser": "^1.18.3",
     "chalk": "^3.0.0",
     "clean-css-cli": "^4.3.0",
-    "copy-webpack-plugin": "^5.1.1",
+    "copy-webpack-plugin": "^6.0.3",
     "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
     "cssnano": "^4.1.10",
@@ -129,7 +129,7 @@
     "vue-styleguidist": "^4.22.2",
     "vue-svgicon": "^3.2.1",
     "vue-template-compiler": "^2.6.11",
-    "webpack": "^4.43.0",
+    "webpack": "^4.44.1",
     "webpack-bundle-analyzer": "^3.7.0",
     "webpack-cli": "^3.3.10",
     "webpack-merge": "^4.2.2"
