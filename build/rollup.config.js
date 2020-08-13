@@ -14,7 +14,6 @@ import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
 // Import JPG, PNG, GIF and SVG images.
 import image from '@rollup/plugin-image';
-import postcss from 'rollup-plugin-postcss';
 import copy from 'rollup-plugin-copy';
 // show generated bundle sizes
 import bundleSize from 'rollup-plugin-bundle-size';
@@ -68,19 +67,20 @@ const baseConfig = {
     preVue: [
       // Preferably set as first plugin.
       peerDepsExternal(),
-      // plugin for aliases (to work in webpack and rollup)
+      // plugin for aliases (to work in webpack and rollup) (should come before node-resolve)
       alias({
         resolve: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
         entries: {
           '@': path.resolve(projectRoot, 'src'),
+          '~': path.resolve(projectRoot, 'node_modules'),
         },
       }),
-      image(),
-      commonjs(),
       // allow for skipping file extensions
       resolve({
         extensions: ['.mjs', '.js', '.json', '.node', '.vue'],
       }),
+      image(),
+      commonjs(),
       copy({
         targets: [
           // import images used as background-image from leaflet
@@ -88,9 +88,6 @@ const baseConfig = {
             src: 'node_modules/leaflet/dist/images', dest: 'dist',
           }
         ]
-      }),
-      postcss({
-        plugins: require('../postcss.config.js')().plugins,
       }),
     ],
     // define file name for separate css file
@@ -100,7 +97,15 @@ const baseConfig = {
     },
     vue: {
       style: {
+        // instead of separate postcss() run it in vue directly
         postcssPlugins: require('../postcss.config.js')().plugins,
+        preprocessOptions: {
+          scss: {
+            includePaths: ['node_modules'],
+            implementation: require('node-sass'),
+            data: `@import "${path.resolve(projectRoot, 'src/styles/lib.scss')}";`,
+          }
+        },
       },
       template: {
         isProduction: true,
@@ -191,8 +196,8 @@ if (!argv.format || argv.format === 'es') {
         ...baseConfig.plugins.replace,
         'process.env.ES_BUILD': JSON.stringify('true'),
       }),
-      css(baseConfig.plugins.css),
       ...baseConfig.plugins.preVue,
+      css(baseConfig.plugins.css),
       vue({
         ...baseConfig.plugins.vue,
         // Setting { css: false } converts <style> blocks to import statements

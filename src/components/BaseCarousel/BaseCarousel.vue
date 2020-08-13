@@ -182,7 +182,7 @@ export default {
 
 <style lang="scss">
   @import "../../styles/variables";
-  @import "node_modules/swiper/css/swiper";
+  @import "swiper/css/swiper";
 
   .base-carousel {
     .base-image-box-image {

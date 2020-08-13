@@ -1,7 +1,6 @@
 // Import vue components
 import * as components from './components';
 import { use } from './utils/plugins';
-import './styles/lib.scss';
 
 /* eslint-disable-next-line no-unused-vars */
 let VueInstance;

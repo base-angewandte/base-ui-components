@@ -265,6 +265,7 @@ export default {
       z-index: map-get($zindex, dropdown);
       box-shadow: $drop-shadow;
       cursor: pointer;
+      text-align: left;
 
       .base-autocomplete-drop-down-entry-wrapper {
         padding: 0 16px;
@@ -272,15 +273,6 @@ export default {
 
         &.base-autocomplete-drop-down-entry-wrapper-active {
           background: $background-color;
-        }
-
-        .base-autocomplete-drop-down-entry-additional {
-          color: $font-color-second;
-          margin-left: $spacing-small;
-        }
-
-        .base-autocomplete-drop-down-entry-remark {
-          float: right;
         }
       }
     }
