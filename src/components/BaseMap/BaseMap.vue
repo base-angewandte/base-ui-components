@@ -98,5 +98,8 @@ export default {
 </style>
 
 <style>
-  @import 'leaflet/dist/leaflet.css';
+  /* for some reason this is not working as "leaflet/dist/leaflet.css" (webpack)
+  or "~leaflet/dist/leaflet.css" (rollup)
+   (compare BaseCarousel where exactly the same (first version) IS working */
+  @import '../../../node_modules/leaflet/dist/leaflet.css';
 </style>
