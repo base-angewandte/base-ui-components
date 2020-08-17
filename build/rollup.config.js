@@ -103,7 +103,8 @@ const baseConfig = {
           scss: {
             includePaths: ['node_modules'],
             implementation: require('node-sass'),
-            data: `@import "${path.resolve(projectRoot, 'src/styles/lib.scss')}";`,
+            data: `@import "${path.resolve(projectRoot, 'src/styles/lib.scss')}";
+            @import "${path.resolve(projectRoot, 'node_modules/normalize.css/normalize.css')}";`,
           }
         },
       },
