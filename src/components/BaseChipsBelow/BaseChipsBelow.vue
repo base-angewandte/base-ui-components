@@ -23,7 +23,6 @@
         v-slot:no-options>
         <!-- @slot a slot to customize messages in case of no options present in drop down -->
         <slot
-          :item="props.item"
           name="no-options" />
       </template>
     </BaseChipsInput>
@@ -347,23 +346,20 @@ export default {
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
-          return {
-            ...{
-              roles: [],
-              idInt: this.identifierPropertyNameInt && (entry[this.identifierPropertyNameInt] === 0
+          return { ...{
+            roles: [],
+            idInt: this.identifierPropertyNameInt && (entry[this.identifierPropertyNameInt] === 0
               || entry[this.identifierPropertyNameInt])
-                ? entry[this.identifierPropertyNameInt] : entry[this.valuePropertyNameInt] + index,
-            },
-            ...entry,
+              ? entry[this.identifierPropertyNameInt] : entry[this.valuePropertyNameInt] + index,
+          },
+          ...entry,
           };
         }
-        return {
-          ...{
-            [this.valuePropertyNameInt]: entry,
-            idInt: this.list.length + index,
-            roles: [],
-          },
-        };
+        return { ...{
+          [this.valuePropertyNameInt]: entry,
+          idInt: this.list.length + index,
+          roles: [],
+        } };
       });
     },
     emitInternalList(val) {

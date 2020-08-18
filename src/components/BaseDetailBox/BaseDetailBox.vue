@@ -24,6 +24,7 @@ import BaseBox from '../BaseBox/BaseBox';
 import setLanguage from '../../mixins/i18n';
 
 export default {
+  name: 'BaseDetailBox',
   components: {
     BaseBox,
   },
