@@ -2,7 +2,7 @@
   <compontent
     :is="boxType"
     :style="boxSizeInt"
-    :class="['base-box', 'base-box-' + $props.boxRatio]"
+    :class="['base-box', 'base-box-' + $props.boxRatio, {'base-box-hover': boxHover}]"
     :disabled="disabled"
     :type="(boxType === 'button') ? 'button' : ''"
     @click="clicked">
@@ -48,6 +48,13 @@ export default {
       default: '100',
     },
     /**
+     *  set hover class
+     */
+    boxHover: {
+      type: Boolean,
+      default: true,
+    },
+    /**
      * set button inactive
      */
     disabled: {
@@ -84,7 +91,7 @@ export default {
     min-height: 100%;
     position: relative;
     overflow: hidden;
-
+    display: flex;
 
     &:after {
       content:  '';
@@ -100,7 +107,8 @@ export default {
       padding-bottom: calc(50% - #{$spacing-small});
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
       box-shadow: $box-shadow-hov;
     }
 
