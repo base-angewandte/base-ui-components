@@ -7,11 +7,11 @@
 </template>
 
 <script>
+import BaseImageBox from '../BaseImageBox/BaseImageBox';
+
 /**
  * A box for information display after mouse hover or click
  */
-
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
 export default {
   name: 'BaseHoverBox',

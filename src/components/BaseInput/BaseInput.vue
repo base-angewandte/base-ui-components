@@ -216,15 +216,14 @@ export default {
     input(val) {
       this.inputInt = val;
     },
+    isActive(val) {
+      if (val !== this.active) {
+        this.active = val;
+      }
+    },
   },
   mounted() {
     this.inputInt = this.input;
-  },
-  updated() {
-    const elems = this.$el.getElementsByTagName('input');
-    if (this.active && elems && elems.length) {
-      elems[0].focus();
-    }
   },
   methods: {
     clickedOutsideInput() {
