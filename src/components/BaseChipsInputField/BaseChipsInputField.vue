@@ -70,7 +70,7 @@
         <div
           v-if="!allowMultipleEntries && useFormFieldStyling"
           class="base-chips-input-field__single-dropdown">
-          <SvgIcon
+          <base-icon
             :class="[
               'base-chips-input-field__single-dropdown-icon',
               { 'base-chips-input-field__single-dropdown-icon-rotated': dropDownActive }
@@ -85,7 +85,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
@@ -102,7 +102,7 @@ export default {
     BaseInput,
     BaseChip,
     Draggable,
-    SvgIcon,
+    BaseIcon,
   },
   directives: {
     ClickOutside,

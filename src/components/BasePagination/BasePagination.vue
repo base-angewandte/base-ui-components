@@ -14,7 +14,7 @@
         aria-label="Previous page"
         class="base-pagination__arrow"
         @keypress.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
-        <SvgIcon
+        <base-icon
           class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
           name="arrow-left" />
       </component>
@@ -105,7 +105,7 @@
         aria-label="Next Page"
         class="base-pagination__arrow"
         @keypress.enter="active + 1 <= total ? setActivePage(active + 1) : false">
-        <SvgIcon
+        <base-icon
           class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
           name="arrow-left" />
       </component>
@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Pagination component
@@ -123,7 +123,7 @@ import SvgIcon from 'vue-svgicon';
 export default {
   name: 'BasePagination',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   model: {
     prop: 'current',

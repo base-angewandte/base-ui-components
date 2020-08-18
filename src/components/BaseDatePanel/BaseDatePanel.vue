@@ -8,7 +8,7 @@
         {'base-date-panel__label--hover': !isInline },
       ]"
       @click.stop="isOpen = !isOpen">
-      <svg-icon
+      <base-icon
         v-if="!isInline"
         name="calendar-many"
         :class="['base-date-panel__icon',
@@ -41,8 +41,8 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 // languages needed for datepicker locale
 import 'vue2-datepicker/locale/de';
@@ -55,7 +55,7 @@ import 'vue2-datepicker/locale/fr';
 export default {
   name: 'BaseDatePanel',
   components: {
-    SvgIcon,
+    BaseIcon,
     DatePicker,
   },
   directives: {

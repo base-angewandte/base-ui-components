@@ -10,3 +10,5 @@ icon.register({
     data: '<path pid="0" d="M20.339 0v20.089H.25v9.447h20.089v20.089h9.447V29.536h20.089v-9.447H29.786V0z"/>'
   }
 })
+
+export default 'plus2';

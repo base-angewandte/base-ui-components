@@ -14,14 +14,14 @@
         <div
           class="button-box-image-row">
           <div class="button-box-plus-container">
-            <svg-icon
+            <base-icon
               v-if="showPlus"
               name="plus"
               alt="add"
               class="button-box-plus" />
           </div>
           <div class="button-box-icon-container">
-            <svg-icon
+            <base-icon
               v-if="icon"
               :name="icon"
               class="button-box-icon" />
@@ -44,7 +44,7 @@
     <div
       v-else
       class="button-box-content-small">
-      <svg-icon
+      <base-icon
         v-if="icon"
         :name="icon"
         class="button-box-icon-small" />
@@ -57,10 +57,9 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index';
 
 /**
  * A Base Box Shaped Button
@@ -69,7 +68,7 @@ import '../../assets/icons/index';
 export default {
   name: 'BaseBoxButton',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseBox,
     BaseBoxTooltip,
   },

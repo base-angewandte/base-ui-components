@@ -102,10 +102,10 @@ export default {
       return this.selected;
     },
     dragAndDropCapable() {
-      return ('DragEvent' in window);
+      return false;
     },
     isMobile() {
-      return window.innerWidth < 640;
+      return true;
     },
   },
   watch: {

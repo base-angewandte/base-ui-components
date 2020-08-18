@@ -14,10 +14,10 @@
     <div
       :class="['base-switch-container']">
       <span class="base-switch">
-        <SvgIcon
+        <base-icon
           v-if="checkedInt"
           name="check-mark" />
-        <SvgIcon
+        <base-icon
           v-if="!checkedInt"
           name="remove" />
       </span>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Toggle Component
@@ -35,7 +35,7 @@ import SvgIcon from 'vue-svgicon';
 export default {
   name: 'BaseToggle',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   model: {
     prop: 'checked',
