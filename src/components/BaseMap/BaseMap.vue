@@ -91,6 +91,11 @@ export default {
 };
 </script>
 
+<style lang="scss">
+  @import '../../styles/lib.scss';
+  @import '../../../node_modules/normalize.css/normalize.css';
+</style>
+
 <style lang="scss" scoped>
   .base-map {
     min-height: 200px;
