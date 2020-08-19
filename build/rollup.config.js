@@ -14,7 +14,6 @@ import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
 // Import JPG, PNG, GIF and SVG images.
 import image from '@rollup/plugin-image';
-import copy from 'rollup-plugin-copy';
 // show generated bundle sizes
 import bundleSize from 'rollup-plugin-bundle-size';
 // for css extraction
@@ -81,14 +80,6 @@ const baseConfig = {
       }),
       image(),
       commonjs(),
-      copy({
-        targets: [
-          // import images used as background-image from leaflet
-          {
-            src: 'node_modules/leaflet/dist/images', dest: 'dist',
-          }
-        ]
-      }),
     ],
     // define file name for separate css file
     // only for esm build with css-extract!
@@ -103,8 +94,6 @@ const baseConfig = {
           scss: {
             includePaths: ['node_modules'],
             implementation: require('node-sass'),
-            data: `@import "${path.resolve(projectRoot, 'src/styles/lib.scss')}";
-            @import "${path.resolve(projectRoot, 'node_modules/normalize.css/normalize.css')}";`,
           }
         },
       },

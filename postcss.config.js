@@ -6,14 +6,13 @@ const plugins = [
 ];
 
 if (process.env.NODE_ENV === 'production') {
-  // plugin to minify CSS
-  plugins.push(require('postcss-csso')());
+  // needed for import of external css (e.g. leaflet)
+  // needs to be before postcss-url to have leaflet background-images included
+  plugins.push(require('postcss-import')());
   // needed for inlining svgs - e.g. BaseSearch magnifier
   plugins.push(require('postcss-url')({
     url: 'inline',
   }));
-  // needed for import of external css (e.g. leaflet)
-  plugins.push(require('postcss-import')());
 }
 
 module.exports = () => ({
