@@ -1,6 +1,5 @@
+import { use, registerComponent } from '@/utils/plugins';
 import BaseLoader from './BaseLoader';
-
-import { use, registerComponent } from '../../utils/plugins';
 
 const Plugin = {
   install(Vue) {

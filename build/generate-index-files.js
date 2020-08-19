@@ -23,9 +23,8 @@ const generate = () => {
       console.info(`index.js generated for ${component}`);
       fs.writeFileSync(
         indexFilePath,
-        `import ${component} from './${component}';
-
-import { use, registerComponent } from '../../utils/plugins';
+        `import { use, registerComponent } from '@/utils/plugins';
+import ${component} from './${component}';
 
 const Plugin = {
   install(Vue) {

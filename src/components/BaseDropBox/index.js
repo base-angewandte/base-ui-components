@@ -1,6 +1,5 @@
+import { use, registerComponent } from '@/utils/plugins';
 import BaseDropBox from './BaseDropBox';
-
-import { use, registerComponent } from '../../utils/plugins';
 
 const Plugin = {
   install(Vue) {

@@ -1,6 +1,5 @@
+import { use, registerComponent } from '@/utils/plugins';
 import BaseMenuEntry from './BaseMenuEntry';
-
-import { use, registerComponent } from '../../utils/plugins';
 
 const Plugin = {
   install(Vue) {

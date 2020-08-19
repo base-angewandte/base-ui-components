@@ -1,6 +1,5 @@
+import { use, registerComponent } from '@/utils/plugins';
 import BasePagination from './BasePagination';
-
-import { use, registerComponent } from '../../utils/plugins';
 
 const Plugin = {
   install(Vue) {
