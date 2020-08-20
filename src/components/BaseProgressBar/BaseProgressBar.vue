@@ -42,15 +42,15 @@
         class="base-progress-bar__file-size">
         {{ fileSize }}
       </span>
-      <SvgIcon
+      <base-icon
         v-if="status === 'success'"
         class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
         name="success" />
-      <SvgIcon
+      <base-icon
         v-if="status === 'fail'"
         class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
         name="attention" />
-      <SvgIcon
+      <base-icon
         v-if="showRemove"
         class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
         name="remove"
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Progress bar including file upload features (display filename or file size)
@@ -70,7 +70,7 @@ import SvgIcon from 'vue-svgicon';
 export default {
   name: 'BaseProgressBar',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   props: {
     /**

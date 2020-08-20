@@ -13,7 +13,7 @@
         class="base-expand-row-icon">
         <!-- @slot slot to inject icon/image left side before label  -->
         <slot name="icon">
-          <SvgIcon
+          <base-icon
             :name="icon"
             title="open" />
         </slot>
@@ -23,7 +23,7 @@
         {{ label }}
       </div>
 
-      <SvgIcon
+      <base-icon
         name="drop-down"
         title="open"
         class="base-expand-row-collapse-icon" />
@@ -40,12 +40,12 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 export default {
   name: 'BaseExpandRow',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   props: {
     /**

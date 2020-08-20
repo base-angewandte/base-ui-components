@@ -53,7 +53,7 @@
             @open="setActiveState('time', 'From', true)"
             @change="closeTimePicker('from', ...arguments, $event)">
             <template v-slot:icon-calendar>
-              <svg-icon
+              <base-icon
                 name="clock"
                 class="base-date-input__date-icon" />
             </template>
@@ -124,7 +124,7 @@
             @open="setActiveState('time', 'To', true)"
             @change="closeTimePicker('to', ...arguments, $event)">
             <template v-slot:icon-calendar>
-              <svg-icon
+              <base-icon
                 name="clock"
                 class="base-date-input__date-icon" />
             </template>
@@ -166,7 +166,6 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
 
 // languages needed for datepicker locale
@@ -175,7 +174,7 @@ import 'vue2-datepicker/locale/en';
 import 'vue2-datepicker/locale/fr';
 
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
-
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -187,7 +186,7 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 export default {
   name: 'BaseDateInput',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseSwitchButton,
     DatePicker,
   },

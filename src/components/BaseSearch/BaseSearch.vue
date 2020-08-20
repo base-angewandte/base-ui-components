@@ -18,7 +18,7 @@
       @blur="inputBlur"
       @input="onInput"
       @keydown.enter.prevent="">
-    <SvgIcon
+    <base-icon
       v-if="inputInt"
       name="remove"
       class="base-search__remove-icon"
@@ -27,14 +27,14 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 /**
  * A basic text search to filter entries or files
   */
 export default {
   name: 'BaseSearch',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   model: {
     prop: 'input',

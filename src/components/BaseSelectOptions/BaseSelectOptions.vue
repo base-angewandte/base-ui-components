@@ -17,7 +17,6 @@ import BaseButton from '../BaseButton/BaseButton';
 /**
  * component to enable display of selected items and a select all
  */
-
 export default {
   name: 'BaseSelectOptions',
   components: {

@@ -34,7 +34,7 @@
       </div>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
-        <SvgIcon
+        <base-icon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
           name="drop-down" />
       </slot>
@@ -70,9 +70,9 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
 import ClickOutside from 'vue-click-outside';
 import i18n from '../../mixins/i18n';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Accessible drop down component
@@ -80,7 +80,7 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseDropDown',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   directives: {
     ClickOutside,

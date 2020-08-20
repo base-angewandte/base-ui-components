@@ -9,15 +9,15 @@
     <div
       :style="{ 'width': progressWidth + '%'}"
       class="base-upload-bar-progress" />
-    <SvgIcon
+    <base-icon
       v-if="status === 'success'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-success"
       name="success" />
-    <SvgIcon
+    <base-icon
       v-if="status === 'fail'"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-fail"
       name="attention" />
-    <SvgIcon
+    <base-icon
       v-if="showRemove"
       class="base-upload-bar-status-icon base-upload-bar-status-icon-remove"
       name="remove"
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * The status bar displayed during file upload
@@ -36,7 +36,7 @@ import SvgIcon from 'vue-svgicon';
 export default {
   name: 'BaseUploadBar',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   props: {
     /**

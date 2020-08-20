@@ -11,7 +11,7 @@
     @click.prevent="clicked">
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
-    <svg-icon
+    <base-icon
       v-if="iconPosition === 'left' && icon"
       :name="icon"
       :class="['base-button-icon',
@@ -21,7 +21,7 @@
     <span class="base-button-text">{{ text }}</span>
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
-    <svg-icon
+    <base-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
@@ -35,9 +35,8 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index';
 
 /**
  * Standard buttons
@@ -45,7 +44,7 @@ import '../../assets/icons/index';
 export default {
   name: 'BaseButton',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseBoxTooltip,
   },
   props: {

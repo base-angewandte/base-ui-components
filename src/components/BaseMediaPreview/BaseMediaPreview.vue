@@ -5,7 +5,7 @@
     <div
       class="base-media-preview-close"
       @click="$emit('hide-preview')">
-      <SvgIcon
+      <base-icon
         name="remove"
         class="base-media-preview-close-icon" />
     </div>
@@ -122,7 +122,7 @@ export default {
   name: 'BaseMediaPreview',
   components: {
     BaseButton: () => import('../BaseButton/BaseButton'),
-    SvgIcon: () => import('vue-svgicon'),
+    BaseIcon: () => import('../BaseIcon/BaseIcon'),
   },
   directives: {
     VueClickOutside: () => import('vue-click-outside'),

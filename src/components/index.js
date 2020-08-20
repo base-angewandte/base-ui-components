@@ -34,6 +34,7 @@ import Toggle from './BaseToggle';
 import UploadBar from './BaseUploadBar';
 import Checkmark from './BaseCheckmark';
 import Map from './BaseMap';
+import Icon from './BaseIcon';
 
 export {
   Loader as BaseLoader,
@@ -72,4 +73,5 @@ export {
   UploadBar as BaseUploadBar,
   Checkmark as BaseCheckmark,
   Map as BaseMap,
+  Icon as BaseIcon,
 };
