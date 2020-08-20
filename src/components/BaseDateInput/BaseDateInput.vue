@@ -152,8 +152,8 @@
               @open="setActiveState('date', 'To', true)"
               @pick="setActiveState('date', 'To', false)">
               <template v-slot:icon-calendar>
-                <svg-icon
-                  name="calendar-many"
+                <base-icon
+                  name="clock"
                   class="base-date-input__date-icon" />
               </template>
             </DatePicker>
