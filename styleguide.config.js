@@ -31,7 +31,6 @@ module.exports = {
   ],
   // these are components used internally however not included in the package
   ignore: [
-    'src/components/BaseBox/*',
     'src/components/BaseCheckBox/*',
     'src/components/BaseToolTip/*',
     'src/components/BaseChip/*',
