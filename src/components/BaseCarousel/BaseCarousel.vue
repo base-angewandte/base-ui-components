@@ -42,8 +42,7 @@
 </template>
 
 <script>
-// eslint-disable-next-line
-import lazySizes from 'lazysizes';
+import 'lazysizes';
 import Swiper from 'swiper';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
