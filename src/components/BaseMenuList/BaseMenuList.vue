@@ -95,17 +95,13 @@ export default {
       // outside store mutations
       entryProps: [],
       dragging: false,
+      dragAndDropCapable: false,
+      isMobile: false,
     };
   },
   computed: {
     selectActive() {
       return this.selected;
-    },
-    dragAndDropCapable() {
-      return ('DragEvent' in window);
-    },
-    isMobile() {
-      return window.innerWidth < 640;
     },
   },
   watch: {
@@ -138,6 +134,10 @@ export default {
       }
       return false;
     }, { passive: false }); */
+  },
+  mounted() {
+    this.isMobile = window.innerWidth < 640;
+    this.dragAndDropCapable = ('DragEvent' in window);
   },
   methods: {
     // determines which icon should be shown for each menu entry
