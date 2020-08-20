@@ -1,7 +1,7 @@
 <template>
   <div
     :class="['base-chip',
-             { 'base-chip-edited': entryEdited },
+             { 'base-chip-linked': isLinked },
              { 'base-chip__active': chipActive }]">
     <div
       class="base-chip-text"
@@ -78,7 +78,6 @@ export default {
   data() {
     return {
       entryInt: {},
-      entryEdited: false,
       showInfoBox: false,
     };
   },
@@ -91,15 +90,9 @@ export default {
     entry(val) {
       this.entryInt = val;
     },
-    isLinked(val) {
-      if (!this.entryEdited) {
-        this.entryEdited = !val;
-      }
-    },
   },
   created() {
     this.entryInt = this.entry;
-    this.entryEdited = !this.isLinked;
   },
   methods: {
     clickAction(e) {
@@ -175,7 +168,7 @@ export default {
     cursor: default;
     position: relative;
 
-    &.base-chip-edited {
+    &.base-chip-linked {
       background-color: rgba(255, 255, 255, 0);
     }
 

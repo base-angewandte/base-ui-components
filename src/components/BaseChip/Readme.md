@@ -4,12 +4,7 @@ A chip that can be edited
 <template>
   <div>
       <base-chip
-          v-model="entry"
-          :chip-editable="true"
-          @remove-entry="remove"/>
-      <base-chip
-          :entry="'A chip not Linked'"
-          :chip-editable="true"
+          :entry="entry"
           :is-linked="false"
           @remove-entry="remove"/>
       <base-chip
@@ -24,7 +19,7 @@ A chip that can be edited
 export default {
   data() {
     return {
-      entry: 'An editable Chip',
+      entry: 'A chip not Linked',
     };
   },
   methods: {
