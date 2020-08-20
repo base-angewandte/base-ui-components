@@ -80,7 +80,7 @@
               @open="setActiveState('date', 'From', true)"
               @pick="setActiveState('date', 'From', false)">
               <template v-slot:icon-calendar>
-                <svg-icon
+                <base-icon
                   name="calendar-many"
                   class="base-date-input__date-icon" />
               </template>
