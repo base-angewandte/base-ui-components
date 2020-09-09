@@ -156,8 +156,12 @@ const mapComponent = name => ({
     replace(baseConfig.plugins.replace),
     ...baseConfig.plugins.preVue,
     bundleSize(),
+    css({
+      output: `dist/components/${name}/${name}.css`,
+    }),
     vue({
       ...baseConfig.plugins.vue,
+      css: false,
     }),
     babel(baseConfig.plugins.babel),
     terser({
@@ -224,12 +228,14 @@ if (!argv.format || argv.format === 'cjs') {
     plugins: [
       replace(baseConfig.plugins.replace),
       ...baseConfig.plugins.preVue,
+      css(baseConfig.plugins.css),
       vue({
         ...baseConfig.plugins.vue,
         template: {
           ...baseConfig.plugins.vue.template,
           optimizeSSR: true,
         },
+        css: false,
       }),
       babel(baseConfig.plugins.babel),
     ],
