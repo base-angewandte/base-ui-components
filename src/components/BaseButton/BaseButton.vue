@@ -62,7 +62,7 @@ export default {
      * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
      * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
      * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'checked' | 'unchecked' | 'attachment' |
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'attachment' |
      * 'drag-lines' | 'download' | 'duplicate' | 'forbidden' | 'information' | 'sort' |
      * 'success' | 'text'
      */
