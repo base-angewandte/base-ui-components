@@ -1,3 +1,6 @@
+import ExpandBox from '@/components/BaseExpandBox';
+import TextList from '@/components/BaseTextList';
+import ExpandRow from '@/components/BaseExpandRow';
 import Input from './BaseInput';
 import Loader from './BaseLoader';
 import AutocompleteInput from './BaseAutocompleteInput';
@@ -35,6 +38,7 @@ import UploadBar from './BaseUploadBar';
 import Checkmark from './BaseCheckmark';
 import Map from './BaseMap';
 import Icon from './BaseIcon';
+import DetailBox from './BaseDetailBox';
 
 export {
   Loader as BaseLoader,
@@ -74,4 +78,8 @@ export {
   Checkmark as BaseCheckmark,
   Map as BaseMap,
   Icon as BaseIcon,
+  DetailBox as BaseDetailBox,
+  ExpandBox as BaseExpandBox,
+  TextList as BaseTextList,
+  ExpandRow as BaseExpandRow,
 };
