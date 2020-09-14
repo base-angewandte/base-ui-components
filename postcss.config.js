@@ -13,6 +13,11 @@ if (process.env.NODE_ENV === 'production') {
   plugins.push(require('postcss-url')({
     url: 'inline',
   }));
+  // especially for removing normalize comment
+  // TODO: add again one line on top!!
+  plugins.push(require('postcss-discard-comments')({
+    removeAll: true,
+  }));
 }
 
 module.exports = () => ({
