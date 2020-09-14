@@ -1,6 +1,8 @@
 <template>
   <svg-icon
-    :name="name" />
+    :name="name"
+    :title="title">
+  </svg-icon>
 </template>
 
 <script>
@@ -30,6 +32,13 @@ export default {
     name: {
       type: String,
       default: null,
+    },
+    /**
+     * Add a title tag to the svg
+     */
+    title: {
+      type: String,
+      default: '',
     },
   },
   computed: {
