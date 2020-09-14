@@ -1,8 +1,7 @@
 <template>
   <svg-icon
     :name="name"
-    :title="title">
-  </svg-icon>
+    :title="title" />
 </template>
 
 <script>
