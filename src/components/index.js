@@ -29,6 +29,7 @@ import MultilineTextInput from './BaseMultilineTextInput';
 import Options from './BaseOptions';
 import Pagination from './BasePagination';
 import PopUp from './BasePopUp';
+import ProgressBar from './BaseProgressBar';
 import ResultBoxSection from './BaseResultBoxSection';
 import Search from './BaseSearch';
 import SelectOptions from './BaseSelectOptions';
@@ -69,6 +70,7 @@ export {
   Options as BaseOptions,
   Pagination as BasePagination,
   PopUp as BasePopUp,
+  ProgressBar as BaseProgressBar,
   ResultBoxSection as BaseResultBoxSection,
   Search as BaseSearch,
   SelectOptions as BaseSelectOptions,
