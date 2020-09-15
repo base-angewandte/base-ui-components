@@ -511,6 +511,14 @@ export default {
     }
   }
 
+  .base-image-box-features {
+    .base-image-box-checkbox {
+      position: absolute;
+      bottom: $spacing;
+      right: $spacing;
+    }
+  }
+
   .base-image-box-description {
     position: absolute;
     color: white;
@@ -524,12 +532,6 @@ export default {
     .bold {
       font-weight: bold;
     }
-  }
-
-  .base-image-box-checkbox {
-    position: absolute;
-    bottom: $spacing;
-    right: $spacing;
   }
 
   .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
