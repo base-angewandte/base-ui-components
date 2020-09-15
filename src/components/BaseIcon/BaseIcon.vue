@@ -1,7 +1,8 @@
 <template>
   <svg-icon
     :name="name"
-    :title="title" />
+    :title="title"
+    v-on="$listeners" />
 </template>
 
 <script>
