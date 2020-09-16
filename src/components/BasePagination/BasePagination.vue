@@ -233,11 +233,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '../../styles/lib.scss';
-  @import '../../../node_modules/normalize.css/normalize.css';
-</style>
-
-<style lang="scss">
   @import '../../styles/variables.scss';
 
   .base-pagination {
