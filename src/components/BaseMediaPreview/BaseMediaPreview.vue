@@ -30,15 +30,11 @@
           class="base-media-preview-error">
           An error occured displaying this image.
         </div>
-        <video
+        <base-hls-video
           v-else-if="fileType === 'video'"
-          ref="videoPlayer"
-          :style="displaySize"
-          controls
-          autoplay
-          class="base-media-preview-image base-media-preview-video">
-          Your browser does not support the video tag.
-        </video>
+          :displaySize="displaySize"
+          :mediaUrl="mediaUrl"
+          class="base-media-preview-image base-media-preview-video" />
         <audio
           v-else-if="fileType === 'audio'"
           controls
@@ -110,7 +106,6 @@
 </template>
 
 <script>
-import Hls from 'hls.js/dist/hls.light';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -123,6 +118,7 @@ export default {
   components: {
     BaseButton: () => import('../BaseButton/BaseButton'),
     BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
   },
   directives: {
     VueClickOutside: () => import('vue-click-outside'),
@@ -279,22 +275,24 @@ export default {
   mounted() {
     this.isMobile = window.innerWidth <= 640;
   },
-  updated() {
-    if (this.showPreview) {
-      const video = this.$refs.videoPlayer;
-      if (video) {
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(this.mediaUrl);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = this.mediaUrl;
-          video.addEventListener('loadedmetadata', () => video.play());
-        }
-      }
-    }
-  },
+  // updated() {
+  //   console.log('updated');
+  //
+  //   if (this.showPreview) {
+  //     const video = this.$refs.videoPlayer;
+  //     if (video) {
+  //       if (Hls.isSupported()) {
+  //         const hls = new Hls();
+  //         hls.loadSource(this.mediaUrl);
+  //         hls.attachMedia(video);
+  //         hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+  //       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+  //         video.src = this.mediaUrl;
+  //         video.addEventListener('loadedmetadata', () => video.play());
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
     clickOutside(event) {
       // for some reason clickOutside is also triggered when opening the box

@@ -108,6 +108,10 @@ const baseConfig = {
       babelHelpers: 'runtime',
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue'],
     },
+    replace: {
+      // remove logger from hls.js due problems with ssr
+      'Object(_utils_logger__WEBPACK_IMPORTED_MODULE_2__["enableLogs"])(config.debug); // signal end of worker init': '',
+    },
   },
 };
 

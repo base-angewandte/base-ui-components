@@ -20,6 +20,7 @@ import DropDown from './BaseDropDown';
 import DropDownList from './BaseDropDownList';
 import Form from './BaseForm';
 import FormFieldCreator from './BaseFormFieldCreator';
+import HlsVideo from './BaseHlsVideo';
 import HoverBox from './BaseHoverBox';
 import ImageBox from './BaseImageBox';
 import MediaPreview from './BaseMediaPreview';
@@ -61,6 +62,7 @@ export {
   DropDownList as BaseDropDownList,
   Form as BaseForm,
   FormFieldCreator as BaseFormFieldCreator,
+  HlsVideo as BaseHlsVideo,
   HoverBox as BaseHoverBox,
   ImageBox as BaseImageBox,
   MediaPreview as BaseMediaPreview,

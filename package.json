@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
-    "hls.js": "^0.13.1",
+    "hls.js": "^0.14.12",
     "lazysizes": "^5.2.2",
     "leaflet": "^1.6.0",
     "normalize.css": "^8.0.1",
