@@ -87,13 +87,19 @@ var webpackConfig = merge(baseWebpackConfig, {
       chunksSortMode: 'dependency'
     }),
     // copy custom static assets
-    new CopyWebpackPlugin([
+    new CopyWebpackPlugin(
       {
-        from: path.resolve(__dirname, '../static'),
-        to: config.build.assetsSubDirectory,
-        ignore: ['.*']
+        patterns: [
+          {
+            from: path.resolve(__dirname, '../static'),
+            to: config.build.assetsSubDirectory,
+            globOptions: {
+              ignore: ['.*']
+            }
+          },
+        ]
       }
-    ]),
+    ),
     new VueLoaderPlugin()
   ]
 })
