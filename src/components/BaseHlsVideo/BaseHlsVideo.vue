@@ -1,14 +1,11 @@
 <template>
-  <div>
-    <video
-      ref="videoPlayer"
-      id="videoPlayer"
-      :style="displaySize"
-      controls
-      autoplay>
-      Your browser does not support the video tag.
-    </video>
-  </div>
+  <video
+    ref="videoPlayer"
+    :style="displaySize"
+    controls
+    autoplay>
+    Your browser does not support the video tag.
+  </video>
 </template>
 
 <script>
@@ -16,11 +13,6 @@ import Hls from 'hls.js/dist/hls.light';
 
 export default {
   name: 'BaseHlsVideo',
-  data() {
-    return {
-      hsl: () => {},
-    };
-  },
   props: {
     mediaUrl: {
       type: String,
@@ -30,6 +22,11 @@ export default {
       type: Object,
       default: () => ({ height: '720px', width: '1280px' }),
     },
+  },
+  data() {
+    return {
+      hsl: () => {},
+    };
   },
   mounted() {
     const video = this.$refs.videoPlayer;

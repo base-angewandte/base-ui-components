@@ -32,8 +32,8 @@
         </div>
         <base-hls-video
           v-else-if="fileType === 'video'"
-          :displaySize="displaySize"
-          :mediaUrl="mediaUrl"
+          :display-size="displaySize"
+          :media-url="mediaUrl"
           class="base-media-preview-image base-media-preview-video" />
         <audio
           v-else-if="fileType === 'audio'"
@@ -275,24 +275,6 @@ export default {
   mounted() {
     this.isMobile = window.innerWidth <= 640;
   },
-  // updated() {
-  //   console.log('updated');
-  //
-  //   if (this.showPreview) {
-  //     const video = this.$refs.videoPlayer;
-  //     if (video) {
-  //       if (Hls.isSupported()) {
-  //         const hls = new Hls();
-  //         hls.loadSource(this.mediaUrl);
-  //         hls.attachMedia(video);
-  //         hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-  //       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-  //         video.src = this.mediaUrl;
-  //         video.addEventListener('loadedmetadata', () => video.play());
-  //       }
-  //     }
-  //   }
-  // },
   methods: {
     clickOutside(event) {
       // for some reason clickOutside is also triggered when opening the box

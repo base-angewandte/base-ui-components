@@ -76,7 +76,7 @@ export default{
 
 ```
 
-An audio example
+An video example
 
 ```vue
 <template>
