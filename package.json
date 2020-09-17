@@ -1,50 +1,38 @@
 {
   "name": "base-ui-components",
-  "description": "base Angewandte Component Library",
   "version": "0.5.1",
-  "homepage": "https://base.uni-ak.ac.at",
-  "author": "baseAngewandte <basemail@uni-ak.ac.at>",
   "private": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/base-angewandte/base-ui-components.git"
+  "description": "base Angewandte Component Library",
+  "author": "baseAngewandte <basemail@uni-ak.ac.at>",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js && npm run build:transform-css:all",
+    "lint": "eslint --ext .js,.vue src",
+    "build:components": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format components && npm run build:transform-css",
+    "build:docs": "vue-styleguidist build",
+    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es && npm run build:transform-css:all",
+    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs && npm run build:transform-css:all",
+    "build:transform-css": "build/transform-css.sh",
+    "build:transform-css:all": "build/transform-css.sh -a",
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife && npm run build:transform-css:all",
+    "build:watch": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --watch",
+    "dev": "vue-cli-service serve",
+    "dev:docs": "webpack-dev-server --progress --config build/webpack.dev.conf.js",
+    "dev:lib": "webpack --config build/webpack.lib.conf.js --watch --progress --hide-modules & node server.js",
+    "postversion": "./postversion.sh",
+    "prepublishOnly": "npm run build",
+    "styleguide": "vue-cli-service styleguidist",
+    "styleguide:build": "vue-cli-service styleguidist:build",
+    "svg": "npx vsvg -s ./src/static/icons/ -t ./src/assets/icons/ --es6 && node ./build/update-svg-icon-files.js",
+    "updateindex": "node build/generate-index-files.js",
+    "updateindex:all": "node build/generate-index-files.js --force true"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "unpkg": "dist/base-ui-components.min.js",
-  "scripts": {
-    "lint": "eslint --ext .js,.vue src",
-    "prepublishOnly": "npm run build",
-    "dev": "vue-cli-service serve src/",
-    "dev:docs": "webpack-dev-server --progress --config build/webpack.dev.conf.js",
-    "dev:lib": "webpack --config build/webpack.lib.conf.js --watch --progress --hide-modules & node server.js",
-    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js && npm run build:transform-css:all",
-    "build:watch": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --watch",
-    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs && npm run build:transform-css:all",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es && npm run build:transform-css:all",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife && npm run build:transform-css:all",
-    "build:components": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format components && npm run build:transform-css",
-    "build:docs": "vue-styleguidist build",
-    "build:transform-css:all": "build/transform-css.sh -a",
-    "build:transform-css": "build/transform-css.sh",
-    "svg": "npx vsvg -s ./src/static/icons/ -t ./src/assets/icons/ --es6 && node ./build/update-svg-icon-files.js",
-    "updateindex": "node build/generate-index-files.js",
-    "updateindex:all": "node build/generate-index-files.js --force true",
-    "styleguide": "vue-styleguidist server",
-    "postversion": "./postversion.sh"
-  },
-  "license": "SEE LICENSE IN LICENSE.md",
   "files": [
     "dist/*",
     "src/**/*.vue"
   ],
-  "sideEffects": [
-    "*.css",
-    "*.scss"
-  ],
-  "peerDependencies": {
-    "vue": "^2.6.11"
-  },
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
     "hls.js": "^0.13.1",
@@ -128,15 +116,15 @@
     "semver": "^5.7.1",
     "shelljs": "^0.7.6",
     "url-loader": "^1.1.2",
+    "vue-cli-plugin-styleguidist": "~4.32.3",
     "vue-loader": "^15.9.2",
     "vue-style-loader": "^4.1.2",
     "vue-styleguidist": "^4.22.2",
     "vue-svgicon": "^3.2.1",
-    "vue-template-compiler": "^2.6.11",
-    "webpack": "^4.44.1",
-    "webpack-bundle-analyzer": "^3.7.0",
-    "webpack-cli": "^3.3.10",
-    "webpack-merge": "^4.2.2"
+    "vue-template-compiler": "^2.6.11"
+  },
+  "peerDependencies": {
+    "vue": "^2.6.11"
   },
   "browserslist": [
     "> 1%",
@@ -146,5 +134,15 @@
   "engines": {
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
-  }
+  },
+  "homepage": "https://base.uni-ak.ac.at",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/base-angewandte/base-ui-components.git"
+  },
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ]
 }

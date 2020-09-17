@@ -209,6 +209,11 @@
 
     <div class="canvas">
       <!-- MULTILINE WITH TABS TEST -->
+      <BaseMultilineTextInput
+        :tabs="['English', 'German']"
+        label="Multiline Label Tabs"
+        placeholder="Enter Text here"
+        v-model="textInput"/>
       <base-multiline-text-input
         v-model="multilineInputObj"
         :label="'Label'"
@@ -511,6 +516,10 @@ export default {
   },
   data() {
     return {
+      textInput: {
+        English: 'Text Set from Outside',
+        German: '',
+      },
       activeAction: '',
       data: {
         column1: [{
