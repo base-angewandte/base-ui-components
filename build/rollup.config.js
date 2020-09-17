@@ -93,7 +93,7 @@ const baseConfig = {
         preprocessOptions: {
           scss: {
             includePaths: ['node_modules'],
-            implementation: require('node-sass'),
+            implementation: require('dart-sass'),
           }
         },
       },
