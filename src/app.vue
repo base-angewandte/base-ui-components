@@ -4,14 +4,16 @@
     <div class="background">
       <base-box
         :box-size="{ width: 'calc(25% - 12px)' }">
-        <p class="example-text">Example Content</p>
+        <p class="example-text">
+          Example Content
+        </p>
       </base-box>
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }" />
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }" />
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }" />
     </div>
     <BaseDetailBox
       :data="[{
@@ -210,10 +212,10 @@
     <div class="canvas">
       <!-- MULTILINE WITH TABS TEST -->
       <BaseMultilineTextInput
+        v-model="textInput"
         :tabs="['English', 'German']"
         label="Multiline Label Tabs"
-        placeholder="Enter Text here"
-        v-model="textInput"/>
+        placeholder="Enter Text here" />
       <base-multiline-text-input
         v-model="multilineInputObj"
         :label="'Label'"

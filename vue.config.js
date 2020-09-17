@@ -13,6 +13,7 @@ module.exports = {
     devtool: 'source-map',
   },
   chainWebpack: (config) => {
+    // lead webpack to the correct entry point
     config
       .entry('app')
       .clear()
