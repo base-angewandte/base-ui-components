@@ -70,7 +70,6 @@
     "eslint-plugin-vue": "^6.2.2",
     "express": "^4.17.1",
     "minimist": "^1.2.5",
-    "node-sass": "^4.14.1",
     "postcss-cli": "^7.1.1",
     "postcss-discard-comments": "^4.0.2",
     "postcss-import": "^12.0.1",
@@ -82,7 +81,8 @@
     "rollup-plugin-peer-deps-external": "^2.2.3",
     "rollup-plugin-terser": "^6.1.0",
     "rollup-plugin-vue": "^5.1.9",
-    "sass-loader": "^7.3.1",
+    "sass": "^1.26.10",
+    "sass-loader": "^10.0.2",
     "vue-cli-plugin-styleguidist": "~4.32.3",
     "vue-template-compiler": "^2.6.11"
   },

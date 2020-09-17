@@ -12,6 +12,14 @@ module.exports = {
     // DevTools failed to load SourceMap: Could not load content for webpack:///node_modules/es6-promise/dist/es6-promise.map: HTTP error: status code 404, net::ERR_UNKNOWN_URL_SCHEME
     devtool: 'source-map',
   },
+  css: {
+    loaderOptions: {
+      sass: {
+        // eslint-disable-next-line global-require
+        implementation: require('sass'),
+      },
+    },
+  },
   chainWebpack: (config) => {
     // lead webpack to the correct entry point
     config
