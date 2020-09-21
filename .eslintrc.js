@@ -8,26 +8,25 @@ module.exports = {
   },
   env: {
     browser: true,
-    "es6": true,
-    "node": true,
+    es6: true,
+    node: true,
   },
   extends: [
-    'airbnb-base',
-    "plugin:vue/recommended",
-    'plugin:import/errors',
-    'plugin:import/warnings'
-
+    'plugin:vue/recommended',
+    '@vue/airbnb',
   ],
-  // check if imports actually resolve
-  'settings': {
-    'import/resolver': {
-      'webpack': {
-        'config': 'build/webpack.base.conf.js'
-      }
-    }
-  },
   // add your custom rules here
   'rules': {
+    // disallow reassignment of function parameters
+    // disallow parameter object manipulation except for specific exclusions
+    'no-param-reassign': ['error', {
+      props: true,
+      ignorePropertyModificationsFor: [
+        'state', // for vuex state
+        'acc', // for reduce accumulators
+        'e', // for e.returnvalue
+      ],
+    }],
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       'js': 'never',

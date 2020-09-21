@@ -4,14 +4,16 @@
     <div class="background">
       <base-box
         :box-size="{ width: 'calc(25% - 12px)' }">
-        <p class="example-text">Example Content</p>
+        <p class="example-text">
+          Example Content
+        </p>
       </base-box>
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }" />
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }" />
       <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }"/>
+        :box-size="{ width: 'calc(25% - 12px)' }" />
     </div>
     <BaseDetailBox
       :data="[{
@@ -182,20 +184,20 @@
       <BaseImageBox
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('@/assets/images/img1.png')"
+        image-url="https://placeimg.com/460/341/arch"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
       <BaseImageBox
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('@/static/images/icons.png')"
+        image-url="https://placeimg.com/460/341/animal"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
       <BaseImageBox
         :selectable="selectable"
-        :image-url="require('@/static/images/icons.png')"
+        image-url="https://placeimg.com/460/341/tech"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
@@ -209,6 +211,11 @@
 
     <div class="canvas">
       <!-- MULTILINE WITH TABS TEST -->
+      <BaseMultilineTextInput
+        v-model="textInput"
+        :tabs="['English', 'German']"
+        label="Multiline Label Tabs"
+        placeholder="Enter Text here" />
       <base-multiline-text-input
         v-model="multilineInputObj"
         :label="'Label'"
@@ -449,33 +456,33 @@
 import axios from 'axios';
 
 import BaseBox from '@/components/BaseBox/BaseBox';
-import BaseMenuEntry from './components/BaseMenuEntry/BaseMenuEntry';
-import BasePopUp from './components/BasePopUp/BasePopUp';
-import BaseDropDown from './components/BaseDropDown/BaseDropDown';
-import BaseInput from './components/BaseInput/BaseInput';
-import BaseDropBox from './components/BaseDropBox/BaseDropBox';
-import BaseMenuList from './components/BaseMenuList/BaseMenuList';
-import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
-import BaseSearch from './components/BaseSearch/BaseSearch';
-import BaseMultilineTextInput from './components/BaseMultilineTextInput/BaseMultilineTextInput';
-import BaseAutocompleteInput from './components/BaseAutocompleteInput/BaseAutocompleteInput';
-import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
-import BaseDateInput from './components/BaseDateInput/BaseDateInput';
-import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
-import BasePagination from './components/BasePagination/BasePagination';
-import BaseMediaPreview from './components/BaseMediaPreview/BaseMediaPreview';
-import BaseForm from './components/BaseForm/BaseForm';
-import BaseButton from './components/BaseButton/BaseButton';
-import BaseImageBox from './components/BaseImageBox/BaseImageBox';
-import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseResultBoxSection from './components/BaseResultBoxSection/BaseResultBoxSection';
-import BaseProgressBar from './components/BaseProgressBar/BaseProgressBar';
-import BaseCarousel from './components/BaseCarousel/BaseCarousel';
-import BaseMap from './components/BaseMap/BaseMap';
-import BaseTextList from './components/BaseTextList/BaseTextList';
-import BaseExpandBox from './components/BaseExpandBox/BaseExpandBox';
-import BaseDetailBox from './components/BaseDetailBox/BaseDetailBox';
-import BaseExpandRow from './components/BaseExpandRow/BaseExpandRow';
+import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry';
+import BasePopUp from '@/components/BasePopUp/BasePopUp';
+import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
+import BaseInput from '@/components/BaseInput/BaseInput';
+import BaseDropBox from '@/components/BaseDropBox/BaseDropBox';
+import BaseMenuList from '@/components/BaseMenuList/BaseMenuList';
+import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput';
+import BaseSearch from '@/components/BaseSearch/BaseSearch';
+import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
+import BaseAutocompleteInput from '@/components/BaseAutocompleteInput/BaseAutocompleteInput';
+import BaseChipsBelow from '@/components/BaseChipsBelow/BaseChipsBelow';
+import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
+import BaseDatePanel from '@/components/BaseDatePanel/BaseDatePanel';
+import BasePagination from '@/components/BasePagination/BasePagination';
+import BaseMediaPreview from '@/components/BaseMediaPreview/BaseMediaPreview';
+import BaseForm from '@/components/BaseForm/BaseForm';
+import BaseButton from '@/components/BaseButton/BaseButton';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox';
+import BaseToggle from '@/components/BaseToggle/BaseToggle';
+import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
+import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar';
+import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
+import BaseMap from '@/components/BaseMap/BaseMap';
+import BaseTextList from '@/components/BaseTextList/BaseTextList';
+import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
+import BaseDetailBox from '@/components/BaseDetailBox/BaseDetailBox';
+import BaseExpandRow from '@/components/BaseExpandRow/BaseExpandRow';
 
 export default {
   name: 'App',
@@ -511,6 +518,10 @@ export default {
   },
   data() {
     return {
+      textInput: {
+        English: 'Text Set from Outside',
+        German: '',
+      },
       activeAction: '',
       data: {
         column1: [{
@@ -560,7 +571,7 @@ export default {
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
           // eslint-disable-next-line global-require
-          imageUrl: require('@/assets/images/img1.png'),
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -569,7 +580,7 @@ export default {
           subtitle: 'Lets find it out and look deeper',
           description: 'Novel',
           // eslint-disable-next-line global-require
-          imageUrl: require('@/assets/images/img1.png'),
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
@@ -1191,20 +1202,20 @@ export default {
           description: 'Austellung 1',
           additional: '07.05.2020 - 21.05.2020',
           // eslint-disable-next-line global-require
-          imageUrl: require('@/static/images/icons.png'),
+          imageUrl: 'https://placeimg.com/460/341/arch',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
               // eslint-disable-next-line global-require
-              '460w': require('@/static/images/icons.png'),
+              '460w': 'https://placeimg.com/460/341/animal',
             },
             {
               // eslint-disable-next-line global-require
-              '640w': require('@/static/images/icons.png'),
+              '640w': 'https://placeimg.com/640/480/animal',
             },
             {
               // eslint-disable-next-line global-require
-              '768w': require('@/static/images/icons.png'),
+              '768w': 'https://placeimg.com/768/576/animal',
             },
           ],
         },
@@ -1439,7 +1450,7 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "./styles/variables.scss";
+  @import "../src/styles/variables";
 
   .dropdown-extended {
     border-top: $separation-line;

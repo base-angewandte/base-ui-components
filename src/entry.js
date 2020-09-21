@@ -66,26 +66,6 @@ if (process.env.ES_BUILD === 'false') {
 // Default export is library as a whole, registered via Vue.use()
 export default BaseUiComponents;
 
-
-/*
-
-// install function executed by Vue.use()
-const install = function installSrcRollupTest(Vue) {
-  if (install.installed) return;
-  install.installed = true;
-  Object.entries(components).forEach(([componentName, component]) => {
-    Vue.component(componentName, component);
-  });
-};
-
-// Create module definition for Vue.use()
-const plugin = {
-  install,
-};
-
-// Default export is library as a whole, registered via Vue.use()
-export default plugin; */
-
 // To allow individual component use, export components
 // each can be registered via Vue.component()
 export * from './components';
