@@ -27,7 +27,7 @@ module.exports = {
   usageMode: 'expand',
   require: [
     path.join(__dirname, './node_modules/normalize.css/normalize.css'),
-    path.join(__dirname, './dev/styles/app.scss'),
+    path.join(__dirname, './dev-docs/styles/app.scss'),
   ],
   // these are components used internally however not included in the package
   ignore: [

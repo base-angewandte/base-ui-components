@@ -22,7 +22,7 @@ module.exports = {
     config
       .entry('app')
       .clear()
-      .add('./dev/docs.js');
+      .add('./dev-docs/docs.js');
 
     // added due to source maps error: (DevTools failed to load SourceMap:...)
     config.module

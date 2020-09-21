@@ -25,7 +25,7 @@ export default {
   computed: {
     getImgUrl() {
       /* eslint-disable-next-line */
-      const url = require('@/../dev/assets/images/img1.png');
+      const url = require('@/../dev-docs/assets/images/img1.png');
       return url;
     },
   },

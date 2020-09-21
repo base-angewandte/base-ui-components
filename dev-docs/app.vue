@@ -184,7 +184,7 @@
       <BaseImageBox
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('@/../dev/assets/images/img1.png')"
+        :image-url="require('@/../dev-docs/assets/images/img1.png')"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
@@ -571,7 +571,7 @@ export default {
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
           // eslint-disable-next-line global-require
-          imageUrl: require('@/../dev/assets/images/img1.png'),
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -580,7 +580,7 @@ export default {
           subtitle: 'Lets find it out and look deeper',
           description: 'Novel',
           // eslint-disable-next-line global-require
-          imageUrl: require('@/../dev/assets/images/img1.png'),
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
