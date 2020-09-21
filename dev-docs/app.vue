@@ -184,20 +184,20 @@
       <BaseImageBox
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('@/../dev-docs/assets/images/img1.png')"
+        image-url="https://placeimg.com/460/341/arch"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
       <BaseImageBox
         :selectable="selectable"
         :show-title="false"
-        :image-url="require('./static/images/icons.png')"
+        image-url="https://placeimg.com/460/341/animal"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
       <BaseImageBox
         :selectable="selectable"
-        :image-url="require('./static/images/icons.png')"
+        image-url="https://placeimg.com/460/341/tech"
         title="Afterlife II Ausstellungsansichten"
         description="Bildserie"
         class="image-box" />
@@ -1202,20 +1202,20 @@ export default {
           description: 'Austellung 1',
           additional: '07.05.2020 - 21.05.2020',
           // eslint-disable-next-line global-require
-          imageUrl: require('./static/images/icons.png'),
+          imageUrl: 'https://placeimg.com/460/341/arch',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
               // eslint-disable-next-line global-require
-              '460w': require('./static/images/icons.png'),
+              '460w': 'https://placeimg.com/460/341/animal',
             },
             {
               // eslint-disable-next-line global-require
-              '640w': require('./static/images/icons.png'),
+              '640w': 'https://placeimg.com/640/480/animal',
             },
             {
               // eslint-disable-next-line global-require
-              '768w': require('./static/images/icons.png'),
+              '768w': 'https://placeimg.com/768/576/animal',
             },
           ],
         },

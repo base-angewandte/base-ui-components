@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     imgUrl() {
-      const url = require('@/../dev-docs/assets/images/img1.png');
+      const url = 'https://placeimg.com/460/341/arch';
       return url;
     },
   },

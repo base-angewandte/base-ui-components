@@ -35,7 +35,7 @@ export default {
           subtitle: 'A test',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+          imageUrl: 'https://placeimg.com/460/341/arch',
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -43,7 +43,7 @@ export default {
           title: 'Unknown',
           subtitle: 'Lets find it out and look deeper',
           description: 'Novel',
-          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+          imageUrl: 'https://placeimg.com/460/341/animal',
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
@@ -165,7 +165,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: require('@/../dev-docs/assets/images/img1.png'),
+            image: 'https://placeimg.com/460/341/people',
           },
         },
         {
@@ -181,7 +181,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: require('@/../dev-docs/assets/images/img1.png'),
+            image: 'https://placeimg.com/460/341/animal',
           },
         },
         {
@@ -198,7 +198,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: require('@/../dev-docs/assets/images/img1.png'),
+            image: 'https://placeimg.com/460/341/tech',
           },
         },
     ],
