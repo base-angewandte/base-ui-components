@@ -8,9 +8,6 @@ module.exports = {
         '~': path.resolve(__dirname, ''),
       },
     },
-    // added because of styleguidist error:
-    // DevTools failed to load SourceMap: Could not load content for webpack:///node_modules/es6-promise/dist/es6-promise.map: HTTP error: status code 404, net::ERR_UNKNOWN_URL_SCHEME
-    devtool: 'source-map',
   },
   css: {
     loaderOptions: {
@@ -26,5 +23,14 @@ module.exports = {
       .entry('app')
       .clear()
       .add('./src/docs.js');
+
+    // added due to source maps error: (DevTools failed to load SourceMap:...)
+    config.module
+      .rule('source-map')
+      .test(/\.js$/)
+      .enforce('pre')
+      .use('source-map-loader')
+      .loader('source-map-loader')
+      .end();
   },
 };
