@@ -175,107 +175,99 @@ const mapComponent = name => ({
 let buildFormats = [];
 
 // ESM build to be used with webpack/rollup
-if (!argv.format || argv.format === 'es') {
-  const esConfig = {
-    ...baseConfig,
-    external,
-    output: {
-      format: 'esm',
-      dir: 'dist/esm',
-      exports: 'named',
-    },
-    plugins: [
-      replace({
-        ...baseConfig.plugins.replace,
-        'process.env.ES_BUILD': JSON.stringify('true'),
-      }),
-      ...baseConfig.plugins.preVue,
-      css(baseConfig.plugins.css),
-      vue({
-        ...baseConfig.plugins.vue,
-        // Setting { css: false } converts <style> blocks to import statements
-        css: false,
-      }),
-      babel({
-        ...baseConfig.plugins.babel,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              targets: esbrowserslist,
-            },
-          ],
+const esConfig = {
+  ...baseConfig,
+  external,
+  output: {
+    format: 'esm',
+    dir: 'dist/esm',
+    exports: 'named',
+  },
+  plugins: [
+    replace({
+      ...baseConfig.plugins.replace,
+      'process.env.ES_BUILD': JSON.stringify('true'),
+    }),
+    ...baseConfig.plugins.preVue,
+    css(baseConfig.plugins.css),
+    vue({
+      ...baseConfig.plugins.vue,
+      // Setting { css: false } converts <style> blocks to import statements
+      css: false,
+    }),
+    babel({
+      ...baseConfig.plugins.babel,
+      presets: [
+        [
+          '@babel/preset-env',
+          {
+            targets: esbrowserslist,
+          },
         ],
-      }),
-    ],
-  };
-  buildFormats.push(esConfig);
-}
+      ],
+    }),
+  ],
+};
+buildFormats.push(esConfig);
 
 // SSR build
-if (!argv.format || argv.format === 'cjs') {
-  const umdConfig = {
-    ...baseConfig,
-    external,
-    output: {
-      compact: true,
-      format: 'cjs',
-      dir: 'dist/cjs',
-      exports: 'named',
-      globals,
-    },
-    plugins: [
-      replace(baseConfig.plugins.replace),
-      ...baseConfig.plugins.preVue,
-      css(baseConfig.plugins.css),
-      vue({
-        ...baseConfig.plugins.vue,
-        template: {
-          ...baseConfig.plugins.vue.template,
-          optimizeSSR: true,
-        },
-        css: false,
-      }),
-      babel(baseConfig.plugins.babel),
-    ],
-  };
-  buildFormats.push(umdConfig);
-}
+const umdConfig = {
+  ...baseConfig,
+  external,
+  output: {
+    compact: true,
+    format: 'cjs',
+    dir: 'dist/cjs',
+    exports: 'named',
+    globals,
+  },
+  plugins: [
+    replace(baseConfig.plugins.replace),
+    ...baseConfig.plugins.preVue,
+    css(baseConfig.plugins.css),
+    vue({
+      ...baseConfig.plugins.vue,
+      template: {
+        ...baseConfig.plugins.vue.template,
+        optimizeSSR: true,
+      },
+      css: false,
+    }),
+    babel(baseConfig.plugins.babel),
+  ],
+};
+buildFormats.push(umdConfig);
 
 // Browser build
-if (!argv.format || argv.format === 'iife') {
-  const unpkgConfig = {
-    ...baseConfig,
-    external,
-    input: 'src/entry.js',
-    output: {
-      compact: true,
-      file: 'dist/base-ui-components.min.js',
-      format: 'iife',
-      name: 'SrcRollupTest',
-      exports: 'named',
-      globals,
-    },
-    plugins: [
-      bundleSize(),
-      replace(baseConfig.plugins.replace),
-      ...baseConfig.plugins.preVue,
-      vue(baseConfig.plugins.vue),
-      babel(baseConfig.plugins.babel),
-      terser({
-        output: {
-          ecma: 5,
-        },
-      }),
-    ],
-  };
-  buildFormats.push(unpkgConfig);
-}
+const unpkgConfig = {
+  ...baseConfig,
+  external,
+  input: 'src/entry.js',
+  output: {
+    compact: true,
+    file: 'dist/base-ui-components.min.js',
+    format: 'iife',
+    name: 'SrcRollupTest',
+    exports: 'named',
+    globals,
+  },
+  plugins: [
+    bundleSize(),
+    replace(baseConfig.plugins.replace),
+    ...baseConfig.plugins.preVue,
+    vue(baseConfig.plugins.vue),
+    babel(baseConfig.plugins.babel),
+    terser({
+      output: {
+        ecma: 5,
+      },
+    }),
+  ],
+};
+buildFormats.push(unpkgConfig);
 
-if (!argv.format || argv.format === 'components') {
-  const componentConfig = components.map(f => mapComponent(f));
-  buildFormats = buildFormats.concat(componentConfig);
-}
+const componentConfig = components.map(f => mapComponent(f));
+buildFormats = buildFormats.concat(componentConfig);
 
 // Export config
 export default buildFormats;
