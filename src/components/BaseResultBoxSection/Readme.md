@@ -35,7 +35,7 @@ export default {
           subtitle: 'A test',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: require('@/assets/images/img1.png'),
+          imageUrl: require('@/../dev/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -43,7 +43,7 @@ export default {
           title: 'Unknown',
           subtitle: 'Lets find it out and look deeper',
           description: 'Novel',
-          imageUrl: require('@/assets/images/img1.png'),
+          imageUrl: require('@/../dev/assets/images/img1.png'),
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
@@ -165,7 +165,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: require('@/assets/images/img1.png'),
+            image: require('@/../dev/assets/images/img1.png'),
           },
         },
         {
@@ -181,7 +181,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: require('@/assets/images/img1.png'),
+            image: require('@/../dev/assets/images/img1.png'),
           },
         },
         {
@@ -198,7 +198,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: require('@/assets/images/img1.png'),
+            image: require('@/../dev/assets/images/img1.png'),
           },
         },
     ],
