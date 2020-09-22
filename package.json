@@ -23,7 +23,7 @@
   "unpkg": "dist/base-ui-components.min.js",
   "files": [
     "dist/*",
-    "src/**/*.vue"
+    "src/*"
   ],
   "dependencies": {
     "body-scroll-lock": "^2.6.4",

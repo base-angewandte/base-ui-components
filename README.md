@@ -19,23 +19,77 @@ npm i base-ui-components
 Currently this project is still under development and therefore usage
 can not be wholeheartedly be recommended at this point.
 
-If you still would like to do so you can import every component individually to the file you want to use them:
+If you still would like to do so you can either import each component individually:
 
 ```vue
+main.js
+
+import Vue from 'vue';
+// import the components you would like
+import { BaseAutcompleteInput, BaseCarousel } from 'base-ui-components';
+// also import the component css
+import 'base-ui-components/dist/components/BaseAutocompleteInput/BaseAutocompleteInput.css';
+import 'base-ui-components/dist/components/BaseCarousel/BaseCarousel.css';
+// additionally a common css file is needed
+import 'base-ui-components/dist/base-ui-components-common.css';
+import App from './App';
+
+Vue.use(BaseAutocompleteInput);
+Vue.use(BaseCarousel);
+
+new Vue({
+  el: '#app',
+  components: { App },
+  template: '<App/>',
+});
+
+```
+
+or as complete package:
+
+```vue
+main.js
+
+import Vue from 'vue';
+// import the complete components bundle
+import BaseUiComponents from 'base-ui-components';
+// and the css
+import 'base-ui-components/dist/base-ui-components.css';
+import App from './App';
+
+Vue.use(BaseUiComponents);
+
+new Vue({
+  el: '#app',
+  components: { App },
+  template: '<App/>',
+});
+
+```
+
+After adding the components as plugins, they can be used in your app globally, like so:
+
+```vue
+Component.vue
+
 <template>
-    <BaseAutocompleteInput />
+    <BaseAutocompleteInput
+      label="test"
+      ...
+    />
+    <BaseCarousel
+      ...
+    />
 </template>
 
 <script>
-import { BaseAutocompleteInput } from 'base-ui-components';
-
-export default {
-    components: {
-        BaseAutocompleteInput,
-    },
-};
+  export default {};
 </script>
 ```
+
+
+
+
 Styles need to be imported separately - this is best done in your `main.js` file:
 
 ```js
@@ -49,9 +103,9 @@ new Vue({
 });
 ```
 
-The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
+All available components, their usage and demos can be found in our [styleguide](https://base-angewandte.github.io/base-ui-components/).
 
-There is a [styleguide](https://base-angewandte.github.io/base-ui-components/) listing all available components and their usage.
+The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
 
 [Development Instructions](buildSetup.md)
 
