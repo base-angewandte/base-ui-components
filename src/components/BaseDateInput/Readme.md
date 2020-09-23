@@ -38,7 +38,7 @@ Single date input with format date_year, enabling switching the format
   <base-date-input
     id="yearformatdemo"
     :label="'Enter A Year'"
-    :format="'date_year'"
+    :format="'date_month_year'"
     :showLabel="true"
     v-model="datepicked"
     type="single"

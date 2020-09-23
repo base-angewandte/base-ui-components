@@ -11,17 +11,18 @@
         @click.prevent="">
         {{ label }}
       </legend>
-      <div
-        v-if="showFormatOptions"
-        class="base-date-input__format-tabs">
-        <BaseSwitchButton
-          v-model="dateFormatInt"
-          :options="[
-            { label: dateFormatLabels.date, value: 'DD.MM.YYYY' },
-            { label: dateFormatLabels.year, value: 'YYYY' },
-          ]"
-          :label="formatTabsLegend"
-          :active-tab="dateFormatInt" />
+      <div class="base-date-input__label-additions">
+        <!-- @slot to add additional elements to the label row -->
+        <slot name="label-addition" />
+        <div
+          v-if="isSwitchableFormat"
+          class="base-date-input__format-tabs">
+          <BaseSwitchButton
+            v-model="dateFormatInt"
+            :options="tabSwitchOptions"
+            :label="formatTabsLegend"
+            :active-tab="dateFormatInt" />
+        </div>
       </div>
     </div>
 
@@ -307,21 +308,23 @@ export default {
      * specify date format<br>
      *  'date_year': display tabs that allow for toggle between only choosing year
      *   or complete date
+     *  'date_month_year': display tabs that allow for toggle between choosing only year,
+     *   year and month or complete date
      */
     format: {
       type: String,
       default: 'day',
       validator(val) {
-        return ['day', 'month', 'year', 'date_year'].includes(val);
+        return ['day', 'month', 'year', 'date_year', 'date_month_year'].includes(val);
       },
     },
     /**
      * specify labels displayed instead of 'DD.MM.YYYY' and 'YYYY' <br>
-     *   should have the form { date: 'xxx', year: 'yyy' }
+     *   should have the form { date: 'xxx', month: 'zzz', year: 'yyy' }
      */
     dateFormatLabels: {
       type: Object,
-      default: () => ({ date: 'DD.MM.YYYY', year: 'YYYY' }),
+      default: () => ({ date: 'DD.MM.YYYY', month: 'MM.YYYY', year: 'YYYY' }),
       validator(val) {
         const labelKeys = Object.keys(val);
         return labelKeys.includes('date') && labelKeys.includes('year');
@@ -541,7 +544,7 @@ export default {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
         return 'YYYY';
       }
-      if (this.format === 'month') {
+      if (this.format === 'month' || this.dateFormatInt === 'MM.YYYY') {
         return 'YYYY-MM';
       }
       return 'YYYY-MM-DD';
@@ -560,10 +563,13 @@ export default {
      * @returns {string}
      */
     minDateView() {
-      if (this.format === 'date_year' && this.dateFormatInt === 'YYYY') {
+      if (this.isSwitchableFormat && this.dateFormatInt === 'YYYY') {
         return 'year';
       }
-      if (this.format === 'date_year' && this.dateFormatInt === 'DD.MM.YYYY') {
+      if (this.isSwitchableFormat && this.dateFormatInt === 'MM.YYYY') {
+        return 'month';
+      }
+      if (this.isSwitchableFormat && this.dateFormatInt === 'DD.MM.YYYY') {
         return 'day';
       }
       return this.format;
@@ -574,13 +580,6 @@ export default {
      */
     inputProperties() {
       return Object.keys(this.input);
-    },
-    /**
-     * check if format switch tabs should be shown
-     * @returns {boolean}
-     */
-    showFormatOptions() {
-      return this.format === 'date_year';
     },
     /**
      * check if input is just a single date or an object
@@ -666,6 +665,35 @@ export default {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && this.inputInt[key].length <= 4));
+    },
+    isDateFormatMonth() {
+      return ((this.isSingleDate && this.inputInt.date
+          && this.inputInt.date.length > 4 && this.inputInt.date.length <= 7)
+        || this.inputProperties.some(key => !!key.includes('date')
+          && this.inputInt[key]
+          && this.inputInt[key].length > 4 && this.inputInt[key].length <= 7));
+    },
+    /**
+     * check if format switch tabs should be shown
+     * @returns {boolean}
+     */
+    isSwitchableFormat() {
+      return this.format === 'date_month_year' || this.format === 'date_year';
+    },
+    tabSwitchOptions() {
+      // minimal options
+      const options = [
+        { label: this.dateFormatLabels.date, value: 'DD.MM.YYYY' },
+        { label: this.dateFormatLabels.year, value: 'YYYY' },
+      ];
+      // if format can be month as well, add month option
+      if (this.format === 'date_month_year') {
+        options.splice(1, 0, {
+          label: this.dateFormatLabels.month,
+          value: 'MM.YYYY',
+        });
+      }
+      return options;
     },
     /**
      * determine if the from field is a time field
@@ -764,8 +792,14 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
           this.inputInt = this.isSingleDate ? { date: val } : { ...val };
           // check if external input was year format and set internal format accordingly
-          if (this.showFormatOptions) {
-            this.dateFormatInt = this.isDateFormatYear ? 'YYYY' : 'DD.MM.YYYY';
+          if (this.isSwitchableFormat) {
+            if (this.isDateFormatYear) {
+              this.dateFormatInt = 'YYYY';
+            } else if (this.isDateFormatMonth) {
+              this.dateFormatInt = 'MM.YYYY';
+            } else {
+              this.dateFormatInt = 'DD.MM.YYYY';
+            }
           }
         }
       },
@@ -1396,6 +1430,7 @@ export default {
 
     .base-date-input__label-row {
       display: flex;
+      flex-wrap: wrap;
       width: 100%;
       height: 100%;
       justify-content: space-between;
@@ -1409,6 +1444,15 @@ export default {
         margin-bottom: $spacing-small-half;
         text-align: left;
         align-self: flex-end;
+        margin-right: 50px;
+      }
+
+      .base-date-input__label-additions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        flex: 1 1 auto;
       }
 
       .base-date-input__format-tabs {
@@ -1487,6 +1531,13 @@ export default {
 
     .base-date-input__below {
       position: relative;
+    }
+  }
+
+  @media screen and (max-width: $mobile) {
+    .base-date-input .base-date-input__label-row .base-date-input__label-additions {
+      align-items: center;
+      margin-bottom: -$spacing-small-half;
     }
   }
 </style>
