@@ -825,10 +825,35 @@ export default {
      * (check necessary for starting with year where format is switched to 'YYYY'
      * but no previous full date avaliable))
      * @param {string} val - the changed dateFormatInt value
+     * @param {string} old - the previous value
      */
-    dateFormatInt(val) {
-      if (val === 'YYYY' && !this.isDateFormatYear) {
+    dateFormatInt(val, old) {
+      // in order to allow user to restore previous date after switching
+      // from date to year and back store in temp variable if
+      // a) date is not just format 'YYYY' & switch was made from full date
+      if (!this.isDateFormatYear && old === 'DD.MM.YYYY') {
         this.tempDateStore = { ...this.inputInt };
+        // b) tab switch was made from month to year
+      } else if (!this.isDateFormatYear
+        && (val === 'YYYY' && old === 'MM.YYYY')) {
+        // if there is no previous stored date just store everything
+        if (!this.tempDateStore) {
+          this.tempDateStore = { ...this.inputInt };
+          // if there was a previous stored date check for every date prop in inputInt
+          // if stored date should be overwritten
+        } else {
+          Object.keys(this.inputInt).filter(key => !!key.includes('date'))
+            .forEach((dateKey) => {
+              // date should be overwritten if month or year are different from
+              // the already stored date
+              if (!this.monthAndYearIdent(
+                this.inputInt[dateKey],
+                this.tempDateStore[dateKey],
+              )) {
+                this.$set(this.tempDateStore, dateKey, this.inputInt[dateKey]);
+              }
+            });
+        }
       }
       this.convertDate();
     },
@@ -1274,23 +1299,44 @@ export default {
     convertDate() {
       Object.keys(this.inputInt).filter(key => !!key.includes('date'))
         .forEach((dateKey) => {
-          if (this.inputInt[dateKey]) {
+          const dateToConvert = this.inputInt[dateKey];
+          if (dateToConvert) {
             if (this.minDateView === 'year') {
               // convert date string to real date in order to get year and convert back to string
-              this.$set(this.inputInt, dateKey, this.convertToDate(this.inputInt[dateKey])
+              this.$set(this.inputInt, dateKey, this.convertToDate(dateToConvert)
                 .getFullYear().toString());
-            } else {
-              // check if year was changed or is still the same
-              const yearIdent = new Date(this.tempDateStore[dateKey])
-                .getFullYear().toString() === this.inputInt[dateKey];
-              // if there is a stored value set this, otherwise convert year string to date
-              // and then to date string in correct format
+            } else if (this.minDateView === 'month') {
+              const newDate = !!this.tempDateStore
+                // get stored date if
+                // a) previous date was full date and month and year
+                // are identical with stored year and month
+                && ((!this.isDateFormatYear
+                && this.monthAndYearIdent(this.tempDateStore[dateKey], dateToConvert))
+                // b) previous date was year and it is identical with stored year
+                || (new Date(this.tempDateStore[dateKey])
+                  .getFullYear().toString() === dateToConvert))
+                // else use current input date
+                ? this.tempDateStore[dateKey] : dateToConvert;
               this.$set(
                 this.inputInt,
                 dateKey,
-                (yearIdent && this.tempDateStore[dateKey]
-                  ? this.tempDateStore[dateKey]
-                  : this.getDateString(this.convertToDate(this.inputInt[dateKey]))),
+                this.getDateString(this.convertToDate(newDate), true),
+              );
+            } else {
+              // check if a previous date was stored and year (coming from year)
+              const useStoredDate = !!this.tempDateStore && ((this.isDateFormatYear
+                && new Date(this.tempDateStore[dateKey]).getFullYear().toString() === dateToConvert)
+                // or month and year (coming from month) was changed or is still the same
+                || (this.isDateFormatMonth
+                && this.monthAndYearIdent(this.tempDateStore[dateKey], dateToConvert)));
+              // if a previous date was stored use this one else use the input date
+              const newDate = useStoredDate ? this.tempDateStore[dateKey] : dateToConvert;
+              // set the new date (converted to date and formatted
+              // in the correct format YYYY-MM-DD)
+              this.$set(
+                this.inputInt,
+                dateKey,
+                this.getDateString(this.convertToDate(newDate)),
               );
             }
           }
@@ -1339,6 +1385,15 @@ export default {
         dateString = `${dateString}-${day.length < 2 ? '0' : ''}${day}`;
       }
       return dateString;
+    },
+    monthAndYearIdent(date1, date2) {
+      const convertedDate1 = this.convertToDate(date1);
+      const convertedDate2 = this.convertToDate(date2);
+      const monthDate1 = convertedDate1.getMonth();
+      const monthDate2 = convertedDate2.getMonth();
+      const yearDate1 = convertedDate1.getFullYear();
+      const yearDate2 = convertedDate2.getFullYear();
+      return monthDate1 === monthDate2 && yearDate1 === yearDate2;
     },
     /**
      * function to calculate if fade out in the input fields should be shown, needs to be

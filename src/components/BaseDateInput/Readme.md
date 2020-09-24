@@ -31,7 +31,7 @@ export default {
 
 ```
 
-Single date input with format date_year, enabling switching the format
+Single date input with format date_month_year, enabling switching the format
 
 ```vue
 <template>
