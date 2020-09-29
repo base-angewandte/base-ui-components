@@ -156,7 +156,7 @@ export default {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
     padding: $chips-spacing 0 $chips-spacing $spacing-small;
     flex: 0 0 auto;
-    background-color: $background-color;
+    background-color: rgba(255, 255, 255, 0);
     line-height: $line-height;
     display: inline-flex;
     align-items: center;
@@ -164,7 +164,7 @@ export default {
     position: relative;
 
     &.base-chip-linked {
-      background-color: rgba(255, 255, 255, 0);
+      background-color: $background-color;
     }
 
     &.base-chip__active {
