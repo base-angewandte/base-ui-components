@@ -4,6 +4,7 @@ Date Panel
   <div>
     <BaseDatePanel
       v-model="datePicked"
+      :show-date-selected="false"
       label="Select a date" />
     <br>
     <div>{{ datePicked }}</div>
@@ -25,6 +26,37 @@ export default {
 }
 </script>
 ```
+
+Date Panel with date displayed, icon position 'right' and language 'de'
+```vue
+<template>
+  <div>
+    <BaseDatePanel
+      v-model="datePicked"
+      icon-position="right"
+      language="de"
+      label="Select a date" />
+    <br>
+    <div>{{ datePicked }}</div>
+  </div>
+</template>
+
+<script>
+import BaseDatePanel from './BaseDatePanel';
+
+export default {
+  components: {
+    BaseDatePanel
+  },
+  data() {
+    return {
+      datePicked: { date: '2020-05-12' },
+    }
+  },
+}
+</script>
+```
+
 
 Date Panel: type week, displayed inline
 ```vue

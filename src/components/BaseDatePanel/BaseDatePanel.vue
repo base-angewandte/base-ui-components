@@ -17,7 +17,7 @@
 
       <label
         v-if="showLabel || !isInline">
-        {{ label }}
+        {{ labelInt || label }}
       </label>
     </div>
 
@@ -33,8 +33,8 @@
         :lang="language"
         :type="type"
         :format="'YYYY-MM-DD'"
-        value-type="format"
-        :open="isOpen" />
+        :open="isOpen"
+        value-type="format" />
     </div>
   </div>
 </template>
@@ -127,12 +127,27 @@ export default {
         return ['date', 'week'].includes(val);
       },
     },
+    /**
+     * label will be replace with selected date unless this is set false
+     */
+    showDateSelected: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      inputInt: this.input,
+      inputInt: null,
       isOpen: false,
     };
+  },
+  computed: {
+    labelInt() {
+      if (!this.isInline && this.showDateSelected && this.inputInt) {
+        return new Date(this.inputInt).toLocaleDateString(this.language);
+      }
+      return this.label;
+    },
   },
   watch: {
     input: {

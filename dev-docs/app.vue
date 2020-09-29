@@ -102,6 +102,7 @@
       display: flex; justify-content: space-between;">
       <BaseDatePanel
         v-model="baseDatePanelInput"
+        language="de"
         label="Select a date"
         type="date" />
 
@@ -526,7 +527,7 @@ export default {
       data: {
         column1: [{
           label: 'Description',
-          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+          data: `Lorem ipsum dolor sit amet, conseteturasdfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
             `,
         },
         {
