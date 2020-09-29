@@ -339,7 +339,6 @@ export default {
     }
   }
 
-
   input::-webkit-input-placeholder {
     line-height: $input-field-line-height;
   }

@@ -141,7 +141,6 @@ export default {
       width: $spacing*2;
     }
 
-
     &:hover input ~ .base-checkmark-container-small {
       border: 1.5px solid $app-color;
     }

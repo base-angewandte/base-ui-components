@@ -49,7 +49,6 @@ import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
  * An Element for dropping files or other UI Elements into
  */
 
-
 export default {
   name: 'BaseDropBox',
   components: {
@@ -262,7 +261,6 @@ export default {
     },
   },
 };
-
 
 </script>
 

@@ -424,7 +424,6 @@ export default {
       margin-bottom: -2px;
       border-bottom: $separation-line;
 
-
       .base-chips-below-list-item-line {
         display: flex;
         align-items: center;
