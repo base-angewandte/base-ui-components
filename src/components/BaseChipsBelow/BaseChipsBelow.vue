@@ -449,6 +449,7 @@ export default {
           margin-right: $spacing;
           max-width: calc(50% - (2 * #{$spacing}));
           flex: 1 0 calc(50% - (2 * #{$spacing}));
+          text-align: left;
         }
 
         .base-chips-below-chips-input {

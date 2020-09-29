@@ -255,6 +255,7 @@ const unpkgConfig = {
     exports: 'named',
     globals,
   },
+  inlineDynamicImports: true,
   plugins: [
     bundleSize(),
     replace(baseConfig.plugins.replace),

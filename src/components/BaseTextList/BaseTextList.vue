@@ -95,38 +95,42 @@ export default {
         margin-top: $line-height;
       }
 
+      .base--text-list-content, .base-text-list-label {
+        overflow-wrap: break-word;
+      }
+
+      .base-text-list-content {
+        color: $font-color-second;
+
+        a {
+          color: $app-color;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .base-text-list-content-pre-line {
+        white-space: pre-line;
+      }
+
+      dt,
+      dd {
+        display: inline;
+      }
+
+      dd:after {
+        display: block;
+        content: '';
+        width: 100%;
+      }
+
       @media screen and (max-width: $mobile) {
         &:first-of-type {
           margin-top: $line-height;
         }
       }
-    }
-
-    .base-text-list-content {
-      color: $font-color-second;
-
-      a {
-        color: $app-color;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .base-text-list-content-pre-line {
-      white-space: pre-line;
-    }
-
-    dt,
-    dd {
-      display: inline;
-    }
-
-    dd:after {
-      display: block;
-      content: '';
-      width: 100%;
     }
   }
 </style>

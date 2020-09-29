@@ -530,7 +530,27 @@ export default {
             `,
         },
         {
+          label: 'Description',
+          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+          `,
+        },
+        {
           label: 'Vero eos et accusam',
+          data: [
+            {
+              label: 'www',
+              value: 'http://base.uni-ak.ac.at',
+              url: 'http://base.uni-ak.ac.at',
+            },
+            {
+              label: 'email',
+              value: 'base@uni-ak.ac.at',
+              url: 'mailto:base@uni-ak.ac.at',
+            },
+          ],
+        },
+        {
+          label: 'Vero eos et accusam asdfddddddddddddddddddddfffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddffffffffffffffffffffffff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
           data: [
             {
               label: 'www',
@@ -555,7 +575,29 @@ export default {
             'Lorem ipsum dolor sit amet',
             'Consetetur sadipscing elitr, sed diam nonumy',
             'Eirmod tempor invidunt',
+            'Eirmod tempor inviduntddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
             'Eirmod tempor invidunt',
+            'Eirmod tempor invidunt',
+          ],
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            'Lorem ipsum dolor sit amet',
+            'Consetetur sadipscing elitr, sed diam nonumy',
+            'Eirmod tempor invidunt',
+            'Eirmod tempor inviduntddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+            'Eirmod tempor invidunt',
+            'Eirmod tempor invidunt',
+          ],
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            'Lorem ipsum dolor sit amet',
+            'Consetetur sadipscing elitr, sed diam nonumy',
+            'Eirmod tempor invidunt',
+            'Eirmod tempor inviduntddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
             'Eirmod tempor invidunt',
             'Eirmod tempor invidunt',
           ],
