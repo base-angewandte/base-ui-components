@@ -110,6 +110,7 @@ export default {
         height: $line-height * 2;
         position: absolute;
         bottom: 0;
+        left: 0;
         z-index: 1;
         pointer-events: none;
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0) , white);

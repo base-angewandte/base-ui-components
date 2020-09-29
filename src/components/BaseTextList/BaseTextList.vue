@@ -34,15 +34,22 @@
         class="base-text-list-content">
         <template
           v-for="(objectItem, objectIndex) in item.data">
-          <dt :key="'l' + objectIndex">
+          <dt
+            :key="'l' + objectIndex"
+            class="base-text-list__content-list-item">
             {{ objectItem.label }}:
           </dt>
-          <dd :key="'v' + objectIndex">
+          <dd
+            :key="'v' + objectIndex"
+            class="base-text-list__content-list-description base-text-list__content-list-item">
             <template
               v-if="objectItem.url">
               <a
                 :href="objectItem.url"
-                :title="objectItem.value">{{ objectItem.value }}</a>
+                :title="objectItem.value"
+                class="base-text-list__content-link">
+                {{ objectItem.value }}
+              </a>
             </template>
 
             <template
@@ -95,14 +102,14 @@ export default {
         margin-top: $line-height;
       }
 
-      .base--text-list-content, .base-text-list-label {
+      .base-text-list-content, .base-text-list-label {
         overflow-wrap: break-word;
       }
 
       .base-text-list-content {
         color: $font-color-second;
 
-        a {
+        .base-text-list__content-link {
           color: $app-color;
 
           &:hover {
@@ -115,12 +122,11 @@ export default {
         white-space: pre-line;
       }
 
-      dt,
-      dd {
+      .base-text-list__content-list-item {
         display: inline;
       }
 
-      dd:after {
+      .base-text-list__content-list-description:after {
         display: block;
         content: '';
         width: 100%;
