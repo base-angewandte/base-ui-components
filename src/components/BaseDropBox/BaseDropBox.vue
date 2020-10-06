@@ -325,21 +325,12 @@ export default {
       border: $upload-border-hover;
     }
   }
+</style>
 
+<style lang="scss">
+.base-drop-box-drag-area {
   .base-drop-box-ghost {
     visibility: hidden !important;
   }
-</style>
-
-<style module lang="scss">
-  @import "../../styles/variables";
-
-  .base-drop-box-drag-area {
-
-    .base-menu-entry {
-      position: absolute;
-      top: auto;
-      left: -99999px;
-    }
-  }
+}
 </style>
