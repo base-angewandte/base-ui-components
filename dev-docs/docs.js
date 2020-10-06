@@ -12,7 +12,6 @@ Vue.use(SvgIcon, {
   tagName: 'svgicon',
 });
 
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
