@@ -353,7 +353,7 @@
         :box-size="{ width: 'calc(25% - 16px)' }"
         drop-type="elements"
         drop-element-name="menuEntry"
-        drag-item-class="base-menu-entry"
+        drag-item-class="base-menu-list__list-entry"
         icon="camera"
         text="Datei hinzufügen"
         subtext="(Click oder durch drag'n drop hinzufügen)"
