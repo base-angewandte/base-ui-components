@@ -5,7 +5,7 @@
     <div
       class="base-media-preview-close"
       @click="$emit('hide-preview')">
-      <SvgIcon
+      <base-icon
         name="remove"
         class="base-media-preview-close-icon" />
     </div>
@@ -30,15 +30,11 @@
           class="base-media-preview-error">
           An error occured displaying this image.
         </div>
-        <video
+        <base-hls-video
           v-else-if="fileType === 'video'"
-          ref="videoPlayer"
-          :style="displaySize"
-          controls
-          autoplay
-          class="base-media-preview-image base-media-preview-video">
-          Your browser does not support the video tag.
-        </video>
+          :display-size="displaySize"
+          :media-url="mediaUrl"
+          class="base-media-preview-image base-media-preview-video" />
         <audio
           v-else-if="fileType === 'audio'"
           controls
@@ -110,10 +106,6 @@
 </template>
 
 <script>
-import VueClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
-import Hls from 'hls.js/dist/hls.light';
-import BaseButton from '../BaseButton/BaseButton';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -122,12 +114,14 @@ import popUpLock from '../../mixins/popUpLock';
  */
 
 export default {
+  name: 'BaseMediaPreview',
   components: {
-    BaseButton,
-    SvgIcon,
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
   },
   directives: {
-    VueClickOutside,
+    VueClickOutside: () => import('vue-click-outside'),
   },
   mixins: [popUpLock],
   props: {
@@ -281,22 +275,6 @@ export default {
   mounted() {
     this.isMobile = window.innerWidth <= 640;
   },
-  updated() {
-    if (this.showPreview) {
-      const video = this.$refs.videoPlayer;
-      if (video) {
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(this.mediaUrl);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = this.mediaUrl;
-          video.addEventListener('loadedmetadata', () => video.play());
-        }
-      }
-    }
-  },
   methods: {
     clickOutside(event) {
       // for some reason clickOutside is also triggered when opening the box
@@ -341,7 +319,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-media-preview-background{
     z-index: map-get($zindex, modal_bg);

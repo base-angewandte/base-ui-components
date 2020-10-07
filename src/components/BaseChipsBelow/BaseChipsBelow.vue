@@ -44,7 +44,7 @@
           <div
             :key="'iconwrapper' + entry.idInt"
             class="base-chips-below-list-icon-wrapper">
-            <SvgIcon
+            <base-icon
               :key="'icon' + entry.idInt"
               name="drag-lines"
               class="svg-icon base-chips-below-list-icon" />
@@ -92,7 +92,7 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
 
@@ -106,11 +106,12 @@ import BaseChip from '../BaseChip/BaseChip';
  */
 
 export default {
+  name: 'BaseChipsBelow',
   components: {
     BaseChipsInput,
     Draggable,
     BaseChip,
-    SvgIcon,
+    BaseIcon,
   },
   model: {
     prop: 'selectedList',
@@ -415,14 +416,13 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-chips-below {
     .base-chips-below-list-item {
       padding: $spacing-small/2 0;
       margin-bottom: -2px;
       border-bottom: $separation-line;
-
 
       .base-chips-below-list-item-line {
         display: flex;
@@ -449,6 +449,7 @@ export default {
           margin-right: $spacing;
           max-width: calc(50% - (2 * #{$spacing}));
           flex: 1 0 calc(50% - (2 * #{$spacing}));
+          text-align: left;
         }
 
         .base-chips-below-chips-input {

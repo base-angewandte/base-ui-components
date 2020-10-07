@@ -1,7 +1,7 @@
 <template>
   <div
     :class="['base-chip',
-             { 'base-chip-edited': entryEdited },
+             { 'base-chip-linked': isLinked },
              { 'base-chip__active': chipActive }]">
     <div
       class="base-chip-text"
@@ -34,6 +34,7 @@ import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
  */
 
 export default {
+  name: 'BaseChip',
   components: {
     BaseHoverBox,
   },
@@ -77,7 +78,6 @@ export default {
   data() {
     return {
       entryInt: {},
-      entryEdited: false,
       showInfoBox: false,
     };
   },
@@ -90,15 +90,9 @@ export default {
     entry(val) {
       this.entryInt = val;
     },
-    isLinked(val) {
-      if (!this.entryEdited) {
-        this.entryEdited = !val;
-      }
-    },
   },
   created() {
     this.entryInt = this.entry;
-    this.entryEdited = !this.isLinked;
   },
   methods: {
     clickAction(e) {
@@ -162,15 +156,15 @@ export default {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
     padding: $chips-spacing 0 $chips-spacing $spacing-small;
     flex: 0 0 auto;
-    background-color: $background-color;
+    background-color: rgba(255, 255, 255, 0);
     line-height: $line-height;
     display: inline-flex;
     align-items: center;
     cursor: default;
     position: relative;
 
-    &.base-chip-edited {
-      background-color: rgba(255, 255, 255, 0);
+    &.base-chip-linked {
+      background-color: $background-color;
     }
 
     &.base-chip__active {

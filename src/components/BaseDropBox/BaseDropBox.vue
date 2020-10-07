@@ -49,8 +49,8 @@ import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
  * An Element for dropping files or other UI Elements into
  */
 
-
 export default {
+  name: 'BaseDropBox',
   components: {
     BaseBoxButton,
     Draggable,
@@ -262,11 +262,10 @@ export default {
   },
 };
 
-
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-drop-box {
     background-color: $background-color !important;

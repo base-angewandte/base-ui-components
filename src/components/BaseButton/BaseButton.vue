@@ -11,7 +11,7 @@
     @click.prevent="clicked">
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
-    <svg-icon
+    <base-icon
       v-if="iconPosition === 'left' && icon"
       :name="icon"
       :class="['base-button-icon',
@@ -21,7 +21,7 @@
     <span class="base-button-text">{{ text }}</span>
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
-    <svg-icon
+    <base-icon
       v-if="iconPosition === 'right' && icon"
       :name="icon"
       :class="['base-button-icon',
@@ -35,9 +35,8 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index';
 
 /**
  * Standard buttons
@@ -45,7 +44,7 @@ import '../../assets/icons/index';
 export default {
   name: 'BaseButton',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseBoxTooltip,
   },
   props: {
@@ -63,7 +62,7 @@ export default {
      * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
      * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
      * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'checked' | 'unchecked' | 'attachment' |
+     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'attachment' |
      * 'drag-lines' | 'download' | 'duplicate' | 'forbidden' | 'information' | 'sort' |
      * 'success' | 'text'
      */
@@ -174,7 +173,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-button {
     position: relative;
@@ -259,7 +258,7 @@ export default {
     &:disabled {
       cursor: default;
 
-      &:hover {
+      &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
         color: $graytext-color;
       }
     }

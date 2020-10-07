@@ -34,14 +34,9 @@
       </div>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
-        <SvgIcon
+        <base-icon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
           name="drop-down" />
-        <!--
-        <img
-          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          svg-inline
-          src="../../static/icons/drop-down.svg"> -->
       </slot>
     </button>
     <div
@@ -75,16 +70,17 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
 import ClickOutside from 'vue-click-outside';
 import i18n from '../../mixins/i18n';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Accessible drop down component
  */
 export default {
+  name: 'BaseDropDown',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   directives: {
     ClickOutside,
@@ -274,7 +270,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-drop-down {
     display: inline-block;
