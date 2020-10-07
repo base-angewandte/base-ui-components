@@ -1,5 +1,6 @@
 <template>
   <draggable
+    ref="draggable"
     v-model="list"
     :sort="false"
     :disabled="isMobile || selectActive"
@@ -138,6 +139,17 @@ export default {
   mounted() {
     this.isMobile = window.innerWidth < 640;
     this.dragAndDropCapable = ('DragEvent' in window);
+
+    // Set _sortable.nativeDraggable directly due
+    // prop force-fallback in vue-draggable is not propagated to sortablejs if updated
+    // eslint-disable-next-line
+    if (typeof this.$refs.draggable._sortable.nativeDraggable !== 'undefined') {
+      // eslint-disable-next-line
+      this.$refs.draggable._sortable.nativeDraggable = this.dragAndDropCapable;
+    } else {
+      console.warn('The option "nativeDraggable" in sortableJS is missing. '
+        + 'Please check for changes https://github.com/SortableJS/sortablejs.');
+    }
   },
   methods: {
     // determines which icon should be shown for each menu entry
