@@ -2,7 +2,56 @@
 const path = require('path');
 module.exports = {
   // set your styleguidist configuration here
-  title: 'Base Components',
+  title: 'Base UI Components',
+  template: {
+    head: {
+      meta: [
+        {
+          lang: 'en',
+        },
+        {
+          name: 'description',
+          content: 'Styleguide for a base Angewandte component library',
+        },
+        {
+          name: 'apple-mobile-web-app-title',
+          content: 'base ui components'
+        },
+        {
+          name: 'application-name',
+          content: 'base ui components styleguide'
+        },
+        {
+          name: 'theme-color',
+          content: '#ffffff'
+        },
+      ],
+      links: [
+        {
+          href: '/apple-touch-icon.png',
+          rel: 'apple-touch-icon',
+          sizes: '180x180'
+        },
+        {
+          href: '/favicon-32x32.png',
+          rel: 'icon',
+          sizes: '32x32',
+          type: 'image/png'
+        },
+        {
+          href: '/favicon-32x32.png',
+          rel: 'icon',
+          sizes: '16x16',
+          type: 'image/png'
+        },
+        {
+          href: '/safari-pinned-tab.svg',
+          rel: 'mask-icon',
+          size: '180x180',
+        }
+      ],
+    },
+  },
   defaultExample: false,
   theme: {
     fontFamily: {
