@@ -133,3 +133,28 @@ button {
 .svg-left {
   transform: rotate(-90deg);
 }
+
+h1, h2, h3 {
+  font-size: $font-size-regular;
+  font-weight: bold;
+  line-height: $line-height;
+  margin-top: 0;
+  margin-bottom: $headline-margin-bottom;
+}
+
+
+/* Helpers */
+.base-text-fade-out {
+  position: relative;
+
+  &::after {
+    content: '';
+    width: calc(#{$fade-out-width} + #{$spacing});
+    height: $row-height-large;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+    z-index: map-get($zindex, fadeout);
+  }
+}

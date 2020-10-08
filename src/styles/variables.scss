@@ -11,7 +11,7 @@
   --uploadbar-color: #999999;
   --switch-checked-color: #4d4d4d;
   --switch-svg-checked-color: #ffffff;
-  --graytext-color: #808080;
+  --graytext-color: rgba(16, 16, 16, 0.3);
 }*/
 
 /* fonts */
@@ -49,7 +49,7 @@ $switch-color: $background-color;
 $switch-checked-color: var(--switch-checked-color, #4d4d4d);
 $switch-svg-color: $font-color-third;
 $switch-svg-checked-color: var(--switch-svg-checked-color, #ffffff);
-$graytext-color: var(--graytext-color, #808080);
+$graytext-color: var(--graytext-color, rgba(16, 16, 16, 0.3));
 
 /* shadows and borders */
 $border-width: 2px;
@@ -82,6 +82,9 @@ $icon-medium: 16px;
 $icon-small: 12px;
 $icon-min: 8px;
 
+/* animations */
+$drop-down-arrow-animation: transform 0.5s ease, color 0.2s ease, fill 0.2s ease;
+
 /* break-points */
 $mobile: 639px;
 $mobile-min-width: 640px;
@@ -99,4 +102,7 @@ $zindex: (
   loader: 5000,
   modal_bg: 10000,
   modal: 10020,
-)
+);
+
+/* headlines */
+$headline-margin-bottom: $line-height / 2;

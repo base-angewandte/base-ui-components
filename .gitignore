@@ -14,6 +14,8 @@ yarn-error.log*
 dist/
 styleguide/
 /index.html
-config/dev.env.js
-config/prod.env.js
 .history/
+
+# local env files
+.env.local
+.env.*.local

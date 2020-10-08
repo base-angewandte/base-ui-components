@@ -10,3 +10,5 @@ icon.register({
     data: '<path pid="0" d="M100 39.751H0V26.079h100zM100 0H0v13.672h100zm0 52.158H0V65.83h100z"/>'
   }
 })
+
+export default 'dragLines';

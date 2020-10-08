@@ -7,7 +7,7 @@ Date range input fields
         id="dayformatdemo"
         :label="'Enter A Date'"
         :format="'day'"
-        :showLabel="true"
+        :show-label="true"
         v-model="datepicked"
         type="daterange"
         placeholder="enter a date"

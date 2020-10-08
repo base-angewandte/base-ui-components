@@ -42,9 +42,7 @@
 </template>
 
 <script>
-// eslint-disable-next-line
-import lazySizes from 'lazysizes';
-import 'swiper/css/swiper.css';
+import 'lazysizes';
 import Swiper from 'swiper';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
@@ -183,6 +181,7 @@ export default {
 
 <style lang="scss">
   @import "../../styles/variables";
+  @import "swiper/css/swiper";
 
   .base-carousel {
     .base-image-box-image {

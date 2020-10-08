@@ -1,6 +1,9 @@
 This is a basic (autocomplete functionality not working here) example how a form created from a [openAPI](https://www.openapis.org/) standard could look like
 (to see the structure click 'view code')
 
+>Please note that this component should be rendered client side (important for SSR projects). So for example if you have a Nuxt project you will have to wrap the component in a `<client-only>` tag.
+
+
 ```vue
 <template>
   <div>

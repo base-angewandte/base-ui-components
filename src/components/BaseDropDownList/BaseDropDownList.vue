@@ -72,6 +72,7 @@ import i18n from '../../mixins/i18n';
 // TODO: currently only taking objects not strings??
 
 export default {
+  name: 'BaseDropDownList',
   directives: {
     ClickOutside,
   },
@@ -166,6 +167,14 @@ export default {
       type: String,
       default: 'No options available',
     },
+    /**
+     * specify a language (ISO 639-1) (used for label if label is language specific object
+     * e.g. { de: 'xxx', en: 'yyy' }
+     */
+    language: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -183,9 +192,9 @@ export default {
      * @returns {boolean}
      */
     valueIsString() {
-      return this.dropDownOptions[this.valuePropertyName]
-        && this.dropDownOptions[this.valuePropertyName].length
-        && typeof this.getLangLabel(this.dropDownOptions[this.valuePropertyName] === 'string', true);
+      return this.dropDownOptions
+        && this.dropDownOptions.length
+        && typeof this.getLangLabel(this.dropDownOptions[0][this.valuePropertyName], true) === 'string';
     },
     /**
      * the index of the currently active option provided by parent

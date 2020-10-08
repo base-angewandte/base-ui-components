@@ -9,49 +9,83 @@ Applied Arts Vienna](https://www.dieangewandte.at).
 
 ### Installation and Usage
 
-<!---
 Install via:
 ```
 npm i base-ui-components
 ```
--->
 
-Currently this project is still under development and therefore usage
-can not be wholeheartedly be recommended at this point.
-
-If you still would like to do so you can import every component individually to the file you want to use them:
+You can either import each component individually:
 
 ```vue
-<template>
-    <BaseAutocompleteInput />
-</template>
+main.js
 
-<script>
-import { BaseAutocompleteInput } from 'base-ui-components';
-
-export default {
-    components: {
-        BaseAutocompleteInput,
-    },
-};
-</script>
-```
-Styles need to be imported separately - this is best done in your `main.js` file:
-
-```js
 import Vue from 'vue';
-import 'base-ui-components/dist/lib/base-ui-components.min.css';
+// import the components you would like
+import { BaseAutcompleteInput, BaseCarousel } from 'base-ui-components';
+// also import the component css
+import 'base-ui-components/dist/components/BaseAutocompleteInput/BaseAutocompleteInput.css';
+import 'base-ui-components/dist/components/BaseCarousel/BaseCarousel.css';
+// additionally a common css file is needed
+import 'base-ui-components/dist/base-ui-components-common.css';
+import App from './App';
+
+Vue.use(BaseAutocompleteInput);
+Vue.use(BaseCarousel);
 
 new Vue({
   el: '#app',
   components: { App },
   template: '<App/>',
 });
+
 ```
 
-The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
+or as complete package:
 
-There is a [styleguide](https://base-angewandte.github.io/base-ui-components/) listing all available components and their usage.
+```vue
+main.js
+
+import Vue from 'vue';
+// import the complete components bundle
+import BaseUiComponents from 'base-ui-components';
+// and the css
+import 'base-ui-components/dist/base-ui-components.css';
+import App from './App';
+
+Vue.use(BaseUiComponents);
+
+new Vue({
+  el: '#app',
+  components: { App },
+  template: '<App/>',
+});
+
+```
+
+After adding the components as plugins, they can be used in your app globally, like so:
+
+```vue
+Component.vue
+
+<template>
+    <BaseAutocompleteInput
+      label="test"
+      ...
+    />
+    <BaseCarousel
+      ...
+    />
+</template>
+
+<script>
+  export default {};
+</script>
+```
+
+
+All available components, their usage and demos can be found in our [styleguide](https://base-angewandte.github.io/base-ui-components/).
+
+The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
 
 [Development Instructions](buildSetup.md)
 
@@ -73,7 +107,7 @@ In order to do so you can add the following variables to your main css/scss file
   --uploadbar-color: #999999;
   --switch-checked-color: #4d4d4d;
   --switch-svg-checked-color: #ffffff;
-  --graytext-color: #808080;
+  --graytext-color: rgba(16, 16, 16, 0.3);
 }
 ```
 Then in your `main.js` file import your styles before the base-ui-components file. E.g.:
@@ -95,4 +129,10 @@ See [LICENSE](LICENSE.md)
 <!-- logo base -->
 ![alt text](static/base.png "base Angewandte")
 <!-- logo zukunvt?  or anything else? -->
+
+### Support
+
+Developed with the support Live Cross-Browser Testing on:
+
+[![Browserstack-logo](static/browserstack.svg)](https://www.browserstack.com)
 

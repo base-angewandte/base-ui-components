@@ -14,7 +14,7 @@
         'base-checkmark-container',
         'base-checkmark-container-' + checkBoxSize,
         {'base-radiomark': markStyle === 'radio' && checkedInt === label }]">
-      <svg-icon
+      <base-icon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
         name="check-mark" />
@@ -26,15 +26,16 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Checkbox and Radio Button Component
  */
 
 export default {
+  name: 'BaseCheckmark',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   model: {
     prop: 'checked',
@@ -120,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-checkbox-container {
     position: relative;
@@ -139,7 +140,6 @@ export default {
     .base-checkbox-container-large {
       width: $spacing*2;
     }
-
 
     &:hover input ~ .base-checkmark-container-small {
       border: 1.5px solid $app-color;

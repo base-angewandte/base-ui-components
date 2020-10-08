@@ -14,14 +14,14 @@
         <div
           class="button-box-image-row">
           <div class="button-box-plus-container">
-            <svg-icon
+            <base-icon
               v-if="showPlus"
               name="plus"
               alt="add"
               class="button-box-plus" />
           </div>
           <div class="button-box-icon-container">
-            <svg-icon
+            <base-icon
               v-if="icon"
               :name="icon"
               class="button-box-icon" />
@@ -37,7 +37,6 @@
         :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
         {{ subtext }}
       </div>
-
       <BaseBoxTooltip
         v-if="showTooltip"
         @clicked="onTooltip" />
@@ -45,7 +44,7 @@
     <div
       v-else
       class="button-box-content-small">
-      <svg-icon
+      <base-icon
         v-if="icon"
         :name="icon"
         class="button-box-icon-small" />
@@ -58,18 +57,18 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
-import '../../assets/icons/index';
 
 /**
  * A Base Box Shaped Button
  */
 
 export default {
+  name: 'BaseBoxButton',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseBox,
     BaseBoxTooltip,
   },
@@ -198,7 +197,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-box-button {
     display: flex;

@@ -10,3 +10,5 @@ icon.register({
     data: '<path pid="0" _fill="#1d1d1b" d="M40.15 0v70.87h-8.87V0z"/><path pid="1" _fill="#1d1d1b" d="M70.87 39.43H0v-8.87h70.87z"/>'
   }
 })
+
+export default 'plus';
