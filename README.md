@@ -9,17 +9,12 @@ Applied Arts Vienna](https://www.dieangewandte.at).
 
 ### Installation and Usage
 
-<!---
 Install via:
 ```
 npm i base-ui-components
 ```
--->
 
-Currently this project is still under development and therefore usage
-can not be wholeheartedly be recommended at this point.
-
-If you still would like to do so you can either import each component individually:
+You can either import each component individually:
 
 ```vue
 main.js
@@ -88,21 +83,6 @@ Component.vue
 ```
 
 
-
-
-Styles need to be imported separately - this is best done in your `main.js` file:
-
-```js
-import Vue from 'vue';
-import 'base-ui-components/dist/lib/base-ui-components.min.css';
-
-new Vue({
-  el: '#app',
-  components: { App },
-  template: '<App/>',
-});
-```
-
 All available components, their usage and demos can be found in our [styleguide](https://base-angewandte.github.io/base-ui-components/).
 
 The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
@@ -127,7 +107,7 @@ In order to do so you can add the following variables to your main css/scss file
   --uploadbar-color: #999999;
   --switch-checked-color: #4d4d4d;
   --switch-svg-checked-color: #ffffff;
-  --graytext-color: #808080;
+  --graytext-color: rgba(16, 16, 16, 0.3);
 }
 ```
 Then in your `main.js` file import your styles before the base-ui-components file. E.g.:
