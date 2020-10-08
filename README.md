@@ -130,3 +130,9 @@ See [LICENSE](LICENSE.md)
 ![alt text](static/base.png "base Angewandte")
 <!-- logo zukunvt?  or anything else? -->
 
+### Support
+
+Developed with the support Live Cross-Browser Testing on:
+
+[![Browserstack-logo](static/browserstack.svg)](https://www.browserstack.com)
+
