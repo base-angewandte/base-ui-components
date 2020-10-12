@@ -10,6 +10,9 @@ With the FormFieldCreator component you can create any of the following form inp
 
 For description of 'x-attributes' this field creation relies on please see [BaseForm](#baseform)
 
+>Please note that this component should be rendered client side (important for SSR projects). So for example if you have a Nuxt project you will have to wrap the component in a `<client-only>` tag.
+
+
 Example for a MultilineTextInput:
 
 ```vue

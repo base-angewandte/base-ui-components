@@ -10,7 +10,7 @@
     :role="isSelectable && selectActive ? '' : 'link'"
     @keyup.enter.prevent="clicked"
     @click="clicked">
-    <svg-icon
+    <base-icon
       ref="entryIcon"
       :name="icon"
       class="base-menu-entry-icon" />
@@ -46,7 +46,7 @@
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
         class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
-        <svg-icon
+        <base-icon
           v-for="tn in thumbnails"
           :key="tn"
           :name="tn"
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 /**
@@ -74,8 +74,9 @@ import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
  */
 
 export default {
+  name: 'BaseMenuEntry',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseCheckmark,
   },
   props: {
@@ -220,7 +221,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
+
   .base-menu-entry {
     display: flex;
     align-items: center;

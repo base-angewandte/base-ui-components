@@ -1,8 +1,8 @@
 <template>
   <compontent
     :is="boxType"
-    :style="boxSizeInt"
-    :class="['base-box', 'base-box-' + $props.boxRatio, {'base-box-hover': boxHover}]"
+    :style="boxSize"
+    :class="['base-box', 'base-box-' + $props.boxRatio, {'base-box-hover': boxHover && !disabled}]"
     :disabled="disabled"
     :type="(boxType === 'button') ? 'button' : ''"
     @click="clicked">
@@ -16,15 +16,10 @@
  * Base Component for everything Box shaped
  */
 export default {
-  /**
-   * event emitted when clicked on box
-   *
-   * @event clicked
-   * @type None
-   */
+  name: 'BaseBox',
   props: {
     /**
-     * specify the tag of the button
+     * specify the tag type of the box
      */
     boxType: {
       type: String,
@@ -47,24 +42,18 @@ export default {
       default: '100',
     },
     /**
-     *  set hover class
+     *  enable or disable hover
      */
     boxHover: {
       type: Boolean,
       default: true,
     },
     /**
-     * set button inactive
+     * set disabled attribute (e.g. for button elements)
      */
     disabled: {
       type: Boolean,
       default: false,
-    },
-  },
-  computed: {
-    // TODO: do i need this?? why not use prop directly again??
-    boxSizeInt() {
-      return { ...this.boxSize };
     },
   },
   methods: {
@@ -81,7 +70,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-box {
     background: white;
@@ -106,7 +95,7 @@ export default {
       padding-bottom: calc(50% - #{$spacing-small});
     }
 
-    &:hover,
+    &.base-box-hover:hover,
     &:focus {
       box-shadow: $box-shadow-hov;
     }

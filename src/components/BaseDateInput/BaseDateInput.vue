@@ -30,7 +30,7 @@
           {{ label }}
         </label>
         <div
-          v-click-outside="(event) => clickedOutside('From')"
+          v-click-outside="() => clickedOutside('From')"
           :class="['base-date-input__field-container',
                    { 'base-date-input__field-container-active': useFormFieldStyling
                      && (timeFromOpen || dateFromOpen) },
@@ -57,7 +57,7 @@
             @focus="emitFocusEvent"
             @blur="emitBlurEvent">
             <template v-slot:icon-calendar>
-              <svg-icon
+              <base-icon
                 name="clock"
                 class="base-date-input__date-icon" />
             </template>
@@ -87,7 +87,7 @@
               @focus="emitFocusEvent"
               @blur="emitBlurEvent">
               <template v-slot:icon-calendar>
-                <svg-icon
+                <base-icon
                   name="calendar-many"
                   class="base-date-input__date-icon" />
               </template>
@@ -135,7 +135,7 @@
             @focus="emitFocusEvent"
             @blur="emitBlurEvent">
             <template v-slot:icon-calendar>
-              <svg-icon
+              <base-icon
                 name="clock"
                 class="base-date-input__date-icon" />
             </template>
@@ -166,8 +166,8 @@
               @focus="emitFocusEvent"
               @blur="emitBlurEvent">
               <template v-slot:icon-calendar>
-                <svg-icon
-                  name="calendar-many"
+                <base-icon
+                  name="clock"
                   class="base-date-input__date-icon" />
               </template>
             </DatePicker>
@@ -180,9 +180,7 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import SvgIcon from 'vue-svgicon';
 import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
 
 // languages needed for datepicker locale
 import 'vue2-datepicker/locale/de';
@@ -190,7 +188,7 @@ import 'vue2-datepicker/locale/en';
 import 'vue2-datepicker/locale/fr';
 
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
-
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -202,7 +200,7 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 export default {
   name: 'BaseDateInput',
   components: {
-    SvgIcon,
+    BaseIcon,
     BaseSwitchButton,
     DatePicker,
   },
@@ -584,7 +582,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-date-input {
     display: flex;
@@ -676,78 +674,6 @@ export default {
   }
 </style>
 
-<style module lang="scss">
-  @import "../../styles/variables";
-
-  .mx-datepicker {
-    width: 100%;
-  }
-
-  // change font and font size
-  .mx-calendar, .mx-datepicker-main, .mx-calendar-header-label, .mx-btn,
-  .mx-table-date .cell:not(.not-current-month), .mx-table-date th {
-    font: inherit !important;
-    color: $font-color !important;
-
-    .not-current-month {
-      font: inherit !important;
-    }
-  }
-
-  // change font size for time
-  .mx-time-column .mx-time-item {
-    font-size: $font-size-regular !important;
-    height: $row-height-small !important;
-    line-height: $row-height-small;
-  }
-
-  /* dont need special color for today */
-  .mx-table-date td.today {
-    color: $font-color !important;
-  }
-
-  // calendar width
-  .mx-calendar {
-    width: 250px !important;
-  }
-
-  .mx-btn {
-    display: inline !important;
-  }
-
-  // hover color
-  .mx-calendar-content .cell:hover, .mx-calendar-header > a:hover,
-  .mx-time-column .mx-time-item:hover {
-    color: $app-color !important;
-    background-color: transparent !important;
-  }
-
-  // selected color
-  .mx-calendar-content .cell.active,
-  .mx-time-column .mx-time-item.active {
-    background-color: $app-color !important;
-    color: white !important;
-  }
-
-  // remove space in the end in time column
-  .mx-time-column .mx-time-list::after{
-    height: 0 !important;
-  }
-
-  input.base-date-input__datepicker-input:focus {
-    outline: none;
-  }
-
-  .base-date-input__datepicker-input {
-    border: none;
-    outline: none;
-    width: calc(100% - #{$spacing});
-    height: 100%;
-    background-color: transparent;
-  }
-
-  .mx-datepicker-popup {
-    border: none !important;
-    box-shadow: $preview-box-shadow !important;
-  }
+<style lang="scss">
+  @import '../../styles/_datepicker.scss';
 </style>

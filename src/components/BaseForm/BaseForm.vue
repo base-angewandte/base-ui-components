@@ -51,7 +51,7 @@
                   : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}
               </span>
               <span>
-                <SvgIcon
+                <base-icon
                   class="field-group-icon"
                   name="remove" />
               </span>
@@ -72,7 +72,7 @@
               }) }}
             </span>
             <span>
-              <SvgIcon
+              <base-icon
                 class="field-group-icon"
                 name="plus" />
             </span>
@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import i18n from '../../mixins/i18n';
 
 /**
@@ -95,7 +95,7 @@ export default {
   name: 'BaseForm',
   components: {
     BaseFormFieldCreator: () => import('../BaseFormFieldCreator/BaseFormFieldCreator'),
-    SvgIcon,
+    BaseIcon,
   },
   mixins: [i18n],
   props: {

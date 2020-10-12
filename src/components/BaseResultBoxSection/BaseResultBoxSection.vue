@@ -161,6 +161,7 @@ import i18n from '../../mixins/i18n';
  */
 
 export default {
+  name: 'BaseResultBoxSection',
   components: {
     BaseLoader,
     BaseButton,

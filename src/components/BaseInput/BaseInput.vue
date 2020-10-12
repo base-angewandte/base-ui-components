@@ -252,7 +252,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-input {
     display: flex;
@@ -339,7 +339,6 @@ export default {
     }
   }
 
-
   input::-webkit-input-placeholder {
     line-height: $input-field-line-height;
   }
@@ -347,13 +346,5 @@ export default {
   input[type='text'].base-input-field {
     border: none;
     overflow: hidden;
-  }
-
-  input[type='date'].base-input-field {
-    background: url('../../static/icons/magnifier-2.svg') right no-repeat;
-  }
-
-  input[type=text].base-input-field:focus, input[type=date].base-input-field:focus {
-    outline: none;
   }
 </style>

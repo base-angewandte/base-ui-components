@@ -14,6 +14,7 @@ import BaseImageBox from '../BaseImageBox/BaseImageBox';
  */
 
 export default {
+  name: 'BaseHoverBox',
   components: {
     BaseImageBox,
   },
@@ -109,7 +110,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-hover-box {
     box-shadow: $preview-box-shadow;

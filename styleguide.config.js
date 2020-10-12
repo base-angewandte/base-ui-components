@@ -2,7 +2,56 @@
 const path = require('path');
 module.exports = {
   // set your styleguidist configuration here
-  title: 'Base Components',
+  title: 'Base UI Components',
+  template: {
+    head: {
+      meta: [
+        {
+          lang: 'en',
+        },
+        {
+          name: 'description',
+          content: 'Styleguide for a base Angewandte component library',
+        },
+        {
+          name: 'apple-mobile-web-app-title',
+          content: 'base ui components'
+        },
+        {
+          name: 'application-name',
+          content: 'base ui components styleguide'
+        },
+        {
+          name: 'theme-color',
+          content: '#ffffff'
+        },
+      ],
+      links: [
+        {
+          href: '/apple-touch-icon.png',
+          rel: 'apple-touch-icon',
+          sizes: '180x180'
+        },
+        {
+          href: '/favicon-32x32.png',
+          rel: 'icon',
+          sizes: '32x32',
+          type: 'image/png'
+        },
+        {
+          href: '/favicon-32x32.png',
+          rel: 'icon',
+          sizes: '16x16',
+          type: 'image/png'
+        },
+        {
+          href: '/safari-pinned-tab.svg',
+          rel: 'mask-icon',
+          size: '180x180',
+        }
+      ],
+    },
+  },
   defaultExample: false,
   theme: {
     fontFamily: {
@@ -24,31 +73,15 @@ module.exports = {
   //     components: 'src/components/**/[A-Z]*.vue'
   //   }
   // ],
-  webpackConfig: process.env.NODE_ENV === 'production' ? require('./build/webpack.prod.conf.js') : require('./build/webpack.dev.conf.js'),
   usageMode: 'expand',
   require: [
-    path.join(__dirname, './src/styles/app.scss'),
+    path.join(__dirname, './node_modules/normalize.css/normalize.css'),
+    path.join(__dirname, './dev-docs/styles/app.scss'),
   ],
   // these are components used internally however not included in the package
   ignore: [
-    'src/components/BaseBox/*',
     'src/components/BaseCheckBox/*',
     'src/components/BaseToolTip/*',
     'src/components/BaseChip/*',
   ],
-  // https://github.com/vue-styleguidist/vue-styleguidist/issues/290
-  dangerouslyUpdateWebpackConfig(webpackConfig) {
-    let filteredFirstHMR = false;
-
-    webpackConfig.plugins = webpackConfig.plugins.filter(plugin => {
-      if (plugin.constructor.name === 'HotModuleReplacementPlugin' && !filteredFirstHMR) {
-        filteredFirstHMR = true;
-        return false;
-      }
-
-      return true;
-    });
-
-    return webpackConfig;
-  }
 }

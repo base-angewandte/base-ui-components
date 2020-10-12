@@ -4,29 +4,20 @@
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:6060
+# serve with hot reload at localhost:8080
 npm run dev
 
-# build library components with watcher
-npm run dev:lib
+# build library components with rollup
+npm run build
 
-# build for serving on localhost:6060 with hot reload
-npm run dev:docs
+# build library components with rollup with rebuild on changes
+npm run build:watch
 
 # run styleguide for development purposes
 npm run styleguide
 
-# build for production with minification
-npm run build
-
-# build components
-npm run build:lib
-
-# build documentation website
-npm run build:docs
-
-# build for production and view the bundle analyzer report
-npm run build --report
+# build styleguide docs
+npm run styleguilde:build
 
 # lint files
 npm run lint
@@ -34,6 +25,15 @@ npm run lint
 # create styleable components from svg icons
 npm run svg
 
+# create index file for every component (if it does not exist yet)
+npm run updateindex
+
+# force index update (also if index.js already exists)
+npm run updateindex:all
+
+```
+
+```bash
 # to use locally for development
 # in this project
 npm link

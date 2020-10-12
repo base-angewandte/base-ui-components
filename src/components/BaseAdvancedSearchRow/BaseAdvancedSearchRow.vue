@@ -960,7 +960,6 @@ export default {
               color: $app-color;
               padding: $spacing-small/2 $spacing;
 
-
               &:focus {
                 outline: none;
               }
@@ -1036,7 +1035,6 @@ export default {
           display: none;
         }
       }
-
 
     }
 

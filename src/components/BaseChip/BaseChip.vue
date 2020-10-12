@@ -2,11 +2,12 @@
   <div
     :class="['base-chip',
              { 'base-chip__removable': isRemovable },
-             { 'base-chip-edited': entryEdited },
-             { 'base-chip__active': chipActive }]"
-    @click.stop="clickAction">
+             { 'base-chip-linked': isLinked },
+             { 'base-chip__active': chipActive }]">
     <div
       class="base-chip-text"
+      @click.stop="clickAction"
+      @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox">
       {{ entryInt }}
@@ -35,6 +36,7 @@ import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
  */
 
 export default {
+  name: 'BaseChip',
   components: {
     BaseHoverBox,
   },
@@ -85,7 +87,6 @@ export default {
   data() {
     return {
       entryInt: {},
-      entryEdited: false,
       showInfoBox: false,
     };
   },
@@ -98,15 +99,9 @@ export default {
     entry(val) {
       this.entryInt = val;
     },
-    isLinked(val) {
-      if (!this.entryEdited) {
-        this.entryEdited = !val;
-      }
-    },
   },
   created() {
     this.entryInt = this.entry;
-    this.entryEdited = !this.isLinked;
   },
   methods: {
     clickAction(e) {
@@ -140,6 +135,15 @@ export default {
         this.showInfoBox = false;
       }
     },
+    onMouseDown(event) {
+      /**
+       * event on mouse down, needed by base chips input to determine active chip
+       *
+       * @type {Event}
+       *
+       */
+      this.$emit('mouse-down', event);
+    },
     removeClicked() {
       /**
        * triggered when the remove icon is clicked and returns the data behind the chip
@@ -161,15 +165,15 @@ export default {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
     padding: $chips-spacing $spacing-small;
     flex: 0 0 auto;
-    background-color: $background-color;
+    background-color: rgba(255, 255, 255, 0);
     line-height: $line-height;
     display: inline-flex;
     align-items: center;
     cursor: default;
     position: relative;
 
-    &.base-chip-edited {
-      background-color: rgba(255, 255, 255, 0);
+    &.base-chip-linked {
+      background-color: $background-color;
     }
 
     &.base-chip__removable {
@@ -193,6 +197,7 @@ export default {
     .base-chip-text {
       border: none;
       background-color: rgba(255, 255, 255, 0);
+      color: $font-color;
       word-break: break-word;
       z-index: map-get($zindex, boxcontent);
 

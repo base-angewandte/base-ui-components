@@ -3,7 +3,7 @@
     role="button"
     class="base-box-tooltip"
     @click="clicked">
-    <svg-icon
+    <base-icon
       name="information"
       alt="information"
       class="base-box-tooltip-icon" />
@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 export default {
   name: 'BaseBoxTooltip',
   components: {
-    SvgIcon,
+    BaseIcon,
   },
   methods: {
     clicked(event) {

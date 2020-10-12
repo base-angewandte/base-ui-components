@@ -1,5 +1,6 @@
 <template>
   <draggable
+    ref="draggable"
     v-model="list"
     :sort="false"
     :disabled="isMobile || selectActive"
@@ -42,6 +43,7 @@ import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
  */
 
 export default {
+  name: 'BaseMenuList',
   components: {
     BaseMenuEntry,
     Draggable,
@@ -94,17 +96,13 @@ export default {
       // outside store mutations
       entryProps: [],
       dragging: false,
+      dragAndDropCapable: false,
+      isMobile: false,
     };
   },
   computed: {
     selectActive() {
       return this.selected;
-    },
-    dragAndDropCapable() {
-      return ('DragEvent' in window);
-    },
-    isMobile() {
-      return window.innerWidth < 640;
     },
   },
   watch: {
@@ -137,6 +135,21 @@ export default {
       }
       return false;
     }, { passive: false }); */
+  },
+  mounted() {
+    this.isMobile = window.innerWidth < 640;
+    this.dragAndDropCapable = ('DragEvent' in window);
+
+    // Set _sortable.nativeDraggable directly due
+    // prop force-fallback in vue-draggable is not propagated to sortablejs if updated
+    // eslint-disable-next-line
+    if (typeof this.$refs.draggable._sortable.nativeDraggable !== 'undefined') {
+      // eslint-disable-next-line
+      this.$refs.draggable._sortable.nativeDraggable = this.dragAndDropCapable;
+    } else {
+      console.warn('The option "nativeDraggable" in sortableJS is missing. '
+        + 'Please check for changes https://github.com/SortableJS/sortablejs.');
+    }
   },
   methods: {
     // determines which icon should be shown for each menu entry
@@ -185,11 +198,13 @@ export default {
       this.$emit('selected', { index, selected });
     },
     setInternalVar() {
-      this.entryProps = this.list.map(entry => ({ ...{
-        selected: entry.selected || this.selectedList.includes(entry.id),
-        active: entry.active || false,
-        error: entry.error || false,
-      } }));
+      this.entryProps = this.list.map(entry => ({
+        ...{
+          selected: entry.selected || this.selectedList.includes(entry.id),
+          active: entry.active || false,
+          error: entry.error || false,
+        },
+      }));
       if (this.entryProps.length && this.activeEntry >= 0) {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }

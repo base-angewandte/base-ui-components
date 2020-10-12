@@ -25,7 +25,7 @@ export default {
   computed: {
     getImgUrl() {
       /* eslint-disable-next-line */
-      const url = require('@/assets/images/img1.png');
+      const url = require('@/../dev-docs/assets/images/img1.png');
       return url;
     },
   },
@@ -50,11 +50,11 @@ An audio example
 ```vue
 <template>
   <div>
-      <BaseButton 
+      <BaseButton
         text="Show Audio File"
         @clicked="showPreview = true"/>
-        
-      <BaseMediaPreview 
+
+      <BaseMediaPreview
         :show-preview="showPreview"
         :allow-download="false"
         display-name="Taken from http://www.hochmuth.com/mp3-samples.htm"
@@ -76,16 +76,16 @@ export default{
 
 ```
 
-An audio example
+An video example
 
 ```vue
 <template>
   <div>
-      <BaseButton 
+      <BaseButton
         text="Show Video File"
         @clicked="showPreview = true"/>
-        
-      <BaseMediaPreview 
+
+      <BaseMediaPreview
         :show-preview="showPreview"
         :allow-download="false"
         display-name="Taken from https://bitmovin.com/mpeg-dash-hls-examples-sample-streams/"
@@ -112,11 +112,11 @@ An pdf example
 ```vue
 <template>
   <div>
-      <BaseButton 
+      <BaseButton
         text="Show PDF File"
         @clicked="showPreview = true"/>
-        
-      <BaseMediaPreview 
+
+      <BaseMediaPreview
         :show-preview="showPreview"
         display-name="Taken from http://www.africau.edu/images/default/sample.pdf"
         media-url="http://www.africau.edu/images/default/sample.pdf"

@@ -19,7 +19,7 @@
           class="base-multiline-text-input-tabs">
           <template
             v-slot:right-of-text="tab">
-            <SvgIcon
+            <base-icon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input-text-icon"
               name="text" />
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 
 /**
@@ -46,7 +46,11 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
  */
 
 export default {
-  components: { BaseSwitchButton, SvgIcon },
+  name: 'BaseMultilineTextInput',
+  components: {
+    BaseSwitchButton,
+    BaseIcon,
+  },
   model: {
     prop: 'input',
     event: 'text-input',
@@ -183,7 +187,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-multiline-text-input {
     position: relative;

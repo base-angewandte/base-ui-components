@@ -72,6 +72,7 @@ import i18n from '../../mixins/i18n';
 // TODO: currently only taking objects not strings??
 
 export default {
+  name: 'BaseDropDownList',
   directives: {
     ClickOutside,
   },

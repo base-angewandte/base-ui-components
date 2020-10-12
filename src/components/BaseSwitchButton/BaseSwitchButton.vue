@@ -39,6 +39,7 @@
  * accessible tab switch buttons
  */
 export default {
+  name: 'BaseSwitchButton',
   model: {
     prop: 'activeTab',
     event: 'switch',
@@ -106,7 +107,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-switch-buttons {
     clear: both;

@@ -9,7 +9,7 @@
     </label>
     <!-- @slot to add things before the input e.g. chips -->
     <slot name="before-input">
-      <SvgIcon
+      <BaseIcon
         v-if="showImage"
         name="magnifier"
         :class="['base-search__magnifier-icon',
@@ -62,7 +62,7 @@
       v-on="chipsInputListeners" />
     <!-- @slot for icon after input field -->
     <slot>
-      <SvgIcon
+      <BaseIcon
         v-if="inputInt && type === 'text'"
         name="remove"
         class="base-search__remove-icon"
@@ -72,18 +72,19 @@
 </template>
 
 <script>
-import SvgIcon from 'vue-svgicon';
-import { createId } from '../../utils/utils';
+import { createId } from '@/utils/utils';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * A basic text search to filter entries or files
   */
 export default {
+  name: 'BaseSearch',
   components: {
+    BaseIcon,
     // lazy load components that might not be required!
     BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField'),
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
-    SvgIcon,
   },
   model: {
     prop: 'input',
@@ -292,7 +293,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @import '../../styles/variables.scss';
 
   .base-search {
     position: relative;
