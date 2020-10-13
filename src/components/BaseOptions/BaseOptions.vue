@@ -208,7 +208,7 @@ export default {
       flex-wrap: wrap;
       height: auto;
       justify-content: center;
-      margin-bottom: $spacing;
+      margin-bottom: $spacing-small;
     }
   }
 

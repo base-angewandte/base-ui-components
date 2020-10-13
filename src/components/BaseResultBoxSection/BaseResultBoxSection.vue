@@ -31,7 +31,7 @@
             <div
               v-if="!selectActive"
               class="base-result-box-section__result-options">
-              <!-- @slot options-buttons to add custom options buttons -->
+              <!-- @slot to add custom options buttons -->
               <slot
                 :set-action="setAction"
                 name="option-buttons">
@@ -77,7 +77,7 @@
           <div class="base-result-box-section__message-area-subtext">
             {{ messageSubtext }}
           </div>
-          <!-- @slot options-message-area-after - add a custom element after the message area -->
+          <!-- @slot add a custom element after the message area -->
           <slot name="options-message-area-after" />
         </div>
         <BaseSelectOptions
@@ -498,19 +498,19 @@ export default {
 
     .base-result-box-section__area {
 
-      .base-result-box-section__header {
-        font-size: $font-size-regular;
-        color: $font-color-second;
-        font-weight: normal;
-        margin: $spacing;
-
-      }
-
       .base-result-box-section__header-row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        margin: $spacing-small 0 $spacing-small $spacing;
+
+        .base-result-box-section__header {
+          font-size: $font-size-regular;
+          color: $font-color-second;
+          font-weight: normal;
+          margin: 0;
+        }
 
         .base-result-box-section__result-options {
           display: flex;
@@ -573,7 +573,7 @@ export default {
     }
   }
 
-  .base-result-box-section__action-button:nth-of-type(n + 5) {
+  .base-result-box-section__action-button:nth-child(n + 5) {
     margin-top: $spacing;
   }
 
@@ -586,7 +586,7 @@ export default {
       flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
     }
 
-    .base-result-box-section__action-button:nth-of-type(n + 3) {
+    .base-result-box-section__action-button:nth-child(n + 3) {
       margin-top: $spacing;
     }
 
