@@ -19,11 +19,14 @@
           :show-options="showActions"
           @options-toggle="optionsToggle">
           <template v-slot:beforeOptions>
-            <h3
-              v-if="headerText"
-              class="base-result-box-section__header">
-              {{ headerText }}
-            </h3>
+            <!-- @slot add a custom header instead of headerText -->
+            <slot name="header">
+              <h3
+                v-if="headerText"
+                class="base-result-box-section__header">
+                {{ headerText }}
+              </h3>
+            </slot>
           </template>
           <template
             v-if="showOptions"

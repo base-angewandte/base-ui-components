@@ -179,6 +179,8 @@ export default {
       align-items: center;
 
       .base-options-before {
+        display: flex;
+        align-items: center;
         align-self: center;
       }
 

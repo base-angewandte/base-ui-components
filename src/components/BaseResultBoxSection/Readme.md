@@ -108,6 +108,23 @@ An example with custom ImageBoxes and demonstrating other slots
       @cancel-action="activeAction = ''"
       @set-action="activeAction = $event">
       <template
+        v-slot:header>
+        <h2 class="header-text">This is a custom header</h2>
+        <base-drop-down
+          :showLabel="false"
+          v-model="selected"
+          :options="[
+            { label: 'A-Z', value: 'alphabetical_down' },
+            { label: 'Z-A', value: 'alphabetical_up' },
+            { label: 'Type', value: 'type' },
+            { label: 'Newest First', value: 'date_created_down' },
+            { label: 'Oldest First', value: 'date_created_up' }]"
+          header-style="single"
+          label="Sort"
+          placeholder="Sort"
+        />
+      </template>
+      <template
         v-slot:option-buttons="scope">
         <BaseButton
           text="Custom Option 1"
@@ -146,9 +163,15 @@ An example with custom ImageBoxes and demonstrating other slots
 </template>
 
 <script>
+import BaseDropDown from '../BaseDropDown/BaseDropDown';
+
 export default {
+  components: {
+    BaseDropDown,
+  },
   data() {
     return {
+    selected: {},
     activeAction: '',
     entriesList: [
         {
@@ -233,5 +256,10 @@ export default {
   .result-box {
     margin-right: 16px;
   }
+
+  .header-text {
+    margin: 0;
+  }
+
 </style>
 ```
