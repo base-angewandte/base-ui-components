@@ -94,12 +94,15 @@
           :selected-list="selectedList"
           @selected="selectAllTriggered" />
         <!-- BOXAREA -->
-        <div
+        <ul
           :key="headerText + '_boxArea'"
           ref="resultBoxesArea"
           class="base-result-box-section__box-area">
-          <template
-            v-for="(entry, index) of visibleBoxes">
+          <li
+            v-for="(entry, index) of visibleBoxes"
+            :key="entry.id"
+            :tabindex="0"
+            class="base-result-box-section__result-box">
             <!-- @slot result-box - for custom result boxes -->
             <slot
               :item="entry"
@@ -110,30 +113,28 @@
                 :key="entry.id"
                 :selectable="selectActive"
                 :selected="selectedList.map(entry => entry.id || entry).includes(entry.id)"
-                :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
+                :box-size="{ width: 'auto' }"
                 :box-ratio="100"
                 :title="entry.title"
                 :subtext="entry.subtitle"
                 :description="entry.description"
                 :image-url="entry.imageUrl"
                 :box-text="entry.text"
-                class="base-result-box-section__result-box"
                 @select-triggered="entrySelected(entry.id, $event)"
                 @clicked="entrySelected(entry.id)" />
             </slot>
-          </template>
+          </li>
 
           <!-- ACTION BUTTON -->
           <BaseBoxButton
             v-if="showActionButtonBox && actionInt"
             :text="actionButtonText"
-            :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon="save-file"
             box-style="small"
             box-type="button"
-            class="base-result-box-section__action-button"
+            class="base-result-box-section__result-box"
             @clicked="submitAction" />
-        </div>
+        </ul>
         <component
           :is="paginationComponent"
           v-if="maxRows && pages > 1"
@@ -498,19 +499,18 @@ export default {
 
     .base-result-box-section__area {
 
-      .base-result-box-section__header {
-        font-size: $font-size-regular;
-        color: $font-color-second;
-        font-weight: normal;
-        margin: $spacing;
-
-      }
-
       .base-result-box-section__header-row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+
+        .base-result-box-section__header {
+          font-size: $font-size-regular;
+          color: $font-color-second;
+          font-weight: normal;
+          margin: $spacing;
+        }
 
         .base-result-box-section__result-options {
           display: flex;
@@ -525,6 +525,19 @@ export default {
         flex-wrap: wrap;
 
         .base-result-box-section__result-box {
+          // subtracted 0.01rem for edge
+          flex: 0 0 calc(25% - #{$spacing-small} - #{$spacing-small/2} - 0.01rem);
+
+          &:focus {
+            outline: 1px solid $app-color;
+          }
+        }
+
+        .base-result-box-section__result-box:nth-child(n + 5) {
+          margin-top: $spacing;
+        }
+
+        .base-result-box-section__result-box:not(:nth-child(4n)) {
           margin-right: $spacing;
         }
       }
@@ -573,29 +586,27 @@ export default {
     }
   }
 
-  .base-result-box-section__action-button:nth-of-type(n + 5) {
-    margin-top: $spacing;
-  }
-
-  .base-result-box-section__action-button:not(:nth-child(4n)) {
-    margin-right: $spacing;
-  }
-
   @media screen and (max-width: $tablet) {
-    .base-result-box-section__action-button {
-      flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
-    }
+    .base-result-box-section {
+      .base-result-box-section__area {
+        .base-result-box-section__box-area {
+          .base-result-box-section__result-box {
+            flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
+          }
 
-    .base-result-box-section__action-button:nth-of-type(n + 3) {
-      margin-top: $spacing;
-    }
+          .base-result-box-section__result-box:nth-child(n + 3) {
+            margin-top: $spacing;
+          }
 
-    .base-result-box-section__action-button:not(:nth-child(4n)) {
-      margin-right: 0;
-    }
+          .base-result-box-section__result-box:not(:nth-child(4n)) {
+            margin-right: 0;
+          }
 
-    .base-result-box-section__action-button:not(:nth-child(2n)) {
-      margin-right: $spacing;
+          .base-result-box-section__result-box:not(:nth-child(2n)) {
+            margin-right: $spacing;
+          }
+        }
+      }
     }
   }
 </style>
