@@ -299,13 +299,3 @@ export default {
     }
   }
 </style>
-
-<style lang="scss">
-  @import "../../styles/variables";
-
-  .file-select {
-    &:focus-within {
-      color: $app-color;
-    }
-  }
-</style>
