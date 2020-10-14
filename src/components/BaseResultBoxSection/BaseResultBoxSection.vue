@@ -127,7 +127,7 @@
           </template>
           <!-- ACTION BUTTON -->
           <BaseBoxButton
-            v-if="showActionButtonBox && !!actionInt"
+            v-if="showActionButtonBox && selectActive"
             :text="actionButtonText"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon="save-file"
@@ -137,7 +137,7 @@
             @clicked="submitAction" />
           <!-- EXPAND BUTTON -->
           <BaseBoxButton
-            v-else-if="!actionInt"
+            v-else-if="!selectActive"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon=""
             text=""
@@ -145,8 +145,9 @@
             class="base-result-box-section__action-button"
             @clicked="expandedInt = !expandedInt">
             <template v-slot>
+              <!-- needed to add v-if here again - otherwise strange side effects -->
               <div
-                v-if="!actionInt"
+                v-if="!selectActive"
                 class="base-result-box-section__expand-button__content">
                 <span
                   v-if="!expandedInt"
@@ -300,14 +301,6 @@ export default {
       default: null,
     },
     /**
-     * how many rows should be shown with show more button
-     * if specified a show more button will be available
-     */
-    maxShowMoreRows: {
-      type: Number,
-      default: 1,
-    },
-    /**
      * define if options should be shown
      */
     showOptions: {
@@ -351,14 +344,35 @@ export default {
       type: Number,
       default: null,
     },
+    /**
+     * set this true if only a limited number of boxes should be shown
+     * and rest can be displayed by clicking a "show more" button
+     */
     useExpandMode: {
       type: Boolean,
       default: true,
     },
+    /**
+     * how many rows should be shown with show more button
+     * if specified a show more button will be available
+     */
+    maxShowMoreRows: {
+      type: Number,
+      default: 1,
+    },
+    /**
+     * in 'expand mode' set the state of 'show more' from outside
+     */
     expanded: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Provide text that should be shown within the button with the
+     * expand / collapse functionality<br>
+     *   should be an object with props 'expand' for text to expand
+     *   and 'collapse' for text to collapse
+     */
     expandText: {
       type: Object,
       default: () => ({
@@ -386,33 +400,67 @@ export default {
     };
   },
   computed: {
+    /**
+     * variable to determine if select is active
+     * @returns {boolean}
+     */
     selectActive() {
       return !!this.actionInt;
     },
-    // computed property to lazy load base pagination if max rows was specified
+    /**
+     * computed property to lazy load base pagination if max rows was specified
+     * @returns {null|(function(): Module)}
+     */
     paginationComponent() {
       if (this.maxRows) {
         return () => import('../BasePagination/BasePagination');
       }
       return null;
     },
+    /**
+     * the number of items that should be visible on one page
+     * (if pagination is active)
+     * @returns {number}
+     */
     visibleNumberOfItems() {
+      if (this.useExpandMode) {
+        return (this.itemsPerRow * this.maxRows) - 1;
+      }
       return this.itemsPerRow * this.maxRows;
     },
+    /**
+     * number of pages (if pagination is active)
+     * @returns {number}
+     */
     pages() {
-      return Math.ceil(this.entryList.length / this.visibleNumberOfItems);
+      return Math.ceil((this.total || this.entryList.length) / this.visibleNumberOfItems);
     },
+    /**
+     * get the entries that should be displayed in the section -
+     * taking into consideration pagination and 'show more' functionality
+     * @returns {Object[]}
+     */
     visibleBoxes() {
-      debugger;
-      if (this.useExpandMode && !this.expandedInt && this.itemsPerRow < this.entryList.length) {
+      // if expand mode is used and status is collapsed and there
+      // are more items than can be displayed in the rows specified by 'show more'
+      // slice first few
+      if (this.useExpandMode && !this.expandedInt
+        && (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length) {
+        // slice from 0 to number of rows * items per row - 1 so that the button
+        // take the last box
         return this.entryList.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
       }
+      // else if pagination is active and items are not fetched from outside
+      // slice items fitting one page
       if (this.maxRows && !this.fetchItemsExternally) {
+        // slice taking into account current pagination and the total number of
+        // visible items
+        // if expand mode is used -1 to leave space for the 'collapse' button
         return this.entryList
           .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
-            (this.useExpandMode ? (this.currentPageNumber * this.visibleNumberOfItems) - 1
-              : this.currentPageNumber * this.visibleNumberOfItems));
+            this.currentPageNumber * this.visibleNumberOfItems);
       }
+      // else return complete list
       return this.entryList;
     },
   },
@@ -433,11 +481,14 @@ export default {
         this.currentPageNumber = val;
       }
     },
+    // if respective prop is set jump to top on page change
     currentPageNumber() {
       if (this.jumpToTop) {
         window.scrollTo(0, this.$el.offsetTop);
       }
     },
+    // if expanded variable is set from outside change
+    // internal variable accordingly
     expanded: {
       handler(val) {
         if (val !== this.expandedInt) {
@@ -451,6 +502,7 @@ export default {
       if (!val) {
         this.currentPageNumber = 1;
       }
+      // inform parent of internal change
       if (val !== this.expanded) {
         /**
          * event emitted on expand toggle - the .sync modifier can be used here
