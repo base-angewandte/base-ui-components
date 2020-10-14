@@ -165,7 +165,7 @@
         </div>
         <component
           :is="paginationComponent"
-          v-if="maxRows && pages > 1"
+          v-if="expandedInt && maxRows && pages > 1"
           key="pagination"
           :total="pages"
           :current="currentPageNumber"
@@ -305,7 +305,7 @@ export default {
      */
     maxShowMoreRows: {
       type: Number,
-      default: null,
+      default: 1,
     },
     /**
      * define if options should be shown
@@ -359,10 +359,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    numberOfCollapsedRows: {
-      type: Number,
-      default: 1,
-    },
     expandText: {
       type: Object,
       default: () => ({
@@ -407,13 +403,15 @@ export default {
       return Math.ceil(this.entryList.length / this.visibleNumberOfItems);
     },
     visibleBoxes() {
+      debugger;
       if (this.useExpandMode && !this.expandedInt && this.itemsPerRow < this.entryList.length) {
-        return this.entryList.slice(0, (this.itemsPerRow * this.numberOfCollapsedRows) - 1);
+        return this.entryList.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
       }
       if (this.maxRows && !this.fetchItemsExternally) {
         return this.entryList
           .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
-            this.currentPageNumber * this.visibleNumberOfItems);
+            (this.useExpandMode ? (this.currentPageNumber * this.visibleNumberOfItems) - 1
+              : this.currentPageNumber * this.visibleNumberOfItems));
       }
       return this.entryList;
     },
@@ -449,6 +447,10 @@ export default {
       immediate: true,
     },
     expandedInt(val) {
+      // reset current page number on collapse
+      if (!val) {
+        this.currentPageNumber = 1;
+      }
       if (val !== this.expanded) {
         /**
          * event emitted on expand toggle - the .sync modifier can be used here
