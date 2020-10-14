@@ -7,52 +7,56 @@
     :disabled="disabled"
     class="base-box-button"
     @clicked="clicked">
-    <div
-      v-if="boxStyle === 'large'"
-      class="button-box-content">
-      <div class="button-box-center">
+    <!-- @slot customize the button content instead of setting things via props -->
+    <slot>
+      <template>
         <div
-          class="button-box-image-row">
-          <div class="button-box-plus-container">
-            <base-icon
-              v-if="showPlus"
-              name="plus"
-              alt="add"
-              class="button-box-plus" />
+          v-if="boxStyle === 'large'"
+          class="button-box-content">
+          <div class="button-box-center">
+            <div
+              class="button-box-image-row">
+              <div class="button-box-plus-container">
+                <base-icon
+                  v-if="showPlus"
+                  name="plus"
+                  alt="add"
+                  class="button-box-plus" />
+              </div>
+              <div class="button-box-icon-container">
+                <base-icon
+                  v-if="icon"
+                  :name="icon"
+                  class="button-box-icon" />
+              </div>
+            </div>
+            <div class="button-box-text">
+              {{ text }}
+            </div>
           </div>
-          <div class="button-box-icon-container">
-            <base-icon
-              v-if="icon"
-              :name="icon"
-              class="button-box-icon" />
-          </div>
-        </div>
-        <div class="button-box-text">
-          {{ text }}
-        </div>
-      </div>
 
-      <div
-        ref="baseBoxSubtext"
-        :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
-        {{ subtext }}
-      </div>
-      <BaseBoxTooltip
-        v-if="showTooltip"
-        @clicked="onTooltip" />
-    </div>
-    <div
-      v-else
-      class="button-box-content-small">
-      <base-icon
-        v-if="icon"
-        :name="icon"
-        class="button-box-icon-small" />
-      <div class="button-box-text-small">
-        {{ text }}
-      </div>
-    </div>
-    <slot />
+          <div
+            ref="baseBoxSubtext"
+            :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
+            {{ subtext }}
+          </div>
+          <BaseBoxTooltip
+            v-if="showTooltip"
+            @clicked="onTooltip" />
+        </div>
+        <div
+          v-else
+          class="button-box-content-small">
+          <base-icon
+            v-if="icon"
+            :name="icon"
+            class="button-box-icon-small" />
+          <div class="button-box-text-small">
+            {{ text }}
+          </div>
+        </div>
+      </template>
+    </slot>
   </base-box>
 </template>
 
