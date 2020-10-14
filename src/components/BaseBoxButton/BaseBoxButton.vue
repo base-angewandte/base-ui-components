@@ -7,9 +7,8 @@
     :disabled="disabled"
     class="base-box-button"
     @clicked="clicked">
-    <!-- @slot customize the button content instead of setting things via props -->
-    <slot>
-      <template>
+    <template v-slot>
+      <slot>
         <div
           v-if="boxStyle === 'large'"
           class="button-box-content">
@@ -55,8 +54,8 @@
             {{ text }}
           </div>
         </div>
-      </template>
-    </slot>
+      </slot>
+    </template>
   </base-box>
 </template>
 
@@ -215,6 +214,16 @@ export default {
       cursor: pointer;
     }
 
+    &.base-box-button-disabled {
+      cursor: default;
+      color: $graytext-color;
+
+      &:hover {
+        color: $graytext-color !important;
+        box-shadow: none !important;
+      }
+    }
+
     .button-box-content {
       padding: $spacing;
       position: absolute;
@@ -276,30 +285,20 @@ export default {
         }
       }
     }
+  }
 
-    .button-box-content-small {
-      padding: $spacing;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
+  .button-box-content-small {
+    padding: $spacing;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 
-      .button-box-icon-small {
-        flex-shrink: 0;
-        margin-right: $spacing;
-        width: $icon-large;
-        max-height: $icon-large;
-      }
-    }
-
-    &.base-box-button-disabled {
-      cursor: default;
-      color: $graytext-color;
-
-      &:hover {
-        color: $graytext-color !important;
-        box-shadow: none !important;
-      }
+    .button-box-icon-small {
+      flex-shrink: 0;
+      margin-right: $spacing;
+      width: $icon-large;
+      max-height: $icon-large;
     }
   }
 </style>
