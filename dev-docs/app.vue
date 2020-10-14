@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!--
     <h1>BaseDetailBox bbb</h1>
     <div class="background">
       <base-box
@@ -81,6 +82,7 @@
         </div>
       </div>
     </BaseExpandBox>
+    -->
     <BaseResultBoxSection
       :entry-list="entriesList"
       :action="activeAction"
@@ -456,7 +458,7 @@
 <script>
 import axios from 'axios';
 
-import BaseBox from '@/components/BaseBox/BaseBox';
+// import BaseBox from '@/components/BaseBox/BaseBox';
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry';
 import BasePopUp from '@/components/BasePopUp/BasePopUp';
 import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
@@ -478,11 +480,11 @@ import BaseImageBox from '@/components/BaseImageBox/BaseImageBox';
 import BaseToggle from '@/components/BaseToggle/BaseToggle';
 import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar';
-import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-import BaseMap from '@/components/BaseMap/BaseMap';
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
-import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
-import BaseDetailBox from '@/components/BaseDetailBox/BaseDetailBox';
+// import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
+// import BaseMap from '@/components/BaseMap/BaseMap';
+// import BaseTextList from '@/components/BaseTextList/BaseTextList';
+// import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
+// import BaseDetailBox from '@/components/BaseDetailBox/BaseDetailBox';
 import BaseExpandRow from '@/components/BaseExpandRow/BaseExpandRow';
 
 export default {
@@ -508,14 +510,14 @@ export default {
     BaseInput,
     BaseButton,
     BaseDropBox,
-    BaseDetailBox,
+    // BaseDetailBox,
     BaseToggle,
     BaseProgressBar,
-    BaseCarousel,
-    BaseMap,
-    BaseExpandBox,
-    BaseTextList,
-    BaseBox,
+    // BaseCarousel,
+    // BaseMap,
+    // BaseExpandBox,
+    // BaseTextList,
+    // BaseBox,
   },
   data() {
     return {
@@ -606,6 +608,36 @@ export default {
         ],
       },
       entriesList: [
+        {
+          id: 'pCSLggvdsi8asfdsdfb3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'An extra extra long title',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          // eslint-disable-next-line global-require
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+        },
+        {
+          id: 'pCSLggvdsi8basdfsssssadf3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'An extra extra long title',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          // eslint-disable-next-line global-require
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+        },
+        {
+          id: 'pCSLggvdsddddi8b3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'An extra extra long title',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          // eslint-disable-next-line global-require
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+        },
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
           date_created: '2020-04-27T11:01:37.246606Z',
@@ -1514,10 +1546,6 @@ export default {
 
   .row {
     max-height: 300px;
-  }
-
-  div > .base-box-button {
-    margin: 8px;
   }
 
   button {

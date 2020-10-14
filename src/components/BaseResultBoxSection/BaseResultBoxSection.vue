@@ -125,10 +125,9 @@
                 @clicked="entrySelected(entry.id)" />
             </slot>
           </template>
-
           <!-- ACTION BUTTON -->
           <BaseBoxButton
-            v-if="showActionButtonBox && actionInt"
+            v-if="showActionButtonBox && !!actionInt"
             :text="actionButtonText"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon="save-file"
@@ -136,6 +135,33 @@
             box-type="button"
             class="base-result-box-section__action-button"
             @clicked="submitAction" />
+          <!-- EXPAND BUTTON -->
+          <BaseBoxButton
+            v-else-if="!actionInt"
+            :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
+            icon=""
+            text=""
+            box-type="button"
+            class="base-result-box-section__action-button"
+            @clicked="expandedInt = !expandedInt">
+            <template v-slot>
+              <div
+                v-if="!actionInt"
+                class="base-result-box-section__expand-button__content">
+                <span
+                  v-if="!expandedInt"
+                  class="base-result-box-section__expand-button__content-number">
+                  {{ `+${(total || entryList.length) - visibleBoxes.length}` }}
+                </span>
+                <span
+                  :class="[expandedInt
+                    ? 'base-result-box-section__expand-button__content-text-expanded'
+                    : 'base-result-box-section__expand-button__content-text-collapsed']">
+                  {{ expandedInt ? expandText.collapse : expandText.expand }}
+                </span>
+              </div>
+            </template>
+          </BaseBoxButton>
         </div>
         <component
           :is="paginationComponent"
@@ -151,12 +177,7 @@
 </template>
 
 <script>
-import BaseOptions from '../BaseOptions/BaseOptions';
-import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
-import BaseLoader from '../BaseLoader/BaseLoader';
-import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
-import BaseSelectOptions from '../BaseSelectOptions/BaseSelectOptions';
 import i18n from '../../mixins/i18n';
 
 /**
@@ -166,12 +187,12 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseResultBoxSection',
   components: {
-    BaseLoader,
-    BaseButton,
-    BaseOptions,
+    BaseLoader: () => import('../BaseLoader/BaseLoader'),
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    BaseOptions: () => import('../BaseOptions/BaseOptions'),
     BaseImageBox,
-    BaseBoxButton,
-    BaseSelectOptions,
+    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton'),
+    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions'),
   },
   mixins: [i18n],
   props: {
@@ -323,6 +344,32 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * add a number of total elements
+     */
+    total: {
+      type: Number,
+      default: null,
+    },
+    useExpandMode: {
+      type: Boolean,
+      default: true,
+    },
+    expanded: {
+      type: Boolean,
+      default: false,
+    },
+    numberOfCollapsedRows: {
+      type: Number,
+      default: 1,
+    },
+    expandText: {
+      type: Object,
+      default: () => ({
+        expand: 'more objects',
+        collapse: 'collapse',
+      }),
+    },
   },
   data() {
     return {
@@ -336,6 +383,10 @@ export default {
       currentPageNumber: 1,
       // a timeout for resize listener
       resizeTimeout: null,
+      // store the expand state internally
+      expandedInt: false,
+      // store collapsed state on action start
+      wasExpanded: false,
     };
   },
   computed: {
@@ -356,6 +407,9 @@ export default {
       return Math.ceil(this.entryList.length / this.visibleNumberOfItems);
     },
     visibleBoxes() {
+      if (this.useExpandMode && !this.expandedInt && this.itemsPerRow < this.entryList.length) {
+        return this.entryList.slice(0, (this.itemsPerRow * this.numberOfCollapsedRows) - 1);
+      }
       if (this.maxRows && !this.fetchItemsExternally) {
         return this.entryList
           .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
@@ -386,6 +440,24 @@ export default {
         window.scrollTo(0, this.$el.offsetTop);
       }
     },
+    expanded: {
+      handler(val) {
+        if (val !== this.expandedInt) {
+          this.expandedInt = val;
+        }
+      },
+      immediate: true,
+    },
+    expandedInt(val) {
+      if (val !== this.expanded) {
+        /**
+         * event emitted on expand toggle - the .sync modifier can be used here
+         * @event update:expanded
+         * @type { Boolean }
+         */
+        this.$emit('update:expanded', val);
+      }
+    },
   },
   mounted() {
     this.calcBoxNumber();
@@ -406,7 +478,12 @@ export default {
   },
   methods: {
     setAction(act) {
+      // store the collapsed state first
+      this.wasExpanded = this.expandedInt;
+      // if options are triggered the section should expand automatically
+      this.expandedInt = true;
       this.actionInt = act;
+      console.log(this.expandedInt);
       /**
        * event triggered when an action is selected (and boxes
        * are ready to be selected)
@@ -417,6 +494,9 @@ export default {
       this.$emit('set-action', act);
     },
     submitAction() {
+      // return to original collapsed state
+      this.expandedInt = this.wasExpanded;
+      this.actionInt = '';
       /**
        * event triggered when an action is triggered (after selecting boxes)
        *
@@ -427,6 +507,8 @@ export default {
     },
     cancelAction() {
       this.actionInt = '';
+      // return to original collapsed state
+      this.expandedInt = this.wasExpanded;
       /**
        * event triggered when an action cancelled
        *
@@ -529,6 +611,27 @@ export default {
 
         .base-result-box-section__result-box {
           margin-right: $spacing;
+        }
+
+        .base-result-box-section__expand-button__content {
+          display: flex;
+          width: 100%;
+          height: 100%;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          .base-result-box-section__expand-button__content-number {
+            color: $app-color;
+            font-size: $font-size-large;
+            font-weight: bold;
+          }
+
+          .base-result-box-section__expand-button__content-text-collapsed,
+          .base-result-box-section__expand-button__content-text-expanded:hover{
+            color: $app-color;
+          }
         }
       }
 
