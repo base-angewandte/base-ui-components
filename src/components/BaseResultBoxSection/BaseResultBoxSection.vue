@@ -16,6 +16,7 @@
         v-if="showHeader"
         class="base-result-box-section__header-row">
         <BaseOptions
+          v-if="showOptions"
           :show-options="showActions"
           @options-toggle="optionsToggle">
           <template v-slot:beforeOptions>
@@ -164,9 +165,8 @@
             </template>
           </BaseBoxButton>
         </div>
-        <component
-          :is="paginationComponent"
-          v-if="expandedInt && maxRows && pages > 1"
+        <BasePagination
+          v-if="(!useExpandMode || expandedInt) && maxRows && pages > 1"
           key="pagination"
           :total="pages"
           :current="currentPageNumber"
@@ -188,12 +188,13 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseResultBoxSection',
   components: {
-    BaseLoader: () => import('../BaseLoader/BaseLoader'),
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseOptions: () => import('../BaseOptions/BaseOptions'),
     BaseImageBox,
-    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton'),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions'),
+    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
+    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
+    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton').then(m => m.default || m),
+    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {
@@ -465,6 +466,7 @@ export default {
     },
   },
   watch: {
+    // watch prop action if set from outside
     action: {
       handler(val) {
         // update action if changed from outside and if not equal
@@ -497,6 +499,7 @@ export default {
       },
       immediate: true,
     },
+    // if internal value changes, reset page number and inform parent
     expandedInt(val) {
       // reset current page number on collapse
       if (!val) {
@@ -514,30 +517,32 @@ export default {
     },
   },
   mounted() {
+    // calculate the correct box number to start with
     this.calcBoxNumber();
     // need to get the correct number of boxes per row to calculate the visible
     // number of items correctly
-    window.addEventListener('resize', () => {
-      // check if there is a timeout already set and clear it if yes
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = null;
-      }
-      if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
-        this.resizeTimeout = setTimeout(() => {
-          this.calcBoxNumber();
-        }, 500);
-      }
-    });
+    window.addEventListener('resize', this.resizeBoxes);
+  },
+  destroyed() {
+    // remove event listener from window
+    window.removeEventListener('resize', this.resizeBoxes);
   },
   methods: {
+    /**
+     * triggered when an action is selected (=button is clicked) and the
+     * select mode is triggered
+     *
+     * using custom options this function can be triggered within
+     * the option-buttons slot-scope
+     *
+     * @param {string} act the action triggered (e.g. 'delete')
+     */
     setAction(act) {
       // store the collapsed state first
       this.wasExpanded = this.expandedInt;
       // if options are triggered the section should expand automatically
       this.expandedInt = true;
       this.actionInt = act;
-      console.log(this.expandedInt);
       /**
        * event triggered when an action is selected (and boxes
        * are ready to be selected)
@@ -547,9 +552,14 @@ export default {
        */
       this.$emit('set-action', act);
     },
+    /**
+     * function triggered when items were selected and user has
+     * clicked action button to go through with the action
+     */
     submitAction() {
       // return to original collapsed state
       this.expandedInt = this.wasExpanded;
+      // reset the action string
       this.actionInt = '';
       /**
        * event triggered when an action is triggered (after selecting boxes)
@@ -559,7 +569,12 @@ export default {
        */
       this.$emit('submit-action', this.actionInt);
     },
+    /**
+     * function triggered when the user cancels the selected action and
+     * returns to non-select mode
+     */
     cancelAction() {
+      // reset the action string
       this.actionInt = '';
       // return to original collapsed state
       this.expandedInt = this.wasExpanded;
@@ -570,10 +585,22 @@ export default {
        */
       this.$emit('cancel-action');
     },
+    /**
+     * toggling of options when options are behind a 'options' button
+     *
+     * @param {Boolean} actionsVisible true for open, false for close
+     */
     optionsToggle(actionsVisible) {
+      // reset the actions string
       this.actionInt = '';
+      // set the component internal showActions variable in sync
       this.showActions = actionsVisible;
     },
+    /**
+     * function triggered when page in pagination component is selected
+     *
+     * @param {number} number - the selected page number
+     */
     setPage(number) {
       this.currentPageNumber = number;
       /**
@@ -584,9 +611,24 @@ export default {
        */
       this.$emit('fetch-items', number);
     },
-    getI18nString(string, count, variables) {
+    /**
+     * get an internationalized string
+     *
+     * @param {string} string to look up in a Locale messages file
+     * @param {number} count - for pluralization
+     * @param {Object} variables - locale string variables object
+     * @returns {string}
+     */
+    getI18nString(string, count = -1, variables = {}) {
       return this.getI18nTerm(string, count, variables);
     },
+    /**
+     * triggered when an entry is selected or is clicked upon
+     *
+     * @param {string} entryId - the entry id of the selected entry
+     * @param {boolean} [selected=undefined] - not provided and thus undefined
+     * if entry was clicked
+     */
     entrySelected(entryId, selected = undefined) {
       /**
        * event emitted from default image box when clicked
@@ -598,6 +640,12 @@ export default {
        */
       this.$emit('entry-selected', { entryId, selected });
     },
+    /**
+     * function triggered when selecteAll was clicked in select mode
+     *
+     * @param {boolean} selectAll - true if everything was selected,
+     * false if everything was deselected
+     */
     selectAllTriggered(selectAll) {
       /**
        * event emitted on 'select all' button click
@@ -606,11 +654,30 @@ export default {
        */
       this.$emit('all-selected', selectAll);
     },
+    /**
+     * calculate the box number according to available space
+     */
     calcBoxNumber() {
       if (this.$refs && this.$refs.resultBoxesArea) {
         const totalWidth = this.$refs.resultBoxesArea.clientWidth;
         const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
         this.itemsPerRow = Math.floor(totalWidth / boxWidth);
+      }
+    },
+    /**
+     * timeout function for resize event to limit the number of times
+     * box number is recalculated
+     */
+    resizeBoxes() {
+      // check if there is a timeout already set and clear it if yes
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = null;
+      }
+      if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
+        this.resizeTimeout = setTimeout(() => {
+          this.calcBoxNumber();
+        }, 500);
       }
     },
   },
