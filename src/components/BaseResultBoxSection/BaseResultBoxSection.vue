@@ -58,6 +58,7 @@
                 @clicked="cancelAction" />
               <BaseButton
                 :text="actionButtonText"
+                :description="`${messageText}. ${messageSubtext}`"
                 icon-size="large"
                 icon="save-file"
                 button-style="single"
@@ -106,6 +107,7 @@
             v-for="(entry, index) of visibleBoxes"
             :key="entry.id"
             :tabindex="selectActive ? -1 : 0"
+            :aria-label="entry.title"
             class="base-result-box-section__result-box">
             <!-- @slot result-box - for custom result boxes -->
             <slot

@@ -90,8 +90,6 @@
       :selected-list="selectedBoxes"
       :max-rows="2"
       :use-expand-mode="false"
-      message-text="delete linked"
-      message-subtext="delete linked"
       option-button-text="delete linked"
       action-button-text="delete"
       cancel-text="cancel"
