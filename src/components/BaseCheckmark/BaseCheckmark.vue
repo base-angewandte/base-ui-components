@@ -3,6 +3,7 @@
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
     @click.stop="clicked">
     <input
+      :id="internalId"
       v-model="checkedInt"
       :name="label"
       :value="label"
@@ -20,12 +21,13 @@
         name="check-mark" />
     </div>
     <label
-      :for="label"
+      :for="internalId"
       :class="['base-checkbox-labeltext', { 'hide': !showLabel }]">{{ label }}</label>
   </div>
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
@@ -96,6 +98,11 @@ export default {
     return {
       checkedInt: false,
     };
+  },
+  computed: {
+    internalId() {
+      return createId();
+    },
   },
   watch: {
     checked: {
