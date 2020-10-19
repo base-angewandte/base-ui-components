@@ -88,6 +88,8 @@
       :action="activeAction"
       :is-loading="false"
       :selected-list="selectedBoxes"
+      :max-rows="2"
+      :use-expand-mode="false"
       message-text="delete linked"
       message-subtext="delete linked"
       option-button-text="delete linked"
@@ -608,6 +610,16 @@ export default {
         ],
       },
       entriesList: [
+        {
+          id: 'pCSLggvdsi8asfdsrrrrrdfb3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'An extra extra long title',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          // eslint-disable-next-line global-require
+          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+        },
         {
           id: 'pCSLggvdsi8asfdsdfb3zRTLM4dJR',
           date_created: '2020-04-27T11:01:37.246606Z',

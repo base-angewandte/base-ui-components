@@ -141,7 +141,7 @@
             @clicked="submitAction" />
           <!-- EXPAND BUTTON -->
           <BaseBoxButton
-            v-else-if="!selectActive && expandNeeded"
+            v-else-if="useExpandMode && !selectActive && expandNeeded"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon=""
             text=""
@@ -427,7 +427,7 @@ export default {
      * @returns {number}
      */
     visibleNumberOfItems() {
-      if (this.useExpandMode) {
+      if (this.useExpandMode || this.actionInt) {
         return (this.itemsPerRow * this.maxRows) - 1;
       }
       return this.itemsPerRow * this.maxRows;
@@ -461,7 +461,6 @@ export default {
       if (this.maxRows && !this.fetchItemsExternally) {
         // slice taking into account current pagination and the total number of
         // visible items
-        // if expand mode is used -1 to leave space for the 'collapse' button
         return this.entryList
           .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
             this.currentPageNumber * this.visibleNumberOfItems);
@@ -720,7 +719,7 @@ export default {
           font-size: $font-size-regular;
           color: $font-color-second;
           font-weight: normal;
-          margin: $spacing;
+          margin: 0;
         }
 
         .base-result-box-section__result-options {
