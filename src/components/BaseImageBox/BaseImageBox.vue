@@ -132,7 +132,7 @@ import BaseBox from '../BaseBox/BaseBox';
 export default {
   name: 'BaseImageBox',
   components: {
-    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark'),
+    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
     BaseBox,
   },
   props: {
