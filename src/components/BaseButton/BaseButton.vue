@@ -2,6 +2,7 @@
   <button
     :disabled="disabled"
     :aria-disabled="disabled"
+    :aria-describedby="internalId"
     :type="buttonType"
     :style="{ justifyContent: alignText }"
     :class="['base-button',
@@ -31,10 +32,18 @@
     <BaseBoxTooltip
       v-if="showTooltip"
       @clicked="clicked" />
+    <span
+      v-if="description"
+      :id="internalId"
+      :aria-hidden="true"
+      class="hide">
+      {{ description }}
+    </span>
   </button>
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
@@ -157,6 +166,18 @@ export default {
     showTooltip: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * Add a button description to be used by aria-describedby
+     */
+    description: {
+      type: String,
+      default: '',
+    },
+  },
+  computed: {
+    internalId() {
+      return createId();
     },
   },
   methods: {

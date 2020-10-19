@@ -8,15 +8,18 @@ const executeFire = function(){
 <div style="display: flex;">
   <base-button
     text="No Icon"
+    description="i'm a button with no icon example"
     style="margin-right: 16px;"
     @clicked="executeFire"/>
   <base-button
     style="margin-right: 16px;"
+    description="a buttton with a small icon example"
     icon="waste-bin"
     text="Small Icon"
     @clicked="executeFire"/>
   <base-button
     style="margin-right: 16px;"
+    description="button with large icon example"
     icon="waste-bin"
     icon-size="large"
     text="Large Icon"
@@ -34,7 +37,8 @@ const executeFire = function(){
 
 <div style="display: flex; background-color: rgb(240, 240, 240); padding: 16px;">
   <base-button
-    text="Small Icon"
+    text="Small Icon Right"
+    description="button with small icon right example"
     style="margin-right: 16px;"
     icon="save-file"
     icon-position="right"
