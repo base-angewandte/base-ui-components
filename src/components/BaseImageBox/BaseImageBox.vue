@@ -112,6 +112,7 @@
         <BaseCheckmark
           v-if="selectable"
           :checked="selectedInt"
+          :label="title"
           mark-style="checkbox"
           check-box-size="large"
           class="base-image-box-checkbox"
@@ -122,7 +123,6 @@
 </template>
 <script>
 import BaseBox from '../BaseBox/BaseBox';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 /**
  * A component with the primary purpose to display
@@ -132,7 +132,7 @@ import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 export default {
   name: 'BaseImageBox',
   components: {
-    BaseCheckmark,
+    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark'),
     BaseBox,
   },
   props: {
