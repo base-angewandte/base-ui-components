@@ -200,7 +200,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default: () => ({ width: '200px', height: '200px' }),
+      default: () => ({ width: 'auto', height: 'auto' }),
     },
     /**
      * specify any text that should be displayed instead of an image;

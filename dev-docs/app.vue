@@ -1600,14 +1600,6 @@ export default {
     padding: 16px;
   }
 
-  .base-box {
-    margin-right: 16px;
-  }
-
-  .base-box:nth-of-type(4n) {
-    margin-right: 0;
-  }
-
   .example-text {
     position: absolute;
     left: 50%;

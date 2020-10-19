@@ -145,12 +145,10 @@ An example with custom ImageBoxes and demonstrating other slots
           :key="props.item.id"
           :selectable="props.selectActive"
           :selected="selectedBoxes.map(entry => entry.id || entry).includes(props.item.id)"
-          :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
           :title="props.item.parent.title"
           :subtext="props.item.parent.subtitle"
           :description="props.item.parent.type.label.en"
           :image-url="props.item.parent.image"
-          class="result-box"
           show-title
           @select-triggered="entrySelected(props.item.id, $event)" />
       </template>
@@ -176,6 +174,40 @@ export default {
     entriesList: [
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          parent: {
+            id: '8MuVSYmDy5wdRAvxpqrKsV',
+            title: 'Item 1',
+            subtitle: 'More text',
+            type: {
+              label: {
+                de: 'Album',
+                en: 'album',
+              },
+              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+            },
+            image: 'https://placeimg.com/460/341/people',
+          },
+        },
+        {
+          id: 'pCSLggvdsi8b3zRThhhhLM4dJR',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          parent: {
+            id: '8MuVSYmDy5wdRAvxpqrKsV',
+            title: 'Item 1',
+            subtitle: 'More text',
+            type: {
+              label: {
+                de: 'Album',
+                en: 'album',
+              },
+              source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+            },
+            image: 'https://placeimg.com/460/341/people',
+          },
+        },
+        {
+          id: 'pCSLggvdsi8ffffb3zRTLM4dJR',
           date_created: '2020-04-27T11:01:37.246606Z',
           parent: {
             id: '8MuVSYmDy5wdRAvxpqrKsV',
@@ -252,11 +284,6 @@ export default {
     padding: 16px;
     background: rgb(240, 240, 240);
   }
-
-  .result-box {
-    margin-right: 16px;
-  }
-
   .header-text {
     margin: 0;
   }

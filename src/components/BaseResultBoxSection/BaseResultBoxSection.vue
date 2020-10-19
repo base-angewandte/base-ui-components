@@ -98,12 +98,15 @@
           :selected-list="selectedList"
           @selected="selectAllTriggered" />
         <!-- BOXAREA -->
-        <div
+        <ul
           :key="headerText + '_boxArea'"
           ref="resultBoxesArea"
           class="base-result-box-section__box-area">
-          <template
-            v-for="(entry, index) of visibleBoxes">
+          <li
+            v-for="(entry, index) of visibleBoxes"
+            :key="entry.id"
+            :tabindex="selectActive ? _ -1 : 0"
+            class="base-result-box-section__result-box">
             <!-- @slot result-box - for custom result boxes -->
             <slot
               :item="entry"
@@ -114,18 +117,18 @@
                 :key="entry.id"
                 :selectable="selectActive"
                 :selected="selectedList.map(entry => entry.id || entry).includes(entry.id)"
-                :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
+                :box-size="{ width: 'auto' }"
                 :box-ratio="100"
                 :title="entry.title"
                 :subtext="entry.subtitle"
                 :description="entry.description"
                 :image-url="entry.imageUrl"
                 :box-text="entry.text"
-                class="base-result-box-section__result-box"
                 @select-triggered="entrySelected(entry.id, $event)"
                 @clicked="entrySelected(entry.id)" />
             </slot>
-          </template>
+          </li>
+
           <!-- ACTION BUTTON -->
           <BaseBoxButton
             v-if="showActionButtonBox && selectActive"
@@ -134,7 +137,7 @@
             icon="save-file"
             box-style="small"
             box-type="button"
-            class="base-result-box-section__action-button"
+            class="base-result-box-section__result-box"
             @clicked="submitAction" />
           <!-- EXPAND BUTTON -->
           <BaseBoxButton
@@ -143,7 +146,7 @@
             icon=""
             text=""
             box-type="button"
-            class="base-result-box-section__action-button"
+            class="base-result-box-section__result-box"
             @clicked="expandedInt = !expandedInt">
             <template v-slot>
               <!-- needed to add v-if here again - otherwise strange side effects -->
@@ -164,7 +167,7 @@
               </div>
             </template>
           </BaseBoxButton>
-        </div>
+        </ul>
         <BasePagination
           v-if="(!useExpandMode || expandedInt) && maxRows && pages > 1"
           key="pagination"
@@ -715,7 +718,7 @@ export default {
           font-size: $font-size-regular;
           color: $font-color-second;
           font-weight: normal;
-          margin: 0;
+          margin: $spacing;
         }
 
         .base-result-box-section__result-options {
@@ -731,6 +734,19 @@ export default {
         flex-wrap: wrap;
 
         .base-result-box-section__result-box {
+          // subtracted 0.01rem for edge
+          flex: 0 0 calc(25% - #{$spacing-small} - #{$spacing-small/2} - 0.01rem);
+
+          &:focus {
+            outline: 1px solid $app-color;
+          }
+        }
+
+        .base-result-box-section__result-box:nth-child(n + 5) {
+          margin-top: $spacing;
+        }
+
+        .base-result-box-section__result-box:not(:nth-child(4n)) {
           margin-right: $spacing;
         }
 
@@ -800,29 +816,27 @@ export default {
     }
   }
 
-  .base-result-box-section__action-button:nth-child(n + 5) {
-    margin-top: $spacing;
-  }
-
-  .base-result-box-section__action-button:not(:nth-child(4n)) {
-    margin-right: $spacing;
-  }
-
   @media screen and (max-width: $tablet) {
-    .base-result-box-section__action-button {
-      flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
-    }
+    .base-result-box-section {
+      .base-result-box-section__area {
+        .base-result-box-section__box-area {
+          .base-result-box-section__result-box {
+            flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
+          }
 
-    .base-result-box-section__action-button:nth-child(n + 3) {
-      margin-top: $spacing;
-    }
+          .base-result-box-section__result-box:nth-child(n + 3) {
+            margin-top: $spacing;
+          }
 
-    .base-result-box-section__action-button:not(:nth-child(4n)) {
-      margin-right: 0;
-    }
+          .base-result-box-section__result-box:not(:nth-child(4n)) {
+            margin-right: 0;
+          }
 
-    .base-result-box-section__action-button:not(:nth-child(2n)) {
-      margin-right: $spacing;
+          .base-result-box-section__result-box:not(:nth-child(2n)) {
+            margin-right: $spacing;
+          }
+        }
+      }
     }
   }
 </style>
