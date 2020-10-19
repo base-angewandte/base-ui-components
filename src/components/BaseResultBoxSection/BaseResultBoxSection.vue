@@ -105,7 +105,7 @@
           <li
             v-for="(entry, index) of visibleBoxes"
             :key="entry.id"
-            :tabindex="selectActive ? _ -1 : 0"
+            :tabindex="selectActive ? -1 : 0"
             class="base-result-box-section__result-box">
             <!-- @slot result-box - for custom result boxes -->
             <slot
