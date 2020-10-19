@@ -141,7 +141,7 @@
             @clicked="submitAction" />
           <!-- EXPAND BUTTON -->
           <BaseBoxButton
-            v-else-if="!selectActive"
+            v-else-if="!selectActive && expandNeeded"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon=""
             text=""
@@ -439,6 +439,9 @@ export default {
     pages() {
       return Math.ceil((this.total || this.entryList.length) / this.visibleNumberOfItems);
     },
+    expandNeeded() {
+      return (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length;
+    },
     /**
      * get the entries that should be displayed in the section -
      * taking into consideration pagination and 'show more' functionality
@@ -448,8 +451,7 @@ export default {
       // if expand mode is used and status is collapsed and there
       // are more items than can be displayed in the rows specified by 'show more'
       // slice first few
-      if (this.useExpandMode && !this.expandedInt
-        && (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length) {
+      if (this.useExpandMode && !this.expandedInt && this.expandNeeded) {
         // slice from 0 to number of rows * items per row - 1 so that the button
         // take the last box
         return this.entryList.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
