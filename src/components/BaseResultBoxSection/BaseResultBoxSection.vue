@@ -16,7 +16,7 @@
         v-if="showHeader"
         class="base-result-box-section__header-row">
         <BaseOptions
-          v-if="showOptions"
+          v-if="showOptions || draggable"
           :show-options="showActions"
           @options-toggle="optionsToggle">
           <template v-slot:beforeOptions>
@@ -29,26 +29,44 @@
               </h3>
             </slot>
           </template>
+          <!-- ACTIONS FOR BOXES -->
           <template
-            v-if="showOptions"
             v-slot:options>
+            <!-- show options as long as no action was activated -->
             <div
-              v-if="!selectActive"
+              v-if="!actionInt"
               class="base-result-box-section__result-options">
-              <!-- @slot to add custom options buttons -->
+              <!-- TODO: drag functionality is hidden from keyboard users
+              until solution for making draggable accessible is implemented
+               e.g. use $event information to activate select mode? -->
+              <!-- DRAG OPTION -->
+              <BaseButton
+                v-if="draggable"
+                :text="optionButtonText.drag"
+                :aria-hidden="true"
+                tabindex="-1"
+                icon="drag-n-drop"
+                icon-size="large"
+                @clicked="setAction('drag')" />
+              <!-- slot to add further options -->
+              <!-- @slot to add custom options buttons, otherwise there is a delete option unless
+               showOptions is set false -->
               <slot
                 :set-action="setAction"
                 name="option-buttons">
+                <!-- default option: delete -->
                 <BaseButton
-                  :text="optionButtonText"
+                  v-if="showOptions && !draggableActive"
+                  :text="optionButtonText.delete"
                   icon-size="large"
                   icon="waste-bin"
                   button-style="single"
                   @clicked="setAction('delete')" />
               </slot>
             </div>
+            <!-- if action was activated show a cancel and submit action button instead -->
             <div
-              v-else
+              v-else-if="!!actionInt"
               class="base-result-box-section__result-options">
               <BaseButton
                 :text="cancelText"
@@ -57,7 +75,7 @@
                 button-style="single"
                 @clicked="cancelAction" />
               <BaseButton
-                :text="actionButtonText"
+                :text="actionButtonText[actionInt]"
                 :description="`${messageText}. ${messageSubtext}`"
                 icon-size="large"
                 icon="save-file"
@@ -69,11 +87,13 @@
       </div>
 
       <!-- ACTION AREA -->
+      <!-- transition group to animate the message area -->
       <transition-group
         tag="div"
         name="slide">
+        <!-- MESSAGE AREA -->
         <div
-          v-if="selectActive"
+          v-if="!!actionInt"
           :key="headerText + '_messageArea'"
           class="base-result-box-section__message-area">
           <div class="base-result-box-section__message-area-text">
@@ -85,6 +105,8 @@
           <!-- @slot add a custom element after the message area -->
           <slot name="options-message-area-after" />
         </div>
+        <!-- adding a indicator of how many items are selected and 'select all' button
+        only shown in select mode -->
         <BaseSelectOptions
           v-if="selectActive"
           :key="headerText + '_selectOptions'"
@@ -98,17 +120,26 @@
           :list="entryList"
           :selected-list="selectedList"
           @selected="selectAllTriggered" />
+
         <!-- BOXAREA -->
-        <ul
+        <!-- implemented with vue component tag to only load draggable if
+        it is actually needed -->
+        <component
+          :is="draggableComponent"
           :key="headerText + '_boxArea'"
           ref="resultBoxesArea"
+          v-model="draggedList"
+          tag="ul"
           class="base-result-box-section__box-area">
+          <!-- TODO: try to add vue transition-group -->
           <li
             v-for="(entry, index) of visibleBoxes"
             :key="entry.id"
             :tabindex="selectActive ? -1 : 0"
             :aria-label="entry.title"
-            class="base-result-box-section__result-box">
+            :class="['base-result-box-section__box',
+                     'base-result-box-section__result-box',
+                     { 'base-result-box-section__result-box-draggable': draggableActive }]">
             <!-- @slot result-box - for custom result boxes -->
             <slot
               :item="entry"
@@ -133,22 +164,22 @@
 
           <!-- ACTION BUTTON -->
           <BaseBoxButton
-            v-if="showActionButtonBox && selectActive"
-            :text="actionButtonText"
+            v-if="showActionButtonBox && !!actionInt"
+            :text="actionButtonText[actionInt]"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon="save-file"
             box-style="small"
             box-type="button"
-            class="base-result-box-section__result-box"
+            class="base-result-box-section__box"
             @clicked="submitAction" />
           <!-- EXPAND BUTTON -->
           <BaseBoxButton
-            v-else-if="useExpandMode && !selectActive && expandNeeded"
+            v-else-if="useExpandMode && !draggableActive && !selectActive && expandNeeded"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon=""
             text=""
             box-type="button"
-            class="base-result-box-section__result-box"
+            class="base-result-box-section__box"
             @clicked="expandedInt = !expandedInt">
             <template v-slot>
               <!-- needed to add v-if here again - otherwise strange side effects -->
@@ -169,9 +200,16 @@
               </div>
             </template>
           </BaseBoxButton>
-        </ul>
+        </component>
+
+        <!-- PAGINATION -->
+        <!-- only shown if
+        * not draggable active
+        * expand mode is not used or boxes are expanded
+        * there is a number of max rows specified
+        * and it is actually needed because there is more than one page -->
         <BasePagination
-          v-if="(!useExpandMode || expandedInt) && maxRows && pages > 1"
+          v-if="!draggableActive && (!useExpandMode || expandedInt) && maxRows && pages > 1"
           key="pagination"
           :total="pages"
           :current="currentPageNumber"
@@ -183,6 +221,7 @@
 </template>
 
 <script>
+import Draggable from 'vuedraggable';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 
@@ -194,6 +233,7 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
+    Draggable,
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
     BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
     BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
@@ -202,6 +242,10 @@ export default {
     BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
   },
   mixins: [i18n],
+  model: {
+    prop: 'entryList',
+    event: 'entries-changed',
+  },
   props: {
     /**
      * title of section
@@ -211,6 +255,8 @@ export default {
       default: '',
     },
     /**
+     * @model
+     *
      * actual entries list - if slot result-box is not used to use custom elements this
      * object array should have the following properties to be displayed
      * in a [BaseImageBox](#baseimagebox):<br>
@@ -243,18 +289,30 @@ export default {
       default: 'Please select the relevant items:',
     },
     /**
-     * if slot (options) is not used this text is used for the option button text
+     * if slot (options) is not used this text is used for the option button text<br>
+     *   it should be an object with the actions needed, so if showOptions is true and no
+     *   custom options are used at least text is needed for delete,
+     *   but if 'draggable' is true also a 'drag' text is needed
      */
     optionButtonText: {
-      type: String,
-      default: 'Delete',
+      type: Object,
+      default: () => ({
+        delete: 'Delete',
+        drag: 'Order',
+      }),
     },
     /**
-     * customize the action text of the submit button
+     * customize the action text of the submit button<br>
+     *   it should be an object with the actions needed, so if showOptions is true and no
+     *   custom options are used at least text is needed for delete,
+     *   but if 'draggable' is true also a 'drag' text is needed
      */
     actionButtonText: {
-      type: String,
-      default: 'Delete',
+      type: Object,
+      default: () => ({
+        delete: 'Delete',
+        drag: 'Save',
+      }),
     },
     /**
      * customize the cancel button message
@@ -293,7 +351,7 @@ export default {
       default: () => [],
     },
     /**
-     * define entry type (currently media or entry
+     * define entry type (currently media or entry)
      */
     entryType: {
       type: String,
@@ -314,13 +372,6 @@ export default {
       default: true,
     },
     /**
-     * specify total item number
-     */
-    maxItemNumber: {
-      type: Number,
-      default: null,
-    },
-    /**
      * specifiy if filling the entryList will be fetched from outside on page
      * change or list is complete and can be done by slicing relevant items from
      * entryList
@@ -330,7 +381,8 @@ export default {
       default: false,
     },
     /**
-     * if false the header row (title and options) will not be available
+     * if false the header row (title and options) will not be available<br>
+     *   caveat: for draggable functionality this needs to be true
      */
     showHeader: {
       type: Boolean,
@@ -360,7 +412,6 @@ export default {
     },
     /**
      * how many rows should be shown with show more button
-     * if specified a show more button will be available
      */
     maxShowMoreRows: {
       type: Number,
@@ -386,6 +437,13 @@ export default {
         collapse: 'collapse',
       }),
     },
+    /**
+     * determine if boxes can be dragged
+     */
+    draggable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -403,6 +461,9 @@ export default {
       expandedInt: false,
       // store collapsed state on action start
       wasExpanded: false,
+      // a variable to store the reorder information until
+      // 'save' is clicked
+      draggedList: [],
     };
   },
   computed: {
@@ -411,17 +472,7 @@ export default {
      * @returns {boolean}
      */
     selectActive() {
-      return !!this.actionInt;
-    },
-    /**
-     * computed property to lazy load base pagination if max rows was specified
-     * @returns {null|(function(): Module)}
-     */
-    paginationComponent() {
-      if (this.maxRows) {
-        return () => import('../BasePagination/BasePagination');
-      }
-      return null;
+      return !this.draggableActive && !!this.actionInt;
     },
     /**
      * the number of items that should be visible on one page
@@ -441,6 +492,10 @@ export default {
     pages() {
       return Math.ceil((this.total || this.entryList.length) / this.visibleNumberOfItems);
     },
+    /**
+     * determines if the total number of entries exceedes the number of entries that
+     * can be displayed and thus if an expand button is needed
+     */
     expandNeeded() {
       return (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length;
     },
@@ -450,6 +505,9 @@ export default {
      * @returns {Object[]}
      */
     visibleBoxes() {
+      if (this.draggableActive) {
+        return this.draggedList;
+      }
       // if expand mode is used and status is collapsed and there
       // are more items than can be displayed in the rows specified by 'show more'
       // slice first few
@@ -469,6 +527,29 @@ export default {
       }
       // else return complete list
       return this.entryList;
+    },
+    /**
+     * to lazy load vuedraggable only if draggable mode is set true
+     *
+     * @returns {string|(function(): Promise<U>)}
+     */
+    draggableComponent() {
+      if (this.draggable && this.draggableActive) {
+        return () => import('vuedraggable').then(m => (m.default || m));
+      }
+      return 'ul';
+    },
+    /**
+     * is draggable mode active
+     *
+     * attention: should this be at some point changed to be settable from
+     // outside (= a prop) this leads to problem with calculating the correct
+     // number for itemsPerRow in calcBoxNumber on mounted
+     *
+     * @returns {boolean}
+     */
+    draggableActive() {
+      return this.actionInt === 'drag';
     },
   },
   watch: {
@@ -521,6 +602,23 @@ export default {
         this.$emit('update:expanded', val);
       }
     },
+    // watch the entry entriesList for changes so draggedList needed for
+    // drag mode is up to date
+    entryList: {
+      handler(val) {
+        if (this.draggable && JSON.stringify(val) !== JSON.stringify(this.draggedList)) {
+          this.draggedList = [...val];
+        }
+      },
+      immediate: true,
+    },
+    // if draggedList was changed via v-model of draggable component
+    // update also visible boxes
+    draggedList(val) {
+      if (JSON.stringify(val) !== JSON.stringify(this.visibleBoxes)) {
+        this.visibleBoxes = [...val];
+      }
+    },
   },
   mounted() {
     // calculate the correct box number to start with
@@ -565,15 +663,27 @@ export default {
     submitAction() {
       // return to original collapsed state
       this.expandedInt = this.wasExpanded;
+      // special case drag
+      if (this.actionInt === 'drag') {
+        /**
+         * event emited when entry order was changed (draggable mode)
+         * entryList is automatically updated with v-model
+         *
+         * @event entries-changed
+         * @type {Object[]}
+         */
+        this.$emit('entries-changed', this.draggedList);
+      } else {
+        /**
+         * event triggered when an action is triggered (after selecting boxes)
+         *
+         * @event submit-action
+         * @param {string} actionInt - the action type
+         */
+        this.$emit('submit-action', this.actionInt);
+      }
       // reset the action string
       this.actionInt = '';
-      /**
-       * event triggered when an action is triggered (after selecting boxes)
-       *
-       * @event submit-action
-       * @param {string} actionInt - the action type
-       */
-      this.$emit('submit-action', this.actionInt);
     },
     /**
      * function triggered when the user cancels the selected action and
@@ -664,9 +774,14 @@ export default {
      * calculate the box number according to available space
      */
     calcBoxNumber() {
-      if (this.$refs && this.$refs.resultBoxesArea) {
-        const totalWidth = this.$refs.resultBoxesArea.clientWidth;
-        const boxWidth = this.$refs.resultBoxesArea.children[0].clientWidth;
+      // get the resultBoxesArea element which is either a native element or
+      // if draggable is true a vue component
+      const resultBoxesElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
+        ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
+      // if the element has children (= boxes are rendered) calculate items per row
+      if (resultBoxesElement && resultBoxesElement.children && resultBoxesElement.children.length) {
+        const totalWidth = resultBoxesElement.clientWidth;
+        const boxWidth = resultBoxesElement.children[0].clientWidth;
         this.itemsPerRow = Math.floor(totalWidth / boxWidth);
       }
     },
@@ -680,7 +795,14 @@ export default {
         clearTimeout(this.resizeTimeout);
         this.resizeTimeout = null;
       }
-      if (this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.children.length) {
+      // get the resultBoxesArea element which can be a native HTML element or
+      // if draggable is used a vue component
+      const boxesAreaElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
+        ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
+      // check if element has children (= boxes are rendered)
+      if (boxesAreaElement && boxesAreaElement.children
+        && boxesAreaElement.children.length) {
+        // if yes set timeout to recalculate box number after
         this.resizeTimeout = setTimeout(() => {
           this.calcBoxNumber();
         }, 500);
@@ -736,7 +858,7 @@ export default {
         flex-direction: row;
         flex-wrap: wrap;
 
-        .base-result-box-section__result-box {
+        .base-result-box-section__box {
           // subtracted 0.01rem for edge
           flex: 0 0 calc(25% - #{$spacing-small} - #{$spacing-small/2} - 0.01rem);
 
@@ -745,11 +867,20 @@ export default {
           }
         }
 
-        .base-result-box-section__result-box:nth-child(n + 5) {
+        .base-result-box-section__result-box {
+          // TODO: try to add transition... (was not working for some reason)
+          box-shadow: $box-shadow-reg;
+        }
+
+        .base-result-box-section__result-box-draggable {
+          box-shadow: 0px 0px 12px 2px rgba(0, 0, 0, 0.25)
+        }
+
+        .base-result-box-section__box:nth-child(n + 5) {
           margin-top: $spacing;
         }
 
-        .base-result-box-section__result-box:not(:nth-child(4n)) {
+        .base-result-box-section__box:not(:nth-child(4n)) {
           margin-right: $spacing;
         }
 
@@ -823,19 +954,19 @@ export default {
     .base-result-box-section {
       .base-result-box-section__area {
         .base-result-box-section__box-area {
-          .base-result-box-section__result-box {
+          .base-result-box-section__box {
             flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
           }
 
-          .base-result-box-section__result-box:nth-child(n + 3) {
+          .base-result-box-section__box:nth-child(n + 3) {
             margin-top: $spacing;
           }
 
-          .base-result-box-section__result-box:not(:nth-child(4n)) {
+          .base-result-box-section__box:not(:nth-child(4n)) {
             margin-right: 0;
           }
 
-          .base-result-box-section__result-box:not(:nth-child(2n)) {
+          .base-result-box-section__box:not(:nth-child(2n)) {
             margin-right: $spacing;
           }
         }
