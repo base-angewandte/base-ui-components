@@ -30,7 +30,7 @@ export default {
         'magnifier', 'people', 'plus', 'print', 'remove', 'save-file', 'save-file-thin',
         'sheet-empty', 'sheet-plus', 'waste-bin', 'attachment',
         'drag-lines', 'download', 'duplicate', 'forbidden', 'information', 'sort',
-        'success', 'text', 'drag-n-drop', 'hide', 'edit'].includes(val),
+        'success', 'text', 'drag-n-drop', 'hide', 'edit', 'options-menu'].includes(val),
     },
     /**
      * Add a title tag to the svg

@@ -172,6 +172,11 @@ Available icons:
     name="edit"
     title="edit"
   />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="options-menu"
+    title="options-menu"
+  />
 </div>
 
 ```
