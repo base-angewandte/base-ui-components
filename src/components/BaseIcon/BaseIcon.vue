@@ -20,18 +20,17 @@ export default {
   },
   props: {
     /**
-     * icon displayed <br>
-     * available per default:
-     * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
-     * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
-     * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'attachment' |
-     * 'drag-lines' | 'download' | 'duplicate' | 'forbidden' | 'information' | 'sort' |
-     * 'success' | 'text'
+     * icon displayed
      */
     name: {
       type: String,
       default: null,
+      validator: val => ['arrow-left', 'attention', 'calendar-many', 'calendar-number', 'camera',
+        'check-mark', 'clock', 'drop-down', 'eye', 'licence', 'link', 'logo',
+        'magnifier', 'people', 'plus', 'print', 'remove', 'save-file', 'save-file-thin',
+        'sheet-empty', 'sheet-plus', 'waste-bin', 'attachment',
+        'drag-lines', 'download', 'duplicate', 'forbidden', 'information', 'sort',
+        'success', 'text', 'drag-n-drop', 'hide', 'edit'].includes(val),
     },
     /**
      * Add a title tag to the svg

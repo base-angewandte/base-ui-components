@@ -8,13 +8,16 @@ import checkMark from './check-mark';
 import clock from './clock';
 import download from './download';
 import dragLines from './drag-lines';
+import dragNDrop from './drag-n-drop';
 import dropDown2 from './drop-down-2';
 import dropDown3 from './drop-down-3';
 import dropDown4 from './drop-down-4';
 import dropDown from './drop-down';
 import duplicate from './duplicate';
+import edit from './edit';
 import eye from './eye';
 import forbidden from './forbidden';
+import hide from './hide';
 import information from './information';
 import licence from './licence';
 import link from './link';
@@ -48,13 +51,16 @@ export default {
   clock,
   download,
   dragLines,
+  dragNDrop,
   dropDown2,
   dropDown3,
   dropDown4,
   dropDown,
   duplicate,
+  edit,
   eye,
   forbidden,
+  hide,
   information,
   licence,
   link,

@@ -157,6 +157,21 @@ Available icons:
     name="text"
     title="text"
   />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="drag-n-drop"
+    title="drag-n-drop"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="hide"
+    title="hide"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="edit"
+    title="edit"
+  />
 </div>
 
 ```
