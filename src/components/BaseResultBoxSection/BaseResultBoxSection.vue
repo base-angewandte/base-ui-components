@@ -42,7 +42,7 @@
               <!-- DRAG OPTION -->
               <BaseButton
                 v-if="draggable"
-                :text="optionButtonText.drag"
+                :text="optionButtonText.drag || optionButtonText"
                 :aria-hidden="true"
                 tabindex="-1"
                 icon="drag-n-drop"
@@ -57,7 +57,7 @@
                 <!-- default option: delete -->
                 <BaseButton
                   v-if="showOptions && !draggableActive"
-                  :text="optionButtonText.delete"
+                  :text="optionButtonText.delete || optionButtonText"
                   icon-size="large"
                   icon="waste-bin"
                   button-style="single"
@@ -75,8 +75,9 @@
                 button-style="single"
                 @clicked="cancelAction" />
               <BaseButton
-                :text="actionButtonText[actionInt]"
-                :description="`${messageText}. ${messageSubtext}`"
+                :text="actionButtonText[actionInt] || actionButtonText"
+                :description="`${messageText[actionInt] || messageText}.
+                 ${messageSubtext[actionInt] || messageSubtext}`"
                 icon-size="large"
                 icon="save-file"
                 button-style="single"
@@ -97,10 +98,10 @@
           :key="headerText + '_messageArea'"
           class="base-result-box-section__message-area">
           <div class="base-result-box-section__message-area-text">
-            {{ messageText }}
+            {{ messageText[actionInt] || messageText }}
           </div>
           <div class="base-result-box-section__message-area-subtext">
-            {{ messageSubtext }}
+            {{ messageSubtext[actionInt] || messageSubtext }}
           </div>
           <!-- @slot add a custom element after the message area -->
           <slot name="options-message-area-after" />
@@ -166,7 +167,7 @@
           <!-- ACTION BUTTON -->
           <BaseBoxButton
             v-if="showActionButtonBox && !!actionInt"
-            :text="actionButtonText[actionInt]"
+            :text="actionButtonText[actionInt] || actionButtonText"
             :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
             icon="save-file"
             box-style="small"
@@ -275,28 +276,40 @@ export default {
     },
     /**
      * if slot (options-message-area) is not used this variable
-     * can be used to customize message text
+     * can be used to customize message text<br>
+     *   this should be a string or an object with the actions needed (default: 'delete',
+     *   if 'draggable' is true than also a 'drag' text is needed)<br>
+     *     in case of a string the same text is used for all actions
      */
     messageText: {
-      type: String,
-      default: 'Select',
+      type: [String, Object],
+      default: () => ({
+        delete: 'Select',
+        drag: 'Drag items',
+      }),
     },
     /**
      * if slot (options-message-area) is not used this variable
-     * can be used to customize message subtext
+     * can be used to customize message subtext<br>
+     *   this should be a string or an object with the actions needed (default: 'delete',
+     *   if 'draggable' is true than also a 'drag' text is needed)<br>
+     *     in case of a string the same text is used for all actions
      */
     messageSubtext: {
-      type: String,
-      default: 'Please select the relevant items:',
+      type: [String, Object],
+      default: () => ({
+        delete: 'Please select the relevant items:',
+        drag: 'Drag an item to the new position in order to rearrange.',
+      }),
     },
     /**
      * if slot (options) is not used this text is used for the option button text<br>
-     *   it should be an object with the actions needed, so if showOptions is true and no
-     *   custom options are used at least text is needed for delete,
-     *   but if 'draggable' is true also a 'drag' text is needed
+     *   this should be a string or an object with the actions needed (default: 'delete',
+     *   if 'draggable' is true than also a 'drag' text is needed)<br>
+     *     in case of a string the same text is used for all actions
      */
     optionButtonText: {
-      type: Object,
+      type: [String, Object],
       default: () => ({
         delete: 'Delete',
         drag: 'Order',
@@ -304,12 +317,13 @@ export default {
     },
     /**
      * customize the action text of the submit button<br>
-     *   it should be an object with the actions needed, so if showOptions is true and no
-     *   custom options are used at least text is needed for delete,
-     *   but if 'draggable' is true also a 'drag' text is needed
+     *   this should be a string or an object with the actions needed (default: 'delete',
+     *   if 'draggable' is true than also a 'drag' text is needed)<br>
+     *     in case of a string the same text is used for all actions (not recommended
+     *     if more than one option is available)
      */
     actionButtonText: {
-      type: Object,
+      type: [Object, String],
       default: () => ({
         delete: 'Delete',
         drag: 'Save',
