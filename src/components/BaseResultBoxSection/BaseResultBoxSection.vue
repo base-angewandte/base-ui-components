@@ -129,6 +129,8 @@
           :key="headerText + '_boxArea'"
           ref="resultBoxesArea"
           v-model="draggedList"
+          :draggable="draggableActive ? '.base-result-box-section__result-box' : false"
+          :animation="150"
           tag="ul"
           class="base-result-box-section__box-area">
           <!-- TODO: try to add vue transition-group -->
@@ -161,7 +163,6 @@
                 @clicked="entrySelected(entry.id)" />
             </slot>
           </li>
-
           <!-- ACTION BUTTON -->
           <BaseBoxButton
             v-if="showActionButtonBox && !!actionInt"
@@ -923,12 +924,13 @@ export default {
         }
       }
 
+      // TODO: find animation that also works for draggable
       .slide-enter-active {
-        transition: all .5s ease-in-out;
+        transition: transform .5s ease-in-out;
       }
 
       .slide-move {
-        transition: all .15s ease-out;
+        transition: transform .15s ease-out;
       }
 
       .slide-enter {

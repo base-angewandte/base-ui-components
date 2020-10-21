@@ -84,14 +84,16 @@
     </BaseExpandBox>
     -->
     <BaseResultBoxSection
-      :entry-list="entriesList"
+      v-model="entriesList"
       :action="activeAction"
       :is-loading="false"
       :selected-list="selectedBoxes"
-      :max-rows="2"
-      :use-expand-mode="false"
-      option-button-text="delete linked"
-      action-button-text="delete"
+      :max-rows="1"
+      :use-expand-mode="true"
+      :show-options="true"
+      :draggable="true"
+      :option-button-text="{ delete: 'delete linked', drag: 'drag' }"
+      :action-button-text="{ delete: 'delete', drag: 'save' }"
       cancel-text="cancel"
       header-text="header"
       @entry-selected="entrySelected"
