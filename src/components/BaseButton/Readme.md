@@ -24,6 +24,14 @@ const executeFire = function(){
     icon-size="large"
     text="Large Icon"
     @clicked="executeFire"/>
+  <base-button
+    style="margin-right: 16px;"
+    description="active button example"
+    icon="calendar-number"
+    icon-size="large"
+    text="Button Active"
+    :active="true"
+    @clicked="executeFire"/>
 </div>
 
 ```

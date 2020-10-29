@@ -98,7 +98,8 @@ export default {
       },
     },
     /**
-     * set button active (will display a colored border on botton)
+     * set button active (will display a colored border on botton) (row style)
+     * or keep icon colored (single style)
      */
     active: {
       type: Boolean,
@@ -236,6 +237,12 @@ export default {
         height: $icon-medium;
         max-width: $icon-medium;
       }
+
+      &.base-button-active {
+        /* TODO: adjust this to style guide if necessary */
+        box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
+        z-index: map-get($zindex, button-active);
+      }
     }
 
     &.base-button-single {
@@ -255,17 +262,15 @@ export default {
         height: $icon-small;
         max-width: $icon-small;
       }
+
+      &.base-button-active .base-button-icon {
+        color: $app-color;
+      }
     }
 
     &.base-button-secondary {
       font-size: $font-size-small;
       color: $font-color-second;
-    }
-
-    &.base-button-active {
-      /* TODO: adjust this to style guide if necessary */
-      box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
-      z-index: map-get($zindex, button-active);
     }
 
     &:hover {
