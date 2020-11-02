@@ -1,37 +1,33 @@
-<template>
-  <div
-    id="app"
-    style="max-width: 900px; margin: 0 auto;">
-    <base-edit-control
-      title="Activities"
-      :subtitle="`(${baseExpandList.filter(item => item.visible).length})`"
-      :edit="editExpandList"
-      @activated="activateExpandList"
-      @canceled="cancelExpandList"
-      @saved="saveExpandList" />
+Component to render list data
 
-    <base-expand-list
-      ref="baseExpandList"
-      :data="editExpandList ? baseExpandList : baseExpandList.filter(item => item.visible)"
-      :edit="editExpandList"
-      @saved="saveExpandListEdit" />
-  </div>
+```vue
+<template>
+  <!--BaseEditControl
+    title="Activities"
+    :subtitle="`(${baseExpandList.filter(item => item.visible).length})`"
+    :edit="editExpandList"
+    @activated="activateExpandList"
+    @canceled="cancelExpandList"
+    @saved="saveExpandList" /-->
+
+  <BaseExpandList
+    ref="baseExpandList"
+    :data="editExpandList ? baseExpandList : baseExpandList.filter(item => item.visible)"
+    :edit="editExpandList"
+    @saved="saveExpandListEdit" />
 </template>
 
 <script>
-// import axios from 'axios';
-import BaseExpandList from '@/components/BaseExpandList/BaseExpandList';
-import BaseEditControl from '@/components/BaseEditControl/BaseEditControl';
+// import BaseEditControl from '../BaseEditControl/BaseEditControl';
+import BaseExpandList from './BaseExpandList';
 
 export default {
-  name: 'App',
   components: {
-    BaseEditControl,
+    // BaseEditControl,
     BaseExpandList,
   },
   data() {
     return {
-      toggleList: false,
       editExpandList: false,
       baseExpandList: [
         {
@@ -68,20 +64,6 @@ export default {
                   id: '44',
                   href: '#',
                 },
-                // {
-                //   label: 'Sammelbände',
-                //   data: [
-                //     {
-                //       value: '1 qui reiciendis',
-                //       attributes: [
-                //         'rerum corporis voluptatibus',
-                //         'beatae occaecati non',
-                //       ],
-                //       id: '19',
-                //       href: '#',
-                //     },
-                //   ],
-                // },
               ],
             },
             {
@@ -280,8 +262,6 @@ export default {
       ],
     };
   },
-  computed: {},
-  watch: {},
   methods: {
     activateExpandList() {
       this.editExpandList = true;
@@ -300,142 +280,4 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-@import "../src/styles/variables";
-
-.dropdown-extended {
-  border-top: $separation-line;
-  padding: $spacing;
-
-  .show-more-toggle {
-    color: $app-color;
-  }
-}
-
-.canvas {
-  padding: 16px;
-}
-
-.flex {
-  display: flex;
-}
-
-.row {
-  max-height: 300px;
-}
-
-div > .base-box-button {
-  margin: 8px;
-}
-
-button {
-  display: block;
-}
-
-.popup-text {
-  display: flex;
-  align-items: flex-end;
-}
-
-.popup-text > div:first-of-type {
-  margin-right: 16px;
-}
-
-.form-field {
-  background-color: white;
-  padding: 16px;
-  margin-bottom: 32px;
-}
-
-.image-box {
-  margin: 8px;
-}
-
-.multiline-dropdown {
-  margin-bottom: -4px;
-}
-
-.spacer {
-  height: 300px;
-}
-
-.result-box {
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-.result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
-  margin-left: 16px;
-}
-
-.base-map {
-  height: 400px;
-}
-
-.base-expand-row {
-  margin: 16px;
-}
-
-.background {
-  display: flex;
-  flex-wrap: wrap;
-  background-color: rgb(240, 240, 240);
-  padding: 16px;
-}
-
-.base-box {
-  margin-right: 16px;
-}
-
-.base-box:nth-of-type(4n) {
-  margin-right: 0;
-}
-
-.example-text {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.slide-move {
-  transition: all .15s ease-out;
-}
-
-.slide-enter {
-  opacity: 0;
-  transform: translateY(-#{$spacing});
-}
-
-.slide-leave-to {
-  opacity: 0;
-  transform: translateY(-#{$spacing});
-}
-
-.slide-leave-active {
-  position: absolute;
-  width: 100%;
-  margin: auto;
-  transition: opacity 0.15s ease, transform 0.3s ease;
-}
-
-.bounce-enter-active {
-  opacity: bounce-in .5s;
-}
-.bounce-leave-active {
-  animation: bounce-in .5s reverse;
-}
-@keyframes bounce-in {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.5);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-</style>
+```

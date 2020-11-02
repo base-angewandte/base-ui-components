@@ -1,6 +1,7 @@
 /* Overwrite colors in your App with css vars defined in your app root css */
 /*:root {
   --app-color: #FF9800;
+  --app-color-secondary: #ffd95b;
   --font-color: rgb(0, 0, 0);
   --font-color-second: rgb(107, 107, 107);
   --button-header-color: rgb(240, 240, 240);
@@ -35,6 +36,7 @@ $fade-out-width: 30px;
 
 /* colors */
 $app-color: var(--app-color, #FF9800);
+$app-color-secondary: var(--app-color-secondary, #ffd95b);
 $font-color: var(--font-color, rgb(0, 0, 0));
 $font-color-second: var(--font-color-second, rgb(107, 107, 107));
 $font-color-third: var(--font-color-third, rgb(160, 160, 160));
@@ -106,3 +108,6 @@ $zindex: (
 
 /* headlines */
 $headline-margin-bottom: $line-height / 2;
+
+/* transitions */
+$link-transition: color 0.2s ease-in-out;
