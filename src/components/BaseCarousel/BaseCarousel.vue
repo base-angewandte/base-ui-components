@@ -55,14 +55,28 @@ export default {
   },
   props: {
     /**
-     * specify array of items to render
+     * specify array of items to render<br>
+     *   the item object should have the following properties:<br>
+     *     title - the title to display<br>
+     *     subtext - the text below the title<br>
+     *     description - the type of item<br>
+     *     additional - additional information (e.g. dates)<br>
+     *     href - a url to follow upon item click<br>
+     *     previews - an array of image urls in different sizes in the following form:<br>
+     *       ```
+            [{<br>
+              '460w': 'image url',
+            },
+     {
+              '640w': 'image url',
+            },...],```
      */
     items: {
       type: Array,
       default: () => ([]),
     },
     /**
-     * specify number of initial displayed items
+     * specify number of initial displayed items in mobile view
      */
     minItems: {
       type: Number,
@@ -82,6 +96,14 @@ export default {
     swiperOptions: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * specify the name of the item object property that should
+     * be used as identifier (key)
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'uid',
     },
   },
   data() {
@@ -106,8 +128,11 @@ export default {
   },
   methods: {
     getImageSrc(object, value) {
-      return object.map(obj => ((Object.keys(obj)[0] === value) ? Object.values(obj)[0] : ''))
-        .filter(obj => obj !== '').toString();
+      if (object && object.length) {
+        return object.map(obj => ((Object.keys(obj)[0] === value) ? Object.values(obj)[0] : ''))
+          .filter(obj => obj !== '').toString();
+      }
+      return '';
     },
     breakpointChecker() {
       // init list view on small devices
@@ -150,7 +175,7 @@ export default {
 
   .base-carousel {
     max-width: 1400px;
-    margin: 10px auto;
+    margin: 0 auto;
 
     .base-carousel-slide {
       margin-bottom: 0;
