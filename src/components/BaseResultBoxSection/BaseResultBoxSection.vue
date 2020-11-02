@@ -18,6 +18,8 @@
         <BaseOptions
           v-if="showOptions || draggable"
           :show-options="showActions"
+          :show-after-options-inline="true"
+          align-options="left"
           @options-toggle="optionsToggle">
           <template v-slot:beforeOptions>
             <!-- @slot add a custom header instead of headerText -->
@@ -34,7 +36,6 @@
             v-slot:options>
             <!-- show options as long as no action was activated -->
             <div
-              v-if="!actionInt"
               class="base-result-box-section__result-options">
               <!-- TODO: drag functionality is hidden from keyboard users
               until solution for making draggable accessible is implemented
@@ -44,20 +45,24 @@
                 v-if="draggable"
                 :text="optionButtonText.drag || optionButtonText"
                 :aria-hidden="true"
+                :active="actionInt === 'drag'"
                 tabindex="-1"
                 icon="drag-n-drop"
                 icon-size="large"
                 @clicked="setAction('drag')" />
               <!-- slot to add further options -->
               <!-- @slot to add custom options buttons, otherwise there is a delete option unless
-               showOptions is set false -->
+               showOptions is set false<br>
+                to trigger and action call the slot scope function
+                setAction([string of action in question]) -->
               <slot
                 :set-action="setAction"
                 name="option-buttons">
                 <!-- default option: delete -->
                 <BaseButton
-                  v-if="showOptions && !draggableActive"
+                  v-if="showOptions"
                   :text="optionButtonText.delete || optionButtonText"
+                  :active="actionInt === 'delete'"
                   icon-size="large"
                   icon="waste-bin"
                   button-style="single"
@@ -66,7 +71,7 @@
             </div>
             <!-- if action was activated show a cancel and submit action button instead -->
             <div
-              v-else-if="!!actionInt"
+              v-if="!!actionInt"
               class="base-result-box-section__result-options">
               <BaseButton
                 :text="cancelText"
@@ -83,6 +88,9 @@
                 button-style="single"
                 @clicked="submitAction" />
             </div>
+          </template>
+          <template v-slot:afterOptions>
+            <slot name="option-buttons-after" />
           </template>
         </BaseOptions>
       </div>
@@ -113,13 +121,13 @@
           :key="headerText + '_selectOptions'"
           :selected-number-text="getI18nString(
             'entriesSelected',
-            selectedList.length,
+            selectedListInt.length,
             { type: getI18nString(`notify.${entryType}`) }
           )"
           :select-text="getI18nString('selectAll')"
           :deselect-text="getI18nString('selectNone')"
           :list="entryList"
-          :selected-list="selectedList"
+          :selected-list="selectedListInt"
           @selected="selectAllTriggered" />
 
         <!-- BOXAREA -->
@@ -152,7 +160,7 @@
               <BaseImageBox
                 :key="entry.id"
                 :selectable="selectActive"
-                :selected="selectedList.map(entry => entry.id || entry).includes(entry.id)"
+                :selected="selectedListInt.map(entry => entry.id || entry).includes(entry.id)"
                 :box-size="{ width: 'auto' }"
                 :box-ratio="100"
                 :title="entry.title"
@@ -223,7 +231,6 @@
 </template>
 
 <script>
-import Draggable from 'vuedraggable';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 
@@ -235,7 +242,6 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
-    Draggable,
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
     BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
     BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
@@ -423,7 +429,7 @@ export default {
      */
     useExpandMode: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * how many rows should be shown with show more button
@@ -459,6 +465,35 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify how many boxes should be displayed in a row in an array
+     * with "tupples" (array with min-size and number of boxes)
+     * depending on the size of the container (not screen width - unless
+     * `calcBoxNumberRelativeToWindow` is set to true)
+     * like the following:<br>
+     *   <code>
+     *   [<br>
+     *     \[0, [number of boxes]],<br>
+     *     \[[min px size for this number of boxes\], [number]],<br>
+     *     ...<br>
+     *   ]
+     *   </code>
+     */
+    boxBreakpoints: {
+      type: Array,
+      default: () => ([
+        [0, 2],
+        [640, 4],
+        [1024, 6],
+      ]),
+    },
+    /**
+     * TODO: implement!!
+     */
+    calcBoxNumberRelativeToWindow: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -479,6 +514,8 @@ export default {
       // a variable to store the reorder information until
       // 'save' is clicked
       draggedList: [],
+      // to manipulate selectedList internally
+      selectedListInt: [],
     };
   },
   computed: {
@@ -578,6 +615,10 @@ export default {
       },
       immediate: true,
     },
+    actionInt() {
+      // reset selected boxes
+      this.selectedListInt = [];
+    },
     // watch pages in case of deletion of items and take care
     // current page is not higher than total page number
     pages(val) {
@@ -632,6 +673,21 @@ export default {
     draggedList(val) {
       if (JSON.stringify(val) !== JSON.stringify(this.visibleBoxes)) {
         this.visibleBoxes = [...val];
+      }
+    },
+    // watch selectedList prop and assign to internal value if changes occur
+    selectedList: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+          this.selectedListInt = JSON.parse(JSON.stringify(val));
+        }
+      },
+      immediate: true,
+    },
+    // watch selectedList prop and assign to internal value if changes occur
+    selectedListInt(val) {
+      if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
+        this.$emit('update:selected-list', val);
       }
     },
   },
@@ -709,6 +765,7 @@ export default {
       this.actionInt = '';
       // return to original collapsed state
       this.expandedInt = this.wasExpanded;
+      this.draggedList = [...this.entryList];
       /**
        * event triggered when an action cancelled
        *
@@ -761,6 +818,15 @@ export default {
      * if entry was clicked
      */
     entrySelected(entryId, selected = undefined) {
+      // first take care of internally selected list
+      if (selected && !this.selectedListInt.includes(entryId)) {
+        this.selectedListInt.push(entryId);
+      } else if (!selected) {
+        this.selectedListInt = this.selectedListInt.filter(boxId => boxId !== entryId);
+      }
+      // then emit event to parent for additional actions
+      // (and for backwards compatibility with portfolio)
+      // TODO for v2: remove event emitter and and method call in slot!
       /**
        * event emitted from default image box when clicked
        * @event entry-selected
@@ -778,27 +844,21 @@ export default {
      * false if everything was deselected
      */
     selectAllTriggered(selectAll) {
+      // first take care of internal selected list array
+      if (selectAll) {
+        this.selectedListInt = this.entryList.map(entry => entry.id);
+      } else {
+        this.selectedListInt = [];
+      }
+      // then emit event to parent for additional actions
+      // (and for backwards compatibility with portfolio)
+      // TODO for v2: remove event emitter and and method call in slot!
       /**
        * event emitted on 'select all' button click
        * @event all-selected
        * @param {boolean} selectAll - was select all or select none triggered
        */
       this.$emit('all-selected', selectAll);
-    },
-    /**
-     * calculate the box number according to available space
-     */
-    calcBoxNumber() {
-      // get the resultBoxesArea element which is either a native element or
-      // if draggable is true a vue component
-      const resultBoxesElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
-        ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
-      // if the element has children (= boxes are rendered) calculate items per row
-      if (resultBoxesElement && resultBoxesElement.children && resultBoxesElement.children.length) {
-        const totalWidth = resultBoxesElement.clientWidth;
-        const boxWidth = resultBoxesElement.children[0].clientWidth;
-        this.itemsPerRow = Math.floor(totalWidth / boxWidth);
-      }
     },
     /**
      * timeout function for resize event to limit the number of times
@@ -810,17 +870,60 @@ export default {
         clearTimeout(this.resizeTimeout);
         this.resizeTimeout = null;
       }
-      // get the resultBoxesArea element which can be a native HTML element or
-      // if draggable is used a vue component
-      const boxesAreaElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
+      // if yes set timeout to recalculate box number after
+      this.resizeTimeout = setTimeout(() => {
+        this.calcBoxNumber();
+      }, 300);
+    },
+    /**
+     * calculate the box number according to available space and breaking points set
+     */
+    calcBoxNumber() {
+      // get the result boxes parent - in case of draggable active this is a vue component
+      // and $el needs to be addressed - otherwise native HTML element can be used directly
+      const resultBoxesElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
         ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
-      // check if element has children (= boxes are rendered)
-      if (boxesAreaElement && boxesAreaElement.children
-        && boxesAreaElement.children.length) {
-        // if yes set timeout to recalculate box number after
-        this.resizeTimeout = setTimeout(() => {
-          this.calcBoxNumber();
-        }, 500);
+      // if such an element was found and element has children (= boxes are rendered)
+      if (resultBoxesElement && resultBoxesElement.children
+        && resultBoxesElement.children.length) {
+        // get the element width
+        const totalWidth = resultBoxesElement.clientWidth;
+        // calculate how many items should be displayed according to
+        // breakpoints set
+        this.itemsPerRow = this.boxBreakpoints
+          // then also sorting should not be necessary anymore (maybe keep to
+          // be on the save side?
+          .sort((a, b) => a[0] > b[0])
+          // get the correct box number
+          .reduce((prev, [size, number]) => {
+            if (totalWidth > size) {
+              return number;
+            }
+            return prev;
+          }, 0);
+        // set the styles
+        // set a css variable that is responsible for the number of items
+        this.$el.style.setProperty('--items-per-row', this.itemsPerRow);
+        // set the correct margins for the boxes
+        const nodeId = 'base-result-box-section__box-style';
+        let style = document.getElementById(nodeId);
+        // check if element already exists to only create it once
+        if (!style) {
+          // if not - create the style element
+          style = document.createElement('style');
+          // set an id
+          style.id = nodeId;
+          // append the style element
+          this.$el.appendChild(style);
+        }
+        // set the acutally css in the style element
+        style.innerHTML = `
+          .base-result-box-section__box:nth-child(n + ${this.itemsPerRow + 1}) {
+            margin-top: var(--spacing-regular);
+          }
+          .base-result-box-section__box:not(:nth-child(${this.itemsPerRow}n)) {
+            margin-right: var(--spacing-regular);
+          }`;
       }
     },
   },
@@ -832,6 +935,8 @@ export default {
 
   .base-result-box-section {
     position: relative;
+    --items-per-row: 6;
+    --spacing-regular: #{$spacing};
 
     .base-result-box-section__loading {
       position: absolute;
@@ -852,13 +957,12 @@ export default {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        margin: $spacing-small 0 $spacing-small $spacing;
 
         .base-result-box-section__header {
           font-size: $font-size-regular;
           color: $font-color-second;
           font-weight: normal;
-          margin: 0;
+          margin: var(--spacing-regular);
         }
 
         .base-result-box-section__result-options {
@@ -875,7 +979,8 @@ export default {
 
         .base-result-box-section__box {
           // subtracted 0.01rem for edge
-          flex: 0 0 calc(25% - #{$spacing-small} - #{$spacing-small/2} - 0.01rem);
+          flex: 0 0 calc(((100% - ((var(--items-per-row) - 1) * #{$spacing}))
+          / var(--items-per-row)) - 0.01rem);
 
           &:focus {
             outline: 1px solid $app-color;
@@ -883,20 +988,11 @@ export default {
         }
 
         .base-result-box-section__result-box {
-          // TODO: try to add transition... (was not working for some reason)
           box-shadow: $box-shadow-reg;
         }
 
         .base-result-box-section__result-box-draggable {
-          box-shadow: 0px 0px 12px 2px rgba(0, 0, 0, 0.25)
-        }
-
-        .base-result-box-section__box:nth-child(n + 5) {
-          margin-top: $spacing;
-        }
-
-        .base-result-box-section__box:not(:nth-child(4n)) {
-          margin-right: $spacing;
+          box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.25)
         }
 
         .base-result-box-section__expand-button__content {
@@ -962,30 +1058,6 @@ export default {
         width: 100%;
         margin: auto;
         transition: opacity 0.15s ease, transform 0.3s ease;
-      }
-    }
-  }
-
-  @media screen and (max-width: $tablet) {
-    .base-result-box-section {
-      .base-result-box-section__area {
-        .base-result-box-section__box-area {
-          .base-result-box-section__box {
-            flex: 0 0 calc(50% - #{$spacing-small} - 0.01rem);
-          }
-
-          .base-result-box-section__box:nth-child(n + 3) {
-            margin-top: $spacing;
-          }
-
-          .base-result-box-section__box:not(:nth-child(4n)) {
-            margin-right: 0;
-          }
-
-          .base-result-box-section__box:not(:nth-child(2n)) {
-            margin-right: $spacing;
-          }
-        }
       }
     }
   }

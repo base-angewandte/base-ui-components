@@ -41,7 +41,7 @@
     </transition>
     <div
       v-if="!showAfterOptionsInline && afterSlotHasData"
-      class="base-options-after">
+      :class="['base-options-after', { 'base-options-after-left': alignOptions === 'left' }]">
       <!-- @slot add elements after the options element -->
       <slot name="afterOptions" />
     </div>
@@ -71,8 +71,7 @@ export default {
       default: false,
     },
     /**
-     * define where options should be aligned<br>
-     *   valid values: 'left', 'right'
+     * define where options should be aligned
      */
     alignOptions: {
       type: String,
@@ -199,9 +198,12 @@ export default {
       }
 
       .base-options-after {
-        flex: 1 1 auto;
         align-self: center;
         max-width: 100%;
+
+        &.base-options-after-left {
+          flex: 1 1 auto;
+        }
       }
     }
 
