@@ -93,8 +93,16 @@
             <slot name="option-buttons-after" />
           </template>
         </BaseOptions>
+        <template v-else>
+          <slot name="header">
+            <h3
+              v-if="headerText"
+              class="base-result-box-section__header">
+              {{ headerText }}
+            </h3>
+          </slot>
+        </template>
       </div>
-
       <!-- ACTION AREA -->
       <!-- transition group to animate the message area -->
       <transition-group
