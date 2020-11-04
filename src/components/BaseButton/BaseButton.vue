@@ -192,6 +192,7 @@ export default {
       height: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;
+      transition: $drop-down-arrow-animation;
 
       &.base-button-icon-left {
         margin-right: #{$spacing};
@@ -245,6 +246,12 @@ export default {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
       z-index: map-get($zindex, button-active);
+    }
+
+    &.base-button-icon-rotate-180 {
+      .base-button-icon {
+        transform: rotate(180deg);
+      }
     }
 
     &:hover {

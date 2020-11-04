@@ -16,7 +16,7 @@ npm i base-ui-components
 
 You can either import each component individually:
 
-```vue
+```js
 main.js
 
 import Vue from 'vue';
@@ -42,7 +42,7 @@ new Vue({
 
 or as complete package:
 
-```vue
+```js
 main.js
 
 import Vue from 'vue';
@@ -132,7 +132,7 @@ See [LICENSE](LICENSE.md)
 
 ### Support
 
-Developed with the support Live Cross-Browser Testing on:
+This open-source project was developed (and more specifically - cross-browser tested) with the support of:
 
 [![Browserstack-logo](static/browserstack.svg)](https://www.browserstack.com)
 
