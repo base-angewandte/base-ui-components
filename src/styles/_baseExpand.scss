@@ -43,34 +43,48 @@
   }
 
   &__body {
-    // display: none;
-
     .base-expand__head__label {
       font-weight: inherit;
     }
   }
 
   &.expanded {
-
-    > .base-expand__body {
-      //display: block;
-    }
-
     > .base-expand__head {
       .base-expand__head__icon {
         transform: rotate(180deg);
       }
     }
 
-    // Colors
+    // first level
     .base-expand-item {
-      border-color: $app-color-secondary;
+      position: relative;
+
+      &:before {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 0;
+        z-index: 1;
+        width: $border-active-width;
+        height: 100%;
+        background-color: $app-color-secondary;
+      }
     }
 
+    // second level
     .base-expand {
+
       &.expanded {
-        .base-expand-item {
-          border-color: $app-color;
+        position: relative;
+
+        &:before {
+          content: "";
+          display: block;
+          position: absolute;
+          z-index: 2;
+          width: $border-active-width;
+          height: 100%;
+          background-color: $app-color;
         }
       }
     }
