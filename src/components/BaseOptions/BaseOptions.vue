@@ -8,22 +8,22 @@
         <slot name="beforeOptions" />
       </div>
 
+      <div
+        v-if="showOptionsToggle && !optionsHidden && !isMobile"
+        class="base-options-inline">
+        <!-- @slot add the actual options -->
+        <slot name="options" />
+      </div>
       <BaseButton
         v-if="useOptionsButton"
         ref="options"
-        :text="buttonLabel"
-        :icon="'options-menu'"
+        :text="showOptionsToggle ? 'Done' : buttonLabel"
+        :icon="showOptionsToggle ? 'remove' : 'options-menu'"
         :disabled="optionsHidden"
         :has-background-color="false"
         :class="['base-options-button', { 'base-options-button-hidden': optionsHidden }]"
         icon-position="left"
         @clicked="showOptionsToggle = !showOptionsToggle" />
-      <div
-        v-else-if="!optionsHidden && !isMobile"
-        class="base-options-inline">
-        <!-- @slot add the actual options -->
-        <slot name="options" />
-      </div>
       <div
         v-if="showAfterOptionsInline && afterSlotHasData"
         class="base-options-after">
@@ -31,14 +31,14 @@
         <slot name="afterOptions" />
       </div>
     </div>
-    <transition name="slide-fade-options">
-      <div
-        v-if="showOptionsToggle && !optionsHidden"
-        class="base-options-below">
-        <!-- @slot add the actual options -->
-        <slot name="options" />
-      </div>
-    </transition>
+<!--    <transition name="slide-fade-options">-->
+<!--      <div-->
+<!--        v-if="showOptionsToggle && !optionsHidden"-->
+<!--        class="base-options-below">-->
+<!--        &lt;!&ndash; @slot add the actual options &ndash;&gt;-->
+<!--        <slot name="options" />-->
+<!--      </div>-->
+<!--    </transition>-->
     <div
       v-if="!showAfterOptionsInline && afterSlotHasData"
       :class="['base-options-after', { 'base-options-after-left': alignOptions === 'left' }]">
@@ -125,7 +125,7 @@ export default {
      * @returns {boolean}
      */
     useOptionsButton() {
-      return this.alwaysShowOptionsButton || this.isMobile;
+      return !this.neverShowOptionsButton;
     },
     beforeSlotHasData() {
       return this.$slots.beforeOptions;
@@ -143,6 +143,7 @@ export default {
         this.$emit('options-toggle', val);
       },
       get() {
+        console.log(this.showOptions);
         return this.showOptions;
       },
     },

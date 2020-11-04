@@ -17,8 +17,8 @@
         class="base-result-box-section__header-row">
         <BaseOptions
           v-if="showOptions || draggable"
-          :show-options="showActions"
           :show-after-options-inline="true"
+          :show-options="editModeActive"
           align-options="left"
           @options-toggle="optionsToggle">
           <template v-slot:beforeOptions>
@@ -41,15 +41,16 @@
               until solution for making draggable accessible is implemented
                e.g. use $event information to activate select mode? -->
               <!-- DRAG OPTION -->
-              <BaseButton
-                v-if="draggable"
-                :text="optionButtonText.drag || optionButtonText"
-                :aria-hidden="true"
-                :active="actionInt === 'drag'"
-                tabindex="-1"
-                icon="drag-n-drop"
-                icon-size="large"
-                @clicked="setAction('drag')" />
+              <!--              <BaseButton-->
+              <!--                v-if="draggable"-->
+              <!--                :text="'change order via drag\'n drop'"-->
+              <!--                :aria-hidden="true"-->
+              <!--                :active="actionInt === 'drag'"-->
+              <!--                :disabled="true"-->
+              <!--                tabindex="-1"-->
+              <!--                icon="drag-n-drop"-->
+              <!--                icon-size="large"-->
+              <!--                @clicked="setAction('drag')" />-->
               <!-- slot to add further options -->
               <!-- @slot to add custom options buttons, otherwise there is a delete option unless
                showOptions is set false<br>
@@ -61,7 +62,8 @@
                 <!-- default option: delete -->
                 <BaseButton
                   v-if="showOptions"
-                  :text="optionButtonText.delete || optionButtonText"
+                  :text="optionButtonText.delete || 'delete'"
+                  :use-options-button="true"
                   :active="actionInt === 'delete'"
                   icon-size="large"
                   icon="waste-bin"
@@ -70,24 +72,24 @@
               </slot>
             </div>
             <!-- if action was activated show a cancel and submit action button instead -->
-            <div
-              v-if="!!actionInt"
-              class="base-result-box-section__result-options">
-              <BaseButton
-                :text="cancelText"
-                icon-size="large"
-                icon="remove"
-                button-style="single"
-                @clicked="cancelAction" />
-              <BaseButton
-                :text="actionButtonText[actionInt] || actionButtonText"
-                :description="`${messageText[actionInt] || messageText}.
-                 ${messageSubtext[actionInt] || messageSubtext}`"
-                icon-size="large"
-                icon="save-file"
-                button-style="single"
-                @clicked="submitAction" />
-            </div>
+            <!--            <div-->
+            <!--              v-if="!!actionInt"-->
+            <!--              class="base-result-box-section__result-options">-->
+            <!--              <BaseButton-->
+            <!--                :text="cancelText"-->
+            <!--                icon-size="large"-->
+            <!--                icon="remove"-->
+            <!--                button-style="single"-->
+            <!--                @clicked="cancelAction" />-->
+            <!--              <BaseButton-->
+            <!--                :text="actionButtonText[actionInt] || actionButtonText"-->
+            <!--                :description="`${messageText[actionInt] || messageText}.-->
+            <!--                 ${messageSubtext[actionInt] || messageSubtext}`"-->
+            <!--                icon-size="large"-->
+            <!--                icon="save-file"-->
+            <!--                button-style="single"-->
+            <!--                @clicked="submitAction" />-->
+            <!--            </div>-->
           </template>
           <template v-slot:afterOptions>
             <slot name="option-buttons-after" />
@@ -110,14 +112,14 @@
         name="slide">
         <!-- MESSAGE AREA -->
         <div
-          v-if="!!actionInt"
+          v-if="editModeActive"
           :key="headerText + '_messageArea'"
           class="base-result-box-section__message-area">
           <div class="base-result-box-section__message-area-text">
-            {{ messageText[actionInt] || messageText }}
+            {{ 'Drag or Select' }}
           </div>
           <div class="base-result-box-section__message-area-subtext">
-            {{ messageSubtext[actionInt] || messageSubtext }}
+            {{ 'Drag\'n Drop to reorder or select the relevant items and choose an action' }}
           </div>
           <!-- @slot add a custom element after the message area -->
           <slot name="options-message-area-after" />
@@ -125,7 +127,7 @@
         <!-- adding a indicator of how many items are selected and 'select all' button
         only shown in select mode -->
         <BaseSelectOptions
-          v-if="selectActive"
+          v-if="editModeActive"
           :key="headerText + '_selectOptions'"
           :selected-number-text="getI18nString(
             'entriesSelected',
@@ -146,78 +148,86 @@
           :key="headerText + '_boxArea'"
           ref="resultBoxesArea"
           v-model="draggedList"
-          :draggable="draggableActive ? '.base-result-box-section__result-box' : false"
+          :draggable="editModeActive ? '.base-result-box-section__result-box' : false"
           :animation="150"
           tag="ul"
           class="base-result-box-section__box-area">
-          <!-- TODO: try to add vue transition-group -->
-          <li
-            v-for="(entry, index) of visibleBoxes"
-            :key="entry.id"
-            :tabindex="selectActive ? -1 : 0"
-            :aria-label="entry.title"
-            :class="['base-result-box-section__box',
+          <template v-if="initialBoxCalcDone">
+            <!-- TODO: try to add vue transition-group -->
+            <li
+              v-for="(entry, index) of visibleBoxes"
+              :key="entry.id"
+              :tabindex="editModeActive ? -1 : 0"
+              :aria-label="entry.title"
+              :class="['base-result-box-section__box',
                      'base-result-box-section__result-box',
-                     { 'base-result-box-section__result-box-draggable': draggableActive }]">
-            <!-- @slot result-box - for custom result boxes -->
+                     { 'base-result-box-section__result-box-draggable': editModeActive }]">
+              <!-- @slot result-box - for custom result boxes -->
+              <slot
+                :item="entry"
+                :index="index"
+                :select-active="editModeActive"
+                name="result-box">
+                <BaseImageBox
+                  :key="entry.id"
+                  :selectable="editModeActive"
+                  :selected="selectedListInt.map(entry => entry.id || entry).includes(entry.id)"
+                  :box-size="{ width: 'auto' }"
+                  :box-ratio="100"
+                  :title="entry.title"
+                  :subtext="entry.subtitle"
+                  :description="entry.description"
+                  :image-url="entry.imageUrl"
+                  :box-text="entry.text"
+                  @select-triggered="entrySelected(entry.id, $event)"
+                  @clicked="entrySelected(entry.id)" />
+              </slot>
+            </li>
+            <!-- ACTION BUTTON -->
+            <!-- TODO: only show boxbutton if there is only one action total -->
             <slot
-              :item="entry"
-              :index="index"
-              :select-active="selectActive"
-              name="result-box">
-              <BaseImageBox
-                :key="entry.id"
-                :selectable="selectActive"
-                :selected="selectedListInt.map(entry => entry.id || entry).includes(entry.id)"
-                :box-size="{ width: 'auto' }"
-                :box-ratio="100"
-                :title="entry.title"
-                :subtext="entry.subtitle"
-                :description="entry.description"
-                :image-url="entry.imageUrl"
-                :box-text="entry.text"
-                @select-triggered="entrySelected(entry.id, $event)"
-                @clicked="entrySelected(entry.id)" />
+              v-if="showActionButtonBox"
+              :set-action="setAction"
+              name="actionButtons">
+              <!-- default button -->
+              <BaseBoxButton
+                :text="actionButtonText[actionInt] || 'delete'"
+                :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
+                icon="waste-bin"
+                box-style="small"
+                box-type="button"
+                class="base-result-box-section__box"
+                @clicked="submitAction" />
             </slot>
-          </li>
-          <!-- ACTION BUTTON -->
-          <BaseBoxButton
-            v-if="showActionButtonBox && !!actionInt"
-            :text="actionButtonText[actionInt] || actionButtonText"
-            :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
-            icon="save-file"
-            box-style="small"
-            box-type="button"
-            class="base-result-box-section__box"
-            @clicked="submitAction" />
-          <!-- EXPAND BUTTON -->
-          <BaseBoxButton
-            v-else-if="useExpandMode && !draggableActive && !selectActive && expandNeeded"
-            :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
-            icon=""
-            text=""
-            box-type="button"
-            class="base-result-box-section__box"
-            @clicked="expandedInt = !expandedInt">
-            <template v-slot>
-              <!-- needed to add v-if here again - otherwise strange side effects -->
-              <div
-                v-if="!selectActive"
-                class="base-result-box-section__expand-button__content">
+            <!-- EXPAND BUTTON -->
+            <BaseBoxButton
+              v-else-if="useExpandMode && !editModeActive && expandNeeded"
+              :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))' }"
+              icon=""
+              text=""
+              box-type="button"
+              class="base-result-box-section__box"
+              @clicked="expandedInt = !expandedInt">
+              <template v-slot>
+                <!-- needed to add v-if here again - otherwise strange side effects -->
+                <div
+                  v-if="!editModeActive"
+                  class="base-result-box-section__expand-button__content">
                 <span
                   v-if="!expandedInt"
                   class="base-result-box-section__expand-button__content-number">
                   {{ `+${(total || entryList.length) - visibleBoxes.length}` }}
                 </span>
-                <span
-                  :class="[expandedInt
+                  <span
+                    :class="[expandedInt
                     ? 'base-result-box-section__expand-button__content-text-expanded'
                     : 'base-result-box-section__expand-button__content-text-collapsed']">
                   {{ expandedInt ? expandText.collapse : expandText.expand }}
                 </span>
-              </div>
-            </template>
-          </BaseBoxButton>
+                </div>
+              </template>
+            </BaseBoxButton>
+          </template>
         </component>
 
         <!-- PAGINATION -->
@@ -227,7 +237,7 @@
         * there is a number of max rows specified
         * and it is actually needed because there is more than one page -->
         <BasePagination
-          v-if="!draggableActive && (!useExpandMode || expandedInt) && maxRows && pages > 1"
+          v-if="!editModeActive && (!useExpandMode || expandedInt) && maxRows && pages > 1"
           key="pagination"
           :total="pages"
           :current="currentPageNumber"
@@ -502,6 +512,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    editMode: {
+      type: Boolean,
+      default: false,
+    },
+    actionButtonProps: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -510,7 +528,7 @@ export default {
       // internally saved action
       actionInt: '',
       // how many items do fit in one row
-      itemsPerRow: 4,
+      itemsPerRow: 0,
       // current page number
       currentPageNumber: 1,
       // a timeout for resize listener
@@ -524,16 +542,11 @@ export default {
       draggedList: [],
       // to manipulate selectedList internally
       selectedListInt: [],
+      initialBoxCalcDone: false,
+      editModeActive: false,
     };
   },
   computed: {
-    /**
-     * variable to determine if select is active
-     * @returns {boolean}
-     */
-    selectActive() {
-      return !this.draggableActive && !!this.actionInt;
-    },
     /**
      * the number of items that should be visible on one page
      * (if pagination is active)
@@ -565,7 +578,7 @@ export default {
      * @returns {Object[]}
      */
     visibleBoxes() {
-      if (this.draggableActive) {
+      if (this.editModeActive) {
         return this.draggedList;
       }
       // if expand mode is used and status is collapsed and there
@@ -594,25 +607,34 @@ export default {
      * @returns {string|(function(): Promise<U>)}
      */
     draggableComponent() {
-      if (this.draggable && this.draggableActive) {
+      if (this.draggable && this.editModeActive) {
         return () => import('vuedraggable').then(m => (m.default || m));
       }
       return 'ul';
     },
-    /**
-     * is draggable mode active
-     *
-     * attention: should this be at some point changed to be settable from
-     // outside (= a prop) this leads to problem with calculating the correct
-     // number for itemsPerRow in calcBoxNumber on mounted
-     *
-     * @returns {boolean}
-     */
-    draggableActive() {
-      return this.actionInt === 'drag';
-    },
+    // /**
+    //  * is draggable mode active
+    //  *
+    //  * attention: should this be at some point changed to be settable from
+    //  // outside (= a prop) this leads to problem with calculating the correct
+    //  // number for itemsPerRow in calcBoxNumber on mounted
+    //  *
+    //  * @returns {boolean}
+    //  */
+    // draggableActive() {
+    //   return this.actionInt === 'drag';
+    // },
   },
   watch: {
+    $refs: {
+      handler(val) {
+        console.log(val);
+        console.log('listening');
+        // this.$nextTick(() => console.log('refs tick'));
+      },
+      deep: true,
+      immediate: true,
+    },
     // watch prop action if set from outside
     action: {
       handler(val) {
@@ -646,6 +668,7 @@ export default {
       handler(val) {
         if (val !== this.expandedInt) {
           this.expandedInt = val;
+          // this.$nextTick(() => console.log('expanded tick'));
         }
       },
       immediate: true,
@@ -665,12 +688,13 @@ export default {
          */
         this.$emit('update:expanded', val);
       }
+      // this.$nextTick(() => console.log('expandedInt tick'));
     },
     // watch the entry entriesList for changes so draggedList needed for
     // drag mode is up to date
     entryList: {
       handler(val) {
-        if (this.draggable && JSON.stringify(val) !== JSON.stringify(this.draggedList)) {
+        if (JSON.stringify(val) !== JSON.stringify(this.draggedList)) {
           this.draggedList = [...val];
         }
       },
@@ -699,12 +723,21 @@ export default {
       }
     },
   },
+  created() {
+    this.editModeActive = this.editMode;
+  },
   mounted() {
-    // calculate the correct box number to start with
-    this.calcBoxNumber();
+    if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
+      this.calcBoxNumber();
+    }
     // need to get the correct number of boxes per row to calculate the visible
     // number of items correctly
     window.addEventListener('resize', this.resizeBoxes);
+  },
+  updated() {
+    if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
+      this.calcBoxNumber();
+    }
   },
   destroyed() {
     // remove event listener from window
@@ -787,10 +820,13 @@ export default {
      * @param {Boolean} actionsVisible true for open, false for close
      */
     optionsToggle(actionsVisible) {
+      console.log('options toggle');
+      console.log(actionsVisible);
       // reset the actions string
       this.actionInt = '';
       // set the component internal showActions variable in sync
       this.showActions = actionsVisible;
+      this.editModeActive = actionsVisible;
     },
     /**
      * function triggered when page in pagination component is selected
@@ -892,8 +928,7 @@ export default {
       const resultBoxesElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
         ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
       // if such an element was found and element has children (= boxes are rendered)
-      if (resultBoxesElement && resultBoxesElement.children
-        && resultBoxesElement.children.length) {
+      if (resultBoxesElement) {
         // get the element width
         const totalWidth = resultBoxesElement.clientWidth;
         // calculate how many items should be displayed according to
@@ -932,6 +967,7 @@ export default {
           .base-result-box-section__box:not(:nth-child(${this.itemsPerRow}n)) {
             margin-right: var(--spacing-regular);
           }`;
+        this.initialBoxCalcDone = true;
       }
     },
   },
@@ -943,7 +979,7 @@ export default {
 
   .base-result-box-section {
     position: relative;
-    --items-per-row: 6;
+    --items-per-row: 0;
     --spacing-regular: #{$spacing};
 
     .base-result-box-section__loading {
@@ -984,6 +1020,7 @@ export default {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        min-height: 200px;
 
         .base-result-box-section__box {
           // subtracted 0.01rem for edge
