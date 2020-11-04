@@ -2,28 +2,30 @@ Component to render list data
 
 ```vue
 <template>
-  <!--BaseEditControl
-    title="Activities"
-    :subtitle="`(${baseExpandList.filter(item => item.visible).length})`"
-    :edit="editExpandList"
-    @activated="activateExpandList"
-    @canceled="cancelExpandList"
-    @saved="saveExpandList" /-->
+  <div>
+    <BaseEditControl
+      title="Activities"
+      :subtitle="'(' + baseExpandList.filter(item => item.visible).length + ')'"
+      :edit="editExpandList"
+      @activated="activateExpandList"
+      @canceled="cancelExpandList"
+      @saved="saveExpandList" />
 
-  <BaseExpandList
-    ref="baseExpandList"
-    :data="editExpandList ? baseExpandList : baseExpandList.filter(item => item.visible)"
-    :edit="editExpandList"
-    @saved="saveExpandListEdit" />
+    <BaseExpandList
+      ref="baseExpandList"
+      :data="editExpandList ? baseExpandList : baseExpandList.filter(item => item.visible)"
+      :edit="editExpandList"
+      @saved="saveExpandListEdit" />
+  </div>
 </template>
 
 <script>
-// import BaseEditControl from '../BaseEditControl/BaseEditControl';
+import BaseEditControl from '../BaseEditControl/BaseEditControl';
 import BaseExpandList from './BaseExpandList';
 
 export default {
   components: {
-    // BaseEditControl,
+    BaseEditControl,
     BaseExpandList,
   },
   data() {
