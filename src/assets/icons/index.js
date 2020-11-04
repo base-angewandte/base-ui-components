@@ -6,6 +6,7 @@ import calendarNumber from './calendar-number';
 import camera from './camera';
 import checkMark from './check-mark';
 import clock from './clock';
+import collection from './collection';
 import download from './download';
 import dragLines from './drag-lines';
 import dragNDrop from './drag-n-drop';
@@ -49,6 +50,7 @@ export default {
   camera,
   checkMark,
   clock,
+  collection,
   download,
   dragLines,
   dragNDrop,

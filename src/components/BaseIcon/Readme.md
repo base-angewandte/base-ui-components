@@ -177,6 +177,11 @@ Available icons:
     name="options-menu"
     title="options-menu"
   />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="collection"
+    title="collection"
+  />
 </div>
 
 ```
