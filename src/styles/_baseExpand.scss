@@ -57,33 +57,26 @@
 
     // first level
     .base-expand-item {
-      position: relative;
-
-      &:before {
-        content: "";
-        display: block;
-        position: absolute;
-        left: 0;
-        z-index: 1;
-        width: $border-active-width;
-        height: 100%;
-        background-color: $app-color-secondary;
-      }
+      border-color: $app-color-secondary;
     }
 
     // second level
     .base-expand {
+      position: relative;
+
+      &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        z-index: 2;
+        width: $border-active-width;
+        height: 100%;
+        background-color: transparent;
+        transition: all 500ms ease-in-out;
+      }
 
       &.expanded {
-        position: relative;
-
-        &:before {
-          content: "";
-          display: block;
-          position: absolute;
-          z-index: 2;
-          width: $border-active-width;
-          height: 100%;
+        &::before {
           background-color: $app-color;
         }
       }

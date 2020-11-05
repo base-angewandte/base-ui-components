@@ -16,7 +16,7 @@
         @click="expand">
         <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
           <span
-            class="base-expand__head__label">{{ data.label }} {{ maxHeight }}</span>
+            class="base-expand__head__label">{{ data.label }}</span>
           <span
             class="base-expand__head__additional">({{ data.data.length }})</span>
         </span>
@@ -26,7 +26,12 @@
           class="base-expand-item__col base-expand__head__icon" />
       </button>
 
-      <transition name="slide-expand">
+      <transition
+        name="expand"
+        @enter="enter"
+        @after-enter="afterEnter"
+        @before-leave="leave"
+        @after-leave="afterLeave">
         <ul
           v-show="expanded"
           :id="'base-expand-region-' + _uid"
@@ -34,13 +39,13 @@
           :aria-labelledby="'base-expand-control-' + _uid"
           :aria-hidden="!expanded ? 'true' : 'false'"
           class="base-expand__body">
-          <!-- :style="`max-height: ${maxHeight}`" -->
-          <!-- Todo: limit levels (counter) -->
+          <!-- Todo: limit levels (counter)  :style="`max-height: ${calcMaxHeight()}px`" -->
           <base-expand-list-row
             v-for="(items, index) in data.data"
             ref="baseExpandListRow"
             :key="'item_' + index"
             :data="items"
+            :multiple="multiple"
             render-as="li" />
         </ul>
       </transition>
@@ -163,15 +168,6 @@ export default {
       movableInt: this.movable,
     };
   },
-  computed: {
-    maxHeight() {
-      // const elementHeight = this.$el.querySelector('.base-expand-item').offsetHeight;
-      // // const children = this.$el.querySelectorAll('.base-expand-item');
-      // console.log(elementHeight);
-      return '';
-      // return `${elementHeight * children}px`;
-    },
-  },
   watch: {
     /**
      * Set focus to active movable item
@@ -209,18 +205,80 @@ export default {
         return;
       }
 
-      // close all items
+      // close expanded rows
       if (!this.multiple) {
         const rows = this.$parent.$refs.baseExpandListRow;
+
         if (rows) {
           rows.forEach((row) => {
             // eslint-disable-next-line
             row.expanded = false;
+            this.closeRows(row.$children);
           });
         }
       }
 
       this.expanded = true;
+    },
+    /**
+     * calc max height for transition
+     *
+     * @params {object} el
+     */
+    maxHeight(el) {
+      const elementHeight = this.$el.querySelector('.base-expand-item').offsetHeight;
+      const maxHeight = elementHeight + elementHeight * this.data.data.length;
+
+      el.setAttribute('style', `max-height: ${maxHeight}px`);
+    },
+    /**
+     * close expanded rows
+     *
+     * @params {array} rows
+     */
+    closeRows(rows) {
+      if (rows) {
+        rows.forEach((row) => {
+          // eslint-disable-next-line
+          row.expanded = false;
+        });
+      }
+    },
+    /**
+     * event triggered on enter transition
+     *
+     * @params {object} el
+     */
+    enter(el) {
+      this.maxHeight(el);
+    },
+    /**
+     * event triggered on finished enter transition
+     *
+     * @params {object} el
+     */
+    afterEnter(el) {
+      el.style.removeProperty('max-height');
+    },
+    /**
+     * event triggered on leave transition
+     *
+     * @params {object} el
+     */
+    leave(el) {
+      const elementHeight = this.$el.offsetHeight;
+      el.setAttribute('style', `max-height: ${elementHeight}px`);
+    },
+    /**
+     * event triggered on finished leave transition
+     *
+     * @params {object} el
+     */
+    afterLeave() {
+      // close expanded rows of current level
+      if (!this.multiple) {
+        this.closeRows(this.$refs.baseExpandListRow);
+      }
     },
   },
 };
@@ -228,16 +286,17 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../styles/variables";
-@import "../../styles/baseExpand";
 
 .base-expand-item {
   display: flex;
   align-items: center;
   background-color: #fff;
   margin-bottom: $border-width;
-  padding-left: $spacing;
+  padding-left: calc(#{$spacing} - #{$border-active-width});
   padding-right: $spacing;
   outline: 1px solid $background-color;
+  border-left: $border-active-width solid transparent;
+  transition: border-left-color 500ms ease-in-out;
 
   &__col {
     display: flex;
@@ -299,4 +358,41 @@ export default {
     outline: 1px solid $app-color;
   }
 }
+</style>
+
+<style lang="scss">
+@import "../../styles/variables";
+
+.expand-enter-active,
+.expand-leave-active {
+  transition-duration: 500ms;
+  transition-timing-function: ease-in-out;
+}
+
+.expand-enter-to,
+.expand-leave {
+  overflow: hidden;
+}
+
+.expand-enter,
+.expand-leave-to {
+  overflow: hidden;
+  max-height: 0 !important;
+}
+
+.expand-enter {
+  .base-expand-item {
+    border-color: transparent !important;
+  }
+}
+
+.expand-enter-to {
+  .base-expand-item {
+    border-color: $app-color-secondary !important;
+  }
+}
+</style>
+
+<style lang="scss">
+@import "../../styles/baseExpand";
 </style>
