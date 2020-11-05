@@ -235,8 +235,7 @@ export default {
   align-items: center;
   background-color: #fff;
   margin-bottom: $border-width;
-  border-left: $border-active-width solid #ffffff;
-  padding-left: calc(#{$spacing} - #{$border-active-width});
+  padding-left: $spacing;
   padding-right: $spacing;
   outline: 1px solid $background-color;
 
