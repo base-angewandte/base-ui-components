@@ -22,7 +22,7 @@
         icon="drop-down"
         icon-position="right"
         :text="showAll ? showLessText: showMoreText"
-        :class="{ 'base-button-rotate': showAll }"
+        :class="{ 'base-button-icon-rotate-180': showAll }"
         @clicked="showAll = !showAll" />
     </template>
 
