@@ -97,7 +97,7 @@
             :has-background-color="false"
             icon-size="large"
             class="base-expand-item__controls__fixed"
-            @clicked="data.visible =! data.visible" />
+            @clicked="setVisibility" />
         </div>
       </div>
     </template>
@@ -182,6 +182,10 @@ export default {
     },
   },
   methods: {
+    setVisibility() {
+      this.data.visible = !this.data.visible;
+      this.$forceUpdate();
+    },
     /**
      * move item
      *
