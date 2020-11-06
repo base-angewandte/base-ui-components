@@ -39,7 +39,7 @@
           :aria-labelledby="'base-expand-control-' + _uid"
           :aria-hidden="!expanded ? 'true' : 'false'"
           class="base-expand__body">
-          <!-- Todo: limit levels (counter)  :style="`max-height: ${calcMaxHeight()}px`" -->
+          <!-- Todo: limit levels (counter) -->
           <base-expand-list-row
             v-for="(items, index) in data.data"
             ref="baseExpandListRow"
