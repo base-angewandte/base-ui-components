@@ -158,3 +158,14 @@ h1, h2, h3 {
     z-index: map-get($zindex, fadeout);
   }
 }
+
+.base-box-shadow {
+  position: relative;
+  z-index: 1;
+  box-shadow: $box-shadow-reg;
+  transition: box-shadow 150ms ease-in-out;
+
+  &--edit {
+    box-shadow: $box-shadow-edit;
+  }
+}

@@ -1,9 +1,10 @@
 <template>
   <div class="base-expand-list">
     <!-- List items with clickable head to expand body -->
-    <template
-      v-if="!edit">
+    <div
+      :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
       <ul
+        v-if="!edit"
         role="list"
         :aria-labelledby="`base-expand-list-${_uid}`">
         <base-expand-list-row
@@ -15,21 +16,10 @@
           :multiple="multiple"
           render-as="li" />
       </ul>
-      <base-button
-        v-if="data.length > minItems"
-        :id="`base-expand-list-${_uid}`"
-        :aria-expanded="showAll ? 'true' : 'false'"
-        icon="drop-down"
-        icon-position="right"
-        :text="showAll ? showLessText: showMoreText"
-        :class="{ 'base-button-icon-rotate-180': showAll }"
-        @clicked="showAll = !showAll" />
-    </template>
 
-    <!-- List items in draggable area -->
-    <template
-      v-if="edit">
+      <!-- List items in draggable area -->
       <draggable
+        v-if="edit"
         v-model="dataInt"
         :draggable="'.base-expand-list__draggable__item'"
         :handle="['.base-expand-item__handle', '.base-expand-item__label']"
@@ -44,7 +34,17 @@
           class="base-expand-list__draggable__item"
           @sorted="sort" />
       </draggable>
-    </template>
+    </div>
+
+    <base-button
+      v-if="!edit && data.length > minItems"
+      :id="`base-expand-list-${_uid}`"
+      :aria-expanded="showAll ? 'true' : 'false'"
+      icon="drop-down"
+      icon-position="right"
+      :text="showAll ? showLessText: showMoreText"
+      :class="{ 'base-button-icon-rotate-180': showAll }"
+      @clicked="showAll = !showAll" />
   </div>
 </template>
 
