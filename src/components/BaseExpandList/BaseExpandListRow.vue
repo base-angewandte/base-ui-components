@@ -196,6 +196,9 @@ export default {
     },
   },
   methods: {
+    /**
+     * set visibility and force update
+     */
     setVisibility() {
       this.data.visible = !this.data.visible;
       this.$forceUpdate();

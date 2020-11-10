@@ -149,9 +149,6 @@ export default {
       // }
     },
   },
-  mounted() {
-    // console.log(this.$refs.baseExpandListRow[0]);
-  },
   methods: {
     /**
      * add additional parameters e.g: order for sorting
