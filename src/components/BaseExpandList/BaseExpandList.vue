@@ -31,6 +31,8 @@
           :key="index"
           :data="item"
           :edit="true"
+          :edit-hide-text="editHideText"
+          :edit-show-text="editShowText"
           class="base-expand-list__draggable__item"
           @sorted="sort" />
       </draggable>
