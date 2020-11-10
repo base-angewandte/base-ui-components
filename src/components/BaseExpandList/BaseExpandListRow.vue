@@ -329,7 +329,7 @@ export default {
 
     &:hover,
     &:focus {
-      color: $app-color;
+      color: $app-color-secondary;
     }
   }
 
@@ -366,7 +366,7 @@ export default {
     padding-left: calc(#{$spacing-large} - #{$border-active-width});
 
     @media screen and (max-width: $mobile) {
-      padding-left: $spacing-small;
+      padding-left: calc(#{$spacing} - #{$border-active-width});
     }
   }
 
