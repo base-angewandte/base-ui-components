@@ -93,10 +93,10 @@
         <div class="base-expand-item__col base-expand-item__controls">
           <base-button
             :icon="data.visible ? 'eye-hide': 'eye'"
-            :text="data.visible ? 'Hide' : 'Show'"
+            :text="data.visible ? editHideText : editShowText"
             :has-background-color="false"
             icon-size="large"
-            class="base-expand-item__controls__fixed"
+            align-text="left"
             @clicked="setVisibility" />
         </div>
       </div>
@@ -160,6 +160,20 @@ export default {
     renderAs: {
       type: String,
       default: 'div',
+    },
+    /**
+     * button text to hide item
+     */
+    editHideText: {
+      type: String,
+      default: 'Hide',
+    },
+    /**
+     * button text to show item
+     */
+    editShowText: {
+      type: String,
+      default: 'Show',
     },
   },
   data() {

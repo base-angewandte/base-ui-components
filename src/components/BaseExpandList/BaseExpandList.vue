@@ -102,6 +102,20 @@ export default {
       type: String,
       default: 'Show less',
     },
+    /**
+     * button text to hide item
+     */
+    editHideText: {
+      type: String,
+      default: 'Hide',
+    },
+    /**
+     * button text to show item
+     */
+    editShowText: {
+      type: String,
+      default: 'Show',
+    },
   },
   data() {
     return {
