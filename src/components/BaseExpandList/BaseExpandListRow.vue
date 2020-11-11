@@ -3,8 +3,7 @@
     :is="renderAs"
     :class="[{
       'base-expand': !edit,
-      'expanded': expanded,
-      'hidden': hide }]">
+      'expanded': expanded }]">
     <template
       v-if="!edit && data.label">
       <button
@@ -130,13 +129,6 @@ export default {
      * set edit mode
      */
     edit: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * initial hide component
-     */
-    hide: {
       type: Boolean,
       default: false,
     },

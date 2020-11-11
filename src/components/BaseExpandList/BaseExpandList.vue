@@ -9,10 +9,10 @@
         :aria-labelledby="`base-expand-list-${_uid}`">
         <base-expand-list-row
           v-for="(items, index) in data"
+          v-show="index < (showAll ? data.length : minItems)"
           ref="baseExpandListRow"
           :key="index"
           :data="items"
-          :hide="index>=(showAll ? data.length : minItems)"
           :multiple="multiple"
           render-as="li" />
       </ul>
