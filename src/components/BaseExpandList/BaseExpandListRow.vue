@@ -85,14 +85,14 @@
           <span
             :class="[
               'base-expand__head__label',
-              { 'base-expand__head__label--disabled': !data.visible }]">{{ data.label }}</span>
+              { 'base-expand__head__label--disabled': data.hidden }]">{{ data.label }}</span>
           <span
             class="base-expand__head__additional">({{ data.data.length }})</span>
         </div>
         <div class="base-expand-item__col base-expand-item__controls">
           <base-button
-            :icon="data.visible ? 'eye-hide': 'eye'"
-            :text="data.visible ? editHideText : editShowText"
+            :icon="data.hidden ? 'eye': 'eye-hide'"
+            :text="data.hidden ? editShowText : editHideText"
             :has-background-color="false"
             icon-size="large"
             align-text="left"
@@ -192,7 +192,7 @@ export default {
      * set visibility and force update
      */
     setVisibility() {
-      this.data.visible = !this.data.visible;
+      this.data.hidden = !this.data.hidden;
       this.$forceUpdate();
     },
     /**

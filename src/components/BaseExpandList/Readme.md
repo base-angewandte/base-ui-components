@@ -5,7 +5,7 @@ Component to render list data
   <div>
     <BaseEditControl
       title="Activities"
-      :subtitle="'(' + baseExpandList.filter(item => item.visible).length + ')'"
+      :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
       :edit="editExpandList"
       @activated="activateExpandList"
       @canceled="cancelExpandList"
@@ -13,7 +13,7 @@ Component to render list data
 
     <BaseExpandList
       ref="baseExpandList"
-      :data="editExpandList ? baseExpandList : baseExpandList.filter(item => item.visible)"
+      :data="editExpandList ? baseExpandList : baseExpandList.filter(item => !item.hidden)"
       :edit="editExpandList"
       @saved="saveExpandListEdit" />
   </div>
@@ -34,7 +34,6 @@ export default {
       baseExpandList: [
         {
           label: 'Monographien',
-          visible: true, // TODO: define naming, maybe 'hidden' better
           data: [
             {
               label: 'Beiträge in Sammelband',
@@ -45,7 +44,7 @@ export default {
                     'molestiae commodi ipsum',
                     'eos dolorem in',
                   ],
-                  id: '29', // TODO: should be id (change in open-api-definition)
+                  id: '29',
                   href: '#',
                 },
                 {
@@ -104,7 +103,6 @@ export default {
         },
         {
           label: 'Film/Video',
-          visible: true,
           data: [
             {
               value: 'qui fugit',
@@ -146,7 +144,6 @@ export default {
         },
         {
           label: 'Audio',
-          visible: true,
           data: [
             {
               value: 'sed et',
@@ -179,7 +176,6 @@ export default {
         },
         {
           label: 'Preise und Stipendien',
-          visible: true,
           data: [
             {
               value: 'qui fugit',
@@ -221,7 +217,6 @@ export default {
         },
         {
           label: 'Konferenzen & Symposien',
-          visible: true,
           data: [
             {
               value: 'qui fugit',
