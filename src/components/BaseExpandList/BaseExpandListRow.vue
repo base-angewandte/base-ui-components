@@ -30,8 +30,8 @@
         name="expand"
         @enter="enter"
         @after-enter="afterEnter"
-        @before-leave="leave"
-        @after-leave="afterLeave">
+        @leave="leave"
+        @before-leave="beforeLeave">
         <ul
           v-show="expanded"
           :id="'base-expand-region-' + _uid"
@@ -291,11 +291,9 @@ export default {
       el.setAttribute('style', `max-height: ${elementHeight}px`);
     },
     /**
-     * event triggered on finished leave transition
-     *
-     * @params {object} el
+     * event triggered on before leave transition
      */
-    afterLeave() {
+    beforeLeave() {
       // close expanded rows of current level
       if (!this.multiple) {
         this.closeRows(this.$refs.baseExpandListRow);
