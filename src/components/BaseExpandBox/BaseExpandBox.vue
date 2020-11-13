@@ -2,7 +2,10 @@
   <base-box
     box-ratio="0"
     :box-size="{width: '100%'}"
-    :class="['base-expand-box', {'base-expand-box-open': isOpen }]">
+    :class="[
+      'base-expand-box',
+      { 'base-expand-box-open': isOpen,
+        'base-expand-box-show-content': showContent }]">
     <div
       :class="[
         'base-expand-box-content',
@@ -32,6 +35,10 @@
 import BaseBox from '../BaseBox/BaseBox';
 import BaseButton from '../BaseButton/BaseButton';
 
+/**
+ * Component to render content in expandable container
+ */
+
 export default {
   name: 'BaseExpandBox',
   components: {
@@ -58,10 +65,14 @@ export default {
     return {
       isOpen: false,
       showButton: false,
+      showContent: false,
     };
   },
   mounted() {
+    // compare content to parent container -> set button visibility
     this.showButton = this.contentInnerHeight() > this.contentHeight();
+    // set content visible
+    this.showContent = true;
   },
   methods: {
     /**
@@ -117,6 +128,10 @@ export default {
       }
     }
 
+    .base-expand-box-content-inner {
+      visibility: hidden;
+    }
+
     .base-expand-box-button {
       margin-top: $spacing;
       padding-left: 0;
@@ -125,6 +140,14 @@ export default {
     &.base-expand-box-open {
       .base-expand-box-content {
         height: auto;
+      }
+    }
+
+    &.base-expand-box-show-content {
+      .base-expand-box-content-inner {
+        position: relative;
+        height: 100%;
+        visibility: visible;
       }
     }
   }

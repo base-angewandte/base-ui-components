@@ -1,5 +1,11 @@
 <template>
-  <div class="base-text-list">
+  <div
+    :class="[
+      'base-text-list',
+      {
+        'base-text-list-2-cols': cols2 && data.length > 1,
+        'base-test-list-2-cols-single-content':
+          cols2 && data.length === 1 && typeof data[0].data === 'string' }]">
     <div
       v-for="(item, index) in data"
       :key="index"
@@ -14,7 +20,10 @@
       <!-- eslint-disable -->
       <p
         v-if="typeof item.data === 'string'"
-        class="base-text-list-content base-text-list-content-pre-line">{{ item.data }}</p>
+        :class="[
+          'base-text-list-content',
+          'base-text-list-content-pre-line',
+          { 'base-text-list-2-cols': data.length === 1 }]">{{ item.data }}</p>
       <!-- eslint-enable -->
 
       <!-- Array as unordered list -->
@@ -64,6 +73,11 @@
 </template>
 
 <script>
+
+/**
+ * Component to render data in p | ul | dt tags depending on field type
+ */
+
 export default {
   name: 'BaseTextList',
   props: {
@@ -81,6 +95,13 @@ export default {
       type: String,
       default: 'div',
     },
+    /**
+     * render content in two columns
+     */
+    cols2: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>
@@ -88,9 +109,19 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
+  .base-text-list-2-cols {
+    columns: 2;
+    column-gap: $spacing-large;
+
+    @media screen and (max-width: $mobile) {
+      columns: inherit;
+    }
+  }
+
   .base-text-list {
 
     .base-text-list-group {
+      page-break-inside: avoid;
 
       &:first-of-type {
         .base-text-list-label {
@@ -102,12 +133,14 @@ export default {
         margin-top: $line-height;
       }
 
-      .base-text-list-content, .base-text-list-label {
+      .base-text-list-content,
+      .base-text-list-label {
         overflow-wrap: break-word;
       }
 
       .base-text-list-content {
         color: $font-color-second;
+        height: 100%;
 
         .base-text-list__content-link {
           color: $app-color;
@@ -137,6 +170,11 @@ export default {
           margin-top: $line-height;
         }
       }
+    }
+
+    &.base-test-list-2-cols-single-content {
+      display: flex;
+      height: calc(100% - #{$line-height});
     }
   }
 </style>
