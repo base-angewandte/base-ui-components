@@ -135,6 +135,7 @@ export default {
     .base-expand-box-button {
       margin-top: $spacing;
       padding-left: 0;
+      justify-content: flex-start; // IE 11
     }
 
     &.base-expand-box-open {
