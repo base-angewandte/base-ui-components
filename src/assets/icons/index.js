@@ -21,10 +21,12 @@ import link from './link';
 import logo from './logo';
 import magnifier2 from './magnifier-2';
 import magnifier from './magnifier';
+import next from './next';
 import optionsMenu from './options-menu';
 import people from './people';
 import plus2 from './plus-2';
 import plus from './plus';
+import prev from './prev';
 import print from './print';
 import remove2 from './remove-2';
 import remove from './remove';
@@ -61,10 +63,12 @@ export default {
   logo,
   magnifier2,
   magnifier,
+  next,
   optionsMenu,
   people,
   plus2,
   plus,
+  prev,
   print,
   remove2,
   remove,

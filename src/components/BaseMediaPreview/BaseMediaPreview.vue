@@ -9,6 +9,25 @@
         name="remove"
         class="base-media-preview-close-icon" />
     </div>
+
+    <div
+      v-if="typeof slideShowIndex === 'number'"
+      class="base-media-preview__slideshow">
+      <button
+        @click="slide('prev')">
+        <base-icon
+          name="prev"
+          class="base-media-preview__slideshow__icon base-media-preview__slideshow__icon--prev" />
+      </button>
+
+      <button
+        @click="slide('next')">
+        <base-icon
+          name="next"
+          class="base-media-preview__slideshow__icon base-media-preview__slideshow__icon--next" />
+      </button>
+    </div>
+
     <!-- TODO_ add transition -->
     <transition name="grow">
       <div
@@ -90,6 +109,12 @@
                 {{ textline }}
               </p>
             </template>
+          </div>
+          <div
+            v-if="slideShowTotal">
+            <p>
+              {{ slideShowIndex + 1 }} / {{ slideShowTotal }}
+            </p>
           </div>
           <BaseButton
             v-if="allowDownload"
@@ -210,6 +235,14 @@ export default {
       type: Array,
       default: () => [],
     },
+    slideShowIndex: {
+      type: Number,
+      default: null,
+    },
+    slideShowTotal: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -305,6 +338,19 @@ export default {
     },
     openPdf() {
       window.open(this.mediaUrl);
+    },
+    /**
+     * Slide media
+     *
+     * @param {string} direction
+     */
+    slide(direction) {
+      /**
+       * event emitted upon button prev/next click
+       *
+       * @type { Event }
+       */
+      this.$emit('slide', { index: this.slideShowIndex, direction });
     },
   },
 };
@@ -485,23 +531,49 @@ export default {
   }
 
   @media screen and (max-width: $tablet) {
-    .base-media-preview-background
-    .base-media-preview-image-stage
+    .base-media-preview-background,
+    .base-media-preview-image-stage,
     .base-media-preview-not-supported {
       width: 75%;
     }
   }
 
   @media screen and (max-width: $mobile) {
-    .base-media-preview-background
-    .base-media-preview-image-stage
-    .base-media-preview-not-supported
+    .base-media-preview-background,
+    .base-media-preview-image-stage,
+    .base-media-preview-not-supported,
     .base-media-preview-not-supported-buttons {
       flex-wrap: wrap;
 
       .base-media-preview-not-supported-button {
         margin: $spacing-small;
         min-width: 125px;
+      }
+    }
+  }
+
+  .base-media-preview__slideshow {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 52px); // Todo: calc with footer height
+
+    &__icon {
+      position: absolute;
+      top: calc(50% - #{$icon-large} / 2);
+      width: $icon-large;
+      height: $icon-large;
+      fill: white;
+
+      &--prev {
+        left: $spacing;
+      }
+
+      &--next {
+        right: $spacing;
+      }
+
+      &:hover {
+        cursor: pointer;
       }
     }
   }
