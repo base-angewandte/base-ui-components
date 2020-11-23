@@ -5,7 +5,8 @@
       :class="[
         'base-options__row',
         `base-options__row-${alignOptions}`,
-        { 'base-options__row-wrap': !showOptionsInline },
+        { 'base-options__row-wrap': !showOptionsInline
+        || (!useOptionsButton && remainingActionsWidth < actionButtonsWidth) },
       ]">
       <div
         ref="beforeOptions"
@@ -18,7 +19,7 @@
         v-if="alignOptions === 'right'"
         class="base-options__spacer" />
       <div
-        v-if="showOptionsInline && showOptionsInt"
+        v-if="!optionsHidden && showOptionsInline && showOptionsInt"
         ref="actions"
         :class="['base-options__options-inline',
                  { 'base-options__options-inline-wrap': wrapActions },
@@ -27,7 +28,7 @@
         <slot name="options" />
       </div>
       <BaseButton
-        v-if="useOptionsButton"
+        v-if="!optionsHidden && useOptionsButton"
         ref="optionsButton"
         :text="showOptionsInt ? getI18nTerm(optionsButtonText.hide)
           : getI18nTerm(optionsButtonText.show)"
@@ -47,7 +48,7 @@
     </div>
     <transition name="slide-fade-options">
       <div
-        v-if="showOptionsInt && !showOptionsInline"
+        v-if="!optionsHidden && showOptionsInt && !showOptionsInline"
         class="base-options__below">
         <!-- @slot add the actual options -->
         <slot name="options" />
@@ -77,6 +78,13 @@ export default {
      * set showing of option buttons from outside
      */
     showOptions: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * hide options completely (necessary if only before or after elements should remain)
+     */
+    optionsHidden: {
       type: Boolean,
       default: false,
     },
@@ -211,7 +219,7 @@ export default {
      * @returns {Boolean}
      */
     showOptionsInline() {
-      return this.remainingActionsWidth > this.actionButtonsWidth || !this.useOptionsButton;
+      return this.remainingActionsWidth - this.actionButtonsWidth > 0 || !this.useOptionsButton;
     },
     /**
      * determine if afterOptions slot should be shown above or below options in a
@@ -253,14 +261,6 @@ export default {
     // watch options toggle to recalculate the remaining size
     // for options (= should they be shown inline or below)
     showOptionsInt(val) {
-      // if options are shown
-      if (val) {
-        // wait until options elements are rendered
-        this.$nextTick(() => {
-          // then recalculate element widths
-          this.calcOptionsWidth();
-        });
-      }
       if (this.showOptions !== val) {
         /**
          * emitted when options button is toggled (not relevant if 'useOptionsButtonOn' prop
@@ -302,6 +302,9 @@ export default {
   },
   updated() {
     this.calcFixedElementWidth();
+    if (this.showOptionsInt && this.$refs.actions) {
+      this.calcOptionsWidth();
+    }
   },
   beforeDestroy() {
     if (this.observer) this.observer.unobserve(this.$refs.optionsRow);
@@ -407,7 +410,6 @@ export default {
     }
 
     &-right {
-      justify-content: space-between;
     }
 
     &-wrap {

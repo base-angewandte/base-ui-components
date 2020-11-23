@@ -16,11 +16,18 @@
         v-if="showHeader"
         class="base-result-box-section__header-row">
         <BaseOptions
-          v-if="showOptions || draggable"
-          :show-after-options-inline="true"
+          v-if="showOptions"
           :show-options="editModeActive"
-          align-options="left"
-          @options-toggle="optionsToggle">
+          :options-button-icon="{
+            show: 'edit',
+            hide: 'remove',
+          }"
+          :options-button-text="{
+            show: 'edit',
+            hide: 'editReturn',
+          }"
+          use-options-button-on="always"
+          @update:show-options="optionsToggle">
           <template v-slot:beforeOptions>
             <!-- @slot add a custom header instead of headerText -->
             <slot name="header">
@@ -37,25 +44,7 @@
             <!-- show options as long as no action was activated -->
             <div
               class="base-result-box-section__result-options">
-              <!-- TODO: drag functionality is hidden from keyboard users
-              until solution for making draggable accessible is implemented
-               e.g. use $event information to activate select mode? -->
-              <!-- DRAG OPTION -->
-              <!--              <BaseButton-->
-              <!--                v-if="draggable"-->
-              <!--                :text="'change order via drag\'n drop'"-->
-              <!--                :aria-hidden="true"-->
-              <!--                :active="actionInt === 'drag'"-->
-              <!--                :disabled="true"-->
-              <!--                tabindex="-1"-->
-              <!--                icon="drag-n-drop"-->
-              <!--                icon-size="large"-->
-              <!--                @clicked="setAction('drag')" />-->
-              <!-- slot to add further options -->
-              <!-- @slot to add custom options buttons, otherwise there is a delete option unless
-               showOptions is set false<br>
-                to trigger and action call the slot scope function
-                setAction([string of action in question]) -->
+              <!-- TODO: drag functionality is hidden from keyboard users-->
               <slot
                 :set-action="setAction"
                 name="option-buttons">
@@ -71,28 +60,6 @@
                   @clicked="setAction('delete')" />
               </slot>
             </div>
-            <!-- if action was activated show a cancel and submit action button instead -->
-            <!--            <div-->
-            <!--              v-if="!!actionInt"-->
-            <!--              class="base-result-box-section__result-options">-->
-            <!--              <BaseButton-->
-            <!--                :text="cancelText"-->
-            <!--                icon-size="large"-->
-            <!--                icon="remove"-->
-            <!--                button-style="single"-->
-            <!--                @clicked="cancelAction" />-->
-            <!--              <BaseButton-->
-            <!--                :text="actionButtonText[actionInt] || actionButtonText"-->
-            <!--                :description="`${messageText[actionInt] || messageText}.-->
-            <!--                 ${messageSubtext[actionInt] || messageSubtext}`"-->
-            <!--                icon-size="large"-->
-            <!--                icon="save-file"-->
-            <!--                button-style="single"-->
-            <!--                @clicked="submitAction" />-->
-            <!--            </div>-->
-          </template>
-          <template v-slot:afterOptions>
-            <slot name="option-buttons-after" />
           </template>
         </BaseOptions>
         <template v-else>
@@ -180,13 +147,31 @@
                   :image-url="entry.imageUrl"
                   :box-text="entry.text"
                   @select-triggered="entrySelected(entry.id, $event)"
-                  @clicked="entrySelected(entry.id)" />
+                  @clicked="entrySelected(entry.id)">
+                  <div
+                    slot="top">
+                    <template v-if="entry.type === 'album'">
+                      <div class="file-published">
+                        <base-icon
+                          name="edit"
+                          :title="'published'"
+                          :aria-title="'published'"
+                          class="published-icon" />
+                        <base-icon
+                          name="collection"
+                          :title="'published'"
+                          :aria-title="'published'"
+                          class="collection-icon" />
+                      </div>
+                    </template>
+                  </div>
+                </BaseImageBox>
               </slot>
             </li>
             <!-- ACTION BUTTON -->
             <!-- TODO: only show boxbutton if there is only one action total -->
             <slot
-              v-if="showActionButtonBox"
+              v-if="showActionButtonBox && editModeActive"
               :set-action="setAction"
               name="actionButtons">
               <!-- default button -->
@@ -197,7 +182,7 @@
                 box-style="small"
                 box-type="button"
                 class="base-result-box-section__box"
-                @clicked="submitAction" />
+                @clicked="setAction('delete')" />
             </slot>
             <!-- EXPAND BUTTON -->
             <BaseBoxButton
@@ -232,12 +217,12 @@
 
         <!-- PAGINATION -->
         <!-- only shown if
-        * not draggable active
+        * not draggable
         * expand mode is not used or boxes are expanded
         * there is a number of max rows specified
         * and it is actually needed because there is more than one page -->
         <BasePagination
-          v-if="!editModeActive && (!useExpandMode || expandedInt) && maxRows && pages > 1"
+          v-if="!draggable && (!useExpandMode || expandedInt) && maxRows && pages > 1"
           key="pagination"
           :total="pages"
           :current="currentPageNumber"
@@ -249,6 +234,7 @@
 </template>
 
 <script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 
@@ -260,6 +246,7 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
+    BaseIcon,
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
     BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
     BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
@@ -340,7 +327,7 @@ export default {
       }),
     },
     /**
-     * customize the action text of the submit button<br>
+     * customize the text of the action button<br>
      *   this should be a string or an object with the actions needed (default: 'delete',
      *   if 'draggable' is true than also a 'drag' text is needed)<br>
      *     in case of a string the same text is used for all actions (not recommended
@@ -365,14 +352,7 @@ export default {
      */
     showActionButtonBox: {
       type: Boolean,
-      default: true,
-    },
-    /**
-     * set action from outside
-     */
-    action: {
-      type: String,
-      default: '',
+      default: false,
     },
     /**
      * set component loader active
@@ -435,7 +415,8 @@ export default {
       default: true,
     },
     /**
-     * add a number of total elements
+     * add a number of total elements (needed for expandMode and
+     * pagination
      */
     total: {
       type: Number,
@@ -553,7 +534,9 @@ export default {
      * @returns {number}
      */
     visibleNumberOfItems() {
-      if (this.useExpandMode || this.actionInt) {
+      // TODO: also subtract 1 if action box buttons should be shown!
+      if (this.useExpandMode) {
+        // subtract 1 for the Expand Box Button or Action Button
         return (this.itemsPerRow * this.maxRows) - 1;
       }
       return this.itemsPerRow * this.maxRows;
@@ -578,7 +561,7 @@ export default {
      * @returns {Object[]}
      */
     visibleBoxes() {
-      if (this.editModeActive) {
+      if (this.editModeActive && this.draggable) {
         return this.draggedList;
       }
       // if expand mode is used and status is collapsed and there
@@ -612,29 +595,8 @@ export default {
       }
       return 'ul';
     },
-    // /**
-    //  * is draggable mode active
-    //  *
-    //  * attention: should this be at some point changed to be settable from
-    //  // outside (= a prop) this leads to problem with calculating the correct
-    //  // number for itemsPerRow in calcBoxNumber on mounted
-    //  *
-    //  * @returns {boolean}
-    //  */
-    // draggableActive() {
-    //   return this.actionInt === 'drag';
-    // },
   },
   watch: {
-    $refs: {
-      handler(val) {
-        console.log(val);
-        console.log('listening');
-        // this.$nextTick(() => console.log('refs tick'));
-      },
-      deep: true,
-      immediate: true,
-    },
     // watch prop action if set from outside
     action: {
       handler(val) {
@@ -745,74 +707,28 @@ export default {
   },
   methods: {
     /**
-     * triggered when an action is selected (=button is clicked) and the
-     * select mode is triggered
-     *
-     * using custom options this function can be triggered within
-     * the option-buttons slot-scope
-     *
-     * @param {string} act the action triggered (e.g. 'delete')
-     */
-    setAction(act) {
-      // store the collapsed state first
-      this.wasExpanded = this.expandedInt;
-      // if options are triggered the section should expand automatically
-      this.expandedInt = true;
-      this.actionInt = act;
-      /**
-       * event triggered when an action is selected (and boxes
-       * are ready to be selected)
-       *
-       * @event set-action
-       * @param {string} act - the action type
-       */
-      this.$emit('set-action', act);
-    },
-    /**
      * function triggered when items were selected and user has
      * clicked action button to go through with the action
      */
-    submitAction() {
-      // return to original collapsed state
-      this.expandedInt = this.wasExpanded;
-      // special case drag
-      if (this.actionInt === 'drag') {
-        /**
-         * event emited when entry order was changed (draggable mode)
-         * entryList is automatically updated with v-model
-         *
-         * @event entries-changed
-         * @type {Object[]}
-         */
-        this.$emit('entries-changed', this.draggedList);
-      } else {
-        /**
-         * event triggered when an action is triggered (after selecting boxes)
-         *
-         * @event submit-action
-         * @param {string} actionInt - the action type
-         */
-        this.$emit('submit-action', this.actionInt);
-      }
-      // reset the action string
-      this.actionInt = '';
+    setAction(action) {
+      /**
+       * event triggered when an action is triggered (after selecting boxes)
+       *
+       * @event set-action
+       * @param {string} actionInt - the action type
+       */
+      this.$emit('set-action', action);
     },
     /**
      * function triggered when the user cancels the selected action and
      * returns to non-select mode
      */
-    cancelAction() {
+    returnFromEditMode() {
       // reset the action string
       this.actionInt = '';
       // return to original collapsed state
       this.expandedInt = this.wasExpanded;
       this.draggedList = [...this.entryList];
-      /**
-       * event triggered when an action cancelled
-       *
-       * @event cancel-action
-       */
-      this.$emit('cancel-action');
     },
     /**
      * toggling of options when options are behind a 'options' button
@@ -820,13 +736,13 @@ export default {
      * @param {Boolean} actionsVisible true for open, false for close
      */
     optionsToggle(actionsVisible) {
-      console.log('options toggle');
-      console.log(actionsVisible);
       // reset the actions string
       this.actionInt = '';
-      // set the component internal showActions variable in sync
-      this.showActions = actionsVisible;
       this.editModeActive = actionsVisible;
+      if (!actionsVisible) {
+        this.returnFromEditMode();
+      }
+      this.$emit('update:edit-mode', actionsVisible);
     },
     /**
      * function triggered when page in pagination component is selected
@@ -977,6 +893,58 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
+  .test {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(160, 160, 160, 0.1);
+    color: rgba(111,111,111, 0.3);
+    cursor: grab;
+
+    .drag-icon {
+      height: 90%;
+      width: 90%;
+    }
+  }
+
+  .file-published {
+    height: 42px;
+    width: 100px;
+    position: absolute;
+    border-radius: $icon-max/2;
+    background: radial-gradient(circle,
+      rgba(255,255,255,1) 60%,
+      rgba(255,255,255,0) 100%);
+    right: 0;
+    top: 0;
+    display: flex;
+    justify-content: flex-end;
+
+    .published-icon {
+      height: $icon-medium;
+      max-width: $icon-medium;
+      margin: $spacing $spacing 0 0;
+      flex-shrink: 0;
+      color: $font-color-second;
+      fill: $font-color-second;
+      cursor: pointer;
+    }
+    .collection-icon {
+      height: $icon-medium;
+      max-width: $icon-medium;
+      color: $app-color;
+      fill: $app-color;
+      margin: $spacing $spacing 0 0;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+  }
+
   .base-result-box-section {
     position: relative;
     --items-per-row: 0;
@@ -1001,12 +969,13 @@ export default {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        margin: $spacing-small 0;
 
         .base-result-box-section__header {
           font-size: $font-size-regular;
           color: $font-color-second;
           font-weight: normal;
-          margin: var(--spacing-regular);
+          margin: 0 0 0 $spacing;
         }
 
         .base-result-box-section__result-options {
@@ -1023,6 +992,7 @@ export default {
         min-height: 200px;
 
         .base-result-box-section__box {
+          position: relative;
           // subtracted 0.01rem for edge
           flex: 0 0 calc(((100% - ((var(--items-per-row) - 1) * #{$spacing}))
           / var(--items-per-row)) - 0.01rem);
@@ -1037,7 +1007,8 @@ export default {
         }
 
         .base-result-box-section__result-box-draggable {
-          box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.25)
+          box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.25);
+          cursor: url('../../static/images/drag-n-drop-cursor.svg'), auto;
         }
 
         .base-result-box-section__expand-button__content {
