@@ -6,7 +6,7 @@
         'base-options__row',
         `base-options__row-${alignOptions}`,
         { 'base-options__row-wrap': !showOptionsInline
-        || (!useOptionsButton && remainingActionsWidth < actionButtonsWidth) },
+          || (!useOptionsButton && remainingActionsWidth < actionButtonsWidth) },
       ]">
       <div
         ref="beforeOptions"

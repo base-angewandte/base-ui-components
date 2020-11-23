@@ -2,122 +2,218 @@
   <div
     id="app"
     style="max-width: 1400px; margin: 0 auto;">
+    <div class="sidebar-options-container">
+      <BaseOptionsNew
+        ref="baseOptions"
+        :use-options-button-on="'never'"
+        :show-options.sync="showCheckbox"
+        :show-after-options-below="true"
+        align-options="left">
+        <template slot="afterOptions">
+          <div
+            ref="afterOptions"
+            class="sidebar-drop-downs">
+            <BaseDropDown
+              v-model="sortParam"
+              :placeholder="'sort by'"
+              :label="'sort by'"
+              :options="[{
+                label: 'test',
+                value: 'test',
+              }]"
+              :with-spacing="false"
+              class="sidebar-dropdown" />
+            <BaseDropDown
+              v-model="filterType"
+              :label="'filter by'"
+              :options="[{
+                label: 'test',
+                value: 'test',
+              }]"
+              :language="'de'"
+              :with-spacing="false"
+              value-prop="source"
+              align-drop-down="right"
+              class="sidebar-dropdown" />
+          </div>
+        </template>
+        <template
+          slot="options">
+          <BaseButton
+            :text="'publish'"
+            :has-background-color="false"
+            icon-size="large"
+            icon="eye"
+            button-style="single" />
+          <BaseButton
+            :text="'offline'"
+            :has-background-color="false"
+            icon-size="large"
+            icon="forbidden"
+            button-style="single" />
+          <BaseButton
+            :text="'duplicate'"
+            :has-background-color="false"
+            icon-size="large"
+            icon="duplicate"
+            button-style="single" />
+          <BaseButton
+            :text="'delete'"
+            :has-background-color="false"
+            icon-size="large"
+            icon="waste-bin"
+            button-style="single" />
+        </template>
+      </BaseOptionsNew>
+    </div>
+<!--    <BaseResultBoxSectionNew-->
+<!--      v-if="editMode"-->
+<!--      v-model="entriesList"-->
+<!--      :action="activeAction"-->
+<!--      :is-loading="false"-->
+<!--      :selected-list="selectedBoxes"-->
+<!--      :show-options="true"-->
+<!--      :draggable="true"-->
+<!--      :edit-mode="true"-->
+<!--      :option-button-text="{ delete: 'delete linked', drag: 'drag' }"-->
+<!--      :action-button-text="{ delete: 'delete', drag: 'done' }"-->
+<!--      :show-action-button-box="true"-->
+<!--      :show-edit-mode-return-button="false"-->
+<!--      cancel-text="cancel"-->
+<!--      header-text="Activity Showcase"-->
+<!--      @entry-selected="entrySelected"-->
+<!--      @all-selected="selectEntries($event)"-->
+<!--      @cancel-action="activeAction = ''"-->
+<!--      @set-action="activeAction = $event"-->
+<!--      @submit-action="activeAction = ''"-->
+<!--      @entries-changed="activeAction = ''">-->
+<!--      <template v-slot:header>-->
+<!--        <h3 class="activity-showcase__header">-->
+<!--          Activity Showcase-->
+<!--        </h3>-->
+<!--      </template>-->
+<!--      <template v-slot:option-buttons="scope">-->
+<!--        <BaseButton-->
+<!--          :text="'add Album'"-->
+<!--          icon-size="large"-->
+<!--          icon="collection"-->
+<!--          button-style="single"-->
+<!--          @clicked="scope.setAction('delete')" />-->
+<!--        <BaseButton-->
+<!--          :text="'add Activity'"-->
+<!--          icon-size="large"-->
+<!--          icon="sheet-empty"-->
+<!--          button-style="single"-->
+<!--          @clicked="scope.setAction('delete')" />-->
+<!--        <BaseButton-->
+<!--          :text="'delete'"-->
+<!--          icon-size="large"-->
+<!--          icon="waste-bin"-->
+<!--          button-style="single"-->
+<!--          @clicked="scope.setAction('delete')" />-->
+<!--      </template>-->
+<!--      <template v-slot:actionButtons>-->
+<!--        <BaseBoxButton-->
+<!--          :text="'Add Album'"-->
+<!--          :box-size="{ width: 'auto' }"-->
+<!--          :show-plus="true"-->
+<!--          icon="collection"-->
+<!--          box-style="large"-->
+<!--          box-type="button"-->
+<!--          class="base-result-box-section__box" />-->
+<!--        <BaseBoxButton-->
+<!--          :text="'Add Activity'"-->
+<!--          :box-size="{ width: 'auto' }"-->
+<!--          :show-plus="true"-->
+<!--          icon="sheet-empty"-->
+<!--          box-style="large"-->
+<!--          box-type="button"-->
+<!--          class="base-result-box-section__box" />-->
+<!--      </template>-->
+<!--    </BaseResultBoxSectionNew>-->
+<!--    <template-->
+<!--      v-else>-->
+<!--      <div class="activity-showcase">-->
+<!--        <h3 class="activity-showcase__header">-->
+<!--          Activity Showcase-->
+<!--        </h3>-->
+<!--        <BaseButton-->
+<!--          icon="edit"-->
+<!--          text="edit"-->
+<!--          @clicked="editMode = true" />-->
+<!--      </div>-->
+<!--      <base-carousel-->
+<!--        :items="entriesList"-->
+<!--        :swiper-options="{-->
+<!--          slidesPerView: 2,-->
+<!--          slidesPerGroup: 2,-->
+<!--          spaceBetween: 15,-->
+<!--          loop: carousel.length > 3,-->
+<!--          speed: 750,-->
+<!--          keyboard: {-->
+<!--            enabled: true,-->
+<!--          },-->
+<!--          pagination: {-->
+<!--            el: '.swiper-pagination',-->
+<!--            clickable: true,-->
+<!--          },-->
+<!--          breakpoints: {-->
+<!--            1024: {-->
+<!--              slidesPerView: carousel.length < 3 ? 2 : 3,-->
+<!--              slidesPerGroup: carousel.length < 3 ? 2 : 3,-->
+<!--            },-->
+<!--          },-->
+<!--        }"-->
+<!--        identifier-property-name="id" />-->
+<!--    </template>-->
     <BaseResultBoxSection
-      v-if="editMode"
-      v-model="entriesList"
-      :action="activeAction"
+      :entry-list="entriesList"
       :is-loading="false"
-      :selected-list="selectedBoxes"
       :show-options="true"
+      :show-header="true"
       :draggable="true"
-      :edit-mode="true"
-      :option-button-text="{ delete: 'delete linked', drag: 'drag' }"
-      :action-button-text="{ delete: 'delete', drag: 'done' }"
-      cancel-text="cancel"
-      header-text="Activity Showcase"
-      @entry-selected="entrySelected"
-      @all-selected="selectEntries($event)"
-      @cancel-action="activeAction = ''"
-      @set-action="activeAction = $event"
-      @submit-action="activeAction = ''"
-      @entries-changed="activeAction = ''">
+      :max-show-more-rows="1"
+      :use-expand-mode="true"
+      :use-pagination="true"
+      :show-action-button-boxes="true"
+      :max-rows="2"
+      @submit-action="test">
       <template v-slot:header>
-        <h3 class="activity-showcase__header">
-          Activity Showcase
-        </h3>
+        <div :style="{ display: 'flex' }">
+          <h3 class="activity-showcase__header">
+            Results
+          </h3>
+          <span> (30)</span>
+        </div>
       </template>
       <template v-slot:option-buttons="scope">
         <BaseButton
           :text="'add Album'"
           icon-size="large"
-          icon="waste-bin"
+          icon="collection"
           button-style="single"
-          @clicked="scope.setAction('delete')" />
+          @clicked="scope.submitAction('delete')" />
         <BaseButton
           :text="'add Activity'"
           icon-size="large"
-          icon="waste-bin"
+          icon="sheet-empty"
           button-style="single"
-          @clicked="scope.setAction('delete')" />
+          @clicked="scope.submitAction('delete')" />
         <BaseButton
           :text="'delete'"
           icon-size="large"
           icon="waste-bin"
           button-style="single"
-          @clicked="scope.setAction('delete')" />
-      </template>
-      <template v-slot:option-buttons-after>
-        <div
-          v-if="!activeAction"
-          class="activity-showcase-after">
-          <BaseButton
-            text="Return to View Mode"
-            icon-size="large"
-            icon="remove"
-            @clicked="editMode = false" />
-        </div>
-      </template>
-      <template v-slot:actionButtons>
-        <BaseBoxButton
-          :text="'Add Album'"
-          :box-size="{ width: 'auto' }"
-          :show-plus="true"
-          icon="collection"
-          box-style="large"
-          box-type="button"
-          class="base-result-box-section__box" />
-        <BaseBoxButton
-          :text="'add Activity'"
-          :box-size="{ width: 'auto' }"
-          :show-plus="true"
-          icon="sheet-empty"
-          box-style="large"
-          box-type="button"
-          class="base-result-box-section__box" />
+          @clicked="scope.submitAction('delete')" />
       </template>
     </BaseResultBoxSection>
-    <template
-      v-else>
-      <div class="activity-showcase">
-        <h3 class="activity-showcase__header">
-          Activity Showcase
-        </h3>
-        <BaseButton
-          icon="edit"
-          text="edit"
-          @clicked="editMode = true" />
-      </div>
-      <base-carousel
-        :items="entriesList"
-        :swiper-options="{
-          slidesPerView: 2,
-          slidesPerGroup: 2,
-          spaceBetween: 15,
-          loop: carousel.length > 3,
-          speed: 750,
-          keyboard: {
-            enabled: true,
-          },
-          pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-          },
-          breakpoints: {
-            1024: {
-              slidesPerView: carousel.length < 3 ? 2 : 3,
-              slidesPerGroup: carousel.length < 3 ? 2 : 3,
-            },
-          },
-        }"
-        identifier-property-name="id" />
-    </template>
     <BaseResultBoxSection
       :entry-list="entriesList"
       :is-loading="false"
-      :show-options="false"
+      :show-options="true"
       :show-header="true"
-      :draggable="false"
-      :max-show-more-rows="2"
+      :draggable="true"
+      :max-show-more-rows="1"
       :use-expand-mode="true"
       :max-rows="5">
       <template v-slot:header>
@@ -133,21 +229,33 @@
 <script>
 // import axios from 'axios';
 import axios from 'axios';
-import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
 import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton';
+// import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
+// import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton';
+import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
+import BaseOptionsNew from '@/components/BaseOptions/BaseOptions';
+import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
 
 export default {
   name: 'App',
   components: {
     BaseResultBoxSection,
-    BaseCarousel,
+    // BaseCarousel,
     BaseButton,
-    BaseBoxButton,
+    // BaseBoxButton,
+    BaseOptionsNew,
+    BaseDropDown,
   },
   data() {
     return {
+      filterType: {
+        label: 'all types',
+        source: '',
+      },
+      sortParam: {
+        label: 'date modified',
+        value: 'date_modified',
+      },
       toggleList: false,
       editExpandList: false,
       baseExpandList: [
@@ -408,6 +516,7 @@ export default {
       entriesList: [
         {
           id: 'pCSLggvdsi8asfdsrruuurrrdfb3dddzRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 1',
           subtitle: 'A test',
@@ -437,8 +546,9 @@ export default {
         },
         {
           id: 'pCSLggvdsi8asfdsrruuurrrdfb3zRTLM4dJR',
+          type: 'album',
           date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'Title 2',
+          title: 'Title 2 extra looooong',
           subtitle: 'A test',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
@@ -459,6 +569,7 @@ export default {
         },
         {
           id: 'pCSLgasdfgvdsi8asfdsrrrrrdfb3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 3',
           subtitle: 'A test',
@@ -481,6 +592,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8aasdsfdsrrrrrdfb3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 4',
           subtitle: 'A test',
@@ -503,6 +615,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8asfdsrrrasrrdfb3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 5',
           subtitle: 'A test',
@@ -525,6 +638,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8asfdsrrrrdsrdfb3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 6',
           subtitle: 'A test',
@@ -547,6 +661,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8asfdsrrrrrdfb3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 6',
           subtitle: 'A test',
@@ -569,6 +684,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8asfdsdfb3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 7',
           subtitle: 'A test',
@@ -592,6 +708,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8basdfsssssadf3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'An extra extra long title',
           subtitle: 'A test',
@@ -614,6 +731,7 @@ export default {
         },
         {
           id: 'pCSLggvdsddddi8b3zRTLM4dJR',
+          type: 'album',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 8',
           subtitle: 'A test',
@@ -636,6 +754,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Title 9',
           subtitle: 'A test',
@@ -658,6 +777,7 @@ export default {
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
+          type: 'album',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Unknown',
           subtitle: 'Lets find it out and look deeper',
@@ -679,6 +799,7 @@ export default {
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'TBD',
           subtitle: 'Misterious',
@@ -937,6 +1058,9 @@ export default {
     },
   },
   methods: {
+    test() {
+      console.log('reaching');
+    },
     entrySelected({ entryId, selected }) {
       if (selected && !this.selectedBoxes.includes(entryId)) {
         this.selectedBoxes.push(entryId);
@@ -1050,7 +1174,8 @@ export default {
 }
 
 .activity-showcase__header {
-  margin: $spacing;
+  font-size: $font-size-regular;
+  margin: 0 0 0 $spacing;
 }
 
 .activity-showcase-after {
