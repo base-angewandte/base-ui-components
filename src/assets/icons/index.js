@@ -1,3 +1,7 @@
+import addExistingCollection from './add-existing-collection';
+import addExistingObject from './add-existing-object';
+import addNewCollection from './add-new-collection';
+import addNewObject from './add-new-object';
 import arrowLeft from './arrow-left';
 import attachment from './attachment';
 import attention from './attention';
@@ -42,6 +46,10 @@ import text from './text';
 import wasteBin from './waste-bin';
 
 export default {
+  addExistingCollection,
+  addExistingObject,
+  addNewCollection,
+  addNewObject,
   arrowLeft,
   attachment,
   attention,
