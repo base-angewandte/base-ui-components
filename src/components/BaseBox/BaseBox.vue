@@ -76,7 +76,6 @@ export default {
     background: white;
     box-shadow: $box-shadow-reg;
     transition: $box-transition;
-    min-height: 100%;
     position: relative;
     overflow: hidden;
     display: flex;
