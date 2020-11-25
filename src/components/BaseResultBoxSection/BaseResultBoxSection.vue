@@ -41,17 +41,16 @@
               name="option-buttons"
               :submit-action="submitAction">
               <!-- default iterate through optionsConfig array -->
-              <template v-if="showOptions">
-                <template v-for="action of actionButtonsConfig">
-                  <BaseButton
-                    v-if="action.display === 'top' || action.display === 'all' || !action.display"
-                    :key="action.text"
-                    :text="action.text"
-                    :icon="action.icon"
-                    icon-size="large"
-                    button-style="single"
-                    @clicked="submitAction(action.value)" />
-                </template>
+              <template v-for="action of actionButtonsConfig">
+                <BaseButton
+                  v-if="action.display === 'top' || action.display === 'all' || !action.display"
+                  :key="action.text"
+                  :text="action.text"
+                  :icon="action.icon"
+                  :has-background-color="false"
+                  icon-size="large"
+                  button-style="single"
+                  @clicked="submitAction(action.value)" />
               </template>
             </slot>
           </template>
@@ -114,6 +113,7 @@
           :aria-label="entry[titlePropertyName]"
           :class="['base-result-box-section__box-item',
                    'base-result-box-section__result-box-item',
+                   `base-result-box-section__box-item-${elementId}`,
                    { 'base-result-box-section__result-box-item-draggable':
                     draggable && editModeActive }]">
           <!-- @slot result-box - for custom result boxes -->
@@ -155,7 +155,8 @@
               :icon="action.icon"
               box-style="small"
               box-type="button"
-              class="base-result-box-section__box-item"
+              :class="['base-result-box-section__box-item',
+                       `base-result-box-section__box-item-${elementId}`,]"
               @clicked="submitAction(action.value)" />
           </template>
         </slot>
@@ -166,7 +167,8 @@
           icon=""
           text=""
           box-type="button"
-          class="base-result-box-section__box-item"
+          :class="['base-result-box-section__box-item',
+                   `base-result-box-section__box-item-${elementId}`,]"
           @clicked="expandedInt = !expandedInt">
           <template v-slot>
             <!-- needed to add v-if here again - otherwise strange side effects -->
@@ -241,17 +243,17 @@ export default {
      * actual entries list - if slot result-box is not used to use custom elements this
      * object array should have the following properties to be displayed
      * in a [BaseImageBox](#baseimagebox):<br>
-     *    * id {string} - a unique identifier
-     *    * title {?string} - the title of the box<br>
-     *    * subtitle {?string} - a subtitle<br>
-     *    * description {?string} - text displayed at the bottom of the box<br>
-     *    * imageUrl {?string} - url to display an image<br>
-     *    * text {?string[]} - an array with strings that will be
+     *    * **id** {string} - a unique identifier
+     *    * **title** {?string} - the title of the box<br>
+     *    * **subtitle** {?string} - a subtitle<br>
+     *    * **description** {?string} - text displayed at the bottom of the box<br>
+     *    * **imageUrl** {?string} - url to display an image<br>
+     *    * **text** {?string[]} - an array with strings that will be
      *    displayed if no image is provided<br>
-     *
-     *      if a different schema is used please use the slot 'result-box' to create your own
-     *      elements - only id and title should still be provided but can also
-     *      be customized via 'identifierPropertyName' and 'titlePropertyName'
+     *    <br>
+     *    if a different schema is used please use the slot 'result-box' to create your own
+     *    elements - only id and title should still be provided but can also
+     *    be customized via `identifierPropertyName` and `titlePropertyName`
      */
     entryList: {
       type: Array,
@@ -331,7 +333,8 @@ export default {
     },
     /**
      * flag if component should be in edit mode (dragging, deleting,
-     * other custom options visible)
+     * other custom options visible)<br>
+     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
      */
     editMode: {
       type: Boolean,
@@ -339,7 +342,9 @@ export default {
     },
     /**
      * provide a list of selected entries for select options (can
-     * be entry objects or entry ids)
+     * be entry objects or entry ids)<br>
+     *  the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+
      */
     selectedList: {
       type: Array,
@@ -418,7 +423,7 @@ export default {
     },
     /**
      * in 'expand mode' set the state of 'show more' from outside<br>
-     *   the .sync modifier can be used here
+     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
      */
     expanded: {
       type: Boolean,
@@ -468,11 +473,11 @@ export default {
     },
     /**
      * set some config for each action used<br>
-     *   @property {string} text - the text displayed in the button
-     *   @property {string} icon - the icon name to display
-     *    (for available icons see [BaseIcon](#baseicon) )
-     *   @property {string} value - the value emitted on button click
-     *   @property {string} [display='all'] - define where the action should be displayed:<br>
+     *   **text** {string} - the text displayed in the button<br>
+     *   **icon** {string} - the icon name to display
+     *    (for available icons see [BaseIcon](#baseicon) )<br>
+     *   **value** {string} - the value emitted on button click<br>
+     *   **[display='all']** {string} - define where the action should be displayed:<br>
      *     top: only in top row<br>
      *     bottom: only in action button box at bottom of list<br>
      *     all: on top as well as bottom<br>
@@ -608,6 +613,14 @@ export default {
     expandNeeded() {
       return (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length;
     },
+    /**
+     * create an element id to have an unique id to assign
+     * javascript calculated styles to
+     */
+    elementId() {
+      // eslint-disable-next-line no-underscore-dangle
+      return this._uid;
+    },
   },
   watch: {
     entryList: {
@@ -622,6 +635,13 @@ export default {
     entryListInt: {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.entryList)) {
+          /**
+           * event emitted when the list of entries changed internally
+           * (relevant if `draggable` is set true)
+           *
+           * @event entries-changed
+           * @param {Object[]} - the updated list of entries
+           */
           this.$emit('entries-changed', val);
         }
       },
@@ -640,9 +660,12 @@ export default {
     selectedListInt(val) {
       if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
         /**
-         * inform the parent of the changes in the selected list
+         * inform the parent of the changes in the selected list and provide
+         * the ids of all selected<br>
+         *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          *
          * @event update:selected-list
+         * @param {Array} - the list of selected entry ids
          */
         this.$emit('update:selected-list', val);
       }
@@ -679,9 +702,10 @@ export default {
       // inform parent of internal change
       if (val !== this.expanded) {
         /**
-         * event emitted on expand toggle - the .sync modifier can be used here
+         * event emitted on expand toggle<br>
+         *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          * @event update:expanded
-         * @type { Boolean }
+         * @param { Boolean } - true if list is expanded
          */
         this.$emit('update:expanded', val);
       }
@@ -731,8 +755,11 @@ export default {
         this.wasExpanded = this.expandedInt;
       }
       /**
-       * @event update:edit-mode emitted on edit mode toggle (options toggle)
-       * @type {Boolean} flag for edit mode active
+       * emitted on edit mode toggle (options toggle)<br>
+       *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+       *
+       * @event update:edit-mode
+       * @param {Boolean} - flag for edit mode active
        */
       this.$emit('update:edit-mode', actionsVisible);
     },
@@ -793,7 +820,7 @@ export default {
        * event triggered when an action is triggered (after selecting boxes)
        *
        * @event submit-action
-       * @param {string} actionInt - the action type
+       * @param {string} - the action type
        */
       this.$emit('submit-action', action);
     },
@@ -843,8 +870,7 @@ export default {
         // set a css variable that is responsible for the number of items
         this.$el.style.setProperty('--items-per-row', this.itemsPerRow);
         // set the correct margins for the boxes
-        // eslint-disable-next-line no-underscore-dangle
-        const nodeId = `base-result-box-section__box-style-${this._uid}`;
+        const nodeId = `base-result-box-section__box-style-${this.elementId}`;
         let style = document.getElementById(nodeId);
         // check if element already exists to only create it once
         if (!style) {
@@ -857,10 +883,10 @@ export default {
         }
         // set the acutally css in the style element
         style.innerHTML = `
-          .base-result-box-section__box-item:nth-child(n + ${this.itemsPerRow + 1}) {
+          .base-result-box-section__box-item-${this.elementId}:nth-child(n + ${this.itemsPerRow + 1}) {
             margin-top: var(--spacing-regular);
           }
-          .base-result-box-section__box-item:not(:nth-child(${this.itemsPerRow}n)) {
+          .base-result-box-section__box-item-${this.elementId}:not(:nth-child(${this.itemsPerRow}n)) {
             margin-right: var(--spacing-regular);
           }`;
         this.initialBoxCalcDone = true;
@@ -878,7 +904,7 @@ export default {
        * event triggered on page number change
        *
        * @event fetch-items
-       * @param {number} number - the new page number
+       * @param {number} - the new page number
        */
       this.$emit('fetch-items', number);
     },
@@ -893,7 +919,7 @@ export default {
       /**
        * event emitted from default image box when clicked
        * @event entry-selected
-       * @param {Object} obj - an object with the following properties:
+       * @param {Object} - an object with the following properties:
        * @property {string} entryId - the id of the clicked entry
        * the select mode was not active but the box was clicked
        */
