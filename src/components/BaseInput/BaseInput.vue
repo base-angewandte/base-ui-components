@@ -206,7 +206,8 @@ export default {
              * passing only the event.target.value
              *
              */
-            this.$emit('input', event.target.value);
+            this.$emit('input', this.fieldType === 'number'
+              ? Number(event.target.value) : event.target.value);
           },
         },
       };
