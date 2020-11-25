@@ -11,6 +11,7 @@
       <div
         ref="beforeOptions"
         class="base-options__before">
+        <!-- @slot add an element before the options e.g. a header -->
         <slot
           v-if="beforeSlotHasData"
           name="beforeOptions" />
@@ -25,7 +26,18 @@
                  { 'base-options__options-inline-wrap': wrapActions },
                  { 'base-options__options-inline-left': alignOptions === 'left' }]">
         <!-- @slot add the actual options -->
-        <slot name="options" />
+        <slot name="options">
+          <template v-if="optionsConfig.length">
+            <BaseButton
+              v-for="(config, index) of optionsConfig"
+              :key="config.text + '_' + index"
+              :text="config.text"
+              :icon="config.icon"
+              icon-size="large"
+              button-style="single"
+              @clicked="optionTriggered(config.value)" />
+          </template>
+        </slot>
       </div>
       <BaseButton
         v-if="!optionsHidden && useOptionsButton"
@@ -51,7 +63,18 @@
         v-if="!optionsHidden && showOptionsInt && !showOptionsInline"
         class="base-options__below">
         <!-- @slot add the actual options -->
-        <slot name="options" />
+        <slot name="options">
+          <template v-if="optionsConfig.length">
+            <BaseButton
+              v-for="(config, index) of optionsConfig"
+              :key="config.text + '_' + index"
+              :text="config.text"
+              :icon="config.icon"
+              icon-size="large"
+              button-style="single"
+              @clicked="optionTriggered(config.value)" />
+          </template>
+        </slot>
       </div>
     </transition>
     <div
@@ -67,6 +90,11 @@
 import BaseButton from '@/components/BaseButton/BaseButton';
 import i18n from '@/mixins/i18n';
 
+/**
+ * a row that can display options responsively either hidden behind an options button
+ * or directly
+ */
+
 export default {
   name: 'BaseOptions',
   components: {
@@ -75,14 +103,15 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * set showing of option buttons from outside
+     * set showing of option buttons from outside<br>
+     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
      */
     showOptions: {
       type: Boolean,
       default: false,
     },
     /**
-     * hide options completely (necessary if only before or after elements should remain)
+     * hide options completely (necessary if only before or after slot elements should remain)
      */
     optionsHidden: {
       type: Boolean,
@@ -98,9 +127,9 @@ export default {
     },
     /**
      * define in which scenario an options button should be shown<br>
-     *   'always': always show the options button<br>
-     *   'mobile': only show options button when window size < 640px<br>
-     *   'never': never show the options button - just show the avialable options directly
+     *   **always**: always show the options button<br>
+     *   **mobile**: only show options button when window size < 640px<br>
+     *   **never**: never show the options button - just show the avialable options directly
      */
     useOptionsButtonOn: {
       type: String,
@@ -108,10 +137,10 @@ export default {
       validator: val => ['always', 'mobile', 'never'].includes(val),
     },
     /**
-     * define the options button text as an object with 'show' (=text that should be
-     * shown with options hidden) and 'hide' (=text that should be shown with options visible)<br>
+     * define the options button text as an object with `show` (=text that should be
+     * shown with options hidden) and `hide` (=text that should be shown with options visible)<br>
      *   values can be either plain strings or a string leading to a localization file<br>
-     *   only relevant if 'useOptionsButtonOn' is different from 'never'
+     *   (only relevant if `useOptionsButtonOn` is different from 'never')
      */
     optionsButtonText: {
       type: Object,
@@ -122,10 +151,10 @@ export default {
       validator: val => 'show' in val && 'hide' in val,
     },
     /**
-     * define the icon for the options button as an object with 'show' (=icon that should be
-     * shown with options hidden) and 'hide' (=icon that should be shown with options visible)<br>
+     * define the icon for the options button as an object with `show` (=icon that should be
+     * shown with options hidden) and `hide` (=icon that should be shown with options visible)<br>
      *   see [BaseIcon](#baseicon) for available icons<br>
-     *   only relevant if 'useOptionsButtonOn' is different from 'never'
+     *   (only relevant if `useOptionsButtonOn` is different from 'never')
      */
     optionsButtonIcon: {
       type: Object,
@@ -143,6 +172,28 @@ export default {
     showAfterOptionsBelow: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * in order to display options one can either use the slot 'options' or specify a
+     * config via 'optionsConfig' prop. If the latter option is used the following properties
+     * need to be provided:<br>
+     *   **text** {string} - the text displayed in the button<br>
+     *   **icon** {string} - the icon name to display
+     *    (for available icons see [BaseIcon](#baseicon) )<br>
+     *   **value** {string} - the value emitted on button click<br>
+     */
+    optionsConfig: {
+      type: Array,
+      default: () => [{
+        text: 'delete',
+        icon: 'waste-bin',
+        value: 'delete',
+      }],
+      validator: val => val.every((action) => {
+        const requiredProps = ['text', 'icon', 'value'];
+        const actionProps = Object.keys(action);
+        return requiredProps.every(prop => actionProps.includes(prop));
+      }),
     },
   },
   data() {
@@ -242,6 +293,9 @@ export default {
     wrapActions() {
       return this.rowWidth <= this.actionButtonsWidth;
     },
+    wrapHeaderActions() {
+      return this.rowWidth - this.beforeOptionsWidth < this.actionButtonsWidth;
+    },
     /**
      * determine if before slot has data
      * @returns {Boolean}
@@ -267,26 +321,40 @@ export default {
          * is set to 'never')<br>
          *   the .sync modifier can be used on 'showOptions' prop here
          * @event update:show-options
-         * @param {boolean} val - was show value set true or false
+         * @param {boolean} - was show value set true or false
          */
         this.$emit('update:show-options', val);
       }
     },
+    // update show options internal value if different from parent
     showOptions: {
       handler(val) {
-        // if options button is not used always have showOptions true
-        if (!this.useOptionsButton) {
-          this.showOptionsInt = true;
-          // else check if it is different from external value and update
-          // if necessary
-        } else if (this.showOptionsInt !== val) {
+        if (this.showOptionsInt !== val && this.useOptionsButton) {
           this.showOptionsInt = val;
         }
       },
       immediate: true,
     },
-    // watch isMobile to have the options transform into options button when
-    // useOptionsButtonOn is 'mobile'
+    /**
+     * watch use options button variable which changes if options button
+     * is only used on mobile
+     * @param {boolean }val
+     */
+    useOptionsButton: {
+      handler(val) {
+        // make sure options are shown when options button is disabled
+        if (!val) {
+          this.showOptionsInt = true;
+        }
+      },
+      immediate: true,
+    },
+    /**
+     * watch isMobile to have the options transform into options button when
+     * useOptionsButtonOn is 'mobile'
+     *
+     * @param {boolean} val
+     */
     isMobile(val) {
       if (this.useOptionsButtonOn === 'mobile' && val) {
         this.showOptionsInt = false;
@@ -314,6 +382,15 @@ export default {
       const observer = new ResizeObserver(this.resizeActions);
       observer.observe(this.$refs.optionsRow);
       this.observer = observer;
+    },
+    optionTriggered(value) {
+      /**
+       * emitted if prop `optionsConfig` is used when an options button is clicked
+       *
+       * @event option-triggered
+       * @param {string} - the value provided in `optionsConfig` object
+       */
+      this.$emit('option-triggered', value);
     },
     /**
      * method for all resize actions with setTimeout function to prevent
@@ -403,13 +480,13 @@ export default {
     align-items: center;
     min-height: $row-height-small;
     width: 100%;
-    justify-content: flex-end;
 
     &-left {
-
+      justify-content: flex-start;
     }
 
     &-right {
+      justify-content: flex-end;
     }
 
     &-wrap {
@@ -421,7 +498,7 @@ export default {
     }
 
     .base-options__before {
-      flex: 0 0 auto;
+      flex: 0 1 auto;
     }
 
     .base-options__spacer {
@@ -445,11 +522,12 @@ export default {
       &-wrap {
         flex: 0 1 auto;
         flex-wrap: wrap;
+        justify-content: center;
       }
     }
 
     .base-options__after-inline {
-      flex: 0 0 auto;
+      flex: 0 1 auto;
       order: 5;
       display: flex;
       justify-content: flex-end;
