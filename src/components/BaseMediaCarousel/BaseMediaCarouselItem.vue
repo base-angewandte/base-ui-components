@@ -7,7 +7,7 @@
     </div>
     <img
       v-if="displayImage && fileType === 'image'"
-      :srcset="imageSourceSet"
+      :data-srcset="imageSourceSet"
       :data-src="sourceUrl"
       :style="displaySize"
       :class="[

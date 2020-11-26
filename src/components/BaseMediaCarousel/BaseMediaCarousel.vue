@@ -48,10 +48,13 @@
 </template>
 
 <script>
-import Swiper from 'swiper';
+import Swiper, { Navigation, Lazy, Keyboard } from 'swiper';
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
+
+// init swiper plugins
+Swiper.use([Navigation, Lazy, Keyboard]);
 
 /**
  * Component allowing sliding through images,
@@ -205,7 +208,8 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/css/swiper";
+  @import "swiper/swiper.scss";
+  @import "swiper/components/navigation/navigation.scss";
 
   .base-media-carousel {
     position: fixed;
