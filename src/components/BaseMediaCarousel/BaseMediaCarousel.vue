@@ -217,7 +217,7 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10;
+    z-index: map-get($zindex, modal_bg);
     display: flex;
 
     &__background {
