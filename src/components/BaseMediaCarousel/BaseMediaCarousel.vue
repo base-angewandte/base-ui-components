@@ -124,6 +124,14 @@ export default {
       this.showInt = val;
     },
   },
+  mounted() {
+    // close modal using 'esc' key
+    window.addEventListener('keyup', (e) => {
+      if (e.keyCode === 27) {
+        this.hide();
+      }
+    });
+  },
   updated() {
     this.$nextTick(() => {
       if (process.browser && this.showInt) {
@@ -239,6 +247,7 @@ export default {
       z-index: 5;
       transition: color 250ms ease-in-out;
 
+      &:focus,
       &:hover {
         cursor: pointer;
         color: $app-color;
@@ -260,6 +269,7 @@ export default {
         transform: translateY(-50%);
         transition: fill 250ms ease-in-out;
 
+        &:focus,
         &:hover {
           fill: $app-color;
         }
