@@ -19,9 +19,9 @@ A example with input disabled
 ```vue
 <template>
   <BaseInput
-    id="simpleexample"
-    disabled="true"
-    label="This label says Specify any text below"
+    id="disabled"
+    :disabled="true"
+    label="Label for disabled input"
     placeholder="A custom placeholder"/>
 </template>
 <script>
