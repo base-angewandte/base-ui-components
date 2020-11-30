@@ -33,6 +33,7 @@
               :key="config.text + '_' + index"
               :text="config.text"
               :icon="config.icon"
+              :has-background-color="false"
               icon-size="large"
               button-style="single"
               @clicked="optionTriggered(config.value)" />
@@ -70,6 +71,7 @@
               :key="config.text + '_' + index"
               :text="config.text"
               :icon="config.icon"
+              :has-background-color="false"
               icon-size="large"
               button-style="single"
               @clicked="optionTriggered(config.value)" />
@@ -362,13 +364,12 @@ export default {
     },
   },
   mounted() {
-    // calc the width of all fixed width elements (beforeOptions,
-    // options button, after Options)
-    this.calcFixedElementWidth();
     // to listen to element with instead of window width create an observer!
     this.initObserver();
   },
   updated() {
+    // calc the width of all fixed width elements (beforeOptions,
+    // options button, after Options)
     this.calcFixedElementWidth();
     if (this.showOptionsInt && this.$refs.actions) {
       this.calcOptionsWidth();

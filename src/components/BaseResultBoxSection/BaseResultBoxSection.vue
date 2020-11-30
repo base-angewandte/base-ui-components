@@ -37,8 +37,9 @@
           <!-- ACTIONS FOR BOXES -->
           <template
             v-slot:options>
+            <!-- @slot add custom option/action elements in the header row -->
             <slot
-              name="option-buttons"
+              name="optionButtons"
               :submit-action="submitAction">
               <!-- default iterate through optionsConfig array -->
               <template v-for="action of actionButtonsConfig">
@@ -81,7 +82,7 @@
           {{ messageSubtext }}
         </div>
         <!-- @slot add a custom element after the message area -->
-        <slot name="options-message-area-after" />
+        <slot name="optionsMessageAreaAfter" />
       </div>
 
       <!-- SELECT OPTIONS (NUMBER OF SELECTED AND SELECT ALL) -->
@@ -108,14 +109,14 @@
         class="base-result-box-section__boxes-container">
         <li
           v-for="(entry, index) of visibleBoxes"
-          :key="entry[identifierPropertyName]"
+          :key="getPropValue(identifierPropertyName, entry)"
           :tabindex="editModeActive ? -1 : 0"
-          :aria-label="entry[titlePropertyName]"
+          :aria-label="getPropValue(titlePropertyName, entry)"
           :class="['base-result-box-section__box-item',
                    'base-result-box-section__result-box-item',
                    `base-result-box-section__box-item-${elementId}`,
                    { 'base-result-box-section__result-box-item-draggable':
-                    draggable && editModeActive }]">
+                     draggable && editModeActive }]">
           <!-- @slot result-box - for custom result boxes -->
           <slot
             :item="entry"
@@ -123,33 +124,39 @@
             :select-active="editModeActive"
             :is-entry-selected="isEntrySelected"
             :entry-selected="entrySelected"
-            name="result-box">
+            name="resultBox">
             <BaseImageBox
-              :key="entry[identifierPropertyName]"
+              :key="getPropValue(identifierPropertyName, entry)"
               :selectable="imageBoxesSelectable"
               :selected="isEntrySelected(entry)"
               :box-size="{ width: 'auto' }"
               :box-ratio="100"
-              :title="entry[titlePropertyName]"
+              :title="getPropValue(titlePropertyName, entry)"
               :subtext="entry.subtext"
               :description="entry.description"
               :image-url="entry.imageUrl"
               :box-text="entry.text"
-              @select-triggered="entrySelected(entry[identifierPropertyName], $event)"
-              @clicked="entryClicked(entry[identifierPropertyName])" />
+              :lazyload="true"
+              @select-triggered="entrySelected(getPropValue(identifierPropertyName, entry), $event)"
+              @clicked="entryClicked(getPropValue(identifierPropertyName, entry))" />
           </slot>
         </li>
 
         <!-- ACTION BUTTONS -->
+        <!-- @slot add custom elements after result elements list<br>
+         use scoped slot prop 'itemsPerRow' or dynamically adjusted css variable --items-per-row
+          to adjust element width in accordance with other boxes-->
         <slot
           v-if="showActionButtonBoxes && editModeActive"
+          :items-per-row="itemsPerRow"
+          :element-id="elementId"
           name="actionButtons">
           <!-- default button -->
           <template
             v-for="action of actionButtonsConfig">
             <BaseBoxButton
               v-if="action.display === 'bottom' || action.display === 'all' || !action.display"
-              :key="action.text"
+              :key="action.value"
               :text="action.text"
               :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
               :icon="action.icon"
@@ -204,7 +211,7 @@
             || (!editModeActive && expandedInt))"
         key="pagination"
         :total="pages"
-        :current="currentPageNumber"
+        :current="currentPageNumberInt"
         :use-link-element="false"
         @set-page="setPage" />
     </div>
@@ -213,6 +220,7 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import { extractNestedPropertyValue } from '@/utils/utils';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 
@@ -243,12 +251,12 @@ export default {
      * actual entries list - if slot result-box is not used to use custom elements this
      * object array should have the following properties to be displayed
      * in a [BaseImageBox](#baseimagebox):<br>
-     *    * **id** {string} - a unique identifier
-     *    * **title** {?string} - the title of the box<br>
-     *    * **subtitle** {?string} - a subtitle<br>
-     *    * **description** {?string} - text displayed at the bottom of the box<br>
-     *    * **imageUrl** {?string} - url to display an image<br>
-     *    * **text** {?string[]} - an array with strings that will be
+     *    **id** {string} - a unique identifier<br>
+     *    **title** {?string} - the title of the box<br>
+     *    **subtext** {?string} - a subtitle<br>
+     *    **description** {?string} - text displayed at the bottom of the box<br>
+     *    **imageUrl** {?string} - url to display an image<br>
+     *    **text** {?string[]} - an array with strings that will be
      *    displayed if no image is provided<br>
      *    <br>
      *    if a different schema is used please use the slot 'result-box' to create your own
@@ -392,7 +400,8 @@ export default {
       default: 'Drag\'n Drop to reorder or select the relevant items and choose an action',
     },
     /**
-     * determine if boxes can be dragged
+     * determine if boxes can be dragged<br>
+     *   (only applicable if `showHeader` and `showOptions` is set to `true`)
      */
     draggable: {
       type: Boolean,
@@ -407,7 +416,8 @@ export default {
     },
     /**
      * if 'usePagination' is set true this will determine the number of
-     * rows shown on one page
+     * rows shown on one page<br>
+     *   (only applicable if `usePagination` is set `true`)
      */
     maxRows: {
       type: Number,
@@ -423,7 +433,7 @@ export default {
     },
     /**
      * in 'expand mode' set the state of 'show more' from outside<br>
-     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
      */
     expanded: {
       type: Boolean,
@@ -432,8 +442,8 @@ export default {
     /**
      * Provide text that should be shown within the button with the
      * expand / collapse functionality<br>
-     *   should be an object with props 'expand' for text to expand
-     *   and 'collapse' for text to collapse
+     *   should be an object with props `expand` for text to expand
+     *   and `collapse` for text to collapse
      */
     expandText: {
       type: Object,
@@ -451,14 +461,25 @@ export default {
       default: null,
     },
     /**
-     * how many rows should be shown with show more button (expandMode)
+     * add a number of total elements (needed for expandMode and
+     * pagination<br>
+     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     */
+    currentPageNumber: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * how many rows should be shown with show more button (expandMode)<br>
+     *   (only applicable with `useExpandMode true`)
      */
     maxShowMoreRows: {
       type: Number,
       default: 1,
     },
     /**
-     * define if the section should scroll to top on page change
+     * define if the section should scroll to top on page change<br>
+     *   (only applicable with `usePagination true`)
      */
     jumpToTop: {
       type: Boolean,
@@ -499,7 +520,9 @@ export default {
     },
     /**
      * define a custom identifier property name for objects in your
-     * entryList array
+     * entryList array<br>
+     *   if relevant property is contained in a nested object the string can
+     *   be in dot notation. e.g. 'nestedObject.id'
      */
     identifierPropertyName: {
       type: String,
@@ -507,7 +530,9 @@ export default {
     },
     /**
      * define a custom title property name for objects in your
-     * entryList array
+     * entryList array<br>
+     *   if relevant property is contained in a nested object the string can
+     *   be in dot notation. e.g. 'nestedObject.title'
      */
     titlePropertyName: {
       type: String,
@@ -522,7 +547,7 @@ export default {
       // flag for edit mode activated
       editModeActive: false,
       // current page number
-      currentPageNumber: 1,
+      currentPageNumberInt: 1,
       // store the expand state internally
       expandedInt: false,
       // store collapsed state on action start
@@ -572,8 +597,8 @@ export default {
           // slice taking into account current pagination and the total number of
           // visible items
           return this.entryListInt
-            .slice((this.currentPageNumber - 1) * this.visibleNumberOfItems,
-              this.currentPageNumber * this.visibleNumberOfItems);
+            .slice((this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
+              this.currentPageNumberInt * this.visibleNumberOfItems);
         }
         // else return complete list
         return this.entryListInt;
@@ -673,14 +698,14 @@ export default {
     // watch pages in case of deletion of items and take care
     // current page is not higher than total page number
     pages(val) {
-      if (this.currentPageNumber > val) {
-        this.currentPageNumber = val;
+      if (this.currentPageNumberInt > val) {
+        this.currentPageNumberInt = val;
       }
     },
-    // if respective prop is set jump to top on page change
-    currentPageNumber() {
-      if (this.jumpToTop) {
-        window.scrollTo(0, this.$el.offsetTop);
+    // update internal page number if changed from outside
+    currentPageNumber(val) {
+      if (val !== this.currentPageNumberInt) {
+        this.currentPageNumberInt = val;
       }
     },
     // if expanded variable is set from outside change
@@ -697,7 +722,7 @@ export default {
     expandedInt(val) {
       // reset current page number on collapse
       if (!val) {
-        this.currentPageNumber = 1;
+        this.currentPageNumberInt = 1;
       }
       // inform parent of internal change
       if (val !== this.expanded) {
@@ -715,10 +740,37 @@ export default {
       setTimeout(() => {
         this.imageBoxesSelectable = val;
       }, 50);
+      if (val !== this.editMode) {
+        /**
+         * emitted on edit mode toggle (options toggle)<br>
+         *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         *
+         * @event update:edit-mode
+         * @param {Boolean} - flag for edit mode active
+         */
+        this.$emit('update:edit-mode', val);
+      }
+    },
+    editMode: {
+      handler(val) {
+        if (val !== this.editModeActive) {
+          this.editModeActive = val && this.showOptions && this.showHeader;
+        }
+      },
+      immediate: true,
+    },
+    showOptions(val) {
+      if (!val) {
+        this.editModeActive = false;
+      }
+    },
+    showHeader(val) {
+      if (!val) {
+        this.editModeActive = false;
+      }
     },
   },
   created() {
-    this.editModeActive = this.editMode;
     if (!this.useExpandMode) {
       this.expandedInt = true;
     }
@@ -754,14 +806,6 @@ export default {
       } else {
         this.wasExpanded = this.expandedInt;
       }
-      /**
-       * emitted on edit mode toggle (options toggle)<br>
-       *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
-       *
-       * @event update:edit-mode
-       * @param {Boolean} - flag for edit mode active
-       */
-      this.$emit('update:edit-mode', actionsVisible);
     },
     /**
      * function triggered when selecteAll was clicked in select mode
@@ -774,12 +818,14 @@ export default {
         // select all entries that are currently visible
         // deduplicate by creating Set and converting back to array
         this.selectedListInt = [...new Set([...this.selectedListInt,
-          ...this.visibleBoxes.map(entry => entry[this.identifierPropertyName])])];
+          ...this.visibleBoxes.map(entry => this
+            .getPropValue(this.identifierPropertyName, entry))])];
       } else {
         const visibleEntryIds = this.visibleBoxes
-          .map(visibleEntry => visibleEntry[this.identifierPropertyName]);
+          .map(visibleEntry => this.getPropValue(this.identifierPropertyName, visibleEntry));
         this.selectedListInt = this.selectedListInt
-          .filter(entry => !visibleEntryIds.includes(entry[this.identifierPropertyName] || entry));
+          .filter(entry => !visibleEntryIds
+            .includes(this.getPropValue(this.identifierPropertyName, entry) || entry));
       }
     },
     /**
@@ -798,9 +844,6 @@ export default {
         this.selectedListInt = this.selectedListInt.filter(boxId => boxId !== entryId);
       }
     },
-    clearSelected() {
-      this.selectedListInt = [];
-    },
     /**
      * function to calc if image box is currently selected
      *
@@ -808,8 +851,9 @@ export default {
      * @returns {Boolean}
      */
     isEntrySelected(entry) {
-      return this.selectedListInt.map(selectedEntry => selectedEntry[this.identifierPropertyName]
-        || selectedEntry).includes(entry[this.identifierPropertyName]);
+      return this.selectedListInt
+        .map(selectedEntry => this.getPropValue(this.identifierPropertyName, selectedEntry)
+        || selectedEntry).includes(this.getPropValue(this.identifierPropertyName, entry));
     },
     /**
      * function triggered when user has
@@ -899,14 +943,21 @@ export default {
      * @param {number} number - the selected page number
      */
     setPage(number) {
-      this.currentPageNumber = number;
-      /**
-       * event triggered on page number change
-       *
-       * @event fetch-items
-       * @param {number} - the new page number
-       */
-      this.$emit('fetch-items', number);
+      this.currentPageNumberInt = number;
+      // if variable is set true jump to top of element
+      if (this.jumpToTop) {
+        window.scrollTo(0, this.$el.offsetTop);
+      }
+      // and also inform parent of page number change
+      if (number !== this.currentPageNumber) {
+        /**
+         * emitted when pagination is used and page number was changed
+         *
+         * @event update:current-page-number
+         * @param {number} - the new page number
+         */
+        this.$emit('update:current-page-number', number);
+      }
     },
 
     /** GENERAL FUNCTIONALITIES */
@@ -918,7 +969,7 @@ export default {
     entryClicked(entryId) {
       /**
        * event emitted from default image box when clicked
-       * @event entry-selected
+       * @event entry-clicked
        * @param {Object} - an object with the following properties:
        * @property {string} entryId - the id of the clicked entry
        * the select mode was not active but the box was clicked
@@ -944,6 +995,16 @@ export default {
       // if not - assume an object with the relevant properties
       const { string, count, variables } = { ...localizationArguments };
       return this.getI18nTerm(string, count, variables);
+    },
+    /**
+     * to get a nested object property value from a string in dot notation
+     *
+     * @param {string} string - the nested object property path in dot notation
+     * @param {Object} object - the object from which the property value should be extracted
+     * @returns {*}
+     */
+    getPropValue(string, object) {
+      return extractNestedPropertyValue(string, object);
     },
   },
 };

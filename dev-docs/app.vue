@@ -2,170 +2,106 @@
   <div
     id="app"
     style="max-width: 1400px; margin: 0 auto;">
-    <div class="sidebar-options-container">
-      <BaseOptionsNew
-        ref="baseOptions"
-        :use-options-button-on="'never'"
-        :show-options.sync="showCheckbox"
-        :show-after-options-below="true"
-        align-options="left">
-        <template slot="afterOptions">
-          <div
-            ref="afterOptions"
-            class="sidebar-drop-downs">
-            <BaseDropDown
-              v-model="sortParam"
-              :placeholder="'sort by'"
-              :label="'sort by'"
-              :options="[{
-                label: 'test',
-                value: 'test',
-              }]"
-              :with-spacing="false"
-              class="sidebar-dropdown" />
-            <BaseDropDown
-              v-model="filterType"
-              :label="'filter by'"
-              :options="[{
-                label: 'test',
-                value: 'test',
-              }]"
-              :language="'de'"
-              :with-spacing="false"
-              value-prop="source"
-              align-drop-down="right"
-              class="sidebar-dropdown" />
-          </div>
-        </template>
-        <template
-          slot="options">
-          <BaseButton
-            :text="'publish'"
-            :has-background-color="false"
-            icon-size="large"
-            icon="eye"
-            button-style="single" />
-          <BaseButton
-            :text="'offline'"
-            :has-background-color="false"
-            icon-size="large"
-            icon="forbidden"
-            button-style="single" />
-          <BaseButton
-            :text="'duplicate'"
-            :has-background-color="false"
-            icon-size="large"
-            icon="duplicate"
-            button-style="single" />
-          <BaseButton
-            :text="'delete'"
-            :has-background-color="false"
-            icon-size="large"
-            icon="waste-bin"
-            button-style="single" />
-        </template>
-      </BaseOptionsNew>
-    </div>
-<!--    <BaseResultBoxSectionNew-->
-<!--      v-if="editMode"-->
-<!--      v-model="entriesList"-->
-<!--      :action="activeAction"-->
-<!--      :is-loading="false"-->
-<!--      :selected-list="selectedBoxes"-->
-<!--      :show-options="true"-->
-<!--      :draggable="true"-->
-<!--      :edit-mode="true"-->
-<!--      :option-button-text="{ delete: 'delete linked', drag: 'drag' }"-->
-<!--      :action-button-text="{ delete: 'delete', drag: 'done' }"-->
-<!--      :show-action-button-box="true"-->
-<!--      :show-edit-mode-return-button="false"-->
-<!--      cancel-text="cancel"-->
-<!--      header-text="Activity Showcase"-->
-<!--      @entry-selected="entrySelected"-->
-<!--      @all-selected="selectEntries($event)"-->
-<!--      @cancel-action="activeAction = ''"-->
-<!--      @set-action="activeAction = $event"-->
-<!--      @submit-action="activeAction = ''"-->
-<!--      @entries-changed="activeAction = ''">-->
-<!--      <template v-slot:header>-->
-<!--        <h3 class="activity-showcase__header">-->
-<!--          Activity Showcase-->
-<!--        </h3>-->
-<!--      </template>-->
-<!--      <template v-slot:option-buttons="scope">-->
-<!--        <BaseButton-->
-<!--          :text="'add Album'"-->
-<!--          icon-size="large"-->
-<!--          icon="collection"-->
-<!--          button-style="single"-->
-<!--          @clicked="scope.setAction('delete')" />-->
-<!--        <BaseButton-->
-<!--          :text="'add Activity'"-->
-<!--          icon-size="large"-->
-<!--          icon="sheet-empty"-->
-<!--          button-style="single"-->
-<!--          @clicked="scope.setAction('delete')" />-->
-<!--        <BaseButton-->
-<!--          :text="'delete'"-->
-<!--          icon-size="large"-->
-<!--          icon="waste-bin"-->
-<!--          button-style="single"-->
-<!--          @clicked="scope.setAction('delete')" />-->
-<!--      </template>-->
-<!--      <template v-slot:actionButtons>-->
-<!--        <BaseBoxButton-->
-<!--          :text="'Add Album'"-->
-<!--          :box-size="{ width: 'auto' }"-->
-<!--          :show-plus="true"-->
-<!--          icon="collection"-->
-<!--          box-style="large"-->
-<!--          box-type="button"-->
-<!--          class="base-result-box-section__box" />-->
-<!--        <BaseBoxButton-->
-<!--          :text="'Add Activity'"-->
-<!--          :box-size="{ width: 'auto' }"-->
-<!--          :show-plus="true"-->
-<!--          icon="sheet-empty"-->
-<!--          box-style="large"-->
-<!--          box-type="button"-->
-<!--          class="base-result-box-section__box" />-->
-<!--      </template>-->
-<!--    </BaseResultBoxSectionNew>-->
-<!--    <template-->
-<!--      v-else>-->
-<!--      <div class="activity-showcase">-->
-<!--        <h3 class="activity-showcase__header">-->
-<!--          Activity Showcase-->
-<!--        </h3>-->
-<!--        <BaseButton-->
-<!--          icon="edit"-->
-<!--          text="edit"-->
-<!--          @clicked="editMode = true" />-->
-<!--      </div>-->
-<!--      <base-carousel-->
-<!--        :items="entriesList"-->
-<!--        :swiper-options="{-->
-<!--          slidesPerView: 2,-->
-<!--          slidesPerGroup: 2,-->
-<!--          spaceBetween: 15,-->
-<!--          loop: carousel.length > 3,-->
-<!--          speed: 750,-->
-<!--          keyboard: {-->
-<!--            enabled: true,-->
-<!--          },-->
-<!--          pagination: {-->
-<!--            el: '.swiper-pagination',-->
-<!--            clickable: true,-->
-<!--          },-->
-<!--          breakpoints: {-->
-<!--            1024: {-->
-<!--              slidesPerView: carousel.length < 3 ? 2 : 3,-->
-<!--              slidesPerGroup: carousel.length < 3 ? 2 : 3,-->
-<!--            },-->
-<!--          },-->
-<!--        }"-->
-<!--        identifier-property-name="id" />-->
-<!--    </template>-->
+    <BaseResultBoxSection
+      v-if="editMode"
+      v-model="entriesList"
+      :action="activeAction"
+      :is-loading="false"
+      :selected-list="selectedBoxes"
+      :show-options="true"
+      :draggable="true"
+      :edit-mode.sync="editMode"
+      :option-button-text="{ delete: 'delete linked', drag: 'drag' }"
+      :action-button-text="{ delete: 'delete', drag: 'done' }"
+      :show-action-button-box="true"
+      :show-edit-mode-return-button="false"
+      cancel-text="cancel"
+      header-text="Activity Showcase"
+      @entry-selected="entrySelected"
+      @all-selected="selectEntries($event)"
+      @cancel-action="activeAction = ''"
+      @set-action="activeAction = $event"
+      @submit-action="activeAction = ''"
+      @entries-changed="activeAction = ''">
+      <template #header>
+        <h3 class="activity-showcase__header">
+          Activity Showcase
+        </h3>
+      </template>
+      <template #optionButtons="scope">
+        <BaseButton
+          :text="'add Album'"
+          icon-size="large"
+          icon="collection"
+          button-style="single"
+          @clicked="scope.setAction('delete')" />
+        <BaseButton
+          :text="'add Activity'"
+          icon-size="large"
+          icon="sheet-empty"
+          button-style="single"
+          @clicked="scope.setAction('delete')" />
+        <BaseButton
+          :text="'delete'"
+          icon-size="large"
+          icon="waste-bin"
+          button-style="single"
+          @clicked="scope.setAction('delete')" />
+      </template>
+      <template #actionButtons>
+        <BaseBoxButton
+          :text="'Add Album'"
+          :box-size="{ width: 'auto' }"
+          :show-plus="true"
+          icon="collection"
+          box-style="large"
+          box-type="button"
+          class="base-result-box-section__box" />
+        <BaseBoxButton
+          :text="'Add Activity'"
+          :box-size="{ width: 'auto' }"
+          :show-plus="true"
+          icon="sheet-empty"
+          box-style="large"
+          box-type="button"
+          class="base-result-box-section__box" />
+      </template>
+    </BaseResultBoxSection>
+    <template
+      v-else>
+      <div class="activity-showcase">
+        <h3 class="activity-showcase__header">
+          Activity Showcase
+        </h3>
+        <BaseButton
+          icon="edit"
+          text="edit"
+          @clicked="editMode = true" />
+      </div>
+      <base-carousel
+        :items="entriesList"
+        :swiper-options="{
+          slidesPerView: 2,
+          slidesPerGroup: 2,
+          spaceBetween: 15,
+          loop: carousel.length > 3,
+          speed: 750,
+          keyboard: {
+            enabled: true,
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          breakpoints: {
+            1024: {
+              slidesPerView: carousel.length < 3 ? 2 : 3,
+              slidesPerGroup: carousel.length < 3 ? 2 : 3,
+            },
+          },
+        }"
+        identifier-property-name="id" />
+    </template>
     <BaseResultBoxSection
       :entry-list="entriesList"
       :is-loading="false"
@@ -178,7 +114,7 @@
       :show-action-button-boxes="true"
       :max-rows="2"
       @submit-action="test">
-      <template v-slot:header>
+      <template #header>
         <div :style="{ display: 'flex' }">
           <h3 class="activity-showcase__header">
             Results
@@ -186,7 +122,7 @@
           <span> (30)</span>
         </div>
       </template>
-      <template v-slot:option-buttons="scope">
+      <template #optionButtons="scope">
         <BaseButton
           :text="'add Album'"
           icon-size="large"
@@ -216,7 +152,7 @@
       :max-show-more-rows="1"
       :use-expand-mode="true"
       :max-rows="5">
-      <template v-slot:header>
+      <template #header>
         <h3 class="activity-showcase__header">
           Results
         </h3>
@@ -230,21 +166,17 @@
 // import axios from 'axios';
 import axios from 'axios';
 import BaseButton from '@/components/BaseButton/BaseButton';
-// import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-// import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton';
-import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
-import BaseOptionsNew from '@/components/BaseOptions/BaseOptions';
+import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
+import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton';
 import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
 
 export default {
   name: 'App',
   components: {
     BaseResultBoxSection,
-    // BaseCarousel,
+    BaseCarousel,
     BaseButton,
-    // BaseBoxButton,
-    BaseOptionsNew,
-    BaseDropDown,
+    BaseBoxButton,
   },
   data() {
     return {
