@@ -46,7 +46,7 @@
                 <BaseButton
                   v-if="action.display === 'top' || action.display === 'all' || !action.display"
                   :key="action.text"
-                  :text="action.text"
+                  :text="getI18nString(action.text)"
                   :icon="action.icon"
                   :has-background-color="false"
                   icon-size="large"
@@ -157,7 +157,7 @@
             <BaseBoxButton
               v-if="action.display === 'bottom' || action.display === 'all' || !action.display"
               :key="action.value"
-              :text="action.text"
+              :text="getI18nString(action.text)"
               :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
               :icon="action.icon"
               box-style="small"
@@ -371,7 +371,7 @@ export default {
         selectAll: 'select all',
         selectNone: 'select none',
         entriesSelected: {
-          string: 'entriesSelected',
+          string: 'entries selected',
           count: 2,
           variables: { type: 'entry' },
         },
