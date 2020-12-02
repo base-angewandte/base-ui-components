@@ -84,7 +84,9 @@ export default {
       default: () => [{}],
     },
     /**
-     * index of initial slide
+     * index of initial slide<br>
+     *   this NEEDS to be provided if carousel should start with any other
+     *   than first image in items array
      */
     initialSlide: {
       type: Number,
@@ -113,6 +115,7 @@ export default {
   data() {
     return {
       showInt: this.showPreview,
+      // needed for popUpLock mixin
       targetName: 'mediaCarousel',
       swiper: null,
       // eslint-disable-next-line
@@ -127,7 +130,7 @@ export default {
   mounted() {
     // close modal using 'esc' key
     window.addEventListener('keyup', (e) => {
-      if (e.keyCode === 27) {
+      if (e.code === 'Escape') {
         this.hide();
       }
     });

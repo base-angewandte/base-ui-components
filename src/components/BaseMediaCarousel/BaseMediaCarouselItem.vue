@@ -3,7 +3,8 @@
     <div
       v-if="displayImage && fileType === 'image'"
       class="base-media-preview-preloader">
-      <base-loader />
+      <base-loader
+        class="base-media-preview-preloader-loader" />
     </div>
     <img
       v-if="displayImage && fileType === 'image'"
@@ -48,7 +49,7 @@
       <div class="base-media-preview-not-supported-buttons">
         <BaseButton
           v-if="allowDownload"
-          :text="infoTexts.download"
+          :text="getI18nTerm(infoTexts.download)"
           icon="download"
           icon-position="right"
           icon-size="large"
@@ -56,7 +57,7 @@
           @clicked="download" />
         <BaseButton
           v-if="!isMobile && fileEnding === 'pdf'"
-          :text="infoTexts.view"
+          :text="getI18nTerm(infoTexts.view)"
           icon="eye"
           icon-position="right"
           icon-size="large"
@@ -113,6 +114,7 @@
 
 <script>
 import BaseLoader from '@/components/BaseLoader/BaseLoader';
+import i18n from '../../mixins/i18n';
 
 /**
  * Component allowing for the display of images or streaming of
@@ -126,6 +128,7 @@ export default {
     BaseButton: () => import('../BaseButton/BaseButton'),
     BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
   },
+  mixins: [i18n],
   props: {
     /**
      * url of the medium to be displayed
@@ -181,7 +184,9 @@ export default {
       default: true,
     },
     /**
-     * define information texts for download and view (for pdfs) buttons
+     * define information texts for download and view (for pdfs) buttons in an
+     * object with the respective properties<br>
+     *   could be strings or path to i18n json as well
      */
     infoTexts: {
       type: Object,
@@ -494,11 +499,9 @@ export default {
     justify-content: center;
     align-items: center;
 
-    &::v-deep {
-      .base-loader {
-        top: 50%;
-        transform: translate(-50%, -75%);
-      }
+    .base-media-preview-preloader-loader {
+      top: 50%;
+      transform: translate(-50%, -75%);
     }
   }
 
