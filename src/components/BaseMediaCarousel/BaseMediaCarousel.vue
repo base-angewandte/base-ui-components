@@ -35,11 +35,18 @@
             <base-media-carousel-item
               ref="baseMedia"
               :autoplay="index === initialSlide"
+              :additional-info="media.additionalInfo"
+              :allow-download="allowDownload"
+              :current-slide-info="`${index + 1} / ${items.length}`"
+              :display-name="media.title"
+              :display-size="media.displaySize"
+              :download-url="media.downloadUrl"
+              :info-texts="infoTexts"
               :media-url="media.mediaUrl"
               :media-poster-url="media.mediaPosterUrl"
-              :display-name="media.title"
-              :display-size="{ 'width': '1280px' }"
-              :current-slide-info="`${index + 1} / ${items.length}`" />
+              :media-type="media.mediaType"
+              :orientation="media.orientation"
+              :previews="media.previews" />
           </div>
         </div>
       </div>
@@ -70,13 +77,6 @@ export default {
   mixins: [popUpLock],
   props: {
     /**
-     * specify to play media (video) when slide is active
-     */
-    autoplayMedia: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * array of items to render
      */
     items: {
@@ -91,6 +91,23 @@ export default {
     initialSlide: {
       type: Number,
       default: 0,
+    },
+    /**
+     * define if download button should be shown and download be enabled
+     */
+    allowDownload: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define information texts for download and view (for pdfs) buttons
+     */
+    infoTexts: {
+      type: Object,
+      default: () => ({
+        download: 'Download',
+        view: 'View',
+      }),
     },
     /**
      * steer the display of the lightbox
