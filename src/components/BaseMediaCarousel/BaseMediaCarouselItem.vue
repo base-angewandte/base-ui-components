@@ -90,15 +90,14 @@
         </template>
       </div>
       <div
-        :class="['base-media-preview__info__col',
-                 'base-media-preview__info__col2']">
-        <div
-          v-if="currentSlideInfo"
-          class="base-media-preview-info-center">
-          <p>
-            {{ currentSlideInfo }}
-          </p>
-        </div>
+        v-if="currentSlideInfo"
+        class="base-media-preview__info__col base-media-preview__info__col2">
+        <p>
+          {{ currentSlideInfo }}
+        </p>
+      </div>
+      <div
+        class="base-media-preview__info__col base-media-preview__info__col3">
         <BaseButton
           v-if="allowDownload"
           :text="infoTexts.download"
@@ -430,8 +429,9 @@ export default {
       padding: $spacing-small;
       margin-top: auto;
 
-      .base-media-preview__info__col {
-        flex: 1;
+      .base-media-preview__info__col1,
+      .base-media-preview__info__col3 {
+        width: calc(50% - 50px);
       }
 
       .base-media-preview__info__col1 {
@@ -439,9 +439,14 @@ export default {
       }
 
       .base-media-preview__info__col2 {
+        padding: 0 15px;
+        text-align: center;
+        font-size: $font-size-small;
+      }
+
+      .base-media-preview__info__col3 {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        justify-content: flex-end;
       }
 
       .base-media-preview__info-text-wrapper {
@@ -457,12 +462,6 @@ export default {
           margin-bottom: 0;
         }
       }
-    }
-
-    .base-media-preview-info-center {
-      font-size: $font-size-small;
-      min-width: 50px;
-      text-align: center;
     }
 
     .base-media-preview__button {
