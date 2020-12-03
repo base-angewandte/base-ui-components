@@ -43,9 +43,11 @@
 
 <script>
 import 'lazysizes';
-import Swiper from 'swiper';
+import Swiper, { Autoplay, Keyboard, Pagination } from 'swiper';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
+
+Swiper.use([Autoplay, Keyboard, Pagination]);
 
 export default {
   name: 'BaseCarousel',
@@ -147,6 +149,7 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
+  @import "swiper/swiper.scss";
 
   .base-carousel {
     max-width: 1400px;
