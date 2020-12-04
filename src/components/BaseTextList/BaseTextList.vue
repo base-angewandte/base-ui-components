@@ -3,9 +3,9 @@
     :class="[
       'base-text-list',
       {
-        'base-text-list-2-cols': cols2 && data.length > 1,
+        'base-text-list-2-cols': cols2Int && data.length > 1,
         'base-test-list-2-cols-single-content':
-          cols2 && data.length === 1 && typeof data[0].data === 'string' }]">
+          cols2Int && data.length === 1 && typeof data[0].data === 'string' }]">
     <div
       v-for="(item, index) in data"
       :key="index"
@@ -17,14 +17,14 @@
       </component>
 
       <!-- String as text -->
-      <!-- eslint-disable -->
       <p
         v-if="typeof item.data === 'string'"
         :class="[
           'base-text-list-content',
           'base-text-list-content-pre-line',
-          { 'base-text-list-2-cols': data.length === 1 }]">{{ item.data }}</p>
-      <!-- eslint-enable -->
+          { 'base-text-list-2-cols': data.length === 1 }]">
+        {{ item.data }}
+      </p>
 
       <!-- Array as unordered list -->
       <ul
@@ -46,19 +46,25 @@
           <dt
             :key="'l' + objectIndex"
             class="base-text-list__content-list-item">
-            {{ objectItem.label }}:
+            <template
+              v-if="objectItem.label">
+              {{ objectItem.label }}:
+            </template>
           </dt>
           <dd
             :key="'v' + objectIndex"
             class="base-text-list__content-list-description base-text-list__content-list-item">
             <template
               v-if="objectItem.url">
-              <a
-                :href="objectItem.url"
+              <component
+                :is="useRouterLink ? 'router-link' : 'a'"
+                :to="useRouterLink ? objectItem.url : null"
+                :href="!useRouterLink ? objectItem.url : null"
                 :title="objectItem.value"
+                :target="target(objectItem.url)"
                 class="base-text-list__content-link">
                 {{ objectItem.value }}
-              </a>
+              </component>
             </template>
 
             <template
@@ -75,21 +81,25 @@
 <script>
 
 /**
- * Component to render data in p | ul | dt tags depending on field type
+ * Component to render data in p | ul | dt tags depending on field type 'data'
  */
 
 export default {
   name: 'BaseTextList',
   props: {
     /**
-     * Data to display
+     * data structure for different rendered tags: <br>
+     * p: { label: 'String', data: 'String' } <br>
+     * ul: { label: 'String, data: ['String']}} <br>
+     * dt: { label: 'String, data: [{ label: 'String', value: 'String', url: 'String'}]}} <br><br>
+     * Note: for dt property 'url' will render 'value' as a link<br>
      */
     data: {
       type: Array,
       default: () => ([]),
     },
     /**
-     * Render component as e.g.: 'h2' | 'h3'
+     * render component as e.g.: 'h2' | 'h3'
      */
     renderLabelAs: {
       type: String,
@@ -101,6 +111,48 @@ export default {
     cols2: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * define box width, when content is rendered in two columns<br>
+     * note: property 'cols2' has to be true
+     */
+    cols2Breakpoint: {
+      type: Number,
+      default: 600,
+    },
+  },
+  data() {
+    return {
+      cols2Int: false,
+    };
+  },
+  computed: {
+    // check if router is available
+    useRouterLink() {
+      return !!this.$route;
+    },
+  },
+  mounted() {
+    if (this.cols2) {
+      this.boxResize().observe(this.$el);
+    }
+  },
+  methods: {
+    /**
+     * check if box size changes and set cols2Int
+     */
+    boxResize() {
+      return new ResizeObserver((entries) => {
+        if (entries[0].contentRect.width >= this.cols2Breakpoint) {
+          this.cols2Int = true;
+          return;
+        }
+        this.cols2Int = false;
+      });
+    },
+    target(url) {
+      // Todo: if url string contains either http or https we assume it is an external link?
+      return url.match(/(http|https)/) ? '_blank' : null;
     },
   },
 };
