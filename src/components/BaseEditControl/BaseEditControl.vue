@@ -4,32 +4,41 @@
     <component
       :is="renderTitleAs"
       v-if="title"
-      class="base-edit-control__title">
-      {{ title }}
-      <span
-        v-if="subtitle"
-        class="base-edit-control__title__additional">
-        {{ subtitle }}
-      </span>
+      class="base-edit-control__title  base-text-fade-out-background">
+      <!-- @slot title slot -->
+      <slot>
+        {{ title }}
+        <span
+          v-if="subtitle"
+          class="base-edit-control__title__additional">
+          {{ subtitle }}
+        </span>
+      </slot>
     </component>
 
     <div class="base-edit-control__buttons">
       <base-button
         v-if="!edit"
+        :has-background-color="false"
         icon="edit"
-        text="edit"
+        :text="getI18nTerm(editButtonText)"
+        class="base-edit-control__button"
         @clicked="activate" />
 
       <base-button
         v-if="edit"
+        :has-background-color="false"
         icon="remove"
-        text="cancel"
+        :text="getI18nTerm(cancelButtonText)"
+        class="base-edit-control__button"
         @clicked="cancel" />
 
       <base-button
         v-if="edit"
+        :has-background-color="false"
         icon="save-file"
-        text="save"
+        :text="getI18nTerm(saveButtonText)"
+        class="base-edit-control__button"
         @clicked="save" />
     </div>
   </div>
@@ -37,12 +46,16 @@
 
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton';
+import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseEditControl',
   components: {
     BaseButton,
   },
+  mixins: [
+    i18n,
+  ],
   props: {
     /**
      * set edit mode
@@ -63,7 +76,7 @@ export default {
      */
     subtitle: {
       type: String,
-      default: 'Subtitle',
+      default: '',
     },
     /**
      * render title as e.g.: 'h2' | 'h3'
@@ -73,41 +86,42 @@ export default {
       default: 'h2',
     },
     /**
-     * button text edit
+     * define button text<br>
+     * could be string or path to i18n json as well
      */
     editButtonText: {
       type: String,
-      default: 'Show all',
+      default: 'edit',
     },
     /**
-     * button text cancel
+     * define button text<br>
+     * could be string or path to i18n json as well
      */
     cancelButtonText: {
       type: String,
-      default: 'Show all',
+      default: 'cancel',
     },
     /**
-     * button text save
+     * define button text<br>
+     * could be string or path to i18n json as well
      */
     saveButtonText: {
       type: String,
-      default: 'Show all',
+      default: 'save',
     },
   },
   methods: {
     activate(event) {
-      this.editInt = true;
       /**
-       * event emitted on activate click
+       * event emitted by click on edit button
        *
        * @type {Event}
        */
       this.$emit('activated', event);
     },
     cancel(event) {
-      this.editInt = false;
       /**
-       * event emitted on cancel click
+       * event emitted by click on cancel button
        *
        * @type {Event}
        */
@@ -115,7 +129,7 @@ export default {
     },
     save(event) {
       /**
-       * event emitted on save click
+       * event emitted by click on save button
        *
        * @type {Event}
        */
@@ -137,9 +151,14 @@ export default {
       flex-grow: 1;
       justify-self: flex-start;
       margin-bottom: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+      z-index: -1;
 
       &__additional {
-        font-weight: inherit;
+        font-weight: normal;
+        font-size: $font-size-small;
         color: $font-color-second;
       }
     }
@@ -147,6 +166,13 @@ export default {
     &__buttons {
       display: flex;
       align-items: center;
+    }
+
+    &__button {
+      &:last-of-type {
+        padding-right: 0;
+        transition-property: color;
+      }
     }
   }
 </style>

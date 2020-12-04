@@ -159,6 +159,21 @@ h1, h2, h3 {
   }
 }
 
+.base-text-fade-out-background {
+  position: relative;
+
+  &::after {
+    content: '';
+    width: calc(#{$fade-out-width} + #{$spacing});
+    height: $row-height-large;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) , $background-color);
+    z-index: map-get($zindex, fadeout);
+  }
+}
+
 .base-box-shadow {
   position: relative;
   z-index: 1;
