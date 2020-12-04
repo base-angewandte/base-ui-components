@@ -4,12 +4,12 @@
     :box-size="{width: '100%'}"
     :class="[
       'base-expand-box',
-      { 'base-expand-box-open': isOpen,
+      { 'base-expand-box-open': expandInt,
         'base-expand-box-show-content': showContent }]">
     <div
       :class="[
         'base-expand-box-content',
-        {'base-expand-box-content-fade-out': (!isOpen && showButton)}]">
+        {'base-expand-box-content-fade-out': (!expandInt && showButton)}]">
       <div
         class="base-expand-box-content-inner">
         <!--
@@ -21,12 +21,14 @@
 
     <base-button
       v-if="showButton"
-      :text="isOpen ? showLessText : showMoreText"
+      :text="expandInt ? showLessText : showMoreText"
       :has-background-color="false"
       align-text="left"
       icon="drop-down"
       icon-position="right"
-      class="base-expand-box-button"
+      :class="[
+        'base-expand-box-button',
+        { 'base-button-icon-rotate-180': expandInt }]"
       @clicked="clicked" />
   </base-box>
 </template>
@@ -47,14 +49,21 @@ export default {
   },
   props: {
     /**
-     * Button text to show more content
+     * expand box from outside
+     */
+    expand: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * button text to show more content
      */
     showMoreText: {
       type: String,
       default: 'Show more',
     },
     /**
-     * Button text to show less content
+     * button text to show less content
      */
     showLessText: {
       type: String,
@@ -63,38 +72,81 @@ export default {
   },
   data() {
     return {
-      isOpen: false,
+      expandInt: false,
+      contentWidth: null,
       showButton: false,
       showContent: false,
     };
   },
   mounted() {
-    // compare content to parent container -> set button visibility
-    this.showButton = this.contentInnerHeight() > this.contentHeight();
-    // set content visible
-    this.showContent = true;
+    this.init();
   },
   methods: {
     /**
-     * Calculate height of content
+     * init
+     */
+    init() {
+      if (this.expand) {
+        // check if button is needed
+        this.showButton = this.contentInnerHeight() > this.contentHeight();
+        this.expandInt = true;
+      }
+
+      // show content
+      this.showContent = true;
+
+      // observe resize of container and set visibility of button
+      this.boxResize().observe(this.$el);
+    },
+    /**
+     * check if box width changes and set visibility of button
+     */
+    boxResize() {
+      return new ResizeObserver((entries) => {
+        const currentWidth = entries[0].contentRect.width;
+
+        if (this.contentWidth !== currentWidth) {
+          // compare content to parent container -> set button visibility
+          if (!this.expandInt) {
+            this.showButton = this.contentInnerHeight() > this.contentHeight();
+          }
+
+          // close expanded box
+          if (this.expand
+            && this.expandInt
+            && this.contentWidth !== null) {
+            this.expandInt = false;
+          }
+        }
+
+        // save currentWidth for next comparison
+        this.contentWidth = currentWidth;
+      });
+    },
+    /**
+     * calculate height of content
      */
     contentHeight() {
       return this.$el.querySelector('.base-expand-box-content').offsetHeight;
     },
     /**
-     * Calculate height of content inner
+     * calculate height of content inner
      */
     contentInnerHeight() {
-      return this.$el.querySelector('.base-expand-box-content-inner').offsetHeight;
+      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight;
     },
     /**
-     * event emitted on button click, <br>
-     * expand box
      *
-     * @type {boolean}
      */
     clicked() {
-      this.isOpen = !this.isOpen;
+      this.expandInt = !this.expandInt;
+
+      /**
+       * event emitted on button click
+       *
+       * @type {Event}
+       */
+      this.$emit('update:expand', this.expandInt);
     },
   },
 };
@@ -102,8 +154,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-
-  $initial-text-rows: 10;
 
   .base-expand-box {
     padding: $spacing;
@@ -113,7 +163,7 @@ export default {
       position: relative;
       overflow: hidden;
       line-height: $line-height;
-      height: $line-height * $initial-text-rows + $headline-margin-bottom;
+      height: $line-height * $base-expand-box-text-rows + $headline-margin-bottom;
 
       &.base-expand-box-content-fade-out::after {
         content: '';
@@ -149,50 +199,6 @@ export default {
         position: relative;
         height: 100%;
         visibility: visible;
-      }
-    }
-  }
-</style>
-
-<style lang="scss">
-  @import "../../styles/variables";
-
-  .base-expand-box-button {
-    .base-button-icon {
-      transition: transform 250ms ease-in-out;
-    }
-  }
-
-  .base-expand-box-open {
-    .base-expand-box-button {
-      .base-button-icon {
-        transform: rotate(180deg);
-      }
-    }
-  }
-
-  .base-expand-box-columns {
-    display: flex;
-    justify-content: space-between;
-
-    .base-expand-box-column {
-      width: calc(50% - #{$spacing-large});
-    }
-
-    @media screen and (max-width: $mobile) {
-      display: block;
-      justify-content: inherit;
-
-      .base-expand-box-column {
-        width: 100%;
-
-        &:first-of-type {
-          .base-text-list-group {
-            &:first-of-type {
-              margin-top: 0;
-            }
-          }
-        }
       }
     }
   }
