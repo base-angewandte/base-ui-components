@@ -21,7 +21,6 @@
         </span>
         <base-icon
           name="drop-down"
-          title="open"
           class="base-expand-item__col base-expand__head__icon" />
       </button>
 
@@ -34,7 +33,6 @@
         <ul
           v-show="expanded"
           :id="'base-expand-region-' + _uid"
-          role="region"
           :aria-labelledby="'base-expand-control-' + _uid"
           :aria-hidden="!expanded ? 'true' : 'false'"
           class="base-expand__body">
@@ -45,7 +43,15 @@
             :key="'item_' + index"
             :data="items"
             :multiple="multiple"
-            render-as="li" />
+            render-as="li">
+            <template
+              v-slot:content="dataNextLevel">
+              <!-- @slot a slot to provide customized entry row in next level -->
+              <slot
+                name="content"
+                :data="dataNextLevel.data" />
+            </template>
+          </base-expand-list-row>
         </ul>
       </transition>
     </template>
@@ -54,13 +60,12 @@
       v-if="!edit && data.value">
       <div class="base-expand-item base-expand-item--intend">
         <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
-          <a
-            v-if="data.href"
-            :href="data.href"
-            :title="`${data.value}${data.attributes ? ` - ${data.attributes.join(', ')}` : ''}`"
-            class="base-expand-item__href">{{ `${data.value} ` }}</a>
-          <template v-if="data.href">{{ ` - ` }}</template>
-          <template v-if="data.attributes">{{ data.attributes.join(', ') }}</template>
+          <!-- @slot a slot to provide customized entry row -->
+          <slot
+            name="content"
+            :data="data">
+            {{ data.value }}
+          </slot>
         </span>
       </div>
     </template>
@@ -68,17 +73,17 @@
     <template
       v-if="edit">
       <div
-        :class="['base-expand-item', { 'base-expand-item--movable': movableInt }]">
+        :class="['base-expand-item', { 'base-expand-item--movable': movable }]">
         <button
           ref="baseExpandItemHandle"
           class="base-expand-item__col base-expand-item__handle"
           @keyup.down="moveItem('down')"
           @keyup.up="moveItem('up')"
-          @keyup.space="movableInt =! movableInt"
-          @keyup.esc="movableInt = false"
-          @blur="movableInt = false">
+          @keyup.space="movable =! movable"
+          @keyup.esc="movable = false"
+          @blur="movable = false">
           <base-icon
-            title="drag items"
+            :title="`${getI18nTerm('drag')} ${data.label}`"
             name="drag-lines" />
         </button>
         <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
@@ -108,6 +113,7 @@
 import BaseExpandListRow from '@/components/BaseExpandList/BaseExpandListRow';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseButton from '@/components/BaseButton/BaseButton';
+import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseExpandListRow',
@@ -116,9 +122,13 @@ export default {
     BaseExpandListRow,
     BaseIcon,
   },
+  mixins: [i18n],
   props: {
     /**
-     * data to display
+     * data object: { label: 'String', data: [{ value: 'String', }] } <br><br>
+     * rendered variants: <br>
+     * expandable row: data object contains property 'label'<br>
+     * entry row: data object contains property 'value'
      */
     data: {
       type: Object,
@@ -129,13 +139,6 @@ export default {
      * set edit mode
      */
     edit: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * set move mode from outside
-     */
-    movable: {
       type: Boolean,
       default: false,
     },
@@ -171,7 +174,8 @@ export default {
   data() {
     return {
       expanded: false,
-      movableInt: this.movable,
+      // please be aware that this variable is referenced in BaseExpandList
+      movable: false,
     };
   },
   watch: {
@@ -180,7 +184,7 @@ export default {
      *
      * @params {string}
      */
-    movableInt(val) {
+    movable(val) {
       if (val) {
         this.$el.querySelector('.base-expand-item__handle')
           .focus();
@@ -201,8 +205,8 @@ export default {
      * @param {string} direction values: 'up' | 'down'
      */
     moveItem(direction = 'up ') {
-      if (this.movableInt) {
-        this.movableInt = false;
+      if (this.movable) {
+        this.movable = false;
         this.$emit('sorted', {
           direction,
           order: this.data.order,
@@ -226,7 +230,6 @@ export default {
           rows.forEach((row) => {
             // eslint-disable-next-line
             row.expanded = false;
-            this.closeRows(row.$children);
           });
         }
       }
@@ -309,13 +312,7 @@ export default {
   border-left: $border-active-width solid transparent;
   transition: border-left-color 500ms ease-in-out;
 
-  &__col {
-    display: flex;
-    align-items: center;
-    min-height: $row-height-large;
-  }
-
-  &__href {
+  a {
     color: $app-color;
     transition: $link-transition;
     margin-right: 5px; // Todo: find better solution for spacing
@@ -324,6 +321,12 @@ export default {
     &:focus {
       color: $app-color-secondary;
     }
+  }
+
+  &__col {
+    display: flex;
+    align-items: center;
+    min-height: $row-height-large;
   }
 
   &__handle {
@@ -376,7 +379,7 @@ export default {
 
 .expand-enter-active,
 .expand-leave-active {
-  transition-duration: 500ms;
+  transition-duration: $base-expand-list-transition-duration;
   transition-timing-function: ease-in-out;
 }
 

@@ -15,7 +15,15 @@ Component to render list data
       ref="baseExpandList"
       :data="editExpandList ? baseExpandList : baseExpandList.filter(item => !item.hidden)"
       :edit="editExpandList"
-      @saved="saveExpandListEdit" />
+      @saved="saveExpandListEdit">
+      <template
+        v-slot:content="props">
+        <a
+          :href="props.data.href"
+          :title="props.data.value">{{ props.data.value }}</a>
+        <template v-if="props.data.attributes"> - {{ props.data.attributes.join(', ') }}</template>
+      </template>
+    </BaseExpandList>
   </div>
 </template>
 
@@ -34,35 +42,33 @@ export default {
       baseExpandList: [
         {
           label: 'Monographien',
+          hidden: false,
           data: [
             {
               label: 'Beiträge in Sammelband',
               data: [
                 {
-                  value: '1 qui nesciunt',
+                  value: 'qui nesciunt',
                   attributes: [
-                    'molestiae commodi ipsum',
-                    'eos dolorem in',
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
                   ],
-                  id: '29',
                   href: '#',
                 },
                 {
-                  value: '2 animi voluptates',
+                  value: 'animi voluptates',
                   attributes: [
-                    'ut eum et',
-                    'quis odit est',
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
                   ],
-                  id: '31',
                   href: '#',
                 },
                 {
-                  value: '3 officiis quisquam',
+                  value: 'officiis quisquam',
                   attributes: [
-                    'qui et sit',
-                    'occaecati facere temporibus',
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
                   ],
-                  id: '44',
                   href: '#',
                 },
               ],
@@ -71,30 +77,27 @@ export default {
               label: 'Konferenzbeiträge',
               data: [
                 {
-                  value: '1 qui reiciendis',
+                  value: 'qui reiciendis',
                   attributes: [
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  id: '19',
                   href: '#',
                 },
                 {
-                  value: '2 quia quisquam',
+                  value: 'quia quisquam',
                   attributes: [
                     'quae laudantium expedita',
                     'maxime omnis accusamus',
                   ],
-                  id: '28',
                   href: '#',
                 },
                 {
-                  value: '3 qui nesciunt',
+                  value: 'qui nesciunt',
                   attributes: [
                     'molestiae commodi ipsum',
                     'eos dolorem in',
                   ],
-                  id: '29',
                   href: '#',
                 },
               ],
@@ -103,6 +106,7 @@ export default {
         },
         {
           label: 'Film/Video',
+          hidden: false,
           data: [
             {
               value: 'qui fugit',
@@ -110,7 +114,6 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              id: '8',
               href: '#',
             },
             {
@@ -119,7 +122,6 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              id: '24',
               href: '#',
             },
             {
@@ -128,7 +130,6 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              id: '26',
               href: '#',
             },
             {
@@ -137,13 +138,13 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              id: '50',
               href: '#',
             },
           ],
         },
         {
           label: 'Audio',
+          hidden: false,
           data: [
             {
               value: 'sed et',
@@ -151,7 +152,6 @@ export default {
                 'est quos sed',
                 'sed molestiae veritatis',
               ],
-              id: '5',
               href: '#',
             },
             {
@@ -160,7 +160,6 @@ export default {
                 'non possimus possimus',
                 'nobis recusandae sed',
               ],
-              id: '20',
               href: '#',
             },
             {
@@ -169,13 +168,13 @@ export default {
                 'non magnam eius',
                 'harum exercitationem non',
               ],
-              id: '48',
               href: '#',
             },
           ],
         },
         {
           label: 'Preise und Stipendien',
+          hidden: false,
           data: [
             {
               value: 'qui fugit',
@@ -183,7 +182,6 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              id: '8',
               href: '#',
             },
             {
@@ -192,7 +190,6 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              id: '24',
               href: '#',
             },
             {
@@ -201,7 +198,6 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              id: '26',
               href: '#',
             },
             {
@@ -210,13 +206,13 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              id: '50',
               href: '#',
             },
           ],
         },
         {
           label: 'Konferenzen & Symposien',
+          hidden: false,
           data: [
             {
               value: 'qui fugit',
@@ -224,7 +220,6 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              id: '8',
               href: '#',
             },
             {
@@ -233,7 +228,6 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              id: '24',
               href: '#',
             },
             {
@@ -242,7 +236,6 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              id: '26',
               href: '#',
             },
             {
@@ -251,7 +244,6 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              id: '50',
               href: '#',
             },
           ],

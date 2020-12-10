@@ -4,9 +4,7 @@
     <div
       :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
       <ul
-        v-if="!edit"
-        role="list"
-        :aria-labelledby="`base-expand-list-${_uid}`">
+        v-if="!edit">
         <base-expand-list-row
           v-for="(items, index) in data"
           v-show="index < (showAll ? data.length : minItems)"
@@ -14,10 +12,19 @@
           :key="index"
           :data="items"
           :multiple="multiple"
-          render-as="li" />
+          render-as="li">
+          <template
+            v-slot:content="props">
+            <!-- @slot a slot to provide customized entry row -->
+            <slot
+              name="content"
+              :data="props.data" />
+          </template>
+        </base-expand-list-row>
       </ul>
 
       <!-- List items in draggable area -->
+      <!-- Todo: better support for screen reader -->
       <draggable
         v-if="edit"
         v-model="dataInt"
@@ -42,6 +49,7 @@
       v-if="!edit && data.length > minItems"
       :id="`base-expand-list-${_uid}`"
       :aria-expanded="showAll ? 'true' : 'false'"
+      :has-background-color="false"
       icon="drop-down"
       icon-position="right"
       :text="showAll ? showLessText: showMoreText"
@@ -63,7 +71,11 @@ export default {
   },
   props: {
     /**
-     * data to display
+     * data object: [{ label: 'String', hidden: false, data: [{ value: 'String', }] }] <br><br>
+     * rendered variants: <br>
+     * expandable row: data object contains property 'label'<br>
+     * entry row: data object contains property 'value'<br><br>
+     * Note: property hidden is used to set visibility and is set in edit mode to toggle item
      */
     data: {
       type: Array,
@@ -126,6 +138,7 @@ export default {
     };
   },
   computed: {
+    // the data array computed for draggable
     dataInt: {
       get() {
         if (this.dataSorted) {
@@ -135,19 +148,21 @@ export default {
       },
       set(val) {
         this.dataSorted = this.addParams(val);
-        return this.dataSorted;
       },
     },
   },
-  watch: {
-    edit() {
-      // if (this.edit) {
-      //   // set focus to first item
-      //   setTimeout(() => {
-      //     this.$refs.baseExpandListRow[0].$refs.baseExpandItemHandle.focus();
-      //   }, 100);
-      // }
-    },
+  async updated() {
+    await this.$nextTick();
+
+    // set focus to first handle
+    // if update was triggered by reordering list items, focus will set in function sort()
+    if (this.edit) {
+      const isHandleFocused = document.activeElement.classList.contains('base-expand-item__handle');
+
+      if (!isHandleFocused && this.$refs.baseExpandListRow[0]) {
+        this.$refs.baseExpandListRow[0].$refs.baseExpandItemHandle.focus();
+      }
+    }
   },
   methods: {
     /**
@@ -179,16 +194,18 @@ export default {
       this.dataInt = data;
 
       // set current item movable (focus)
-      this.$refs.baseExpandListRow[to].movableInt = true;
+      this.$refs.baseExpandListRow[to].movable = true;
     },
     /**
      * reset list data
+     * @public
      */
     reset() {
       this.dataInt = this.data;
     },
     /**
      * save changed data
+     * @public
      */
     save() {
       /**
