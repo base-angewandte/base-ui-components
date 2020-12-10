@@ -1,5 +1,7 @@
 <template>
   <div class="base-media-preview-image-stage">
+    <!-- container 'base-media-preview-preloader' is removed by swiper after image is loaded -->
+    <!-- class is also defined in swiper setup -->
     <div
       v-if="displayImage && fileType === 'image'"
       class="base-media-preview-preloader">
