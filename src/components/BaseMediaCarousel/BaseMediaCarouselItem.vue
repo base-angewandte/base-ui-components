@@ -169,11 +169,12 @@ export default {
       },
     },
     /**
-     * set height and with from outside
+     * set height and with from outside <br>
+     * e.g. { width: 1280px, height: 720px }
      */
     displaySize: {
       type: Object,
-      default: () => ({ height: '720px', width: '1280px' }),
+      default: () => ({}),
     },
     /**
      * define if download button should be shown and download be enabled
