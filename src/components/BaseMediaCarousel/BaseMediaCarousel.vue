@@ -202,20 +202,42 @@ export default {
       });
 
       // swiper events
+      this.swiper.on('init', () => {
+        this.setFocus();
+      });
+
       this.swiper.on('slideChange', () => {
         this.mediaPause();
+      });
+
+      this.swiper.on('transitionEnd', () => {
+        this.setFocus();
       });
 
       this.swiper.init();
     },
     /**
-     * init media
+     * set focus to first element with action (video, audio, button) of current slide
      */
-    mediaInit() {
+    setFocus() {
+      // select active slide
       const media = this.$refs.baseMedia[this.swiper.activeIndex];
 
+      // video
       if (media && media.$refs.baseMediaVideo) {
-        media.$refs.baseMediaVideo.init();
+        media.$refs.baseMediaVideo.$refs.playButton.focus();
+        return;
+      }
+
+      // audio
+      if (media && media.$refs.baseMediaAudio) {
+        media.$refs.baseMediaAudio.focus();
+        return;
+      }
+
+      // default
+      if (media && media.$el.querySelector('button')) {
+        media.$el.querySelector('button').focus();
       }
     },
     /**
