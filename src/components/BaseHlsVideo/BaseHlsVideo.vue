@@ -1,18 +1,35 @@
 <template>
-  <video
-    ref="videoPlayer"
-    :style="displaySize"
-    :poster="mediaPosterUrl"
-    controls>
-    Your browser does not support the video tag.
-  </video>
+  <div
+    class="base-media-video">
+    <button
+      v-if="playButton && !autoplay"
+      ref="playButton"
+      class="base-media-video__control"
+      @click="play">
+      <base-icon
+        name="play"
+        class="base-media-video__icon" />
+    </button>
+
+    <video
+      ref="videoPlayer"
+      :style="displaySize"
+      :poster="mediaPosterUrl"
+      class="base-media-video__video">
+      Your browser does not support the video tag.
+    </video>
+  </div>
 </template>
 
 <script>
 import Hls from 'hls.js/dist/hls.light';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 
 export default {
   name: 'BaseHlsVideo',
+  components: {
+    BaseIcon,
+  },
   props: {
     /**
      * url of the medium to be displayed
@@ -47,14 +64,14 @@ export default {
     return {
       hsl: () => {},
       video: null,
-      autoplayInt: this.autoplay,
+      playButton: true,
     };
   },
   mounted() {
     this.video = this.$refs.videoPlayer;
 
     if (this.autoplay) {
-      this.init();
+      this.play();
     }
   },
   destroyed() {
@@ -75,23 +92,15 @@ export default {
             this.hls.loadSource(this.mediaUrl);
             this.hls.attachMedia(this.video);
             this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
-              if (this.autoplayInt) {
-                this.play();
-                this.autoplayInt = false;
-                return;
-              }
-              this.pause();
+              this.play();
+              this.playButton = false;
+              this.video.controls = true;
             });
           }
         } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
           this.video.src = this.mediaUrl;
           this.video.addEventListener('loadedmetadata', () => {
-            if (this.autoplayInt) {
-              this.play();
-              this.autoplayInt = false;
-              return;
-            }
-            this.pause();
+            this.play();
           });
         }
       }
@@ -101,6 +110,11 @@ export default {
      */
     play() {
       if (this.video) {
+        if (!this.hls) {
+          this.init();
+          return;
+        }
+
         this.video.play();
       }
     },
@@ -115,3 +129,37 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  @import "../../styles/variables";
+
+  .base-media-video {
+    position: relative;
+
+    &__control {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      color: $app-color;
+      background-color: white;
+      box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.15);
+      opacity: 0.5;
+      transition: opacity 250ms ease-in-out;
+
+      &:focus,
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    &__video {
+      max-width: 100%;
+    }
+  }
+</style>

@@ -24,6 +24,7 @@ import magnifier from './magnifier';
 import next from './next';
 import optionsMenu from './options-menu';
 import people from './people';
+import play from './play';
 import plus2 from './plus-2';
 import plus from './plus';
 import prev from './prev';
@@ -66,6 +67,7 @@ export default {
   next,
   optionsMenu,
   people,
+  play,
   plus2,
   plus,
   prev,

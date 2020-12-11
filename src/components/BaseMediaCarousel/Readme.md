@@ -42,6 +42,7 @@ export default {
           title: 'Video: Taken from: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
           mediaUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
           mediaPosterUrl: 'https://placeimg.com/1200/650/arch.jpg',
+          displaySize: { width: '1000px' },
         },
         {
           title: 'Audio: Taken from: http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3',

@@ -46,7 +46,8 @@
               :media-poster-url="media.mediaPosterUrl"
               :media-type="media.mediaType"
               :orientation="media.orientation"
-              :previews="media.previews" />
+              :previews="media.previews"
+              tabindex="-1" />
           </div>
         </div>
       </div>
@@ -179,6 +180,7 @@ export default {
      */
     initSwiper() {
       const additionalOptions = {
+        init: false,
         initialSlide: this.initialSlide,
         navigation: {
           nextEl: '.swiper-button-next',
@@ -189,6 +191,9 @@ export default {
           loadPrevNext: true,
           preloaderClass: 'base-media-preview-preloader',
         },
+        // Threshold value in px.
+        // If "touch distance" will be lower than this value then swiper will not move
+        threshold: 10,
       };
 
       this.swiper = new Swiper(`#${this.swiperId}`, {
@@ -196,13 +201,12 @@ export default {
         ...additionalOptions,
       });
 
-      this.swiper.init();
-
-      // play/pause playable media
+      // swiper events
       this.swiper.on('slideChange', () => {
-        this.mediaPause(); // previous slide
-        this.mediaInit(); // actual slide
+        this.mediaPause();
       });
+
+      this.swiper.init();
     },
     /**
      * init media
