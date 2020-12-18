@@ -51,6 +51,7 @@
         </div>
         <base-hls-video
           v-else-if="fileType === 'video'"
+          :autoplay="true"
           :display-size="displaySize"
           :media-url="mediaUrl"
           class="base-media-preview-image base-media-preview-video" />
