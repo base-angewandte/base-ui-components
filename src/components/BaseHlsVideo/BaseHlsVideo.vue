@@ -11,10 +11,12 @@
         class="base-media-video__icon" />
     </button>
 
+    <!-- tabindex is needed for swiper to handle focus after using tab key -->
     <video
       ref="videoPlayer"
       :style="displaySize"
       :poster="mediaPosterUrl"
+      :tabindex="playButton ? '-1' : '1'"
       class="base-media-video__video">
       Your browser does not support the video tag.
     </video>
@@ -95,12 +97,15 @@ export default {
               this.play();
               this.playButton = false;
               this.video.controls = true;
+              this.video.focus();
             });
           }
         } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
           this.video.src = this.mediaUrl;
           this.video.addEventListener('loadedmetadata', () => {
+            this.playButton = false;
             this.play();
+            this.video.focus();
           });
         }
       }

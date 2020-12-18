@@ -47,7 +47,7 @@
               :media-type="media.mediaType"
               :orientation="media.orientation"
               :previews="media.previews"
-              tabindex="-1" />
+              tabindex="1" />
           </div>
         </div>
       </div>
@@ -145,18 +145,18 @@ export default {
       this.showInt = val;
     },
   },
-  mounted() {
-    // close modal using 'esc' key
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'Escape') {
-        this.hide();
-      }
-    });
-  },
   updated() {
     this.$nextTick(() => {
-      if (process.browser && this.showInt) {
+      if (process.browser && this.showInt && this.swiper === null) {
         this.initSwiper();
+        this.$el.addEventListener('keyup', e => this.escapeEvent(e));
+        this.$el.addEventListener('keydown', e => this.tabEvents(e));
+      }
+
+      if (!this.showInt) {
+        this.swiper = null;
+        this.$el.removeEventListener('keyup', e => this.escapeEvent(e));
+        this.$el.removeEventListener('keydown', e => this.tabEvents(e));
       }
     });
   },
@@ -201,47 +201,20 @@ export default {
         ...additionalOptions,
       });
 
-      // swiper events
-      this.swiper.on('init', () => {
-        this.setFocus();
-      });
-
       this.swiper.on('slideChange', () => {
         this.mediaPause();
       });
 
       this.swiper.on('transitionEnd', () => {
-        this.setFocus();
+        // select active slide and set focus
+        const media = this.$refs.baseMedia[this.swiper.activeIndex];
+        media.$el.focus();
       });
 
       this.swiper.init();
     },
     /**
-     * set focus to first element with action (video, audio, button) of current slide
-     */
-    setFocus() {
-      // select active slide
-      const media = this.$refs.baseMedia[this.swiper.activeIndex];
-
-      // video
-      if (media && media.$refs.baseMediaVideo) {
-        media.$refs.baseMediaVideo.$refs.playButton.focus();
-        return;
-      }
-
-      // audio
-      if (media && media.$refs.baseMediaAudio) {
-        media.$refs.baseMediaAudio.focus();
-        return;
-      }
-
-      // default
-      if (media && media.$el.querySelector('button')) {
-        media.$el.querySelector('button').focus();
-      }
-    },
-    /**
-     * pause media
+     * pause media on previous slide
      */
     mediaPause() {
       const media = this.$refs.baseMedia[this.swiper.previousIndex];
@@ -254,6 +227,88 @@ export default {
       // audio
       if (media && media.$refs.baseMediaAudio) {
         media.$refs.baseMediaAudio.pause();
+      }
+    },
+    /**
+     * intercept escape key event, hide modal
+     */
+    escapeEvent(e) {
+      if (e.code === 'Escape') {
+        console.log('hide');
+        this.hide();
+      }
+    },
+    /**
+     * intercept tab key event
+     * due swiper breaks using tab keys
+     */
+    tabEvents(e) {
+      if (e.shiftKey && e.code === 'Tab') {
+        e.preventDefault();
+
+        this.setFocus('prev');
+        return;
+      }
+
+      if (e.code === 'Tab') {
+        e.preventDefault();
+        this.setFocus('next');
+      }
+    },
+    /**
+     * get focusable dom elements per slide
+     *
+     * @return array
+     */
+    getFocusableItems() {
+      const focusable = 'button, audio, video[tabindex="1"]';
+      const focusableBySlide = [];
+
+      this.$refs.baseMedia.forEach((slide) => {
+        // focusable dom elements
+        const items = Array.from(slide.$el.querySelectorAll(focusable));
+        // add current slide (is focused after slide change)
+        items.unshift(slide.$el);
+
+        focusableBySlide.push(items);
+      });
+
+      return focusableBySlide;
+    },
+    /**
+     * set focus to prev/next focusable dom element
+     * trigger slideEvent if needed
+     *
+     * @param {string} direction 'prev', 'next'
+     */
+    setFocus(direction = 'next') {
+      const items = this.getFocusableItems();
+      let currentSlide;
+      let currentFocus;
+
+      items.forEach((item, itemIndex) => {
+        item.forEach((element, elemIndex) => {
+          if (element.matches(':focus')) {
+            currentSlide = itemIndex;
+            currentFocus = elemIndex;
+          }
+        });
+      });
+
+      if (direction === 'next') {
+        if (items[currentSlide][currentFocus + 1]) {
+          items[currentSlide][currentFocus + 1].focus();
+          return;
+        }
+        this.swiper.slideNext();
+      }
+
+      if (direction === 'prev') {
+        if (items[currentSlide][currentFocus - 1]) {
+          items[currentSlide][currentFocus - 1].focus();
+          return;
+        }
+        this.swiper.slidePrev();
       }
     },
   },

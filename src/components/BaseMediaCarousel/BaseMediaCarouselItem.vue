@@ -93,6 +93,7 @@
       </div>
       <div
         v-if="currentSlideInfo"
+        aria-hidden="true"
         class="base-media-preview__info__col base-media-preview__info__col2">
         <p>
           {{ currentSlideInfo }}
@@ -323,6 +324,7 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    outline: none;
 
     .base-media-preview-image {
       max-height: calc(100% - #{$spacing}*4);
