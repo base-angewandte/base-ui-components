@@ -4,6 +4,7 @@
     <button
       v-if="playButton && !autoplay"
       ref="playButton"
+      :title="`${getI18nTerm(buttonTitle)} Video`"
       class="base-media-video__control"
       @click="play">
       <base-icon
@@ -26,12 +27,16 @@
 <script>
 import Hls from 'hls.js/dist/hls.light';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseHlsVideo',
   components: {
     BaseIcon,
   },
+  mixins: [
+    i18n,
+  ],
   props: {
     /**
      * url of the medium to be displayed
@@ -60,6 +65,14 @@ export default {
     autoplay: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * define play button text
+     * could be string or path to i18n json as well
+     */
+    buttonTitle: {
+      type: String,
+      default: 'Play',
     },
   },
   data() {
