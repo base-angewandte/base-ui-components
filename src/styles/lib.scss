@@ -184,3 +184,11 @@ h1, h2, h3 {
     box-shadow: $box-shadow-edit;
   }
 }
+
+.supportive-text {
+  position: absolute;
+  z-index: 1000;
+  width: 1px;
+  margin-left: -1px;
+  overflow: hidden;
+}

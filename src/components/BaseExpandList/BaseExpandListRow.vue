@@ -17,7 +17,9 @@
           <span
             class="base-expand__head__label">{{ data.label }}</span>
           <span
-            class="base-expand__head__additional">({{ data.data.length }})</span>
+            class="base-expand__head__additional">
+            ({{ data.data.length }})
+          </span>
         </span>
         <base-icon
           name="drop-down"
@@ -74,31 +76,36 @@
       v-if="edit">
       <div
         :class="['base-expand-item', { 'base-expand-item--movable': movable }]">
-        <button
+        <span
           ref="baseExpandItemHandle"
+          :title="data.label"
+          tabindex="0"
           class="base-expand-item__col base-expand-item__handle"
           @keyup.down="moveItem('down')"
           @keyup.up="moveItem('up')"
           @keyup.space="movable =! movable"
           @keyup.esc="movable = false"
+          @focus="supportiveText('activate')"
           @blur="movable = false">
           <base-icon
-            :title="`${getI18nTerm('drag')} ${data.label}`"
             name="drag-lines" />
-        </button>
+        </span>
         <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
           <span
             :class="[
               'base-expand__head__label',
               { 'base-expand__head__label--disabled': data.hidden }]">{{ data.label }}</span>
           <span
-            class="base-expand__head__additional">({{ data.data.length }})</span>
+            class="base-expand__head__additional">
+            ({{ data.data.length }})
+          </span>
         </div>
         <div class="base-expand-item__col base-expand-item__controls">
           <base-button
             :icon="data.hidden ? 'eye': 'eye-hide'"
             :text="data.hidden ? editShowText : editHideText"
             :has-background-color="false"
+            :aria-label="`${data.hidden ? editShowText : editHideText} ${data.label}`"
             icon-size="large"
             align-text="left"
             @clicked="setVisibility" />
@@ -174,8 +181,10 @@ export default {
   data() {
     return {
       expanded: false,
-      // please be aware that this variable is referenced in BaseExpandList
+      // referenced in BaseExpandList
       movable: false,
+      // referenced in BaseExpandList
+      useSupportiveText: true,
     };
   },
   watch: {
@@ -185,10 +194,20 @@ export default {
      * @params {string}
      */
     movable(val) {
+      const dragHandle = this.$el.querySelector('.base-expand-item__handle');
+
       if (val) {
-        this.$el.querySelector('.base-expand-item__handle')
-          .focus();
+        dragHandle.focus();
       }
+
+      // check if dragHandle has focus
+      if (document.activeElement === dragHandle) {
+        // emit supportive text for aria-live
+        this.supportiveText(this.movable ? 'activated' : 'activate');
+      }
+
+      // enable supportive text (disabled by moveItem())
+      this.useSupportiveText = true;
     },
   },
   methods: {
@@ -206,6 +225,8 @@ export default {
      */
     moveItem(direction = 'up ') {
       if (this.movable) {
+        // disable supportive text to avoid message cue
+        this.useSupportiveText = false;
         this.movable = false;
         this.$emit('sorted', {
           direction,
@@ -294,6 +315,21 @@ export default {
         this.closeRows(this.$refs.baseExpandListRow);
       }
     },
+    /**
+     * supportive text for screen readers
+     */
+    supportiveText(type = 'activate') {
+      if (!this.useSupportiveText) {
+        return;
+      }
+      /**
+       * event emitted on dragHandle toggle
+       *
+       * @event
+       * @property {string} type
+       */
+      this.$emit('supportive', type);
+    },
   },
 };
 </script>
@@ -344,6 +380,7 @@ export default {
     &:focus {
       cursor: grab;
       color: $app-color;
+      outline: none;
     }
   }
 
@@ -370,6 +407,12 @@ export default {
     position: relative;
     z-index: 1;
     outline: 1px solid $app-color;
+  }
+
+  &:focus {
+    .base-expand-item__handle {
+      color: $app-color;
+    }
   }
 }
 </style>
