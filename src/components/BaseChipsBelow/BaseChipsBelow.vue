@@ -328,7 +328,6 @@ export default {
     removeEntry(evt, index) {
       const item = this.selectedBelowListInt.splice(index, 1);
       this.$set(item, 'roles', {});
-      this.$refs.chipsInput.dropDownList = this.$refs.chipsInput.dropDownList.concat(item);
       this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
