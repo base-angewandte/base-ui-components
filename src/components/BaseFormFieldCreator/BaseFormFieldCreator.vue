@@ -560,6 +560,10 @@ export default {
         position: relative;
         margin: -16px auto;
         width: calc(100% - 6px);
+
+        @media screen and (max-width: $mobile) {
+          margin: -13px auto;
+        }
       }
     }
   }
@@ -589,6 +593,10 @@ export default {
     font-size: $font-size-small;
     margin-top: auto;
     white-space: nowrap;
+  }
+
+  .base-form-field-creator__date-fieldset {
+    display: contents;
   }
 
   @media screen and (max-width: 1260px) {
