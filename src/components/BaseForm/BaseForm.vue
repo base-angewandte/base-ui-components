@@ -484,6 +484,10 @@ export default {
         fill: $app-color;
       }
     }
+
+    &.base-form-pt-0 {
+      padding-top: 0;
+    }
   }
 
   @media screen and (max-width: 870px) {
