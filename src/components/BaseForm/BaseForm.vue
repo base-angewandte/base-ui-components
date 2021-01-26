@@ -1,5 +1,7 @@
 <template>
-  <div class="base-form">
+  <div
+    class="base-form"
+    :style="formStyle">
     <template v-for="(element, index) in formFieldListInt">
       <!-- SINGLE FORM FIELD -->
       <BaseFormFieldCreator
@@ -134,6 +136,14 @@ export default {
     formId: {
       type: String,
       default: '',
+    },
+    /**
+     * define additional style for the form
+     * should be an object eg. { 'padding-top': 0 }
+     */
+    formStyle: {
+      type: Object,
+      default: () => ({}),
     },
     /**
      * define fields (specify field name!) for which tabs should be shown
@@ -483,10 +493,6 @@ export default {
       &:focus .field-group-icon {
         fill: $app-color;
       }
-    }
-
-    &.base-form-pt-0 {
-      padding-top: 0;
     }
   }
 
