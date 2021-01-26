@@ -558,11 +558,11 @@ export default {
 
       .base-form-field-creator__subform {
         position: relative;
-        margin: -16px auto;
+        margin: -$spacing auto;
         width: calc(100% - 6px);
 
         @media screen and (max-width: $mobile) {
-          margin: -13px auto;
+          margin: -$spacing auto;
         }
       }
     }
