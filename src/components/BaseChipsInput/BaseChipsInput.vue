@@ -637,7 +637,6 @@ export default {
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
 
     onInputFocus() {
-      console.log('focus');
       this.inputFieldActive = true;
     },
     onInputBlur() {
