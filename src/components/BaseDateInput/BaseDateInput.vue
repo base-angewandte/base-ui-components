@@ -503,14 +503,15 @@ export default {
     },
     /**
      * if input was just a single string return that otherwise
-     * only return the properties provided by external input
+     * only return the properties provided by external input <br>
+     * if input is empty set value to empty string instead of null (default vue2-datepicker)
      */
     getInputData() {
       if (this.isSingleDate) {
-        return this.inputInt.date;
+        return this.inputInt.date !== null ? this.inputInt.data : '';
       }
       const data = {};
-      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key]));
+      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key] !== null ? this.inputInt[key] : ''));
       return data;
     },
     /**
