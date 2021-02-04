@@ -508,7 +508,7 @@ export default {
      */
     getInputData() {
       if (this.isSingleDate) {
-        return this.inputInt.date !== null ? this.inputInt.data : '';
+        return this.inputInt.date !== null ? this.inputInt.date : '';
       }
       const data = {};
       this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key] !== null ? this.inputInt[key] : ''));
