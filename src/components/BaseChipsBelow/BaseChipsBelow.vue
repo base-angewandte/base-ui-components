@@ -17,7 +17,7 @@
         <!-- @slot a slot to provide customized drop down options -->
         <slot
           :item="props.item"
-          name="below-drop-down-entry" />
+          name="drop-down-entry" />
       </template>
       <template
         v-slot:no-options>
