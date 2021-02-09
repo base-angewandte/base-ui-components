@@ -16,7 +16,6 @@
       :return-as-string="returnAsString"
       @focus="onInputFocus"
       @blur="onInputBlur"
-      @clicked-outside="onInputBlur"
       @keydown="checkKeyEvent"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -440,7 +439,7 @@ export default {
       if (val) {
         this.addSelectedOption(val);
         // if input element was found - focus after chips select
-        if (this.inputElem) {
+        if (this.inputElem && this.allowMultipleEntries) {
           this.inputElem.focus();
         }
       }
@@ -608,6 +607,7 @@ export default {
       this.selectedOption = null;
       // remove focus from input if element is single select
       if (!this.allowMultipleEntries) {
+        this.inputFieldActive = false;
         this.inputElem.blur();
       }
     },

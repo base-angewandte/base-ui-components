@@ -17,7 +17,7 @@
         <!-- @slot a slot to provide customized drop down options -->
         <slot
           :item="props.item"
-          name="below-drop-down-entry" />
+          name="drop-down-entry" />
       </template>
       <template
         v-slot:no-options>
@@ -328,7 +328,6 @@ export default {
     removeEntry(evt, index) {
       const item = this.selectedBelowListInt.splice(index, 1);
       this.$set(item, 'roles', {});
-      this.$refs.chipsInput.dropDownList = this.$refs.chipsInput.dropDownList.concat(item);
       this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
