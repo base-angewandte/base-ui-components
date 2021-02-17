@@ -184,8 +184,7 @@
       <!-- BASE IMAGE BOX TEST -->
       <BaseImageBox
         :selectable="selectable"
-        :show-title="false"
-        image-url="https://placeimg.com/460/341/arch"
+        :box-text="boxText"
         description="Bildserie"
         title="Afterlife II Ausstellungsansichten"
         class="image-box" />
@@ -208,6 +207,9 @@
         icon-size="large"
         button-style="row"
         @clicked="enableSelect()" />
+      <BaseButton
+        :text="'Add Text'"
+        @clicked="boxText = ['test', 'test2', 'test3', 'test4', 'test5', 'test6']" />
     </div>
 
     <div class="canvas">
@@ -519,6 +521,7 @@ export default {
   },
   data() {
     return {
+      boxText: [],
       textInput: {
         English: 'Text Set from Outside',
         German: '',

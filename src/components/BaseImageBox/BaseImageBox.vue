@@ -44,7 +44,6 @@
               v-if="lazyload"
               ref="image"
               :data-src="imageUrl"
-              :style="imageStyle"
               :alt="title"
               :class="['base-image-box-image',
                        { 'base-image-box__image-second': !imageFirst },
@@ -58,7 +57,6 @@
               v-if="!lazyload"
               ref="image"
               :src="imageUrl"
-              :style="imageStyle"
               :alt="title"
               :class="['base-image-box-image',
                        { 'base-image-box__image-second': !imageFirst },
@@ -249,8 +247,13 @@ export default {
        * needed to set text height and line-clamp correctly after resize
        */
       boxTextStyle: {},
-      imageStyle: {},
+      /**
+       * steer displaying of image in case of display error
+       */
       displayImage: true,
+      /**
+       * timeout variable to only do height calcs after certain time
+       */
       resizeTimeout: null,
     };
   },
