@@ -272,6 +272,9 @@ export default {
         this.selectedInt = val;
       }
     },
+    boxText() {
+      this.calcTextHeight();
+    },
   },
   mounted() {
     this.selectedInt = this.selected;
