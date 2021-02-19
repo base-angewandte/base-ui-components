@@ -430,8 +430,8 @@ export default {
       }
 
       .base-media-preview-video {
-        max-height: 95%;
-        max-width: 95%;
+        max-height: 90%;
+        max-width: 90%;
         margin-top: auto;
       }
 
