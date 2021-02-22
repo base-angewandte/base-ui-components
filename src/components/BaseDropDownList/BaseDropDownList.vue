@@ -17,6 +17,7 @@
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
           v-if="optionHasData(option[valuePropertyName])"
+          :id="option[identifierPropertyName]"
           ref="option"
           :key="optionIndex"
           :value="valueIsString ? getLangLabel(option[valuePropertyName], true)
@@ -24,13 +25,14 @@
           :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
           :class="[
             'base-drop-down-list__option',
-            { 'base-drop-down-list__option-drop-down-styling': displayAsDropDown },
-            { 'base-drop-down-list__option-selected': selectStyled
+            { 'base-drop-down-list__option__hover': activeStyled },
+            { 'base-drop-down-list__option__drop-down-styling': displayAsDropDown },
+            { 'base-drop-down-list__option__selected': selectStyled
               && option === selectedOption },
-            { 'base-drop-down-list__option-active': activeStyled
+            { 'base-drop-down-list__option__active': activeStyled
               && optionIndex === activeOptionIndex }]"
           role="option"
-          @mouseenter="setActive(option)"
+          tabindex="0"
           @click="selected(option)">
           <!-- @slot a slot to customize every single option (e.g. display of
           information other than [valuePorpoertyName]) -->
@@ -242,12 +244,13 @@ export default {
               // add the height of one option row to scroll top
             } else if (event.code === 'ArrowDown'
               && this.$refs.option[this.activeOptionIndex].offsetTop
-              >= this.$refs.dropDownContainer.clientHeight) {
+              >= this.$refs.dropDownContainer.clientHeight
+              + this.$refs.dropDownContainer.scrollTop) {
               this.$refs.dropDownContainer.scrollTop += this
                 .$refs.option[this.activeOptionIndex].clientHeight;
               // else if index is smaller than previous index (navigating up) and the container
               // top position is larger than the option top position subtract one option row height
-            } else if (event.code === 'ArrowUp' && this.$refs.dropDownContainer.offsetTop
+            } else if (event.code === 'ArrowUp' && this.$refs.dropDownContainer.scrollTop
               > this.$refs.option[this.activeOptionIndex].offsetTop) {
               this.$refs.dropDownContainer.scrollTop -= this
                 .$refs.option[this.activeOptionIndex].clientHeight;
@@ -335,7 +338,7 @@ export default {
         transition: all 0.2s ease;
         cursor: pointer;
 
-        &.base-drop-down-list__option-drop-down-styling {
+        &.base-drop-down-list__option__drop-down-styling {
           padding: $spacing-small/2 $spacing;
         }
 
@@ -343,12 +346,17 @@ export default {
           cursor: default;
         }
 
-        &.base-drop-down-list__option-selected {
+        &.base-drop-down-list__option__selected {
           color: $app-color;
         }
 
-        &.base-drop-down-list__option-active {
+        &.base-drop-down-list__option__hover:hover {
           background-color: $button-header-color;
+        }
+
+        &.base-drop-down-list__option__active,
+        &.base-drop-down-list__option__active:hover {
+          background-color: $keyboard-active-color;
         }
       }
     }
