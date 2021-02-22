@@ -9,6 +9,7 @@
         class="base-input-label"
         @click.prevent.stop="clickedOutsideInput">
         {{ label }}
+        <span class="hide">{{ placeholder }}</span>
       </label>
       <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
         (e.g. language tabs))
@@ -43,6 +44,7 @@
               :type="fieldType"
               :list="dropDownListId || false"
               :aria-activedescendant="linkedListOption"
+              :aria-describedby="label + '_' + id"
               :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
               autocomplete="off"
               @click="active = true"
