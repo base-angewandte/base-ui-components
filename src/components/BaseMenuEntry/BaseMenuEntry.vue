@@ -40,8 +40,11 @@
       </div>
     </div>
     <transition-group
+      ref="slideFade"
       name="slide-fade"
-      class="slide-fade-group">
+      class="slide-fade-group"
+      @leave="slideFadeLeave"
+      @after-leave="slideFadeAfterLeave">
       <div
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
@@ -215,6 +218,14 @@ export default {
          */
         this.$emit('clicked');
       }
+    },
+    slideFadeLeave() {
+      // safari fix: somehow transition needs to be triggered manually
+      this.$refs.slideFade.$el.style.right = '1px';
+    },
+    slideFadeAfterLeave() {
+      // safari fix: reset transition
+      this.$refs.slideFade.$el.style.removeProperty('right');
     },
   },
 };
@@ -390,8 +401,7 @@ export default {
 
     .slide-fade-leave-active {
       position: absolute;
-      top: 50%;
-      transform: translate(#{$spacing}, -#{$icon-medium/2});
+      right: -$spacing;
     }
   }
 
