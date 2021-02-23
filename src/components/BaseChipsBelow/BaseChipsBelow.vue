@@ -135,6 +135,13 @@ export default {
       default: () => [],
     },
     /**
+     if field is occuring more then once - set an id
+     */
+    id: {
+      type: String,
+      default: '',
+    },
+    /**
      * if object array was passed - define the property that should be
      * displayed in the chip
      */
