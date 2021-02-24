@@ -330,6 +330,5 @@ export default {
     visibility: hidden !important;
     position: absolute;
     top: auto;
-    left: -99999px;
   }
 </style>
