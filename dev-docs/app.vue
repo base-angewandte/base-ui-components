@@ -276,6 +276,7 @@
         name="BaseToggle"
         label="Zeige Einträge anderen Benutzer*innen auf meinem Showroom-Profil an." />
       <BaseChipsInput
+        id="set your marx"
         :list="dropDownInput"
         :placeholder="'Select Your Marx'"
         :selected-list="chipsInput"
@@ -288,6 +289,7 @@
         draggable
         label="A label"
         @fetchDropDownEntries="fetch" />
+      <!--
       <BaseChipsInput
         :list="[
           { title: '...alle Verhältnisse umzuwerfen',
@@ -344,7 +346,7 @@
         identifier="id"
         object-prop="name"
         label="chips-below-test"
-        @hoverbox-active="setHoverBox" />
+        @hoverbox-active="setHoverBox" /> -->
     </div>
 
     <!-- MENU LIST TEST -->
@@ -468,8 +470,8 @@ import BaseMenuList from '@/components/BaseMenuList/BaseMenuList';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput';
 import BaseSearch from '@/components/BaseSearch/BaseSearch';
 import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
-import BaseAutocompleteInput from '@/components/BaseAutocompleteInput/BaseAutocompleteInput';
-import BaseChipsBelow from '@/components/BaseChipsBelow/BaseChipsBelow';
+// import BaseAutocompleteInput from '@/components/BaseAutocompleteInput/BaseAutocompleteInput';
+// import BaseChipsBelow from '@/components/BaseChipsBelow/BaseChipsBelow';
 import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
 import BaseDatePanel from '@/components/BaseDatePanel/BaseDatePanel';
 import BasePagination from '@/components/BasePagination/BasePagination';
@@ -495,10 +497,10 @@ export default {
     BaseExpandRow,
     BaseMediaPreview,
     BasePagination,
-    BaseChipsBelow,
+    // BaseChipsBelow,
     BaseDateInput,
     BaseDatePanel,
-    BaseAutocompleteInput,
+    // BaseAutocompleteInput,
     BaseImageBox,
     BaseMultilineTextInput,
     BaseSearch,
@@ -1176,11 +1178,62 @@ export default {
       selectedList: ['Leo Löwenthal', 'Eike Geisel', 'Theodor Adorno'],
       chipsInput: [],
       dropDownInput: [
-        '...alle Verhältnisse umzuwerfen',
-        'in denen der Mensch',
-        'ein erniedrigtes, ein geknechtetes',
-        'ein verlassenes, ein verächtliches',
-        'Wesen ist'],
+        {
+          id: '1qw5qwwee',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '15555wqw',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1eeee55',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1rqqwereee',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1ffaerewr',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1ffa',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1ffffdas',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1adafsdf',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1aaa',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '1ddd',
+          value: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          id: '2',
+          value: 'in denen der Mensch',
+        },
+        {
+          id: '3',
+          value: 'ein erniedrigtes, ein geknechtetes',
+        },
+        {
+          id: '4',
+          value: 'ein verlassenes, ein verächtliches',
+        },
+        {
+          id: '5',
+          value: 'Wesen ist',
+        }],
       menuEntryActive: false,
       showCheckbox: false,
       showPopUp: false,
