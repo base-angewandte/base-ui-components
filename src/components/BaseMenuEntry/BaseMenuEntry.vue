@@ -224,8 +224,12 @@ export default {
       this.$refs.slideFade.$el.style.right = '1px';
     },
     slideFadeAfterLeave() {
-      // safari fix: reset transition
-      this.$refs.slideFade.$el.style.removeProperty('right');
+      // sometimes newly duplicated element has no html element yet so
+      // check if element exists first
+      if (this.$refs.slideFade) {
+        // safari fix: reset transition
+        this.$refs.slideFade.$el.style.removeProperty('right');
+      }
     },
   },
 };
