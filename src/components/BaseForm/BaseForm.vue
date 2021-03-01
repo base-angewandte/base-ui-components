@@ -474,7 +474,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 0;
+      padding: 0 $spacing;
       background-color: inherit;
       border: none;
 
@@ -526,6 +526,7 @@ export default {
 
       .group-multiply {
         margin-bottom: $spacing-small + ($spacing-small/2);
+        margin-top: $spacing-small;
       }
     }
   }
