@@ -24,7 +24,7 @@
         <div
           class="base-drop-box-drag-area"
           @dragleave="dragLeave('c', $event)"
-          @pointerenter="dragEnter"
+          @pointerenter="dragEnter('x', $event)"
           @pointerleave="dragLeave('x', $event)">
           <div
             v-for="item in dragList"
@@ -230,8 +230,11 @@ export default {
         }
       }
     },
-    dragEnter() {
-      this.isDragOver = true;
+    dragEnter(d, event) {
+      // trigger click event on touch devices
+      if (event.pointerType === 'touch' && !this.disabled && !this.isDragOver) {
+        this.$emit('clicked', event);
+      }
     },
     dragLeave(d, event) {
       // to prevent trigger when it is touch device and element was just dropped into box
@@ -240,6 +243,11 @@ export default {
       }
     },
     onClicked(event) {
+      // on touch devices the click event is handled with dragEnter() due problems on iOS Safari
+      if (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0)) {
+        return;
+      }
+
       /**
        * Triggered when the box is clicked
        *
