@@ -474,7 +474,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 0 $spacing;
+      padding: 0;
       background-color: inherit;
       border: none;
 
@@ -485,7 +485,7 @@ export default {
 
       .field-group-icon {
         flex: 0 0 auto;
-        margin-left: $spacing;
+        margin: 0 $spacing;
         height: $icon-small;
         width: $icon-small;
       }
