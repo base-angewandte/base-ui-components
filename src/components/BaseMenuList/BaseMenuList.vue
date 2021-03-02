@@ -3,7 +3,7 @@
     ref="draggable"
     v-model="list"
     :sort="false"
-    :disabled="isDraggable || selectActive"
+    :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
     :set-data="modifyDragItem"
     :force-fallback="!dragAndDropCapable"
@@ -97,7 +97,7 @@ export default {
       entryProps: [],
       dragging: false,
       dragAndDropCapable: false,
-      isDraggable: false,
+      isDraggable: true,
       resizeTimeout: null,
     };
   },
@@ -129,22 +129,15 @@ export default {
   },
   created() {
     this.setInternalVar();
-    // TODO: check if drag is still working on tablet!
-    /* document.body.addEventListener('touchmove', (e) => {
-      if (this.dragging) {
-        e.preventDefault();
-      }
-      return false;
-    }, { passive: false }); */
   },
   mounted() {
-    this.isDraggable = this.isMobile();
+    this.isDraggable = !this.isMobile();
     this.dragAndDropCapable = ('DragEvent' in window);
 
     window.addEventListener('resize', () => {
       clearTimeout(this.resizeTimeout);
       this.resizeTimeout = setTimeout(() => {
-        this.isDraggable = this.isMobile();
+        this.isDraggable = !this.isMobile();
       }, 250);
     });
 
