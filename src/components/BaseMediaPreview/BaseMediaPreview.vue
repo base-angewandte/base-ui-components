@@ -28,13 +28,16 @@
         <div
           v-else-if="fileType === 'image' && !displayImage"
           class="base-media-preview-error">
-          An error occured displaying this image.
+          An error occurred displaying this image.
         </div>
+
         <base-hls-video
           v-else-if="fileType === 'video'"
           :display-size="displaySize"
           :media-url="mediaUrl"
-          class="base-media-preview-image base-media-preview-video" />
+          :start-level="hlsStartLevel"
+          class="base-media-preview-video" />
+
         <audio
           v-else-if="fileType === 'audio'"
           controls
@@ -209,6 +212,13 @@ export default {
     additionalInfo: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * set initial hls-video size
+     */
+    hlsStartLevel: {
+      type: Number,
+      default: undefined,
     },
   },
   data() {
@@ -430,9 +440,11 @@ export default {
       }
 
       .base-media-preview-video {
-        max-height: 90%;
-        max-width: 90%;
+        display: flex;
+        justify-content: center;
         margin-top: auto;
+        max-height: 85%;
+        max-width: 100%;
       }
 
       .base-media-preview-document-wrapper {
