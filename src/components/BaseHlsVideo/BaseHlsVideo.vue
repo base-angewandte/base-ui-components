@@ -72,13 +72,20 @@ export default {
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = this.mediaUrl;
-        video.addEventListener('loadedmetadata', () => video.play());
+        video.addEventListener('loadedmetadata', () => {
+          video.oncanplay = () => {
+            this.videoCanPlay = true;
+            video.play();
+          };
+        });
       }
     }
   },
   destroyed() {
     // destroy hls object to stop buffering and save bandwidth
-    this.hls.destroy();
+    if (this.hls) {
+      this.hls.destroy();
+    }
   },
 };
 </script>
