@@ -45,6 +45,14 @@ ul {
 
 li {
   list-style: none;
+
+  :focus {
+    outline: none;
+  }
+}
+
+:focus {
+  outline: none;
 }
 
 fieldset {
