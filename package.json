@@ -11,6 +11,7 @@
     "dev": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
     "postversion": "./postversion.sh",
+    "preinstall": "npx npm-force-resolutions",
     "prepublishOnly": "npm run build",
     "styleguide": "vue-cli-service styleguidist",
     "styleguide:build": "vue-cli-service styleguidist:build",
@@ -80,11 +81,16 @@
     "sass-loader": "^10.0.2",
     "source-map-loader": "^1.1.0",
     "vue": "^2.6.12",
-    "vue-cli-plugin-styleguidist": "~4.32.3",
+    "vue-cli-plugin-styleguidist": "~4.35.0",
     "vue-template-compiler": "^2.6.12"
   },
   "peerDependencies": {
     "vue": "^2.6.11"
+  },
+  "resolutions": {
+    "immer": "^8.0.1",
+    "pug": "^3.0.1",
+    "yargs-parser": "^18.1.2"
   },
   "browserslist": [
     "> 1%",
