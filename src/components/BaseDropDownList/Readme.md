@@ -10,14 +10,10 @@ A list in drop down style. Click the button to display!
             <div>
                 {{ 'Selected Option: ' + selected.value }}
             </div>
-            <div>
-                {{ 'Active Option: ' + active.value }}
-            </div>
         </div>
 
         <BaseDropDownList
             v-if="showDropDown"
-            :active-option.sync="active"
             :selected-option.sync="selected"
             :select-styled="true"
             :drop-down-options="list"
@@ -36,7 +32,6 @@ export default {
     data() {
         return {
             showDropDown: false,
-            active: {},
             selected: {},
             list: [
                 {
@@ -85,14 +80,15 @@ An example connected with an input field (displayAsDropDown: false)
       value-property-name="value"
       placeholder="Add new chips via enter"
       label="A basic input for drop down"
-      @keydown.enter.prevent="addChip"/>
+      @keydown.up.down.prevent="navigate"
+      @keydown.enter.prevent="addChipByKeyboard"/>
     <BaseDropDownList
         :active-option.sync="active"
         :drop-down-options="optionsListInt"
         :display-as-drop-down="false"
         list-id="aSimpleTestList"
         class="base-drop-down-list-example"
-        @update:selected-option="addChip">
+        @update:selected-option="addChipByClick">
       <template v-slot:before-list>
           <div class="slot">
             This is a slot before the list
@@ -157,16 +153,34 @@ export default {
   },
   watch: {
     optionsListInt() {
-      this.active = this.optionsListInt.length ? this.optionsListInt[0] : null;
+      if (this.active && Object.keys(this.active).length) {
+        this.active = this.optionsListInt.length ? this.optionsListInt[0] : null;
+      }
     },
   },
   methods: {
-    addChip() {
+    addChipByKeyboard() {
       if (this.active) {
         this.selectedList.push(this.active);
         this.input = '';
       }
     },
+    addChipByClick(option) {
+      this.selectedList.push(option);
+      this.input = '';
+    },
+    navigate(event) {
+      const currentIndex = this.optionsListInt.indexOf(this.active);
+      const listLength = this.optionsListInt.length;
+      if (event.key === 'ArrowUp') {
+        const newIndex = currentIndex - 1;
+        this.active = newIndex >= 0 ? this.optionsListInt[currentIndex - 1]
+          : this.optionsListInt[listLength - 1];
+      } else if (event.key === 'ArrowDown') {
+        const newIndex = currentIndex + 1;
+        this.active = this.optionsListInt[newIndex < listLength ? newIndex : 0];
+      }
+    }
   },
 };
 </script>

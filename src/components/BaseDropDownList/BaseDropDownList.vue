@@ -106,9 +106,8 @@ export default {
     },
     /**
      * specify the currently active option (will have gray background
-     * if not disabled by setting activeStyled false, also used to control drop
-     * down container scrolling behaviour on keyboard use)<br>
-     *   the .sync modifier can be used here
+     * if not disabled by setting activeStyled false) for example for
+     * combination with input and keyboard use
      */
     activeOption: {
       type: [Object, String],
@@ -238,7 +237,11 @@ export default {
     }
   },
   destroyed() {
-    this.inputElement.removeEventListener('keydown', this.navigateOptions);
+    // check if there is an associated input element
+    if (this.inputElement) {
+      // if yes - remove the event listener again
+      this.inputElement.removeEventListener('keydown', this.navigateOptions);
+    }
   },
   methods: {
     /**
@@ -270,23 +273,6 @@ export default {
         return !!option.length;
       }
       return !!(option && Object.keys(option).length);
-    },
-    /**
-     * on mouse enter - set an option active
-     *
-     * @param {Object} option - the hovered option
-     */
-    setActive(option) {
-      if (option[this.identifierPropertyName] !== this.activeOption) {
-        /**
-         * an option is set active on mouse enter - parent is informed
-         * (the .sync modifier on prop activeOption can be used)
-         *
-         * @event update:active-option
-         * @property {Object} option - the option set active
-         */
-        this.$emit('update:active-option', option);
-      }
     },
     /**
      * a function to navigate the dropdown list by keyboard, used in
@@ -384,6 +370,8 @@ export default {
 
         &.base-drop-down-list__no-options {
           cursor: default;
+          align-items: center;
+          padding: 0 $spacing;
         }
 
         &.base-drop-down-list__option__selected {
