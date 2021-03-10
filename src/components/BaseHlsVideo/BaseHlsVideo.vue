@@ -64,11 +64,9 @@ export default {
         });
         this.hls.loadSource(this.mediaUrl);
         this.hls.attachMedia(video);
-        this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.oncanplay = () => {
-            this.videoCanPlay = true;
-            video.play();
-          };
+        this.hls.on(Hls.Events.BUFFER_CREATED, () => {
+          this.videoCanPlay = true;
+          video.play();
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = this.mediaUrl;
