@@ -304,6 +304,8 @@ export default {
       this.valueListInt[field.name]
         .push(this.getInitialFieldValue(field.items));
       this.multiplyParams = { index: this.valueListInt[field.name].length - 1, name: field.name };
+      // inform parent of changes
+      this.propagateValueListChanges();
     },
     // remove multiplied field again
     removeField(field, index) {
@@ -316,6 +318,9 @@ export default {
         this.$set(fieldGroupValues, index, this.getInitialFieldValue(field.items));
       }
       // inform parent of changes
+      this.propagateValueListChanges();
+    },
+    propagateValueListChanges() {
       /**
        * event triggered when the values of a field were altered or a form
        * field was added or removed
@@ -485,7 +490,7 @@ export default {
 
       .field-group-icon {
         flex: 0 0 auto;
-        margin-left: $spacing;
+        margin: 0 $spacing;
         height: $icon-small;
         width: $icon-small;
       }
@@ -526,6 +531,7 @@ export default {
 
       .group-multiply {
         margin-bottom: $spacing-small + ($spacing-small/2);
+        margin-top: $spacing-small;
       }
     }
   }

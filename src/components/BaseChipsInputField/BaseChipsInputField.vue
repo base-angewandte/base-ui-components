@@ -23,11 +23,12 @@
       <template
         v-if="sortable"
         v-slot:label-addition>
-        <div
+        <button
+          type="button"
           class="base-chips-input-field__sort"
           @click="sortSelectedList(selectedListInt)">
           {{ sortText }}
-        </div>
+        </button>
       </template>
       <template
         v-if="displayChipsInline"
@@ -673,7 +674,7 @@ export default {
       white-space: nowrap;
       transition: all 0.2s ease;
 
-      &:hover {
+      &:hover, &:active, &:focus {
         color: $app-color;
       }
     }

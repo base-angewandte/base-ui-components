@@ -3,7 +3,7 @@
     ref="draggable"
     v-model="list"
     :sort="false"
-    :disabled="isMobile || selectActive"
+    :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
     :set-data="modifyDragItem"
     :force-fallback="!dragAndDropCapable"
@@ -97,7 +97,8 @@ export default {
       entryProps: [],
       dragging: false,
       dragAndDropCapable: false,
-      isMobile: false,
+      isDraggable: true,
+      resizeTimeout: null,
     };
   },
   computed: {
@@ -128,17 +129,17 @@ export default {
   },
   created() {
     this.setInternalVar();
-    // TODO: check if drag is still working on tablet!
-    /* document.body.addEventListener('touchmove', (e) => {
-      if (this.dragging) {
-        e.preventDefault();
-      }
-      return false;
-    }, { passive: false }); */
   },
   mounted() {
-    this.isMobile = window.innerWidth < 640;
+    this.isDraggable = !this.isMobile();
     this.dragAndDropCapable = ('DragEvent' in window);
+
+    window.addEventListener('resize', () => {
+      clearTimeout(this.resizeTimeout);
+      this.resizeTimeout = setTimeout(() => {
+        this.isDraggable = !this.isMobile();
+      }, 250);
+    });
 
     // Set _sortable.nativeDraggable directly due
     // prop force-fallback in vue-draggable is not propagated to sortablejs if updated
@@ -241,6 +242,9 @@ export default {
         dataTransfer.setDragImage(pic, 0, 0);
       }
       dataTransfer.setData('draggable', '');
+    },
+    isMobile() {
+      return window.innerWidth < 640;
     },
   },
 };

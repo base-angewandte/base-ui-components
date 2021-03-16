@@ -88,8 +88,9 @@ An video example
       <BaseMediaPreview
         :show-preview="showPreview"
         :allow-download="false"
-        display-name="Taken from https://bitmovin.com/mpeg-dash-hls-examples-sample-streams/"
-        media-url="https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+        :display-size="{}"
+        display-name="Taken from https://test-streams.mux.dev"
+        media-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
         @hide-preview="showPreview = false"/>
   </div>
 </template>

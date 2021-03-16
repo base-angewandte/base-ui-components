@@ -44,7 +44,6 @@
               v-if="lazyload"
               ref="image"
               :data-src="imageUrl"
-              :style="imageStyle"
               :alt="title"
               :class="['base-image-box-image',
                        { 'base-image-box__image-second': !imageFirst },
@@ -58,7 +57,6 @@
               v-if="!lazyload"
               ref="image"
               :src="imageUrl"
-              :style="imageStyle"
               :alt="title"
               :class="['base-image-box-image',
                        { 'base-image-box__image-second': !imageFirst },
@@ -70,19 +68,18 @@
             ref="boxText"
             class="base-image-box__text-wrapper">
             <!-- @slot to display more advanced text - if you use this please specify the
-            ref attribute with 'textLine' for a single line - so the text display height
-            can be calculated correctly! -->
+            ref attribute with 'boxTextInner' that has the line-height css attribute set
+            - so the text display height can be calculated correctly! -->
             <slot
               :text="boxText"
               name="text">
               <!-- default -->
               <div
-                v-if="!(imageUrl && displayImage) && boxText.length"
+                ref="boxTextInner"
                 :style="boxTextStyle"
                 class="base-image-box-text">
                 <div
                   v-for="(entry, index) in boxText"
-                  ref="textLine"
                   :key="index">
                   {{ entry }}
                 </div>
@@ -231,6 +228,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify if header should be centered
+     * (aligned left otherwise)
+     */
     centerHeader: {
       type: Boolean,
       default: false,
@@ -238,10 +239,21 @@ export default {
   },
   data() {
     return {
+      /**
+       * internal variable for selection status
+       */
       selectedInt: false,
+      /**
+       * needed to set text height and line-clamp correctly after resize
+       */
       boxTextStyle: {},
-      imageStyle: {},
+      /**
+       * steer displaying of image in case of display error
+       */
       displayImage: true,
+      /**
+       * timeout variable to only do height calcs after certain time
+       */
       resizeTimeout: null,
     };
   },
@@ -271,6 +283,9 @@ export default {
       if (this.selectedInt !== val) {
         this.selectedInt = val;
       }
+    },
+    boxText() {
+      this.calcTextHeight();
     },
   },
   mounted() {
@@ -321,7 +336,7 @@ export default {
         // get text-wrapper element
         const elem = this.$refs.boxText;
         // get single text line in the text element (for line height only)
-        const lineElement = this.$refs.textLine[0];
+        const lineElement = this.$refs.boxTextInner[0] || this.$refs.boxTextInner;
         // get the height of the complete box
         const boxHeight = this.$refs.baseBox.$el.clientHeight;
         // get the line height proporty

@@ -33,6 +33,7 @@
       :list-id="id"
       :style="{ 'min-width': dropDownMinWidth }"
       :language="language"
+      :drop-down-no-options-info="dropDownNoOptionsInfo"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
         <span

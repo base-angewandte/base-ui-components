@@ -4,6 +4,7 @@
   --font-color: rgb(0, 0, 0);
   --font-color-second: rgb(107, 107, 107);
   --button-header-color: rgb(240, 240, 240);
+  --keyboard-active-color: rgb(217, 217, 217);
   --input-field-color: rgb(200, 200, 200);
   --background-color: #f0f0f0;
   --box-color: #ffffff;
@@ -44,6 +45,7 @@ $background-color: var(--background-color, #f0f0f0);
 $box-color: var(--box-color, white);
 /* self defined for now! */
 $uploadbar-color: var(--uploadbar-color, #999999);
+$keyboard-active-color: var(--keyboard-active-color, rgb(217, 217, 217));
 $switch-container-color: $input-field-color;
 $switch-color: $background-color;
 $switch-checked-color: var(--switch-checked-color, #4d4d4d);

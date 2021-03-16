@@ -17,6 +17,7 @@
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
           v-if="optionHasData(option[valuePropertyName])"
+          :id="option[identifierPropertyName]"
           ref="option"
           :key="optionIndex"
           :value="valueIsString ? getLangLabel(option[valuePropertyName], true)
@@ -24,13 +25,14 @@
           :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
           :class="[
             'base-drop-down-list__option',
-            { 'base-drop-down-list__option-drop-down-styling': displayAsDropDown },
-            { 'base-drop-down-list__option-selected': selectStyled
+            { 'base-drop-down-list__option__hover': activeStyled },
+            { 'base-drop-down-list__option__drop-down-styling': displayAsDropDown },
+            { 'base-drop-down-list__option__selected': selectStyled
               && option === selectedOption },
-            { 'base-drop-down-list__option-active': activeStyled
+            { 'base-drop-down-list__option__active': activeStyled
               && optionIndex === activeOptionIndex }]"
           role="option"
-          @mouseenter="setActive(option)"
+          tabindex="0"
           @click="selected(option)">
           <!-- @slot a slot to customize every single option (e.g. display of
           information other than [valuePorpoertyName]) -->
@@ -104,9 +106,8 @@ export default {
     },
     /**
      * specify the currently active option (will have gray background
-     * if not disabled by setting activeStyled false, also used to control drop
-     * down container scrolling behaviour on keyboard use)<br>
-     *   the .sync modifier can be used here
+     * if not disabled by setting activeStyled false) for example for
+     * combination with input and keyboard use
      */
     activeOption: {
       type: [Object, String],
@@ -188,7 +189,8 @@ export default {
        */
       withinDropDown: false,
       /**
-       * store the input element associated with the drop down list
+       * if there is any (associated by id) store the related input element
+       * in this variable
        * @type {HTMLElement}
        */
       inputElement: null,
@@ -245,14 +247,15 @@ export default {
       // if the parent also has a input field that should be connected - it will need to
       // have the same id! (input attribute 'list') (this is to avoid unwanted side effects)
       if (this.inputElement) {
-        this.inputElement.addEventListener('keydown', this.scrollDropDown);
+        this.inputElement.addEventListener('keydown', this.navigateOptions);
       }
     }
   },
   destroyed() {
-    // remove the event listener again
+    // check if there is an associated input element
     if (this.inputElement) {
-      this.inputElement.removeEventListener('keydown', this.scrollDropDown);
+      // if yes - remove the event listener again
+      this.inputElement.removeEventListener('keydown', this.navigateOptions);
     }
   },
   methods: {
@@ -287,32 +290,63 @@ export default {
       return !!(option && Object.keys(option).length);
     },
     /**
-     * on mouse enter - set an option active
+     * a function to navigate the dropdown list by keyboard, used in
+     * event listener 'keydown'
      *
-     * @param {Object} option - the hovered option
+     * @property {KeyboardEvent} event - the keydown event from the input
+     * field associated by 'id'
      */
-    setActive(option) {
-      if (option[this.identifierPropertyName] !== this.activeOption) {
-        /**
-         * an option is set active on mouse enter - parent is informed
-         * (the .sync modifier on prop activeOption can be used)
-         *
-         * @event update:active-option
-         * @property {Object} option - the option set active
-         */
-        this.$emit('update:active-option', option);
-      }
-    },
-    /**
-     * scroll the active option into view
-     */
-    scrollDropDown() {
-      // see if active option is set (index > -1)
-      if (this.activeOptionIndex >= 0) {
-        this.$refs.option[this.activeOptionIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
-        // else return to top
-      } else {
-        this.$refs.dropDownContainer.scrollTop = 0;
+    navigateOptions(event) {
+      // check if it is necessary to adjust scrolltop of container (to
+      // always have entry steered to with arrow keys in view)
+      if (this.$refs.option && this.$refs.option[this.activeOptionIndex]) {
+        // save the active option in a variable
+        const activeOptionTemp = this.$refs.option[this.activeOptionIndex];
+        // get the option height
+        const activeOptionHeight = activeOptionTemp.clientHeight;
+        // get the option top position
+        const activeOptionTop = activeOptionTemp.offsetTop;
+        // save the container element in a variable
+        const dropDownContainerTemp = this.$refs.dropDownContainer;
+        // get the current scroll position of the container
+        const dropDownContainerScrollTop = dropDownContainerTemp.scrollTop;
+        // get the container height
+        const dropDownContainerHeight = dropDownContainerTemp.clientHeight;
+        // check if current active option is out of view
+        const optionOutOfView = activeOptionTop + activeOptionHeight
+          < dropDownContainerScrollTop || activeOptionTop
+          > dropDownContainerScrollTop + dropDownContainerHeight;
+        // if active option index is 0 - return to top
+        if (!this.activeOptionIndex) {
+          dropDownContainerTemp.scrollTop = 0;
+          // else if index is last entry of options list - bring last item into view
+        } else if (this.activeOptionIndex === this.dropDownOptions.length - 1) {
+          dropDownContainerTemp.scrollTop = activeOptionTop
+            + activeOptionHeight;
+          // else check if key was arrow down
+        } else if (event.code === 'ArrowDown') {
+          // if option is out of sight set container scrollTop to option position
+          if (optionOutOfView) {
+            dropDownContainerTemp.scrollTop = activeOptionTop;
+            // else if the option position is larger then container height
+            // add the height of one option row to scroll top
+          } else if (activeOptionTop + activeOptionHeight
+            > dropDownContainerHeight + dropDownContainerScrollTop) {
+            dropDownContainerTemp.scrollTop += activeOptionHeight;
+          }
+          // else check if key was arrow up
+        } else if (event.code === 'ArrowUp') {
+          // if option is out of sight set scrollTop to option position so it shows
+          // up as last option in container
+          if (optionOutOfView) {
+            dropDownContainerTemp.scrollTop = activeOptionTop
+              + activeOptionHeight - dropDownContainerHeight;
+          // else if index is smaller than previous index (navigating up) and the container
+          // top position is larger than the option top position subtract one option row height
+          } else if (dropDownContainerScrollTop > activeOptionTop) {
+            dropDownContainerTemp.scrollTop -= activeOptionHeight;
+          }
+        }
       }
     },
   },
@@ -345,20 +379,27 @@ export default {
         transition: all 0.2s ease;
         cursor: pointer;
 
-        &.base-drop-down-list__option-drop-down-styling {
+        &.base-drop-down-list__option__drop-down-styling {
           padding: $spacing-small/2 $spacing;
         }
 
         &.base-drop-down-list__no-options {
           cursor: default;
+          align-items: center;
+          padding: 0 $spacing;
         }
 
-        &.base-drop-down-list__option-selected {
+        &.base-drop-down-list__option__selected {
           color: $app-color;
         }
 
-        &.base-drop-down-list__option-active {
+        &.base-drop-down-list__option__hover:hover {
           background-color: $button-header-color;
+        }
+
+        &.base-drop-down-list__option__active,
+        &.base-drop-down-list__option__active:hover {
+          background-color: $keyboard-active-color;
         }
       }
     }
