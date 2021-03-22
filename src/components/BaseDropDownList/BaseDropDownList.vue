@@ -26,10 +26,11 @@
           :class="[
             'base-drop-down-list__option',
             { 'base-drop-down-list__option__hover': activeStyled },
-            { 'base-drop-down-list__option__drop-down-styling': displayAsDropDown },
             { 'base-drop-down-list__option__selected': selectStyled
               && option === selectedOption },
             { 'base-drop-down-list__option__active': activeStyled
+              && optionIndex === activeOptionIndex },
+            { 'base-drop-down-list__option__active-custom': useCustomOptionActiveBackgroundColor
               && optionIndex === activeOptionIndex }]"
           role="option"
           tabindex="0"
@@ -54,7 +55,6 @@
           :class="[
             'base-drop-down-list__option',
             'base-drop-down-list__no-options',
-            { 'base-drop-down-list__option-drop-down-styling': displayAsDropDown },
           ]">
           {{ dropDownNoOptionsInfo }}
         </div>
@@ -176,7 +176,22 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * this adds the possibility of nested options (thus a second list nested within the first one),
+     * if this is set true this will have consequences for scroll adjustment of list on keyboard use
+     * and how the active option is determined (the identifier property will be used)
+     */
     hasSubOptions: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * in case a custom option background should be set to the currently active option<br>
+     *   (this will also apply if 'activeStyled' is set false)<br>
+     * if you want to use this option please set the css variable --option-background
+     * in your app
+     */
+    useCustomOptionActiveBackgroundColor: {
       type: Boolean,
       default: false,
     },
@@ -237,7 +252,7 @@ export default {
   },
   mounted() {
     // check if this element is associated with an input element
-    const htmlInputElements = this.$parent.$el.getElementsByTagName('input');
+    const htmlInputElements = document.getElementsByTagName('input');
     // check if an input element exists
     if (htmlInputElements && htmlInputElements.length) {
       const inputElementsArray = Array.from(htmlInputElements);
@@ -296,55 +311,64 @@ export default {
      * @property {KeyboardEvent} event - the keydown event from the input
      * field associated by 'id'
      */
-    navigateOptions(event) {
+    navigateOptions(event, { activeOptionHeight = 0, activeOptionTop = 0 } = {}) {
       // check if it is necessary to adjust scrolltop of container (to
       // always have entry steered to with arrow keys in view)
-      if (this.$refs.option && this.$refs.option[this.activeOptionIndex]) {
+      // if list has suboptions this should be navigated from suboptions
+      if ((!this.hasSubOptions || activeOptionHeight) && this.$refs.option
+        && this.$refs.option[this.activeOptionIndex]) {
         // save the active option in a variable
         const activeOptionTemp = this.$refs.option[this.activeOptionIndex];
         // get the option height
-        const activeOptionHeight = activeOptionTemp.clientHeight;
+        const activeOptionHeightTemp = activeOptionHeight || activeOptionTemp.clientHeight;
         // get the option top position
-        const activeOptionTop = activeOptionTemp.offsetTop;
-        // save the container element in a variable
-        const dropDownContainerTemp = this.$refs.dropDownContainer;
-        // get the current scroll position of the container
-        const dropDownContainerScrollTop = dropDownContainerTemp.scrollTop;
-        // get the container height
-        const dropDownContainerHeight = dropDownContainerTemp.clientHeight;
-        // check if current active option is out of view
-        const optionOutOfView = activeOptionTop + activeOptionHeight
-          < dropDownContainerScrollTop || activeOptionTop
-          > dropDownContainerScrollTop + dropDownContainerHeight;
-        // if active option index is 0 - return to top
-        if (!this.activeOptionIndex) {
-          dropDownContainerTemp.scrollTop = 0;
-          // else if index is last entry of options list - bring last item into view
-        } else if (this.activeOptionIndex === this.dropDownOptions.length - 1) {
-          dropDownContainerTemp.scrollTop = activeOptionTop
-            + activeOptionHeight;
-          // else check if key was arrow down
-        } else if (event.code === 'ArrowDown') {
-          // if option is out of sight set container scrollTop to option position
-          if (optionOutOfView) {
-            dropDownContainerTemp.scrollTop = activeOptionTop;
-            // else if the option position is larger then container height
-            // add the height of one option row to scroll top
-          } else if (activeOptionTop + activeOptionHeight
-            > dropDownContainerHeight + dropDownContainerScrollTop) {
-            dropDownContainerTemp.scrollTop += activeOptionHeight;
-          }
-          // else check if key was arrow up
-        } else if (event.code === 'ArrowUp') {
-          // if option is out of sight set scrollTop to option position so it shows
-          // up as last option in container
-          if (optionOutOfView) {
-            dropDownContainerTemp.scrollTop = activeOptionTop
-              + activeOptionHeight - dropDownContainerHeight;
-          // else if index is smaller than previous index (navigating up) and the container
-          // top position is larger than the option top position subtract one option row height
-          } else if (dropDownContainerScrollTop > activeOptionTop) {
-            dropDownContainerTemp.scrollTop -= activeOptionHeight;
+        const activeOptionTopTemp = activeOptionTop || activeOptionTemp.offsetTop;
+        if (this.$parent.$refs.dropDownContainer) {
+          this.$parent.navigateOptions(event, {
+            activeOptionHeight: activeOptionHeightTemp,
+            activeOptionTop: activeOptionTopTemp,
+          });
+        } else {
+          // save the container element in a variable
+          const dropDownContainerTemp = this.$refs.dropDownContainer;
+          // get the current scroll position of the container
+          const dropDownContainerScrollTop = dropDownContainerTemp.scrollTop;
+          // get the container height
+          const dropDownContainerHeight = dropDownContainerTemp.clientHeight;
+          // check if current active option is out of view
+          const optionOutOfView = activeOptionTopTemp + activeOptionHeightTemp
+            < dropDownContainerScrollTop || activeOptionTopTemp
+            > dropDownContainerScrollTop + dropDownContainerHeight;
+          // if active option index is 0 - return to top
+          if (!this.hasSubOptions && !this.activeOptionIndex) {
+            dropDownContainerTemp.scrollTop = 0;
+            // else if index is last entry of options list - bring last item into view
+          } else if (this.activeOptionIndex === this.dropDownOptions.length - 1) {
+            dropDownContainerTemp.scrollTop = activeOptionTopTemp
+              + activeOptionHeightTemp;
+            // else check if key was arrow down
+          } else if (event.code === 'ArrowDown') {
+            // if option is out of sight set container scrollTop to option position
+            if (optionOutOfView) {
+              dropDownContainerTemp.scrollTop = activeOptionTopTemp;
+              // else if the option position is larger then container height
+              // add the height of one option row to scroll top
+            } else if (activeOptionTopTemp + activeOptionHeightTemp
+              > dropDownContainerHeight + dropDownContainerScrollTop) {
+              dropDownContainerTemp.scrollTop += activeOptionHeightTemp;
+            }
+            // else check if key was arrow up
+          } else if (event.code === 'ArrowUp') {
+            // if option is out of sight set scrollTop to option position so it shows
+            // up as last option in container
+            if (optionOutOfView) {
+              dropDownContainerTemp.scrollTop = activeOptionTopTemp
+                + activeOptionHeightTemp - dropDownContainerHeight;
+              // else if index is smaller than previous index (navigating up) and the container
+              // top position is larger than the option top position subtract one option row height
+            } else if (dropDownContainerScrollTop > activeOptionTopTemp) {
+              dropDownContainerTemp.scrollTop -= activeOptionHeightTemp;
+            }
           }
         }
       }
@@ -357,7 +381,7 @@ export default {
   @import "../../styles/variables";
 
   .base-drop-down-list__container {
-    background: white;
+    background: inherit;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;
@@ -372,16 +396,13 @@ export default {
 
       .base-drop-down-list__option {
         display: flex;
+        align-items: center;
         min-height: $row-height-small;
-        padding: $spacing-small/2 0;
+        padding: $spacing-small/2 $spacing;
         line-height: $line-height;
         width: 100%;
         transition: all 0.2s ease;
         cursor: pointer;
-
-        &.base-drop-down-list__option__drop-down-styling {
-          padding: $spacing-small/2 $spacing;
-        }
 
         &.base-drop-down-list__no-options {
           cursor: default;
@@ -400,6 +421,10 @@ export default {
         &.base-drop-down-list__option__active,
         &.base-drop-down-list__option__active:hover {
           background-color: $keyboard-active-color;
+        }
+
+        &.base-drop-down-list__option__active-custom, {
+          background-color: var(--option-background);
         }
       }
     }
