@@ -50,8 +50,24 @@ module.exports = {
           id: 'Performance',
         },
         {
-          label: 'Exhibition',
-          id: 'Exhibition',
+          label: 'Exhibitionaaaa',
+          id: 'Exhibitionaaaa',
+        },
+        {
+          label: 'Exhibitionssss',
+          id: 'Exhibitionssss',
+        },
+        {
+          label: 'Exhibitiondddd',
+          id: 'Exhibitiondddd',
+        },
+        {
+          label: 'Exhibitionasdfasdf',
+          id: 'Exhibitionasdfasdf',
+        },
+        {
+          label: 'Exhibitionlooooooooooooooooooooooong',
+          id: 'Exhibitiong',
         },
         {
           label: 'Architecture',
