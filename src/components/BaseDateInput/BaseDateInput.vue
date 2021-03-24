@@ -296,7 +296,7 @@ export default {
       default: 'Switch between date formats',
     },
     /**
-     * set calendar language
+     * set calendar language (currently only 'en', 'de' and 'fr' are supported)
      */
     language: {
       type: String,

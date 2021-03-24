@@ -202,6 +202,7 @@ export default {
       }
     }
 
+    // this class is also specified as handle in BaseChipsInputField!
     .base-chip__text {
       border: none;
       background-color: rgba(255, 255, 255, 0);

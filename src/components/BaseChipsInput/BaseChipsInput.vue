@@ -34,6 +34,7 @@
       :style="{ 'min-width': dropDownMinWidth }"
       :language="language"
       :drop-down-no-options-info="dropDownNoOptionsInfo"
+      class="base-chips-input__drop-down"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
         <span
@@ -718,3 +719,11 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .base-chips-input {
+    .base-chips-input__drop-down {
+      background: white;
+    }
+  }
+</style>
