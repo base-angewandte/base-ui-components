@@ -2,10 +2,11 @@
   <div
     :class="['base-chip',
              { 'base-chip__removable': isRemovable },
-             { 'base-chip-linked': isLinked },
+             { 'base-chip__linked': isLinked },
              { 'base-chip__active': chipActive }]">
     <div
-      class="base-chip-text"
+      :style="textStyling"
+      class="base-chip__text"
       @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
@@ -14,17 +15,17 @@
     </div>
     <div
       v-if="isRemovable"
-      class="base-chip-icon"
+      class="base-chip__icon"
       @click.stop="removeClicked">
       <img
         :src="require('../../static/icons/remove.svg')"
         alt="remove"
-        class="base-chip-icon-img">
+        class="base-chip__icon-img">
     </div>
     <base-hover-box
       ref="hoverBox"
       v-bind="hoverBoxContent"
-      :class="{ 'hidden': !hoverBoxEnabled || !showInfoBox }" />
+      :class="{ 'base-chip__hover-box__hidden': !hoverBoxEnabled || !showInfoBox }" />
   </div>
 </template>
 
@@ -82,6 +83,13 @@ export default {
     isRemovable: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * add some custom text styling
+     */
+    textStyling: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -161,7 +169,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-chip, .base-chip-inline {
+  .base-chip {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
     padding: $chips-spacing $spacing-small;
     flex: 0 0 auto;
@@ -172,7 +180,7 @@ export default {
     cursor: default;
     position: relative;
 
-    &.base-chip-linked {
+    &.base-chip__linked {
       background-color: $background-color;
     }
 
@@ -194,7 +202,7 @@ export default {
       }
     }
 
-    .base-chip-text {
+    .base-chip__text {
       border: none;
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
@@ -207,21 +215,21 @@ export default {
       }
     }
 
-    .base-chip-icon {
+    .base-chip__icon {
       position: absolute;
       padding: $spacing-small;
       right: 0;
       cursor: pointer;
       display: flex;
 
-      .base-chip-icon-img {
+      .base-chip__icon-img {
         height: $icon-min;
         vertical-align: middle;
       }
     }
   }
 
-  .hidden {
+  .base-chip__hover-box__hidden {
     display: none;
   }
 </style>
