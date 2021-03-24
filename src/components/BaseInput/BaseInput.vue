@@ -271,6 +271,7 @@ export default {
 
       .base-input-field__addition-container {
         display: flex;
+        align-items: center;
         flex: 1 1 auto;
 
         &.base-input-field__addition-container-wrap {

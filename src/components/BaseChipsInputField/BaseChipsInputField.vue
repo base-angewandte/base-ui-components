@@ -40,24 +40,43 @@
             :set-data="setDragElement"
             :force-fallback="true"
             :animation="200"
-            handle=".base-chip-text"
+            handle=".base-chip__text"
             @start="drag = true"
             @end="onDragEnd">
             <transition-group
               :name="!drag ? 'flip-list' : null"
-              type="transition">
-              <BaseChip
-                v-for="(entry, index) in selectedListInt"
-                :id="entry.idInt"
-                ref="baseChip"
-                :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                :entry="getLangLabel(entry[valuePropertyName], true)"
-                :hover-box-content="hoverboxContent"
-                :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
-                  || !!entry[identifierPropertyName]"
-                :chip-active="chipActiveForRemove === index"
-                @remove-entry="removeEntry(entry, index)"
-                @hoverbox-active="hoverBoxActive($event, entry)" />
+              type="transition"
+              class="base-chips-input-field__chips-transition">
+              <template
+                v-for="(entry, index) in selectedListInt">
+                <!-- @slot a slot to provide customized chips
+                  @binding { object } entry - one selected option displayed as chip
+                  @binding { number } index - the index of the entry in the selectedList array
+                  @binding { number } chipActiveForRemove - the index of the chip that is
+                    currently active to be removed (for keyboard handling)
+                  @binding { function } removeEntry - function to remove the entry from
+                    selectedList
+                -->
+                <slot
+                  name="chip"
+                  v-bind="{
+                    entry,
+                    index,
+                    chipActiveForRemove,
+                    removeEntry,
+                  }">
+                  <BaseChip
+                    :id="entry.idInt"
+                    :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                    :entry="getLangLabel(entry[valuePropertyName], true)"
+                    :hover-box-content="hoverboxContent"
+                    :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                      || !!entry[identifierPropertyName]"
+                    :chip-active="chipActiveForRemove === index"
+                    @remove-entry="removeEntry(entry, index)"
+                    @hoverbox-active="hoverBoxActive($event, entry)" />
+                </slot>
+              </template>
             </transition-group>
           </draggable>
         </div>
@@ -666,6 +685,11 @@ export default {
 
     .base-chips-input-field__chips {
       max-width: 100%;
+
+      .base-chips-input-field__chips-transition {
+        display: flex;
+        flex-wrap: wrap;
+      }
     }
 
     .base-chips-input-field__sort {
