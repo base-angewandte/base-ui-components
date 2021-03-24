@@ -36,6 +36,7 @@
       :show-label="false"
       :type="type === 'date' ? 'single' : 'daterange'"
       :use-form-field-styling="false"
+      :language="['de', 'en', 'fr'].includes(language) ? language : 'en'"
       label="date-input"
       @focus="inputFocus"
       @blur="inputBlur"
@@ -52,6 +53,7 @@
       :linked-list-option="linkedListOption"
       :placeholder="placeholder"
       :is-loading="isLoading"
+      :language="language"
       label="chips-input"
       value-property-name="label"
       identifier-property-name="id"
@@ -172,6 +174,13 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * set the language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: 'en',
     },
   },
   data() {

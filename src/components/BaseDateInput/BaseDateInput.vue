@@ -297,10 +297,12 @@ export default {
     },
     /**
      * set calendar language (currently only 'en', 'de' and 'fr' are supported)
+     *  @values de, en, fr
      */
     language: {
       type: String,
       default: 'en',
+      validator: val => ['de', 'en', 'fr'].includes(val),
     },
     /**
      * set id

@@ -179,6 +179,7 @@ export default {
     align-items: center;
     cursor: default;
     position: relative;
+    max-width: 100%;
 
     &.base-chip__linked {
       background-color: $background-color;
