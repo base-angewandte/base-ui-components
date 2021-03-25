@@ -13,7 +13,7 @@ export default {
         return this.$t(term, variables);
       }
       const termPath = term.split('.');
-      return termPath.pop();
+      return termPath.pop() || term;
     },
     setLangLabels(key, locales) {
       return locales

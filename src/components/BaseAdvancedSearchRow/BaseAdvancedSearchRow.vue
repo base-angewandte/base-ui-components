@@ -10,7 +10,7 @@
         :class="[
           'base-advanced-search-row__first-column',
           'base-advanced-search-row__first-column-filter',
-          { 'hide': isMainSearch && filter.label === 'Fulltext' }
+          { 'hide': isMainSearch && filter.label === defaultFilter.label }
         ]">
         <BaseChipsInputField
           :id="'filter-select-' + internalRowId"
@@ -22,15 +22,33 @@
           :use-form-field-styling="false"
           :show-label="false"
           :always-linked="true"
-          label="Select a Filter"
-          drop-down-list-id="filter-options"
+          :label="getI18nTerm(getLangLabel(advancedSearchText.selectFilterLabel))"
+          :language="language"
+          :drop-down-list-id="'filter-options-' + internalRowId"
           identifier-property-name="label"
           value-property-name="label"
           class="base-advanced-search-row__filter-input"
           @focus="activateDropDown"
           @blur="checkDropDownClose"
           @keydown.enter="selectFilter(activeFilter)"
-          @keydown.up.down="navigateFilters" />
+          @keydown.up.down="navigateFilters">
+          <template v-slot:chip="{ entry, index, chipActiveForRemove, removeEntry }">
+            <BaseChip
+              :id="entry.idInt"
+              :key="'chip-' + entry.idInt"
+              :is-removable="entry.label !== defaultFilter.label"
+              :entry="getLangLabel(entry.label, true)"
+              :is-linked="true"
+              :chip-active="chipActiveForRemove === index"
+              :text-styling="{
+                display: '-webkit-box',
+                ['-webkit-line-clamp']: '2',
+                ['-webkit-box-orient']: 'vertical',
+              }"
+              class="base-advanced-search-row__filter-chip"
+              @remove-entry="removeEntry(entry, index)" />
+          </template>
+        </BaseChipsInputField>
       </div>
 
       <!-- SECOND COLUMN OF SEARCH FIELD (BASE SEARCH) -->
@@ -39,13 +57,14 @@
         v-model="searchInput"
         :field-id="'search-input-' + internalRowId"
         :show-image="isMainSearch"
-        :use-label="false"
+        :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
         :style-props="{ height: 'inherit'}"
         :type="filter.type === 'text' ? 'chips' : filter.type"
         :selected-chips.sync="selectedOptions"
         :is-loading="isLoading"
+        :drop-down-list-id="'autocomplete-options-' + internalRowId"
+        :language="language"
         class="base-advanced-search-row__base-search"
-        drop-down-list-id="autocomplete-options"
         @focus="activateDropDown"
         @blur="checkDropDownClose"
         @keydown.up.down.right.left="navigateDropDown"
@@ -57,9 +76,9 @@
         class="base-advanced-search-row__icon-button"
         @click.stop="addFilter">
         <SvgIcon
+          :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
+          :alt="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
           name="plus"
-          title="Add filter"
-          alt="Add Filter"
           class="base-advanced-search-row__plus-icon" />
       </button>
       <button
@@ -67,9 +86,9 @@
         class="base-advanced-search-row__icon-button"
         @click.stop="removeFilter">
         <SvgIcon
+          :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
+          :alt="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
           name="remove"
-          title="Remove filter"
-          alt="Remove filter"
           class="base-advanced-search-row__plus-icon" />
       </button>
     </div>
@@ -82,10 +101,11 @@
       :display-as-drop-down="false"
       :has-sub-options="true"
       :active-styled="false"
+      :list-id="'autocomplete-options-' + internalRowId"
       :use-custom-option-active-background-color="true"
+      :language="language"
       identifier-property-name="collection"
       value-property-name="data"
-      list-id="autocomplete-options"
       class="base-advanced-search-row__drop-down-body"
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:before-list>
@@ -101,11 +121,11 @@
               <div
                 class="base-advanced-search-row__filter-area-header">
                 <div class="base-advanced-search-row__filter-text">
-                  Advanced Search
+                  {{ getI18nTerm(getLangLabel(advancedSearchText.title)) }}
                 </div>
                 <div
                   class="base-advanced-search-row__filter-subtext">
-                  Select a filter
+                  {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
                 </div>
               </div>
               <div
@@ -118,7 +138,7 @@
               </div>
             </div>
             <ul
-              id="filter-options"
+              :id="'filter-options-' + internalRowId"
               role="listbox"
               class="base-advanced-search-row__filter-list base-advanced-search-row__columns">
               <template v-if="!isMobile || filtersOpen">
@@ -126,7 +146,7 @@
                   v-for="(singleFilter, index) in displayedFilters"
                   :id="`filter-option-${singleFilter.label}`"
                   :key="index"
-                  :aria-selected="filter && filter.label === singleFilter.label"
+                  :aria-selected="(filter && filter.label === singleFilter.label).toString()"
                   tabindex="-1"
                   class="base-advanced-search-row__filter base-advanced-search-row__column-item"
                   :class="[{ 'base-advanced-search-row__filter-active':
@@ -163,7 +183,8 @@
             :drop-down-options="slotProps.option.data"
             :active-option.sync="activeEntry"
             :display-as-drop-down="false"
-            list-id="autocomplete-options"
+            :list-id="'autocomplete-options-' + internalRowId"
+            :language="language"
             identifier-property-name="id"
             value-property-name="header"
             class="base-advanced-search-row__autocomplete-options"
@@ -182,14 +203,21 @@
           <div class="base-advanced-search-row__chips-row">
             <div
               class="base-advanced-search-row__first-column">
-              Available options
+              {{ getI18nTerm(getLangLabel(advancedSearchText.availableOptions)) }}
             </div>
+            <!-- TODO: not linked to input!!! -->
             <ul
               v-if="filter && filter.options && displayedOptions.length"
+              role="listbox"
               class="base-advanced-search-row__columns">
               <li
                 v-for="chip in displayedOptions"
                 :key="chip.id"
+                :value="chip.label"
+                :aria-selected="(activeControlledVocabularyEntry
+                  && chip.id === activeControlledVocabularyEntry.id || false).toString()"
+                role="option"
+                tabindex="0"
                 class="base-advanced-search-row__column-item"
                 @mouseenter="activeControlledVocabularyEntry = chip"
                 @mouseleave="activeControlledVocabularyEntry = null">
@@ -203,10 +231,10 @@
               </li>
             </ul>
             <div v-else-if="isLoading">
-              Options are being loaded...
+              {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsOngoing, true)) }}
             </div>
             <div v-else-if="!displayedOptions.length">
-              No more options available
+              {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoOptions, true)) }}
             </div>
           </div>
         </div>
@@ -219,14 +247,14 @@
             { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
           ]">
           <div v-if="!currentInput">
-            Please start typing or select a filter to see options
+            {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
           </div>
           <div
             v-else-if="isLoading">
-            Autocomplete is being fetched...
+            {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteOngoing, true)) }}
           </div>
           <div v-else>
-            No matching options found
+            {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteNoOptions, true)) }}
           </div>
         </div>
       </template>
@@ -237,13 +265,13 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import SvgIcon from 'vue-svgicon';
+import { createId, hasData, sort } from '@/utils/utils';
 import BaseSearch from '../BaseSearch/BaseSearch';
 import BaseDropDownList from '../BaseDropDownList/BaseDropDownList';
 import BaseChip from '../BaseChip/BaseChip';
 import navigateMixin from '../../mixins/navigateList';
 import i18n from '../../mixins/i18n';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
-import { createId, hasData, sort } from '../../utils/utils';
 
 /** Search Row Component for Advanced Search
  *
@@ -280,36 +308,51 @@ export default {
       default: false,
     },
     /**
-     * list of available filters
+     * list of available filters, needs to be an array of objects with the following properties:<br>
+     *   <br>
+     *    <b>label</b> {string} - the label of the filter (displayed
+     *      if not main search)<br>
+     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
+     *      vocabulary options
      */
     filterList: {
       type: Array,
       default: () => ([]),
+      validator: val => !val.length || (val.every(v => v.label && v.type && (v.type !== 'chips' || v.options))),
+
     },
     /**
      * provide the component with the fetched autocomplete results
      * (drop down options)
      */
-    // TODO: check if this is correctly displayed in styleguide
     autocompleteResults: {
       type: [String, Object][Array],
       default: () => [],
     },
     /**
-     * the filter currently applied
+     * the filter currently applied, needs to be an object with the following properties:<br>
+     *   <br>
+     *    <b>label</b> {string} - the label of the filter (displayed
+     *      if not main search)<br>
+     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
+     *      vocabulary options
      */
     appliedFilter: {
       type: [Object, null],
       default: null,
+      validator: val => val === null || (val.label && val.type && (val.type !== 'chips' || val.options)),
     },
     /**
      * specify a default value for a filter that is set when none of the
-     * available filters is selected
-     * @property {string} defaultFilter.label - the label of the filter (displayed
-     * if not main search)
-     * @property {('text'|'chips'|'date'|'daterange')} defaultFilter.type - the filter type
-     * @property {Object[]} defaultFilter.options - for filter type 'chips' the controlled
-     * vocabulary options
+     * available filters is selected, should have the following properties:<br>
+     *   <br>
+     *    <b>label</b> {string} - the label of the filter (displayed
+     *      if not main search)<br>
+     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
+     *      vocabulary options
      */
     defaultFilter: {
       type: Object,
@@ -318,6 +361,7 @@ export default {
         type: 'text',
         options: [],
       }),
+      validator: val => val === null || (val.label && val.type && (val.type !== 'chips' || val.options)),
     },
     /**
      * flag to set if loader should be shown (for autocomplete requests
@@ -325,6 +369,78 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify a language (ISO 639-1) (used for label if label is language specific object
+     * e.g. { de: 'xxx', en: 'yyy' })
+     */
+    language: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify informational texts for the component - this needs to be an object with the following
+     * properties (if you dont want to display any text leave an empty string:  <br>
+     *   <br>
+     *     <b>title</b>: text shown as first line on the drop down in filters area<br>
+     *     <b>subtext</b>: text shown as second line on the drop down in filters area<br>
+     *     <b>availableOptions</b>: text shown with chips options for controlled vocabulary
+     *     search<br>
+     *     <b>addFilter</b>: text/label used for add filter icon<br>
+     *     <b>removeFilter</b>: text/label used for remove filter icon<br>
+     *     <b>selectFilterLabel</b>: label (not visible) used for filter chips input field<br>
+     *     <b>searchLabel</b>: label (not visible) used for search input field<br>
+     *  <br>
+     *  The values of this object might be plain text or a key for an i18n file<br>
+     * This prop can be ignored when the 'no-options' slot is used.
+     */
+    advancedSearchText: {
+      type: Object,
+      default: () => ({
+        title: 'Advanced Search',
+        subtext: 'Select a filter',
+        availableOptions: 'Available options',
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['title', 'subtext', 'availableOptions',
+        'addFilter', 'removeFilter', 'selectFilterLabel', 'searchLabel']
+        .every(prop => Object.keys(val).includes(prop)),
+    },
+    /**
+     * specify informational texts for the drop down - this needs to be an object with the following
+     * properties:  <br>
+     *   <br>
+     *     <b>autocompleteNoOptions</b>: info text shown when autocomplete search does not yield
+     *        any results <br>
+     *     <b>autocompleteOngoing</b>: info text displayed while autocomplete search is ongoing
+     *        (and no previous results are displayed)<br>
+     *     <b>autocompleteInitial</b>: info text shown when user first opens the search
+     *        component<br>
+     *     <b>chipsNoOptions</b>: info text shown when no options for controlled vocabulary search
+     *        are available (anymore)<br>
+     *     <b>chipsOngoing</b>: info text shown when controlled vocabulary chips are being
+     *        fetched<br>
+     *  <br>
+     *  The values of this object might be plain text or a key for an i18n file<br>
+     * This prop can be ignored when the 'no-options' slot is used.
+     */
+    dropDownInfoTexts: {
+      type: Object,
+      default: () => ({
+        autocompleteNoOptions: 'No matching options found',
+        autocompleteOngoing: 'Autocomplete is being fetched...',
+        autocompleteInitial: 'Please start typing or select a filter to see options',
+        chipsNoOptions: 'No more options available',
+        chipsOngoing: 'Options are being loaded...',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['autocompleteNoOptions', 'autocompleteOngoing', 'autocompleteInitial',
+        'chipsNoOptions', 'chipsOngoing']
+        .every(prop => Object.keys(val).includes(prop)),
     },
   },
   data() {
@@ -914,14 +1030,15 @@ export default {
     }
 
     .base-advanced-search-row__first-column {
-      margin-right: $spacing;
       flex: 0 0 25%;
       min-width: 120px;
       max-width: 250px;
+      overflow-wrap: break-word;
 
       &.base-advanced-search-row__first-column-filter {
         display: flex;
         align-items: center;
+        flex: 0 0 calc(25% + #{$spacing});
 
         .base-advanced-search-row__filter-input {
           color: $app-color;
@@ -956,6 +1073,7 @@ export default {
 
             .base-advanced-search-row__filter-area-header {
               align-self: flex-start;
+              max-width: 100%;
             }
 
             .base-advanced-search-row__drop-down-icon-wrapper {
@@ -982,7 +1100,7 @@ export default {
         }
 
         .base-advanced-search-row__filter-list {
-          width: 100%;
+          margin-left: $spacing;
 
           .base-advanced-search-row__filter {
             cursor: pointer;
@@ -1095,6 +1213,10 @@ export default {
 
   @media screen and (max-width: $mobile) {
     .base-advanced-search-row {
+      .base-advanced-search-row__first-column {
+        max-width: 100%;
+      }
+
       .base-advanced-search-row__drop-down-body {
         .base-advanced-search-row__above-list-area{
           .base-advanced-search-row__filter-area-wrapper, .base-advanced-search-row__chips-row {
@@ -1107,6 +1229,10 @@ export default {
             .base-advanced-search-row__filter-text {
               padding-top: 0;
             }
+          }
+
+          .base-advanced-search-row__filter-list {
+            margin-left: 0;
           }
         }
 

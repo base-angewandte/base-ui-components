@@ -42,6 +42,15 @@
         :applied-filter.sync="currentFilter"
         :filter-list="filters"
         :autocomplete-results="resultList"
+        :advanced-search-text="{
+          title: 'A longer longer longer test string',
+          subtext: 'Select a filter',
+          availableOptions: 'Available options',
+          addFilter: 'Add filter',
+          removeFilter: 'Remove filter',
+          selectFilterLabel: 'Select filter',
+          searchLabel: 'Search for Entries',
+        }"
         :is-loading="autocompleteRequestOngoing"
         @add-filter="addFilter"
         @fetch-autocomplete-results="fetchAutocomplete($event, currentFilter)" />
@@ -319,16 +328,18 @@ export default {
     fetchAutocomplete(searchString) {
       if (searchString) {
         this.autocompleteRequestOngoing = true;
-        this.resultList = this.resultListOriginal.map(({ collection, data }) => {
-          const filteredResults = data
-            .filter(entry => entry.header.toLowerCase()
-              .includes(searchString.toLowerCase()));
-          return {
-            collection,
-            data: filteredResults,
-          };
-        });
-        this.autocompleteRequestOngoing = false;
+        setTimeout(() => {
+          this.resultList = this.resultListOriginal.map(({ collection, data }) => {
+            const filteredResults = data
+              .filter(entry => entry.header.toLowerCase()
+                .includes(searchString.toLowerCase()));
+            return {
+              collection,
+              data: filteredResults,
+            };
+          });
+          this.autocompleteRequestOngoing = false;
+        }, 1000);
       } else {
         this.resultList = [];
       }
@@ -359,6 +370,10 @@ export default {
 
 <style lang="scss">
   @import "../src/styles/variables";
+
+  .base-advanced-search__filter-row {
+    margin-bottom: 16px;
+  }
 
   .dropdown-extended {
     border-top: $separation-line;
