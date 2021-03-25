@@ -55,7 +55,7 @@
                   @binding { number } chipActiveForRemove - the index of the chip that is
                     currently active to be removed (for keyboard handling)
                   @binding { function } removeEntry - function to remove the entry from
-                    selectedList
+                    selectedList, needs `entry` and `index` as arguments
                 -->
                 <slot
                   name="chip"

@@ -52,7 +52,7 @@ Example using the 'chip' slot with all props provided by the slot. Click the chi
         :class="['crazy-chips', 'base-chip__text',
           { 'active-for-remove': slotProps.chipActiveForRemove === slotProps.index },
         ]"
-        @click="slotProps.removeEntry">
+        @click="slotProps.removeEntry(slotProps.entry, slotProps.index)">
         {{ slotProps.entry.label }}
       </div>
     </template>
