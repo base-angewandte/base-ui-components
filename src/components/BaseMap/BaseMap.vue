@@ -5,19 +5,45 @@
 </template>
 
 <script>
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+/**
+ * A component to display a Leaflet-map with multiple locations
+ */
 
 export default {
   name: 'BaseMap',
   props: {
     /**
-     * Latitude and longitude value to center map and set marker
+     * define Markers<br>
+     *   structure: [{<br>
+     *     latLng: [48.208309, 16.382782],<br>
+     *     data: [ 'University of Applied Arts', 'Oskar Kokoschka-Platz 2',
+     *     '1010 Vienna', 'Austria']<br>
+     *   }]
      */
-    latLong: {
+    markers: {
       type: Array,
-      required: true,
+      default: () => [],
+    },
+    /**
+     * define if popup for markes is used
+     */
+    markerPopups: {
+      type: Boolean,
+      default: true,
+    },
+    /*
+     * define icon
+     */
+    icon: {
+      type: String,
+      default: '<svg viewBox="0 0 70.866 70.866" xmlns="http://www.w3.org/2000/svg"><path d="m35.433 0a22.731 22.731 0 0 0-22.731 22.82 24.125 24.125 0 0 0 1.872 9.1814l19.611 38.063a1.3718 1.3718 0 0 0 2.496 0l19.611-38.063a22.249 22.249 0 0 0 1.872-9.1814 22.731 22.731 0 0 0-22.731-22.82zm0 32.858a10.216 10.216 0 1 1 10.216-10.216 10.241 10.241 0 0 1-10.216 10.216z" fill="#010101"/></svg>',
+    },
+    /**
+     * define icon size
+     */
+    iconSize: {
+      type: Number,
+      default: 32,
     },
     /**
      * set Leaflet attribution
@@ -55,18 +81,27 @@ export default {
       default: 18,
     },
   },
+  data() {
+    return {
+      scrollWheelZoom: false,
+      boundsPaddingX: 0,
+      boundsPaddingY: 20,
+    };
+  },
   mounted() {
     if (process.browser) {
-      // Require leaflet
       // eslint-disable-next-line
       const L = require('leaflet');
 
       // Initialize Leaflet map
       const map = L.map(this.$refs.mapElement, {
-        center: this.latLong,
         zoom: this.zoom,
-        scrollWheelZoom: false,
+        scrollWheelZoom: this.scrollWheelZoom,
       });
+
+      // Center map based on Marker(s)
+      const bounds = new L.LatLngBounds(this.markers.map(item => item.latLng));
+      map.fitBounds(bounds, { padding: [this.boundsPaddingX, this.boundsPaddingY] });
 
       // Draw Leaflet map
       L.tileLayer(this.url, {
@@ -74,18 +109,33 @@ export default {
         attribution: [this.attribution, this.copyright].join(', '),
       }).addTo(map);
 
-      // Set icon properties
-      // eslint-disable-next-line
-      delete L.Icon.Default.prototype._getIconUrl;
-      L.Icon.Default.imagePath = '';
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl,
-        iconUrl,
-        shadowUrl,
-      });
+      // Custom icon
+      const iconOptions = {
+        className: 'base-map-marker-icon',
+        html: this.icon,
+        iconSize: [this.iconSize, this.iconSize],
+        iconAnchor: [this.iconSize / 2, this.iconSize - 7],
+      };
+      const markerIcon = L.divIcon(iconOptions);
 
-      // Draw Leaflet marker
-      L.marker(this.latLong).addTo(map);
+      // Add markers to map
+      if (this.markers.length) {
+        this.markers.forEach((item) => {
+          const initPopup = this.markerPopups && Array.isArray(item.data);
+          const markerOptions = {
+            icon: markerIcon,
+            interactive: initPopup,
+          };
+
+          const marker = L.marker(L.latLng(item.latLng[0], item.latLng[1]), markerOptions);
+
+          if (initPopup) {
+            marker.bindPopup(item.data.join('<br>'));
+          }
+
+          map.addLayer(marker);
+        });
+      }
     }
   },
 };
@@ -97,9 +147,39 @@ export default {
   }
 </style>
 
-<style>
-  /* for some reason this is not working as "leaflet/dist/leaflet.css" (webpack)
-  or "~leaflet/dist/leaflet.css" (rollup)
-   (compare BaseCarousel where exactly the same (first version) IS working */
-  @import '../../../node_modules/leaflet/dist/leaflet.css';
+<style lang="scss">
+  @import '~leaflet/dist/leaflet.css';
+  @import "../../styles/variables";
+
+  /* marker */
+  .base-map-marker-icon > svg path {
+    fill: $app-color;
+  }
+
+  /* popup */
+  .leaflet-popup {
+    bottom: inherit !important;
+    top: -25px;
+    left: 20px !important;
+  }
+
+  .leaflet-popup-tip-container {
+    display: none;
+  }
+
+  .leaflet-popup-content-wrapper {
+    width: 225px;
+    border-radius: 0;
+  }
+
+  .leaflet-popup-content {
+    margin: $spacing-small $spacing-large $spacing $spacing-small;
+    font-size: 14px !important;
+    line-height: 1.4em;
+    color: $font-color;
+  }
+
+  .leaflet-container a.leaflet-popup-close-button {
+    padding: $spacing-small $spacing-small 0 0;
+  }
 </style>
