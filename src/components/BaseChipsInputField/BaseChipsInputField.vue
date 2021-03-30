@@ -43,7 +43,8 @@
             handle=".base-chip__text"
             @start="drag = true"
             @end="onDragEnd">
-            <transition-group
+            <component
+              :is="drag ? 'transition-group' : 'div'"
               :name="!drag ? 'flip-list' : null"
               type="transition"
               class="base-chips-input-field__chips-transition">
@@ -77,7 +78,7 @@
                     @hoverbox-active="hoverBoxActive($event, entry)" />
                 </slot>
               </template>
-            </transition-group>
+            </component>
           </draggable>
         </div>
       </template>
