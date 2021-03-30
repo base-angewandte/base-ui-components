@@ -1,5 +1,6 @@
 <template>
   <div
+    v-click-outside="checkDropDownClose"
     class="base-advanced-search-row">
     <!-- SEARCH FIELD -->
     <div
@@ -29,7 +30,6 @@
           value-property-name="label"
           class="base-advanced-search-row__filter-input"
           @focus="activateDropDown"
-          @blur="checkDropDownClose"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
           <template v-slot:chip="{ entry, index, chipActiveForRemove, removeEntry }">
@@ -46,7 +46,7 @@
                 ['-webkit-box-orient']: 'vertical',
               }"
               class="base-advanced-search-row__filter-chip"
-              @remove-entry="removeEntry(entry, index)" />
+              @remove-entry="showDropDown = true; removeEntry(entry, index)" />
           </template>
         </BaseChipsInputField>
       </div>
@@ -64,9 +64,9 @@
         :is-loading="isLoading"
         :drop-down-list-id="'autocomplete-options-' + internalRowId"
         :language="language"
-        class="base-advanced-search-row__base-search"
+        :class="['base-advanced-search-row__base-search',
+                 { 'base-advanced-search-row__base-search__no-icon': !isMainSearch}]"
         @focus="activateDropDown"
-        @blur="checkDropDownClose"
         @keydown.up.down.right.left="navigateDropDown"
         @keydown.enter="selectOption"
         @keydown.tab="showDropDown = false"
@@ -106,13 +106,11 @@
       :language="language"
       identifier-property-name="collection"
       value-property-name="data"
-      class="base-advanced-search-row__drop-down-body"
-      @within-drop-down="isWithinDropDown = $event">
+      class="base-advanced-search-row__drop-down-body">
       <template v-slot:before-list>
         <div
           class="base-advanced-search-row__above-list-area
-                    base-advanced-search-row__above-list-area-filters"
-          @click="checkFilterToggle">
+                    base-advanced-search-row__above-list-area-filters">
           <!-- FILTER SELECT LIST -->
           <div
             class="base-advanced-search-row__filter-area-wrapper">
@@ -128,20 +126,19 @@
                   {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
                 </div>
               </div>
-              <div
-                v-if="isMobile"
-                class="base-advanced-search-row__drop-down-icon-wrapper">
-                <SvgIcon
-                  name="drop-down"
-                  :class="['base-advanced-filter-row__drop-down-icon',
-                           filtersOpen ? 'svg-down' : 'svg-up']" />
-              </div>
             </div>
-            <ul
-              :id="'filter-options-' + internalRowId"
-              role="listbox"
-              class="base-advanced-search-row__filter-list base-advanced-search-row__columns">
-              <template v-if="!isMobile || filtersOpen">
+            <div
+              :class="['base-advanced-search-row__columns',
+                       'base-advanced-search-row__filter-list-wrapper',
+                       { 'base-advanced-search-row__filter-list-wrapper__fade-right':
+                         filterFade.right },
+                       { 'base-advanced-search-row__filter-list-wrapper__fade-left':
+                         filterFade.left }]">
+              <ul
+                :id="'filter-options-' + internalRowId"
+                ref="filterBox"
+                role="listbox"
+                class="base-advanced-search-row__filter-list">
                 <li
                   v-for="(singleFilter, index) in displayedFilters"
                   :id="`filter-option-${singleFilter.label}`"
@@ -157,8 +154,8 @@
                   @click.stop="selectFilter(singleFilter)">
                   {{ singleFilter.label }}
                 </li>
-              </template>
-            </ul>
+              </ul>
+            </div>
           </div>
         </div>
       </template>
@@ -209,7 +206,7 @@
             <ul
               v-if="filter && filter.options && displayedOptions.length"
               role="listbox"
-              class="base-advanced-search-row__columns">
+              class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
               <li
                 v-for="chip in displayedOptions"
                 :key="chip.id"
@@ -230,10 +227,14 @@
                   @clicked="selectOption" />
               </li>
             </ul>
-            <div v-else-if="isLoading">
+            <div
+              v-else-if="isLoading"
+              class="base-advanced-search-row__no-options">
               {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsOngoing, true)) }}
             </div>
-            <div v-else-if="!displayedOptions.length">
+            <div
+              v-else-if="!displayedOptions.length"
+              class="base-advanced-search-row__no-options">
               {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoOptions, true)) }}
             </div>
           </div>
@@ -493,23 +494,20 @@ export default {
        */
       showDropDown: false,
       /**
-       * variable to store if cursor is within drop down
-       * (needed for v-clickoutside which does not recognize drop down as 'within')
+       * variable to steer filter mobile display fade outs
+       * @type {Object}
+       * @property {boolean} filterFade.left - left fade out
+       * @property {boolean} filterFade.right - right fade out
+       */
+      filterFade: {
+        left: false,
+        right: true,
+      },
+      /**
+       * make sure event listener is only added once
        * @type {boolean}
        */
-      isWithinDropDown: false,
-      /**
-       * variable to determine if component is rendered on mobile
-       */
-      isMobile: false,
-      /**
-       * control filter area toggle (mobile only)
-       */
-      filtersOpen: true,
-      /**
-       * store time out to trigger resize event listener function less often
-       */
-      resizeTimeout: null,
+      fadeOutAdded: false,
     };
   },
   computed: {
@@ -670,15 +668,19 @@ export default {
       }
     },
   },
-  mounted() {
-    if (window) {
-      this.calcIsMobile();
-      window.addEventListener('resize', this.calcIsMobile);
+  updated() {
+    // if event listener was not added and the filterBox element exists add
+    // the listener
+    if (!this.fadeOutAdded && this.$refs.filterBox) {
+      this.$refs.filterBox.addEventListener('scroll', this.calcFadeOut);
+      // set variable true to know that listener has been added
+      this.fadeOutAdded = true;
     }
   },
   destroyed() {
-    if (window) {
-      window.removeEventListener('resize', this.calcIsMobile);
+    // remove event listener again if element exists
+    if (this.$refs.filterBox) {
+      this.$refs.filterBox.removeEventListener('scroll', this.calcFadeOut);
     }
   },
   methods: {
@@ -690,7 +692,7 @@ export default {
      */
     checkDropDownClose() {
       // only close drop down if cursor is not within drop down
-      if (!this.isWithinDropDown && document.activeElement.tagName === 'BODY') {
+      if (document.activeElement.tagName === 'BODY' || document.activeElement.tagName === 'INPUT') {
         this.showDropDown = false;
       }
     },
@@ -701,14 +703,6 @@ export default {
       this.showDropDown = true;
       if (this.filter.type === 'text') {
         this.$emit('fetch-autocomplete-results', this.currentInput);
-      }
-    },
-    /**
-     * on mobile advanced filters are hidden by default
-     */
-    checkFilterToggle() {
-      if (this.isMobile) {
-        this.filtersOpen = !this.filtersOpen;
       }
     },
 
@@ -994,13 +988,14 @@ export default {
     getLabel(label) {
       return this.getLangLabel(label, true);
     },
-    calcIsMobile() {
-      clearTimeout(this.resizeTimeout);
-      this.resizeTimeout = setTimeout(() => {
-        // set isMobile variable
-        this.isMobile = window.innerWidth < 640;
-        this.filtersOpen = false;
-      }, 250);
+    calcFadeOut(event) {
+      const scrollElement = event.target;
+      const scrollPosition = scrollElement.scrollLeft;
+      const scrollMax = scrollElement.scrollWidth - scrollElement.clientWidth;
+      this.filterFade = {
+        left: scrollPosition !== 0,
+        right: scrollPosition !== scrollMax,
+      };
     },
   },
 };
@@ -1027,6 +1022,10 @@ export default {
       .base-advanced-search-row__base-search {
         margin-left: -$spacing;
       }
+
+      .base-advanced-search-row__base-search__no-icon {
+        margin-left: -$spacing - $spacing-small;
+      }
     }
 
     .base-advanced-search-row__first-column {
@@ -1034,6 +1033,7 @@ export default {
       min-width: 120px;
       max-width: 250px;
       overflow-wrap: break-word;
+      margin-right: $spacing;
 
       &.base-advanced-search-row__first-column-filter {
         display: flex;
@@ -1099,24 +1099,26 @@ export default {
           }
         }
 
-        .base-advanced-search-row__filter-list {
-          margin-left: $spacing;
+        .base-advanced-search-row__filter-list-wrapper {
+          .base-advanced-search-row__filter-list {
+            margin-left: $spacing;
 
-          .base-advanced-search-row__filter {
-            cursor: pointer;
-            color: $app-color;
-            padding: $spacing-small/2 $spacing;
+            .base-advanced-search-row__filter {
+              cursor: pointer;
+              color: $app-color;
+              padding: $spacing-small/2 $spacing;
 
-            &:focus {
-              outline: none;
-            }
+              &:focus {
+                outline: none;
+              }
 
-            &.base-advanced-search-row__filter-active, &:hover {
-              box-shadow: 0 0 0 1px $app-color;
-            }
+              &.base-advanced-search-row__filter-active, &:hover {
+                box-shadow: 0 0 0 1px $app-color;
+              }
 
-            &.base-advanced-search-row__filter-selected {
+              &.base-advanced-search-row__filter-selected {
 
+              }
             }
           }
         }
@@ -1128,18 +1130,22 @@ export default {
         .base-advanced-search-row__chips-row {
           line-height: $row-height-small;
 
-          .base-advanced-search-row__option-chip {
-            cursor: pointer;
+          .base-advanced-search-row__chips-list {
+            margin-left: $spacing;
 
-            &:hover::after {
-              content: '';
-              width: 100%;
-              height: 100%;
-              position: absolute;
-              top: 0;
-              right: 0;
-              background: $app-color;
-              opacity: 0.5;
+            .base-advanced-search-row__option-chip {
+              cursor: pointer;
+
+              &:hover::after {
+                content: '';
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: $app-color;
+                opacity: 0.5;
+              }
             }
           }
         }
@@ -1196,7 +1202,7 @@ export default {
       }
     }
 
-    .base-advanced-search-row__columns, .base-advanced-search-row__filter-list {
+    .base-advanced-search-row__columns {
       column-gap: $spacing;
       display: block;
       width: 100%;
@@ -1215,24 +1221,81 @@ export default {
     .base-advanced-search-row {
       .base-advanced-search-row__first-column {
         max-width: 100%;
+        margin-right: $spacing-small;
       }
 
       .base-advanced-search-row__drop-down-body {
         .base-advanced-search-row__above-list-area{
-          .base-advanced-search-row__filter-area-wrapper, .base-advanced-search-row__chips-row {
-            flex-direction: column;
+          //.base-advanced-search-row__filter-area-wrapper, .base-advanced-search-row__chips-row {
+          //  flex-direction: column;
+          //
+          //  .base-advanced-search-row__filter-area {
+          //    max-width: 100%;
+          //  }
+          //
+          //  .base-advanced-search-row__filter-text {
+          //    padding-top: 0;
+          //  }
+          //}
 
-            .base-advanced-search-row__filter-area {
-              max-width: 100%;
+          .base-advanced-search-row__filter-list-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            transition: all ease-in-out 3s;
+
+            &.base-advanced-search-row__filter-list-wrapper__fade-right {
+              transition: all ease-in-out 3s;
+
+              &::after {
+                content: '';
+                height: 100%;
+                width: 80px;
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: linear-gradient(to right, rgba(255, 255, 255, 0),
+                  rgba(255, 255, 255, 1));
+                pointer-events: none;
+                transition: all ease-in-out 3s;
+              }
             }
 
-            .base-advanced-search-row__filter-text {
-              padding-top: 0;
+            &.base-advanced-search-row__filter-list-wrapper__fade-left {
+              transition: all ease-in-out 3s;
+              &::before {
+                content: '';
+                height: 100%;
+                width: 80px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                background: linear-gradient(to right, rgba(255, 255, 255, 1),
+                  rgba(255, 255, 255, 0));
+                pointer-events: none;
+                transition: all ease-in-out 3s;
+              }
             }
-          }
 
-          .base-advanced-search-row__filter-list {
-            margin-left: 0;
+            .base-advanced-search-row__filter-list {
+              column-count: unset;
+              column-gap: unset;
+              display: flex;
+              align-items: center;
+              flex-direction: row;
+              overflow: auto;
+              margin: 0 1px;
+
+              .base-advanced-search-row__filter {
+                white-space: nowrap;
+
+                &.base-advanced-search-row__filter-selected,
+                &.base-advanced-search-row__filter-active,
+                &.base-advanced-search-row__filter:hover {
+                  box-shadow: none;
+                }
+              }
+            }
           }
         }
 
