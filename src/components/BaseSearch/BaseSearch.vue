@@ -54,9 +54,9 @@
       :placeholder="placeholder"
       :is-loading="isLoading"
       :language="language"
+      :label-property-name="labelPropertyName"
+      :identifier-property-name="identifierPropertyName"
       label="chips-input"
-      value-property-name="label"
-      identifier-property-name="id"
       @focus="inputFocus"
       @clicked-outside="inputBlur"
       @keydown.up.down.prevent=""
@@ -171,6 +171,9 @@ export default {
       type: String,
       default: null,
     },
+    /**
+     * is loading indicator - showing loader if true
+     */
     isLoading: {
       type: Boolean,
       default: false,
@@ -181,6 +184,20 @@ export default {
     language: {
       type: String,
       default: 'en',
+    },
+    /**
+     * specify the object property that should be used as identifier
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'id',
+    },
+    /**
+     * specify the object property that should be used as value to be displayed
+     */
+    labelPropertyName: {
+      type: String,
+      default: 'label',
     },
   },
   data() {
