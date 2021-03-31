@@ -19,6 +19,7 @@
       </template>
     </BaseInput>
 
+    <!-- TODO: refactor to use BaseDropDownList -->
     <!-- DROP DOWN MENU -->
     <div
       v-if="showDropDown"
@@ -42,7 +43,7 @@
           name="drop-down-entry">
           <!-- SLOT DEFAULT -->
           <div class="base-autocomplete-drop-down-entry">
-            {{ entry[objectProp] }}
+            {{ entry[labelPropertyName] }}
           </div>
         </slot>
       </div>
@@ -124,19 +125,19 @@ export default {
       default: 'No options available',
     },
     /**
-     * if input list is an object specify the property that's value should be used
-     */
-    objectProp: {
-      type: String,
-      default: 'name',
-    },
-    /**
      * show spinner to indicate that something is loading
      * (for dynamically fetched entries that need to do backend requests)
      */
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify the object property that should be used as value to be displayed
+     */
+    labelPropertyName: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -172,7 +173,7 @@ export default {
     // watch for changes in the drop down list and set internal variable accordingly
     list(val) {
       this.listInt = val && val.length && typeof val[0] === 'string'
-        ? val.map(v => ({ ...{ [this.objectProp]: v } }))
+        ? val.map(v => ({ ...{ [this.labelPropertyName]: v } }))
         : val.map(v => ({ ...v }));
     },
     // watch for changes in the text input from outside and set internal value accordingly
@@ -183,7 +184,7 @@ export default {
   mounted() {
     // set internal text and list variables with values set in parent
     this.listInt = this.list && this.list.length && typeof this.list[0] === 'string'
-      ? this.list.map(v => ({ ...{ [this.objectProp]: v } }))
+      ? this.list.map(v => ({ ...{ [this.labelPropertyName]: v } }))
       : this.list.map(v => ({ ...v }));
     this.inputTextInt = this.inputText;
   },
@@ -192,12 +193,12 @@ export default {
     selectEntry(entry) {
       // check if entry was selected by clicking in the dropdown
       if (entry) {
-        this.inputTextInt = entry[this.objectProp];
+        this.inputTextInt = entry[this.labelPropertyName];
         this.$emit('selected', entry);
         // or was selected by use of arrow keys
         // (else no explicit setting of inputTextInt and event emitting is needed)
       } else if (this.selectedMenuEntryIndex >= 0) {
-        this.inputTextInt = this.listInt[this.selectedMenuEntryIndex][this.objectProp];
+        this.inputTextInt = this.listInt[this.selectedMenuEntryIndex][this.labelPropertyName];
         /**
          * event triggered when entry is selected from drop down menu
          *

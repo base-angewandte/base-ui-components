@@ -35,7 +35,7 @@ export default {
     /**
      * an array with objects to pass the data to be displayed, expecting an object with
      * 'label' and 'value' properties - if different please use valuePropertyName
-     * and LabelPropertyName respectively!
+     * and labelPropertyName respectively!
      */
     data: {
       type: Array,

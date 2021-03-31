@@ -7,7 +7,7 @@ Form Input Field with Dynamic Autocomplete
       <base-autocomplete-input
         :list="dropDownInput"
         :placeholder="'Select Your Favourite Subject'"
-        :object-prop="'title'"
+        :label-property-name="'title'"
         v-model="autocompleteInput"
         label="Favourite Subject"
         @autocomplete="fetch"/>

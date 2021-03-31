@@ -16,11 +16,11 @@
       class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
         <li
-          v-if="optionHasData(option[valuePropertyName])"
+          v-if="optionHasData(option[labelPropertyName])"
           :id="option[identifierPropertyName]"
           ref="option"
           :key="optionIndex"
-          :value="valueIsString ? getLangLabel(option[valuePropertyName], true)
+          :value="valueIsString ? getLangLabel(option[labelPropertyName], true)
             : option[identifierPropertyName]"
           :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
           :class="[
@@ -40,7 +40,7 @@
           <slot
             name="option"
             :option="option">
-            {{ getLangLabel(option[valuePropertyName], true) }}
+            {{ getLangLabel(option[labelPropertyName], true) }}
           </slot>
         </li>
       </template>
@@ -100,7 +100,7 @@ export default {
     /**
      * specify the name of the property that should be displayed
      */
-    valuePropertyName: {
+    labelPropertyName: {
       type: String,
       default: 'value',
     },
@@ -221,7 +221,7 @@ export default {
     valueIsString() {
       return this.dropDownOptions
         && this.dropDownOptions.length
-        && typeof this.getLangLabel(this.dropDownOptions[0][this.valuePropertyName], true) === 'string';
+        && typeof this.getLangLabel(this.dropDownOptions[0][this.labelPropertyName], true) === 'string';
     },
     /**
      * the index of the currently active option provided by parent

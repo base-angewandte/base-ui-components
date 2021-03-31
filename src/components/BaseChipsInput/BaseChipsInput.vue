@@ -9,10 +9,10 @@
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyNameInt] : null"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :drop-down-active="isDropDownActive"
-      :value-property-name="valuePropertyNameInt"
-      :identifier-property-name="identifierPropertyNameInt"
+      :label-property-name="labelPropertyName"
+      :identifier-property-name="identifierPropertyName"
       :return-as-string="returnAsString"
       @focus="onInputFocus"
       @blur="onInputBlur"
@@ -28,8 +28,8 @@
       :drop-down-options="listInt"
       :active-option.sync="activeOption"
       :selected-option.sync="selectedOption"
-      :identifier-property-name="identifierPropertyNameInt"
-      :value-property-name="valuePropertyNameInt"
+      :identifier-property-name="identifierPropertyName"
+      :label-property-name="labelPropertyName"
       :list-id="id"
       :style="{ 'min-width': dropDownMinWidth }"
       :language="language"
@@ -38,24 +38,24 @@
       @within-drop-down="isWithinDropDown = $event">
       <template v-slot:option="entry">
         <span
-          v-if="allowUnknownEntries && !entry.option[identifierPropertyNameInt]"
+          v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
           ref="option"
-          :key="entry.option[identifierPropertyNameInt]">
+          :key="entry.option[identifierPropertyName]">
           {{ addNewChipText
-            ? `${addNewChipText} ${getLangLabel(entry.option[valuePropertyNameInt], true)} ...`
+            ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
             : `${getI18nTerm('form.Add', -1, {
-              value: getLangLabel(entry.option[valuePropertyNameInt], true)
+              value: getLangLabel(entry.option[labelPropertyName], true)
             })} ...` }}
         </span>
         <template
           v-else-if="entry">
           <!-- @slot a slot to provide more advanced drop down entries<br> per default only the
-            Object[valuePropertyName/objectProp][?lang] will be displayed -->
+            Object[labelPropertyName][?lang] will be displayed -->
           <slot
             :item="entry.option"
             name="drop-down-entry">
             <!-- SLOT DEFAULT -->
-            {{ getLangLabel(entry.option[valuePropertyNameInt], true) }}
+            {{ getLangLabel(entry.option[labelPropertyName], true) }}
           </slot>
         </template>
       </template>
@@ -105,16 +105,6 @@ export default {
     selectedList: {
       type: Array,
       default: () => [],
-    },
-    /**
-     * if object array was passed - define the property that should be
-     * displayed in the chip<br>
-     *   (this prop is deprecated and will be removed in next major release -
-     *   please use valuePropertyName instead)
-     */
-    objectProp: {
-      type: String,
-      default: 'name',
     },
     /**
      * input field label
@@ -206,16 +196,6 @@ export default {
       default: false,
     },
     /**
-     * for dynamic drop down entries a unique identifier (id, uuid)
-     * is needed - specify the attribute name here<br>
-     *   (this prop is deprecated and will be removed in next major release -
-     *   please use identifierPropertyName instead)
-     */
-    identifier: {
-      type: String,
-      default: '',
-    },
-    /**
      * define if entries should always appear linked (-> with grey background)
      */
     alwaysLinked: {
@@ -278,8 +258,6 @@ export default {
     },
     /**
      * specify the object property that should be used as identifier
-     * // TODO: this should replace prop 'identifier' in future versions
-     * (better naming)
      */
     identifierPropertyName: {
       type: String,
@@ -287,10 +265,8 @@ export default {
     },
     /**
      * specify the object property that should be used as value to be displayed
-     * // TODO: this should replace prop 'objectProp' in future versions
-     * (better naming)
      */
-    valuePropertyName: {
+    labelPropertyName: {
       type: String,
       default: '',
     },
@@ -367,7 +343,7 @@ export default {
       let tempList = [];
       if (this.list && this.list.length && typeof this.list[0] === 'string') {
         tempList = this.list.map(option => ({
-          [this.valuePropertyNameInt]: option,
+          [this.labelPropertyName]: option,
         }));
       } else {
         tempList = [...this.list];
@@ -375,22 +351,22 @@ export default {
       // if unknown entries are allowed add a "Add InputSting ..." as first option
       if (this.allowUnknownEntries && this.input) {
         tempList.unshift({
-          [this.valuePropertyNameInt]: this.language ? { [this.language]: this.input } : this.input,
+          [this.labelPropertyName]: this.language ? { [this.language]: this.input } : this.input,
         });
       }
       // filter entries that were already selected, if no identifier
       // compare by object property
       if (this.selectedListInt && this.selectedListInt.length) {
         tempList = tempList.filter(option => !this.selectedListInt
-          .map(selected => (selected[this.identifierPropertyNameInt]
-            || selected[this.valuePropertyNameInt]))
-          .includes(option[this.identifierPropertyNameInt] || option[this.valuePropertyNameInt]));
+          .map(selected => (selected[this.identifierPropertyName]
+            || selected[this.labelPropertyName]))
+          .includes(option[this.identifierPropertyName] || option[this.labelPropertyName]));
       }
       // in case of no dynamic autocomplete fetching match the input string
       // with the options list and only show matching options
       if (this.input && !this.allowDynamicDropDownEntries) {
         // also only return entries matching the input string
-        return tempList.filter(option => this.getLangLabel(option[this.valuePropertyNameInt])
+        return tempList.filter(option => this.getLangLabel(option[this.labelPropertyName])
           .toLowerCase().includes(this.input.toLowerCase()));
       }
       return tempList;
@@ -421,14 +397,6 @@ export default {
       get() {
         return this.listInt[this.activeOptionIndex];
       },
-    },
-    // TODO: this is temporary for backwards compatibility - remove for next major version
-    identifierPropertyNameInt() {
-      return this.identifierPropertyName || this.identifier;
-    },
-    // TODO: this is temporary for backwards compatibility - remove for next major version
-    valuePropertyNameInt() {
-      return this.valuePropertyName || this.objectProp;
     },
   },
   watch: {
@@ -512,9 +480,9 @@ export default {
          *
          * @event fetch-dropdown-entries
          * @property {string} value - the input string
-         * @property {string} type - the valuePropertyName/objectProp that was specified
+         * @property {string} type - the labelPropertyName that was specified
          */
-        this.$emit('fetch-dropdown-entries', { value: val, type: this.valuePropertyNameInt });
+        this.$emit('fetch-dropdown-entries', { value: val, type: this.labelPropertyName });
         // TODO: code there for backwards compatibility - event not necessary anymore
         // since now all input events are forwarded! remove for v2!
       } else {
@@ -548,7 +516,7 @@ export default {
          * @type { object }
          *
          */
-        this.$emit('fetch-dropdown-entries', { value: this.input, type: this.valuePropertyNameInt });
+        this.$emit('fetch-dropdown-entries', { value: this.input, type: this.labelPropertyName });
       }
       if (val) {
         // TODO: check again why this is needed bzw. it not sure if it is working
@@ -625,7 +593,7 @@ export default {
         let tempList = [...updatedList];
         // if list was provided as string also return selected list as string
         if (this.returnAsString) {
-          tempList = tempList.map(selected => selected[this.valuePropertyNameInt]);
+          tempList = tempList.map(selected => selected[this.labelPropertyName]);
         }
         /**
          * inform parent of changes to selectedList

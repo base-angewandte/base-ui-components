@@ -69,7 +69,7 @@
                   <BaseChip
                     :id="entry.idInt"
                     :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                    :entry="getLangLabel(entry[valuePropertyName], true)"
+                    :entry="getLangLabel(entry[labelPropertyName], true)"
                     :hover-box-content="hoverboxContent"
                     :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                       || !!entry[identifierPropertyName]"
@@ -304,8 +304,6 @@ export default {
     },
     /**
      * specify the object property that should be used as identifier
-     * // TODO: this should replace prop 'identifier' in future versions
-     * (better naming)
      */
     identifierPropertyName: {
       type: String,
@@ -313,10 +311,8 @@ export default {
     },
     /**
      * specify the object property that should be used as value to be displayed
-     * // TODO: this should replace prop 'objectProp' in future versions
-     * (better naming)
      */
-    valuePropertyName: {
+    labelPropertyName: {
       type: String,
       default: 'label',
     },
@@ -404,7 +400,7 @@ export default {
         if (val) {
           // create a temporary list object and add an internal id
           const tempList = val.map(option => ({
-            ...(this.isStringArray ? { [this.valuePropertyName]: option }
+            ...(this.isStringArray ? { [this.labelPropertyName]: option }
               : option),
             // adding an internal id - either the one given by identifierProperty or
             // if not available - assign a previously assigned one or a new id
@@ -510,7 +506,7 @@ export default {
       if (this.inputInt && this.allowUnknownEntries && this.addSelectedEntryDirectly) {
         // check for duplicates
         const duplicate = this.selectedListInt
-          .find(option => option[this.valuePropertyName] === this.inputInt);
+          .find(option => option[this.labelPropertyName] === this.inputInt);
         // if no duplicate was found add the entry
         if (!duplicate) {
           // where should new item be placed (added at the end or replacing old entry
@@ -519,7 +515,7 @@ export default {
           // create object to add
           const newEntry = {
             idInt: this.getIdInt(),
-            [this.valuePropertyName]: this.inputInt,
+            [this.labelPropertyName]: this.inputInt,
           };
           // set entry in selectedList
           this.$set(this.selectedListInt, setIndex, newEntry);
@@ -550,7 +546,7 @@ export default {
       let tempList = JSON.parse(JSON.stringify(newSelectedListInt));
       // if provided selected list consisted of strings - return this way
       if (this.isStringArray) {
-        tempList = tempList.map(selected => selected[this.valuePropertyName]);
+        tempList = tempList.map(selected => selected[this.labelPropertyName]);
       } else if (newSelectedListInt.length) {
         // remove internal ids again
         tempList = tempList.map((selected) => {
@@ -581,8 +577,8 @@ export default {
         // get matching option by value (this is only for options that dont have an
         // external id provided anyways (also duplicates are excluded in 'addOption()'
         const matchingOption = this.selectedListInt
-          .find(opt => opt[this.valuePropertyName] === option[this.valuePropertyName]
-            || opt[this.valuePropertyName] === option);
+          .find(opt => opt[this.labelPropertyName] === option[this.labelPropertyName]
+            || opt[this.labelPropertyName] === option);
         // check if there was exactly one matching result
         if (matchingOption) {
           return matchingOption.idInt;
@@ -597,7 +593,7 @@ export default {
     sortSelectedList() {
       sort(
         this.selectedListInt,
-        this.valuePropertyName,
+        this.labelPropertyName,
         this.sortName,
         this.language ? this.getLangLabel : null,
       );

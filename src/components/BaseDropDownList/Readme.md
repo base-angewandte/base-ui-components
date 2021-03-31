@@ -77,7 +77,7 @@ An example connected with an input field (displayAsDropDown: false)
       :selected-list.sync="selectedList"
       drop-down-list-id="aSimpleTestList"
       identifier-property-name="id"
-      value-property-name="value"
+      label-property-name="value"
       placeholder="Add new chips via enter"
       label="A basic input for drop down"
       @keydown.up.down.prevent="navigate"

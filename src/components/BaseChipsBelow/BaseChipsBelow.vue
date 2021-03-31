@@ -35,7 +35,7 @@
       <div
         v-for="(entry,index) in selectedBelowListInt"
         :key="'item' + entry.idInt"
-        :name="entry[valuePropertyNameInt]"
+        :name="entry[labelPropertyName]"
         class="base-chips-below-list-item"
         @mousedown="chipActive = index">
         <div
@@ -57,9 +57,9 @@
               :id="'chips-below' + index"
               ref="selectedChip"
               :key="'chip' + entry.idInt"
-              v-model="entry[valuePropertyNameInt]"
-              :is-linked="!entry.edited && (entry[identifierPropertyNameInt] === 0
-                || !!entry[identifierPropertyNameInt])"
+              v-model="entry[labelPropertyName]"
+              :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
+                || !!entry[identifierPropertyName])"
               :hover-box-content="hoverboxContent"
               class="base-chips-input-chip"
               @value-changed="modifyChipValue($event, index)"
@@ -80,8 +80,8 @@
             :language="language"
             :draggable="true"
             :drop-down-no-options-info="dropDownNoOptionsInfo"
-            :identifier-property-name="identifierPropertyNameInt"
-            :value-property-name="valuePropertyNameInt"
+            :identifier-property-name="identifierPropertyName"
+            :label-property-name="labelPropertyName"
             class="base-chips-below-chips-input"
             @selected="updateRoles($event, index)" />
         </div>
@@ -140,14 +140,6 @@ export default {
     id: {
       type: String,
       default: '',
-    },
-    /**
-     * if object array was passed - define the property that should be
-     * displayed in the chip
-     */
-    objectProp: {
-      type: String,
-      default: 'name',
     },
     /**
      * input field label
@@ -211,13 +203,6 @@ export default {
       default: true,
     },
     /**
-     * specify a property (e.g. id, uuid) that can be used for identification
-     */
-    identifier: {
-      type: String,
-      default: '',
-    },
-    /**
      * Role options will set the roles available for the selected entries
      */
     roleOptions: {
@@ -271,8 +256,6 @@ export default {
     },
     /**
      * specify the object property that should be used as identifier
-     * // TODO: this should replace prop 'identifier' in future versions
-     * (better naming)
      */
     identifierPropertyName: {
       type: String,
@@ -280,10 +263,8 @@ export default {
     },
     /**
      * specify the object property that should be used as value to be displayed
-     * // TODO: this should replace prop 'objectProp' in future versions
-     * (better naming)
      */
-    valuePropertyName: {
+    labelPropertyName: {
       type: String,
       default: '',
     },
@@ -306,14 +287,6 @@ export default {
       delete newProps.rolesPlaceholder;
       return newProps;
     },
-    // TODO: this is temporary for backwards compatibility - remove for next major version
-    identifierPropertyNameInt() {
-      return this.identifierPropertyName || this.identifier;
-    },
-    // TODO: this is temporary for backwards compatibility - remove for next major version
-    valuePropertyNameInt() {
-      return this.valuePropertyName || this.objectProp;
-    },
   },
   watch: {
     selectedList(val) {
@@ -329,7 +302,7 @@ export default {
         if (typeof entry === 'object') {
           return { ...entry, ...{ roles: entry.roles || [] } };
         }
-        return { ...{ [this.valuePropertyNameInt]: entry, roles: entry.roles || [] } };
+        return { ...{ [this.labelPropertyName]: entry, roles: entry.roles || [] } };
       }));
     },
     removeEntry(evt, index) {
@@ -354,15 +327,15 @@ export default {
         if (typeof entry === 'object') {
           return { ...{
             roles: [],
-            idInt: this.identifierPropertyNameInt && (entry[this.identifierPropertyNameInt] === 0
-              || entry[this.identifierPropertyNameInt])
-              ? entry[this.identifierPropertyNameInt] : entry[this.valuePropertyNameInt] + index,
+            idInt: this.identifierPropertyName && (entry[this.identifierPropertyName] === 0
+              || entry[this.identifierPropertyName])
+              ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + index,
           },
           ...entry,
           };
         }
         return { ...{
-          [this.valuePropertyNameInt]: entry,
+          [this.labelPropertyName]: entry,
           idInt: this.list.length + index,
           roles: [],
         } };
@@ -386,10 +359,10 @@ export default {
         this.selectedBelowListInt.splice(index, 1);
       } else {
         const modifiedEntry = { ...this.selectedBelowListInt[index] };
-        if (this.identifierPropertyNameInt) {
-          this.$set(modifiedEntry, this.identifierPropertyNameInt, '');
+        if (this.identifierPropertyName) {
+          this.$set(modifiedEntry, this.identifierPropertyName, '');
         }
-        this.$set(modifiedEntry, this.valuePropertyNameInt, event);
+        this.$set(modifiedEntry, this.labelPropertyName, event);
         this.$set(this.selectedBelowListInt, index, modifiedEntry);
       }
       this.emitInternalList(this.selectedBelowListInt);
@@ -401,7 +374,7 @@ export default {
        * @event fetch-dropdown-entries
        * @param {Object} params - an Object with the following properties:
        * @property {string} value - the input string
-       * @property {string} type - the valuePropertyName/objectProp that was specified
+       * @property {string} type - the labelPropertyName that was specified
        *
        */
       this.$emit('fetch-dropdown-entries', params);
