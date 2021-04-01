@@ -2,7 +2,7 @@
 <template>
   <BaseMap
     :markers="markers"
-  />
+    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 </template>
 
 <script>
@@ -34,3 +34,5 @@ export default {
 }
 </script>
 ```
+
+Also see example in combination with [BaseMapLocations](#basemaplocations).

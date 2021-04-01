@@ -25,7 +25,7 @@ export default {
       default: () => [],
     },
     /**
-     * define if popup for markes is used
+     * deactivate popups for markers
      */
     markerPopups: {
       type: Boolean,
@@ -46,97 +46,191 @@ export default {
       default: 32,
     },
     /**
-     * set Leaflet attribution
+     * define map attribution
      */
     attribution: {
       type: String,
       default: 'Source: <a href=https://openstreetmap.se/>OpenStreetMap Sverige</a>',
     },
     /**
-     * set Leaflet copyright
+     * define map copyright
      */
     copyright: {
       type: String,
       default: '<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>',
     },
     /**
-     * set url to map data
+     * define url to map data
      */
     url: {
       type: String,
       default: 'https://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png',
     },
     /**
-     * set zoom factor
+     * define initial zoom factor
      */
     zoom: {
       type: Number,
       default: 16,
     },
     /**
-     * set max zoom factor
+     * define max zoom factor
      */
     maxZoom: {
       type: Number,
       default: 18,
     },
+    /**
+     * set id to highlight marker
+     */
+    highlightMarker: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
+      L: null,
+      map: null,
+      activePopUp: null,
+      boundsPadding: [0, 20],
+      highlightedMarker: null,
+      markerClass: 'base-map-marker-icon',
+      popupOptions: {
+        offset: [10, -25],
+        closeButton: false,
+        keepInView: true,
+      },
       scrollWheelZoom: false,
-      boundsPaddingX: 0,
-      boundsPaddingY: 20,
     };
   },
-  mounted() {
-    if (process.browser) {
-      // eslint-disable-next-line
-      const L = require('leaflet');
+  watch: {
+    highlightMarker(value, before) {
+      if (value !== null) {
+        // close all open popups
+        this.map.closePopup();
 
-      // Initialize Leaflet map
-      const map = L.map(this.$refs.mapElement, {
-        zoom: this.zoom,
-        scrollWheelZoom: this.scrollWheelZoom,
-      });
-
-      // Center map based on Marker(s)
-      const bounds = new L.LatLngBounds(this.markers.map(item => item.latLng));
-      map.fitBounds(bounds, { padding: [this.boundsPaddingX, this.boundsPaddingY] });
-
-      // Draw Leaflet map
-      L.tileLayer(this.url, {
-        maxZoom: this.maxZoom,
-        attribution: [this.attribution, this.copyright].join(', '),
-      }).addTo(map);
-
-      // Custom icon
-      const iconOptions = {
-        className: 'base-map-marker-icon',
-        html: this.icon,
-        iconSize: [this.iconSize, this.iconSize],
-        iconAnchor: [this.iconSize / 2, this.iconSize - 7],
-      };
-      const markerIcon = L.divIcon(iconOptions);
-
-      // Add markers to map
-      if (this.markers.length) {
-        this.markers.forEach((item) => {
-          const initPopup = this.markerPopups && Array.isArray(item.data);
-          const markerOptions = {
-            icon: markerIcon,
-            interactive: initPopup,
-          };
-
-          const marker = L.marker(L.latLng(item.latLng[0], item.latLng[1]), markerOptions);
-
-          if (initPopup) {
-            marker.bindPopup(item.data.join('<br>'));
+        // get all markers and filter by id
+        this.map.eachLayer((layer) => {
+          if (layer.options.id != null && layer.options.id === value) {
+            // eslint-disable-next-line no-underscore-dangle
+            this.highlightedMarker = layer._icon;
+            this.highlightedMarker.classList.add(`${this.markerClass}-active`);
+            this.map.setView(
+              new this.L.LatLng(layer.getLatLng().lat, layer.getLatLng().lng),
+              this.zoom,
+            );
           }
-
-          map.addLayer(marker);
         });
+        return;
       }
+
+      // reset active marker
+      if (this.highlightedMarker != null && this.activePopUp !== before) {
+        this.highlightedMarker.classList.remove(`${this.markerClass}-active`);
+        this.highlightedMarker = null;
+      }
+    },
+  },
+  mounted() {
+    // only execute on clientside
+    if (!process.browser) {
+      return;
     }
+
+    /* eslint-disable global-require */
+    this.L = require('leaflet');
+    require('leaflet-responsive-popup');
+    /* eslint-enable global-require */
+
+    // Initialize Leaflet map
+    this.map = this.L.map(this.$refs.mapElement, {
+      scrollWheelZoom: this.scrollWheelZoom,
+    });
+
+    // Draw Leaflet map
+    this.L.tileLayer(this.url, {
+      maxZoom: this.maxZoom,
+      attribution: [this.attribution, this.copyright].join(', '),
+    }).addTo(this.map);
+
+    // Custom icon
+    const iconOptions = {
+      className: this.markerClass,
+      html: this.icon,
+      iconSize: [this.iconSize, this.iconSize],
+      iconAnchor: [this.iconSize / 2, this.iconSize],
+    };
+    const markerIcon = this.L.divIcon(iconOptions);
+
+    // Add markers to map
+    if (!this.markers.length) {
+      return;
+    }
+
+    this.markers.forEach((item, index) => {
+      const initPopup = this.markerPopups && Array.isArray(item.data);
+      const popup = this.L.responsivePopup(this.popupOptions);
+      const markerOptions = {
+        id: index,
+        icon: markerIcon,
+        interactive: initPopup,
+      };
+
+      // Set popup content
+      if (initPopup) {
+        popup.setContent(item.data.join('<br>'));
+      }
+
+      // Set marker and popup to map
+      this.L.marker(
+        this.L.latLng(item.latLng[0], item.latLng[1]),
+        markerOptions,
+      ).addTo(this.map).bindPopup(popup);
+    });
+
+    // Center map based on Marker(s)
+    // has to be called after markers have been set to map
+    const bounds = new this.L.LatLngBounds(this.markers.map(item => item.latLng));
+    this.map.fitBounds(bounds, {
+      padding: this.boundsPadding,
+      maxZoom: this.zoom,
+    });
+
+    // popup events
+    this.map.on('popupopen', (e) => {
+      /* eslint-disable no-underscore-dangle */
+      const source = e.popup._source;
+      const { id } = source.options;
+      const marker = source._icon;
+      /* eslint-enable no-underscore-dangle */
+
+      // set active state
+      marker.classList.add(`${this.markerClass}-active`);
+      this.activePopUp = id;
+      this.markerState(id);
+    });
+
+    this.map.on('popupclose', (e) => {
+      // eslint-disable-next-line no-underscore-dangle
+      const marker = e.popup._source._icon;
+
+      // reset active state
+      marker.classList.remove(`${this.markerClass}-active`);
+      this.activePopUp = null;
+      this.markerState(null);
+    });
+  },
+  methods: {
+    markerState(value) {
+      /**
+       * Event emitted when marker is clicked and changes active state
+       *
+       * @event selected
+       * @property {string} value - id or null
+       */
+      this.$emit('selected', value);
+    },
   },
 };
 </script>
@@ -148,19 +242,35 @@ export default {
 </style>
 
 <style lang="scss">
-  @import '~leaflet/dist/leaflet.css';
+  /* for some reason this is not working as "leaflet/dist/leaflet.css" (webpack)
+  or "~leaflet/dist/leaflet.css" (rollup)
+  (compare BaseCarousel where exactly the same (first version) IS working */
+  @import '../../../node_modules/leaflet/dist/leaflet.css';
+  @import '../../../node_modules/leaflet-responsive-popup/leaflet.responsive.popup.css';
   @import "../../styles/variables";
 
   /* marker */
-  .base-map-marker-icon > svg path {
-    fill: $app-color;
+  .base-map-marker-icon {
+    > svg path {
+      fill: $app-color;
+      transition: fill 250ms ease-in-out;
+    }
+
+    &-active,
+    &:hover {
+      > svg path {
+        fill: $app-color-secondary;
+      }
+    }
   }
 
   /* popup */
   .leaflet-popup {
-    bottom: inherit !important;
-    top: -25px;
-    left: 20px !important;
+
+    &.leaflet-resp-popup-north-west .leaflet-popup-content-wrapper,
+    &.leaflet-resp-popup-west-south .leaflet-popup-content-wrapper {
+      border-radius: 0;
+    }
   }
 
   .leaflet-popup-tip-container {

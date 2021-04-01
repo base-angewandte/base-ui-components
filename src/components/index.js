@@ -39,6 +39,7 @@ import Toggle from './BaseToggle';
 import UploadBar from './BaseUploadBar';
 import Checkmark from './BaseCheckmark';
 import Map from './BaseMap';
+import MapLocations from './BaseMapLocations';
 import Icon from './BaseIcon';
 import DetailBox from './BaseDetailBox';
 
@@ -81,6 +82,7 @@ export {
   UploadBar as BaseUploadBar,
   Checkmark as BaseCheckmark,
   Map as BaseMap,
+  MapLocations as BaseMapLocations,
   Icon as BaseIcon,
   DetailBox as BaseDetailBox,
   ExpandBox as BaseExpandBox,

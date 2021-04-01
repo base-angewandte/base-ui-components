@@ -6,6 +6,7 @@
       class="base-text-list-group">
       <component
         :is="renderLabelAs"
+        v-if="item.label"
         class="base-text-list-label">
         {{ item.label }}
       </component>
@@ -106,6 +107,7 @@ export default {
         overflow-wrap: break-word;
       }
 
+      // class gets modified in component baseMapLocations
       .base-text-list-content {
         color: $font-color-second;
 

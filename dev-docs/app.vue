@@ -4,14 +4,18 @@
       show-more-text="Show Map and Address"
       show-less-text="Collapse Map and Address">
       <BaseMap
-        :markers="markers"
+        :markers="locations"
         :marker-popups="true"
+        :highlight-marker="highlightedMarker"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        style="height: 368px; margin-bottom: 0.84211rem;" />
+        style="height: 368px; margin-bottom: 0.84211rem;"
+        @selected="highlightLocation" />
 
-      <baseTextList
-        render-label-as="h2"
-        :data="locationAddress" />
+      <base-map-locations
+        label="Addresses"
+        :locations="locations"
+        :highlight-location="highlightedLocation"
+        @selected="highlightMarker" />
     </BaseExpandBox>
   </div>
 </template>
@@ -19,18 +23,20 @@
 <script>
 import BaseMap from '@/components/BaseMap/BaseMap';
 import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
+import BaseMapLocations from '@/components/BaseMapLocations/BaseMapLocations';
 
 export default {
   name: 'App',
   components: {
     BaseMap,
     BaseExpandBox,
-    BaseTextList,
+    BaseMapLocations,
   },
   data() {
     return {
-      markers: [
+      highlightedMarker: null,
+      highlightedLocation: null,
+      locations: [
         {
           latLng: [48.208309, 16.382782],
           data: [
@@ -79,7 +85,12 @@ export default {
 
   },
   methods: {
-
+    highlightLocation(value) {
+      this.highlightedLocation = value;
+    },
+    highlightMarker(value) {
+      this.highlightedMarker = value;
+    },
   },
 };
 </script>
@@ -87,4 +98,32 @@ export default {
 <style lang="scss">
   @import "../src/styles/variables";
 
+  //.base-map-locations {
+  //  display: flex;
+  //  flex-wrap: wrap;
+  //  justify-content: space-between;
+  //
+  //  &__group {
+  //    width: calc(50% - #{$spacing-large});
+  //    margin-bottom: $spacing;
+  //
+  //    .base-text-list-content {
+  //      transition: color 250ms ease-in-out;
+  //    }
+  //
+  //    &--highlight {
+  //      &.base-text-list-content {
+  //        color: $app-color !important;
+  //      }
+  //    }
+  //
+  //    &:hover {
+  //      cursor: default;
+  //
+  //      .base-text-list-content {
+  //        color: $app-color !important;
+  //      }
+  //    }
+  //  }
+  //}
 </style>
