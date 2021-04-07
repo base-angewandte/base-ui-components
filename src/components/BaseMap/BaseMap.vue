@@ -20,12 +20,12 @@ export default {
      *     '1010 Vienna', 'Austria']<br>
      *   }]
      */
-    markers: {
+    marker: {
       type: Array,
       default: () => [],
     },
     /**
-     * deactivate popups for markers
+     * deactivate popups for marker
      */
     markerPopups: {
       type: Boolean,
@@ -87,6 +87,13 @@ export default {
       type: Number,
       default: null,
     },
+    /**
+     * set id of marker to center map
+     */
+    centerMarker: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -105,21 +112,28 @@ export default {
     };
   },
   watch: {
+    centerMarker(value) {
+      if (value !== null) {
+        this.map.setView(
+          this.marker[value].latLng,
+          this.zoom,
+        );
+      }
+    },
     highlightMarker(value, before) {
       if (value !== null) {
         // close all open popups
         this.map.closePopup();
 
-        // get all markers and filter by id
+        // reset all marker
+        this.resetAllMarker();
+
+        // get all marker and filter by id
         this.map.eachLayer((layer) => {
           if (layer.options.id != null && layer.options.id === value) {
             // eslint-disable-next-line no-underscore-dangle
             this.highlightedMarker = layer._icon;
             this.highlightedMarker.classList.add(`${this.markerClass}-active`);
-            this.map.setView(
-              new this.L.LatLng(layer.getLatLng().lat, layer.getLatLng().lng),
-              this.zoom,
-            );
           }
         });
         return;
@@ -163,71 +177,90 @@ export default {
     };
     const markerIcon = this.L.divIcon(iconOptions);
 
-    // Add markers to map
-    if (!this.markers.length) {
+    // Add marker to map
+    if (!this.marker.length) {
       return;
     }
 
-    this.markers.forEach((item, index) => {
-      const initPopup = this.markerPopups && Array.isArray(item.data);
+    this.marker.forEach((item, index) => {
       const popup = this.L.responsivePopup(this.popupOptions);
       const markerOptions = {
         id: index,
         icon: markerIcon,
-        interactive: initPopup,
       };
 
-      // Set popup content
-      if (initPopup) {
-        popup.setContent(item.data.join('<br>'));
-      }
+      // Set marker to map
+      const marker = this.L.marker(this.L.latLng(item.latLng[0], item.latLng[1]), markerOptions)
+        .on('mouseover', this.activateMarker)
+        .on('mouseout', this.resetMarker)
+        .addTo(this.map);
 
-      // Set marker and popup to map
-      this.L.marker(
-        this.L.latLng(item.latLng[0], item.latLng[1]),
-        markerOptions,
-      ).addTo(this.map).bindPopup(popup);
+      // Set popup content
+      if (this.markerPopups && Array.isArray(item.data)) {
+        popup.setContent(item.data.join('<br>'));
+        marker.bindPopup(popup);
+      }
     });
 
     // Center map based on Marker(s)
-    // has to be called after markers have been set to map
-    const bounds = new this.L.LatLngBounds(this.markers.map(item => item.latLng));
+    // has to be called after marker have been set to map
+    const bounds = new this.L.LatLngBounds(this.marker.map(item => item.latLng));
     this.map.fitBounds(bounds, {
       padding: this.boundsPadding,
       maxZoom: this.zoom,
     });
-
-    // popup events
-    this.map.on('popupopen', (e) => {
+  },
+  methods: {
+    activateMarker(e) {
       /* eslint-disable no-underscore-dangle */
-      const source = e.popup._source;
-      const { id } = source.options;
-      const marker = source._icon;
+      const { id } = e.target.options;
+      const marker = e.target._icon;
       /* eslint-enable no-underscore-dangle */
 
-      // set active state
-      marker.classList.add(`${this.markerClass}-active`);
-      this.activePopUp = id;
-      this.markerState(id);
-    });
+      // reset all marker
+      this.resetAllMarker();
 
-    this.map.on('popupclose', (e) => {
+      // set active and populate markerState
+      if (!e.target.options.active) {
+        this.activePopUp = id;
+        this.markerState(id);
+        marker.classList.add(`${this.markerClass}-active`);
+
+        // eslint-disable-next-line no-param-reassign
+        e.target.options.active = true;
+      }
+    },
+    resetMarker(e) {
       // eslint-disable-next-line no-underscore-dangle
-      const marker = e.popup._source._icon;
+      const marker = e.target._icon;
 
-      // reset active state
       marker.classList.remove(`${this.markerClass}-active`);
       this.activePopUp = null;
       this.markerState(null);
-    });
-  },
-  methods: {
+
+      // eslint-disable-next-line no-param-reassign
+      delete e.target.options.active;
+    },
+    resetAllMarker() {
+      this.map.eachLayer((layer) => {
+        // eslint-disable-next-line no-underscore-dangle
+        const marker = layer._icon;
+
+        if (marker) {
+          marker.classList.remove(`${this.markerClass}-active`);
+          this.activePopUp = null;
+          this.markerState(null);
+          // eslint-disable-next-line no-param-reassign
+          delete layer.options.active;
+        }
+      });
+    },
     markerState(value) {
       /**
        * Event emitted when marker is clicked and changes active state
        *
        * @event selected
-       * @property {string} value - id or null
+       * @property {number} value - id or null
        */
       this.$emit('selected', value);
     },

@@ -4,9 +4,10 @@
       show-more-text="Show Map and Address"
       show-less-text="Collapse Map and Address">
       <BaseMap
-        :markers="locations"
+        :marker="locations"
         :marker-popups="true"
         :highlight-marker="highlightedMarker"
+        :center-marker="centeredMarker"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         style="height: 368px; margin-bottom: 0.84211rem;"
         @selected="highlightLocation" />
@@ -15,6 +16,7 @@
         label="Addresses"
         :locations="locations"
         :highlight-location="highlightedLocation"
+        @clicked="centerMarker"
         @selected="highlightMarker" />
     </BaseExpandBox>
   </div>
@@ -36,9 +38,11 @@ export default {
     return {
       highlightedMarker: null,
       highlightedLocation: null,
+      centeredMarker: null,
       locations: [
         {
           latLng: [48.208309, 16.382782],
+          coordinates: [16.382782, 48.208309],
           data: [
             'University of Applied Arts',
             'Oskar Kokoschka-Platz 2',
@@ -48,6 +52,7 @@ export default {
         },
         {
           latLng: [48.209960, 16.381076],
+          coordinates: [16.381076, 48.209960],
           data: [
             'University of Applied Arts',
             'Georg-Coch-Platz 2',
@@ -57,6 +62,7 @@ export default {
         },
         {
           latLng: [48.208248, 16.384965],
+          coordinates: [16.384965, 48.208248],
           data: [
             'University of Applied Arts',
             'Vordere Zollamtsstraße 7',
@@ -66,6 +72,7 @@ export default {
         },
         {
           latLng: [48.207540, 16.381623],
+          coordinates: [16.381623, 48.207540],
           data: ['MAK - Museum Angewandte Kunst'],
         },
       ],
@@ -90,6 +97,9 @@ export default {
     },
     highlightMarker(value) {
       this.highlightedMarker = value;
+    },
+    centerMarker(value) {
+      this.centeredMarker = value;
     },
   },
 };

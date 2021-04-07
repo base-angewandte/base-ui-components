@@ -13,8 +13,9 @@
         :data="[location]"
         :class="['base-map-locations__list__group',
                  { 'base-map-locations__list__group--highlight': index === highlightLocation }]"
-        @click.native="highlightMarker(index)"
-        @mouseleave.native="highlightMarker(null)" />
+        @click.native="click(index)"
+        @mouseenter.native="select(index)"
+        @mouseleave.native="select(null)" />
     </div>
   </div>
 </template>
@@ -54,12 +55,21 @@ export default {
     },
   },
   methods: {
-    highlightMarker(value) {
+    click(value) {
+      /**
+       * Event emitted if marker is clicked
+       *
+       * @event clicked
+       * @property {number} value - id or null
+       */
+      this.$emit('clicked', value);
+    },
+    select(value) {
       /**
        * Event emitted to toggle map marker
        *
        * @event selected
-       * @property {string} value - id or null
+       * @property {number} value - id or null
        */
       this.$emit('selected', value);
     },
