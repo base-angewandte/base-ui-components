@@ -1,5 +1,21 @@
 <template>
   <div class="base-map-locations">
+    <BaseMap
+      :attribution="attribution"
+      :copyright="copyright"
+      :center-marker="centeredMarker"
+      :icon="icon"
+      :icon-size="iconSize"
+      :highlight-marker="highlightedMarker"
+      :marker="locations"
+      :marker-popups="markerPopups"
+      :max-zoom="maxZoom"
+      :style="additionalMapStyles"
+      :url="url"
+      :zoom="zoom"
+      class="base-map-locations__map"
+      @selected="highlightLocation" />
+
     <h2
       v-if="label"
       class="base-map-locations__label">
@@ -12,30 +28,70 @@
         :key="index"
         :data="[location]"
         :class="['base-map-locations__list__group',
-                 { 'base-map-locations__list__group--highlight': index === highlightLocation }]"
-        @click.native="click(index)"
-        @mouseenter.native="select(index)"
-        @mouseleave.native="select(null)" />
+                 { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
+        @click.native="centeredMarker = index"
+        @mouseenter.native="highlightedMarker = index"
+        @mouseleave.native="highlightedMarker = null" />
     </div>
   </div>
 </template>
 
 <script>
+import BaseMap from '@/components/BaseMap/BaseMap';
 import BaseTextList from '@/components/BaseTextList/BaseTextList';
 
 /**
- * A component to display locations and interact with component BaseMap
+ * A component to display Basemap, locations-list and interact with each other
  */
 
 export default {
   name: 'BaseMapLocations',
   components: {
+    BaseMap,
     BaseTextList,
   },
   props: {
+    /**
+     * set additional styles for map e.g. height
+     */
+    additionalMapStyles: {
+      type: Object,
+      default: () => ({ height: '368px' }),
+    },
+    /**
+     * define map attribution
+     */
+    attribution: {
+      type: String,
+      default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
+    },
+    /**
+     * define map copyright
+     */
+    copyright: {
+      type: String,
+      default: '<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>',
+    },
+    /*
+     * define icon
+     */
+    icon: {
+      type: String,
+      default: '<svg viewBox="0 0 70.866 70.866" xmlns="http://www.w3.org/2000/svg"><path d="m35.433 0a22.731 22.731 0 0 0-22.731 22.82 24.125 24.125 0 0 0 1.872 9.1814l19.611 38.063a1.3718 1.3718 0 0 0 2.496 0l19.611-38.063a22.249 22.249 0 0 0 1.872-9.1814 22.731 22.731 0 0 0-22.731-22.82zm0 32.858a10.216 10.216 0 1 1 10.216-10.216 10.241 10.241 0 0 1-10.216 10.216z" fill="#010101"/></svg>',
+    },
+    /**
+     * define icon size
+     */
+    iconSize: {
+      type: Number,
+      default: 32,
+    },
+    /**
+     * define label for the locations-list
+     */
     label: {
       type: String,
-      default: '',
+      default: 'Addresses',
     },
     /**
      * define locations<br>
@@ -49,29 +105,45 @@ export default {
       type: Array,
       default: () => [],
     },
-    highlightLocation: {
+    /**
+     * deactivate popups for marker
+     */
+    markerPopups: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define max zoom factor
+     */
+    maxZoom: {
       type: Number,
-      default: null,
+      default: 18,
+    },
+    /**
+     * define url to map data
+     */
+    url: {
+      type: String,
+      default: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    },
+    /**
+     * define initial zoom factor
+     */
+    zoom: {
+      type: Number,
+      default: 16,
     },
   },
+  data() {
+    return {
+      highlightedMarker: null,
+      highlightedLocation: null,
+      centeredMarker: null,
+    };
+  },
   methods: {
-    click(value) {
-      /**
-       * Event emitted if marker is clicked
-       *
-       * @event clicked
-       * @property {number} value - id or null
-       */
-      this.$emit('clicked', value);
-    },
-    select(value) {
-      /**
-       * Event emitted to toggle map marker
-       *
-       * @event selected
-       * @property {number} value - id or null
-       */
-      this.$emit('selected', value);
+    highlightLocation(value) {
+      this.highlightedLocation = value;
     },
   },
 };
@@ -81,6 +153,10 @@ export default {
   @import "../../styles/variables";
 
   .base-map-locations {
+
+    &__map {
+      margin-bottom: $spacing;
+    }
 
     &__list {
       display: flex;

@@ -13,7 +13,49 @@ export default {
   name: 'BaseMap',
   props: {
     /**
-     * define Markers<br>
+     * define map attribution
+     */
+    attribution: {
+      type: String,
+      default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
+    },
+    /**
+     * set array id of marker to center map from outside
+     */
+    centerMarker: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * define map copyright
+     */
+    copyright: {
+      type: String,
+      default: '<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>',
+    },
+    /**
+     * set array id of marker to highlight it from outside
+     */
+    highlightMarker: {
+      type: Number,
+      default: null,
+    },
+    /*
+     * define icon
+     */
+    icon: {
+      type: String,
+      default: '<svg viewBox="0 0 70.866 70.866" xmlns="http://www.w3.org/2000/svg"><path d="m35.433 0a22.731 22.731 0 0 0-22.731 22.82 24.125 24.125 0 0 0 1.872 9.1814l19.611 38.063a1.3718 1.3718 0 0 0 2.496 0l19.611-38.063a22.249 22.249 0 0 0 1.872-9.1814 22.731 22.731 0 0 0-22.731-22.82zm0 32.858a10.216 10.216 0 1 1 10.216-10.216 10.241 10.241 0 0 1-10.216 10.216z" fill="#010101"/></svg>',
+    },
+    /**
+     * define icon size
+     */
+    iconSize: {
+      type: Number,
+      default: 32,
+    },
+    /**
+     * define marker<br>
      *   structure: [{<br>
      *     latLng: [48.208309, 16.382782],<br>
      *     data: [ 'University of Applied Arts', 'Oskar Kokoschka-Platz 2',
@@ -31,48 +73,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    /*
-     * define icon
-     */
-    icon: {
-      type: String,
-      default: '<svg viewBox="0 0 70.866 70.866" xmlns="http://www.w3.org/2000/svg"><path d="m35.433 0a22.731 22.731 0 0 0-22.731 22.82 24.125 24.125 0 0 0 1.872 9.1814l19.611 38.063a1.3718 1.3718 0 0 0 2.496 0l19.611-38.063a22.249 22.249 0 0 0 1.872-9.1814 22.731 22.731 0 0 0-22.731-22.82zm0 32.858a10.216 10.216 0 1 1 10.216-10.216 10.241 10.241 0 0 1-10.216 10.216z" fill="#010101"/></svg>',
-    },
-    /**
-     * define icon size
-     */
-    iconSize: {
-      type: Number,
-      default: 32,
-    },
-    /**
-     * define map attribution
-     */
-    attribution: {
-      type: String,
-      default: 'Source: <a href=https://openstreetmap.se/>OpenStreetMap Sverige</a>',
-    },
-    /**
-     * define map copyright
-     */
-    copyright: {
-      type: String,
-      default: '<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>',
-    },
-    /**
-     * define url to map data
-     */
-    url: {
-      type: String,
-      default: 'https://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png',
-    },
-    /**
-     * define initial zoom factor
-     */
-    zoom: {
-      type: Number,
-      default: 16,
-    },
     /**
      * define max zoom factor
      */
@@ -81,18 +81,18 @@ export default {
       default: 18,
     },
     /**
-     * set id to highlight marker
+     * define url to map data
      */
-    highlightMarker: {
-      type: Number,
-      default: null,
+    url: {
+      type: String,
+      default: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     },
     /**
-     * set id of marker to center map
+     * define initial zoom factor
      */
-    centerMarker: {
+    zoom: {
       type: Number,
-      default: null,
+      default: 16,
     },
   },
   data() {

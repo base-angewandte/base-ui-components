@@ -1,15 +1,14 @@
 ```vue
 <template>
   <BaseMap
-    :markers="markers"
-    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    :marker="marker" />
 </template>
 
 <script>
 export default {
   data() {
     return {
-      markers: [
+      marker: [
         {
           latLng: [48.208309, 16.382782],
           data: [
@@ -34,5 +33,3 @@ export default {
 }
 </script>
 ```
-
-Also see example in combination with [BaseMapLocations](#basemaplocations).
