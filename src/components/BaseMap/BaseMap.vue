@@ -67,7 +67,7 @@ export default {
       default: () => [],
     },
     /**
-     * deactivate popups for marker
+     * show popups for marker
      */
     markerPopups: {
       type: Boolean,
