@@ -5,6 +5,18 @@ module.exports = {
       type: 'text',
     },
     {
+      label: 'Persons',
+      type: 'text',
+    },
+    {
+      label: 'Institutions',
+      type: 'text',
+    },
+    {
+      label: 'Albums',
+      type: 'text',
+    },
+    {
       label: 'Newest Events',
       type: 'text',
     },
@@ -75,12 +87,28 @@ module.exports = {
         }],
     },
     {
-      label: 'collection',
+      label: 'Subset',
       type: 'chips',
       options: [
         {
           label: 'Current Art Works',
           id: 'Current_Art_Works',
+        },
+        {
+          label: 'Person',
+          id: 'Person',
+        },
+        {
+          label: 'Institution',
+          id: 'Institution',
+        },
+        {
+          label: 'Album',
+          id: 'Album',
+        },
+        {
+          label: 'Location',
+          id: 'Location',
         },
         {
           label: 'Newest Events',

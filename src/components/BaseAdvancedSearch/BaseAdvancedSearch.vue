@@ -4,18 +4,18 @@
       <BaseAdvancedSearchRow
         v-for="(filter, index) in appliedFilters"
         :key="'filter-' + index"
-        :search-row-id="`${filter[identifierPropertyName.filter]}_${index}`"
+        :search-row-id="getRowId()"
         :is-main-search="false"
-        :autocomplete-results="filterAutocompleteResults
-          [`${filter[identifierPropertyName.filter]}_${index}`]"
+        :autocomplete-results="filtersAutocompleteResults[index + 1]"
         :filter-list="filterList"
         :applied-filter="filter"
-        :is-loading="filterLoadingState[`${filter[identifierPropertyName.filter]}_${index}`]"
+        :is-loading="filtersLoadingState[index + 1]"
         :default-filter="defaultFilter"
+        :autocomplete-property-names="autocompletePropertyNames"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
-        @fetch-autocomplete-results="fetchAutocomplete($event, filter)" />
+        @fetch-autocomplete-results="fetchAutocomplete($event, filter, index + 1)" />
     </template>
 
     <BaseAdvancedSearchRow
@@ -24,7 +24,7 @@
       :applied-filter.sync="mainFilter"
       :filter-list="filterList"
       :default-filter="defaultFilter"
-      :autocomplete-results="filterAutocompleteResults.main"
+      :autocomplete-results="filtersAutocompleteResults[0]"
       :advanced-search-text="{
         title: 'A longer longer longer test string',
         subtext: 'Select a filter',
@@ -34,14 +34,16 @@
         selectFilterLabel: 'Select filter',
         searchLabel: 'Search for Entries',
       }"
-      :is-loading="filterLoadingState.main"
+      :is-loading="filtersLoadingState[0]"
+      :autocomplete-property-names="autocompletePropertyNames"
       @add-filter="addFilter"
-      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter)" />
+      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
   </div>
 </template>
 
 <script>
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import { createId } from '@/utils/utils';
 
 export default {
   name: 'BaseAdvancedSearch',
@@ -207,54 +209,76 @@ export default {
       type: [Object, String],
       default: () => ({
         filter: 'label',
-        // TODO: change to 'label'
-        autocompleteOption: 'header',
+        autocompleteOption: 'title',
         controlledVocabularyOption: 'label',
       }),
+    },
+    /**
+     * autocomplete results need a collection and a data property that contains all the actual
+     * autocomplete results for that specific category
+     * TODO: make category optional
+     */
+    autocompletePropertyNames: {
+      type: Object,
+      default: () => ({
+        collection: 'collection',
+        data: 'data',
+      }),
+      // check if all the necessary attributes are included in the provided object
+      validator: val => ['collection', 'data'].every(key => Object.keys(val).includes(key)),
+    },
+    /**
+     * set the filter that is currently loading autocomplete results from outside
+     */
+    isLoadingIndex: {
+      type: Number,
+      default: -1,
     },
   },
   data() {
     return {
+      /**
+       * internal variable to handle applied filters also when set from outside
+       * @type {Object[]}
+       */
       appliedFiltersInt: [],
+      /**
+       * the filter used in the main search field - not added to applied filters yet
+       * @type {Object}
+       */
       mainFilter: { ...this.defaultFilter },
-      filterStates: [],
+      /**
+       * store the autocomplete results for each filter in this variable to have
+       * it available even when other filter was used in the meantime
+       * @type {Object[]}
+       */
+      filtersAutocompleteResults: [],
+      /**
+       * a variable storing the info for which filter autocomplete results were
+       * requested
+       * @type {number}
+       */
+      autocompleteIndex: -1,
     };
   },
   computed: {
-    filterLoadingState() {
-      console.log('recalc filters');
-      return this.appliedFilters
-        .reduce((prev, curr, index) => ({
-          ...prev,
-          [`${curr[this.identifierPropertyName.filter]}_${index}`]: false,
-        }), { main: false });
+    filtersLoadingState() {
+      return [
+        // add one in the beginning for main search field (not added to applied filters array yet)
+        this.isLoadingIndex === 0,
+        ...this.appliedFilters
+          .map((filter, index) => (this.isLoadingIndex === index + 1)),
+      ];
     },
-    filterAutocompleteResults() {
-      return this.appliedFilters
-        .reduce((prev, curr, index) => ({
-          ...prev,
-          [`${curr[this.identifierPropertyName.filter]}_${index}`]: [],
-        }), { main: [] });
+  },
+  watch: {
+    autocompleteResults(val) {
+      if (this.autocompleteIndex >= 0) {
+        this.$set(this.filtersAutocompleteResults, this.autocompleteIndex, [...val]);
+      }
     },
-    // filterStates() {
-    //   return this.appliedFilters
-    //     .reduce((prev, curr, index) => ({
-    //       ...prev,
-    //       [`${curr[this.identifierPropertyName.filter]}_${index}`]: {
-    //         isLoading: false,
-    //         autocompleteResults: [],
-    //       },
-    //     }), { main: {
-    //       isLoading: false,
-    //       autocompleteResults: [],
-    //     } });
-    // },
   },
   created() {
-  },
-  updated() {
-    console.log(this.filterLoadingState);
-    console.log(this.filterAutocompleteResults);
   },
   methods: {
     addFilter(filter) {
@@ -268,16 +292,24 @@ export default {
       this.$set(this.appliedFilters, index, filter);
       this.search();
     },
-    fetchAutocomplete() {
-      console.log('fetch autocomplete');
+    fetchAutocomplete(event, filter, index) {
+      this.autocompleteIndex = index;
+      this.$emit('fetch-autocomplete', event, index);
     },
     async search() {
-      await this.$emit('trigger-search', this.appliedFilters);
+      await this.$emit('search', this.appliedFilters);
+    },
+    getRowId() {
+      return createId();
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import "../../styles/variables";
 
+.base-advanced-search__filter-row {
+  margin-bottom: $spacing;
+}
 </style>

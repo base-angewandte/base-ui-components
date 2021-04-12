@@ -101,19 +101,18 @@
     </div>
 
     <!-- DROP DOWN BODY -->
-    <!-- TODO: make 'collection' and 'data' customizable! -->
     <BaseDropDownList
       v-if="showDropDown"
       :drop-down-options="resultListInt"
-      :active-option="{ collection: activeCollection }"
+      :active-option="{ [autocompletePropertyNames.collection]: activeCollection }"
       :display-as-drop-down="false"
       :has-sub-options="true"
       :active-styled="false"
       :list-id="'autocomplete-options-' + internalRowId"
       :use-custom-option-active-background-color="true"
       :language="language"
-      identifier-property-name="collection"
-      label-property-name="data"
+      :identifier-property-name="autocompletePropertyNames.collection"
+      :label-property-name="autocompletePropertyNames.data"
       class="base-advanced-search-row__drop-down-body">
       <template v-slot:before-list>
         <div
@@ -176,21 +175,21 @@
         <div
           v-if="!filter || filter.type === 'text'"
           class="base-advanced-search-row__autocomplete-body">
-          <!-- TODO: customize data and collection object property -->
           <div
-            v-if="slotProps.option.data.length"
+            v-if="slotProps.option[autocompletePropertyNames.data].length"
             :class="['base-advanced-search-row__first-column',
                      'base-advanced-search-row__autocomplete-collection',
                      { 'base-advanced-search-row__result-column-active':
-                       slotProps.option.collection === activeCollection }]">
+                       slotProps.option[autocompletePropertyNames.collection] === activeCollection }
+            ]">
             <div class="base-advanced-search-row__autocomplete-collection-text">
-              {{ slotProps.option.collection }}
+              {{ slotProps.option[autocompletePropertyNames.collection] }}
             </div>
           </div>
 
           <!-- AUTOCOMPLETE OPTIONS -->
           <BaseDropDownList
-            :drop-down-options="slotProps.option.data"
+            :drop-down-options="slotProps.option[autocompletePropertyNames.data]"
             :active-option.sync="activeEntry"
             :display-as-drop-down="false"
             :list-id="'autocomplete-options-' + internalRowId"
@@ -198,7 +197,8 @@
             :identifier-property-name="identifierPropertyName.autocompleteOption"
             :label-property-name="labelPropertyName.autocompleteOption"
             class="base-advanced-search-row__autocomplete-options"
-            @update:active-option="setCollection(slotProps.option.collection)"
+            @update:active-option="setCollection(slotProps
+              .option[autocompletePropertyNames.collection])"
             @update:selected-option="addOption" />
         </div>
       </template>
@@ -496,10 +496,23 @@ export default {
       type: [Object, String],
       default: () => ({
         filter: 'label',
-        // TODO: change to 'label'
-        autocompleteOption: 'header',
+        autocompleteOption: 'title',
         controlledVocabularyOption: 'label',
       }),
+    },
+    /**
+     * autocomplete results need a collection and a data property that contains all the actual
+     * autocomplete results for that specific category
+     * TODO: make category optional
+     */
+    autocompletePropertyNames: {
+      type: Object,
+      default: () => ({
+        collection: 'collection',
+        data: 'data',
+      }),
+      // check if all the necessary attributes are included in the provided object
+      validator: val => ['collection', 'data'].every(key => Object.keys(val).includes(key)),
     },
   },
   data() {
@@ -509,6 +522,8 @@ export default {
        * @type {?string}
        */
       currentInput: '',
+      // TODO: use this variable to be able to set list internally
+      autocompleteResultsInt: [],
       // current filter
       // TODO: a) adjust to actual filter structure
       /**
@@ -588,7 +603,7 @@ export default {
       },
     },
     /**
-     * the actually displayed autocomplete options
+     * the actually displayed controlled vocabulary options
      * (filtered for already selected and for the current input string)
      *
      * @returns Object[]
@@ -643,24 +658,38 @@ export default {
      * filtered autocomplete list, e.g. removing collections with no results
      * and options that were already selected
      * @type {Object[]} resultListInt
+     * @returns {Object[]}
      */
     resultListInt() {
-      if (!this.displayedOptions.length) {
+      if (this.filter.type === 'text') {
+        console.log(this.autocompleteResults);
+        let resultsToDisplay = this.autocompleteResults;
+        // if a filter is not default filter then only show autocomplete results that
+        // have same category as selected text filter
+        if (this.filter[this.identifierPropertyName.filter]
+          !== this.defaultFilter[this.identifierPropertyName.filter]) {
+          resultsToDisplay = resultsToDisplay
+            .filter(section => section[this.autocompletePropertyNames.collection]
+              === this.filter[this.identifierPropertyName.filter]);
+        }
         // filter empty collections
-        const resultsToDisplay = this.autocompleteResults
-          .filter(section => section.data && section.data.length);
+        resultsToDisplay = resultsToDisplay
+          .filter(section => section[this.autocompletePropertyNames.data]
+            && section[this.autocompletePropertyNames.data].length);
         // filter options already selected previously
         if (this.selectedOptions && this.selectedOptions.length) {
           const selectedOptionIds = this.selectedOptions
             .map(option => option[this.identifierPropertyName.autocompleteOption]);
-          return resultsToDisplay.map(({ data, collection }) => ({
-            data: data.filter(entry => !selectedOptionIds
+          return resultsToDisplay.map(section => ({
+            data: section[this.autocompletePropertyNames.data].filter(entry => !selectedOptionIds
               .includes(entry[this.identifierPropertyName.autocompleteOption])),
-            collection,
+            [this.autocompletePropertyNames.collection]:
+              section[this.autocompletePropertyNames.collection],
           }));
         }
         return resultsToDisplay;
       }
+      console.log('returning empty array');
       return [];
     },
     /**
@@ -671,7 +700,8 @@ export default {
     consolidatedResultList() {
       const resultObject = {};
       this.resultListInt.forEach((section) => {
-        resultObject[section.collection] = section.data;
+        resultObject[section[this
+          .autocompletePropertyNames.collection]] = section[this.autocompletePropertyNames.data];
       });
       return resultObject;
     },
@@ -722,7 +752,9 @@ export default {
     // when current input changes emit this to parent component which should
     // do the fetching of autocomplete results
     currentInput(val) {
-      if (typeof val === 'string') {
+      console.log('current INput changed');
+      if (this.filter.type === 'text') {
+        console.log('Fetch');
         /**
          * event emitted when input string for text or chips filter changes
          *
@@ -960,11 +992,13 @@ export default {
           // if there is no active Collection (could happen due to hover)
           // set the first item in array
           if (!this.activeCollection) {
-            this.activeCollection = this.resultListInt[0].collection;
+            this.activeCollection = this
+              .resultListInt[0][this.autocompletePropertyNames.collection];
           }
           // get the index of the currently active collection
           const currentCollectionIndex = this.resultListInt
-            .map(section => section.collection).indexOf(this.activeCollection);
+            .map(section => section[this.autocompletePropertyNames.collection])
+            .indexOf(this.activeCollection);
           let currentCollectionArray = this.consolidatedResultList[this.activeCollection];
           // depending if arrow was up or down set +/- one to add or subtract
           // generically
@@ -994,8 +1028,8 @@ export default {
             this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
           )) {
             // set the new active collection
-            this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd]
-              .collection;
+            this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd][this
+              .autocompletePropertyNames.collection];
             currentCollectionArray = this.consolidatedResultList[this.activeCollection];
             // define which element in the newly active collection should appear active
             // if collection select or arrow up - first one otherwise last

@@ -22,39 +22,21 @@
           },
         },
       }" />
-    <div class="base-advanced-search">
-      <template v-if="appliedFilters && appliedFilters.length">
-        <BaseAdvancedSearchRow
-          v-for="(filter, index) in appliedFilters"
-          :key="'filter-' + index"
-          :applied-filter="filter"
-          :filter-list="filters"
-          :autocomplete-results="resultList"
-          :is-loading="autocompleteRequestOngoing"
-          class="base-advanced-search__filter-row"
-          @remove-filter="removeFilter($event, index)"
-          @update:applied-filter="updateFilter($event, index)"
-          @fetch-autocomplete-results="fetchAutocomplete($event, filter)" />
-      </template>
-
-      <BaseAdvancedSearchRow
-        :is-main-search="true"
-        :applied-filter.sync="currentFilter"
-        :filter-list="filters"
-        :autocomplete-results="resultList"
-        :advanced-search-text="{
-          title: 'A longer longer longer test string',
-          subtext: 'Select a filter',
-          availableOptions: 'Available options',
-          addFilter: 'Add filter',
-          removeFilter: 'Remove filter',
-          selectFilterLabel: 'Select filter',
-          searchLabel: 'Search for Entries',
-        }"
-        :is-loading="autocompleteRequestOngoing"
-        @add-filter="addFilter"
-        @fetch-autocomplete-results="fetchAutocomplete($event, currentFilter)" />
-    </div>
+    <BaseAdvancedSearch
+      :filter-list="filters"
+      :autocomplete-results="resultList"
+      :advanced-search-text="{
+        title: 'A longer longer longer test string',
+        subtext: 'Select a filter',
+        availableOptions: 'Available options',
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
+      }"
+      :autocomplete-property-names="{ collection: 'subset', data: 'data' }"
+      :is-loading-index="autocompleteRequestOngoing"
+      @fetch-autocomplete="fetchAutocomplete" />
   </div>
 </template>
 
@@ -62,20 +44,20 @@
 import axios from 'axios';
 
 import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
 
 export default {
   name: 'App',
   components: {
+    BaseAdvancedSearch,
     BaseCarousel,
-    BaseAdvancedSearchRow,
   },
   data() {
     return {
       currentFilter: null,
       fieldValueInt: [],
       fetchDropDownList: [],
-      autocompleteRequestOngoing: false,
+      autocompleteRequestOngoing: -1,
       dropDownList: [
         {
           source: '1',
@@ -129,7 +111,7 @@ export default {
       filters: [],
       appliedFilters: [],
       // autcomplete result list
-      resultListOriginal: [{ collection: 'Institution', data: [{ id: 'i:AtyPMbCGvo87shMwRZikwQ', score: 13.0, header: 'Zebra - Zentrum für Klassische und Moderne Fotografie', subtext: ['Wien, Austria'] }, { id: 'i:kK2kZPzffLknjWhuHxU6sa', score: 13.0, header: 'Zentrum für Erwachsenenbildung', subtext: ['Strobl'] }, { id: 'i:QpNo2ZUPzPKM7wJDSy7F4h', score: 13.0, header: 'H2 - Zentrum für Gegenwartskunst', subtext: ['Augsburg'] }, { id: 'i:A6iu4gLU7bGS5kpAE9pTUf', score: 13.0, header: 'Tomi Ungerer Museum - Internationales Zentrum für Illustration', subtext: ['Strasbourg'] }, { id: 'i:FmHikVmyQJuyynSx7NCsNe', score: 13.0, header: 'Zentrum für Interdisziplinäre Forschnung', subtext: ['ZIF', 'Bielefeld'] }, { id: 'i:R4YjbtHGNsbKzfwyRDF5XJ', score: 13.0, header: 'BrotfabrikGalerie', subtext: ['Zentrum für Kunst & Kultur', 'Berlin, AT'] }, { id: 'i:PYqY6pTrmUgZpnRRhmkgY6', score: 13.0, header: 'Zentrum für Kunst und Kommunikation', subtext: ['Z.K.K.', 'Wien, Austria'] }, { id: 'i:gpptGbzV9f7uYAmxTjyjMg', score: 13.0, header: 'Zentrum für Kunst und Medientechnologie', subtext: ['ZKM', 'Karlsruhe'] }, { id: 'i:Q4AAfWUC6GkHUdRxc7ChxC', score: 13.0, header: 'Open Space - Zentrum für Kunstprojekte', subtext: ['Wien, Austria'] }, { id: 'i:SxX6iZszMJv7M7n54ej6BK', score: 13.0, header: 'Zentrum für Literatur- und Kulturforschung Berlin', subtext: ['Geisteswissenschaftliche Zentren Berlin e.V.', 'Berlin'] }] }, { collection: 'Preis', data: [{ id: 'i:qQCn2jtewXhKnLVsFaHgk6', score: 13.0, header: 'Artist-in-Residenz, Zentrum für Kunst und Medien, Institut für Visuelle Medien, Karlsruhe', subtext: [] }, { id: 'i:X44M8fjtLCXfYvhVMo4gRP', score: 13.0, header: 'Ankauf "Interactive Plant Growing", Zentrum für Medientechnologie Karlsruhe, Germany', subtext: [] }] }, { collection: 'Einzelperson', data: [] }, { collection: 'Kunstgruppe', data: [{ id: 'p:3WU9EBchgTFjE9g5zjUciF', score: 13.0, header: 'Zentrum für politische Schönheit ZPS', subtext: [], description1: { type: 'placedate', value: 'Berlin' } }] }, { collection: 'Event', data: [] }, { collection: 'Projekt', data: [] }, { collection: 'Nachlass', data: [] }, { collection: 'Werk', data: [] }, { collection: 'Archivalie', data: [{ id: 'o:EyZZcmBi6NvBfap2934mah', score: 13.0, header: 'Informationsfolder: Donau-Universität Krems/ Zentrum für Bildwissenschaften. Neuer Lehrgang Bildmanagement, Bildwissenschaft', subtext: [], description2: { text_german: ['Neu startende Universitätslehrgänge Bildmanagement und Bildwissenschaft an der Donau Universität Krems.'], text_english: '' } }] }, { collection: 'Medienbeitrag', data: [] }, { collection: 'Publikation', data: [{ id: 'o:i5aAZLd7APjjhMML55Bi89', score: 13.0, header: 'Museum Gugging als kommendes Zentrum für Art Brut', subtext: ['Text', '', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:fobdG7rNBQ2QDvvaQhJ2mN', score: 13.0, header: 'Neues Zentrum für visuelle Kultur', subtext: ['Text', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:CXQMydrwsUKnf8uDS3KduV', score: 13.0, header: 'Neues Zentrum für zeitgenössische Kunstgeschichte', subtext: ['Text', 'Henriette Horny', ''], description2: { text_german: '', text_english: '' } }] }],
+      resultListOriginal: [{ subset: 'Current Art Works', data: [{ id: 'i:AtyPMbCGvo87shMwRZikwQ', score: 13.0, title: 'Zebra - Zentrum für Klassische und Moderne Fotografie', subtext: ['Wien, Austria'] }, { id: 'i:kK2kZPzffLknjWhuHxU6sa', score: 13.0, title: 'Zentrum für Erwachsenenbildung', subtext: ['Strobl'] }, { id: 'i:QpNo2ZUPzPKM7wJDSy7F4h', score: 13.0, title: 'H2 - Zentrum für Gegenwartskunst', subtext: ['Augsburg'] }, { id: 'i:A6iu4gLU7bGS5kpAE9pTUf', score: 13.0, title: 'Tomi Ungerer Museum - Internationales Zentrum für Illustration', subtext: ['Strasbourg'] }, { id: 'i:FmHikVmyQJuyynSx7NCsNe', score: 13.0, title: 'Zentrum für Interdisziplinäre Forschnung', subtext: ['ZIF', 'Bielefeld'] }, { id: 'i:R4YjbtHGNsbKzfwyRDF5XJ', score: 13.0, title: 'BrotfabrikGalerie', subtext: ['Zentrum für Kunst & Kultur', 'Berlin, AT'] }, { id: 'i:PYqY6pTrmUgZpnRRhmkgY6', score: 13.0, title: 'Zentrum für Kunst und Kommunikation', subtext: ['Z.K.K.', 'Wien, Austria'] }, { id: 'i:gpptGbzV9f7uYAmxTjyjMg', score: 13.0, title: 'Zentrum für Kunst und Medientechnologie', subtext: ['ZKM', 'Karlsruhe'] }, { id: 'i:Q4AAfWUC6GkHUdRxc7ChxC', score: 13.0, title: 'Open Space - Zentrum für Kunstprojekte', subtext: ['Wien, Austria'] }, { id: 'i:SxX6iZszMJv7M7n54ej6BK', score: 13.0, title: 'Zentrum für Literatur- und Kulturforschung Berlin', subtext: ['Geisteswissenschaftliche Zentren Berlin e.V.', 'Berlin'] }] }, { subset: 'Newest Events', data: [{ id: 'i:qQCn2jtewXhKnLVsFaHgk6', score: 13.0, title: 'Artist-in-Residenz, Zentrum für Kunst und Medien, Institut für Visuelle Medien, Karlsruhe', subtext: [] }, { id: 'i:X44M8fjtLCXfYvhVMo4gRP', score: 13.0, title: 'Ankauf "Interactive Plant Growing", Zentrum für Medientechnologie Karlsruhe, Germany', subtext: [] }] }, { subset: 'Einzelperson', data: [] }, { subset: 'Persons', data: [{ id: 'p:3WU9EBchgTFjE9g5zjUciF', score: 13.0, title: 'Zentrum für politische Schönheit ZPS', subtext: [], description1: { type: 'placedate', value: 'Berlin' } }] }, { subset: 'asdfasdffff', data: [] }, { subset: 'asdfasdf', data: [] }, { subset: 'Nachlass', data: [] }, { subset: 'Werk', data: [] }, { subset: 'Institutions', data: [{ id: 'o:EyZZcmBi6NvBfap2934mah', score: 13.0, title: 'Informationsfolder: Donau-Universität Krems/ Zentrum für Bildwissenschaften. Neuer Lehrgang Bildmanagement, Bildwissenschaft', subtext: [], description2: { text_german: ['Neu startende Universitätslehrgänge Bildmanagement und Bildwissenschaft an der Donau Universität Krems.'], text_english: '' } }] }, { subset: 'Medienbeitrag', data: [] }, { subset: 'Album', data: [{ id: 'o:i5aAZLd7APjjhMML55Bi89', score: 13.0, title: 'Museum Gugging als kommendes Zentrum für Art Brut', subtext: ['Text', '', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:fobdG7rNBQ2QDvvaQhJ2mN', score: 13.0, title: 'Neues Zentrum für visuelle Kultur', subtext: ['Text', 'apa - Austria Presse Agentur'], description2: { text_german: '', text_english: '' } }, { id: 'o:CXQMydrwsUKnf8uDS3KduV', score: 13.0, title: 'Neues Zentrum für zeitgenössische Kunstgeschichte', subtext: ['Text', 'Henriette Horny', ''], description2: { text_german: '', text_english: '' } }] }],
       resultList: [],
       list: [
         {
@@ -325,24 +307,24 @@ export default {
     this.filters = result.data || [];
   },
   methods: {
-    fetchAutocomplete(searchString) {
-      if (searchString) {
-        this.autocompleteRequestOngoing = true;
-        setTimeout(() => {
-          this.resultList = this.resultListOriginal.map(({ collection, data }) => {
+    fetchAutocomplete(searchString, filterIndex) {
+      this.autocompleteRequestOngoing = filterIndex;
+      setTimeout(() => {
+        if (searchString) {
+          this.resultList = this.resultListOriginal.map(({ subset, data }) => {
             const filteredResults = data
-              .filter(entry => entry.header.toLowerCase()
+              .filter(entry => entry.title.toLowerCase()
                 .includes(searchString.toLowerCase()));
             return {
-              collection,
+              subset,
               data: filteredResults,
             };
           });
-          this.autocompleteRequestOngoing = false;
-        }, 1000);
-      } else {
-        this.resultList = [];
-      }
+        } else {
+          this.resultList = [];
+        }
+        this.autocompleteRequestOngoing = -1;
+      }, 1000);
     },
     updateFilter(filter, index) {
       this.$set(this.appliedFilters, index, filter);
@@ -370,10 +352,6 @@ export default {
 
 <style lang="scss">
   @import "../src/styles/variables";
-
-  .base-advanced-search__filter-row {
-    margin-bottom: 16px;
-  }
 
   .dropdown-extended {
     border-top: $separation-line;
