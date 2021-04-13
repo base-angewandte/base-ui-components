@@ -857,6 +857,7 @@ export default {
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
+        debugger;
         this.filter = { ...selectedFilter,
           ...{
             values: this.setFilterValues(selectedFilter.type, this.filter.values),
@@ -1080,6 +1081,12 @@ export default {
           date_to: val ? val.date_to : '',
         };
       }
+      // if type is text keep options that dont have an id (= were entered as freetext);
+      // TODO: if switch is from no-filter to certain filter also entries with certain collection
+      //  could be kept... (but collection is not saved atm)
+      if (val && type === 'text') {
+        return val.filter(option => !option[this.identifierPropertyName.autocompleteOption]);
+      }
       return [];
     },
 
@@ -1205,7 +1212,6 @@ export default {
               cursor: pointer;
               color: $app-color;
               padding: $spacing-small/2 $spacing;
-              text-align: center;
 
               &:focus {
                 outline: none;
