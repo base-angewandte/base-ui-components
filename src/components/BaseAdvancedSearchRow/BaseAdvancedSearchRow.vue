@@ -662,7 +662,6 @@ export default {
      */
     resultListInt() {
       if (this.filter.type === 'text') {
-        console.log(this.autocompleteResults);
         let resultsToDisplay = this.autocompleteResults;
         // if a filter is not default filter then only show autocomplete results that
         // have same category as selected text filter
@@ -689,7 +688,6 @@ export default {
         }
         return resultsToDisplay;
       }
-      console.log('returning empty array');
       return [];
     },
     /**
@@ -752,9 +750,7 @@ export default {
     // when current input changes emit this to parent component which should
     // do the fetching of autocomplete results
     currentInput(val) {
-      console.log('current INput changed');
       if (this.filter.type === 'text') {
-        console.log('Fetch');
         /**
          * event emitted when input string for text or chips filter changes
          *
@@ -1005,6 +1001,10 @@ export default {
           const numberToAdd = isArrowDown ? 1 : -1;
           // get the index of the currently active entry within a collection
           const currentEntryIndex = currentCollectionArray.indexOf(this.activeEntry);
+          // check if the last or first entry of the options list is reached
+          const isWithinListLimit = this.isWithinArrayLimit(
+            this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
+          );
           // check if collection select is active and if not if the arrow action is
           // within the limits of the array
           if (!this.collectionSelect
@@ -1019,14 +1019,12 @@ export default {
             );
             // since it is allowed to add unknown entries it must be possible to
             // have no active entry when navigating beyond list
-            // TODO: if this is a use case more often this could also go to navigate()
-          } else if (!this.collectionSelect && currentEntryIndex < 0) {
+          } else if (!this.collectionSelect
+            && (!isArrowDown && currentCollectionIndex === 0 && currentEntryIndex === 0)) {
             this.activeEntry = null;
             // if collection select is active or first/last element of the current collection
             // is reached - switch to next/previous collection
-          } else if (this.isWithinArrayLimit(
-            this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
-          )) {
+          } else if (isWithinListLimit) {
             // set the new active collection
             this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd][this
               .autocompletePropertyNames.collection];
@@ -1037,6 +1035,13 @@ export default {
               : currentCollectionArray.length - 1;
             // set the active entry of the newly set collection
             this.activeEntry = currentCollectionArray[newItemIndex];
+            // if it is the last entry of the complete list - start from the top
+          } else if (!isWithinListLimit && currentCollectionIndex === this.resultListInt.length - 1
+            && currentEntryIndex === currentCollectionArray.length - 1) {
+            this.activeCollection = this
+              .resultListInt[0][this.autocompletePropertyNames.collection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            [this.activeEntry] = currentCollectionArray;
           }
         } else if (key === 'ArrowLeft') {
           this.collectionSelect = true;
