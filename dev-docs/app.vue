@@ -25,7 +25,6 @@ export default {
       locations: [
         {
           latLng: [48.208309, 16.382782],
-          coordinates: [16.382782, 48.208309],
           data: [
             'University of Applied Arts',
             'Oskar Kokoschka-Platz 2',
@@ -34,7 +33,6 @@ export default {
           ],
         },
         {
-          latLng: [48.209960, 16.381076],
           coordinates: [16.381076, 48.209960],
           data: [
             'University of Applied Arts',
@@ -45,7 +43,6 @@ export default {
         },
         {
           latLng: [48.208248, 16.384965],
-          coordinates: [16.384965, 48.208248],
           data: [
             'University of Applied Arts',
             'Vordere Zollamtsstraße 7',
@@ -55,7 +52,6 @@ export default {
         },
         {
           latLng: [48.207540, 16.381623],
-          coordinates: [16.381623, 48.207540],
           data: ['MAK - Museum Angewandte Kunst'],
         },
       ],

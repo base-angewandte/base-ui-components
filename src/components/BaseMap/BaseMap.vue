@@ -1,6 +1,7 @@
 <template>
   <div
     ref="mapElement"
+    :style="cssProps"
     class="base-map" />
 </template>
 
@@ -20,7 +21,7 @@ export default {
       default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
     },
     /**
-     * set array id of marker to center map from outside
+     * set array index of marker to center map from outside
      */
     centerMarker: {
       type: Number,
@@ -34,7 +35,7 @@ export default {
       default: '<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>',
     },
     /**
-     * set array id of marker to highlight it from outside
+     * set array index of marker to highlight it from outside
      */
     highlightMarker: {
       type: Number,
@@ -55,16 +56,28 @@ export default {
       default: 32,
     },
     /**
+     * define style for map data<br>
+     *   usage {style} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     */
+    mapStyle: {
+      type: String,
+      default: '',
+    },
+    /**
      * define marker<br>
      *   structure: [{<br>
+     *     coordinates: [16.382782, 48.208309],<br>
      *     latLng: [48.208309, 16.382782],<br>
      *     data: [ 'University of Applied Arts', 'Oskar Kokoschka-Platz 2',
      *     '1010 Vienna', 'Austria']<br>
-     *   }]
+     *   }]<br><br>
+     *   Note: either coordinates or latLng is mandatory
      */
     marker: {
       type: Array,
       default: () => [],
+      validator: data => data.filter(item => (item.latLng || item.coordinates)).length
+        === data.length,
     },
     /**
      * show popups for marker
@@ -79,6 +92,30 @@ export default {
     maxZoom: {
       type: Number,
       default: 18,
+    },
+    /**
+     * define subdomains for map data<br>
+     *   usage {s} in url property: eg. https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+     */
+    subdomains: {
+      type: Array,
+      default: () => ['a', 'b', 'c'],
+    },
+    /**
+     * define tileMatrixSet of map data<br>
+     *   usage {tileMatrixSet} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     */
+    tileMatrixSet: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define type of map data<br>
+     *   usage {type} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     */
+    type: {
+      type: String,
+      default: '',
     },
     /**
      * define url to map data
@@ -111,11 +148,18 @@ export default {
       scrollWheelZoom: false,
     };
   },
+  computed: {
+    cssProps() {
+      return {
+        '--leaflet-popup-offset-bottom': `${this.popupOptions.offset[1]}px`,
+      };
+    },
+  },
   watch: {
     centerMarker(value) {
       if (value !== null) {
         this.map.setView(
-          this.marker[value].latLng,
+          this.getLatLng(this.marker[value]),
           this.zoom,
         );
       }
@@ -160,12 +204,17 @@ export default {
     // Initialize Leaflet map
     this.map = this.L.map(this.$refs.mapElement, {
       scrollWheelZoom: this.scrollWheelZoom,
+      tap: false, // fix clickEvent for macOS Safari
     });
 
     // Draw Leaflet map
     this.L.tileLayer(this.url, {
       maxZoom: this.maxZoom,
       attribution: [this.attribution, this.copyright].join(', '),
+      subdomains: this.subdomains,
+      type: this.type,
+      style: this.mapStyle,
+      tileMatrixSet: this.tileMatrixSet,
     }).addTo(this.map);
 
     // Custom icon
@@ -189,8 +238,13 @@ export default {
         icon: markerIcon,
       };
 
+      // check if geo reference is present before setting marker on map
+      if (!this.getLatLng(item)) {
+        return;
+      }
+
       // Set marker to map
-      const marker = this.L.marker(this.L.latLng(item.latLng[0], item.latLng[1]), markerOptions)
+      const marker = this.L.marker(this.L.latLng(this.getLatLng(item)), markerOptions)
         .on('mouseover', this.activateMarker)
         .on('mouseout', this.resetMarker)
         .addTo(this.map);
@@ -202,9 +256,18 @@ export default {
       }
     });
 
+    // Check if marker has property latLng or coordinates again, otherwise do not render to map
+    const marker = this.marker.filter(item => (item.latLng || item.coordinates));
+    if (!marker.length) {
+      return;
+    }
+
     // Center map based on Marker(s)
     // has to be called after marker have been set to map
-    const bounds = new this.L.LatLngBounds(this.marker.map(item => item.latLng));
+    const bounds = new this.L.LatLngBounds(
+      this.marker.map(item => this.getLatLng(item)),
+    );
+
     this.map.fitBounds(bounds, {
       padding: this.boundsPadding,
       maxZoom: this.zoom,
@@ -264,6 +327,17 @@ export default {
        */
       this.$emit('selected', value);
     },
+    getLatLng(item) {
+      if (item.coordinates) {
+        return [item.coordinates[1], item.coordinates[0]];
+      }
+
+      if (item.latLng) {
+        return item.latLng;
+      }
+
+      return null;
+    },
   },
 };
 </script>
@@ -301,8 +375,14 @@ export default {
   .leaflet-popup {
 
     &.leaflet-resp-popup-north-west .leaflet-popup-content-wrapper,
-    &.leaflet-resp-popup-west-south .leaflet-popup-content-wrapper {
+    &.leaflet-resp-popup-west-south .leaflet-popup-content-wrapper,
+    &.leaflet-resp-popup-south-east .leaflet-popup-content-wrapper {
       border-radius: 0;
+    }
+
+    &.leaflet-resp-popup-south,
+    &.leaflet-resp-popup-south-east {
+      margin-top: var(--leaflet-popup-offset-bottom);
     }
   }
 
