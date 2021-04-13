@@ -83,6 +83,5 @@ module.exports = {
     'src/components/BaseCheckBox/*',
     'src/components/BaseToolTip/*',
     'src/components/BaseChip/*',
-    'src/components/BaseMapLocations/*',
   ],
 }

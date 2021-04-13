@@ -3,19 +3,13 @@
   <BaseExpandBox
     show-more-text="Show Map and Addresses"
     show-less-text="Collapse Map and Addresses">
-
-    <BaseMap
-      :markers="locations"
-      :highlight-marker="highlightedMarker"
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      style="height: 368px; margin-bottom: 0.84211rem;"
-      @selected="highlightLocation" />
-
-    <BaseMapLocations
-      label="Addresses"
+    <base-map-locations
       :locations="locations"
-      :highlight-location="highlightedLocation"
-      @selected="highlightMarker" />
+      :subdomains="['maps', 'maps1', 'maps2', 'maps3', 'maps4']"
+      attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
+      copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
+      url="https://{s}.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png"
+      label="Addresses" />
   </BaseExpandBox>
 </template>
 

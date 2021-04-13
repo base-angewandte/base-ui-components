@@ -7,10 +7,14 @@
       :icon="icon"
       :icon-size="iconSize"
       :highlight-marker="highlightedMarker"
+      :map-style="mapStyle"
       :marker="locations"
       :marker-popups="markerPopups"
       :max-zoom="maxZoom"
       :style="additionalMapStyles"
+      :subdomains="subdomains"
+      :tile-matrix-set="tileMatrixSet"
+      :type="type"
       :url="url"
       :zoom="zoom"
       class="base-map-locations__map"
@@ -23,15 +27,18 @@
     </h2>
 
     <div class="base-map-locations__list">
-      <baseTextList
-        v-for="(location, index) in locations"
-        :key="index"
-        :data="[location]"
-        :class="['base-map-locations__list__group',
-                 { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
-        @click.native="centeredMarker = index"
-        @mouseenter.native="highlightedMarker = index"
-        @mouseleave.native="highlightedMarker = null" />
+      <template
+        v-for="(location, index) in locations">
+        <baseTextList
+          v-if="location.latLng || location.coordinates"
+          :key="index"
+          :data="[location]"
+          :class="['base-map-locations__list__group',
+                   { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
+          @click.native="centeredMarker = index"
+          @mouseenter.native="highlightedMarker = index"
+          @mouseleave.native="highlightedMarker = null" />
+      </template>
     </div>
   </div>
 </template>
@@ -96,14 +103,26 @@ export default {
     /**
      * define locations<br>
      *   structure: [{<br>
+     *     coordinates: [16.382782, 48.208309],<br>
      *     latLng: [48.208309, 16.382782],<br>
      *     data: [ 'University of Applied Arts', 'Oskar Kokoschka-Platz 2',
      *     '1010 Vienna', 'Austria']<br>
-     *   }]
+     *   }]<br><br>
+     *   Note: either coordinates or latLng is mandatory
      */
     locations: {
       type: Array,
       default: () => [],
+      validator: data => data.filter(item => (item.latLng || item.coordinates)).length
+        === data.length,
+    },
+    /**
+     * define style for map data<br>
+     *   usage {style} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     */
+    mapStyle: {
+      type: String,
+      default: '',
     },
     /**
      * deactivate popups for marker
@@ -118,6 +137,30 @@ export default {
     maxZoom: {
       type: Number,
       default: 18,
+    },
+    /**
+     * define subdomains for map data<br>
+     *   usage {s} in url property: eg. https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+     */
+    subdomains: {
+      type: Array,
+      default: () => ['a', 'b', 'c'],
+    },
+    /**
+     * define tileMatrixSet of map data<br>
+     *   usage {tileMatrixSet} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     */
+    tileMatrixSet: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define type of map data<br>
+     *   usage {type} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     */
+    type: {
+      type: String,
+      default: '',
     },
     /**
      * define url to map data
