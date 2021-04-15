@@ -71,13 +71,12 @@ export default {
      *     data: [ 'University of Applied Arts', 'Oskar Kokoschka-Platz 2',
      *     '1010 Vienna', 'Austria']<br>
      *   }]<br><br>
-     *   Note: either coordinates or latLng is mandatory
+     *   Note: either GeoJSON coordinates or latLng is mandatory
      */
     marker: {
       type: Array,
       default: () => [],
-      validator: data => data.filter(item => (item.latLng || item.coordinates)).length
-        === data.length,
+      validator: data => data.every(item => (item.latLng || item.coordinates)),
     },
     /**
      * show popups for marker
