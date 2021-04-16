@@ -2,19 +2,17 @@
   <div class="base-map-locations">
     <BaseMap
       :attribution="attribution"
+      :attribution-position="attributionPosition"
       :copyright="copyright"
       :center-marker="centeredMarker"
       :icon="icon"
       :icon-size="iconSize"
       :highlight-marker="highlightedMarker"
-      :map-style="mapStyle"
       :marker="locations"
       :marker-popups="markerPopups"
       :max-zoom="maxZoom"
+      :options="options"
       :style="additionalMapStyles"
-      :subdomains="subdomains"
-      :tile-matrix-set="tileMatrixSet"
-      :type="type"
       :url="url"
       :zoom="zoom"
       class="base-map-locations__map"
@@ -73,6 +71,17 @@ export default {
       default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
     },
     /**
+     * define position of map attribution<br>
+     *   valid options: 'topleft' | 'topright' | 'bottomleft' | 'bottomright'
+     */
+    attributionPosition: {
+      type: String,
+      default: 'bottomright',
+      validate(val) {
+        return ['topleft', 'topright', 'bottomleft', 'bottomright'].includes(val);
+      },
+    },
+    /**
      * define map copyright
      */
     copyright: {
@@ -117,14 +126,6 @@ export default {
         === data.length,
     },
     /**
-     * define style for map data<br>
-     *   usage {style} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
-     */
-    mapStyle: {
-      type: String,
-      default: '',
-    },
-    /**
      * deactivate popups for marker
      */
     markerPopups: {
@@ -139,28 +140,19 @@ export default {
       default: 18,
     },
     /**
-     * define subdomains for map data<br>
-     *   usage {s} in url property: eg. https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+     * define custom options for map data<br>
+     *   e.g. {
+     *          style: 'normal',
+     *          subdomains: ['maps'],
+     *          tileMatrixSet: 'google3857',
+     *          type: 'geolandbasemap'
+     *   }<br>
+     *   usage custom keys in url property:
+     *   https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
      */
-    subdomains: {
-      type: Array,
-      default: () => ['a', 'b', 'c'],
-    },
-    /**
-     * define tileMatrixSet of map data<br>
-     *   usage {tileMatrixSet} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
-     */
-    tileMatrixSet: {
-      type: String,
-      default: '',
-    },
-    /**
-     * define type of map data<br>
-     *   usage {type} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
-     */
-    type: {
-      type: String,
-      default: '',
+    options: {
+      type: Object,
+      default: () => ({}),
     },
     /**
      * define url to map data

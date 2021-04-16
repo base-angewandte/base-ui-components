@@ -2,10 +2,10 @@
 <template>
   <BaseMap
     :marker="marker"
-    :subdomains="['maps', 'maps1', 'maps2', 'maps3', 'maps4']"
+    :options="options"
     attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
     copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
-    url="https://{s}.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png" />
+    url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
 </template>
 
 <script>
@@ -32,6 +32,12 @@ export default {
           ],
         },
       ],
+      options: {
+        style: 'normal',
+        subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+        tileMatrixSet: 'google3857',
+        type: 'geolandbasemap',
+      },
     };
   }
 }

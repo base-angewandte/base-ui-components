@@ -21,6 +21,17 @@ export default {
       default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
     },
     /**
+     * define position of map attribution<br>
+     *   valid options: 'topleft' | 'topright' | 'bottomleft' | 'bottomright'
+     */
+    attributionPosition: {
+      type: String,
+      default: 'bottomright',
+      validate(val) {
+        return ['topleft', 'topright', 'bottomleft', 'bottomright'].includes(val);
+      },
+    },
+    /**
      * set array index of marker to center map from outside
      */
     centerMarker: {
@@ -56,12 +67,19 @@ export default {
       default: 32,
     },
     /**
-     * define style for map data<br>
-     *   usage {style} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     * define custom options for map data<br>
+     *   e.g. {
+     *          style: 'normal',
+     *          subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+     *          tileMatrixSet: 'google3857',
+     *          type: 'geolandbasemap'
+     *   }<br>
+     *   usage custom keys in url property:
+     *   https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
      */
-    mapStyle: {
-      type: String,
-      default: '',
+    options: {
+      type: Object,
+      default: () => ({}),
     },
     /**
      * define marker<br>
@@ -91,30 +109,6 @@ export default {
     maxZoom: {
       type: Number,
       default: 18,
-    },
-    /**
-     * define subdomains for map data<br>
-     *   usage {s} in url property: eg. https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
-     */
-    subdomains: {
-      type: Array,
-      default: () => ['a', 'b', 'c'],
-    },
-    /**
-     * define tileMatrixSet of map data<br>
-     *   usage {tileMatrixSet} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
-     */
-    tileMatrixSet: {
-      type: String,
-      default: '',
-    },
-    /**
-     * define type of map data<br>
-     *   usage {type} in url property: eg. https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
-     */
-    type: {
-      type: String,
-      default: '',
     },
     /**
      * define url to map data
@@ -206,14 +200,14 @@ export default {
       tap: false, // fix clickEvent for macOS Safari
     });
 
+    // Set position of attribution
+    this.map.attributionControl.setPosition(this.attributionPosition);
+
     // Draw Leaflet map
     this.L.tileLayer(this.url, {
       maxZoom: this.maxZoom,
       attribution: [this.attribution, this.copyright].join(', '),
-      subdomains: this.subdomains,
-      type: this.type,
-      style: this.mapStyle,
-      tileMatrixSet: this.tileMatrixSet,
+      ...this.options,
     }).addTo(this.map);
 
     // Custom icon

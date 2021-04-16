@@ -5,11 +5,12 @@
     show-less-text="Collapse Map and Addresses">
     <base-map-locations
       :locations="locations"
-      :subdomains="['maps', 'maps1', 'maps2', 'maps3', 'maps4']"
+      :options="options"
       attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
+      attribution-position="topright"
       copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
-      url="https://{s}.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png"
-      label="Addresses" />
+      label="Addresses"
+      url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
   </BaseExpandBox>
 </template>
 
@@ -39,15 +40,13 @@ export default {
           ],
         },
       ],
+      options: {
+        style: 'normal',
+        subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+        tileMatrixSet: 'google3857',
+        type: 'geolandbasemap',
+      },
     };
-  },
-  methods: {
-    highlightLocation(value) {
-      this.highlightedLocation = value;
-    },
-    highlightMarker(value) {
-      this.highlightedMarker = value;
-    },
   },
 }
 </script>
