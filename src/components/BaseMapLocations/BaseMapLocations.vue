@@ -72,13 +72,13 @@ export default {
     },
     /**
      * define position of map attribution<br>
-     *   valid options: 'topleft' | 'topright' | 'bottomleft' | 'bottomright'
+     *   valid options: 'topright' | 'bottomleft' | 'bottomright'
      */
     attributionPosition: {
       type: String,
       default: 'bottomright',
       validate(val) {
-        return ['topleft', 'topright', 'bottomleft', 'bottomright'].includes(val);
+        return ['topright', 'bottomleft', 'bottomright'].includes(val);
       },
     },
     /**
