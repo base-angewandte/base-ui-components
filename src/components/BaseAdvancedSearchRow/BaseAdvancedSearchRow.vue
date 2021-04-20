@@ -4,7 +4,7 @@
     class="base-advanced-search-row">
     <!-- SEARCH FIELD -->
     <div
-      class="base-advanced-search-row__search-field"
+      class="base-advanced-search-row__search-field base-advanced-search-row__area-padding"
       @click="activateDropDown">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <div
@@ -117,7 +117,8 @@
       <template v-slot:before-list>
         <div
           class="base-advanced-search-row__above-list-area
-                    base-advanced-search-row__above-list-area-filters">
+                 base-advanced-search-row__above-list-area-filters
+                 base-advanced-search-row__area-padding">
           <!-- FILTER SELECT LIST -->
           <div
             class="base-advanced-search-row__filter-area-wrapper">
@@ -209,7 +210,8 @@
         v-slot:after-list>
         <div
           class="base-advanced-search-row__above-list-area
-                 base-advanced-search-row__chips-area">
+                 base-advanced-search-row__chips-area
+                 base-advanced-search-row__area-padding">
           <div class="base-advanced-search-row__chips-row">
             <div
               class="base-advanced-search-row__first-column">
@@ -246,12 +248,14 @@
             </ul>
             <div
               v-else-if="isLoading"
-              class="base-advanced-search-row__no-options">
+              class="base-advanced-search-row__no-options
+                     base-advanced-search-row__area-padding">
               {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsOngoing, true)) }}
             </div>
             <div
               v-else-if="!displayedOptions.length"
-              class="base-advanced-search-row__no-options">
+              class="base-advanced-search-row__no-options
+                     base-advanced-search-row__area-padding">
               {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoOptions, true)) }}
             </div>
           </div>
@@ -262,6 +266,7 @@
         <div
           :class="[
             'base-advanced-search-row__no-options',
+            'base-advanced-search-row__area-padding',
             { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
           ]">
           <div v-if="!currentInput">
@@ -1116,13 +1121,17 @@ export default {
     // css variable to define option background color
     --option-background: rgb(248, 248, 248);
 
+    .base-advanced-search-row__area-padding {
+      padding-right: $spacing;
+      padding-left: $spacing;
+    }
+
     .base-advanced-search-row__search-field {
       display: flex;
       align-items: center;
       width: 100%;
       height: 100%;
       min-height: $row-height-large;
-      padding: 0 $spacing;
 
       .base-advanced-search-row__base-search {
         margin-left: -$spacing;
@@ -1162,10 +1171,10 @@ export default {
       z-index: map-get($zindex, dropdown);
 
       .base-advanced-search-row__above-list-area {
-        padding: $spacing-small $spacing;
-
         &.base-advanced-search-row__above-list-area-filters {
           border-bottom: $separation-line;
+          padding-top: $spacing-small/2;
+          padding-bottom: $spacing-small/2;
         }
 
         .base-advanced-search-row__filter-area-wrapper {
@@ -1233,10 +1242,14 @@ export default {
         }
 
         .base-advanced-search-row__chips-row {
-          line-height: $row-height-small;
+          align-items: baseline;
+          min-height: calc(#{$row-height-small} + #{$spacing-small});
+          padding-top: $spacing-small/2;
+          padding-bottom: $spacing-small/2;
 
           .base-advanced-search-row__chips-list {
             margin-left: $spacing;
+            line-height: $row-height-small;
 
             .base-advanced-search-row__option-chip {
               cursor: pointer;
@@ -1276,9 +1289,9 @@ export default {
       }
 
       .base-advanced-search-row__no-options {
-        min-height: $row-height-small;
-        line-height: $line-height;
-        padding: 0 $spacing;
+        min-height: calc(#{$row-height-small} + #{$spacing-small});
+        padding-top: 0;
+        padding-bottom: 0;
         width: 100%;
         display: flex;
         align-items: center;

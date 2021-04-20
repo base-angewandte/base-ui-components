@@ -315,6 +315,7 @@ export default {
             const filteredResults = data
               .filter(entry => entry.title.toLowerCase()
                 .includes(searchString.toLowerCase()));
+            console.log(filteredResults);
             return {
               subset,
               data: filteredResults,
