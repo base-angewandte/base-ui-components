@@ -39,6 +39,15 @@ export default {
             'Austria',
           ],
         },
+        {
+          latLng: [48.208248, 16.384965],
+          data: [
+            'base Angewandte',
+            'Vordere Zollamtsstraße 7',
+            '1030 Vienna',
+            'Austria',
+          ],
+        },
       ],
       options: {
         style: 'normal',

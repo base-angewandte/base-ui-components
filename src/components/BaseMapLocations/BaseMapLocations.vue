@@ -3,12 +3,13 @@
     <BaseMap
       :attribution="attribution"
       :attribution-position="attributionPosition"
+      :cluster-sizes="clusterSizes"
       :copyright="copyright"
       :center-marker="centeredMarker"
       :icon="icon"
       :icon-size="iconSize"
       :highlight-marker="highlightedMarker"
-      :marker="locations"
+      :marker="locationsFiltered"
       :marker-popups="markerPopups"
       :max-zoom="maxZoom"
       :options="options"
@@ -26,7 +27,7 @@
 
     <div class="base-map-locations__list">
       <template
-        v-for="(location, index) in locations">
+        v-for="(location, index) in locationsFiltered">
         <baseTextList
           v-if="location.latLng || location.coordinates"
           :key="index"
@@ -80,6 +81,16 @@ export default {
       validate(val) {
         return ['topright', 'bottomleft', 'bottomright'].includes(val);
       },
+    },
+    /**
+     * define number of items for cluster sizes<br>
+     *   structure: { medium: 5, large: 20, xlarge: 100 }<br>
+     *   Note: medium, large, xlarge is mandatory
+     */
+    clusterSizes: {
+      type: Object,
+      default: () => ({ medium: 5, large: 20, xlarge: 100 }),
+      validator: data => data.medium && data.large && data.xlarge,
     },
     /**
      * define map copyright
@@ -175,6 +186,12 @@ export default {
       highlightedLocation: null,
       centeredMarker: null,
     };
+  },
+  computed: {
+    // compare marker objects and remove duplicates
+    locationsFiltered() {
+      return Array.from(new Set(this.locations.map(JSON.stringify))).map(JSON.parse);
+    },
   },
   methods: {
     highlightLocation(value) {

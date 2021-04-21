@@ -39,6 +39,16 @@ export default {
       default: null,
     },
     /**
+     * define number of items for cluster sizes<br>
+     *   structure: { medium: 5, large: 20, xlarge: 100 }<br>
+     *   Note: medium, large, xlarge is mandatory
+     */
+    clusterSizes: {
+      type: Object,
+      default: () => ({ medium: 5, large: 20, xlarge: 100 }),
+      validator: data => data.medium && data.large && data.xlarge,
+    },
+    /**
      * define map copyright
      */
     copyright: {
@@ -133,6 +143,7 @@ export default {
       boundsPadding: [0, 20],
       highlightedMarker: null,
       markerClass: 'base-map-marker-icon',
+      markerClusterClass: 'base-map-marker-cluster',
       popupOptions: {
         offset: [10, -25],
         closeButton: false,
@@ -147,12 +158,16 @@ export default {
         '--leaflet-popup-offset-bottom': `${this.popupOptions.offset[1]}px`,
       };
     },
+    // compare marker objects and remove duplicates
+    markerFiltered() {
+      return Array.from(new Set(this.marker.map(JSON.stringify))).map(JSON.parse);
+    },
   },
   watch: {
     centerMarker(value) {
       if (value !== null) {
         this.map.setView(
-          this.getLatLng(this.marker[value]),
+          this.getLatLng(this.markerFiltered[value]),
           this.zoom,
         );
       }
@@ -167,10 +182,24 @@ export default {
 
         // get all marker and filter by id
         this.map.eachLayer((layer) => {
+          /* eslint-disable no-underscore-dangle */
+          // highlight markerCluster
+          if (layer._bounds && layer._icon) {
+            const marker = this.getLatLng(this.markerFiltered[value]);
+            const bounds = this.L.latLngBounds(layer._bounds);
+
+            if (bounds.contains(marker)) {
+              layer._icon.classList.add(`${this.markerClusterClass}--active`);
+              return;
+            }
+          }
+          /* eslint-enable no-underscore-dangle */
+
+          // highlight marker
           if (layer.options.id != null && layer.options.id === value) {
             // eslint-disable-next-line no-underscore-dangle
             this.highlightedMarker = layer._icon;
-            this.highlightedMarker.classList.add(`${this.markerClass}-active`);
+            this.highlightedMarker.classList.add(`${this.markerClass}--active`);
           }
         });
         return;
@@ -178,8 +207,14 @@ export default {
 
       // reset active marker
       if (this.highlightedMarker != null && this.activePopUp !== before) {
-        this.highlightedMarker.classList.remove(`${this.markerClass}-active`);
+        this.highlightedMarker.classList.remove(`${this.markerClass}--active`);
         this.highlightedMarker = null;
+      }
+
+      // reset active markerCluster
+      const markerClusterActive = this.$el.querySelector(`.${this.markerClusterClass}--active`);
+      if (markerClusterActive) {
+        markerClusterActive.classList.remove(`${this.markerClusterClass}--active`);
       }
     },
   },
@@ -192,6 +227,7 @@ export default {
     /* eslint-disable global-require */
     this.L = require('leaflet');
     require('leaflet-responsive-popup');
+    require('leaflet.markercluster');
     /* eslint-enable global-require */
 
     // Initialize Leaflet map
@@ -210,6 +246,11 @@ export default {
       ...this.options,
     }).addTo(this.map);
 
+    // Add marker to map
+    if (!this.markerFiltered.length) {
+      return;
+    }
+
     // Custom icon
     const iconOptions = {
       className: this.markerClass,
@@ -219,12 +260,39 @@ export default {
     };
     const markerIcon = this.L.divIcon(iconOptions);
 
-    // Add marker to map
-    if (!this.marker.length) {
-      return;
-    }
+    // Define Leaflet clusterGroup
+    this.markerCluster = this.L.markerClusterGroup({
+      maxClusterRadius: 50,
+      showCoverageOnHover: false,
+      iconCreateFunction: (cluster) => {
+        const items = cluster.getAllChildMarkers().length;
+        let classSize = 'small';
+        let size = 48;
 
-    this.marker.forEach((item, index) => {
+        if (items > this.clusterSizes.medium) {
+          classSize = 'medium';
+          size = 64;
+        }
+
+        if (items > this.clusterSizes.large) {
+          classSize = 'large';
+          size = 80;
+        }
+
+        if (items > this.clusterSizes.xlarge) {
+          classSize = 'xlarge';
+          size = 128;
+        }
+
+        return this.L.divIcon({
+          html: `<div class="${this.markerClusterClass}__inner">${items}</div>`,
+          className: `${this.markerClusterClass} ${this.markerClusterClass}--${classSize}`,
+          iconSize: this.L.point(size, size),
+        });
+      },
+    });
+
+    this.markerFiltered.forEach((item, index) => {
       const popup = this.L.responsivePopup(this.popupOptions);
       const markerOptions = {
         id: index,
@@ -236,21 +304,26 @@ export default {
         return;
       }
 
-      // Set marker to map
+      // Define marker to map
       const marker = this.L.marker(this.L.latLng(this.getLatLng(item)), markerOptions)
         .on('mouseover', this.activateMarker)
-        .on('mouseout', this.resetMarker)
-        .addTo(this.map);
+        .on('mouseout', this.resetMarker);
 
       // Set popup content
       if (this.markerPopups && Array.isArray(item.data)) {
         popup.setContent(item.data.join('<br>'));
         marker.bindPopup(popup);
       }
+
+      // Add marker to cluster
+      this.markerCluster.addLayer(marker);
     });
 
+    // Add clusterGroup to map
+    this.map.addLayer(this.markerCluster);
+
     // Check if marker has property latLng or coordinates again, otherwise do not render to map
-    const marker = this.marker.filter(item => (item.latLng || item.coordinates));
+    const marker = this.markerFiltered.filter(item => (item.latLng || item.coordinates));
     if (!marker.length) {
       return;
     }
@@ -258,7 +331,7 @@ export default {
     // Center map based on Marker(s)
     // has to be called after marker have been set to map
     const bounds = new this.L.LatLngBounds(
-      this.marker.map(item => this.getLatLng(item)),
+      this.markerFiltered.map(item => this.getLatLng(item)),
     );
 
     this.map.fitBounds(bounds, {
@@ -280,7 +353,7 @@ export default {
       if (!e.target.options.active) {
         this.activePopUp = id;
         this.markerState(id);
-        marker.classList.add(`${this.markerClass}-active`);
+        marker.classList.add(`${this.markerClass}--active`);
 
         // eslint-disable-next-line no-param-reassign
         e.target.options.active = true;
@@ -290,7 +363,7 @@ export default {
       // eslint-disable-next-line no-underscore-dangle
       const marker = e.target._icon;
 
-      marker.classList.remove(`${this.markerClass}-active`);
+      marker.classList.remove(`${this.markerClass}--active`);
       this.activePopUp = null;
       this.markerState(null);
 
@@ -303,7 +376,8 @@ export default {
         const marker = layer._icon;
 
         if (marker) {
-          marker.classList.remove(`${this.markerClass}-active`);
+          marker.classList.remove(`${this.markerClass}--active`);
+          marker.classList.remove(`${this.markerClusterClass}--active`);
           this.activePopUp = null;
           this.markerState(null);
           // eslint-disable-next-line no-param-reassign
@@ -346,8 +420,59 @@ export default {
   or "~leaflet/dist/leaflet.css" (rollup)
   (compare BaseCarousel where exactly the same (first version) IS working */
   @import '../../../node_modules/leaflet/dist/leaflet.css';
+  @import '../../../node_modules/leaflet.markercluster/dist/MarkerCluster.css';
   @import '../../../node_modules/leaflet-responsive-popup/leaflet.responsive.popup.css';
   @import "../../styles/variables";
+
+  /* Cluster */
+  $clusterClass: '.base-map-marker-cluster';
+  #{$clusterClass} {
+    &__inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: white;
+      font-weight: bold;
+      font-size: $font-size-regular;
+      background-clip: padding-box;
+      border-radius: 50%;
+      border-style: solid;
+      border-color: $map-cluster-bg;
+      background-color: $map-cluster-bg-inner;
+      transition: all 250ms ease-in-out;
+    }
+
+    &.base-map-marker-cluster--small #{$clusterClass}__inner {
+      border-width: 4px;
+    }
+
+    &.base-map-marker-cluster--medium #{$clusterClass}__inner {
+      border-width: 8px;
+    }
+
+    &.base-map-marker-cluster--large #{$clusterClass}__inner {
+      border-width: 8px;
+    }
+
+    &.base-map-marker-cluster--xlarge #{$clusterClass}__inner {
+      border-width: 16px;
+    }
+
+    &--active,
+    &:hover {
+      #{$clusterClass}__inner {
+        background-color: $map-cluster-bg-inner-hover;
+        border-color:  $map-cluster-bg-hover;
+      }
+    }
+  }
+
+  // cluster spider lines
+  .leaflet-pane > svg path.leaflet-interactive {
+    stroke: $app-color;
+  }
 
   /* marker */
   .base-map-marker-icon {
@@ -356,7 +481,7 @@ export default {
       transition: fill 250ms ease-in-out;
     }
 
-    &-active,
+    &--active,
     &:hover {
       > svg path {
         fill: $app-color-secondary;
