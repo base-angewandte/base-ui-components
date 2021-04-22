@@ -17,7 +17,7 @@
       :url="url"
       :zoom="zoom"
       class="base-map-locations__map"
-      @selected="highlightLocation" />
+      @highlighted="highlightLocation" />
 
     <h2
       v-if="label"

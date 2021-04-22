@@ -387,12 +387,14 @@ export default {
     },
     markerState(value) {
       /**
-       * Event emitted when marker is clicked and changes active state
+       * Event emitted on mouseenter, mouseleave of a map marker<br>
+       * mouseenter: index of marker object in component property 'marker' array<br>
+       * mouseleave: null
        *
-       * @event selected
-       * @property {number} value - id or null
+       * @event highlighted
+       * @property {number} value - array index or null
        */
-      this.$emit('selected', value);
+      this.$emit('highlighted', value);
     },
     getLatLng(item) {
       if (item.coordinates) {
