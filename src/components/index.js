@@ -41,6 +41,7 @@ import Checkmark from './BaseCheckmark';
 import Map from './BaseMap';
 import Icon from './BaseIcon';
 import DetailBox from './BaseDetailBox';
+import ExpandList from './BaseExpandList';
 
 export {
   Loader as BaseLoader,
@@ -86,4 +87,5 @@ export {
   ExpandBox as BaseExpandBox,
   TextList as BaseTextList,
   ExpandRow as BaseExpandRow,
+  ExpandList as BaseExpandList,
 };

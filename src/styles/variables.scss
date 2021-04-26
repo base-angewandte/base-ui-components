@@ -1,6 +1,7 @@
 /* Overwrite colors in your App with css vars defined in your app root css */
 /*:root {
   --app-color: #FF9800;
+  --app-color-secondary: #ffd95b;
   --font-color: rgb(0, 0, 0);
   --font-color-second: rgb(107, 107, 107);
   --button-header-color: rgb(240, 240, 240);
@@ -36,6 +37,7 @@ $fade-out-width: 30px;
 
 /* colors */
 $app-color: var(--app-color, #FF9800);
+$app-color-secondary: var(--app-color-secondary, #ffd95b);
 $font-color: var(--font-color, rgb(0, 0, 0));
 $font-color-second: var(--font-color-second, rgb(107, 107, 107));
 $font-color-third: var(--font-color-third, rgb(160, 160, 160));
@@ -58,6 +60,7 @@ $border-width: 2px;
 $border-active-width: 4px;
 $box-shadow-reg: 0px 0px 3px 0px rgba(0,0,0,0.05);
 $box-shadow-hov: 0px 1px 5px 0px rgba(0,0,0,0.15);
+$box-shadow-edit: 0 0 15px 5px rgba(0, 0, 0, 0.15);
 $drop-shadow: 0px 10px 10px 0px rgba(0,0,0,0.25);
 $pop-up-shadow: 0px 0px 36px 0px rgba(0,0,0,0.5);
 $pop-up-drop-shadow: 0px 10px 46px 0px rgba(0,0,0,0.25);
@@ -108,3 +111,7 @@ $zindex: (
 
 /* headlines */
 $headline-margin-bottom: $line-height / 2;
+
+/* transitions */
+$link-transition: color 0.2s ease-in-out;
+$base-expand-list-transition-duration: 250ms;

@@ -13,6 +13,8 @@ import dropDown3 from './drop-down-3';
 import dropDown4 from './drop-down-4';
 import dropDown from './drop-down';
 import duplicate from './duplicate';
+import edit from './edit';
+import eyeHide from './eye-hide';
 import eye from './eye';
 import forbidden from './forbidden';
 import information from './information';
@@ -53,6 +55,8 @@ export default {
   dropDown4,
   dropDown,
   duplicate,
+  edit,
+  eyeHide,
   eye,
   forbidden,
   information,

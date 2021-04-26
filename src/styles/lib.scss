@@ -166,3 +166,37 @@ h1, h2, h3 {
     z-index: map-get($zindex, fadeout);
   }
 }
+
+.base-text-fade-out-background {
+  position: relative;
+
+  &::after {
+    content: '';
+    width: calc(#{$fade-out-width} + #{$spacing});
+    height: $row-height-large;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) , $background-color);
+    z-index: map-get($zindex, fadeout);
+  }
+}
+
+.base-box-shadow {
+  position: relative;
+  z-index: 1;
+  box-shadow: $box-shadow-reg;
+  transition: box-shadow 150ms ease-in-out;
+
+  &--edit {
+    box-shadow: $box-shadow-edit;
+  }
+}
+
+.supportive-text {
+  position: absolute;
+  z-index: 1000;
+  width: 1px;
+  margin-left: -1px;
+  overflow: hidden;
+}
