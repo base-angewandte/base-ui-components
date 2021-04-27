@@ -248,6 +248,7 @@ export default {
       z-index: map-get($zindex, button-active);
     }
 
+    /* class is set in following components: baseExpandBox */
     &.base-button-icon-rotate-180 {
       .base-button-icon {
         transform: rotate(180deg);
