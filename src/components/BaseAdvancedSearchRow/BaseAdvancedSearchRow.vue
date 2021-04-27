@@ -2,8 +2,7 @@
   <div
     ref="advancedSearchRow"
     v-click-outside="checkDropDownClose"
-    :class="['base-advanced-search-row',
-             { 'base-advanced-search-row__mobile': elementWidth < 640 }]">
+    class="base-advanced-search-row">
     <!-- SEARCH FIELD -->
     <div
       class="base-advanced-search-row__search-field base-advanced-search-row__area-padding"
@@ -590,10 +589,6 @@ export default {
        * @type {boolean}
        */
       fadeOutAdded: false,
-      /**
-       * store the element width
-       */
-      elementWidth: 0,
     };
   },
   computed: {
@@ -773,8 +768,8 @@ export default {
     },
   },
   mounted() {
-    this.calcElementWidth();
-    window.addEventListener('resize', this.calcElementWidth);
+    this.calcColNumber();
+    window.addEventListener('resize', this.calcColNumber);
   },
   updated() {
     // if event listener was not added and the filterBox element exists add
@@ -790,7 +785,7 @@ export default {
     if (this.$refs.filterBox) {
       this.$refs.filterBox.removeEventListener('scroll', this.calcFadeOut);
     }
-    this.$el.removeEventListener('resize', this.calcElementWidth);
+    this.$el.removeEventListener('resize', this.calcColNumber);
   },
   methods: {
     /** DROP DOWN FUNCTIONALITY */
@@ -1120,12 +1115,13 @@ export default {
     /**
      * calculate the number of columns for filters and chips dynamically
      */
-    calcElementWidth() {
+    calcColNumber() {
       const searchElement = this.$refs.advancedSearchRow;
       if (searchElement) {
-        this.elementWidth = this.$refs.advancedSearchRow.clientWidth;
+        const elementWidth = searchElement.clientWidth;
         // set a css variable that is responsible for the number of items
-        this.$el.style.setProperty('--col-number', Math.floor((this.elementWidth - this.elementWidth / 3) / 180));
+        // (subtract 1/4 of elementWidth because of first column)
+        this.$el.style.setProperty('--col-number', Math.floor((elementWidth - elementWidth / 4) / 180) || 1);
       }
     },
   },
@@ -1143,7 +1139,6 @@ export default {
     --option-background: rgb(248, 248, 248);
     // set number of columns for filters and chips
     --col-number: 4;
-    --element-width: 640;
 
     .base-advanced-search-row__area-padding {
       padding-right: $spacing;
@@ -1358,7 +1353,10 @@ export default {
       }
 
     }
-    &.base-advanced-search-row__mobile {
+  }
+
+  @media screen and (max-width: $mobile) {
+    .base-advanced-search-row {
       .base-advanced-search-row__first-column {
         max-width: 100%;
         margin-right: $spacing-small;
