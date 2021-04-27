@@ -1,7 +1,9 @@
 <template>
   <div
+    ref="advancedSearchRow"
     v-click-outside="checkDropDownClose"
-    class="base-advanced-search-row">
+    :class="['base-advanced-search-row',
+             { 'base-advanced-search-row__mobile': elementWidth < 640 }]">
     <!-- SEARCH FIELD -->
     <div
       class="base-advanced-search-row__search-field base-advanced-search-row__area-padding"
@@ -588,6 +590,10 @@ export default {
        * @type {boolean}
        */
       fadeOutAdded: false,
+      /**
+       * store the element width
+       */
+      elementWidth: 0,
     };
   },
   computed: {
@@ -766,6 +772,10 @@ export default {
       }
     },
   },
+  mounted() {
+    this.calcElementWidth();
+    window.addEventListener('resize', this.calcElementWidth);
+  },
   updated() {
     // if event listener was not added and the filterBox element exists add
     // the listener
@@ -780,6 +790,7 @@ export default {
     if (this.$refs.filterBox) {
       this.$refs.filterBox.removeEventListener('scroll', this.calcFadeOut);
     }
+    this.$el.removeEventListener('resize', this.calcElementWidth);
   },
   methods: {
     /** DROP DOWN FUNCTIONALITY */
@@ -862,7 +873,6 @@ export default {
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
-        debugger;
         this.filter = { ...selectedFilter,
           ...{
             values: this.setFilterValues(selectedFilter.type, this.filter.values),
@@ -1107,6 +1117,17 @@ export default {
         right: scrollPosition !== scrollMax,
       };
     },
+    /**
+     * calculate the number of columns for filters and chips dynamically
+     */
+    calcElementWidth() {
+      const searchElement = this.$refs.advancedSearchRow;
+      if (searchElement) {
+        this.elementWidth = this.$refs.advancedSearchRow.clientWidth;
+        // set a css variable that is responsible for the number of items
+        this.$el.style.setProperty('--col-number', Math.floor((this.elementWidth - this.elementWidth / 3) / 180));
+      }
+    },
   },
 };
 </script>
@@ -1120,6 +1141,9 @@ export default {
     position: relative;
     // css variable to define option background color
     --option-background: rgb(248, 248, 248);
+    // set number of columns for filters and chips
+    --col-number: 4;
+    --element-width: 640;
 
     .base-advanced-search-row__area-padding {
       padding-right: $spacing;
@@ -1322,6 +1346,7 @@ export default {
 
     .base-advanced-search-row__columns {
       column-gap: $spacing;
+      column-count: var(--col-number, 4);
       display: block;
       width: 100%;
 
@@ -1333,10 +1358,7 @@ export default {
       }
 
     }
-  }
-
-  @media screen and (max-width: $mobile) {
-    .base-advanced-search-row {
+    &.base-advanced-search-row__mobile {
       .base-advanced-search-row__first-column {
         max-width: 100%;
         margin-right: $spacing-small;
@@ -1407,62 +1429,6 @@ export default {
             margin-right: 0;
           }
         }
-      }
-    }
-  }
-
-  @media screen and (min-width: 1401px) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 5;
-      }
-    }
-  }
-
-  @media screen and (max-width: 1400px) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 4;
-      }
-    }
-  }
-
-  @media screen and (max-width: $tablet) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 3;
-      }
-    }
-  }
-
-  @media screen and (max-width: 700px) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 2;
-      }
-    }
-  }
-
-  @media screen and (max-width: $mobile) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 3;
-      }
-    }
-  }
-
-  @media screen and (max-width: 500px) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 2;
-      }
-    }
-  }
-
-  @media screen and (max-width: 400px) {
-    .base-advanced-search-row {
-      .base-advanced-search-row__columns {
-        column-count: 1;
       }
     }
   }
