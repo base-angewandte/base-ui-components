@@ -64,7 +64,7 @@ input.base-date-input__datepicker-input:focus {
 .base-date-input__datepicker-input {
   border: none;
   outline: none;
-  width: calc(100% - #{$spacing});
+  width: calc(100% - #{$spacing} - #{$icon-large});
   height: 100%;
   background-color: transparent;
 }
@@ -75,4 +75,10 @@ input.base-date-input__datepicker-input:focus {
 
 .mx-datepicker-main {
   border: none;
+}
+
+@media screen and (max-width: $mobile) {
+  .base-date-input__datepicker-input {
+    width: calc(100% - #{$spacing} - #{$icon-medium});
+  }
 }
