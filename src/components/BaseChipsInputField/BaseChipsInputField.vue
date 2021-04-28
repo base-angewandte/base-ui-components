@@ -104,7 +104,6 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
 import Draggable from 'vuedraggable';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseInput from '../BaseInput/BaseInput';
@@ -124,9 +123,6 @@ export default {
     BaseChip,
     Draggable,
     BaseIcon,
-  },
-  directives: {
-    ClickOutside,
   },
   mixins: [
     i18n,
