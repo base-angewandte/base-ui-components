@@ -16,7 +16,9 @@
       </slot>
     </component>
 
-    <div class="base-edit-control__buttons">
+    <div
+      v-if="controls"
+      class="base-edit-control__buttons">
       <base-button
         v-if="!edit"
         :has-background-color="false"
@@ -57,6 +59,13 @@ export default {
     i18n,
   ],
   props: {
+    /**
+     * toggle control buttons
+     */
+    controls: {
+      type: Boolean,
+      default: false,
+    },
     /**
      * set edit mode
      */
