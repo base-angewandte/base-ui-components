@@ -584,11 +584,6 @@ export default {
         left: false,
         right: true,
       },
-      /**
-       * make sure event listener is only added once
-       * @type {boolean}
-       */
-      fadeOutAdded: false,
     };
   },
   computed: {
@@ -766,18 +761,25 @@ export default {
         this.$emit('fetch-autocomplete-results', val);
       }
     },
+    showDropDown(val) {
+      if (val) {
+        console.log('open');
+        this.filterFade = {
+          left: false,
+          right: true,
+        };
+      }
+    },
   },
   mounted() {
     this.calcColNumber();
     window.addEventListener('resize', this.calcColNumber);
   },
   updated() {
-    // if event listener was not added and the filterBox element exists add
+    // if the filterBox element exists add
     // the listener
-    if (!this.fadeOutAdded && this.$refs.filterBox) {
+    if (this.$refs.filterBox) {
       this.$refs.filterBox.addEventListener('scroll', this.calcFadeOut);
-      // set variable true to know that listener has been added
-      this.fadeOutAdded = true;
     }
   },
   destroyed() {
@@ -1104,6 +1106,7 @@ export default {
       return this.getLangLabel(label, true);
     },
     calcFadeOut(event) {
+      console.log('calc fade out');
       const scrollElement = event.target;
       const scrollPosition = scrollElement.scrollLeft;
       const scrollMax = scrollElement.scrollWidth - scrollElement.clientWidth;
