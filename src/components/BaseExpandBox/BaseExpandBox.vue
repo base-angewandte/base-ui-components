@@ -2,6 +2,7 @@
   <base-box
     box-ratio="0"
     :box-size="{width: '100%'}"
+    :box-hover="false"
     :class="[
       'base-expand-box',
       { 'base-expand-box-open': expandInt,
