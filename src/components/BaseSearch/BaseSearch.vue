@@ -1,7 +1,8 @@
 <template>
   <div
     :style="styleProps"
-    :class="['base-search', { 'base-search-fade-out': !active && type === 'text' }]">
+    :class="['base-search',
+             { 'base-search-fade-out': !active && (type === 'text' || type === 'chips') }]">
     <label
       :for="internalFieldId"
       class="hide">
@@ -154,6 +155,7 @@ export default {
     type: {
       type: String,
       default: 'text',
+      validator: val => ['text', 'chips', 'date', 'daterange'].includes(val),
     },
     /**
      * if input type is chips this is the prop to
@@ -184,6 +186,7 @@ export default {
     language: {
       type: String,
       default: 'en',
+      validator: val => !val || val.length === 2,
     },
     /**
      * specify the object property that should be used as identifier
