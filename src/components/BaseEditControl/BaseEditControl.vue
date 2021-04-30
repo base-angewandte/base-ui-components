@@ -155,6 +155,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    min-height: $row-height-small;
 
     &__title {
       flex-grow: 1;
@@ -163,7 +164,7 @@ export default {
       white-space: nowrap;
       overflow: hidden;
       position: relative;
-      z-index: -1;
+      z-index: 0;
 
       &__additional {
         font-weight: normal;

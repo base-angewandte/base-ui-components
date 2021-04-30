@@ -4,7 +4,10 @@ Example of BaseEditControl
 <template>
   <div class="container">
     <baseEditControl
+      :controls="true"
       :edit="edit"
+      title="Title"
+      subtitle="Subtitle"
       @activated="activate"
       @canceled="cancel"
       @saved="save" />

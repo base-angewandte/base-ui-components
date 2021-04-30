@@ -2,9 +2,10 @@ Component to render list data
 
 ```vue
 <template>
-  <div>
+  <div style="background-color: rgb(240, 240, 240); padding: 16px;">
     <BaseEditControl
       title="Activities"
+      :controls="true"
       :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
       :edit="editExpandList"
       @activated="activateExpandList"
