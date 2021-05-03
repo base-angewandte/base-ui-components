@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import 'lazysizes';
 import Swiper from 'swiper';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';

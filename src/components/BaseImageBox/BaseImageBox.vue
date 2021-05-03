@@ -39,29 +39,15 @@
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
-            <!-- image lazyloaded -->
-            <img
-              v-if="lazyload"
+            <BaseImage
               ref="image"
-              :data-src="imageUrl"
               :alt="title"
-              :class="['base-image-box-image',
-                       { 'base-image-box__image-second': !imageFirst },
-                       'lazyload',
-                       { 'base-image-box-no-title': !showTitle }]"
-              :src="clearPng"
-              @error="displayImage = false">
-
-            <!-- image native -->
-            <img
-              v-if="!lazyload"
-              ref="image"
+              :lazyload="lazyload"
               :src="imageUrl"
-              :alt="title"
               :class="['base-image-box-image',
                        { 'base-image-box__image-second': !imageFirst },
                        { 'base-image-box-no-title': !showTitle }]"
-              @error="displayImage = false">
+              @error="displayImage = false" />
           </div>
           <div
             v-if="!imageUrl || !displayImage"
@@ -120,6 +106,7 @@
 <script>
 import BaseBox from '../BaseBox/BaseBox';
 import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+import BaseImage from '../BaseImage/BaseImage';
 
 /**
  * A component with the primary purpose to display
@@ -131,6 +118,7 @@ export default {
   components: {
     BaseCheckmark,
     BaseBox,
+    BaseImage,
   },
   props: {
     /**
@@ -261,9 +249,6 @@ export default {
     // determine if shadow should cover half or third of box
     imageShadowClass() {
       return this.imageFirst ? 'base-image-box-img-third' : 'base-image-box-img-half';
-    },
-    clearPng() {
-      return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';
     },
   },
   watch: {

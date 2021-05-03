@@ -1,5 +1,34 @@
 <template>
   <div id="app">
+    <base-carousel
+      :items="carousel"
+      :swiper-options="{
+        slidesPerView: 2,
+        slidesPerGroup: 2,
+        spaceBetween: 15,
+        loop: carousel.length > 3,
+        speed: 750,
+        keyboard: {
+          enabled: true,
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        breakpoints: {
+          1024: {
+            slidesPerView: carousel.length < 3 ? 2 : 3,
+            slidesPerGroup: carousel.length < 3 ? 2 : 3,
+          },
+        },
+      }" />
+
+    <div>
+      <BaseImage
+        :lazyload="true"
+        alt="Source: https://placeimg.com"
+        src="https://placeimg.com/1800/1200/tech/grayscale" />
+    </div>
     <h1>BaseDetailBox bbb</h1>
     <div class="background">
       <base-box
@@ -38,29 +67,6 @@
       ]"
       language="en" />
 
-    <base-carousel
-      :items="carousel"
-      :swiper-options="{
-        slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 15,
-        loop: carousel.length > 3,
-        speed: 750,
-        keyboard: {
-          enabled: true,
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-        breakpoints: {
-          1024: {
-            slidesPerView: carousel.length < 3 ? 2 : 3,
-            slidesPerGroup: carousel.length < 3 ? 2 : 3,
-          },
-        },
-      }" />
-    <BaseMap
       :lat-long="[
         '48.208370',
         '16.384510',
@@ -488,10 +494,12 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList';
 import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
 import BaseDetailBox from '@/components/BaseDetailBox/BaseDetailBox';
 import BaseExpandRow from '@/components/BaseExpandRow/BaseExpandRow';
+import BaseImage from '@/components/BaseImage/BaseImage';
 
 export default {
   name: 'App',
   components: {
+    BaseImage,
     BaseResultBoxSection,
     BaseForm,
     BaseExpandRow,

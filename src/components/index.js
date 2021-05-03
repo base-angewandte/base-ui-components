@@ -43,6 +43,7 @@ import Icon from './BaseIcon';
 import DetailBox from './BaseDetailBox';
 import EditControl from './BaseEditControl';
 import ExpandList from './BaseExpandList';
+import Image from './BaseImage';
 
 export {
   Loader as BaseLoader,
@@ -90,4 +91,5 @@ export {
   TextList as BaseTextList,
   ExpandRow as BaseExpandRow,
   ExpandList as BaseExpandList,
+  Image as BaseImage,
 };
