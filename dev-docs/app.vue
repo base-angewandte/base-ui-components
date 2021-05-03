@@ -67,6 +67,7 @@
       ]"
       language="en" />
 
+    <BaseMap
       :lat-long="[
         '48.208370',
         '16.384510',
