@@ -8,17 +8,39 @@ Example of BaseExpandBox to display expandable text, unordered list, datalist el
         render-label-as="h2"
         :data="data"
         :cols2="true" />
+      <template v-slot:footer>
+        <div style="display: flex;">
+          <BaseButton
+            :icon-colored="true"
+            :has-background-color="false"
+            icon="print"
+            icon-position="top"
+            icon-size="large"
+            text="Print"
+            style="padding-left: 0;" />
+
+          <BaseButton
+            :icon-colored="true"
+            :has-background-color="false"
+            icon="link"
+            icon-position="top"
+            icon-size="large"
+            text="Share" />
+        </div>
+      </template>
     </BaseExpandBox>
   </div>
 </template>
 
 <script>
 import BaseExpandBox from './BaseExpandBox';
+import BaseButton from '../BaseButton/BaseButton';
 import BaseTextList from '../BaseTextList/BaseTextList';
 
 export default {
   components: {
     BaseExpandBox,
+    BaseButton,
     BaseTextList,
   },
   data() {
@@ -42,18 +64,18 @@ export default {
         {
           label: 'Vero eos et accusam',
           data: [
-             {
-               label: 'www',
-               value: 'http://base.uni-ak.ac.at',
-               url: 'http://base.uni-ak.ac.at',
-             },
-             {
-               label: 'email',
-               value: 'base@uni-ak.ac.at',
-               url: 'mailto:base@uni-ak.ac.at',
-             },
-           ],
-         },
+            {
+              label: 'www',
+              value: 'http://base.uni-ak.ac.at',
+              url: 'http://base.uni-ak.ac.at',
+            },
+            {
+              label: 'email',
+              value: 'base@uni-ak.ac.at',
+              url: 'mailto:base@uni-ak.ac.at',
+            },
+          ],
+        },
       ],
     };
   },

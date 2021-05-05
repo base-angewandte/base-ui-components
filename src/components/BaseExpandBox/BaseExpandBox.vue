@@ -1,22 +1,24 @@
 <template>
   <base-box
     box-ratio="0"
-    :box-size="{width: '100%'}"
+    :box-size="{}"
     :box-hover="false"
     :class="[
       'base-expand-box',
-      { 'base-expand-box-open': expandInt,
-        'base-expand-box-show-content': showContent }]">
+      { 'base-expand-box-open': expandInt }]">
     <div
       :class="[
         'base-expand-box-content',
-        {'base-expand-box-content-fade-out': (!expandInt && showButton)}]">
+        {'base-expand-box-content-fade-out': (!initialized ||!expandInt && showButton)}]">
       <div
         class="base-expand-box-content-inner">
-        <!--
-          @slot default slot
-        -->
-        <slot />
+        <!-- div is needed for calculation of content height -->
+        <div>
+          <!--
+            @slot default slot
+          -->
+          <slot />
+        </div>
       </div>
     </div>
 
@@ -31,6 +33,13 @@
         'base-expand-box-button',
         { 'base-button-icon-rotate-180': expandInt }]"
       @clicked="clicked" />
+
+    <div
+      v-if="!!$slots.footer"
+      class="base-expand-box-footer">
+      <!-- @slot slot to add additional information after expandable content -->
+      <slot name="footer" />
+    </div>
   </base-box>
 </template>
 
@@ -75,8 +84,8 @@ export default {
     return {
       expandInt: false,
       contentWidth: null,
+      initialized: false,
       showButton: false,
-      showContent: false,
     };
   },
   mounted() {
@@ -93,8 +102,7 @@ export default {
         this.expandInt = true;
       }
 
-      // show content
-      this.showContent = true;
+      this.initialized = true;
 
       // observe resize of container and set visibility of button
       this.boxResize().observe(this.$el);
@@ -180,7 +188,9 @@ export default {
     }
 
     .base-expand-box-content-inner {
-      visibility: hidden;
+      position: relative;
+      height: 100%;
+      visibility: visible;
     }
 
     .base-expand-box-button {
@@ -195,12 +205,10 @@ export default {
       }
     }
 
-    &.base-expand-box-show-content {
-      .base-expand-box-content-inner {
-        position: relative;
-        height: 100%;
-        visibility: visible;
-      }
+    .base-expand-box-footer {
+      border-top: $border-width solid $background-color;
+      margin: $spacing 0 $spacing-small;
+      padding-top: $spacing;
     }
   }
 </style>

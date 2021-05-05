@@ -1,5 +1,35 @@
 <template>
   <div id="app">
+    <BaseExpandBox>
+      <BaseTextList
+        render-label-as="h2"
+        :data="baseExpandBox"
+        :cols2="true" />
+
+      <template v-slot:footer>
+        <div style="display: flex;">
+          <BaseButton
+            :icon-colored="true"
+            :has-background-color="false"
+            icon="print"
+            icon-position="top"
+            icon-size="large"
+            text="Print"
+            style="padding-left: 0;" />
+
+          <BaseButton
+            :icon-colored="true"
+            :has-background-color="false"
+            icon="link"
+            icon-position="top"
+            icon-size="large"
+            text="Share" />
+        </div>
+      </template>
+    </BaseExpandBox>
+
+    <br><br><br>
+
     <h1>BaseDetailBox bbb</h1>
     <div class="background">
       <base-box
@@ -523,6 +553,38 @@ export default {
   },
   data() {
     return {
+      baseExpandBox: [
+        {
+          label: 'Vero eos et accusam',
+          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+
+            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`,
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            'Lorem ipsum dolor sit amet',
+            'Consetetur sadipscing elitr, sed diam nonumy',
+            'Eirmod tempor invidunt',
+          ],
+        },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            {
+              label: 'www',
+              value: 'base.uni-ak.ac.at',
+              url: 'http://base.uni-ak.ac.at',
+            },
+            {
+              label: 'email',
+              value: 'base@uni-ak.ac.at',
+              url: 'mailto:base@uni-ak.ac.at',
+            },
+          ],
+        },
+      ],
       boxText: [],
       textInput: {
         English: 'Text Set from Outside',
