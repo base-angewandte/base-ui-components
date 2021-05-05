@@ -34,52 +34,85 @@
         v-if="displayChipsInline"
         v-slot:input-field-addition-before>
         <div class="base-chips-input-field__chips">
-          <draggable
-            v-model="selectedListInt"
-            :disabled="!draggable"
-            :set-data="setDragElement"
-            :force-fallback="true"
-            :animation="200"
-            handle=".base-chip__text"
-            @start="drag = true"
-            @end="onDragEnd">
-            <component
-              :is="drag ? 'transition-group' : 'div'"
-              :name="!drag ? 'flip-list' : null"
-              type="transition"
-              class="base-chips-input-field__chips-transition">
-              <template
-                v-for="(entry, index) in selectedListInt">
-                <!-- @slot a slot to provide customized chips
-                  @binding { object } entry - one selected option displayed as chip
-                  @binding { number } index - the index of the entry in the selectedList array
-                  @binding { number } chipActiveForRemove - the index of the chip that is
-                    currently active to be removed (for keyboard handling)
-                  @binding { function } removeEntry - function to remove the entry from
-                    selectedList, needs `entry` and `index` as arguments
-                -->
-                <slot
-                  name="chip"
-                  v-bind="{
-                    entry,
-                    index,
-                    chipActiveForRemove,
-                    removeEntry,
-                  }">
-                  <BaseChip
-                    :id="entry.idInt"
-                    :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                    :entry="getLangLabel(entry[labelPropertyName], true)"
-                    :hover-box-content="hoverboxContent"
-                    :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
-                      || !!entry[identifierPropertyName]"
-                    :chip-active="chipActiveForRemove === index"
-                    @remove-entry="removeEntry(entry, index)"
-                    @hoverbox-active="hoverBoxActive($event, entry)" />
-                </slot>
-              </template>
-            </component>
-          </draggable>
+          <template v-if="draggable">
+            <draggable
+              v-model="selectedListInt"
+              :disabled="!draggable"
+              :set-data="setDragElement"
+              :force-fallback="true"
+              :animation="200"
+              handle=".base-chip__text"
+              @start="drag = true"
+              @end="onDragEnd">
+              <transition-group
+                :name="!drag ? 'flip-list' : null"
+                type="transition"
+                class="base-chips-input-field__chips-transition">
+                <template
+                  v-for="(entry, index) in selectedListInt">
+                  <!-- @slot a slot to provide customized chips
+                    @binding { object } entry - one selected option displayed as chip
+                    @binding { number } index - the index of the entry in the selectedList array
+                    @binding { number } chipActiveForRemove - the index of the chip that is
+                      currently active to be removed (for keyboard handling)
+                    @binding { function } removeEntry - function to remove the entry from
+                      selectedList, needs `entry` and `index` as arguments
+                  -->
+                  <slot
+                    name="chip"
+                    v-bind="{
+                      entry,
+                      index,
+                      chipActiveForRemove,
+                      removeEntry,
+                    }">
+                    <BaseChip
+                      :id="entry.idInt"
+                      :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                      :entry="getLangLabel(entry[labelPropertyName], true)"
+                      :hover-box-content="hoverboxContent"
+                      :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                        || !!entry[identifierPropertyName]"
+                      :chip-active="chipActiveForRemove === index"
+                      @remove-entry="removeEntry(entry, index)"
+                      @hoverbox-active="hoverBoxActive($event, entry)" />
+                  </slot>
+                </template>
+              </transition-group>
+            </draggable>
+          </template>
+          <template v-else>
+            <template
+              v-for="(entry, index) in selectedListInt">
+              <!-- @slot a slot to provide customized chips
+                @binding { object } entry - one selected option displayed as chip
+                @binding { number } index - the index of the entry in the selectedList array
+                @binding { number } chipActiveForRemove - the index of the chip that is
+                  currently active to be removed (for keyboard handling)
+                @binding { function } removeEntry - function to remove the entry from
+                  selectedList, needs `entry` and `index` as arguments
+              -->
+              <slot
+                name="chip"
+                v-bind="{
+                  entry,
+                  index,
+                  chipActiveForRemove,
+                  removeEntry,
+                }">
+                <BaseChip
+                  :id="entry.idInt"
+                  :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                  :entry="getLangLabel(entry[labelPropertyName], true)"
+                  :hover-box-content="hoverboxContent"
+                  :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                    || !!entry[identifierPropertyName]"
+                  :chip-active="chipActiveForRemove === index"
+                  @remove-entry="removeEntry(entry, index)"
+                  @hoverbox-active="hoverBoxActive($event, entry)" />
+              </slot>
+            </template>
+          </template>
         </div>
       </template>
       <template v-slot:input-field-addition-after>
@@ -105,13 +138,13 @@
 
 <script>
 import Draggable from 'vuedraggable';
+import { sort, createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
-import { sort, createId } from '../../utils/utils';
 
 /** input field with chips functionalities */
 
