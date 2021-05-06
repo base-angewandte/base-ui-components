@@ -10,56 +10,55 @@
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :drop-down-active="isDropDownActive"
-      :label-property-name="labelPropertyName"
-      :identifier-property-name="identifierPropertyName"
       :return-as-string="returnAsString"
-      @focus="onInputFocus"
-      @blur="onInputBlur"
       @keydown="checkKeyEvent"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
       @click-input-field="onInputFocus"
-      v-on="$listeners" />
-
-    <BaseDropDownList
-      v-if="inputFieldActive"
-      ref="dropDownList"
-      :drop-down-options="listInt"
-      :active-option.sync="activeOption"
-      :selected-option.sync="selectedOption"
-      :identifier-property-name="identifierPropertyName"
-      :label-property-name="labelPropertyName"
-      :list-id="id"
-      :style="{ 'min-width': dropDownMinWidth }"
-      :language="language"
-      :drop-down-no-options-info="dropDownNoOptionsInfo"
-      class="base-chips-input__drop-down"
-      @within-drop-down="isWithinDropDown = $event">
-      <template v-slot:option="entry">
-        <span
-          v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
-          ref="option"
-          :key="entry.option[identifierPropertyName]">
-          {{ addNewChipText
-            ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
-            : `${getI18nTerm('form.Add', -1, {
-              value: getLangLabel(entry.option[labelPropertyName], true)
-            })} ...` }}
-        </span>
-        <template
-          v-else-if="entry">
-          <!-- @slot a slot to provide more advanced drop down entries<br> per default only the
-            Object[labelPropertyName][?lang] will be displayed -->
-          <slot
-            :item="entry.option"
-            name="drop-down-entry">
-            <!-- SLOT DEFAULT -->
-            {{ getLangLabel(entry.option[labelPropertyName], true) }}
-          </slot>
-        </template>
+      @clicked-outside="onInputBlur"
+      v-on="$listeners">
+      <template v-slot:below-input>
+        <BaseDropDownList
+          v-if="inputFieldActive"
+          ref="dropDownList"
+          :drop-down-options="listInt"
+          :active-option.sync="activeOption"
+          :selected-option.sync="selectedOption"
+          :identifier-property-name="identifierPropertyName"
+          :label-property-name="labelPropertyName"
+          :list-id="id"
+          :style="{ 'min-width': dropDownMinWidth }"
+          :language="language"
+          :drop-down-no-options-info="dropDownNoOptionsInfo"
+          class="base-chips-input__drop-down"
+          @within-drop-down="dropDownActive = $event"
+          @click.native.stop="">
+          <template v-slot:option="entry">
+            <span
+              v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
+              ref="option"
+              :key="entry.option[identifierPropertyName]">
+              {{ addNewChipText
+                ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
+                : `${getI18nTerm('form.Add', -1, {
+                  value: getLangLabel(entry.option[labelPropertyName], true)
+                })} ...` }}
+            </span>
+            <template
+              v-else-if="entry">
+              <!-- @slot a slot to provide more advanced drop down entries<br> per default only the
+                Object[labelPropertyName][?lang] will be displayed -->
+              <slot
+                :item="entry.option"
+                name="drop-down-entry">
+                <!-- SLOT DEFAULT -->
+                {{ getLangLabel(entry.option[labelPropertyName], true) }}
+              </slot>
+            </template>
+          </template>
+        </BaseDropDownList>
       </template>
-    </BaseDropDownList>
+    </BaseChipsInputField>
   </div>
 </template>
 
@@ -278,6 +277,43 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * mark as required field (currently only used for aria-required)
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once
+     */
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -313,7 +349,7 @@ export default {
        * variable for checking if cursor is withing drop down
        * @type {boolean}
        */
-      isWithinDropDown: false,
+      dropDownActive: false,
       /**
        * variable for storing if external list was array of strings (or objects)
        * @type {boolean}
@@ -376,8 +412,14 @@ export default {
      * if drop down should be active
      * @returns {boolean}
      */
-    isDropDownActive() {
-      return this.inputFieldActive || this.isWithinDropDown;
+    chipsInputActive: {
+      set(val) {
+        this.dropDownActive = val;
+        this.inputFieldActive = val;
+      },
+      get() {
+        return this.inputFieldActive || this.dropDownActive;
+      },
     },
     /**
      * the currently active option object
@@ -506,7 +548,7 @@ export default {
      * c) to inform parent of drop down state changes
      * @param {boolean} val
      */
-    isDropDownActive(val) {
+    chipsInputActive(val) {
       // allow also for static drop down entries to be loaded on first drop down show only
       if (val && !this.allowDynamicDropDownEntries && !this.listInt.length) {
         /**
@@ -567,7 +609,7 @@ export default {
         this.$set(this.selectedListInt, 0, selected);
         // for single select the drop down should close again automatically
         // after choosing the option
-        this.isWithinDropDown = false;
+        this.dropDownActive = false;
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
@@ -607,14 +649,12 @@ export default {
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
 
     onInputFocus() {
-      this.inputFieldActive = true;
+      this.chipsInputActive = true;
     },
     onInputBlur() {
-      if (!this.isWithinDropDown) {
-        this.inputFieldActive = false;
-      }
+      this.chipsInputActive = false;
       // if the focus goes to somewhere else on the page - remove input string
-      if (!this.isWithinDropDown && document.activeElement.tagName === 'BODY') {
+      if (!this.dropDownActive && document.activeElement.tagName === 'BODY') {
         this.input = '';
       }
     },
@@ -629,8 +669,7 @@ export default {
       // if tab this will trigger moving forward to next input field
       // --> this one should be inactive
       if (event.key === 'Tab') {
-        this.inputFieldActive = false;
-        this.isWithinDropDown = false;
+        this.chipsInputActive = false;
       }
     },
     /**

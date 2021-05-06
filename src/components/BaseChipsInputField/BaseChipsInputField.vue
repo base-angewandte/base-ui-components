@@ -10,20 +10,25 @@
       :label="label"
       :show-label="showLabel"
       :show-input-border="showInputBorder"
-      :is-active="dropDownActive"
+      :is-active="inputFieldActive"
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
-      @clicked-outside="onInputBlur"
+      :invalid="invalid"
+      :required="required"
+      :error-message="errorMessage"
+      :show-error-icon="showErrorIcon"
+      @clicked-outside="clickedOutside"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
-      @click-input-field="onInputFocus"
+      @click-input-field="onInputActive"
       v-on="$listeners">
       <template
         v-if="sortable"
         v-slot:label-addition>
         <button
+          :aria-label="`${label}. ${sortText.replace(/[—–-]/, 'to')}`"
           type="button"
           class="base-chips-input-field__sort"
           @click="sortSelectedList(selectedListInt)">
@@ -37,7 +42,6 @@
           <template v-if="draggable">
             <draggable
               v-model="selectedListInt"
-              :disabled="!draggable"
               :set-data="setDragElement"
               :force-fallback="true"
               :animation="200"
@@ -127,10 +131,14 @@
           <base-icon
             :class="[
               'base-chips-input-field__single-dropdown-icon',
-              { 'base-chips-input-field__single-dropdown-icon-rotated': dropDownActive }
+              { 'base-chips-input-field__single-dropdown-icon-rotated':
+                inputFieldActive }
             ]"
             name="drop-down" />
         </div>
+      </template>
+      <template v-slot:below-input>
+        <slot name="below-input" />
       </template>
     </BaseInput>
   </div>
@@ -272,14 +280,6 @@ export default {
       default: false,
     },
     /**
-     * set from outside if drop down is active and special styling should
-     * be applied
-     */
-    dropDownActive: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * if sorting is enabled this will be the text shown in the button
      */
     sortText: {
@@ -360,6 +360,43 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * mark as required field (currently only used for aria-required)
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once
+     */
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -368,6 +405,11 @@ export default {
        * @type {(String[]|Object[])}
        */
       selectedListInt: [],
+      /**
+       * store active state of the base input field
+       * @type {boolean}
+       */
+      inputFieldActive: false,
       /**
        * for removing chips via backspace, to get delay after
        * keydown event
@@ -456,6 +498,11 @@ export default {
      */
     checkKeyEvent(event) {
       const key = event.code;
+      if (key === 'Tab') {
+        console.log('tab in parent');
+        this.inputFieldActive = false;
+        console.log(this.inputFieldActive);
+      }
       // if event was Delete check if a chip should be deleted
       if (key === 'Backspace' || key === 'Delete') {
         // if backspace (once) is used make last chip active
@@ -525,6 +572,8 @@ export default {
        * @property {Object} option - the removed option
        */
       this.$emit('removed', option);
+      // lay the focus on the input field
+      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
     },
     /**
      * adding an selected option to the array of selected options
@@ -620,6 +669,7 @@ export default {
     /** SORTING */
     /** function called when the 'sort' button is clicked */
     sortSelectedList() {
+      this.inputFieldActive = false;
       sort(
         this.selectedListInt,
         this.labelPropertyName,
@@ -660,18 +710,18 @@ export default {
       }
     },
 
-    /** INPUT FIELD FOCUS/BLUR EVENTS */
-    onInputBlur() {
+    /** INPUT FIELD EVENTS */
+    clickedOutside(event) {
+      this.inputFieldActive = false;
       /**
        * propagate to parent that click event happened outside of input field
        *
        * @event clicked-outside
        */
-      this.$emit('clicked-outside');
+      this.$emit('clicked-outside', event);
     },
-    onInputFocus() {
-      // lay the focus on the input field
-      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+    onInputActive() {
+      this.inputFieldActive = true;
       // inform parent of input field click
       /**
        * inform parent that input field was clicked
@@ -730,8 +780,9 @@ export default {
     }
 
     .base-chips-input-field__loader {
-      margin: 0 $spacing-large;
+      margin: 0 $spacing;
       transform: scale(0.5);
+      pointer-events: none;
     }
 
     .base-chips-input-field__single-dropdown {

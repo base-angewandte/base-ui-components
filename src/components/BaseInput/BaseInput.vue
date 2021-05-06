@@ -1,76 +1,113 @@
 <template>
-  <div class="base-input">
-    <!-- TODO: hidden label seems not working? (there is no hide class...) -->
-    <!-- plus show label should probably only influence the label not the additional slot -->
+  <div
+    class="base-input">
     <div
-      :class="['base-input-label-row', { 'hide': !showLabel }]">
+      :class="['base-input__label-row', { 'hide': !showLabelRow }]">
       <label
-        :for="label + '_' + id"
-        class="base-input-label"
-        @click.prevent.stop="clickedOutsideInput">
+        :for="idInt"
+        :class="['base-input__label', { 'hide': !showLabel }]">
         {{ label }}
-        <span class="hide">{{ placeholder }}</span>
       </label>
+      <div class="base-input__label-spacer" />
       <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-        (e.g. language tabs))
-      -->
+      (e.g. language tabs)) -->
       <slot name="label-addition" />
     </div>
     <div
       v-click-outside="clickedOutsideInput"
-      :class="['base-input-field-container',
-               { 'base-input-field-container-border': useFormFieldStyling && showInputBorder },
-               { 'base-input-field-container-active': useFormFieldStyling
-                 && (active || isActive) }]"
-      @click="insideInput">
+      :class="['base-input__input-frame',
+               { 'base-input__input-frame__color': useFormFieldStyling && showInputBorder },
+               { 'base-input__input-frame__invalid': invalid }]"
+      @focusin="clickedInside"
+      @click="clickedInside">
+      <!-- one class __active for pseudo-class :focus-within, one class __is-active
+      for manually setting input active -->
       <div
-        :class="['base-input-field__addition-container',
-                 { 'base-input-field__addition-container-wrap': !hideInputField}]">
-        <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
-        (before \<input\>)
-       -->
-        <slot name="input-field-addition-before" />
-        <div class="base-input__input-line">
-          <div
-            :class="[
-              'base-input-field-wrapper',
-              { 'base-input-field-wrapper-fade-out': !active && !hideInputField },
-            ]">
-            <input
-              :id="label + '_' + id"
-              :name="label"
-              :placeholder="placeholder"
-              :value="inputInt"
-              :type="fieldType"
-              :list="dropDownListId || false"
-              :aria-activedescendant="linkedListOption"
-              :aria-describedby="label + '_' + id"
-              :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
-              autocomplete="off"
-              @click="active = true"
-              @keydown.tab.enter="active = false"
-              @focus="active = true"
-              v-on="inputListeners">
+        :class="['base-input__input-container',
+                 { 'base-input__input-container__is-active':
+                   showInputActive && useFormFieldStyling}]">
+        <div
+          :class="['base-input__input-addition-container',
+                   { 'base-input__input-addition-container__wrap': !hideInputField}]">
+          <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
+          (before \<input\>) -->
+          <slot name="input-field-addition-before" />
+          <div class="base-input__input-line">
+            <div
+              :class="['base-input__input-wrapper',
+                       { 'base-input__input-wrapper__fade-out':
+                         !showInputActive && !hideInputField }]">
+              <input
+                :id="idInt"
+                ref="input"
+                v-model="inputInt"
+                :placeholder="placeholder"
+                :type="fieldType"
+                :list="dropDownListId || false"
+                :aria-activedescendant="linkedListOption"
+                :aria-describedby="idInt"
+                :aria-required="required.toString()"
+                :aria-invalid="invalid.toString()"
+                autocomplete="off"
+                :class="['base-input__input',
+                         { 'base-input__input__hidden': hideInputField }]"
+                @keydown.tab="active = false"
+                v-on="inputListeners">
+            </div>
+            <!-- wrapped in a button for accessibility -->
+            <button
+              v-if="showRemoveIcon"
+              class="base-input__remove-icon-wrapper"
+              @keydown.tab="blurInput"
+              @click.stop="removeInput">
+              <!-- @slot use a custom icon instead of standard remove icon -->
+              <slot name="input-icon">
+                <BaseIcon
+                  name="remove"
+                  title="Clear input"
+                  class="base-input__remove-icon" />
+              </slot>
+            </button>
+            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <slot name="input-field-addition-after" />
+            <slot name="error-icon">
+              <BaseIcon
+                v-if="showErrorIcon && invalid"
+                name="attention"
+                class="base-input__error-icon" />
+            </slot>
           </div>
-          <!-- @slot for adding elements after input (e.g. used to add loader -->
-          <slot name="input-field-addition-after" />
         </div>
       </div>
+    </div>
+    <div>
+      <!-- @slot below-input slot added to e.g. add drop down -->
+      <!-- this way it does not interfere with error message -->
+      <slot name="below-input" />
+    </div>
+    <div
+      v-if="invalid && errorMessage"
+      class="base-input__invalid-message">
+      {{ errorMessage }}
     </div>
   </div>
 </template>
 
 <script>
 import ClickOutside from 'vue-click-outside';
-
+import { createId } from '@/utils/utils';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 /**
  * Form Input Field Component
  */
 
 export default {
-  name: 'BaseInput',
+  name: 'BaseInputNew',
   directives: {
     ClickOutside,
+  },
+  components: {
+    BaseIcon,
   },
   model: {
     prop: 'input',
@@ -81,7 +118,7 @@ export default {
      * @model
      *
      * input field settable from outside
-      */
+     */
     input: {
       type: [String, Number],
       default: '',
@@ -101,6 +138,13 @@ export default {
       default: true,
     },
     /**
+     if field is occurring more then once - set an id
+     */
+    id: {
+      type: String,
+      default: '',
+    },
+    /**
      * set a placeholder for the input field
      */
     placeholder: {
@@ -108,48 +152,43 @@ export default {
       default: 'Enter Text Here',
     },
     /**
-     * option to hide input field from outside (required for chips input)
+     * mark as required field (currently only used for aria-required)
      */
-    hideInputField: {
+    required: {
       type: Boolean,
       default: false,
     },
     /**
-     * option to have the border of the input field not displayed
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field
      */
-    showInputBorder: {
-      type: Boolean,
-      default: true,
-    },
-    /**
-     * show input field active
-     */
-    isActive: {
+    invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * specify if field should be of type text, number
+     * add an error message to be displayed below form field if field is invalid
      */
-    fieldType: {
-      type: String,
-      default: 'text',
-      validator: val => ['text', 'number'].includes(val),
-    },
-    /**
-     if field is occuring more then once - set an id
-     */
-    id: {
+    errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if standard form field styling should be
-     * used (otherwise no border, no box shadow)
+     * define if error icon should be shown
      */
-    useFormFieldStyling: {
+    showErrorIcon: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * specify input type
+     * @values text, number, password, email, 'url'
+     *
+     */
+    fieldType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'number', 'password', 'email', 'url'].includes(val),
     },
     /**
      * specify the id of a linked drop down list
@@ -166,16 +205,66 @@ export default {
       type: String,
       default: null,
     },
+    /**
+     * option to hide input field from outside (required for chips input)
+     */
+    hideInputField: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * show input field active, can be used to override internal input active/inactive
+     * setting, it will override internal active state always, if this is not desired
+     * set isActive to 'null'
+     */
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * option to have the border of the input field not displayed
+     */
+    showInputBorder: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define if standard form field styling should be
+     * used (otherwise no border, no box shadow)
+     */
+    useFormFieldStyling: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once
+     */
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      inputInt: '',
       active: false,
+      inputInt: '',
     };
   },
   computed: {
-    // add all input event listeners to component
-    // https://vuejs.org/v2/guide/components-custom-events.html
+    idInt() {
+      return this.id || createId();
+    },
+    showLabelRow() {
+      // show label when prop is set true or a label addition was added via slot
+      return this.showLabel || this.$slots['label-addition'];
+    },
+    showRemoveIcon() {
+      return this.clearable && !!this.inputInt;
+    },
+    showInputActive() {
+      return this.isActive !== null ? this.isActive : this.active;
+    },
     inputListeners() {
       return {
         // add all the listeners from the parent
@@ -216,31 +305,20 @@ export default {
   },
   watch: {
     input(val) {
-      this.inputInt = val;
-    },
-    isActive(val) {
-      if (val !== this.active) {
-        this.active = val;
+      if (val !== this.inputInt) {
+        this.inputInt = val;
       }
     },
-  },
-  mounted() {
-    this.inputInt = this.input;
   },
   methods: {
-    clickedOutsideInput() {
-      if (this.active || this.isActive) {
-        this.active = false;
-        /**
-         * Event emitted when click outside input field \<div\> is registered
-         *
-         * @event clicked-outside
-         *
-         */
-        this.$emit('clicked-outside');
-      }
+    blurInput(event) {
+      this.active = false;
+      // handle as if tab was coming from input to also allow parent to handle
+      // active state if isActive is used
+      this.$emit('keydown', event);
     },
-    insideInput() {
+    clickedInside() {
+      this.active = true;
       /**
        * Event emitted on click on input field \<div\>
        *
@@ -249,32 +327,80 @@ export default {
        */
       this.$emit('click-input-field');
     },
+    clickedOutsideInput(event) {
+      this.active = false;
+      /**
+       * Event emitted when click outside input field \<div\> is registered
+       *
+       * @event clicked-outside
+       *
+       */
+      this.$emit('clicked-outside', event);
+    },
+    removeInput() {
+      this.inputInt = '';
+      this.$refs.input.focus();
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@import '../../styles/variables.scss';
 
-  .base-input {
+.base-input {
+  position: relative;
+  background: inherit;
+  width: 100%;
+
+  .base-input__label-row {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    margin-bottom: $spacing-small;
+
+    .base-input__label {
+      color: $font-color-second;
+      text-align: left;
+    }
+
+    .base-input__label-spacer {
+      flex: 1 1 auto;
+    }
+  }
+
+  .base-input__input-frame {
+    height: 100%;
     width: 100%;
+    padding: 1px;
+    background: inherit;
+    // necessary for loader animation which is slightly outside
+    overflow: hidden;
 
-    .base-input-field-container {
+    &.base-input__input-frame__color {
+      background: $input-field-color;
+    }
+
+    &.base-input__input-frame__invalid {
+      background: $app-color;
+    }
+
+    .base-input__input-container {
       position: relative;
-      display: flex;
-      align-items: center;
-      padding-left: $spacing-small;
-      min-height: $row-height-small;
       background: white;
+      min-height: $row-height-small;
+      padding: 0 $spacing-small;
 
-      .base-input-field__addition-container {
+      &.base-input__input-container__active:focus-within,
+      &.base-input__input-container__is-active {
+        box-shadow: $input-shadow;
+      }
+
+      .base-input__input-addition-container {
         display: flex;
         align-items: center;
         flex: 1 1 auto;
 
-        &.base-input-field__addition-container-wrap {
+        &.base-input__input-addition-container__wrap {
           flex-wrap: wrap;
         }
 
@@ -283,13 +409,13 @@ export default {
           flex: 1 1 auto;
           align-items: center;
 
-          .base-input-field-wrapper {
+          .base-input__input-wrapper {
             flex: 1 1 auto;
             margin-right: $spacing;
             position: relative;
             display: flex;
 
-            &.base-input-field-wrapper-fade-out::after {
+            &.base-input__input-wrapper__fade-out::after {
               content: '';
               width: calc(#{$fade-out-width} + #{$spacing});
               height: $input-field-line-height;
@@ -300,54 +426,51 @@ export default {
               background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
             }
 
-            .base-input-field {
+            .base-input__input {
               padding: $spacing-small/2 0;
-              min-height: $input-field-line-height;
+              min-height: $row-height-small;
               width: 100%;
 
-              &:invalid {
-                box-shadow: none;
+              &.base-input__input__hidden {
+                width: 1px;
+                overflow: hidden;
+                opacity: 0;
+                filter:alpha(opacity=0);
+                animation: all 500ms ease;
               }
             }
+          }
 
-            .base-input-field-hidden {
-              width: 1px;
-              overflow: hidden;
-              opacity: 0;
-              filter:alpha(opacity=0);
-              animation: all 500ms ease;
+          .base-input__remove-icon-wrapper {
+            color: $font-color-third;
+            cursor: pointer;
+
+            &:focus, &:active {
+              color: $app-color-secondary;
             }
+
+            .base-input__remove-icon {
+              height: $icon-medium;
+              width: $icon-medium;
+              margin: $spacing-small;
+            }
+          }
+
+          .base-input__error-icon {
+            height: $icon-large;
+            width: $icon-large;
+            margin-left: $spacing-small;
+            color: $app-color;
+            flex-shrink: 0;
           }
         }
       }
     }
-
-    .base-input-field-container-border {
-      border: $input-field-border;
-    }
-
-    .base-input-field-container-active {
-      box-shadow: $input-shadow;
-    }
-
-    .base-input-label-row {
-      display: flex;
-      margin-bottom: $spacing-small;
-
-      .base-input-label {
-        color: $font-color-second;
-        text-align: left;
-        flex-grow: 1;
-      }
-    }
   }
 
-  input::-webkit-input-placeholder {
-    line-height: $input-field-line-height;
+  .base-input__invalid-message {
+    font-size: $font-size-small;
+    color: $app-color;
   }
-
-  input[type='text'].base-input-field {
-    border: none;
-    overflow: hidden;
-  }
+}
 </style>
