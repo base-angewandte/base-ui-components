@@ -1,12 +1,9 @@
 <template>
   <div
     ref="dropDownContainer"
-    v-click-outside="() => withinDropDown = false"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
-    class="base-drop-down-list__container"
-    @mouseenter="withinDropDown = true"
-    @mouseleave="withinDropDown = false">
+    class="base-drop-down-list__container">
     <!-- @slot for adding elements before the options list -->
     <slot name="before-list" />
     <ul
@@ -66,7 +63,6 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
 import i18n from '../../mixins/i18n';
 
 /** a multipurpose drop down list */
@@ -75,9 +71,6 @@ import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseDropDownList',
-  directives: {
-    ClickOutside,
-  },
   mixins: [
     i18n,
   ],
@@ -199,11 +192,6 @@ export default {
   data() {
     return {
       /**
-       * variable to store if cursor is within dropdown
-       * @type {boolean}
-       */
-      withinDropDown: false,
-      /**
        * if there is any (associated by id) store the related input element
        * in this variable
        * @type {HTMLElement}
@@ -236,18 +224,6 @@ export default {
             === this.activeOption[this.identifierPropertyName]);
       }
       return this.dropDownOptions.indexOf(this.activeOption);
-    },
-  },
-  watch: {
-    // emit withinDropDown when it has changed
-    withinDropDown(val) {
-      /**
-       * inform parent of changes of mouse cursor within drop down
-       *
-       * @event within-drop-down
-       * @property {boolean} val
-       */
-      this.$emit('within-drop-down', val);
     },
   },
   mounted() {
