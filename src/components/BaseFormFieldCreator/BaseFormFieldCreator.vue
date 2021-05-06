@@ -20,6 +20,11 @@
       :is-loading="autocompleteLoading"
       :input="fieldValueInt"
       :field-type="field.type === 'integer' ? 'number' : 'text'"
+      :invalid="invalid"
+      :required="required"
+      :error-message="errorMessage"
+      :show-error-icon="showErrorIcon"
+      :clearable="clearable"
       @keydown.enter.prevent=""
       @text-input="setMultilineValue($event)"
       @input="fieldValueInt = $event"
@@ -101,8 +106,13 @@
       :drop-down-no-options-info="getI18nTerm('form.noMatch')"
       :role-options="fieldType === 'chips-below' ? secondaryDropdown : false"
       :roles-placeholder="fieldType === 'chips-below' ? getI18nTerm('form.selectRoles') : false"
-      identifier-property-name="source"
-      label-property-name="label"
+      :invalid="invalid"
+      :required="required"
+      :error-message="errorMessage"
+      :show-error-icon="showErrorIcon"
+      :clearable="clearable"
+      :identifier-property-name="identifierPropertyName"
+      :label-property-name="labelPropertyName"
       @fetch-dropdown-entries="fetchAutocomplete"
       @text-input="textInput = $event"
       @hoverbox-active="$emit('fetch-info-data')">
@@ -271,6 +281,57 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * mark as required field (currently only used for aria-required)
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once
+     */
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * specify the object property that should be used as identifier
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'source',
+    },
+    /**
+     * specify the object property that should be used as value to be displayed
+     */
+    labelPropertyName: {
+      type: String,
+      default: 'label',
+    },
   },
   data() {
     return {
@@ -354,8 +415,8 @@ export default {
     textTypeDefault() {
       return {
         // map the language specific labels for no value selected to the default
-        label: this.setLangLabels('form.noTextType', this.availableLocales),
-        source: '',
+        [this.labelPropertyName]: this.setLangLabels('form.noTextType', this.availableLocales),
+        [this.identifierPropertyName]: '',
       };
     },
     // compute the texts type drop down list specific for texts

@@ -168,6 +168,32 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * define if error icon should be shown
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once
+     */
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * provide an object with settings an properties for each field, this is used to set
+     * required, invalid, errorMessage for each field this is applicable to
+     */
+    fieldProps: {
+      type: Object,
+      default: () => ({}),
+      validator: val => Object.values(val)
+        .every(fieldProps => Object.keys(fieldProps)
+          .every(fieldProp => ['required', 'invalid', 'errorMessage'].includes(fieldProp))),
+    },
   },
   data() {
     return {
@@ -340,6 +366,7 @@ export default {
     },
     formFieldComponentProps(element, index, valueIndex) {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
+      const elementProps = this.fieldProps[element.name];
       return {
         field: element,
         label: this.getFieldName(element),
@@ -356,6 +383,11 @@ export default {
         fieldGroupParams: this.formFieldListInt
           .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')
           ? this.$props : null,
+        clearable: this.clearable,
+        showErrorIcon: this.showErrorIcon,
+        required: elementProps ? elementProps.required : false,
+        errorMessage: elementProps ? elementProps.errorMessage : '',
+        invalid: elementProps ? elementProps.invalid : false,
       };
     },
     setFieldValue(value, fieldName, index) {
