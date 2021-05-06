@@ -1,6 +1,7 @@
 <template>
   <div
     class="base-input">
+    <!-- LABEL ROW -->
     <div
       :class="['base-input__label-row', { 'hide': !showLabelRow }]">
       <label
@@ -13,6 +14,8 @@
       (e.g. language tabs)) -->
       <slot name="label-addition" />
     </div>
+
+    <!-- ACTUAL INPUT FIELD -->
     <div
       v-click-outside="clickedOutsideInput"
       :class="['base-input__input-frame',
@@ -61,7 +64,7 @@
               @keydown.tab="blurInput"
               @click.stop="removeInput">
               <!-- @slot use a custom icon instead of standard remove icon -->
-              <slot name="input-icon">
+              <slot name="remove-icon">
                 <BaseIcon
                   name="remove"
                   title="Clear input"
@@ -70,16 +73,21 @@
             </button>
             <!-- @slot for adding elements after input (e.g. used to add loader -->
             <slot name="input-field-addition-after" />
-            <slot name="error-icon">
-              <BaseIcon
-                v-if="showErrorIcon && invalid"
-                name="attention"
-                class="base-input__error-icon" />
-            </slot>
+            <div
+              v-if="showErrorIcon && invalid"
+              class="base-input__error-icon-wrapper">
+              <slot name="error-icon">
+                <BaseIcon
+                  name="attention"
+                  class="base-input__error-icon" />
+              </slot>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- BELOW INPUT FIELD -->
     <div>
       <!-- @slot below-input slot added to e.g. add drop down -->
       <!-- this way it does not interfere with error message -->
@@ -102,7 +110,7 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon';
  */
 
 export default {
-  name: 'BaseInputNew',
+  name: 'BaseInput',
   directives: {
     ClickOutside,
   },
@@ -219,7 +227,7 @@ export default {
      */
     isActive: {
       type: Boolean,
-      default: false,
+      default: null,
     },
     /**
      * option to have the border of the input field not displayed
@@ -242,7 +250,7 @@ export default {
      */
     clearable: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
@@ -304,10 +312,13 @@ export default {
     },
   },
   watch: {
-    input(val) {
-      if (val !== this.inputInt) {
-        this.inputInt = val;
-      }
+    input: {
+      handler(val) {
+        if (val !== this.inputInt) {
+          this.inputInt = val;
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -444,6 +455,8 @@ export default {
           .base-input__remove-icon-wrapper {
             color: $font-color-third;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
 
             &:focus, &:active {
               color: $app-color-secondary;
@@ -456,12 +469,17 @@ export default {
             }
           }
 
-          .base-input__error-icon {
-            height: $icon-large;
-            width: $icon-large;
-            margin-left: $spacing-small;
+          .base-input__error-icon-wrapper {
             color: $app-color;
-            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+
+            .base-input__error-icon {
+              height: $icon-large;
+              width: $icon-large;
+              margin-left: $spacing-small;
+              flex-shrink: 0;
+            }
           }
         }
       }

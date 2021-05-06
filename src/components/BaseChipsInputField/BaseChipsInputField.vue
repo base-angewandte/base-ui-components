@@ -499,9 +499,7 @@ export default {
     checkKeyEvent(event) {
       const key = event.code;
       if (key === 'Tab') {
-        console.log('tab in parent');
         this.inputFieldActive = false;
-        console.log(this.inputFieldActive);
       }
       // if event was Delete check if a chip should be deleted
       if (key === 'Backspace' || key === 'Delete') {
