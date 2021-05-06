@@ -182,7 +182,7 @@ export default {
     },
     /**
      * specify input type
-     * @values text, number, password, email, 'url'
+     * @values text, number, password, email, url
      *
      */
     fieldType: {

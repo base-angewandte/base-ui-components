@@ -70,7 +70,8 @@ input[type='search'] {
   font-size: inherit;
 }
 
-input[type=text], input[type=date], textarea, input[type=number] {
+input[type=text], input[type=date], textarea, input[type=number],
+input[type=password], input[type=email], input[type=url] {
   font-family: inherit;
   font-size: inherit;
   background-color: transparent;
@@ -80,7 +81,8 @@ input[type=text], input[type=date], textarea, input[type=number] {
 }
 
 input:focus, input[type=date]:focus, input[type=search]:focus, textarea:focus, video:focus,
-audio:focus, input[type=number]:focus {
+audio:focus, input[type=number]:focus, input[type=password]:focus, input[type=email]:focus,
+input[type=url]:focus {
   outline: none;
 }
 
@@ -93,7 +95,7 @@ input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
 
-input[type=number], input[type=email] {
+input[type=number], input[type=email], input[type=password] {
   border: none;
 }
 
