@@ -1,12 +1,16 @@
 <template>
   <label
-    :class="['base-toggle-container', {'base-toggle-container-checked': checkedInt }]">
+    :class="['base-toggle-container',
+             {'base-toggle-container-checked': checkedInt },
+             {'base-toggle-container-disabled': disabled }]">
 
     <input
       v-model="checkedInt"
       :name="name"
       :checked="checkedInt"
+      :disabled="disabled"
       :aria-checked="checkedInt"
+      :aria-disabled="disabled"
       :type="'checkbox'"
       value=""
       class="base-toggle-input">
@@ -56,6 +60,13 @@ export default {
     label: {
       type: String,
       default: 'baseToggle',
+    },
+    /**
+     * disable the toggle button
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
     },
     /**
      * checkbox checked or radio button checked can be set from outside, <br>
@@ -149,6 +160,11 @@ export default {
           fill: $switch-svg-color;
         }
       }
+    }
+
+    &-disabled {
+      color: $font-color-second;
+      cursor: not-allowed;
     }
 
     &-checked {
