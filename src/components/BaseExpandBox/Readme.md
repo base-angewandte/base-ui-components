@@ -66,63 +66,14 @@ export default {
           data: [
             {
               label: 'www',
-              value: 'http://base.uni-ak.ac.at',
-              url: 'http://base.uni-ak.ac.at',
+              value: 'https://base.uni-ak.ac.at',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               label: 'email',
               value: 'base@uni-ak.ac.at',
               url: 'mailto:base@uni-ak.ac.at',
             },
-          ],
-        },
-      ],
-    };
-  },
-}
-</script>
-```
-
-Example of BaseExpandBox to display an expandable map and address data
-
-```vue
-<template>
-  <div>
-    <base-expand-box
-      show-more-text="Show Map and Address"
-      show-less-text="Collapse Map and Address">
-      <base-map
-        :lat-long="location"
-        style="height: 368px; margin-bottom: 0.84211rem;" />
-
-      <base-text-list
-        render-label-as="h2"
-        :data="locationAddress" />
-    </base-expand-box>
-  </div>
-</template>
-
-<script>
-import BaseExpandBox from './BaseExpandBox';
-import BaseMap from '../BaseMap/BaseMap';
-import BaseTextList from '../BaseTextList/BaseTextList';
-
-export default {
-  components: {
-    BaseExpandBox,
-    BaseMap,
-    BaseTextList,
-  },
-  data() {
-    return {
-      location: [48.208370, 16.384510],
-      locationAddress: [
-        {
-          label: 'Address',
-          data: [
-            'Vordere Zollamtsstrasse 7',
-            '1030 Vienna',
-            'Austria',
           ],
         },
       ],

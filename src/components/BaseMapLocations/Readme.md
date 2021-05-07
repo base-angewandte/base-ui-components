@@ -1,18 +1,26 @@
 ```vue
 <template>
-  <BaseMap
-    :marker="marker"
-    :options="options"
-    attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
-    copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
-    url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
+  <BaseExpandBox
+    show-more-text="Show Map and Addresses"
+    show-less-text="Collapse Map and Addresses">
+    <base-map-locations
+      :locations="locations"
+      :options="options"
+      attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
+      attribution-position="topright"
+      copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
+      label="Addresses"
+      url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
+  </BaseExpandBox>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      marker: [
+      highlightedMarker: null,
+      highlightedLocation: null,
+      locations: [
         {
           latLng: [48.208309, 16.382782],
           data: [
@@ -48,7 +56,7 @@ export default {
         type: 'geolandbasemap',
       },
     };
-  }
+  },
 }
 </script>
 ```
