@@ -12,7 +12,7 @@
           <BaseImageBox
             :href="item.href"
             :title="item.title"
-            :subtext="item.subtext"
+            :subtext="subtext(item.subtext)"
             :description="item.description"
             :additional="item.additional"
             :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '640w')"
@@ -141,6 +141,9 @@ export default {
     showMore() {
       this.showAll = true;
     },
+    subtext(value) {
+      return typeof value === 'object' && typeof value[0] === 'string' ? value.join(', ') : value;
+    },
   },
 };
 </script>
@@ -150,7 +153,7 @@ export default {
 
   .base-carousel {
     max-width: 1400px;
-    margin: 10px auto;
+    margin: 0 auto;
 
     .base-carousel-slide {
       margin-bottom: 0;
@@ -203,32 +206,40 @@ export default {
       position: inherit;
       bottom: 0;
       left: inherit;
-      margin: $spacing 0;
 
       @media screen and (min-width: $mobile-min-width) {
         display: block;
       }
     }
 
-    .swiper-pagination-bullet {
-      width: 10px;
-      height: 10px;
-      background: #000;
-      opacity: 0.6;
-      margin: 0 $spacing-small;
+    & {
+      > .swiper-pagination-bullets {
+        .swiper-pagination-bullet {
+          width: 10px;
+          height: 10px;
+          background: #000;
+          opacity: 0.6;
+          margin: $spacing $spacing-small 0;
+          display: inline-block;
 
-      &:focus {
-        outline: none;
-      }
-    }
+          &:focus {
+            outline: none;
+          }
 
-    .swiper-pagination-bullet-active {
-      opacity: 1;
-      background: $app-color;
+          &:only-child {
+            display: none;
+          }
+        }
 
-      &:hover,
-      &:focus {
-        box-shadow: $box-shadow-hov;
+        .swiper-pagination-bullet-active {
+          opacity: 1;
+          background: $app-color;
+
+          &:hover,
+          &:focus {
+            box-shadow: $box-shadow-hov;
+          }
+        }
       }
     }
   }
