@@ -5,7 +5,8 @@
     :box-hover="false"
     :class="[
       'base-expand-box',
-      { 'base-expand-box-open': expandInt }]">
+      'base-expand-box-padding-' + padding,
+      { 'base-expand-box-open': expandInt },]">
     <div
       :class="[
         'base-expand-box-content',
@@ -64,6 +65,17 @@ export default {
     expand: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * define padding of the box<br>
+     * valid values: 'large' | 'small'
+     */
+    padding: {
+      type: String,
+      default: 'small',
+      validator(val) {
+        return ['large', 'small'].includes(val);
+      },
     },
     /**
      * button text to show more content
@@ -165,8 +177,15 @@ export default {
   @import "../../styles/variables";
 
   .base-expand-box {
-    padding: $spacing;
     flex-direction: column;
+
+    &.base-expand-box-padding-small {
+      padding: $spacing;
+    }
+
+    &.base-expand-box-padding-large {
+      padding: $spacing-large;
+    }
 
     .base-expand-box-content {
       position: relative;
@@ -207,7 +226,7 @@ export default {
 
     .base-expand-box-footer {
       border-top: $border-width solid $background-color;
-      margin: $spacing 0 $spacing-small;
+      margin: $spacing 0 0;
       padding-top: $spacing;
     }
   }
