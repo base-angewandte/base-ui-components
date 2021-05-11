@@ -13,19 +13,20 @@
       <component
         :is="renderLabelAs"
         v-if="item.label"
-        class="base-text-list-label">
+        :class="['base-text-list-label', { 'base-text-list-label-mb': labelMarginBottom }]">
         {{ item.label }}
       </component>
 
       <!-- String as text -->
+      <!-- eslint-disable vue/multiline-html-element-content-newline -->
+      <!-- get rid of prepending white-space -->
       <p
         v-if="typeof item.data === 'string'"
         :class="[
           'base-text-list-content',
           'base-text-list-content-pre-line',
-          { 'base-text-list-2-cols': data.length === 1 }]">
-        {{ item.data }}
-      </p>
+          { 'base-text-list-2-cols': data.length === 1 }]">{{ item.data }}</p>
+      <!-- eslint-enable vue/multiline-html-element-content-newline-->
 
       <!-- Array as unordered list -->
       <ul
@@ -58,9 +59,9 @@
             <template
               v-if="objectItem.url">
               <component
-                :is="useRouterLink ? 'router-link' : 'a'"
-                :to="useRouterLink ? objectItem.url : null"
-                :href="!useRouterLink ? objectItem.url : null"
+                :is="useRouterLink(objectItem.url) ? 'router-link' : 'a'"
+                :to="useRouterLink(objectItem.url) ? objectItem.url : undefined"
+                :href="!useRouterLink(objectItem.url) ? objectItem.url : undefined"
                 :title="objectItem.value"
                 :target="target(objectItem.url)"
                 class="base-text-list__content-link">
@@ -107,6 +108,13 @@ export default {
       default: 'div',
     },
     /**
+     * set usage of margin-bottom for the label<br>
+     */
+    labelMarginBottom: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * render content in two columns
      */
     cols2: {
@@ -127,12 +135,6 @@ export default {
       cols2Int: false,
     };
   },
-  computed: {
-    // check if router is available
-    useRouterLink() {
-      return !!this.$route;
-    },
-  },
   mounted() {
     if (this.cols2) {
       this.boxResize().observe(this.$el);
@@ -151,9 +153,13 @@ export default {
         this.cols2Int = false;
       });
     },
+    useRouterLink(url) {
+      const pattern = /^(.*?):/;
+      return !!this.$route && url.match(pattern) == null;
+    },
     target(url) {
-      // Todo: if url string contains either http or https we assume it is an external link?
-      return url.match(/(http|https)/) ? '_blank' : null;
+      const pattern = /^(.*?):\/\//;
+      return url.match(pattern) ? '_blank' : null;
     },
   },
 };
@@ -184,6 +190,11 @@ export default {
 
       .base-text-list-label {
         margin-top: $line-height;
+        margin-bottom: 0;
+
+        &.base-text-list-label-mb {
+          margin-bottom: $line-height;
+        }
       }
 
       .base-text-list-content,
@@ -217,12 +228,6 @@ export default {
         display: block;
         content: '';
         width: 100%;
-      }
-
-      @media screen and (max-width: $mobile) {
-        &:first-of-type {
-          margin-top: $line-height;
-        }
       }
     }
 
