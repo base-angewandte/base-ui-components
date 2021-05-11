@@ -128,24 +128,13 @@
         </div>
       </template>
       <template v-slot:input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
         <div
           v-if="isLoading"
           class="base-chips-input-field__loader">
           <BaseLoader />
         </div>
-        <div
-          v-if="!allowMultipleEntries && useFormFieldStyling"
-          class="base-chips-input-field__single-dropdown">
-          <base-icon
-            :class="[
-              'base-chips-input-field__single-dropdown-icon',
-              { 'base-chips-input-field__single-dropdown-icon-rotated':
-                inputFieldActive }
-            ]"
-            name="drop-down" />
-        </div>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
       </template>
       <template v-slot:error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon -->
@@ -166,7 +155,6 @@
 <script>
 import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseInput from '../BaseInput/BaseInput';
 import BaseChip from '../BaseChip/BaseChip';
 import BaseLoader from '../BaseLoader/BaseLoader';
@@ -182,7 +170,6 @@ export default {
     BaseInput,
     BaseChip,
     Draggable,
-    BaseIcon,
   },
   mixins: [
     i18n,
@@ -804,20 +791,6 @@ export default {
       margin: 0 $spacing;
       transform: scale(0.5);
       pointer-events: none;
-    }
-
-    .base-chips-input-field__single-dropdown {
-      margin: 0 $spacing;
-
-      .base-chips-input-field__single-dropdown-icon {
-        transition:  $drop-down-arrow-animation;
-        height: $icon-small;
-        flex-shrink: 0;
-
-        &.base-chips-input-field__single-dropdown-icon-rotated {
-          transform: rotate(180deg);
-        }
-      }
     }
   }
 </style>

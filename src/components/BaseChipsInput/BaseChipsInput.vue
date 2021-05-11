@@ -76,6 +76,17 @@
         <!-- @slot for adding elements after input <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-after" />
+        <div
+          v-if="!allowMultipleEntries"
+          class="base-chips-input__single-dropdown">
+          <BaseIcon
+            :class="[
+              'base-chips-input__single-dropdown-icon',
+              { 'base-chips-input__single-dropdown-icon-rotated':
+                inputFieldActive }
+            ]"
+            name="drop-down" />
+        </div>
       </template>
       <template v-slot:error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon<br>
@@ -92,6 +103,7 @@
 </template>
 
 <script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
@@ -104,6 +116,7 @@ import navigateMixin from '../../mixins/navigateList';
 export default {
   name: 'BaseChipsInput',
   components: {
+    BaseIcon,
     BaseDropDownList: () => import('../BaseDropDownList/BaseDropDownList'),
     BaseChipsInputField,
   },
@@ -761,9 +774,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../styles/variables";
+
   .base-chips-input {
     .base-chips-input__drop-down {
       background: white;
+    }
+
+    .base-chips-input__single-dropdown {
+      margin: 0 $spacing;
+
+      .base-chips-input__single-dropdown-icon {
+        transition:  $drop-down-arrow-animation;
+        height: $icon-small;
+        flex-shrink: 0;
+
+        &.base-chips-input__single-dropdown-icon-rotated {
+          transform: rotate(180deg);
+        }
+      }
     }
   }
 </style>
