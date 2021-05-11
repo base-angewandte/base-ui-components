@@ -17,6 +17,7 @@
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :invalid="invalid"
       :required="required"
+      :clearable="clearable"
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
       @clicked-outside="clickedOutside"
