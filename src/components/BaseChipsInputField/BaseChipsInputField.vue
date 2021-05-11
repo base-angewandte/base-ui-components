@@ -10,7 +10,7 @@
       :label="label"
       :show-label="showLabel"
       :show-input-border="showInputBorder"
-      :is-active="inputFieldActive"
+      :is-active="inputFieldActiveInt"
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
@@ -407,6 +407,14 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * possibility to steer input field active state from outside<br>
+     * it is possible to use the .sync modifier here
+     */
+    inputFieldActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -419,7 +427,7 @@ export default {
        * store active state of the base input field
        * @type {boolean}
        */
-      inputFieldActive: false,
+      inputFieldActiveInt: false,
       /**
        * for removing chips via backspace, to get delay after
        * keydown event
@@ -498,6 +506,16 @@ export default {
       deep: true,
       immediate: true,
     },
+    inputFieldActiveInt(val) {
+      if (val !== this.inputFieldActive) {
+        this.$emit('update:input-field-active', val);
+      }
+    },
+    inputFieldActive(val) {
+      if (val !== this.inputFieldActiveInt) {
+        this.inputFieldActiveInt = val;
+      }
+    },
   },
   methods: {
     /** KEYBOARD HANDLING FOR CHIPS */
@@ -508,8 +526,9 @@ export default {
      */
     checkKeyEvent(event) {
       const key = event.code;
-      if (key === 'Tab') {
-        this.inputFieldActive = false;
+      // define conditions in which input field should be set inactive (in styling and blurring)
+      if (key === 'Tab' || (key === 'Enter' && !this.allowMultipleEntries)) {
+        this.inputFieldActiveInt = false;
       }
       // if event was Delete check if a chip should be deleted
       if (key === 'Backspace' || key === 'Delete') {
@@ -677,7 +696,7 @@ export default {
     /** SORTING */
     /** function called when the 'sort' button is clicked */
     sortSelectedList() {
-      this.inputFieldActive = false;
+      this.inputFieldActiveInt = false;
       sort(
         this.selectedListInt,
         this.labelPropertyName,
@@ -720,7 +739,7 @@ export default {
 
     /** INPUT FIELD EVENTS */
     clickedOutside(event) {
-      this.inputFieldActive = false;
+      this.inputFieldActiveInt = false;
       /**
        * propagate to parent that click event happened outside of input field
        *
@@ -729,7 +748,7 @@ export default {
       this.$emit('clicked-outside', event);
     },
     onInputActive() {
-      this.inputFieldActive = true;
+      this.inputFieldActiveInt = true;
       // inform parent of input field click
       /**
        * inform parent that input field was clicked

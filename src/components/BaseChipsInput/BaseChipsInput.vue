@@ -11,6 +11,7 @@
       :drop-down-list-id="id"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :return-as-string="returnAsString"
+      :input-field-active.sync="inputFieldActive"
       @keydown="checkKeyEvent"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -665,7 +666,7 @@ export default {
       this.selectedOption = null;
       // remove focus from input if element is single select
       if (!this.allowMultipleEntries) {
-        this.inputFieldActive = false;
+        this.chipsInputActive = false;
         this.inputElem.blur();
       }
     },
