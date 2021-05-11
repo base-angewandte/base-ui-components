@@ -1,5 +1,6 @@
 Simple Single Choice Example with fixed dropdown, no unknown, not editable, not draggable
 
+Additionally to the custom events listed above also all native input events are available.
 ```vue
 <template>
   <base-chips-input

@@ -290,21 +290,24 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -312,7 +315,8 @@ export default {
     },
     /**
      * if true a remove icon will be shown allowing to remove
-     * all input at once
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
      */
     clearable: {
       type: Boolean,

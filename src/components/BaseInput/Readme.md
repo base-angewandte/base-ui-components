@@ -13,7 +13,10 @@ export default{};
 
 ```
 
-A example with label and slot demonstrations. Also enter text to see clearable state or toggle controls to see various properties such as invalid state and the 'below-input' slot.
+A example with label and slot demonstrations. Also enter text to see clearable state or toggle controls to see various properties such as invalid state and the 'below-input' slot.<br>
+Also it is demonstrated here how to use the isActive prop.
+
+All events emitted by the native input element (e.g. @keydown) contained in the BaseInput component are also available.
 
 ```vue
 
@@ -102,7 +105,7 @@ A example with label and slot demonstrations. Also enter text to see clearable s
         class="toggle"/>
       <BaseToggle
         v-model="useFormFieldStyling"
-        label="form field stylding"
+        label="form field styling"
         name="use standard form field styling"
         class="toggle"/>
       <BaseToggle

@@ -26,9 +26,12 @@
       @click-input-field="onInputActive"
       v-on="$listeners">
       <template
-        v-if="sortable"
         v-slot:label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
+          (e.g. language tabs)) -->
+        <slot name="label-addition" />
         <button
+          v-if="sortable"
           :aria-label="`${label}. ${sortText.replace(/[—–-]/, 'to')}`"
           type="button"
           class="base-chips-input-field__sort"
@@ -37,9 +40,13 @@
         </button>
       </template>
       <template
-        v-if="displayChipsInline"
         v-slot:input-field-addition-before>
-        <div class="base-chips-input-field__chips">
+        <!-- @slot Slot to allow for additional elements in the input field \<div\>
+          (before \<input\>) -->
+        <slot name="input-field-addition-before" />
+        <div
+          v-if="displayChipsInline"
+          class="base-chips-input-field__chips">
           <template v-if="draggable">
             <draggable
               v-model="selectedListInt"
@@ -121,6 +128,8 @@
         </div>
       </template>
       <template v-slot:input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
         <div
           v-if="isLoading"
           class="base-chips-input-field__loader">
@@ -138,7 +147,16 @@
             name="drop-down" />
         </div>
       </template>
+      <template v-slot:error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <slot name="error-icon" />
+      </template>
+      <template v-slot:remove-icon>
+        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <slot name="remove-icon" />
+      </template>
       <template v-slot:below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
         <slot name="below-input" />
       </template>
     </BaseInput>
@@ -370,21 +388,24 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -392,7 +413,8 @@ export default {
     },
     /**
      * if true a remove icon will be shown allowing to remove
-     * all input at once
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
      */
     clearable: {
       type: Boolean,

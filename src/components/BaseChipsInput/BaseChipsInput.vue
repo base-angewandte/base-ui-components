@@ -58,6 +58,35 @@
           </template>
         </BaseDropDownList>
       </template>
+      <template
+        v-slot:label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
+          (e.g. language tabs)) <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="label-addition" />
+      </template>
+      <template
+        v-slot:input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field \<div\>
+          (before \<input\>) <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template v-slot:input-field-addition-after>
+        <!-- @slot for adding elements after input <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template v-slot:error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="error-icon" />
+      </template>
+      <template v-slot:remove-icon>
+        <!-- @slot for adding elements after input (e.g. used to add loader <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="remove-icon" />
+      </template>
     </BaseChipsInputField>
   </div>
 </template>
@@ -286,21 +315,24 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -308,7 +340,8 @@ export default {
     },
     /**
      * if true a remove icon will be shown allowing to remove
-     * all input at once
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
      */
     clearable: {
       type: Boolean,

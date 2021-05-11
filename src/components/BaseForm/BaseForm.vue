@@ -169,7 +169,8 @@ export default {
       default: () => ({}),
     },
     /**
-     * define if error icon should be shown
+     * define if error icon should be shown<br>
+     * for an example on how it looks on an individual form field see [BaseInput](#baseinput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -177,19 +178,26 @@ export default {
     },
     /**
      * if true a remove icon will be shown allowing to remove
-     * all input at once
+     * all input at once<br>
+     * for an example on how it looks on an individual form field see [BaseInput](#baseinput)
      */
     clearable: {
       type: Boolean,
       default: true,
     },
     /**
-     * provide an object with settings an properties for each field, this is used to set
-     * required, invalid, errorMessage for each field this is applicable to
+     * provide an object with settings and properties for each field, this is used to set
+     * `required`, `invalid`, `errorMessage` for each field this is applicable to<br>
+     * for an example on how these properties look on an individual form field
+     * see [BaseInput](#baseinput)
      */
     fieldProps: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        required: false,
+        invalid: false,
+        errorMessage: '',
+      }),
       validator: val => Object.values(val)
         .every(fieldProps => Object.keys(fieldProps)
           .every(fieldProp => ['required', 'invalid', 'errorMessage'].includes(fieldProp))),

@@ -71,11 +71,12 @@
                   class="base-input__remove-icon" />
               </slot>
             </button>
-            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
             <div
               v-if="showErrorIcon && invalid"
               class="base-input__error-icon-wrapper">
+              <!-- @slot use a custom icon instead of standard error/warning icon -->
               <slot name="error-icon">
                 <BaseIcon
                   name="attention"
@@ -344,6 +345,7 @@ export default {
        * Event emitted when click outside input field \<div\> is registered
        *
        * @event clicked-outside
+       * @param {MouseEvent} event
        *
        */
       this.$emit('clicked-outside', event);
