@@ -10,7 +10,7 @@
       :label="label"
       :show-label="showLabel"
       :show-input-border="showInputBorder"
-      :is-active="inputFieldActiveInt"
+      :is-active.sync="inputFieldActiveInt"
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
@@ -20,10 +20,9 @@
       :clearable="clearable"
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
-      @clicked-outside="clickedOutside"
+      :is-loading="isLoading"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
-      @click-input-field="onInputActive"
       v-on="$listeners">
       <template
         v-slot:label-addition>
@@ -128,11 +127,6 @@
         </div>
       </template>
       <template v-slot:input-field-addition-after>
-        <div
-          v-if="isLoading"
-          class="base-chips-input-field__loader">
-          <BaseLoader />
-        </div>
         <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />
       </template>
@@ -153,11 +147,8 @@
 </template>
 
 <script>
-import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
-import BaseInput from '../BaseInput/BaseInput';
-import BaseChip from '../BaseChip/BaseChip';
-import BaseLoader from '../BaseLoader/BaseLoader';
+import BaseInput from '@/components/BaseInput/BaseInput';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
 
@@ -166,10 +157,9 @@ import navigateMixin from '../../mixins/navigateList';
 export default {
   name: 'BaseChipsInputField',
   components: {
-    BaseLoader,
     BaseInput,
-    BaseChip,
-    Draggable,
+    BaseChip: () => import('@/components/BaseChip/BaseChip'),
+    Draggable: () => import('vuedraggable'),
   },
   mixins: [
     i18n,
@@ -735,27 +725,6 @@ export default {
       if (JSON.stringify(this.selectedList) !== JSON.stringify(this.selectedListInt)) {
         this.updateParentList(this.selectedListInt);
       }
-    },
-
-    /** INPUT FIELD EVENTS */
-    clickedOutside(event) {
-      this.inputFieldActiveInt = false;
-      /**
-       * propagate to parent that click event happened outside of input field
-       *
-       * @event clicked-outside
-       */
-      this.$emit('clicked-outside', event);
-    },
-    onInputActive() {
-      this.inputFieldActiveInt = true;
-      // inform parent of input field click
-      /**
-       * inform parent that input field was clicked
-       *
-       * @event click-input-field
-       */
-      this.$emit('click-input-field');
     },
 
     /** HOVER BOX FUNCTIONALITY */

@@ -28,7 +28,7 @@
       <div
         :class="['base-input__input-container',
                  { 'base-input__input-container__is-active':
-                   showInputActive && useFormFieldStyling}]">
+                   active && useFormFieldStyling}]">
         <div
           :class="['base-input__input-addition-container',
                    { 'base-input__input-addition-container__wrap': !hideInputField}]">
@@ -39,23 +39,34 @@
             <div
               :class="['base-input__input-wrapper',
                        { 'base-input__input-wrapper__fade-out':
-                         !showInputActive && !hideInputField }]">
-              <input
-                :id="idInt"
-                ref="input"
-                v-model="inputInt"
-                :placeholder="placeholder"
-                :type="fieldType"
-                :list="dropDownListId || false"
-                :aria-activedescendant="linkedListOption"
-                :aria-describedby="idInt"
-                :aria-required="required.toString()"
-                :aria-invalid="invalid.toString()"
-                autocomplete="off"
-                :class="['base-input__input',
-                         { 'base-input__input__hidden': hideInputField }]"
-                @keydown.tab="active = false"
-                v-on="inputListeners">
+                         !active && !hideInputField }]">
+              <!-- @slot replace native HTML input element with custom input
+                    @binding { string } id - the id of the base input component - if
+                      id is not provided in props this is an internal id that should
+                      also be set as input id -->
+              <slot
+                v-bind="{
+                  id: idInt,
+                }"
+                name="input">
+                <input
+                  :id="idInt"
+                  ref="input"
+                  v-model="inputInt"
+                  :placeholder="placeholder"
+                  :type="fieldType"
+                  :list="dropDownListId || false"
+                  :aria-activedescendant="linkedListOption"
+                  :aria-describedby="idInt"
+                  :aria-required="required.toString()"
+                  :aria-invalid="invalid.toString()"
+                  :required="required"
+                  autocomplete="off"
+                  :class="['base-input__input',
+                           { 'base-input__input__hidden': hideInputField }]"
+                  @keydown.tab="setFieldState(false)"
+                  v-on="inputListeners">
+              </slot>
             </div>
             <!-- wrapped in a button for accessibility -->
             <button
@@ -71,6 +82,11 @@
                   class="base-input__remove-icon" />
               </slot>
             </button>
+            <div
+              v-if="isLoading"
+              class="base-input__loader">
+              <BaseLoader />
+            </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
             <div
@@ -105,7 +121,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import { createId } from '@/utils/utils';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
+
 /**
  * Form Input Field Component
  */
@@ -116,7 +132,8 @@ export default {
     ClickOutside,
   },
   components: {
-    BaseIcon,
+    BaseIcon: () => import('@/components/BaseIcon/BaseIcon'),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader'),
   },
   model: {
     prop: 'input',
@@ -222,9 +239,8 @@ export default {
       default: false,
     },
     /**
-     * show input field active, can be used to override internal input active/inactive
-     * setting, it will override internal active state always, if this is not desired
-     * set isActive to 'null'
+     * set input field in active state from outside<br>
+     * the .sync modifier can be used on this prop
      */
     isActive: {
       type: Boolean,
@@ -253,6 +269,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * show spinner to indicate that something is loading
+     * (for dynamically fetched entries that need to do backend requests)
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -261,18 +285,27 @@ export default {
     };
   },
   computed: {
+    /**
+     * check if an id was provided (to handle label input connection), if not create one
+     * @returns {String|string}
+     */
     idInt() {
       return this.id || createId();
     },
+    /**
+     * determines if label row should be shown
+     * @returns {Boolean|boolean}
+     */
     showLabelRow() {
       // show label when prop is set true or a label addition was added via slot
-      return this.showLabel || this.$slots['label-addition'];
+      return this.showLabel || !!this.$slots['label-addition'];
     },
+    /**
+     * determines if remove icon should be shown
+     * @returns {boolean}
+     */
     showRemoveIcon() {
       return this.clearable && !!this.inputInt;
-    },
-    showInputActive() {
-      return this.isActive !== null ? this.isActive : this.active;
     },
     inputListeners() {
       return {
@@ -311,8 +344,24 @@ export default {
         },
       };
     },
+    /**
+     * find and store the input element associated with this component in a variable
+     */
+    inputElement() {
+      // check if client side
+      if (window) {
+        if (this.$refs && this.$refs.input) {
+          return this.$refs.input;
+        }
+        return this.$el.getElementsByTagName('input')[0];
+      }
+      return null;
+    },
   },
   watch: {
+    /**
+     * watch input prop to sync with internal inputInt variable
+     */
     input: {
       handler(val) {
         if (val !== this.inputInt) {
@@ -321,26 +370,80 @@ export default {
       },
       immediate: true,
     },
+    /**
+     * if an external input element is used changes in inputInt need to be propagated to
+     * parent manually
+     * @param {string} val
+     */
+    inputInt(val) {
+      // check if the internal input element exists and if values are in sync
+      if (!this.$refs.input && val !== this.input) {
+        // if not propagate change to parent
+        this.$emit('input', val);
+      }
+    },
+    /**
+     * keep externally set active variable and internal active variable in sync
+     * @param {boolean} val
+     */
+    isActive(val) {
+      if (val !== this.active) {
+        this.active = val;
+      }
+    },
+    /**
+     * keep externally set active variable and internal active variable in sync
+     * @param {boolean} val
+     */
+    active(val) {
+      // if active was set true focus the input field
+      if (val) {
+        this.inputElement.focus();
+      }
+      if (val !== this.isActive) {
+        /**
+         * propagate active state changes of input field to parent
+         * @event update:is-active
+         * @param {boolean} val
+         */
+        this.$emit('update:is-active', val);
+      }
+    },
   },
   methods: {
+    /**
+     * special event triggered when tab was used on clear input button
+     * @param {KeyboardEvent} event
+     */
     blurInput(event) {
-      this.active = false;
+      // set input active state false
+      this.setFieldState(false);
       // handle as if tab was coming from input to also allow parent to handle
       // active state if isActive is used
       this.$emit('keydown', event);
     },
-    clickedInside() {
-      this.active = true;
+    /**
+     * function triggered if click event or focus event happened inside the
+     * 'input-frame' element
+     * @param {FocusEvent|MouseEvent} event the native event
+     */
+    clickedInside(event) {
+      this.setFieldState(true);
       /**
        * Event emitted on click on input field \<div\>
        *
        * @event click-input-field
+       * @param {FocusEvent|MouseEvent} event - event triggered by focusin or click
        *
        */
-      this.$emit('click-input-field');
+      this.$emit('click-input-field', event);
     },
+    /**
+     * triggered when click happened outside of 'input-frame' element
+     * @param {Event} event
+     */
     clickedOutsideInput(event) {
-      this.active = false;
+      this.setFieldState(false);
       /**
        * Event emitted when click outside input field \<div\> is registered
        *
@@ -350,9 +453,20 @@ export default {
        */
       this.$emit('clicked-outside', event);
     },
+    /**
+     * triggered on clear input button click and removes input and returns focus
+     * to input field
+     */
     removeInput() {
       this.inputInt = '';
-      this.$refs.input.focus();
+      this.inputElement.focus();
+    },
+    /**
+     * set the active input field state (used for visual active indication)
+     * @param {boolean} val - the value to be set
+     */
+    setFieldState(val) {
+      this.active = val;
     },
   },
 };
@@ -382,12 +496,9 @@ export default {
   }
 
   .base-input__input-frame {
-    height: 100%;
     width: 100%;
     padding: 1px;
     background: inherit;
-    // necessary for loader animation which is slightly outside
-    overflow: hidden;
 
     &.base-input__input-frame__color {
       background: $input-field-color;
@@ -437,6 +548,7 @@ export default {
               transform: translateY(-50%);
               right: 0;
               background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+              pointer-events: none;
             }
 
             .base-input__input {
@@ -469,6 +581,12 @@ export default {
               width: $icon-medium;
               margin: $spacing-small;
             }
+          }
+
+          .base-input__loader {
+            margin: 0 $spacing;
+            transform: scale(0.5);
+            pointer-events: none;
           }
 
           .base-input__error-icon-wrapper {
