@@ -21,167 +21,140 @@
       </div>
     </div>
 
+    <!-- FORM FIELDS -->
     <div class="base-date-input__field-wrapper">
-      <div class="base-date-input__form-field-container">
-        <label
-          :for="label + '-' + id"
-          class="base-date-input__label hide"
-          @click.prevent="">
-          {{ label }}
-        </label>
-        <div
-          v-click-outside="() => clickedOutside('From')"
-          :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': useFormFieldStyling
-                     && (timeFromOpen || dateFromOpen) },
-                   { 'base-date-input__field-container-border': useFormFieldStyling },
-                   { 'base-date-input__field-container-multiple': type === 'datetime' }]">
-          <!-- TIME FROM -->
-          <DatePicker
-            v-if="type === 'timerange'"
-            ref="timepickerFrom"
-            v-model="inputInt.time_from"
-            :input-attr="{id: label + '-' + id}"
-            :placeholder="placeholder.time"
-            :clearable="false"
-            :append-to-body="false"
-            :lang="language"
-            :open="timeFromOpen"
-            type="time"
-            format="HH:mm"
-            value-type="format"
-            input-class="base-date-input__datepicker-input"
-            class="base-date-input__datepicker"
-            @open="setActiveState('time', 'From', true)"
-            @change="closeTimePicker('from', ...arguments, $event)"
-            @focus="emitFocusEvent"
-            @blur="emitBlurEvent">
-            <template v-slot:icon-calendar>
-              <div class="base-date-input__icon-wrapper">
-                <base-icon
-                  name="clock"
-                  class="base-date-input__date-icon" />
-              </div>
-            </template>
-          </DatePicker>
-
-          <!-- DATE FROM -->
+      <!-- INPUT FROM -->
+      <BaseInput
+        :id="label + '-' + id"
+        v-model="inputFrom"
+        :label="label"
+        :show-label="false"
+        :is-active.sync="fromOpen"
+        :use-form-field-styling="useFormFieldStyling"
+        :clearable="clearable"
+        :required="required"
+        :invalid="invalid"
+        :show-error-icon="showErrorIcon"
+        :error-message="errorMessage"
+        class="base-date-input__input-wrapper"
+        v-on="$listeners">
+        <template v-slot:input>
           <div
-            v-else
-            class="base-date-input__datepicker-wrapper"
+            class="base-date-input__datepicker"
             @click.stop="">
             <DatePicker
-              ref="datepickerFrom"
-              v-model="dateFrom"
-              :input-attr="{id: label + '-' + id}"
-              :type="minDateView"
-              :format="dateFormatDisplay"
+              v-model="inputFrom"
+              :input-attr="{ id: label + '-' + id }"
+              :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
               :clearable="false"
-              :placeholder="placeholder.date || placeholder"
               :append-to-body="false"
-              :value-type="datePickerValueFormat"
               :lang="language"
-              :open="dateFromOpen"
+              :open="fromOpen"
+              :type="isFromTimeField ? 'time' : minDateView"
+              :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
+              :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
               input-class="base-date-input__datepicker-input"
-              @open="setActiveState('date', 'From', true)"
-              @close="setActiveState('date', 'From', false)"
-              @pick="setActiveState('date', 'From', false)"
-              @focus="emitFocusEvent"
-              @blur="emitBlurEvent">
+              @pick="isFromTimeField ? '' : fromOpen = false"
+              @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
+              <template v-slot:input>
+                <input
+                  :id="label + '-' + id"
+                  ref="inputFrom"
+                  v-model="inputFrom"
+                  :placeholder="placeholder.date || placeholder"
+                  :type="'text'"
+                  :aria-describedby="label + '-' + id"
+                  :aria-required="required.toString()"
+                  :aria-invalid="invalid.toString()"
+                  :required="required"
+                  autocomplete="off"
+                  class="base-date-input__input"
+                  @keydown.tab="handleTabKey($event,'from')"
+                  v-on="$listeners">
+              </template>
+              <!-- this empty element is here so that the default icon of datepicker is not used -->
               <template v-slot:icon-calendar>
-                <div class="base-date-input__icon-wrapper">
-                  <base-icon
-                    name="calendar-many"
-                    class="base-date-input__date-icon" />
-                </div>
+                <div class="base-date-input__icon-wrapper" />
               </template>
             </DatePicker>
           </div>
-        </div>
-      </div>
+        </template>
+        <template v-slot:input-field-addition-after>
+          <BaseIcon
+            :name="isFromTimeField ? 'clock' : 'calendar-many'"
+            class="base-date-input__date-icon"
+            @click.stop="fromOpen = !fromOpen" />
+        </template>
+      </BaseInput>
+
       <span
         v-if="type === 'daterange' || type === 'timerange'"
         class="base-date-input__separator">{{ rangeSeparator }}</span>
 
-      <div
+      <!-- INPUT TO -->
+      <BaseInput
         v-if="type !== 'single'"
-        class="base-date-input__form-field-container">
-        <label
-          :for="(type === 'datetime' || type === 'timerange')? 'timeTo-' + id : 'dateTo-' + id"
-          class="base-date-input__label hide">
-          {{ label }}
-        </label>
-        <div
-          v-if="type !== 'single'"
-          v-click-outside="() => clickedOutside('To')"
-          :class="['base-date-input__field-container',
-                   { 'base-date-input__field-container-active': useFormFieldStyling
-                     && (timeToOpen || dateToOpen) },
-                   { 'base-date-input__field-container-border': useFormFieldStyling },
-                   { 'base-date-input__field-container-multiple': type === 'datetime' }]">
-          <!-- TIME TO -->
-          <DatePicker
-            v-if="type === 'datetime' || type === 'timerange'"
-            ref="timepickerTo"
-            v-model="timeTo"
-            :input-attr="{id: 'timeTo-' + id}"
-            :placeholder="placeholder.time"
-            :clearable="false"
-            :append-to-body="false"
-            :lang="language"
-            :open="timeToOpen"
-            type="time"
-            format="HH:mm"
-            value-type="format"
-            input-class="base-date-input__datepicker-input"
-            @open="setActiveState('time', 'To', true)"
-            @change="closeTimePicker('to', ...arguments, $event)"
-            @focus="emitFocusEvent"
-            @blur="emitBlurEvent">
-            <template v-slot:icon-calendar>
-              <div class="base-date-input__icon-wrapper">
-                <base-icon
-                  name="clock"
-                  class="base-date-input__date-icon" />
-              </div>
-            </template>
-          </DatePicker>
-
-          <!-- DATE TO -->
+        :id="label + '-to-' + id"
+        v-model="inputTo"
+        :label="label"
+        :show-label="false"
+        :is-active.sync="toOpen"
+        :use-form-field-styling="useFormFieldStyling"
+        :clearable="clearable"
+        :required="required"
+        :invalid="invalid"
+        :show-error-icon="showErrorIcon"
+        :error-message="errorMessage"
+        class="base-date-input__input-wrapper"
+        v-on="$listeners">
+        <template v-slot:input>
           <div
-            v-else
-            class="base-date-input__datepicker-wrapper"
+            class="base-date-input__datepicker"
             @click.stop="">
             <DatePicker
-              key="dateTo"
-              ref="datepickerTo"
-              v-model="inputInt.date_to"
-              :input-attr="{id: 'dateTo-' + id}"
-              :type="minDateView"
-              :format="dateFormatDisplay"
+              v-model="inputTo"
+              :input-attr="{ id: label + '-' + id }"
+              :placeholder="isToTimeField ? placeholder.time : placeholder.date"
               :clearable="false"
-              :placeholder="placeholder.date || placeholder"
               :append-to-body="false"
-              :value-type="datePickerValueFormat"
               :lang="language"
-              :open="dateToOpen"
+              :open="toOpen"
+              :type="isToTimeField ? 'time' : minDateView"
+              :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
+              :value-type="isToTimeField ? 'format' : datePickerValueFormat"
               input-class="base-date-input__datepicker-input"
-              @open="setActiveState('date', 'To', true)"
-              @close="setActiveState('date', 'To', false)"
-              @pick="setActiveState('date', 'To', false)"
-              @focus="emitFocusEvent"
-              @blur="emitBlurEvent">
+              @pick="isToTimeField ? '' : toOpen= false"
+              @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
+              <template v-slot:input>
+                <input
+                  :id="label + '-to-' + id"
+                  ref="inputTo"
+                  v-model="inputTo"
+                  :placeholder="placeholder.date || placeholder"
+                  :type="'text'"
+                  :aria-describedby="label + '-to-' + id"
+                  :aria-required="required.toString()"
+                  :aria-invalid="invalid.toString()"
+                  :required="required"
+                  autocomplete="off"
+                  class="base-date-input__input"
+                  @keydown.tab="handleTabKey($event, 'to')"
+                  v-on="$listeners">
+              </template>
+              <!-- this empty element is here so that the default icon of datepicker is not used -->
               <template v-slot:icon-calendar>
-                <div class="base-date-input__icon-wrapper">
-                  <base-icon
-                    name="calendar-many"
-                    class="base-date-input__date-icon" />
-                </div>
+                <div class="base-date-input__icon-wrapper" />
               </template>
             </DatePicker>
           </div>
-        </div>
-      </div>
+        </template>
+        <template v-slot:input-field-addition-after>
+          <BaseIcon
+            :name="isToTimeField ? 'clock' : 'calendar-many'"
+            class="base-date-input__date-icon"
+            @click.stop="fromOpen = !fromOpen" />
+        </template>
+      </BaseInput>
     </div>
   </div>
 </template>
@@ -194,8 +167,7 @@ import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/locale/de';
 import 'vue2-datepicker/locale/en';
 import 'vue2-datepicker/locale/fr';
-
-import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
+import BaseInput from '@/components/BaseInput/BaseInput';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
@@ -208,8 +180,9 @@ import BaseIcon from '../BaseIcon/BaseIcon';
 export default {
   name: 'BaseDateInput',
   components: {
+    BaseInput,
     BaseIcon,
-    BaseSwitchButton,
+    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton'),
     DatePicker,
   },
   directives: {
@@ -327,6 +300,47 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * mark as required field (currently only used for aria-required)
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -345,14 +359,10 @@ export default {
       // variable to store the date when switching from date to year in order to be
       // able to restore exact date when switching back
       tempDateStore: {},
-      // to steer closing of datepicker date / date_from once date is selected
-      dateFromOpen: false,
-      // to steer closing of datepicker date_to once date is selected
-      dateToOpen: false,
-      // to steer closing of datepicker time / time_from once date is selected
-      timeFromOpen: false,
-      // to steer closing of datepicker time_to once date is selected
-      timeToOpen: false,
+      // to steer closing of datepicker from input field once date is selected
+      fromOpen: false,
+      // to steer closing of datepicker to input field once date is selected
+      toOpen: false,
     };
   },
   computed: {
@@ -394,29 +404,41 @@ export default {
     isSingleDate() {
       return typeof this.input === 'string' || !this.inputProperties.length;
     },
-    // get first datepicker date either from single date ('date' variable) or from
-    // date_from variable
-    dateFrom: {
+    // handle input for the 'from' input field
+    inputFrom: {
       get() {
-        return this.inputInt.date || this.inputInt.date_from;
+        // if it is a time field just return the time_from value
+        if (this.isFromTimeField) {
+          return this.inputInt.time_from;
+        }
+        // else it is a date (either single or date_from) --> convert it into the
+        // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
+        return this.dateDisplay(this.inputInt.date || this.inputInt.date_from);
       },
       // also assign them again accordingly
       set(val) {
-        if (this.inputProperties.includes('date_from')) {
-          this.inputInt.date_from = val;
+        if (this.isFromTimeField) {
+          this.inputInt.time_from = val;
+        } else if (this.inputProperties.includes('date_from')) {
+          this.inputInt.date_from = this.dateStorage(val);
         } else {
-          this.inputInt.date = val;
+          this.inputInt.date = this.dateStorage(val);
         }
       },
     },
     // as above - if there is only a single time field get value from 'time' variable
     // if it is a range use 'time_to''
-    timeTo: {
+    inputTo: {
       get() {
-        return this.inputInt.time || this.inputInt.time_to;
+        if (this.isToTimeField) {
+          return this.inputInt.time || this.inputInt.time_to;
+        }
+        return this.dateDisplay(this.inputInt.date_to);
       },
       set(val) {
-        if (this.inputProperties.includes('time_from')) {
+        if (!this.isToTimeField) {
+          this.inputInt.date_to = this.dateStorage(val);
+        } else if (this.inputProperties.includes('time_from')) {
           this.inputInt.time_to = val;
         } else {
           this.inputInt.time = val;
@@ -427,6 +449,12 @@ export default {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && this.inputInt[key].length <= 4));
+    },
+    isFromTimeField() {
+      return this.type === 'timerange';
+    },
+    isToTimeField() {
+      return this.type === 'datetime' || this.type === 'timerange';
     },
   },
   watch: {
@@ -464,7 +492,39 @@ export default {
       deep: true,
     },
   },
+  updated() {
+    // this hack is necessary because otherwise keyboard navigation was impared by the datepicker
+    // pop up elements
+    // check if datepicker element is actually open
+    if (this.fromOpen || this.toOpen) {
+      // wait until elements are rendered
+      this.$nextTick(() => {
+        // get all focusable elements that have the 'mx-' in the class name
+        const keyboardfocusableElements = [...this.$el.querySelectorAll(
+          'a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])',
+        )]
+          .filter(el => !el.hasAttribute('disabled'))
+          .filter(el => el.className.includes('mx-'));
+        // iterate through the elements and add tabindex -1
+        keyboardfocusableElements.forEach((element) => {
+          element.setAttribute('tabindex', -1);
+        });
+      });
+    }
+  },
   methods: {
+    dateDisplay(dateString) {
+      return dateString.split('-').reverse().join('.');
+    },
+    dateStorage(dateString) {
+      return dateString.split('.').reverse().join('-');
+    },
+    handleTabKey(event, origin) {
+      if (event.shiftKey || !this.clearable
+        || !this[`input${origin.charAt(0).toUpperCase() + origin.slice(1)}`]) {
+        this[`${origin}Open`] = false;
+      }
+    },
     /**
      * a function to have the time picker close automatically as soon as minutes
      * are selected
@@ -474,16 +534,8 @@ export default {
      */
     closeTimePicker(origin, time, type) {
       if (type === 'minute') {
-        this[`time${origin.charAt(0).toUpperCase() + origin.slice(1)}Open`] = false;
+        this[`${origin}Open`] = false;
       }
-    },
-    /**
-     * function called as soon as a click outside the input field occurred
-     * @param {string} origin - is it from the 'from' or 'to' part of the picker
-     */
-    clickedOutside(origin) {
-      this[`time${origin}Open`] = false;
-      this[`date${origin}Open`] = false;
     },
     /**
      * a more generalized function to flexibly set close/open state of the respective picker
@@ -491,8 +543,8 @@ export default {
      * @param {string} origin - 'From' or 'To'
      * @param {boolean} value - open (true) or close (false)
      */
-    setActiveState(type, origin, value) {
-      this[`${type}${origin}Open`] = value;
+    setActiveState(origin, value) {
+      this[`${origin}Open`] = value;
     },
     /**
      * data emit function
@@ -570,24 +622,6 @@ export default {
       const day = date.getDate().toString();
       return `${date.getFullYear().toString()}-${month.length < 2 ? '0' : ''}${month}-${day.length < 2 ? '0' : ''}${day}`;
     },
-    emitBlurEvent(event) {
-      /**
-       * emit blur event to parent
-       *
-       * @event blur
-       * @type {Event}
-       */
-      this.$emit('blur', event);
-    },
-    emitFocusEvent(event) {
-      /**
-       * emit focus event to parent
-       *
-       * @event focus
-       * @type {Event}
-       */
-      this.$emit('focus', event);
-    },
   },
 };
 </script>
@@ -623,62 +657,37 @@ export default {
     .base-date-input__field-wrapper {
       display: flex;
 
-      .base-date-input__form-field-container {
-        flex: 1 1 auto;
-        max-width: 100%;
+      .base-date-input__input-wrapper {
 
-        .base-date-input__field-container {
-          position: relative;
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          padding-left: $spacing-small;
-          min-height: $row-height-small;
-          background: white;
-          flex: 1 1 auto;
-          max-width: 100%;
-
-          &.base-date-input__field-container-border {
-            border: $input-field-border;
-          }
-
-          .base-date-input__datepicker-wrapper {
-            flex-grow: 1;
-            width: auto;
-            font-family: inherit;
-            font-size: inherit;
-          }
-        }
-
-        .base-date-input__field-container + .base-date-input__field-container {
+        & + .base-date-input__input-wrapper {
           margin-left: $spacing;
         }
 
-        .base-date-input__field-container-active {
-          box-shadow: $input-shadow;
+        .base-date-input__datepicker {
+          flex-grow: 1;
+          width: auto;
+          font-family: inherit;
+          font-size: inherit;
+          line-height: $row-height-small;
+
+          .base-date-input__input {
+            padding: $spacing-small/2 0;
+            min-height: $row-height-small;
+            width: 100%;
+          }
         }
-      }
 
-      .base-date-input__form-field-container +  .base-date-input__form-field-container {
-        margin-left: $spacing;
-      }
+        .base-date-input__icon-wrapper::before {
+          content: '';
+        }
 
-      .base-date-input__icon-wrapper::before {
-        content: '';
-        height: 100%;
-        width: 30px;
-        left: -30px;
-        position: absolute;
-        background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
-      }
-
-      .base-date-input__date-icon {
-        position: relative;
-        width: $icon-large;
-        height: $icon-large;
-        color: $font-color-second;
-        cursor: pointer;
+        .base-date-input__date-icon {
+          position: relative;
+          width: $icon-large;
+          height: $icon-large;
+          color: $font-color-second;
+          cursor: pointer;
+        }
       }
 
       .base-date-input__separator {
