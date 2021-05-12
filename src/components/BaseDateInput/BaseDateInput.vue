@@ -57,9 +57,11 @@
             @focus="emitFocusEvent"
             @blur="emitBlurEvent">
             <template v-slot:icon-calendar>
-              <base-icon
-                name="clock"
-                class="base-date-input__date-icon" />
+              <div class="base-date-input__icon-wrapper">
+                <base-icon
+                  name="clock"
+                  class="base-date-input__date-icon" />
+              </div>
             </template>
           </DatePicker>
 
@@ -87,9 +89,11 @@
               @focus="emitFocusEvent"
               @blur="emitBlurEvent">
               <template v-slot:icon-calendar>
-                <base-icon
-                  name="calendar-many"
-                  class="base-date-input__date-icon" />
+                <div class="base-date-input__icon-wrapper">
+                  <base-icon
+                    name="calendar-many"
+                    class="base-date-input__date-icon" />
+                </div>
               </template>
             </DatePicker>
           </div>
@@ -135,9 +139,11 @@
             @focus="emitFocusEvent"
             @blur="emitBlurEvent">
             <template v-slot:icon-calendar>
-              <base-icon
-                name="clock"
-                class="base-date-input__date-icon" />
+              <div class="base-date-input__icon-wrapper">
+                <base-icon
+                  name="clock"
+                  class="base-date-input__date-icon" />
+              </div>
             </template>
           </DatePicker>
 
@@ -166,9 +172,11 @@
               @focus="emitFocusEvent"
               @blur="emitBlurEvent">
               <template v-slot:icon-calendar>
-                <base-icon
-                  name="calendar-many"
-                  class="base-date-input__date-icon" />
+                <div class="base-date-input__icon-wrapper">
+                  <base-icon
+                    name="calendar-many"
+                    class="base-date-input__date-icon" />
+                </div>
               </template>
             </DatePicker>
           </div>
@@ -656,7 +664,17 @@ export default {
         margin-left: $spacing;
       }
 
+      .base-date-input__icon-wrapper::before {
+        content: '';
+        height: 100%;
+        width: 30px;
+        left: -30px;
+        position: absolute;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0) , rgba(255, 255, 255, 1));
+      }
+
       .base-date-input__date-icon {
+        position: relative;
         width: $icon-large;
         height: $icon-large;
         color: $font-color-second;
