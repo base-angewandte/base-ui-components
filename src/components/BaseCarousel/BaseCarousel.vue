@@ -20,6 +20,7 @@
             :lazyload="true"
             :image-first="true"
             :center-header="true"
+            style="margin-right: 0"
             box-type="a" />
         </div>
       </div>
@@ -43,9 +44,11 @@
 
 <script>
 import 'lazysizes';
-import Swiper from 'swiper';
+import Swiper, { Autoplay, Keyboard, Pagination } from 'swiper';
 import BaseButton from '../BaseButton/BaseButton';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
+
+Swiper.use([Autoplay, Keyboard, Pagination]);
 
 export default {
   name: 'BaseCarousel',
@@ -147,6 +150,7 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
+  @import "swiper/swiper.scss";
 
   .base-carousel {
     max-width: 1400px;
@@ -181,7 +185,6 @@ export default {
 
 <style lang="scss">
   @import "../../styles/variables";
-  @import "swiper/css/swiper";
 
   .base-carousel {
     .base-image-box-image {
@@ -200,22 +203,20 @@ export default {
 
     .swiper-pagination {
       display: none;
-      position: inherit;
-      bottom: 0;
-      left: inherit;
-      margin: $spacing 0;
 
       @media screen and (min-width: $mobile-min-width) {
-        display: block;
+        display: flex;
+        justify-content: center;
       }
     }
 
     .swiper-pagination-bullet {
       width: 10px;
       height: 10px;
-      background: #000;
-      opacity: 0.6;
-      margin: 0 $spacing-small;
+      border-radius: 50%;
+      background: $pagination-bullet-color;
+      margin: $spacing-large $spacing-small $spacing;
+      cursor: pointer;
 
       &:focus {
         outline: none;
