@@ -51,8 +51,12 @@ li {
   }
 }
 
+// Todo: check if necessary
 :focus {
   outline: none;
+  &:focus {
+    outline: 0;
+  }
 }
 
 fieldset {

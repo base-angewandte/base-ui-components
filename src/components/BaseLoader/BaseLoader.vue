@@ -1,10 +1,9 @@
 <template>
   <div
-    :style="position"
+    :style="{...position, ...{ '--loader-color': loaderColor } }"
     class="base-loader">
     <svg class="base-loader-circular">
       <circle
-        :style="loaderColorInt"
         class="base-loader-path"
         cx="50"
         cy="50"
@@ -36,11 +35,6 @@ export default {
       default: () => ({}),
     },
   },
-  computed: {
-    loaderColorInt() {
-      return this.loaderColor ? { stroke: this.loaderColor, color: this.loaderColor } : {};
-    },
-  },
 };
 </script>
 
@@ -64,10 +58,10 @@ export default {
       .base-loader-path {
         stroke-dasharray: 1,200;
         stroke-dashoffset: 0;
-        stroke:$app-color;
-        color: $app-color;
         animation:
           dash 1.5s ease-in-out infinite;
+        stroke: var(--loader-color, $app-color);
+        color: var(--loader-color, $app-color);
       }
     }
   }

@@ -2,6 +2,7 @@
   <button
     :disabled="disabled"
     :aria-disabled="disabled"
+    :aria-describedby="internalId"
     :type="buttonType"
     :class="['base-button',
              `base-button-${buttonStyle}`,
@@ -29,10 +30,18 @@
     <BaseBoxTooltip
       v-if="showTooltip"
       @clicked="clicked" />
+    <span
+      v-if="description"
+      :id="internalId"
+      :aria-hidden="true"
+      class="hide">
+      {{ description }}
+    </span>
   </button>
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
@@ -87,7 +96,8 @@ export default {
       },
     },
     /**
-     * set button active (will display a colored border on botton)
+     * set button active (will display a colored border on botton) (row style)
+     * or keep icon colored (single style)
      */
     active: {
       type: Boolean,
@@ -164,6 +174,18 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * Add a button description to be used by aria-describedby
+     */
+    description: {
+      type: String,
+      default: '',
+    },
+  },
+  computed: {
+    internalId() {
+      return createId();
+    },
   },
   methods: {
     clicked(event) {
@@ -220,6 +242,12 @@ export default {
         height: $icon-medium;
         max-width: $icon-medium;
       }
+
+      &.base-button-active {
+        /* TODO: adjust this to style guide if necessary */
+        box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
+        z-index: map-get($zindex, button-active);
+      }
     }
 
     &.base-button-single {
@@ -237,6 +265,10 @@ export default {
       .base-button-icon-small {
         height: $icon-small;
         max-width: $icon-small;
+      }
+
+      &.base-button-active .base-button-icon {
+        color: $app-color;
       }
     }
 

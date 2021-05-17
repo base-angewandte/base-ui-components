@@ -211,6 +211,16 @@ export default {
       cursor: pointer;
     }
 
+    &.base-box-button-disabled {
+      cursor: default;
+      color: $graytext-color;
+
+      &:hover {
+        color: $graytext-color !important;
+        box-shadow: none !important;
+      }
+    }
+
     .button-box-content {
       padding: $spacing;
       position: absolute;
@@ -272,40 +282,20 @@ export default {
         }
       }
     }
-
-    .button-box-content-small {
-      padding: $spacing;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-
-      .button-box-icon-small {
-        flex-shrink: 0;
-        margin-right: $spacing;
-        width: $icon-large;
-        max-height: $icon-large;
-      }
-    }
-
-    &.base-box-button-disabled {
-      cursor: default;
-      color: $graytext-color;
-
-      &:hover {
-        color: $graytext-color !important;
-        box-shadow: none !important;
-      }
-    }
   }
-</style>
 
-<style lang="scss">
-  @import "../../styles/variables";
+  .button-box-content-small {
+    padding: $spacing;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 
-  .file-select {
-    &:focus-within {
-      color: $app-color;
+    .button-box-icon-small {
+      flex-shrink: 0;
+      margin-right: $spacing;
+      width: $icon-large;
+      max-height: $icon-large;
     }
   }
 </style>

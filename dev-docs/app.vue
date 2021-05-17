@@ -1,699 +1,738 @@
 <template>
-  <div id="app">
-    <BaseExpandBox>
-      <BaseTextList
-        render-label-as="h2"
-        :data="baseExpandBox"
-        :cols2="true" />
-
-      <template v-slot:footer>
-        <div style="display: flex;">
-          <BaseButton
-            :icon-colored="true"
-            :has-background-color="false"
-            icon="print"
-            icon-position="top"
-            icon-size="large"
-            text="Print"
-            style="padding-left: 0;" />
-
-          <BaseButton
-            :icon-colored="true"
-            :has-background-color="false"
-            icon="link"
-            icon-position="top"
-            icon-size="large"
-            text="Share" />
-        </div>
-      </template>
-    </BaseExpandBox>
-
-    <br><br><br>
-
-    <h1>BaseDetailBox bbb</h1>
-    <div class="background">
-      <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }">
-        <p class="example-text">
-          Example Content
-        </p>
-      </base-box>
-      <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }" />
-      <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }" />
-      <base-box
-        :box-size="{ width: 'calc(25% - 12px)' }" />
-    </div>
-    <BaseDetailBox
-      :data="[{
-                label: {
-                  de: 'Telefon',
-                  en: 'Telephone',
-                },
-                value: '01234455767',
-              },
-              {
-                label: 'Fax',
-                value: '01234455767 123',
-              },
-              {
-                label: 'Mobile',
-                value: '098012345678',
-              },
-              {
-                label: 'Email',
-                value: 'name@domain.com',
-              },
-      ]"
-      language="en" />
-
-    <base-carousel
-      :items="carousel"
-      :swiper-options="{
-        slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 15,
-        loop: carousel.length > 3,
-        speed: 750,
-        keyboard: {
-          enabled: true,
-        },
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
-        },
-        breakpoints: {
-          1024: {
-            slidesPerView: carousel.length < 3 ? 2 : 3,
-            slidesPerGroup: carousel.length < 3 ? 2 : 3,
-          },
-        },
-      }" />
-    <BaseMap
-      :lat-long="[
-        '48.208370',
-        '16.384510',
-      ]"
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      class="base-map" />
-    <BaseExpandBox>
-      <div class="base-expand-box-columns">
-        <div class="base-expand-box-column">
-          <BaseTextList
-            render-label-as="h2"
-            :data="data.column1" />
-        </div>
-        <div class="base-expand-box-column">
-          <BaseTextList
-            render-label-as="h2"
-            :data="data.column2" />
-        </div>
-      </div>
-    </BaseExpandBox>
+  <div
+    id="app"
+    style="max-width: 1400px; margin: 0 auto;">
     <BaseResultBoxSection
-      :entry-list="entriesList"
+      v-if="editMode"
+      v-model="entriesList"
       :action="activeAction"
       :is-loading="false"
       :selected-list="selectedBoxes"
-      message-text="delete linked"
-      message-subtext="delete linked"
-      option-button-text="delete linked"
-      action-button-text="delete"
+      :show-options="true"
+      :draggable="true"
+      :edit-mode.sync="editMode"
+      :option-button-text="{ delete: 'delete linked', drag: 'drag' }"
+      :action-button-text="{ delete: 'delete', drag: 'done' }"
+      :show-action-button-box="true"
+      :show-edit-mode-return-button="false"
       cancel-text="cancel"
-      header-text="header"
+      header-text="Activity Showcase"
       @entry-selected="entrySelected"
       @all-selected="selectEntries($event)"
       @cancel-action="activeAction = ''"
-      @set-action="activeAction = $event" />
-    <!-- BaseDatePanel -->
-    <div
-      style="max-width: 1000px; margin: 50px auto;
-      display: flex; justify-content: space-between;">
-      <BaseDatePanel
-        v-model="baseDatePanelInput"
-        language="de"
-        label="Select a date"
-        type="date" />
-
-      <base-date-panel
-        label="Select a date"
-        type="week"
-        :input="{ date: '2020-04-29' }"
-        :show-label="false"
-        :is-inline="true"
-        @selected="baseDatePanelSelected($event)" />
-
-      <base-date-panel
-        label="Select a date"
-        type="week"
-        :icon-position="'right'"
-        @selected="baseDatePanelSelected($event)" />
-    </div>
-
-    <!-- BASE EXPAND ROW TEST -->
-    <BaseExpandRow
-      :is-expanded="true"
-      label="looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-        ooooooooooooooooooooooooooooooooooooooooooooooooooooooong"
-      icon="camera"
-      class="base-expand-row">
-      <p>
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam,
-        quis nostrud exercitation ullamco labos
-      </p>
-    </BaseExpandRow>
-
-    <!-- VIDEO TEST -->
-    <!-- <video
-      width="320"
-      height="240"
-      controls >
-      <source
-        src="/home/shauzmayer/index.m3u8"
-        type="application/x-mpegURL">
-      Your browser does not support the video tag.
-    </video> -->
-    <div>
-      <BaseForm
-        :value-list="formValueList"
-        :fields-with-tabs="['texts']"
-        :form-id="'xjlaödsjfadlskj'"
-        :form-field-json="json" />
-    </div>
-    <BaseMediaPreview
-      :show-preview="togglePreview"
-      :media-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8'"
-      :download-url="'https://mnmedias.api.telequebec.tv/m3u8/29880.pdf'"
-      @hide-preview="togglePreview = false" />
-    <BaseButton
-      text="Show Preview"
-      @clicked="togglePreview = !togglePreview" />
-
-    <!-- PAGINATION TEST -->
-    <BasePagination :total="100" />
-
-    <div class="form-field">
-      <BaseProgressBar
-        :progress="progress"
-        file-name="looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-        ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-        ooooooooooooooooong" />
-      <div :style="{ height: '30px' }" />
-      <!-- UPLOAD BAR TEST -->
-      <base-button
-        :active="false"
-        :text="'Change Progress'"
-        icon-size="large"
-        button-style="row"
-        @clicked="changeProgress" />
-    </div>
-    <div class="spacer" />
-
-    <div class="canvas flex">
-      <!-- BASE IMAGE BOX TEST -->
-      <BaseImageBox
-        :selectable="selectable"
-        :box-text="boxText"
-        description="Bildserie"
-        title="Afterlife II Ausstellungsansichten"
-        class="image-box" />
-      <BaseImageBox
-        :selectable="selectable"
-        :show-title="false"
-        image-url="https://placeimg.com/460/341/animal"
-        title="Afterlife II Ausstellungsansichten"
-        description="Bildserie"
-        class="image-box" />
-      <BaseImageBox
-        :selectable="selectable"
-        image-url="https://placeimg.com/460/341/tech"
-        title="Afterlife II Ausstellungsansichten"
-        description="Bildserie"
-        class="image-box" />
-      <BaseButton
-        :active="false"
-        :text="'Activate Select'"
-        icon-size="large"
-        button-style="row"
-        @clicked="enableSelect()" />
-      <BaseButton
-        :text="'Add Text'"
-        @clicked="boxText = ['test', 'test2', 'test3', 'test4', 'test5', 'test6']" />
-    </div>
-
-    <div class="canvas">
-      <!-- MULTILINE WITH TABS TEST -->
-      <BaseMultilineTextInput
-        v-model="textInput"
-        :tabs="['English', 'German']"
-        label="Multiline Label Tabs"
-        placeholder="Enter Text here" />
-      <base-multiline-text-input
-        v-model="multilineInputObj"
-        :label="'Label'"
-        :tabs="['German', 'English']"
-        :placeholder="'Enter Text'"
-        @tab-switch="tabSwitched">
-        <div class="multiline-dropdown">
-          <base-drop-down
-            :selected-option="{ label: 'Textart', value: '' }"
-            :options="[{
-                         value: 'Beschreibung',
-                         label: 'Beschreibung',
-                       },
-                       {
-                         value: 'Ausstellungseinladung',
-                         label: 'Ausstellungseinladung',
-                       },
-                       {
-                         label: 'Textart',
-                         value: '',
-                       },
-                       {
-                         value: 'Zeitungsartikel',
-                         label: 'Zeitungsartikel',
-                       }]" />
+      @set-action="activeAction = $event"
+      @submit-action="activeAction = ''"
+      @entries-changed="activeAction = ''">
+      <template #header>
+        <h3 class="activity-showcase__header">
+          Activity Showcase
+        </h3>
+      </template>
+      <template #optionButtons="scope">
+        <BaseButton
+          :text="'add Album'"
+          icon-size="large"
+          icon="collection"
+          button-style="single"
+          @clicked="scope.setAction('delete')" />
+        <BaseButton
+          :text="'add Activity'"
+          icon-size="large"
+          icon="sheet-empty"
+          button-style="single"
+          @clicked="scope.setAction('delete')" />
+        <BaseButton
+          :text="'delete'"
+          icon-size="large"
+          icon="waste-bin"
+          button-style="single"
+          @clicked="scope.setAction('delete')" />
+      </template>
+      <template #actionButtons>
+        <BaseBoxButton
+          :text="'Add Album'"
+          :box-size="{ width: 'auto' }"
+          :show-plus="true"
+          icon="collection"
+          box-style="large"
+          box-type="button"
+          class="base-result-box-section__box" />
+        <BaseBoxButton
+          :text="'Add Activity'"
+          :box-size="{ width: 'auto' }"
+          :show-plus="true"
+          icon="sheet-empty"
+          box-style="large"
+          box-type="button"
+          class="base-result-box-section__box" />
+      </template>
+    </BaseResultBoxSection>
+    <template
+      v-else>
+      <div class="activity-showcase">
+        <h3 class="activity-showcase__header">
+          Activity Showcase
+        </h3>
+        <BaseButton
+          icon="edit"
+          text="edit"
+          @clicked="editMode = true" />
+      </div>
+      <base-carousel
+        :items="entriesList"
+        :swiper-options="{
+          slidesPerView: 2,
+          slidesPerGroup: 2,
+          spaceBetween: 15,
+          loop: carousel.length > 3,
+          speed: 750,
+          keyboard: {
+            enabled: true,
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          breakpoints: {
+            1024: {
+              slidesPerView: carousel.length < 3 ? 2 : 3,
+              slidesPerGroup: carousel.length < 3 ? 2 : 3,
+            },
+          },
+        }"
+        identifier-property-name="id" />
+    </template>
+    <BaseResultBoxSection
+      :entry-list="entriesList"
+      :is-loading="false"
+      :show-options="true"
+      :show-header="true"
+      :draggable="true"
+      :max-show-more-rows="1"
+      :use-expand-mode="true"
+      :use-pagination="true"
+      :show-action-button-boxes="true"
+      :max-rows="2"
+      @submit-action="test">
+      <template #header>
+        <div :style="{ display: 'flex' }">
+          <h3 class="activity-showcase__header">
+            Results
+          </h3>
+          <span> (30)</span>
         </div>
-      </base-multiline-text-input>
-      <base-multiline-text-input
-        :input="multilineTest"
-        :label="'Label'"
-        :placeholder="'Enter Text'"
-        @text-input="handleMultilineInput" />
-    </div>
+      </template>
+      <template #optionButtons="scope">
+        <BaseButton
+          :text="'add Album'"
+          icon-size="large"
+          icon="collection"
+          button-style="single"
+          @clicked="scope.submitAction('delete')" />
+        <BaseButton
+          :text="'add Activity'"
+          icon-size="large"
+          icon="sheet-empty"
+          button-style="single"
+          @clicked="scope.submitAction('delete')" />
+        <BaseButton
+          :text="'delete'"
+          icon-size="large"
+          icon="waste-bin"
+          button-style="single"
+          @clicked="scope.submitAction('delete')" />
+      </template>
+    </BaseResultBoxSection>
 
-    <!-- SEARCH TEST -->
-    <div class="canvas">
-      <base-search
-        :show-image="true"
-        @input="triggerInput" />
-    </div>
-
-    <!-- FORM FIELD TESTING -->
-    <div class="form-field">
-      <base-date-input
-        v-model="inputDateTime"
-        :type="'datetime'"
-        :label="'unknown'" />
-      <BaseDateInput
-        :label="'unknown'"
-        :input="inputDate"
-        language="de"
-        type="daterange"
-        format="date_year" />
-      <BaseToggle
-        name="BaseToggle"
-        label="Zeige Einträge anderen Benutzer*innen auf meinem Showroom-Profil an." />
-      <BaseChipsInput
-        id="set your marx"
-        :list="dropDownInput"
-        :placeholder="'Select Your Marx'"
-        :selected-list="chipsInput"
-        :allow-multiple-entries="true"
-        :allow-dynamic-drop-down-entries="true"
-        :object-prop="'value'"
-        :chips-inline="true"
-        :chips-editable="true"
-        :identifier="'id'"
-        draggable
-        label="A label"
-        @fetchDropDownEntries="fetch" />
-      <!--
-      <BaseChipsInput
-        :list="[
-          { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '***', source: '1' },
-          { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '**', source: '2' },
-          { title: '...alle Verhältnisse umzuwerfen',
-            additional: 'part1', remark: '*', source: '3' },
-          { title: 'in denen der Mensch', source: '4' },
-          { title: 'ein erniedrigtes, ein geknechtetes', source: '5' },
-          { title: 'ein verlassenes, ein verächtliches', source: '6' },
-          { title: 'Wesen ist', source: '7' }]"
-        :placeholder="'Select your Marx'"
-        :object-prop="'title'"
-        :chips-editable="true"
-        :identifier="'source'"
-        :label="'single choice with special drop down body'"
-        :allow-unknown-entries="true"
-        :add-new-chip-text="'asdfasdfasdfasdf'"
-        :allow-multiple-entries="true">
-        <template
-          v-slot:drop-down-entry="props">
-          <span>{{ props.item.title }}</span>
-          <span>{{ props.item.additional }}</span>
-          <span>{{ props.item.remark }}</span>
-        </template>
-      </BaseChipsInput>
-      <BaseAutocompleteInput
-        v-model="autocompleteInput"
-        :list="dropDownInput"
-        :placeholder="'Fetching from SkosMos'"
-        :object-prop="'prefLabel'"
-        label="text input with dynamic autocomplete"
-        @selected="fetchOther($event, 'this is my type')" />
-      <BaseChipsBelow
-        v-model="selectedList"
-        :chips-inline="false"
-        :chips-editable="true"
-        :allow-unknown-entries="false"
-        :list="[{
-                  id: '1',
-                  name: 'Herbert Marcuse'
-                },
-                {
-                  id: '2',
-                  name: 'Erich From',
-                },
-                {
-                  id: '',
-                  name: 'Georg Werth',
-                }]"
-        :role-options="['Farmer', 'Magician', 'Priest']"
-        :hoverbox-content="hoverboxContent"
-        identifier="id"
-        object-prop="name"
-        label="chips-below-test"
-        @hoverbox-active="setHoverBox" /> -->
-    </div>
-
-    <!-- MENU LIST TEST -->
-    <base-menu-list
-      :selected="showCheckbox"
-      :list="list"
-      @clicked="activateMenuEntry" />
-    <base-menu-entry
-      :entry-id="'asingleentry'"
-      :icon="'sheet-empty'"
-      :active="menuEntryActive"
-      :select-active="showCheckbox"
-      :is-selectable="true"
-      :thumbnails="['attention', 'people']"
-      title="Poesie oh Poesisssssssssssssssssssssssssssssssssse"
-      subtext="Aus einer anderen Weltsssssssssssssssssssssssssss"
-      description="Gemälde"
-      @clicked="menuEntryActive = true" />
-    <base-button
-      text="toggle checkboxes"
-      button-style="row"
-      @clicked="showCheckbox = !showCheckbox" />
-
-    <!-- DROP BOX TEST -->
-    <div class="flex row">
-      <base-drop-box
-        :show-plus="true"
-        :box-size="{ width: 'calc(25% - 16px)' }"
-        drop-type="elements"
-        drop-element-name="menuEntry"
-        drag-item-class="base-menu-list__list-entry"
-        icon="camera"
-        text="Datei hinzufügen"
-        subtext="(Click oder durch drag'n drop hinzufügen)"
-        @dropped-element="dropped($event)"
-        @clicked="boxClicked" />
-      <base-drop-box
-        drop-type="files" />
-    </div>
-    <div>
-      <ul>
-        <li
-          v-for="item in elements"
-          :key="item.id">
-          {{ item.title }}
-        </li>
-      </ul>
-    </div>
-
-    <!-- POP UP TEST -->
-    <base-button
-      draggable="true"
-      icon="options-menu"
-      @clicked="showPopUp = true" />
-    <base-pop-up
-      :show="showPopUp"
-      title="Bild entfernen"
-      button-left-text="Cancel"
-      button-right-text="Submit"
-      @clicked="buttonTriggered"
-      @close="showPopUp = false">
-      <div>
-        Test Create Entity
-      </div>
-      <div class="popup-text">
-        <base-input
-          :label="'Test1'"
-          field-type="number"
-          placeholder="Enter your Name" />
-        <base-input
-          :label="'Test'"
-          field-type="text"
-          placeholder="Enter your Name" />
-      </div>
-      <div class="popup-text">
-        <base-drop-down
-          :label="'select type'"
-          :option-selected="{ label: 'Alle Typen', value: '' }"
-          :options="[
-            { label: 'Alle Typen', value: '' },
-            { label: 'Bild', value: 'picture' },
-            { label: 'Publikation', value: 'publication' },
-            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
-          ]"
-          :header-background-color="'rgb(240, 240, 240)'" />
-        <base-drop-down
-          :label="'select type'"
-          :option-selected="{ label: 'Alle Typen', value: '' }"
-          :options="[
-            { label: 'Alle Typen', value: '' },
-            { label: 'Bild', value: 'picture' },
-            { label: 'Publikation', value: 'publication' },
-            { label: 'Film/Videobbbbbbbbbbbbb', value: 'movie'},
-          ]"
-          :header-background-color="'rgb(240, 240, 240)'" />
-      </div>
-    </base-pop-up>
-
-    <!-- DROP DOWN TEST -->
-    <base-drop-down
-      v-model="selectedVal"
-      :label="'select type'"
-      :show-label="true"
-      :options="selectionList" />
-    <base-drop-down
-      :options="selectionList" />
-    <div class="spacer" />
+    <BaseResultBoxSection
+      :entry-list="entriesList"
+      :is-loading="false"
+      :show-options="true"
+      :show-header="true"
+      :draggable="true"
+      :max-show-more-rows="1"
+      :use-expand-mode="true"
+      :max-rows="5">
+      <template #header>
+        <h3 class="activity-showcase__header">
+          Results
+        </h3>
+        <span>(30)</span>
+      </template>
+    </BaseResultBoxSection>
   </div>
 </template>
 
 <script>
+// import axios from 'axios';
 import axios from 'axios';
-
-import BaseBox from '@/components/BaseBox/BaseBox';
-import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry';
-import BasePopUp from '@/components/BasePopUp/BasePopUp';
-import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseDropBox from '@/components/BaseDropBox/BaseDropBox';
-import BaseMenuList from '@/components/BaseMenuList/BaseMenuList';
-import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput';
-import BaseSearch from '@/components/BaseSearch/BaseSearch';
-import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
-// import BaseAutocompleteInput from '@/components/BaseAutocompleteInput/BaseAutocompleteInput';
-// import BaseChipsBelow from '@/components/BaseChipsBelow/BaseChipsBelow';
-import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
-import BaseDatePanel from '@/components/BaseDatePanel/BaseDatePanel';
-import BasePagination from '@/components/BasePagination/BasePagination';
-import BaseMediaPreview from '@/components/BaseMediaPreview/BaseMediaPreview';
-import BaseForm from '@/components/BaseForm/BaseForm';
 import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseImageBox from '@/components/BaseImageBox/BaseImageBox';
-import BaseToggle from '@/components/BaseToggle/BaseToggle';
-import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
-import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar';
 import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-import BaseMap from '@/components/BaseMap/BaseMap';
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
-import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
-import BaseDetailBox from '@/components/BaseDetailBox/BaseDetailBox';
-import BaseExpandRow from '@/components/BaseExpandRow/BaseExpandRow';
+import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton';
+import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection';
 
 export default {
   name: 'App',
   components: {
     BaseResultBoxSection,
-    BaseForm,
-    BaseExpandRow,
-    BaseMediaPreview,
-    BasePagination,
-    // BaseChipsBelow,
-    BaseDateInput,
-    BaseDatePanel,
-    // BaseAutocompleteInput,
-    BaseImageBox,
-    BaseMultilineTextInput,
-    BaseSearch,
-    BaseChipsInput,
-    BaseMenuList,
-    BaseMenuEntry,
-    BaseDropDown,
-    BasePopUp,
-    BaseInput,
-    BaseButton,
-    BaseDropBox,
-    BaseDetailBox,
-    BaseToggle,
-    BaseProgressBar,
     BaseCarousel,
-    BaseMap,
-    BaseExpandBox,
-    BaseTextList,
-    BaseBox,
+    BaseButton,
+    BaseBoxButton,
   },
   data() {
     return {
-      baseExpandBox: [
+      filterType: {
+        label: 'all types',
+        source: '',
+      },
+      sortParam: {
+        label: 'date modified',
+        value: 'date_modified',
+      },
+      toggleList: false,
+      editExpandList: false,
+      baseExpandList: [
         {
-          label: 'Vero eos et accusam',
-          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-
-            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`,
-        },
-        {
-          label: 'Vero eos et accusam',
+          label: 'Monographien',
+          visible: true, // TODO: define naming, maybe 'hidden' better
           data: [
-            'Lorem ipsum dolor sit amet',
-            'Consetetur sadipscing elitr, sed diam nonumy',
-            'Eirmod tempor invidunt',
+            {
+              label: 'Beiträge in Sammelband',
+              data: [
+                {
+                  value: '1 qui nesciunt',
+                  attributes: [
+                    'molestiae commodi ipsum',
+                    'eos dolorem in',
+                  ],
+                  id: '29', // TODO: should be id (change in open-api-definition)
+                  href: '#',
+                },
+                {
+                  value: '2 animi voluptates',
+                  attributes: [
+                    'ut eum et',
+                    'quis odit est',
+                  ],
+                  id: '31',
+                  href: '#',
+                },
+                {
+                  value: '3 officiis quisquam',
+                  attributes: [
+                    'qui et sit',
+                    'occaecati facere temporibus',
+                  ],
+                  id: '44',
+                  href: '#',
+                },
+                // {
+                //   label: 'Sammelbände',
+                //   data: [
+                //     {
+                //       value: '1 qui reiciendis',
+                //       attributes: [
+                //         'rerum corporis voluptatibus',
+                //         'beatae occaecati non',
+                //       ],
+                //       id: '19',
+                //       href: '#',
+                //     },
+                //   ],
+                // },
+              ],
+            },
+            {
+              label: 'Konferenzbeiträge',
+              data: [
+                {
+                  value: '1 qui reiciendis',
+                  attributes: [
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
+                  ],
+                  id: '19',
+                  href: '#',
+                },
+                {
+                  value: '2 quia quisquam',
+                  attributes: [
+                    'quae laudantium expedita',
+                    'maxime omnis accusamus',
+                  ],
+                  id: '28',
+                  href: '#',
+                },
+                {
+                  value: '3 qui nesciunt',
+                  attributes: [
+                    'molestiae commodi ipsum',
+                    'eos dolorem in',
+                  ],
+                  id: '29',
+                  href: '#',
+                },
+              ],
+            },
           ],
         },
         {
-          label: 'Vero eos et accusam',
+          label: 'Film/Video',
+          visible: true,
           data: [
             {
-              label: 'www',
-              value: 'base.uni-ak.ac.at',
-              url: 'http://base.uni-ak.ac.at',
+              value: 'qui fugit',
+              attributes: [
+                'consequatur consequatur ipsa',
+                'et sunt delectus',
+              ],
+              id: '8',
+              href: '#',
             },
             {
-              label: 'email',
-              value: 'base@uni-ak.ac.at',
-              url: 'mailto:base@uni-ak.ac.at',
+              value: 'molestiae error',
+              attributes: [
+                'nobis voluptatibus quae',
+                'iusto et voluptate',
+              ],
+              id: '24',
+              href: '#',
+            },
+            {
+              value: 'cum ut',
+              attributes: [
+                'sed ut perferendis',
+                'velit dicta voluptatem',
+              ],
+              id: '26',
+              href: '#',
+            },
+            {
+              value: 'totam tenetur',
+              attributes: [
+                'laudantium temporibus cupiditate',
+                'ducimus quos quia',
+              ],
+              id: '50',
+              href: '#',
+            },
+          ],
+        },
+        {
+          label: 'Audio',
+          visible: true,
+          data: [
+            {
+              value: 'sed et',
+              attributes: [
+                'est quos sed',
+                'sed molestiae veritatis',
+              ],
+              id: '5',
+              href: '#',
+            },
+            {
+              value: 'quis quis',
+              attributes: [
+                'non possimus possimus',
+                'nobis recusandae sed',
+              ],
+              id: '20',
+              href: '#',
+            },
+            {
+              value: 'mollitia quo',
+              attributes: [
+                'non magnam eius',
+                'harum exercitationem non',
+              ],
+              id: '48',
+              href: '#',
+            },
+          ],
+        },
+        {
+          label: 'Preise und Stipendien',
+          visible: true,
+          data: [
+            {
+              value: 'qui fugit',
+              attributes: [
+                'consequatur consequatur ipsa',
+                'et sunt delectus',
+              ],
+              id: '8',
+              href: '#',
+            },
+            {
+              value: 'molestiae error',
+              attributes: [
+                'nobis voluptatibus quae',
+                'iusto et voluptate',
+              ],
+              id: '24',
+              href: '#',
+            },
+            {
+              value: 'cum ut',
+              attributes: [
+                'sed ut perferendis',
+                'velit dicta voluptatem',
+              ],
+              id: '26',
+              href: '#',
+            },
+            {
+              value: 'totam tenetur',
+              attributes: [
+                'laudantium temporibus cupiditate',
+                'ducimus quos quia',
+              ],
+              id: '50',
+              href: '#',
+            },
+          ],
+        },
+        {
+          label: 'Konferenzen & Symposien',
+          visible: true,
+          data: [
+            {
+              value: 'qui fugit',
+              attributes: [
+                'consequatur consequatur ipsa',
+                'et sunt delectus',
+              ],
+              id: '8',
+              href: '#',
+            },
+            {
+              value: 'molestiae error',
+              attributes: [
+                'nobis voluptatibus quae',
+                'iusto et voluptate',
+              ],
+              id: '24',
+              href: '#',
+            },
+            {
+              value: 'cum ut',
+              attributes: [
+                'sed ut perferendis',
+                'velit dicta voluptatem',
+              ],
+              id: '26',
+              href: '#',
+            },
+            {
+              value: 'totam tenetur',
+              attributes: [
+                'laudantium temporibus cupiditate',
+                'ducimus quos quia',
+              ],
+              id: '50',
+              href: '#',
             },
           ],
         },
       ],
-      boxText: [],
+      currentFilter: null,
+      fieldValueInt: [],
+      fetchDropDownList: [],
+      autocompleteRequestOngoing: false,
+      editMode: false,
       textInput: {
         English: 'Text Set from Outside',
         German: '',
       },
       activeAction: '',
-      data: {
-        column1: [{
-          label: 'Description',
-          data: `Lorem ipsum dolor sit amet, conseteturasdfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-            `,
-        },
-        {
-          label: 'Description',
-          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-          `,
-        },
-        {
-          label: 'Vero eos et accusam',
-          data: [
-            {
-              label: 'www',
-              value: 'http://base.uni-ak.ac.at',
-              url: 'http://base.uni-ak.ac.at',
-            },
-            {
-              label: 'email',
-              value: 'base@uni-ak.ac.at',
-              url: 'mailto:base@uni-ak.ac.at',
-            },
-          ],
-        },
-        {
-          label: 'Vero eos et accusam asdfddddddddddddddddddddfffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddffffffffffffffffffffffff ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-          data: [
-            {
-              label: 'www',
-              value: 'http://base.uni-ak.ac.at',
-              url: 'http://base.uni-ak.ac.at',
-            },
-            {
-              label: 'email',
-              value: 'base@uni-ak.ac.at',
-              url: 'mailto:base@uni-ak.ac.at',
-            },
-          ],
-        },
-        ],
-        column2: [{
-          label: 'Vero eos et accusam',
-          data: 'no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-        },
-        {
-          label: 'Vero eos et accusam',
-          data: [
-            'Lorem ipsum dolor sit amet',
-            'Consetetur sadipscing elitr, sed diam nonumy',
-            'Eirmod tempor invidunt',
-            'Eirmod tempor inviduntddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
-            'Eirmod tempor invidunt',
-            'Eirmod tempor invidunt',
-          ],
-        },
-        {
-          label: 'Vero eos et accusam',
-          data: [
-            'Lorem ipsum dolor sit amet',
-            'Consetetur sadipscing elitr, sed diam nonumy',
-            'Eirmod tempor invidunt',
-            'Eirmod tempor inviduntddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
-            'Eirmod tempor invidunt',
-            'Eirmod tempor invidunt',
-          ],
-        },
-        {
-          label: 'Vero eos et accusam',
-          data: [
-            'Lorem ipsum dolor sit amet',
-            'Consetetur sadipscing elitr, sed diam nonumy',
-            'Eirmod tempor invidunt',
-            'Eirmod tempor inviduntddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
-            'Eirmod tempor invidunt',
-            'Eirmod tempor invidunt',
-          ],
-        },
-        ],
-      },
       entriesList: [
         {
-          id: 'pCSLggvdsi8b3zRTLM4dJR',
+          id: 'pCSLggvdsi8asfdsrruuurrrdfb3dddzRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
-          title: 'An extra extra long title',
+          title: 'Title 1',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          // eslint-disable-next-line global-require
+          uid: '1',
+          subtext: 'Subtitle',
+          additional: '07.05.2020 - 21.05.2020',
+          // eslint-disable-next-line global-require
+          imageUrl: 'https://placeimg.com/460/341/grayscale',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              // eslint-disable-next-line global-require
+              '460w': 'https://placeimg.com/460/341/grayscale',
+            },
+            {
+              // eslint-disable-next-line global-require
+              '640w': 'https://placeimg.com/640/480/grayscale',
+            },
+            {
+              // eslint-disable-next-line global-require
+              '768w': 'https://placeimg.com/768/576/grayscale',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8asfdsrruuurrrdfb3zRTLM4dJR',
+          type: 'album',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 2 extra looooong',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/animal',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/animal',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/animal',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/animal',
+            },
+          ],
+        },
+        {
+          id: 'pCSLgasdfgvdsi8asfdsrrrrrdfb3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 3',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/arch',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/arch',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/arch',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/arch',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8aasdsfdsrrrrrdfb3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 4',
+          subtitle: 'A test',
+          description: 'Performance',
+          additional: '07.05.2020 - 21.05.2020',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          imageUrl: 'https://placeimg.com/640/480/tech',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/tech',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/tech',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/tech',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8asfdsrrrasrrdfb3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 5',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/people',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/people',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/people',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/people',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8asfdsrrrrdsrdfb3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 6',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/nature',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/nature',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/nature',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/tech',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8asfdsrrrrrdfb3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 6',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/tech',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/tech',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/tech',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/tech',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8asfdsdfb3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 7',
           subtitle: 'A test',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
           // eslint-disable-next-line global-require
           imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/tech',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/tech',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/tech',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8basdfsssssadf3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'An extra extra long title',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/people',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/people',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/people',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/people',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsddddi8b3zRTLM4dJR',
+          type: 'album',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 8',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/nature',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/nature',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/nature',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/nature',
+            },
+          ],
+        },
+        {
+          id: 'pCSLggvdsi8b3zRTLM4dJR',
+          type: 'activity',
+          date_created: '2020-04-27T11:01:37.246606Z',
+          title: 'Title 9',
+          subtitle: 'A test',
+          description: 'Performance',
+          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/arch',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/arch',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/arch',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/arch',
+            },
+          ],
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
+          type: 'album',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'Unknown',
           subtitle: 'Lets find it out and look deeper',
           description: 'Novel',
-          // eslint-disable-next-line global-require
-          imageUrl: require('@/../dev-docs/assets/images/img1.png'),
+          additional: '07.05.2020 - 21.05.2020',
+          imageUrl: 'https://placeimg.com/640/480/animal',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/animal',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/animal',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/animal',
+            },
+          ],
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
+          type: 'activity',
           date_created: '2020-04-27T11:01:37.246606Z',
           title: 'TBD',
           subtitle: 'Misterious',
@@ -702,514 +741,6 @@ export default {
       ],
       selectedBoxes: [],
       baseDatePanelInput: { date: '' },
-      formValueList: {
-        id: 'JVKyWKTr8pit772AQKMW5V',
-        parents: [
-        ],
-        relations: [
-        ],
-        icon: '/s/img/sheet-empty.svg',
-        has_media: false,
-        date_created: '2020-01-09T14:34:05.815419+01:00',
-        date_changed: '2020-01-09T14:34:55.747568+01:00',
-        title: '<ycsaasd',
-        subtitle: '',
-        type: null,
-        notes: '',
-        reference: null,
-        keywords: [
-        ],
-        texts: [
-          {
-            data: [
-              {
-                text: 'aaa',
-                language: {
-                  source: 'http://base.uni-ak.ac.at/portfolio/languages/en',
-                },
-              },
-            ],
-          },
-          {
-            data: [
-              {
-                text: 'asdfsdf',
-                language: {
-                  source: 'http://base.uni-ak.ac.at/portfolio/languages/en',
-                },
-              },
-            ],
-            type: {
-              label: {
-                de: 'Beschreibung',
-                en: 'description',
-              },
-              source: 'http://base.uni-ak.ac.at/portfolio/vocabulary/description',
-            },
-          },
-        ],
-        published: false,
-        data: {
-        },
-      },
-      json: {
-        id: {
-          title: 'Id',
-          type: 'string',
-          readOnly: true,
-          minLength: 1,
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-        parents: {
-          $ref: '#/definitions/Parent',
-        },
-        relations: {
-          $ref: '#/definitions/Relations',
-        },
-        icon: {
-          title: 'Icon',
-          type: 'string',
-          readOnly: true,
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-        has_media: {
-          title: 'Has media',
-          type: 'boolean',
-          readOnly: true,
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-        date_created: {
-          title: 'Date created',
-          type: 'string',
-          format: 'date-time',
-          readOnly: true,
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-        date_changed: {
-          title: 'Date changed',
-          type: 'string',
-          format: 'date-time',
-          readOnly: true,
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-        title: {
-          title: 'Title',
-          type: 'string',
-          maxLength: 255,
-          minLength: 1,
-          'x-attrs': {
-            field_type: 'text',
-            field_format: 'half',
-            order: 1,
-            placeholder: 'Enter title',
-          },
-        },
-        subtitle: {
-          title: 'Subtitle',
-          type: 'string',
-          maxLength: 255,
-          'x-nullable': true,
-          'x-attrs': {
-            field_type: 'text',
-            field_format: 'half',
-            order: 2,
-            placeholder: 'Enter subtitle',
-          },
-        },
-        type: {
-          title: 'Type',
-          type: 'object',
-          properties: {
-            source: {
-              type: 'string',
-              'x-attrs': {
-                hidden: true,
-              },
-            },
-            label: {
-              type: 'object',
-              properties: {
-                de: {
-                  type: 'string',
-                },
-                en: {
-                  type: 'string',
-                },
-                fr: {
-                  type: 'string',
-                },
-              },
-              additionalProperties: false,
-            },
-          },
-          additionalProperties: false,
-          'x-nullable': true,
-          'x-attrs': {
-            field_type: 'chips',
-            source: '/api/v1/jsonschema/',
-            order: 3,
-            placeholder: 'Enter type',
-            set_label_language: true,
-          },
-        },
-        notes: {
-          title: 'Notes',
-          type: 'string',
-          'x-nullable': true,
-          'x-attrs': {
-            field_type: 'multiline',
-            order: 6,
-            placeholder: 'Enter notes (will not be published)',
-          },
-        },
-        reference: {
-          title: 'Reference',
-          type: 'string',
-          maxLength: 255,
-          'x-nullable': true,
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-        keywords: {
-          title: 'Keywords',
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              source: {
-                type: 'string',
-                'x-attrs': {
-                  hidden: true,
-                },
-              },
-              label: {
-                type: 'object',
-                properties: {
-                  de: {
-                    type: 'string',
-                  },
-                  en: {
-                    type: 'string',
-                  },
-                  fr: {
-                    type: 'string',
-                  },
-                },
-                additionalProperties: false,
-              },
-            },
-            additionalProperties: false,
-          },
-          'x-nullable': true,
-          'x-attrs': {
-            field_type: 'chips',
-            source: '/autosuggest/v1/keywords/',
-            prefetch: [
-              'source',
-            ],
-            order: 5,
-            allow_unknown_entries: true,
-            dynamic_autosuggest: true,
-            set_label_language: true,
-            placeholder: 'Enter keywords',
-          },
-        },
-        texts: {
-          title: 'Text',
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              type: {
-                type: 'object',
-                properties: {
-                  source: {
-                    type: 'string',
-                    'x-attrs': {
-                      hidden: true,
-                    },
-                  },
-                  label: {
-                    type: 'object',
-                    properties: {
-                      de: {
-                        type: 'string',
-                      },
-                      en: {
-                        type: 'string',
-                      },
-                      fr: {
-                        type: 'string',
-                      },
-                    },
-                    additionalProperties: false,
-                  },
-                },
-                additionalProperties: false,
-                title: 'type',
-              },
-              data: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    language: {
-                      type: 'object',
-                      properties: {
-                        source: {
-                          type: 'string',
-                          enum: [
-                            'http://base.uni-ak.ac.at/portfolio/languages/ab',
-                            'http://base.uni-ak.ac.at/portfolio/languages/aa',
-                            'http://base.uni-ak.ac.at/portfolio/languages/af',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ak',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sq',
-                            'http://base.uni-ak.ac.at/portfolio/languages/am',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ar',
-                            'http://base.uni-ak.ac.at/portfolio/languages/an',
-                            'http://base.uni-ak.ac.at/portfolio/languages/hy',
-                            'http://base.uni-ak.ac.at/portfolio/languages/as',
-                            'http://base.uni-ak.ac.at/portfolio/languages/av',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ae',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ay',
-                            'http://base.uni-ak.ac.at/portfolio/languages/az',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bm',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ba',
-                            'http://base.uni-ak.ac.at/portfolio/languages/eu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/be',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bh',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/nb',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bs',
-                            'http://base.uni-ak.ac.at/portfolio/languages/br',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bg',
-                            'http://base.uni-ak.ac.at/portfolio/languages/my',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ca',
-                            'http://base.uni-ak.ac.at/portfolio/languages/km',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ch',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ce',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ny',
-                            'http://base.uni-ak.ac.at/portfolio/languages/zh',
-                            'http://base.uni-ak.ac.at/portfolio/languages/cu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/cv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kw',
-                            'http://base.uni-ak.ac.at/portfolio/languages/co',
-                            'http://base.uni-ak.ac.at/portfolio/languages/cr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/hr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/cs',
-                            'http://base.uni-ak.ac.at/portfolio/languages/da',
-                            'http://base.uni-ak.ac.at/portfolio/languages/dv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/nl',
-                            'http://base.uni-ak.ac.at/portfolio/languages/dz',
-                            'http://base.uni-ak.ac.at/portfolio/languages/en',
-                            'http://base.uni-ak.ac.at/portfolio/languages/eo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/et',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ee',
-                            'http://base.uni-ak.ac.at/portfolio/languages/fo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/fj',
-                            'http://base.uni-ak.ac.at/portfolio/languages/fi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/fr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ff',
-                            'http://base.uni-ak.ac.at/portfolio/languages/gd',
-                            'http://base.uni-ak.ac.at/portfolio/languages/gl',
-                            'http://base.uni-ak.ac.at/portfolio/languages/lg',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ka',
-                            'http://base.uni-ak.ac.at/portfolio/languages/de',
-                            'http://base.uni-ak.ac.at/portfolio/languages/el',
-                            'http://base.uni-ak.ac.at/portfolio/languages/gn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/gu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ht',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ha',
-                            'http://base.uni-ak.ac.at/portfolio/languages/he',
-                            'http://base.uni-ak.ac.at/portfolio/languages/hz',
-                            'http://base.uni-ak.ac.at/portfolio/languages/hi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ho',
-                            'http://base.uni-ak.ac.at/portfolio/languages/hu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/is',
-                            'http://base.uni-ak.ac.at/portfolio/languages/io',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ig',
-                            'http://base.uni-ak.ac.at/portfolio/languages/id',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ia',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ie',
-                            'http://base.uni-ak.ac.at/portfolio/languages/iu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ik',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ga',
-                            'http://base.uni-ak.ac.at/portfolio/languages/it',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ja',
-                            'http://base.uni-ak.ac.at/portfolio/languages/jv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kl',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ks',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kk',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ki',
-                            'http://base.uni-ak.ac.at/portfolio/languages/rw',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ky',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kg',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ko',
-                            'http://base.uni-ak.ac.at/portfolio/languages/kj',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ku',
-                            'http://base.uni-ak.ac.at/portfolio/languages/lo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/la',
-                            'http://base.uni-ak.ac.at/portfolio/languages/lv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/li',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ln',
-                            'http://base.uni-ak.ac.at/portfolio/languages/lt',
-                            'http://base.uni-ak.ac.at/portfolio/languages/lu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/lb',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mk',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mg',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ms',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ml',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mt',
-                            'http://base.uni-ak.ac.at/portfolio/languages/gv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mh',
-                            'http://base.uni-ak.ac.at/portfolio/languages/mn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/na',
-                            'http://base.uni-ak.ac.at/portfolio/languages/nv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/nd',
-                            'http://base.uni-ak.ac.at/portfolio/languages/nr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ng',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ne',
-                            'http://base.uni-ak.ac.at/portfolio/languages/se',
-                            'http://base.uni-ak.ac.at/portfolio/languages/no',
-                            'http://base.uni-ak.ac.at/portfolio/languages/nn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/oc',
-                            'http://base.uni-ak.ac.at/portfolio/languages/oj',
-                            'http://base.uni-ak.ac.at/portfolio/languages/or',
-                            'http://base.uni-ak.ac.at/portfolio/languages/om',
-                            'http://base.uni-ak.ac.at/portfolio/languages/os',
-                            'http://base.uni-ak.ac.at/portfolio/languages/pi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/pa',
-                            'http://base.uni-ak.ac.at/portfolio/languages/fa',
-                            'http://base.uni-ak.ac.at/portfolio/languages/pl',
-                            'http://base.uni-ak.ac.at/portfolio/languages/pt',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ps',
-                            'http://base.uni-ak.ac.at/portfolio/languages/qu',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ro',
-                            'http://base.uni-ak.ac.at/portfolio/languages/rm',
-                            'http://base.uni-ak.ac.at/portfolio/languages/rn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ru',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sm',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sg',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sa',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sc',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ii',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sd',
-                            'http://base.uni-ak.ac.at/portfolio/languages/si',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sk',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sl',
-                            'http://base.uni-ak.ac.at/portfolio/languages/so',
-                            'http://base.uni-ak.ac.at/portfolio/languages/st',
-                            'http://base.uni-ak.ac.at/portfolio/languages/es',
-                            'http://base.uni-ak.ac.at/portfolio/languages/su',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sw',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ss',
-                            'http://base.uni-ak.ac.at/portfolio/languages/sv',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tl',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ty',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tg',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ta',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tt',
-                            'http://base.uni-ak.ac.at/portfolio/languages/te',
-                            'http://base.uni-ak.ac.at/portfolio/languages/th',
-                            'http://base.uni-ak.ac.at/portfolio/languages/bo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ti',
-                            'http://base.uni-ak.ac.at/portfolio/languages/to',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ts',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tn',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tr',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tk',
-                            'http://base.uni-ak.ac.at/portfolio/languages/tw',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ug',
-                            'http://base.uni-ak.ac.at/portfolio/languages/uk',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ur',
-                            'http://base.uni-ak.ac.at/portfolio/languages/uz',
-                            'http://base.uni-ak.ac.at/portfolio/languages/ve',
-                            'http://base.uni-ak.ac.at/portfolio/languages/vi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/vo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/wa',
-                            'http://base.uni-ak.ac.at/portfolio/languages/cy',
-                            'http://base.uni-ak.ac.at/portfolio/languages/fy',
-                            'http://base.uni-ak.ac.at/portfolio/languages/wo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/xh',
-                            'http://base.uni-ak.ac.at/portfolio/languages/yi',
-                            'http://base.uni-ak.ac.at/portfolio/languages/yo',
-                            'http://base.uni-ak.ac.at/portfolio/languages/za',
-                            'http://base.uni-ak.ac.at/portfolio/languages/zu',
-                          ],
-                          'x-attrs': {
-                            hidden: true,
-                          },
-                        },
-                        label: {
-                          type: 'object',
-                          properties: {
-                            de: {
-                              type: 'string',
-                            },
-                            en: {
-                              type: 'string',
-                            },
-                            fr: {
-                              type: 'string',
-                            },
-                          },
-                          additionalProperties: false,
-                        },
-                      },
-                      additionalProperties: false,
-                    },
-                    text: {
-                      type: 'string',
-                      title: 'text',
-                    },
-                  },
-                  required: [
-                    'text',
-                  ],
-                  additionalProperties: false,
-                },
-              },
-            },
-            additionalProperties: false,
-          },
-          'x-nullable': true,
-          'x-attrs': {
-            field_type: 'multiline',
-            source_type: '/autosuggest/v1/texttypes/',
-            prefetch: [
-              'source_type',
-            ],
-            order: 4,
-            placeholder: 'Enter text',
-          },
-        },
-        published: {
-          title: 'Published',
-          type: 'boolean',
-          'x-attrs': {
-            hidden: true,
-          },
-        },
-      },
       selectionList: [
         { label: 'Option 1', value: 'option 1' },
         { label: 'Option 2', value: 'option 2' },
@@ -1240,62 +771,11 @@ export default {
       selectedList: ['Leo Löwenthal', 'Eike Geisel', 'Theodor Adorno'],
       chipsInput: [],
       dropDownInput: [
-        {
-          id: '1qw5qwwee',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '15555wqw',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1eeee55',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1rqqwereee',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1ffaerewr',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1ffa',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1ffffdas',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1adafsdf',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1aaa',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '1ddd',
-          value: '...alle Verhältnisse umzuwerfen',
-        },
-        {
-          id: '2',
-          value: 'in denen der Mensch',
-        },
-        {
-          id: '3',
-          value: 'ein erniedrigtes, ein geknechtetes',
-        },
-        {
-          id: '4',
-          value: 'ein verlassenes, ein verächtliches',
-        },
-        {
-          id: '5',
-          value: 'Wesen ist',
-        }],
+        '...alle Verhältnisse umzuwerfen',
+        'in denen der Mensch',
+        'ein erniedrigtes, ein geknechtetes',
+        'ein verlassenes, ein verächtliches',
+        'Wesen ist'],
       menuEntryActive: false,
       showCheckbox: false,
       showPopUp: false,
@@ -1511,6 +991,9 @@ export default {
     },
   },
   methods: {
+    test() {
+      console.log('reaching');
+    },
     entrySelected({ entryId, selected }) {
       if (selected && !this.selectedBoxes.includes(entryId)) {
         this.selectedBoxes.push(entryId);
@@ -1611,98 +1094,158 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../src/styles/variables";
+@import "../src/styles/variables";
 
-  .dropdown-extended {
-    border-top: $separation-line;
-    padding: $spacing;
+.base-advanced-search {
+  margin-top: 32px;
+}
 
-    .show-more-toggle {
-      color: $app-color;
-    }
-  }
+.activity-showcase {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .canvas {
-    padding: 16px;
-  }
+.activity-showcase__header {
+  font-size: $font-size-regular;
+  margin: 0 0 0 $spacing;
+}
 
-  .flex {
-    display: flex;
-  }
+.activity-showcase-after {
+  display: flex;
+}
 
-  .row {
-    max-height: 300px;
-  }
+.dropdown-extended {
+  border-top: $separation-line;
+  padding: $spacing;
 
-  div > .base-box-button {
-    margin: 8px;
+  .show-more-toggle {
+    color: $app-color;
   }
+}
 
-  button {
-    display:block;
-  }
+.canvas {
+  padding: 16px;
+}
 
-  .popup-text {
-    display: flex;
-    align-items: flex-end;
-  }
+.flex {
+  display: flex;
+}
 
-  .popup-text > div:first-of-type {
-    margin-right: 16px;
-  }
+.row {
+  max-height: 300px;
+}
 
-  .form-field {
-    background-color: white;
-    padding: 16px;
-    margin-bottom: 32px;
-  }
+div > .base-box-button {
+  margin: 8px;
+}
 
-  .image-box {
-    margin: 8px;
-  }
+button {
+  display: block;
+}
 
-  .multiline-dropdown {
-    margin-bottom: -4px;
-  }
-  .spacer {
-    height: 300px;
-  }
+.popup-text {
+  display: flex;
+  align-items: flex-end;
+}
 
-  .result-box {
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
-  .result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
-    margin-left: 16px;
-  }
+.popup-text > div:first-of-type {
+  margin-right: 16px;
+}
 
-  .base-map {
-    height: 400px;
-  }
+.form-field {
+  background-color: white;
+  padding: 16px;
+  margin-bottom: 32px;
+}
 
-  .base-expand-row {
-    margin: 16px;
-  }
-  .background {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: rgb(240, 240, 240);
-    padding: 16px;
-  }
+.image-box {
+  margin: 8px;
+}
 
-  .base-box {
-    margin-right: 16px;
-  }
+.multiline-dropdown {
+  margin-bottom: -4px;
+}
 
-  .base-box:nth-of-type(4n) {
-    margin-right: 0;
-  }
+.spacer {
+  height: 300px;
+}
 
-  .example-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+.result-box {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.result-box:nth-of-type(2n), .result-box:nth-of-type(3n) {
+  margin-left: 16px;
+}
+
+.base-map {
+  height: 400px;
+}
+
+.base-expand-row {
+  margin: 16px;
+}
+
+.background {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: rgb(240, 240, 240);
+  padding: 16px;
+}
+
+.example-text {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.base-advanced-search__filter-row {
+  margin-bottom: $spacing;
+}
+
+.slide-move {
+  transition: all .15s ease-out;
+}
+
+.slide-enter {
+  opacity: 0;
+  transform: translateY(-#{$spacing});
+}
+
+.slide-leave-to {
+  opacity: 0;
+  transform: translateY(-#{$spacing});
+}
+
+.slide-leave-active {
+  position: absolute;
+  width: 100%;
+  margin: auto;
+  transition: opacity 0.15s ease, transform 0.3s ease;
+}
+
+.base-result-box-section__box {
+  // subtracted 0.01rem for edge
+  flex: 0 0 calc(((100% - ((var(--items-per-row) - 1) * #{$spacing}))
+  / var(--items-per-row)) - 0.01rem);
+}
+
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
   }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 </style>

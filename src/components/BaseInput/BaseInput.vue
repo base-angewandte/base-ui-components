@@ -19,6 +19,7 @@
     <div
       v-click-outside="clickedOutsideInput"
       :class="['base-input-field-container',
+               { 'base-input-field-container-disabled': disabled },
                { 'base-input-field-container-border': useFormFieldStyling && showInputBorder },
                { 'base-input-field-container-active': useFormFieldStyling
                  && (active || isActive) }]"
@@ -43,6 +44,8 @@
               :value="inputInt"
               :type="fieldType"
               :list="dropDownListId || false"
+              :disabled="disabled"
+              :aria-disabled="disabled"
               :aria-activedescendant="linkedListOption"
               :aria-describedby="label + '_' + id"
               :class="['base-input-field', { 'base-input-field-hidden': hideInputField }]"
@@ -166,6 +169,13 @@ export default {
       type: String,
       default: null,
     },
+    /**
+     * set true if input field should be disabled
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -208,7 +218,8 @@ export default {
              * passing only the event.target.value
              *
              */
-            this.$emit('input', event.target.value);
+            this.$emit('input', this.fieldType === 'number'
+              ? Number(event.target.value) : event.target.value);
           },
         },
       };
@@ -307,6 +318,10 @@ export default {
               &:invalid {
                 box-shadow: none;
               }
+
+              &:disabled {
+                color: $font-color-second;
+              }
             }
 
             .base-input-field-hidden {
@@ -319,14 +334,24 @@ export default {
           }
         }
       }
-    }
 
-    .base-input-field-container-border {
-      border: $input-field-border;
-    }
+      &-active {
+        box-shadow: $input-shadow;
 
-    .base-input-field-container-active {
-      box-shadow: $input-shadow;
+      }
+
+      &-border {
+        border: $input-field-border;
+      }
+
+      &-disabled::after {
+        position: absolute;
+        left: 0;
+        content: '';
+        height: 100%;
+        width: 100%;
+        background: rgba(245, 245, 245, 0.4);
+      }
     }
 
     .base-input-label-row {
@@ -348,5 +373,9 @@ export default {
   input[type='text'].base-input-field {
     border: none;
     overflow: hidden;
+  }
+
+  .base-input-field-wrapper-fade-out::after {
+    background: rgba(239, 239, 239, 0.3);
   }
 </style>

@@ -95,6 +95,7 @@
         <BaseCheckmark
           v-if="selectable"
           :checked="selectedInt"
+          :label="title"
           mark-style="checkbox"
           check-box-size="large"
           class="base-image-box-checkbox"
@@ -105,7 +106,6 @@
 </template>
 <script>
 import BaseBox from '../BaseBox/BaseBox';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 import BaseImage from '../BaseImage/BaseImage';
 
 /**
@@ -116,7 +116,7 @@ import BaseImage from '../BaseImage/BaseImage';
 export default {
   name: 'BaseImageBox',
   components: {
-    BaseCheckmark,
+    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
     BaseBox,
     BaseImage,
   },
@@ -185,7 +185,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default: () => ({ width: '200px', height: '200px' }),
+      default: () => ({ width: 'auto', height: 'auto' }),
     },
     /**
      * specify any text that should be displayed instead of an image;

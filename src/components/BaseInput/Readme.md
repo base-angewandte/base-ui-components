@@ -14,6 +14,22 @@ export default{};
 
 ```
 
+A example with input disabled
+
+```vue
+<template>
+  <BaseInput
+    id="disabled"
+    :disabled="true"
+    label="Label for disabled input"
+    placeholder="A custom placeholder"/>
+</template>
+<script>
+export default{};
+</script>
+
+```
+
 A simple example without border
 
 ```vue
