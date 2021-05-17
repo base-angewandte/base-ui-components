@@ -55,11 +55,10 @@ $switch-svg-color: $font-color-third;
 $switch-svg-checked-color: var(--switch-svg-checked-color, #ffffff);
 $graytext-color: var(--graytext-color, rgba(16, 16, 16, 0.3));
 $map-cluster-bg: var(--map-cluster-bg, rgba(255, 152, 0, .4));
-$map-cluster-bg-inner: var(--map-cluster-bg, rgba(255, 152, 0, .85));
-$map-cluster-bg-hover: var(--map-cluster-bg, rgba(255, 217, 91, .4));
-$map-cluster-bg-inner-hover: var(--map-cluster-bg, rgba(255, 217, 91, .85));
+$map-cluster-bg-inner: var(--map-cluster-bg-inner, rgba(255, 152, 0, .85));
+$map-cluster-bg-hover: var(--map-cluster-bg-hover, rgba(255, 217, 91, .4));
+$map-cluster-bg-inner-hover: var(--map-cluster-bg-inner-hover, rgba(255, 217, 91, .85));
 $pagination-bullet-color: var(--pagination-bullet-color, #444444);
-
 
 /* shadows and borders */
 $border-width: 2px;
