@@ -39,7 +39,7 @@
             <div
               :class="['base-input__input-wrapper',
                        { 'base-input__input-wrapper__fade-out':
-                         !active && !hideInputField }]">
+                         useFadeOut && !active && !hideInputField }]">
               <!-- @slot replace native HTML input element with custom input
                     @binding { string } id - the id of the base input component - if
                       id is not provided in props this is an internal id that should
@@ -164,7 +164,9 @@ export default {
       default: true,
     },
     /**
-     if field is occurring more then once - set an id
+     * if field is occurring more then once - set an id<br>
+     * in case a custom input is used with the input slot it is important to
+     * assign the same id to the input element
      */
     id: {
       type: String,
@@ -277,6 +279,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    useFadeOut: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -350,10 +356,18 @@ export default {
     inputElement() {
       // check if client side
       if (window) {
+        // if input element exists in ref use this one
         if (this.$refs && this.$refs.input) {
           return this.$refs.input;
         }
-        return this.$el.getElementsByTagName('input')[0];
+        // otherwise check for an custom element by id
+        const tempElement = document.getElementById(this.idInt);
+        // check if element exists
+        if (tempElement) {
+          return tempElement;
+        }
+        // otherwise warn that the id was not assigned to the input element
+        console.warn('BaseInput: you did not assign the same id to the BaseInputComponent and the input element!');
       }
       return null;
     },
@@ -488,6 +502,9 @@ export default {
     .base-input__label {
       color: $font-color-second;
       text-align: left;
+      align-self: flex-end;
+      overflow-wrap: break-word;
+      min-width: 150px;
     }
 
     .base-input__label-spacer {
@@ -609,6 +626,19 @@ export default {
   .base-input__invalid-message {
     font-size: $font-size-small;
     color: $app-color;
+  }
+}
+
+@media screen and (max-width: $tablet) {
+  .base-input {
+    .base-input__label-row {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+
+      .base-input__label-spacer {
+        flex: 1 1 auto;
+      }
+    }
   }
 }
 </style>

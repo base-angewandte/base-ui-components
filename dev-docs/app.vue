@@ -1,5 +1,33 @@
 <template>
   <div id="app">
+    <div class="spacer" />
+    <BaseInput
+      :clearable="true"
+      label="dasdfasdfasd" />
+    <BaseChipsInputField
+      :sortable="true"
+      :clearable="true"
+      label="basechipsinpudasdf asdfasdfadfasdfasdfddddddddddddddddddddddddddddddddd
+      ddddddddddddddddddddt" />
+    <BaseMultilineTextInput
+      v-model="textInput"
+      :tabs="['English', 'German']"
+      label="Multiline Label Tabs"
+      placeholder="Enter Text here">
+      <BaseDropDown
+        :options="[{
+          label: 'x',
+          value: 'X',
+        }, {
+          label: 'y',
+          value: 'y',
+        }]" />
+    </BaseMultilineTextInput>
+    <BaseMultilineTextInput
+      v-model="textInput"
+      :tabs="['English', 'German']"
+      label="Multiline Label Tabs"
+      placeholder="Enter Text here" />
     <base-carousel
       :items="carousel"
       :swiper-options="{
@@ -45,15 +73,24 @@ import axios from 'axios';
 
 import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
 import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
+import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
+import BaseInput from '@/components/BaseInput/BaseInput';
+import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
+import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
 
 export default {
   name: 'App',
   components: {
+    BaseDropDown,
+    BaseChipsInputField,
+    BaseInput,
+    BaseMultilineTextInput,
     BaseAdvancedSearch,
     BaseCarousel,
   },
   data() {
     return {
+      textInput: {},
       currentFilter: null,
       fieldValueInt: [],
       fetchDropDownList: [],
@@ -296,14 +333,9 @@ export default {
   computed: {
   },
   watch: {
-    selectedFilter(val) {
-      console.log('filter changed');
-      console.log(val);
-    },
   },
   async created() {
     const result = await axios.get('http://localhost:9900/fetchFilters');
-    console.log(result);
     this.filters = result.data || [];
   },
   methods: {

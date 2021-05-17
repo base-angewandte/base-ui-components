@@ -1,14 +1,23 @@
 <template>
-  <div class="base-multiline-text-input">
-    <div class="base-multiline-text-input-label-row">
-      <label
-        :class="{ 'hide': !showLabel }"
-        :for="label + '-' + id"
-        class="base-multiline-text-input-label">
-        {{ label }}
-      </label>
-      <div class="base-multiline-text-input-additions">
-        <!-- @slot to add drop down needed for text input field (base specific) -->
+  <BaseInput
+    :id="idInt"
+    v-model="fieldContent[activeTabInt]"
+    :is-active.sync="isActive"
+    :label="label"
+    :show-label="showLabel"
+    :placeholder="placeholder"
+    :required="required"
+    :invalid="invalid"
+    :show-error-icon="showErrorIcon"
+    :error-message="errorMessage"
+    :clearable="clearable"
+    :use-fade-out="false"
+    class="base-multiline-text-input"
+    v-on="$listeners">
+    <template v-slot:label-addition>
+      <div class="base-multiline-text-input__additions">
+        <!-- @slot to add drop down needed for text input field (base specific)
+          or any other element deemed necessary -->
         <slot />
         <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
@@ -16,30 +25,41 @@
           :options="switchTabs"
           :label="tabsLegend"
           :active-tab="activeTab"
-          class="base-multiline-text-input-tabs">
+          class="base-multiline-text-input__tabs">
           <template
             v-slot:right-of-text="tab">
-            <base-icon
+            <BaseIcon
               v-if="hasText(tab.value)"
-              class="base-multiline-text-input-text-icon"
+              class="base-multiline-text-input__text-icon"
               name="text" />
           </template>
         </BaseSwitchButton>
       </div>
-    </div>
-
-    <textarea
-      :id="label + '-' + id"
-      v-model="fieldContent[activeTabInt]"
-      :placeholder="placeholder"
-      rows="10"
-      class="base-multiline-text-input-textarea" />
-  </div>
+    </template>
+    <template v-slot:input>
+      <div
+        ref="textareaWrapper"
+        :class="['base-multiline-text-input__textarea-wrapper',
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut }]">
+        <textarea
+          :id="idInt"
+          ref="textarea"
+          v-model="fieldContent[activeTabInt]"
+          :required="required"
+          :aria-required="required.toString()"
+          :aria-describedby="idInt"
+          :aria-invalid="invalid.toString()"
+          :placeholder="placeholder"
+          class="base-multiline-text-input__textarea"
+          v-on="inputListeners" />
+      </div>
+    </template>
+  </BaseInput>
 </template>
 
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
+import BaseInput from '@/components/BaseInput/BaseInput';
+import { createId } from '@/utils/utils';
 
 /**
  * A multiline textfield base component
@@ -48,12 +68,13 @@ import BaseSwitchButton from '../BaseSwitchButton/BaseSwitchButton';
 export default {
   name: 'BaseMultilineTextInput',
   components: {
-    BaseSwitchButton,
-    BaseIcon,
+    BaseInput,
+    BaseIcon: () => import('@/components/BaseIcon/BaseIcon'),
+    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton'),
   },
   model: {
     prop: 'input',
-    event: 'text-input',
+    event: 'input',
   },
   props: {
     /**
@@ -125,49 +146,119 @@ export default {
       type: [String, Number],
       default: '',
     },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
+    },
+    /**
+     * mark as required field (currently only used for aria-required)
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
-      fieldContent: {},
       activeTabInt: this.activeTab || 'default',
+      fieldContent: {},
+      isActive: false,
     };
   },
   computed: {
+    /**
+     * check if an id was provided (to handle label input connection), if not create one
+     * @returns {String|string}
+     */
+    idInt() {
+      return this.id || createId();
+    },
     // TODO: refactor component props to already match object necessary for switch component
     switchTabs() {
       return this.tabs.map((tab, index) => ({ value: tab, label: this.tabLabels[index] || tab }));
     },
+    inputListeners() {
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          input: () => {
+            /**
+             * Event emitted on input, passing input string
+             *
+             * @event input
+             * @param {string|Object} - the input event value however
+             * passing only the event.target.value
+             *
+             */
+            this.$emit('input', this.emitFieldContent());
+          },
+        },
+      };
+    },
+    showFadeOut() {
+      if (this.$refs && this.$refs.textarea) {
+        return !this.isActive
+          && this.$refs.textarea.scrollHeight > this.$refs.textareaWrapper.clientHeight;
+      }
+      return !this.isActive;
+    },
   },
   watch: {
     // watch for input changes from outside
-    input(val) {
-      // if input changes set internal fieldContent variable
-      this.setFieldContent(val);
+    input: {
+      handler(val) {
+        if ((typeof val === 'object' && JSON.stringify(val) !== JSON.stringify(this.fieldContent))
+          || (typeof val === 'string' && val !== this.fieldContent[this.activeTabInt])) {
+          // if input changes set internal fieldContent variable
+          this.setFieldContent(val);
+        }
+      },
+      immediate: true,
+      deep: true,
     },
-    // set active tab from outside
+    // get updates for active tab from outside
     activeTab(val) {
       this.activeTabInt = val;
     },
-    fieldContent: {
-      handler(val) {
-        if (typeof this.input === 'object' && JSON.stringify(val) !== JSON.stringify(this.input)) {
-          this.$emit('text-input', val);
-        } else if (typeof this.input === 'string' && val[this.activeTabInt] !== this.input) {
-          /**
-           * Event emitted on keyup (text input change)
-           *
-           * @event text-input
-           * @type { Object | String }
-           */
-          this.$emit('text-input', val[this.activeTabInt]);
-        }
-      },
-      deep: true,
-    },
-  },
-  mounted() {
-    // set internal field content variable
-    this.setFieldContent(this.input);
   },
   methods: {
     setFieldContent(val) {
@@ -179,6 +270,12 @@ export default {
           val[tab]));
       }
     },
+    emitFieldContent() {
+      if (typeof this.input === 'object') {
+        return this.fieldContent;
+      }
+      return this.fieldContent[this.activeTabInt];
+    },
     hasText(val) {
       return !!this.fieldContent[val];
     },
@@ -187,93 +284,79 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@import '../../styles/variables.scss';
 
-  .base-multiline-text-input {
-    position: relative;
-    width: 100%;
-    font-family: inherit;
-    font-size: inherit;
+.base-multiline-text-input {
+  font-family: inherit;
+  font-size: inherit;
 
-    .base-multiline-text-input-label-row {
-      display: flex;
-      width: 100%;
-      margin-bottom: $spacing-small/2;
+  .base-multiline-text-input__additions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: -$spacing-small/2;
 
-      .base-multiline-text-input-label {
-        color: $font-color-second;
-        text-align: left;
+    .base-multiline-text-input__tabs {
+      align-self: center;
+      flex-shrink: 0;
+
+      .base-multiline-text-input__text-icon {
+        margin-left: $spacing-small;
+        height: 10px;
+        width: 10px;
+        vertical-align: middle;
         margin-bottom: $spacing-small/2;
-        flex-grow: 2;
-        align-self: flex-end;
-      }
-
-      .base-multiline-text-input-additions {
-        display: flex;
-        flex-wrap: wrap;
-
-        .base-multiline-text-input-tabs {
-          align-self: center;
-          flex-shrink: 0;
-
-          .base-multiline-text-input-text-icon {
-            margin-left: $spacing-small;
-            height: 10px;
-            width: 10px;
-            vertical-align: middle;
-            margin-bottom: $spacing-small/2;
-            color: $font-color-second;
-            fill: $font-color-second;
-          }
-        }
+        color: $font-color-second;
+        fill: $font-color-second;
       }
     }
+  }
 
-    .base-multiline-text-input-textarea {
+  .base-multiline-text-input__textarea-wrapper {
+    width: 100%;
+
+    &.base-multiline-text-input__textarea-wrapper__fade-out::after {
+      content: '';
+      width: 100%;
+      height: $fade-out-width;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0) , white);
+      pointer-events: none;
+    }
+
+    .base-multiline-text-input__textarea {
       width: 100%;
       line-height: $line-height;
-      border: $input-field-border;
-      padding: $spacing;
+      padding: $spacing-small/2 0;
       margin: 0;
       height: 240px;
-      background: white;
-      -webkit-appearance: none;
-      -moz-appearance: none;
       appearance: none;
+      resize: none;
+      -ms-overflow-style: none;  /* Internet Explorer 10+ */
+      scrollbar-width: none;  /* Firefox */
 
-      &:active, &:focus {
-        box-shadow: $input-shadow;
+      &::-webkit-scrollbar {
+        display: none;  /* Safari and Chrome */
       }
     }
   }
+}
 
-  @media screen and (max-width: $tablet) {
-    .base-multiline-text-input {
-      .base-multiline-text-input-textarea {
-        height: 200px;
-      }
-
-      .base-multiline-text-input-label-row {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-
-        .base-multiline-text-input-label {
-          flex-basis: 33%;
-        }
-
-        .base-multiline-text-input-additions {
-          justify-content: flex-end;
-        }
-      }
+@media screen and (max-width: $tablet) {
+  .base-multiline-text-input {
+    .base-multiline-text-input__additions {
+      justify-content: flex-end;
     }
   }
+}
 
-  @media screen and (max-width: $mobile) {
-    .base-multiline-text-input
-    .base-multiline-text-input-label-row
-    .base-multiline-text-input-additions {
-      align-items: center;
-      margin-bottom: -$spacing-small/2;
-    }
+@media screen and (max-width: $mobile) {
+  .base-multiline-text-input
+  .base-multiline-text-input__additions {
+    margin-bottom: -$spacing-small;
   }
+}
+
 </style>

@@ -395,7 +395,7 @@ export default {
      */
     clearable: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * possibility to steer input field active state from outside<br>
