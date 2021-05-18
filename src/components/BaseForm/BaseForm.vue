@@ -174,7 +174,7 @@ export default {
      */
     showErrorIcon: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * if true a remove icon will be shown allowing to remove
@@ -183,7 +183,7 @@ export default {
      */
     clearable: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * provide an object with settings and properties for each field, this is used to set
