@@ -59,6 +59,7 @@
 
 <script>
 import BaseInput from '@/components/BaseInput/BaseInput';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import { createId } from '@/utils/utils';
 
 /**
@@ -69,7 +70,7 @@ export default {
   name: 'BaseMultilineTextInput',
   components: {
     BaseInput,
-    BaseIcon: () => import('@/components/BaseIcon/BaseIcon'),
+    BaseIcon,
     BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton'),
   },
   model: {

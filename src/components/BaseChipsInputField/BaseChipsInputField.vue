@@ -149,6 +149,7 @@
 <script>
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput';
+import Draggable from 'vuedraggable';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
 
@@ -159,7 +160,7 @@ export default {
   components: {
     BaseInput,
     BaseChip: () => import('@/components/BaseChip/BaseChip'),
-    Draggable: () => import('vuedraggable'),
+    Draggable,
   },
   mixins: [
     i18n,

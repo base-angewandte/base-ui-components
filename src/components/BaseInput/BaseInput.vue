@@ -120,6 +120,7 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import { createId } from '@/utils/utils';
 
 /**
@@ -132,7 +133,7 @@ export default {
     ClickOutside,
   },
   components: {
-    BaseIcon: () => import('@/components/BaseIcon/BaseIcon'),
+    BaseIcon,
     BaseLoader: () => import('@/components/BaseLoader/BaseLoader'),
   },
   model: {
