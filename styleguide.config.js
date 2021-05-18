@@ -84,5 +84,6 @@ module.exports = {
     'src/components/BaseToolTip/*',
     'src/components/BaseChip/*',
     'src/components/BaseExpandList/BaseExpandListRow.vue',
+    'src/components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
   ],
 }
