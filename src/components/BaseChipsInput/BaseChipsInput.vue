@@ -33,7 +33,8 @@
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
           @within-drop-down="dropDownActive = $event"
-          @click.native.stop="">
+          @click.native.stop=""
+          @touchstart.native.stop="">
           <template v-slot:option="entry">
             <span
               v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
