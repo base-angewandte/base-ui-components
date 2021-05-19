@@ -1,6 +1,130 @@
 <template>
   <div id="app">
     <div class="spacer" />
+    <BaseDateInput
+      id="dayformatdemo"
+      v-model="datepicked"
+      :label="'Enter A Date'"
+      :format="'date_year'"
+      :show-label="true"
+      :invalid="true"
+      :show-error-icon="true"
+      error-message="this field is invalid"
+      type="daterange"
+      placeholder="enter a date"
+      @clicked-outside="test"
+      @click-input-field="test" />
+    <BaseDateInput
+      id="dayformatdemox"
+      v-model="datesingle"
+      :label="'Enter A Date'"
+      :format="'day'"
+      :show-label="true"
+      :invalid="invalid"
+      :show-error-icon="true"
+      error-message="this field is invalid"
+      type="single"
+      placeholder="enter a date" />
+    <BaseDateInput
+      id="dayformatdemoy"
+      v-model="datetime"
+      :label="'Enter A Date'"
+      :format="'day'"
+      :show-label="true"
+      :invalid="invalid"
+      :show-error-icon="true"
+      error-message="this field is invalid"
+      type="datetime"
+      placeholder="enter a date" />
+    <BaseDateInput
+      id="dayformatdemoz"
+      v-model="timepicked"
+      :label="'Enter A Time'"
+      :format="'day'"
+      :show-label="true"
+      :invalid="invalid"
+      :show-error-icon="true"
+      error-message="this field is invalid"
+      type="timerange"
+      placeholder="enter a date" />
+    <BaseInput
+      id="daödlskjaödklsjfdkjasfölkjdfs"
+      v-model="input"
+      :is-active="active"
+      :invalid="invalid"
+      :required="true"
+      :is-loading="isLoading"
+      :show-error-icon="true"
+      :clearable="true"
+      field-type="text"
+      error-message="this field is required"
+      placeholder="enter some random string here"
+      label="test">
+    </BaseInput>
+    <BaseChipsInput
+      id="chipsinput"
+      :list="list"
+      :allow-multiple-entries="false"
+      :always-linked="true"
+      :clearable="true"
+      :invalid="invalid"
+      :allow-unknown-entries="true"
+      identifier-property-name="id"
+      label-property-name="title"
+      add-new-chip-text="Add "
+      label="Single Choice with fixed DropDown"
+      error-message="this field is required"
+      placeholder="Select Quote Snippet" />
+    <BaseChipsInputField
+      id="chipsinputfield"
+      v-model="input"
+      :selected-list.sync="selectedList"
+      :allow-unknown-entries="true"
+      :allow-multiple-entries="true"
+      :add-selected-entry-directly="true"
+      :sortable="true"
+      :draggable="true"
+      :always-linked="true"
+      :is-string-array="true"
+      :is-loading="true"
+      :invalid="invalid"
+      :clearable="true"
+      placeholder="type + enter to add chips"
+      error-message="this field is required"
+      label="A simple chips input field example"
+      @clicked-outside="test"
+      @click-input-field="test">
+      <template v-slot:label-addition>
+        test
+      </template>
+      <template v-slot:input-field-addition-before>
+        <div>test</div>
+      </template>
+      <template v-slot:input-field-addition-after>
+        <div>test</div>
+      </template>
+      <template v-slot:remove-icon>
+        <BaseIcon
+          :style="{ height: '16px', width: '16px' }"
+          name="waste-bin" />
+      </template>
+      <template v-slot:error-icon>
+        <BaseIcon
+          :style="{ height: '16px', width: '16px' }"
+          name="waste-bin" />
+      </template>
+    </BaseChipsInputField>
+    <div class="spacer" />
+    <BaseButton
+      text="toggle"
+      @clicked="clickbutton" />
+    <BaseInput
+      label="old"
+      :required="true"/>
+    <div>
+      {{ input }}
+    </div>
+    <div class="spacer" />
     <BaseInput
       :clearable="true"
       label="dasdfasdfasd" />
@@ -73,9 +197,13 @@ import axios from 'axios';
 
 import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
 import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
-import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseInput from '@/components/BaseInput/BaseInput';
+import BaseButton from '@/components/BaseButton/BaseButton';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
+import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
+import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
 
 export default {
@@ -85,12 +213,33 @@ export default {
     BaseChipsInputField,
     BaseInput,
     BaseMultilineTextInput,
+    BaseDateInput,
+    BaseIcon,
+    BaseChipsInput,
     BaseAdvancedSearch,
     BaseCarousel,
+    BaseButton,
   },
   data() {
     return {
       textInput: {},
+      datepicked: {
+        date_from: '',
+        date_to: '',
+      },
+      timepicked: {
+        time_from: '',
+        time_to: '',
+      },
+      datetime: {
+        date: '',
+        time: '',
+      },
+      datesingle: '',
+      active: null,
+      selectedList: [],
+      input: '',
+      invalid: false,
       currentFilter: null,
       fieldValueInt: [],
       fetchDropDownList: [],
@@ -333,12 +482,26 @@ export default {
   computed: {
   },
   watch: {
+    selectedFilter(val) {
+      console.log('filter changed');
+      console.log(val);
+    },
   },
   async created() {
     const result = await axios.get('http://localhost:9900/fetchFilters');
     this.filters = result.data || [];
   },
   methods: {
+    test(event) {
+      console.log('inside or outside event');
+      console.log(event);
+    },
+    clickbutton() {
+      this.active = !this.active;
+      this.input = this.input ? '' : 'Test';
+      this.invalid = !this.invalid;
+      this.isLoading = !this.isLoading;
+    },
     fetchAutocomplete(searchString, filterIndex) {
       this.autocompleteRequestOngoing = filterIndex;
       setTimeout(() => {
@@ -438,6 +601,6 @@ export default {
     margin-bottom: -4px;
   }
   .spacer {
-    height: 300px;
+    height: 50px;
   }
 </style>

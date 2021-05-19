@@ -79,7 +79,8 @@
         <slot name="input-field-addition-after" />
         <div
           v-if="!allowMultipleEntries"
-          class="base-chips-input__single-dropdown">
+          class="base-chips-input__single-dropdown"
+          @click.stop="inputFieldActive = !inputFieldActive">
           <BaseIcon
             :class="[
               'base-chips-input__single-dropdown-icon',
