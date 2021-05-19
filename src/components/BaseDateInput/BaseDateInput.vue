@@ -40,8 +40,7 @@
         v-on="$listeners">
         <template v-slot:input>
           <div
-            class="base-date-input__datepicker"
-            @click.stop="">
+            class="base-date-input__datepicker">
             <DatePicker
               v-model="inputFrom"
               :input-attr="{ id: label + '-' + id }"
@@ -109,8 +108,7 @@
         v-on="$listeners">
         <template v-slot:input>
           <div
-            class="base-date-input__datepicker"
-            @click.stop="">
+            class="base-date-input__datepicker">
             <DatePicker
               v-model="inputTo"
               :input-attr="{ id: label + '-' + id }"
@@ -152,7 +150,7 @@
           <BaseIcon
             :name="isToTimeField ? 'clock' : 'calendar-many'"
             class="base-date-input__date-icon"
-            @click.stop="fromOpen = !fromOpen" />
+            @click.stop="toOpen = !toOpen" />
         </template>
       </BaseInput>
     </div>
@@ -445,19 +443,25 @@ export default {
         }
       },
     },
+    // determine if the initially provided date is a year or a full date
+    // (used to set the correct date display format and date/year switch button)
     isDateFormatYear() {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && this.inputInt[key].length <= 4));
     },
+    // determine if the from field is a time field
     isFromTimeField() {
       return this.type === 'timerange';
     },
+    // determine if the to field is a time field
     isToTimeField() {
       return this.type === 'datetime' || this.type === 'timerange';
     },
   },
   watch: {
+    // watch input set from outside and set internal inputInt accordingly as well as
+    // set the correct display format
     input: {
       handler(val) {
         // check if input string is different from inputInt
@@ -472,24 +476,36 @@ export default {
       // to not need to do extra assignment in created()
       immediate: true,
     },
+    // in order to allow user to restore previous date after switching
+    // from date to year and back store in temp variable (but only if previous date was full date
+    // (check necessary for starting with year where format is switched to 'YYYY'
+    // but no previous full date avaliable))
     dateFormatInt(val) {
-      // in order to allow user to restore previous date after switching
-      // from date to year and back store in temp variable (but only if previous date was full date
-      // (check necessary for starting with year where format is switched to 'YYYY'
-      // but no previous full date avaliable))
       if (val === 'YYYY' && !this.isDateFormatYear) {
         this.tempDateStore = { ...this.inputInt };
       }
       this.convertDate();
     },
+    // if inputInt changes inform parent about it
     inputInt: {
       handler() {
-        // also watch inputInt for differences to input and notify parent in case
         if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
           this.emitData();
         }
       },
       deep: true,
+    },
+    // when input becomes inactive always also blur input field just in case
+    fromOpen(val) {
+      if (!val) {
+        this.$refs.inputFrom.blur();
+      }
+    },
+    // when input becomes inactive always also blur input field just in case
+    toOpen(val) {
+      if (!val) {
+        this.$refs.inputTo.blur();
+      }
     },
   },
   updated() {
@@ -514,9 +530,15 @@ export default {
     }
   },
   methods: {
+    /**
+     * transform the date to the correct display format
+     */
     dateDisplay(dateString) {
       return dateString.split('-').reverse().join('.');
     },
+    /**
+     * transform the date to the correct storage format
+     */
     dateStorage(dateString) {
       return dateString.split('.').reverse().join('-');
     },
