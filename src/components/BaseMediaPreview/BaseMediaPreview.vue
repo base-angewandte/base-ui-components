@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -120,7 +121,7 @@ export default {
   name: 'BaseMediaPreview',
   components: {
     BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseIcon,
     BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
   },
   directives: {

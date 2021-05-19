@@ -69,6 +69,7 @@
 </template>
 
 <script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseLoader from '../BaseLoader/BaseLoader';
 import popUpLock from '../../mixins/popUpLock';
 
@@ -81,7 +82,7 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseIcon,
     BaseLoader,
   },
   mixins: [popUpLock],
