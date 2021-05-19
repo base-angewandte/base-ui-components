@@ -18,7 +18,7 @@
       <div class="base-multiline-text-input__additions">
         <!-- @slot to add drop down needed for text input field (base specific)
           or any other element deemed necessary -->
-        <slot />
+        <slot name="label-addition" />
         <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
           v-model="activeTabInt"
@@ -51,8 +51,29 @@
           :aria-invalid="invalid.toString()"
           :placeholder="placeholder"
           class="base-multiline-text-input__textarea"
-          v-on="inputListeners" />
+          v-on="inputListeners"
+          @keydown.tab="isActive = false" />
       </div>
+    </template>
+    <template
+      v-slot:input-field-addition-before>
+      <!-- @slot Slot to allow for additional elements in the input field \<div\>
+        (before \<input\>) -->
+      <slot name="input-field-addition-before" />
+    </template>
+    <template v-slot:input-field-addition-after>
+      <!-- @slot for adding elements after input -->
+      <slot name="input-field-addition-after" />
+    </template>
+    <template v-slot:error-icon>
+      <!-- @slot use a custom icon instead of standard error/warning icon<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="error-icon" />
+    </template>
+    <template v-slot:remove-icon>
+      <!-- @slot for adding elements after input (e.g. used to add loader) <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="remove-icon" />
     </template>
   </BaseInput>
 </template>

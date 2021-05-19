@@ -131,11 +131,13 @@
         <slot name="input-field-addition-after" />
       </template>
       <template v-slot:error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <!-- @slot use a custom icon instead of standard error/warning icon<br>
+          for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="error-icon" />
       </template>
       <template v-slot:remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <!-- @slot for adding elements after input (e.g. used to add loader <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="remove-icon" />
       </template>
       <template v-slot:below-input>

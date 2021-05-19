@@ -25,7 +25,7 @@
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
       :clearable="clearable"
-      @keydown.enter.prevent=""
+      @keydown.enter="onEnter"
       @text-input="setMultilineValue($event)"
       @input="fieldValueInt = $event"
       @autocomplete="$emit('fetch-autocomplete', {
@@ -35,7 +35,8 @@
       })">
       <template
         v-if="fieldType === 'multiline' && field.items
-          && field.items.properties && field.items.properties.type">
+          && field.items.properties && field.items.properties.type"
+        v-slot:label-addition>
         <BaseDropDown
           :id="fieldKey"
           :selected-option="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
@@ -598,6 +599,14 @@ export default {
     setMultilineDropDown(val) {
       // set texts type value if present - otherwise set empty
       this.$set(this.fieldValueInt, 'type', val.source ? val : null);
+    },
+    // prevent default action for everything except multiline
+    onEnter(event) {
+      if (this.fieldType !== 'multiline') {
+        event.preventDefault();
+      } else {
+        this.$emit('keydodwn', event);
+      }
     },
   },
 };

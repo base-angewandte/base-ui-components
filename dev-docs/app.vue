@@ -1,6 +1,14 @@
 <template>
   <div id="app">
     <div class="spacer" />
+    <BaseChipsInput
+      :id="'dropdowntest'"
+      :list="list"
+      :allow-multiple-entries="false"
+      :label="'asdfasdfasdf'"
+      identifier-property-name="id"
+      label-property-name="title">
+    </BaseChipsInput>
     <BaseDateInput
       id="dayformatdemo"
       v-model="datepicked"
@@ -11,9 +19,7 @@
       :show-error-icon="true"
       error-message="this field is invalid"
       type="daterange"
-      placeholder="enter a date"
-      @clicked-outside="test"
-      @click-input-field="test" />
+      placeholder="enter a date" />
     <BaseDateInput
       id="dayformatdemox"
       v-model="datesingle"
@@ -32,6 +38,7 @@
       :format="'day'"
       :show-label="true"
       :invalid="invalid"
+      :clearable="true"
       :show-error-icon="true"
       error-message="this field is invalid"
       type="datetime"
@@ -43,6 +50,7 @@
       :format="'day'"
       :show-label="true"
       :invalid="invalid"
+      :clearable="true"
       :show-error-icon="true"
       error-message="this field is invalid"
       type="timerange"
@@ -59,12 +67,11 @@
       field-type="text"
       error-message="this field is required"
       placeholder="enter some random string here"
-      label="test">
-    </BaseInput>
+      label="test" />
     <BaseChipsInput
       id="chipsinput"
       :list="list"
-      :allow-multiple-entries="false"
+      :allow-multiple-entries="true"
       :always-linked="true"
       :clearable="true"
       :invalid="invalid"
@@ -91,9 +98,7 @@
       :clearable="true"
       placeholder="type + enter to add chips"
       error-message="this field is required"
-      label="A simple chips input field example"
-      @clicked-outside="test"
-      @click-input-field="test">
+      label="A simple chips input field example">
       <template v-slot:label-addition>
         test
       </template>
@@ -120,7 +125,7 @@
       @clicked="clickbutton" />
     <BaseInput
       label="old"
-      :required="true"/>
+      :required="true" />
     <div>
       {{ input }}
     </div>
@@ -492,10 +497,6 @@ export default {
     this.filters = result.data || [];
   },
   methods: {
-    test(event) {
-      console.log('inside or outside event');
-      console.log(event);
-    },
     clickbutton() {
       this.active = !this.active;
       this.input = this.input ? '' : 'Test';
