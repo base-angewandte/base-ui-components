@@ -19,7 +19,8 @@
         :name="label"
         :class="['hide', 'base-switch-button-input',
                  { 'base-switch-button-input-active': option.value === selectedOption }]"
-        type="radio">
+        type="radio"
+        @keydown.enter.prevent="">
       <label
         :key="option.value + 'label'"
         :for="optionIds[index]"
