@@ -500,8 +500,9 @@ export default {
       // wait until elements are rendered
       this.$nextTick(() => {
         // get all focusable elements that have the 'mx-' in the class name
+        // had to add 'div's as well because of some strange effect in Firefox
         const keyboardfocusableElements = [...this.$el.querySelectorAll(
-          'a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])',
+          'div, a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])',
         )]
           .filter(el => !el.hasAttribute('disabled'))
           .filter(el => el.className.includes('mx-'));
