@@ -7,7 +7,7 @@
       <label
         :for="idInt"
         :class="['base-input__label', { 'hide': !showLabel }]">
-        {{ label }}
+        {{ getLangLabel(label) }}
       </label>
       <div class="base-input__label-spacer" />
       <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
@@ -36,6 +36,9 @@
           (before \<input\>) -->
           <slot name="input-field-addition-before" />
           <div class="base-input__input-line">
+            <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap -->
+            <slot name="input-field-inline-before" />
             <div
               :class="['base-input__input-wrapper',
                        { 'base-input__input-wrapper__fade-out':
@@ -62,9 +65,8 @@
                   :aria-invalid="invalid.toString()"
                   :required="required"
                   autocomplete="off"
-                  :class="['base-input__input',
+                  :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
-                  @keydown.tab="setFieldState(false)"
                   v-on="inputListeners">
               </slot>
             </div>
@@ -113,7 +115,7 @@
     <div
       v-if="invalid && errorMessage"
       class="base-input__invalid-message">
-      {{ errorMessage }}
+      {{ getLangLabel(errorMessage) }}
     </div>
   </div>
 </template>
@@ -122,6 +124,7 @@
 import ClickOutside from 'vue-click-outside';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import { createId } from '@/utils/utils';
+import i18n from '../../mixins/i18n';
 
 /**
  * Form Input Field Component
@@ -136,6 +139,7 @@ export default {
     BaseIcon,
     BaseLoader: () => import('@/components/BaseLoader/BaseLoader'),
   },
+  mixins: [i18n],
   model: {
     prop: 'input',
     event: 'input',
@@ -211,13 +215,13 @@ export default {
     },
     /**
      * specify input type
-     * @values text, number, password, email, url
+     * @values text, number, password, email, url, search
      *
      */
     fieldType: {
       type: String,
       default: 'text',
-      validator: val => ['text', 'number', 'password', 'email', 'url'].includes(val),
+      validator: val => ['text', 'number', 'password', 'email', 'url', 'search'].includes(val),
     },
     /**
      * specify the id of a linked drop down list
@@ -280,9 +284,26 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * turn off input fade out if it interferes with other styling (e.g. with custom input)
+     */
     useFadeOut: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * specify additional input field styling
+     */
+    inputClass: {
+      type: String,
+      default: '',
+    },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -392,7 +413,7 @@ export default {
      */
     inputInt(val) {
       // check if the internal input element exists and if values are in sync
-      if (!this.$refs.input && val !== this.input) {
+      if (val !== this.input) {
         // if not propagate change to parent
         this.$emit('input', val);
       }

@@ -71,7 +71,7 @@ input[type='search'] {
 }
 
 input[type=text], input[type=date], textarea, input[type=number],
-input[type=password], input[type=email], input[type=url] {
+input[type=password], input[type=email], input[type=url], input[type=search] {
   font-family: inherit;
   font-size: inherit;
   background-color: transparent;
@@ -82,7 +82,7 @@ input[type=password], input[type=email], input[type=url] {
 
 input:focus, input[type=date]:focus, input[type=search]:focus, textarea:focus, video:focus,
 audio:focus, input[type=number]:focus, input[type=password]:focus, input[type=email]:focus,
-input[type=url]:focus {
+input[type=url]:focus, input[type=search]:focus  {
   outline: none;
 }
 
