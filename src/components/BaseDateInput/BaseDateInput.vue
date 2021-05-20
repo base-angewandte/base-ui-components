@@ -1,6 +1,8 @@
 <template>
   <div class="base-date-input">
-    <div class="base-date-input__label-row">
+    <div
+      :class="['base-date-input__label-row',
+               { 'base-date-input__label-row_visible': showLabel }]">
       <legend
         v-if="showLabel"
         class="base-date-input__label"
@@ -36,6 +38,7 @@
         :invalid="invalid"
         :show-error-icon="showErrorIcon"
         :error-message="errorMessage"
+        :input-class="inputClass"
         class="base-date-input__input-wrapper"
         v-on="$listeners">
         <template v-slot:input>
@@ -66,8 +69,8 @@
                   :aria-required="required.toString()"
                   :aria-invalid="invalid.toString()"
                   :required="required"
+                  :class="['base-date-input__input', inputClass]"
                   autocomplete="off"
-                  class="base-date-input__input"
                   @keydown.tab="handleTabKey($event,'from')"
                   v-on="$listeners">
               </template>
@@ -135,7 +138,7 @@
                   :aria-invalid="invalid.toString()"
                   :required="required"
                   autocomplete="off"
-                  class="base-date-input__input"
+                  :class="['base-date-input__input', inputClass]"
                   @keydown.tab="handleTabKey($event, 'to')"
                   v-on="$listeners">
               </template>
@@ -338,6 +341,13 @@ export default {
     clearable: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify additional input field styling
+     */
+    inputClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -661,8 +671,11 @@ export default {
       display: flex;
       width: 100%;
       height: 100%;
-      margin-bottom: $spacing-small/2;
       justify-content: space-between;
+
+      &.base-date-input__label-row_visible {
+        margin-bottom: $spacing-small/2;
+      }
 
       .base-date-input__label {
         color: $font-color-second;
@@ -679,6 +692,7 @@ export default {
 
     .base-date-input__field-wrapper {
       display: flex;
+      align-items: center;
 
       .base-date-input__input-wrapper {
 
