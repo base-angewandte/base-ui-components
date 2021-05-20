@@ -1,14 +1,38 @@
 <template>
   <div id="app">
     <div class="spacer" />
+    <BaseSearch
+      :show-image="true"
+      label="old search" />
+    <div class="spacer" />
+    <BaseSearchNew
+      label="new addasldjflsearch"
+      :type="searchType" />
+    <div class="spacer" />
+    <BaseButton
+      text="text"
+      button-style="row"
+      @clicked="searchType = 'text'" />
+    <BaseButton
+      text="chips"
+      button-style="row"
+      @clicked="searchType = 'chips'" />
+    <BaseButton
+      text="date"
+      button-style="row"
+      @clicked="searchType = 'date'" />
+    <BaseButton
+      text="daterange"
+      button-style="row"
+      @clicked="searchType = 'daterange'" />
     <BaseChipsInput
       :id="'dropdowntest'"
       :list="list"
       :allow-multiple-entries="false"
       :label="'asdfasdfasdf'"
+      :clearable="true"
       identifier-property-name="id"
-      label-property-name="title">
-    </BaseChipsInput>
+      label-property-name="title" />
     <BaseDateInput
       id="dayformatdemo"
       v-model="datepicked"
@@ -210,10 +234,14 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
 import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
+import BaseSearchNew from '@/components/BaseSearch/BaseSearch';
+import BaseSearch from '@/components/BaseSearch/BaseSearchOld';
 
 export default {
   name: 'App',
   components: {
+    BaseSearch,
+    BaseSearchNew,
     BaseDropDown,
     BaseChipsInputField,
     BaseInput,
@@ -227,6 +255,7 @@ export default {
   },
   data() {
     return {
+      searchType: 'text',
       textInput: {},
       datepicked: {
         date_from: '',

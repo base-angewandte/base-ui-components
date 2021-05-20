@@ -1,93 +1,71 @@
 <template>
-  <div
-    :style="styleProps"
-    :class="['base-search',
-             { 'base-search-fade-out': !active && (type === 'text' || type === 'chips') }]">
-    <label
-      :for="internalFieldId"
-      class="hide">
-      {{ label }}
-    </label>
-    <!-- @slot to add things before the input e.g. chips -->
-    <slot name="before-input">
-      <BaseIcon
-        v-if="showImage"
-        name="magnifier"
-        :class="['base-search__magnifier-icon',
-                 { 'base-search__magnifier-icon-active': active }]" />
-    </slot>
-    <input
-      v-if="type === 'text'"
-      :id="internalFieldId"
-      v-model="inputInt"
-      :list="dropDownListId || false"
-      :placeholder="placeholder"
-      :aria-activedescendant="linkedListOption"
-      type="search"
-      autocomplete="off"
-      class="base-search-input"
-      @focus.prevent="inputFocus"
-      @blur="inputBlur"
-      @keydown.enter.prevent=""
-      v-on="inputListeners">
-    <BaseDateInput
-      v-else-if="type === 'date' || type === 'daterange'"
-      :id="internalFieldId"
-      v-model="dateInputInt"
-      :show-label="false"
-      :type="type === 'date' ? 'single' : 'daterange'"
-      :use-form-field-styling="false"
-      :language="['de', 'en', 'fr'].includes(language) ? language : 'en'"
-      label="date-input"
-      @focus="inputFocus"
-      @blur="inputBlur"
-      v-on="$listeners" />
-    <BaseChipsInputField
-      v-else-if="type === 'chips'"
-      :id="internalFieldId"
-      v-model="inputInt"
-      :selected-list.sync="selectedChipsInt"
-      :show-label="false"
-      :use-form-field-styling="false"
-      :allow-unknown-entries="true"
-      :drop-down-list-id="dropDownListId"
-      :linked-list-option="linkedListOption"
-      :placeholder="placeholder"
-      :is-loading="isLoading"
-      :language="language"
-      :label-property-name="labelPropertyName"
-      :identifier-property-name="identifierPropertyName"
-      label="chips-input"
-      @focus="inputFocus"
-      @clicked-outside="inputBlur"
-      @keydown.up.down.prevent=""
-      @keydown.tab="active = false"
-      v-on="chipsInputListeners" />
-    <!-- @slot for icon after input field -->
-    <slot>
-      <BaseIcon
-        v-if="inputInt && type === 'text'"
-        name="remove"
-        class="base-search__remove-icon"
-        @click="clearInput" />
-    </slot>
-  </div>
+  <component
+    :is="inputComponent"
+    :id="idInt"
+    v-model="inputInt"
+    :selected-list.sync="selectedChipsInt"
+    :is-active.sync="activeInt"
+    :type="dateFieldType"
+    :show-label="false"
+    :use-form-field-styling="false"
+    :label="label"
+    :placeholder="placeholder"
+    :linked-list-option="linkedListOption"
+    :drop-down-list-id="dropDownListId || false.toString()"
+    :is-loading="isLoading"
+    :clearable="clearable"
+    :invalid="invalid"
+    :error-message="errorMessage"
+    :show-error-icon="showErrorIcon"
+    :language="languageInt"
+    :allow-unknown-entries="isFieldTypeChips"
+    :label-property-name="isFieldTypeChips ? labelPropertyName : false"
+    :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
+    input-class="base-search__input-field"
+    field-type="search"
+    class="base-search__input">
+    <template v-slot:input-field-inline-before>
+      <!-- @slot a slot to exchange the magnifier icon with other elements -->
+      <slot name="before-input">
+        <BaseIcon
+          v-if="showPreInputIcon"
+          name="magnifier"
+          :class="['base-search__magnifier-icon',
+                   { 'base-search__magnifier-icon-active': activeInt }]" />
+      </slot>
+    </template>
+    <template v-slot:input-field-addition-after>
+      <!-- @slot for adding elements after input <br>
+      for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="input-field-addition-after" />
+    </template>
+    <template v-slot:error-icon>
+      <!-- @slot use a custom icon instead of standard error/warning icon<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="error-icon" />
+    </template>
+    <template v-slot:remove-icon>
+      <!-- @slot for adding elements after input (e.g. used to add loader <br>
+      for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="remove-icon" />
+    </template>
+    <template v-slot:below-input>
+      <!-- @slot below-input slot added to e.g. add drop down -->
+      <slot name="below-input" />
+    </template>
+  </component>
 </template>
 
 <script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import { createId } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
-
 /**
  * A basic text search to filter entries or files
-  */
+ */
 export default {
   name: 'BaseSearch',
   components: {
     BaseIcon,
-    // lazy load components that might not be required!
-    BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField'),
-    BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
   },
   model: {
     prop: 'input',
@@ -106,6 +84,15 @@ export default {
       default: '',
     },
     /**
+     * if input type is chips this is the prop to
+     * pass selected options (chips)<br>
+     *  you may use the .sync modifier on this prop
+     */
+    selectedChips: {
+      type: Array,
+      default: () => ([]),
+    },
+    /**
      * placeholder to show for input
      */
     placeholder: {
@@ -120,18 +107,11 @@ export default {
       default: 'Search',
     },
     /**
-     * define if the magnifier glass should be shown
+     * define if the magnifier glass (in front of input field) should be shown
      */
-    showImage: {
+    showPreInputIcon: {
       type: Boolean,
-      default: false,
-    },
-    /**
-     * specify additional styling for the component e.g. height & width
-     */
-    styleProps: {
-      type: Object,
-      default: () => ({}),
+      default: true,
     },
     /**
      * specify the id of a linked drop down list
@@ -144,7 +124,7 @@ export default {
      * specify a field id for identification of the input field
      * if none is specified an internal id will be assigned
      */
-    fieldId: {
+    id: {
       type: String,
       default: '',
     },
@@ -156,14 +136,6 @@ export default {
       type: String,
       default: 'text',
       validator: val => ['text', 'chips', 'date', 'daterange'].includes(val),
-    },
-    /**
-     * if input type is chips this is the prop to
-     * pass selected options (chips)
-     */
-    selectedChips: {
-      type: Array,
-      default: () => ([]),
     },
     /**
      * specify a linked list option (e.g. drop down) <br>
@@ -202,177 +174,237 @@ export default {
       type: String,
       default: 'label',
     },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    clearable: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      active: false,
-      inputInt: '',
+      /**
+       * internal handling of the input active state
+       * @type {boolean}
+       */
+      activeInt: false,
+      /**
+       * internal handling of text input --> for 'chips' and 'text'
+       * (separated from dateInputInt to preserve the input when switching type)
+       * @type {string}
+       */
+      textInputInt: '',
+      /**
+       * internal handling of date input (separated from textInputInt to preserve
+       * the input when switching type)
+       * @type {string|Object}
+       */
+      dateInputInt: '',
+      /**
+       * internal handling of selected chips for type 'chips'
+       * @type {Array}
+       */
+      selectedChipsInt: [],
     };
   },
   computed: {
-    dateInputInt: {
-      // sync setter and getter for date input
+    /**
+     * compute and import only the component necessary for the respective type selected
+     * @returns {null|(function(): Promise<HTMLElement>)}
+     */
+    inputComponent() {
+      if (this.type === 'text') {
+        return () => import('../BaseInput/BaseInput');
+      } if (this.type === 'chips') {
+        return () => import('../BaseChipsInputField/BaseChipsInputField');
+      } if (this.type === 'date' || this.type === 'daterange') {
+        return () => import('../BaseDateInput/BaseDateInput');
+      }
+      return null;
+    },
+    /**
+     * compute the inputInt used for BaseInput v-model
+     * this can either be a string or an object - also this is used to
+     * convert dates between 'daterange' and 'date'
+     */
+    inputInt: {
+      /**
+       * set either textInputInt or dateInputInt depending on the type
+       * @param {string|{date_to: string, date_from: string}} val - depending on the type
+       * this is a date string, text string or an Object for 'daterange' with the following
+       * properties:
+       * @property {string} val.date_from
+       * @property {string} val.date_to
+       */
       set(val) {
-        if (JSON.stringify(this.inputInt) !== JSON.stringify(val)) {
-          let tempInput = null;
-          // check if it is object or string
-          if (typeof val === 'object') {
-            tempInput = { ...val };
-          } else {
-            tempInput = val;
-          }
-          /**
-           * event to inform parent of picked date if type date or daterange
-           *
-           * @event date-input-changed
-           * @property {Object} tempInput - an object with the following properties:
-           * @property { string } date - if type is date
-           * @property { string } date_from - if type is daterange
-           * @property { string } date_to - if type is daterange
-           */
-          this.$emit('date-input-changed', tempInput);
+        if (this.type === 'date') {
+          this.dateInputInt = val;
+          this.$emit('input', this.dateInputInt);
+        } else if (this.type === 'daterange') {
+          this.dateInputInt = { ...val };
+          this.$emit('input', this.dateInputInt);
+        } else {
+          this.textInputInt = val;
+          this.$emit('input', this.textInputInt);
         }
       },
+      /**
+       * get inputInt according to search type
+       * @returns {string|{date_to: string, date_from: string}}
+       */
       get() {
-        // just in case for some reason the correct format is not provided
-        return this.type === 'daterange' && typeof this.input === 'string'
-          ? {
-            date_from: this.input || '',
-            date_to: this.input || '',
-          }
-          : this.input;
-      },
-    },
-    // keep selected chips in sync
-    selectedChipsInt: {
-      set(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
-          /**
-           * inform parent of changes in chips selected if type is chips<br>
-           *   (the .sync modifier can be used here)
-           * @event update:selected-chips
-           * @property {Object[]} val - the array with selected chips
-           */
-          this.$emit('update:selected-chips', val);
+        // for date or daterange use dateInputInt and use correct type
+        // this preserves the date when switching between date and daterange btw
+        if (this.type === 'date') {
+          return this.dateInputInt.date_from || this.dateInputInt;
         }
+        if (this.type === 'daterange') {
+          return typeof this.dateInputInt === 'object' ? this.dateInputInt : {
+            date_from: this.dateInputInt,
+            date_to: '',
+          };
+        }
+        // everything else just return the textInputInt string
+        // this preserves the text switching between chips and text
+        return this.textInputInt;
       },
-      get() {
-        return this.selectedChips;
-      },
     },
-    // this is needed for native input element to only provide values
-    // to parent (as it is the case for chips input)
-    inputListeners() {
-      return ({
-        // add all the listeners from the parent
-        ...this.$listeners,
-        // and add custom listeners
-        ...{
-          input: (event) => {
-            /**
-             * Event emitted on input, passing input string
-             *
-             * @event input
-             * @property {string} value 'event.target.value' of the input event
-             *
-             */
-            this.$emit('input', event.target.value);
-          },
-        },
-      });
+    /**
+     * to easily access the type needed for BaseDateInput in case type
+     * is 'date' or 'daterange'
+     * @returns {string|boolean}
+     */
+    dateFieldType() {
+      if (this.type === 'date') {
+        return 'single';
+      }
+      if (this.type === 'daterange') {
+        return 'daterange';
+      }
+      // if type is neither 'date' or 'daterange' set the element attribute to false
+      // so it does not show up in the rendered HTML
+      return false;
     },
-    chipsInputListeners() {
-      return ({
-        // add all the listeners from the parent
-        ...this.$listeners,
-        // and add custom listeners
-        ...{
-          blur: (event) => {
-            event.stopPropagation();
-          },
-          'clicked-outside': () => {
-            this.$emit('blur');
-          },
-        },
-      });
+    /**
+     * compute adaptions necessary for BaseDateInput since this component currently
+     * only has 3 languages to choose from
+     * @returns {string}
+     */
+    languageInt() {
+      // adaptions for date input since only 'de', 'en', 'fr' available atm
+      if (this.type === 'date' || this.type === 'daterange') {
+        return ['de', 'en', 'fr'].includes(this.language) ? this.language : 'en';
+      }
+      return this.language;
     },
-    internalFieldId() {
+    /**
+     * determine if type is 'chips'
+     * @returns {boolean}
+     */
+    isFieldTypeChips() {
+      return this.type === 'chips';
+    },
+    /**
+     * internally used id - eiter provided by props or created internally with utils function
+     * @returns {string}
+     */
+    idInt() {
       return this.fieldId || createId();
     },
   },
   watch: {
+    /**
+     * watch input prop to sync with inputInt
+     * @param {string|{date_from: string, date_to: string}} val
+     */
     input(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.inputInt)) {
-        this.inputInt = JSON.parse(JSON.stringify(val));
+      if (val !== this.inputInt) {
+        this.inputInt = val;
       }
     },
-  },
-  methods: {
-    inputBlur() {
-      this.active = false;
+    /**
+     * watch inputInt to sync with parent input
+     * @param {string|{date_from: string, date_to: string}} val
+     */
+    inputInt(val) {
+      if (val !== this.input) {
+        this.$emit('input', val);
+      }
     },
-    inputFocus() {
-      this.active = true;
+    /**
+     * watch selectedChips prop to sync with selectedChipsInt
+     * @param {Object[]} val
+     */
+    selectedChips(val) {
+      if (JSON.stringify(val) !== JSON.stringify(this.selectedChipsInt)) {
+        this.selectedChipsInt = val;
+      }
     },
-    clearInput() {
-      this.inputInt = null;
+    /**
+     * watch selectedChipsInt to sync with selectedChips prop provided by parent
+     * @param {Object[]} val
+     */
+    selectedChipsInt(val) {
+      if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
+        this.$emit('update:selected-chips', val);
+      }
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@import '../../styles/variables.scss';
 
-  .base-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    background: white;
-    padding: 0 $spacing;
-    height: $row-height-large;
+.base-search__input {
+  background:white;
 
-    &.base-search-fade-out::after {
-      content: '';
-      width: calc(#{$fade-out-width} + #{$spacing});
-      height: 100%;
-      position: absolute;
-      top: 0;
-      right: calc(2 * #{$spacing} + #{$icon-medium});
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-    }
+  .base-search__magnifier-icon {
+    height: $icon-large;
+    width: $icon-large;
+    margin-right: $spacing;
+    flex-shrink: 0;
 
-    .base-search__magnifier-icon {
-      height: $icon-large;
-      width: $icon-large;
-      margin-right: $spacing;
-      flex-shrink: 0;
-
-      &.base-search__magnifier-icon-active {
-        color: grey;
-        fill: grey;
-      }
-    }
-
-    .base-search-input {
-      width: calc(100% - #{$spacing} - #{$icon-medium} - #{$spacing-small} / 2);
-      border: none;
-      height: 100%;
-      transition: background 0.2s ease;
-
-      &::placeholder {
-        color: $font-color-third;
-        opacity: 1;
-      }
-    }
-
-    .base-search__remove-icon {
-      cursor: pointer;
-      margin-left: $spacing;
-      height: $icon-medium;
-      width: $icon-medium;
-      fill: $font-color-second;
+    &.base-search__magnifier-icon-active {
+      color: grey;
+      fill: grey;
     }
   }
+}
+</style>
+
+<style lang="scss">
+@import '../../styles/variables.scss';
+
+.base-search__input-field {
+  height: calc(#{$row-height-large} - 2px);
+}
 </style>
