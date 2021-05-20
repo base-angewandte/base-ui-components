@@ -5,7 +5,7 @@
       :show-image="true"
       label="old search" />
     <div class="spacer" />
-    <BaseSearchNew
+    <BaseSearch
       label="new addasldjflsearch"
       :type="searchType" />
     <div class="spacer" />
@@ -234,14 +234,12 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
 import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
-import BaseSearchNew from '@/components/BaseSearch/BaseSearch';
-import BaseSearch from '@/components/BaseSearch/BaseSearchOld';
+import BaseSearch from '@/components/BaseSearch/BaseSearch';
 
 export default {
   name: 'App',
   components: {
     BaseSearch,
-    BaseSearchNew,
     BaseDropDown,
     BaseChipsInputField,
     BaseInput,
