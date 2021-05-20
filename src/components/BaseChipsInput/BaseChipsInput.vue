@@ -363,6 +363,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify additional input field styling
+     */
+    inputClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {

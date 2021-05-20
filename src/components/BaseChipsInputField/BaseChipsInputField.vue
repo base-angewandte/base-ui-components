@@ -21,6 +21,7 @@
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
       :is-loading="isLoading"
+      :input-class="inputClass"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
       v-on="$listeners">
@@ -407,6 +408,13 @@ export default {
     inputFieldActive: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify additional input field styling
+     */
+    inputClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
