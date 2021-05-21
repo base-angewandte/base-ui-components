@@ -131,7 +131,7 @@ export default {
      * define in which scenario an options button should be shown<br>
      *   **always**: always show the options button<br>
      *   **mobile**: only show options button when window size < 640px<br>
-     *   **never**: never show the options button - just show the avialable options directly
+     *   **never**: never show the options button - just show the available options directly
      */
     useOptionsButtonOn: {
       type: String,
@@ -323,7 +323,7 @@ export default {
          * is set to 'never')<br>
          *   the .sync modifier can be used on 'showOptions' prop here
          * @event update:show-options
-         * @param {boolean} - was show value set true or false
+         * @param {boolean} val - was show value set true or false
          */
         this.$emit('update:show-options', val);
       }
@@ -340,7 +340,7 @@ export default {
     /**
      * watch use options button variable which changes if options button
      * is only used on mobile
-     * @param {boolean }val
+     * @param {boolean} val
      */
     useOptionsButton: {
       handler(val) {
@@ -389,7 +389,7 @@ export default {
        * emitted if prop `optionsConfig` is used when an options button is clicked
        *
        * @event option-triggered
-       * @param {string} - the value provided in `optionsConfig` object
+       * @param {string} value - the value provided in `optionsConfig` object
        */
       this.$emit('option-triggered', value);
     },
