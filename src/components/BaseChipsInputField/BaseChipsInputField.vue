@@ -127,6 +127,11 @@
           </template>
         </div>
       </template>
+      <template v-slot:input-field-inline-before>
+        <!-- @slot @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap -->
+        <slot name="input-field-inline-before" />
+      </template>
       <template v-slot:input-field-addition-after>
         <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />

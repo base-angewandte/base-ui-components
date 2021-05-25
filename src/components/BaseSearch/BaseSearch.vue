@@ -25,6 +25,7 @@
     field-type="search"
     class="base-search__input">
     <template v-slot:input-field-inline-before>
+      <div class="base-search__spacing" />
       <!-- @slot a slot to exchange the magnifier icon with other elements -->
       <slot name="before-input">
         <BaseIcon
@@ -386,6 +387,11 @@ export default {
 
 .base-search__input {
   background:white;
+
+  .base-search__spacing {
+    margin-left: $spacing-small;
+    content: '';
+  }
 
   .base-search__magnifier-icon {
     height: $icon-large;

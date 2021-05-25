@@ -41,6 +41,11 @@
         :input-class="inputClass"
         class="base-date-input__input-wrapper"
         v-on="$listeners">
+        <template v-slot:input-field-inline-before>
+          <!-- @slot @slot to add elements directly inline before the input
+              (contrary to input-field-addition-before this does not wrap -->
+          <slot name="input-field-inline-before" />
+        </template>
         <template v-slot:input>
           <div
             class="base-date-input__datepicker">
