@@ -303,6 +303,7 @@ import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
  */
 
 export default {
+  name: 'BaseAdvancedSearchRow',
   components: {
     BaseChipsInputField,
     BaseChip,
