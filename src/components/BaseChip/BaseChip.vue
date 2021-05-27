@@ -179,6 +179,7 @@ export default {
     align-items: center;
     cursor: default;
     position: relative;
+    overflow: hidden;
     max-width: 100%;
 
     &.base-chip__linked {
