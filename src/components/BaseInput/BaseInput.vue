@@ -28,10 +28,12 @@
       <div
         :class="['base-input__input-container',
                  { 'base-input__input-container__is-active':
-                   active && useFormFieldStyling}]">
+                   isActiveInt && useFormFieldStyling}]">
+        <!-- @slot elements before the actual input line but within the input field container -->
+        <slot name="pre-input-field" />
         <div
-          :class="['base-input__input-addition-container',
-                   { 'base-input__input-addition-container__wrap': !hideInputField}]">
+          :class="['base-input__input-line-container',
+                   { 'base-input__input-line-container__wrap': !hideInputField}]">
           <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
           (before \<input\>) -->
           <slot name="input-field-addition-before" />
@@ -42,7 +44,7 @@
             <div
               :class="['base-input__input-wrapper',
                        { 'base-input__input-wrapper__fade-out':
-                         useFadeOut && !active && !hideInputField }]">
+                         useFadeOut && !isActiveInt && !hideInputField }]">
               <!-- @slot replace native HTML input element with custom input
                     @binding { string } id - the id of the base input component - if
                       id is not provided in props this is an internal id that should
@@ -305,10 +307,18 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * use this prop to deactivate automatic setting of focus as soon as input element
+     * becomes active - this might require external handling of focus setting!
+     */
+    setFocusOnActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      active: false,
+      isActiveInt: false,
       inputInt: '',
     };
   },
@@ -423,17 +433,17 @@ export default {
      * @param {boolean} val
      */
     isActive(val) {
-      if (val !== this.active) {
-        this.active = val;
+      if (val !== this.isActiveInt) {
+        this.isActiveInt = val;
       }
     },
     /**
      * keep externally set active variable and internal active variable in sync
      * @param {boolean} val
      */
-    active(val) {
+    isActiveInt(val) {
       // if active was set true focus the input field
-      if (val) {
+      if (val && this.setFocusOnActive) {
         this.inputElement.focus();
       }
       if (val !== this.isActive) {
@@ -502,7 +512,7 @@ export default {
      * @param {boolean} val - the value to be set
      */
     setFieldState(val) {
-      this.active = val;
+      this.isActiveInt = val;
     },
   },
 };
@@ -548,6 +558,7 @@ export default {
     }
 
     .base-input__input-container {
+      display: flex;
       position: relative;
       background: white;
       min-height: $row-height-small;
@@ -558,12 +569,12 @@ export default {
         box-shadow: $input-shadow;
       }
 
-      .base-input__input-addition-container {
+      .base-input__input-line-container {
         display: flex;
         align-items: center;
         flex: 1 1 auto;
 
-        &.base-input__input-addition-container__wrap {
+        &.base-input__input-line-container__wrap {
           flex-wrap: wrap;
         }
 

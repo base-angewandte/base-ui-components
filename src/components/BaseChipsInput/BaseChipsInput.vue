@@ -11,7 +11,7 @@
       :drop-down-list-id="id"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :return-as-string="returnAsString"
-      :input-field-active.sync="inputFieldActive"
+      :is-active.sync="isActive"
       @keydown="checkKeyEvent"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -20,7 +20,7 @@
       v-on="$listeners">
       <template v-slot:below-input>
         <BaseDropDownList
-          v-if="inputFieldActive"
+          v-if="isActive"
           ref="dropDownList"
           :drop-down-options="listInt"
           :active-option.sync="activeOption"
@@ -81,12 +81,12 @@
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
-          @click.stop="inputFieldActive = !inputFieldActive">
+          @click.stop="isActive = !isActive">
           <BaseIcon
             :class="[
               'base-chips-input__single-dropdown-icon',
               { 'base-chips-input__single-dropdown-icon-rotated':
-                inputFieldActive }
+                isActive }
             ]"
             name="drop-down" />
         </div>
@@ -400,7 +400,7 @@ export default {
        * variable to store state of input field (for drop down handling)
        * @type {boolean}
        */
-      inputFieldActive: false,
+      isActive: false,
       /**
        * variable for checking if cursor is withing drop down
        * @type {boolean}
@@ -471,10 +471,10 @@ export default {
     chipsInputActive: {
       set(val) {
         this.dropDownActive = val;
-        this.inputFieldActive = val;
+        this.isActive = val;
       },
       get() {
-        return this.inputFieldActive || this.dropDownActive;
+        return this.isActive || this.dropDownActive;
       },
     },
     /**

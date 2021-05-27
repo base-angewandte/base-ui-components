@@ -10,7 +10,7 @@
       :label="label"
       :show-label="showLabel"
       :show-input-border="showInputBorder"
-      :is-active.sync="inputFieldActiveInt"
+      :is-active.sync="isActiveInt"
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
@@ -22,6 +22,7 @@
       :show-error-icon="showErrorIcon"
       :is-loading="isLoading"
       :input-class="inputClass"
+      :set-focus-on-active="setFocusOnActive"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
       v-on="$listeners">
@@ -38,6 +39,11 @@
           @click="sortSelectedList(selectedListInt)">
           {{ sortText }}
         </button>
+      </template>
+      <template v-slot:pre-input-field>
+        <!-- @slot @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap -->
+        <slot name="pre-input-field" />
       </template>
       <template
         v-slot:input-field-addition-before>
@@ -410,7 +416,7 @@ export default {
      * possibility to steer input field active state from outside<br>
      * it is possible to use the .sync modifier here
      */
-    inputFieldActive: {
+    isActive: {
       type: Boolean,
       default: false,
     },
@@ -420,6 +426,14 @@ export default {
     inputClass: {
       type: String,
       default: '',
+    },
+    /**
+     * use this prop to deactivate automatic setting of focus as soon as input element
+     * becomes active - this might require external handling of focus setting!
+     */
+    setFocusOnActive: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -433,7 +447,7 @@ export default {
        * store active state of the base input field
        * @type {boolean}
        */
-      inputFieldActiveInt: false,
+      isActiveInt: false,
       /**
        * for removing chips via backspace, to get delay after
        * keydown event
@@ -512,14 +526,14 @@ export default {
       deep: true,
       immediate: true,
     },
-    inputFieldActiveInt(val) {
-      if (val !== this.inputFieldActive) {
-        this.$emit('update:input-field-active', val);
+    isActiveInt(val) {
+      if (val !== this.isActive) {
+        this.$emit('update:is-active', val);
       }
     },
-    inputFieldActive(val) {
-      if (val !== this.inputFieldActiveInt) {
-        this.inputFieldActiveInt = val;
+    isActive(val) {
+      if (val !== this.isActiveInt) {
+        this.isActiveInt = val;
       }
     },
   },
@@ -534,7 +548,7 @@ export default {
       const key = event.code;
       // define conditions in which input field should be set inactive (in styling and blurring)
       if (key === 'Tab' || (key === 'Enter' && !this.allowMultipleEntries)) {
-        this.inputFieldActiveInt = false;
+        this.isActiveInt = false;
       }
       // if event was Delete check if a chip should be deleted
       if (key === 'Backspace' || key === 'Delete') {
@@ -702,7 +716,7 @@ export default {
     /** SORTING */
     /** function called when the 'sort' button is clicked */
     sortSelectedList() {
-      this.inputFieldActiveInt = false;
+      this.isActiveInt = false;
       sort(
         this.selectedListInt,
         this.labelPropertyName,

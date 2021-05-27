@@ -24,7 +24,13 @@
     </div>
 
     <!-- FORM FIELDS -->
-    <div class="base-date-input__field-wrapper">
+    <div
+      v-click-outside="clickedOutside"
+      class="base-date-input__field-wrapper"
+      @click="clickedInside">
+      <!-- @slot @slot to add elements directly inline before the input -->
+      <slot name="pre-input-field" />
+      <slot name="input-field-inline-before" />
       <!-- INPUT FROM -->
       <BaseInput
         :id="label + '-' + id"
@@ -39,13 +45,9 @@
         :show-error-icon="showErrorIcon"
         :error-message="errorMessage"
         :input-class="inputClass"
+        :set-focus-on-active="setFocusOnActive"
         class="base-date-input__input-wrapper"
-        v-on="$listeners">
-        <template v-slot:input-field-inline-before>
-          <!-- @slot @slot to add elements directly inline before the input
-              (contrary to input-field-addition-before this does not wrap -->
-          <slot name="input-field-inline-before" />
-        </template>
+        v-on="inputListeners">
         <template v-slot:input>
           <div
             class="base-date-input__datepicker">
@@ -112,8 +114,9 @@
         :invalid="invalid"
         :show-error-icon="showErrorIcon"
         :error-message="errorMessage"
+        :set-focus-on-active="setFocusOnActive"
         class="base-date-input__input-wrapper"
-        v-on="$listeners">
+        v-on="inputListeners">
         <template v-slot:input>
           <div
             class="base-date-input__datepicker">
@@ -161,6 +164,10 @@
             @click.stop="toOpen = !toOpen" />
         </template>
       </BaseInput>
+    </div>
+    <div class="base-date-input__below">
+      <!-- @slot below-input slot added to e.g. add drop down -->
+      <slot name="below-input" />
     </div>
   </div>
 </template>
@@ -354,6 +361,18 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * use this prop to deactivate automatic setting of focus as soon as input element
+     * becomes active - this might require external handling of focus setting!
+     */
+    setFocusOnActive: {
+      type: Boolean,
+      default: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -376,6 +395,7 @@ export default {
       fromOpen: false,
       // to steer closing of datepicker to input field once date is selected
       toOpen: false,
+      isActiveInt: false,
     };
   },
   computed: {
@@ -473,6 +493,25 @@ export default {
     isToTimeField() {
       return this.type === 'datetime' || this.type === 'timerange';
     },
+    inputListeners() {
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          // stop these BaseInput originating events to substitute them with the
+          // correct events in search container element
+          'clicked-outside': (event) => {
+            event.stopPropagation();
+          },
+          // need to stop the event triggered in original BaseInput as well
+          // and replace it with the internal active state variable
+          'update:is-active': () => {
+            this.$emit('update:is-active', this.isActiveInt);
+          },
+        },
+      };
+    },
   },
   watch: {
     // watch input set from outside and set internal inputInt accordingly as well as
@@ -521,6 +560,19 @@ export default {
       if (!val) {
         this.$refs.inputTo.blur();
       }
+    },
+    isActiveInt(val) {
+      if (val !== this.isActive) {
+        this.$emit('update:is-active', val);
+      }
+    },
+    isActive: {
+      handler(val) {
+        if (val !== this.isActiveInt) {
+          this.isActiveInt = val;
+        }
+      },
+      immediate: true,
     },
   },
   updated() {
@@ -575,14 +627,13 @@ export default {
         this[`${origin}Open`] = false;
       }
     },
-    /**
-     * a more generalized function to flexibly set close/open state of the respective picker
-     * @param {string} type - 'date' or 'time'
-     * @param {string} origin - 'From' or 'To'
-     * @param {boolean} value - open (true) or close (false)
-     */
-    setActiveState(origin, value) {
-      this[`${origin}Open`] = value;
+    clickedOutside(event) {
+      this.isActiveInt = false;
+      this.$emit('clicked-outside', event);
+    },
+    clickedInside(event) {
+      this.isActiveInt = true;
+      this.$emit('click-input-field', event);
     },
     /**
      * data emit function
@@ -729,6 +780,7 @@ export default {
           height: $icon-large;
           color: $font-color-second;
           cursor: pointer;
+          flex-shrink: 0;
         }
       }
 
@@ -736,6 +788,10 @@ export default {
         padding: 0 $spacing;
         line-height: $row-height-small;
       }
+    }
+
+    .base-date-input__below {
+      position: relative;
     }
   }
   @media screen and (max-width: $mobile) {
