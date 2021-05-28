@@ -18,7 +18,7 @@ export default {
      */
     attribution: {
       type: String,
-      default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
+      default: 'Source: <a href="https://openstreetmap.org/">OpenStreetMap contributors</a>',
     },
     /**
      * define position of map attribution<br>
@@ -121,11 +121,22 @@ export default {
       default: 18,
     },
     /**
-     * define url to map data
+     * define url to tileLayer service
      */
     url: {
       type: String,
-      default: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      default: '',
+    },
+    /**
+     * specify service for the [tileLayer](https://leafletjs.com/examples/wms/wms.html)<br>
+     * valid values: 'WMTS' | 'TMS' | 'WMS'
+     */
+    tileLayerService: {
+      type: String,
+      default: 'WMTS',
+      validator(val) {
+        return ['WMTS', 'TMS', 'WMS'].includes(val);
+      },
     },
     /**
      * define initial zoom factor
@@ -240,11 +251,18 @@ export default {
     this.map.attributionControl.setPosition(this.attributionPosition);
 
     // Draw Leaflet map
-    this.L.tileLayer(this.url, {
+    const mapConfig = {
       maxZoom: this.maxZoom,
       attribution: [this.attribution, this.copyright].join(', '),
+      tms: this.tileLayerService === 'TMS',
       ...this.options,
-    }).addTo(this.map);
+    };
+
+    if (this.tileLayerService === 'WMS') {
+      this.L.tileLayer.wms(this.url, mapConfig).addTo(this.map);
+    } else {
+      this.L.tileLayer(this.url, mapConfig).addTo(this.map);
+    }
 
     // Add marker to map
     if (!this.markerFiltered.length) {
