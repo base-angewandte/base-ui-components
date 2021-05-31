@@ -26,6 +26,7 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
       id="withslot"
       v-model="input"
       :invalid="invalid"
+      :disabled="disabled"
       :required="true"
       :isActive="inputActive || dropdownActive"
       :clearable="clearable"

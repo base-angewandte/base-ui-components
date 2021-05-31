@@ -8,6 +8,7 @@
     :placeholder="placeholder"
     :required="required"
     :invalid="invalid"
+    :disabled="disabled"
     :show-error-icon="showErrorIcon"
     :error-message="errorMessage"
     :clearable="clearable"
@@ -49,6 +50,8 @@
           :aria-required="required.toString()"
           :aria-describedby="idInt"
           :aria-invalid="invalid.toString()"
+          :disabled="disabled"
+          :aria-disabled="disabled.toString()"
           :placeholder="placeholder"
           class="base-multiline-text-input__textarea"
           v-on="inputListeners"
@@ -188,6 +191,14 @@ export default {
      * for an example see [BaseInput](#baseinput)
      */
     invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set true if input field should be disabled<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    disabled: {
       type: Boolean,
       default: false,
     },

@@ -62,13 +62,13 @@
                   :placeholder="placeholder"
                   :type="fieldType"
                   :list="dropDownListId || false"
-                  :disabled="disabled"
-                  :aria-disabled="disabled"
+                  :disabled="disabled.toString()"
+                  :aria-disabled="disabled.toString()"
                   :aria-activedescendant="linkedListOption"
                   :aria-describedby="idInt"
                   :aria-required="required.toString()"
+                  :required="required.toString()"
                   :aria-invalid="invalid.toString()"
-                  :required="required"
                   autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
@@ -485,15 +485,17 @@ export default {
      * @param {FocusEvent|MouseEvent} event the native event
      */
     clickedInside(event) {
-      this.setFieldState(true);
-      /**
-       * Event emitted on click on input field \<div\>
-       *
-       * @event click-input-field
-       * @param {FocusEvent|MouseEvent} event - event triggered by focusin or click
-       *
-       */
-      this.$emit('click-input-field', event);
+      if (!this.disabled) {
+        this.setFieldState(true);
+        /**
+         * Event emitted on click on input field \<div\>
+         *
+         * @event click-input-field
+         * @param {FocusEvent|MouseEvent} event - event triggered by focusin or click
+         *
+         */
+        this.$emit('click-input-field', event);
+      }
     },
     /**
      * triggered when click happened outside of 'input-frame' element
@@ -556,6 +558,7 @@ export default {
   }
 
   .base-input__input-frame {
+    position: relative;
     width: 100%;
     padding: 1px;
     background: inherit;
@@ -571,6 +574,7 @@ export default {
     &.base-input__input-frame__disabled::after {
       position: absolute;
       left: 0;
+      top: 0;
       content: '';
       height: 100%;
       width: 100%;
@@ -632,14 +636,6 @@ export default {
                 opacity: 0;
                 filter:alpha(opacity=0);
                 animation: all 500ms ease;
-
-                &:invalid {
-                  box-shadow: none;
-                }
-
-                &:disabled {
-                  color: $font-color-second;
-                }
               }
             }
           }

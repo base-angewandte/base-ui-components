@@ -17,6 +17,7 @@
       :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
       :invalid="invalid"
       :required="required"
+      :disabled="disabled"
       :clearable="clearable"
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
@@ -384,6 +385,14 @@ export default {
      * for an example see [BaseInput](#baseinput)
      */
     invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set true if input field should be disabled<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    disabled: {
       type: Boolean,
       default: false,
     },

@@ -339,6 +339,14 @@ export default {
       default: false,
     },
     /**
+     * set true if input field should be disabled<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * add an error message to be displayed below form field if field is invalid<br>
      * for an example see [BaseInput](#baseinput)
      */

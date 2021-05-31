@@ -42,6 +42,7 @@
         :clearable="clearable"
         :required="required"
         :invalid="invalid"
+        :disabled="disabled"
         :show-error-icon="showErrorIcon"
         :error-message="errorMessage"
         :input-class="inputClass"
@@ -76,6 +77,8 @@
                   :aria-required="required.toString()"
                   :aria-invalid="invalid.toString()"
                   :required="required"
+                  :disabled="disabled"
+                  :aria-disabled="disabled"
                   :class="['base-date-input__input', inputClass]"
                   autocomplete="off"
                   @keydown.tab="handleTabKey($event,'from')"
@@ -112,6 +115,7 @@
         :clearable="clearable"
         :required="required"
         :invalid="invalid"
+        :disabled="disabled"
         :show-error-icon="showErrorIcon"
         :error-message="errorMessage"
         :set-focus-on-active="setFocusOnActive"
@@ -145,6 +149,8 @@
                   :aria-required="required.toString()"
                   :aria-invalid="invalid.toString()"
                   :required="required"
+                  :disabled="disabled"
+                  :aria-disabled="disabled"
                   autocomplete="off"
                   :class="['base-date-input__input', inputClass]"
                   @keydown.tab="handleTabKey($event, 'to')"
@@ -326,6 +332,14 @@ export default {
      * for an example see [BaseInput](#baseinput)
      */
     invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set true if input field should be disabled<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    disabled: {
       type: Boolean,
       default: false,
     },

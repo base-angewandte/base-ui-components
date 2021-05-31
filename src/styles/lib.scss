@@ -118,9 +118,17 @@ textarea {
   box-shadow: none
 }
 
-// to prevent safari strange padding
 input {
+  // to prevent safari strange padding
   padding: 0;
+
+  &:invalid {
+    box-shadow: none;
+  }
+
+  &:disabled {
+    color: $font-color-second;
+  }
 }
 
 button {
