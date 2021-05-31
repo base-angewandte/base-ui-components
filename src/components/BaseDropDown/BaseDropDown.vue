@@ -13,7 +13,7 @@
     </div>
     <button
       :id="getLangLabel(label) + '-' + id"
-      :aria-expanded="showDropDown"
+      :aria-expanded="String(showDropDown)"
       :style="{ 'background-color': headerBackgroundColor }"
       :disabled="isDisabled"
       :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing}]"

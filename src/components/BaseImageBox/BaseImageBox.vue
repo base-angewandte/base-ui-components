@@ -39,29 +39,15 @@
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
-            <!-- image lazyloaded -->
-            <img
-              v-if="lazyload"
+            <BaseImage
               ref="image"
-              :data-src="imageUrl"
               :alt="title"
-              :class="['base-image-box-image',
-                       { 'base-image-box__image-second': !imageFirst },
-                       'lazyload',
-                       { 'base-image-box-no-title': !showTitle }]"
-              :src="clearPng"
-              @error="displayImage = false">
-
-            <!-- image native -->
-            <img
-              v-if="!lazyload"
-              ref="image"
+              :lazyload="lazyload"
               :src="imageUrl"
-              :alt="title"
               :class="['base-image-box-image',
                        { 'base-image-box__image-second': !imageFirst },
                        { 'base-image-box-no-title': !showTitle }]"
-              @error="displayImage = false">
+              @error="displayImage = false" />
           </div>
           <div
             v-if="!imageUrl || !displayImage"
@@ -109,6 +95,7 @@
         <BaseCheckmark
           v-if="selectable"
           :checked="selectedInt"
+          :label="title"
           mark-style="checkbox"
           check-box-size="large"
           class="base-image-box-checkbox"
@@ -119,7 +106,7 @@
 </template>
 <script>
 import BaseBox from '../BaseBox/BaseBox';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+import BaseImage from '../BaseImage/BaseImage';
 
 /**
  * A component with the primary purpose to display
@@ -129,8 +116,9 @@ import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 export default {
   name: 'BaseImageBox',
   components: {
-    BaseCheckmark,
+    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
     BaseBox,
+    BaseImage,
   },
   props: {
     /**
@@ -197,7 +185,7 @@ export default {
      */
     boxSize: {
       type: Object,
-      default: () => ({ width: '200px', height: '200px' }),
+      default: () => ({ width: 'auto', height: 'auto' }),
     },
     /**
      * specify any text that should be displayed instead of an image;
@@ -261,9 +249,6 @@ export default {
     // determine if shadow should cover half or third of box
     imageShadowClass() {
       return this.imageFirst ? 'base-image-box-img-third' : 'base-image-box-img-half';
-    },
-    clearPng() {
-      return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';
     },
   },
   watch: {

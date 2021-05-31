@@ -39,8 +39,12 @@ import Toggle from './BaseToggle';
 import UploadBar from './BaseUploadBar';
 import Checkmark from './BaseCheckmark';
 import Map from './BaseMap';
+import MapLocations from './BaseMapLocations';
 import Icon from './BaseIcon';
 import DetailBox from './BaseDetailBox';
+import EditControl from './BaseEditControl';
+import ExpandList from './BaseExpandList';
+import Image from './BaseImage';
 import AdvancedSearchRow from './BaseAdvancedSearchRow';
 
 export {
@@ -82,10 +86,14 @@ export {
   UploadBar as BaseUploadBar,
   Checkmark as BaseCheckmark,
   Map as BaseMap,
+  MapLocations as BaseMapLocations,
   Icon as BaseIcon,
   DetailBox as BaseDetailBox,
+  EditControl as BaseEditControl,
   ExpandBox as BaseExpandBox,
   TextList as BaseTextList,
   ExpandRow as BaseExpandRow,
+  ExpandList as BaseExpandList,
+  Image as BaseImage,
   AdvancedSearchRow as BaseAdvancedSearchRow,
 };

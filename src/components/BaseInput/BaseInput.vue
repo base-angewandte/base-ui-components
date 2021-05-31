@@ -20,6 +20,7 @@
       v-click-outside="clickedOutsideInput"
       :class="['base-input__input-frame',
                { 'base-input__input-frame__color': useFormFieldStyling && showInputBorder },
+               { 'base-input__input-frame__disabled': disabled },
                { 'base-input__input-frame__invalid': invalid }]"
       @focusin="clickedInside"
       @click="clickedInside">
@@ -61,6 +62,8 @@
                   :placeholder="placeholder"
                   :type="fieldType"
                   :list="dropDownListId || false"
+                  :disabled="disabled"
+                  :aria-disabled="disabled"
                   :aria-activedescendant="linkedListOption"
                   :aria-describedby="idInt"
                   :aria-required="required.toString()"
@@ -315,6 +318,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * set true if input field should be disabled
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -377,7 +387,8 @@ export default {
              * passing only the event.target.value
              *
              */
-            this.$emit('input', event.target.value);
+            this.$emit('input', this.fieldType === 'number'
+              ? Number(event.target.value) : event.target.value);
           },
         },
       };
@@ -557,6 +568,15 @@ export default {
       background: $app-color;
     }
 
+    &.base-input__input-frame__disabled::after {
+      position: absolute;
+      left: 0;
+      content: '';
+      height: 100%;
+      width: 100%;
+      background: rgba(245, 245, 245, 0.4);
+    }
+
     .base-input__input-container {
       display: flex;
       position: relative;
@@ -612,6 +632,14 @@ export default {
                 opacity: 0;
                 filter:alpha(opacity=0);
                 animation: all 500ms ease;
+
+                &:invalid {
+                  box-shadow: none;
+                }
+
+                &:disabled {
+                  color: $font-color-second;
+                }
               }
             }
           }

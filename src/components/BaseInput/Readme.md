@@ -1,4 +1,4 @@
-A simple example
+A simple example without label
 
 ```vue
 <template>
@@ -82,6 +82,11 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
         v-model="invalid"
         label="invalid"
         name="toggle invalid"
+        class="toggle"/>
+      <BaseToggle
+        v-model="disabled"
+        label="disabled"
+        name="toggle disabled"
         class="toggle"/>
       <BaseToggle
         v-model="dropdownActive"
@@ -176,6 +181,7 @@ export default {
   data() {
     return {
       invalid: false,
+      disabled: false,
       dropdownActive: false,
       inputActive: false,
       isLoading: false,

@@ -2,39 +2,46 @@
   <button
     :disabled="disabled"
     :aria-disabled="disabled"
+    :aria-describedby="internalId"
     :type="buttonType"
-    :style="{ justifyContent: alignText }"
     :class="['base-button',
              `base-button-${buttonStyle}`,
+             `base-button-icon-${iconPosition}`,
+             `base-button-align-${alignText}`,
              { 'base-button-background': hasBackgroundColor },
-             {'base-button-active': active }]"
+             { 'base-button-active': active }]"
     @click.prevent="clicked">
+    <base-icon
+      v-if="icon"
+      :name="icon"
+      :class="['base-button-icon',
+               'base-button-icon-' + iconSize,
+               { 'base-button-icon-colored': iconColored },
+               { 'base-button-icon-hide': hideIcon }]" />
+
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
-    <base-icon
-      v-if="iconPosition === 'left' && icon"
-      :name="icon"
-      :class="['base-button-icon',
-               'base-button-icon-left',
-               'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]" />
+
     <span class="base-button-text">{{ text }}</span>
+
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
-    <base-icon
-      v-if="iconPosition === 'right' && icon"
-      :name="icon"
-      :class="['base-button-icon',
-               'base-button-icon-right',
-               'base-button-icon-' + iconSize,
-               { 'base-button-icon-hide': hideIcon }]" />
+
     <BaseBoxTooltip
       v-if="showTooltip"
       @clicked="clicked" />
+    <span
+      v-if="description"
+      :id="internalId"
+      :aria-hidden="true"
+      class="hide">
+      {{ description }}
+    </span>
   </button>
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
@@ -79,17 +86,18 @@ export default {
     },
     /**
      * specify if icon should be displayed left or right <br>
-     * valid values: 'left' | 'right'
+     * valid values: 'top' | 'right' | 'left'
      */
     iconPosition: {
       type: String,
       default: 'left',
       validator(val) {
-        return ['left', 'right'].includes(val);
+        return ['top', 'right', 'left'].includes(val);
       },
     },
     /**
-     * set button active (will display a colored border on botton)
+     * set button active (will display a colored border on botton) (row style)
+     * or keep icon colored (single style)
      */
     active: {
       type: Boolean,
@@ -105,6 +113,13 @@ export default {
       validator(val) {
         return val === 'single' || val === 'row' || val === 'secondary';
       },
+    },
+    /**
+     * display icon with app-color
+     */
+    iconColored: {
+      type: Boolean,
+      default: false,
     },
     /**
      * specify icon size <br>
@@ -134,7 +149,8 @@ export default {
     },
     /**
      * define alignment of button content<br>
-     * allowed values: 'center', 'left', 'right'
+     * allowed values: 'center', 'left', 'right'<br>
+     * Info: has no effect, if icon-position 'top' is set
      */
     alignText: {
       type: String,
@@ -157,6 +173,18 @@ export default {
     showTooltip: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * Add a button description to be used by aria-describedby
+     */
+    description: {
+      type: String,
+      default: '',
+    },
+  },
+  computed: {
+    internalId() {
+      return createId();
     },
   },
   methods: {
@@ -181,8 +209,8 @@ export default {
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
 
     .base-button-text {
       text-align: center;
@@ -192,20 +220,18 @@ export default {
       height: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;
-      transition: $drop-down-arrow-animation;
 
-      &.base-button-icon-left {
-        margin-right: #{$spacing};
-      }
-
-      &.base-button-icon-right {
-        margin-left: #{$spacing};
+      &.base-button-icon-colored {
+        color: $app-color;
       }
     }
 
     &.base-button-row {
       min-height: $row-height-large;
-      background: white;
+
+      &.base-button-background {
+        background-color: white;
+      }
 
       .base-button-icon-large {
         height: $icon-large;
@@ -216,10 +242,15 @@ export default {
         height: $icon-medium;
         max-width: $icon-medium;
       }
+
+      &.base-button-active {
+        /* TODO: adjust this to style guide if necessary */
+        box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
+        z-index: map-get($zindex, button-active);
+      }
     }
 
     &.base-button-single {
-      background-color: transparent;
       min-height: $row-height-small;
 
       &.base-button-background {
@@ -235,11 +266,19 @@ export default {
         height: $icon-small;
         max-width: $icon-small;
       }
+
+      &.base-button-active .base-button-icon {
+        color: $app-color;
+      }
     }
 
     &.base-button-secondary {
       font-size: $font-size-small;
       color: $font-color-second;
+
+      &.base-button-background {
+        background-color: $button-header-color;
+      }
     }
 
     &.base-button-active {
@@ -248,6 +287,38 @@ export default {
       z-index: map-get($zindex, button-active);
     }
 
+    &.base-button-align-left:not(&.base-button-icon-top) {
+      justify-content: flex-start;
+    }
+
+    &.base-button-align-center {
+      justify-content: center;
+    }
+
+    &.base-button-align-right:not(&.base-button-icon-top)  {
+      justify-content: flex-end;
+    }
+
+    &.base-button-icon-top {
+      flex-direction: column;
+      justify-content: center;
+      line-height: $line-height;
+    }
+
+    &.base-button-icon-left {
+      .base-button-icon {
+        margin-right: #{$spacing};
+      }
+    }
+
+    &.base-button-icon-right {
+      .base-button-icon {
+        order: 1;
+        margin-left: #{$spacing};
+      }
+    }
+
+    /* class is set in following components: baseExpandBox */
     &.base-button-icon-rotate-180 {
       .base-button-icon {
         transform: rotate(180deg);

@@ -1,3 +1,7 @@
+import addExistingCollection from './add-existing-collection';
+import addExistingObject from './add-existing-object';
+import addNewCollection from './add-new-collection';
+import addNewObject from './add-new-object';
 import arrowLeft from './arrow-left';
 import attachment from './attachment';
 import attention from './attention';
@@ -6,15 +10,19 @@ import calendarNumber from './calendar-number';
 import camera from './camera';
 import checkMark from './check-mark';
 import clock from './clock';
+import collection from './collection';
 import download from './download';
 import dragLines from './drag-lines';
+import dragNDrop from './drag-n-drop';
 import dropDown2 from './drop-down-2';
 import dropDown3 from './drop-down-3';
 import dropDown4 from './drop-down-4';
 import dropDown from './drop-down';
 import duplicate from './duplicate';
+import edit from './edit';
 import eye from './eye';
 import forbidden from './forbidden';
+import hide from './hide';
 import information from './information';
 import licence from './licence';
 import link from './link';
@@ -38,6 +46,10 @@ import text from './text';
 import wasteBin from './waste-bin';
 
 export default {
+  addExistingCollection,
+  addExistingObject,
+  addNewCollection,
+  addNewObject,
   arrowLeft,
   attachment,
   attention,
@@ -46,15 +58,19 @@ export default {
   camera,
   checkMark,
   clock,
+  collection,
   download,
   dragLines,
+  dragNDrop,
   dropDown2,
   dropDown3,
   dropDown4,
   dropDown,
   duplicate,
+  edit,
   eye,
   forbidden,
+  hide,
   information,
   licence,
   link,

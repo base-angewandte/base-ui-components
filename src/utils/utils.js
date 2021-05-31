@@ -8,6 +8,14 @@ export const capitalizeString = (string) => {
 export const createId = () => Math.random().toString(36).substr(2, 9);
 
 /**
+ *
+ * @param {string} string - the nested object property path in dot notation
+ * @param {Object} object - the object from which the property value should be extracted
+ * @returns {*} - the value contained in the nested object
+ */
+export const extractNestedPropertyValue = (string, object) => string.split('.').reduce((a, b) => a[b], object);
+
+/**
  * function taking a string and returning returning any name format in an array
  * with primary compare value (=last name) first and
  * secondary compare value (=first name) second

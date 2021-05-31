@@ -14,7 +14,7 @@
       <div
         ref="mediaStage"
         class="base-media-preview-image-stage">
-        <img
+        <BaseImage
           v-if="displayImage && fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
           :srcset="imageSourceSet"
@@ -24,7 +24,7 @@
             'base-media-preview-image',
             'base-media-preview-rotation-' + orientation.toString()
           ]"
-          @error="displayImage = false">
+          @error="displayImage = false" />
         <div
           v-else-if="fileType === 'image' && !displayImage"
           class="base-media-preview-error">
@@ -109,7 +109,6 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -121,7 +120,8 @@ export default {
   name: 'BaseMediaPreview',
   components: {
     BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseIcon,
+    BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseImage: () => import('../BaseImage/BaseImage'),
     BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
   },
   directives: {
@@ -269,7 +269,7 @@ export default {
     },
     imageSourceSet() {
       return this.previews.length ? this.previews.map(size => Object.keys(size)
-        .map(width => `${size[width]} ${width}`)).join(', ') : '';
+        .map(width => `${size[width]} ${width}`)).join(', ') : [];
     },
     sourceUrl() {
       const last = this.previews.length - 1;
