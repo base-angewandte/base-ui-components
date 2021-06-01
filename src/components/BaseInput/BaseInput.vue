@@ -62,7 +62,7 @@
                   :placeholder="placeholder"
                   :type="fieldType"
                   :list="dropDownListId || false"
-                  :disabled="disabled.toString()"
+                  :disabled="disabled"
                   :aria-disabled="disabled.toString()"
                   :aria-activedescendant="linkedListOption"
                   :aria-describedby="idInt"
