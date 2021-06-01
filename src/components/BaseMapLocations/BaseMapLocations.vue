@@ -14,6 +14,7 @@
       :max-zoom="maxZoom"
       :options="options"
       :style="additionalMapStyles"
+      :tile-layer-service="tileLayerService"
       :url="url"
       :zoom="zoom"
       class="base-map-locations__map"
@@ -69,7 +70,7 @@ export default {
      */
     attribution: {
       type: String,
-      default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap</a>',
+      default: 'Source: <a href=https://openstreetmap.org/>OpenStreetMap contributors</a>',
     },
     /**
      * define position of map attribution<br>
@@ -166,11 +167,22 @@ export default {
       default: () => ({}),
     },
     /**
-     * define url to map data
+     * define url to tileLayer service
      */
     url: {
       type: String,
-      default: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      default: '',
+    },
+    /**
+     * specify service for the [tileLayer](https://leafletjs.com/examples/wms/wms.html)<br>
+     * valid values: 'WMTS' | 'TMS' | 'WMS'
+     */
+    tileLayerService: {
+      type: String,
+      default: 'WMTS',
+      validator(val) {
+        return ['WMTS', 'TMS', 'WMS'].includes(val);
+      },
     },
     /**
      * define initial zoom factor

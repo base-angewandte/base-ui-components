@@ -7,11 +7,13 @@ Image View Box
     <BaseImageBox
       :show-title="false"
       :image-url="getImgUrl"
+      style="width: 200px"
       @clicked="showPreview = true"/>
     <BaseMediaPreview
-          :show-preview="showPreview"
-          :media-url="getImgUrl"
-          @hide-preview="showPreview = false"/>
+      :display-size="{ 'max-width': '100%' }"
+      :show-preview="showPreview"
+      :media-url="getImgUrl"
+      @hide-preview="showPreview = false"/>
 </div>
 </template>
 
@@ -91,6 +93,7 @@ An video example
         :display-size="{}"
         display-name="Taken from https://test-streams.mux.dev"
         media-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+        media-poster-url="https://placeimg.com/1920/1200/arch.jpg"
         @hide-preview="showPreview = false"/>
   </div>
 </template>

@@ -5,12 +5,13 @@
     show-less-text="Collapse Map and Addresses">
     <base-map-locations
       :locations="locations"
-      :options="options"
-      attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
+      :options="{ layers: 'OSM-WMS' }"
+      attribution="Source: <a href='https://openstreetmap.org/'>OpenStreetMap contributors</a>"
       attribution-position="topright"
-      copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
+      copyright="<a href='https://creativecommons.org/licenses/by-sa/3.0/'>CC BY-SA 3.0</a>"
       label="Addresses"
-      url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
+      tile-layer-service="WMS"
+      url="https://ows.terrestris.de/osm-gray/service" />
   </BaseExpandBox>
 </template>
 
@@ -49,12 +50,6 @@ export default {
           ],
         },
       ],
-      options: {
-        style: 'normal',
-        subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
-        tileMatrixSet: 'google3857',
-        type: 'geolandbasemap',
-      },
     };
   },
 }

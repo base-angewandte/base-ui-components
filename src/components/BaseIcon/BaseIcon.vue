@@ -28,7 +28,7 @@ export default {
       validator: val => ['arrow-left', 'attention', 'calendar-many', 'calendar-number', 'camera',
         'check-mark', 'clock', 'drop-down', 'eye', 'licence', 'link', 'logo',
         'magnifier', 'people', 'plus', 'print', 'remove', 'save-file', 'save-file-thin',
-        'sheet-empty', 'sheet-plus', 'waste-bin', 'attachment',
+        'sheet-empty', 'sheet-plus', 'waste-bin', 'attachment', 'prev', 'next', 'play',
         'drag-lines', 'download', 'duplicate', 'forbidden', 'information', 'sort',
         'success', 'text', 'drag-n-drop', 'hide', 'edit', 'options-menu', 'collection'].includes(val),
     },

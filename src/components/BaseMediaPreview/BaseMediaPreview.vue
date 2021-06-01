@@ -36,6 +36,7 @@
           :display-size="displaySize"
           :media-url="mediaUrl"
           :start-level="hlsStartLevel"
+          :media-poster-url="mediaPosterUrl"
           class="base-media-preview-video" />
 
         <audio
@@ -140,6 +141,13 @@ export default {
      * url of the medium to be displayed
      */
     mediaUrl: {
+      type: String,
+      default: '',
+    },
+    /**
+     * url of image for poster property in html5 video tag
+     */
+    mediaPosterUrl: {
       type: String,
       default: '',
     },

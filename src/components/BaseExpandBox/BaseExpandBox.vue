@@ -38,8 +38,10 @@
     <div
       v-if="!!$slots.footer"
       class="base-expand-box-footer">
-      <!-- @slot slot to add additional information after expandable content -->
-      <slot name="footer" />
+      <div class="base-expand-box-footer-inner">
+        <!-- @slot slot to add additional information after expandable content -->
+        <slot name="footer" />
+      </div>
     </div>
   </base-box>
 </template>
@@ -142,6 +144,16 @@ export default {
 
         // save currentWidth for next comparison
         this.contentWidth = currentWidth;
+
+        // emit box-size
+        if (!this.expandInt) {
+          /**
+           * emitting box-height on resize
+           *
+           * @type {String}
+           */
+          this.$emit('box-height', this.$el.offsetHeight);
+        }
       });
     },
     /**
@@ -225,9 +237,13 @@ export default {
     }
 
     .base-expand-box-footer {
-      border-top: $border-width solid $background-color;
-      margin: $spacing 0 0;
-      padding-top: $spacing;
+      margin-top: auto;
+
+      .base-expand-box-footer-inner {
+        border-top: $border-width solid $background-color;
+        margin: $spacing 0 0;
+        padding-top: $spacing;
+      }
     }
   }
 </style>

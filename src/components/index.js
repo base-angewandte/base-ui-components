@@ -23,6 +23,7 @@ import FormFieldCreator from './BaseFormFieldCreator';
 import HlsVideo from './BaseHlsVideo';
 import HoverBox from './BaseHoverBox';
 import ImageBox from './BaseImageBox';
+import MediaCarousel from './BaseMediaCarousel';
 import MediaPreview from './BaseMediaPreview';
 import MenuEntry from './BaseMenuEntry';
 import MenuList from './BaseMenuList';
@@ -70,6 +71,7 @@ export {
   HlsVideo as BaseHlsVideo,
   HoverBox as BaseHoverBox,
   ImageBox as BaseImageBox,
+  MediaCarousel as BaseMediaCarousel,
   MediaPreview as BaseMediaPreview,
   MenuEntry as BaseMenuEntry,
   MenuList as BaseMenuList,

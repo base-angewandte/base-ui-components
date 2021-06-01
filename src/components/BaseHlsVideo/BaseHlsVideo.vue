@@ -1,15 +1,24 @@
 <template>
   <div
-    class="base-video">
-    <BaseLoader
-      v-if="!videoCanPlay"
-      :position="{ top: '50%', transform: 'translate(-50%, -100%)' }" />
+    class="base-media-video">
+    <button
+      v-if="playButton && !autoplay"
+      ref="playButton"
+      :title="`${getI18nTerm(buttonTitle)} Video`"
+      class="base-media-video__control"
+      @click="play">
+      <base-icon
+        name="play"
+        class="base-media-video__icon" />
+    </button>
+
+    <!-- tabindex is needed for swiper to handle focus after using tab key -->
     <video
       ref="videoPlayer"
       :style="displaySize"
-      controls
-      autoplay
-      :class="['base-video__player', { 'base-video__player--show': videoCanPlay }]">
+      :poster="mediaPosterUrl"
+      :tabindex="playButton ? '-1' : '1'"
+      class="base-media-video__video">
       Your browser does not support the video tag.
     </video>
   </div>
@@ -17,66 +26,67 @@
 
 <script>
 import Hls from 'hls.js/dist/hls.light';
-import BaseLoader from '@/components/BaseLoader/BaseLoader';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseHlsVideo',
   components: {
-    BaseLoader,
+    BaseIcon,
   },
+  mixins: [
+    i18n,
+  ],
   props: {
     /**
-     * url of the video to be displayed
+     * url of the medium to be displayed
      */
     mediaUrl: {
       type: String,
       default: '',
     },
     /**
-     * set additional styles from outside <br>
-     *   e.g. { width: '600px' }
+     * url of image for poster property in html5 video tag
+     */
+    mediaPosterUrl: {
+      type: String,
+      default: '',
+    },
+    /**
+     * set height and with from outside
      */
     displaySize: {
       type: Object,
-      default: () => ({}),
+      default: () => ({ height: '720px', width: '1280px' }),
     },
     /**
-     * set initial hls-video size
+     * start video on load
      */
-    hlsStartLevel: {
-      type: Number,
-      default: undefined,
+    autoplay: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * define play button text
+     * could be string or path to i18n json as well
+     */
+    buttonTitle: {
+      type: String,
+      default: 'Play',
     },
   },
   data() {
     return {
       hsl: () => {},
-      videoCanPlay: false,
+      video: null,
+      playButton: true,
     };
   },
   mounted() {
-    const video = this.$refs.videoPlayer;
+    this.video = this.$refs.videoPlayer;
 
-    if (video) {
-      if (Hls.isSupported()) {
-        this.hls = new Hls({
-          startLevel: this.hlsStartLevel,
-        });
-        this.hls.loadSource(this.mediaUrl);
-        this.hls.attachMedia(video);
-        this.hls.on(Hls.Events.BUFFER_CREATED, () => {
-          this.videoCanPlay = true;
-          video.play();
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = this.mediaUrl;
-        video.addEventListener('loadedmetadata', () => {
-          video.oncanplay = () => {
-            this.videoCanPlay = true;
-            video.play();
-          };
-        });
-      }
+    if (this.autoplay) {
+      this.play();
     }
   },
   destroyed() {
@@ -85,23 +95,89 @@ export default {
       this.hls.destroy();
     }
   },
+  methods: {
+    /**
+     * init video
+     */
+    init() {
+      if (this.video) {
+        if (Hls.isSupported()) {
+          if (!this.hls) {
+            this.hls = new Hls();
+            this.hls.loadSource(this.mediaUrl);
+            this.hls.attachMedia(this.video);
+            this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              this.play();
+              this.playButton = false;
+              this.video.controls = true;
+              this.video.focus();
+            });
+          }
+        } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+          this.video.src = this.mediaUrl;
+          this.video.addEventListener('loadedmetadata', () => {
+            this.playButton = false;
+            this.play();
+            this.video.focus();
+          });
+        }
+      }
+    },
+    /**
+     * play video
+     */
+    play() {
+      if (this.video) {
+        if (!this.hls) {
+          this.init();
+          return;
+        }
+
+        this.video.play();
+      }
+    },
+    /**
+     * pause video
+     */
+    pause() {
+      if (this.video) {
+        this.video.pause();
+      }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @import "../../styles/variables";
 
-  .base-video {
-    padding: $spacing;
+  .base-media-video {
+    position: relative;
 
-    &__player {
-      visibility: hidden;
-      max-height: 100%;
-      max-width: 100%;
+    &__control {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      color: $app-color;
+      background-color: white;
+      box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.15);
+      opacity: 0.5;
+      transition: opacity 250ms ease-in-out;
 
-      &--show {
-        visibility: visible;
+      &:focus,
+      &:hover {
+        opacity: 1;
       }
+    }
+
+    &__video {
+      max-width: 100%;
     }
   }
 </style>

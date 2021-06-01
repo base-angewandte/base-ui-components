@@ -20,6 +20,7 @@ import dropDown4 from './drop-down-4';
 import dropDown from './drop-down';
 import duplicate from './duplicate';
 import edit from './edit';
+import eyeHide from './eye-hide';
 import eye from './eye';
 import forbidden from './forbidden';
 import hide from './hide';
@@ -29,10 +30,13 @@ import link from './link';
 import logo from './logo';
 import magnifier2 from './magnifier-2';
 import magnifier from './magnifier';
+import next from './next';
 import optionsMenu from './options-menu';
 import people from './people';
+import play from './play';
 import plus2 from './plus-2';
 import plus from './plus';
+import prev from './prev';
 import print from './print';
 import remove2 from './remove-2';
 import remove from './remove';
@@ -68,6 +72,7 @@ export default {
   dropDown,
   duplicate,
   edit,
+  eyeHide,
   eye,
   forbidden,
   hide,
@@ -77,10 +82,13 @@ export default {
   logo,
   magnifier2,
   magnifier,
+  next,
   optionsMenu,
   people,
+  play,
   plus2,
   plus,
+  prev,
   print,
   remove2,
   remove,
