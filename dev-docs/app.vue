@@ -81,8 +81,8 @@
       <base-carousel
         :items="entriesList"
         :swiper-options="{
-          slidesPerView: 2,
-          slidesPerGroup: 2,
+          slidesPerView: 1,
+          slidesPerGroup: 1,
           spaceBetween: 15,
           loop: carousel.length > 3,
           speed: 750,
@@ -94,6 +94,10 @@
             clickable: true,
           },
           breakpoints: {
+            640: {
+              slidesPerView: 2,
+              slidesPerGroup: 2,
+            },
             1024: {
               slidesPerView: carousel.length < 3 ? 2 : 3,
               slidesPerGroup: carousel.length < 3 ? 2 : 3,

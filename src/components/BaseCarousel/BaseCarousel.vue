@@ -1,13 +1,13 @@
 <template>
   <div>
     <div
-      :class="['base-carousel', {'swiper-container': swiperIsActive}]">
+      class="base-carousel swiper-container">
       <div
         class="swiper-wrapper">
         <div
           v-for="(item, index) in items"
-          v-show="swiperIsActive || (!swiperIsActive && index < minItems || showAll)"
-          :key="item.uid"
+          v-show="swiperIsActive"
+          :key="index"
           :class="['base-carousel-slide', {'swiper-slide': swiperIsActive}]">
           <BaseImageBox
             :href="item.href"
@@ -29,15 +29,16 @@
         v-if="items.length > 2"
         class="swiper-pagination" />
 
-      <div
-        v-if="(!swiperIsActive && items.length > minItems && !showAll)"
-        class="base-carousel-more">
-        <BaseButton
-          :text="showMoreText"
-          icon="plus"
-          class="base-carousel-more-button"
-          @clicked="showMore" />
-      </div>
+      <template
+        v-if="items.length > 1">
+        <base-icon
+          name="prev"
+          class="swiper-button swiper-button-prev" />
+
+        <base-icon
+          name="next"
+          class="swiper-button swiper-button-next" />
+      </template>
     </div>
   </div>
 </template>
@@ -45,7 +46,7 @@
 <script>
 import 'lazysizes';
 import Swiper, { Autoplay, Keyboard, Pagination } from 'swiper';
-import BaseButton from '../BaseButton/BaseButton';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
 Swiper.use([Autoplay, Keyboard, Pagination]);
@@ -53,7 +54,7 @@ Swiper.use([Autoplay, Keyboard, Pagination]);
 export default {
   name: 'BaseCarousel',
   components: {
-    BaseButton,
+    BaseIcon,
     BaseImageBox,
   },
   props: {
@@ -67,8 +68,8 @@ export default {
      *     href - a url to follow upon item click<br>
      *     previews - an array of image urls in different sizes in the following form:<br>
      *       ```
-            [{<br>
-              '460w': 'image url',
+            [{
+              '460w': 'image-url',
             },
      {
               '640w': 'image url',
@@ -79,20 +80,6 @@ export default {
       default: () => ([]),
     },
     /**
-     * specify number of initial displayed items in mobile view
-     */
-    minItems: {
-      type: Number,
-      default: 3,
-    },
-    /**
-     * specify text of button to show more items
-     */
-    showMoreText: {
-      type: String,
-      default: 'Show more',
-    },
-    /**
      * specify swiper options
      * swiper API: https://swiperjs.com/api/#parameters
      */
@@ -100,21 +87,11 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    /**
-     * specify the name of the item object property that should
-     * be used as identifier (key)
-     */
-    identifierPropertyName: {
-      type: String,
-      default: 'uid',
-    },
   },
   data() {
     return {
       swiper: undefined,
       swiperIsActive: false,
-      showAll: false,
-      breakpoint: null,
     };
   },
   computed: {
@@ -124,9 +101,7 @@ export default {
   },
   mounted() {
     if (process.browser) {
-      this.breakpoint = window.matchMedia('(min-width: 640px)');
-      this.breakpoint.addListener(this.breakpointChecker);
-      this.breakpointChecker();
+      this.initSwiper();
     }
   },
   methods: {
@@ -137,23 +112,8 @@ export default {
       }
       return '';
     },
-    breakpointChecker() {
-      // init list view on small devices
-      if (this.breakpoint.matches === false) {
-        if (this.swiper !== undefined) {
-          this.swiper.destroy(true, true);
-          this.swiperIsActive = false;
-        }
-      }
-
-      // init swiper on larger devices
-      if (this.breakpoint.matches === true) {
-        this.enableSwiper();
-      }
-    },
-    enableSwiper() {
+    initSwiper() {
       this.swiperIsActive = true;
-
       this.swiperOptions.init = false;
       if (this.swiperOptions.autoplay) {
         this.swiperOptions.autoplay = {};
@@ -161,13 +121,15 @@ export default {
         this.swiperOptions.autoplay.disableOnInteraction = true;
       }
 
+      this.swiperOptions.navigation = {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      };
+
       setTimeout(() => {
         this.swiper = new Swiper('.swiper-container', this.swiperOptions);
         this.swiper.init();
-      }, 250);
-    },
-    showMore() {
-      this.showAll = true;
+      }, 0);
     },
     subtext(value) {
       return typeof value === 'object' && typeof value[0] === 'string' ? value.join(', ') : value;
@@ -183,6 +145,7 @@ export default {
   .base-carousel {
     max-width: 1400px;
     margin: 0 auto;
+    position: relative;
 
     .base-carousel-slide {
       margin-bottom: 0;
@@ -194,18 +157,34 @@ export default {
 
     .swiper-wrapper {
       display: flex;
+    }
+
+    .swiper-button {
+      display: none;
+      position: absolute;
+      top: calc(50% - #{$line-height} - #{$spacing});
+      z-index: 1;
+      width: $icon-large;
+      height: $icon-large;
+      fill: white;
+      transform: translateY(-50%);
+      transition: fill 250ms ease-in-out;
+
+      &:focus,
+      &:hover {
+        fill: $app-color;
+      }
+
+      &-prev {
+        left: $spacing;
+      }
+
+      &-next {
+        right: $spacing;
+      }
 
       @media screen and (max-width: $mobile) {
         display: block;
-      }
-    }
-
-    .base-carousel-more {
-      display: none;
-
-      @media screen and (max-width: $mobile) {
-        display: flex;
-        justify-content: center;
       }
     }
   }
