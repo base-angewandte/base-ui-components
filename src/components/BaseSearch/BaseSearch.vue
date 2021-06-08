@@ -4,7 +4,7 @@
     :id="idInt"
     v-model="inputInt"
     :selected-list.sync="selectedChipsInt"
-    :is-active.sync="activeInt"
+    :is-active.sync="isActiveInt"
     :type="dateFieldType"
     :show-label="false"
     :use-form-field-styling="false"
@@ -21,19 +21,24 @@
     :allow-unknown-entries="isFieldTypeChips"
     :label-property-name="isFieldTypeChips ? labelPropertyName : false"
     :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
+    :set-focus-on-active="setFocusOnActive"
     input-class="base-search__input-field"
     field-type="search"
-    class="base-search__input">
+    class="base-search__input"
+    v-on="$listeners">
+    <template v-slot:pre-input-field>
+      <slot name="pre-input-field" />
+    </template>
     <template v-slot:input-field-inline-before>
-      <div class="base-search__spacing" />
       <!-- @slot a slot to exchange the magnifier icon with other elements -->
-      <slot name="before-input">
-        <BaseIcon
-          v-if="showPreInputIcon"
-          name="magnifier"
-          :class="['base-search__magnifier-icon',
-                   { 'base-search__magnifier-icon-active': activeInt }]" />
-      </slot>
+      <slot name="input-field-inline-before" />
+      <div class="base-search__spacing" />
+      <BaseIcon
+        v-if="showPreInputIcon"
+        name="magnifier"
+        :class="['base-search__magnifier-icon',
+                 { 'base-search__magnifier-icon__date': !!dateFieldType },
+                 { 'base-search__magnifier-icon__active': isActiveInt }]" />
     </template>
     <template v-slot:input-field-addition-after>
       <!-- @slot for adding elements after input <br>
@@ -209,6 +214,21 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * set active state from outside
+     */
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * use this prop to deactivate automatic setting of focus as soon as input element
+     * becomes active - this might require external handling of focus setting!
+     */
+    setFocusOnActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -216,7 +236,7 @@ export default {
        * internal handling of the input active state
        * @type {boolean}
        */
-      activeInt: false,
+      isActiveInt: false,
       /**
        * internal handling of text input --> for 'chips' and 'text'
        * (separated from dateInputInt to preserve the input when switching type)
@@ -338,7 +358,7 @@ export default {
      * @returns {string}
      */
     idInt() {
-      return this.fieldId || createId();
+      return this.id || createId();
     },
   },
   watch: {
@@ -378,6 +398,25 @@ export default {
         this.$emit('update:selected-chips', val);
       }
     },
+    /**
+     * sync internal active state with parent
+     */
+    isActive: {
+      handler(val) {
+        if (val !== this.isActiveInt) {
+          this.isActiveInt = val;
+        }
+      },
+      immediate: true,
+    },
+    /**
+     * propagate internal active state changes to parent
+     */
+    isActiveInt(val) {
+      if (val !== this.isActive) {
+        this.$emit('update:is-active', val);
+      }
+    },
   },
 };
 </script>
@@ -399,7 +438,11 @@ export default {
     margin-right: $spacing;
     flex-shrink: 0;
 
-    &.base-search__magnifier-icon-active {
+    &.base-search__magnifier-icon__date {
+      margin-right: $spacing-small;
+    }
+
+    &.base-search__magnifier-icon__active {
       color: grey;
       fill: grey;
     }

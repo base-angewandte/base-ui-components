@@ -170,7 +170,10 @@
             @click.stop="toOpen = !toOpen" />
         </template>
       </BaseInput>
+      <!-- @slot for adding elements after input -->
+      <slot name="input-field-addition-after" />
     </div>
+
     <div class="base-date-input__below">
       <!-- @slot below-input slot added to e.g. add drop down -->
       <slot name="below-input" />

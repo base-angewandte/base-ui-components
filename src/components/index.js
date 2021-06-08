@@ -47,6 +47,7 @@ import EditControl from './BaseEditControl';
 import ExpandList from './BaseExpandList';
 import Image from './BaseImage';
 import AdvancedSearchRow from './BaseAdvancedSearchRow';
+import AdvancedSearch from './BaseAdvancedSearch';
 
 export {
   Loader as BaseLoader,
@@ -98,4 +99,5 @@ export {
   ExpandList as BaseExpandList,
   Image as BaseImage,
   AdvancedSearchRow as BaseAdvancedSearchRow,
+  AdvancedSearch as BaseAdvancedSearch,
 };

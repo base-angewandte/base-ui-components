@@ -560,10 +560,10 @@ export default {
   .base-input__input-frame {
     position: relative;
     width: 100%;
-    padding: 1px;
     background: inherit;
 
     &.base-input__input-frame__color {
+      padding: 1px;
       background: $input-field-color;
     }
 
