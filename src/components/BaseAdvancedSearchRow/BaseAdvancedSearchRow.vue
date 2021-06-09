@@ -19,6 +19,7 @@
       :label-property-name="filter.type === 'text'? labelPropertyName.autocompleteOption
         : labelPropertyName.controlledVocabularyOption"
       :set-focus-on-active="false"
+      :clearable="false"
       class="base-advanced-search-row__search"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.enter="selectOptionOnKeyEnter">
@@ -71,9 +72,8 @@
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @click.prevent.stop.prevent="addFilter">
-          <SvgIcon
+          <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
-            :alt="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
             name="plus"
             class="base-advanced-search-row__search-row-icon" />
         </button>
@@ -82,9 +82,8 @@
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @click.stop.prevent="removeFilter">
-          <SvgIcon
+          <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
-            :alt="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
@@ -95,6 +94,7 @@
         <BaseDropDownList
           v-if="isActive"
           :drop-down-options="resultListInt"
+          :active-option="{ [autocompletePropertyNames.collection]: activeCollection }"
           :list-id="'autocomplete-options-' + internalRowId"
           :active-styled="false"
           :has-sub-options="true"
@@ -172,9 +172,6 @@
                 v-if="slotProps.option[autocompletePropertyNames.data].length"
                 :class="['base-advanced-search-row__first-column',
                          'base-advanced-search-row__autocomplete-collection',
-                         { 'base-advanced-search-row__result-column-active':
-                           slotProps.option[autocompletePropertyNames.collection]
-                           === activeCollection }
                 ]">
                 <div class="base-advanced-search-row__autocomplete-collection-text">
                   {{ slotProps.option[autocompletePropertyNames.collection] }}
@@ -205,7 +202,10 @@
               class="base-advanced-search-row__above-list-area
                  base-advanced-search-row__chips-area
                  base-advanced-search-row__area-padding">
-              <div class="base-advanced-search-row__chips-row">
+              <div
+                :class="['base-advanced-search-row__chips-row',
+                         { 'base-advanced-search-row__chips-row__no-options':
+                           filter.type === 'chips' && !displayedOptions.length }]">
                 <div
                   class="base-advanced-search-row__first-column">
                   {{ getI18nTerm(getLangLabel(advancedSearchText.availableOptions)) }}
@@ -282,8 +282,8 @@
 
 <script>
 // TODO: use base icon instead??
-import SvgIcon from 'vue-svgicon';
 import BaseSearch from '@/components/BaseSearch/BaseSearch';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
 import BaseChip from '@/components/BaseChip/BaseChip';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
@@ -298,7 +298,7 @@ export default {
     BaseChip,
     BaseChipsInputField,
     BaseSearch,
-    SvgIcon,
+    BaseIcon,
   },
   mixins: [navigateMixin, i18n],
   props: {
@@ -684,7 +684,7 @@ export default {
 
         // also propagate change to parent if necessary
         if (val && JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
-          this.$emit('update:applied-filter', val);
+          this.$emit('update:applied-filter', { ...val });
         }
       },
       deep: true,
@@ -695,6 +695,13 @@ export default {
       handler(val) {
         if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
           this.filter = { ...val };
+        }
+        if (val.values) {
+          if (val.type.includes('date')) {
+            this.currentInput = val.values;
+          } else {
+            this.selectedOptions = val.values;
+          }
         }
       },
       immediate: true,
@@ -710,6 +717,9 @@ export default {
          * @property {Object} val - the input string
          */
         this.$emit('fetch-autocomplete-results', val);
+      }
+      if (this.filter.type.includes('date')) {
+        this.$set(this.filter, 'values', val);
       }
     },
     isActive(val) {
@@ -1022,7 +1032,9 @@ export default {
       // TODO: if switch is from no-filter to certain filter also entries with certain collection
       //  could be kept... (but collection is not saved atm)
       if (val && val.length && type === 'text') {
-        return val.filter(option => !option[this.identifierPropertyName.autocompleteOption]);
+        return typeof val === 'object' && !!val.length
+          ? val.filter(option => !option[this.identifierPropertyName.autocompleteOption])
+          : [];
       }
       return [];
     },
@@ -1031,10 +1043,6 @@ export default {
       this.activeEntry = null;
       this.activeCollection = '';
       this.activeControlledVocabularyEntry = null;
-    },
-    // TODO: currently not used
-    setDate(event) {
-      this.$set(this.filter, 'values', this.setFilterValues(this.filter.type, event));
     },
     calcFadeOut(event) {
       const scrollElement = event.target;
@@ -1203,6 +1211,11 @@ export default {
           min-height: calc(#{$row-height-small} + #{$spacing-small});
           padding-top: $spacing-small/2;
           padding-bottom: $spacing-small/2;
+
+          &.base-advanced-search-row__chips-row__no-options {
+            padding-top: 0;
+            padding-bottom: 0;
+          }
 
           .base-advanced-search-row__chips-list {
             margin-left: $spacing;

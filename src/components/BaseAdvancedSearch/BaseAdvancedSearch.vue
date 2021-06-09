@@ -4,11 +4,12 @@
       <BaseAdvancedSearchRow
         v-for="(filter, index) in appliedFilters"
         :key="'filter-' + index"
+        :label="'filter-' + index"
         :search-row-id="getRowId()"
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index + 1]"
         :filter-list="filterList"
-        :applied-filter="filter"
+        :applied-filter.sync="filter"
         :is-loading="filtersLoadingState[index + 1]"
         :default-filter="defaultFilter"
         :autocomplete-property-names="autocompletePropertyNames"
@@ -20,6 +21,7 @@
 
     <BaseAdvancedSearchRow
       :search-row-id="'main'"
+      :label="'main'"
       :is-main-search="true"
       :applied-filter.sync="mainFilter"
       :filter-list="filterList"
@@ -283,13 +285,13 @@ export default {
   methods: {
     addFilter(filter) {
       this.appliedFilters.push(filter);
+      this.mainFilter = this.defaultFilter;
     },
     removeFilter(filter, index) {
       this.appliedFilters.splice(index, 1);
       this.search();
     },
-    updateFilter(filter, index) {
-      this.$set(this.appliedFilters, index, filter);
+    updateFilter() {
       this.search();
     },
     fetchAutocomplete(event, filter, index) {

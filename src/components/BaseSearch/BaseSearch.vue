@@ -366,10 +366,13 @@ export default {
      * watch input prop to sync with inputInt
      * @param {string|{date_from: string, date_to: string}} val
      */
-    input(val) {
-      if (val !== this.inputInt) {
-        this.inputInt = val;
-      }
+    input: {
+      handler(val) {
+        if (val !== this.inputInt) {
+          this.inputInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * watch inputInt to sync with parent input
@@ -384,10 +387,13 @@ export default {
      * watch selectedChips prop to sync with selectedChipsInt
      * @param {Object[]} val
      */
-    selectedChips(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedChipsInt)) {
-        this.selectedChipsInt = val;
-      }
+    selectedChips: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedChipsInt)) {
+          this.selectedChipsInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * watch selectedChipsInt to sync with selectedChips prop provided by parent
