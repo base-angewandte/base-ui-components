@@ -64,6 +64,9 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
+import BaseInput from '@/components/BaseInput/BaseInput';
+import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
 import { createId } from '@/utils/utils';
 /**
  * A basic text search to filter entries or files
@@ -72,6 +75,9 @@ export default {
   name: 'BaseSearch',
   components: {
     BaseIcon,
+    BaseChipsInputField,
+    BaseDateInput,
+    BaseInput,
   },
   model: {
     prop: 'input',
@@ -259,15 +265,15 @@ export default {
   computed: {
     /**
      * compute and import only the component necessary for the respective type selected
-     * @returns {null|(function(): Promise<HTMLElement>)}
+     * @returns {null|(function(): Promise<HTMLElement>)|string}
      */
     inputComponent() {
       if (this.type === 'text') {
-        return () => import('../BaseInput/BaseInput');
+        return 'BaseInput';
       } if (this.type === 'chips') {
-        return () => import('../BaseChipsInputField/BaseChipsInputField');
+        return 'BaseChipsInputField';
       } if (this.type === 'date' || this.type === 'daterange') {
-        return () => import('../BaseDateInput/BaseDateInput');
+        return 'BaseDateInput';
       }
       return null;
     },

@@ -77,11 +77,12 @@ export default {
     },
     /**
      * provide the component with the fetched autocomplete results
-     * (drop down options)
-     * TODO: can this really be a string???
+     * (drop down options)<br>
+     * this needs to be an object array with the properties specified in
+     * `autocompletePropertyNames`
      */
     autocompleteResults: {
-      type: [String, Object][Array],
+      type: Array,
       default: () => [],
     },
     /**
