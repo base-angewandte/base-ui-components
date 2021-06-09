@@ -51,7 +51,7 @@
       <slot name="error-icon" />
     </template>
     <template v-slot:remove-icon>
-      <!-- @slot for adding elements after input (e.g. used to add loader <br>
+      <!-- @slot for adding custom input remove icon <br>
       for an example see [BaseChipsInputField](#basechipsinputfield)-->
       <slot name="remove-icon" />
     </template>
@@ -368,7 +368,12 @@ export default {
      */
     input: {
       handler(val) {
-        if (val !== this.inputInt) {
+        // if value is empty clear all input (to be able to reset the component completely)
+        if (!val) {
+          this.textInputInt = '';
+          this.dateInputInt = this.type === 'daterange' ? {} : '';
+          // else if input is not matching internal input update
+        } else if (val !== this.inputInt) {
           this.inputInt = val;
         }
       },
