@@ -4,7 +4,6 @@
       <BaseAdvancedSearchRow
         v-for="(filter, index) in appliedFilters"
         :key="'filter-' + index"
-        :label="'filter-' + index"
         :search-row-id="getRowId()"
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index + 1]"
@@ -21,7 +20,6 @@
 
     <BaseAdvancedSearchRow
       :search-row-id="'main'"
-      :label="'main'"
       :is-main-search="true"
       :applied-filter.sync="mainFilter"
       :filter-list="filterList"

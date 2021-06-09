@@ -71,7 +71,7 @@
           v-if="isMainSearch"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
-          @click.prevent.stop.prevent="addFilter">
+          @click.stop.prevent="addFilter">
           <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
             name="plus"
@@ -309,10 +309,6 @@ export default {
       type: String,
       default: '',
     },
-    label: {
-      type: String,
-      required: true,
-    },
     /**
      * property to distinguish between one of multiple filter rows
      * and the main search field (where new filters are added) that has
@@ -374,11 +370,12 @@ export default {
     },
     /**
      * provide the component with the fetched autocomplete results
-     * (drop down options)
-     * TODO: can this really be a string???
+     * (drop down options)<br>
+     * this needs to be an object array with the properties specified in
+     * `autocompletePropertyNames`
      */
     autocompleteResults: {
-      type: [String, Object][Array],
+      type: Array,
       default: () => [],
     },
     /**
@@ -475,6 +472,19 @@ export default {
         searchLabel: 'Search for Entries',
       }),
     },
+    /**
+     * specify informational texts for the drop down - this needs to be an object with the following
+     * properties (if you dont want to display any text leave an empty string:  <br>
+     *   <br>
+     *     <b>autocompleteNoOptions</b>: text shown when no autocomplete options are available<br>
+     *     <b>autocompleteOngoing</b>: text shown when an autocomplete search request is ongoing<br>
+     *     <b>autocompleteInitial</b>: initial text shown before user started typing<br>
+     *     <b>chipsNoOptions</b>: text shown when there are no options for controlled vocabulary
+     *        available<br>
+     *     <b>chipsOngoing</b>: text shown for chips fetching request ongoing<br>
+     *  <br>
+     *  The values of this object might be plain text or a key for an i18n file<br>
+     */
     dropDownInfoTexts: {
       type: Object,
       default: () => ({
@@ -501,13 +511,13 @@ export default {
       // TODO: a) adjust to actual filter structure
       /**
        * the currently selected filter
-       * @typedef {Object} filter
-       * @property {string} [filter.label]
-       * @property {string} [filter[labelPropertyName.filter]] - an alternative to
+       * @typedef {Object} Filter filter
+       * @property {string} [Filter.label]
+       * @property {string} [Filter[labelPropertyName.filter]] - an alternative to
        *  filter.label with custom property name
-       * @property {string} filter.type
-       * @property {*[]} [filter.values]
-       * @property {Object[]} [filter.options]
+       * @property {string} Filter.type
+       * @property {*[]} [Filter.values]
+       * @property {Object[]} [Filter.options]
        */
       filter: { ...this.defaultFilter },
       /**
@@ -560,36 +570,38 @@ export default {
     internalRowId() {
       return this.searchRowId || createId();
     },
-    // to be able to use v-model on filter input
+    /**
+     * v-model of BaseChipsInputField provides an array of selected options - do
+     * conversion to object and array respectively with this computed variable
+     */
     selectedFilter: {
       set(val) {
+        // check if filter was selected - else use the default filter
         this.filter = val.length ? val.pop()
           : { ...this.defaultFilter };
       },
       get() {
+        // return current filter object as array
         return [this.filter];
       },
     },
     /**
      * the actually displayed filters (currently only sorted)
-     * TODO: check if there should actually be a functionality where input
-     * filters the displayed filters
      */
     displayedFilters() {
       const displayed = [...this.filterList];
       return sort(displayed, this.labelPropertyName.filter);
     },
     /**
-     * selected controlled vocabulary or autocomplete options
+     * depending on the filter type get selectedOptions for BaseSearch from filter values
      */
     selectedOptions: {
       set(val) {
         this.$set(this.filter, 'values', val);
       },
       get() {
-        // TODO: check if this is correct
-        // this variable should only contain values for chips and text filters
-        // not for date or daterange (should be array)
+        // this variable should only contain values for chips and text filters (should be array)
+        // not for date or daterange
         if (this.filter.type === 'chips' || this.filter.type === 'text') {
           return this.filter.values;
         }
@@ -663,17 +675,20 @@ export default {
      * list of autocomplete results used for determining currently active
      * collection // activity
      * @type {Object} consolidatedResultList
+     * @returns {Object}
      */
     consolidatedResultList() {
-      const resultObject = {};
-      this.resultListInt.forEach((section) => {
-        resultObject[section[this
-          .autocompletePropertyNames.collection]] = section[this.autocompletePropertyNames.data];
-      });
-      return resultObject;
+      return this.resultListInt.reduce((prev, curr) => {
+        this.$set(prev, curr[this
+          .autocompletePropertyNames.collection], curr[this.autocompletePropertyNames.data]);
+        return prev;
+      }, {});
     },
   },
   watch: {
+    /**
+     * watch internal filter object for changes
+     */
     filter: {
       handler(val, old) {
         // when a filter type changes set current input according to filter type
@@ -690,25 +705,35 @@ export default {
       deep: true,
       immediate: true,
     },
-    // watch if applied filter changes from outside
+    /**
+     * watch if applied filter changes from outside
+     */
     appliedFilter: {
       handler(val) {
+        // check if anything actually changed
         if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
           this.filter = { ...val };
-        }
-        if (val.values) {
-          if (val.type.includes('date')) {
-            this.currentInput = val.values;
-          } else {
-            this.selectedOptions = val.values;
+          // check if the new filter has values
+          if (val.values) {
+            // distinguish between date and others to assign to correct variable
+            if (val.type.includes('date')) {
+              this.currentInput = val.values;
+            } else {
+              this.selectedOptions = val.values;
+            }
           }
         }
       },
       immediate: true,
     },
-    // when current input changes emit this to parent component which should
-    // do the fetching of autocomplete results
+    /**
+     * when current input changes emit this to parent component which should
+     * do the fetching of autocomplete results (if filter type 'text') or assign
+     * the values to filter.values if type is 'date' or 'daterange'
+     * @param {string} val - the search string
+     */
     currentInput(val) {
+      // if filter type is text - just emit for fetching autocomplete results
       if (this.filter.type === 'text') {
         /**
          * event emitted when input string for text or chips filter changes
@@ -718,10 +743,15 @@ export default {
          */
         this.$emit('fetch-autocomplete-results', val);
       }
+      // if type is date assign the values to the filter.values immediately
       if (this.filter.type.includes('date')) {
         this.$set(this.filter, 'values', val);
       }
     },
+    /**
+     * if 'isActive' is set true reset the filterFade (for mobile filter view) to
+     * default values
+     */
     isActive(val) {
       if (val) {
         this.filterFade = {
@@ -752,7 +782,7 @@ export default {
     this.$el.removeEventListener('resize', this.calcColNumber);
   },
   methods: {
-    /** FILTER RELATED FUNCTIONALITIES */
+    /** FILTER ROW RELATED FUNCTIONALITIES */
 
     // inform parent of click on plus or remove respectively
     addFilter() {
@@ -764,14 +794,10 @@ export default {
        * @property {Object} filter - the filter object in question
        */
       this.$emit('add-filter', this.filter);
-      // TODO: why the below??
-      // check if filter has any data
-      // if (hasData(this.filter.values)) {
-      //   // reset everything
-      //   this.resetAllInput();
-      //   // reset filter
-      //   this.filter = { ...this.defaultFilter };
-      // }
+      // reset everything
+      this.resetAllInput();
+      // reset filter
+      this.filter = { ...this.defaultFilter };
     },
     removeFilter() {
       /**
@@ -782,6 +808,9 @@ export default {
        */
       this.$emit('remove-filter', this.filter);
     },
+
+    /** FILTER RELATED FUNCTIONALITIES */
+
     /**
      * set the via click or navigation selected filter as currently
      * active filter
@@ -1038,18 +1067,32 @@ export default {
       }
       return [];
     },
+    /**
+     * reset all filter row input and navigational variables
+     */
     resetAllInput() {
       this.currentInput = '';
       this.activeEntry = null;
       this.activeCollection = '';
       this.activeControlledVocabularyEntry = null;
     },
+    /**
+     * needed for mobile filter view to determine when to show fade out on filter list
+     *
+     * @param {Event} event - the event that triggered the recalculation
+     */
     calcFadeOut(event) {
+      // get the target element
       const scrollElement = event.target;
+      // get the actual scroll position
       const scrollPosition = scrollElement.scrollLeft;
+      // determine the maximum possible scroll position
       const scrollMax = scrollElement.scrollWidth - scrollElement.clientWidth;
+      // set filter fade variables
       this.filterFade = {
+        // show fade out left as soon as scroll position is different from 0
         left: scrollPosition !== 0,
+        // show fade out right as soon as scroll position is different from maximum position
         right: scrollPosition !== scrollMax,
       };
     },
@@ -1065,12 +1108,14 @@ export default {
   width: 100%;
   background: white;
   // css variable to define option background color
+  // THIS IS SETTING THE BACKGROUND COLOR IN BASEDROPDOWNLIST
   --option-background: rgb(248, 248, 248);
   // set number of columns for filters and chips
   --col-number: 4;
 
   .base-advanced-search-row__search {
     .base-advanced-search-row__first-column {
+      // if the 25% is changed the function calcColNumber() needs to be adapted as well
       flex: 0 0 25%;
       min-width: 120px;
       max-width: 250px;
@@ -1097,6 +1142,11 @@ export default {
       padding: $spacing;
       margin-right: -$spacing-small;
       cursor: pointer;
+
+      &:active, &:focus {
+        color: $app-color;
+        fill: $app-color;
+      }
 
       &.base-advanced-search-row__icon-button__date {
         margin-right: 0;
