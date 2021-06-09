@@ -237,7 +237,7 @@ export default {
     // can the user add Entries that are not available in the vocabulary (selectable list)
     allowUnknownEntries: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     /**
      * define only a single or multiple options can be selected
@@ -479,33 +479,8 @@ export default {
        * @type {number}
        */
       chipActiveForRemove: -1,
+      inputInt: '',
     };
-  },
-  computed: {
-    /**
-     * to have base input string available here
-     */
-    inputInt: {
-      /**
-       * getter function for inputInt
-       * @returns {string}
-       */
-      get() {
-        return this.input;
-      },
-      /**
-       * setter function for inputInt
-       * @param {string} val - the value to set
-       */
-      set(val) {
-        /**
-         * emitting the input string if changed internally
-         * @event input
-         * @property {string} val - the new input string
-         */
-        this.$emit('input', val);
-      },
-    },
   },
   watch: {
     // selectedList is watched to also change selectedListInt if necessary
@@ -545,6 +520,27 @@ export default {
         this.isActiveInt = val;
       }
     },
+    input: {
+      handler(val) {
+        if (val !== this.inputInt) {
+          this.inputInt = val;
+        }
+      },
+      immediate: true,
+    },
+    inputInt: {
+      handler(val) {
+        if (val !== this.input) {
+          /**
+           * emitting the input string if changed internally
+           * @event input
+           * @property {string} val - the new input string
+           */
+          this.$emit('input', val);
+        }
+      },
+      immediate: true,
+    },
   },
   methods: {
     /** KEYBOARD HANDLING FOR CHIPS */
@@ -556,7 +552,7 @@ export default {
     checkKeyEvent(event) {
       const key = event.code;
       // define conditions in which input field should be set inactive (in styling and blurring)
-      if (key === 'Tab' || (key === 'Enter' && !this.allowMultipleEntries)) {
+      if ((key === 'Tab' && !(this.clearable && !!this.inputInt)) || (key === 'Enter' && !this.allowMultipleEntries)) {
         this.isActiveInt = false;
       }
       // if event was Delete check if a chip should be deleted

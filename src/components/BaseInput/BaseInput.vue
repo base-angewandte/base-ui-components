@@ -72,6 +72,7 @@
                   autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
+                  @keydown.tab="handleInputTab"
                   v-on="inputListeners">
               </slot>
             </div>
@@ -526,6 +527,12 @@ export default {
      */
     setFieldState(val) {
       this.isActiveInt = val;
+    },
+    handleInputTab(event) {
+      if (!(this.showRemoveIcon && !!this.inputInt)) {
+        this.setFieldState(false);
+      }
+      this.$emit('keydown', event);
     },
   },
 };
