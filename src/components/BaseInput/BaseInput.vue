@@ -346,8 +346,14 @@ export default {
      * @returns {Boolean|boolean}
      */
     showLabelRow() {
+      // get label-addition slot
+      const slotElements = this.$slots['label-addition'];
+      // check if slot exists and has data and actually has content
+      // (this did not work with SSR otherwise...)
+      const slotsHaveData = !!slotElements && !!slotElements.length
+        && slotElements.some(elem => elem.tag);
       // show label when prop is set true or a label addition was added via slot
-      return this.showLabel || !!this.$slots['label-addition'];
+      return this.showLabel || slotsHaveData;
     },
     /**
      * determines if remove icon should be shown
