@@ -466,11 +466,3 @@ export default {
   }
 }
 </style>
-
-<style lang="scss">
-@import '../../styles/variables.scss';
-
-.base-search__input-field {
-  height: calc(#{$row-height-large} - 2px);
-}
-</style>

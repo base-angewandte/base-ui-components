@@ -295,7 +295,7 @@ export default {
     },
     fetchAutocomplete(event, filter, index) {
       this.autocompleteIndex = index;
-      this.$emit('fetch-autocomplete', event, index);
+      this.$emit('fetch-autocomplete', { searchString: event, filter, index });
     },
     async search() {
       await this.$emit('search', this.appliedFilters);

@@ -1,30 +1,45 @@
 <template>
   <div id="app">
     <div class="spacer" />
-    <BaseSearch
-      :show-image="true"
-      label="old search" />
+<!--    <BaseAdvancedSearchRow-->
+<!--      :filter-list="filters"-->
+<!--      :is-main-search="true"-->
+<!--      label="testasdfaser" />-->
     <div class="spacer" />
-    <BaseSearch
-      label="new addasldjflsearch"
-      :type="searchType" />
+    <BaseAdvancedSearch
+      :filter-list="filters"
+      :autocomplete-results="resultList"
+      :advanced-search-text="{
+        title: 'A longer longer longer test string',
+        subtext: 'Select a filter',
+        availableOptions: 'Available options',
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
+      }"
+      :autocomplete-property-names="{ collection: 'subset', data: 'data' }"
+      :is-loading-index="autocompleteRequestOngoing"
+      @fetch-autocomplete="fetchAutocomplete" />
     <div class="spacer" />
-    <BaseButton
-      text="text"
-      button-style="row"
-      @clicked="searchType = 'text'" />
-    <BaseButton
-      text="chips"
-      button-style="row"
-      @clicked="searchType = 'chips'" />
-    <BaseButton
-      text="date"
-      button-style="row"
-      @clicked="searchType = 'date'" />
-    <BaseButton
-      text="daterange"
-      button-style="row"
-      @clicked="searchType = 'daterange'" />
+<!--    <BaseAdvancedSearchRow-->
+<!--      :is-main-search="true"-->
+<!--      :filter-list="filters"-->
+<!--      :autocomplete-results="resultList"-->
+<!--      :advanced-search-text="{-->
+<!--        title: 'A longer longer longer test string',-->
+<!--        subtext: 'Select a filter',-->
+<!--        availableOptions: 'Available options',-->
+<!--        addFilter: 'Add filter',-->
+<!--        removeFilter: 'Remove filter',-->
+<!--        selectFilterLabel: 'Select filter',-->
+<!--        searchLabel: 'Search for Entries',-->
+<!--      }"-->
+<!--      :autocomplete-property-names="{ collection: 'subset', data: 'data' }"-->
+<!--      :is-loading="autocompleteRequestOngoing !== -1"-->
+<!--      label="testasdfasdddddd"-->
+<!--      @fetch-autocomplete-results="fetchAutocomplete" />-->
+    <div class="spacer" />
     <BaseChipsInput
       :id="'dropdowntest'"
       :list="list"
@@ -203,21 +218,6 @@
           },
         },
       }" />
-    <BaseAdvancedSearch
-      :filter-list="filters"
-      :autocomplete-results="resultList"
-      :advanced-search-text="{
-        title: 'A longer longer longer test string',
-        subtext: 'Select a filter',
-        availableOptions: 'Available options',
-        addFilter: 'Add filter',
-        removeFilter: 'Remove filter',
-        selectFilterLabel: 'Select filter',
-        searchLabel: 'Search for Entries',
-      }"
-      :autocomplete-property-names="{ collection: 'subset', data: 'data' }"
-      :is-loading-index="autocompleteRequestOngoing"
-      @fetch-autocomplete="fetchAutocomplete" />
   </div>
 </template>
 
@@ -234,12 +234,12 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
 import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput';
 import BaseDropDown from '@/components/BaseDropDown/BaseDropDown';
-import BaseSearch from '@/components/BaseSearch/BaseSearch';
+// import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
 
 export default {
   name: 'App',
   components: {
-    BaseSearch,
+    BaseAdvancedSearch,
     BaseDropDown,
     BaseChipsInputField,
     BaseInput,
@@ -247,7 +247,7 @@ export default {
     BaseDateInput,
     BaseIcon,
     BaseChipsInput,
-    BaseAdvancedSearch,
+    // BaseAdvancedSearch,
     BaseCarousel,
     BaseButton,
   },
@@ -531,6 +531,7 @@ export default {
       this.isLoading = !this.isLoading;
     },
     fetchAutocomplete(searchString, filterIndex) {
+      console.log('fetching');
       this.autocompleteRequestOngoing = filterIndex;
       setTimeout(() => {
         if (searchString) {
@@ -544,6 +545,7 @@ export default {
               data: filteredResults,
             };
           });
+          console.log(this.resultList);
         } else {
           this.resultList = [];
         }
