@@ -42,8 +42,9 @@
         </button>
       </template>
       <template v-slot:pre-input-field>
-        <!-- @slot @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap -->
+        <!-- @slot slot to add elements within the form field but in a row before the actual
+        input field<br>
+        for an example see [BaseInput](#baseinput)-->
         <slot name="pre-input-field" />
       </template>
       <template
@@ -135,8 +136,9 @@
         </div>
       </template>
       <template v-slot:input-field-inline-before>
-        <!-- @slot @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap -->
+        <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap<br>
+        for an example see [BaseInput](#baseinput)-->
         <slot name="input-field-inline-before" />
       </template>
       <template v-slot:input-field-addition-after>
@@ -144,13 +146,11 @@
         <slot name="input-field-addition-after" />
       </template>
       <template v-slot:error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon<br>
-          for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
         <slot name="error-icon" />
       </template>
       <template v-slot:remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements after input (e.g. used to add loader -->
         <slot name="remove-icon" />
       </template>
       <template v-slot:below-input>
@@ -479,14 +479,20 @@ export default {
        * @type {number}
        */
       chipActiveForRemove: -1,
+      /**
+       * variable for internal input handling
+       * @type {string}
+       */
       inputInt: '',
     };
   },
   watch: {
-    // selectedList is watched to also change selectedListInt if necessary
-    // was thinking of making this a computed property however if you do
-    // list manipulations (e.g. push, splice) the setter is not triggered
-    // --> more complicated to inform parent (because sometimes setter triggered sometimes not)
+    /**
+     * selectedList is watched to also change selectedListInt if necessary
+     * was thinking of making this a computed property however if you do
+     * list manipulations (e.g. push, splice) the setter is not triggered
+     * --> more complicated to inform parent (because sometimes setter triggered sometimes not)
+     */
     selectedList: {
       handler(val) {
         // check that new value is not undefined (would throw error with map)
@@ -510,24 +516,47 @@ export default {
       deep: true,
       immediate: true,
     },
+    /**
+     * to have isActive prop in sync
+     * @param {boolean} val - internal input field active value
+     */
     isActiveInt(val) {
+      // check if values are in sync already
       if (val !== this.isActive) {
+        /**
+         * event updating the is-active prop in case of internal changes
+         *
+         * @event update:is-active
+         * @type {boolean}
+         */
         this.$emit('update:is-active', val);
       }
     },
+    /**
+     * watch for outside changes in the input field active state
+     * @param {boolean} val - the prop value set from outside
+     */
     isActive(val) {
+      // check is in sync already
       if (val !== this.isActiveInt) {
         this.isActiveInt = val;
       }
     },
+    /**
+     * also input needs to be synchronized between component and parent (if necessary)
+     */
     input: {
       handler(val) {
+        // check if sync already
         if (val !== this.inputInt) {
           this.inputInt = val;
         }
       },
       immediate: true,
     },
+    /**
+     * watch if input changes internally and emit event if necessary
+     */
     inputInt: {
       handler(val) {
         if (val !== this.input) {

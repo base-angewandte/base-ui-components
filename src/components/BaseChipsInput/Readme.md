@@ -1,4 +1,4 @@
-Simple Single Choice Example with fixed dropdown, no unknown, not editable, not draggable
+Simple Single Choice Example with fixed dropdown, no unknown, not draggable
 
 Additionally to the custom events listed above also all native input events are available.
 ```vue
@@ -30,7 +30,7 @@ export default {
 
 ```
 
-Multiple Entries Example with fixed dropdown, no unknown, editable and draggable
+Multiple Entries Example with fixed dropdown, no unknown and draggable
 
 ```vue
 <template>
@@ -38,7 +38,6 @@ Multiple Entries Example with fixed dropdown, no unknown, editable and draggable
     :list="list"
     :always-linked="true"
     :draggable="true"
-    :chips-editable="true"
     label="Multipe Choice with fixed DropDown"
     placeholder="Select Quote Snippet"
     />

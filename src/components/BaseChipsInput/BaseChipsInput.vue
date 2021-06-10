@@ -629,21 +629,6 @@ export default {
         this.calcDropDownMinWidth();
         // reset the active option index to first item
         this.activeOptionIndex = 0;
-        /**
-         * event triggered on show drop down
-         *
-         * @event show-dropdown
-         *
-         */
-        this.$emit('show-dropdown');
-      } else {
-        /**
-         * event triggered on hide drop down
-         *
-         * @event hide-dropdown
-         *
-         */
-        this.$emit('hide-dropdown');
       }
     },
   },
