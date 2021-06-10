@@ -42,10 +42,18 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
       @click-input-field="inputActive = true"
       @clicked-outside="inputActive = false">
       <template v-slot:label-addition>
-        <div>Add elements here</div>
+        <div>label-addition</div>
+      </template>
+      <template v-slot:pre-input-field>
+        <div class="pre-input-field">
+          pre-input-field
+        </div>
       </template>
       <template v-slot:input-field-addition-before>
-        <span class="input-field-addition-before">Or here</span>
+        <span class="input-field-addition-before">input-field-addition-before</span>
+      </template>
+      <template v-slot:input-field-inline-before>
+        <span class="input-field-inline-before">input-field-inline-before</span>
       </template>
       <template v-slot:below-input>
         <div
@@ -206,6 +214,16 @@ export default {
 .input-field-addition-before {
   margin-right: 16px;
   background-color: lightblue;
+}
+
+.input-field-inline-before{
+  background: darkseagreen;
+}
+
+.pre-input-field {
+  background: rosybrown;
+  align-self: center;
+  flex: 1 1 25%;
 }
 
 .drop-down-slot {
