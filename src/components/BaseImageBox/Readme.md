@@ -39,6 +39,39 @@ A variety of possibilities with image box
           class="box"
           description="no overlap with text"/>
     </div>
+    <div class="boxes-background">
+      <base-image-box
+        :selectable="selectActive"
+        :showTitle="false"
+        :image-url="imgUrl"
+        :box-size="{ width: 'calc(25% - 12px)' }"
+        :play-icon="true"
+        title="box with no title"
+        description="play icon & showtitle false"
+        class="box"
+        @select-triggered="handleBoxArray($event, '5')" />
+
+      <base-image-box
+        :selectable="selectActive"
+        :showTitle="false"
+        :box-size="{ width: 'calc(25% - 12px)' }"
+        icon="file-object"
+        title="box with no title, icon"
+        description="icon & showtitle false"
+        class="box"
+        @select-triggered="handleBoxArray($event, '6')" />
+
+      <base-image-box
+        :selectable="selectActive"
+        :showTitle="false"
+        :box-size="{ width: 'calc(25% - 12px)' }"
+        :play-icon="true"
+        icon="audio-object"
+        title="box with no title, icon and play-icon"
+        description="icon, play icon & showtitle false"
+        class="box"
+        @select-triggered="handleBoxArray($event, '7')" />
+    </div>
     <div class="button-area">
       <BaseButton
         text="Toggle Select"
@@ -48,11 +81,11 @@ A variety of possibilities with image box
       {{ 'Selected boxes: ' + selectedBoxes}}
     </div>
   </div>
-
 </template>
 
 <script>
 export default {
+  components: {},
   data() {
     return {
       selectActive: false,

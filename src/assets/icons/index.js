@@ -2,9 +2,13 @@ import addExistingCollection from './add-existing-collection';
 import addExistingObject from './add-existing-object';
 import addNewCollection from './add-new-collection';
 import addNewObject from './add-new-object';
+import archiveArrow from './archive-arrow';
+import archiveEmpty from './archive-empty';
+import archiveSheets from './archive-sheets';
 import arrowLeft from './arrow-left';
 import attachment from './attachment';
 import attention from './attention';
+import audioObject from './audio-object';
 import calendarMany from './calendar-many';
 import calendarNumber from './calendar-number';
 import camera from './camera';
@@ -22,8 +26,10 @@ import duplicate from './duplicate';
 import edit from './edit';
 import eyeHide from './eye-hide';
 import eye from './eye';
+import fileObject from './file-object';
 import forbidden from './forbidden';
 import hide from './hide';
+import imageObject from './image-object';
 import information from './information';
 import licence from './licence';
 import link from './link';
@@ -47,6 +53,7 @@ import sheetPlus from './sheet-plus';
 import sort from './sort';
 import success from './success';
 import text from './text';
+import videoObject from './video-object';
 import wasteBin from './waste-bin';
 
 export default {
@@ -54,9 +61,13 @@ export default {
   addExistingObject,
   addNewCollection,
   addNewObject,
+  archiveArrow,
+  archiveEmpty,
+  archiveSheets,
   arrowLeft,
   attachment,
   attention,
+  audioObject,
   calendarMany,
   calendarNumber,
   camera,
@@ -74,8 +85,10 @@ export default {
   edit,
   eyeHide,
   eye,
+  fileObject,
   forbidden,
   hide,
+  imageObject,
   information,
   licence,
   link,
@@ -99,5 +112,6 @@ export default {
   sort,
   success,
   text,
+  videoObject,
   wasteBin,
 };
