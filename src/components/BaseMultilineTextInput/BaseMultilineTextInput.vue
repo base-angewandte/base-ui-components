@@ -255,12 +255,10 @@ export default {
         ...{
           input: () => {
             /**
-             * Event emitted on input, passing input string
+             * Event emitted on input, passing input string or input object
              *
              * @event input
-             * @param {string|Object} - the input event value however
-             * passing only the event.target.value
-             *
+             * @type {string | Object}
              */
             this.$emit('input', this.emitFieldContent());
           },

@@ -665,7 +665,7 @@ export default {
            * (relevant if `draggable` is set true)
            *
            * @event entries-changed
-           * @param {Object[]} - the updated list of entries
+           * @param {Object[]} val - the updated list of entries
            */
           this.$emit('entries-changed', val);
         }
@@ -690,7 +690,7 @@ export default {
          *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          *
          * @event update:selected-list
-         * @param {Array} - the list of selected entry ids
+         * @param {Array} val - the list of selected entry ids
          */
         this.$emit('update:selected-list', val);
       }
@@ -730,7 +730,7 @@ export default {
          * event emitted on expand toggle<br>
          *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          * @event update:expanded
-         * @param { Boolean } - true if list is expanded
+         * @param { Boolean } val - true if list is expanded
          */
         this.$emit('update:expanded', val);
       }
@@ -746,7 +746,7 @@ export default {
          *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          *
          * @event update:edit-mode
-         * @param {Boolean} - flag for edit mode active
+         * @param {Boolean} val - flag for edit mode active
          */
         this.$emit('update:edit-mode', val);
       }
@@ -864,7 +864,7 @@ export default {
        * event triggered when an action is triggered (after selecting boxes)
        *
        * @event submit-action
-       * @param {string} - the action type
+       * @param {string} action - the action type
        */
       this.$emit('submit-action', action);
     },
@@ -954,7 +954,7 @@ export default {
          * emitted when pagination is used and page number was changed
          *
          * @event update:current-page-number
-         * @param {number} - the new page number
+         * @param {number} number - the new page number
          */
         this.$emit('update:current-page-number', number);
       }
@@ -970,7 +970,7 @@ export default {
       /**
        * event emitted from default image box when clicked
        * @event entry-clicked
-       * @param {Object} - an object with the following properties:
+       * @param {Object} object - an object with the following properties:
        * @property {string} entryId - the id of the clicked entry
        * the select mode was not active but the box was clicked
        */
