@@ -22,10 +22,18 @@
       <base-button
         v-if="!edit"
         :has-background-color="false"
-        icon="edit"
+        :icon="!isLoading ? 'edit' : ''"
         :text="getI18nTerm(editButtonText)"
         class="base-edit-control__button"
-        @clicked="activate" />
+        @clicked="activate">
+        <template
+          v-if="isLoading"
+          slot="left-of-text">
+          <span class="base-edit-control__loader">
+            <BaseLoader />
+          </span>
+        </template>
+      </base-button>
 
       <base-button
         v-if="edit"
@@ -38,22 +46,32 @@
       <base-button
         v-if="edit"
         :has-background-color="false"
-        icon="save-file"
+        :icon="!isLoading ? 'save-file' : ''"
         :text="getI18nTerm(saveButtonText)"
         class="base-edit-control__button"
-        @clicked="save" />
+        @clicked="save">
+        <template
+          v-if="isLoading"
+          slot="left-of-text">
+          <span class="base-edit-control__loader">
+            <BaseLoader />
+          </span>
+        </template>
+      </base-button>
     </div>
   </div>
 </template>
 
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton';
+import BaseLoader from '@/components/BaseLoader/BaseLoader';
 import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseEditControl',
   components: {
     BaseButton,
+    BaseLoader,
   },
   mixins: [
     i18n,
@@ -70,6 +88,13 @@ export default {
      * set edit mode
      */
     edit: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * flag to set if loader should be shown (for autocomplete requests
+     */
+    isLoading: {
       type: Boolean,
       default: false,
     },
@@ -183,6 +208,16 @@ export default {
         padding-right: 0;
         transition-property: color;
       }
+    }
+
+    &__loader {
+      position: relative;
+      margin-right: $spacing;
+      transform: scale(0.45);
+      /* adjusted for 'save-file' icon */
+      top: 2px;
+      height: 12px;
+      width: 12px;
     }
   }
 </style>
