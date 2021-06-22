@@ -3,9 +3,9 @@
     :class="[
       'base-text-list',
       {
-        'base-text-list-2-cols': cols2Int && data.length > 1,
-        'base-test-list-2-cols-single-content':
-          cols2Int && data.length === 1 && typeof data[0].data === 'string' }]">
+        'base-text-list-2-cols': cols2,
+        'base-text-list-2-cols-single-content':
+          cols2 && data.length === 1 && typeof data[0].data === 'string' }]">
     <div
       v-for="(item, index) in data"
       :key="index"
@@ -108,7 +108,7 @@ export default {
       default: 'div',
     },
     /**
-     * set usage of margin-bottom for the label<br>
+     * set margin-bottom for the label
      */
     labelMarginBottom: {
       type: Boolean,
@@ -122,37 +122,14 @@ export default {
       default: false,
     },
     /**
-     * define box width, when content is rendered in two columns<br>
-     * note: property 'cols2' has to be true
+     * set box height to auto
      */
-    cols2Breakpoint: {
-      type: Number,
-      default: 600,
+    autoHeight: {
+      type: Boolean,
+      default: false,
     },
-  },
-  data() {
-    return {
-      cols2Int: false,
-    };
-  },
-  mounted() {
-    if (this.cols2) {
-      this.boxResize().observe(this.$el);
-    }
   },
   methods: {
-    /**
-     * check if box size changes and set cols2Int
-     */
-    boxResize() {
-      return new ResizeObserver((entries) => {
-        if (entries[0].contentRect.width >= this.cols2Breakpoint) {
-          this.cols2Int = true;
-          return;
-        }
-        this.cols2Int = false;
-      });
-    },
     useRouterLink(url) {
       const pattern = /^(.*?):/;
       return !!this.$route && url.match(pattern) == null;
@@ -181,6 +158,7 @@ export default {
 
     .base-text-list-group {
       page-break-inside: avoid;
+      break-inside: avoid;
 
       &:first-of-type {
         .base-text-list-label {
@@ -193,7 +171,7 @@ export default {
         margin-bottom: 0;
 
         &.base-text-list-label-mb {
-          margin-bottom: $line-height;
+          margin-bottom: $spacing;
         }
       }
 
@@ -218,6 +196,7 @@ export default {
 
       .base-text-list-content-pre-line {
         white-space: pre-line;
+        break-inside: avoid;
       }
 
       .base-text-list__content-list-item {
@@ -231,7 +210,7 @@ export default {
       }
     }
 
-    &.base-test-list-2-cols-single-content {
+    &.base-text-list-2-cols-single-content {
       display: flex;
       height: calc(100% - #{$line-height});
     }
