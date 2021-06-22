@@ -6,11 +6,12 @@
     :class="[
       'base-expand-box',
       'base-expand-box-padding-' + padding,
+      { 'base-expand-box-auto-height': autoHeight },
       { 'base-expand-box-open': expandInt },]">
     <div
       :class="[
         'base-expand-box-content',
-        {'base-expand-box-content-fade-out': (!initialized ||!expandInt && showButton)}]">
+        { 'base-expand-box-content-fade-out': (!initialized ||!expandInt && showButton) }]">
       <div
         class="base-expand-box-content-inner">
         <!-- div is needed for calculation of content height -->
@@ -92,6 +93,10 @@ export default {
     showLessText: {
       type: String,
       default: 'Show less',
+    },
+    autoHeight: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -199,11 +204,18 @@ export default {
       padding: $spacing-large;
     }
 
+    &.base-expand-box-auto-height:not(.base-expand-box-open) .base-expand-box-content {
+      max-height: $line-height * $base-expand-box-text-rows + $headline-margin-bottom;
+    }
+
+    &:not(.base-expand-box-auto-height) .base-expand-box-content {
+      height: $line-height * $base-expand-box-text-rows + $headline-margin-bottom;
+    }
+
     .base-expand-box-content {
       position: relative;
       overflow: hidden;
       line-height: $line-height;
-      height: $line-height * $base-expand-box-text-rows + $headline-margin-bottom;
 
       &.base-expand-box-content-fade-out::after {
         content: '';
