@@ -1,3 +1,5 @@
+import archiveArrow from './archive-arrow';
+import archiveSheets from './archive-sheets';
 import arrowLeft from './arrow-left';
 import attachment from './attachment';
 import attention from './attention';
@@ -38,6 +40,8 @@ import text from './text';
 import wasteBin from './waste-bin';
 
 export default {
+  archiveArrow,
+  archiveSheets,
   arrowLeft,
   attachment,
   attention,

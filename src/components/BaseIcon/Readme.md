@@ -4,6 +4,16 @@ Available icons:
 <div style="display: flex; flex-wrap: wrap">
   <BaseIcon
     style="height: 24px; margin: 8px;"
+    name="archive-arrow"
+    title="archive-arrow"
+  />
+  <BaseIcon
+    style="height: 24px; margin: 8px;"
+    name="archive-sheets"
+    title="archive-sheets"
+  />
+  <BaseIcon
+    style="height: 24px; margin: 8px;"
     name="arrow-left"
     title="arrow-left"
   />
