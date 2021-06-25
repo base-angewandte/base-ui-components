@@ -169,7 +169,7 @@
         </slot>
         <!-- EXPAND BUTTON -->
         <BaseBoxButton
-          v-else-if="useExpandMode && !editModeActive && expandNeeded"
+          v-else-if="useExpandMode && !editModeActive && expandNeeded && initialBoxCalcDone"
           :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
           icon=""
           text=""
