@@ -530,22 +530,20 @@ export default {
       this.invalid = !this.invalid;
       this.isLoading = !this.isLoading;
     },
-    fetchAutocomplete(searchString, filterIndex) {
+    fetchAutocomplete({ searchString, index }) {
       console.log('fetching');
-      this.autocompleteRequestOngoing = filterIndex;
+      console.log(searchString);
+      this.autocompleteRequestOngoing = index;
       setTimeout(() => {
         if (searchString) {
           this.resultList = this.resultListOriginal.map(({ subset, data }) => {
             const filteredResults = data
-              .filter(entry => entry.title.toLowerCase()
-                .includes(searchString.toLowerCase()));
-            console.log(filteredResults);
+              .filter(entry => entry.title.toLowerCase().includes(searchString.toLowerCase()));
             return {
               subset,
               data: filteredResults,
             };
           });
-          console.log(this.resultList);
         } else {
           this.resultList = [];
         }

@@ -26,6 +26,7 @@
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template v-slot:pre-input-field>
         <BaseChipsInputField
+          v-if="!(isMainSearch && filter.label === defaultFilter.label)"
           :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
@@ -71,6 +72,7 @@
           v-if="isMainSearch"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
+          @keydown.tab="onTab"
           @click.stop.prevent="addFilter">
           <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
@@ -81,6 +83,7 @@
           v-else
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
+          @keydown.tab="onTab"
           @click.stop.prevent="removeFilter">
           <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
@@ -558,8 +561,21 @@ export default {
       activeEntry: null,
       /**
        * to control if search field is active (and drop down shown)
+       * @type {boolean}
        */
       isActive: false,
+      /**
+       * store the current filter type to recognize when it changes and only take
+       * action e.g. on focusing input field, after it was rendered
+       * @type {string}
+       */
+      currentFilterType: this.appliedFilter.type,
+      /**
+       * the search input element stored in a variable so it can easily be focused again after
+       * option selection
+       * @type {?HTMLElement}
+       */
+      searchInputElement: null,
     };
   },
   computed: {
@@ -696,7 +712,6 @@ export default {
         if (val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
           this.currentInput = '';
         }
-
         // also propagate change to parent if necessary
         if (val && JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
           this.$emit('update:applied-filter', { ...val });
@@ -766,8 +781,19 @@ export default {
     // render and recalculate on resize
     this.calcColNumber();
     window.addEventListener('resize', this.calcColNumber);
+    this.getSearchInputElement();
   },
   updated() {
+    // check if the filter type changed and thus a new input field needed to be rendered
+    if (this.filter.type !== this.currentFilterType) {
+      this.getSearchInputElement();
+      // run focus function
+      this.searchInputElement.focus();
+
+      // update the filter type to the new type
+      this.currentFilterType = this.filter.type;
+    }
+
     // if the filterBox element exists add
     // the listener
     if (this.$refs.filterBox) {
@@ -835,11 +861,9 @@ export default {
          */
         this.$emit('update:applied-filter', this.filter);
         this.activeFilter = null;
-        // delay focus in case type is different and new component needs to be
-        // rendered first
-        // TODO: hopefully obsolete with new approach
-        // this.$nextTick(() => this.focusInputField());
       }
+      // in either case - focus on input field again after click on filter
+      this.searchInputElement.focus();
     },
     /**
      * @param {KeyboardEvent} event - keyboard event bubbled from
@@ -880,7 +904,8 @@ export default {
       // reset everything
       this.resetAllInput();
       // return focus to input field after select
-      // this.focusInputField();
+      this.searchInputElement.focus();
+      // this.focusSearchInput();
     },
     /**
      * function triggered on BaseSearch keyboard enter. Will add the currently active option or
@@ -1095,6 +1120,29 @@ export default {
         // show fade out right as soon as scroll position is different from maximum position
         right: scrollPosition !== scrollMax,
       };
+    },
+    /**
+     * function called on tab keydown on row 'x' or '+' icon
+     * @param {KeyboardEvent} event - the keydown event
+     */
+    onTab(event) {
+      // check if shift key was pressed on tab keydown (only if not the focus leaves the row)
+      if (!event.shiftKey) {
+        // if no - set row active to false
+        this.isActive = false;
+      }
+    },
+    /**
+     * function to get the current search input element
+     */
+    getSearchInputElement() {
+      // get input elements
+      const inputElements = this.$el.getElementsByTagName('input');
+      // check if input elements were found
+      if (inputElements && inputElements.length) {
+        // if yes - transform HTMLElement list to Array and find the search input element
+        this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input'));
+      }
     },
   },
 };
