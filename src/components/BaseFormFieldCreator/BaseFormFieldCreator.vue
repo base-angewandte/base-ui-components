@@ -142,7 +142,7 @@
       <div
         v-if="field['x-attrs'] && field['x-attrs'].show_label"
         class="base-form-field-creator__field-array-label">
-        {{ getI18nTerm('form.' + field.name) + ':' }}
+        {{ `${labelInt}:` }}
       </div>
       <div
         :key="fieldKey"
