@@ -917,6 +917,7 @@ export default {
     .base-date-input__field-wrapper {
       display: flex;
       align-items: center;
+      width: 100%;
 
       .base-date-input__input-wrapper {
 

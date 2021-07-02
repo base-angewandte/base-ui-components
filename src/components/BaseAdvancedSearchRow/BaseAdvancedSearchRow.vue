@@ -569,7 +569,7 @@ export default {
        * action e.g. on focusing input field, after it was rendered
        * @type {string}
        */
-      currentFilterType: this.appliedFilter.type,
+      currentFilterType: this.appliedFilter ? this.appliedFilter.type : this.defaultFilter.type,
       /**
        * the search input element stored in a variable so it can easily be focused again after
        * option selection
@@ -1188,7 +1188,7 @@ export default {
       display: flex;
       height: 100%;
       padding: $spacing;
-      margin-right: -$spacing-small;
+      margin-right: -$spacing;
       cursor: pointer;
 
       &:active, &:focus {
@@ -1197,7 +1197,7 @@ export default {
       }
 
       &.base-advanced-search-row__icon-button__date {
-        margin-right: 0;
+        margin-right: -$spacing-small;
       }
 
       .base-advanced-search-row__search-row-icon {
