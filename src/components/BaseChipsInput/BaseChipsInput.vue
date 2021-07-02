@@ -718,3 +718,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.base-chips-input {
+  position: relative;
+}
+</style>
