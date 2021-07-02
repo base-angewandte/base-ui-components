@@ -111,7 +111,6 @@ export default {
 
   .base-switch-buttons {
     clear: both;
-    display: inline-block;
     position: relative;
     line-height: $row-height-small;
   }
