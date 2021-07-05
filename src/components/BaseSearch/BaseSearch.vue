@@ -32,8 +32,9 @@
     <template v-slot:input-field-inline-before>
       <!-- @slot a slot to exchange the magnifier icon with other elements -->
       <slot name="input-field-inline-before" />
-      <div :class="[dateFieldType && showPreInputIcon
-        ? 'base-search__spacing-date' : 'base-search__spacing']" />
+      <div
+        :class="[dateFieldType && showPreInputIcon
+          ? 'base-search__spacing-date' : 'base-search__spacing']" />
       <BaseIcon
         v-if="showPreInputIcon"
         name="magnifier"
@@ -45,7 +46,7 @@
       <!-- @slot for adding elements after input <br>
       for an example see [BaseChipsInputField](#basechipsinputfield)-->
       <slot name="input-field-addition-after" />
-      <div class="base-search__spacing"/>
+      <div class="base-search__spacing" />
     </template>
     <template v-slot:error-icon>
       <!-- @slot use a custom icon instead of standard error/warning icon<br>

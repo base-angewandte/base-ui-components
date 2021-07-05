@@ -25,15 +25,7 @@
       :filter-list="filterList"
       :default-filter="defaultFilter"
       :autocomplete-results="filtersAutocompleteResults[0]"
-      :advanced-search-text="{
-        title: 'A longer longer longer test string',
-        subtext: 'Select a filter',
-        availableOptions: 'Available options',
-        addFilter: 'Add filter',
-        removeFilter: 'Remove filter',
-        selectFilterLabel: 'Select filter',
-        searchLabel: 'Search for Entries',
-      }"
+      :advanced-search-text="advancedSearchText"
       :is-loading="filtersLoadingState[0]"
       :autocomplete-property-names="autocompletePropertyNames"
       @add-filter="addFilter"
