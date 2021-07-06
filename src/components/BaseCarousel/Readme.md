@@ -5,11 +5,10 @@ Base Carousel
     <BaseCarousel
       :items="items"
       :swiper-options="{
-       slidesPerView: 2,
-       slidesPerGroup: 2,
+       slidesPerView: 1,
+       slidesPerGroup: 1,
        spaceBetween: 15,
        autoplay: false,
-       autoPlayDelay: 5000,
        loop: true,
        speed: 750,
        keyboard: {
@@ -20,6 +19,10 @@ Base Carousel
          clickable: true,
        },
        breakpoints: {
+         640: {
+           slidesPerView: 2,
+           slidesPerGroup: 2,
+         },
          1024: {
            slidesPerView: 3,
            slidesPerGroup: 3,
@@ -37,7 +40,7 @@ export default {
     return {
       items: [
         {
-          uid: '1',
+          id: '1',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 1',
@@ -57,7 +60,7 @@ export default {
           ],
         },
         {
-          uid: '2',
+          id: '2',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 2',
@@ -77,7 +80,7 @@ export default {
           ],
         },
         {
-          uid: '3',
+          id: '3',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 3',
@@ -97,7 +100,7 @@ export default {
           ],
         },
         {
-          uid: '4',
+          id: '4',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 4',
@@ -117,7 +120,7 @@ export default {
           ],
         },
         {
-          uid: '5',
+          id: '5',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung',
@@ -137,7 +140,7 @@ export default {
           ],
         },
         {
-          uid: '6',
+          id: '6',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung',

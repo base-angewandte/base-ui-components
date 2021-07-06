@@ -2,7 +2,10 @@
   <compontent
     :is="boxType"
     :style="boxSize"
-    :class="['base-box', 'base-box-' + $props.boxRatio, {'base-box-hover': boxHover && !disabled}]"
+    :class="['base-box',
+             'base-box-' + $props.boxRatio,
+             'base-box-shadow-' + boxShadowSize,
+             { 'base-box-hover': boxHover && !disabled }]"
     :disabled="disabled"
     :type="(boxType === 'button') ? 'button' : ''"
     @click="clicked">
@@ -49,6 +52,14 @@ export default {
       default: true,
     },
     /**
+     *  set boxShadow size
+     */
+    boxShadowSize: {
+      type: String,
+      default: 'small',
+      validator: val => ['small', 'large'].includes(val),
+    },
+    /**
      * set disabled attribute (e.g. for button elements)
      */
     disabled: {
@@ -74,8 +85,6 @@ export default {
 
   .base-box {
     background: white;
-    box-shadow: $box-shadow-reg;
-    transition: $box-transition;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -101,6 +110,15 @@ export default {
 
     &:disabled {
       box-shadow: none;
+    }
+
+    &-shadow-small {
+      box-shadow: $box-shadow-reg;
+      transition: $box-transition;
+    }
+
+    &-shadow-large {
+      box-shadow: $box-shadow-edit;
     }
   }
 </style>

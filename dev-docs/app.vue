@@ -512,6 +512,18 @@ export default {
     };
   },
   computed: {
+    multiline: {
+      get() {
+        return this.langTab === 'English' ? this.multilineInputObj[0].value : this.multilineInputObj[1].value;
+      },
+      set(event) {
+        if (event.tab === 'English') {
+          this.$set(this.multilineInputObj[0], 'value', event.val);
+        } else {
+          this.$set(this.multilineInputObj[1], 'value', event.val);
+        }
+      },
+    },
   },
   watch: {
     selectedFilter(val) {
@@ -575,16 +587,35 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "../src/styles/variables";
+@import "../src/styles/variables";
 
-  .dropdown-extended {
-    border-top: $separation-line;
-    padding: $spacing;
+.base-advanced-search {
+  margin-top: 32px;
+}
 
-    .show-more-toggle {
-      color: $app-color;
-    }
+.activity-showcase {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activity-showcase__header {
+  font-size: $font-size-regular;
+  margin: 0 0 0 $spacing;
+}
+
+.activity-showcase-after {
+  display: flex;
+}
+
+.dropdown-extended {
+  border-top: $separation-line;
+  padding: $spacing;
+
+  .show-more-toggle {
+    color: $app-color;
   }
+}
 
   .canvas {
     padding: 16px;
