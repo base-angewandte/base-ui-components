@@ -712,10 +712,8 @@ export default {
         if (val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
           this.currentInput = '';
         }
-        // also propagate change to parent if necessary
-        if (val && JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
-          this.$emit('update:applied-filter', { ...val });
-        }
+        // also inform parent of changes
+        this.$emit('update:applied-filter', { ...val });
       },
       deep: true,
       immediate: true,
