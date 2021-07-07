@@ -12,6 +12,7 @@
       :type="filter.type === 'text' ? 'chips' : filter.type"
       :selected-chips.sync="selectedOptions"
       :is-loading="isLoading"
+      :placeholder="placeholder"
       :drop-down-list-id="'autocomplete-options-' + internalRowId"
       :language="language"
       :identifier-property-name="filter.type === 'text'? identifierPropertyName.autocompleteOption
@@ -345,7 +346,9 @@ export default {
      *      labelPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
-     *      vocabulary options
+     *      vocabulary options<br>
+     *    <b>values</b> {Object[]|string[]|Object} - the values selected - object for date
+     *    or array of objects or strings for type 'text' and type 'chips'
      */
     defaultFilter: {
       type: Object,
@@ -353,6 +356,7 @@ export default {
         label: 'Fulltext',
         type: 'text',
         options: [],
+        values: [],
       }),
       validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
     },
@@ -448,6 +452,13 @@ export default {
       validator: val => ['collection', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
+     * add a place holder for the search input
+     */
+    placeholder: {
+      type: String,
+      default: 'Search and discover',
+    },
+    /**
      * specify informational texts for the component - this needs to be an object with the following
      * properties (if you dont want to display any text leave an empty string:  <br>
      *   <br>
@@ -522,9 +533,9 @@ export default {
        * @property {*[]} [Filter.values]
        * @property {Object[]} [Filter.options]
        */
-      filter: { ...this.defaultFilter },
+      filter: null,
       /**
-       * the currently active filter
+       * the currently active (selected by key navigation) filter
        * @type {?Object}
        */
       activeFilter: null,
@@ -589,12 +600,13 @@ export default {
     /**
      * v-model of BaseChipsInputField provides an array of selected options - do
      * conversion to object and array respectively with this computed variable
+     * (this is triggered when deleting the selected filter)
      */
     selectedFilter: {
       set(val) {
         // check if filter was selected - else use the default filter
         this.filter = val.length ? val.pop()
-          : { ...this.defaultFilter };
+          : { ...this.defaultFilter, values: [] };
       },
       get() {
         // return current filter object as array
@@ -709,14 +721,13 @@ export default {
       handler(val, old) {
         // when a filter type changes set current input according to filter type
         // (empty string or date object)
-        if (val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
+        if (!val || val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
           this.currentInput = '';
         }
         // also inform parent of changes
-        this.$emit('update:applied-filter', { ...val });
+        this.$emit('update:applied-filter', val);
       },
       deep: true,
-      immediate: true,
     },
     /**
      * watch if applied filter changes from outside
@@ -725,7 +736,7 @@ export default {
       handler(val) {
         // check if anything actually changed
         if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
-          this.filter = { ...val };
+          this.filter = val;
           // check if the new filter has values
           if (val.values) {
             // distinguish between date and others to assign to correct variable
@@ -774,6 +785,9 @@ export default {
       }
     },
   },
+  created() {
+    this.filter = this.appliedFilter || { ...this.defaultFilter, values: [] };
+  },
   mounted() {
     // calculate the number of columns shown for filters and chips options on
     // render and recalculate on resize
@@ -821,7 +835,8 @@ export default {
       // reset everything
       this.resetAllInput();
       // reset filter
-      this.filter = { ...this.defaultFilter };
+      // add values separately so this does not remain linked
+      this.filter = { ...this.defaultFilter, values: [] };
     },
     removeFilter() {
       /**
@@ -847,10 +862,8 @@ export default {
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
-        this.filter = { ...selectedFilter,
-          ...{
-            values: this.setFilterValues(selectedFilter.type, this.filter.values),
-          } };
+        this.filter = { ...selectedFilter };
+        this.$set(this.filter, 'values', this.setFilterValues(selectedFilter.type, this.filter.values));
         /**
          * event emitted when the applied filter changes<br>
          *   (possible to use .sync modifier on prop appliedFilter)
@@ -903,7 +916,6 @@ export default {
       this.resetAllInput();
       // return focus to input field after select
       this.searchInputElement.focus();
-      // this.focusSearchInput();
     },
     /**
      * function triggered on BaseSearch keyboard enter. Will add the currently active option or
@@ -1060,9 +1072,8 @@ export default {
      *
      * @param {string} type - the filter type
      * @param {?string|Array|Object} [val=null] - the values already present in a filter
-     * to set (otherwise emtpy values (null, [], { date: '' },
+     * to set (otherwise emtpy values (null, [], '',
      * { date_from: '', date_to: ''}) will be used)
-     * @param {string} [val.date] - for filter type 'date'
      * @param {string} [val.date_from] - for filter type 'daterange' - from value
      * @param {string} [val.date_to] - for filter type 'daterange' - to value
      * @returns {?string|Array|Object} the correct value type for the filter type
@@ -1070,13 +1081,13 @@ export default {
     setFilterValues(type, val = null) {
       if (type === 'date') {
         // map the date from daterange to date if necessary
-        return { date: val && (val.date || val.date_from || val.date_to)
-          ? val.date || val.date_from || val.date_to : '' };
+        return val && (val.date_from || val.date_to)
+          ? val.date_from || val.date_to : '';
       }
       if (type === 'daterange') {
         return {
           // map the date from date to date range if necessary!
-          date_from: val && (val.date || val.date_from) ? val.date_from || val.date : '',
+          date_from: (val && val.date_from) || val ? val.date_from || val : '',
           date_to: val ? val.date_to : '',
         };
       }
