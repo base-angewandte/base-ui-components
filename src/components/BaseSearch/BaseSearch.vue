@@ -15,32 +15,35 @@
     :is-loading="isLoading"
     :clearable="clearable"
     :invalid="invalid"
-    :error-message="errorMessage"
     :show-error-icon="showErrorIcon"
     :language="languageInt"
     :allow-unknown-entries="isFieldTypeChips"
     :label-property-name="isFieldTypeChips ? labelPropertyName : false"
     :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
     :set-focus-on-active="setFocusOnActive"
+    :add-selected-entry-directly="true"
     input-class="base-search__input-field"
     field-type="search"
     class="base-search__input"
     v-on="$listeners">
     <template v-slot:pre-input-field>
+      <!-- @slot add elements within search but before all other elements <br>
+        for an example see [BaseInput](#baseinput) -->
       <slot name="pre-input-field" />
     </template>
     <template v-slot:input-field-inline-before>
-      <!-- @slot a slot to exchange the magnifier icon with other elements -->
-      <slot name="input-field-inline-before" />
       <div
         :class="[dateFieldType && showPreInputIcon
           ? 'base-search__spacing-date' : 'base-search__spacing']" />
-      <BaseIcon
-        v-if="showPreInputIcon"
-        name="magnifier"
-        :class="['base-search__magnifier-icon',
-                 { 'base-search__magnifier-icon__date': !!dateFieldType },
-                 { 'base-search__magnifier-icon__active': isActiveInt }]" />
+      <!-- @slot a slot to exchange the magnifier icon with other elements -->
+      <slot name="input-field-inline-before">
+        <BaseIcon
+          v-if="showPreInputIcon"
+          name="magnifier"
+          :class="['base-search__magnifier-icon',
+                   { 'base-search__magnifier-icon__date': !!dateFieldType },
+                   { 'base-search__magnifier-icon__active': isActiveInt }]" />
+      </slot>
     </template>
     <template v-slot:input-field-addition-after>
       <!-- @slot for adding elements after input <br>
@@ -176,14 +179,16 @@ export default {
       validator: val => !val || val.length === 2,
     },
     /**
-     * specify the object property that should be used as identifier
+     * specify the object property that should be used as identifier (only needed
+     * for type 'chips'
      */
     identifierPropertyName: {
       type: String,
       default: 'id',
     },
     /**
-     * specify the object property that should be used as value to be displayed
+     * specify the object property that should be used as value to be displayed (only needed
+     * for type 'chips'
      */
     labelPropertyName: {
       type: String,
@@ -197,14 +202,6 @@ export default {
     invalid: {
       type: Boolean,
       default: false,
-    },
-    /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
-     */
-    errorMessage: {
-      type: String,
-      default: '',
     },
     /**
      * define if error icon should be shown<br>
