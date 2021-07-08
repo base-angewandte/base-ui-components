@@ -294,6 +294,12 @@ export default {
       set(val) {
         if (this.type === 'date') {
           this.dateInputInt = val;
+          /**
+           * inform parent of changed input values (v-model)
+           *
+           * @event input
+           * @type {(string|Object)}
+           */
           this.$emit('input', this.dateInputInt);
         } else if (this.type === 'daterange') {
           this.dateInputInt = { ...val };
@@ -412,6 +418,12 @@ export default {
      */
     selectedChipsInt(val) {
       if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
+        /**
+         * inform parent of changes in selected chips
+         *
+         * @event update:selected-chips
+         * @type {Array}
+         */
         this.$emit('update:selected-chips', val);
       }
     },
@@ -431,6 +443,12 @@ export default {
      */
     isActiveInt(val) {
       if (val !== this.isActive) {
+        /**
+         * to keep active state of component in sync
+         *
+         * @event update:is-active
+         * @type {boolean}
+         */
         this.$emit('update:is-active', val);
       }
     },

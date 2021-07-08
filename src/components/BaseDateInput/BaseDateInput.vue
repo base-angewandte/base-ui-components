@@ -85,7 +85,7 @@
                   :class="['base-date-input__input', inputClass]"
                   autocomplete="off"
                   @keydown.tab="handleTabKey($event,'from')"
-                  v-on="$listeners">
+                  v-on="dateInputListeners">
               </template>
               <!-- this empty element is here so that the default icon of datepicker is not used -->
               <template v-slot:icon-calendar>
@@ -157,7 +157,7 @@
                   autocomplete="off"
                   :class="['base-date-input__input', inputClass]"
                   @keydown.tab="handleTabKey($event, 'to')"
-                  v-on="$listeners">
+                  v-on="dateInputListeners">
               </template>
               <!-- this empty element is here so that the default icon of datepicker is not used -->
               <template v-slot:icon-calendar>
@@ -624,6 +624,29 @@ export default {
              */
             this.$emit('update:is-active', this.isActiveInt);
           },
+        },
+      };
+    },
+    /**
+     * compute an object that takes component $listeners and manipulate them for custom
+     * needs
+     * @returns {Object}
+     */
+    dateInputListeners() {
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        input: (event) => {
+          /**
+           * Event emitted on input, passing input string
+           *
+           * @event input
+           * @param {string} value - the input event value however
+           * passing only the event.target.value
+           *
+           */
+          this.$emit('input', event.target.value);
         },
       };
     },
