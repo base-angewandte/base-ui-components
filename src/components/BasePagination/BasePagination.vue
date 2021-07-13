@@ -8,7 +8,7 @@
       @click="active - 1 > 0 ? setActivePage(active - 1) : false">
       <component
         :is="numberElement"
-        :to="getLinkPath(active - 1 > 0 ? active - 1 : 1)"
+        :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : false"
         :aria-disabled="active <= 1"
         :tabindex="active <= 1 ? -1 : 0"
         aria-label="Previous page"
@@ -28,7 +28,7 @@
         @click="setActivePage(1)">
         <component
           :is="numberElement"
-          :to="useLinkElement ? getLinkPath(1) : false"
+          :to="!!useLinkElement ? getLinkPath(1) : false"
           :tabindex="active === 1 ? -1 : 0"
           aria-label="page 1"
           class="base-pagination__number-inner"
@@ -46,7 +46,7 @@
         @click="setActivePage(n)">
         <component
           :is="numberElement"
-          :to="getLinkPath(n)"
+          :to="!!useLinkElement ? getLinkPath(n) : false"
           :tabindex="active === n ? -1 : 0"
           :aria-label="`Page ${n}`"
           class="base-pagination__number-inner"
@@ -63,7 +63,7 @@
         @click="setActivePage(total)">
         <component
           :is="numberElement"
-          :to="getLinkPath(total)"
+          :to="!!useLinkElement ? getLinkPath(total) : false"
           :tabindex="active === total ? -1 : 0"
           :aria-label="`Page ${total}`"
           class="base-pagination__number-inner"
@@ -82,7 +82,7 @@
         @click="setActivePage(n)">
         <component
           :is="numberElement"
-          :to="useLinkElement ? getLinkPath(n) : false"
+          :to="!!useLinkElement ? getLinkPath(n) : false"
           :tabindex="active === n ? -1 : 0"
           :aria-label="`Page ${n}`"
           class="base-pagination__number-inner"
@@ -99,7 +99,7 @@
       @click="active + 1 <= total ? setActivePage(active + 1) : false">
       <component
         :is="numberElement"
-        :to="getLinkPath(active + 1 <= total ? active + 1 : total)"
+        :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : false"
         :aria-disabled="active >= total"
         :tabindex="active >= total ? -1 : 0"
         aria-label="Next Page"
@@ -147,24 +147,65 @@ export default {
       default: 1,
     },
     /**
-     * specify if pagination elements should be links
-     * (this needs vue-router)
+     * specify if pagination elements should be links - specify a vue link element or
+     * set the variable false if element should not be a link
+     * (this needs vue-router)<br>
+     * currently only vue components (like 'router-link' or 'nuxt-link') are supported!
      */
     useLinkElement: {
-      type: Boolean,
-      default: true,
+      type: [String, Boolean],
+      default: false,
+      validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
+    },
+    /**
+     * if pagination elements are link-elements the default href is set as
+     *  '[currentRoute]?page=[currentPage]'. Adding properties here gives the possibility to
+     *  add additional parameters BEFORE the page parameter:<br>
+     *  '[currentRoute]?[customParam1]=[customValue1]
+     *    &[customParam2]=[customValue2]&page=[currentPage]'
+     */
+    additionalLinkQueryParams: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
     return {
+      /**
+       * currently active page number
+       * @type {number}
+       */
       active: this.current,
+      /**
+       * number the displayed pages between '...' should start with
+       * (only relevant if not all numbers can be displayed)
+       * @type {?number}
+       */
       start: null,
+      /**
+       * number the displayed pages between the '...' should end with
+       * (only relevant if not all numbers can be displayed)
+       * @type {?number}
+       */
       end: null,
+      /**
+       * total numbers to be displayed before the '...' depending on the width of the
+       * pagination element (only relevant if not all numbers can be displayed)
+       * @type {number}
+       */
       subsetNumber: 7,
+      /**
+       * max numbers to be displayed
+       * @type {number}
+       */
       maxNumbers: 10,
     };
   },
   computed: {
+    /**
+     * calculate the actual subset page numbers to be displayed
+     * @returns {number[]}
+     */
     subset() {
       // check if subset number would exceed total number of items and start
       // array from total - subsetNumber
@@ -173,12 +214,21 @@ export default {
       return Array.from({ length: this.subsetNumber },
         (v, k) => k + subsetStart);
     },
+    /**
+     * check if element should be displayed as a link element, otherwise make it a <span>
+     * @returns {String|Boolean|string}
+     */
     numberElement() {
-      return this.$route && this.useLinkElement ? 'router-link' : 'span';
+      return this.useLinkElement ? this.useLinkElement : 'span';
     },
   },
   watch: {
+    /**
+     * if active number changes inform parent
+     * @param {number} val - the new page number active
+     */
     active(val) {
+      // check if new number is different from prop value
       if (this.current !== val) {
         /**
          * triggered on page select
@@ -188,23 +238,37 @@ export default {
          */
         this.$emit('set-page', val);
       }
+      // adjust the start and end value accordingly (if not all numbers can be displayed)
       this.setStartEnd();
     },
+    /**
+     * check if parent prop changes
+     * @param {number} val - the page number provided by the parent component
+     */
     current(val) {
       this.active = val;
     },
   },
   mounted() {
+    // initialize the start and end variable in case not all numbers can be displayed
     this.setStartEnd();
+    // add an resize event listener
     window.addEventListener('resize', this.setStartEnd);
   },
   destroyed() {
+    // remove the resize event listener
     window.removeEventListener('resize', this.setStartEnd);
   },
   methods: {
+    /**
+     * depending on with of the parent element of the pagination calculate
+     * how many page numbers can be displayed
+     */
     setStartEnd() {
+      // get parent width
       const parentWidth = this.$parent.$el.clientWidth
         || this.$parent.clientWidth || window.innerWidth;
+      // set the subset and the max number accordingly
       if (parentWidth < 390) {
         this.subsetNumber = 1;
         this.maxNumbers = 5;
@@ -214,19 +278,31 @@ export default {
       } else if (parentWidth < 710) {
         this.subsetNumber = 5;
       }
+      // calc start and end number from the subset number
       this.start = this.active - this.subsetNumber / 2 > 0
         ? this.active - Math.floor(this.subsetNumber / 2) : 1;
       this.end = this.active + this.subsetNumber / 2 < this.total
         ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
     },
+    /**
+     * function to set a new page number active
+     * @param {number} page - the new page number
+     */
     setActivePage(page) {
+      // set internal variable to new page number
       this.active = page;
     },
-    getLinkPath() {
-      // check if router in project and set link path accordingly if yes
-      // TODO: think about adding pagination query to route
-      return this.$route && this.useLinkElement
-        ? { path: this.$route.fullPath } : '';
+    /**
+     * get the correct link in case element is a link element
+     * @param {number} page - the page number of the element in question
+     * @returns {{path: string, query: Object}|string}
+     */
+    getLinkPath(page) {
+      // check if router in project and link element is used and set link path accordingly if yes
+      if (!!this.useLinkElement && this.$route) {
+        return ({ path: this.$route.fullPath, query: { ...this.additionalLinkQueryParams, page } });
+      }
+      return '';
     },
   },
 };
