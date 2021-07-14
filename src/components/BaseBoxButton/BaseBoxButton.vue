@@ -1,7 +1,7 @@
 <template>
   <base-box
     ref="baseBox"
-    :box-type="boxType"
+    :render-element-as="renderElementAs"
     :box-size="boxSize"
     :box-ratio="boxRatio"
     :disabled="disabled"
@@ -76,7 +76,7 @@ export default {
     /**
      * specify the tag of the button
      */
-    boxType: {
+    renderElementAs: {
       type: String,
       default: 'div',
     },

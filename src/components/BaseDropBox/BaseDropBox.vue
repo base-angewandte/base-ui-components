@@ -2,7 +2,7 @@
   <base-box-button
     v-bind="$props"
     :box-ratio="boxRatio"
-    :box-type="boxType"
+    :render-element-as="renderElementAs"
     :disabled="disabled"
     :class="[
       'base-drop-box',
@@ -102,7 +102,7 @@ export default {
     /**
      * specify the tag of the button
      */
-    boxType: {
+    renderElementAs: {
       type: String,
       default: 'div',
     },
