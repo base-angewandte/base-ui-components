@@ -282,7 +282,6 @@ export default {
      * @param {number} page - the new page number
      */
     setActivePage(page) {
-      console.log('trigg');
       // set internal variable to new page number
       this.active = page;
     },
