@@ -212,7 +212,8 @@
         key="pagination"
         :total="pages"
         :current="currentPageNumberInt"
-        :use-link-element="false"
+        :use-link-element="usePaginationLinkElement"
+        :additional-link-query-params="!!usePaginationLinkElement ? { collection: headerText } : {}"
         @set-page="setPage" />
     </div>
   </div>
@@ -483,7 +484,7 @@ export default {
      */
     jumpToTop: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     /**
      * define if the big button box at the end of all attached items should be shown
@@ -537,6 +538,16 @@ export default {
     titlePropertyName: {
       type: String,
       default: 'title',
+    },
+    /**
+     * specify if pagination elements should be a link element - if pagination element should
+     * be a link element - please specify the kind of element (currently only Vue components (e.g.
+     * 'router-link', 'nuxt-link') are supported)
+     */
+    usePaginationLinkElement: {
+      type: [String, Boolean],
+      default: false,
+      validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
     },
   },
   data() {

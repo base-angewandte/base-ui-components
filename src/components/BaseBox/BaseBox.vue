@@ -8,6 +8,7 @@
              { 'base-box-hover': boxHover && !disabled }]"
     :disabled="disabled"
     :type="(renderElementAs === 'button') ? 'button' : ''"
+    v-bind="additionalAttributes"
     @click="clicked">
     <!-- @slot slot for box contents -->
     <slot />
@@ -65,6 +66,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    additionalAttributes: {
+      type: Object,
+      default: () => {},
     },
   },
   methods: {

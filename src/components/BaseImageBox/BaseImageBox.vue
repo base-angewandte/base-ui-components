@@ -1,8 +1,9 @@
 <template>
   <BaseBox
     ref="baseBox"
-    :box-type="boxType"
     :box-size="boxSize"
+    :render-element-as="renderElementAs"
+    :additional-attributes="linkTo ? { to: linkTo } : {}"
     box-ratio="100"
     @clicked="boxSelect">
     <div
@@ -261,13 +262,6 @@ export default {
       default: () => [],
     },
     /**
-     * specify the tag of the box
-     */
-    boxType: {
-      type: String,
-      default: 'div',
-    },
-    /**
      * specify lazy image loading
      */
     lazyload: {
@@ -288,6 +282,24 @@ export default {
     centerHeader: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * define html element that should be rendered
+     */
+    renderElementAs: {
+      type: String,
+      default: 'div',
+    },
+    /**
+     * if element is rendered as vue link component, specify a value for the 'to' attribute
+     * can either be a string or a vue-router Location object (= object with 'path' property
+     * and optional 'params' or 'query' object)<br>
+     * (this needs vue-router)
+     */
+    linkTo: {
+      type: [String, Object],
+      default: '',
+      validator: val => typeof val === 'string' || (val instanceof Object && Object.keys(val).includes('path')),
     },
   },
   data() {

@@ -10,7 +10,6 @@
           :key="index"
           :class="['base-carousel-slide', {'swiper-slide': swiperIsActive}]">
           <BaseImageBox
-            :href="item.href"
             :title="item.title"
             :subtext="subtext(item.subtext)"
             :description="item.description"
@@ -20,8 +19,9 @@
             :lazyload="true"
             :image-first="true"
             :center-header="true"
-            style="margin-right: 0"
-            box-type="a" />
+            :render-element-as="vueRouterAvailable ? renderLinkElementAs : 'div'"
+            :link-to="vueRouterAvailable ? item.href : ''"
+            style="margin-right: 0" />
         </div>
       </div>
 
@@ -87,6 +87,15 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * specify how link element should be rendered - this needs to be a
+     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
+     * is necessary
+     */
+    renderLinkElementAs: {
+      type: String,
+      default: 'router-link',
+    },
   },
   data() {
     return {
@@ -97,6 +106,9 @@ export default {
   computed: {
     boxSize() {
       return this.swiperIsActive ? { height: '400px' } : { 'min-height': '250px', 'max-height': '350px' };
+    },
+    vueRouterAvailable() {
+      return !!this.$router;
     },
   },
   mounted() {
