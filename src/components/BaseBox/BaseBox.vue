@@ -1,13 +1,13 @@
 <template>
   <compontent
-    :is="boxType"
+    :is="renderElementAs"
     :style="boxSize"
     :class="['base-box',
              'base-box-' + $props.boxRatio,
              'base-box-shadow-' + boxShadowSize,
              { 'base-box-hover': boxHover && !disabled }]"
     :disabled="disabled"
-    :type="(boxType === 'button') ? 'button' : ''"
+    :type="(renderElementAs === 'button') ? 'button' : ''"
     @click="clicked">
     <!-- @slot slot for box contents -->
     <slot />
@@ -24,7 +24,7 @@ export default {
     /**
      * specify the tag type of the box
      */
-    boxType: {
+    renderElementAs: {
       type: String,
       default: 'div',
     },
