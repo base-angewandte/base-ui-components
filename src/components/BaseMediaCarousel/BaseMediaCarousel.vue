@@ -219,6 +219,10 @@ export default {
       });
 
       this.swiper.init();
+
+      // calc of slide width is wrong on first initialization using component in ssr
+      // quickfix is to trigger resize after init
+      window.dispatchEvent(new Event('resize'));
     },
     /**
      * pause media on previous slide
@@ -241,7 +245,6 @@ export default {
      */
     escapeEvent(e) {
       if (e.code === 'Escape') {
-        console.log('hide');
         this.hide();
       }
     },
@@ -369,6 +372,10 @@ export default {
     }
 
     &::v-deep {
+      .swiper-container {
+        width: 100%;
+      }
+
       .swiper-button {
         display: block;
         width: $icon-large;
