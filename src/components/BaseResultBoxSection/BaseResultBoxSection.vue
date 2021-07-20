@@ -714,10 +714,13 @@ export default {
       }
     },
     // update internal page number if changed from outside
-    currentPageNumber(val) {
-      if (val !== this.currentPageNumberInt) {
-        this.currentPageNumberInt = val;
-      }
+    currentPageNumber: {
+      handler(val) {
+        if (val !== this.currentPageNumberInt) {
+          this.currentPageNumberInt = val;
+        }
+      },
+      immediate: true,
     },
     // if expanded variable is set from outside change
     // internal variable accordingly
