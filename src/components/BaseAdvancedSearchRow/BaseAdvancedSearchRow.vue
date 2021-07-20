@@ -328,6 +328,9 @@ export default {
      *    <b>label</b> {string} - the label of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      labelPropertyName.filter<br>
+     *    <b>id</b> {string} - the identifier of the filter (displayed
+     *      if not main search) - this prop can be customized by specifying
+     *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options
@@ -344,6 +347,9 @@ export default {
      *    <b>label</b> {string} - the label of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      labelPropertyName.filter<br>
+     *    <b>id</b> {string} - the identifier of the filter (displayed
+     *      if not main search) - this prop can be customized by specifying
+     *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options<br>
@@ -366,6 +372,9 @@ export default {
      *    <b>label</b> {string} - the label of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      labelPropertyName.filter<br>
+     *    <b>id</b> {string} - the identifier of the filter (displayed
+     *      if not main search) - this prop can be customized by specifying
+     *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options
@@ -413,8 +422,7 @@ export default {
     identifierPropertyName: {
       type: [Object, String],
       default: () => ({
-        // TODO: change to default 'id'
-        filter: 'label',
+        filter: 'id',
         autocompleteOption: 'id',
         controlledVocabularyOption: 'id',
       }),
