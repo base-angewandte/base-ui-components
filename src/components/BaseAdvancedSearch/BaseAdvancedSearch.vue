@@ -244,11 +244,12 @@ export default {
     autocompletePropertyNames: {
       type: Object,
       default: () => ({
-        collection: 'collection',
+        label: 'label',
+        id: 'id',
         data: 'data',
       }),
       // check if all the necessary attributes are included in the provided object
-      validator: val => ['collection', 'data'].every(key => Object.keys(val).includes(key)),
+      validator: val => ['id', 'label', 'data'].every(key => Object.keys(val).includes(key)),
     },
   },
   data() {

@@ -98,14 +98,14 @@
         <BaseDropDownList
           v-if="isActive"
           :drop-down-options="resultListInt"
-          :active-option="{ [autocompletePropertyNames.collection]: activeCollection }"
+          :active-option="{ [autocompletePropertyNames.id]: activeCollection }"
           :list-id="'autocomplete-options-' + internalRowId"
           :active-styled="false"
           :has-sub-options="true"
           :display-as-drop-down="false"
           :use-custom-option-active-background-color="true"
           :language="language"
-          :identifier-property-name="autocompletePropertyNames.collection"
+          :identifier-property-name="autocompletePropertyNames.id"
           :label-property-name="autocompletePropertyNames.data"
           class="base-advanced-search-row__drop-down-body"
           @click.native.stop="">
@@ -178,7 +178,7 @@
                          'base-advanced-search-row__autocomplete-collection',
                 ]">
                 <div class="base-advanced-search-row__autocomplete-collection-text">
-                  {{ slotProps.option[autocompletePropertyNames.collection] }}
+                  {{ slotProps.option[autocompletePropertyNames.label] }}
                 </div>
               </div>
 
@@ -193,7 +193,7 @@
                 :label-property-name="labelPropertyName.autocompleteOption"
                 class="base-advanced-search-row__autocomplete-options"
                 @update:active-option="setCollection(slotProps
-                  .option[autocompletePropertyNames.collection])"
+                  .option[autocompletePropertyNames.id])"
                 @update:selected-option="addOption" />
             </div>
           </template>
@@ -453,11 +453,12 @@ export default {
     autocompletePropertyNames: {
       type: Object,
       default: () => ({
-        collection: 'collection',
+        label: 'label',
+        id: 'id',
         data: 'data',
       }),
       // check if all the necessary attributes are included in the provided object
-      validator: val => ['collection', 'data'].every(key => Object.keys(val).includes(key)),
+      validator: val => ['label', 'id', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
      * add a place holder for the search input
@@ -685,7 +686,7 @@ export default {
         if (this.filter[this.identifierPropertyName.filter]
           !== this.defaultFilter[this.identifierPropertyName.filter]) {
           resultsToDisplay = resultsToDisplay
-            .filter(section => section[this.autocompletePropertyNames.collection]
+            .filter(section => section[this.autocompletePropertyNames.id]
               === this.filter[this.identifierPropertyName.filter]);
         }
         // filter empty collections
@@ -699,8 +700,10 @@ export default {
           return resultsToDisplay.map(section => ({
             data: section[this.autocompletePropertyNames.data].filter(entry => !selectedOptionIds
               .includes(entry[this.identifierPropertyName.autocompleteOption])),
-            [this.autocompletePropertyNames.collection]:
-              section[this.autocompletePropertyNames.collection],
+            [this.autocompletePropertyNames.id]:
+              section[this.autocompletePropertyNames.id],
+            [this.autocompletePropertyNames.label]:
+              section[this.autocompletePropertyNames.label],
           }));
         }
         return resultsToDisplay;
@@ -716,7 +719,7 @@ export default {
     consolidatedResultList() {
       return this.resultListInt.reduce((prev, curr) => {
         this.$set(prev, curr[this
-          .autocompletePropertyNames.collection], curr[this.autocompletePropertyNames.data]);
+          .autocompletePropertyNames.id], curr[this.autocompletePropertyNames.data]);
         return prev;
       }, {});
     },
@@ -996,11 +999,11 @@ export default {
           // set the first item in array
           if (!this.activeCollection) {
             this.activeCollection = this
-              .resultListInt[0][this.autocompletePropertyNames.collection];
+              .resultListInt[0][this.autocompletePropertyNames.id];
           }
           // get the index of the currently active collection
           const currentCollectionIndex = this.resultListInt
-            .map(section => section[this.autocompletePropertyNames.collection])
+            .map(section => section[this.autocompletePropertyNames.id])
             .indexOf(this.activeCollection);
           let currentCollectionArray = this.consolidatedResultList[this.activeCollection];
           // depending if arrow was up or down set +/- one to add or subtract
@@ -1034,7 +1037,7 @@ export default {
           } else if (isWithinListLimit) {
             // set the new active collection
             this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd][this
-              .autocompletePropertyNames.collection];
+              .autocompletePropertyNames.id];
             currentCollectionArray = this.consolidatedResultList[this.activeCollection];
             // define which element in the newly active collection should appear active
             // if collection select or arrow up - first one otherwise last
@@ -1046,7 +1049,7 @@ export default {
           } else if (!isWithinListLimit && currentCollectionIndex === this.resultListInt.length - 1
             && currentEntryIndex === currentCollectionArray.length - 1) {
             this.activeCollection = this
-              .resultListInt[0][this.autocompletePropertyNames.collection];
+              .resultListInt[0][this.autocompletePropertyNames.id];
             currentCollectionArray = this.consolidatedResultList[this.activeCollection];
             [this.activeEntry] = currentCollectionArray;
           }
