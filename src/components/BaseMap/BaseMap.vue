@@ -164,6 +164,21 @@ export default {
     };
   },
   computed: {
+    // Observer to check if component is in viewport and init map
+    observer() {
+      return new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          // If the entry is not in the viewport, do nothing
+          if (!entry.isIntersecting) return;
+
+          // Stop observing
+          observer.unobserve(entry.target);
+
+          // Init map
+          this.init();
+        });
+      });
+    },
     cssProps() {
       return {
         '--leaflet-popup-offset-bottom': `${this.popupOptions.offset[1]}px`,
@@ -229,135 +244,147 @@ export default {
       }
     },
   },
+  beforeDestroy() {
+    this.observer.disconnect();
+  },
   mounted() {
-    // only execute on clientside
+    // Execute only on clientside
     if (!process.browser) {
       return;
     }
 
-    /* eslint-disable global-require */
-    this.L = require('leaflet');
-    require('leaflet-responsive-popup');
-    require('leaflet.markercluster');
-    /* eslint-enable global-require */
-
-    // Initialize Leaflet map
-    this.map = this.L.map(this.$refs.mapElement, {
-      scrollWheelZoom: this.scrollWheelZoom,
-      tap: false, // fix clickEvent for macOS Safari
-    });
-
-    // Set position of attribution
-    this.map.attributionControl.setPosition(this.attributionPosition);
-
-    // Draw Leaflet map
-    const mapConfig = {
-      maxZoom: this.maxZoom,
-      attribution: [this.attribution, this.copyright].join(', '),
-      tms: this.tileLayerService === 'TMS',
-      ...this.options,
-    };
-
-    if (this.tileLayerService === 'WMS') {
-      this.L.tileLayer.wms(this.url, mapConfig).addTo(this.map);
-    } else {
-      this.L.tileLayer(this.url, mapConfig).addTo(this.map);
-    }
-
-    // Add marker to map
-    if (!this.markerFiltered.length) {
-      return;
-    }
-
-    // Custom icon
-    const iconOptions = {
-      className: this.markerClass,
-      html: this.icon,
-      iconSize: [this.iconSize, this.iconSize],
-      iconAnchor: [this.iconSize / 2, this.iconSize],
-    };
-    const markerIcon = this.L.divIcon(iconOptions);
-
-    // Define Leaflet clusterGroup
-    this.markerCluster = this.L.markerClusterGroup({
-      maxClusterRadius: 50,
-      showCoverageOnHover: false,
-      iconCreateFunction: (cluster) => {
-        const items = cluster.getAllChildMarkers().length;
-        let classSize = 'small';
-        let size = 48;
-
-        if (items > this.clusterSizes.medium) {
-          classSize = 'medium';
-          size = 64;
-        }
-
-        if (items > this.clusterSizes.large) {
-          classSize = 'large';
-          size = 80;
-        }
-
-        if (items > this.clusterSizes.xlarge) {
-          classSize = 'xlarge';
-          size = 128;
-        }
-
-        return this.L.divIcon({
-          html: `<div class="${this.markerClusterClass}__inner">${items}</div>`,
-          className: `${this.markerClusterClass} ${this.markerClusterClass}--${classSize}`,
-          iconSize: this.L.point(size, size),
-        });
-      },
-    });
-
-    this.markerFiltered.forEach((item, index) => {
-      const popup = this.L.responsivePopup(this.popupOptions);
-      const markerOptions = {
-        id: index,
-        icon: markerIcon,
-      };
-
-      // check if geo reference is present before setting marker on map
-      if (!this.getLatLng(item)) {
+    // Add observer to check if component is in viewport and init map
+    this.observer.observe(this.$el);
+  },
+  methods: {
+    init() {
+      // Check if leaflet map is already initialized
+      if (this.L) {
         return;
       }
 
-      // Define marker to map
-      const marker = this.L.marker(this.L.latLng(this.getLatLng(item)), markerOptions)
-        .on('mouseover', this.activateMarker)
-        .on('mouseout', this.resetMarker);
+      /* eslint-disable global-require */
+      this.L = require('leaflet');
+      require('leaflet-responsive-popup');
+      require('leaflet.markercluster');
+      /* eslint-enable global-require */
 
-      // Set popup content
-      if (this.markerPopups && Array.isArray(item.data)) {
-        popup.setContent(item.data.join('<br>'));
-        marker.bindPopup(popup);
+      // Initialize Leaflet map
+      this.map = this.L.map(this.$refs.mapElement, {
+        scrollWheelZoom: this.scrollWheelZoom,
+        tap: false, // fix clickEvent for macOS Safari
+      });
+
+      // Set position of attribution
+      this.map.attributionControl.setPosition(this.attributionPosition);
+
+      // Draw Leaflet map
+      const mapConfig = {
+        maxZoom: this.maxZoom,
+        attribution: [this.attribution, this.copyright].join(', '),
+        tms: this.tileLayerService === 'TMS',
+        ...this.options,
+      };
+
+      if (this.tileLayerService === 'WMS') {
+        this.L.tileLayer.wms(this.url, mapConfig).addTo(this.map);
+      } else {
+        this.L.tileLayer(this.url, mapConfig).addTo(this.map);
       }
 
-      // Add marker to cluster
-      this.markerCluster.addLayer(marker);
-    });
+      // Add marker to map
+      if (!this.markerFiltered.length) {
+        return;
+      }
 
-    // Add clusterGroup to map
-    this.map.addLayer(this.markerCluster);
+      // Custom icon
+      const iconOptions = {
+        className: this.markerClass,
+        html: this.icon,
+        iconSize: [this.iconSize, this.iconSize],
+        iconAnchor: [this.iconSize / 2, this.iconSize],
+      };
+      const markerIcon = this.L.divIcon(iconOptions);
 
-    // Check if marker has property latLng or coordinates again, otherwise do not render to map
-    const marker = this.markerFiltered.filter(item => (item.latLng || item.coordinates));
-    if (!marker.length) {
-      return;
-    }
+      // Define Leaflet clusterGroup
+      this.markerCluster = this.L.markerClusterGroup({
+        maxClusterRadius: 50,
+        showCoverageOnHover: false,
+        iconCreateFunction: (cluster) => {
+          const items = cluster.getAllChildMarkers().length;
+          let classSize = 'small';
+          let size = 48;
 
-    // Center map based on Marker(s)
-    // has to be called after marker have been set to map
-    const bounds = new this.L.LatLngBounds(
-      this.markerFiltered.map(item => this.getLatLng(item)),
-    );
+          if (items > this.clusterSizes.medium) {
+            classSize = 'medium';
+            size = 64;
+          }
 
-    this.map.fitBounds(bounds, {
-      padding: this.boundsPadding,
-      maxZoom: this.zoom,
-    });
-  },
-  methods: {
+          if (items > this.clusterSizes.large) {
+            classSize = 'large';
+            size = 80;
+          }
+
+          if (items > this.clusterSizes.xlarge) {
+            classSize = 'xlarge';
+            size = 128;
+          }
+
+          return this.L.divIcon({
+            html: `<div class="${this.markerClusterClass}__inner">${items}</div>`,
+            className: `${this.markerClusterClass} ${this.markerClusterClass}--${classSize}`,
+            iconSize: this.L.point(size, size),
+          });
+        },
+      });
+
+      this.markerFiltered.forEach((item, index) => {
+        const popup = this.L.responsivePopup(this.popupOptions);
+        const markerOptions = {
+          id: index,
+          icon: markerIcon,
+        };
+
+        // check if geo reference is present before setting marker on map
+        if (!this.getLatLng(item)) {
+          return;
+        }
+
+        // Define marker to map
+        const marker = this.L.marker(this.L.latLng(this.getLatLng(item)), markerOptions)
+          .on('mouseover', this.activateMarker)
+          .on('mouseout', this.resetMarker);
+
+        // Set popup content
+        if (this.markerPopups && Array.isArray(item.data)) {
+          popup.setContent(item.data.join('<br>'));
+          marker.bindPopup(popup);
+        }
+
+        // Add marker to cluster
+        this.markerCluster.addLayer(marker);
+      });
+
+      // Add clusterGroup to map
+      this.map.addLayer(this.markerCluster);
+
+      // Check if marker has property latLng or coordinates again, otherwise do not render to map
+      const marker = this.markerFiltered.filter(item => (item.latLng || item.coordinates));
+      if (!marker.length) {
+        return;
+      }
+
+      // Center map based on Marker(s)
+      // has to be called after marker have been set to map
+      const bounds = new this.L.LatLngBounds(
+        this.markerFiltered.map(item => this.getLatLng(item)),
+      );
+
+      this.map.fitBounds(bounds, {
+        padding: this.boundsPadding,
+        maxZoom: this.zoom,
+      });
+    },
     activateMarker(e) {
       /* eslint-disable no-underscore-dangle */
       const { id } = e.target.options;
