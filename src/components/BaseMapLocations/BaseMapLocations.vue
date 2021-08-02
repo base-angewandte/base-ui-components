@@ -1,24 +1,28 @@
 <template>
   <div class="base-map-locations">
-    <BaseMap
-      :attribution="attribution"
-      :attribution-position="attributionPosition"
-      :cluster-sizes="clusterSizes"
-      :copyright="copyright"
-      :center-marker="centeredMarker"
-      :icon="icon"
-      :icon-size="iconSize"
-      :highlight-marker="highlightedMarker"
-      :marker="locationsFiltered"
-      :marker-popups="markerPopups"
-      :max-zoom="maxZoom"
-      :options="options"
-      :style="additionalMapStyles"
-      :tile-layer-service="tileLayerService"
-      :url="url"
-      :zoom="zoom"
+    <div
       class="base-map-locations__map"
-      @highlighted="highlightLocation" />
+      :style="additionalMapStyles">
+      <BaseMap
+        v-if="initMap"
+        :attribution="attribution"
+        :attribution-position="attributionPosition"
+        :cluster-sizes="clusterSizes"
+        :copyright="copyright"
+        :center-marker="centeredMarker"
+        :icon="icon"
+        :icon-size="iconSize"
+        :highlight-marker="highlightedMarker"
+        :marker="locationsFiltered"
+        :marker-popups="markerPopups"
+        :max-zoom="maxZoom"
+        :options="options"
+        :style="additionalMapStyles"
+        :tile-layer-service="tileLayerService"
+        :url="url"
+        :zoom="zoom"
+        @highlighted="highlightLocation" />
+    </div>
 
     <h2
       v-if="label"
@@ -44,7 +48,6 @@
 </template>
 
 <script>
-import BaseMap from '@/components/BaseMap/BaseMap';
 import BaseTextList from '@/components/BaseTextList/BaseTextList';
 
 /**
@@ -54,7 +57,7 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList';
 export default {
   name: 'BaseMapLocations',
   components: {
-    BaseMap,
+    BaseMap: () => import('../BaseMap/BaseMap').then(m => m.default || m),
     BaseTextList,
   },
   props: {
@@ -197,13 +200,41 @@ export default {
       highlightedMarker: null,
       highlightedLocation: null,
       centeredMarker: null,
+      initMap: false,
     };
   },
   computed: {
+    // Observer to check if component is in viewport and show baseMap
+    observer() {
+      return new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          // If the entry is not in the viewport, do nothing
+          if (!entry.isIntersecting) return;
+
+          // Stop observing
+          observer.unobserve(entry.target);
+
+          // Init map
+          this.initMap = true;
+        });
+      });
+    },
     // compare marker objects and remove duplicates
     locationsFiltered() {
       return Array.from(new Set(this.locations.map(JSON.stringify))).map(JSON.parse);
     },
+  },
+  beforeDestroy() {
+    this.observer.disconnect();
+  },
+  mounted() {
+    // Execute only on clientside
+    if (!process.browser) {
+      return;
+    }
+
+    // Add observer to check if component is in viewport and init baseMap
+    this.observer.observe(this.$el);
   },
   methods: {
     highlightLocation(value) {
