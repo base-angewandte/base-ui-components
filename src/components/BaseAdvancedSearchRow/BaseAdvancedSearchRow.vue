@@ -217,7 +217,7 @@
                 </div>
                 <!-- TODO: not linked to input!!! -->
                 <ul
-                  v-if="filter && filter.options && displayedOptions.length"
+                  v-if="controlledVocabularyOptions && displayedOptions.length"
                   role="listbox"
                   class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
                   <li
@@ -377,13 +377,11 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
-     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
-     *      vocabulary options
      */
     appliedFilter: {
       type: [Object, null],
       default: null,
-      validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
+      validator: val => val === null || ['id', 'type', 'label'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
      * provide the component with the fetched autocomplete results
@@ -541,7 +539,7 @@ export default {
        *  filter.label with custom property name
        * @property {string} Filter.type
        * @property {*[]} [Filter.values]
-       * @property {Object[]} [Filter.options]
+       * @property {Object[]} [Filter.options?]
        */
       filter: null,
       /**
@@ -646,6 +644,10 @@ export default {
         return [];
       },
     },
+    controlledVocabularyOptions() {
+      const currentFilter = this.filterList.find(filter => filter.id === this.filter.id);
+      return currentFilter ? currentFilter.options : [];
+    },
     /**
      * the actually displayed controlled vocabulary options
      * (filtered for already selected and for the current input string)
@@ -653,9 +655,9 @@ export default {
      * @returns Object[]
      */
     displayedOptions() {
-      if (this.filter.options) {
+      if (this.controlledVocabularyOptions) {
         // remove already selected options
-        let options = [].concat(this.filter.options)
+        let options = [].concat(this.controlledVocabularyOptions)
           .filter(option => !this.filter.values
             .map(value => value[this.identifierPropertyName.controlledVocabularyOption])
             .includes(option[this.identifierPropertyName.controlledVocabularyOption]));
@@ -974,7 +976,7 @@ export default {
       const isArrowDown = event.code === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
       // option specified in the filter?) only use arrow up and down
-      if (this.filter.options && this.filter.options.length
+      if (this.controlledVocabularyOptions && this.controlledVocabularyOptions.length
         && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(

@@ -71,12 +71,13 @@ export default {
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
-     * see filterList
+     * see filterList (except options - these are not necessary for applied filters)
      */
     appliedFilters: {
       type: Array,
       default: () => ([]),
-      validator: val => !val.length || (val.every(v => v.type && (v.type !== 'chips' || v.options))),
+      // dont check for options on applied filters - not necessary
+      validator: val => !val.length || val.every(v => v.type),
     },
     /**
      * provide the component with the fetched autocomplete results
