@@ -22,6 +22,7 @@
       :set-focus-on-active="false"
       :clearable="false"
       class="base-advanced-search-row__search"
+      v-bind="$listeners"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.enter="selectOptionOnKeyEnter">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
@@ -794,6 +795,7 @@ export default {
           right: true,
         };
       }
+      this.$emit('is-active');
     },
   },
   created() {
@@ -812,7 +814,6 @@ export default {
       this.getSearchInputElement();
       // run focus function
       this.searchInputElement.focus();
-
       // update the filter type to the new type
       this.currentFilterType = this.filter.type;
     }
@@ -884,8 +885,11 @@ export default {
         this.$emit('update:applied-filter', this.filter);
         this.activeFilter = null;
       }
-      // in either case - focus on input field again after click on filter
-      this.searchInputElement.focus();
+
+      if (this.searchInputElement) {
+        // in either case - focus on input field again after click on filter
+        this.searchInputElement.focus();
+      }
     },
     /**
      * @param {KeyboardEvent} event - keyboard event bubbled from
@@ -925,8 +929,10 @@ export default {
       }
       // reset everything
       this.resetAllInput();
-      // return focus to input field after select
-      this.searchInputElement.focus();
+      if (this.searchInputElement) {
+        // return focus to input field after select
+        this.searchInputElement.focus();
+      }
     },
     /**
      * function triggered on BaseSearch keyboard enter. Will add the currently active option or

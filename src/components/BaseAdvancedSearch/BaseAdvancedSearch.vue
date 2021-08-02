@@ -34,6 +34,8 @@
       :autocomplete-property-names="autocompletePropertyNames"
       :label-property-name="labelPropertyName"
       :identifier-property-name="identifierPropertyName"
+      v-bind="$listeners"
+      @is-active="emitIsActive"
       @add-filter="addFilter"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
   </div>
@@ -403,6 +405,12 @@ export default {
        * @type {Object[]}
        */
       this.$emit('search', this.appliedFiltersInt);
+    },
+    /**
+     * inform parent if main search is set active
+     */
+    emitIsActive() {
+      this.$emit('main-search-active');
     },
     /**
      * create an internal row id for unique identification of added filter rows
