@@ -69,10 +69,6 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseDateInput from '@/components/BaseDateInput/BaseDateInput';
 import { createId } from '@/utils/utils';
 /**
  * A basic text search to filter entries or files
@@ -80,10 +76,10 @@ import { createId } from '@/utils/utils';
 export default {
   name: 'BaseSearch',
   components: {
-    BaseIcon,
-    BaseChipsInputField,
-    BaseDateInput,
-    BaseInput,
+    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
+    BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField').then(m => m.default || m),
+    BaseInput: () => import('../BaseInput/BaseInput').then(m => m.default || m),
+    BaseDateInput: () => import('../BaseDateInput/BaseDateInput').then(m => m.default || m),
   },
   model: {
     prop: 'input',

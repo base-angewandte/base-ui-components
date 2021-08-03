@@ -524,6 +524,7 @@ export default {
   },
   data() {
     return {
+      observer: null,
       /**
        * variable containing search text
        * @type {?string|?Object}
@@ -809,17 +810,9 @@ export default {
     this.calcColNumber();
     window.addEventListener('resize', this.calcColNumber);
     this.getSearchInputElement();
+    this.initObserver();
   },
   updated() {
-    // check if the filter type changed and thus a new input field needed to be rendered
-    if (this.filter.type !== this.currentFilterType) {
-      this.getSearchInputElement();
-      // run focus function
-      this.searchInputElement.focus();
-      // update the filter type to the new type
-      this.currentFilterType = this.filter.type;
-    }
-
     // if the filterBox element exists add
     // the listener
     if (this.$refs.filterBox) {
@@ -1160,16 +1153,36 @@ export default {
         this.isActive = false;
       }
     },
+    initObserver() {
+      const observer = new MutationObserver(this.filterChangeObserverAction);
+      observer.observe(this.$refs.advancedSearchRow, {
+        subtree: true,
+        childList: true,
+      });
+      this.observer = observer;
+    },
+    filterChangeObserverAction() {
+      this.getSearchInputElement();
+      if (this.filter.type !== this.currentFilterType) {
+        if (this.searchInputElement) {
+          this.searchInputElement.focus();
+          this.currentFilterType = this.filter.type;
+        }
+      }
+    },
     /**
      * function to get the current search input element
      */
     getSearchInputElement() {
       // get input elements
-      const inputElements = this.$el.getElementsByTagName('input');
+      const inputElements = document.getElementsByTagName('input');
       // check if input elements were found
       if (inputElements && inputElements.length) {
+        console.log(this.searchRowId);
         // if yes - transform HTMLElement list to Array and find the search input element
-        this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input'));
+        this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
+          && inputElem.id.includes(this.searchRowId));
+        console.log(this.searchInputElement);
       }
     },
   },
