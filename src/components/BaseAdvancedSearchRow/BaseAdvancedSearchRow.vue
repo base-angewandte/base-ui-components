@@ -741,6 +741,9 @@ export default {
         }
         // also inform parent of changes
         this.$emit('update:applied-filter', val);
+        if (this.searchInputElement && this.isActive) {
+          this.searchInputElement.focus();
+        }
       },
       deep: true,
     },
@@ -1163,7 +1166,7 @@ export default {
     },
     filterChangeObserverAction() {
       this.getSearchInputElement();
-      if (this.filter.type !== this.currentFilterType) {
+      if (this.filter.type !== this.currentFilterType && this.isActive) {
         if (this.searchInputElement) {
           this.searchInputElement.focus();
           this.currentFilterType = this.filter.type;
@@ -1178,11 +1181,9 @@ export default {
       const inputElements = document.getElementsByTagName('input');
       // check if input elements were found
       if (inputElements && inputElements.length) {
-        console.log(this.searchRowId);
         // if yes - transform HTMLElement list to Array and find the search input element
         this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
           && inputElem.id.includes(this.searchRowId));
-        console.log(this.searchInputElement);
       }
     },
   },
