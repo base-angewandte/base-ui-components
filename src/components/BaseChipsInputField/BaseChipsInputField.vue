@@ -654,7 +654,11 @@ export default {
        */
       this.$emit('removed', option);
       // lay the focus on the input field
-      this.$refs.baseInput.$el.getElementsByTagName('input')[0].focus({ preventScroll: true });
+      const inputElements = this.$refs.baseInput.$el.getElementsByTagName('input');
+      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.id);
+      if (mainInputElement) {
+        mainInputElement.focus();
+      }
     },
     /**
      * adding an selected option to the array of selected options
