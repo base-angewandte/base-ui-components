@@ -403,7 +403,7 @@ export default {
     selectedChips: {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.selectedChipsInt)) {
-          this.selectedChipsInt = val;
+          this.selectedChipsInt = [...val];
         }
       },
       immediate: true,

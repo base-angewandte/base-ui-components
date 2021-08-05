@@ -353,6 +353,7 @@ export default {
       // TODO: check if filter contains values before adding it
       // (otherwise tell user to add values)
       this.appliedFiltersInt.push(filter);
+      this.search();
       // reset main filter to defaults again
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     },
@@ -372,7 +373,8 @@ export default {
      * @param {Object} filter - the filter that was altered
      * @param {number} index - the index of the filter
      */
-    updateFilter() {
+    updateFilter(filter, index) {
+      this.$set(this.appliedFiltersInt, index, filter);
       // trigger search to update search results
       this.search();
     },

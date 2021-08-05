@@ -365,7 +365,7 @@ export default {
         options: [],
         values: [],
       }),
-      validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
+      validator: val => val.type && (val.type !== 'chips' || val.options),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>
@@ -381,7 +381,7 @@ export default {
     appliedFilter: {
       type: [Object, null],
       default: null,
-      validator: val => val === null || ['id', 'type', 'label'].every(prop => Object.keys(val).includes(prop)),
+      validator: val => val === null || !val.length || ['id', 'type', 'label'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
      * provide the component with the fetched autocomplete results
@@ -615,7 +615,7 @@ export default {
       set(val) {
         // check if filter was selected - else use the default filter
         this.filter = val.length ? val.pop()
-          : { ...this.defaultFilter, values: [] };
+          : JSON.parse(JSON.stringify(this.defaultFilter));
       },
       get() {
         // return current filter object as array
@@ -634,19 +634,21 @@ export default {
      */
     selectedOptions: {
       set(val) {
-        this.$set(this.filter, 'values', val);
+        this.$set(this.filter, 'values', [...val]);
       },
       get() {
         // this variable should only contain values for chips and text filters (should be array)
         // not for date or daterange
         if (this.filter.type === 'chips' || this.filter.type === 'text') {
-          return this.filter.values;
+          return [...this.filter.values];
         }
         return [];
       },
     },
     controlledVocabularyOptions() {
-      const currentFilter = this.filterList.find(filter => filter.id === this.filter.id);
+      const currentFilter = this.filterList
+        .find(filter => filter[this.identifierPropertyName.filter]
+          === this.filter[this.identifierPropertyName.filter]);
       return currentFilter ? currentFilter.options : [];
     },
     /**
@@ -739,10 +741,17 @@ export default {
         if (!val || val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
           this.currentInput = '';
         }
-        // also inform parent of changes
-        this.$emit('update:applied-filter', val);
-        if (this.searchInputElement && this.isActive) {
-          this.searchInputElement.focus();
+        if (JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
+          /**
+           * event emitted when the applied filter changes<br>
+           *   (possible to use .sync modifier on prop appliedFilter)
+           * @event update:applied-filter
+           * @property {Object} val - the new currently applied filter
+           */
+          this.$emit('update:applied-filter', { ...val });
+          if (this.searchInputElement) {
+            this.searchInputElement.focus();
+          }
         }
       },
       deep: true,
@@ -753,8 +762,9 @@ export default {
     appliedFilter: {
       handler(val) {
         // check if anything actually changed
-        if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
-          this.filter = val;
+        if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
+          this.filter = val ? JSON.parse(JSON.stringify(val))
+            : { ...this.defaultFilter, values: [] };
           // check if the new filter has values
           if (val.values) {
             // distinguish between date and others to assign to correct variable
@@ -804,9 +814,6 @@ export default {
       this.$emit('is-active');
     },
   },
-  created() {
-    this.filter = this.appliedFilter || { ...this.defaultFilter, values: [] };
-  },
   mounted() {
     // calculate the number of columns shown for filters and chips options on
     // render and recalculate on resize
@@ -846,7 +853,7 @@ export default {
       this.resetAllInput();
       // reset filter
       // add values separately so this does not remain linked
-      this.filter = { ...this.defaultFilter, values: [] };
+      this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
     },
     removeFilter() {
       /**
@@ -865,22 +872,15 @@ export default {
      * active filter
      *
      * @param {Object} selectedFilter - the selected filter object
-     * @param {string} selectedFilter.type - the type of the filter needed
+     * @property {string} selectedFilter.type - the type of the filter needed
      * to set the default filter values accordingly (array, string, object)
      */
     selectFilter(selectedFilter) {
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
-        this.filter = { ...selectedFilter };
+        this.filter = JSON.parse(JSON.stringify(selectedFilter));
         this.$set(this.filter, 'values', this.setFilterValues(selectedFilter.type, this.filter.values));
-        /**
-         * event emitted when the applied filter changes<br>
-         *   (possible to use .sync modifier on prop appliedFilter)
-         * @event update:applied-filter
-         * @property {Object} val - the new currently applied filter
-         */
-        this.$emit('update:applied-filter', this.filter);
         this.activeFilter = null;
       }
 
@@ -920,11 +920,7 @@ export default {
      * @param {Object} entry - the entry to add to the selected list
      */
     addOption(entry) {
-      if (this.filter.values) {
-        this.filter.values.push(entry);
-      } else {
-        this.$set(this.filter, 'values', [entry]);
-      }
+      this.filter.values = this.filter.values.concat(entry);
       // reset everything
       this.resetAllInput();
       if (this.searchInputElement) {
