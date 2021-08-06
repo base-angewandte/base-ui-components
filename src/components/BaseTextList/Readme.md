@@ -49,6 +49,36 @@ export default {
             },
           ],
         },
+        {
+          label: 'Vero eos et accusam',
+          data: [
+            {
+              value: 'additional info in toolip',
+              additional: {
+                label: 'label',
+                data: [
+                  {
+                    label: 'www',
+                    value: 'base',
+                    url: 'https://base.uni-ak.ac.at',
+                  },
+                  {
+                    label: 'label',
+                    value: 'some value',
+                  },
+                ],
+              },
+            },
+            {
+              value: 'external link',
+              url: 'https://base.uni-ak.ac.at',
+            },
+            {
+              value: 'internal link',
+              source: 'some-id',
+            },
+          ],
+        },
       ],
     }
   }

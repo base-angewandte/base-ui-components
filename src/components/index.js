@@ -48,6 +48,8 @@ import ExpandList from './BaseExpandList';
 import Image from './BaseImage';
 import AdvancedSearchRow from './BaseAdvancedSearchRow';
 import AdvancedSearch from './BaseAdvancedSearch';
+import Tooltip from './BaseTooltip';
+import Link from './BaseLink';
 
 export {
   Loader as BaseLoader,
@@ -100,4 +102,6 @@ export {
   Image as BaseImage,
   AdvancedSearchRow as BaseAdvancedSearchRow,
   AdvancedSearch as BaseAdvancedSearch,
+  Link as BaseLink,
+  Tooltip as BaseTooltip,
 };

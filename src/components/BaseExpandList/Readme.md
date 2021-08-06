@@ -17,12 +17,16 @@ Component to render list data
       :data="editExpandList ? baseExpandList : baseExpandList.filter(item => !item.hidden)"
       :edit="editExpandList"
       @saved="saveExpandListEdit">
-      <template
-        v-slot:content="props">
-        <a
-          :href="props.data.href"
-          :title="props.data.value">{{ props.data.value }}</a>
-        <template v-if="props.data.attributes"> - {{ props.data.attributes.join(', ') }}</template>
+        <template
+          v-slot:content="props">
+          <BaseLink
+            :url="props.data.url"
+            :value="props.data.value"
+            :source="props.data.source"
+            :space-after="!!props.data.additional"
+            :tooltip="props.data.additional"
+            :type="props.data.type" />
+          <template v-if="props.data.attributes"> - {{ props.data.attributes.join(', ') }}</template>
       </template>
     </BaseExpandList>
   </div>
@@ -31,11 +35,13 @@ Component to render list data
 <script>
 import BaseEditControl from '../BaseEditControl/BaseEditControl';
 import BaseExpandList from './BaseExpandList';
+import BaseLink from '../BaseLink/BaseLink';
 
 export default {
   components: {
     BaseEditControl,
     BaseExpandList,
+    BaseLink,
   },
   data() {
     return {
@@ -49,12 +55,12 @@ export default {
               label: 'Beiträge in Sammelband',
               data: [
                 {
-                  value: 'qui nesciunt',
+                  value: 'qui nesciunt officiis quisquam officiis',
                   attributes: [
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  href: '#',
+                  source: 'asdfasdf',
                 },
                 {
                   value: 'animi voluptates',
@@ -62,7 +68,14 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  href: '#',
+                  additional: {
+                    data: [
+                      {
+                        label: 'label',
+                        value: 'value',
+                      },
+                    ],
+                  },
                 },
                 {
                   value: 'officiis quisquam',
@@ -70,7 +83,7 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  href: '#',
+                  url: '#',
                 },
               ],
             },
@@ -83,7 +96,7 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  href: '#',
+                  url: '#',
                 },
                 {
                   value: 'quia quisquam',
@@ -91,7 +104,7 @@ export default {
                     'quae laudantium expedita',
                     'maxime omnis accusamus',
                   ],
-                  href: '#',
+                  url: '#',
                 },
                 {
                   value: 'qui nesciunt',
@@ -99,7 +112,7 @@ export default {
                     'molestiae commodi ipsum',
                     'eos dolorem in',
                   ],
-                  href: '#',
+                  url: '#',
                 },
               ],
             },
@@ -115,7 +128,7 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'molestiae error',
@@ -123,7 +136,7 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'cum ut',
@@ -131,7 +144,7 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'totam tenetur',
@@ -139,7 +152,7 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              href: '#',
+              url: '#',
             },
           ],
         },
@@ -153,7 +166,7 @@ export default {
                 'est quos sed',
                 'sed molestiae veritatis',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'quis quis',
@@ -161,7 +174,7 @@ export default {
                 'non possimus possimus',
                 'nobis recusandae sed',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'mollitia quo',
@@ -169,7 +182,7 @@ export default {
                 'non magnam eius',
                 'harum exercitationem non',
               ],
-              href: '#',
+              url: '#',
             },
           ],
         },
@@ -183,7 +196,7 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'molestiae error',
@@ -191,7 +204,7 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'cum ut',
@@ -199,7 +212,7 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'totam tenetur',
@@ -207,7 +220,7 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              href: '#',
+              url: '#',
             },
           ],
         },
@@ -221,7 +234,7 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'molestiae error',
@@ -229,7 +242,7 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'cum ut',
@@ -237,7 +250,7 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              href: '#',
+              url: '#',
             },
             {
               value: 'totam tenetur',
@@ -245,7 +258,7 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              href: '#',
+              url: '#',
             },
           ],
         },
