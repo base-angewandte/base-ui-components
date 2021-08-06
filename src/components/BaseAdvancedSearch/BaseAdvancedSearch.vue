@@ -34,6 +34,8 @@
       :autocomplete-property-names="autocompletePropertyNames"
       :label-property-name="labelPropertyName"
       :identifier-property-name="identifierPropertyName"
+      v-bind="$listeners"
+      @is-active="emitIsActive"
       @add-filter="addFilter"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
   </div>
@@ -69,12 +71,13 @@ export default {
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
-     * see filterList
+     * see filterList (except options - these are not necessary for applied filters)
      */
     appliedFilters: {
       type: Array,
       default: () => ([]),
-      validator: val => !val.length || (val.every(v => v.type && (v.type !== 'chips' || v.options))),
+      // dont check for options on applied filters - not necessary
+      validator: val => !val.length || val.every(v => v.type),
     },
     /**
      * provide the component with the fetched autocomplete results
@@ -350,6 +353,7 @@ export default {
       // TODO: check if filter contains values before adding it
       // (otherwise tell user to add values)
       this.appliedFiltersInt.push(filter);
+      this.search();
       // reset main filter to defaults again
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     },
@@ -369,7 +373,8 @@ export default {
      * @param {Object} filter - the filter that was altered
      * @param {number} index - the index of the filter
      */
-    updateFilter() {
+    updateFilter(filter, index) {
+      this.$set(this.appliedFiltersInt, index, filter);
       // trigger search to update search results
       this.search();
     },
@@ -403,6 +408,12 @@ export default {
        * @type {Object[]}
        */
       this.$emit('search', this.appliedFiltersInt);
+    },
+    /**
+     * inform parent if main search is set active
+     */
+    emitIsActive() {
+      this.$emit('main-search-active');
     },
     /**
      * create an internal row id for unique identification of added filter rows

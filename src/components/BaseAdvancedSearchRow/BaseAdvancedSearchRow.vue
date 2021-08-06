@@ -22,6 +22,7 @@
       :set-focus-on-active="false"
       :clearable="false"
       class="base-advanced-search-row__search"
+      v-bind="$listeners"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.enter="selectOptionOnKeyEnter">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
@@ -216,7 +217,7 @@
                 </div>
                 <!-- TODO: not linked to input!!! -->
                 <ul
-                  v-if="filter && filter.options && displayedOptions.length"
+                  v-if="controlledVocabularyOptions && displayedOptions.length"
                   role="listbox"
                   class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
                   <li
@@ -364,7 +365,7 @@ export default {
         options: [],
         values: [],
       }),
-      validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
+      validator: val => val.type && (val.type !== 'chips' || val.options),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>
@@ -376,13 +377,11 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
-     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
-     *      vocabulary options
      */
     appliedFilter: {
       type: [Object, null],
       default: null,
-      validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
+      validator: val => val === null || !val.length || ['id', 'type', 'label'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
      * provide the component with the fetched autocomplete results
@@ -525,6 +524,7 @@ export default {
   },
   data() {
     return {
+      observer: null,
       /**
        * variable containing search text
        * @type {?string|?Object}
@@ -540,7 +540,7 @@ export default {
        *  filter.label with custom property name
        * @property {string} Filter.type
        * @property {*[]} [Filter.values]
-       * @property {Object[]} [Filter.options]
+       * @property {Object[]} [Filter.options?]
        */
       filter: null,
       /**
@@ -615,7 +615,7 @@ export default {
       set(val) {
         // check if filter was selected - else use the default filter
         this.filter = val.length ? val.pop()
-          : { ...this.defaultFilter, values: [] };
+          : JSON.parse(JSON.stringify(this.defaultFilter));
       },
       get() {
         // return current filter object as array
@@ -634,16 +634,22 @@ export default {
      */
     selectedOptions: {
       set(val) {
-        this.$set(this.filter, 'values', val);
+        this.$set(this.filter, 'values', [...val]);
       },
       get() {
         // this variable should only contain values for chips and text filters (should be array)
         // not for date or daterange
         if (this.filter.type === 'chips' || this.filter.type === 'text') {
-          return this.filter.values;
+          return [...this.filter.values];
         }
         return [];
       },
+    },
+    controlledVocabularyOptions() {
+      const currentFilter = this.filterList
+        .find(filter => filter[this.identifierPropertyName.filter]
+          === this.filter[this.identifierPropertyName.filter]);
+      return currentFilter ? currentFilter.options : [];
     },
     /**
      * the actually displayed controlled vocabulary options
@@ -652,9 +658,9 @@ export default {
      * @returns Object[]
      */
     displayedOptions() {
-      if (this.filter.options) {
+      if (this.controlledVocabularyOptions) {
         // remove already selected options
-        let options = [].concat(this.filter.options)
+        let options = [].concat(this.controlledVocabularyOptions)
           .filter(option => !this.filter.values
             .map(value => value[this.identifierPropertyName.controlledVocabularyOption])
             .includes(option[this.identifierPropertyName.controlledVocabularyOption]));
@@ -735,8 +741,18 @@ export default {
         if (!val || val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
           this.currentInput = '';
         }
-        // also inform parent of changes
-        this.$emit('update:applied-filter', val);
+        if (JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
+          /**
+           * event emitted when the applied filter changes<br>
+           *   (possible to use .sync modifier on prop appliedFilter)
+           * @event update:applied-filter
+           * @property {Object} val - the new currently applied filter
+           */
+          this.$emit('update:applied-filter', { ...val });
+          if (this.searchInputElement) {
+            this.searchInputElement.focus();
+          }
+        }
       },
       deep: true,
     },
@@ -746,8 +762,9 @@ export default {
     appliedFilter: {
       handler(val) {
         // check if anything actually changed
-        if (val && JSON.stringify(val) !== JSON.stringify(this.filter)) {
-          this.filter = val;
+        if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
+          this.filter = val ? JSON.parse(JSON.stringify(val))
+            : { ...this.defaultFilter, values: [] };
           // check if the new filter has values
           if (val.values) {
             // distinguish between date and others to assign to correct variable
@@ -794,10 +811,8 @@ export default {
           right: true,
         };
       }
+      this.$emit('is-active');
     },
-  },
-  created() {
-    this.filter = this.appliedFilter || { ...this.defaultFilter, values: [] };
   },
   mounted() {
     // calculate the number of columns shown for filters and chips options on
@@ -805,18 +820,9 @@ export default {
     this.calcColNumber();
     window.addEventListener('resize', this.calcColNumber);
     this.getSearchInputElement();
+    this.initObserver();
   },
   updated() {
-    // check if the filter type changed and thus a new input field needed to be rendered
-    if (this.filter.type !== this.currentFilterType) {
-      this.getSearchInputElement();
-      // run focus function
-      this.searchInputElement.focus();
-
-      // update the filter type to the new type
-      this.currentFilterType = this.filter.type;
-    }
-
     // if the filterBox element exists add
     // the listener
     if (this.$refs.filterBox) {
@@ -847,7 +853,7 @@ export default {
       this.resetAllInput();
       // reset filter
       // add values separately so this does not remain linked
-      this.filter = { ...this.defaultFilter, values: [] };
+      this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
     },
     removeFilter() {
       /**
@@ -866,26 +872,22 @@ export default {
      * active filter
      *
      * @param {Object} selectedFilter - the selected filter object
-     * @param {string} selectedFilter.type - the type of the filter needed
+     * @property {string} selectedFilter.type - the type of the filter needed
      * to set the default filter values accordingly (array, string, object)
      */
     selectFilter(selectedFilter) {
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
-        this.filter = { ...selectedFilter };
+        this.filter = JSON.parse(JSON.stringify(selectedFilter));
         this.$set(this.filter, 'values', this.setFilterValues(selectedFilter.type, this.filter.values));
-        /**
-         * event emitted when the applied filter changes<br>
-         *   (possible to use .sync modifier on prop appliedFilter)
-         * @event update:applied-filter
-         * @property {Object} val - the new currently applied filter
-         */
-        this.$emit('update:applied-filter', this.filter);
         this.activeFilter = null;
       }
-      // in either case - focus on input field again after click on filter
-      this.searchInputElement.focus();
+
+      if (this.searchInputElement) {
+        // in either case - focus on input field again after click on filter
+        this.searchInputElement.focus();
+      }
     },
     /**
      * @param {KeyboardEvent} event - keyboard event bubbled from
@@ -918,15 +920,13 @@ export default {
      * @param {Object} entry - the entry to add to the selected list
      */
     addOption(entry) {
-      if (this.filter.values) {
-        this.filter.values.push(entry);
-      } else {
-        this.$set(this.filter, 'values', [entry]);
-      }
+      this.filter.values = this.filter.values.concat(entry);
       // reset everything
       this.resetAllInput();
-      // return focus to input field after select
-      this.searchInputElement.focus();
+      if (this.searchInputElement) {
+        // return focus to input field after select
+        this.searchInputElement.focus();
+      }
     },
     /**
      * function triggered on BaseSearch keyboard enter. Will add the currently active option or
@@ -968,7 +968,7 @@ export default {
       const isArrowDown = event.code === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
       // option specified in the filter?) only use arrow up and down
-      if (this.filter.options && this.filter.options.length
+      if (this.controlledVocabularyOptions && this.controlledVocabularyOptions.length
         && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(
@@ -1152,16 +1152,34 @@ export default {
         this.isActive = false;
       }
     },
+    initObserver() {
+      const observer = new MutationObserver(this.filterChangeObserverAction);
+      observer.observe(this.$refs.advancedSearchRow, {
+        subtree: true,
+        childList: true,
+      });
+      this.observer = observer;
+    },
+    filterChangeObserverAction() {
+      this.getSearchInputElement();
+      if (this.filter.type !== this.currentFilterType && this.isActive) {
+        if (this.searchInputElement) {
+          this.searchInputElement.focus();
+          this.currentFilterType = this.filter.type;
+        }
+      }
+    },
     /**
      * function to get the current search input element
      */
     getSearchInputElement() {
       // get input elements
-      const inputElements = this.$el.getElementsByTagName('input');
+      const inputElements = document.getElementsByTagName('input');
       // check if input elements were found
       if (inputElements && inputElements.length) {
         // if yes - transform HTMLElement list to Array and find the search input element
-        this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input'));
+        this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
+          && inputElem.id.includes(this.searchRowId));
       }
     },
   },

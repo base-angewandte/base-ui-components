@@ -213,7 +213,6 @@
         :total="pages"
         :current="currentPageNumberInt"
         :use-link-element="usePaginationLinkElement"
-        :additional-link-query-params="!!usePaginationLinkElement ? { collection: headerText } : {}"
         @set-page="setPage" />
     </div>
   </div>
@@ -549,6 +548,13 @@ export default {
       default: false,
       validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
     },
+    /**
+     * set this variable true if pagination is used and data fetching is done per page
+     */
+    fetchDataExternally: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -604,7 +610,7 @@ export default {
         }
         // else if pagination is active and items are not fetched from outside
         // slice items fitting one page
-        if (this.usePagination && !this.fetchItemsExternally) {
+        if (this.usePagination && !this.fetchDataExternally) {
           // slice taking into account current pagination and the total number of
           // visible items
           return this.entryListInt
@@ -721,6 +727,9 @@ export default {
         }
       },
       immediate: true,
+    },
+    itemsPerRow(val, old) {
+      this.$emit('items-per-row-changed', val);
     },
     // if expanded variable is set from outside change
     // internal variable accordingly
