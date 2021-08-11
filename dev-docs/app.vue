@@ -7,7 +7,7 @@
       <h2>Skills</h2>
       <BaseLink
         value="Teaching"
-        :tooltip="{}">
+        :tooltip="[]">
         <template v-slot:tooltip>
           asdf
         </template>
@@ -100,22 +100,20 @@ export default {
                 'rerum corporis voluptatibus',
                 'beatae occaecati non',
               ],
-              additional: {
-                data: [
-                  {
-                    label: 'label',
-                    value: 'value',
-                  },
-                  {
-                    label: 'label',
-                    value: 'value',
-                  },
-                  {
-                    label: 'label',
-                    value: 'value',
-                  },
-                ],
-              },
+              additional: [
+                {
+                  label: 'label',
+                  value: 'value',
+                },
+                {
+                  label: 'label',
+                  value: 'value',
+                },
+                {
+                  label: 'label',
+                  value: 'value',
+                },
+              ],
             },
             {
               value: 'qui nesciunt officiis quisquam officiis',
@@ -143,23 +141,23 @@ export default {
             {
               label: 'label',
               value: 'value',
-              additional: {
-                data: [
-                  {
-                    label: 'label',
-                    value: 'value',
-                  },
-                  {
-                    label: 'label',
-                    value: 'value',
-                  },
-                ],
-              },
+              additional: [
+                {
+                  label: 'GND',
+                  value: '1036440591',
+                  url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
+                },
+                {
+                  label: 'ORCID',
+                  value: '0000-0003-2731-3077',
+                  url: 'https://orcid.org/0000-0003-2731-3077',
+                },
+              ],
             },
             {
               label: 'label',
               value: 'value',
-              source: '/#',
+              url: '/#',
             },
             {
               label: 'label',
@@ -175,20 +173,18 @@ export default {
           data: [
             {
               value: 'additional info in toolip',
-              additional: {
-                data: [
-                  {
-                    label: 'GND',
-                    value: '1036440591',
-                    url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
-                  },
-                  {
-                    label: 'ORCID',
-                    value: '0000-0003-2731-3077',
-                    url: 'https://orcid.org/0000-0003-2731-3077',
-                  },
-                ],
-              },
+              additional: [
+                {
+                  label: 'GND',
+                  value: '1036440591',
+                  url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
+                },
+                {
+                  label: 'ORCID',
+                  value: '0000-0003-2731-3077',
+                  url: 'https://orcid.org/0000-0003-2731-3077',
+                },
+              ],
             },
             {
               value: 'external link',
@@ -207,79 +203,7 @@ export default {
       contributors: [
         {
           value: 'Shorty',
-          additional: {
-            data: [
-              {
-                label: 'GND',
-                value: '1036440591',
-                url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
-              },
-              {
-                label: 'ORCID',
-                value: '0000-0003-2731-3077',
-                url: 'https://orcid.org/0000-0003-2731-3077',
-              },
-            ],
-          },
-        },
-        {
-          value: 'David Blandy',
-          url: 'https:/base.uni-ak.ac.at',
-        },
-        {
-          value: 'Irene Cassini',
-          source: 'irene.cassini',
-        },
-        {
-          value: 'Justine A. Chambers',
-          additional: {
-            label: 'Justine A. Chambers',
-            data: [
-              {
-                label: 'GND',
-                value: '1036440591',
-                url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
-              },
-              {
-                label: 'ORCID',
-                value: '0000-0003-2731-3077',
-                url: 'https://orcid.org/0000-0003-2731-3077',
-              },
-            ],
-          },
-        },
-        {
-          value: 'Jerome Morrow',
-        },
-        {
-          value: 'Vincent Freeman',
-          additional: {
-            label: 'Vincent Freeman',
-            data: [
-              {
-                label: 'GND',
-                value: '1036440591',
-                url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
-              },
-              {
-                label: 'ORCID',
-                value: '0000-0003-2731-3077',
-                url: 'https://orcid.org/0000-0003-2731-3077',
-              },
-            ],
-          },
-        },
-      ],
-    };
-  },
-  computed: {},
-  watch: {},
-  methods: {
-    async asyncTooltip(value, index) {
-      setTimeout(() => {
-        this.$set(this.contributors[index], 'tooltip', {
-          label: 'async content',
-          data: [
+          additional: [
             {
               label: 'GND',
               value: '1036440591',
@@ -291,7 +215,68 @@ export default {
               url: 'https://orcid.org/0000-0003-2731-3077',
             },
           ],
-        });
+        },
+        {
+          value: 'David Blandy',
+          url: 'https:/base.uni-ak.ac.at',
+        },
+        {
+          value: 'Irene Cassini',
+          source: 'irene.cassini',
+        },
+        {
+          value: 'Justine A. Chambers',
+          additional: [
+            {
+              label: 'GND',
+              value: '1036440591',
+              url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
+            },
+            {
+              label: 'ORCID',
+              value: '0000-0003-2731-3077',
+              url: 'https://orcid.org/0000-0003-2731-3077',
+            },
+          ],
+        },
+        {
+          value: 'Jerome Morrow',
+        },
+        {
+          value: 'Vincent Freeman',
+          additional: [
+            {
+              label: 'GND',
+              value: '1036440591',
+              url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
+            },
+            {
+              label: 'ORCID',
+              value: '0000-0003-2731-3077',
+              url: 'https://orcid.org/0000-0003-2731-3077',
+            },
+          ],
+        },
+      ],
+    };
+  },
+  computed: {},
+  watch: {},
+  methods: {
+    async asyncTooltip(value, index) {
+      setTimeout(() => {
+        this.$set(this.contributors[index], 'tooltip', [
+          {
+            label: 'GND',
+            value: '1036440591',
+            url: 'https://portal.dnb.de/opac.htm?method=simpleSearch&cqlMode=true&query=nid%3D1036440591',
+          },
+          {
+            label: 'ORCID',
+            value: '0000-0003-2731-3077',
+            url: 'https://orcid.org/0000-0003-2731-3077',
+          },
+        ]);
       }, 100);
     },
   },

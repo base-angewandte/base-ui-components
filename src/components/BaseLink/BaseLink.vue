@@ -2,8 +2,8 @@
   <component
     :is="renderAs"
     v-click-outside="() => closeTooltip()"
-    :tabindex="source || url || (source && type) || tooltip ? 0 : null"
-    :role="tooltip ? 'button' : null"
+    :tabindex="source || url || (source && type) || tooltip.length ? 0 : null"
+    :role="tooltip.length ? 'button' : null"
     :href="source || url ? source || url : null"
     :to="vueRouterAvailable && source && !type ? '/' + source : null"
     :title="source || url || (source && type) ? value : null"
@@ -13,23 +13,23 @@
         'base-link--external': url,
         'base-link--internal': source && !type,
         'base-link--chip': source && type,
-        'base-link--tooltip': tooltip || tooltipAsync,
+        'base-link--tooltip': tooltip.length || tooltipAsync.length,
         'base-link--active': showTooltip,
         'base-link--space-after': spaceAfter,
       },
     ]"
     @click="source && type ? { click: chipClicked } : {}">
     <template
-      v-if="!tooltip && !tooltipAsync">
+      v-if="!tooltip.length && !tooltipAsync.length">
       {{ value }}
     </template>
 
     <!-- (i) tooltip -->
     <template
-      v-if="(tooltip && !source) || (tooltipAsync && !source)">
+      v-if="(tooltip.length && !source) || (tooltipAsync.length && !source)">
       <span
         class="base-link__label"
-        @keydown.enter.prevent="tooltip ? { click: tooltipClicked } : {}"
+        @keydown.enter.prevent="tooltip.length ? { click: tooltipClicked } : {}"
         @click="tooltipClicked">
         {{ value }}
         <span
@@ -63,7 +63,7 @@
           </span>
 
           <div
-            v-for="(item, index) in tooltip.data"
+            v-for="(item, index) in tooltip"
             :key="index"
             class="base-tooltip__row">
             {{ item.label }}:
@@ -115,21 +115,21 @@ export default {
     },
     /**
      * tooltip content<br>
-     * by default a label and a list (label: value) is rendered<br>
-     * structure: { label: 'headline', data: [{ label: 'label', value: 'value', url: '#' }]}<br>
+     * by default a list (label: value) is rendered<br>
+     * structure: [{ label: 'label', value: 'value', url: '#' }]<br>
      * or use v-slot:tooltip to customize the content
      */
     tooltip: {
-      type: Object,
-      default: () => {},
+      type: Array,
+      default: () => [],
     },
     /**
      * async tooltip content<br>
      * if set, event @tooltipClicked with this object will be emitted
      */
     tooltipAsync: {
-      type: Object,
-      default: () => {},
+      type: Array,
+      default: () => [],
     },
     /**
      * additional tooltip styles<br>
@@ -213,7 +213,7 @@ export default {
   },
   watch: {
     tooltip(val) {
-      if (val.data) {
+      if (val) {
         this.isLoading = false;
         this.showTooltip = true;
       }
@@ -232,12 +232,12 @@ export default {
       this.$emit('chipClicked', { source: this.source, type: this.type });
     },
     async tooltipClicked() {
-      if (this.tooltip) {
+      if (this.tooltip.length) {
         this.showTooltip = !this.showTooltip;
         return;
       }
 
-      if (this.tooltipAsync) {
+      if (this.tooltipAsync.length) {
         this.isLoading = true;
         this.$emit('tooltipClicked', this.tooltipAsync);
       }

@@ -43,36 +43,7 @@ export default {
         },
         {
           value: 'tooltip',
-          tooltip: {
-            label: 'additional information',
-            data: [
-              {
-                label: 'label',
-                value: 'value',
-              },
-              {
-                label: 'label',
-                value: 'external link',
-                url: 'https://base.uni-ak.ac.at',
-              },
-            ],
-          },
-        },
-        {
-          value: 'aync tooltip',
-          additional: {
-            key: 'value',
-          },
-        },
-      ],
-    };
-  },
-  methods: {
-    async asyncTooltip(value, index) {
-      setTimeout(() => {
-        this.$set(this.links[index], 'tooltip', {
-          label: 'async content',
-          data: [
+          tooltip: [
             {
               label: 'label',
               value: 'value',
@@ -83,7 +54,33 @@ export default {
               url: 'https://base.uni-ak.ac.at',
             },
           ],
-        });
+        },
+        {
+          value: 'aync tooltip',
+          additional: [
+            {
+              label: 'label',
+              value: 'value',
+            },
+          ],
+        },
+      ],
+    };
+  },
+  methods: {
+    async asyncTooltip(value, index) {
+      setTimeout(() => {
+        this.$set(this.links[index], 'tooltip', [
+          {
+            label: 'label',
+            value: 'value',
+          },
+          {
+            label: 'label',
+            value: 'external link',
+            url: 'https://base.uni-ak.ac.at',
+          },
+        ]);
       }, 500);
     },
   },

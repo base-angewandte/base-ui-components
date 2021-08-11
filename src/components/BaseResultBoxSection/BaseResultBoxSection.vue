@@ -728,7 +728,7 @@ export default {
       },
       immediate: true,
     },
-    itemsPerRow(val, old) {
+    itemsPerRow(val) {
       this.$emit('items-per-row-changed', val);
     },
     // if expanded variable is set from outside change

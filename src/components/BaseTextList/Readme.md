@@ -54,20 +54,17 @@ export default {
           data: [
             {
               value: 'additional info in toolip',
-              additional: {
-                label: 'label',
-                data: [
-                  {
-                    label: 'www',
-                    value: 'base',
-                    url: 'https://base.uni-ak.ac.at',
-                  },
-                  {
-                    label: 'label',
-                    value: 'some value',
-                  },
-                ],
-              },
+              additional: [
+                {
+                  label: 'www',
+                  value: 'base',
+                  url: 'https://base.uni-ak.ac.at',
+                },
+                {
+                  label: 'label',
+                  value: 'some value',
+                },
+              ],
             },
             {
               value: 'external link',

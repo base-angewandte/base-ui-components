@@ -57,7 +57,7 @@
               <!-- @slot slot for tooltip content -->
               <template v-slot:tooltip>
                 <slot
-                  :data="objectItem.additional.data"
+                  :data="objectItem.additional"
                   name="tooltip" />
               </template>
             </BaseLink>
