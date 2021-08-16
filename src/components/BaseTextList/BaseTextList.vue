@@ -39,43 +39,69 @@
         </li>
       </ul>
 
-      <!-- Array/Objects as data list -->
-      <dl
-        v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
-        class="base-text-list-content">
+      <!-- Array/Objects -->
+      <template
+        v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'">
+        <!-- render as comma separated list -->
         <template
-          v-for="(objectItem, objectIndex) in item.data">
-          <dt
-            :key="'l' + objectIndex"
-            class="base-text-list__content-list-item">
-            <template
-              v-if="objectItem.label">
-              {{ objectItem.label }}:
-            </template>
-          </dt>
-          <dd
-            :key="'v' + objectIndex"
-            class="base-text-list__content-list-description base-text-list__content-list-item">
-            <template
-              v-if="objectItem.url">
-              <component
-                :is="useRouterLink(objectItem.url) ? 'router-link' : 'a'"
-                :to="useRouterLink(objectItem.url) ? objectItem.url : undefined"
-                :href="!useRouterLink(objectItem.url) ? objectItem.url : undefined"
-                :title="objectItem.value"
-                :target="target(objectItem.url)"
-                class="base-text-list__content-link">
-                {{ objectItem.value }}
-              </component>
-            </template>
+          v-if="!containKeys(item.data, 'label')">
+          <template
+            v-for="(objectItem, objectIndex) in item.data">
+            <BaseLink
+              :key="objectIndex"
+              :source="objectItem.source"
+              :tooltip="objectItem.additional"
+              :type="objectItem.type"
+              :url="objectItem.url"
+              :value="objectItem.value">
+              <!-- @slot slot for tooltip content -->
+              <template v-slot:tooltip>
+                <slot
+                  :data="objectItem.additional"
+                  name="tooltip" />
+              </template>
+            </BaseLink>
 
-            <template
-              v-else>
-              {{ objectItem.value }}
-            </template>
-          </dd>
+            <!-- eslint-disable -->
+            <template v-if="objectIndex !== item.data.length - 1">, </template>
+            <!-- eslint-enable -->
+          </template>
         </template>
-      </dl>
+
+        <!-- render as data list -->
+        <template
+          v-if="containKeys(item.data, 'label')">
+          <dl
+            v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
+            class="base-text-list-content">
+            <template
+              v-for="(objectItem, objectIndex) in item.data">
+              <dt
+                :key="'l' + objectIndex"
+                class="base-text-list__content-list-item">
+                <template
+                  v-if="objectItem.label">
+                  {{ objectItem.label }}:
+                </template>
+              </dt>
+              <dd
+                :key="'v' + objectIndex"
+                class="base-text-list__content-list-description base-text-list__content-list-item">
+                <BaseLink
+                  :render-link-as="renderLinkAs"
+                  :source="objectItem.source"
+                  :tooltip="objectItem.additional"
+                  :type="objectItem.type"
+                  :url="objectItem.url"
+                  :value="objectItem.value">
+                  <!-- @slot slot for tooltip content -->
+                  <slot name="tooltip" />
+                </BaseLink>
+              </dd>
+            </template>
+          </dl>
+        </template>
+      </template>
     </div>
   </div>
 </template>
@@ -88,6 +114,9 @@
 
 export default {
   name: 'BaseTextList',
+  components: {
+    BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
+  },
   props: {
     /**
      * data structure for different rendered tags: <br>
@@ -128,15 +157,32 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify how link element should be rendered - this needs to be a
+     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
+     * is necessary
+     */
+    renderLinkAs: {
+      type: String,
+      default: 'router-link',
+    },
   },
   methods: {
-    useRouterLink(url) {
-      const pattern = /^(.*?):/;
-      return !!this.$route && url.match(pattern) == null;
-    },
-    target(url) {
-      const pattern = /^(.*?):\/\//;
-      return url.match(pattern) ? '_blank' : null;
+    /**
+     * check if all array objects have a key label
+     *
+     * @param {array} data
+     * @param {string} key
+     * @returns {boolean}
+     */
+    containKeys(data, key) {
+      // eslint-disable-next-line
+      for (const obj of data) {
+        if (!Object.keys(obj).includes(key)) {
+          return false;
+        }
+      }
+      return true;
     },
   },
 };
