@@ -2,14 +2,13 @@
   <div class="base-result-box-section">
     <!-- LOADER -->
     <div
-      v-if="entryListInt.length && isLoading"
+      v-if="isLoading"
       class="base-result-box-section__loading">
       <BaseLoader class="base-result-box-section__loader" />
     </div>
 
     <!-- RESULT BOX SECTION AREA -->
     <div
-      v-if="entryListInt.length"
       class="base-result-box-section__container">
       <!-- HEADER ROW -->
       <div
@@ -99,127 +98,128 @@
         :selected-list="selectedListInt"
         @selected="selectAllTriggered" />
       <!-- BOXES AREA -->
-      <component
-        :is="draggableComponent"
-        ref="resultBoxesArea"
-        v-model="visibleBoxes"
-        :animation="draggable ? 150 : false"
-        :tag="draggable ? 'ul' : false"
-        :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
-        class="base-result-box-section__boxes-container">
-        <li
-          v-for="(entry, index) of visibleBoxes"
-          :key="getPropValue(identifierPropertyName, entry)"
-          :tabindex="editModeActive ? -1 : 0"
-          :aria-label="getPropValue(titlePropertyName, entry)"
-          :class="['base-result-box-section__box-item',
-                   'base-result-box-section__result-box-item',
-                   `base-result-box-section__box-item-${elementId}`,
-                   { 'base-result-box-section__result-box-item-draggable':
-                     draggable && editModeActive }]">
-          <!-- @slot result-box - for custom result boxes -->
+      <template v-if="entryListInt.length">
+        <component
+          :is="draggableComponent"
+          ref="resultBoxesArea"
+          v-model="visibleBoxes"
+          :animation="draggable ? 150 : false"
+          :tag="draggable ? 'ul' : false"
+          :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
+          class="base-result-box-section__boxes-container">
+          <li
+            v-for="(entry, index) of visibleBoxes"
+            :key="getPropValue(identifierPropertyName, entry)"
+            :tabindex="editModeActive ? -1 : 0"
+            :aria-label="getPropValue(titlePropertyName, entry)"
+            :class="['base-result-box-section__box-item',
+                     'base-result-box-section__result-box-item',
+                     `base-result-box-section__box-item-${elementId}`,
+                     { 'base-result-box-section__result-box-item-draggable':
+                       draggable && editModeActive }]">
+            <!-- @slot result-box - for custom result boxes -->
+            <slot
+              :item="entry"
+              :index="index"
+              :select-active="editModeActive"
+              :is-entry-selected="isEntrySelected"
+              :entry-selected="entrySelected"
+              name="resultBox">
+              <BaseImageBox
+                :key="getPropValue(identifierPropertyName, entry)"
+                :selectable="imageBoxesSelectable"
+                :selected="isEntrySelected(entry)"
+                :box-size="{ width: 'auto' }"
+                :box-ratio="100"
+                :title="getPropValue(titlePropertyName, entry)"
+                :subtext="entry.subtext"
+                :description="entry.description"
+                :image-url="entry.imageUrl"
+                :box-text="entry.text"
+                :lazyload="true"
+                @select-triggered="entrySelected(
+                  getPropValue(identifierPropertyName, entry), $event)"
+                @clicked="entryClicked(getPropValue(identifierPropertyName, entry))" />
+            </slot>
+          </li>
+
+          <!-- ACTION BUTTONS -->
+          <!-- @slot add custom elements after result elements list<br>
+           use scoped slot prop 'itemsPerRow' or dynamically adjusted css variable --items-per-row
+            to adjust element width in accordance with other boxes-->
           <slot
-            :item="entry"
-            :index="index"
-            :select-active="editModeActive"
-            :is-entry-selected="isEntrySelected"
-            :entry-selected="entrySelected"
-            name="resultBox">
-            <BaseImageBox
-              :key="getPropValue(identifierPropertyName, entry)"
-              :selectable="imageBoxesSelectable"
-              :selected="isEntrySelected(entry)"
-              :box-size="{ width: 'auto' }"
-              :box-ratio="100"
-              :title="getPropValue(titlePropertyName, entry)"
-              :subtext="entry.subtext"
-              :description="entry.description"
-              :image-url="entry.imageUrl"
-              :box-text="entry.text"
-              :lazyload="true"
-              @select-triggered="entrySelected(getPropValue(identifierPropertyName, entry), $event)"
-              @clicked="entryClicked(getPropValue(identifierPropertyName, entry))" />
+            v-if="showActionButtonBoxes && editModeActive"
+            :items-per-row="itemsPerRow"
+            :element-id="elementId"
+            name="actionButtons">
+            <!-- default button -->
+            <template
+              v-for="action of actionButtonsConfig">
+              <BaseBoxButton
+                v-if="action.display === 'bottom' || action.display === 'all' || !action.display"
+                :key="action.value"
+                :text="getI18nString(action.text)"
+                :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
+                :icon="action.icon"
+                box-style="small"
+                box-type="button"
+                :class="['base-result-box-section__box-item',
+                        `base-result-box-section__box-item-${elementId}`,]"
+                @clicked="submitAction(action.value)" />
+            </template>
           </slot>
-        </li>
-
-        <!-- ACTION BUTTONS -->
-        <!-- @slot add custom elements after result elements list<br>
-         use scoped slot prop 'itemsPerRow' or dynamically adjusted css variable --items-per-row
-          to adjust element width in accordance with other boxes-->
-        <slot
-          v-if="showActionButtonBoxes && editModeActive"
-          :items-per-row="itemsPerRow"
-          :element-id="elementId"
-          name="actionButtons">
-          <!-- default button -->
-          <template
-            v-for="action of actionButtonsConfig">
-            <BaseBoxButton
-              v-if="action.display === 'bottom' || action.display === 'all' || !action.display"
-              :key="action.value"
-              :text="getI18nString(action.text)"
-              :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
-              :icon="action.icon"
-              box-style="small"
-              box-type="button"
-              :class="['base-result-box-section__box-item',
-                       `base-result-box-section__box-item-${elementId}`,]"
-              @clicked="submitAction(action.value)" />
-          </template>
-        </slot>
-        <!-- EXPAND BUTTON -->
-        <BaseBoxButton
-          v-else-if="useExpandMode && !editModeActive && expandNeeded && initialBoxCalcDone"
-          :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
-          icon=""
-          text=""
-          box-type="button"
-          :class="['base-result-box-section__box-item',
-                   `base-result-box-section__box-item-${elementId}`,]"
-          @clicked="expandedInt = !expandedInt">
-          <template v-slot>
-            <!-- needed to add v-if here again - otherwise strange side effects -->
-            <div
-              v-if="!editModeActive"
-              class="base-result-box-section__expand-button__content">
-              <span
-                v-if="!expandedInt"
-                class="base-result-box-section__expand-button__content-number">
-                {{ `+${(total || entryList.length) - visibleBoxes.length}` }}
-              </span>
-              <span
-                :class="[expandedInt
-                  ? 'base-result-box-section__expand-button__content-text-expanded'
-                  : 'base-result-box-section__expand-button__content-text-collapsed']">
-                {{ expandedInt ? expandText.collapse : expandText.expand }}
-              </span>
-            </div>
-          </template>
-        </BaseBoxButton>
-      </component>
-
-      <!-- PAGINATION -->
-      <!-- only shown if
-      * usePagination is true
-      * it is actually needed because there is more than one page
-      * edit mode is active and draggable functionality is not used
-      * edit mode is not active and rows are expanded (always true if
-        useExpandMode is set false) -->
-      <BasePagination
-        v-if="usePagination && pages > 1
+          <!-- EXPAND BUTTON -->
+          <BaseBoxButton
+            v-else-if="useExpandMode && !editModeActive && expandNeeded && initialBoxCalcDone"
+            :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
+            icon=""
+            text=""
+            box-type="button"
+            :class="['base-result-box-section__box-item',
+                    `base-result-box-section__box-item-${elementId}`,]"
+            @clicked="expandedInt = !expandedInt">
+            <template v-slot>
+              <!-- needed to add v-if here again - otherwise strange side effects -->
+              <div
+                v-if="!editModeActive"
+                class="base-result-box-section__expand-button__content">
+                <span
+                  v-if="!expandedInt"
+                  class="base-result-box-section__expand-button__content-number">
+                  {{ `+${(total || entryList.length) - visibleBoxes.length}` }}
+                </span>
+                <span
+                  :class="[expandedInt
+                    ? 'base-result-box-section__expand-button__content-text-expanded'
+                    : 'base-result-box-section__expand-button__content-text-collapsed']">
+                  {{ expandedInt ? expandText.collapse : expandText.expand }}
+                </span>
+              </div>
+            </template>
+          </BaseBoxButton>
+        </component>
+        <!-- PAGINATION -->
+        <!-- only shown if
+        * usePagination is true
+        * it is actually needed because there is more than one page
+        * edit mode is active and draggable functionality is not used
+        * edit mode is not active and rows are expanded (always true if
+          useExpandMode is set false) -->
+        <BasePagination
+          v-if="usePagination && pages > 1
           && ((editModeActive && !draggable)
             || (!editModeActive && expandedInt))"
-        key="pagination"
-        :total="pages"
-        :current="currentPageNumberInt"
-        :use-link-element="usePaginationLinkElement"
-        @set-page="setPage" />
+          :key="'pagination-' + elementId"
+          :total="pages"
+          :current="currentPageNumberInt"
+          :use-link-element="usePaginationLinkElement"
+          @set-page="setPage" />
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import { extractNestedPropertyValue } from '@/utils/utils';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
@@ -231,7 +231,6 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
-    BaseIcon,
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
     BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
     BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
@@ -555,6 +554,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * specify an additional number of px for the position the page
+     * should jump to on page change
+     */
+    scrollToOffset: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -570,7 +577,7 @@ export default {
       // store collapsed state on action start
       wasExpanded: false,
       // how many items do fit in one row
-      itemsPerRow: 0,
+      itemsPerRow: 6,
       // try to only do initial box size calculation once
       initialBoxCalcDone: false,
       // to manipulate selectedList internally
@@ -617,6 +624,9 @@ export default {
             .slice((this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
               this.currentPageNumberInt * this.visibleNumberOfItems);
         }
+        if (this.fetchDataExternally) {
+          return this.entryList.slice(0, this.visibleNumberOfItems);
+        }
         // else return complete list
         return this.entryListInt;
       },
@@ -646,7 +656,8 @@ export default {
      * @returns {number}
      */
     pages() {
-      return Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems);
+      return this.total || this.entryListInt.length
+        ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
     },
     /**
      * determines if the total number of entries exceedes the number of entries that
@@ -714,21 +725,40 @@ export default {
     },
     // watch pages in case of deletion of items and take care
     // current page is not higher than total page number
-    pages(val) {
-      if (this.currentPageNumberInt > val) {
-        this.currentPageNumberInt = val;
-      }
-    },
-    // update internal page number if changed from outside
-    currentPageNumber: {
+    pages: {
       handler(val) {
-        if (val !== this.currentPageNumberInt) {
+        if (this.currentPageNumberInt > val) {
+          // if the current page number exceeds the total number of pages
+          // set the value to the last existing page
           this.currentPageNumberInt = val;
         }
       },
       immediate: true,
     },
-    itemsPerRow(val, old) {
+    // update internal page number if changed from outside
+    currentPageNumber: {
+      handler(val) {
+        if (val !== this.currentPageNumberInt) {
+          // check if number is larger than max number of pages currently available and
+          // set to max possible value if yes instead
+          this.currentPageNumberInt = val > this.pages ? this.pages : val;
+        }
+      },
+      immediate: true,
+    },
+    /**
+     * watch internal page number to inform parent about changes
+     * @param {number} val
+     */
+    currentPageNumberInt: {
+      handler(val) {
+        if (val !== this.currentPageNumber) {
+          this.$emit('update:current-page-number', this.currentPageNumberInt);
+        }
+      },
+      immediate: true,
+    },
+    itemsPerRow(val) {
       this.$emit('items-per-row-changed', val);
     },
     // if expanded variable is set from outside change
@@ -969,7 +999,7 @@ export default {
       this.currentPageNumberInt = number;
       // if variable is set true jump to top of element
       if (this.jumpToTop) {
-        window.scrollTo(0, this.$el.offsetTop);
+        window.scrollTo(0, this.$el.offsetTop - this.scrollToOffset);
       }
       // and also inform parent of page number change
       if (number !== this.currentPageNumber) {
@@ -1046,7 +1076,7 @@ export default {
     height: 100%;
     width: 100%;
     z-index: map-get($zindex, loader);
-    background-color: rgba(255,255,255, 0.50);
+    background-color: $loading-background;
 
     .base-result-box-section__loader {
       top: 50%;
