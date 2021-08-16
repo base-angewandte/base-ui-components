@@ -11,8 +11,8 @@
         { 'base-pagination__arrow-icon-inactive': active <= 1 }
       ]"
       aria-label="Go to previous page"
-      @click="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @click.native="active - 1 > 0 ? setActivePage(active - 1) : false"
+      @click.prevent="active - 1 > 0 ? setActivePage(active - 1) : false"
+      @click.native.prevent="active - 1 > 0 ? setActivePage(active - 1) : false"
       @keypress.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
@@ -31,8 +31,8 @@
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n}]"
           @keypress.enter="setActivePage(n)"
-          @click.native="setActivePage(n)"
-          @click="setActivePage(n)">
+          @click.native.prevent="setActivePage(n)"
+          @click.prevent="setActivePage(n)">
           {{ n }}
         </component>
       </template>
@@ -46,8 +46,8 @@
           :aria-label="`${active === 1 ? 'Current Page, Page' : 'Go to page'} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1}]"
           @keypress.enter="setActivePage(1)"
-          @click.native="setActivePage(1)"
-          @click="setActivePage(1)">
+          @click.native.prevent="setActivePage(1)"
+          @click.prevent="setActivePage(1)">
           {{ 1 }}
         </component>
         <span
@@ -63,8 +63,8 @@
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n}]"
           @keypress.enter="setActivePage(n)"
-          @click.native="setActivePage(n)"
-          @click="setActivePage(n)">
+          @click.native.prevent="setActivePage(n)"
+          @click.prevent="setActivePage(n)">
           {{ n }}
         </component>
         <span
@@ -80,8 +80,8 @@
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total}]"
           @keypress.enter="setActivePage(total)"
-          @click.native="setActivePage(total)"
-          @click="setActivePage(total)">
+          @click.native.prevent="setActivePage(total)"
+          @click.prevent="setActivePage(total)">
           {{ total }}
         </component>
       </template>
@@ -96,8 +96,8 @@
         { 'base-pagination__arrow-icon-inactive': active >= total }
       ]"
       aria-label="Go to next Page"
-      @click="active + 1 <= total ? setActivePage(active + 1) : false"
-      @click.native="active + 1 <= total ? setActivePage(active + 1) : false"
+      @click.prevent="active + 1 <= total ? setActivePage(active + 1) : false"
+      @click.native.prevent.prevent="active + 1 <= total ? setActivePage(active + 1) : false"
       @keypress.enter="active + 1 <= total ? setActivePage(active + 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
@@ -149,17 +149,6 @@ export default {
       type: [String, Boolean],
       default: false,
       validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
-    },
-    /**
-     * if pagination elements are link-elements the default href is set as
-     *  '[currentRoute]?page=[currentPage]'. Adding properties here gives the possibility to
-     *  add additional parameters BEFORE the page parameter:<br>
-     *  '[currentRoute]?[customParam1]=[customValue1]
-     *    &[customParam2]=[customValue2]&page=[currentPage]'
-     */
-    additionalLinkQueryParams: {
-      type: Object,
-      default: () => ({}),
     },
   },
   data() {
@@ -293,7 +282,7 @@ export default {
     getLinkPath(page) {
       // check if router in project and link element is used and set link path accordingly if yes
       if (!!this.useLinkElement && this.$route) {
-        return ({ path: this.$route.fullPath, query: { ...this.additionalLinkQueryParams, page } });
+        return ({ path: this.$route.fullPath, query: { page } });
       }
       return '';
     },
