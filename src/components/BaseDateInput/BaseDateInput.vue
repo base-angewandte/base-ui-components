@@ -637,7 +637,7 @@ export default {
         // add all the listeners from the parent
         ...this.$listeners,
         // and add custom listeners
-        input: (event) => {
+        input: () => {
           /**
            * Event emitted on input, passing input string
            *
@@ -646,7 +646,7 @@ export default {
            * passing only the event.target.value
            *
            */
-          this.$emit('input', event.target.value);
+          this.$emit('input', this.getInputData());
         },
       };
     },
