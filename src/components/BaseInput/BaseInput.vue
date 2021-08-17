@@ -462,7 +462,7 @@ export default {
      */
     isActiveInt(val) {
       // if active was set true focus the input field
-      if (val && this.setFocusOnActive) {
+      if (this.inputElement && val && this.setFocusOnActive) {
         this.inputElement.focus();
       }
       if (val !== this.isActive) {
@@ -526,7 +526,9 @@ export default {
      */
     removeInput() {
       this.inputInt = '';
-      this.inputElement.focus();
+      if (this.inputElement) {
+        this.inputElement.focus();
+      }
     },
     /**
      * set the active input field state (used for visual active indication)
