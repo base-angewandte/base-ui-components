@@ -6,11 +6,13 @@
     :class="['base-menu-entry',
              {'base-menu-entry-activatable': isActivatable,
               'base-menu-entry-active': isActive,
+              'base-menu-entry-no-icon': !icon,
               'base-menu-entry-text-fade-out' : !showThumbnails }]"
     :role="isSelectable && selectActive ? '' : 'link'"
     @keyup.enter.prevent="clicked"
     @click="clicked">
     <base-icon
+      v-if="icon"
       ref="entryIcon"
       :name="icon"
       class="base-menu-entry-icon" />
@@ -265,6 +267,10 @@ export default {
       margin: 0 $spacing;
       flex: 0 0 #{$icon-large};
       transition: fill 0.1s ease;
+    }
+
+    &.base-menu-entry-no-icon {
+      padding-left: $spacing;
     }
 
     .base-menu-entry-text-wrapper {
