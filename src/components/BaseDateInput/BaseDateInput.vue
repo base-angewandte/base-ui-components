@@ -84,7 +84,9 @@
                   :aria-disabled="disabled"
                   :class="['base-date-input__input', inputClass]"
                   autocomplete="off"
-                  @keydown.tab="handleTabKey($event,'from')"
+                  @blur="checkDateValidity('From')"
+                  @input="checkDate($event, 'From')"
+                  @keydown="handleInputKeydown($event, 'From')"
                   v-on="dateInputListeners">
               </template>
               <!-- this empty element is here so that the default icon of datepicker is not used -->
@@ -156,7 +158,9 @@
                   :aria-disabled="disabled"
                   autocomplete="off"
                   :class="['base-date-input__input', inputClass]"
-                  @keydown.tab="handleTabKey($event, 'to')"
+                  @blur="checkDateValidity('To')"
+                  @input="checkDate($event, 'To')"
+                  @keydown="handleInputKeydown($event, 'To')"
                   v-on="dateInputListeners">
               </template>
               <!-- this empty element is here so that the default icon of datepicker is not used -->
@@ -773,15 +777,89 @@ export default {
       return dateString.split('.').reverse().join('-');
     },
     /**
-     * tab key needs separate handling and only needs to set input field close when
+     * checks done on keydown events
+     * a) tab key needs separate handling and only needs to set input field close when
      * there is no clearable button (or shift key was used for going to previous field)
-     * @param {KeyboardEvent} event - the tab keydown event
-     * @param {string} origin - is event coming from 'from' or 'to' field in lower case
+     * b) prevent user from entering chars other than number or period and not more characters than
+     * the date format requires
+     * @param {KeyboardEvent} event - the keydown event
+     * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
-    handleTabKey(event, origin) {
-      if (event.shiftKey || !this.clearable
-        || !this[`input${origin.charAt(0).toUpperCase() + origin.slice(1)}`]) {
-        this[`${origin}Open`] = false;
+    handleInputKeydown(event, origin) {
+      // get the key triggering the event
+      const { key } = event;
+      // check if key was tab because of reasons specified above
+      if (key === 'Tab' && (event.shiftKey || !this.clearable
+        || !this[`input${origin + origin.slice(1)}`])) {
+        // if yes set the relevant input field open status to false
+        this[`${origin.charAt(0).toLowerCase()}Open`] = false;
+      }
+      // check if key was not any of the allowed keys
+      // or was an allowed key but the length is to long for the format in
+      // question (and no text was selected = will be replaced)
+      if (!/([0-9]|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)/.test(key)
+        || (/[0-9]|/.test(key) && this[`input${origin}`].length >= this.dateFormatInt.length
+          && !window.getSelection())) {
+        event.preventDefault();
+      }
+    },
+    /**
+     * this function is triggered with the input event - it checks the length of the value and
+     * adds the '.' in the correct places if necessary
+     * @param {InputEvent} event - the input event
+     * @param {string} origin - is event coming from 'from' or 'to' field in title case
+     */
+    checkDate(event, origin) {
+      // get the value in question
+      const value = this[`input${origin}`];
+      // check if value is present and if input type is other than 'deleteContentBackward' because
+      // otherwise the dots can not be deleted anymore
+      if (value && event.inputType !== 'deleteContentBackward') {
+        // now check the date format and if input so far matches the appropriate regex
+        if ((this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}|\d{2}\.\d{2})$/.test(value))
+          || (this.dateFormatInt === 'MM.YYYY' && /^\d{2}$/.test(value))) {
+          // if so - add a period character
+          this[`input${origin}`] = `${value}.`;
+        }
+      }
+    },
+    /**
+     * this function is triggered with the blur event on the input and does a last check on the
+     * validity of the value
+     * @param {string} origin - is event coming from 'from' or 'to' field in title case
+     */
+    checkDateValidity(origin) {
+      // get the value in question
+      const value = this[`input${origin}`];
+      // also save the current format length
+      const formatLength = this.dateFormatInt.length;
+      // check if there is a value present
+      if (value) {
+        // if the date is simply not a date - remove the value
+        if (Number.isNaN(Date.parse(this.dateStorage(value)))) {
+          // TODO: check if this really fits all use cases
+          this[`input${origin}`] = '';
+          // secondly check if the length of the value is correct
+        } else if (value.length !== formatLength) {
+          // first check if the reason for the length not matching is that the day is missing a zero
+          if (this.dateFormatInt === 'DD.MM.YYYY' && /^[1-9]\.\d{1,2}\.\d{4}$/.test(value)) {
+            // get the values
+            const [day, month, year] = value.split('.');
+            // repair date and add a zero to day
+            this[`input${origin}`] = `0${day}.${month}.${year}`;
+          }
+          // second check if the reason for mismatching length is that the zero in month is missing
+          if (['DD.MM.YYYY', 'MM.YYYY'].includes(this.dateFormatInt) && /^\d{2}?\.?[1-9]\.\d{4}$/.test(value)) {
+            // get values, reverse in order to be able to get also correct values for format 'month'
+            const [year, month, day] = value.split('.').reverse();
+            // repair date and add missing zero to month
+            this[`input${origin}`] = `${day}.0${month}.${year}`;
+          }
+          // now check if date has now the correct length - if not still remove the value
+          if (this[`input${origin}`].length !== formatLength) {
+            this[`input${origin}`] = '';
+          }
+        }
       }
     },
     /**
