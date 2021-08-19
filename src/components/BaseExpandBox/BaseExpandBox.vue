@@ -3,6 +3,7 @@
     box-ratio="0"
     :box-size="{}"
     :box-hover="false"
+    :style="style"
     :class="[
       'base-expand-box',
       'base-expand-box-padding-' + padding,
@@ -98,6 +99,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * define how many rows of text are displayed
+     */
+    rows: {
+      type: Number,
+      default: 10,
+    },
   },
   data() {
     return {
@@ -106,6 +114,11 @@ export default {
       initialized: false,
       showButton: false,
     };
+  },
+  computed: {
+    style() {
+      return { '--rows': this.rows };
+    },
   },
   mounted() {
     this.init();
@@ -205,11 +218,11 @@ export default {
     }
 
     &.base-expand-box-auto-height:not(.base-expand-box-open) .base-expand-box-content {
-      max-height: $line-height * $base-expand-box-text-rows + $headline-margin-bottom;
+      max-height: calc(#{$line-height} * var(--rows) + #{$headline-margin-bottom});
     }
 
     &:not(.base-expand-box-auto-height) .base-expand-box-content {
-      height: $line-height * $base-expand-box-text-rows + $headline-margin-bottom;
+      height: calc(#{$line-height} * var(--rows) + #{$headline-margin-bottom});
     }
 
     .base-expand-box-content {

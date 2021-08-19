@@ -73,12 +73,13 @@
           v-if="containKeys(item.data, 'label')">
           <dl
             v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
-            class="base-text-list-content">
+            :class="['base-text-list-content',
+                     'base-text-list-content--' + listType]">
             <template
               v-for="(objectItem, objectIndex) in item.data">
               <dt
                 :key="'l' + objectIndex"
-                class="base-text-list__content-list-item">
+                class="base-text-list__content__label">
                 <template
                   v-if="objectItem.label">
                   {{ objectItem.label }}:
@@ -86,7 +87,7 @@
               </dt>
               <dd
                 :key="'v' + objectIndex"
-                class="base-text-list__content-list-description base-text-list__content-list-item">
+                class="base-text-list__content__label base-text-list__content__value">
                 <BaseLink
                   :render-link-as="renderLinkAs"
                   :source="objectItem.source"
@@ -165,6 +166,16 @@ export default {
     renderLinkAs: {
       type: String,
       default: 'router-link',
+    },
+    /**
+     * specify how data-list (label, value) should be rendered:
+     */
+    listType: {
+      type: String,
+      default: 'horizontal',
+      validate(val) {
+        return ['horizontal', 'vertical'].includes(val);
+      },
     },
   },
   methods: {
@@ -245,14 +256,35 @@ export default {
         break-inside: avoid;
       }
 
-      .base-text-list__content-list-item {
-        display: inline;
+      .base-text-list-content--horizontal {
+        .base-text-list__content__label {
+          display: inline;
+        }
+
+        .base-text-list__content__value {
+          display: inline;
+
+          &:after {
+            display: block;
+            content: '';
+            width: 100%;
+          }
+        }
       }
 
-      .base-text-list__content-list-description:after {
-        display: block;
-        content: '';
-        width: 100%;
+      .base-text-list-content--vertical {
+        line-height: $line-height;
+
+        .base-text-list__content__label {
+          display: block;
+        }
+
+        .base-text-list__content__value {
+          display: block;
+          color: $font-color;
+          margin-bottom: $spacing-small;
+          word-break: break-word;
+        }
       }
     }
 
