@@ -797,9 +797,9 @@ export default {
       // check if key was not any of the allowed keys
       // or was an allowed key but the length is to long for the format in
       // question (and no text was selected = will be replaced)
-      if (!/([0-9]|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)/.test(key)
-        || (/[0-9]|/.test(key) && this[`input${origin}`].length >= this.dateFormatInt.length
-          && !window.getSelection())) {
+      if (!/([0-9]|Period|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)/.test(key)
+        || (/([0-9]|Period)/.test(key) && this[`input${origin}`].length >= this.dateFormatInt.length
+          && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)) {
         event.preventDefault();
       }
     },
