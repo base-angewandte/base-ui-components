@@ -847,20 +847,31 @@ export default {
       const formatLength = this.dateFormatInt.length;
       // check if there is a value present
       if (value) {
-        // first check if the length of the value is correct
-        if (value.length !== formatLength) {
-          // first check if periods are missing
-          if (this.dateFormatInt.split('.').length > value.split('.').length) {
-            if (formatLength !== 4 && /^\d{3}/.test(value)) {
-              this[`input${origin}`] = `${value.slice(0, 2)}.${value.slice(2, value.length)}`;
-              value = this[`input${origin}`];
-            }
-            if (this.dateFormatInt === 'DD.MM.YYYY' && formatLength !== 4 && /^\d{2}\.\d{3}/.test(value)) {
-              this[`input${origin}`] = `${value.slice(0, 5)}.${value.slice(5, value.length)}`;
-              value = this[`input${origin}`];
-            }
+        // first check if periods are there in correct number
+        if (value.split('.').length > this.dateFormatInt.split('.').length) {
+          // just remove all the periods - there the next check will add some again
+          this[`input${origin}`] = value.replaceAll('.', '');
+          value = this[`input${origin}`];
+        }
+        if (this.dateFormatInt.split('.').length > value.split('.').length) {
+          // check if day and month (for DDMMYYYY) or month and year (for MMYYYY) are without
+          // period
+          if (formatLength !== 4 && /^\d{3}/.test(value)) {
+            // this assumes the first two digits are for day or month respectively!
+            this[`input${origin}`] = `${value.slice(0, 2)}.${value.slice(2, value.length)}`;
+            value = this[`input${origin}`];
           }
-          // first check if the reason for the length not matching is that the day is missing a zero
+          // check if there is a second period between month and year (for DDMMYYYY)
+          if (this.dateFormatInt === 'DD.MM.YYYY' && formatLength !== 4 && /^\d{2}\.\d{3}/.test(value)) {
+            // this assumes there are two digits for day and month respectively!
+            this[`input${origin}`] = `${value.slice(0, 5)}.${value.slice(5, value.length)}`;
+            value = this[`input${origin}`];
+          }
+        }
+        // second check if the length of the value is correct
+        if (value.length !== formatLength) {
+          // first check if the reason for the length not matching is that the day is
+          // missing a zero
           if (this.dateFormatInt === 'DD.MM.YYYY' && /^[1-9]\.\d{1,2}\.\d{4}$/.test(value)) {
             // get the values
             const [day, month, year] = value.split('.');
@@ -876,10 +887,63 @@ export default {
             this[`input${origin}`] = `${day}.0${month}.${year}`;
             value = this[`input${origin}`];
           }
+          // third check reason for length mismatch is year having only two digits or is completely
+          // missing
+          // for date format
+          if (this.dateFormatInt === 'DD.MM.YYYY' && /^\d{2}\.\d{2}\.?(\d{0}|\d{2})$/.test(value)) {
+            // determine current year
+            const currentYear = new Date().getFullYear();
+            const [day, month, year] = value.split('.');
+            // repair date and add first two year digits - if date more than 10 years to the
+            // future - make it 20. century
+            this[`input${origin}`] = `${day}.${month}.${year > (currentYear + 10).toString().slice(2, 4)
+              ? '19' : '20'}${year || currentYear.toString().slice(2, 4)}`;
+            value = this[`input${origin}`];
+          }
+          // for month format
+          if (this.dateFormatInt === 'MM.YYYY' && /^\d{2}\.?(\d{0}|\d{2})$/.test(value)) {
+            // determine current year
+            const currentYear = new Date().getFullYear();
+            const [month, year] = value.split('.');
+            // repair date and add first two year digits - if date more than 10 years to the
+            // future - make it 20. century
+            this[`input${origin}`] = `${month}.${year > (currentYear + 10).toString().slice(2, 4)
+              ? '19' : '20'}${year || currentYear.toString().slice(2, 4)}`;
+            value = this[`input${origin}`];
+          }
           // now check if date has now the correct length - if not still remove the value
           if (value.length !== formatLength) {
             this[`input${origin}`] = '';
           }
+        }
+        // now truly check if date is a valid date
+        if (Number.isNaN(Date.parse(this.dateStorage(value)))) {
+          // TODO: check if date has appropriate number of periods
+          const [year, month, day] = value.split('.').reverse();
+          if (this.dateFormatInt === 'DD.MM.YYYY') {
+            // TODO: could this check already be done on input???
+            // check if something is wrong with the day
+            if (!/^(0[1-9]|[1-2][0-9]|3[0-1])/.test(day)) {
+              // replace day with appropriate value
+              this[`input${origin}`] = `01.${month}.${year}`;
+            }
+          } if (this.dateFormatInt !== 'YYYY') {
+            // check if something is wrong with the month
+            if (!/^(0[1-9]|1[0-2])/.test(month)) {
+              // replace month with appropriate value
+              this[`input${origin}`] = `${day ? `${day}.` : ''}01.${year}`;
+            }
+          }
+        }
+        // since technically invalid dates (like 30.02.2000) will also be considered a
+        // vaild date by Date.parse() just convert to Date and back one more time
+        // new Date(input) will always convert to the actual day in the next month
+        // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
+        const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
+        if (!Number.isNaN(Date.parse(this.dateStorage(tempDate)))) {
+          this[`input${origin}`] = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
+        } else {
+          this[`input${origin}`] = '';
         }
       }
     },
@@ -984,8 +1048,8 @@ export default {
     /**
      * convert a value to a date in local time at zero hours
      *
-     * @param value: the date string stored in db
-     * @returns {Date}
+     * @param value: the date string stored in db (format YYYY-MM-DD)
+     * @returns {Date} - (e.g. Fri Jul 30 2021 00:00:00 GMT+0200 (Central European Summer Time))
      */
     convertToDate(value) {
       return new Date(`${value}T00:00:00.000`);
@@ -993,13 +1057,23 @@ export default {
     /**
      * a function to convert a date to a string in the format YYYY-MM-DD
      *
-     * @param date
-     * @returns {string}
+     * @param {Date} date in format
+     * @returns {string} - returns a string in format YYYY-MM-DD
      */
     getDateString(date) {
-      const month = (date.getMonth() + 1).toString();
-      const day = date.getDate().toString();
-      return `${date.getFullYear().toString()}-${month.length < 2 ? '0' : ''}${month}-${day.length < 2 ? '0' : ''}${day}`;
+      // there is always a year
+      let dateString = `${date.getFullYear().toString()}`;
+      // if date format is not 'year' only - add month
+      if (this.dateFormatInt !== 'YYYY') {
+        const month = (date.getMonth() + 1).toString();
+        dateString = `${dateString}-${month.length < 2 ? '0' : ''}${month}`;
+      }
+      // if date format is 'date' - add day
+      if (this.dateFormatInt === 'DD.MM.YYYY') {
+        const day = date.getDate().toString();
+        dateString = `${dateString}-${day.length < 2 ? '0' : ''}${day}`;
+      }
+      return dateString;
     },
   },
 };
