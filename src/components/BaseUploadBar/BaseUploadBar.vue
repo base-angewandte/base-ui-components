@@ -170,7 +170,7 @@ export default {
       }
 
       &.base-upload-bar-status-icon-fail {
-        fill: #ff4444;
+        fill: $warning-color;
       }
 
       &.base-upload-bar-status-icon-remove {

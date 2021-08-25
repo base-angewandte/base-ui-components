@@ -14,6 +14,8 @@
   --switch-checked-color: #4d4d4d;
   --switch-svg-checked-color: #ffffff;
   --graytext-color: rgba(16, 16, 16, 0.3);
+
+  --warning-color: #ff4444;
 }*/
 
 /* fonts */
@@ -59,6 +61,7 @@ $map-cluster-bg-inner: var(--map-cluster-bg-inner, rgba(255, 152, 0, .85));
 $map-cluster-bg-hover: var(--map-cluster-bg-hover, rgba(255, 217, 91, .4));
 $map-cluster-bg-inner-hover: var(--map-cluster-bg-inner-hover, rgba(255, 217, 91, .85));
 $pagination-bullet-color: var(--pagination-bullet-color, #444444);
+$warning-color: var(--warning-color, #ff4444);
 
 /* shadows and borders */
 $border-width: 2px;
@@ -123,6 +126,3 @@ $headline-margin-bottom: $line-height / 2;
 /* transitions */
 $link-transition: color 0.2s ease-in-out;
 $base-expand-list-transition-duration: 250ms;
-
-/* components */
-$base-expand-box-text-rows: 10;
