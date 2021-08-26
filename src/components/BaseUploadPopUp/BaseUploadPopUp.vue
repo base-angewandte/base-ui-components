@@ -51,7 +51,7 @@
       <BaseButton
         ref="uploadButton"
         :text="buttonText"
-        :icon="currentStatus !== 'saving' || currentStatus !== 'failed' ? 'check-mark' : ''"
+        :icon="currentStatus !== 'saving' && currentStatus !== 'failed' ? 'check-mark' : ''"
         :icon-position="'right'"
         :icon-size="'small'"
         :disabled="currentStatus === 'saving' || userQuotaExceeded"
