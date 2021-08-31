@@ -1,13 +1,14 @@
 <template>
   <div
-    :data-group="groupName !== '' ? groupName : false"
-    :class="['base-expand-row', {'expanded': isVisible}]">
-    <button
-      :id="'base-expand-row-' + id"
-      :aria-expanded="isVisible ? 'true' : 'false'"
-      type="button"
+    :class="['base-expand-row',
+             { 'base-expand-row--expandable': expandable },
+             { 'base-expand-row--expanded': expanded }]">
+    <component
+      :is="expandable ? 'button' : 'div'"
+      :aria-expanded="expandable ? expanded.toString() : null"
+      :type="expandable ? 'button' : null"
       class="base-expand-row-header"
-      @click="clicked">
+      @click="expandable ? clicked() : null">
       <div
         v-if="icon || hasIconSlot"
         class="base-expand-row-icon">
@@ -24,14 +25,15 @@
       </div>
 
       <base-icon
+        v-if="expandable"
         name="drop-down"
         title="open"
         class="base-expand-row-collapse-icon" />
-    </button>
+    </component>
     <div
       role="region"
       :aria-labelledby="'base-expand-row-' + id"
-      :aria-hidden="!isVisible ? 'true' : 'false'"
+      :aria-hidden="!expanded ? 'true' : 'false'"
       :class="['base-expand-row-body', {'base-expand-row-body-bg': bodyHasBackground}]">
       <!-- @slot slot for expanded content -->
       <slot />
@@ -49,19 +51,18 @@ export default {
   },
   props: {
     /**
+     * specify if box is expandable
+     */
+    expandable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
      * label for the expand row
      */
     label: {
       type: String,
       default: 'Label',
-    },
-    /**
-     * group components by name, only one component is expanded at once
-     * Todo: implement logic
-     */
-    groupName: {
-      type: String,
-      default: '',
     },
     /**
      * specify an icon that is displayed before the label
@@ -89,7 +90,7 @@ export default {
   data() {
     return {
       id: null,
-      isVisible: this.isExpanded,
+      expanded: this.isExpanded,
     };
   },
   computed: {
@@ -108,7 +109,7 @@ export default {
      * @event clicked
      */
     clicked() {
-      this.isVisible = !this.isVisible;
+      this.expanded = !this.expanded;
     },
   },
 };
@@ -162,16 +163,6 @@ export default {
         color: $font-color;
       }
 
-      &:focus,
-      &:hover {
-        cursor: pointer;
-        box-shadow: $box-shadow-hov;
-
-        .base-expand-row-collapse-icon {
-          color: $app-color;
-        }
-      }
-
       &:focus {
         outline: none;
       }
@@ -186,7 +177,22 @@ export default {
       }
     }
 
-    &.expanded {
+    &.base-expand-row--expandable {
+
+      .base-expand-row-header {
+
+        &:focus,
+        &:hover {
+          cursor: pointer;
+
+          .base-expand-row-collapse-icon {
+            color: $app-color;
+          }
+        }
+      }
+    }
+
+    &.base-expand-row--expanded {
 
       .base-expand-row-title {
         color: $font-color;

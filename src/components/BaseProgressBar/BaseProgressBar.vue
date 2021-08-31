@@ -281,7 +281,7 @@ export default {
         }
 
         &.base-progress-bar__status-icon-fail {
-          fill: #ff4444;
+          fill: $warning-color;
         }
 
         &.base-progress-bar__status-icon-remove {

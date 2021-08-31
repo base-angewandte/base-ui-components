@@ -68,14 +68,12 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  additional: {
-                    data: [
-                      {
-                        label: 'label',
-                        value: 'value',
-                      },
-                    ],
-                  },
+                  additional: [
+                    {
+                      label: 'label',
+                      value: 'value',
+                    },
+                  ],
                 },
                 {
                   value: 'officiis quisquam',
