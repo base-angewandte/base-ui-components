@@ -65,7 +65,7 @@
               :open="fromOpen"
               :type="isFromTimeField ? 'time' : minDateView"
               :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
-              :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
+              :value-type="isFromTimeField ? 'format' : dateFormatInt"
               input-class="base-date-input__datepicker-input"
               @pick="isFromTimeField ? '' : fromOpen = false"
               @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
@@ -780,8 +780,8 @@ export default {
      * checks done on keydown events
      * a) tab key needs separate handling and only needs to set input field close when
      * there is no clearable button (or shift key was used for going to previous field)
-     * b) prevent user from entering chars other than number or period and not more characters than
-     * the date format requires
+     * b) prevent user from entering chars other than number or period (date) or colon (time)
+     * and not more characters than the date format requires
      * @param {KeyboardEvent} event - the keydown event
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
@@ -795,39 +795,57 @@ export default {
         // if yes set the relevant input field open status to false
         this[`${origin.charAt(0).toLowerCase()}Open`] = false;
       }
+      // now check for the specific input key to preventDefault and prevent unwanted
+      // characters
+      // create boolean to determine if it is a time field (otherwise date is assumed)
+      const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin === 'to');
+      // if time ':' is allowed in input regex - otherwise '.'
+      const allowedFieldKey = isTimeField ? ':' : '\\.';
+      // create regex for allowed keys
+      const allowedKeysRegex = new RegExp(`([0-9]|${allowedFieldKey}|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)`);
+      // create regex that should not be allowed if max length is reached
+      const disallowedKeysOnLengthRegex = new RegExp(`([0-9]|${allowedFieldKey})`);
+      // get the max length for the respective format (for time: 'HH:mm' = 5)
+      const formatLength = isTimeField ? 5 : this.dateFormatInt.length;
       // check if
       // * key was not any of the allowed keys
       // * or was an allowed key but the length is to long for the format in
       //    question (and no text was selected = will be replaced)
-      // * if key was period and  date format is year or last char in string was already a period
-      if (!/([0-9]|\.|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)/.test(key)
-        || (/([0-9]|\.)/.test(key) && this[`input${origin}`].length >= this.dateFormatInt.length
+      // * if type is date and key was period and date format is year or last char in string was
+      //    already a period
+      // * if type is time and key was colon and last char was already a colon
+      if (!allowedKeysRegex.test(key)
+        || (disallowedKeysOnLengthRegex.test(key) && this[`input${origin}`].length >= formatLength
           && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
-        || (key === '.' && (this.dateFormatInt === 'YYYY'
-          || currentInputString.charAt(currentInputString.length - 1) === '.'))) {
+        || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
+          || currentInputString.charAt(currentInputString.length - 1) === '.'))
+        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':')) {
         event.preventDefault();
       }
     },
     /**
      * this function is triggered with the input event - it checks the length of the value and
-     * adds the '.' in the correct places if necessary
+     * adds the '.' (date) or (':') or '0' in the correct places if necessary
      * @param {InputEvent} event - the input event
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     checkDate(event, origin) {
       // get the value in question
       const value = this[`input${origin}`];
+      const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin === 'to');
+      const charToAdd = isTimeField ? ':' : '.';
       // check if value is present and if input type is other than 'deleteContentBackward' because
       // otherwise the dots can not be deleted anymore
       if (value && event.inputType !== 'deleteContentBackward') {
         // now check the date format and if input so far matches the appropriate regex
-        if ((this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}$|\d{2}\.\d{2})$/.test(value))
-          || (this.dateFormatInt === 'MM.YYYY' && /^\d{2}$/.test(value))) {
+        if ((!isTimeField && this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}$|\d{2}\.\d{2})$/.test(value))
+            || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(value))) {
           // if so - add a period character
-          this[`input${origin}`] = `${value}.`;
+          this[`input${origin}`] = `${value}${charToAdd}`;
         }
+        const firstTwoDigitsRegex = new RegExp(`^[1-9]${isTimeField ? ':' : '\\.'}$`);
         // check if input was a period - if yes - check date validity and add zeros if necessary
-        if (/^[1-9]\.$/.test(value)) {
+        if (firstTwoDigitsRegex.test(value)) {
           this[`input${origin}`] = `0${this[`input${origin}`]}`;
         } else if (/^\d{2}\.\d\.$/.test(value)) {
           const [day, month, year] = value.split('.');
@@ -843,107 +861,164 @@ export default {
     checkDateValidity(origin) {
       // get the value in question
       let value = this[`input${origin}`];
-      // also save the current format length
-      const formatLength = this.dateFormatInt.length;
       // check if there is a value present
       if (value) {
-        // first check if periods are there in correct number
-        if (value.split('.').length > this.dateFormatInt.split('.').length) {
-          // just remove all the periods - there the next check will add some again
+        // important and mostly different checks to make depending if value is date or time
+        // so save that in variable
+        const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin === 'to');
+        // also save the current format length
+        const formatLength = isTimeField ? 5 : this.dateFormatInt.length;
+        // get the separator depending on time or date field
+        const separator = isTimeField ? ':' : '.';
+        // get the array length of array with string split up by separator (should be same for
+        // format and value string)
+        const numberFormatParts = isTimeField ? 2 : this.dateFormatInt.split('.').length;
+        // first check if periods (date) or colons (time) are too many
+        if (value.split(separator).length > numberFormatParts) {
+          // just remove all the periods or colons - there the next check will add some again
           this[`input${origin}`] = value.replaceAll('.', '');
           value = this[`input${origin}`];
         }
-        if (this.dateFormatInt.split('.').length > value.split('.').length) {
-          // check if day and month (for DDMMYYYY) or month and year (for MMYYYY) are without
-          // period
+        // check if there are too little separators
+        if (numberFormatParts > value.split(separator).length) {
+          // check if day and month (for DDMMYYYY) or month and year (for MMYYYY) or time
+          // are without period or colon respectively
           if (formatLength !== 4 && /^\d{3}/.test(value)) {
             // this assumes the first two digits are for day or month respectively!
-            this[`input${origin}`] = `${value.slice(0, 2)}.${value.slice(2, value.length)}`;
+            // TODO: not ideal that 2 digits are assumed - see if this can be improved
+            this[`input${origin}`] = `${value.slice(0, 2)}${separator}${value.slice(2, value.length)}`;
             value = this[`input${origin}`];
           }
           // check if there is a second period between month and year (for DDMMYYYY)
           if (this.dateFormatInt === 'DD.MM.YYYY' && formatLength !== 4 && /^\d{2}\.\d{3}/.test(value)) {
             // this assumes there are two digits for day and month respectively!
+            // TODO: not ideal that 2 digits are assumed - see if this can be improved
             this[`input${origin}`] = `${value.slice(0, 5)}.${value.slice(5, value.length)}`;
             value = this[`input${origin}`];
           }
         }
         // second check if the length of the value is correct
         if (value.length !== formatLength) {
-          // first check if the reason for the length not matching is that the day is
-          // missing a zero
-          if (this.dateFormatInt === 'DD.MM.YYYY' && /^[1-9]\.\d{1,2}\.\d{4}$/.test(value)) {
-            // get the values
-            const [day, month, year] = value.split('.');
-            // repair date and add a zero to day
-            this[`input${origin}`] = `0${day}.${month}.${year}`;
-            value = this[`input${origin}`];
+          // distinguish between date and time string
+          if (isTimeField) {
+            // check if minutes are missing
+            if (/^\d{1,2}:?$/.test(value)) {
+              const [hours] = value.split(':');
+              this[`input${origin}`] = `${hours}:00`;
+              value = this[`input${origin}`];
+            }
+            // check if zeros out front are missing from hour
+            if (/^\d:\d{1,2}$/.test(value)) {
+              const [hours, minutes] = value.split(':');
+              this[`input${origin}`] = `0${hours}:${minutes}`;
+              value = this[`input${origin}`];
+            }
+            // check if zeros out front are missing from minute
+            if (/^\d{2}:\d$/.test(value)) {
+              const [hours, minutes] = value.split(':');
+              this[`input${origin}`] = `${hours}:0${minutes}`;
+              value = this[`input${origin}`];
+            }
+          } else {
+            // first check reason for length mismatch is year having only two digits or is
+            // completely missing for date format
+            if (this.dateFormatInt === 'DD.MM.YYYY' && /^\d{1,2}\.\d{1,2}\.?(\d{0}|\d{2})$/.test(value)) {
+              // determine current year
+              const currentYear = new Date().getFullYear();
+              const [day, month, year] = value.split('.');
+              // repair date and add first two year digits - if date more than 10 years to the
+              // future - make it 20. century
+              const century = (currentYear).toString().slice(0, 2);
+              this[`input${origin}`] = `${day}.${month}.${year > (currentYear + 10).toString().slice(2, 4)
+                ? Number(century - 1) : century}${year || currentYear.toString().slice(2, 4)}`;
+              value = this[`input${origin}`];
+            }
+            // for month format
+            if (this.dateFormatInt === 'MM.YYYY' && /^\d{1,2}\.?(\d{0}|\d{2})$/.test(value)) {
+              // determine current year
+              const currentYear = new Date().getFullYear();
+              const [month, year] = value.split('.');
+              // repair date and add first two year digits - if date more than 10 years to the
+              // future - make it current century - otherwise last century
+              const century = (currentYear).toString().slice(0, 2);
+              this[`input${origin}`] = `${month}.${year > (currentYear + 10).toString().slice(2, 4)
+                ? Number(century - 1) : century}${year || currentYear.toString().slice(2, 4)}`;
+              value = this[`input${origin}`];
+            }
+            // second check if the reason for the length not matching is that the day is
+            // missing a zero
+            if (this.dateFormatInt === 'DD.MM.YYYY' && /^[1-9]\.\d{1,2}\.\d{4}$/.test(value)) {
+              // get the values
+              const [day, month, year] = value.split('.');
+              // repair date and add a zero to day
+              this[`input${origin}`] = `0${day}.${month}.${year}`;
+              value = this[`input${origin}`];
+            }
+            // second check if the reason for mismatching length is that the zero in month
+            // is missing
+            if (['DD.MM.YYYY', 'MM.YYYY'].includes(this.dateFormatInt) && /^\d{2}?\.?[1-9]\.\d{4}$/.test(value)) {
+              // get values, reverse in order to be able to get also correct values for format
+              // 'month'
+              const [year, month, day] = value.split('.').reverse();
+              // repair date and add missing zero to month
+              this[`input${origin}`] = `${day}.0${month}.${year}`;
+              value = this[`input${origin}`];
+            }
           }
-          // second check if the reason for mismatching length is that the zero in month is missing
-          if (['DD.MM.YYYY', 'MM.YYYY'].includes(this.dateFormatInt) && /^\d{2}?\.?[1-9]\.\d{4}$/.test(value)) {
-            // get values, reverse in order to be able to get also correct values for format 'month'
-            const [year, month, day] = value.split('.').reverse();
-            // repair date and add missing zero to month
-            this[`input${origin}`] = `${day}.0${month}.${year}`;
-            value = this[`input${origin}`];
-          }
-          // third check reason for length mismatch is year having only two digits or is completely
-          // missing
-          // for date format
-          if (this.dateFormatInt === 'DD.MM.YYYY' && /^\d{2}\.\d{2}\.?(\d{0}|\d{2})$/.test(value)) {
-            // determine current year
-            const currentYear = new Date().getFullYear();
-            const [day, month, year] = value.split('.');
-            // repair date and add first two year digits - if date more than 10 years to the
-            // future - make it 20. century
-            this[`input${origin}`] = `${day}.${month}.${year > (currentYear + 10).toString().slice(2, 4)
-              ? '19' : '20'}${year || currentYear.toString().slice(2, 4)}`;
-            value = this[`input${origin}`];
-          }
-          // for month format
-          if (this.dateFormatInt === 'MM.YYYY' && /^\d{2}\.?(\d{0}|\d{2})$/.test(value)) {
-            // determine current year
-            const currentYear = new Date().getFullYear();
-            const [month, year] = value.split('.');
-            // repair date and add first two year digits - if date more than 10 years to the
-            // future - make it 20. century
-            this[`input${origin}`] = `${month}.${year > (currentYear + 10).toString().slice(2, 4)
-              ? '19' : '20'}${year || currentYear.toString().slice(2, 4)}`;
-            value = this[`input${origin}`];
-          }
-          // now check if date has now the correct length - if not still remove the value
+          // now check if time/date has now the correct length - if not still remove the value
           if (value.length !== formatLength) {
             this[`input${origin}`] = '';
           }
         }
-        // now truly check if date is a valid date
-        if (Number.isNaN(Date.parse(this.dateStorage(value)))) {
-          // TODO: check if date has appropriate number of periods
-          const [year, month, day] = value.split('.').reverse();
-          if (this.dateFormatInt === 'DD.MM.YYYY') {
-            // TODO: could this check already be done on input???
-            // check if something is wrong with the day
-            if (!/^(0[1-9]|[1-2][0-9]|3[0-1])/.test(day)) {
-              // replace day with appropriate value
-              this[`input${origin}`] = `01.${month}.${year}`;
+        // now check for general validity
+        if (isTimeField) {
+          // just add random date to see if time is valid
+          if (Number.isNaN(Date.parse(`12.12.1212T${value}`))) {
+            let [hours, minutes] = value.split(':');
+            // check if valid hours
+            if (!/^([0-1][0-9]|2[0-4])$/.test(hours)) {
+              hours = '00';
             }
-          } if (this.dateFormatInt !== 'YYYY') {
-            // check if something is wrong with the month
-            if (!/^(0[1-9]|1[0-2])/.test(month)) {
-              // replace month with appropriate value
-              this[`input${origin}`] = `${day ? `${day}.` : ''}01.${year}`;
+            // check if valid minutes
+            if (!/^[0-5][0-9]$/.test(minutes)) {
+              minutes = '00';
+            }
+            // construct a new time
+            const newTime = `${hours}:${minutes}`;
+            // now check again if time is valid now if yes assign, if no delete the string
+            this[`input${origin}`] = Number.isNaN(Date.parse(`12.12.1212T${newTime}`)) ? newTime : '';
+            value = this[`input${origin}`];
+          }
+        } else {
+          // now truly check if date is a valid date
+          if (Number.isNaN(Date.parse(this.dateStorage(value)))) {
+            // TODO: check if date has appropriate number of periods
+            const [year, month, day] = value.split('.').reverse();
+            if (this.dateFormatInt === 'DD.MM.YYYY') {
+              // TODO: could this check already be done on input???
+              // check if something is wrong with the day
+              if (!/^(0[1-9]|[1-2][0-9]|3[0-1])/.test(day)) {
+                // replace day with appropriate value
+                this[`input${origin}`] = `01.${month}.${year}`;
+              }
+            } if (this.dateFormatInt !== 'YYYY') {
+              // check if something is wrong with the month
+              if (!/^(0[1-9]|1[0-2])/.test(month)) {
+                // replace month with appropriate value
+                this[`input${origin}`] = `${day ? `${day}.` : ''}01.${year}`;
+              }
             }
           }
-        }
-        // since technically invalid dates (like 30.02.2000) will also be considered a
-        // vaild date by Date.parse() just convert to Date and back one more time
-        // new Date(input) will always convert to the actual day in the next month
-        // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
-        const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
-        if (!Number.isNaN(Date.parse(this.dateStorage(tempDate)))) {
-          this[`input${origin}`] = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
-        } else {
-          this[`input${origin}`] = '';
+          // since technically invalid dates (like 30.02.2000) will also be considered a
+          // vaild date by Date.parse() just convert to Date and back one more time
+          // new Date(input) will always convert to the actual day in the next month
+          // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
+          const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
+          if (!Number.isNaN(Date.parse(this.dateStorage(tempDate)))) {
+            this[`input${origin}`] = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
+          } else {
+            this[`input${origin}`] = '';
+          }
         }
       }
     },
@@ -1112,7 +1187,7 @@ export default {
 
     .base-date-input__field-wrapper {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       width: 100%;
 
       .base-date-input__input-wrapper {
@@ -1151,7 +1226,6 @@ export default {
 
       .base-date-input__separator {
         padding: 0 $spacing;
-        line-height: $row-height-small;
       }
     }
 
