@@ -109,6 +109,7 @@
           :identifier-property-name="autocompletePropertyNames.id"
           :label-property-name="autocompletePropertyNames.data"
           class="base-advanced-search-row__drop-down-body"
+          @touchstart.native.stop=""
           @click.native.stop="">
           <template v-slot:before-list>
             <div
@@ -876,6 +877,7 @@ export default {
      * to set the default filter values accordingly (array, string, object)
      */
     selectFilter(selectedFilter) {
+      console.log('select filter');
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
