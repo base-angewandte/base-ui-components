@@ -33,6 +33,8 @@ Forbidden by Noah from the Noun Project
 
 drag by b farias from the Noun Project
 
+Drag by ProSymbols, from the Noun Project
+
 success by Trident from the Noun Project
 
 Download by scott desmond from the Noun Project

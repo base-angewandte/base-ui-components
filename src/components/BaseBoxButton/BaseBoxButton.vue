@@ -91,11 +91,8 @@ export default {
       },
     },
     /**
-     * specify icon name if desired, this uses svg icon; available per default:
-     * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
-     * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
-     * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin'
+     * specify icon name if desired, this uses the BaseIcon component; <br>
+     * see [BaseIcon](#baseicon) for available icons<br>
      */
     icon: {
       type: String,

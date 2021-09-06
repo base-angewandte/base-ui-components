@@ -22,7 +22,7 @@ Example of BaseExpandBox to display expandable text, unordered list, datalist el
           <BaseButton
             :icon-colored="true"
             :has-background-color="false"
-            icon="link"
+            icon="share"
             icon-position="top"
             icon-size="large"
             text="Share" />

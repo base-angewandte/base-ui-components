@@ -55,14 +55,14 @@ const executeFire = function(){
   <base-button
       text="Large Icon"
       style="margin-right: 16px;"
-      icon="sheet-plus"
+      icon="add-new-object"
       button-style="row"
       icon-size="large"
       @clicked="executeFire"/>
   <base-button
       :active="true"
       text="Button Active"
-      icon="sheet-plus"
+      icon="add-new-object"
       button-style="row"
       icon-size="large"
       @clicked="executeFire"/>

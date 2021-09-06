@@ -11,16 +11,16 @@ A box with event firing on drop
           class="drop-box"
           @dropped-file="handleFileSelect($event)"
         />
-  
+
         <base-drop-box
-          :icon="'sheet-empty'"
+          :icon="'file-object'"
           :show-plus="true"
           text="Box with Plus"
           subtext="Add more info"
           class="drop-box"
         />
         <base-drop-box
-          :icon="'sheet-empty'"
+          :icon="'file-object'"
           :box-size="{ width: 'calc(50%)' }"
           box-ratio="50"
           text="Ratio 50"
@@ -29,7 +29,7 @@ A box with event firing on drop
         />
     </div>
     <div>
-      <p 
+      <p
         v-for="(file, index) in filesToUpload"
         :key="index">
         {{ file.name }}

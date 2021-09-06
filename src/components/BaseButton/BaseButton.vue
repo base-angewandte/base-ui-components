@@ -65,13 +65,7 @@ export default {
     // TODO: need to check if it is possible to use custom icons --> if yes description!
     /**
      * icon displayed <br>
-     * available per default:
-     * 'arrow-left' | 'attention' | 'calendar-many' | 'calendar-number' | 'camera' |
-     * 'check-mark' | 'clock' | 'drop-down' | 'eye' | 'licence' | 'link' | 'logo' |
-     * 'magnifier' | 'people' | 'plus' | 'print' | 'remove' | 'save-file' | 'save-file-thin' |
-     * 'sheet-empty' | 'sheet-plus' | 'waste-bin' | 'attachment' |
-     * 'drag-lines' | 'download' | 'duplicate' | 'forbidden' | 'information' | 'sort' |
-     * 'success' | 'text'
+     * see [BaseIcon](#baseicon) for available icons<br>
      */
     icon: {
       type: String,

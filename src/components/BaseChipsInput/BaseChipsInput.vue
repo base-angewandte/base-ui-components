@@ -392,7 +392,7 @@ export default {
       selectedListInt: [],
       /**
        * the currently active option, styled with grey background
-       * (by mouse hovering or keyboard use)
+       * (only if selected by keyboard)
        *
        * @type {number}
        */

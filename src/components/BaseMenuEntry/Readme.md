@@ -5,11 +5,11 @@ Example Entry with all available features
   <div class="background">
     <BaseMenuEntry
       :thumbnails="['eye', 'attention']"
-      entryId="single" 
+      entryId="single"
       description="Description"
       title="Title"
       subtext="Subtext"
-      icon="sheet-empty"/>
+      icon="file-object"/>
   </div>
 </template>
 <script>

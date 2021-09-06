@@ -156,7 +156,7 @@ export default {
     // determines which icon should be shown for each menu entry
     // TODO: this should probably also be definable per entry dynamically on the long run...
     getType(val) {
-      return val && val.includes('calendar-many') ? 'calendar-many' : 'sheet-empty';
+      return val && val.includes('calendar-many') ? 'calendar-many' : 'file-object';
     },
     // define which thumbnails should be shown for each item
     // TODO: currently hardcoded here but needs dynamic solution!

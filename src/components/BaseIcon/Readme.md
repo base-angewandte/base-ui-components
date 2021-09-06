@@ -54,11 +54,6 @@ Available icons:
   />
   <BaseIcon
     style="height: 24px;  margin: 8px;"
-    name="link"
-    title="link"
-  />
-  <BaseIcon
-    style="height: 24px;  margin: 8px;"
     name="logo"
     title="logo"
   />
@@ -79,11 +74,6 @@ Available icons:
   />
   <BaseIcon
     style="height: 24px;  margin: 8px;"
-    name="print"
-    title="print"
-  />
-  <BaseIcon
-    style="height: 24px;  margin: 8px;"
     name="remove"
     title="remove"
   />
@@ -94,18 +84,8 @@ Available icons:
   />
   <BaseIcon
     style="height: 24px;  margin: 8px;"
-    name="save-file-thin"
-    title="save-file-thin"
-  />
-  <BaseIcon
-    style="height: 24px;  margin: 8px;"
-    name="sheet-empty"
-    title="sheet-empty"
-  />
-  <BaseIcon
-    style="height: 24px;  margin: 8px;"
-    name="sheet-plus"
-    title="sheet-plus"
+    name="add-new-object"
+    title="add-new-object"
   />
   <BaseIcon
     style="height: 24px;  margin: 8px;"
@@ -164,8 +144,8 @@ Available icons:
   />
   <BaseIcon
     style="height: 24px;  margin: 8px;"
-    name="hide"
-    title="hide"
+    name="eye-hide"
+    title="eye-hide"
   />
   <BaseIcon
     style="height: 24px;  margin: 8px;"
@@ -181,6 +161,91 @@ Available icons:
     style="height: 24px;  margin: 8px;"
     name="collection"
     title="collection"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="add-existing-collection"
+    title="add-existing-collection"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="add-existing-object"
+    title="add-existing-object"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="add-new-collection"
+    title="add-new-collection"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="archive-arrow"
+    title="archive-arrow"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="archive-empty"
+    title="archive-empty"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="archive-sheets"
+    title="archive-sheets"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="audio-object"
+    title="audio-object"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="file-object"
+    title="file-object"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="image-object"
+    title="image-object"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="video-object"
+    title="video-object"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="next"
+    title="next"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="prev"
+    title="prev"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="play"
+    title="play"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="print"
+    title="print"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="share"
+    title="share"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="subscribe"
+    title="subscribe"
+  />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="unsubscribe"
+    title="unsubscribe"
   />
 </div>
 
