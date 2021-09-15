@@ -365,8 +365,8 @@ export default {
       align-items: center;
 
       .base-media-preview-image {
-        max-height: calc(100% - #{$spacing}*4);
-        max-width: calc(100% - #{$spacing}*4);
+        max-height: calc(100% - #{$spacing*6});
+        max-width: calc(100% - #{$spacing*6});
         padding: $spacing;
         margin-top: auto;
 
