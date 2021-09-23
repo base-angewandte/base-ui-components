@@ -133,13 +133,13 @@ export default {
     },
     /**
      * define alignment of button content<br>
-     * allowed values: 'center', 'left', 'right'
+     * since this is a flex-box container use values allowed for justify-content
      */
     alignText: {
       type: String,
       default: 'center',
       validator(val) {
-        return ['center', 'left', 'right'].includes(val);
+        return ['center', 'start', 'end', 'flex-start', 'flex-end'].includes(val);
       },
     },
     /**
