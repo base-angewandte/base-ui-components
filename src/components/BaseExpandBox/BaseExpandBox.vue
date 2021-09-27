@@ -20,7 +20,7 @@
       v-if="showButton"
       :text="isOpen ? showLessText : showMoreText"
       :has-background-color="false"
-      align-text="left"
+      align-text="flex-start"
       icon="drop-down"
       icon-position="right"
       class="base-expand-box-button"
