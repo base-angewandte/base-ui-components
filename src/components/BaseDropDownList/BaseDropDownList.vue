@@ -12,6 +12,7 @@
     <ul
       :id="listId"
       :style="listBodyStyle"
+      :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : false"
       role="listbox"
       class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
@@ -32,7 +33,6 @@
             { 'base-drop-down-list__option__active': activeStyled
               && optionIndex === activeOptionIndex }]"
           role="option"
-          tabindex="0"
           @click="selected(option)">
           <!-- @slot a slot to customize every single option (e.g. display of
           information other than [valuePorpoertyName]) -->
@@ -128,7 +128,7 @@ export default {
      */
     listId: {
       type: String,
-      required: true,
+      default: '',
     },
     /**
      * add styling to the list body (e.g. max-height)
