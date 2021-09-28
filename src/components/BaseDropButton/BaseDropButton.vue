@@ -386,6 +386,7 @@ export default {
         min-height: $row-height-small - $spacing-small/2;
         width: 100%;
         color: inherit;
+        white-space: nowrap;
 
         &.base-drop-button__action__active, &:hover, &:focus, &:active {
           color: $app-color;
