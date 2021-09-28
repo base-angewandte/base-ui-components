@@ -1,6 +1,7 @@
 import ExpandBox from '@/components/BaseExpandBox';
 import TextList from '@/components/BaseTextList';
 import ExpandRow from '@/components/BaseExpandRow';
+import DropButton from '@/components/BaseDropButton';
 import Input from './BaseInput';
 import Loader from './BaseLoader';
 import AutocompleteInput from './BaseAutocompleteInput';
@@ -86,4 +87,5 @@ export {
   ExpandBox as BaseExpandBox,
   TextList as BaseTextList,
   ExpandRow as BaseExpandRow,
+  DropButton as BaseDropButton,
 };
