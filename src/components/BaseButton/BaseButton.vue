@@ -186,6 +186,7 @@ export default {
 
     .base-button-text {
       text-align: center;
+      white-space: nowrap;
     }
 
     .base-button-icon {
