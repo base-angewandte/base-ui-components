@@ -23,7 +23,8 @@
         @keydown.up.down="navigateOptions">
         <BaseIcon
           name="drop-down"
-          class="base-drop-button__drop-icon" />
+          :class="['base-drop-button__drop-icon',
+                   { 'base-drop-button__drop-icon__rotated': showOptions }]" />
       </button>
       <BaseDropDownList
         v-if="showOptions"
@@ -370,6 +371,11 @@ export default {
 
       .base-drop-button__drop-icon {
         width: $icon-small;
+        transition: $drop-down-arrow-animation;
+
+        &.base-drop-button__drop-icon__rotated {
+          transform: rotate(180deg);
+        }
       }
     }
 
