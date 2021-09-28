@@ -182,6 +182,7 @@ export default {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    color: inherit;
 
     .base-button-text {
       text-align: center;

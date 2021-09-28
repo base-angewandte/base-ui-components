@@ -268,7 +268,9 @@ export default {
     calculateDropDownPosition() {
       // check if elements are renderend
       if (this.$refs.dropDown) {
-        const windowWidth = window.innerWidth;
+        // use viewport width instead of window width so element is always in view
+        // even if window is wider than visible frame
+        const windowWidth = window.visualViewport.width;
         // get drop down position
         const dropElement = this.$refs.dropDown.$el.getBoundingClientRect();
         // get parent element position
@@ -296,11 +298,13 @@ export default {
               this.dropDownTransformation = {
                 transform: `translate(${moveToLeft}px, 0px)`,
               };
+              this.dropDownPosition.horizontal = 'right';
               // if yes - only move to window border
             } else {
               this.dropDownTransformation = {
                 transform: `translate(-${dropAreaStart}px, 0px)`,
               };
+              this.dropDownPosition.horizontal = 'right';
             }
           }
         } else {
@@ -311,7 +315,7 @@ export default {
 
         // check for top/bottom position
         // check if element has enough space on the bottom
-        if (dropAreaBottom + dropElement.height >= window.innerHeight) {
+        if (dropAreaBottom + dropElement.height >= window.visualViewport.height) {
           // if not check if there is enough space on the top
           if (dropAreaTop - dropElement.height >= 0) {
             // if yes - position it on the top
@@ -350,6 +354,7 @@ export default {
       height: 100%;
       padding: $spacing-small $spacing;
       background: $background-color;
+      color: inherit;
 
       &.base-drop-button__toggle-button__active,
       &:hover {
@@ -374,6 +379,7 @@ export default {
         align-items: center;
         min-height: $row-height-small - $spacing-small/2;
         width: 100%;
+        color: inherit;
 
         &.base-drop-button__action__active, &:hover, &:focus, &:active {
           color: $app-color;
