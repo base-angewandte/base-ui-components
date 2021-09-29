@@ -7,7 +7,16 @@
       :icon="primaryButtonInt.icon || null"
       icon-size="large"
       :class="{ 'base-drop-button__button__multi': buttonsInt && buttonsInt.length }"
-      @clicked="fireAction(primaryButtonInt[identifierPropertyName])" />
+      @clicked="fireAction(primaryButtonInt[identifierPropertyName])">
+      <!-- @slot create custom content (e.g. icon) left of text -->
+      <template v-slot:left-of-text>
+        <slot name="left-of-text" />
+      </template>
+      <template v-slot:right-of-text>
+        <!-- @slot create custom content (e.g. icon) right of text -->
+        <slot name="right-of-text" />
+      </template>
+    </BaseButton>
     <div
       v-if="buttonsInt && buttonsInt.length"
       ref="dropArea"
@@ -17,10 +26,12 @@
         :aria-label="expandButtonLabel"
         :class="['base-drop-button__toggle-button',
                  { 'base-drop-button__toggle-button__active': showOptions }]"
+        type="button"
         aria-haspopup="listbox"
-        @click="showOptions = !showOptions"
+        @click.prevent="showOptions = !showOptions"
         @keydown.enter.prevent="dropDownEnterAction"
-        @keydown.up.down="navigateOptions">
+        @keydown.tab="activeOption = null"
+        @keydown.up.down.prevent="navigateOptions">
         <BaseIcon
           name="drop-down"
           :class="['base-drop-button__drop-icon',
@@ -48,7 +59,9 @@
               'base-drop-button__action',
               { 'base-drop-button__action__active': activeOption
                 && option[identifierPropertyName] === activeOption[identifierPropertyName] }]"
-            @click="fireAction(option[identifierPropertyName])">
+            type="button"
+            @keydown.up.down.prevent=""
+            @click.prevent="fireAction(option[identifierPropertyName])">
             <BaseIcon
               v-if="option.icon"
               :name="option.icon"
