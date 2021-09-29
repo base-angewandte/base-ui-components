@@ -5,8 +5,6 @@ fixpath() {
   case "$OSTYPE" in
     *linux* ) echo "${1//\\/\/}"
       ;;
-    *ux* ) echo "linux"
-      ;;
     *darwin* ) echo "${1//\\/\/}" ;;
     *bsd* ) echo "${1//\\/\/}" ;;
     *win* ) echo "${1//\//\\}" ;;
