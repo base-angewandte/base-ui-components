@@ -278,6 +278,7 @@ export default {
 
     &:disabled {
       cursor: default;
+      color: $graytext-color;
 
       &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
         color: $graytext-color;
