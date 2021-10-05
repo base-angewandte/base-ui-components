@@ -18,7 +18,10 @@
                'base-button-icon-left',
                'base-button-icon-' + iconSize,
                { 'base-button-icon-hide': hideIcon }]" />
-    <span class="base-button-text">{{ text }}</span>
+    <span
+      :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
+      {{ text }}
+    </span>
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
     <base-icon
@@ -157,6 +160,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set false if button text should not be wrapped
+     */
+    buttonTextWrap: {
+      type: Boolean,
+      default: true,
+    },
   },
   methods: {
     clicked(event) {
@@ -186,7 +196,10 @@ export default {
 
     .base-button-text {
       text-align: center;
-      white-space: nowrap;
+
+      &.base-button-text__nowrap {
+        white-space: nowrap;
+      }
     }
 
     .base-button-icon {
