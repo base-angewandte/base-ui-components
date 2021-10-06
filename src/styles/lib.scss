@@ -27,6 +27,7 @@ button {
   border: none;
   text-transform: inherit;
   background: transparent;
+  color: $graytext-color;
 
   &:focus {
     outline: 0;
