@@ -102,7 +102,7 @@ export default {
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options<br>
-     *    <b>values</b> {Object[]|string[]|Object} - the values selected - object for date
+     *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
      *    or array of objects or strings for type 'text' and type 'chips'
      */
     defaultFilter: {
@@ -111,7 +111,7 @@ export default {
         label: 'Fulltext',
         type: 'text',
         options: [],
-        values: [],
+        filter_values: [],
       }),
       validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
     },
@@ -122,6 +122,13 @@ export default {
     language: {
       type: String,
       default: '',
+    },
+    /**
+     * set the row loader from outside per row index
+     */
+    isLoadingIndex: {
+      type: Number,
+      default: -1,
     },
     /**
      * specify informational texts for the component - this needs to be an object with the following
@@ -309,6 +316,12 @@ export default {
       }
     },
     /**
+     * set autocomplete loading from outside
+     */
+    autocompleteLoadingIndex(val) {
+      this.autocompleteIndex = val;
+    },
+    /**
      * have appliedFilters in sync with parent to be able to set them from outside
      */
     appliedFiltersInt: {
@@ -342,7 +355,7 @@ export default {
     },
   },
   created() {
-    this.mainFilter = { ...this.defaultFilter, values: [] };
+    this.mainFilter = { ...this.defaultFilter, filter_values: [] };
   },
   methods: {
     /**

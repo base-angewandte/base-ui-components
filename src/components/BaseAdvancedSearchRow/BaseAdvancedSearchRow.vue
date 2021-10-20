@@ -355,7 +355,7 @@ export default {
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options<br>
-     *    <b>values</b> {Object[]|string[]|Object} - the values selected - object for date
+     *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
      *    or array of objects or strings for type 'text' and type 'chips'
      */
     defaultFilter: {
@@ -364,7 +364,7 @@ export default {
         label: 'Fulltext',
         type: 'text',
         options: [],
-        values: [],
+        filter_values: [],
       }),
       validator: val => val.type && (val.type !== 'chips' || val.options),
     },
@@ -540,7 +540,7 @@ export default {
        * @property {string} [Filter[labelPropertyName.filter]] - an alternative to
        *  filter.label with custom property name
        * @property {string} Filter.type
-       * @property {*[]} [Filter.values]
+       * @property {*[]} [Filter.filter_values]
        * @property {Object[]} [Filter.options?]
        */
       filter: null,
@@ -635,13 +635,13 @@ export default {
      */
     selectedOptions: {
       set(val) {
-        this.$set(this.filter, 'values', [...val]);
+        this.$set(this.filter, 'filter_values', [...val]);
       },
       get() {
         // this variable should only contain values for chips and text filters (should be array)
         // not for date or daterange
         if (this.filter.type === 'chips' || this.filter.type === 'text') {
-          return [...this.filter.values];
+          return this.filter && this.filter.filter_values ? [...this.filter.filter_values] : [];
         }
         return [];
       },
@@ -662,7 +662,7 @@ export default {
       if (this.controlledVocabularyOptions) {
         // remove already selected options
         let options = [].concat(this.controlledVocabularyOptions)
-          .filter(option => !this.filter.values
+          .filter(option => !this.filter.filter_values
             .map(value => value[this.identifierPropertyName.controlledVocabularyOption])
             .includes(option[this.identifierPropertyName.controlledVocabularyOption]));
         // only display options matching the current input string
@@ -765,14 +765,14 @@ export default {
         // check if anything actually changed
         if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
           this.filter = val ? JSON.parse(JSON.stringify(val))
-            : { ...this.defaultFilter, values: [] };
+            : { ...this.defaultFilter, filter_values: [] };
           // check if the new filter has values
-          if (val.values) {
+          if (val.filter_values) {
             // distinguish between date and others to assign to correct variable
             if (val.type.includes('date')) {
-              this.currentInput = val.values;
+              this.currentInput = val.filter_values;
             } else {
-              this.selectedOptions = val.values;
+              this.selectedOptions = val.filter_values;
             }
           }
         }
@@ -782,7 +782,7 @@ export default {
     /**
      * when current input changes emit this to parent component which should
      * do the fetching of autocomplete results (if filter type 'text') or assign
-     * the values to filter.values if type is 'date' or 'daterange'
+     * the values to filter.filter_values if type is 'date' or 'daterange'
      * @param {string} val - the search string
      */
     currentInput(val) {
@@ -796,9 +796,9 @@ export default {
          */
         this.$emit('fetch-autocomplete-results', val);
       }
-      // if type is date assign the values to the filter.values immediately
+      // if type is date assign the values to the filter.filter_values immediately
       if (this.filter.type.includes('date')) {
-        this.$set(this.filter, 'values', val);
+        this.$set(this.filter, 'filter_values', val);
       }
     },
     /**
@@ -882,7 +882,7 @@ export default {
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
         this.filter = JSON.parse(JSON.stringify(selectedFilter));
-        this.$set(this.filter, 'values', this.setFilterValues(selectedFilter.type, this.filter.values));
+        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter.type, this.filter.filter_values));
         this.activeFilter = null;
       }
 
@@ -922,7 +922,7 @@ export default {
      * @param {Object} entry - the entry to add to the selected list
      */
     addOption(entry) {
-      this.filter.values = this.filter.values.concat(entry);
+      this.filter.filter_values = this.filter.filter_values.concat(entry);
       // reset everything
       this.resetAllInput();
       if (this.searchInputElement) {
@@ -952,8 +952,8 @@ export default {
         this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
         // if this is main search and there is no current input and filter values are present
         // inform parent that filter can be processed
-      } else if (this.isMainSearch && !this.currentInput && this.filter.values
-        && this.filter.values.length) {
+      } else if (this.isMainSearch && !this.currentInput && this.filter.filter_values
+        && this.filter.filter_values.length) {
         this.addFilter();
       }
     },
@@ -1080,7 +1080,7 @@ export default {
     },
     /**
      * function to set the correct values for
-     * a) filter.values attribute
+     * a) filter.filter_values attribute
      * b) search input (currentInput)
      *
      * @param {string} type - the filter type
@@ -1387,7 +1387,7 @@ export default {
 
           .base-advanced-search-row__autocomplete-collection-text {
             min-height: $row-height-small;
-            line-height: $row-height-small;
+            padding-top: calc(#{$spacing-small} / 2);
           }
         }
 
