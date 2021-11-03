@@ -206,7 +206,6 @@ export default {
       height: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;
-      transition: $drop-down-arrow-animation;
 
       &.base-button-icon-left {
         margin-right: #{$spacing};
