@@ -49,11 +49,11 @@
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
         class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
-        <base-icon
-          v-for="tn in thumbnails"
-          :key="tn"
-          :name="tn"
-          class="base-menu-entry-thumbnail" />
+        <!-- @slot Use this slot to supply a list of [BaseIcon](#baseicon) components that are
+        to be shown in the right area of the menu entry as thumbnails. The slot
+        supports up to four `BaseIcon` components. If using the slot, make sure that
+         `showThumbnails` is true. -->
+        <slot name="thumbnails" />
       </div>
       <base-checkmark
         v-if="isSelectable && selectActive"
@@ -128,14 +128,6 @@ export default {
     icon: {
       type: String,
       default: '',
-    },
-    /**
-     * specify an array of icon names (available values - see ***) to indicate e.g. errors
-     */
-    thumbnails: {
-      type: Array,
-      // eslint-disable-next-line no-unused-expressions
-      default: () => [],
     },
     /**
      * Text displayed at the end of the item
@@ -367,6 +359,7 @@ export default {
     .base-menu-entry-thumbnail-container {
       display: flex;
       flex-direction: column;
+      flex-wrap: wrap-reverse;
       // added for IE
       justify-content: space-around;
       // however this is the value it should take
@@ -374,12 +367,8 @@ export default {
       height: $row-height-large;
       padding-left:$spacing;
       background-color: white;
-      min-width: 30px;
-
-      .base-menu-entry-thumbnail {
-        max-height: $icon-small;
-        width: $icon-small;
-      }
+      min-width: 50px;
+      align-items: flex-start;
     }
 
     .base-menu-entry-checkbox {

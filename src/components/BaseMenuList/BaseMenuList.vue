@@ -23,18 +23,27 @@
         :is-active="entryProps[index].active"
         :is-selected="entryProps[index].selected"
         :icon="getType(item.icon)"
-        :thumbnails="getThumbnails(item)"
         :description="item.description"
         :is-selectable="true"
         :select-active="selectActive"
         @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)" />
+        @selected="selectItem(index, $event)">
+        <template
+          v-slot:thumbnails>
+          <base-icon
+            v-for="tn in getThumbnails(item)"
+            :key="tn"
+            :name="tn"
+            class="base-menu-entry-thumbnail" />
+        </template>
+      </base-menu-entry>
     </li>
   </draggable>
 </template>
 
 <script>
 import Draggable from 'vuedraggable';
+import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 /**
@@ -45,6 +54,7 @@ import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 export default {
   name: 'BaseMenuList',
   components: {
+    BaseIcon,
     BaseMenuEntry,
     Draggable,
   },
@@ -174,6 +184,9 @@ export default {
       if (val.has_media) {
         thumbnails.push('attachment');
       }
+      if (val.archive_URI) {
+        thumbnails.push('archive-sheets');
+      }
       return thumbnails;
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
@@ -261,5 +274,11 @@ export default {
         border-bottom: $separation-line;
       }
     }
+  }
+
+  .base-menu-entry-thumbnail {
+    max-height: $icon-small;
+    width: $icon-small;
+    margin: 4px 6px;
   }
 </style>
