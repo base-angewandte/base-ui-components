@@ -13,19 +13,19 @@ Example entry with three thumbnail icons
       <template
           v-slot:thumbnails>
           <base-icon
-            :key="icon-eye"
-            :name="eye"
-            :title="eye"
+            key="icon-eye"
+            name="eye"
+            title="eye"
             class="base-menu-entry-thumbnail" />
           <base-icon
-            :key="icon-archive"
-            :name="archive-arrow"
-            :title="archived"
+            key="icon-archive"
+            name="archive-arrow"
+            title="archived"
             class="base-menu-entry-thumbnail" />
           <base-icon
-            :key="icon-shared"
-            :name="people"
-            :title="shared"
+            key="icon-shared"
+            name="people"
+            title="shared"
             class="base-menu-entry-thumbnail" />
         </template>
     </base-menu-entry>
