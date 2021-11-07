@@ -332,10 +332,10 @@ export default {
           /**
            * inform parent of changes in applied filters
            *
-           * @event update:appliedFilters
+           * @event update:applied-filters
            * @type {Object[]}
            */
-          this.$emit('update:appliedFilters', val);
+          this.$emit('update:applied-filters', val);
         }
       },
       deep: true,
