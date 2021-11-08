@@ -318,7 +318,7 @@ export default {
     /**
      * set autocomplete loading from outside
      */
-    autocompleteLoadingIndex(val) {
+    isLoadingIndex(val) {
       this.autocompleteIndex = val;
     },
     /**
@@ -397,8 +397,10 @@ export default {
      * @param {number} index - the index of the filter
      */
     fetchAutocomplete(string, filter, index) {
-      // set autocomplete variable to correct filter row
-      this.autocompleteIndex = index;
+      // if a string to autocomplete is present - set autocomplete variable to correct filter row
+      if (string) {
+        this.autocompleteIndex = index;
+      }
       /**
        * inform parent to fetch autocomplete data for the provided filter
        *
