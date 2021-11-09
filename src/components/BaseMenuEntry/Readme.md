@@ -1,5 +1,4 @@
-Example entry with three thumbnail icons
-(see also [BaseMenuList](#basemenulist))
+Example entry with three thumbnail icons. For a more complex example, see [BaseMenuList](#basemenulist).
 ```vue
 <template>
   <div class="background">
@@ -16,17 +15,17 @@ Example entry with three thumbnail icons
             key="icon-eye"
             name="eye"
             title="eye"
-            class="base-menu-entry-thumbnail" />
+            class="thumbnail" />
           <base-icon
             key="icon-archive"
             name="archive-arrow"
             title="archived"
-            class="base-menu-entry-thumbnail" />
+            class="thumbnail" />
           <base-icon
             key="icon-shared"
             name="people"
             title="shared"
-            class="base-menu-entry-thumbnail" />
+            class="thumbnail" />
         </template>
     </base-menu-entry>
   </div>
@@ -39,7 +38,7 @@ export default {};
   padding: 16px;
   background-color: rgb(240, 240, 240);
 }
-.base-menu-entry-thumbnail {
+.thumbnail {
   max-height: 12px;
   width: 12px;
   margin: 4px 6px;

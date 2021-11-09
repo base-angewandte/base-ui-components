@@ -48,11 +48,12 @@
       <div
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
-        class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
+        ref="thumbnailContainer"
+        class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out"
+        :style="{ width: thumbnailContainerWidth + 'px' }">
         <!-- @slot Use this slot to supply a list of [BaseIcon](#baseicon) components that are
-        to be shown in the right area of the menu entry as thumbnails. The slot
-        supports up to four `BaseIcon` components. If using the slot, make sure that
-         `showThumbnails` is true. -->
+        to be shown in the right area of the menu entry as thumbnails. If using the slot,
+        make sure that `showThumbnails` is true. -->
         <slot name="thumbnails" />
       </div>
       <base-checkmark
@@ -175,6 +176,8 @@ export default {
   data() {
     return {
       isSelectedInt: false,
+      // the width of the thumbnail container; it is set dynamically on component mount or update
+      thumbnailContainerWidth: 0,
     };
   },
   computed: {
@@ -188,7 +191,11 @@ export default {
     },
   },
   mounted() {
+    this.setThumbnailContainerWidth();
     this.isSelectedInt = this.isSelected;
+  },
+  updated() {
+    this.setThumbnailContainerWidth();
   },
   methods: {
     clicked() {
@@ -221,6 +228,26 @@ export default {
       if (this.$refs.slideFade) {
         // safari fix: reset transition
         this.$refs.slideFade.$el.style.removeProperty('right');
+      }
+    },
+    /**
+     * Updates the width of the thumbnail container according to the number of
+     * thumbnails currently displayed in the right area of the component.
+     */
+    setThumbnailContainerWidth() {
+      if (this.showThumbnails) {
+        // get the current count of thumbnails
+        const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
+        // find the count of columns (each column holds 2 thumbnails)
+        const thumbnailColumnCount = Math.ceil(thumbnailCount / 2);
+        if (thumbnailColumnCount > 1) {
+          // set an initial width of 40px + 18px width increment for each column;
+          // 18px because each icon width is 12px, and then 3px added for both left and right margin
+          this.thumbnailContainerWidth = 40 + thumbnailColumnCount * 18;
+        } else {
+          // initial width when only one column exists
+          this.thumbnailContainerWidth = 40;
+        }
       }
     },
   },
@@ -367,7 +394,6 @@ export default {
       height: $row-height-large;
       padding-left:$spacing;
       background-color: white;
-      min-width: 50px;
       align-items: flex-start;
     }
 
