@@ -73,6 +73,11 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
           <BaseLoader/>
         </div>
       </template>
+      <template v-slot:post-input-field>
+        <span class="post-input-field">
+          post-input-field
+        </span>
+      </template>
       <template v-slot:remove-icon>
         <BaseIcon
           v-if="useCustomRemoveIcon"
@@ -224,6 +229,12 @@ export default {
   background: rosybrown;
   align-self: center;
   flex: 1 1 25%;
+}
+
+.post-input-field {
+  background: lightgoldenrodyellow;
+  align-self: center;
+  margin-left: 8px;
 }
 
 .drop-down-slot {

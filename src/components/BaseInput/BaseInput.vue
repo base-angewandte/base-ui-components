@@ -100,7 +100,6 @@
             <slot name="input-field-addition-after" />
           </div>
         </div>
-        <!-- @slot elements after the actual input element but within the input field container -->
         <div
           v-if="showErrorIcon && invalid"
           class="base-input__error-icon-wrapper">
@@ -111,6 +110,7 @@
               class="base-input__error-icon" />
           </slot>
         </div>
+        <!-- @slot after the actual input element over whole height of the input field container -->
         <slot name="post-input-field" />
       </div>
     </div>
