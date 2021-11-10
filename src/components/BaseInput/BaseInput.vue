@@ -98,18 +98,20 @@
             </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
-            <div
-              v-if="showErrorIcon && invalid"
-              class="base-input__error-icon-wrapper">
-              <!-- @slot use a custom icon instead of standard error/warning icon -->
-              <slot name="error-icon">
-                <BaseIcon
-                  name="attention"
-                  class="base-input__error-icon" />
-              </slot>
-            </div>
           </div>
         </div>
+        <!-- @slot elements after the actual input element but within the input field container -->
+        <div
+          v-if="showErrorIcon && invalid"
+          class="base-input__error-icon-wrapper">
+          <!-- @slot use a custom icon instead of standard error/warning icon -->
+          <slot name="error-icon">
+            <BaseIcon
+              name="attention"
+              class="base-input__error-icon" />
+          </slot>
+        </div>
+        <slot name="post-input-field" />
       </div>
     </div>
 
@@ -681,19 +683,19 @@ export default {
             transform: scale(0.5);
             pointer-events: none;
           }
+        }
+      }
+      .base-input__error-icon-wrapper {
+        color: $app-color;
+        display: flex;
+        justify-content: center;
+        align-self: center;
 
-          .base-input__error-icon-wrapper {
-            color: $app-color;
-            display: flex;
-            justify-content: center;
-
-            .base-input__error-icon {
-              height: $icon-large;
-              width: $icon-large;
-              margin-left: $spacing-small;
-              flex-shrink: 0;
-            }
-          }
+        .base-input__error-icon {
+          height: $icon-large;
+          width: $icon-large;
+          margin-left: $spacing-small;
+          flex-shrink: 0;
         }
       }
     }
