@@ -37,6 +37,7 @@
       v-bind="$listeners"
       @is-active="emitIsActive"
       @add-filter="addFilter"
+      @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
   </div>
 </template>
@@ -363,11 +364,17 @@ export default {
      * @param {Object} filter - the filter to add
      */
     addFilter(filter) {
+      console.log('Add filter');
+      console.log(filter);
       // TODO: check if filter contains values before adding it
       // (otherwise tell user to add values)
-      this.appliedFiltersInt.push(filter);
-      this.search();
+      // this.appliedFiltersInt.push(filter);
+      this.search(filter);
       // reset main filter to defaults again
+      // this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
+    },
+    addFilterRow() {
+      this.appliedFiltersInt.push(this.mainFilter);
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     },
     /**
@@ -413,14 +420,16 @@ export default {
     /**
      * search function
      */
-    search() {
+    search(newFilter) {
+      console.log('search triggered');
+      console.log(this.mainFilter);
       /**
        * inform parent that search should be triggered
        *
        * @event search
        * @type {Object[]}
        */
-      this.$emit('search', this.appliedFiltersInt);
+      this.$emit('search', newFilter ? [...this.appliedFiltersInt, newFilter] : this.appliedFiltersInt);
     },
     /**
      * inform parent if main search is set active

@@ -71,18 +71,8 @@
       </template>
       <template v-slot:input-field-addition-after>
         <button
-          v-if="isMainSearch"
-          :class="['base-advanced-search-row__icon-button',
-                   { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
-          @keydown.tab="onTab"
-          @click.stop.prevent="addFilter">
-          <BaseIcon
-            :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
-            name="plus"
-            class="base-advanced-search-row__search-row-icon" />
-        </button>
-        <button
-          v-else
+          v-if="!isMainSearch
+            || (appliedFilter.filter_values && appliedFilter.filter_values.length)"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
@@ -283,6 +273,20 @@
         </BaseDropDownList>
       </template>
     </BaseSearch>
+    <div class="base-advanced-search-row__add-filter">
+      <button
+        v-if="isMainSearch"
+        :class="['base-advanced-search-row__icon-button',
+                 { 'base-advanced-search-row__icon-button__date':
+                   filter.type.includes('date') }]"
+        @keydown.tab="onTab"
+        @click.stop.prevent="addFilterRow">
+        <BaseIcon
+          :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
+          name="plus"
+          class="base-advanced-search-row__search-row-icon" />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -750,7 +754,8 @@ export default {
            * @property {Object} val - the new currently applied filter
            */
           this.$emit('update:applied-filter', { ...val });
-          if (this.searchInputElement) {
+          if (this.isMainSearch && this.searchInputElement) {
+            console.log('applied filter focus');
             this.searchInputElement.focus();
           }
         }
@@ -851,10 +856,19 @@ export default {
        */
       this.$emit('add-filter', this.filter);
       // reset everything
-      this.resetAllInput();
+      // this.resetAllInput();
       // reset filter
       // add values separately so this does not remain linked
-      this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+      // this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+    },
+    addFilterRow() {
+      /**
+       * event emitted when user took action to add filter
+       *
+       * @event add-filter-row
+       * @property {Object} filter - the filter object in question
+       */
+      this.$emit('add-filter-row', this.filter);
     },
     removeFilter() {
       /**
@@ -887,6 +901,7 @@ export default {
       }
 
       if (this.searchInputElement) {
+        console.log('filter focus');
         // in either case - focus on input field again after click on filter
         this.searchInputElement.focus();
       }
@@ -926,8 +941,14 @@ export default {
       // reset everything
       this.resetAllInput();
       if (this.searchInputElement) {
-        // return focus to input field after select
-        this.searchInputElement.focus();
+        console.log('add option focus');
+        if (this.isMainSearch) {
+          // return focus to input field after select
+          this.searchInputElement.focus();
+        } else {
+          this.isActive = false;
+          // this.searchInputElement.blur();
+        }
       }
     },
     /**
@@ -937,6 +958,7 @@ export default {
      * as a signal to add the filter to a filter array (parent is informed)
      */
     selectOptionOnKeyEnter() {
+      console.log('enter');
       if (this.filter.type === 'chips' && this.activeControlledVocabularyEntry) {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
@@ -954,8 +976,9 @@ export default {
         // inform parent that filter can be processed
       } else if (this.isMainSearch && !this.currentInput && this.filter.filter_values
         && this.filter.filter_values.length) {
-        this.addFilter();
+        // this.addFilter();
       }
+      this.addFilter();
     },
 
     /** DROP DOWN NAVIGATION */
@@ -1166,6 +1189,7 @@ export default {
       this.getSearchInputElement();
       if (this.filter.type !== this.currentFilterType && this.isActive) {
         if (this.searchInputElement) {
+          console.log('observer focus');
           this.searchInputElement.focus();
           this.currentFilterType = this.filter.type;
         }
@@ -1194,12 +1218,13 @@ export default {
 .base-advanced-search-row {
   position: relative;
   width: 100%;
-  background: white;
   // css variable to define option background color
   // THIS IS SETTING THE BACKGROUND COLOR IN BASEDROPDOWNLIST
   --option-background: rgb(248, 248, 248);
   // set number of columns for filters and chips
   --col-number: 4;
+  display: flex;
+  flex-direction: row;
 
   .base-advanced-search-row__search {
     .base-advanced-search-row__first-column {
@@ -1408,6 +1433,35 @@ export default {
           display: none;
         }
       }
+    }
+  }
+}
+
+.base-advanced-search-row__add-filter {
+  background: white;
+  height: $row-height-large;
+  margin-left: 8px;
+  align-self: flex-end;
+
+  .base-advanced-search-row__icon-button {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: $spacing;
+    cursor: pointer;
+
+    &:active, &:focus {
+      color: $app-color;
+      fill: $app-color;
+    }
+
+    &.base-advanced-search-row__icon-button__date {
+      margin-right: -$spacing-small;
+    }
+
+    .base-advanced-search-row__search-row-icon {
+      height: $icon-medium;
+      width: $icon-medium;
     }
   }
 }
