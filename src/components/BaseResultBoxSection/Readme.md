@@ -367,9 +367,7 @@ components: { BaseInput , BaseToggle } ,
       },
       set(val) {
         const nonVisibleBoxes = this.entriesList.slice(this.numberOfBoxes -1, this.entriesList.length - 1);
-        console.log(nonVisibleBoxes);
         this.entriesList = [...val, ...nonVisibleBoxes];
-        console.log(this.entriesList);
       },
     },
   },

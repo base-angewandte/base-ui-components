@@ -72,7 +72,7 @@
       <template v-slot:post-input-field>
         <button
           v-if="!isMainSearch
-            || (appliedFilter.filter_values && appliedFilter.filter_values.length)"
+            || filterHasValues"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
@@ -186,7 +186,8 @@
                 class="base-advanced-search-row__autocomplete-options"
                 @update:active-option="setCollection(slotProps
                   .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption" />
+                @update:selected-option="addOption($event,slotProps
+                  .option[autocompletePropertyNames.id])" />
             </div>
           </template>
 
@@ -290,13 +291,12 @@
 </template>
 
 <script>
-// TODO: use base icon instead??
 import BaseSearch from '@/components/BaseSearch/BaseSearch';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
 import BaseChip from '@/components/BaseChip/BaseChip';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
-import { createId, sort } from '@/utils/utils';
+import { createId, hasData, sort } from '@/utils/utils';
 import navigateMixin from '../../mixins/navigateList';
 import i18n from '../../mixins/i18n';
 
@@ -663,11 +663,13 @@ export default {
      */
     displayedOptions() {
       if (this.controlledVocabularyOptions) {
-        // remove already selected options
-        let options = [].concat(this.controlledVocabularyOptions)
-          .filter(option => !this.filter.filter_values
+        let options = [].concat(this.controlledVocabularyOptions);
+        // remove already selected options if there are any
+        if (this.filter.filter_values && this.filter.filter_values.length) {
+          options = options.filter(option => !this.filter.filter_values
             .map(value => value[this.identifierPropertyName.controlledVocabularyOption])
             .includes(option[this.identifierPropertyName.controlledVocabularyOption]));
+        }
         // only display options matching the current input string
         if (this.currentInput) {
           options = options.filter(filter => filter[this.labelPropertyName.filter]
@@ -732,6 +734,21 @@ export default {
           .autocompletePropertyNames.id], curr[this.autocompletePropertyNames.data]);
         return prev;
       }, {});
+    },
+    filterHasValues() {
+      return hasData(this.filter.filter_values);
+      // const filterValues = this.filter.filter_values;
+      // // check if values are there and are array or object
+      // if (filterValues && typeof filterValues === 'object') {
+      //   // check if it is array
+      //   if (filterValues && filterValues.length >= 0) {
+      //     return !!filterValues.length;
+      //   }
+      //   // else assume object
+      //   return Object.values(filterValues).some(value => !!value);
+      // }
+      // // else assume string (or undefinded,...) and evaluate that
+      // return !!filterValues;
     },
   },
   watch: {
@@ -844,21 +861,21 @@ export default {
     /** FILTER ROW RELATED FUNCTIONALITIES */
 
     // inform parent of click on plus or remove respectively
-    addFilter() {
-      // emit event in any case (so frontend can inform user to add values if empty)
-      /**
-       * event emitted when user took action to add filter
-       *
-       * @event add-filter
-       * @property {Object} filter - the filter object in question
-       */
-      this.$emit('add-filter', this.filter);
-      // reset everything
-      // this.resetAllInput();
-      // reset filter
-      // add values separately so this does not remain linked
-      // this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
-    },
+    // addFilter() {
+    //   // emit event in any case (so frontend can inform user to add values if empty)
+    //   /**
+    //    * event emitted when user took action to add filter
+    //    *
+    //    * @event add-filter
+    //    * @property {Object} filter - the filter object in question
+    //    */
+    //   this.$emit('add-filter', this.filter);
+    //   // reset everything
+    //   // this.resetAllInput();
+    //   // reset filter
+    //   // add values separately so this does not remain linked
+    //   // this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+    // },
     addFilterRow() {
       /**
        * event emitted when user took action to add filter
@@ -931,19 +948,28 @@ export default {
      * base search input is handled as chips)
      *
      * @param {Object} entry - the entry to add to the selected list
+     * @param {string} collectionId - to set filter after adding from autocomplete a collection id
+     *  is needed when option was selected by click
      */
-    addOption(entry) {
+    addOption(entry, collectionId = '') {
+      // if option is coming from autocomplete and currently active filter is not identical
+      // with the category of the selected item (if everything is going right this should
+      // be 'default') then set the category of the selected item as current filter
+      if (this.filter.type === 'text'
+        && this.filter[this.identifierPropertyName.filter] !== this.activeCollection) {
+        this.filter = {
+          ...this.filterList.find(filter => filter[this.identifierPropertyName.filter]
+            === (this.activeCollection || collectionId)),
+          // also add the filter values property which does not exist in the filterList filters
+          filter_values: [],
+        };
+      }
       this.filter.filter_values = this.filter.filter_values.concat(entry);
       // reset everything
       this.resetAllInput();
       if (this.searchInputElement) {
-        if (this.isMainSearch) {
-          // return focus to input field after select
-          this.searchInputElement.focus();
-        } else {
-          this.isActive = false;
-          // this.searchInputElement.blur();
-        }
+        this.isActive = false;
+        this.searchInputElement.blur();
       }
     },
     /**
@@ -968,11 +994,7 @@ export default {
         this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
         // if this is main search and there is no current input and filter values are present
         // inform parent that filter can be processed
-      } else if (this.isMainSearch && !this.currentInput && this.filter.filter_values
-        && this.filter.filter_values.length) {
-        // this.addFilter();
       }
-      this.addFilter();
     },
 
     /** DROP DOWN NAVIGATION */
