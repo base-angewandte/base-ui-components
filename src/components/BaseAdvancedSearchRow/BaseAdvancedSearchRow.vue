@@ -69,7 +69,7 @@
           </template>
         </BaseChipsInputField>
       </template>
-      <template v-slot:input-field-addition-after>
+      <template v-slot:post-input-field>
         <button
           v-if="!isMainSearch
             || (appliedFilter.filter_values && appliedFilter.filter_values.length)"
@@ -273,12 +273,11 @@
         </BaseDropDownList>
       </template>
     </BaseSearch>
-    <div class="base-advanced-search-row__add-filter">
+    <div
+      v-if="isMainSearch"
+      class="base-advanced-search-row__add-filter">
       <button
-        v-if="isMainSearch"
-        :class="['base-advanced-search-row__icon-button',
-                 { 'base-advanced-search-row__icon-button__date':
-                   filter.type.includes('date') }]"
+        :class="['base-advanced-search-row__icon-button']"
         @keydown.tab="onTab"
         @click.stop.prevent="addFilterRow">
         <BaseIcon
@@ -755,7 +754,6 @@ export default {
            */
           this.$emit('update:applied-filter', { ...val });
           if (this.isMainSearch && this.searchInputElement) {
-            console.log('applied filter focus');
             this.searchInputElement.focus();
           }
         }
@@ -891,7 +889,6 @@ export default {
      * to set the default filter values accordingly (array, string, object)
      */
     selectFilter(selectedFilter) {
-      console.log('select filter');
       // check if filter actually changed
       if (this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
@@ -901,7 +898,6 @@ export default {
       }
 
       if (this.searchInputElement) {
-        console.log('filter focus');
         // in either case - focus on input field again after click on filter
         this.searchInputElement.focus();
       }
@@ -941,7 +937,6 @@ export default {
       // reset everything
       this.resetAllInput();
       if (this.searchInputElement) {
-        console.log('add option focus');
         if (this.isMainSearch) {
           // return focus to input field after select
           this.searchInputElement.focus();
@@ -958,7 +953,6 @@ export default {
      * as a signal to add the filter to a filter array (parent is informed)
      */
     selectOptionOnKeyEnter() {
-      console.log('enter');
       if (this.filter.type === 'chips' && this.activeControlledVocabularyEntry) {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
@@ -1189,7 +1183,6 @@ export default {
       this.getSearchInputElement();
       if (this.filter.type !== this.currentFilterType && this.isActive) {
         if (this.searchInputElement) {
-          console.log('observer focus');
           this.searchInputElement.focus();
           this.currentFilterType = this.filter.type;
         }
@@ -1251,9 +1244,10 @@ export default {
 
     .base-advanced-search-row__icon-button {
       display: flex;
+      align-self: center;
       height: 100%;
       padding: $spacing;
-      margin-right: -$spacing;
+      margin-right: -$spacing-small;
       cursor: pointer;
 
       &:active, &:focus {
@@ -1263,6 +1257,7 @@ export default {
 
       &.base-advanced-search-row__icon-button__date {
         margin-right: -$spacing-small;
+        align-items: center;
       }
 
       .base-advanced-search-row__search-row-icon {
@@ -1439,9 +1434,8 @@ export default {
 
 .base-advanced-search-row__add-filter {
   background: white;
-  height: $row-height-large;
-  margin-left: 8px;
-  align-self: flex-end;
+  margin-left: $spacing-small;
+  align-self: stretch;
 
   .base-advanced-search-row__icon-button {
     display: flex;
@@ -1453,10 +1447,6 @@ export default {
     &:active, &:focus {
       color: $app-color;
       fill: $app-color;
-    }
-
-    &.base-advanced-search-row__icon-button__date {
-      margin-right: -$spacing-small;
     }
 
     .base-advanced-search-row__search-row-icon {

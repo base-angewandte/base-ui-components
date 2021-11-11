@@ -145,6 +145,10 @@
         <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />
       </template>
+      <template v-slot:post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height -->
+        <slot name="post-input-field" />
+      </template>
       <template v-slot:error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon -->
         <slot name="error-icon" />
