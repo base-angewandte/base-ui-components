@@ -12,17 +12,14 @@ Example entry with three thumbnail icons. For a more complex example, see [BaseM
       <template
           v-slot:thumbnails>
           <base-icon
-            key="icon-eye"
             name="eye"
             title="eye"
             class="thumbnail" />
           <base-icon
-            key="icon-archive"
             name="archive-arrow"
             title="archived"
             class="thumbnail" />
           <base-icon
-            key="icon-shared"
             name="people"
             title="shared"
             class="thumbnail" />
@@ -41,7 +38,6 @@ export default {};
 .thumbnail {
   max-height: 12px;
   width: 12px;
-  margin: 4px 6px;
 }
 </style>
 

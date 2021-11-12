@@ -241,9 +241,9 @@ export default {
         // find the count of columns (each column holds 2 thumbnails)
         const thumbnailColumnCount = Math.ceil(thumbnailCount / 2);
         if (thumbnailColumnCount > 1) {
-          // set an initial width of 40px + 18px width increment for each column;
-          // 18px because each icon width is 12px, and then 3px added for both left and right margin
-          this.thumbnailContainerWidth = 40 + thumbnailColumnCount * 18;
+          // set an initial width of 24px then a 18px width increment for each column;
+          // 18px because each icon width is 12px, and then 6px added for the column gap
+          this.thumbnailContainerWidth = 24 + thumbnailColumnCount * 18;
         } else {
           // initial width when only one column exists
           this.thumbnailContainerWidth = 40;
@@ -392,9 +392,10 @@ export default {
       // however this is the value it should take
       justify-content: space-evenly;
       height: $row-height-large;
-      padding-left:$spacing;
+      padding: 4px 0 4px $spacing;
       background-color: white;
-      align-items: flex-start;
+      align-items: center;
+      gap: 8px 6px;
     }
 
     .base-menu-entry-checkbox {

@@ -94,7 +94,6 @@ export default {
   .thumbnail {
     max-height: 12px;
     width: 12px;
-    margin: 4px 6px;
   }
 </style>
 
