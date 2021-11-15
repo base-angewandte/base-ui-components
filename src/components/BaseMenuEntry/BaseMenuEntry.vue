@@ -53,7 +53,7 @@
         :style="{ width: thumbnailContainerWidth + 'px' }">
         <!-- @slot Use this slot to supply a list of [BaseIcon](#baseicon) components that are
         to be shown in the right area of the menu entry as thumbnails. If using the slot,
-        make sure that `showThumbnails` is true. -->
+        make sure that `showThumbnails` is true.-->
         <slot name="thumbnails" />
       </div>
       <base-checkmark
@@ -240,14 +240,9 @@ export default {
         const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
         // find the count of columns (each column holds 2 thumbnails)
         const thumbnailColumnCount = Math.ceil(thumbnailCount / 2);
-        if (thumbnailColumnCount > 1) {
-          // set an initial width of 24px then a 18px width increment for each column;
-          // 18px because each icon width is 12px, and then 6px added for the column gap
-          this.thumbnailContainerWidth = 24 + thumbnailColumnCount * 18;
-        } else {
-          // initial width when only one column exists
-          this.thumbnailContainerWidth = 40;
-        }
+        const gapsCount = thumbnailColumnCount - 1;
+        // 16px comes from $spacing and then 12px for each column and column gap
+        this.thumbnailContainerWidth = 16 + thumbnailColumnCount * 12 + gapsCount * 12;
       }
     },
   },
@@ -387,15 +382,14 @@ export default {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap-reverse;
-      // added for IE
-      justify-content: space-around;
-      // however this is the value it should take
-      justify-content: space-evenly;
       height: $row-height-large;
-      padding: 4px 0 4px $spacing;
+      justify-content: center;
       background-color: white;
       align-items: center;
-      gap: 8px 6px;
+      padding-left: $spacing;
+      // the strict pixel value is needed for aligning child thumbnails,
+      // see also the setThumbnailContainerWidth method
+      gap: 12px;
     }
 
     .base-menu-entry-checkbox {
@@ -435,16 +429,6 @@ export default {
       left: calc(-#{$fade-out-width} - #{$spacing});
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
       z-index: map-get($zindex, fadeout);
-    }
-  }
-
-  @supports (-ms-ime-align:auto) {
-    /* Edge only - space-around instead of justify-evenly since
-    they "forgot" that (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15947692/) */
-    .base-menu-entry {
-      .base-menu-entry-thumbnail-container {
-        justify-content: space-around;
-      }
     }
   }
 </style>

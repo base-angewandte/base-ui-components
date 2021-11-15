@@ -1,4 +1,4 @@
-Example entry with three thumbnail icons. For a more complex example, see [BaseMenuList](#basemenulist).
+The example entry below has three thumbnail icons. Note that icons appear stacked in columns (2 columns, in this example), and each column accomodates a maximum of two icons. If you provide more thumbnails, they will continue to align according to this pattern along the x-axis, from right to left, and from top to bottom. In order for thumbnails to align this way, each thumbnail is expected to have a width and height of **12px**, like in the code listing below. 
 ```vue
 <template>
   <div class="background">
@@ -42,3 +42,4 @@ export default {};
 </style>
 
 ```
+For another example of using `BaseMenuEntry`, see [BaseMenuList](#basemenulist).
