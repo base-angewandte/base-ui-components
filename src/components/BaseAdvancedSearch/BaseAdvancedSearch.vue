@@ -329,7 +329,7 @@ export default {
     appliedFiltersInt: {
       handler(val) {
         // check if val is actually different from prop value
-        if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters)) {
+        if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters.slice(1))) {
           // if yes - inform parent
           /**
            * inform parent of changes in applied filters
@@ -337,7 +337,7 @@ export default {
            * @event update:applied-filters
            * @type {Object[]}
            */
-          this.$emit('update:applied-filters', val);
+          this.$emit('update:applied-filters', [this.mainFilter, ...val]);
         }
       },
       deep: true,
@@ -348,9 +348,9 @@ export default {
     appliedFilters: {
       handler(val) {
         // check if value is different from internal value
-        if (JSON.stringify(val) !== JSON.stringify(this.appliedFiltersInt)) {
+        if (JSON.stringify(val.slice(1)) !== JSON.stringify(this.appliedFiltersInt)) {
           // if yes - update internal value
-          this.appliedFiltersInt = JSON.parse(JSON.stringify(val));
+          [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON.stringify(val));
         }
       },
       immediate: true,
@@ -378,6 +378,7 @@ export default {
           this.search();
         }
       }
+      this.$emit('update:applied-filters', [val, ...this.appliedFiltersInt]);
     },
   },
   created() {
@@ -386,16 +387,13 @@ export default {
   },
   methods: {
     /**
-     * function to add a filter after '+' icon was triggered or enter was hit
+     * function to add a filter after '+' icon was triggered
      * @param {Object} filter - the filter to add
      */
     addFilter(filter) {
       // TODO: check if filter contains values before adding it
       // (otherwise tell user to add values)
-      // this.appliedFiltersInt.push(filter);
       this.search(filter);
-      // reset main filter to defaults again
-      // this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     },
     addFilterRow() {
       this.appliedFiltersInt.push(this.mainFilter);
