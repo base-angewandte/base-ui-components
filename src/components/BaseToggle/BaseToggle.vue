@@ -47,7 +47,7 @@ export default {
   },
   props: {
     /**
-     * specify a discriptive name <br>
+     * specify a descriptive name <br>
      * this will not be displayed but is only there for usability purposes
      */
     name: {
@@ -117,14 +117,13 @@ export default {
     user-select: none;
     display: flex;
     align-items: center;
-    margin-bottom: $spacing;
 
     .base-toggle-input {
       position: absolute;
       opacity: 0;
       z-index: map-get($zindex, boxcontent);
 
-      &:focus ~ .base-switch-container {
+      &:focus-visible ~ .base-switch-container {
         border: 1px solid $app-color;
       }
     }

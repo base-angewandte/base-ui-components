@@ -452,6 +452,12 @@ export default {
         });
         return ({ ...initObj, ...value });
       }
+
+      // check if field is boolean
+      if (field.type === 'boolean') {
+        return value;
+      }
+
       // if it is not a array or object simply return value from list or empty string
       return (typeof value === 'string' ? value : '');
     },

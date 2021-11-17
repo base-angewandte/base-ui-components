@@ -6,7 +6,8 @@
     <component
       :is="fieldElement"
       v-if="fieldType !== 'date' && fieldType !== 'chips'
-        && fieldType !== 'chips-below' && fieldType !== 'group'"
+        && fieldType !== 'chips-below' && fieldType !== 'group'
+        && fieldType !== 'boolean'"
       :id="fieldKey"
       :key="fieldKey"
       :label="labelInt"
@@ -168,6 +169,14 @@
           @fetch-autocomplete="subFormFetchAutocomplete" />
       </div>
     </div>
+
+    <!-- FIELD BOOLEAN -->
+    <BaseToggle
+      v-else-if="fieldType === 'boolean'"
+      :name="fieldKey"
+      :label="labelInt"
+      :checked="fieldValue"
+      @clicked="$emit('field-value-changed', $event)"/>
   </div>
 </template>
 
@@ -184,6 +193,7 @@ export default {
     BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
     BaseForm: () => import('../BaseForm/BaseForm'),
+    BaseToggle: () => import('../BaseToggle/BaseToggle'),
   },
   mixins: [i18n],
   props: {
@@ -205,7 +215,7 @@ export default {
      * the field value
      */
     fieldValue: {
-      type: [Object, String, Array, Date, Number],
+      type: [Object, String, Array, Date, Number, Boolean],
       required: true,
     },
     /**
