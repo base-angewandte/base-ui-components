@@ -387,14 +387,8 @@ export default {
   },
   methods: {
     /**
-     * function to add a filter after '+' icon was triggered
-     * @param {Object} filter - the filter to add
+     * function to add a filter row after '+' icon was triggered
      */
-    addFilter(filter) {
-      // TODO: check if filter contains values before adding it
-      // (otherwise tell user to add values)
-      this.search(filter);
-    },
     addFilterRow() {
       this.appliedFiltersInt.push(this.mainFilter);
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));

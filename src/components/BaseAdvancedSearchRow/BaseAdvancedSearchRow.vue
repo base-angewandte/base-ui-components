@@ -956,7 +956,8 @@ export default {
       // with the category of the selected item (if everything is going right this should
       // be 'default') then set the category of the selected item as current filter
       if (this.filter.type === 'text'
-        && this.filter[this.identifierPropertyName.filter] !== this.activeCollection) {
+        && this.filter[this.identifierPropertyName.filter]
+          !== (this.activeCollection || collectionId)) {
         this.filter = {
           ...this.filterList.find(filter => filter[this.identifierPropertyName.filter]
             === (this.activeCollection || collectionId)),
