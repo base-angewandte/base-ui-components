@@ -1330,7 +1330,7 @@ export default {
               }
 
               &.base-advanced-search-row__filter-active, &:hover {
-                box-shadow: 0 0 0 1px $app-color;
+                box-shadow: inset 0 0 0 1px $app-color;
               }
 
               &.base-advanced-search-row__filter-selected {
