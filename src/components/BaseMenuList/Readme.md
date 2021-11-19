@@ -7,22 +7,18 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
         :selected-list="selectedArray"
         :selected="selectActive"
         @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
-        @clicked="activeEntry = $event"
-        >
+        @clicked="activeEntry = $event">
         <template
           v-slot:thumbnails="{ item }">
           <base-icon
             v-if="item.shared"
-            name="people"
-            class="thumbnail" />
+            name="people" />
           <base-icon
             v-if="item.published"
-            name="eye"
-            class="thumbnail" />
+            name="eye" />
           <base-icon
             v-if="item.error"
-            name="attention"
-            class="thumbnail" />
+            name="attention" />
         </template>
     </BaseMenuList>
     <BaseButton
@@ -90,10 +86,6 @@ export default {
   }
   .show {
     margin-top: 16px;
-  }
-  .thumbnail {
-    max-height: 12px;
-    width: 12px;
   }
 </style>
 

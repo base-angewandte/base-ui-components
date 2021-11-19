@@ -50,7 +50,7 @@
         :key="entryId + 'thumbnail'"
         ref="thumbnailContainer"
         class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out"
-        :style="{ width: thumbnailContainerWidth + 'px' }">
+        :style="{ '--cols': columns }">
         <!-- @slot Use this slot to supply a list of [BaseIcon](#baseicon) components that are
         to be shown in the right area of the menu entry as thumbnails. If using the slot,
         make sure that `showThumbnails` is true.-->
@@ -176,8 +176,8 @@ export default {
   data() {
     return {
       isSelectedInt: false,
-      // the width of the thumbnail container; it is set dynamically on component mount or update
-      thumbnailContainerWidth: 0,
+      // how many columns the thumbnail container takes
+      columns: 0,
     };
   },
   computed: {
@@ -191,11 +191,11 @@ export default {
     },
   },
   mounted() {
-    this.setThumbnailContainerWidth();
+    this.setThumbnailColumns();
     this.isSelectedInt = this.isSelected;
   },
   updated() {
-    this.setThumbnailContainerWidth();
+    this.setThumbnailColumns();
   },
   methods: {
     clicked() {
@@ -231,19 +231,13 @@ export default {
       }
     },
     /**
-     * Updates the width of the thumbnail container according to the number of
-     * thumbnails currently displayed in the right area of the component.
+     * Returns the count of columns that the thumbnail icons take.
      */
-    setThumbnailContainerWidth() {
-      if (this.showThumbnails) {
-        // get the current count of thumbnails
-        const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
-        // find the count of columns (each column holds 2 thumbnails)
-        const thumbnailColumnCount = Math.ceil(thumbnailCount / 2);
-        const gapsCount = thumbnailColumnCount - 1;
-        // 16px comes from $spacing and then 12px for each column and column gap
-        this.thumbnailContainerWidth = 16 + thumbnailColumnCount * 12 + gapsCount * 12;
-      }
+    setThumbnailColumns() {
+      // get the current count of thumbnails
+      const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
+      // find the count of columns (each column holds 2 thumbnails)
+      this.columns = Math.ceil(thumbnailCount / 2);
     },
   },
 };
@@ -385,11 +379,18 @@ export default {
       height: $row-height-large;
       justify-content: center;
       background-color: white;
-      align-items: center;
+      align-items: flex-start;
       padding-left: $spacing;
-      // the strict pixel value is needed for aligning child thumbnails,
-      // see also the setThumbnailContainerWidth method
-      gap: 12px;
+      gap: $spacing;
+      // calculate container width as sum of thumbnail columns and column gaps,
+      // plus an extra $spacing to account for the padding-left applied above.
+      // the count of columns is calculated in the setThumbnailColumns() method.
+      width: calc(var(--cols) * #{$icon-small} + (var(--cols) - 1) * #{$spacing} + #{$spacing});
+      // width and height of each thumbnail icon
+      ::v-deep .svg-icon {
+        max-height: $icon-small;
+        width: $icon-small;
+      }
     }
 
     .base-menu-entry-checkbox {
