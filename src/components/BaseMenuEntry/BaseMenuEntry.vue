@@ -234,10 +234,12 @@ export default {
      * Returns the count of columns that the thumbnail icons take.
      */
     setThumbnailColumns() {
-      // get the current count of thumbnails
-      const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
-      // find the count of columns (each column holds 2 thumbnails)
-      this.columns = Math.ceil(thumbnailCount / 2);
+      if (this.showThumbnails) {
+        // get the current count of thumbnails
+        const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
+        // find the count of columns (each column holds 2 thumbnails)
+        this.columns = Math.ceil(thumbnailCount / 2);
+      }
     },
   },
 };
