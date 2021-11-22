@@ -8,7 +8,7 @@
       v-model="currentInput"
       :show-pre-input-icon="isMainSearch"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
-      :type="filter && filter.type === 'text' ? 'chips' : filter.type"
+      :type="searchType"
       :selected-chips.sync="selectedOptions"
       :is-loading="isLoading"
       :placeholder="placeholder"
@@ -742,8 +742,27 @@ export default {
         return prev;
       }, {});
     },
+    /**
+     * function to determine if filter has filter values
+     */
     filterHasValues() {
       return hasData(this.filter.filter_values);
+    },
+    /**
+     * map filter type
+     */
+    searchType() {
+      if (this.filter) {
+        const { type } = this.filter;
+        if (this.filter.id === 'default') {
+          return 'text';
+        }
+        if (type === 'text' || type === 'chips') {
+          return 'chips';
+        }
+        return type;
+      }
+      return 'text';
     },
   },
   watch: {

@@ -463,8 +463,6 @@ export default {
 .base-search__input {
   background:white;
   min-height: $row-height-large;
-  display: flex;
-  justify-content: center;
 
   .base-search__spacing {
     margin-left: $spacing-small;

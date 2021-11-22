@@ -21,7 +21,7 @@ export default {
      *  (https://kazupon.github.io/vue-i18n/guide/formatting.html)
      * @returns {string}
      */
-    getI18nTerm(key, count = -1, variables) {
+    getI18nTerm(key, count = -1, variables = {}) {
       if (this.hasI18n && this.$te(key)) {
         if (count >= 0) {
           return this.$tc(key, count, variables);
