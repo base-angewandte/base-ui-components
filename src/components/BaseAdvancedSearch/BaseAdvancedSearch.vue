@@ -35,9 +35,7 @@
       :label-property-name="labelPropertyName"
       :identifier-property-name="identifierPropertyName"
       v-bind="$listeners"
-      @is-active="emitIsActive"
       @add-filter-row="addFilterRow"
-      @remove-filter="resetFilter"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
   </div>
 </template>
@@ -351,6 +349,10 @@ export default {
         if (JSON.stringify(val.slice(1)) !== JSON.stringify(this.appliedFiltersInt)) {
           // if yes - update internal value
           [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON.stringify(val));
+          // also check if main filter is different separately!
+        } else if (val && val.length === 1
+          && JSON.stringify(this.mainFilter) !== JSON.stringify(val[0])) {
+          [this.mainFilter] = val;
         }
       },
       immediate: true,
@@ -382,7 +384,11 @@ export default {
     },
   },
   created() {
-    this.mainFilter = { ...this.defaultFilter, filter_values: [] };
+    // check if mainFilter was already set (e.g. from outside)
+    if (!this.mainFilter) {
+      // if not set default filter
+      this.mainFilter = { ...this.defaultFilter, filter_values: [] };
+    }
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
   },
   methods: {
@@ -403,11 +409,6 @@ export default {
       this.appliedFiltersInt.splice(index, 1);
       // trigger search to update search results
       this.search();
-    },
-    resetFilter() {
-      // TODO: reset filter - reset everything or just values??
-      this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
-      // this.search();
     },
     /**
      * function called when a filter object within a filter row changes
@@ -448,13 +449,7 @@ export default {
        * @event search
        * @type {Object[]}
        */
-      this.$emit('search', [...this.appliedFiltersInt, this.mainFilter]);
-    },
-    /**
-     * inform parent if main search is set active
-     */
-    emitIsActive() {
-      this.$emit('main-search-active');
+      this.$emit('search', [this.mainFilter, ...this.appliedFiltersInt]);
     },
     /**
      * create an internal row id for unique identification of added filter rows

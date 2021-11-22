@@ -6,10 +6,9 @@
     <BaseSearch
       :id="'search-input-' + internalRowId"
       v-model="currentInput"
-      :is-active.sync="isActive"
       :show-pre-input-icon="isMainSearch"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
-      :type="filter.type === 'text' ? 'chips' : filter.type"
+      :type="filter && filter.type === 'text' ? 'chips' : filter.type"
       :selected-chips.sync="selectedOptions"
       :is-loading="isLoading"
       :placeholder="placeholder"
@@ -23,12 +22,15 @@
       :clearable="false"
       class="base-advanced-search-row__search"
       v-bind="$listeners"
+      @clicked-outside="isActive = false"
+      @click="isActive = true"
+      @keypress="isActive = true"
       @keydown.up.down.right.left="navigateDropDown"
+      @keydown.tab="handleDropDownOnTabKey"
       @keydown.enter="selectOptionOnKeyEnter">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template v-slot:pre-input-field>
         <BaseChipsInputField
-          v-if="!(isMainSearch && filter.label === defaultFilter.label)"
           :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
@@ -47,8 +49,13 @@
           input-class="base-advanced-search-row__input-field"
           :class="['base-advanced-search-row__first-column',
                    'base-advanced-search-row__filter-input',
+                   { 'hide' :
+                     isMainSearch && filter.label === defaultFilter.label },
                    { 'base-advanced-search-row__filter-input__date':
                      filter.type.includes('date') }]"
+          @click="isActive = true"
+          @keypress="isActive = true"
+          @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
           <template v-slot:chip="{ entry, index, chipActiveForRemove, removeEntry }">
@@ -259,7 +266,7 @@
                 'base-advanced-search-row__area-padding',
                 { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
               ]">
-              <div v-if="!currentInput">
+              <div v-if="!currentInput.trim()">
                 {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
               </div>
               <div
@@ -546,7 +553,7 @@ export default {
        * @property {*[]} [Filter.filter_values]
        * @property {Object[]} [Filter.options?]
        */
-      filter: null,
+      filter: this.defaultFilter,
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Object}
@@ -737,18 +744,6 @@ export default {
     },
     filterHasValues() {
       return hasData(this.filter.filter_values);
-      // const filterValues = this.filter.filter_values;
-      // // check if values are there and are array or object
-      // if (filterValues && typeof filterValues === 'object') {
-      //   // check if it is array
-      //   if (filterValues && filterValues.length >= 0) {
-      //     return !!filterValues.length;
-      //   }
-      //   // else assume object
-      //   return Object.values(filterValues).some(value => !!value);
-      // }
-      // // else assume string (or undefinded,...) and evaluate that
-      // return !!filterValues;
     },
   },
   watch: {
@@ -787,7 +782,7 @@ export default {
           this.filter = val ? JSON.parse(JSON.stringify(val))
             : { ...this.defaultFilter, filter_values: [] };
           // check if the new filter has values
-          if (val.filter_values) {
+          if (val && val.filter_values) {
             // distinguish between date and others to assign to correct variable
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
@@ -861,21 +856,6 @@ export default {
     /** FILTER ROW RELATED FUNCTIONALITIES */
 
     // inform parent of click on plus or remove respectively
-    // addFilter() {
-    //   // emit event in any case (so frontend can inform user to add values if empty)
-    //   /**
-    //    * event emitted when user took action to add filter
-    //    *
-    //    * @event add-filter
-    //    * @property {Object} filter - the filter object in question
-    //    */
-    //   this.$emit('add-filter', this.filter);
-    //   // reset everything
-    //   // this.resetAllInput();
-    //   // reset filter
-    //   // add values separately so this does not remain linked
-    //   // this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
-    // },
     addFilterRow() {
       /**
        * event emitted when user took action to add filter
@@ -886,13 +866,18 @@ export default {
       this.$emit('add-filter-row', this.filter);
     },
     removeFilter() {
-      /**
-       * event emitted when user triggered remove icon on filter row
-       *
-       * @event remove-filter
-       * @property {Object} filter - the filter to be removed
-       */
-      this.$emit('remove-filter', this.filter);
+      if (this.isMainSearch) {
+        this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+        this.resetAllInput();
+      } else {
+        /**
+         * event emitted when user triggered remove icon on filter row
+         *
+         * @event remove-filter
+         * @property {Object} filter - the filter to be removed
+         */
+        this.$emit('remove-filter', this.filter);
+      }
     },
 
     /** FILTER RELATED FUNCTIONALITIES */
@@ -907,7 +892,7 @@ export default {
      */
     selectFilter(selectedFilter) {
       // check if filter actually changed
-      if (this.filter[this.identifierPropertyName.filter]
+      if (selectedFilter && this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
         this.filter = JSON.parse(JSON.stringify(selectedFilter));
         this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter.type, this.filter.filter_values));
@@ -927,7 +912,7 @@ export default {
       if (this.displayedFilters.length) {
         const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
         // determine if arrow was up or down - true if down, false for up
-        const isArrowDown = event.code === 'ArrowDown';
+        const isArrowDown = event.key === 'ArrowDown';
         this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
       }
     },
@@ -952,25 +937,32 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
-      // if option is coming from autocomplete and currently active filter is not identical
+      // if option is coming from autocomplete drop down list (=has an id)
+      // and currently active filter is not identical
       // with the category of the selected item (if everything is going right this should
       // be 'default') then set the category of the selected item as current filter
       if (this.filter.type === 'text'
+        && entry[this.identifierPropertyName.autocompleteOption]
         && this.filter[this.identifierPropertyName.filter]
-          !== (this.activeCollection || collectionId)) {
+          !== (this.activeCollection || collectionId
+            || this.defaultFilter[this.identifierPropertyName.filter])) {
+        const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
+          === (this.activeCollection || collectionId));
         this.filter = {
-          ...this.filterList.find(filter => filter[this.identifierPropertyName.filter]
-            === (this.activeCollection || collectionId)),
+          // the filterList SHOULD have the filter included that is displayed as autocomplete option
+          // category but if everything fails - use default filter again
+          ...(newFilter || this.defaultFilter),
           // also add the filter values property which does not exist in the filterList filters
           filter_values: [],
         };
       }
-      this.filter.filter_values = this.filter.filter_values.concat(entry);
+      this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
       // reset everything
       this.resetAllInput();
-      if (this.searchInputElement) {
+      // if filter row is not controlled vocabulary close the filter to be able to see search
+      // results
+      if (this.filter.type !== 'chips') {
         this.isActive = false;
-        this.searchInputElement.blur();
       }
     },
     /**
@@ -995,6 +987,8 @@ export default {
         this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
         // if this is main search and there is no current input and filter values are present
         // inform parent that filter can be processed
+      } else {
+        this.isActive = !this.isActive;
       }
     },
 
@@ -1007,11 +1001,11 @@ export default {
      */
     navigateDropDown(event) {
       // determine if arrow was up or down - true if down, false for up
-      const isArrowDown = event.code === 'ArrowDown';
+      const isArrowDown = event.key === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
       // option specified in the filter?) only use arrow up and down
       if (this.controlledVocabularyOptions && this.controlledVocabularyOptions.length
-        && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
+        && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(
           this.displayedOptions,
@@ -1034,7 +1028,7 @@ export default {
     navigateAutocomplete(event, isArrowDown) {
       if (this.resultListInt.length) {
         // store key stroked in variable
-        const key = event.code;
+        const { key } = event;
         // actions for arrow up or down
         if (key === 'ArrowDown' || key === 'ArrowUp') {
           // if there is no active Collection (could happen due to hover)
@@ -1099,6 +1093,23 @@ export default {
           this.collectionSelect = true;
         } else if (key === 'ArrowRight') {
           this.collectionSelect = false;
+        }
+      }
+    },
+    handleDropDownOnTabKey(event) {
+      // get all input elements
+      const inputElements = this.$el.getElementsByTagName('input');
+      // check if some where found
+      if (inputElements) {
+        // create an array out of input elements found
+        const inputArray = Array.from(inputElements);
+        // get the index of the element the event came from
+        const eventInputIndex = inputArray.indexOf(event.target);
+        // check if element is either the last input element and no shift key was used or
+        // it is the first element and shift key was used --> if true --> close drop down
+        if ((!event.shiftKey && eventInputIndex >= inputArray.length - 1)
+          || (event.shiftKey && eventInputIndex <= 0)) {
+          this.isActive = false;
         }
       }
     },
