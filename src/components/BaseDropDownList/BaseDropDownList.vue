@@ -323,7 +323,7 @@ export default {
             dropDownContainerTemp.scrollTop = activeOptionTopTemp
               + activeOptionHeightTemp;
             // else check if key was arrow down
-          } else if (event.code === 'ArrowDown') {
+          } else if (event.key === 'ArrowDown') {
             // if option is out of sight set container scrollTop to option position
             if (optionOutOfView) {
               dropDownContainerTemp.scrollTop = activeOptionTopTemp;
@@ -334,7 +334,7 @@ export default {
               dropDownContainerTemp.scrollTop += activeOptionHeightTemp;
             }
             // else check if key was arrow up
-          } else if (event.code === 'ArrowUp') {
+          } else if (event.key === 'ArrowUp') {
             // if option is out of sight set scrollTop to option position so it shows
             // up as last option in container
             if (optionOutOfView) {

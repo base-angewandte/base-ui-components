@@ -745,7 +745,7 @@ export default {
         // if yes trigger the navigate function
         this.activeOption = this.navigate(
           this.listInt,
-          event.code === 'ArrowDown',
+          event.key === 'ArrowDown',
           this.activeOptionIndex,
           true,
         );

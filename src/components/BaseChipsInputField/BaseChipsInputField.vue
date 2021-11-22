@@ -583,7 +583,7 @@ export default {
      * @param {KeyboardEvent} event
      */
     checkKeyEvent(event) {
-      const key = event.code;
+      const { key } = event;
       // define conditions in which input field should be set inactive (in styling and blurring)
       if ((key === 'Tab' && !(this.clearable && !!this.inputInt)) || (key === 'Enter' && !this.allowMultipleEntries)) {
         this.isActiveInt = false;

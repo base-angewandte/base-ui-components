@@ -244,7 +244,7 @@ export default {
      * intercept escape key event, hide modal
      */
     escapeEvent(e) {
-      if (e.code === 'Escape') {
+      if (e.key === 'Escape') {
         this.hide();
       }
     },
@@ -253,14 +253,14 @@ export default {
      * due swiper breaks using tab keys
      */
     tabEvents(e) {
-      if (e.shiftKey && e.code === 'Tab') {
+      if (e.shiftKey && e.key === 'Tab') {
         e.preventDefault();
 
         this.setFocus('prev');
         return;
       }
 
-      if (e.code === 'Tab') {
+      if (e.key === 'Tab') {
         e.preventDefault();
         this.setFocus('next');
       }
