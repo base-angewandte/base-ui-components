@@ -6,10 +6,9 @@
     <BaseSearch
       :id="'search-input-' + internalRowId"
       v-model="currentInput"
-      :is-active.sync="isActive"
       :show-pre-input-icon="isMainSearch"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
-      :type="filter.type === 'text' ? 'chips' : filter.type"
+      :type="searchType"
       :selected-chips.sync="selectedOptions"
       :is-loading="isLoading"
       :placeholder="placeholder"
@@ -23,12 +22,15 @@
       :clearable="false"
       class="base-advanced-search-row__search"
       v-bind="$listeners"
+      @clicked-outside="isActive = false"
+      @click="isActive = true"
+      @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
+      @keydown.tab="handleDropDownOnTabKey"
       @keydown.enter="selectOptionOnKeyEnter">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template v-slot:pre-input-field>
         <BaseChipsInputField
-          v-if="!(isMainSearch && filter.label === defaultFilter.label)"
           :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
@@ -47,8 +49,13 @@
           input-class="base-advanced-search-row__input-field"
           :class="['base-advanced-search-row__first-column',
                    'base-advanced-search-row__filter-input',
+                   { 'hide' :
+                     isMainSearch && filter.label === defaultFilter.label },
                    { 'base-advanced-search-row__filter-input__date':
                      filter.type.includes('date') }]"
+          @click="isActive = true"
+          @keypress="isActive = true"
+          @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
           <template v-slot:chip="{ entry, index, chipActiveForRemove, removeEntry }">
@@ -69,20 +76,10 @@
           </template>
         </BaseChipsInputField>
       </template>
-      <template v-slot:input-field-addition-after>
+      <template v-slot:post-input-field>
         <button
-          v-if="isMainSearch"
-          :class="['base-advanced-search-row__icon-button',
-                   { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
-          @keydown.tab="onTab"
-          @click.stop.prevent="addFilter">
-          <BaseIcon
-            :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
-            name="plus"
-            class="base-advanced-search-row__search-row-icon" />
-        </button>
-        <button
-          v-else
+          v-if="!isMainSearch
+            || filterHasValues"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
@@ -196,7 +193,8 @@
                 class="base-advanced-search-row__autocomplete-options"
                 @update:active-option="setCollection(slotProps
                   .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption" />
+                @update:selected-option="addOption($event,slotProps
+                  .option[autocompletePropertyNames.id])" />
             </div>
           </template>
 
@@ -268,7 +266,7 @@
                 'base-advanced-search-row__area-padding',
                 { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
               ]">
-              <div v-if="!currentInput">
+              <div v-if="!currentInput.trim()">
                 {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
               </div>
               <div
@@ -283,17 +281,29 @@
         </BaseDropDownList>
       </template>
     </BaseSearch>
+    <div
+      v-if="isMainSearch"
+      class="base-advanced-search-row__add-filter">
+      <button
+        :class="['base-advanced-search-row__icon-button']"
+        @keydown.tab="onTab"
+        @click.stop.prevent="addFilterRow">
+        <BaseIcon
+          :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
+          name="plus"
+          class="base-advanced-search-row__search-row-icon" />
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
-// TODO: use base icon instead??
 import BaseSearch from '@/components/BaseSearch/BaseSearch';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
 import BaseChip from '@/components/BaseChip/BaseChip';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
-import { createId, sort } from '@/utils/utils';
+import { createId, hasData, sort } from '@/utils/utils';
 import navigateMixin from '../../mixins/navigateList';
 import i18n from '../../mixins/i18n';
 
@@ -543,7 +553,7 @@ export default {
        * @property {*[]} [Filter.filter_values]
        * @property {Object[]} [Filter.options?]
        */
-      filter: null,
+      filter: this.defaultFilter,
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Object}
@@ -660,11 +670,13 @@ export default {
      */
     displayedOptions() {
       if (this.controlledVocabularyOptions) {
-        // remove already selected options
-        let options = [].concat(this.controlledVocabularyOptions)
-          .filter(option => !this.filter.filter_values
+        let options = [].concat(this.controlledVocabularyOptions);
+        // remove already selected options if there are any
+        if (this.filter.filter_values && this.filter.filter_values.length) {
+          options = options.filter(option => !this.filter.filter_values
             .map(value => value[this.identifierPropertyName.controlledVocabularyOption])
             .includes(option[this.identifierPropertyName.controlledVocabularyOption]));
+        }
         // only display options matching the current input string
         if (this.currentInput) {
           options = options.filter(filter => filter[this.labelPropertyName.filter]
@@ -730,6 +742,28 @@ export default {
         return prev;
       }, {});
     },
+    /**
+     * function to determine if filter has filter values
+     */
+    filterHasValues() {
+      return hasData(this.filter.filter_values);
+    },
+    /**
+     * map filter type
+     */
+    searchType() {
+      if (this.filter) {
+        const { type } = this.filter;
+        if (this.filter.id === 'default') {
+          return 'text';
+        }
+        if (type === 'text' || type === 'chips') {
+          return 'chips';
+        }
+        return type;
+      }
+      return 'text';
+    },
   },
   watch: {
     /**
@@ -750,7 +784,7 @@ export default {
            * @property {Object} val - the new currently applied filter
            */
           this.$emit('update:applied-filter', { ...val });
-          if (this.searchInputElement) {
+          if (this.isMainSearch && this.searchInputElement) {
             this.searchInputElement.focus();
           }
         }
@@ -767,10 +801,13 @@ export default {
           this.filter = val ? JSON.parse(JSON.stringify(val))
             : { ...this.defaultFilter, filter_values: [] };
           // check if the new filter has values
-          if (val.filter_values) {
+          if (val && val.filter_values) {
             // distinguish between date and others to assign to correct variable
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
+              // TODO: dont use default id but proper filter type for pure text string search
+            } else if (val.id === 'default') {
+              [this.currentInput] = val.filter_values;
             } else {
               this.selectedOptions = val.filter_values;
             }
@@ -841,29 +878,28 @@ export default {
     /** FILTER ROW RELATED FUNCTIONALITIES */
 
     // inform parent of click on plus or remove respectively
-    addFilter() {
-      // emit event in any case (so frontend can inform user to add values if empty)
+    addFilterRow() {
       /**
        * event emitted when user took action to add filter
        *
-       * @event add-filter
+       * @event add-filter-row
        * @property {Object} filter - the filter object in question
        */
-      this.$emit('add-filter', this.filter);
-      // reset everything
-      this.resetAllInput();
-      // reset filter
-      // add values separately so this does not remain linked
-      this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+      this.$emit('add-filter-row', this.filter);
     },
     removeFilter() {
-      /**
-       * event emitted when user triggered remove icon on filter row
-       *
-       * @event remove-filter
-       * @property {Object} filter - the filter to be removed
-       */
-      this.$emit('remove-filter', this.filter);
+      if (this.isMainSearch) {
+        this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+        this.resetAllInput();
+      } else {
+        /**
+         * event emitted when user triggered remove icon on filter row
+         *
+         * @event remove-filter
+         * @property {Object} filter - the filter to be removed
+         */
+        this.$emit('remove-filter', this.filter);
+      }
     },
 
     /** FILTER RELATED FUNCTIONALITIES */
@@ -877,9 +913,8 @@ export default {
      * to set the default filter values accordingly (array, string, object)
      */
     selectFilter(selectedFilter) {
-      console.log('select filter');
       // check if filter actually changed
-      if (this.filter[this.identifierPropertyName.filter]
+      if (selectedFilter && this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
         this.filter = JSON.parse(JSON.stringify(selectedFilter));
         this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter.type, this.filter.filter_values));
@@ -899,7 +934,7 @@ export default {
       if (this.displayedFilters.length) {
         const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
         // determine if arrow was up or down - true if down, false for up
-        const isArrowDown = event.code === 'ArrowDown';
+        const isArrowDown = event.key === 'ArrowDown';
         this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
       }
     },
@@ -920,14 +955,42 @@ export default {
      * base search input is handled as chips)
      *
      * @param {Object} entry - the entry to add to the selected list
+     * @param {string} collectionId - to set filter after adding from autocomplete a collection id
+     *  is needed when option was selected by click
      */
-    addOption(entry) {
-      this.filter.filter_values = this.filter.filter_values.concat(entry);
-      // reset everything
-      this.resetAllInput();
-      if (this.searchInputElement) {
-        // return focus to input field after select
-        this.searchInputElement.focus();
+    addOption(entry, collectionId = '') {
+      // if option is coming from autocomplete drop down list (=has an id)
+      // and currently active filter is not identical
+      // with the category of the selected item (if everything is going right this should
+      // be 'default') then set the category of the selected item as current filter
+      if (this.filter.type === 'text'
+        && entry[this.identifierPropertyName.autocompleteOption]
+        && this.filter[this.identifierPropertyName.filter]
+          !== (this.activeCollection || collectionId
+            || this.defaultFilter[this.identifierPropertyName.filter])) {
+        const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
+          === (this.activeCollection || collectionId));
+        this.filter = {
+          // the filterList SHOULD have the filter included that is displayed as autocomplete option
+          // category but if everything fails - use default filter again
+          ...(newFilter || this.defaultFilter),
+          // also add the filter values property which does not exist in the filterList filters
+          filter_values: [],
+        };
+      }
+      this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
+      // if filter type is default only use string for search on enter
+      // TODO: do not use default filter but proper filter type for this evaluation
+      if (this.filter.id !== 'default') {
+        // reset everything
+        this.resetAllInput();
+      }
+
+      // if filter row is not controlled vocabulary close the filter to be able to see search
+      // results
+      // TODO: do not use default filter but proper filter type for this evaluation
+      if (this.filter.type !== 'chips' || this.filter.id === 'default') {
+        this.isActive = false;
       }
     },
     /**
@@ -937,24 +1000,41 @@ export default {
      * as a signal to add the filter to a filter array (parent is informed)
      */
     selectOptionOnKeyEnter() {
+      // else check if filter type is chips and there is an active entry in the options list
       if (this.filter.type === 'chips' && this.activeControlledVocabularyEntry) {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
       } else if (this.filter.type === 'text' && this.activeEntry) {
         this.addOption(this.activeEntry);
+        // check if filter id is default (because this should be fulltext search
+        // TODO: do not use default filter but proper filter type for this evaluation
+      } else if (this.filter.id === 'default' && this.currentInput.trim()) {
+        this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
+        this.isActive = false;
         // if there is no active entry check if there is input in the search field and
         // add the text input as chip if available, however check if text was already added
         // to avoid duplicates
-      } else if (this.filter.type === 'text' && this.currentInput
+      } else if (this.filter.type === 'text' && this.filter.id !== 'default' && this.currentInput.trim()
         && (!this.selectedOptions || !this.selectedOptions
           .some(option => (!option[this.identifierPropertyName.autocompleteOption]
             && option[this.labelPropertyName.autocompleteOption] === this.currentInput)))) {
         this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
         // if this is main search and there is no current input and filter values are present
         // inform parent that filter can be processed
-      } else if (this.isMainSearch && !this.currentInput && this.filter.filter_values
-        && this.filter.filter_values.length) {
-        this.addFilter();
+      } else {
+        this.isActive = !this.isActive;
+      }
+    },
+    /**
+     * @param {KeyboardEvent} event - the event triggered by keydown
+     */
+    handleKeyDownEvent(event) {
+      const { key } = event;
+      if (!['Tab', 'Enter', ' '].includes(key)) {
+        this.isActive = true;
+      } else if (key === ' ' && !this.currentInput) {
+        this.isActive = !this.isActive;
+        event.preventDefault();
       }
     },
 
@@ -967,11 +1047,11 @@ export default {
      */
     navigateDropDown(event) {
       // determine if arrow was up or down - true if down, false for up
-      const isArrowDown = event.code === 'ArrowDown';
+      const isArrowDown = event.key === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
       // option specified in the filter?) only use arrow up and down
       if (this.controlledVocabularyOptions && this.controlledVocabularyOptions.length
-        && (event.code === 'ArrowDown' || event.code === 'ArrowUp')) {
+        && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(
           this.displayedOptions,
@@ -994,7 +1074,7 @@ export default {
     navigateAutocomplete(event, isArrowDown) {
       if (this.resultListInt.length) {
         // store key stroked in variable
-        const key = event.code;
+        const { key } = event;
         // actions for arrow up or down
         if (key === 'ArrowDown' || key === 'ArrowUp') {
           // if there is no active Collection (could happen due to hover)
@@ -1059,6 +1139,23 @@ export default {
           this.collectionSelect = true;
         } else if (key === 'ArrowRight') {
           this.collectionSelect = false;
+        }
+      }
+    },
+    handleDropDownOnTabKey(event) {
+      // get all input elements
+      const inputElements = this.$el.getElementsByTagName('input');
+      // check if some where found
+      if (inputElements) {
+        // create an array out of input elements found
+        const inputArray = Array.from(inputElements);
+        // get the index of the element the event came from
+        const eventInputIndex = inputArray.indexOf(event.target);
+        // check if element is either the last input element and no shift key was used or
+        // it is the first element and shift key was used --> if true --> close drop down
+        if ((!event.shiftKey && eventInputIndex >= inputArray.length - 1)
+          || (event.shiftKey && eventInputIndex <= 0)) {
+          this.isActive = false;
         }
       }
     },
@@ -1194,12 +1291,13 @@ export default {
 .base-advanced-search-row {
   position: relative;
   width: 100%;
-  background: white;
   // css variable to define option background color
   // THIS IS SETTING THE BACKGROUND COLOR IN BASEDROPDOWNLIST
   --option-background: rgb(248, 248, 248);
   // set number of columns for filters and chips
   --col-number: 4;
+  display: flex;
+  flex-direction: row;
 
   .base-advanced-search-row__search {
     .base-advanced-search-row__first-column {
@@ -1226,9 +1324,10 @@ export default {
 
     .base-advanced-search-row__icon-button {
       display: flex;
+      align-self: center;
       height: 100%;
       padding: $spacing;
-      margin-right: -$spacing;
+      margin-right: -$spacing-small;
       cursor: pointer;
 
       &:active, &:focus {
@@ -1238,6 +1337,7 @@ export default {
 
       &.base-advanced-search-row__icon-button__date {
         margin-right: -$spacing-small;
+        align-items: center;
       }
 
       .base-advanced-search-row__search-row-icon {
@@ -1408,6 +1508,30 @@ export default {
           display: none;
         }
       }
+    }
+  }
+}
+
+.base-advanced-search-row__add-filter {
+  background: white;
+  margin-left: $spacing-small;
+  align-self: stretch;
+
+  .base-advanced-search-row__icon-button {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: $spacing;
+    cursor: pointer;
+
+    &:active, &:focus {
+      color: $app-color;
+      fill: $app-color;
+    }
+
+    .base-advanced-search-row__search-row-icon {
+      height: $icon-medium;
+      width: $icon-medium;
     }
   }
 }

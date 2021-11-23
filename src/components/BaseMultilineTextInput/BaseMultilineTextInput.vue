@@ -68,6 +68,11 @@
       <!-- @slot for adding elements after input -->
       <slot name="input-field-addition-after" />
     </template>
+    <template v-slot:post-input-field>
+      <!-- @slot elements after the actual input element but within the input field container <br>
+      for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="post-input-field" />
+    </template>
     <template v-slot:error-icon>
       <!-- @slot use a custom icon instead of standard error/warning icon<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->

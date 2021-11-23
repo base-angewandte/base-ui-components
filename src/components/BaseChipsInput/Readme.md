@@ -7,6 +7,9 @@ Additionally to the custom events listed above also all native input events are 
     :list="list"
     :allow-multiple-entries="false"
     :always-linked="true"
+    :invalid="true"
+    :is-loading="true"
+    :show-error-icon="true"
     label="Single Choice with fixed DropDown"
     placeholder="Select Quote Snippet"
     />

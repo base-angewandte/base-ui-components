@@ -35,15 +35,14 @@
       :label-property-name="labelPropertyName"
       :identifier-property-name="identifierPropertyName"
       v-bind="$listeners"
-      @is-active="emitIsActive"
-      @add-filter="addFilter"
+      @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
   </div>
 </template>
 
 <script>
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
-import { createId } from '@/utils/utils';
+import { createId, hasData } from '@/utils/utils';
 
 export default {
   name: 'BaseAdvancedSearch',
@@ -286,6 +285,7 @@ export default {
        * @type {number}
        */
       autocompleteIndex: -1,
+      originalMainFilter: null,
     };
   },
   computed: {
@@ -318,8 +318,8 @@ export default {
     /**
      * set autocomplete loading from outside
      */
-    isLoadingIndex(val) {
-      this.autocompleteIndex = val;
+    isLoadingIndex() {
+      // this.autocompleteIndex = val;
     },
     /**
      * have appliedFilters in sync with parent to be able to set them from outside
@@ -327,7 +327,7 @@ export default {
     appliedFiltersInt: {
       handler(val) {
         // check if val is actually different from prop value
-        if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters)) {
+        if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters.slice(1))) {
           // if yes - inform parent
           /**
            * inform parent of changes in applied filters
@@ -335,7 +335,7 @@ export default {
            * @event update:applied-filters
            * @type {Object[]}
            */
-          this.$emit('update:applied-filters', val);
+          this.$emit('update:applied-filters', [this.mainFilter, ...val]);
         }
       },
       deep: true,
@@ -346,29 +346,59 @@ export default {
     appliedFilters: {
       handler(val) {
         // check if value is different from internal value
-        if (JSON.stringify(val) !== JSON.stringify(this.appliedFiltersInt)) {
+        if (JSON.stringify(val.slice(1)) !== JSON.stringify(this.appliedFiltersInt)) {
           // if yes - update internal value
-          this.appliedFiltersInt = [...val];
+          [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON.stringify(val));
+          // also check if main filter is different separately!
+        } else if (val && val.length === 1
+          && JSON.stringify(this.mainFilter) !== JSON.stringify(val[0])) {
+          [this.mainFilter] = val;
         }
       },
       immediate: true,
     },
+    mainFilter(val) {
+      // make sure mainFilter exists and has property filter_values
+      if (this.mainFilter && this.mainFilter.filter_values) {
+        // store values to compare in variables
+        const mainFilterHasData = hasData(this.mainFilter.filter_values);
+        // for original filter also check right here if property filter_values actually
+        // exists
+        const originalMainFilterHasData = this.originalMainFilter
+          && this.originalMainFilter.filter_values
+          && hasData(this.originalMainFilter.filter_values);
+        // now check a) if originalMainFilter exists already and
+        // b) original data and current data diverge (only one of them does not have data)
+        // c) or both have data but data are different from each other
+        if (this.originalMainFilter && (mainFilterHasData !== originalMainFilterHasData
+          || (mainFilterHasData && originalMainFilterHasData
+          && JSON.stringify(this.originalMainFilter.filter_values)
+            !== JSON.stringify(val.filter_values)))) {
+          // if so - update original data
+          this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
+          // and trigger search
+          this.search();
+        }
+      }
+      this.$emit('update:applied-filters', [val, ...this.appliedFiltersInt]);
+    },
   },
   created() {
-    this.mainFilter = { ...this.defaultFilter, filter_values: [] };
+    // check if mainFilter was already set (e.g. from outside)
+    if (!this.mainFilter) {
+      // if not set default filter
+      this.mainFilter = { ...this.defaultFilter, filter_values: [] };
+    }
+    this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
   },
   methods: {
     /**
-     * function to add a filter after '+' icon was triggered or enter was hit
-     * @param {Object} filter - the filter to add
+     * function to add a filter row after '+' icon was triggered
      */
-    addFilter(filter) {
-      // TODO: check if filter contains values before adding it
-      // (otherwise tell user to add values)
-      this.appliedFiltersInt.push(filter);
-      this.search();
-      // reset main filter to defaults again
+    addFilterRow() {
+      this.appliedFiltersInt.push(this.mainFilter);
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
+      this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
     },
     /**
      * remove filter after 'x' was triggered
@@ -376,7 +406,6 @@ export default {
      * @param {number} index - the index of the filter
      */
     removeFilter(filter, index) {
-      // splice filter identified by index from the list
       this.appliedFiltersInt.splice(index, 1);
       // trigger search to update search results
       this.search();
@@ -387,7 +416,7 @@ export default {
      * @param {number} index - the index of the filter
      */
     updateFilter(filter, index) {
-      this.$set(this.appliedFiltersInt, index, filter);
+      this.$set(this.appliedFiltersInt, index, JSON.parse(JSON.stringify(filter)));
       // trigger search to update search results
       this.search();
     },
@@ -397,10 +426,8 @@ export default {
      * @param {number} index - the index of the filter
      */
     fetchAutocomplete(string, filter, index) {
-      // if a string to autocomplete is present - set autocomplete variable to correct filter row
-      if (string) {
-        this.autocompleteIndex = index;
-      }
+      // set autocomplete variable to correct filter row
+      this.autocompleteIndex = index;
       /**
        * inform parent to fetch autocomplete data for the provided filter
        *
@@ -422,13 +449,7 @@ export default {
        * @event search
        * @type {Object[]}
        */
-      this.$emit('search', this.appliedFiltersInt);
-    },
-    /**
-     * inform parent if main search is set active
-     */
-    emitIsActive() {
-      this.$emit('main-search-active');
+      this.$emit('search', [this.mainFilter, ...this.appliedFiltersInt]);
     },
     /**
      * create an internal row id for unique identification of added filter rows

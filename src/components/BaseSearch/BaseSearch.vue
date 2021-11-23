@@ -49,7 +49,12 @@
       <!-- @slot for adding elements after input <br>
       for an example see [BaseChipsInputField](#basechipsinputfield)-->
       <slot name="input-field-addition-after" />
-      <div class="base-search__spacing" />
+    </template>
+    <template v-slot:post-input-field>
+      <!-- @slot elements after the actual input element but within the input field container <br>
+      for an example see [BaseChipsInputField](#basechipsinputfield)-->
+      <slot name="post-input-field" />
+      <div :class="{ 'base-search__spacing': dateFieldType }" />
     </template>
     <template v-slot:error-icon>
       <!-- @slot use a custom icon instead of standard error/warning icon<br>
@@ -458,8 +463,6 @@ export default {
 .base-search__input {
   background:white;
   min-height: $row-height-large;
-  display: flex;
-  justify-content: center;
 
   .base-search__spacing {
     margin-left: $spacing-small;
@@ -475,6 +478,7 @@ export default {
     width: $icon-large;
     margin-right: $spacing;
     flex-shrink: 0;
+    align-self: center;
 
     &.base-search__magnifier-icon__date {
       margin-right: $spacing-small;

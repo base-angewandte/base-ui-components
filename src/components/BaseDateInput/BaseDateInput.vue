@@ -96,7 +96,7 @@
             </DatePicker>
           </div>
         </template>
-        <template v-slot:input-field-addition-after>
+        <template v-slot:post-input-field>
           <BaseIcon
             :name="isFromTimeField ? 'clock' : 'calendar-many'"
             class="base-date-input__date-icon"
@@ -170,7 +170,7 @@
             </DatePicker>
           </div>
         </template>
-        <template v-slot:input-field-addition-after>
+        <template v-slot:post-input-field>
           <BaseIcon
             :name="isToTimeField ? 'clock' : 'calendar-many'"
             class="base-date-input__date-icon"
@@ -178,7 +178,7 @@
         </template>
       </BaseInput>
       <!-- @slot for adding elements after input -->
-      <slot name="input-field-addition-after" />
+      <slot name="post-input-field" />
     </div>
 
     <div class="base-date-input__below">
@@ -1221,6 +1221,8 @@ export default {
           color: $font-color-second;
           cursor: pointer;
           flex-shrink: 0;
+          align-self: center;
+          margin-left: $spacing-small;
         }
       }
 

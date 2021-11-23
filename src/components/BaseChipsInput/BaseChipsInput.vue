@@ -74,9 +74,13 @@
         <slot name="input-field-addition-before" />
       </template>
       <template v-slot:input-field-addition-after>
-        <!-- @slot for adding elements after input <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />
+      </template>
+      <template v-slot:post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="post-input-field" />
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
@@ -741,7 +745,7 @@ export default {
         // if yes trigger the navigate function
         this.activeOption = this.navigate(
           this.listInt,
-          event.code === 'ArrowDown',
+          event.key === 'ArrowDown',
           this.activeOptionIndex,
           true,
         );
@@ -784,7 +788,7 @@ export default {
     }
 
     .base-chips-input__single-dropdown {
-      margin: 0 $spacing;
+      padding: $spacing-small;
 
       .base-chips-input__single-dropdown-icon {
         transition:  $drop-down-arrow-animation;
