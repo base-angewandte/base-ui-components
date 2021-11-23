@@ -17,7 +17,7 @@
     :invalid="invalid"
     :show-error-icon="showErrorIcon"
     :language="languageInt"
-    :allow-unknown-entries="isFieldTypeChips"
+    :allow-unknown-entries="isFieldTypeChips && type === 'chips'"
     :label-property-name="isFieldTypeChips ? labelPropertyName : false"
     :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
     :set-focus-on-active="setFocusOnActive"
@@ -149,12 +149,12 @@ export default {
     },
     /**
      * specify the type of input field <br>
-     * @values: text, chips, date, daterange
+     * @values: text, chips, controlled, date, daterange
      */
     type: {
       type: String,
       default: 'text',
-      validator: val => ['text', 'chips', 'date', 'daterange'].includes(val),
+      validator: val => ['text', 'chips', 'controlled', 'date', 'daterange'].includes(val),
     },
     /**
      * specify a linked list option (e.g. drop down) <br>
@@ -271,7 +271,7 @@ export default {
     inputComponent() {
       if (this.type === 'text') {
         return 'BaseInput';
-      } if (this.type === 'chips') {
+      } if (this.isFieldTypeChips) {
         return 'BaseChipsInputField';
       } if (this.type === 'date' || this.type === 'daterange') {
         return 'BaseDateInput';
@@ -364,7 +364,7 @@ export default {
      * @returns {boolean}
      */
     isFieldTypeChips() {
-      return this.type === 'chips';
+      return this.type === 'chips' || this.type === 'controlled';
     },
     /**
      * internally used id - eiter provided by props or created internally with utils function

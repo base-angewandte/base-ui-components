@@ -757,8 +757,11 @@ export default {
         if (this.filter.id === 'default') {
           return 'text';
         }
-        if (type === 'text' || type === 'chips') {
+        if (type === 'text') {
           return 'chips';
+        }
+        if (type === 'chips') {
+          return 'controlled';
         }
         return type;
       }
@@ -1021,7 +1024,7 @@ export default {
         this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
         // if this is main search and there is no current input and filter values are present
         // inform parent that filter can be processed
-      } else {
+      } else if (!this.currentInput) {
         this.isActive = !this.isActive;
       }
     },
@@ -1030,7 +1033,7 @@ export default {
      */
     handleKeyDownEvent(event) {
       const { key } = event;
-      if (!['Tab', 'Enter', ' '].includes(key)) {
+      if (!['Tab', 'Enter', ' ', 'Shift'].includes(key)) {
         this.isActive = true;
       } else if (key === ' ' && !this.currentInput) {
         this.isActive = !this.isActive;
