@@ -24,7 +24,7 @@
       v-bind="$listeners"
       @clicked-outside="isActive = false"
       @click="isActive = true"
-      @keypress="isActive = true"
+      @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
       @keydown.enter="selectOptionOnKeyEnter">
@@ -805,6 +805,9 @@ export default {
             // distinguish between date and others to assign to correct variable
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
+              // TODO: dont use default id but proper filter type for pure text string search
+            } else if (val.id === 'default') {
+              [this.currentInput] = val.filter_values;
             } else {
               this.selectedOptions = val.filter_values;
             }
@@ -976,11 +979,17 @@ export default {
         };
       }
       this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
-      // reset everything
-      this.resetAllInput();
+      // if filter type is default only use string for search on enter
+      // TODO: do not use default filter but proper filter type for this evaluation
+      if (this.filter.id !== 'default') {
+        // reset everything
+        this.resetAllInput();
+      }
+
       // if filter row is not controlled vocabulary close the filter to be able to see search
       // results
-      if (this.filter.type !== 'chips') {
+      // TODO: do not use default filter but proper filter type for this evaluation
+      if (this.filter.type !== 'chips' || this.filter.id === 'default') {
         this.isActive = false;
       }
     },
@@ -991,15 +1000,21 @@ export default {
      * as a signal to add the filter to a filter array (parent is informed)
      */
     selectOptionOnKeyEnter() {
+      // else check if filter type is chips and there is an active entry in the options list
       if (this.filter.type === 'chips' && this.activeControlledVocabularyEntry) {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
       } else if (this.filter.type === 'text' && this.activeEntry) {
         this.addOption(this.activeEntry);
+        // check if filter id is default (because this should be fulltext search
+        // TODO: do not use default filter but proper filter type for this evaluation
+      } else if (this.filter.id === 'default' && this.currentInput.trim()) {
+        this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
+        this.isActive = false;
         // if there is no active entry check if there is input in the search field and
         // add the text input as chip if available, however check if text was already added
         // to avoid duplicates
-      } else if (this.filter.type === 'text' && this.currentInput
+      } else if (this.filter.type === 'text' && this.filter.id !== 'default' && this.currentInput.trim()
         && (!this.selectedOptions || !this.selectedOptions
           .some(option => (!option[this.identifierPropertyName.autocompleteOption]
             && option[this.labelPropertyName.autocompleteOption] === this.currentInput)))) {
@@ -1008,6 +1023,18 @@ export default {
         // inform parent that filter can be processed
       } else {
         this.isActive = !this.isActive;
+      }
+    },
+    /**
+     * @param {KeyboardEvent} event - the event triggered by keydown
+     */
+    handleKeyDownEvent(event) {
+      const { key } = event;
+      if (!['Tab', 'Enter', ' '].includes(key)) {
+        this.isActive = true;
+      } else if (key === ' ' && !this.currentInput) {
+        this.isActive = !this.isActive;
+        event.preventDefault();
       }
     },
 
