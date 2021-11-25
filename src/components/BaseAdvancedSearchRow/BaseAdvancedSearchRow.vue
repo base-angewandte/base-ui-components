@@ -266,7 +266,7 @@
                 'base-advanced-search-row__area-padding',
                 { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
               ]">
-              <div v-if="!currentInput.trim()">
+              <div v-if="!currentInput || !currentInput.trim()">
                 {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
               </div>
               <div
@@ -1011,13 +1011,14 @@ export default {
         this.addOption(this.activeEntry);
         // check if filter id is default (because this should be fulltext search
         // TODO: do not use default filter but proper filter type for this evaluation
-      } else if (this.filter.id === 'default' && this.currentInput.trim()) {
+      } else if (this.filter.id === 'default' && this.currentInput && this.currentInput.trim()) {
         this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
         this.isActive = false;
         // if there is no active entry check if there is input in the search field and
         // add the text input as chip if available, however check if text was already added
         // to avoid duplicates
-      } else if (this.filter.type === 'text' && this.filter.id !== 'default' && this.currentInput.trim()
+      } else if (this.filter.type === 'text' && this.filter.id !== 'default'
+        && this.currentInput && this.currentInput.trim()
         && (!this.selectedOptions || !this.selectedOptions
           .some(option => (!option[this.identifierPropertyName.autocompleteOption]
             && option[this.labelPropertyName.autocompleteOption] === this.currentInput)))) {
