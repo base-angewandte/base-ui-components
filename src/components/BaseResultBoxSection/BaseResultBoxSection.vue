@@ -164,7 +164,7 @@
                 box-style="small"
                 box-type="button"
                 :class="['base-result-box-section__box-item',
-                        `base-result-box-section__box-item-${elementId}`,]"
+                         `base-result-box-section__box-item-${elementId}`,]"
                 @clicked="submitAction(action.value)" />
             </template>
           </slot>
@@ -176,7 +176,7 @@
             text=""
             box-type="button"
             :class="['base-result-box-section__box-item',
-                    `base-result-box-section__box-item-${elementId}`,]"
+                     `base-result-box-section__box-item-${elementId}`,]"
             @clicked="expandedInt = !expandedInt">
             <template v-slot>
               <!-- needed to add v-if here again - otherwise strange side effects -->
@@ -207,8 +207,8 @@
           useExpandMode is set false) -->
         <BasePagination
           v-if="usePagination && pages > 1
-          && ((editModeActive && !draggable)
-            || (!editModeActive && expandedInt))"
+            && ((editModeActive && !draggable)
+              || (!editModeActive && expandedInt))"
           :key="'pagination-' + elementId"
           :total="pages"
           :current="currentPageNumberInt"
@@ -662,7 +662,7 @@ export default {
         ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
     },
     /**
-     * determines if the total number of entries exceedes the number of entries that
+     * determines if the total number of entries exceeds the number of entries that
      * can be displayed and thus if an expand button is needed
      */
     expandNeeded() {
@@ -977,7 +977,7 @@ export default {
           // append the style element
           this.$el.appendChild(style);
         }
-        // set the acutally css in the style element
+        // set the actually css in the style element
         style.innerHTML = `
           .base-result-box-section__box-item-${this.elementId}:nth-child(n + ${this.itemsPerRow + 1}) {
             margin-top: var(--spacing-regular);

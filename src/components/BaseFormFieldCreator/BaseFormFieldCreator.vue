@@ -176,7 +176,7 @@
       :name="fieldKey"
       :label="labelInt"
       :checked="fieldValue"
-      @clicked="$emit('field-value-changed', $event)"/>
+      @clicked="$emit('field-value-changed', $event)" />
   </div>
 </template>
 
