@@ -583,6 +583,8 @@ export default {
       // to manipulate selectedList internally
       selectedListInt: [],
       imageBoxesSelectable: false,
+      // unique id to assign javascript calculated styles to
+      elementId: null,
     };
   },
   computed: {
@@ -665,14 +667,6 @@ export default {
      */
     expandNeeded() {
       return (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length;
-    },
-    /**
-     * create an element id to have an unique id to assign
-     * javascript calculated styles to
-     */
-    elementId() {
-      // eslint-disable-next-line no-underscore-dangle
-      return this._uid;
     },
   },
   watch: {
@@ -829,6 +823,11 @@ export default {
     }
   },
   mounted() {
+    // create an element id to have an unique id to assign javascript calculated styles to
+    // note: done here, cause of mismatching ids (entries, class definition) in ssr-mode
+    // eslint-disable-next-line no-underscore-dangle
+    this.elementId = this._uid;
+
     if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
       this.calcBoxNumber();
     }
