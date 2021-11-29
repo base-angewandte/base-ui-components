@@ -35,7 +35,7 @@ export default {
         },
         {
           value: 'external link',
-          url: 'https:/base.uni-ak.ac.at',
+          url: 'https://base.uni-ak.ac.at',
         },
         {
           value: 'internal link',
