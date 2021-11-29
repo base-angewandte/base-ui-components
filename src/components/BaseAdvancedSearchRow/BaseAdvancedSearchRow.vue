@@ -266,7 +266,9 @@
                 'base-advanced-search-row__area-padding',
                 { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
               ]">
-              <div v-if="!currentInput || !currentInput.trim()">
+              <div
+                v-if="!currentInput
+                  || (typeof currentInput === 'string' && !currentInput.trim())">
                 {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
               </div>
               <div
