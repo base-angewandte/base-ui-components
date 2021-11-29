@@ -2,15 +2,16 @@
   <component
     :is="renderAs"
     v-click-outside="() => closeTooltip()"
-    :tabindex="source || url || (source && type) || tooltip.length ? 0 : null"
+    :tabindex="source || hasValidUrl || (source && type) || tooltip.length ? 0 : null"
     :role="tooltip.length ? 'button' : null"
-    :href="source || url ? source || url : null"
+    :href="source || hasValidUrl ? source || url : null"
     :to="vueRouterAvailable && source && !type ? '/' + source : null"
-    :title="source || url || (source && type) ? value : null"
+    :target="hasValidUrl && externalLinkTarget === '_blank' ? '_blank' : null"
+    :title="source || hasValidUrl || (source && type) ? value : null"
     :class="[
       'base-link',
       {
-        'base-link--external': url,
+        'base-link--external': hasValidUrl,
         'base-link--internal': source && !type,
         'base-link--chip': source && type,
         'base-link--tooltip': tooltip.length || tooltipAsync.length,
@@ -114,6 +115,17 @@ export default {
       default: 'router-link',
     },
     /**
+     * specify external link target<br>
+     * valid values: '_blank' | '_self'
+     */
+    externalLinkTarget: {
+      type: String,
+      default: '_blank',
+      validator(val) {
+        return (val === '_blank' || val === '_self');
+      },
+    },
+    /**
      * tooltip content<br>
      * by default a list (label: value) is rendered<br>
      * structure: [{ label: 'label', value: 'value', url: '#' }]<br>
@@ -196,7 +208,7 @@ export default {
     renderAs() {
       let tag = 'span';
 
-      if (this.url) {
+      if (this.hasValidUrl) {
         tag = 'a';
       }
 
@@ -209,6 +221,10 @@ export default {
       }
 
       return tag;
+    },
+    hasValidUrl() {
+      // check if url is set and includes a protocol (eg. http://, https://)
+      return this.url && this.url.match(/^([a-z][a-z0-9+\-.]*:\/\/)/);
     },
   },
   watch: {
