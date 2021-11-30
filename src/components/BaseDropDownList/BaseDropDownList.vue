@@ -288,62 +288,76 @@ export default {
      * field associated by 'id'
      */
     navigateOptions(event, { activeOptionHeight = 0, activeOptionTop = 0 } = {}) {
-      // check if it is necessary to adjust scrolltop of container (to
-      // always have entry steered to with arrow keys in view)
-      // if list has suboptions this should be navigated from suboptions
-      if ((!this.hasSubOptions || activeOptionHeight) && this.$refs.option
-        && this.$refs.option[this.activeOptionIndex]) {
-        // save the active option in a variable
-        const activeOptionTemp = this.$refs.option[this.activeOptionIndex];
-        // get the option height
-        const activeOptionHeightTemp = activeOptionHeight || activeOptionTemp.clientHeight;
-        // get the option top position
-        const activeOptionTopTemp = activeOptionTop || activeOptionTemp.offsetTop;
-        if (this.$parent.$refs.dropDownContainer) {
-          this.$parent.navigateOptions(event, {
-            activeOptionHeight: activeOptionHeightTemp,
-            activeOptionTop: activeOptionTopTemp,
-          });
-        } else {
-          // save the container element in a variable
-          const dropDownContainerTemp = this.$refs.dropDownContainer;
-          // get the current scroll position of the container
-          const dropDownContainerScrollTop = dropDownContainerTemp.scrollTop;
-          // get the container height
-          const dropDownContainerHeight = dropDownContainerTemp.clientHeight;
-          // check if current active option is out of view
-          const optionOutOfView = activeOptionTopTemp + activeOptionHeightTemp
-            < dropDownContainerScrollTop || activeOptionTopTemp
-            > dropDownContainerScrollTop + dropDownContainerHeight;
-          // if active option index is 0 - return to top
-          if (!this.hasSubOptions && !this.activeOptionIndex) {
-            dropDownContainerTemp.scrollTop = 0;
-            // else if index is last entry of options list - bring last item into view
-          } else if (this.activeOptionIndex === this.dropDownOptions.length - 1) {
-            dropDownContainerTemp.scrollTop = activeOptionTopTemp
-              + activeOptionHeightTemp;
-            // else check if key was arrow down
-          } else if (event.key === 'ArrowDown') {
-            // if option is out of sight set container scrollTop to option position
-            if (optionOutOfView) {
-              dropDownContainerTemp.scrollTop = activeOptionTopTemp;
-              // else if the option position is larger then container height
-              // add the height of one option row to scroll top
-            } else if (activeOptionTopTemp + activeOptionHeightTemp
-              > dropDownContainerHeight + dropDownContainerScrollTop) {
-              dropDownContainerTemp.scrollTop += activeOptionHeightTemp;
-            }
-            // else check if key was arrow up
-          } else if (event.key === 'ArrowUp') {
-            // if option is out of sight set scrollTop to option position so it shows
-            // up as last option in container
-            if (optionOutOfView) {
-              dropDownContainerTemp.scrollTop = activeOptionTopTemp
-                + activeOptionHeightTemp - dropDownContainerHeight;
-              // else if index is smaller than previous index (navigating up) and the container
-              // top position is larger than the option top position subtract one option row height
-            } else if (dropDownContainerScrollTop > activeOptionTopTemp) {
-              dropDownContainerTemp.scrollTop -= activeOptionHeightTemp;
+      const { key } = event;
+      if (['ArrowDown', 'ArrowUp'].includes(key)) {
+        // check if it is necessary to adjust scrolltop of container (to
+        // always have entry steered to with arrow keys in view)
+        // if list has suboptions this should be navigated from suboptions
+        if ((!this.hasSubOptions || activeOptionHeight) && this.$refs.option
+          && this.$refs.option[this.activeOptionIndex]) {
+          // save the active option in a variable
+          const activeOptionTemp = this.$refs.option[this.activeOptionIndex];
+          // get the option height
+          const activeOptionHeightTemp = activeOptionHeight || activeOptionTemp.clientHeight;
+          // get the option top position
+          const activeOptionTopTemp = activeOptionTop || activeOptionTemp.offsetTop;
+          if (this.$parent.$refs.dropDownContainer) {
+            this.$parent.navigateOptions(event, {
+              activeOptionHeight: activeOptionHeightTemp,
+              activeOptionTop: activeOptionTopTemp,
+            });
+          } else {
+            // save the container element in a variable
+            const dropDownContainerTemp = this.$refs.dropDownContainer;
+            // get the current scroll position of the container
+            const dropDownContainerScrollTop = dropDownContainerTemp.scrollTop;
+            // get the container height
+            const dropDownContainerHeight = dropDownContainerTemp.clientHeight;
+            // check if current active option is out of view
+            const optionOutOfView = activeOptionTopTemp + activeOptionHeightTemp
+              < dropDownContainerScrollTop || activeOptionTopTemp
+              > dropDownContainerScrollTop + dropDownContainerHeight;
+            // if active option index is 0 - return to top
+            if (!this.hasSubOptions && !this.activeOptionIndex) {
+              dropDownContainerTemp.scrollTop = 0;
+              // else if index is last entry of options list - bring last item into view
+            } else if (!this.hasSubOptions
+              && this.activeOptionIndex === this.dropDownOptions.length - 1) {
+              dropDownContainerTemp.scrollTo({
+                top: activeOptionTopTemp + activeOptionHeightTemp,
+              });
+              // dropDownContainerTemp.scrollTop = activeOptionTopTemp
+              //   + activeOptionHeightTemp;
+              // else check if key was arrow down
+            } else if (event.key === 'ArrowDown') {
+              // if option is out of sight set container scrollTop to option position
+              if (optionOutOfView) {
+                dropDownContainerTemp.scrollTo({
+                  top: activeOptionTopTemp,
+                });
+                // dropDownContainerTemp.scrollTop = activeOptionTopTemp;
+                // else if the option position is larger then container height
+                // add the height of one option row to scroll top
+              } else if (activeOptionTopTemp + activeOptionHeightTemp
+                > dropDownContainerHeight + dropDownContainerScrollTop) {
+                // dropDownContainerTemp.scrollTop += activeOptionHeightTemp;
+                dropDownContainerTemp.scrollTo({
+                  top: dropDownContainerScrollTop + activeOptionHeightTemp,
+                });
+              }
+              // else check if key was arrow up
+            } else if (event.key === 'ArrowUp') {
+              // if option is out of sight set scrollTop to option position so it shows
+              // up as last option in container
+              if (optionOutOfView) {
+                dropDownContainerTemp.scrollTop = activeOptionTopTemp
+                  + activeOptionHeightTemp - dropDownContainerHeight;
+                // else if index is smaller than previous index (navigating up) and the container
+                // top position is larger than the option top position subtract one option row
+                // height
+              } else if (dropDownContainerScrollTop > activeOptionTopTemp) {
+                dropDownContainerTemp.scrollTop -= activeOptionHeightTemp;
+              }
             }
           }
         }

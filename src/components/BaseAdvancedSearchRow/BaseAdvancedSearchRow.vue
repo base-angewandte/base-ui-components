@@ -95,6 +95,7 @@
       <template v-slot:below-input>
         <BaseDropDownList
           v-if="isActive"
+          ref="dropDown"
           :drop-down-options="resultListInt"
           :active-option="{ [autocompletePropertyNames.id]: activeCollection }"
           :list-id="'autocomplete-options-' + internalRowId"
@@ -146,6 +147,7 @@
                       v-for="(singleFilter, index) in displayedFilters"
                       :id="`filter-option-${singleFilter[identifierPropertyName.filter]}`"
                       :key="index"
+                      ref="filterOption"
                       :aria-selected="(filter && filter[identifierPropertyName.filter]
                         === singleFilter[identifierPropertyName.filter]).toString()"
                       tabindex="-1"
@@ -938,6 +940,13 @@ export default {
     navigateFilters(event) {
       if (this.displayedFilters.length) {
         const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
+        const dropDownElement = this.$refs.dropDown.$el;
+        // if filters are out of view - scroll to top to make them visible
+        if (this.$refs.filterOption && dropDownElement.scrollTop !== 0) {
+          this.$refs.dropDown.$el.scrollTo({
+            top: 0,
+          });
+        }
         // determine if arrow was up or down - true if down, false for up
         const isArrowDown = event.key === 'ArrowDown';
         this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
@@ -1078,6 +1087,8 @@ export default {
      * @param {boolean} isArrowDown - param passed from navigateDropDown so no need to newly assign
      */
     navigateAutocomplete(event, isArrowDown) {
+      // prevent moving of cursor on input line
+      event.preventDefault();
       if (this.resultListInt.length) {
         // store key stroked in variable
         const { key } = event;
@@ -1140,6 +1151,13 @@ export default {
               .resultListInt[0][this.autocompletePropertyNames.id];
             currentCollectionArray = this.consolidatedResultList[this.activeCollection];
             [this.activeEntry] = currentCollectionArray;
+            // else if current index is at -1 go to the last entry in the list
+          } else if (!isWithinListLimit && currentCollectionIndex === 0
+            && currentEntryIndex === -1) {
+            this.activeCollection = this.resultListInt[this.resultListInt.length - 1][this
+              .autocompletePropertyNames.id];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            [this.activeEntry] = currentCollectionArray.slice(-1);
           }
         } else if (key === 'ArrowLeft') {
           this.collectionSelect = true;
