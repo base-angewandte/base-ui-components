@@ -1061,6 +1061,7 @@ export default {
      * @param {KeyboardEvent} event - the keydown event bubbled from search input field
      */
     navigateDropDown(event) {
+      event.preventDefault();
       // determine if arrow was up or down - true if down, false for up
       const isArrowDown = event.key === 'ArrowDown';
       // if navigation is used to navigate controlled vocabulary options (= are there
