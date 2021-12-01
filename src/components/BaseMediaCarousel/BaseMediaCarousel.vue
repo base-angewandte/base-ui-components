@@ -47,7 +47,8 @@
               :media-type="media.mediaType"
               :orientation="media.orientation"
               :previews="media.previews"
-              tabindex="1" />
+              tabindex="1"
+              @download="download" />
           </div>
         </div>
       </div>
@@ -320,6 +321,16 @@ export default {
         }
         this.swiper.slidePrev();
       }
+    },
+    download(value) {
+      /**
+       * download button clicked
+       *
+       * @event download
+       * @type { Object }
+       *
+       */
+      this.$emit('download', value);
     },
   },
 };
