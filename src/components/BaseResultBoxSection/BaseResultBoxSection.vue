@@ -330,6 +330,9 @@ export default {
         [640, 4],
         [1024, 6],
       ]),
+      validator: val => val
+        .every(point => typeof point === 'object' && point.length === 2
+          && point.every(pointValue => typeof pointValue === 'number')),
     },
     /**
      * set component loader active
@@ -735,7 +738,10 @@ export default {
         if (val !== this.currentPageNumberInt) {
           // check if number is larger than max number of pages currently available and
           // set to max possible value if yes instead
-          this.currentPageNumberInt = val > this.pages ? this.pages : val;
+          // TODO: changed this to internal handling for now because it makes problems with
+          // externally provided data but maybe it would make sense to get rid of it all together
+          this.currentPageNumberInt = val > this.pages && !this.fetchDataExternally
+            ? this.pages : val;
         }
       },
       immediate: true,
