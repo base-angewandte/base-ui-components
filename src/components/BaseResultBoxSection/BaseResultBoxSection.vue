@@ -747,6 +747,12 @@ export default {
     currentPageNumberInt: {
       handler(val) {
         if (val !== this.currentPageNumber) {
+          console.log('current page number int changed', val);
+          /** emitted when pagination is used and page number was changed
+           *
+           * @event update:current-page-number
+           * @param {number} number - the new page number
+          */
           this.$emit('update:current-page-number', this.currentPageNumberInt);
         }
       },
@@ -995,20 +1001,11 @@ export default {
      * @param {number} number - the selected page number
      */
     setPage(number) {
+      // set internal page number - this will also trigger an event to parent
       this.currentPageNumberInt = number;
       // if variable is set true jump to top of element
       if (this.jumpToTop) {
         window.scrollTo(0, this.$el.offsetTop - this.scrollToOffset);
-      }
-      // and also inform parent of page number change
-      if (number !== this.currentPageNumber) {
-        /**
-         * emitted when pagination is used and page number was changed
-         *
-         * @event update:current-page-number
-         * @param {number} number - the new page number
-         */
-        this.$emit('update:current-page-number', number);
       }
     },
 
