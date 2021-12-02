@@ -747,7 +747,6 @@ export default {
     currentPageNumberInt: {
       handler(val) {
         if (val !== this.currentPageNumber) {
-          console.log('current page number int changed', val);
           /** emitted when pagination is used and page number was changed
            *
            * @event update:current-page-number
