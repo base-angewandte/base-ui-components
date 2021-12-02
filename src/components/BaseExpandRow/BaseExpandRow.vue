@@ -2,32 +2,47 @@
   <div
     :data-group="groupName !== '' ? groupName : false"
     :class="['base-expand-row', {'expanded': isVisible}]">
-    <button
+    <div
       :id="'base-expand-row-' + id"
-      :aria-expanded="isVisible ? 'true' : 'false'"
-      type="button"
       class="base-expand-row-header"
-      @click="clicked">
-      <div
-        v-if="icon || hasIconSlot"
-        class="base-expand-row-icon">
-        <!-- @slot slot to inject icon/image left side before label  -->
-        <slot name="icon">
-          <base-icon
-            :name="icon"
-            title="open" />
-        </slot>
-      </div>
-
-      <div class="base-expand-row-title base-text-fade-out">
-        {{ label }}
-      </div>
-
-      <base-icon
-        name="drop-down"
-        title="open"
-        class="base-expand-row-collapse-icon" />
-    </button>
+      :aria-expanded="isVisible ? 'true' : 'false'">
+      <base-checkmark
+        v-if="isSelectable"
+        :key="id + 'checkmark'"
+        title="checkbox"
+        mark-style="checkbox"
+        class="base-expand-row-checkbox"
+        @clicked="checkboxClicked" />
+      <button
+        type="button"
+        :class="[ 'base-expand-row-button', {'selectable': isSelectable}]"
+        @click="clicked">
+        <div
+          v-if="icon || hasIconSlot"
+          class="base-expand-row-icon">
+          <!-- @slot slot to inject icon/image left side before the title  -->
+          <slot name="icon">
+            <base-icon
+              :name="icon"
+              title="open" />
+          </slot>
+        </div>
+        <div class="base-expand-row-title-subtitle-wrapper">
+          <div class="base-expand-row-title base-text-fade-out">
+            {{ title }}
+          </div>
+          <div
+            v-if="subtitle"
+            class="base-expand-row-subtitle base-text-fade-out">
+            {{ subtitle }}
+          </div>
+        </div>
+        <base-icon
+          name="drop-down"
+          title="open"
+          class="base-expand-row-collapse-icon" />
+      </button>
+    </div>
     <div
       role="region"
       :aria-labelledby="'base-expand-row-' + id"
@@ -49,11 +64,18 @@ export default {
   },
   props: {
     /**
-     * label for the expand row
+     * Title of the row.
      */
-    label: {
+    title: {
       type: String,
-      default: 'Label',
+      default: 'Title',
+    },
+    /**
+     * Optional subtitle of the row.
+     */
+    subtitle: {
+      type: String,
+      default: '',
     },
     /**
      * group components by name, only one component is expanded at once
@@ -64,8 +86,8 @@ export default {
       default: '',
     },
     /**
-     * specify an icon that is displayed before the label
-     * available values: see ***
+     * Lets you optionally specify an icon that is displayed before the title.
+     * For valid values, see [BaseIcon](#baseicon).
      */
     icon: {
       type: String,
@@ -79,9 +101,17 @@ export default {
       default: true,
     },
     /**
-     * open expand-row-body on load
+     * Lets you specify if the row should be in expanded state by default.
      */
     isExpanded: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Lets you specify if the row is selectable. If **true**, a check box appears
+     * on the left side.
+     */
+    isSelectable: {
       type: Boolean,
       default: false,
     },
@@ -90,6 +120,7 @@ export default {
     return {
       id: null,
       isVisible: this.isExpanded,
+      isSelected: false,
     };
   },
   computed: {
@@ -102,13 +133,20 @@ export default {
     this.id = this._uid;
   },
   methods: {
-    /**
-     * event emitted when clicked on header
-     *
-     * @event clicked
-     */
     clicked() {
       this.isVisible = !this.isVisible;
+    },
+    checkboxClicked() {
+      this.isSelected = !this.isSelected;
+      /**
+       * Event triggered when the *check box* is clicked; this is applicable
+       * only if the row is selectable and has a check box.
+       * The payload indicates the selected state (true or false).
+       *
+       * @event selected
+       * @param {Boolean}
+       */
+      this.$emit('selected', this.isSelected);
     },
   },
 };
@@ -125,41 +163,69 @@ export default {
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      height: $row-height-large;
-      width: 100%;
-      padding: 0 $spacing;
       background: $box-color;
       box-shadow: $box-shadow-reg;
       transition: $box-transition;
 
-      .base-expand-row-title {
-        flex: auto;
-        margin-right: $spacing;
-        color: $font-color-second;
-        text-align: left;
-        overflow: hidden;
-        white-space: nowrap;
+      .base-expand-row-checkbox {
+        padding: 0 $spacing;
+        width: $spacing * 3;
       }
 
-      .base-expand-row-icon {
-        height: $icon-large;
-        width: $icon-large;
-        margin-right: $spacing;
-        color: currentColor;
-        flex-shrink: 0;
+      .base-expand-row-button {
+        height: $row-height-large;
+        padding: 0 $spacing;
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
 
-        svg,
-        img {
-          width: 100%;
+        .base-expand-row-title-subtitle-wrapper {
+          flex: auto;
+          margin-right: $spacing;
+          overflow: hidden;
+
+          .base-expand-row-title {
+            color: $font-color-second;
+            text-align: left;
+            white-space: nowrap;
+          }
+
+          .base-expand-row-subtitle {
+            font-size: $font-size-small;
+            color: $font-color-second;
+            text-align: left;
+            white-space: nowrap;
+          }
         }
-      }
 
-      .base-expand-row-collapse-icon {
-        transition: $drop-down-arrow-animation;
-        height: $icon-small;
-        width: $icon-small;
-        min-width: $icon-small;
-        color: $font-color;
+        .base-expand-row-icon {
+          height: $icon-large;
+          width: $icon-large;
+          margin-right: $spacing;
+          color: currentColor;
+          flex-shrink: 0;
+
+          svg,
+          img {
+            width: 100%;
+          }
+        }
+
+        .base-expand-row-collapse-icon {
+          transition: $drop-down-arrow-animation;
+          height: $icon-small;
+          width: $icon-small;
+          min-width: $icon-small;
+          color: $font-color;
+        }
+
+        &.selectable {
+          // if row is selectable, we must account for the width of the check box.
+          // therefore, decrease 100% width by the width of .base-expand-row-checkbox
+          width: calc(100% - #{$spacing} * 3);
+          padding: 0 $spacing 0 0;
+        }
       }
 
       &:focus,
@@ -187,10 +253,15 @@ export default {
     }
 
     &.expanded {
-
-      .base-expand-row-title {
-        color: $font-color;
-        font-weight: bold;
+      .base-expand-row-header {
+        .base-expand-row-button {
+          .base-expand-row-title-subtitle-wrapper {
+            .base-expand-row-title {
+              color: $font-color;
+              font-weight: bold;
+            }
+          }
+        }
       }
 
       .base-expand-row-body {
