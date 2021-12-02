@@ -50,7 +50,7 @@
       </p>
       <div class="base-media-preview-not-supported-buttons">
         <BaseButton
-          v-if="allowDownload"
+          v-if="allowDownload || (!allowDownload && fileType === '')"
           :text="getI18nTerm(infoTexts.download)"
           icon="download"
           icon-position="right"
@@ -295,7 +295,7 @@ export default {
   methods: {
     download() {
       // check again if user is allowed to download
-      if (this.allowDownload) {
+      if (this.allowDownload || (!this.allowDownload && this.fileType === '')) {
         /**
          * download button clicked
          *
