@@ -91,6 +91,12 @@
           <div
             :class="['base-image-box-footer',
                      { 'base-image-box-footer-invert': icon }]">
+            <div
+              v-if="$slots.footerLeft"
+              class="base-image-box-footer-left">
+              <!-- @slot for featured icon of files -->
+              <slot name="footerLeft" />
+            </div>
             <div class="base-image-box-footer-body">
               <div
                 v-if="showTitleOnHover"
@@ -116,7 +122,7 @@
 
             <div
               v-if="$slots.footer || playIcon"
-              class="base-image-box-footer-slot">
+              class="base-image-box-footer-right">
               <!-- display optional play icon e.g. for video, audio -->
               <BaseIcon
                 v-if="playIcon"
@@ -490,7 +496,7 @@ export default {
         }
 
         .base-image-box-footer-body,
-        .base-image-box-footer-slot {
+        .base-image-box-footer-right {
           color: $font-color;
         }
       }
@@ -710,29 +716,37 @@ export default {
     bottom: $spacing;
     left: $spacing;
     right: $spacing;
-    display: flex;
-    justify-content: space-between;
+    //justify-content: space-between;
     color: white;
     z-index: 1;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 
     &.base-image-box-footer-invert {
       color: $font-color;
 
-      .base-image-box-footer-slot {
+      .base-image-box-footer-right {
         .base-image-box-icon-play-small {
           fill: $font-color;
         }
       }
     }
 
+    .base-image-box-footer-left {
+      display: flex;
+      margin-right: $spacing-small;
+    }
+
     .base-image-box-footer-body {
+      flex-grow: 1;
       overflow: hidden;
     }
 
-    .base-image-box-footer-slot {
+    .base-image-box-footer-right {
       display: flex;
       align-items: center;
-      align-self: flex-end;
       margin-left: $spacing;
 
       .base-image-box-icon-play-small {
