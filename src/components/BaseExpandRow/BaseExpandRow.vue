@@ -12,6 +12,7 @@
         title="checkbox"
         mark-style="checkbox"
         class="base-expand-row-checkbox"
+        :checked="isSelected"
         @clicked="checkboxClicked" />
       <button
         type="button"
@@ -109,9 +110,17 @@ export default {
     },
     /**
      * Lets you specify if the row is selectable. If **true**, a check box appears
-     * on the left side.
+     * on the left side. The *isSelected* prop determines whether the check box is
+     * actually selected or not.
      */
     isSelectable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Lets you specify if the row is currently selected.
+     */
+    isSelected: {
       type: Boolean,
       default: false,
     },
@@ -120,7 +129,7 @@ export default {
     return {
       id: null,
       isVisible: this.isExpanded,
-      isSelected: false,
+      isSelectedInternal: false,
     };
   },
   computed: {
@@ -131,22 +140,23 @@ export default {
   created() {
     // eslint-disable-next-line
     this.id = this._uid;
+    this.isSelectedInternal = this.isSelected;
   },
   methods: {
     clicked() {
       this.isVisible = !this.isVisible;
     },
     checkboxClicked() {
-      this.isSelected = !this.isSelected;
+      this.isSelectedInternal = !this.isSelectedInternal;
       /**
        * Event triggered when the *check box* is clicked; this is applicable
-       * only if the row is selectable and has a check box.
+       * only if the row is selectable and thus has a check box.
        * The payload indicates the selected state (true or false).
        *
        * @event selected
        * @param {Boolean}
        */
-      this.$emit('selected', this.isSelected);
+      this.$emit('selected', this.isSelectedInternal);
     },
   },
 };
