@@ -520,7 +520,7 @@ export default {
         const requiredProps = ['text', 'icon', 'value'];
         const actionProps = Object.keys(action);
         return requiredProps.every(prop => actionProps.includes(prop))
-          && (['all', 'top', 'botttom'].includes(action.display) || !action.display);
+          && (['all', 'top', 'bottom'].includes(action.display) || !action.display);
       }),
     },
     /**
