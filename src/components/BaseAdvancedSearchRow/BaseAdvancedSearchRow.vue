@@ -54,7 +54,7 @@
                    { 'base-advanced-search-row__filter-input__date':
                      filter.type.includes('date') }]"
           @click="isActive = true"
-          @keypress="isActive = true"
+          @keydown="handleKeyDownEvent"
           @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
@@ -938,7 +938,7 @@ export default {
      * filter input field
      */
     navigateFilters(event) {
-      if (this.displayedFilters.length) {
+      if (this.displayedFilters.length && this.isActive && this.$refs.dropDown) {
         const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
         const dropDownElement = this.$refs.dropDown.$el;
         // if filters are out of view - scroll to top to make them visible
