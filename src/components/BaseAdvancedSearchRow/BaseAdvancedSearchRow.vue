@@ -218,7 +218,9 @@
                 </div>
                 <!-- TODO: not linked to input!!! -->
                 <ul
-                  v-if="controlledVocabularyOptions && displayedOptions.length"
+                  v-if="controlledVocabularyOptions && displayedOptions.length
+                    && (displayedOptions.length <= maxNumberControlledOptions
+                      || (currentInput && currentInput.length >= 4))"
                   role="listbox"
                   class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
                   <li
@@ -251,6 +253,24 @@
                      base-advanced-search-row__area-padding">
                   {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsOngoing, true)) }}
                 </div>
+                <!-- INFO if there are too many options to display (however from a certain
+                string length options are still displayed because this would be not very
+                user friendly else... -->
+                <div
+                  v-else-if="displayedOptions.length > maxNumberControlledOptions
+                    && (!currentInput || currentInput.length < 4)"
+                  class="base-advanced-search-row__no-options
+                  base-advanced-search-row__area-padding">
+                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsMaxOptions, true)) }}
+                </div>
+                <!-- IFNO if string does not match any options -->
+                <div
+                  v-else-if="currentInput && currentInput.length && !displayedOptions.length"
+                  class="base-advanced-search-row__no-options
+                     base-advanced-search-row__area-padding">
+                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoMatch, true)) }}
+                </div>
+                <!-- INFO if no more options are available (all options already added) -->
                 <div
                   v-else-if="!displayedOptions.length"
                   class="base-advanced-search-row__no-options
@@ -518,6 +538,9 @@ export default {
      *     <b>autocompleteInitial</b>: initial text shown before user started typing<br>
      *     <b>chipsNoOptions</b>: text shown when there are no options for controlled vocabulary
      *        available<br>
+     *     <b>chipsMaxOptions</b>: text displayed if more than max number of options that can be
+     *        displayed are available (configure via prop maxNumberControlledOptions)<br>
+     *     <b>chipsNoMatch</b>: text displayed if string in input does not match any options<br>
      *     <b>chipsOngoing</b>: text shown for chips fetching request ongoing<br>
      *  <br>
      *  The values of this object might be plain text or a key for an i18n file<br>
@@ -529,12 +552,21 @@ export default {
         autocompleteOngoing: 'Autocomplete is being fetched...',
         autocompleteInitial: 'Please start typing or select a filter to see options',
         chipsNoOptions: 'No more options available',
+        chipsMaxOptions: 'Please start typing to see options',
+        chipsNoMatch: 'No matching options were found',
         chipsOngoing: 'Options are being loaded...',
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => ['autocompleteNoOptions', 'autocompleteOngoing', 'autocompleteInitial',
         'chipsNoOptions', 'chipsOngoing']
         .every(prop => Object.keys(val).includes(prop)),
+    },
+    /**
+     * define a maximum number of controlled vocabulary options to be displayed
+     */
+    maxNumberControlledOptions: {
+      type: Number,
+      default: 100,
     },
   },
   data() {
