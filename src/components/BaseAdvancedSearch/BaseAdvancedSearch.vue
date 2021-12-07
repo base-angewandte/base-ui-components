@@ -15,6 +15,8 @@
         :autocomplete-property-names="autocompletePropertyNames"
         :label-property-name="labelPropertyName"
         :identifier-property-name="identifierPropertyName"
+        :drop-down-info-texts="dropDownInfoTexts"
+        :advanced-search-text="advancedSearchText"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
@@ -28,12 +30,13 @@
       :filter-list="filterList"
       :default-filter="defaultFilter"
       :autocomplete-results="filtersAutocompleteResults[0]"
-      :advanced-search-text="advancedSearchText"
       :is-loading="filtersLoadingState[0]"
       :placeholder="placeholder.main || placeholder"
       :autocomplete-property-names="autocompletePropertyNames"
       :label-property-name="labelPropertyName"
       :identifier-property-name="identifierPropertyName"
+      :drop-down-info-texts="dropDownInfoTexts"
+      :advanced-search-text="advancedSearchText"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
@@ -173,6 +176,9 @@ export default {
      *        component<br>
      *     <b>chipsNoOptions</b>: info text shown when no options for controlled vocabulary search
      *        are available (anymore)<br>
+     *     <b>chipsMaxOptions</b>: text displayed if more than max number of options that can be
+     *        displayed are available (configure via prop maxNumberControlledOptions)<br>
+     *     <b>chipsNoMatch</b>: text displayed if string in input does not match any options<br>
      *     <b>chipsOngoing</b>: info text shown when controlled vocabulary chips are being
      *        fetched<br>
      *  <br>
@@ -186,11 +192,13 @@ export default {
         autocompleteOngoing: 'Autocomplete is being fetched...',
         autocompleteInitial: 'Please start typing or select a filter to see options',
         chipsNoOptions: 'No more options available',
+        chipsMaxOptions: 'Please start typing to see options',
+        chipsNoMatch: 'No matching options were found',
         chipsOngoing: 'Options are being loaded...',
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => ['autocompleteNoOptions', 'autocompleteOngoing', 'autocompleteInitial',
-        'chipsNoOptions', 'chipsOngoing']
+        'chipsNoOptions', 'chipsOngoing', 'chipsMaxOptions', 'chipsNoMatch']
         .every(prop => Object.keys(val).includes(prop)),
     },
     /**

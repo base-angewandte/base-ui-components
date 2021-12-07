@@ -558,7 +558,7 @@ export default {
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => ['autocompleteNoOptions', 'autocompleteOngoing', 'autocompleteInitial',
-        'chipsNoOptions', 'chipsOngoing']
+        'chipsNoOptions', 'chipsOngoing', 'chipsMaxOptions', 'chipsNoMatch']
         .every(prop => Object.keys(val).includes(prop)),
     },
     /**
