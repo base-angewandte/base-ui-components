@@ -48,6 +48,7 @@
                   :text="getI18nString(action.text)"
                   :icon="action.icon"
                   :has-background-color="false"
+                  :disabled="action.disabled"
                   icon-size="large"
                   button-style="single"
                   @clicked="submitAction(action.value)" />
@@ -504,6 +505,7 @@ export default {
      *     top: only in top row<br>
      *     bottom: only in action button box at bottom of list<br>
      *     all: on top as well as bottom<br>
+     *   **disabled** {boolean} - disable button
      */
     actionButtonsConfig: {
       type: Array,
@@ -512,12 +514,13 @@ export default {
         icon: 'waste-bin',
         value: 'delete',
         display: 'all',
+        disabled: false,
       }],
       validator: val => val.every((action) => {
         const requiredProps = ['text', 'icon', 'value'];
         const actionProps = Object.keys(action);
         return requiredProps.every(prop => actionProps.includes(prop))
-          && (['all', 'top', 'botttom'].includes(action.display) || !action.display);
+          && (['all', 'top', 'bottom'].includes(action.display) || !action.display);
       }),
     },
     /**
