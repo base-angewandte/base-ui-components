@@ -51,6 +51,7 @@ import AdvancedSearchRow from './BaseAdvancedSearchRow';
 import AdvancedSearch from './BaseAdvancedSearch';
 import Tooltip from './BaseTooltip';
 import Link from './BaseLink';
+import DropButton from './BaseDropButton';
 
 export {
   Loader as BaseLoader,
@@ -106,4 +107,5 @@ export {
   AdvancedSearch as BaseAdvancedSearch,
   Link as BaseLink,
   Tooltip as BaseTooltip,
+  DropButton as BaseDropButton,
 };

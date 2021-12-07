@@ -9,6 +9,7 @@
     <ul
       :id="listId"
       :style="listBodyStyle"
+      :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : false"
       role="listbox"
       class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
@@ -121,7 +122,7 @@ export default {
      */
     listId: {
       type: String,
-      required: true,
+      default: '',
     },
     /**
      * add styling to the list body (e.g. max-height)
@@ -371,7 +372,7 @@ export default {
   @import "../../styles/variables";
 
   .base-drop-down-list__container {
-    background: inherit;
+    background: white;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;
