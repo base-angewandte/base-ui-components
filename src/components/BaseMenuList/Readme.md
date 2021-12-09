@@ -1,3 +1,4 @@
+Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnails` slot.
 ```vue
 <template>
   <div class="listcontainer">
@@ -6,8 +7,20 @@
         :selected-list="selectedArray"
         :selected="selectActive"
         @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
-        @clicked="activeEntry = $event"
-        />
+        @clicked="activeEntry = $event">
+        <template
+          v-slot:thumbnails="{ item }">
+          <base-icon
+            v-if="item.shared"
+            name="people" />
+          <base-icon
+            v-if="item.published"
+            name="eye" />
+          <base-icon
+            v-if="item.error"
+            name="attention" />
+        </template>
+    </BaseMenuList>
     <BaseButton
         text="Toggle Select"
         button-style="row"
@@ -29,6 +42,7 @@ export default {
           error: false,
           shared: true,
           active: true,
+          published: true,
         },
         {
           id: '2',
@@ -36,17 +50,19 @@ export default {
           type: 'Type',
           error: false,
           shared: false,
+          published: false,
         },
         {
           id: '3',
-          title: 'Entry with "shared" and "error" true',
+          title: 'Entry with "error", "shared", and "published" properties set to true',
           type: 'Konzert',
           error: true,
           shared: true,
+          published: true,
         },
         {
           id: '4',
-          title: 'Selected, "published" true',
+          title: 'Entry with "published" property set to true',
           type: 'Publikation',
           error: false,
           published: true,
@@ -57,11 +73,7 @@ export default {
       selectedArray: [],
     };
   },
-  methods: {
-    toggleSelect() {
-      
-    },
-  },
+
 };
 </script>
 <style>
@@ -72,7 +84,6 @@ export default {
   .listbutton {
     margin-top: 16px;
   }
-  
   .show {
     margin-top: 16px;
   }

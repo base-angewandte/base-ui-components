@@ -50,12 +50,13 @@
       <div
         v-if="showThumbnails"
         :key="entryId + 'thumbnail'"
-        class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out">
-        <base-icon
-          v-for="tn in thumbnails"
-          :key="tn"
-          :name="tn"
-          class="base-menu-entry-thumbnail" />
+        ref="thumbnailContainer"
+        class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out"
+        :style="{ '--cols': columns }">
+        <!-- @slot Use this slot to supply a list of [BaseIcon](#baseicon) components that are
+        to be shown in the right area of the menu entry as thumbnails. If using the slot,
+        make sure that `showThumbnails` is true.-->
+        <slot name="thumbnails" />
       </div>
       <base-checkmark
         v-if="isSelectable && selectActive"
@@ -132,14 +133,6 @@ export default {
       default: '',
     },
     /**
-     * specify an array of icon names (available values - see ***) to indicate e.g. errors
-     */
-    thumbnails: {
-      type: Array,
-      // eslint-disable-next-line no-unused-expressions
-      default: () => [],
-    },
-    /**
      * Text displayed at the end of the item
      */
     description: {
@@ -185,6 +178,8 @@ export default {
   data() {
     return {
       isSelectedInt: false,
+      // how many columns the thumbnail container takes
+      columns: 0,
     };
   },
   computed: {
@@ -198,7 +193,11 @@ export default {
     },
   },
   mounted() {
+    this.setThumbnailColumns();
     this.isSelectedInt = this.isSelected;
+  },
+  updated() {
+    this.setThumbnailColumns();
   },
   methods: {
     clicked() {
@@ -231,6 +230,17 @@ export default {
       if (this.$refs.slideFade) {
         // safari fix: reset transition
         this.$refs.slideFade.$el.style.removeProperty('right');
+      }
+    },
+    /**
+     * Returns the count of columns that the thumbnail icons take.
+     */
+    setThumbnailColumns() {
+      if (this.showThumbnails) {
+        // get the current count of thumbnails
+        const thumbnailCount = this.$refs.thumbnailContainer.childElementCount;
+        // find the count of columns (each column holds 2 thumbnails)
+        this.columns = Math.ceil(thumbnailCount / 2);
       }
     },
   },
@@ -373,16 +383,19 @@ export default {
     .base-menu-entry-thumbnail-container {
       display: flex;
       flex-direction: column;
-      // added for IE
-      justify-content: space-around;
-      // however this is the value it should take
-      justify-content: space-evenly;
+      flex-wrap: wrap-reverse;
       height: $row-height-large;
-      padding-left:$spacing;
+      justify-content: center;
       background-color: white;
-      min-width: 30px;
-
-      .base-menu-entry-thumbnail {
+      align-items: flex-start;
+      padding-left: $spacing;
+      gap: $spacing;
+      // calculate container width as sum of thumbnail columns and column gaps,
+      // plus an extra $spacing to account for the padding-left applied above.
+      // the count of columns is calculated in the setThumbnailColumns() method.
+      width: calc(var(--cols) * #{$icon-small} + (var(--cols) - 1) * #{$spacing} + #{$spacing});
+      // width and height of each thumbnail icon
+      ::v-deep .svg-icon {
         max-height: $icon-small;
         width: $icon-small;
       }
@@ -425,16 +438,6 @@ export default {
       left: calc(-#{$fade-out-width} - #{$spacing});
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
       z-index: map-get($zindex, fadeout);
-    }
-  }
-
-  @supports (-ms-ime-align:auto) {
-    /* Edge only - space-around instead of justify-evenly since
-    they "forgot" that (https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15947692/) */
-    .base-menu-entry {
-      .base-menu-entry-thumbnail-container {
-        justify-content: space-around;
-      }
     }
   }
 </style>

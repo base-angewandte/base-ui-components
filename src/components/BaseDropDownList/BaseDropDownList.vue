@@ -31,7 +31,6 @@
             { 'base-drop-down-list__option__active-custom': useCustomOptionActiveBackgroundColor
               && optionIndex === activeOptionIndex }]"
           role="option"
-          tabindex="0"
           @click="selected(option)">
           <!-- @slot a slot to customize every single option (e.g. display of
           information other than [valuePorpoertyName]) -->

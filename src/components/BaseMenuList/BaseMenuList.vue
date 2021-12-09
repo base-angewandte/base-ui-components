@@ -23,12 +23,21 @@
         :is-active="entryProps[index].active"
         :is-selected="entryProps[index].selected"
         :icon="getType(item.icon)"
-        :thumbnails="getThumbnails(item)"
         :description="item.description"
         :is-selectable="true"
         :select-active="selectActive"
         @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)" />
+        @selected="selectItem(index, $event)">
+        <template
+          v-slot:thumbnails>
+          <!-- @slot Use this scoped slot to supply a list of thumbnails
+          (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is a
+          [BaseMenuEntry](#basemenuentry). See also the example below.-->
+          <slot
+            name="thumbnails"
+            :item="item" />
+        </template>
+      </base-menu-entry>
     </li>
   </draggable>
 </template>
@@ -157,24 +166,6 @@ export default {
     // TODO: this should probably also be definable per entry dynamically on the long run...
     getType(val) {
       return val && val.includes('calendar-many') ? 'calendar-many' : 'file-object';
-    },
-    // define which thumbnails should be shown for each item
-    // TODO: currently hardcoded here but needs dynamic solution!
-    getThumbnails(val) {
-      const thumbnails = [];
-      if (val.shared) {
-        thumbnails.push('people');
-      }
-      if (val.published) {
-        thumbnails.push('eye');
-      }
-      if (val.error) {
-        thumbnails.push('attention');
-      }
-      if (val.has_media) {
-        thumbnails.push('attachment');
-      }
-      return thumbnails;
     },
     // this function is called when a menu entry is clicked (when checkboxes not active)
     activateItem(index) {
