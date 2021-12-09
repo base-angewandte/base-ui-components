@@ -786,15 +786,9 @@ export default {
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     handleInputKeydown(event, origin) {
-      const currentInputString = this[`input${origin}`];
+      let currentInputString = this[`input${origin}`];
       // get the key triggering the event
       const { key } = event;
-      // check if key was tab because of reasons specified above
-      if (key === 'Tab' && (event.shiftKey || !this.clearable
-        || !this[`input${origin + origin.slice(1)}`])) {
-        // if yes set the relevant input field open status to false
-        this[`${origin.charAt(0).toLowerCase()}Open`] = false;
-      }
       // now check for the specific input key to preventDefault and prevent unwanted
       // characters
       // create boolean to determine if it is a time field (otherwise date is assumed)
@@ -821,6 +815,17 @@ export default {
           || currentInputString.charAt(currentInputString.length - 1) === '.'))
         || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':')) {
         event.preventDefault();
+      }
+      // when the user tries to leave the field check if input string is valid
+      if (['Tab', 'Enter'].includes(key) && currentInputString) {
+        this.checkDateValidity(origin);
+        currentInputString = this[`input${origin}`];
+      }
+      // check if key was tab because of reasons specified above and close picker if necessary
+      if (key === 'Enter' || (key === 'Tab' && (event.shiftKey || !this.clearable
+        || !currentInputString))) {
+        // if yes set the relevant input field open status to false
+        this[`${origin.charAt(0).toLowerCase()}${origin.slice(1)}Open`] = false;
       }
     },
     /**
