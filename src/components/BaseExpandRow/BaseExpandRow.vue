@@ -166,7 +166,7 @@ export default {
   @import "../../styles/variables";
 
   .base-expand-row {
-    margin-bottom: $spacing;
+    margin-bottom: $border-width;
     background-color: $background-color;
 
     .base-expand-row-header {
