@@ -1162,6 +1162,7 @@ export default {
 
       .base-result-box-section__message-area-text {
         font-size: $font-size-large;
+        margin-bottom: $spacing-small;
       }
 
       .base-result-box-section__message-area-subtext {
