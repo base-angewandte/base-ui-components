@@ -67,7 +67,7 @@
               @remove-entry="removeEntry($event, index)" />
           </div>
           <BaseChipsInput
-            :id="label + '_' + (entry.idInt || entry.identifier)"
+            :id="`${id}_roles_${entry[identifierPropertyNameInt] || entry.idInt}`"
             :key="'input_' + entry.idInt"
             v-model="entry.roles"
             :show-label="false"

@@ -783,6 +783,8 @@ export default {
 @import "../../styles/variables";
 
   .base-chips-input {
+    position: relative;
+
     .base-chips-input__drop-down {
       background: white;
     }

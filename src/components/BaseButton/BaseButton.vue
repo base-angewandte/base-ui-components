@@ -22,8 +22,10 @@
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
 
-    <span class="base-button-text">{{ text }}</span>
-
+    <span
+      :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
+      {{ text }}
+    </span>
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
 
@@ -143,14 +145,13 @@ export default {
     },
     /**
      * define alignment of button content<br>
-     * allowed values: 'center', 'left', 'right'<br>
-     * Info: has no effect, if icon-position 'top' is set
+     * since this is a flex-box container use values allowed for justify-content
      */
     alignText: {
       type: String,
       default: 'center',
       validator(val) {
-        return ['center', 'left', 'right'].includes(val);
+        return ['center', 'start', 'end', 'flex-start', 'flex-end'].includes(val);
       },
     },
     /**
@@ -174,6 +175,13 @@ export default {
     description: {
       type: String,
       default: '',
+    },
+    /**
+     * set false if button text should not be wrapped
+     */
+    buttonTextWrap: {
+      type: Boolean,
+      default: true,
     },
   },
   computed: {
@@ -205,9 +213,15 @@ export default {
     align-items: center;
     background-color: transparent;
     transition: all 0.2s ease-in-out;
+    justify-content: center;
+    color: inherit;
 
     .base-button-text {
       text-align: center;
+
+      &.base-button-text__nowrap {
+        white-space: nowrap;
+      }
     }
 
     .base-button-icon {
@@ -329,6 +343,7 @@ export default {
 
     &:disabled {
       cursor: default;
+      color: $graytext-color;
 
       &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
         color: $graytext-color;
