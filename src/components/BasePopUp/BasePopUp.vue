@@ -54,9 +54,10 @@
               class="base-popup-button"
               @clicked="buttonRight">
               <template
-                v-if="isLoading"
                 v-slot:right-of-text>
-                <span class="base-popup-button-loader">
+                <span
+                  v-show="isLoading"
+                  class="base-popup-button-loader">
                   <BaseLoader />
                 </span>
               </template>
@@ -225,80 +226,82 @@ export default {
 <style lang="scss" scoped>
   @import '../../styles/variables.scss';
 
-  .base-pop-up-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    /* specific to be higher than base header */
-    z-index: map-get($zindex, modal_bg);
-    overflow: hidden;
-  }
-
-  .popup-box {
-    box-shadow: $pop-up-shadow;
-    position: fixed;
-    top: 20vh;
-    left: 50%;
-    z-index: map-get($zindex, modal);
-    min-width: 288px;
-    width: 50%;
-    max-width: 700px;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(-50%);
-  }
-
-  .popup-header {
-    background-color: $button-header-color;
-    height: $row-height-large;
-    padding: 0 #{$spacing};
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
-
-    .base-popup__close-button {
-      &:active, &:focus {
-        color: $app-color;
-        fill: $app-color;
-      }
-    }
-  }
-
-  .popup-remove {
-    width: 16px;
-    cursor: pointer;
-  }
-
-  .popup-content {
-    padding: $spacing;
-    background-color: white;
-  }
-
-  .popup-button-row {
-    margin-top: $spacing;
-    display: flex;
-    flex-direction: row;
-
-    /* TODO: check if button size should just be adjustable via props in general" */
-    .base-popup-button {
-      margin-right: $spacing;
-      // width: calc(50% - 8px);
-      flex-basis: 50%;
-
-      .base-popup-button-loader{
-        position: relative;
-        transform: scale(0.5);
-        margin-left: $spacing;
-        padding-left: $spacing;
-      }
+  .base-pop-up {
+    .base-pop-up-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      /* specific to be higher than base header */
+      z-index: map-get($zindex, modal_bg);
+      overflow: hidden;
     }
 
-    & .base-popup-button:last-child {
-      margin-right: 0;
+    .popup-box {
+      box-shadow: $pop-up-shadow;
+      position: fixed;
+      top: 20vh;
+      left: 50%;
+      z-index: map-get($zindex, modal);
+      min-width: 288px;
+      width: 50%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-50%);
+
+      .popup-header {
+        background-color: $button-header-color;
+        height: $row-height-large;
+        padding: 0 #{$spacing};
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+
+        .base-popup__close-button {
+          &:active, &:focus {
+            color: $app-color;
+            fill: $app-color;
+          }
+
+          .popup-remove {
+            width: $icon-medium;
+            cursor: pointer;
+          }
+        }
+      }
+
+      .popup-content {
+        padding: $spacing;
+        background-color: white;
+
+        .popup-button-row {
+          margin-top: $spacing;
+          display: flex;
+          flex-direction: row;
+
+          /* TODO: check if button size should just be adjustable via props in general" */
+          .base-popup-button {
+            margin-right: $spacing;
+            // width: calc(50% - 8px);
+            flex-basis: 50%;
+          }
+
+          & .base-popup-button:last-child {
+            margin-right: 0;
+          }
+
+          .base-popup-button-loader {
+            position: relative;
+            transform: scale(0.5);
+            margin-left: $spacing;
+            padding-left: $spacing;
+          }
+        }
+      }
     }
   }
 
