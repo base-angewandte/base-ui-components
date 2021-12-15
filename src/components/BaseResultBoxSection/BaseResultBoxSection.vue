@@ -107,6 +107,7 @@
           :animation="draggable ? 150 : false"
           :tag="draggable ? 'ul' : false"
           :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
+          handle=".base-result-box-section__result-box-item-draggable .base-image-box-content"
           class="base-result-box-section__boxes-container">
           <li
             v-for="(entry, index) of visibleBoxes"

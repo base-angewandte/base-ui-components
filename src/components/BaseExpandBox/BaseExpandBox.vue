@@ -29,7 +29,7 @@
       v-if="showButton"
       :text="expandInt ? showLessText : showMoreText"
       :has-background-color="false"
-      align-text="flex-start"
+      align-text="left"
       icon="drop-down"
       icon-position="right"
       :class="[

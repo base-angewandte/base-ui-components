@@ -699,7 +699,7 @@ export default {
   .base-image-box-features {
     position: absolute;
     top: 0;
-    width: 100%;
+    right: 0;
     z-index: 10;
     display: flex;
     justify-content: flex-end;
