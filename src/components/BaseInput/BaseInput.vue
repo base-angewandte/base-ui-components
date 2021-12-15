@@ -19,8 +19,7 @@
     <div
       v-click-outside="clickedOutsideInput"
       :class="['base-input__input-frame',
-               { 'base-input__input-frame__border': useFormFieldStyling },
-               { 'base-input__input-frame__color': useFormFieldStyling && showInputBorder },
+               { 'base-input__input-frame__border': showInputBorder },
                { 'base-input__input-frame__disabled': disabled },
                { 'base-input__input-frame__invalid': invalid }]"
       @focusin="clickedInside"
@@ -580,16 +579,23 @@ export default {
     width: 100%;
     background: inherit;
 
-    &.base-input__input-frame__border {
-      padding: 1px;
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      pointer-events: none;
+      background: transparent;
     }
 
-    &.base-input__input-frame__color {
-      background: $input-field-color;
+    &.base-input__input-frame__border::after {
+      border: $input-field-border;
     }
 
-    &.base-input__input-frame__invalid {
-      background: $app-color;
+    &.base-input__input-frame__invalid::after {
+      border: 1px solid #{$app-color};
     }
 
     &.base-input__input-frame__disabled::after {

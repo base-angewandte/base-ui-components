@@ -1,76 +1,79 @@
 <template>
-  <component
-    :is="inputComponent"
-    :id="idInt"
-    v-model="inputInt"
-    :selected-list.sync="selectedChipsInt"
-    :is-active.sync="isActiveInt"
-    :type="dateFieldType"
-    :show-label="false"
-    :use-form-field-styling="false"
-    :label="label"
-    :placeholder="placeholder"
-    :linked-list-option="linkedListOption"
-    :drop-down-list-id="dropDownListId || false.toString()"
-    :is-loading="isLoading"
-    :clearable="clearable"
-    :invalid="invalid"
-    :show-error-icon="showErrorIcon"
-    :language="languageInt"
-    :allow-unknown-entries="isFieldTypeChips && type === 'chips'"
-    :label-property-name="isFieldTypeChips ? labelPropertyName : false"
-    :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
-    :set-focus-on-active="setFocusOnActive"
-    :add-selected-entry-directly="true"
-    input-class="base-search__input-field"
-    field-type="search"
-    class="base-search__input"
-    v-on="$listeners">
-    <template v-slot:pre-input-field>
-      <!-- @slot add elements within search but before all other elements <br>
-        for an example see [BaseInput](#baseinput) -->
-      <slot name="pre-input-field" />
-    </template>
-    <template v-slot:input-field-inline-before>
-      <div
-        :class="[dateFieldType && showPreInputIcon
-          ? 'base-search__spacing-date' : 'base-search__spacing']" />
-      <!-- @slot a slot to exchange the magnifier icon with other elements -->
-      <slot name="input-field-inline-before">
-        <BaseIcon
-          v-if="showPreInputIcon"
-          name="magnifier"
-          :class="['base-search__magnifier-icon',
-                   { 'base-search__magnifier-icon__date': !!dateFieldType },
-                   { 'base-search__magnifier-icon__active': isActiveInt }]" />
-      </slot>
-    </template>
-    <template v-slot:input-field-addition-after>
-      <!-- @slot for adding elements after input <br>
-      for an example see [BaseChipsInputField](#basechipsinputfield)-->
-      <slot name="input-field-addition-after" />
-    </template>
-    <template v-slot:post-input-field>
-      <!-- @slot elements after the actual input element but within the input field container <br>
-      for an example see [BaseChipsInputField](#basechipsinputfield)-->
-      <slot name="post-input-field" />
-      <div :class="{ 'base-search__spacing': dateFieldType }" />
-    </template>
-    <template v-slot:error-icon>
-      <!-- @slot use a custom icon instead of standard error/warning icon<br>
+  <div class="base-search">
+    <component
+      :is="inputComponent"
+      :id="idInt"
+      v-model="inputInt"
+      :selected-list.sync="selectedChipsInt"
+      :is-active.sync="isActiveInt"
+      :type="dateFieldType"
+      :show-label="false"
+      :use-form-field-styling="false"
+      :show-input-border="false"
+      :label="label"
+      :placeholder="placeholder"
+      :linked-list-option="linkedListOption"
+      :drop-down-list-id="dropDownListId || false.toString()"
+      :is-loading="isLoading"
+      :clearable="clearable"
+      :invalid="invalid"
+      :show-error-icon="showErrorIcon"
+      :language="languageInt"
+      :allow-unknown-entries="isFieldTypeChips && type === 'chips'"
+      :label-property-name="isFieldTypeChips ? labelPropertyName : false"
+      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
+      :set-focus-on-active="setFocusOnActive"
+      :add-selected-entry-directly="true"
+      input-class="base-search__input-field"
+      field-type="search"
+      class="base-search__input"
+      v-on="$listeners">
+      <template v-slot:pre-input-field>
+        <!-- @slot add elements within search but before all other elements <br>
+          for an example see [BaseInput](#baseinput) -->
+        <slot name="pre-input-field" />
+      </template>
+      <template v-slot:input-field-inline-before>
+        <div
+          :class="[dateFieldType && showPreInputIcon
+            ? 'base-search__spacing-date' : 'base-search__spacing']" />
+        <!-- @slot a slot to exchange the magnifier icon with other elements -->
+        <slot name="input-field-inline-before">
+          <BaseIcon
+            v-if="showPreInputIcon"
+            name="magnifier"
+            :class="['base-search__magnifier-icon',
+                     { 'base-search__magnifier-icon__date': !!dateFieldType },
+                     { 'base-search__magnifier-icon__active': isActiveInt }]" />
+        </slot>
+      </template>
+      <template v-slot:input-field-addition-after>
+        <!-- @slot for adding elements after input <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
-      <slot name="error-icon" />
-    </template>
-    <template v-slot:remove-icon>
-      <!-- @slot for adding custom input remove icon <br>
-      for an example see [BaseChipsInputField](#basechipsinputfield)-->
-      <slot name="remove-icon" />
-    </template>
-    <template v-slot:below-input>
-      <!-- @slot below-input slot added to e.g. add drop down -->
-      <slot name="below-input" />
-    </template>
-  </component>
+        <slot name="input-field-addition-after" />
+      </template>
+      <template v-slot:post-input-field>
+        <!-- @slot elements after the actual input element but within the input field container <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="post-input-field" />
+        <div :class="{ 'base-search__spacing': dateFieldType }" />
+      </template>
+      <template v-slot:error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon<br>
+          for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="error-icon" />
+      </template>
+      <template v-slot:remove-icon>
+        <!-- @slot for adding custom input remove icon <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="remove-icon" />
+      </template>
+      <template v-slot:below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
+        <slot name="below-input" />
+      </template>
+    </component>
+  </div>
 </template>
 
 <script>
@@ -460,33 +463,40 @@ export default {
 <style lang="scss" scoped>
 @import '../../styles/variables.scss';
 
-.base-search__input {
-  background:white;
+.base-search {
+  background: white;
   min-height: $row-height-large;
+  width: 100%;
 
-  .base-search__spacing {
-    margin-left: $spacing-small;
-    content: '';
-  }
+  .base-search__input {
+    background:white;
+    width: 100%;
+    min-height: $row-height-large;
 
-  .base-search__spacing-date {
-    margin-left: $spacing;
-  }
-
-  .base-search__magnifier-icon {
-    height: $icon-large;
-    width: $icon-large;
-    margin-right: $spacing;
-    flex-shrink: 0;
-    align-self: center;
-
-    &.base-search__magnifier-icon__date {
-      margin-right: $spacing-small;
+    .base-search__spacing {
+      margin-left: $spacing-small;
+      content: '';
     }
 
-    &.base-search__magnifier-icon__active {
-      color: grey;
-      fill: grey;
+    .base-search__spacing-date {
+      margin-left: $spacing;
+    }
+
+    .base-search__magnifier-icon {
+      height: $icon-large;
+      width: $icon-large;
+      margin-right: $spacing;
+      flex-shrink: 0;
+      align-self: center;
+
+      &.base-search__magnifier-icon__date {
+        margin-right: $spacing-small;
+      }
+
+      &.base-search__magnifier-icon__active {
+        color: grey;
+        fill: grey;
+      }
     }
   }
 }
