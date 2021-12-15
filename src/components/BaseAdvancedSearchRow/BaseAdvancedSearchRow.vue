@@ -39,6 +39,7 @@
           :linked-list-option="activeFilter
             ? `filter-option-${activeFilter[identifierPropertyName.filter]}` : null"
           :use-form-field-styling="false"
+          :show-input-border="false"
           :show-label="false"
           :always-linked="true"
           :label="getI18nTerm(getLangLabel(advancedSearchText.selectFilterLabel))"

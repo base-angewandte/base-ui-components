@@ -9,6 +9,7 @@
       :type="dateFieldType"
       :show-label="false"
       :use-form-field-styling="false"
+      :show-input-border="false"
       :label="label"
       :placeholder="placeholder"
       :linked-list-option="linkedListOption"
