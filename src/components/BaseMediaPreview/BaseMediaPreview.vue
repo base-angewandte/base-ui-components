@@ -17,7 +17,7 @@
         <BaseImage
           v-if="displayImage && fileType === 'image'"
           v-vue-click-outside.prevent="clickOutside"
-          :srcset="imageSourceSet"
+          :srcset="previews"
           :src="sourceUrl"
           :style="displaySize"
           :class="[
@@ -274,10 +274,6 @@ export default {
     },
     formatNotSupported() {
       return !this.fileType;
-    },
-    imageSourceSet() {
-      return this.previews.length ? this.previews.map(size => Object.keys(size)
-        .map(width => `${size[width]} ${width}`)).join(', ') : [];
     },
     sourceUrl() {
       const last = this.previews.length - 1;
