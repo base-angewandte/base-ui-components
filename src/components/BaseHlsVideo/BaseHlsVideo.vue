@@ -2,7 +2,7 @@
   <div
     class="base-media-video">
     <button
-      v-if="playButton && !autoplay"
+      v-if="playButton"
       ref="playButton"
       :title="`${getI18nTerm(buttonTitle)} Video`"
       class="base-media-video__control"
@@ -113,14 +113,23 @@ export default {
               this.video.focus();
             });
           }
-        } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+        } else if (this.video.canPlayType('application/vnd.apple.mpegurl')
+            || this.video.canPlayType('application/vnd.apple.mpegurl') === 'maybe') {
+          this.hls = false;
           this.video.src = this.mediaUrl;
           this.video.addEventListener('loadedmetadata', () => {
-            this.playButton = false;
-            this.play();
+            this.video.play();
             this.video.focus();
           });
         }
+
+        this.video.addEventListener('pause', () => {
+          this.playButton = true;
+        });
+
+        this.video.addEventListener('play', () => {
+          this.playButton = false;
+        });
       }
     },
     /**
@@ -128,12 +137,12 @@ export default {
      */
     play() {
       if (this.video) {
-        if (!this.hls) {
-          this.init();
+        if (this.hls || this.video.src) {
+          this.video.play();
           return;
         }
 
-        this.video.play();
+        this.init();
       }
     },
     /**
