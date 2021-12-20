@@ -27,8 +27,7 @@
       :show-error-icon="showErrorIcon"
       :clearable="clearable"
       @keydown.enter="onEnter"
-      @text-input="setMultilineValue($event)"
-      @input="fieldValueInt = $event"
+      @input="fieldType === 'multiline' ? setMultilineValue($event) : fieldValueInt = $event"
       @autocomplete="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
