@@ -7,7 +7,7 @@ The example entry below has three thumbnail icons. Note that icons appear stacke
       description="Description"
       title="Title"
       subtext="Subtext"
-      icon="sheet-empty"
+      icon="file-object"
       :showThumbnails="true">
       <template
           v-slot:thumbnails>
