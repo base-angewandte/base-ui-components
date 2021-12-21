@@ -27,8 +27,7 @@
       :show-error-icon="showErrorIcon"
       :clearable="clearable"
       @keydown.enter="onEnter"
-      @text-input="setMultilineValue($event)"
-      @input="fieldValueInt = $event"
+      @input="setInputValue($event)"
       @autocomplete="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
@@ -544,7 +543,7 @@ export default {
       }
     },
     // as above but specific for multiline text input field
-    setMultilineValue(val) {
+    setInputValue(val) {
       if (!val || typeof val === 'string') {
         this.fieldValueInt = val;
       } else {
