@@ -42,6 +42,7 @@
         :show-label="false"
         :is-active.sync="fromOpen"
         :use-form-field-styling="useFormFieldStyling"
+        :show-input-border="showInputBorder"
         :clearable="clearable"
         :required="required"
         :invalid="invalid"
@@ -67,7 +68,7 @@
               :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
               :value-type="isFromTimeField ? 'format' : dateFormatInt"
               input-class="base-date-input__datepicker-input"
-              @pick="isFromTimeField ? '' : fromOpen = false"
+              @pick="datePicked('from')"
               @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
               <template v-slot:input>
                 <input
@@ -117,6 +118,7 @@
         :show-label="false"
         :is-active.sync="toOpen"
         :use-form-field-styling="useFormFieldStyling"
+        :show-input-border="showInputBorder"
         :clearable="clearable"
         :required="required"
         :invalid="invalid"
@@ -141,7 +143,7 @@
               :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
               :value-type="isToTimeField ? 'format' : datePickerValueFormat"
               input-class="base-date-input__datepicker-input"
-              @pick="isToTimeField ? '' : toOpen= false"
+              @pick="datePicked('to')"
               @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
               <template v-slot:input>
                 <input
@@ -242,7 +244,7 @@ export default {
      */
     input: {
       type: [Object, String, Date],
-      default: '',
+      required: true,
     },
     /** label for input field, required for usability purposes, handle
      * showing of label with property showLabel
@@ -324,6 +326,13 @@ export default {
      * used (otherwise no border, no box shadow)
      */
     useFormFieldStyling: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * option to have the border of the input field not displayed
+     */
+    showInputBorder: {
       type: Boolean,
       default: true,
     },
@@ -817,7 +826,7 @@ export default {
         event.preventDefault();
       }
       // when the user tries to leave the field check if input string is valid
-      if (['Tab', 'Enter'].includes(key) && currentInputString) {
+      if (key === 'Enter' && currentInputString) {
         this.checkDateValidity(origin);
         currentInputString = this[`input${origin}`];
       }
@@ -1026,6 +1035,14 @@ export default {
           }
         }
       }
+      const data = this.getInputData();
+      /**
+       * this event is emitted when the value was validated in case input should just be considered
+       * after date validation
+       *
+       * @event value-validated
+       */
+      this.$emit('value-validated', data);
     },
     /**
      * a function to have the time picker close automatically as soon as minutes
@@ -1038,6 +1055,18 @@ export default {
       if (type === 'minute') {
         this[`${origin}Open`] = false;
       }
+    },
+    /**
+     * function triggered on datepicker 'pick' event, handling date picker closing
+     * and date validation
+     * @param origin
+     * @param isTimeField
+     */
+    datePicked(origin, isTimeField) {
+      if (!isTimeField) {
+        this[`${origin}Open`] = false;
+      }
+      this.checkDateValidity(origin);
     },
     /**
      * handle click outside event and adjust input active variable accordingly

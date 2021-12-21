@@ -387,7 +387,10 @@ export default {
         // if value is empty clear all input (to be able to reset the component completely)
         if (!val) {
           this.textInputInt = '';
-          this.dateInputInt = this.type === 'daterange' ? {} : '';
+          this.dateInputInt = this.type === 'daterange' ? {
+            date_from: '',
+            date_to: '',
+          } : '';
           // else if input is not matching internal input update
         } else if (val !== this.inputInt) {
           this.inputInt = val;

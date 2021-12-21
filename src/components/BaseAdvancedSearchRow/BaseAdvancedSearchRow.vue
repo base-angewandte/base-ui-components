@@ -27,7 +27,8 @@
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
-      @keydown.enter="selectOptionOnKeyEnter">
+      @keydown.enter="selectOptionOnKeyEnter"
+      @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template v-slot:pre-input-field>
         <BaseChipsInputField
@@ -873,10 +874,6 @@ export default {
          */
         this.$emit('fetch-autocomplete-results', val);
       }
-      // if type is date assign the values to the filter.filter_values immediately
-      if (this.filter.type.includes('date')) {
-        this.$set(this.filter, 'filter_values', val);
-      }
     },
     /**
      * if 'isActive' is set true reset the filterFade (for mobile filter view) to
@@ -1217,6 +1214,23 @@ export default {
         }
       }
     },
+    /**
+     * handle the date input after it was validated (necessary to only assign valid date input
+     * to filter_values)
+     *
+     * @param {string|Object} data - the date data in question - either a single string for type
+     * 'date' or an object with date_from and date_to for type 'daterange'
+     */
+    handleDateInput(data) {
+      this.currentInput = data;
+      // check if filter is actually of type date and the validated value differs from the
+      // previously set values
+      if (this.filter.type.includes('date')
+        && JSON.stringify(this.currentInput) !== JSON.stringify(this.filter.filter_values)) {
+        // set the filter_values with date values - this will trigger search
+        this.$set(this.filter, 'filter_values', this.currentInput);
+      }
+    },
 
     /** OTHERS */
 
@@ -1358,6 +1372,7 @@ export default {
   flex-direction: row;
 
   .base-advanced-search-row__search {
+    width: 100%;
     .base-advanced-search-row__first-column {
       // if the 25% is changed the function calcColNumber() needs to be adapted as well
       flex: 0 0 25%;
