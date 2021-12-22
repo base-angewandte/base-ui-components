@@ -1,11 +1,11 @@
 <template>
   <div
     :data-group="groupName !== '' ? groupName : false"
-    :class="['base-expand-row', {'expanded': isVisible}]">
+    :class="['base-expand-row', {'expanded': isExpandedInternal}]">
     <div
       :id="'base-expand-row-' + id"
       class="base-expand-row-header"
-      :aria-expanded="isVisible ? 'true' : 'false'">
+      :aria-expanded="isExpandedInternal ? 'true' : 'false'">
       <base-checkmark
         v-if="isSelectable"
         :key="id + 'checkmark'"
@@ -47,7 +47,7 @@
     <div
       role="region"
       :aria-labelledby="'base-expand-row-' + id"
-      :aria-hidden="!isVisible ? 'true' : 'false'"
+      :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
       :class="['base-expand-row-body', {'base-expand-row-body-bg': bodyHasBackground}]">
       <!-- @slot slot for expanded content -->
       <slot />
@@ -102,7 +102,7 @@ export default {
       default: true,
     },
     /**
-     * Lets you specify if the row should be in expanded state by default.
+     * Set this to **true** if the row should be in expanded state.
      */
     isExpanded: {
       type: Boolean,
@@ -128,7 +128,7 @@ export default {
   data() {
     return {
       id: null,
-      isVisible: this.isExpanded,
+      isExpandedInternal: false,
       isSelectedInternal: false,
     };
   },
@@ -137,14 +137,32 @@ export default {
       return !!this.$slots.icon;
     },
   },
+  watch: {
+    /**
+     * Guard for changes to expanded/collapsed state made from outside
+     * bypassing the click event (e.g. from a parent component like accordion)
+     */
+    isExpanded(val) {
+      this.isExpandedInternal = val;
+    },
+  },
   created() {
     // eslint-disable-next-line
     this.id = this._uid;
     this.isSelectedInternal = this.isSelected;
+    this.isExpandedInternal = this.isExpanded;
   },
   methods: {
     clicked() {
-      this.isVisible = !this.isVisible;
+      this.isExpandedInternal = !this.isExpandedInternal;
+      /**
+       * Event triggered when the row is expanded or collapsed.
+       * The payload value `true` indicates expanded state, `false` indicates collapsed state.
+       *
+       * @event expanded
+       * @param {Boolean}
+       */
+      this.$emit('expanded', this.isExpandedInternal);
     },
     checkboxClicked() {
       this.isSelectedInternal = !this.isSelectedInternal;
