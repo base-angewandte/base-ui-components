@@ -1,5 +1,7 @@
 <template>
-  <div class="base-select-options">
+  <div
+    class="base-select-options"
+    :style="{ '--direction': flexDirection}">
     <div class="base-select-options__number-selected">
       {{ `${numberSelected} ${selectedNumberText}` }}
     </div>
@@ -59,10 +61,20 @@ export default {
       type: Array,
       default: () => [],
     },
+    /**
+     * By default, the "All/None" button appears on the right, and the counter of
+     * selected items appears on the left. Set this to `true` to reverse the order.
+     */
+    reverse: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       selectedInt: false,
+      // used to change the flex direction of select options from 'row' to 'row-reverse' (#1692)
+      flexDirection: 'row',
     };
   },
   computed: {
@@ -89,6 +101,10 @@ export default {
       immediate: true,
     },
   },
+  created() {
+    // swap position of select options based on the 'reverse' prop (#1692)
+    this.flexDirection = this.reverse ? 'row-reverse' : 'row';
+  },
   methods: {
     select() {
       this.selectedInt = !this.selectedInt;
@@ -109,7 +125,8 @@ export default {
 
   .base-select-options {
     display: flex;
-    flex-direction: row;
+    // flex direction can be 'row' or 'row-reverse' and depends on the 'reverse' prop (#1692)
+    flex-direction: var(--direction);
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
@@ -119,10 +136,6 @@ export default {
       font-size: $font-size-small;
       color: $font-color-second;
       margin: $spacing-small/2 $spacing-small;
-    }
-
-    .base-select-options__select-button {
-      margin-left: auto;
     }
   }
 </style>
