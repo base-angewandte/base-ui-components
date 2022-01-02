@@ -811,12 +811,7 @@ export default {
      * watch internal filter object for changes
      */
     filter: {
-      handler(val, old) {
-        // when a filter type changes set current input according to filter type
-        // (empty string or date object)
-        if (!val || val.type === 'chips' || (val.type === 'text' && (!old || old.type !== 'text'))) {
-          this.currentInput = '';
-        }
+      handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
           /**
            * event emitted when the applied filter changes<br>
@@ -953,8 +948,13 @@ export default {
       // check if filter actually changed
       if (selectedFilter && this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
+        const oldFilterValues = this.filter.filter_values;
         this.filter = JSON.parse(JSON.stringify(selectedFilter));
-        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter.type, this.filter.filter_values));
+        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter.type, oldFilterValues));
+        // if filter type date sync current input
+        if (this.filter.type.includes('date')) {
+          this.currentInput = this.filter.filter_values;
+        }
         this.activeFilter = null;
       }
 
@@ -1222,11 +1222,11 @@ export default {
      * 'date' or an object with date_from and date_to for type 'daterange'
      */
     handleDateInput(data) {
-      this.currentInput = data;
       // check if filter is actually of type date and the validated value differs from the
       // previously set values
       if (this.filter.type.includes('date')
-        && JSON.stringify(this.currentInput) !== JSON.stringify(this.filter.filter_values)) {
+        && JSON.stringify(data) !== JSON.stringify(this.filter.filter_values)) {
+        this.currentInput = data;
         // set the filter_values with date values - this will trigger search
         this.$set(this.filter, 'filter_values', this.currentInput);
       }
@@ -1269,8 +1269,8 @@ export default {
       if (type === 'daterange') {
         return {
           // map the date from date to date range if necessary!
-          date_from: (val && val.date_from) || val ? val.date_from || val : '',
-          date_to: val ? val.date_to : '',
+          date_from: (val && val.date_from) || (val && typeof val === 'string') ? val.date_from || val || '' : '',
+          date_to: val && val.date_to ? val.date_to : '',
         };
       }
       // if type is text keep options that dont have an id (= were entered as freetext);
