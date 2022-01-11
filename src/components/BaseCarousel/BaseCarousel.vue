@@ -20,7 +20,7 @@
             :image-first="true"
             :center-header="true"
             :render-element-as="vueRouterAvailable ? renderLinkElementAs : 'div'"
-            :link-to="vueRouterAvailable ? item.href : ''"
+            :link-to="vueRouterAvailable && item.href ? item.href : ''"
             style="margin-right: 0" />
         </div>
       </div>
@@ -141,6 +141,13 @@ export default {
       setTimeout(() => {
         this.swiper = new Swiper('.swiper-container', this.swiperOptions);
         this.swiper.init();
+        /**
+         * event triggered when slider is initialized
+         *
+         * @event initialized
+         * @type { boolean }
+         */
+        this.$emit('initialized', true);
       }, 0);
     },
     subtext(value) {
