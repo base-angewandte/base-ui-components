@@ -9,11 +9,11 @@
           || (!useOptionsButton && remainingActionsWidth < actionButtonsWidth) },
       ]">
       <div
+        v-if="beforeSlotHasData"
         ref="beforeOptions"
         class="base-options__before">
         <!-- @slot add an element before the options e.g. a header -->
         <slot
-          v-if="beforeSlotHasData"
           name="beforeOptions" />
       </div>
       <div

@@ -313,26 +313,28 @@ export default {
   }
 
   @media screen and (max-width: $mobile) {
-    .popup-box {
-      max-width: 100%;
-      width: 90%;
-      top: 10vh;
-    }
+    .base-pop-up {
+      .popup-box {
+        max-width: 100%;
+        width: 90%;
+        top: 10vh;
 
-    .popup-content {
-      padding: $spacing $spacing-small;
-    }
+        .popup-content {
+          padding: $spacing $spacing-small;
 
-    .popup-button-row {
-      flex-wrap: wrap;
+          .popup-button-row {
+            flex-wrap: wrap;
 
-      & .base-popup-button {
-        margin-right: 0;
-        flex-basis: 100%;
-      }
+            & .base-popup-button {
+              margin-right: 0;
+              flex-basis: 100%;
+            }
 
-      & .base-popup-button:last-child {
-        margin-top: $spacing-small;
+            & .base-popup-button:last-child {
+              margin-top: $spacing-small;
+            }
+          }
+        }
       }
     }
   }
