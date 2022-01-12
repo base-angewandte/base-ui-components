@@ -52,6 +52,7 @@ import AdvancedSearch from './BaseAdvancedSearch';
 import Tooltip from './BaseTooltip';
 import Link from './BaseLink';
 import DropButton from './BaseDropButton';
+import EntrySelector from './BaseEntrySelector';
 
 export {
   Loader as BaseLoader,
@@ -108,4 +109,5 @@ export {
   Link as BaseLink,
   Tooltip as BaseTooltip,
   DropButton as BaseDropButton,
+  EntrySelector as BaseEntrySelector,
 };
