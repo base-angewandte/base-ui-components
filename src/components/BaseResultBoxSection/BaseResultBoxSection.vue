@@ -92,7 +92,7 @@
       <BaseSelectOptions
         v-if="editModeActive"
         :key="headerText + '_selectOptions'"
-        :selected-number-text="getI18nString(selectOptionsText.entriesSelected)"
+        :selected-number-text="'xxxx'"
         :select-text="getI18nString(selectOptionsText.selectAll)"
         :deselect-text="getI18nString(selectOptionsText.selectNone)"
         :list="visibleBoxes"
@@ -365,21 +365,13 @@ export default {
     },
     /**
      * set a text for 'x entries selected' and 'select all / none'<br>
-     *   might be a plain string or a localization file key string or an object with the values:<br>
-     *     string {string} - the string to look up
-     *     count {number} - for pluralization
-     *     variables {Object|Array} - to provide variables for custom formatting
      */
     selectOptionsText: {
       type: Object,
       default: () => ({
         selectAll: 'select all',
         selectNone: 'select none',
-        entriesSelected: {
-          string: 'entries selected',
-          count: 2,
-          variables: { type: 'entry' },
-        },
+        entriesSelected: 'entries selected',
       }),
     },
     /**
