@@ -12,17 +12,17 @@
         <BaseSearch
           v-model="filterString"
           :show-image="true"
-          :placeholder="getI18nTerm(getLangLabel(entrySelectorText.search))"
+          :placeholder="getI18nTerm(entrySelectorText.search)"
           class="base-entry-selector__head__search-bar"
           @input="filterEntries($event, 'title')" />
       </slot>
 
-      <div class="base-entry-selector__options">
+      <div>
         <!-- @slot options -->
         <slot name="options">
           <BaseOptions
             ref="baseOptions"
-            :show-options="entriesSelectable"
+            :show-options.sync="showOptions"
             :options-hidden="optionsHidden"
             :use-options-button-on="'always'"
             :show-after-options-below="true"
@@ -30,12 +30,9 @@
               show: 'options-menu',
               hide: 'options-menu',
             }"
-            :options-button-text="{
-              show: 'options',
-              hide: 'options',
-            }"
+            :options-button-text="entrySelectorText.options"
             align-options="left"
-            @update:show-options="toggleOptions">
+            class="base-entry-selector__options">
             <template
               slot="afterOptions">
               <div
@@ -69,22 +66,15 @@
               <slot name="optionActions" />
             </template>
           </BaseOptions>
-
-          <!-- TODO: add translation -->
-          <!--
-           :selected-number-text="$t(
-              'entriesSelected',
-              { type: $tc('notify.entry', selectedEntries.length) }
-            )"
-           -->
-          <BaseSelectOptions
-            v-if="showOptions && entriesSelectable"
-            :select-text="getI18nTerm(getLangLabel(entrySelectorText.selectAll))"
-            :deselect-text="getI18nTerm(getLangLabel(entrySelectorText.selectNone))"
-            :list="entriesInt"
-            :selected-list="selectedEntries"
-            @selected="changeAllSelectState" />
         </slot>
+        <BaseSelectOptions
+          v-if="showOptions"
+          :select-text="getI18nTerm(entrySelectorText.selectAll)"
+          :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
+          :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
+          :list="entriesInt"
+          :selected-list="selectedEntries"
+          @selected="changeAllSelectState" />
       </div>
     </div>
 
@@ -134,10 +124,10 @@
           v-else-if="!isLoading"
           class="base-entry-selector__no-entries">
           <p class="base-entry-selector__no-entries__title">
-            {{ getI18nTerm(getLangLabel(entrySelectorText.noEntriesTitle)) }}
+            {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
           </p>
           <p class="base-entry-selector__no-entries__subtext">
-            {{ getI18nTerm(getLangLabel(entrySelectorText.noEntriesSubtext)) }}
+            {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
           </p>
         </div>
       </slot>
@@ -253,20 +243,34 @@ export default {
      * specify informational texts for the component - this needs to be an object with the following
      * properties (if you dont want to display any text leave an empty string:  <br>
      *   <br>
-     *     <b>search</b>: text shown in<br>
+     *     <b>noEntriesTitle</b>: Header text shown if search for string returned no results<br>
+     *     <b>noEntriesSubtext</b>: subtext shown if search for string returned no result <br>
+     *     <b>options</b>: Text for title button<br>
+     *        this needs to be an object containing a 'show' and 'hide' property that are shown when
+     *        'entriesSelecable' is true or false respectively<br>
+     *     <b>search</b>: placeholder in search input field<br>
+     *     <b>selectAll</b>: Text for Select All button <br>
+     *     <b>selectNone</b>: Text for Select None button <br>
+     *     <b>entriesSelected</b>: Text for number of entries (x) selected information displayed as
+     *      'x {provided text} <br>
      *  <br>
-     *  The values of this object might be plain text or a key for an i18n file<br>
-     * This prop can be ignored when the 'no-options' slot is used.
+     *  The values of this object might be plain string or a key for an i18n file (in case it is not
+     *  an object that is required! - in that case the above applies to the values within that
+     *  object)<br>
      */
     entrySelectorText: {
       type: Object,
       default: () => ({
         noEntriesTitle: 'No matching entries found',
         noEntriesSubtext: 'Please adjust your search criteria.',
-        options: 'Options',
+        options: {
+          show: 'options',
+          hide: 'options',
+        },
         search: 'Search',
         selectAll: 'Select All',
         selectNone: 'Select None',
+        entriesSelected: 'entries selected',
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => [
@@ -276,8 +280,10 @@ export default {
         'search',
         'selectAll',
         'selectNone',
+        'entriesSelected',
       ]
-        .every(prop => Object.keys(val).includes(prop)),
+        .every(prop => Object.keys(val).includes(prop))
+          && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
     },
   },
   data() {
@@ -310,10 +316,30 @@ export default {
     entries(val) {
       this.entriesInt = [].concat(val);
     },
-    entriesSelectable(val) {
+    /**
+     * watch outside variable to have it in sync with internal 'showOptions'
+     */
+    entriesSelectable: {
+      handler(val) {
+        if (val !== this.showOptions) {
+          this.showOptions = val;
+        }
+      },
+      immediate: true,
+    },
+    showOptions(val) {
       // delete selected when options menu is closed and reset select all
       if (!val) {
         this.selectedEntries = [];
+      }
+      if (val !== this.entriesSelectable) {
+        /**
+         * emit event to inform parent about toggle triggered and keep prop variable
+         * entriesSelectable in sync
+         * @event update:entries-selectable
+         * @type {boolean}
+         */
+        this.$emit('update:entries-selectable', this.showOptions);
       }
     },
     selectedEntries() {
@@ -418,13 +444,6 @@ export default {
        * @type {Event}
        */
       this.$emit('show-entry', this.entriesInt[index].id);
-    },
-    /**
-     * enable/disable options
-     */
-    toggleOptions() {
-      this.showOptions = !this.showOptions;
-      this.$emit('toggle-options', this.showOptions);
     },
   },
 };

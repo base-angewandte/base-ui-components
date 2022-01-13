@@ -63,7 +63,7 @@ export default {
       if (value && language && useAny) {
         const availableLang = Object.keys(value).find(key => !!value[key]);
         // return the first one that has content
-        return value[availableLang] || value[language];
+        return value[availableLang] || value[language] || '';
       }
       return value;
     },
