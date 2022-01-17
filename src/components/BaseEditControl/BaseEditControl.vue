@@ -21,6 +21,7 @@
       class="base-edit-control__buttons">
       <base-button
         v-if="!edit"
+        :disabled="disabled"
         :has-background-color="false"
         :icon="!isLoading ? 'edit' : ''"
         :text="getI18nTerm(editButtonText)"
@@ -81,6 +82,13 @@ export default {
      * toggle control buttons
      */
     controls: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * disable edit button
+     */
+    disabled: {
       type: Boolean,
       default: false,
     },
