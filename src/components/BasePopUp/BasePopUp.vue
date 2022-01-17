@@ -51,6 +51,7 @@
               :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
               :icon-size="'small'"
+              :disabled="buttonRightDisabled"
               class="base-popup-button"
               @clicked="buttonRight">
               <template
@@ -136,6 +137,13 @@ export default {
     buttonRightIcon: {
       type: String,
       default: 'check-mark',
+    },
+    /**
+     * disable right button
+     */
+    buttonRightDisabled: {
+      type: Boolean,
+      default: false,
     },
     /**
      * if true button loader will be shown
