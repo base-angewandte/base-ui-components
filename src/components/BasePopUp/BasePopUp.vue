@@ -72,7 +72,6 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseLoader from '../BaseLoader/BaseLoader';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -83,9 +82,9 @@ import popUpLock from '../../mixins/popUpLock';
 export default {
   name: 'BasePopUp',
   components: {
-    BaseButton: () => import('../BaseButton/BaseButton'),
     BaseIcon,
-    BaseLoader,
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    BaseLoader: () => import('../BaseLoader/BaseLoader'),
   },
   mixins: [popUpLock],
   props: {
