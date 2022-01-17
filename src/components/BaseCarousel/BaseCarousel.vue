@@ -111,6 +111,11 @@ export default {
       return !!this.$router;
     },
   },
+  watch: {
+    data() {
+      this.swiper.update();
+    },
+  },
   mounted() {
     if (process.browser) {
       this.initSwiper();

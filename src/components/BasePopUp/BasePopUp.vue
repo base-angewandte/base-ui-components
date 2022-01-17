@@ -51,6 +51,7 @@
               :icon="!isLoading ? buttonRightIcon : ''"
               :icon-position="'right'"
               :icon-size="'small'"
+              :disabled="buttonRightDisabled"
               class="base-popup-button"
               @clicked="buttonRight">
               <template
@@ -71,7 +72,6 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseLoader from '../BaseLoader/BaseLoader';
 import popUpLock from '../../mixins/popUpLock';
 
 /**
@@ -82,9 +82,9 @@ import popUpLock from '../../mixins/popUpLock';
 export default {
   name: 'BasePopUp',
   components: {
-    BaseButton: () => import('../BaseButton/BaseButton'),
     BaseIcon,
-    BaseLoader,
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    BaseLoader: () => import('../BaseLoader/BaseLoader'),
   },
   mixins: [popUpLock],
   props: {
@@ -136,6 +136,13 @@ export default {
     buttonRightIcon: {
       type: String,
       default: 'check-mark',
+    },
+    /**
+     * disable right button
+     */
+    buttonRightDisabled: {
+      type: Boolean,
+      default: false,
     },
     /**
      * if true button loader will be shown
