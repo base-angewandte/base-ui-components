@@ -2,20 +2,21 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
 ```vue
 <template>
   <div class="listcontainer">
-    <BaseMenuList 
+    <BaseMenuList
         :list="list"
         :selected-list="selectedArray"
         :selected="selectActive"
+        :active-entry="activeEntry"
         @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
         @clicked="activeEntry = $event">
         <template
           v-slot:thumbnails="{ item }">
           <base-icon
-            v-if="item.shared"
-            name="people" />
-          <base-icon
             v-if="item.published"
             name="eye" />
+          <base-icon
+            v-if="item.shared"
+            name="people" />
           <base-icon
             v-if="item.error"
             name="attention" />
@@ -25,7 +26,7 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
         text="Toggle Select"
         button-style="row"
         class="listbutton"
-        @clicked="selectActive=!selectActive"/>
+        @clicked="selectActive = !selectActive"/>
     <div class="show">{{ 'Entry active Index: ' + activeEntry}}</div>
     <div class="show">{{ 'Selected Entries: ' + selectedArray }}</div>
   </div>
@@ -47,6 +48,7 @@ export default {
         {
           id: '2',
           title: 'Title',
+          description: 'Description',
           type: 'Type',
           error: false,
           shared: false,
@@ -69,7 +71,7 @@ export default {
         },
       ],
       selectActive: false,
-      activeEntry: '0',
+      activeEntry: 0,
       selectedArray: [],
     };
   },

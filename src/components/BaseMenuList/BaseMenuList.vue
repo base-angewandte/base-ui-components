@@ -22,7 +22,7 @@
         :title="item.title"
         :is-active="entryProps[index].active"
         :is-selected="entryProps[index].selected"
-        :icon="getType(item.icon)"
+        :icon="item.icon"
         :description="item.description"
         :is-selectable="true"
         :select-active="selectActive"
@@ -31,8 +31,8 @@
         <template
           v-slot:thumbnails>
           <!-- @slot Use this scoped slot to supply a list of thumbnails
-          (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is a
-          [BaseMenuEntry](#basemenuentry). See also the example below.-->
+          (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is one list element.
+          See also the example below.-->
           <slot
             name="thumbnails"
             :item="item" />
@@ -68,13 +68,23 @@ export default {
     /**
      * list of menu entries - array of objects <br>
      *   Entry properties that can be displayed: <br>
-     *     required: 'id' <br>
-     *     optional: 'title', 'description', 'active', 'selected', 'icon',
-     *     'shared', 'published', 'error'
+     *     *required*:<br>
+     *      **id** {string}: give every item an unique id<br>
+     *     *optional*:<br>
+     *      **title** {string}: main text line in the list item<br>
+     *      **description**: {string}: second text line in the list item<br>
+     *      **active** { boolean}: steer from outside if item should be displayed active (with left
+     *        side color border)<br>
+     *      **selected** {boolean}: steer from outside if entry select box should be checked<br>
+     *      **icon** {string}: a valid [BaseIcon](#baseicon) icon name<br>
+     *      <br>
+     *      Also see [BaseMenuEntry](#basemenuentry) component for more information on
+     *        the mentioned properties.
      */
     list: {
       type: Array,
       default: () => [],
+      validator: val => val.every(item => Object.keys(item).includes('id')),
     },
     /**
      * index of the entry that should currently be active
@@ -162,11 +172,6 @@ export default {
     }
   },
   methods: {
-    // determines which icon should be shown for each menu entry
-    // TODO: this should probably also be definable per entry dynamically on the long run...
-    getType(val) {
-      return val && val.includes('calendar-many') ? 'calendar-many' : 'file-object';
-    },
     // this function is called when a menu entry is clicked (when checkboxes not active)
     activateItem(index) {
       /**
