@@ -182,11 +182,6 @@ export default {
       columns: 0,
     };
   },
-  computed: {
-    iconSrc() {
-      return `../../assets/icons/${this.icon}.svg`;
-    },
-  },
   watch: {
     isSelected(val) {
       this.isSelectedInt = val;
