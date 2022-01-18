@@ -92,7 +92,7 @@
       <BaseSelectOptions
         v-if="editModeActive"
         :key="headerText + '_selectOptions'"
-        :selected-number-text="'xxxx'"
+        :selected-number-text="getI18nString(selectOptionsText.entriesSelected)"
         :select-text="getI18nString(selectOptionsText.selectAll)"
         :deselect-text="getI18nString(selectOptionsText.selectNone)"
         :list="visibleBoxes"
