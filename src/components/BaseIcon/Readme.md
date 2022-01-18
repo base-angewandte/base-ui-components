@@ -1,5 +1,7 @@
 Available icons:
 
+(Hover to see icon name)
+
 ```js
 <div style="display: flex; flex-wrap: wrap">
   <BaseIcon

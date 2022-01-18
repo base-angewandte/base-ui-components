@@ -25,14 +25,16 @@ export default {
     name: {
       type: String,
       default: null,
-      validator: val => ['arrow-left', 'attention', 'calendar-many', 'calendar-number', 'camera', 'check-mark', 'clock',
-        'drop-down', 'eye', 'licence', 'logo', 'magnifier', 'people', 'plus', 'print', 'share',
-        'remove', 'save-file', 'add-new-object', 'waste-bin', 'subscribe', 'unsubscribe',
-        'attachment', 'prev', 'next', 'play', 'drag-lines', 'download', 'duplicate', 'forbidden',
-        'information', 'sort', 'success', 'text', 'drag-n-drop', 'eye-hide', 'edit', 'options-menu',
-        'audio-object', 'file-object', 'image-object', 'video-object',
-        'collection', 'add-new-collection', 'add-existing-collection', 'add-existing-object',
-        'archive-arrow', 'archive-empty', 'archive-sheets'].includes(val),
+      validator(val) {
+        return ['arrow-left', 'attention', 'calendar-many', 'calendar-number', 'camera', 'check-mark', 'clock',
+          'drop-down', 'eye', 'licence', 'logo', 'magnifier', 'people', 'plus', 'print', 'share',
+          'remove', 'save-file', 'add-new-object', 'waste-bin', 'subscribe', 'unsubscribe',
+          'attachment', 'prev', 'next', 'play', 'drag-lines', 'download', 'duplicate', 'forbidden',
+          'information', 'sort', 'success', 'text', 'drag-n-drop', 'eye-hide', 'edit', 'options-menu',
+          'audio-object', 'file-object', 'image-object', 'video-object',
+          'collection', 'add-new-collection', 'add-existing-collection', 'add-existing-object',
+          'archive-arrow', 'archive-empty', 'archive-sheets'].includes(val);
+      },
     },
     /**
      * Add a title tag to the svg
