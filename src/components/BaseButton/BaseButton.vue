@@ -81,8 +81,7 @@ export default {
       default: false,
     },
     /**
-     * specify if icon should be displayed left or right <br>
-     * valid values: 'top' | 'right' | 'left'
+     * specify if icon should be displayed left or right
      */
     iconPosition: {
       type: String,
@@ -100,14 +99,13 @@ export default {
       default: false,
     },
     /**
-     * specify a button style <br>
-     * valid values: 'single' | 'row' | 'secondary'
+     * specify a button style
      */
     buttonStyle: {
       type: String,
       default: 'single',
       validator(val) {
-        return val === 'single' || val === 'row' || val === 'secondary';
+        return ['single', 'row', 'secondary'].includes(val);
       },
     },
     /**
@@ -118,15 +116,14 @@ export default {
       default: false,
     },
     /**
-     * specify icon size <br>
-     * valid values: 'large' | 'small'<br>
+     * specify icon size<br>
      *   this will have no effect on button-style: secondary - icon will always be small
      */
     iconSize: {
       type: String,
       default: 'small',
       validator(val) {
-        return val === 'small' || val === 'large';
+        return ['small', 'large'].includes(val);
       },
     },
     /**
@@ -145,8 +142,7 @@ export default {
     },
     /**
      * define alignment of button content<br>
-     * allowed values: 'center', 'left', 'right'<br>
-     * Info: has no effect, if icon-position 'top' is set
+     * Info: has no effect, if iconPosition 'top' is set
      */
     alignText: {
       type: String,
