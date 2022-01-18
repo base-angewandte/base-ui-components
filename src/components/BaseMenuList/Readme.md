@@ -5,7 +5,7 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
     <BaseMenuList
         :list="list"
         :selected-list="selectedArray"
-        :selected="selectActive"
+        :select-active="selectActive"
         :active-entry="activeEntry"
         @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
         @clicked="activeEntry = $event">

@@ -61,7 +61,7 @@ export default {
     /**
      * define if entries are selectable -> d.h. the selectboxes are showing
      */
-    selected: {
+    selectActive: {
       type: Boolean,
       default: false,
     },
@@ -119,11 +119,6 @@ export default {
       isDraggable: true,
       resizeTimeout: null,
     };
-  },
-  computed: {
-    selectActive() {
-      return this.selected;
-    },
   },
   watch: {
     list() {

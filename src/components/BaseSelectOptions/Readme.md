@@ -13,7 +13,7 @@ Example with a BaseMenuList with BaseSelectOptions above.
     <BaseMenuList
             :list="list"
             :selected-list="selectedArray"
-            :selected="true"
+            :select-active="true"
             @selected="selectEntry"
             />
   </div>
