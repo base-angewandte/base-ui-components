@@ -39,14 +39,6 @@
       <base-button
         v-if="edit"
         :has-background-color="false"
-        icon="remove"
-        :text="getI18nTerm(cancelButtonText)"
-        class="base-edit-control__button"
-        @clicked="cancel" />
-
-      <base-button
-        v-if="edit"
-        :has-background-color="false"
         :icon="!isLoading ? 'save-file' : ''"
         :text="getI18nTerm(saveButtonText)"
         class="base-edit-control__button"
@@ -59,6 +51,14 @@
           </span>
         </template>
       </base-button>
+
+      <base-button
+        v-if="edit"
+        :has-background-color="false"
+        icon="remove"
+        :text="getI18nTerm(cancelButtonText)"
+        class="base-edit-control__button"
+        @clicked="cancel" />
     </div>
   </div>
 </template>
