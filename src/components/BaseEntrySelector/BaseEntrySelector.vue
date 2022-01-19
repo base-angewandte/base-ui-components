@@ -2,11 +2,13 @@
   <div
     :style="calcStyle"
     class="base-entry-selector">
+    <!-- HEAD -->
     <div
       ref="head"
       :class="['base-entry-selector__head',
                { 'base-entry-selector__head--shadow': headHasShadow }]">
-      <!-- @slot head -->
+      <!-- @slot per default this element contains the search element of the component.
+        Use this slot to replace it with your own elements -->
       <slot name="head">
         <!-- default -->
         <BaseSearch
@@ -17,107 +19,117 @@
           @input="filterEntries($event, 'title')" />
       </slot>
 
-      <div>
-        <!-- @slot options -->
-        <slot name="options">
-          <BaseOptions
-            ref="baseOptions"
-            :show-options.sync="showOptions"
-            :options-hidden="optionsHidden"
-            :use-options-button-on="'always'"
-            :show-after-options-below="true"
-            :options-button-icon="{
-              show: 'options-menu',
-              hide: 'options-menu',
-            }"
-            :options-button-text="entrySelectorText.options"
-            align-options="left"
-            class="base-entry-selector__options">
-            <template
-              slot="afterOptions">
-              <div
-                ref="afterOptions"
-                class="base-entry-selector__dropdowns">
+      <!-- BASE OPTIONS ROW -->
+      <div class="base-entry-selector__options">
+        <BaseOptions
+          ref="baseOptions"
+          :show-options.sync="showOptions"
+          :options-hidden="optionsHidden"
+          :use-options-button-on="'always'"
+          :show-after-options-below="true"
+          :options-button-icon="{
+            show: 'options-menu',
+            hide: 'options-menu',
+          }"
+          :options-button-text="entrySelectorText.options"
+          align-options="left">
+          <template
+            slot="afterOptions">
+            <div
+              class="base-entry-selector__dropdowns">
+              <!-- @slot to add custom elements at the end of the options row,
+              e.g. custom drop downs -->
+              <slot name="after-options">
+                <!-- default -->
                 <BaseDropDown
                   v-if="sortOptions.length"
+                  :id="`${sortConfig.label}-sort-drop-down`"
+                  ref="baseDropDown"
                   v-model="sortParam"
-                  :placeholder="'dropdown.sortBy'"
-                  :label="'dropdown.sortBy'"
+                  :label="sortConfig.label"
                   :options="sortOptions"
                   :with-spacing="false"
                   :align-drop-down="entryTypes.length ? 'left' : 'right'"
+                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
+                  :value-prop="sortConfig.valuePropertyName"
                   class="base-entry-selector__dropdowns__dropdown"
                   @value-selected="fetchEntries" />
                 <BaseDropDown
                   v-if="entryTypes.length"
+                  :id="`${entryTypesConfig.label}-types-drop-down`"
+                  ref="baseDropDown"
                   v-model="filterType"
-                  :label="'dropdown.filterByType'"
+                  :label="entryTypesConfig.label"
                   :options="entryTypes"
                   :language="language"
                   :with-spacing="false"
-                  value-prop="source"
+                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
+                  :value-prop="entryTypesConfig.valuePropertyName"
                   align-drop-down="right"
                   class="base-entry-selector__dropdowns__dropdown"
                   @value-selected="filterEntries($event, 'type')" />
-              </div>
-            </template>
-            <template
-              slot="options">
-              <slot name="optionActions" />
-            </template>
-          </BaseOptions>
-        </slot>
-        <BaseSelectOptions
-          v-if="showOptions"
-          :select-text="getI18nTerm(entrySelectorText.selectAll)"
-          :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
-          :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
-          :list="entriesInt"
-          :selected-list="selectedEntries"
-          @selected="changeAllSelectState" />
+              </slot>
+            </div>
+          </template>
+          <template
+            slot="options">
+            <!-- @slot add custom action (buttons) -->
+            <slot name="option-actions" />
+          </template>
+        </BaseOptions>
       </div>
+      <!-- SELECTOR OPTIONS -->
+      <BaseSelectOptions
+        v-if="showOptions"
+        :select-text="getI18nTerm(entrySelectorText.selectAll)"
+        :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
+        :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
+        :list="entries"
+        :selected-list="selectedEntries"
+        @selected="changeAllSelectState" />
     </div>
 
+    <!-- BODY -->
     <div
       ref="body"
       class="base-entry-selector__body">
       <div
         v-if="isLoading"
         class="loading-area">
-        <BaseLoader />
+        <BaseLoader
+          :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
       </div>
 
-      <!-- @slot entries -->
-      <slot name="entries">
+      <!-- @slot the component [BaseMenuList](#basemenulist) is used per default to display the
+      list of entries - if something different is required use this slot. <br>
+      If an entry is selected, the public method 'selectEntry' should be triggered - this method
+      takes two arguments:<br>
+        **index {number}: the index of the element in the entries list<br>
+        **selected {boolean}: if element was selected or deselected -->
+      <slot
+        name="entries"
+        :entries="entries"
+        :select-entry="selectEntry">
         <!-- default -->
         <BaseMenuList
-          v-if="entriesInt.length"
+          v-if="entries.length"
           key="menu-list"
           ref="menuList"
-          :selected="selectActive || entriesSelectable"
-          :list="entriesInt"
+          :select-active="showOptions"
+          :list="entries"
           :active-entry="activeEntry"
           :selected-list="selectedList"
           class="base-entry-selector__body__entries"
-          @clicked="showEntry"
+          @clicked="entryClicked"
           @selected="selectEntry">
           <template
             v-slot:thumbnails="{ item }">
-            <base-icon
-              v-if="item.shared"
-              name="people" />
-            <base-icon
-              v-if="item.published"
-              name="eye" />
-            <base-icon
-              v-if="item.error"
-              name="attention" />
-            <base-icon
-              v-if="item.has_media"
-              name="attachment" />
-            <!--base-icon
-              v-if="item.archive_URI && getIsArchivalEnabled"
-              name="archive-sheets" /-->
+            <!-- @slot add custom elements at the end of the item row
+              (see also [BaseMenuList](#basemenulist))<br>
+              this slot can only be be used if the 'entries' slot is not used -->
+            <slot
+              :item="item"
+              name="thumbnails" />
           </template>
         </BaseMenuList>
         <div
@@ -145,11 +157,14 @@
 <script>
 import i18n from '../../mixins/i18n';
 
+/**
+ * Component to select elements from a list, including search, options and pagination elements.
+ */
+
 export default {
   name: 'BaseEntrySelector',
   components: {
     BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
-    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
     BaseMenuList: () => import('../BaseMenuList/BaseMenuList').then(m => m.default || m),
     BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
@@ -160,21 +175,24 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * list of entries to display
+     * list of entries to display. Unless the slot 'entries' is used this should be an object with
+     * properties compatible with [BaseMenuList](#basemenulist) 'list' object array
      */
     entries: {
       type: Array,
       default: () => [],
     },
     /**
-     *
+     * provide the total number of entries for pagination calculations
      */
-    entriesNumber: {
+    entriesTotal: {
       type: Number,
       default: null,
     },
     /**
-     * number of entries per page
+     * number of entries per page (this does not steer the number of entries displayed
+     * (the correct number needs to be provided by 'entries') but is solely
+     * needed for correct pagination calculations)
      */
     entriesPerPage: {
       type: Number,
@@ -188,22 +206,9 @@ export default {
       default: false,
     },
     /**
-     * define options to filter entries
-     * structure e.g.: [{ label: { de: "Alle Typen", en: "All Types" }, source: "" }]
-     */
-    entryTypes: {
-      type: Array,
-      default: () => [],
-    },
-    /**
-     * to hide the active entry from the link entries functionality
-     */
-    hideActive: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * custom height needed for link entries functionality
+     * specify a custom height - mainly useful if component is within a pop up.
+     * Use a valid CSS height
+     * property value.
      */
     height: {
       type: String,
@@ -215,6 +220,13 @@ export default {
     isLoading: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify an entry to be marked active (color border on left side)
+     */
+    activeEntry: {
+      type: Number,
+      default: -1,
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
@@ -232,6 +244,34 @@ export default {
       default: false,
     },
     /**
+     * define options to filter entries
+     * structure e.g.: [{ label: { de: "Alle Typen", en: "All Types" }, source: "" }]
+     */
+    entryTypes: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * specify config options for your sorting drop down element (if 'sortOptions are
+     * provided<br>
+     * Needs to be an object with the following properties:<br>
+     *  *label*: specify a label for the sort options drop down (purely for accessibility purposes)
+     *  *default*: specify a default option that the drop down is initialized with<br>
+     *    this needs to have the same object structure as the objects in 'entryTypes'<br>
+     *    if no default is provided the first option in the list will be selected
+     *  *valuePropertyName*: specify the name of the property that contains a unique value
+     */
+    entryTypesConfig: {
+      type: Object,
+      default: () => ({
+        label: 'filter by type',
+        default: null,
+        valuePropertyName: 'value',
+      }),
+      validator: value => !value || ['label', 'default', 'valuePropertyName']
+        .every(key => Object.keys(value).includes(key)),
+    },
+    /**
      * define options for sorting entries <br>
      * structure e.g: [{ label: 'By Type', value: 'type_en' }]
      */
@@ -240,13 +280,33 @@ export default {
       default: () => [],
     },
     /**
-     * specify informational texts for the component - this needs to be an object with the following
+     * specify config options for your sorting drop down element (if 'sortOptions are
+     * provided<br>
+     * Needs to be an object with the following properties:<br>
+     *  *label*: specify a label for the sort options drop down (purely for accessibility purposes)
+     *  *default*: specify a default option that the drop down is initialized with.
+     *    if none is specified the first type in the 'sortOptions' will be used.<br>
+     *    This needs to be an object with the same properties as 'sortOptions'.
+     *  *valuePropertyName*: specify the name of the property that contains a unique value
+     */
+    sortConfig: {
+      type: Object,
+      default: () => ({
+        label: 'sort entries',
+        default: null,
+        valuePropertyName: 'value',
+      }),
+      validator: value => !value || Object.keys(value).every(key => ['label', 'default', 'valuePropertyName'].includes(key)),
+    },
+    /**
+     * specify informational texts for the component (especially helpful to provide language
+     * specific text - this needs to be an object with the following
      * properties (if you dont want to display any text leave an empty string:  <br>
      *   <br>
      *     <b>noEntriesTitle</b>: Header text shown if search for string returned no results<br>
      *     <b>noEntriesSubtext</b>: subtext shown if search for string returned no result <br>
      *     <b>options</b>: Text for title button<br>
-     *        this needs to be an object containing a 'show' and 'hide' property that are shown when
+     *        This needs to be an object containing a 'show' and 'hide' property that are shown when
      *        'entriesSelecable' is true or false respectively<br>
      *     <b>search</b>: placeholder in search input field<br>
      *     <b>selectAll</b>: Text for Select All button <br>
@@ -288,34 +348,71 @@ export default {
   },
   data() {
     return {
-      activeEntry: -1, // TODO: add functionality
-      entriesInt: this.entries,
+      /**
+       * variable to store filter text entered into search
+       * @type {string}
+       */
       filterString: '',
-      filterType: this.entryTypes.length ? this.entryTypes[0] : {},
+      /**
+       * variable to store selected filter type
+       * @type {Object}
+       */
+      filterType: {},
+      /**
+       * variable to store selected sort option
+       * @type {Object}
+       */
+      sortParam: {},
       headHasShadow: false,
       pageNumber: 1,
       showOptions: false,
-      selectActive: false,
+      // TODO: eventually it would make sense to have selected entries settable from outside
       selectedEntries: [],
-      sortParam: this.sortOptions.length ? this.sortOptions[0] : {},
+      /**
+       * timeout to prevent triggering of search after every key stroke
+       * @type {?number}
+       * TODO: eventually this should be kept in front end to give more individual control to
+       * component users
+       */
       timeout: null,
     };
   },
   computed: {
+    /**
+     * create object for the element style attribute
+     * @returns {Object}
+     */
     calcStyle() {
       return this.height ? { height: this.height } : {};
     },
+    /**
+     * calculate page total for pagination from available numbers
+     * @returns {number}
+     */
     pageTotal() {
-      return this.entriesPerPage ? Math.ceil(this.entriesNumber / this.entriesPerPage) : 0;
+      return this.entriesPerPage ? Math.ceil(this.entriesTotal / this.entriesPerPage) : 0;
     },
+    /**
+     * BaseMenuList components needs a list of id's for selected entries
+     * @returns {string[]}
+     */
     selectedList() {
       return this.selectedEntries.map(entry => entry.id);
     },
+    /**
+     * to calc the correct max-with for the sort and type drop downs we need to know how
+     * many there are
+     * @type {number}
+     */
+    dropDownElementsCount() {
+      if (this.sortOptions && this.sortOptions.length
+        && this.entryTypes && this.entryTypes.length) {
+        return 2;
+      }
+      return 1;
+    },
   },
   watch: {
-    entries(val) {
-      this.entriesInt = [].concat(val);
-    },
     /**
      * watch outside variable to have it in sync with internal 'showOptions'
      */
@@ -342,23 +439,38 @@ export default {
         this.$emit('update:entries-selectable', this.showOptions);
       }
     },
+    /**
+     * watch selectedEntries to inform parent of changes in selection
+     */
     selectedEntries() {
+      /**
+       * event emitted every time the selected entries change
+       * @event selected-changed
+       * @type {Object[]}
+       */
       this.$emit('selected-changed', this.selectedEntries);
     },
+  },
+  created() {
+    // set the default option for the drop down menus
+    this.sortParam = this.sortConfig.default
+      || (this.sortOptions.length ? this.sortOptions[0] : {});
+    this.filterType = this.entryTypesConfig.default
+      || (this.entryTypes.length ? this.entryTypes[0] : {});
   },
   mounted() {
     // fetch initial entries
     this.fetchEntries();
-
+    // add scroll listener to determine if head shadow should be displayed
     this.$refs.body
       .addEventListener('scroll', this.scroll);
-
+    // add resize listener to adapt the number of entries shown on each page
+    // TODO: should this really be in here??
     window.addEventListener('resize', this.fetchEntries);
   },
   beforeDestroy() {
     this.$refs.body
       .removeEventListener('scroll', this.scroll);
-
     window.removeEventListener('resize', this.fetchEntries);
   },
   methods: {
@@ -370,13 +482,13 @@ export default {
     changeAllSelectState(selected) {
       if (selected) {
         // add all visible entries to selected list
-        this.selectedEntries = this.selectedEntries.concat(this.entriesInt);
+        this.selectedEntries = this.selectedEntries.concat(this.entries);
         // deduplicate by creating set and convert back to array
         this.selectedEntries = [...new Set(this.selectedEntries)];
       } else {
-        const entriesIntIds = this.entriesInt.map(entry => entry.id);
+        const entriesIds = this.entries.map(entry => entry.id);
         this.selectedEntries = this.selectedEntries
-          .filter(entry => !entriesIntIds.includes(entry.id));
+          .filter(entry => !entriesIds.includes(entry.id));
       }
     },
     fetchEntries() {
@@ -384,7 +496,6 @@ export default {
        * Event emitted to fetch entries
        *
        * @event fetch-entries
-       * @param {Object} valObject - the spread object which has the following properties
        * @property {string} page - current pagination page
        * @property {string} query - the search string
        * @property {object} sort - the sort filter
@@ -423,27 +534,30 @@ export default {
     /**
      *
      * @param {Object} obj - selected entry
+     * @property {boolean} obj.selected - variable indicating if entry was selected or deselected
+     * @property {string} obj.index - the index of the selected or deselected entry in 'entries'
+     * @public
      */
     selectEntry(obj) {
       if (obj.selected) {
-        this.selectedEntries.push(this.entriesInt[obj.index]);
+        this.selectedEntries.push(this.entries[obj.index]);
       } else {
         this.selectedEntries = this.selectedEntries
-          .filter(entry => entry.id !== this.entriesInt[obj.index].id);
+          .filter(entry => entry.id !== this.entries[obj.index].id);
       }
     },
     setPage(number) {
       this.pageNumber = number;
       this.fetchEntries();
     },
-    showEntry(index) {
+    entryClicked(index) {
       /**
        * Triggered when the entry is clicked
        *
-       * @event clicked
-       * @type {Event}
+       * @event entry-clicked
+       * @type {string}
        */
-      this.$emit('show-entry', this.entriesInt[index].id);
+      this.$emit('entry-clicked', this.entries[index].id);
     },
   },
 };
@@ -455,6 +569,7 @@ export default {
   .base-entry-selector {
     display: flex;
     flex-direction: column;
+    background: $background-color;
 
     &__head {
       position: sticky;
@@ -494,6 +609,11 @@ export default {
         width: 100%;
         z-index: map-get($zindex, loader);
         background-color: $loading-background;
+        overflow: hidden;
+
+        .base-entry-selector__loader__center {
+          top: 50%;
+        }
       }
     }
 
@@ -520,9 +640,6 @@ export default {
       justify-content: flex-end;
 
       &__dropdown {
-        // TODO: recheck if is really needed?
-        max-width: 50%;
-
         &:not(:first-of-type) {
           margin-left: $spacing;
         }
@@ -530,10 +647,6 @@ export default {
 
       @media screen and (max-width: $tablet) {
         flex-wrap: wrap;
-
-        &__dropdown {
-          max-width: 100%;
-        }
       }
     }
   }
