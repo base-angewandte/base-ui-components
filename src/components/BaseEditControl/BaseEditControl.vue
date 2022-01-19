@@ -21,6 +21,7 @@
       class="base-edit-control__buttons">
       <base-button
         v-if="!edit"
+        :disabled="disabled"
         :has-background-color="false"
         :icon="!isLoading ? 'edit' : ''"
         :text="getI18nTerm(editButtonText)"
@@ -38,14 +39,6 @@
       <base-button
         v-if="edit"
         :has-background-color="false"
-        icon="remove"
-        :text="getI18nTerm(cancelButtonText)"
-        class="base-edit-control__button"
-        @clicked="cancel" />
-
-      <base-button
-        v-if="edit"
-        :has-background-color="false"
         :icon="!isLoading ? 'save-file' : ''"
         :text="getI18nTerm(saveButtonText)"
         class="base-edit-control__button"
@@ -58,6 +51,14 @@
           </span>
         </template>
       </base-button>
+
+      <base-button
+        v-if="edit"
+        :has-background-color="false"
+        icon="remove"
+        :text="getI18nTerm(cancelButtonText)"
+        class="base-edit-control__button"
+        @clicked="cancel" />
     </div>
   </div>
 </template>
@@ -81,6 +82,13 @@ export default {
      * toggle control buttons
      */
     controls: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * disable edit button
+     */
+    disabled: {
       type: Boolean,
       default: false,
     },
