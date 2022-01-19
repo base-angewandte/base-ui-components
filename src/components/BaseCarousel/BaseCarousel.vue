@@ -67,13 +67,7 @@ export default {
      *     additional - additional information (e.g. dates)<br>
      *     href - a url to follow upon item click<br>
      *     previews - an array of image urls in different sizes in the following form:<br>
-     *       ```
-            [{
-              '460w': 'image-url',
-            },
-     {
-              '640w': 'image url',
-            },...],```
+     *     e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
      */
     items: {
       type: Array,
@@ -123,11 +117,19 @@ export default {
   },
   methods: {
     getImageSrc(object, value) {
+      let imageSrc = '';
       if (object && object.length) {
-        return object.map(obj => ((Object.keys(obj)[0] === value) ? Object.values(obj)[0] : ''))
+        // filter by value
+        imageSrc = object.map(obj => ((Object.keys(obj)[0] === value) ? Object.values(obj)[0] : ''))
           .filter(obj => obj !== '').toString();
+
+        // otherwise take first one
+        if (!imageSrc.length) {
+          // eslint-disable-next-line
+          imageSrc = Object.values(object[0])[0];
+        }
       }
-      return '';
+      return imageSrc;
     },
     initSwiper() {
       this.swiperIsActive = true;
