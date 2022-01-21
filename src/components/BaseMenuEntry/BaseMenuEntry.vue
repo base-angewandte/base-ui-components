@@ -205,7 +205,7 @@ export default {
   },
   methods: {
     clicked() {
-      if (!this.disabled) {
+      if (this.isDisabled) {
         return;
       }
 

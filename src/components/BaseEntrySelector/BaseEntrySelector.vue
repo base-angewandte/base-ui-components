@@ -84,7 +84,7 @@
         :select-text="getI18nTerm(entrySelectorText.selectAll)"
         :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
-        :list="entries"
+        :list="selectableEntries"
         :selected-list="selectedEntries"
         @selected="changeAllSelectState" />
     </div>
@@ -411,6 +411,14 @@ export default {
       }
       return 1;
     },
+    /**
+     * filter entries which are not disabled
+     *
+     * @returns {Object[]}
+     */
+    selectableEntries() {
+      return this.entries.filter(entry => !entry.disabled);
+    },
   },
   watch: {
     /**
@@ -482,7 +490,7 @@ export default {
     changeAllSelectState(selected) {
       if (selected) {
         // add all visible entries to selected list
-        this.selectedEntries = this.selectedEntries.concat(this.entries);
+        this.selectedEntries = this.selectedEntries.concat(this.selectableEntries);
         // deduplicate by creating set and convert back to array
         this.selectedEntries = [...new Set(this.selectedEntries)];
       } else {
