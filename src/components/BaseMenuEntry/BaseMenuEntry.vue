@@ -4,9 +4,10 @@
     :tabindex="isSelectable && selectActive ? -1 : 0"
     :href="'#' + title"
     :class="['base-menu-entry',
-             {'base-menu-entry-activatable': isActivatable,
+             {'base-menu-entry-activatable': isActivatable && !isDisabled,
               'base-menu-entry-active': isActive,
               'base-menu-entry-no-icon': !icon,
+              'base-menu-entry-disabled' : isDisabled,
               'base-menu-entry-text-fade-out' : !showThumbnails }]"
     :role="isSelectable && selectActive ? '' : 'link'"
     @keyup.enter.prevent="clicked"
@@ -59,7 +60,7 @@
         <slot name="thumbnails" />
       </div>
       <base-checkmark
-        v-if="isSelectable && selectActive"
+        v-if="isSelectable && selectActive && !isDisabled"
         :key="entryId + 'checkmark'"
         :checked="isSelected"
         title="checkbox"
@@ -154,6 +155,14 @@ export default {
       default: false,
     },
     /**
+     * define if entry is disabled - thus if checkboxes are available<br>
+     *   will overrule prop isSelectable
+     */
+    isDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * define if entry will be active upon click
      */
     isActivatable: {
@@ -196,6 +205,10 @@ export default {
   },
   methods: {
     clicked() {
+      if (!this.disabled) {
+        return;
+      }
+
       if (this.selectActive) {
         this.isSelectedInt = !this.isSelectedInt;
         /**
@@ -322,6 +335,19 @@ export default {
           white-space: nowrap;
           transition: color 0.1s ease;
         }
+      }
+    }
+
+    &.base-menu-entry-disabled {
+      .base-menu-entry-text-wrapper {
+        .base-menu-entry-title,
+        .base-menu-entry-description {
+          color: $graytext-color;
+        }
+      }
+
+      .base-menu-entry-thumbnail-container {
+        color: $graytext-color;
       }
     }
 

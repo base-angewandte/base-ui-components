@@ -22,6 +22,7 @@
         :title="item.title"
         :is-active="entryProps[index].active"
         :is-selected="entryProps[index].selected"
+        :is-disabled="item.disabled"
         :icon="item.icon"
         :description="item.description"
         :is-selectable="true"
@@ -76,6 +77,7 @@ export default {
      *      **active** { boolean}: steer from outside if item should be displayed active (with left
      *        side color border)<br>
      *      **selected** {boolean}: steer from outside if entry select box should be checked<br>
+     *      **disabled** {boolean}: steer from outside if entry select box should be disabled<br>
      *      **icon** {string}: a valid [BaseIcon](#baseicon) icon name<br>
      *      <br>
      *      Also see [BaseMenuEntry](#basemenuentry) component for more information on
