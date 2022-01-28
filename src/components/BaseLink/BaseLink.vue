@@ -223,8 +223,11 @@ export default {
       return tag;
     },
     hasValidUrl() {
-      // check if url is set and includes a protocol (eg. http://, https://)
-      return this.url && this.url.match(/^([a-z][a-z0-9+\-.]*:\/\/)/);
+      // check if url is set and includes a protocol (eg. 'http://', 'https://'), 'mailto:' or 'tel:'
+      return this.url
+        && (this.url.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
+            || this.url.match(/^mailto:/)
+            || this.url.match(/^tel:/));
     },
   },
   watch: {

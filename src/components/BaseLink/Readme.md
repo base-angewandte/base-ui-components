@@ -13,10 +13,7 @@
         :type="link.type"
         :url="link.url"
         :value="link.value"
-        @tooltipClicked="asyncTooltip($event, index)" />
-      <!-- eslint-disable -->
-      <template v-if="index !== links.length - 1">, </template>
-      <!-- eslint-enable -->
+        @tooltipClicked="asyncTooltip($event, index)" /><!-- eslint-disable --><template v-if="index !== links.length - 1">, </template><!-- eslint-enable -->
     </template>
   </div>
 </template>
@@ -36,6 +33,10 @@ export default {
         {
           value: 'external link',
           url: 'https://base.uni-ak.ac.at',
+        },
+        {
+          value: 'email link',
+          url: 'mailto:email@uni-ak.ac.at',
         },
         {
           value: 'internal link',
