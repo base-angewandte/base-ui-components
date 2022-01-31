@@ -45,27 +45,29 @@
         <!-- render as comma separated list -->
         <template
           v-if="!containKeys(item.data, 'label')">
-          <template
-            v-for="(objectItem, objectIndex) in item.data">
-            <BaseLink
-              :key="objectIndex"
-              :source="objectItem.source"
-              :tooltip="objectItem.additional"
-              :type="objectItem.type"
-              :url="objectItem.url"
-              :value="objectItem.value">
-              <!-- @slot slot for tooltip content -->
-              <template v-slot:tooltip>
-                <slot
-                  :data="objectItem.additional"
-                  name="tooltip" />
-              </template>
-            </BaseLink>
+          <div class="base-text-list-content">
+            <template
+              v-for="(objectItem, objectIndex) in item.data">
+              <BaseLink
+                :key="objectIndex"
+                :source="objectItem.source"
+                :tooltip="objectItem.additional"
+                :type="objectItem.type"
+                :url="objectItem.url"
+                :value="objectItem.value">
+                <!-- @slot slot for tooltip content -->
+                <template v-slot:tooltip>
+                  <slot
+                    :data="objectItem.additional"
+                    name="tooltip" />
+                </template>
+              </BaseLink>
 
-            <!-- eslint-disable -->
-            <template v-if="objectIndex !== item.data.length - 1">, </template>
-            <!-- eslint-enable -->
-          </template>
+              <!-- eslint-disable -->
+              <template v-if="objectIndex !== item.data.length - 1">, </template>
+              <!-- eslint-enable -->
+            </template>
+          </div>
         </template>
 
         <!-- render as data list -->
