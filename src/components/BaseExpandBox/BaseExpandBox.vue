@@ -100,11 +100,18 @@ export default {
       default: false,
     },
     /**
-     * define how many rows of text are displayed
+     * define the max height of the collapsed box in px
      */
-    rows: {
+    maxCollapsedHeight: {
       type: Number,
-      default: 10,
+      default: 300,
+    },
+    /**
+     * define the height including margin of the show-more button in px
+     */
+    showButtonHeight: {
+      type: Number,
+      default: 54,
     },
   },
   data() {
@@ -116,8 +123,13 @@ export default {
     };
   },
   computed: {
+    maxCollapsedHeightInt() {
+      return this.showButton
+        ? this.maxCollapsedHeight - this.showButtonHeight
+        : this.maxCollapsedHeight;
+    },
     style() {
-      return { '--rows': this.rows };
+      return { '--max-collapsed-height': `${this.maxCollapsedHeightInt}px` };
     },
   },
   mounted() {
@@ -218,11 +230,11 @@ export default {
     }
 
     &.base-expand-box-auto-height:not(.base-expand-box-open) .base-expand-box-content {
-      max-height: calc(#{$line-height} * var(--rows) + #{$headline-margin-bottom});
+      max-height: var(--max-collapsed-height);
     }
 
     &:not(.base-expand-box-auto-height) .base-expand-box-content {
-      height: calc(#{$line-height} * var(--rows) + #{$headline-margin-bottom});
+      height: var(--max-collapsed-height);
     }
 
     .base-expand-box-content {
