@@ -570,4 +570,12 @@ export default {
   .leaflet-container a.leaflet-popup-close-button {
     padding: $spacing-small $spacing-small 0 0;
   }
+
+  .leaflet-control a {
+    color: $app-color;
+
+    &:hover {
+      color: $app-color-secondary;
+    }
+  }
 </style>
