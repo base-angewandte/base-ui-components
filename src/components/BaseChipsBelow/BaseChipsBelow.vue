@@ -399,7 +399,7 @@ export default {
 
   .base-chips-below {
     .base-chips-below-list-item {
-      padding: $spacing-small/2 0;
+      padding: $spacing-small-half 0;
       margin-bottom: -2px;
       border-bottom: $separation-line;
 
@@ -432,8 +432,8 @@ export default {
         }
 
         .base-chips-below-chips-input {
-          max-width: calc(50% - #{$spacing-small} - #{$spacing-small/2});
-          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small/2});
+          max-width: calc(50% - #{$spacing-small} - #{$spacing-small-half});
+          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small-half});
         }
       }
 

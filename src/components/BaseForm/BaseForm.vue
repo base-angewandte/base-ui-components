@@ -576,7 +576,7 @@ export default {
       }
 
       .group-multiply {
-        margin-bottom: $spacing-small + ($spacing-small/2);
+        margin-bottom: $spacing-small + $spacing-small-half;
         margin-top: $spacing-small;
       }
     }

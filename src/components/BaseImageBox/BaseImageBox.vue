@@ -754,7 +754,7 @@ export default {
         fill: white;
         height: $icon-medium;
         width: $icon-medium;
-        margin-right: $spacing-small / 2;
+        margin-right: $spacing-small-half;
       }
     }
 

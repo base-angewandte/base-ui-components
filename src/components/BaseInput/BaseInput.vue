@@ -653,7 +653,7 @@ export default {
             }
 
             .base-input__input {
-              padding: $spacing-small/2 0;
+              padding: $spacing-small-half 0;
               min-height: $row-height-small;
               width: 100%;
 

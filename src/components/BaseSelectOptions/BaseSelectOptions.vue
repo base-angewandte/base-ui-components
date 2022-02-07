@@ -118,7 +118,7 @@ export default {
     .base-select-options__number-selected {
       font-size: $font-size-small;
       color: $font-color-second;
-      margin: $spacing-small/2 $spacing-small;
+      margin: $spacing-small-half $spacing-small;
     }
 
     .base-select-options__select-button {

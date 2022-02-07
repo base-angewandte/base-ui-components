@@ -196,8 +196,8 @@ export default {
       .base-checkmark-small {
         height: $spacing-small;
         width: $spacing-small;
-        top: $spacing-small/2;
-        left: $spacing-small/2;
+        top: $spacing-small-half;
+        left: $spacing-small-half;
       }
     }
 
@@ -209,8 +209,8 @@ export default {
       .base-checkmark-large {
         height: $spacing;
         width: $spacing;
-        top: $spacing/2;
-        left: $spacing/2;
+        top: $spacing-small;
+        left: $spacing-small;
         color: white;
       }
     }

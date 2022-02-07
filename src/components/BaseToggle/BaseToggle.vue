@@ -135,7 +135,7 @@ export default {
       justify-content: flex-start;
       height: 18px;
       min-width: 30px;
-      margin-right: $spacing/2;
+      margin-right: $spacing-small;
       background-color: $switch-container-color;
       border-radius: 9px;
       border: 1px solid $switch-container-color;
@@ -155,7 +155,7 @@ export default {
         transition: all 250ms ease-in-out;
 
         svg {
-          width: $spacing / 2;
+          width: $spacing-small;
           fill: $switch-svg-color;
         }
       }
@@ -183,7 +183,7 @@ export default {
     }
 
     .base-toggle-labeltext {
-      padding-left: $spacing/2;
+      padding-left: $spacing-small;
     }
   }
 </style>

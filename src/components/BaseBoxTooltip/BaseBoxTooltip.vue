@@ -44,8 +44,8 @@ export default {
     @media screen and (min-width: $mobile) {
       position: absolute;
       margin-left: 0;
-      top: $spacing/2;
-      right: $spacing/2;
+      top: $spacing-small;
+      right: $spacing-small;
     }
 
     &:hover {

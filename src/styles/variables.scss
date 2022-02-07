@@ -18,23 +18,26 @@
   --warning-color: #ff4444;
 }*/
 
+@use "sass:math";
+
 /* fonts */
 $font-size-regular: 1rem;
-$font-size-small: 16rem/19;
-$font-size-large: 24rem/19;
-$line-height: 24rem/19;
+$font-size-small: math.div(16rem, 19);
+$font-size-large: math.div(24rem, 19);
+$line-height: math.div(24rem, 19);
 
 /* height and spacing */
-$spacing: 16rem/19;
-$spacing-small: 8rem/19;
-$spacing-large: 32rem/19;
+$spacing: math.div(16rem, 19);
+$spacing-small: math.div(8rem, 19);
+$spacing-large: math.div(32rem, 19);
+$spacing-small-half: math.div($spacing-small, 2);
 /* new styleguide: font size + relative spacing! */
 $row-height-large: 1rem +  2*1rem;
 $row-height-small: 1.1rem +  2*$spacing-small;
 $header-height: 55px;
 $chips-spacing: 0.05rem;
 $chips-list-height: 1rem + 2*$spacing;
-$input-field-line-height: 27rem/19;
+$input-field-line-height: math.div(27rem, 19);
 $fade-out-width: 30px;
 
 /* colors */
@@ -121,7 +124,7 @@ $zindex: (
 );
 
 /* headlines */
-$headline-margin-bottom: $line-height / 2;
+$headline-margin-bottom: math.div($line-height, 2);
 
 /* transitions */
 $link-transition: color 0.2s ease-in-out;

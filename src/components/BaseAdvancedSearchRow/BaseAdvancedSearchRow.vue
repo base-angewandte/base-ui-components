@@ -1451,8 +1451,8 @@ export default {
       .base-advanced-search-row__above-list-area {
         &.base-advanced-search-row__above-list-area-filters {
           border-bottom: $separation-line;
-          padding-top: $spacing-small/2;
-          padding-bottom: $spacing-small/2;
+          padding-top: $spacing-small-half;
+          padding-bottom: $spacing-small-half;
         }
 
         .base-advanced-search-row__filter-area-wrapper {
@@ -1482,7 +1482,7 @@ export default {
           }
 
           .base-advanced-search-row__filter-text {
-            padding-top: $spacing-small/2;
+            padding-top: $spacing-small-half;
             color: $font-color-second;
           }
           .base-advanced-search-row__filter-subtext {
@@ -1496,7 +1496,7 @@ export default {
             .base-advanced-search-row__filter {
               cursor: pointer;
               color: $app-color;
-              padding: $spacing-small/2 $spacing;
+              padding: $spacing-small-half $spacing;
 
               &:focus {
                 outline: none;
@@ -1520,8 +1520,8 @@ export default {
         .base-advanced-search-row__chips-row {
           align-items: baseline;
           min-height: calc(#{$row-height-small} + #{$spacing-small});
-          padding-top: $spacing-small/2;
-          padding-bottom: $spacing-small/2;
+          padding-top: $spacing-small-half;
+          padding-bottom: $spacing-small-half;
 
           &.base-advanced-search-row__chips-row__no-options {
             padding-top: 0;
