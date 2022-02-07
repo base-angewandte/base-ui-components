@@ -5,22 +5,14 @@ Component to toggle content area
 <template>
   <div class="container">
     <BaseExpandRow
-      :is-expanded="true"
       icon="camera">
-      <p>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam,
-        quis nostrud exercitation ullamco labos</p>
+      <p>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam, quis nostrud exercitation ullamco labos</p>
     </BaseExpandRow>
   </div>
 </template>
 
 <script>
-import BaseExpandRow from './BaseExpandRow';
-
-export default {
-  components: {
-    BaseExpandRow,
-  },
-};
+export default {};
 </script>
 
 <style>
@@ -29,4 +21,22 @@ export default {
     padding: 16px;
   }
 </style>
+```
+
+Selectable row in expanded state, having both a title and a subtitle, without icon:
+
+```vue
+<template>
+  <BaseExpandRow
+    title="Lorem ipsum"
+    subtitle="Donec eris felix multos numerabis amicos"
+    :is-expandable="true"
+    :is-expanded="true"
+    :is-selectable="true">
+    <p>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam, quis nostrud exercitation ullamco labos</p>
+  </BaseExpandRow>
+</template>
+<script>
+export default {};
+</script>
 ```
