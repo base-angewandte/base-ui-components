@@ -28,7 +28,8 @@ Example with Tabs
 <template>
   <div>
     <BaseMultilineTextInput
-      :tabs="['English', 'German']"
+      :tabs="['de', 'en']"
+      :tab-labels="['German', 'English']"
       label="Multiline Label Tabs"
       placeholder="Enter Text here"
       v-model="textInput"/>
@@ -44,8 +45,8 @@ export default {
   data() {
     return {
       textInput: {
-        English: 'Text Set from Outside',
-        German: '',
+        en: 'Text Set from Outside',
+        de: '',
       },
     };
   },
