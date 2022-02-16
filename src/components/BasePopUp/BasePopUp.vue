@@ -313,9 +313,11 @@ export default {
   }
 
   @media screen and (max-width: $tablet) {
-    .popup-box {
-      max-width: 100%;
-      width: 70%;
+    .base-pop-up {
+      .popup-box {
+        max-width: 100%;
+        width: 70%;
+      }
     }
   }
 
@@ -347,14 +349,18 @@ export default {
   }
 
   @media screen and (max-height: 1042px) {
-    .popup-box {
-      top: 10vh;
+    .base-pop-up {
+      .popup-box {
+        top: 10vh;
+      }
     }
   }
 
   @media screen and (max-height: 500px) {
-    .popup-box {
-      top: 2vh;
+    .base-pop-up {
+      .popup-box {
+        top: 2vh;
+      }
     }
   }
 </style>
