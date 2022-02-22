@@ -35,7 +35,6 @@
     <span
       v-if="description"
       :id="internalId"
-      :aria-hidden="true"
       class="hide">
       {{ description }}
     </span>
@@ -181,10 +180,10 @@ export default {
       default: true,
     },
   },
-  computed: {
-    internalId() {
-      return createId();
-    },
+  data() {
+    return {
+      internalId: createId(),
+    };
   },
   methods: {
     clicked(event) {
