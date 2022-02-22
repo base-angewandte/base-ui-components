@@ -1,7 +1,9 @@
 <template>
   <div class="base-select-options">
     <div class="base-select-options__number-selected">
-      {{ `${numberSelected} ${selectedNumberText}` }}
+      <slot name="selectedText">
+        {{ `${numberSelected} ${selectedNumberText}` }}
+      </slot>
     </div>
     <BaseButton
       :text="allSelectedX ? deselectText : selectText"

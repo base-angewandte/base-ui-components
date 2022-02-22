@@ -86,7 +86,17 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        @selected="changeAllSelectState" />
+        @selected="changeAllSelectState">
+        <template v-slot:selectedText>
+          {{ `${selectedList.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
+          ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
+          <span
+            v-if="!!maxSelectedEntries && selectedList.length >= maxSelectedEntries">
+            {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
+          </span>
+
+        </template>
+      </BaseSelectOptions>
     </div>
 
     <!-- BODY -->
@@ -204,6 +214,14 @@ export default {
     entriesSelectable: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify a maximum number of entries that can be selected<br>
+     * specify '0' if there should be no limit
+     */
+    maxSelectedEntries: {
+      type: Number,
+      default: 0,
     },
     /**
      * specify a custom height - mainly useful if component is within a pop up.
@@ -331,6 +349,7 @@ export default {
         selectAll: 'Select All',
         selectNone: 'Select None',
         entriesSelected: 'entries selected',
+        maxEntriesReached: 'Maximum Number Exceeded!',
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => [
@@ -341,6 +360,7 @@ export default {
         'selectAll',
         'selectNone',
         'entriesSelected',
+        'maxEntriesReached',
       ]
         .every(prop => Object.keys(val).includes(prop))
           && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
