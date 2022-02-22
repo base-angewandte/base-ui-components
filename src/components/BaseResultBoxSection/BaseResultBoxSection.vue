@@ -82,9 +82,7 @@
           <div class="base-result-box-section__message-area-text">
             {{ messageText }}
           </div>
-          <div class="base-result-box-section__message-area-subtext">
-            {{ messageSubtext }}
-          </div>
+          <span class="base-result-box-section__message-area-subtext">{{ messageSubtext }}</span>
           <!-- @slot add a custom element after the message area -->
           <slot name="optionsMessageAreaAfter" />
         </div>
@@ -1173,6 +1171,7 @@ export default {
 
       .base-result-box-section__message-area-subtext {
         font-size: $font-size-small;
+        white-space: pre-line;
       }
     }
 
