@@ -276,15 +276,6 @@ export default {
       }
     }
 
-    &.base-button-secondary {
-      font-size: $font-size-small;
-      color: $font-color-second;
-
-      &.base-button-background {
-        background-color: $button-header-color;
-      }
-    }
-
     &.base-button-active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
@@ -343,6 +334,23 @@ export default {
 
       &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
         color: $graytext-color;
+      }
+    }
+
+    &.base-button-secondary {
+      font-size: $font-size-small;
+      color: $font-color-second;
+
+      &.base-button-background {
+        background-color: $button-header-color;
+      }
+
+      &:disabled {
+        color: $font-color-third;
+
+        &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
+          color: $font-color-third;
+        }
       }
     }
 
