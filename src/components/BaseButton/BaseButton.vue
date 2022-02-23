@@ -23,6 +23,7 @@
     <slot name="left-of-text" />
 
     <span
+      v-if="text"
       :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
       {{ text }}
     </span>
@@ -301,15 +302,18 @@ export default {
     }
 
     &.base-button-icon-left {
-      .base-button-icon {
-        margin-right: #{$spacing};
+      .base-button-icon + .base-button-text {
+        margin-left: $spacing;
       }
     }
 
     &.base-button-icon-right {
       .base-button-icon {
         order: 1;
-        margin-left: #{$spacing};
+
+        & + .base-button-text {
+          margin-right: $spacing;
+        }
       }
     }
 
