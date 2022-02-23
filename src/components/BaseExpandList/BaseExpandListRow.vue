@@ -91,6 +91,9 @@
             name="drag-lines" />
         </span>
         <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
+          <div
+            v-if="data.hidden"
+            class="base-expand-item__overlay" />
           <span
             :class="[
               'base-expand__head__label',
@@ -103,11 +106,11 @@
         <div class="base-expand-item__col base-expand-item__controls">
           <base-button
             :icon="data.hidden ? 'eye': 'eye-hide'"
-            :text="data.hidden ? editShowText : editHideText"
+            :text="''"
             :has-background-color="false"
             :aria-label="`${data.hidden ? editShowText : editHideText} ${data.label}`"
             icon-size="large"
-            align-text="left"
+            icon-position="left"
             @clicked="setVisibility" />
         </div>
       </div>
@@ -393,11 +396,20 @@ export default {
     flex-grow: 1;
     overflow: hidden;
     white-space: nowrap;
+
+    & .base-expand-item__overlay {
+      position: absolute;
+      content: '';
+      height: 100%;
+      width: 100%;
+      background: rgba(255, 255, 255, 40%);
+    }
   }
 
   &__controls {
     justify-self: flex-end;
     border-left: $border-width solid $background-color;
+    margin-right: -$spacing;
   }
 
   &--intend {
