@@ -6,7 +6,8 @@
       </slot>
     </div>
     <BaseButton
-      :text="allSelectedX ? deselectText : selectText"
+      :text="allSelected ? deselectText : selectText"
+      :disabled="selectAllDisabled"
       button-style="secondary"
       class="base-select-options__select-button"
       @clicked="select" />
@@ -61,6 +62,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    selectAllDisabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -71,7 +76,7 @@ export default {
     numberSelected() {
       return this.selectedList.length;
     },
-    allSelectedX() {
+    allSelected() {
       // not just calc comparing selectedList with list because with pagination
       // selectedList can contain entries that are currently not incluced in list
       const idList = this.selectedList.length && this.selectedList[0].id
@@ -82,7 +87,7 @@ export default {
     },
   },
   watch: {
-    allSelectedX: {
+    allSelected: {
       handler(val) {
         if (val !== this.selectedInt) {
           this.selectedInt = val;
