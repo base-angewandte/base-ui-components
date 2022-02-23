@@ -92,11 +92,15 @@ export default {
   },
   props: {
     /**
-     * data object: [{ label: 'String', hidden: false, data: [{ value: 'String', }] }] <br><br>
+     * data object: [{ label: 'String', data: [{ value: 'String', }],
+     *  [hidden]: boolean, [count]: number }]<br><br>
+     * optional properties:<br>
+     *  count: used for the number shown in brackets
+     *    (else the array length will be used)<br>
+     *  hidden: used to set visibility and is set in edit mode to toggle item<br><br>
      * rendered variants: <br>
-     * expandable row: data object contains property 'label'<br>
-     * entry row: data object contains property 'value'<br><br>
-     * Note: property hidden is used to set visibility and is set in edit mode to toggle item
+     *  expandable row: data object contains property 'label'<br>
+     *  entry row: data object contains property 'value'
      */
     data: {
       type: Array,

@@ -97,7 +97,6 @@
             v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
             {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
           </span>
-
         </template>
       </BaseSelectOptions>
     </div>
