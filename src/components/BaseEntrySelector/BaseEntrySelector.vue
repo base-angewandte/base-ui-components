@@ -86,12 +86,15 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
+        :select-all-disabled="!(selectableEntries.length
+          < (maxSelectedEntries - selectedListIds.length)
+          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
         @selected="changeAllSelectState">
         <template v-slot:selectedText>
-          {{ `${selectedList.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
+          {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
           ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
           <span
-            v-if="!!maxSelectedEntries && selectedList.length >= maxSelectedEntries">
+            v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
             {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
           </span>
 
@@ -128,7 +131,7 @@
           :select-active="showOptions"
           :list="entries"
           :active-entry="activeEntry"
-          :selected-list="selectedList"
+          :selected-list="selectedListIds"
           class="base-entry-selector__body__entries"
           @clicked="entryClicked"
           @selected="selectEntry">
@@ -416,7 +419,7 @@ export default {
      * BaseMenuList components needs a list of id's for selected entries
      * @returns {string[]}
      */
-    selectedList() {
+    selectedListIds() {
       return this.selectedEntries.map(entry => entry.id);
     },
     /**
