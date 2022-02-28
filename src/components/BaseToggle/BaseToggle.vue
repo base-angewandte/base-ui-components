@@ -26,7 +26,10 @@
           name="remove" />
       </span>
     </div>
-    {{ label }}
+    <span
+      :class="['base-toggle__label', { 'hide': hideLabel }]">
+      {{ label }}
+    </span>
   </label>
 </template>
 
@@ -76,6 +79,10 @@ export default {
      */
     checked: {
       type: [Boolean, String],
+      default: false,
+    },
+    hideLabel: {
+      type: Boolean,
       default: false,
     },
   },
@@ -135,7 +142,6 @@ export default {
       justify-content: flex-start;
       height: 18px;
       min-width: 30px;
-      margin-right: $spacing/2;
       background-color: $switch-container-color;
       border-radius: 9px;
       border: 1px solid $switch-container-color;
@@ -182,7 +188,7 @@ export default {
       }
     }
 
-    .base-toggle-labeltext {
+    .base-toggle__label {
       padding-left: $spacing/2;
     }
   }
