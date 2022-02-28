@@ -140,21 +140,21 @@ export default {
       display: inline-flex;
       align-items: center;
       justify-content: flex-start;
-      height: 18px;
+      height: calc(#{$spacing} + 2px);
       min-width: 30px;
       background-color: $switch-container-color;
-      border-radius: 9px;
+      border-radius: calc((#{$spacing} + 2px) / 2);
       border: 1px solid $switch-container-color;
       cursor: pointer;
       transition: border-color 250ms ease-in-out;
 
       .base-switch {
         position: absolute;
-        left: 0;
+        right: 0;
         display: flex;
         justify-content: center;
-        width: 16px;
-        height: 16px;
+        width: $spacing;
+        height: $spacing;
         border-radius: 50%;
         background-color: $switch-color;
         cursor: pointer;
@@ -177,8 +177,8 @@ export default {
         justify-content: flex-end;
 
         .base-switch {
-          left: 100%;
-          transform: translateX(-100%);
+          right: 100%;
+          transform: translateX(100%);
           background-color: $switch-checked-color;
 
           svg {
