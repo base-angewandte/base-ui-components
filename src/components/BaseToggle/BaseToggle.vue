@@ -20,14 +20,17 @@
       <span class="base-switch">
         <base-icon
           v-if="checkedInt"
+          :title="hideLabel ? label : ''"
           name="check-mark" />
         <base-icon
           v-if="!checkedInt"
+          :title="hideLabel ? label : ''"
           name="remove" />
       </span>
     </div>
     <span
-      :class="['base-toggle__label', { 'hide': hideLabel }]">
+      v-if="!hideLabel"
+      class="base-toggle__label">
       {{ label }}
     </span>
   </label>
