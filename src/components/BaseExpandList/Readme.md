@@ -1,8 +1,23 @@
 Component to render list data
 
 ```vue
+
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
+    <div v-if="editExpandList">
+      <BaseCheckmark
+        v-model="toggleElements"
+        :radio-value="'button'"
+        :show-label="true"
+        label="Use button elements"
+        mark-style="radio" />
+      <BaseCheckmark
+        v-model="toggleElements"
+        :radio-value="'toggle'"
+        :show-label="true"
+        label="Use toggle elements"
+        mark-style="radio" />
+    </div>
     <BaseEditControl
       title="Activities"
       :controls="true"
@@ -10,23 +25,24 @@ Component to render list data
       :edit="editExpandList"
       @activated="activateExpandList"
       @canceled="cancelExpandList"
-      @saved="saveExpandList" />
+      @saved="saveExpandList"/>
 
     <BaseExpandList
       ref="baseExpandList"
       :data="editExpandList ? baseExpandList : baseExpandList.filter(item => !item.hidden)"
       :edit="editExpandList"
+      :control-type="toggleElements"
       @saved="saveExpandListEdit">
-        <template
-          v-slot:content="props">
-          <BaseLink
-            :url="props.data.url"
-            :value="props.data.value"
-            :source="props.data.source"
-            :space-after="!!props.data.additional"
-            :tooltip="props.data.additional"
-            :type="props.data.type" />
-          <template v-if="props.data.attributes"> - {{ props.data.attributes.join(', ') }}</template>
+      <template
+        v-slot:content="props">
+        <BaseLink
+          :url="props.data.url"
+          :value="props.data.value"
+          :source="props.data.source"
+          :space-after="!!props.data.additional"
+          :tooltip="props.data.additional"
+          :type="props.data.type"/>
+        <template v-if="props.data.attributes"> - {{ props.data.attributes.join(', ') }}</template>
       </template>
     </BaseExpandList>
   </div>
@@ -36,9 +52,11 @@ Component to render list data
 import BaseEditControl from '../BaseEditControl/BaseEditControl';
 import BaseExpandList from './BaseExpandList';
 import BaseLink from '../BaseLink/BaseLink';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   components: {
+    BaseCheckmark,
     BaseEditControl,
     BaseExpandList,
     BaseLink,
@@ -261,6 +279,7 @@ export default {
           ],
         },
       ],
+      toggleElements: 'toggle',
     };
   },
   methods: {

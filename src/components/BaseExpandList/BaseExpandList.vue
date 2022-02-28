@@ -58,9 +58,11 @@
               :edit="true"
               :edit-hide-text="editHideText"
               :edit-show-text="editShowText"
+              :control-type="controlType"
               class="base-expand-list__draggable__item"
-              @supportive="supportive"
-              @sorted="sort" />
+              @supportive="supportive($event, index)"
+              @sorted="sort"
+              @update:data="updateData($event, index)" />
           </draggable>
         </div>
       </template>
@@ -157,25 +159,39 @@ export default {
     },
     /**
      * additional texts for screen-reader users to order items<br>
-     *   should have the form:
+     *   object that needs to have the following properties:<br>
+     *   <b>activate</b>: Text read when item is focused, use variable {state} to
+     *    announce item visibility - specify text used in properties 'hidden' and 'visible'
+     *   <b>activated</b>: Text read after item was activated (selected by spacebar)
+     *   <b>description</b>: Text read on initial list focus
+     *   <b>moved</b>: Text read after item was moved
+     *   <b>visible</b>: string substituted to 'activate' text for state variable if item is visible
+     *   <b>hidden</b>: string substituted to 'activate' text for state variable if item is hidden
      *   { activate: 'aaa', activated: 'bbb', description: 'ccc', moved: 'ddd' }<br>
      *   property moved can contain variables {pos} and {total}
      */
     supportiveText: {
       type: Object,
       default: () => ({
-        activate: 'Click Spacebar to select item.',
+        activate: 'Click Spacebar to select item. Item is currently {state}',
         activated: 'Item selected. Use arrow keys to order item.',
         description: 'Use Tab key to navigate to item an order item.',
         moved: 'Item moved: {pos} of {total}',
+        visible: 'visible',
+        hidden: 'hidden',
       }),
-      validator(val) {
-        const labelKeys = Object.keys(val);
-        return labelKeys.includes('activate')
-          && labelKeys.includes('activated')
-          && labelKeys.includes('description')
-          && labelKeys.includes('moved');
-      },
+      validator: val => Object.keys(val)
+        .every(key => ['activate', 'activated', 'description', 'moved', 'visible', 'hidden'].includes(key)),
+    },
+    /**
+     * specify the type of visibility switch in edit mode<br>
+     *  <b>button</b>: a [BaseButton](#basebutton) without text<br>
+     *  <b>button</b>: a [BaseToggle](#basetoggle) element without text<br>
+     */
+    controlType: {
+      type: String,
+      default: 'button',
+      validator: val => ['button', 'toggle'].includes(val),
     },
   },
   data() {
@@ -213,6 +229,9 @@ export default {
     });
   },
   methods: {
+    updateData(rowData, index) {
+      this.$set(this.dataInt, index, rowData);
+    },
     /**
      * add additional parameters e.g: order for sorting
      *
@@ -273,18 +292,22 @@ export default {
      * set supportiveText for screen readers
      *
      * @param {string} type
+     * @param {number} index
      */
-    supportive(type) {
-      if (this.assertiveText === this.supportiveText[type]) {
+    supportive(type, index) {
+      const visibilityText = this.dataInt[index].hidden
+        ? this.supportiveText.hidden : this.supportiveText.visible;
+      const currentSupportString = this.supportiveText[type].replace('{state}', visibilityText);
+      if (this.assertiveText === currentSupportString) {
         // clear temporary to trigger screen reader
         this.assertiveText = '';
         // screen reader needs delay to trigger aria-live message
         setTimeout(() => {
-          this.assertiveText = this.supportiveText[type];
+          this.assertiveText = currentSupportString;
         }, 1);
         return;
       }
-      this.assertiveText = this.supportiveText[type];
+      this.assertiveText = currentSupportString;
     },
   },
 };
