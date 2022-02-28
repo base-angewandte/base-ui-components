@@ -217,15 +217,15 @@ export default {
 
     .base-radiomark {
       &:after {
+        position: absolute;
         content: "";
-        left: 4px;
-        top: 8px;
-        width: 8px;
-        height: 8px;
+        left: $spacing-small;
+        top: 50%;
+        width: $spacing-small;
+        height: $spacing-small;
         background-color: black;
-        border-width: 4px;
-        border-radius: 8px;
-
+        border-radius: $spacing-small;
+        transform: translate(-50%, -50%);
       }
     }
 
