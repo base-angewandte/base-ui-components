@@ -177,8 +177,7 @@ export default {
         justify-content: flex-end;
 
         .base-switch {
-          right: 100%;
-          transform: translateX(100%);
+          right: calc(100% - #{$spacing});
           background-color: $switch-checked-color;
 
           svg {
