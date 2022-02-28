@@ -14,6 +14,7 @@
     <base-icon
       v-if="icon"
       :name="icon"
+      :title="iconTitle"
       :class="['base-button-icon',
                'base-button-icon-' + iconSize,
                { 'base-button-icon-colored': iconColored },
@@ -125,6 +126,13 @@ export default {
       validator(val) {
         return ['small', 'large'].includes(val);
       },
+    },
+    /**
+     * set a title for the icon that is shown as a tooltip on hover
+     */
+    iconTitle: {
+      type: String,
+      default: '',
     },
     /**
      * set button inactive
