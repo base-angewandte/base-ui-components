@@ -14,9 +14,10 @@
       :placeholder="placeholder"
       :drop-down-list-id="'autocomplete-options-' + internalRowId"
       :language="language"
-      :identifier-property-name="filter.type === 'text'? identifierPropertyName.autocompleteOption
+      :identifier-property-name="useAutocompleteFunctionality
+        ? identifierPropertyName.autocompleteOption
         : identifierPropertyName.controlledVocabularyOption"
-      :label-property-name="filter.type === 'text'? labelPropertyName.autocompleteOption
+      :label-property-name="useAutocompleteFunctionality ? labelPropertyName.autocompleteOption
         : labelPropertyName.controlledVocabularyOption"
       :set-focus-on-active="false"
       :clearable="false"
@@ -51,8 +52,9 @@
           input-class="base-advanced-search-row__input-field"
           :class="['base-advanced-search-row__first-column',
                    'base-advanced-search-row__filter-input',
-                   { 'hide' :
-                     isMainSearch && filter.label === defaultFilter.label },
+                   { 'hide' : isMainSearch && filter
+                     [identifierPropertyName.filter] === defaultFilter
+                       [identifierPropertyName.filter] },
                    { 'base-advanced-search-row__filter-input__date':
                      filter.type.includes('date') }]"
           @click="isActive = true"
@@ -173,7 +175,7 @@
           <template
             v-slot:option="slotProps">
             <div
-              v-if="!filter || filter.type === 'text'"
+              v-if="!filter || useAutocompleteFunctionality"
               class="base-advanced-search-row__autocomplete-body">
               <div
                 v-if="slotProps.option[autocompletePropertyNames.data].length"
@@ -204,7 +206,7 @@
 
           <!-- CHIPS (CONTROLLED VOCABULARY OPTIONS) AREA -->
           <template
-            v-if="filter.type === 'chips'"
+            v-if="filter.type === 'chips' && !filter.freetext_allowed"
             v-slot:after-list>
             <div
               class="base-advanced-search-row__above-list-area
@@ -288,7 +290,7 @@
               :class="[
                 'base-advanced-search-row__no-options',
                 'base-advanced-search-row__area-padding',
-                { 'base-advanced-search-row__no-options-hidden': filter.type !== 'text' }
+                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality }
               ]">
               <div
                 v-if="!currentInput
@@ -370,13 +372,16 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
+     *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options
      */
     filterList: {
       type: Array,
       default: () => ([]),
-      validator: val => !val.length || (val.every(v => v.type && (v.type !== 'chips' || v.options))),
+      validator: val => !val.length
+        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
     },
     /**
      * specify a default value for a filter that is set when none of the
@@ -389,6 +394,8 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
+     *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options<br>
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
@@ -402,7 +409,7 @@ export default {
         options: [],
         filter_values: [],
       }),
-      validator: val => val.type && (val.type !== 'chips' || val.options),
+      validator: val => val.type && (val.type !== 'chips' || val.freetext_allowed || val.options),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>
@@ -414,6 +421,10 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
+     *      property are used or autocomplete is used
+     *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
+     *      or array of objects or strings for type 'text' and type 'chips'
      */
     appliedFilter: {
       type: [Object, null],
@@ -583,18 +594,12 @@ export default {
       // TODO: a) adjust to actual filter structure
       /**
        * the currently selected filter
-       * @typedef {Object} Filter filter
-       * @property {string} [Filter.label]
-       * @property {string} [Filter[labelPropertyName.filter]] - an alternative to
-       *  filter.label with custom property name
-       * @property {string} Filter.type
-       * @property {*[]} [Filter.filter_values]
-       * @property {Object[]} [Filter.options?]
+       * @type {Filter}
        */
       filter: this.defaultFilter,
       /**
        * the currently active (selected by key navigation) filter
-       * @type {?Object}
+       * @type {?Filter}
        */
       activeFilter: null,
       /**
@@ -673,10 +678,15 @@ export default {
     },
     /**
      * the actually displayed filters (currently only sorted)
+     * @returns {Filter[]}
      */
     displayedFilters() {
       const displayed = [...this.filterList];
       return sort(displayed, this.labelPropertyName.filter);
+    },
+    useAutocompleteFunctionality() {
+      const { type } = this.filter;
+      return type === 'text' || (type === 'chips' && this.filter.freetext_allowed);
     },
     /**
      * depending on the filter type get selectedOptions for BaseSearch from filter values
@@ -686,9 +696,9 @@ export default {
         this.$set(this.filter, 'filter_values', [...val]);
       },
       get() {
-        // this variable should only contain values for chips and text filters (should be array)
-        // not for date or daterange
-        if (this.filter.type === 'chips' || this.filter.type === 'text') {
+        // this variable should only contain values for chips
+        // not for date, daterange or text
+        if (this.filter.type === 'chips') {
           return this.filter && this.filter.filter_values ? [...this.filter.filter_values] : [];
         }
         return [];
@@ -736,7 +746,7 @@ export default {
      * @returns {Object[]}
      */
     resultListInt() {
-      if (this.filter.type === 'text') {
+      if (this.useAutocompleteFunctionality) {
         let resultsToDisplay = this.autocompleteResults;
         // if a filter is not default filter then only show autocomplete results that
         // have same category as selected text filter
@@ -784,7 +794,11 @@ export default {
      * function to determine if filter has filter values
      */
     filterHasValues() {
-      return hasData(this.filter.filter_values);
+      // check if filter is not default filter
+      return this.filter[this.identifierPropertyName.filter]
+        !== this.defaultFilter[this.identifierPropertyName.filter]
+        // or has filter values
+        || hasData(this.filter.filter_values);
     },
     /**
      * map filter type
@@ -792,13 +806,9 @@ export default {
     searchType() {
       if (this.filter) {
         const { type } = this.filter;
-        if (this.filter.id === 'default') {
-          return 'text';
-        }
-        if (type === 'text') {
-          return 'chips';
-        }
-        if (type === 'chips') {
+        // chips input filters that dont allow freetext need to have the type 'controlled'
+        // in BaseSearchComponent
+        if (type === 'chips' && !this.filter.freetext_allowed) {
           return 'controlled';
         }
         return type;
@@ -817,7 +827,7 @@ export default {
            * event emitted when the applied filter changes<br>
            *   (possible to use .sync modifier on prop appliedFilter)
            * @event update:applied-filter
-           * @property {Object} val - the new currently applied filter
+           * @property {Filter} val - the new currently applied filter
            */
           this.$emit('update:applied-filter', { ...val });
           if (this.isMainSearch && this.searchInputElement) {
@@ -831,6 +841,9 @@ export default {
      * watch if applied filter changes from outside
      */
     appliedFilter: {
+      /**
+       * @param {Filter} val - the currently applied filter as set from outside
+       */
       handler(val) {
         // check if anything actually changed
         if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
@@ -841,11 +854,8 @@ export default {
             // distinguish between date and others to assign to correct variable
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
-              // TODO: dont use default id but proper filter type for pure text string search
-            } else if (val.id === 'default') {
+            } else if (val.type === 'text') {
               [this.currentInput] = val.filter_values;
-            } else {
-              this.selectedOptions = val.filter_values;
             }
           }
         }
@@ -860,7 +870,7 @@ export default {
      */
     currentInput(val) {
       // if filter type is text - just emit for fetching autocomplete results
-      if (this.filter.type === 'text') {
+      if (this.useAutocompleteFunctionality) {
         /**
          * event emitted when input string for text or chips filter changes
          *
@@ -915,7 +925,7 @@ export default {
        * event emitted when user took action to add filter
        *
        * @event add-filter-row
-       * @property {Object} filter - the filter object in question
+       * @property {Filter} filter - the filter object in question
        */
       this.$emit('add-filter-row', this.filter);
     },
@@ -928,7 +938,7 @@ export default {
          * event emitted when user triggered remove icon on filter row
          *
          * @event remove-filter
-         * @property {Object} filter - the filter to be removed
+         * @property {Filter} filter - the filter to be removed
          */
         this.$emit('remove-filter', this.filter);
       }
@@ -940,7 +950,7 @@ export default {
      * set the via click or navigation selected filter as currently
      * active filter
      *
-     * @param {Object} selectedFilter - the selected filter object
+     * @param {Filter} selectedFilter - the selected filter object
      * @property {string} selectedFilter.type - the type of the filter needed
      * to set the default filter values accordingly (array, string, object)
      */
@@ -948,16 +958,26 @@ export default {
       // check if filter actually changed
       if (selectedFilter && this.filter[this.identifierPropertyName.filter]
         !== selectedFilter[this.identifierPropertyName.filter]) {
-        const oldFilterValues = this.filter.filter_values;
+        // store the previous filter in a variable
+        const previousFilter = this.filter;
+        const previousInput = this.currentInput;
+        // set newly selected filter as current filter
         this.filter = JSON.parse(JSON.stringify(selectedFilter));
-        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter.type, oldFilterValues));
+        // set filter values separately to be able to keep some values
+        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter, previousFilter));
+        // reset all input variables
+        this.resetAllInput();
+        this.activeFilter = null;
+        if (((previousFilter.type === 'text'
+          || (previousFilter.type === 'chips' && previousFilter.freetext_allowed)))
+          && this.useAutocompleteFunctionality) {
+          this.currentInput = previousInput;
+        }
         // if filter type date sync current input
         if (this.filter.type.includes('date')) {
           this.currentInput = this.filter.filter_values;
         }
-        this.activeFilter = null;
       }
-
       if (this.searchInputElement) {
         // in either case - focus on input field again after click on filter
         this.searchInputElement.focus();
@@ -1007,7 +1027,7 @@ export default {
       // and currently active filter is not identical
       // with the category of the selected item (if everything is going right this should
       // be 'default') then set the category of the selected item as current filter
-      if (this.filter.type === 'text'
+      if (this.useAutocompleteFunctionality
         && entry[this.identifierPropertyName.autocompleteOption]
         && this.filter[this.identifierPropertyName.filter]
           !== (this.activeCollection || collectionId
@@ -1023,9 +1043,8 @@ export default {
         };
       }
       this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
-      // if filter type is default only use string for search on enter
-      // TODO: do not use default filter but proper filter type for this evaluation
-      if (this.filter.id !== 'default') {
+      // if filter type is text only use string for search on enter
+      if (this.filter.type !== 'text') {
         // reset everything
         this.resetAllInput();
       }
@@ -1033,7 +1052,7 @@ export default {
       // if filter row is not controlled vocabulary close the filter to be able to see search
       // results
       // TODO: do not use default filter but proper filter type for this evaluation
-      if (this.filter.type !== 'chips' || this.filter.id === 'default') {
+      if (this.filter.type !== 'chips' && !this.filter.freetext_allowed) {
         this.isActive = false;
       }
     },
@@ -1048,17 +1067,16 @@ export default {
       if (this.filter.type === 'chips' && this.activeControlledVocabularyEntry) {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
-      } else if (this.filter.type === 'text' && this.activeEntry) {
+      } else if (this.useAutocompleteFunctionality && this.activeEntry) {
         this.addOption(this.activeEntry);
-        // check if filter id is default (because this should be fulltext search
-        // TODO: do not use default filter but proper filter type for this evaluation
-      } else if (this.filter.id === 'default' && this.currentInput && this.currentInput.trim()) {
+        // check if filter type is text
+      } else if (this.filter.type === 'text' && this.currentInput && this.currentInput.trim()) {
         this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
         this.isActive = false;
         // if there is no active entry check if there is input in the search field and
         // add the text input as chip if available, however check if text was already added
         // to avoid duplicates
-      } else if (this.filter.type === 'text' && this.filter.id !== 'default'
+      } else if (this.filter.type === 'chips'
         && this.currentInput && this.currentInput.trim()
         && (!this.selectedOptions || !this.selectedOptions
           .some(option => (!option[this.identifierPropertyName.autocompleteOption]
@@ -1248,38 +1266,47 @@ export default {
       }
     },
     /**
-     * function to set the correct values for
-     * a) filter.filter_values attribute
-     * b) search input (currentInput)
+     * function to set the correct values for filter.filter_values attribute
      *
-     * @param {string} type - the filter type
-     * @param {?string|Array|Object} [val=null] - the values already present in a filter
-     * to set (otherwise emtpy values (null, [], '',
-     * { date_from: '', date_to: ''}) will be used)
-     * @param {string} [val.date_from] - for filter type 'daterange' - from value
-     * @param {string} [val.date_to] - for filter type 'daterange' - to value
+     * @param {Filter} newFilter - the newly selected filter
+     * @param {Filter} previousFilter - the previously set filter
+
      * @returns {?string|Array|Object} the correct value type for the filter type
      */
-    setFilterValues(type, val = null) {
+    setFilterValues(newFilter, previousFilter = {}) {
+      const previousFilterValues = previousFilter.filter_values;
+      const { type } = newFilter;
+      const freetextAllowed = newFilter.freetext_allowed;
       if (type === 'date') {
         // map the date from daterange to date if necessary
-        return val && (val.date_from || val.date_to)
-          ? val.date_from || val.date_to : '';
+        return previousFilterValues.date_from || previousFilterValues.date_to || '';
       }
       if (type === 'daterange') {
+        // check if it can be mapped from date to daterange
+        if (previousFilter.type.includes('date')) {
+          return {
+            date_from: previousFilterValues.date_from || previousFilterValues || '',
+            date_to: previousFilterValues.to || '',
+          };
+        }
+        // else just return empty object
         return {
-          // map the date from date to date range if necessary!
-          date_from: (val && val.date_from) || (val && typeof val === 'string') ? val.date_from || val || '' : '',
-          date_to: val && val.date_to ? val.date_to : '',
+          date_from: '',
+          date_to: '',
         };
       }
-      // if type is text keep options that dont have an id (= were entered as freetext);
-      // TODO: if switch is from no-filter to certain filter also entries with certain collection
-      //  could be kept... (but collection is not saved atm)
-      if (val && val.length && type === 'text') {
-        return typeof val === 'object' && !!val.length
-          ? val.filter(option => !option[this.identifierPropertyName.autocompleteOption])
-          : [];
+      // check if both are autocomplete chips filters
+      if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
+        // if both are chips with freetext keep options without id (=not specific entries)
+        return previousFilterValues
+          .filter(value => !value[this.identifierPropertyName.autocompleteOption]);
+      }
+      // check if previous filter was text and new filter is autocomplete chips
+      if (previousFilter.type === 'text' && previousFilterValues.length
+        && type === 'chips' && freetextAllowed) {
+        return [{
+          [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
+        }];
       }
       return [];
     },

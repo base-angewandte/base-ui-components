@@ -47,6 +47,22 @@
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
 import { createId, hasData } from '@/utils/utils';
 
+/**
+ * @typedef Filter
+ * @property {string} label|* - property 'label' indicating the label or an equivalent
+ *  custom property defined in prop labelPropertyName.filter
+ * @property {string} id|* - property 'id' used as unique identifier or an equivalent
+ *  custom property defined in prop identifierPropertyName.filter
+ * @property {string} type - a filter type defining the type of search element shown
+ *  @values text, chips, date, daterange
+ * @property {boolean} [freetext_allowed] - property specifc for type: chips determining
+ *  if options are autocompleted (true) or used from the options property (false)
+ * @property {Object[]} [options] - the options used for chips filter types with
+ *  freetext_allowed false
+ * @property {Object[]|string[]|string|Object} [filter_values] - the values a filter contains - only
+ *  relevant for applied filters, not for filters coming from backend presented in the drop down
+ */
+
 export default {
   name: 'BaseAdvancedSearch',
   components: {
@@ -63,13 +79,18 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
+     *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options
      */
     filterList: {
       type: Array,
       default: () => ([]),
-      validator: val => !val.length || (val.every(v => v.type && (v.type !== 'chips' || v.options))),
+      validator: val => !val.length
+        // make sure a filter type is present and type is other than chips or freetext is
+        // allowed - otherwise it needs to have an options property
+        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
@@ -273,12 +294,12 @@ export default {
     return {
       /**
        * internal variable to handle applied filters also when set from outside
-       * @type {Object[]}
+       * @type {Filter[]}
        */
       appliedFiltersInt: [],
       /**
        * the filter used in the main search field - not added to applied filters yet
-       * @type {Object}
+       * @type {Filter}
        */
       mainFilter: null,
       /**
@@ -341,7 +362,7 @@ export default {
            * inform parent of changes in applied filters
            *
            * @event update:applied-filters
-           * @type {Object[]}
+           * @type {Filter[]}
            */
           this.$emit('update:applied-filters', [this.mainFilter, ...val]);
         }
@@ -410,7 +431,7 @@ export default {
     },
     /**
      * remove filter after 'x' was triggered
-     * @param {Object} filter - the filter to remove
+     * @param {Filter} filter - the filter to remove
      * @param {number} index - the index of the filter
      */
     removeFilter(filter, index) {
@@ -420,7 +441,7 @@ export default {
     },
     /**
      * function called when a filter object within a filter row changes
-     * @param {Object} filter - the filter that was altered
+     * @param {Filter} filter - the filter that was altered
      * @param {number} index - the index of the filter
      */
     updateFilter(filter, index) {
@@ -430,7 +451,7 @@ export default {
     },
     /**
      * @param {string} string - the search string to autocomplete
-     * @param {Object} filter - the filter the autocomplete was triggered for
+     * @param {Filter} filter - the filter the autocomplete was triggered for
      * @param {number} index - the index of the filter
      */
     fetchAutocomplete(string, filter, index) {
@@ -442,7 +463,7 @@ export default {
        * @event fetch-autocomplete
        * @type {Object} - object with the following properties:
        * @property {string} searchString - the string to autocomplete
-       * @property {Object} filter - the filter object
+       * @property {Filter} filter - the filter object
        * @property {number} index - the filter index of all filters (main and applied)
        */
       this.$emit('fetch-autocomplete', { searchString: string, filter, index });
@@ -455,7 +476,7 @@ export default {
        * inform parent that search should be triggered
        *
        * @event search
-       * @type {Object[]}
+       * @type {Filter[]}
        */
       this.$emit('search', [this.mainFilter, ...this.appliedFiltersInt]);
     },
