@@ -148,7 +148,7 @@
                     role="listbox"
                     class="base-advanced-search-row__filter-list">
                     <li
-                      v-for="(singleFilter, index) in displayedFilters"
+                      v-for="(singleFilter, index) in filterList"
                       :id="`filter-option-${singleFilter[identifierPropertyName.filter]}`"
                       :key="index"
                       ref="filterOption"
@@ -677,13 +677,11 @@ export default {
       },
     },
     /**
-     * the actually displayed filters (currently only sorted)
-     * @returns {Filter[]}
+     * variable to return if autocomplete functionality should be shown (= results fetched
+     * and displayed in drop down, how input is handled, etc.)
+     * this evaluates to true if type is text or chips with freetext allowed
+     * @returns {boolean}
      */
-    displayedFilters() {
-      const displayed = [...this.filterList];
-      return sort(displayed, this.labelPropertyName.filter);
-    },
     useAutocompleteFunctionality() {
       const { type } = this.filter;
       return type === 'text' || (type === 'chips' && this.filter.freetext_allowed);
@@ -692,23 +690,42 @@ export default {
      * depending on the filter type get selectedOptions for BaseSearch from filter values
      */
     selectedOptions: {
+      /**
+       * this is used when a chip is deleted
+       * @param {Object[]|string[]} val - the new selected options to be set as filter_values in the
+       *  current filter
+       */
       set(val) {
         this.$set(this.filter, 'filter_values', [...val]);
       },
       get() {
-        // this variable should only contain values for chips
-        // not for date, daterange or text
+        /**
+         * this variable should only contain values for chips
+         * not for date, daterange or text
+         * @returns {Object[]|string[]}
+         */
         if (this.filter.type === 'chips') {
           return this.filter && this.filter.filter_values ? [...this.filter.filter_values] : [];
         }
         return [];
       },
     },
+    /**
+     * in case the filter is a controlled vocabulary filter get the options
+     * from the corresponding filter in the filter list
+     * @returns {Object[]}
+     */
     controlledVocabularyOptions() {
-      const currentFilter = this.filterList
-        .find(filter => filter[this.identifierPropertyName.filter]
-          === this.filter[this.identifierPropertyName.filter]);
-      return currentFilter ? currentFilter.options : [];
+      // check first if filter is type controlled vocabulary
+      if (this.filter.type === 'chips' && !this.filter.freetext_allowed) {
+        // if yes - get the filter from filterList that has all the options
+        const currentFilter = this.filterList
+          .find(filter => filter[this.identifierPropertyName.filter]
+            === this.filter[this.identifierPropertyName.filter]);
+        // if one was found return the options
+        return currentFilter ? currentFilter.options : [];
+      }
+      return [];
     },
     /**
      * the actually displayed controlled vocabulary options
@@ -960,6 +977,8 @@ export default {
         !== selectedFilter[this.identifierPropertyName.filter]) {
         // store the previous filter in a variable
         const previousFilter = this.filter;
+        // store previous input value in a variable (to keep it if new filter type is
+        // compatible
         const previousInput = this.currentInput;
         // set newly selected filter as current filter
         this.filter = JSON.parse(JSON.stringify(selectedFilter));
@@ -968,6 +987,8 @@ export default {
         // reset all input variables
         this.resetAllInput();
         this.activeFilter = null;
+        // now restore the input value if it makes sense (=filter type is autocomplete filter and
+        // type stays the same or switches to other autocomplete type (chips, text))
         if (((previousFilter.type === 'text'
           || (previousFilter.type === 'chips' && previousFilter.freetext_allowed)))
           && this.useAutocompleteFunctionality) {
@@ -988,8 +1009,8 @@ export default {
      * filter input field
      */
     navigateFilters(event) {
-      if (this.displayedFilters.length && this.isActive && this.$refs.dropDown) {
-        const currentIndex = this.displayedFilters.indexOf(this.activeFilter);
+      if (this.filterList.length && this.isActive && this.$refs.dropDown) {
+        const currentIndex = this.filterList.indexOf(this.activeFilter);
         const dropDownElement = this.$refs.dropDown.$el;
         // if filters are out of view - scroll to top to make them visible
         if (this.$refs.filterOption && dropDownElement.scrollTop !== 0) {
@@ -999,7 +1020,7 @@ export default {
         }
         // determine if arrow was up or down - true if down, false for up
         const isArrowDown = event.key === 'ArrowDown';
-        this.activeFilter = this.navigate(this.displayedFilters, isArrowDown, currentIndex, true);
+        this.activeFilter = this.navigate(this.filterList, isArrowDown, currentIndex, true);
       }
     },
 
@@ -1051,8 +1072,7 @@ export default {
 
       // if filter row is not controlled vocabulary close the filter to be able to see search
       // results
-      // TODO: do not use default filter but proper filter type for this evaluation
-      if (this.filter.type !== 'chips' && !this.filter.freetext_allowed) {
+      if (this.filter.type !== 'chips' || this.filter.freetext_allowed) {
         this.isActive = false;
       }
     },

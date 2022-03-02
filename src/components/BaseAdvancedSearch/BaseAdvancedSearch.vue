@@ -7,7 +7,7 @@
         :search-row-id="getRowId()"
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index + 1]"
-        :filter-list="filterList"
+        :filter-list="displayedFilters"
         :applied-filter.sync="filter"
         :is-loading="filtersLoadingState[index + 1]"
         :default-filter="defaultFilter"
@@ -45,7 +45,7 @@
 
 <script>
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
-import { createId, hasData } from '@/utils/utils';
+import { createId, hasData, sort } from '@/utils/utils';
 
 /**
  * @typedef Filter
@@ -55,6 +55,7 @@ import { createId, hasData } from '@/utils/utils';
  *  custom property defined in prop identifierPropertyName.filter
  * @property {string} type - a filter type defining the type of search element shown
  *  @values text, chips, date, daterange
+ * @property {boolean} [hidden] - exclude filters that have this attribute true from display
  * @property {boolean} [freetext_allowed] - property specifc for type: chips determining
  *  if options are autocompleted (true) or used from the options property (false)
  * @property {Object[]} [options] - the options used for chips filter types with
@@ -79,6 +80,8 @@ export default {
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
      *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>hidden</b> {boolean} - filters with this attribute true will be filtered from
+     *      displayed filter list<br>
      *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
      *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
@@ -331,6 +334,16 @@ export default {
           .map((filter, index) => (this.autocompleteIndex === index + 1)),
       ];
     },
+    /**
+     * the actually displayed filters
+     * @returns {Filter[]}
+     */
+    displayedFilters() {
+      // filter filters with property hidden true
+      const displayed = [...this.filterList].filter(f => !f.hidden);
+      // sort them
+      return sort(displayed, this.labelPropertyName.filter);
+    },
   },
   watch: {
     /**
@@ -358,12 +371,6 @@ export default {
         // check if val is actually different from prop value
         if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters.slice(1))) {
           // if yes - inform parent
-          /**
-           * inform parent of changes in applied filters
-           *
-           * @event update:applied-filters
-           * @type {Filter[]}
-           */
           this.$emit('update:applied-filters', [this.mainFilter, ...val]);
         }
       },
@@ -386,29 +393,42 @@ export default {
       },
       immediate: true,
     },
+    /**
+     * watch main filter since changes are not directly handled via update:applied-filters
+     * event and trigger search if anything changed
+     * @param {Filter} val - the updated main filter
+     */
     mainFilter(val) {
       // make sure mainFilter exists and has property filter_values
-      if (this.mainFilter && this.mainFilter.filter_values) {
+      if (val && val.filter_values) {
         // store values to compare in variables
-        const mainFilterHasData = hasData(this.mainFilter.filter_values);
+        const mainFilterHasData = hasData(val.filter_values);
         // for original filter also check right here if property filter_values actually
         // exists
         const originalMainFilterHasData = this.originalMainFilter
           && this.originalMainFilter.filter_values
           && hasData(this.originalMainFilter.filter_values);
         // now check a) if originalMainFilter exists already and
-        // b) original data and current data diverge (only one of them does not have data)
-        // c) or both have data but data are different from each other
-        if (this.originalMainFilter && (mainFilterHasData !== originalMainFilterHasData
+        // b) filter itself has switched (and there are actually data to search for)
+        // c) original data and current data diverge (only one of them does not have data)
+        // d) or both have data but data are different from each other
+        if (this.originalMainFilter && (this.originalMainFilter.id !== val.id
+          || mainFilterHasData !== originalMainFilterHasData
           || (mainFilterHasData && originalMainFilterHasData
-          && JSON.stringify(this.originalMainFilter.filter_values)
-            !== JSON.stringify(val.filter_values)))) {
+          && (JSON.stringify(this.originalMainFilter.filter_values
+              !== JSON.stringify(val.filter_values)))))) {
           // if so - update original data
           this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // and trigger search
           this.search();
         }
       }
+      /**
+       * inform parent of changes in applied filters
+       *
+       * @event update:applied-filters
+       * @type {Filter[]}
+       */
       this.$emit('update:applied-filters', [val, ...this.appliedFiltersInt]);
     },
   },
