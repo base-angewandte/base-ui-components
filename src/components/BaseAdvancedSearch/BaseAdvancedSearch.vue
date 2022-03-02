@@ -27,7 +27,7 @@
       :search-row-id="'main'"
       :is-main-search="true"
       :applied-filter.sync="mainFilter"
-      :filter-list="filterList"
+      :filter-list="displayedFilters"
       :default-filter="defaultFilter"
       :autocomplete-results="filtersAutocompleteResults[0]"
       :is-loading="filtersLoadingState[0]"
