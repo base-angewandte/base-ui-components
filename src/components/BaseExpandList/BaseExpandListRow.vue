@@ -84,9 +84,9 @@
           @keydown.down.prevent.stop="moveItem('down')"
           @keydown.up.prevent.stop="moveItem('up')"
           @keydown.space.prevent.stop="movable =! movable"
-          @keydown.esc="movable = false"
           @focus="supportiveText('activate')"
-          @blur="movable = false">
+          @keyup.esc="cancelMovable"
+          @blur="cancelMovable">
           <base-icon
             name="drag-lines" />
         </span>
@@ -272,6 +272,20 @@ export default {
     },
   },
   methods: {
+    /**
+     * cancel movable state, stop propagation if needed<br>
+     *   e.g. further esc key event
+     * @param {Object} e - event
+     */
+    cancelMovable(e) {
+      if (this.movable) {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        e.cancelBubble = false;
+        this.movable = false;
+      }
+    },
     /**
      * set visibility if button was clicked
      */
