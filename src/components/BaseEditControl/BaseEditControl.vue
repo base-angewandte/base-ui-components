@@ -39,8 +39,8 @@
       <base-button
         v-if="edit"
         :has-background-color="false"
-        :icon="!isLoading ? 'save-file' : ''"
-        :text="getI18nTerm(saveButtonText)"
+        :icon="saveButtonIcon"
+        :text="getI18nTerm(saveButtonTextInt)"
         class="base-edit-control__button"
         @clicked="save">
         <template
@@ -53,7 +53,7 @@
       </base-button>
 
       <base-button
-        v-if="edit"
+        v-if="editMode === 'save' && edit"
         :has-background-color="false"
         icon="remove"
         :text="getI18nTerm(cancelButtonText)"
@@ -133,7 +133,7 @@ export default {
      */
     editButtonText: {
       type: String,
-      default: 'edit',
+      default: 'Edit',
     },
     /**
      * define button text<br>
@@ -141,7 +141,7 @@ export default {
      */
     cancelButtonText: {
       type: String,
-      default: 'cancel',
+      default: 'Cancel',
     },
     /**
      * define button text<br>
@@ -149,7 +149,37 @@ export default {
      */
     saveButtonText: {
       type: String,
+      default: '',
+    },
+    /**
+     * decide on buttons presented in edit mode<br>
+     *  <b>save</b>: element has a 'save' and 'cancel' button
+     *  <b>done</b>: element solely has a 'done' button. this button is also emitting
+     *    a 'saved' event when clicked and uses the saveButtonText
+     */
+    editMode: {
+      type: String,
       default: 'save',
+      validator: val => ['save', 'done'].includes(val),
+    },
+  },
+  computed: {
+    /**
+     * set icon depending on editMode
+     * @returns {string}
+     */
+    saveButtonIcon() {
+      if (this.isLoading) {
+        return '';
+      }
+      return this.editMode === 'done' ? 'check-mark' : 'save-file';
+    },
+    /**
+     * set default save button text depending on editMode
+     * @returns {string}
+     */
+    saveButtonTextInt() {
+      return this.saveButtonText || (this.editMode === 'done' ? 'Done' : 'Save');
     },
   },
   methods: {
@@ -157,7 +187,7 @@ export default {
       /**
        * event emitted by click on edit button
        *
-       * @type {Event}
+       * @type {PointerEvent}
        */
       this.$emit('activated', event);
     },
@@ -165,7 +195,7 @@ export default {
       /**
        * event emitted by click on cancel button
        *
-       * @type {Event}
+       * @type {PointerEvent}
        */
       this.$emit('canceled', event);
     },
@@ -173,7 +203,7 @@ export default {
       /**
        * event emitted by click on save button
        *
-       * @type {Event}
+       * @type {PointerEvent}
        */
       this.$emit('saved', event);
     },
