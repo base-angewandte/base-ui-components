@@ -199,6 +199,7 @@ export default {
       assertiveText: '',
       showAll: false,
       dataSorted: null,
+      originalData: null,
     };
   },
   computed: {
@@ -231,6 +232,14 @@ export default {
       },
       deep: true,
       immediate: true,
+    },
+    /**
+     * watch edit to create a copy of the data for the reset function
+     */
+    edit(val) {
+      if (val) {
+        this.originalData = JSON.parse(JSON.stringify(this.data));
+      }
     },
   },
   updated() {
@@ -294,11 +303,12 @@ export default {
       this.$refs.baseExpandListRow[to].movable = true;
     },
     /**
-     * reset list data
+     * reset list data - this always restores the state of the data on
+     * last save() triggered (=was triggered in parent)
      * @public
      */
     reset() {
-      this.dataInt = this.data;
+      this.dataInt = this.originalData;
     },
     /**
      * save changed data
@@ -311,6 +321,8 @@ export default {
        * @type {object}
        */
       this.$emit('saved', this.dataInt);
+      // update reset data copy
+      this.originalData = JSON.parse(JSON.stringify(this.dataInt));
     },
     /**
      * set supportiveText for screen readers
