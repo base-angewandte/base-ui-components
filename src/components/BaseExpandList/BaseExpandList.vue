@@ -215,7 +215,9 @@ export default {
   watch: {
     dataSorted: {
       handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.data)) {
+        // check if update is actually done by user during edit mode
+        // (this is the only time internal data should change!)
+        if (this.edit && JSON.stringify(val) !== JSON.stringify(this.data)) {
           this.$emit('update:data', val);
         }
       },

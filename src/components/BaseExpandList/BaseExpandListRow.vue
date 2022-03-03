@@ -275,7 +275,7 @@ export default {
     /**
      * cancel movable state, stop propagation if needed<br>
      *   e.g. further esc key event
-     * @param {Object} e - event
+     * @param {KeyboardEvent} e - event
      */
     cancelMovable(e) {
       if (this.movable) {
