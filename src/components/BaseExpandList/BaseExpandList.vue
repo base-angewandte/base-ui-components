@@ -94,7 +94,7 @@ export default {
   },
   props: {
     /**
-     * data object: [{ label: 'String', data: [{ value: 'String', }],
+     * data object: [{ label: 'String', id: 'String', data: [{ value: 'String', }],
      *  [hidden]: boolean, [count]: number }]<br><br>
      * optional properties:<br>
      *  count: used for the number shown in brackets
@@ -205,14 +205,30 @@ export default {
     // the data array computed for draggable
     dataInt: {
       get() {
-        if (this.dataSorted) {
-          return this.dataSorted;
-        }
-        return this.addParams(this.data);
+        return this.dataSorted || this.data;
       },
       set(val) {
         this.dataSorted = this.addParams(val);
       },
+    },
+  },
+  watch: {
+    dataSorted: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.data)) {
+          this.$emit('update:data', val);
+        }
+      },
+      deep: true,
+    },
+    data: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.dataSorted)) {
+          this.dataInt = JSON.parse(JSON.stringify(val));
+        }
+      },
+      deep: true,
+      immediate: true,
     },
   },
   updated() {
@@ -229,8 +245,14 @@ export default {
     });
   },
   methods: {
+    /**
+     * function called from BaseExpandListRow in case a prop of the data variable
+     * changes (e.g. hidden)
+     * @param {Object} rowData - the updated data of the BaseExpandListRow
+     * @param {number} index - the index in the dataInt array
+     */
     updateData(rowData, index) {
-      this.$set(this.dataInt, index, rowData);
+      this.$set(this.dataSorted, index, rowData);
     },
     /**
      * add additional parameters e.g: order for sorting
@@ -239,7 +261,7 @@ export default {
      * @returns {Array}
      */
     addParams(data) {
-      return data.map((obj, index) => ({ ...obj, order: index }));
+      return data.map((obj, index) => ({ ...obj, order: obj.order || index }));
     },
     /**
      * sort list

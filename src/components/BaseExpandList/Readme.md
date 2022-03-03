@@ -29,7 +29,7 @@ Component to render list data
 
     <BaseExpandList
       ref="baseExpandList"
-      :data="editExpandList ? baseExpandList : baseExpandList.filter(item => !item.hidden)"
+      :data.sync="displayData"
       :edit="editExpandList"
       :control-type="toggleElements"
       @saved="saveExpandListEdit">
@@ -281,6 +281,17 @@ export default {
       ],
       toggleElements: 'toggle',
     };
+  },
+  computed: {
+    displayData: {
+      set(val) {
+        this.baseExpandList = val;
+      },
+      get() {
+        return this.editExpandList ? this.baseExpandList
+          : this.baseExpandList.filter(item => !item.hidden);
+      },
+    }
   },
   methods: {
     activateExpandList() {
