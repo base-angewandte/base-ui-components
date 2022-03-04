@@ -595,6 +595,8 @@ export default {
       imageBoxesSelectable: false,
       // unique id to assign javascript calculated styles to
       elementId: null,
+      // store state if component is mounted and window is present
+      initialized: false,
     };
   },
   computed: {
@@ -815,6 +817,14 @@ export default {
          */
         this.$emit('update:edit-mode', val);
       }
+
+      // add listener to esc key event (toggle edit mode)
+      if (!this.initialized) return;
+      if (val) {
+        window.addEventListener('keyup', this.escEventHandler);
+      } else {
+        window.removeEventListener('keyup', this.escEventHandler);
+      }
     },
     editMode: {
       handler(val) {
@@ -852,6 +862,7 @@ export default {
     // need to get the correct number of boxes per row to calculate the visible
     // number of items correctly
     window.addEventListener('resize', this.resizeBoxes);
+    this.initialized = true;
   },
   updated() {
     if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
@@ -937,6 +948,14 @@ export default {
        * @param {string} action - the action type
        */
       this.$emit('submit-action', action);
+    },
+    /**
+     * intercept escape key event and reset edit mode
+     */
+    escEventHandler(e) {
+      if (e.key === 'Escape') {
+        this.editModeActive = false;
+      }
     },
 
     /** BOX DISPLAY FUNCTIONALITIES */

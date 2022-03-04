@@ -182,6 +182,17 @@ export default {
       return this.saveButtonText || (this.editMode === 'done' ? 'Done' : 'Save');
     },
   },
+  watch: {
+    edit: {
+      handler(val) {
+        if (val) {
+          window.addEventListener('keyup', this.escEventHandler);
+        } else {
+          window.removeEventListener('keyup', this.escEventHandler);
+        }
+      },
+    },
+  },
   methods: {
     activate(event) {
       /**
@@ -206,6 +217,14 @@ export default {
        * @type {PointerEvent}
        */
       this.$emit('saved', event);
+    },
+    /**
+     * intercept escape key event and reset edit mode
+     */
+    escEventHandler(e) {
+      if (e.key === 'Escape') {
+        this.cancel();
+      }
     },
   },
 };
