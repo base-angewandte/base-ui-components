@@ -371,7 +371,7 @@ export default {
   @import "../../styles/variables";
 
   .base-drop-down-list__container {
-    background: white;
+    background: inherit;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;

@@ -14,6 +14,11 @@ To see autocomplete results try typing 'zentrum'.
         autocompleteOption: 'header',
         controlledVocabularyOption: 'label',
       }"
+      :autocompletePropertyNames="{
+        label: 'collection',
+        id: 'collection',
+        data: 'data',
+      }"
       @add-filter="addFilter"
       @fetch-autocomplete="fetchAutocomplete" />
   </div>

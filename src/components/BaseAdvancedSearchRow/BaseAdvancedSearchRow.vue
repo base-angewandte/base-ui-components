@@ -493,7 +493,7 @@ export default {
       }),
     },
     /**
-     * autocomplete results need a collection and a data property that contains all the actual
+     * autocomplete results need a label and a data property that contains all the actual
      * autocomplete results for that specific category
      * TODO: make category optional
      */

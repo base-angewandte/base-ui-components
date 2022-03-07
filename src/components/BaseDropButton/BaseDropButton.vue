@@ -393,6 +393,8 @@ export default {
     }
 
     .base-drop-button__drop-down {
+      background: white;
+
       .base-drop-button__action {
         display: flex;
         align-items: center;
