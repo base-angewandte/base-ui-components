@@ -304,7 +304,6 @@ export default {
         this.movable = false;
         this.$emit('sorted', {
           direction,
-          order: this.dataInt.order,
         });
       }
     },

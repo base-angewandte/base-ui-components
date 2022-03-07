@@ -61,7 +61,7 @@
               :control-type="controlType"
               class="base-expand-list__draggable__item"
               @supportive="supportive($event, index)"
-              @sorted="sort"
+              @sorted="sort($event, index)"
               @update:data="updateData($event, index)" />
           </draggable>
         </div>
@@ -272,23 +272,28 @@ export default {
      * @returns {Array}
      */
     addParams(data) {
-      return data.map((obj, index) => ({ ...obj, order: obj.order || index }));
+      return data.map((obj, index) => ({ ...obj, order: index }));
     },
     /**
      * sort list
      *
      * @param {object} obj
+     * @property {string} obj.direction - 'up' or 'down'
+     * @param {number} index - the previous index of the item in the array
      */
-    sort(obj) {
+    sort({ direction }, index) {
       // check list boundary
-      if ((obj.direction === 'up' && obj.order - 1 < 0)
-        || (obj.direction === 'down' && obj.order + 1 >= this.dataInt.length)) {
+      if ((direction === 'up' && index - 1 < 0)
+        || (direction === 'down' && index + 1 >= this.dataInt.length)) {
+        // current movable item (focus) needs to stay the same
+        this.$refs.baseExpandListRow[index].useSupportiveText = false;
+        this.$refs.baseExpandListRow[index].movable = true;
         return;
       }
 
       // set object to new position
-      const to = obj.direction === 'up' ? obj.order - 1 : obj.order + 1;
-      const from = obj.order;
+      const to = direction === 'up' ? index - 1 : index + 1;
+      const from = index;
       const data = this.dataInt;
       data.splice(to, 0, data.splice(from, 1)[0]);
       this.dataInt = data;
