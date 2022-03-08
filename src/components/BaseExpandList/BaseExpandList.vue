@@ -237,23 +237,16 @@ export default {
      * watch edit to create a copy of the data for the reset function
      */
     edit(val) {
+      this.assertiveText = '';
       if (val) {
+        this.$nextTick(() => {
+          // set focus draggable area on edit start
+          this.$refs.baseExpandListDraggable.focus({ preventScroll: true });
+        });
+        // save a copy of original data in variable on edit activation
         this.originalData = JSON.parse(JSON.stringify(this.data));
       }
     },
-  },
-  updated() {
-    this.$nextTick(() => {
-      // set focus draggable area
-      // if update was triggered by reordering list items, focus will set in function sort()
-      if (this.edit) {
-        const isHandleFocused = document.activeElement.classList.contains('base-expand-item__handle');
-
-        if (!isHandleFocused) {
-          this.$refs.baseExpandListDraggable.focus();
-        }
-      }
-    });
   },
   methods: {
     /**
