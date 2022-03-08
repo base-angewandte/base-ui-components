@@ -306,7 +306,10 @@ export default {
      * @public
      */
     reset() {
-      this.dataInt = this.originalData;
+      this.dataInt = JSON.parse(JSON.stringify(this.originalData));
+      // watcher on sortedData is not triggered here (because edit is already false)
+      // - need to propagate event to parent manually
+      this.$emit('update:data', this.dataInt);
     },
     /**
      * save changed data
