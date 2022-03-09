@@ -603,7 +603,7 @@ export default {
 
     &__head {
       position: sticky;
-      z-index: map-get($zindex, dropdown);
+      z-index: map-get($zindex, entry-selector-head);
       padding-top: $spacing;
       background-color: $background-color;
       flex: 0 0 auto;
