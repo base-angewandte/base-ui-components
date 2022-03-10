@@ -130,7 +130,7 @@
                     || !!entry[identifierPropertyName]"
                   :chip-active="chipActiveForRemove === index"
                   @remove-entry="removeEntry(entry, index)"
-                  @value-changed="test($event, index)"
+                  @value-changed="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
               </slot>
             </template>
