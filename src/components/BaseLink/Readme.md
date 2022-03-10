@@ -65,6 +65,11 @@ export default {
             },
           ],
         },
+        {
+          value: 'internal link (chips)',
+          source: 'internal.link',
+          type: 'activity'
+        },
       ],
     };
   },
