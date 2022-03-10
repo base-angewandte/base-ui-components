@@ -448,7 +448,7 @@ export default {
     // check if mainFilter was already set (e.g. from outside)
     if (!this.mainFilter) {
       // if not set default filter
-      this.mainFilter = { ...this.defaultFilter, filter_values: [] };
+      this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     }
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
   },

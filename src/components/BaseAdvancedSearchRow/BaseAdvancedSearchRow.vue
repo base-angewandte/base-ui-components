@@ -405,10 +405,10 @@ export default {
     defaultFilter: {
       type: Object,
       default: () => ({
+        id: 'default',
         label: 'Fulltext',
         type: 'text',
         options: [],
-        filter_values: [],
       }),
       validator: val => val.type && (val.type !== 'chips' || val.freetext_allowed || val.options),
     },
@@ -607,7 +607,10 @@ export default {
        * the currently selected filter
        * @type {Filter}
        */
-      filter: this.defaultFilter,
+      filter: {
+        ...this.defaultFilter,
+        filter_values: this.setFilterValues(this.defaultFilter),
+      },
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Filter}
@@ -677,10 +680,17 @@ export default {
      * (this is triggered when deleting the selected filter)
      */
     selectedFilter: {
+      /**
+       * triggered on deleting a filter via chip 'x'
+       * @param {Filter[]} val
+       */
       set(val) {
+        const newFilter = val.length ? val.pop() : this.defaultFilter;
         // check if filter was selected - else use the default filter
-        this.filter = val.length ? val.pop()
-          : JSON.parse(JSON.stringify(this.defaultFilter));
+        this.filter = {
+          ...newFilter,
+          filter_values: this.setFilterValues(newFilter, this.filter),
+        };
       },
       get() {
         // return current filter object as array
@@ -875,8 +885,11 @@ export default {
       handler(val) {
         // check if anything actually changed
         if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
-          this.filter = val ? JSON.parse(JSON.stringify(val))
-            : { ...this.defaultFilter, filter_values: [] };
+          const newFilter = val || this.defaultFilter;
+          this.filter = {
+            ...newFilter,
+            filter_values: this.setFilterValues(newFilter, this.filter),
+          };
           // check if the new filter has values
           if (val && val.filter_values) {
             // distinguish between date and others to assign to correct variable
@@ -959,7 +972,10 @@ export default {
     },
     removeFilter() {
       if (this.isMainSearch) {
-        this.filter = JSON.parse(JSON.stringify(this.defaultFilter));
+        this.filter = {
+          ...this.defaultFilter,
+          filter_values: this.setFilterValues(this.defaultFilter),
+        };
         this.resetAllInput();
       } else {
         /**
@@ -1065,13 +1081,13 @@ export default {
           !== (this.activeCollection || collectionId
             || this.defaultFilter[this.identifierPropertyName.filter])) {
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
-          === (this.activeCollection || collectionId));
+          === (this.activeCollection || collectionId)) || this.defaultFilter;
         this.filter = {
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
-          ...(newFilter || this.defaultFilter),
+          ...newFilter,
           // also add the filter values property which does not exist in the filterList filters
-          filter_values: [],
+          filter_values: this.setFilterValues(newFilter, this.filter),
         };
       }
       this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
@@ -1310,14 +1326,14 @@ export default {
       const freetextAllowed = newFilter.freetext_allowed;
       if (type === 'date') {
         // map the date from daterange to date if necessary
-        return previousFilterValues.date_from || previousFilterValues.date_to || '';
+        return previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
       }
       if (type === 'daterange') {
         // check if it can be mapped from date to daterange
         if (previousFilter.type.includes('date')) {
           return {
-            date_from: previousFilterValues.date_from || previousFilterValues || '',
-            date_to: previousFilterValues.to || '',
+            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues : '',
+            date_to: previousFilterValues ? previousFilterValues.to : '',
           };
         }
         // else just return empty object
@@ -1329,11 +1345,11 @@ export default {
       // check if both are autocomplete chips filters
       if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
         // if both are chips with freetext keep options without id (=not specific entries)
-        return previousFilterValues
-          .filter(value => !value[this.identifierPropertyName.autocompleteOption]);
+        return previousFilterValues && previousFilterValues.length ? previousFilterValues
+          .filter(value => !value[this.identifierPropertyName.autocompleteOption]) : [];
       }
       // check if previous filter was text and new filter is autocomplete chips
-      if (previousFilter.type === 'text' && previousFilterValues.length
+      if (previousFilter.type === 'text' && previousFilterValues && previousFilterValues.length
         && type === 'chips' && freetextAllowed) {
         return [{
           [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
