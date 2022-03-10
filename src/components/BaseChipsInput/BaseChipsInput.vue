@@ -381,6 +381,18 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * define true if chip should be editable on click
+     * <br>
+     * CAVEAT: chips can not be both draggable AND editable and it can not show
+     *  hoverBoxContent as soon as it is editable respectively - if both are set true edit
+     *  functionality takes precedent - chip will not be draggable, hoverBoxContent will not
+     *  be shown!
+     */
+    chipsEditable: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
