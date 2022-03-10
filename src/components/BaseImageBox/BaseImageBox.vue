@@ -57,13 +57,13 @@
           <BaseIcon
             v-if="icon"
             :name="icon"
-            class="base-image-box-icon" />
+            :class="['base-image-box-icon', 'base-image-box-icon--' + iconSize]" />
 
           <!-- display optional play icon e.g. for video, audio -->
           <BaseIcon
             v-if="playIcon"
             name="play"
-            class="base-image-box-icon-play" />
+            :class="['base-image-box-icon-play', 'base-image-box-icon--' + iconSize]"/>
 
           <div
             v-if="!imageUrl || !displayImage"
@@ -231,6 +231,14 @@ export default {
       default: '',
     },
     /**
+     * set optional icon size <br>
+     */
+    iconSize: {
+      type: String,
+      default: 'xxlarge',
+      validator: val => ['small', 'medium', 'large', 'xlarge', 'xxlarge'].includes(val),
+    },
+    /**
      * display play icon <br>
      * e.g. for Video, Audio files
      */
@@ -275,7 +283,7 @@ export default {
       default: false,
     },
     /**
-     * specifiy position of image
+     * specify position of image
      */
     imageFirst: {
       type: Boolean,
@@ -564,24 +572,42 @@ export default {
         height: 100%;
       }
 
-      .base-image-box-icon {
+      .base-image-box-icon,
+      .base-image-box-icon-play {
         position: absolute;
         top: 50%;
         left: 50%;
-        fill: $font-color-second;
-        max-width: $icon-xxlarge;
         transform: translate(-50%, -50%);
+
+        &.base-image-box-icon--xxlarge {
+          max-width: $icon-xxlarge;
+        }
+
+        &.base-image-box-icon--xlarge {
+          max-width: $icon-xlarge;
+        }
+
+        &.base-image-box-icon--large {
+          max-width: $icon-large;
+        }
+
+        &.base-image-box-icon--medium {
+          max-width: $icon-medium;
+        }
+
+        &.base-image-box-icon-small {
+          max-width: $icon-small;
+        }
+      }
+
+      .base-image-box-icon {
+        fill: $font-color-second;
       }
 
       .base-image-box-icon-play {
         opacity: 0;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         z-index: 1;
         fill: $app-color;
-        max-width: $icon-xlarge;
       }
 
       .base-image-box-img-wrapper {

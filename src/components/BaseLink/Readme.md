@@ -65,11 +65,16 @@ export default {
             },
           ],
         },
+        {
+          value: 'internal link (chips)',
+          source: 'internal.link',
+          type: 'activity'
+        },
       ],
     };
   },
   methods: {
-    async asyncTooltip(value, index) {
+    asyncTooltip(value, index) {
       setTimeout(() => {
         this.$set(this.links[index], 'tooltip', [
           {
