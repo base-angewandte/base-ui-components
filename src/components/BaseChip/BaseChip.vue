@@ -8,6 +8,7 @@
       ref="chipText"
       :style="textStyling"
       :contenteditable="editable ? 'true' : false"
+      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
       class="base-chip__text"
       @blur="updateText"
       @click.stop="clickAction"
@@ -16,6 +17,12 @@
       @mouseleave="hideBox">
       {{ entryInt }}
     </div>
+    <span
+      v-if="assistiveText"
+      :id="`${internalId}_aria-label`"
+      class="hide">
+      {{ assistiveText }}
+    </span>
     <div
       v-if="isRemovable"
       class="base-chip__icon"
@@ -33,6 +40,7 @@
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 /**
@@ -105,6 +113,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    assistiveText: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -123,6 +135,9 @@ export default {
   computed: {
     hoverBoxEnabled() {
       return this.isLinked && !!Object.keys(this.hoverBoxContent).length;
+    },
+    internalId() {
+      return createId();
     },
   },
   watch: {

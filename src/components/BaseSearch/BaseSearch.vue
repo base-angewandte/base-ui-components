@@ -20,10 +20,12 @@
       :show-error-icon="showErrorIcon"
       :language="languageInt"
       :allow-unknown-entries="isFieldTypeChips && type === 'chips'"
+      :chips-editable="type === 'chips'"
       :label-property-name="isFieldTypeChips ? labelPropertyName : false"
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
+      :assistive-text="isFieldTypeChips ? assistiveText: false"
       input-class="base-search__input-field"
       field-type="search"
       class="base-search__input"
@@ -238,6 +240,16 @@ export default {
     setFocusOnActive: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for type chips)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {

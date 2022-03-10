@@ -21,6 +21,7 @@
         : labelPropertyName.controlledVocabularyOption"
       :set-focus-on-active="false"
       :clearable="false"
+      :assistive-text="assistiveText"
       class="base-advanced-search-row__search"
       v-bind="$listeners"
       @clicked-outside="isActive = false"
@@ -580,6 +581,16 @@ export default {
     maxNumberControlledOptions: {
       type: Number,
       default: 100,
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for type chips with autocomplete (=freetext_allowed))
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {

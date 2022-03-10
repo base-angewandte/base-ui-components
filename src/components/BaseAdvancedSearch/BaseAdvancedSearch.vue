@@ -17,6 +17,7 @@
         :identifier-property-name="identifierPropertyName"
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
+        :assistive-text="assistiveText"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
@@ -37,6 +38,7 @@
       :identifier-property-name="identifierPropertyName"
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
+      :assistive-text="assistiveText"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
@@ -291,6 +293,16 @@ export default {
       }),
       // check if all the necessary attributes are included in the provided object
       validator: val => ['id', 'label', 'data'].every(key => Object.keys(val).includes(key)),
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for type chips with autocomplete (=freetext_allowed))
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {

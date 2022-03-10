@@ -393,6 +393,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for editable chips)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {

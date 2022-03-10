@@ -129,6 +129,7 @@
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                     || !!entry[identifierPropertyName]"
                   :chip-active="chipActiveForRemove === index"
+                  :assistive-text="assistiveText.selectedOption"
                   @remove-entry="removeEntry(entry, index)"
                   @value-changed="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
@@ -461,6 +462,16 @@ export default {
     chipsEditable: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for editable chips)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
