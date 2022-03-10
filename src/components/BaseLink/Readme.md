@@ -69,7 +69,7 @@ export default {
     };
   },
   methods: {
-    async asyncTooltip(value, index) {
+    asyncTooltip(value, index) {
       setTimeout(() => {
         this.$set(this.links[index], 'tooltip', [
           {
