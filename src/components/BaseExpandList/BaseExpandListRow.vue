@@ -60,8 +60,9 @@
 
     <template
       v-if="!edit && dataInt.value">
-      <div class="base-expand-item base-expand-item--intend">
-        <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
+      <div class="base-expand-item base-expand-item--intend base-text-fade-out">
+        <span
+          class="base-expand-item__col base-expand-item__label">
           <!-- @slot a slot to provide customized entry row -->
           <slot
             name="content"
@@ -420,6 +421,7 @@ export default {
   outline: 1px solid $background-color;
   border-left: $border-active-width solid transparent;
   transition: border-left-color 500ms ease-in-out;
+  overflow: hidden;
 
   a {
     color: $app-color;
@@ -436,6 +438,7 @@ export default {
     display: flex;
     align-items: center;
     min-height: $row-height-large;
+    overflow: hidden;
   }
 
   &__handle {
@@ -459,8 +462,16 @@ export default {
 
   &__label {
     flex-grow: 1;
-    overflow: hidden;
     white-space: nowrap;
+    // enable scroll and hide scrollBars
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar { /* WebKit */
+      width: 0;
+      height: 0;
+    }
 
     & .base-expand-item__overlay {
       position: absolute;
@@ -478,6 +489,18 @@ export default {
 
     .base-expand-item__toggle {
       margin: 0 $spacing;
+    }
+  }
+
+  &.base-text-fade-out::after {
+    right: $spacing-small;
+  }
+
+  &.base-text-fade-out-left::before {
+    left: calc(#{$spacing-large} - #{$border-active-width});
+
+    @media screen and (max-width: $mobile) {
+      left: calc(#{$spacing} - #{$border-active-width});
     }
   }
 
