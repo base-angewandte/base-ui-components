@@ -888,7 +888,9 @@ export default {
           const newFilter = val || this.defaultFilter;
           this.filter = {
             ...newFilter,
-            filter_values: this.setFilterValues(newFilter, this.filter),
+            // if filter is changed from outside this often means resetting a filter so previous
+            // values should not be taken over (=leave second argument of function empty here)
+            filter_values: newFilter.filter_values || this.setFilterValues(newFilter),
           };
           // check if the new filter has values
           if (val && val.filter_values) {
@@ -897,7 +899,11 @@ export default {
               this.currentInput = val.filter_values;
             } else if (val.type === 'text') {
               [this.currentInput] = val.filter_values;
+            } else {
+              this.currentInput = '';
             }
+          } else {
+            this.currentInput = '';
           }
         }
       },
@@ -1326,7 +1332,8 @@ export default {
       const freetextAllowed = newFilter.freetext_allowed;
       if (type === 'date') {
         // map the date from daterange to date if necessary
-        return previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
+        return previousFilter.type.includes('date') && previousFilterValues
+          ? previousFilterValues.date_from || previousFilterValues.date_to : '';
       }
       if (type === 'daterange') {
         // check if it can be mapped from date to daterange

@@ -458,7 +458,9 @@ export default {
      */
     addFilterRow() {
       this.appliedFiltersInt.push(this.mainFilter);
-      this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
+      this.mainFilter = {
+        ...this.defaultFilter,
+      };
       this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
     },
     /**
