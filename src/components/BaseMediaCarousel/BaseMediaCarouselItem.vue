@@ -21,8 +21,10 @@
       @error="displayImage = false">
     <div
       v-else-if="fileType === 'image' && !displayImage"
-      class="base-media-preview-error">
-      An error occured displaying this image.
+      class="base-media-preview-not-supported base-media-preview-error">
+      <p class="base-media-preview-not-supported-file-name">
+        An error occured displaying this image.
+      </p>
     </div>
     <base-hls-video
       v-else-if="fileType === 'video'"
