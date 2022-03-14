@@ -1122,9 +1122,14 @@ export default {
       } else if (this.useAutocompleteFunctionality && this.activeEntry) {
         this.addOption(this.activeEntry);
         // check if filter type is text
-      } else if (this.filter.type === 'text' && this.currentInput && this.currentInput.trim()) {
-        this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
-        this.isActive = false;
+      } else if (this.filter.type === 'text') {
+        const newTextArray = [].concat(this.currentInput);
+        if (JSON.stringify(this.filter.filter_values) !== JSON.stringify(newTextArray)) {
+          this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
+          this.isActive = false;
+        } else {
+          this.isActive = !this.isActive;
+        }
         // if there is no active entry check if there is input in the search field and
         // add the text input as chip if available, however check if text was already added
         // to avoid duplicates
