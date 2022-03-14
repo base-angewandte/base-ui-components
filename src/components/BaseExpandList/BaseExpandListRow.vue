@@ -60,8 +60,13 @@
 
     <template
       v-if="!edit && dataInt.value">
-      <div class="base-expand-item base-expand-item--intend base-text-fade-out">
+      <div
+        :class="['base-expand-item',
+                 'base-expand-item--intend',
+                 { 'base-text-fade-out-left': fadeOutLeft,
+                   'base-text-fade-out': fadeOutRight }]">
         <span
+          ref="listItemScrollable"
           class="base-expand-item__col base-expand-item__label">
           <!-- @slot a slot to provide customized entry row -->
           <slot
@@ -215,6 +220,9 @@ export default {
       useSupportiveText: true,
       // internal representation of data
       dataInt: null,
+      // fade out overlays
+      fadeOutLeft: false,
+      fadeOutRight: true,
     };
   },
   computed: {
@@ -271,6 +279,18 @@ export default {
       deep: true,
       immediate: true,
     },
+  },
+  mounted() {
+    if (this.$refs.listItemScrollable) {
+      const scrollable = this.$refs.listItemScrollable;
+      scrollable.addEventListener('scroll', () => this.scrollHandler(scrollable));
+    }
+  },
+  destroyed() {
+    if (this.$refs.listItemScrollable) {
+      const scrollable = this.$refs.listItemScrollable;
+      scrollable.removeEventListener('scroll', () => this.scrollHandler(scrollable));
+    }
   },
   methods: {
     /**
@@ -403,6 +423,15 @@ export default {
        * @property {string} type
        */
       this.$emit('supportive', type);
+    },
+    /**
+     * set fadeOut elements depending on scroll position
+     *
+     * @param {object} row
+     */
+    scrollHandler(row) {
+      this.fadeOutLeft = !!row.scrollLeft;
+      this.fadeOutRight = row.scrollWidth - row.scrollLeft !== row.offsetWidth;
     },
   },
 };
