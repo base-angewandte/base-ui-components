@@ -1022,8 +1022,7 @@ export default {
         this.activeFilter = null;
         // now restore the input value if it makes sense (=filter type is autocomplete filter and
         // type stays the same or switches to other autocomplete type (chips, text))
-        if (((previousFilter.type === 'text'
-          || (previousFilter.type === 'chips' && previousFilter.freetext_allowed)))
+        if (previousFilter.type === 'chips' && previousFilter.freetext_allowed
           && this.useAutocompleteFunctionality) {
           this.currentInput = previousInput;
         }
@@ -1339,8 +1338,8 @@ export default {
         // check if it can be mapped from date to daterange
         if (previousFilter.type.includes('date')) {
           return {
-            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues : '',
-            date_to: previousFilterValues ? previousFilterValues.to : '',
+            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues || '' : '',
+            date_to: previousFilterValues && previousFilterValues.to ? previousFilterValues.to : '',
           };
         }
         // else just return empty object
