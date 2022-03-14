@@ -1130,7 +1130,6 @@ export default {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      min-height: 200px;
 
       .base-result-box-section__box-item {
         position: relative;
