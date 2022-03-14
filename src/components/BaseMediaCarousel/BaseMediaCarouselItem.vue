@@ -100,9 +100,9 @@
         </p>
       </div>
       <div
+        v-if="allowDownload"
         class="base-media-preview__info__col base-media-preview__info__col3">
         <BaseButton
-          v-if="allowDownload"
           :text="infoTexts.download"
           icon="download"
           icon-position="right"
@@ -327,9 +327,9 @@ export default {
     outline: none;
 
     .base-media-preview-image {
-      max-height: calc(100% - #{$spacing}*4);
-      max-width: calc(100% - #{$spacing}*4);
-      padding: $spacing;
+      max-height: 90%;
+      max-width: 100%;
+      padding: $spacing-small;
       margin-top: auto;
 
       &.base-media-preview-rotation-2 {
@@ -381,13 +381,14 @@ export default {
       justify-content: center;
       color: whitesmoke;
       margin-top: auto;
+      padding: $spacing;
 
       @media screen and (max-width: $mobile) {
         width: 75%;
       }
 
       .base-media-preview-not-supported-file-name {
-        margin-bottom: $spacing-small;
+        margin-bottom: $spacing;
         padding: 0 $spacing;
         font-weight: 600;
         word-break: break-all;
@@ -398,19 +399,20 @@ export default {
         justify-content: center;
 
         .base-media-preview-not-supported-button {
-          margin: $spacing $spacing-small;
-          min-width: 200px;
+          margin: 0 $spacing-small $spacing;
+          min-width: 150px;
         }
       }
 
       .base-media-preview__not-supported-additional {
         font-size: $font-size-small;
+        word-break: break-all;
       }
     }
 
     .base-media-preview-video {
-      max-height: 95%;
-      max-width: 95%;
+      max-height: 90%;
+      max-width: 100%;
       margin-top: auto;
     }
 
@@ -436,7 +438,7 @@ export default {
 
       .base-media-preview__info__col1,
       .base-media-preview__info__col3 {
-        width: calc(50% - 50px);
+        flex: 1;
       }
 
       .base-media-preview__info__col1 {
@@ -444,9 +446,9 @@ export default {
       }
 
       .base-media-preview__info__col2 {
-        padding: 0 15px;
         text-align: center;
         font-size: $font-size-small;
+        align-self: flex-end;
       }
 
       .base-media-preview__info__col3 {
