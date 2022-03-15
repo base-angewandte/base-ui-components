@@ -115,6 +115,9 @@ import popUpLock from '../../mixins/popUpLock';
 /**
  * Component allowing for the display of images or streaming of
  * audio and video (currently only hls format) and by using browser pdf viewer also pdfs
+ *
+ * CAVEAT: this component will be deprecated and replaced by BaseMediaCarousel!<br>
+ * Usage not recommended!
  */
 
 export default {
