@@ -12,6 +12,7 @@
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :return-as-string="returnAsString"
       :is-active.sync="isActive"
+      :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
       @click-input-field="onInputFocus"

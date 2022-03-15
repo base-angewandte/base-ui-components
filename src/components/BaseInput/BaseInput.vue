@@ -91,8 +91,8 @@
               </slot>
             </button>
             <div
-              v-if="isLoading"
-              class="base-input__loader">
+              v-if="loadable"
+              :class="['base-input__loader', { 'base-input__loader__hidden': !isLoading}]">
               <BaseLoader />
             </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
@@ -281,6 +281,14 @@ export default {
      * all input at once
      */
     clearable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if true space is reserved for a loader that can be activated
+     * with the 'isLoading' prop
+     */
+    loadable: {
       type: Boolean,
       default: false,
     },
@@ -688,6 +696,10 @@ export default {
             margin: 0 $spacing;
             transform: scale(0.5);
             pointer-events: none;
+
+            &__hidden {
+              visibility: hidden;
+            }
           }
         }
       }

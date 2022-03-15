@@ -19,6 +19,7 @@
       :required="required"
       :disabled="disabled"
       :clearable="clearable"
+      :loadable="loadable"
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
       :is-loading="isLoading"
@@ -425,6 +426,14 @@ export default {
      * for an example see [BaseInput](#baseinput)
      */
     clearable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if true space is reserved for a loader that can be activated
+     * with the 'isLoading' prop
+     */
+    loadable: {
       type: Boolean,
       default: false,
     },
