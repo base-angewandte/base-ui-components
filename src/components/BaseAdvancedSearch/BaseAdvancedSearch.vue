@@ -137,6 +137,7 @@ export default {
       type: Object,
       default: () => ({
         label: 'Fulltext',
+        id: 'default',
         type: 'text',
         options: [],
         filter_values: [],
