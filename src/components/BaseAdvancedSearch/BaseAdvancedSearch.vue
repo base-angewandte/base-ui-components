@@ -305,6 +305,13 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * if desired the box shadow around the search rows can be deactivated here
+     */
+    applyBoxShadow: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {

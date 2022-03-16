@@ -22,7 +22,8 @@
       :set-focus-on-active="false"
       :clearable="false"
       :assistive-text="assistiveText"
-      class="base-advanced-search-row__search"
+      :class="['base-advanced-search-row__search',
+               { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       v-bind="$listeners"
       @clicked-outside="isActive = false"
       @click="isActive = true"
@@ -314,7 +315,8 @@
       v-if="isMainSearch"
       class="base-advanced-search-row__add-filter">
       <button
-        :class="['base-advanced-search-row__icon-button']"
+        :class="['base-advanced-search-row__icon-button',
+                 { 'base-advanced-search-row__icon-button__shadow': applyBoxShadow }]"
         @keydown.tab="onTab"
         @click.stop.prevent="addFilterRow">
         <BaseIcon
@@ -591,6 +593,13 @@ export default {
     assistiveText: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * if desired the box shadow around the search rows can be deactivated here
+     */
+    applyBoxShadow: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -1455,6 +1464,11 @@ export default {
 
   .base-advanced-search-row__search {
     width: 100%;
+
+    &__shadow {
+      box-shadow: $box-shadow-reg;
+    }
+
     .base-advanced-search-row__first-column {
       // if the 25% is changed the function calcColNumber() needs to be adapted as well
       flex: 0 0 25%;
@@ -1678,6 +1692,10 @@ export default {
     height: 100%;
     padding: $spacing;
     cursor: pointer;
+
+    &__shadow {
+      box-shadow: $box-shadow-reg;
+    }
 
     &:active, &:focus {
       color: $app-color;
