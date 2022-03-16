@@ -48,6 +48,7 @@
           <div class="base-text-list-content">
             <template
               v-for="(objectItem, objectIndex) in [].concat(item.data)">
+              <!-- eslint-disable -->
               <BaseLink
                 :key="objectIndex"
                 :source="objectItem.source"
@@ -61,10 +62,8 @@
                     :data="objectItem.additional"
                     name="tooltip" />
                 </template>
-              </BaseLink>
-
-              <!-- eslint-disable -->
-              <template v-if="objectIndex !== item.data.length - 1">, </template>
+                <!-- add directly after to avoid additional spaces -->
+              </BaseLink>{{ objectIndex !== item.data.length - 1 ? ', ' : '' }}
               <!-- eslint-enable -->
             </template>
           </div>
