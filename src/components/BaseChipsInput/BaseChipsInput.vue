@@ -556,7 +556,7 @@ export default {
         if (val.length && !this.activeOption) {
           // set first option in list as active option
           this.activeOptionIndex = 0;
-        } else if (!val.length) {
+        } else if (!val.length && (!this.allowUnknownEntries || !this.input)) {
           this.activeOptionIndex = -1;
         }
       },
@@ -569,7 +569,7 @@ export default {
        */
       handler(val) {
         // if list changed externally - reset index to 0
-        this.activeOptionIndex = val.length ? 0 : -1;
+        this.activeOptionIndex = val.length || (this.allowUnknownEntries && this.input) ? 0 : -1;
         // check if list should be returned as array of strings
         if (!this.returnAsString && val && val.length && typeof val[0] === 'string') {
           this.returnAsString = true;
