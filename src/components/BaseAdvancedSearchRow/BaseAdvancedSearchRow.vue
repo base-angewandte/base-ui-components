@@ -868,9 +868,6 @@ export default {
            * @property {Filter} val - the new currently applied filter
            */
           this.$emit('update:applied-filter', { ...val });
-          if (this.isMainSearch && this.searchInputElement) {
-            this.searchInputElement.focus();
-          }
         }
       },
       deep: true,
