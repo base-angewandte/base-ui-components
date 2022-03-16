@@ -14,7 +14,7 @@
         :is="renderLabelAs"
         v-if="item.label"
         :class="['base-text-list-label', { 'base-text-list-label-mb': labelMarginBottom }]">
-        {{ item.label }}
+        {{ getLangLabel(item.label) }}
       </component>
 
       <!-- String as text -->
@@ -30,7 +30,7 @@
 
       <!-- Array as unordered list -->
       <ul
-        v-if="typeof item.data === 'object' && typeof item.data[0] === 'string'"
+        v-else-if="typeof item.data === 'object' && typeof item.data[0] === 'string'"
         class="base-text-list-content">
         <li
           v-for="(arrayItem, listIndex) in item.data"
@@ -41,13 +41,13 @@
 
       <!-- Array/Objects -->
       <template
-        v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'">
+        v-else-if="typeof item.data === 'object'">
         <!-- render as comma separated list -->
         <template
-          v-if="!containKeys(item.data, 'label')">
+          v-if="!containKeys([].concat(item.data), 'label')">
           <div class="base-text-list-content">
             <template
-              v-for="(objectItem, objectIndex) in item.data">
+              v-for="(objectItem, objectIndex) in [].concat(item.data)">
               <BaseLink
                 :key="objectIndex"
                 :source="objectItem.source"
@@ -72,19 +72,19 @@
 
         <!-- render as data list -->
         <template
-          v-if="containKeys(item.data, 'label')">
+          v-if="containKeys([].concat(item.data), 'label')">
           <dl
-            v-if="typeof item.data === 'object' && typeof item.data[0] === 'object'"
+            v-if="typeof item.data === 'object'"
             :class="['base-text-list-content',
                      'base-text-list-content--' + listType]">
             <template
-              v-for="(objectItem, objectIndex) in item.data">
+              v-for="(objectItem, objectIndex) in [].concat(item.data)">
               <dt
                 :key="'l' + objectIndex"
                 class="base-text-list__content__label">
                 <template
                   v-if="objectItem.label">
-                  {{ objectItem.label }}:
+                  {{ getLangLabel(objectItem.label) }}:
                 </template>
               </dt>
               <dd
@@ -110,6 +110,7 @@
 </template>
 
 <script>
+import i18n from '../../mixins/i18n';
 
 /**
  * Component to render data in p | ul | dt tags depending on field type 'data'
@@ -120,12 +121,31 @@ export default {
   components: {
     BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
   },
+  mixins: [i18n],
   props: {
     /**
      * data structure for different rendered tags: <br>
-     * p: { label: 'String', data: 'String' } <br>
-     * ul: { label: 'String, data: ['String']}} <br>
-     * dt: { label: 'String, data: [{ label: 'String', value: 'String', url: 'String'}]}} <br><br>
+     * p: { label: 'String|Object', data: 'String' } <br>
+     * ul: { label: 'String|Object, data: ['String']}} <br>
+     * dt: {<br>
+     *  label: 'String|Object,<br>
+     *  data: [{
+     *    label: 'String|Object',
+     *    value: 'String',
+     *    url: 'String',
+     *    additional: 'Object' }]}} or<br>
+     * dt: {<br>
+     *  label: 'String|Object,<br>
+     *  data: {
+     *    label: 'String|Object',
+     *    value: 'String',
+     *    url: 'String'
+     *    additional: 'Object'}}}<br><br>
+     *
+     * label might be a string or a language object with ISO 639-1 as object properties
+     *  (e.g. { en: 'x', de: 'y' })<br>
+     *  additional property creates a tooltip and takes an object in the same format as
+     *    data: label, value and url<br>
      * Note: for dt property 'url' will render 'value' as a link<br>
      */
     data: {
