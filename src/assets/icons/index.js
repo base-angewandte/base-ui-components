@@ -25,6 +25,7 @@ import eyeHide from './eye-hide';
 import eye from './eye';
 import fileObject from './file-object';
 import forbidden from './forbidden';
+import home from './home';
 import imageObject from './image-object';
 import information from './information';
 import licence from './licence';
@@ -76,6 +77,7 @@ export default {
   eye,
   fileObject,
   forbidden,
+  home,
   imageObject,
   information,
   licence,

@@ -44,3 +44,5 @@ text by Bohdan Burmich from the Noun Project
 Info by Jason Santos from the Noun Project
 
 Archive with sheets, Archive with arrow by bezier master from the Noun Project
+
+Home by il Capitano from the Noun Project

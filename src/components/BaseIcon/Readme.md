@@ -259,6 +259,11 @@ Available icons:
     name="unsubscribe"
     title="unsubscribe"
   />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="home"
+    title="home"
+  />
 </div>
 
 ```

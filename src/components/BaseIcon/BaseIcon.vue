@@ -33,7 +33,7 @@ export default {
           'information', 'sort', 'success', 'text', 'drag-n-drop', 'eye-hide', 'edit', 'options-menu',
           'audio-object', 'file-object', 'image-object', 'video-object',
           'collection', 'add-new-collection', 'add-existing-collection', 'add-existing-object',
-          'archive-arrow', 'archive-empty', 'archive-sheets'].includes(val);
+          'archive-arrow', 'archive-empty', 'archive-sheets', 'home'].includes(val);
       },
     },
     /**
