@@ -38,6 +38,7 @@ import play from './play';
 import plus from './plus';
 import prev from './prev';
 import print from './print';
+import refresh from './refresh';
 import remove from './remove';
 import saveFile from './save-file';
 import share from './share';
@@ -90,6 +91,7 @@ export default {
   plus,
   prev,
   print,
+  refresh,
   remove,
   saveFile,
   share,

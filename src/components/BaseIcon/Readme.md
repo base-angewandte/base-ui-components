@@ -264,6 +264,11 @@ Available icons:
     name="home"
     title="home"
   />
+  <BaseIcon
+    style="height: 24px;  margin: 8px;"
+    name="refresh"
+    title="refresh"
+  />
 </div>
 
 ```

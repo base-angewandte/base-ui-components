@@ -46,3 +46,5 @@ Info by Jason Santos from the Noun Project
 Archive with sheets, Archive with arrow by bezier master from the Noun Project
 
 Home by il Capitano from the Noun Project
+
+Refresh by Hea Poh Lin from the Noun Project
