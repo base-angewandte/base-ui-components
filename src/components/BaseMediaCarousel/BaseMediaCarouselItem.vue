@@ -327,12 +327,14 @@ export default {
     justify-content: center;
     align-items: center;
     outline: none;
+    padding: 0 $spacing-small;
 
     .base-media-preview-image {
+      width: 100%;
       max-height: 90%;
       max-width: 100%;
-      padding: $spacing-small;
       margin-top: auto;
+      object-fit: scale-down;
 
       &.base-media-preview-rotation-2 {
         transform: scaleX(-1);
@@ -413,6 +415,7 @@ export default {
     }
 
     .base-media-preview-video {
+      width: auto;
       max-height: 90%;
       max-width: 100%;
       margin-top: auto;
@@ -429,7 +432,7 @@ export default {
     }
 
     .base-media-preview-info {
-      width: 100%;
+      width: calc(100% + #{$spacing});
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -437,6 +440,8 @@ export default {
       color: whitesmoke;
       padding: $spacing-small;
       margin-top: auto;
+      margin-left: -$spacing-small;
+      margin-right: -$spacing-small;
 
       .base-media-preview__info__col1,
       .base-media-preview__info__col3 {
@@ -487,11 +492,14 @@ export default {
   }
 
   @media screen and (max-width: $mobile) {
-    .base-media-preview-image-stage,
     .base-media-preview-not-supported,
     .base-media-preview-not-supported-buttons {
       flex-wrap: wrap;
+    }
 
+    .base-media-preview-image-stage,
+    .base-media-preview-not-supported,
+    .base-media-preview-not-supported-buttons {
       .base-media-preview-not-supported-button {
         margin: $spacing-small;
         min-width: 125px;
