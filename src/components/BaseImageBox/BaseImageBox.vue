@@ -63,7 +63,7 @@
           <BaseIcon
             v-if="playIcon"
             name="play"
-            :class="['base-image-box-icon-play', 'base-image-box-icon--' + iconSize]"/>
+            :class="['base-image-box-icon-play', 'base-image-box-icon--' + iconSize]" />
 
           <div
             v-if="!imageUrl || !displayImage"

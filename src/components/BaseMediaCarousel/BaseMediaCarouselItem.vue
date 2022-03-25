@@ -61,7 +61,7 @@
           @clicked="download" />
         <BaseButton
           v-if="(!isMobile && fileEnding === 'pdf')
-           || (!allowDownload && fileEnding === 'pdf')"
+            || (!allowDownload && fileEnding === 'pdf')"
           :text="getI18nTerm(infoTexts.view)"
           icon="eye"
           icon-position="right"
