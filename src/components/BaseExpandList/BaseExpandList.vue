@@ -46,9 +46,8 @@
           <draggable
             v-model="dataInt"
             :draggable="'.base-expand-list__draggable__item'"
-            :handle="['.base-expand-item__handle', '.base-expand-item__label']"
+            :handle="dragHandle"
             animation="150"
-            title="bla"
             class="base-expand-list__draggable">
             <base-expand-list-row
               v-for="(item, index) in dataInt"
@@ -200,6 +199,7 @@ export default {
       showAll: false,
       dataSorted: null,
       originalData: null,
+      dragHandle: '',
     };
   },
   computed: {
@@ -247,6 +247,13 @@ export default {
         this.originalData = JSON.parse(JSON.stringify(this.data));
       }
     },
+  },
+  mounted() {
+    // set draggable area depending on device touch capabilities
+    // ssr: check when component is mounted because isTouchCapable() uses window object
+    this.dragHandle = this.isTouchCapable()
+      ? ['.base-expand-item__handle']
+      : ['.base-expand-item__handle', '.base-expand-item__label'];
   },
   methods: {
     /**
@@ -345,6 +352,17 @@ export default {
         return;
       }
       this.assertiveText = currentSupportString;
+    },
+    /**
+     * check touch capabilities of current device
+     *
+     * @returns {boolean|*}
+     */
+    isTouchCapable() {
+      return 'ontouchstart' in window
+        || (window.DocumentTouch && document instanceof window.DocumentTouch)
+        || navigator.maxTouchPoints > 0
+        || window.navigator.msMaxTouchPoints > 0;
     },
   },
 };
