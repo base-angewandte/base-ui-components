@@ -60,7 +60,8 @@
           class="base-media-preview__button base-media-preview-not-supported-button"
           @clicked="download" />
         <BaseButton
-          v-if="!isMobile && fileEnding === 'pdf'"
+          v-if="(!isMobile && fileEnding === 'pdf')
+           || (!allowDownload && fileEnding === 'pdf')"
           :text="getI18nTerm(infoTexts.view)"
           icon="eye"
           icon-position="right"
@@ -82,7 +83,7 @@
                base-media-preview__info__col1
                base-media-preview__info-text-wrapper">
         <p class="base-media-preview-info-text">
-          {{ fileName }}
+          {{ displayName }}
         </p>
         <template v-if="additionalInfo.length">
           <p
@@ -268,10 +269,7 @@ export default {
       return '';
     },
     fileName() {
-      if (this.displayName) {
-        return this.displayName;
-      }
-      const match = this.downloadUrl.match(/([^/]+)$/);
+      const match = this.sourceUrl.match(/([^/]+)$/);
       return match ? decodeURI(match[1]) : '';
     },
     fileEnding() {
