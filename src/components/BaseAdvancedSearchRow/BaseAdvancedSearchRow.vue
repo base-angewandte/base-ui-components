@@ -31,6 +31,7 @@
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
       @keydown.enter="selectOptionOnKeyEnter"
+      @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template v-slot:pre-input-field>
@@ -1368,7 +1369,7 @@ export default {
       }
       // check if previous filter was text and new filter is autocomplete chips
       if (previousFilter.type === 'text' && previousFilterValues && previousFilterValues.length
-        && type === 'chips' && freetextAllowed) {
+        && !!previousFilterValues[0] && type === 'chips' && freetextAllowed) {
         return [{
           [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
         }];
