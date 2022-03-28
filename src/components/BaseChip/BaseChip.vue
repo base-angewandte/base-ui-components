@@ -11,6 +11,7 @@
       :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
       class="base-chip__text"
       @blur="updateText"
+      @keydown.enter.prevent="updateText"
       @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
