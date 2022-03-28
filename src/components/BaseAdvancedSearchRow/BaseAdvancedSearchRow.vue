@@ -1098,7 +1098,7 @@ export default {
           // category but if everything fails - use default filter again
           ...newFilter,
           // also add the filter values property which does not exist in the filterList filters
-          filter_values: this.setFilterValues(newFilter, this.filter),
+          filter_values: this.setFilterValues(newFilter),
         };
       }
       this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
