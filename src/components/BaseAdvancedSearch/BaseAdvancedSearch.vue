@@ -6,10 +6,10 @@
         :key="'filter-' + index"
         :search-row-id="getRowId()"
         :is-main-search="false"
-        :autocomplete-results="filtersAutocompleteResults[index + 1]"
+        :autocomplete-results="filtersAutocompleteResults[index]"
         :filter-list="displayedFilters"
         :applied-filter.sync="filter"
-        :is-loading="filtersLoadingState[index + 1]"
+        :is-loading="filtersLoadingState[index]"
         :default-filter="defaultFilter"
         :placeholder="placeholder.filterRow || placeholder"
         :autocomplete-property-names="autocompletePropertyNames"
@@ -21,7 +21,7 @@
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
-        @fetch-autocomplete-results="fetchAutocomplete($event, filter, index + 1)" />
+        @fetch-autocomplete-results="fetchAutocomplete($event, filter, index)" />
     </template>
 
     <BaseAdvancedSearchRow
@@ -30,8 +30,8 @@
       :applied-filter.sync="mainFilter"
       :filter-list="displayedFilters"
       :default-filter="defaultFilter"
-      :autocomplete-results="filtersAutocompleteResults[0]"
-      :is-loading="filtersLoadingState[0]"
+      :autocomplete-results="filtersAutocompleteResults[mainFilterIndex]"
+      :is-loading="filtersLoadingState[mainFilterIndex]"
       :placeholder="placeholder.main || placeholder"
       :autocomplete-property-names="autocompletePropertyNames"
       :label-property-name="labelPropertyName"
@@ -41,7 +41,7 @@
       :assistive-text="assistiveText"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
-      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, 0)" />
+      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, mainFilterIndex)" />
   </div>
 </template>
 
@@ -351,10 +351,10 @@ export default {
      */
     filtersLoadingState() {
       return [
-        // add one in the beginning for main search field (not added to applied filters array yet)
-        this.autocompleteIndex === 0,
         ...this.appliedFiltersInt
           .map((filter, index) => (this.autocompleteIndex === index + 1)),
+        // add one at the end for main search field (not added to applied filters array yet)
+        this.autocompleteIndex === 0,
       ];
     },
     /**
@@ -366,6 +366,9 @@ export default {
       const displayed = [...this.filterList].filter(f => !f.hidden);
       // sort them
       return sort(displayed, this.labelPropertyName.filter);
+    },
+    mainFilterIndex() {
+      return this.appliedFilters.length - 1;
     },
   },
   watch: {
@@ -394,7 +397,7 @@ export default {
         // check if val is actually different from prop value
         if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters.slice(1))) {
           // if yes - inform parent
-          this.$emit('update:applied-filters', [this.mainFilter, ...val]);
+          this.$emit('update:applied-filters', [...val, this.mainFilter]);
         }
       },
       deep: true,
@@ -405,12 +408,13 @@ export default {
     appliedFilters: {
       handler(val) {
         // check if value is different from internal value
-        if (JSON.stringify(val.slice(1)) !== JSON.stringify(this.appliedFiltersInt)) {
+        if (JSON.stringify(val.slice(0, -1)) !== JSON.stringify(this.appliedFiltersInt)) {
           // if yes - update internal value
-          [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON.stringify(val));
+          [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON
+            .stringify([val.pop(), ...val]));
           // also check if main filter is different separately!
         } else if (val && val.length === 1
-          && JSON.stringify(this.mainFilter) !== JSON.stringify(val[0])) {
+          && JSON.stringify(this.mainFilter) !== JSON.stringify(val[this.mainFilterIndex])) {
           [this.mainFilter] = val;
         }
       },
@@ -452,7 +456,7 @@ export default {
        * @event update:applied-filters
        * @type {Filter[]}
        */
-      this.$emit('update:applied-filters', [val, ...this.appliedFiltersInt]);
+      this.$emit('update:applied-filters', [...this.appliedFiltersInt, val]);
     },
   },
   created() {
@@ -523,7 +527,7 @@ export default {
        * @event search
        * @type {Filter[]}
        */
-      this.$emit('search', [this.mainFilter, ...this.appliedFiltersInt]);
+      this.$emit('search', [...this.appliedFiltersInt, this.mainFilter]);
     },
     /**
      * create an internal row id for unique identification of added filter rows
