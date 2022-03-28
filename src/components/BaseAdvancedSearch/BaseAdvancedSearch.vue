@@ -234,6 +234,9 @@ export default {
      * properties:<br>
      *     <b>filterRow</b>: for already added filter rows<br>
      *     <b>main</b>: for the primary search input field<br>
+     *
+     *  each of these specific placeholders can again be a string or an object with different
+     *  placeholders for for each search type (text, chips, date)
      */
     placeholder: {
       type: [Object, String],

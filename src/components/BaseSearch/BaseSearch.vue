@@ -11,7 +11,7 @@
       :use-form-field-styling="false"
       :show-input-border="false"
       :label="label"
-      :placeholder="placeholder"
+      :placeholder="placeholderInt"
       :linked-list-option="linkedListOption"
       :drop-down-list-id="dropDownListId || false.toString()"
       :is-loading="isLoading"
@@ -118,10 +118,11 @@ export default {
       default: () => ([]),
     },
     /**
-     * placeholder to show for input
+     * placeholder to show for input; either just a string or an object with
+     * different text for each search type (text, chips, date)
      */
     placeholder: {
-      type: String,
+      type: [String, Object],
       default: 'Search your works and events',
     },
     /**
@@ -388,6 +389,18 @@ export default {
      */
     idInt() {
       return this.id || createId();
+    },
+    placeholderInt() {
+      if (typeof this.placeholder === 'string') {
+        return this.placeholder;
+      }
+      if (this.type.includes('date')) {
+        return this.placeholder.date;
+      }
+      if (this.type === 'controlled') {
+        return this.placeholder.chips;
+      }
+      return this.placeholder[this.type];
     },
   },
   watch: {

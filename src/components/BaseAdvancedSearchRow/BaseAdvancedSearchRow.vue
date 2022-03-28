@@ -511,10 +511,11 @@ export default {
       validator: val => ['label', 'id', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
-     * add a place holder for the search input
+     * add a place holder for the search input; either just a string or an object with
+     * different text for each search type (text, chips, date)
      */
     placeholder: {
-      type: String,
+      type: [String, Object],
       default: 'Search and discover',
     },
     /**
