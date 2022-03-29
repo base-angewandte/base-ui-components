@@ -522,21 +522,27 @@ export default {
       }
     },
     fetchEntries() {
-      /**
-       * Event emitted to fetch entries
-       *
-       * @event fetch-entries
-       * @property {string} page - current pagination page
-       * @property {string} query - the search string
-       * @property {object} sort - the sort filter
-       * @property {object} type - the type filter
-       */
-      this.$emit('fetch-entries', {
-        page: this.pageNumber,
-        query: this.filterString,
-        sort: this.sortParam,
-        type: this.filterType,
-      });
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+      }
+      this.timeout = setTimeout(() => {
+        /**
+         * Event emitted to fetch entries
+         *
+         * @event fetch-entries
+         * @property {string} page - current pagination page
+         * @property {string} query - the search string
+         * @property {object} sort - the sort filter
+         * @property {object} type - the type filter
+         */
+        this.$emit('fetch-entries', {
+          page: this.pageNumber,
+          query: this.filterString,
+          sort: this.sortParam,
+          type: this.filterType,
+        });
+      }, 600);
     },
     filterEntries(value, type) {
       if (type === 'type') {
