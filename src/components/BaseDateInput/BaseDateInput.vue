@@ -69,6 +69,7 @@
               :value-type="isFromTimeField ? 'format' : dateFormatInt"
               input-class="base-date-input__datepicker-input"
               @pick="datePicked('from')"
+              @click.native.prevent.stop=""
               @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
               <template v-slot:input>
                 <input
@@ -144,6 +145,7 @@
               :value-type="isToTimeField ? 'format' : datePickerValueFormat"
               input-class="base-date-input__datepicker-input"
               @pick="datePicked('to')"
+              @click.native.prevent.stop=""
               @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
               <template v-slot:input>
                 <input

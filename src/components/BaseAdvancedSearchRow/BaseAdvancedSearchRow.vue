@@ -1312,6 +1312,7 @@ export default {
         this.currentInput = data;
         // set the filter_values with date values - this will trigger search
         this.$set(this.filter, 'filter_values', this.currentInput);
+        this.isActive = false;
       }
     },
 
