@@ -5,7 +5,8 @@
     :data-srcset="lazyload ? sourceSet : null"
     :src="lazyload ? clearPng : source"
     :srcset="lazyload ? null : sourceSet"
-    :class="['base-image', { 'lazyload': lazyload }]">
+    :class="['base-image', { 'lazyload': lazyload }]"
+    @error="emitError">
 </template>
 
 <script>
@@ -64,6 +65,11 @@ export default {
     sourceSet() {
       return this.srcset.length ? this.srcset.map(size => Object.keys(size)
         .map(width => `${size[width]} ${width}`)).join(', ') : null;
+    },
+  },
+  methods: {
+    emitError(event) {
+      this.$emit('error', event);
     },
   },
 };
