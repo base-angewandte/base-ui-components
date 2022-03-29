@@ -366,10 +366,16 @@ export default {
   },
   mounted() {
     this.selectedInt = this.selected;
-    this.calcTextHeight();
+
     if (window) {
       window.addEventListener('resize', this.resizeTriggered);
     }
+
+    // calcTextHeight when component is really mounted, even in ssr mode
+    // otherwise the calculation will be wrong and not set as style attribute
+    this.$nextTick(() => {
+      this.calcTextHeight();
+    });
   },
   destroyed() {
     window.removeEventListener('resize', this.resizeTriggered);
