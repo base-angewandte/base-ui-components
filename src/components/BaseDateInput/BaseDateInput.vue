@@ -718,6 +718,8 @@ export default {
     fromOpen(val) {
       if (!val) {
         this.$refs.inputFrom.blur();
+      } else {
+        this.toOpen = false;
       }
     },
     /**
@@ -725,8 +727,10 @@ export default {
      * @param {boolean} val - the changed toOpen value
      */
     toOpen(val) {
-      if (!val) {
+      if (!val && this.$refs.inputTo) {
         this.$refs.inputTo.blur();
+      } else if (val) {
+        this.fromOpen = false;
       }
     },
     /**
