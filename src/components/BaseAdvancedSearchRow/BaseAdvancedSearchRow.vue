@@ -1344,8 +1344,8 @@ export default {
       const freetextAllowed = newFilter.freetext_allowed;
       if (type === 'date') {
         // map the date from daterange to date if necessary
-        return previousFilter.type.includes('date') && previousFilterValues
-          ? previousFilterValues.date_from || previousFilterValues.date_to : '';
+        return previousFilter.type && previousFilter.type.includes('date')
+          && previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
       }
       if (type === 'daterange') {
         // check if it can be mapped from date to daterange
