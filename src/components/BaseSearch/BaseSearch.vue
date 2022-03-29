@@ -20,7 +20,7 @@
       :show-error-icon="showErrorIcon"
       :language="languageInt"
       :allow-unknown-entries="type === 'chips'"
-      :loadable="type === 'text' || isFieldTypeChips"
+      :loadable="loadable"
       :chips-editable="type === 'chips'"
       :label-property-name="isFieldTypeChips ? labelPropertyName : false"
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
@@ -170,6 +170,14 @@ export default {
     linkedListOption: {
       type: String,
       default: null,
+    },
+    /**
+     * if true space is reserved for a loader that can be activated
+     * with the 'isLoading' prop
+     */
+    loadable: {
+      type: Boolean,
+      default: false,
     },
     /**
      * is loading indicator - showing loader if true

@@ -10,6 +10,7 @@
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
       :type="searchType"
       :selected-chips.sync="selectedOptions"
+      :loadable="type === 'text' || type === 'chips'"
       :is-loading="isLoading"
       :placeholder="placeholder"
       :drop-down-list-id="'autocomplete-options-' + internalRowId"
