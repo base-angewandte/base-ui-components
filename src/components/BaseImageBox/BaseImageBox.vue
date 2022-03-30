@@ -16,12 +16,12 @@
         <div
           v-if="showTitle"
           ref="headerBox"
-          :class="[
-            'base-image-box-header',
-            { 'base-image-box-header-centered': centerHeader}]">
+          :class="['base-image-box-header',
+                   { 'base-image-box-header-centered': centerHeader }]">
           <div
             :title="title"
-            class="base-image-box-title">
+            :class="['base-image-box-title',
+                     { 'base-image-box-header-2-lines': !subtext } ]">
             {{ title }}
           </div>
           <div
@@ -561,6 +561,13 @@ export default {
 
         .base-image-box-title {
           font-weight: bold;
+
+          &.base-image-box-header-2-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 2 ;
+            max-height: 100%;
+            white-space: normal;
+          }
         }
 
         &.base-image-box-header-centered {
