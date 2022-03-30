@@ -5,12 +5,13 @@
     <!-- SEARCH FIELD -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
+      ref="baseSearch"
       v-model="currentInput"
       :show-pre-input-icon="isMainSearch"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
       :type="searchType"
       :selected-chips.sync="selectedOptions"
-      :loadable="type === 'text' || type === 'chips'"
+      :loadable="filter.type === 'text' || filter.type === 'chips'"
       :is-loading="isLoading"
       :placeholder="placeholder"
       :drop-down-list-id="'autocomplete-options-' + internalRowId"
@@ -35,7 +36,7 @@
       @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
-      <template v-slot:pre-input-field>
+      <template v-slot:[filterSlotName]>
         <BaseChipsInputField
           :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
@@ -53,8 +54,11 @@
           :drop-down-list-id="'filter-options-' + internalRowId"
           :identifier-property-name="identifierPropertyName.filter"
           :label-property-name="labelPropertyName.filter"
-          input-class="base-advanced-search-row__input-field"
+          :input-class="filterSlotName === 'input-field-addition-before'
+            ? '' : 'base-advanced-search-row__input-field'"
           :class="['base-advanced-search-row__first-column',
+                   { 'base-advanced-search-row__first-column__small':
+                     filterSlotName === 'input-field-addition-before' },
                    'base-advanced-search-row__filter-input',
                    { 'hide' : isMainSearch && filter
                      [identifierPropertyName.filter] === defaultFilter
@@ -607,7 +611,6 @@ export default {
   },
   data() {
     return {
-      observer: null,
       /**
        * variable containing search text
        * @type {?string|?Object}
@@ -676,6 +679,23 @@ export default {
        * @type {?HTMLElement}
        */
       searchInputElement: null,
+      /**
+       * Mutation observer for handling the focusing of input field after changes
+       * @type {?MutationObserver}
+       */
+      observer: null,
+      /**
+       * Resize Observer to trigger actions (e.g. drop down columns calculations) when
+       * component is resized
+       * @type {?ResizeObserver}
+       */
+      resizeObserver: null,
+      /**
+       * depending on element size a different slot of BaseInput is used and needs
+       * to be passed on to v-slot directive of template element
+       * @type {string}
+       */
+      filterSlotName: 'pre-input-field',
     };
   },
   computed: {
@@ -951,12 +971,12 @@ export default {
     },
   },
   mounted() {
-    // calculate the number of columns shown for filters and chips options on
-    // render and recalculate on resize
-    this.calcColNumber();
-    window.addEventListener('resize', this.calcColNumber);
+    // get the search input element for later use
     this.getSearchInputElement();
-    this.initObserver();
+    // initialize observers that calculate the number of columns shown for filters
+    // and chips options on render and recalculate on resize of element and that handle
+    // focusing of the search input on changes
+    this.initObservers();
   },
   updated() {
     // if the filterBox element exists add
@@ -965,12 +985,14 @@ export default {
       this.$refs.filterBox.addEventListener('scroll', this.calcFadeOut);
     }
   },
+  beforeDestroy() {
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.advancedSearchRow);
+  },
   destroyed() {
     // remove event listener again if element exists
     if (this.$refs.filterBox) {
       this.$refs.filterBox.removeEventListener('scroll', this.calcFadeOut);
     }
-    this.$el.removeEventListener('resize', this.calcColNumber);
   },
   methods: {
     /** FILTER ROW RELATED FUNCTIONALITIES */
@@ -1320,19 +1342,6 @@ export default {
     /** OTHERS */
 
     /**
-     * calculate the number of columns for filters and chips dynamically
-     */
-    calcColNumber() {
-      const searchElement = this.$refs.advancedSearchRow;
-      if (searchElement) {
-        const elementWidth = searchElement.clientWidth;
-        // set a css variable that is responsible for the number of items
-        // (subtract 1/4 of elementWidth because of first column)
-        this.$el.style.setProperty('--col-number',
-          Math.floor((elementWidth - elementWidth / 4) / 180) || 1);
-      }
-    },
-    /**
      * function to set the correct values for filter.filter_values attribute
      *
      * @param {Filter} newFilter - the newly selected filter
@@ -1418,13 +1427,16 @@ export default {
         this.isActive = false;
       }
     },
-    initObserver() {
-      const observer = new MutationObserver(this.filterChangeObserverAction);
-      observer.observe(this.$refs.advancedSearchRow, {
+    initObservers() {
+      const tempObserver = new MutationObserver(this.filterChangeObserverAction);
+      tempObserver.observe(this.$refs.advancedSearchRow, {
         subtree: true,
         childList: true,
       });
-      this.observer = observer;
+      this.observer = tempObserver;
+      const tempResizeObserver = new ResizeObserver(this.resizeActions);
+      tempResizeObserver.observe(this.$refs.advancedSearchRow);
+      this.resizeObserver = tempResizeObserver;
     },
     filterChangeObserverAction() {
       this.getSearchInputElement();
@@ -1433,6 +1445,32 @@ export default {
           this.searchInputElement.focus();
           this.currentFilterType = this.filter.type;
         }
+      }
+    },
+    /**
+     * calculate the number of columns for filters and chips dynamically and
+     * use correct slot for selected filter depending on element size
+     */
+    resizeActions() {
+      // get the components base element
+      const searchRowElement = this.$refs.advancedSearchRow;
+      const searchElement = this.$refs.baseSearch;
+      // check if it was found
+      if (searchElement) {
+        // SET COLUMN STYLE
+        // get the width of the element
+        const searchElementWidth = searchElement.$el.clientWidth;
+        // set a css variable that is responsible for the number of items
+        // (subtract 1/4 of elementWidth because of first column): 180px is assumed for each column
+        this.$el.style.setProperty('--col-number',
+          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1);
+      }
+      // check if it was found
+      if (searchRowElement) {
+        // SET CORRECT SLOT FOR SELECTED FILTER DISPLAY
+        // get the width of the element
+        const searchRowElementWidth = searchRowElement.clientWidth;
+        this.filterSlotName = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
       }
     },
     /**
@@ -1474,12 +1512,18 @@ export default {
     }
 
     .base-advanced-search-row__first-column {
-      // if the 25% is changed the function calcColNumber() needs to be adapted as well
+      // if the 25% is changed the function resizeActions() column calculations
+      // needs to be adapted as well
       flex: 0 0 25%;
       min-width: 120px;
       max-width: 250px;
       overflow-wrap: break-word;
       margin-right: $spacing;
+
+      &__small {
+        flex: unset;
+        max-width: 100%;
+      }
     }
 
     .base-advanced-search-row__area-padding {
