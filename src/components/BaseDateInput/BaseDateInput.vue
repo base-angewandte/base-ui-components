@@ -31,156 +31,166 @@
       <!-- @slot to add elements within form field but before the input element line<br>
         for an example see [BaseInput](#baseinput)-->
       <slot name="pre-input-field" />
-      <!-- @slot add elements directly in the input line (no wrapping)<br>
-        for an example see [BaseInput](#baseinput)-->
-      <slot name="input-field-inline-before" />
-      <!-- INPUT FROM -->
-      <BaseInput
-        :id="label + '-' + id"
-        v-model="inputFrom"
-        :label="label"
-        :show-label="false"
-        :is-active.sync="fromOpen"
-        :use-form-field-styling="useFormFieldStyling"
-        :show-input-border="showInputBorder"
-        :clearable="clearable"
-        :required="required"
-        :invalid="invalid"
-        :disabled="disabled"
-        :show-error-icon="showErrorIcon"
-        :error-message="errorMessage"
-        :input-class="inputClass"
-        :set-focus-on-active="setFocusOnActive"
-        class="base-date-input__input-wrapper"
-        v-on="inputListeners">
-        <template v-slot:input>
-          <div
-            class="base-date-input__datepicker">
-            <DatePicker
-              v-model="inputFrom"
-              :input-attr="{ id: label + '-' + id }"
-              :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
-              :clearable="false"
-              :append-to-body="false"
-              :lang="language"
-              :open="fromOpen"
-              :type="isFromTimeField ? 'time' : minDateView"
-              :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
-              :value-type="isFromTimeField ? 'format' : dateFormatInt"
-              input-class="base-date-input__datepicker-input"
-              @pick="datePicked('from')"
-              @click.native.prevent.stop=""
-              @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
-              <template v-slot:input>
-                <input
-                  :id="label + '-' + id"
-                  ref="inputFrom"
+      <div class="base-date-input__input-fields">
+        <!-- @slot add elements within input form field but before all other elements - this
+        field wraps if necessary <br>
+        for an example see [BaseInput](#baseinput) -->
+        <slot name="input-field-addition-before" />
+        <div class="base-date-input__input-line">
+          <!-- @slot add elements directly in the input line (no wrapping)<br>
+          for an example see [BaseInput](#baseinput)-->
+          <slot name="input-field-inline-before" />
+          <!-- INPUT FROM -->
+          <BaseInput
+            :id="label + '-' + id"
+            v-model="inputFrom"
+            :label="label"
+            :show-label="false"
+            :is-active.sync="fromOpen"
+            :use-form-field-styling="useFormFieldStyling"
+            :show-input-border="showInputBorder"
+            :clearable="clearable"
+            :required="required"
+            :invalid="invalid"
+            :disabled="disabled"
+            :show-error-icon="showErrorIcon"
+            :error-message="errorMessage"
+            :input-class="inputClass"
+            :set-focus-on-active="setFocusOnActive"
+            class="base-date-input__input-wrapper"
+            v-on="inputListeners">
+            <template v-slot:input>
+              <div
+                class="base-date-input__datepicker">
+                <DatePicker
                   v-model="inputFrom"
-                  :placeholder="placeholder.date || placeholder"
-                  :type="'text'"
-                  :aria-describedby="label + '-' + id"
-                  :aria-required="required.toString()"
-                  :aria-invalid="invalid.toString()"
-                  :required="required"
-                  :disabled="disabled"
-                  :aria-disabled="disabled"
-                  :class="['base-date-input__input', inputClass]"
-                  autocomplete="off"
-                  @blur="checkDateValidity('From')"
-                  @input="checkDate($event, 'From')"
-                  @keydown="handleInputKeydown($event, 'From')"
-                  v-on="dateInputListeners">
-              </template>
-              <!-- this empty element is here so that the default icon of datepicker is not used -->
-              <template v-slot:icon-calendar>
-                <div class="base-date-input__icon-wrapper" />
-              </template>
-            </DatePicker>
-          </div>
-        </template>
-        <template v-slot:post-input-field>
-          <BaseIcon
-            :name="isFromTimeField ? 'clock' : 'calendar-many'"
-            class="base-date-input__date-icon"
-            @click.stop="fromOpen = !fromOpen" />
-        </template>
-      </BaseInput>
+                  :input-attr="{ id: label + '-' + id }"
+                  :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
+                  :clearable="false"
+                  :append-to-body="false"
+                  :lang="language"
+                  :open="fromOpen"
+                  :type="isFromTimeField ? 'time' : minDateView"
+                  :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
+                  :value-type="isFromTimeField ? 'format' : dateFormatInt"
+                  input-class="base-date-input__datepicker-input"
+                  @pick="datePicked('from')"
+                  @click.native.prevent.stop=""
+                  @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
+                  <template v-slot:input>
+                    <input
+                      :id="label + '-' + id"
+                      ref="inputFrom"
+                      v-model="inputFrom"
+                      :placeholder="placeholder.date || placeholder"
+                      :type="'text'"
+                      :aria-describedby="label + '-' + id"
+                      :aria-required="required.toString()"
+                      :aria-invalid="invalid.toString()"
+                      :required="required"
+                      :disabled="disabled"
+                      :aria-disabled="disabled"
+                      :class="['base-date-input__input', inputClass]"
+                      autocomplete="off"
+                      @blur="checkDateValidity('From')"
+                      @input="checkDate($event, 'From')"
+                      @keydown="handleInputKeydown($event, 'From')"
+                      v-on="dateInputListeners">
+                  </template>
+                  <!-- this empty element is here so that the default icon of datepicker
+                  is not used -->
+                  <template v-slot:icon-calendar>
+                    <div class="base-date-input__icon-wrapper" />
+                  </template>
+                </DatePicker>
+              </div>
+            </template>
+            <template v-slot:post-input-field>
+              <BaseIcon
+                :name="isFromTimeField ? 'clock' : 'calendar-many'"
+                class="base-date-input__date-icon"
+                @click.stop="fromOpen = !fromOpen" />
+            </template>
+          </BaseInput>
 
-      <span
-        v-if="type === 'daterange' || type === 'timerange'"
-        class="base-date-input__separator">{{ rangeSeparator }}</span>
+          <span
+            v-if="type === 'daterange' || type === 'timerange'"
+            class="base-date-input__separator">{{ rangeSeparator }}</span>
 
-      <!-- INPUT TO -->
-      <BaseInput
-        v-if="type !== 'single'"
-        :id="label + '-to-' + id"
-        v-model="inputTo"
-        :label="label"
-        :show-label="false"
-        :is-active.sync="toOpen"
-        :use-form-field-styling="useFormFieldStyling"
-        :show-input-border="showInputBorder"
-        :clearable="clearable"
-        :required="required"
-        :invalid="invalid"
-        :disabled="disabled"
-        :show-error-icon="showErrorIcon"
-        :error-message="errorMessage"
-        :set-focus-on-active="setFocusOnActive"
-        class="base-date-input__input-wrapper"
-        v-on="inputListeners">
-        <template v-slot:input>
-          <div
-            class="base-date-input__datepicker">
-            <DatePicker
-              v-model="inputTo"
-              :input-attr="{ id: label + '-' + id }"
-              :placeholder="isToTimeField ? placeholder.time : placeholder.date"
-              :clearable="false"
-              :append-to-body="false"
-              :lang="language"
-              :open="toOpen"
-              :type="isToTimeField ? 'time' : minDateView"
-              :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
-              :value-type="isToTimeField ? 'format' : datePickerValueFormat"
-              input-class="base-date-input__datepicker-input"
-              @pick="datePicked('to')"
-              @click.native.prevent.stop=""
-              @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
-              <template v-slot:input>
-                <input
-                  :id="label + '-to-' + id"
-                  ref="inputTo"
+          <!-- INPUT TO -->
+          <BaseInput
+            v-if="type !== 'single'"
+            :id="label + '-to-' + id"
+            v-model="inputTo"
+            :label="label"
+            :show-label="false"
+            :is-active.sync="toOpen"
+            :use-form-field-styling="useFormFieldStyling"
+            :show-input-border="showInputBorder"
+            :clearable="clearable"
+            :required="required"
+            :invalid="invalid"
+            :disabled="disabled"
+            :show-error-icon="showErrorIcon"
+            :error-message="errorMessage"
+            :set-focus-on-active="setFocusOnActive"
+            class="base-date-input__input-wrapper"
+            v-on="inputListeners">
+            <template v-slot:input>
+              <div
+                class="base-date-input__datepicker">
+                <DatePicker
                   v-model="inputTo"
-                  :placeholder="placeholder.date || placeholder"
-                  :type="'text'"
-                  :aria-describedby="label + '-to-' + id"
-                  :aria-required="required.toString()"
-                  :aria-invalid="invalid.toString()"
-                  :required="required"
-                  :disabled="disabled"
-                  :aria-disabled="disabled"
-                  autocomplete="off"
-                  :class="['base-date-input__input', inputClass]"
-                  @blur="checkDateValidity('To')"
-                  @input="checkDate($event, 'To')"
-                  @keydown="handleInputKeydown($event, 'To')"
-                  v-on="dateInputListeners">
-              </template>
-              <!-- this empty element is here so that the default icon of datepicker is not used -->
-              <template v-slot:icon-calendar>
-                <div class="base-date-input__icon-wrapper" />
-              </template>
-            </DatePicker>
-          </div>
-        </template>
-        <template v-slot:post-input-field>
-          <BaseIcon
-            :name="isToTimeField ? 'clock' : 'calendar-many'"
-            class="base-date-input__date-icon"
-            @click.stop="toOpen = !toOpen" />
-        </template>
-      </BaseInput>
+                  :input-attr="{ id: label + '-' + id }"
+                  :placeholder="isToTimeField ? placeholder.time : placeholder.date"
+                  :clearable="false"
+                  :append-to-body="false"
+                  :lang="language"
+                  :open="toOpen"
+                  :type="isToTimeField ? 'time' : minDateView"
+                  :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
+                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
+                  input-class="base-date-input__datepicker-input"
+                  @pick="datePicked('to')"
+                  @click.native.prevent.stop=""
+                  @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
+                  <template v-slot:input>
+                    <input
+                      :id="label + '-to-' + id"
+                      ref="inputTo"
+                      v-model="inputTo"
+                      :placeholder="placeholder.date || placeholder"
+                      :type="'text'"
+                      :aria-describedby="label + '-to-' + id"
+                      :aria-required="required.toString()"
+                      :aria-invalid="invalid.toString()"
+                      :required="required"
+                      :disabled="disabled"
+                      :aria-disabled="disabled"
+                      autocomplete="off"
+                      :class="['base-date-input__input', inputClass]"
+                      @blur="checkDateValidity('To')"
+                      @input="checkDate($event, 'To')"
+                      @keydown="handleInputKeydown($event, 'To')"
+                      v-on="dateInputListeners">
+                  </template>
+                  <!-- this empty element is here so that the default icon of
+                  datepicker is not used -->
+                  <template v-slot:icon-calendar>
+                    <div class="base-date-input__icon-wrapper" />
+                  </template>
+                </DatePicker>
+              </div>
+            </template>
+            <template v-slot:post-input-field>
+              <BaseIcon
+                :name="isToTimeField ? 'clock' : 'calendar-many'"
+                class="base-date-input__date-icon"
+                @click.stop="toOpen = !toOpen" />
+            </template>
+          </BaseInput>
+        </div>
+      </div>
       <!-- @slot for adding elements after input -->
       <slot name="post-input-field" />
     </div>
@@ -1230,44 +1240,57 @@ export default {
       align-items: baseline;
       width: 100%;
 
-      .base-date-input__input-wrapper {
+      .base-date-input__input-fields {
+        display: flex;
+        align-items: center;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
 
-        & + .base-date-input__input-wrapper {
-          margin-left: $spacing;
-        }
+        .base-date-input__input-line {
+          display: flex;
+          flex: 1 1 auto;
+          align-items: center;
 
-        .base-date-input__datepicker {
-          flex-grow: 1;
-          width: auto;
-          font-family: inherit;
-          font-size: inherit;
-          line-height: $row-height-small;
+          .base-date-input__input-wrapper {
 
-          .base-date-input__input {
-            padding: $spacing-small/2 0;
-            min-height: $row-height-small;
-            width: 100%;
+            & + .base-date-input__input-wrapper {
+              margin-left: $spacing;
+            }
+
+            .base-date-input__datepicker {
+              flex-grow: 1;
+              width: auto;
+              font-family: inherit;
+              font-size: inherit;
+              line-height: $row-height-small;
+
+              .base-date-input__input {
+                padding: $spacing-small/2 0;
+                min-height: $row-height-small;
+                width: 100%;
+              }
+            }
+
+            .base-date-input__icon-wrapper::before {
+              content: '';
+            }
+
+            .base-date-input__date-icon {
+              position: relative;
+              width: $icon-large;
+              height: $icon-large;
+              color: $font-color-second;
+              cursor: pointer;
+              flex-shrink: 0;
+              align-self: center;
+              margin-left: $spacing-small;
+            }
+          }
+
+          .base-date-input__separator {
+            padding: 0 $spacing;
           }
         }
-
-        .base-date-input__icon-wrapper::before {
-          content: '';
-        }
-
-        .base-date-input__date-icon {
-          position: relative;
-          width: $icon-large;
-          height: $icon-large;
-          color: $font-color-second;
-          cursor: pointer;
-          flex-shrink: 0;
-          align-self: center;
-          margin-left: $spacing-small;
-        }
-      }
-
-      .base-date-input__separator {
-        padding: 0 $spacing;
       }
     }
 
@@ -1276,7 +1299,8 @@ export default {
     }
   }
   @media screen and (max-width: $mobile) {
-    .base-date-input .base-date-input__field-wrapper .base-date-input__date-icon {
+    .base-date-input .base-date-input__field-wrapper .base-date-input__date-icon
+    .base-date-input__input-fields .base-date-input__input-line  {
       height: $icon-medium;
       width: $icon-medium;
     }
