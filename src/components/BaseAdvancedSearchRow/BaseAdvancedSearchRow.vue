@@ -7,7 +7,8 @@
       :id="'search-input-' + internalRowId"
       ref="baseSearch"
       v-model="currentInput"
-      :show-pre-input-icon="isMainSearch"
+      :show-pre-input-icon="isMainSearch
+        && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
       :type="searchType"
       :selected-chips.sync="selectedOptions"

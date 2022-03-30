@@ -414,7 +414,6 @@ export default {
           // if yes - update internal value
           [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON
             .stringify([val.pop(), ...val]));
-          // also check if main filter is different separately
         }
       },
       immediate: true,

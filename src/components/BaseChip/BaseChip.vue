@@ -9,6 +9,7 @@
       :style="textStyling"
       :contenteditable="editable ? 'true' : false"
       :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
+      enterkeyhint="search"
       class="base-chip__text"
       @blur="updateText"
       @keydown.enter.prevent="updateText"
