@@ -1767,6 +1767,11 @@ export default {
 
     .base-advanced-search-row__drop-down-body {
       .base-advanced-search-row__above-list-area{
+
+        .base-advanced-search-row__filter-area-wrapper, .base-advanced-search-row__chips-row {
+          flex-direction: column;
+        }
+
         .base-advanced-search-row__filter-list-wrapper {
           position: relative;
           overflow: hidden;
@@ -1808,6 +1813,13 @@ export default {
             flex-direction: row;
             overflow: auto;
             margin: 0 1px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+
+            &::-webkit-scrollbar { /* WebKit */
+              width: 0;
+              height: 0;
+            }
 
             .base-advanced-search-row__filter {
               white-space: nowrap;
