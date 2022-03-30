@@ -36,6 +36,11 @@
           for an example see [BaseInput](#baseinput) -->
         <slot name="pre-input-field" />
       </template>
+      <template v-slot:input-field-addition-before>
+        <!-- @slot add elements within search but before all other elements <br>
+          for an example see [BaseInput](#baseinput) -->
+        <slot name="input-field-addition-before" />
+      </template>
       <template v-slot:input-field-inline-before>
         <div
           :class="[dateFieldType && showPreInputIcon
