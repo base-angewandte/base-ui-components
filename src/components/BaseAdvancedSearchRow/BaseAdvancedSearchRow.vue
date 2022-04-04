@@ -49,7 +49,6 @@
           :use-form-field-styling="false"
           :show-input-border="false"
           :show-label="false"
-          :always-linked="true"
           :label="getI18nTerm(getLangLabel(advancedSearchText.selectFilterLabel))"
           :language="language"
           :drop-down-list-id="'filter-options-' + internalRowId"
@@ -71,21 +70,13 @@
           @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
-          <template v-slot:chip="{ entry, index, chipActiveForRemove, removeEntry }">
-            <BaseChip
+          <template v-slot:chip="{ entry }">
+            <span
               :id="entry.idInt"
               :key="'chip-' + entry.idInt"
-              :is-removable="entry[identifierPropertyName.filter]
-                !== defaultFilter[identifierPropertyName.filter]"
-              :entry="getLangLabel(entry[labelPropertyName.filter], true)"
-              :is-linked="true"
-              :chip-active="chipActiveForRemove === index"
-              :text-styling="{
-                display: '-webkit-box',
-                ['-webkit-line-clamp']: '2',
-                ['-webkit-box-orient']: 'vertical',
-              }"
-              @remove-entry="isActive = true; removeEntry(entry, index)" />
+              class="base-advanced-search-row__selected-filter-label">
+              {{ `#${getLangLabel(entry[labelPropertyName.filter], true)}` }}
+            </span>
           </template>
         </BaseChipsInputField>
       </template>
@@ -172,7 +163,7 @@
                                    === singleFilter[identifierPropertyName.filter] }]"
                       role="option"
                       @click.stop="selectFilter(singleFilter)">
-                      {{ singleFilter[labelPropertyName.filter] }}
+                      {{ `#${singleFilter[labelPropertyName.filter]}` }}
                     </li>
                   </ul>
                 </div>
@@ -226,7 +217,8 @@
                          { 'base-advanced-search-row__chips-row__no-options':
                            filter.type === 'chips' && !displayedOptions.length }]">
                 <div
-                  class="base-advanced-search-row__first-column">
+                  class="base-advanced-search-row__controlled-options-title
+                         base-advanced-search-row__first-column">
                   {{ getI18nTerm(getLangLabel(advancedSearchText.availableOptions)) }}
                 </div>
                 <!-- TODO: not linked to input!!! -->
@@ -1538,6 +1530,14 @@ export default {
       &.base-advanced-search-row__filter-input__date {
         padding-left: $spacing-small;
       }
+
+      .base-advanced-search-row__selected-filter-label {
+        color: $app-color;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
     }
 
     .base-advanced-search-row__icon-button {
@@ -1673,6 +1673,12 @@ export default {
             padding-bottom: 0;
           }
 
+          .base-advanced-search-row__controlled-options-title {
+            color: $font-color-second;
+            min-height: $row-height-small;
+            padding-top: calc(#{$spacing-small} / 2);
+          }
+
           .base-advanced-search-row__chips-list {
             margin-left: $spacing;
             line-height: $row-height-small;
@@ -1701,7 +1707,7 @@ export default {
         width: 100%;
 
         .base-advanced-search-row__autocomplete-collection {
-          color: $app-color;
+          font-weight: 600;
 
           .base-advanced-search-row__autocomplete-collection-text {
             min-height: $row-height-small;
@@ -1776,6 +1782,7 @@ export default {
           position: relative;
           overflow: hidden;
           display: flex;
+          min-height: $row-height-small;
 
           &.base-advanced-search-row__filter-list-wrapper__fade-right {
             &::after {
