@@ -274,7 +274,8 @@ export default {
     /**
      * expand items
      *
-     * @param {Array} state - expanded state, eg: [0, 1]: level1 first item, level2 second item is expanded
+     * @param {Array} state - expanded state, eg: [0, 1]: level1 first item,
+     *  level2 second item is expanded
      */
     expandItems(state) {
       if (!state.length) {
