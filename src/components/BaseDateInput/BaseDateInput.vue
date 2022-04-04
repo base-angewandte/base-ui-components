@@ -1,5 +1,7 @@
 <template>
-  <div class="base-date-input">
+  <div
+    ref="baseDateInput"
+    class="base-date-input">
     <div
       :class="['base-date-input__label-row',
                { 'base-date-input__label-row_visible': showLabel }]">
@@ -57,6 +59,7 @@
             :error-message="errorMessage"
             :input-class="inputClass"
             :set-focus-on-active="setFocusOnActive"
+            :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
             v-on="inputListeners">
             <template v-slot:input>
@@ -107,6 +110,8 @@
             </template>
             <template v-slot:post-input-field>
               <BaseIcon
+                v-if="showIcons"
+                ref="baseIcon"
                 :name="isFromTimeField ? 'clock' : 'calendar-many'"
                 class="base-date-input__date-icon"
                 @click.stop="fromOpen = !fromOpen" />
@@ -134,6 +139,7 @@
             :show-error-icon="showErrorIcon"
             :error-message="errorMessage"
             :set-focus-on-active="setFocusOnActive"
+            :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
             v-on="inputListeners">
             <template v-slot:input>
@@ -184,6 +190,7 @@
             </template>
             <template v-slot:post-input-field>
               <BaseIcon
+                v-if="showIcons"
                 :name="isToTimeField ? 'clock' : 'calendar-many'"
                 class="base-date-input__date-icon"
                 @click.stop="toOpen = !toOpen" />
@@ -468,6 +475,33 @@ export default {
        * BaseAdvancedSearchRow to keep dropdown open even if datepicker is closed)
        */
       isActiveInt: false,
+      /**
+       * variable to steer if input fade out of from field should be shown
+       * @type {boolean}
+       */
+      useFadeOutFrom: false,
+      /**
+       * variable to steer if input fade out of to field should be shown
+       * @type {boolean}
+       */
+      useFadeOutTo: false,
+      /**
+       * variable to steer if icons should be shown (becoming false if not enough
+       * space)
+       * @type {boolean}
+       */
+      showIcons: true,
+      /**
+       * variable to store icon size which is calculated in the beginning and might be
+       * hidden later
+       * @type {number}
+       */
+      iconSize: 24,
+      /**
+       * Resize Observer to trigger fade out calculations when component is resized
+       * @type {?ResizeObserver}
+       */
+      resizeObserver: null,
     };
   },
   computed: {
@@ -765,6 +799,13 @@ export default {
       immediate: true,
     },
   },
+  mounted() {
+    if (this.$refs.baseIcon) {
+      this.iconWidth = this.$refs.baseIcon.$el.clientWidth;
+    }
+    // initialize the resize observer to calculate fade out when component is resized
+    this.initObserver();
+  },
   updated() {
     // this hack is necessary because otherwise keyboard navigation was impaired by the datepicker
     // pop up elements
@@ -786,7 +827,18 @@ export default {
       });
     }
   },
+  beforeDestroy() {
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDateInput);
+  },
   methods: {
+    initObserver() {
+      // create an observer with the fade out calc function
+      const tempResizeObserver = new ResizeObserver(() => this.calcFadeOut(['From', 'To']));
+      // put it on the relevant element
+      tempResizeObserver.observe(this.$refs.baseDateInput);
+      // store it in variable
+      this.resizeObserver = tempResizeObserver;
+    },
     /**
      * transform the date to the correct display format
      * @param {string} dateString - the date string in YYYY-MM-DD format
@@ -1050,6 +1102,8 @@ export default {
             this[`input${origin}`] = '';
           }
         }
+        // after everything also still check if the new date/time string needs a fade out
+        this.calcFadeOut([origin]);
       }
       const data = this.getInputData();
       /**
@@ -1070,6 +1124,8 @@ export default {
     closeTimePicker(origin, time, type) {
       if (type === 'minute') {
         this[`${origin}Open`] = false;
+        // check if the new date/time string needs a fade out
+        this.calcFadeOut([`${origin.charAt(0).toUpperCase()}${origin.slice(1)}`]);
       }
     },
     /**
@@ -1082,7 +1138,6 @@ export default {
       if (!isTimeField) {
         this[`${origin}Open`] = false;
       }
-      this.checkDateValidity(origin);
     },
     /**
      * handle click outside event and adjust input active variable accordingly
@@ -1200,6 +1255,63 @@ export default {
       }
       return dateString;
     },
+    /**
+     * function to calculate if fade out in the input fields should be shown, needs to be
+     * recalculated after resize or if input changes
+     */
+    calcFadeOut(inputFields) {
+      // now iterate through the relevant fields
+      inputFields.forEach((field) => {
+        // check if element exists
+        if (this.$refs[`input${field}`]) {
+          // now get the input field value
+          const inputValue = this.$refs[`input${field}`].value;
+          // for width (and fade out) calculation either use that or the placeholder visible
+          // in the field (this is saved in a separate variable from inputValue because for
+          // show icons only input value is relevant)
+          const text = inputValue || this.$refs[`input${field}`].getAttribute('placeholder');
+          // now check if any of the two exists
+          if (text) {
+            // create a span
+            const span = document.createElement('span');
+            // hide the span
+            span.setAttribute('class', 'hide');
+            // add the input extracted text to this span
+            span.innerHTML = text;
+            // add the element to the document body
+            document.body.appendChild(span);
+            // get the width of that element
+            const textWidth = span.offsetWidth;
+            // remove the element again
+            document.body.removeChild(span);
+            // now also get the input width
+            const inputWidth = this.$refs[`input${field}`].offsetWidth;
+            // check if the input value or placeholder width exceeds input width
+            if (textWidth > inputWidth) {
+              // if yes and there is input and icons are shown
+              if (inputValue && this.showIcons) {
+                // remove icons
+                this.showIcons = false;
+                // otherwise use fade out
+              } else {
+                this[`useFadeOut${field}`] = true;
+              }
+              // if input value or placeholder fit the input width
+            } else if (textWidth <= inputWidth) {
+              // check first if the fade out is used
+              if (this[`useFadeOut${field}`]) {
+                // if so - disable this one first
+                this[`useFadeOut${field}`] = false;
+                // else check if the icon would actually fit in the input together with the
+                // input width - if so - show icons
+              } else if (!this.showIcons && textWidth + this.iconWidth <= inputWidth) {
+                this.showIcons = true;
+              }
+            }
+          }
+        }
+      });
+    },
   },
 };
 </script>
@@ -1296,13 +1408,6 @@ export default {
 
     .base-date-input__below {
       position: relative;
-    }
-  }
-  @media screen and (max-width: $mobile) {
-    .base-date-input .base-date-input__field-wrapper .base-date-input__date-icon
-    .base-date-input__input-fields .base-date-input__input-line  {
-      height: $icon-medium;
-      width: $icon-medium;
     }
   }
 </style>
