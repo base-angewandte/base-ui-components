@@ -42,10 +42,11 @@
           <base-expand-list-row
             v-for="(items, index) in dataInt.data"
             ref="baseExpandListRow"
-            :key="'item_' + index"
+            :key="`${parentIndex}-${index}`"
             :data="items"
             :multiple="multiple"
-            render-as="li">
+            render-as="li"
+            @expanded-state="emitExpandedState">
             <template
               v-slot:content="dataNextLevel">
               <!-- @slot a slot to provide customized entry row in next level -->
@@ -210,9 +211,18 @@ export default {
       default: 'button',
       validator: val => ['button', 'toggle'].includes(val),
     },
+    /**
+     * index of parent element
+     * used to expand item from outside
+     */
+    parentIndex: {
+      type: [Number, String],
+      default: 0,
+    },
   },
   data() {
     return {
+      // toggle item
       expanded: false,
       // referenced in BaseExpandList
       movable: false,
@@ -332,8 +342,14 @@ export default {
      * expand item
      */
     expand() {
+      // which element(s) are currently expanded
+      // eg: level1, first item = 0; level2, second item: 0-1
+      const currentState = this.$vnode.key.toString().split('-');
+
       if (this.expanded) {
         this.expanded = false;
+        // remove current level and emit expanded state
+        this.emitExpandedState(currentState.length > 1 ? currentState.slice(-1) : '');
         return;
       }
 
@@ -350,6 +366,23 @@ export default {
       }
 
       this.expanded = true;
+      this.emitExpandedState(currentState);
+    },
+    /**
+     * emit expanded state of items
+     * each array element represents the index of the expanded item per level
+     * eg: [0,1]: level1 first item, level2 second item is expanded
+     *
+     * @param {Array} value - value to emit
+     */
+    emitExpandedState(value) {
+      /**
+       * event triggered when expanded state changes
+       *
+       * @event expanded-state
+       * @type { array }
+       */
+      this.$emit('expanded-state', value);
     },
     /**
      * calc max height for transition

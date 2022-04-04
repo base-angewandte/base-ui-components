@@ -10,9 +10,11 @@
           v-show="index < (showAll ? data.length : minItems)"
           ref="baseExpandListRow"
           :key="index"
+          :parent-index="index"
           :data="items"
           :multiple="multiple"
-          render-as="li">
+          render-as="li"
+          @expanded-state="emitExpandedState">
           <template
             v-slot:content="props">
             <!-- @slot a slot to provide customized entry row -->
@@ -192,6 +194,13 @@ export default {
       default: 'button',
       validator: val => ['button', 'toggle'].includes(val),
     },
+    /**
+     * define which items are expanded
+     */
+    expanded: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -247,6 +256,12 @@ export default {
         this.originalData = JSON.parse(JSON.stringify(this.data));
       }
     },
+    /**
+     * watch expanded state and expand items
+     */
+    expanded(val) {
+      this.expandItems(val);
+    },
   },
   mounted() {
     // set draggable area depending on device touch capabilities
@@ -256,6 +271,50 @@ export default {
       : ['.base-expand-item__handle', '.base-expand-item__label'];
   },
   methods: {
+    /**
+     * expand items
+     *
+     * @param {Array} state - expanded state, eg: [0, 1]: level1 first item, level2 second item is expanded
+     */
+    expandItems(state) {
+      if (!state.length) {
+        return;
+      }
+
+      // show all list items
+      if (state[0] >= this.minItems
+        && this.$refs.baseExpandListRow[state[0]]) {
+        this.showAll = true;
+      }
+
+      // first level
+      if (state[0] !== undefined
+        && this.$refs.baseExpandListRow[state[0]]) {
+        this.$refs.baseExpandListRow[state[0]].expanded = true;
+      }
+
+      // second level
+      if (state[1] !== undefined
+        && this.$refs.baseExpandListRow[state[0]].$refs.baseExpandListRow[state[1]]) {
+        this.$refs.baseExpandListRow[state[0]].$refs.baseExpandListRow[state[1]].expanded = true;
+      }
+    },
+    /**
+     * emit expanded state of items
+     * each array element represents the index of the expanded item per level
+     * eg: [0, 1]: level1 first item, level2 second item is expanded
+     *
+     * @param {Array} value - value to emit
+     */
+    emitExpandedState(value) {
+      /**
+       * event triggered when expanded state changes
+       *
+       * @event expanded-state
+       * @type { array }
+       */
+      this.$emit('expanded-state', value);
+    },
     /**
      * function called from BaseExpandListRow in case a prop of the data variable
      * changes (e.g. hidden)
