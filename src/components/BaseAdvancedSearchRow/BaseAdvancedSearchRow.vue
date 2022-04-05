@@ -310,26 +310,29 @@
         </BaseDropDownList>
       </template>
     </BaseSearch>
-    <div
+    <BaseButton
       v-if="isMainSearch"
-      class="base-advanced-search-row__add-filter">
-      <button
-        :class="['base-advanced-search-row__icon-button',
-                 { 'base-advanced-search-row__icon-button__shadow': applyBoxShadow }]"
-        @keydown.tab="onTab"
-        @click.stop.prevent="addFilterRow">
-        <BaseIcon
-          :title="getI18nTerm(getLangLabel(advancedSearchText.addFilter))"
-          name="plus"
-          class="base-advanced-search-row__search-row-icon" />
-      </button>
-    </div>
+      icon="plus"
+      button-style="row"
+      icon-position="right"
+      :class="['base-advanced-search-row__add-filter-button',
+               { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
+      @clicked="addFilterRow"
+      @click.native.stop="">
+      <template #text>
+        <span
+          class="base-advanced-search-row__add-filter-button__text">
+          {{ getI18nTerm(getLangLabel(advancedSearchText.addFilter)) }}
+        </span>
+      </template>
+    </BaseButton>
   </div>
 </template>
 
 <script>
 import BaseSearch from '@/components/BaseSearch/BaseSearch';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseButton from '@/components/BaseButton/BaseButton';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
 import BaseChip from '@/components/BaseChip/BaseChip';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
@@ -340,6 +343,7 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseAdvancedSearchRow',
   components: {
+    BaseButton,
     BaseDropDownList,
     BaseChip,
     BaseChipsInputField,
@@ -1562,6 +1566,10 @@ export default {
         height: $icon-medium;
         width: $icon-medium;
       }
+
+      .base-advanced-search-row__icon-button__text {
+        display: none;
+      }
     }
 
     .base-advanced-search-row__drop-down-body {
@@ -1736,36 +1744,35 @@ export default {
   }
 }
 
-.base-advanced-search-row__add-filter {
-  background: white;
+.base-advanced-search-row__add-filter-button {
   margin-left: $spacing-small;
-  align-self: stretch;
+  width: $row-height-large;
 
-  .base-advanced-search-row__icon-button {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    padding: $spacing;
-    cursor: pointer;
+  .base-advanced-search-row__add-filter-button__text {
+    display: none;
+  }
 
-    &__shadow {
-      box-shadow: $box-shadow-reg;
-    }
-
-    &:active, &:focus {
-      color: $app-color;
-      fill: $app-color;
-    }
-
-    .base-advanced-search-row__search-row-icon {
-      height: $icon-medium;
-      width: $icon-medium;
-    }
+  &__shadow {
+    box-shadow: $box-shadow-reg;
   }
 }
 
 @media screen and (max-width: $mobile) {
   .base-advanced-search-row {
+    flex-direction: column;
+
+    .base-advanced-search-row__add-filter-button {
+      margin-left: 0;
+      margin-top: $spacing-small;
+      height: $row-height-large;
+      width: 100%;
+
+      .base-advanced-search-row__add-filter-button__text {
+        display: inline;
+        margin-right: $spacing;
+      }
+    }
+
     .base-advanced-search-row__first-column {
       max-width: 100%;
       margin-right: $spacing-small;
