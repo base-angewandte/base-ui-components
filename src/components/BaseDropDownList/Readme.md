@@ -57,6 +57,9 @@ export default {
 </script>
 
 <style>
+    .drop-down-test {
+      background: white;
+    }
     .button-display-area {
         display: flex;
         justify-content: space-between;
