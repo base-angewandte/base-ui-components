@@ -970,10 +970,26 @@ export default {
      */
     isActive(val) {
       if (val) {
+        // reset filter fade (mobile view)
         this.filterFade = {
           left: false,
           right: true,
         };
+      }
+      // if isActive becomes false and the drop down closes check for remaining input strings
+      // if the filter is chips
+      if (!val && this.filter.type === 'chips' && this.currentInput && this.currentInput.trim()) {
+        // check if the string can actually be added (freetext options allowed) and that the option
+        // was not added previously
+        if (this.filter.freetext_allowed && (!this.selectedOptions || !this.selectedOptions
+          .some(option => (!option[this.identifierPropertyName.autocompleteOption]
+            && option[this.labelPropertyName.autocompleteOption] === this.currentInput)))) {
+          // if this holds true - add the option
+          this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
+        } else {
+          // else reset all input
+          this.resetAllInput();
+        }
       }
       this.$emit('is-active');
     },
@@ -1172,12 +1188,14 @@ export default {
         // if there is no active entry check if there is input in the search field and
         // add the text input as chip if available, however check if text was already added
         // to avoid duplicates
-      } else if (this.filter.type === 'chips'
+      } else if (this.filter.type === 'chips' && this.filter.freetext_allowed
         && this.currentInput && this.currentInput.trim()
         && (!this.selectedOptions || !this.selectedOptions
           .some(option => (!option[this.identifierPropertyName.autocompleteOption]
             && option[this.labelPropertyName.autocompleteOption] === this.currentInput)))) {
-        this.addOption({ [this.labelPropertyName.autocompleteOption]: this.currentInput });
+        this.addOption({
+          [this.labelPropertyName.autocompleteOption]: this.currentInput,
+        });
         // if this is main search and there is no current input and filter values are present
         // inform parent that filter can be processed
       } else if (!this.currentInput) {
