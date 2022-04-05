@@ -795,6 +795,11 @@ export default {
         if (val !== this.isActiveInt) {
           this.isActiveInt = val;
         }
+        // if isActive is set false from outside also close date picker
+        if (!val) {
+          this.fromOpen = false;
+          this.toOpen = false;
+        }
       },
       immediate: true,
     },
@@ -1138,6 +1143,8 @@ export default {
       if (!isTimeField) {
         this[`${origin}Open`] = false;
       }
+      // need this here because on blur() date is not updated
+      this.checkDateValidity(origin);
     },
     /**
      * handle click outside event and adjust input active variable accordingly
