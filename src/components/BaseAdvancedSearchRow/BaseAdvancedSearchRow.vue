@@ -110,6 +110,10 @@
           :language="language"
           :identifier-property-name="autocompletePropertyNames.id"
           :label-property-name="autocompletePropertyNames.data"
+          :list-body-style="{
+            'max-height': '400px',
+            'overflow-y': 'auto',
+          }"
           class="base-advanced-search-row__drop-down-body"
           @touchstart.native.stop=""
           @click.native.stop="">
@@ -1578,8 +1582,6 @@ export default {
       width: 100%;
       position: absolute;
       box-shadow: $drop-shadow;
-      max-height: 400px;
-      overflow-y: auto;
       z-index: map-get($zindex, dropdown);
 
       &.base-advanced-search-row__drop-down-body__date {
