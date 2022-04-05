@@ -23,11 +23,15 @@
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
 
-    <span
-      v-if="text"
-      :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
-      {{ text }}
-    </span>
+    <!-- @slot have your own text element which also allows for easier custom styling -->
+    <slot name="text">
+      <span
+        v-if="text"
+        :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
+        {{ text }}
+      </span>
+    </slot>
+
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
 
