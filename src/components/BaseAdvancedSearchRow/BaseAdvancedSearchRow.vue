@@ -138,6 +138,13 @@
                       {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
                     </div>
                   </div>
+                  <span
+                    class="base-advanced-search-row__filter-area-close"
+                    @click="isActive = false">
+                    <BaseIcon
+                      class="rotate-180 base-advanced-search-row__filter-area-close-icon"
+                      name="drop-down" />
+                  </span>
                 </div>
                 <div
                   :class="['base-advanced-search-row__columns',
@@ -1621,28 +1628,16 @@ export default {
             .base-advanced-search-row__filter-area-header {
               align-self: flex-start;
               max-width: 100%;
-            }
 
-            .base-advanced-search-row__drop-down-icon-wrapper {
-              height: $row-height-small;
-              display: flex;
-              justify-content: flex-end;
-              align-items: center;
-
-              .base-advanced-filter-row__drop-down-icon {
-                height: $icon-small;
-                transition: $drop-down-arrow-animation;
+              .base-advanced-search-row__filter-text {
+                padding-top: $spacing-small/2;
+                color: $font-color-second;
+              }
+              .base-advanced-search-row__filter-subtext {
+                color: $font-color-second;
+                font-size: $font-size-small;
               }
             }
-          }
-
-          .base-advanced-search-row__filter-text {
-            padding-top: $spacing-small/2;
-            color: $font-color-second;
-          }
-          .base-advanced-search-row__filter-subtext {
-            color: $font-color-second;
-            font-size: $font-size-small;
           }
         }
 
@@ -1759,6 +1754,14 @@ export default {
   }
 }
 
+.base-advanced-search-row__filter-area-close {
+  display: none;
+
+  .base-advanced-search-row__filter-area-close-icon {
+    width: $icon-medium;
+  }
+}
+
 @media screen and (max-width: $mobile) {
   .base-advanced-search-row {
     flex-direction: column;
@@ -1785,6 +1788,17 @@ export default {
 
         .base-advanced-search-row__filter-area-wrapper, .base-advanced-search-row__chips-row {
           flex-direction: column;
+        }
+
+        .base-advanced-search-row__filter-area-wrapper {
+          .base-advanced-search-row__filter-area {
+            max-width: unset;
+
+            .base-advanced-search-row__filter-area-close {
+              display: inline;
+              padding: $spacing-small $spacing;
+            }
+          }
         }
 
         .base-advanced-search-row__filter-list-wrapper {
