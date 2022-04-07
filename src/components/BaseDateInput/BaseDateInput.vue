@@ -1338,12 +1338,12 @@ export default {
       justify-content: space-between;
 
       &.base-date-input__label-row_visible {
-        margin-bottom: $spacing-small/2;
+        margin-bottom: $spacing-small-half;
       }
 
       .base-date-input__label {
         color: $font-color-second;
-        margin-bottom: $spacing-small/2;
+        margin-bottom: $spacing-small-half;
         text-align: left;
         align-self: flex-end;
       }
@@ -1384,7 +1384,7 @@ export default {
               line-height: $row-height-small;
 
               .base-date-input__input {
-                padding: $spacing-small/2 0;
+                padding: $spacing-small-half 0;
                 min-height: $row-height-small;
                 width: 100%;
               }

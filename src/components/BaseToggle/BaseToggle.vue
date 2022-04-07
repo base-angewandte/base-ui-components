@@ -164,7 +164,7 @@ export default {
         transition: all 250ms ease-in-out;
 
         svg {
-          width: $spacing / 2;
+          width: $spacing-small;
           fill: $switch-svg-color;
         }
       }
@@ -191,7 +191,7 @@ export default {
     }
 
     .base-toggle__label {
-      padding-left: $spacing/2;
+      padding-left: $spacing-small;
     }
   }
 </style>

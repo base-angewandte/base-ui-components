@@ -302,7 +302,7 @@ export default {
       display: inline-block;
       height: $icon-small;
       width: $icon-small;
-      margin-left: $spacing-small / 2;
+      margin-left: $spacing-small-half;
 
       &::v-deep svg {
         vertical-align: top;

@@ -330,7 +330,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin-bottom: -$spacing-small/2;
+    margin-bottom: -$spacing-small-half;
 
     .base-multiline-text-input__tabs {
       align-self: center;
@@ -341,7 +341,7 @@ export default {
         height: 10px;
         width: 10px;
         vertical-align: middle;
-        margin-bottom: $spacing-small/2;
+        margin-bottom: $spacing-small-half;
         color: $font-color-second;
         fill: $font-color-second;
       }
@@ -365,7 +365,7 @@ export default {
     .base-multiline-text-input__textarea {
       width: 100%;
       line-height: $line-height;
-      padding: $spacing-small/2 0;
+      padding: $spacing-small-half 0;
       margin: 0;
       height: 240px;
       appearance: none;

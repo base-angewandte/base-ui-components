@@ -121,7 +121,7 @@ export default {
     & + .base-switch-button-label {
       cursor: pointer;
       background-color: inherit;
-      padding: $spacing-small/2 $spacing;
+      padding: $spacing-small-half $spacing;
       position: relative;
       border: 1px solid rgba(255, 255, 255, 0);
     }

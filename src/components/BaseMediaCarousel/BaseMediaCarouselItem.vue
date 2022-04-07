@@ -465,7 +465,7 @@ export default {
         margin-right: $spacing;
 
         .base-media-preview-info-text {
-          padding-bottom: $spacing-small/2;
+          padding-bottom: $spacing-small-half;
           margin-bottom: 0;
         }
 

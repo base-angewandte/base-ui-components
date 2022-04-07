@@ -398,7 +398,7 @@ export default {
       .base-drop-button__action {
         display: flex;
         align-items: center;
-        min-height: $row-height-small - $spacing-small/2;
+        min-height: $row-height-small - $spacing-small-half;
         width: 100%;
         color: inherit;
         white-space: nowrap;
