@@ -408,12 +408,18 @@ export default {
     appliedFilters: {
       handler(val) {
         // check if value is different from internal value
-        if (val && val.length >= 1
-          && (JSON.stringify(val.slice(0, -1)) !== JSON.stringify(this.appliedFiltersInt)
-          || JSON.stringify(this.mainFilter) !== JSON.stringify(val[this.mainFilterIndex]))) {
+        if (val
+          && JSON.stringify(val.slice(0, -1)) !== JSON.stringify(this.appliedFiltersInt)) {
           // if yes - update internal value
-          [this.mainFilter, ...this.appliedFiltersInt] = JSON.parse(JSON
-            .stringify([val.pop(), ...val]));
+          [, ...this.appliedFiltersInt] = JSON.parse(JSON
+            .stringify([val, ...val.slice(0, -1)]));
+        }
+        // also check if main filter is different separately!
+        if (val && val.length >= 1
+          && JSON.stringify(this.mainFilter) !== JSON.stringify(val[this.mainFilterIndex])) {
+          [this.mainFilter] = JSON.parse(JSON.stringify(val.slice(-1)));
+        } else if (!val || val < 1) {
+          this.mainFilter = { ...this.defaultFilter };
         }
       },
       immediate: true,
