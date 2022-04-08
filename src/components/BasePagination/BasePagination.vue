@@ -11,9 +11,9 @@
         { 'base-pagination__arrow-icon-inactive': active <= 1 }
       ]"
       aria-label="Go to previous page"
-      @click.prevent="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @click.native.prevent="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @keydown.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
+      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
+      @click.native.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
+      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
         name="arrow-left" />
@@ -96,9 +96,10 @@
         { 'base-pagination__arrow-icon-inactive': active >= total }
       ]"
       aria-label="Go to next Page"
-      @click.prevent="active + 1 <= total ? setActivePage(active + 1) : false"
-      @click.native.prevent.prevent="active + 1 <= total ? setActivePage(active + 1) : false"
-      @keydown.enter="active + 1 <= total ? setActivePage(active + 1) : false">
+      @click.prevent="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false"
+      @click.native.prevent.prevent="active + 1 <= total && !useLinkElement
+        ? setActivePage(active + 1) : false"
+      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
         name="arrow-left" />
