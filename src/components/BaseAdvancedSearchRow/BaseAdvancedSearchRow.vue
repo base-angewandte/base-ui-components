@@ -160,7 +160,7 @@
                     role="listbox"
                     class="base-advanced-search-row__filter-list">
                     <li
-                      v-for="(singleFilter, index) in filterList"
+                      v-for="(singleFilter, index) in displayFilterList"
                       :id="`filter-option-${singleFilter[identifierPropertyName.filter]}`"
                       :key="index"
                       ref="filterOption"
@@ -737,6 +737,10 @@ export default {
         // return current filter object as array
         return [this.filter];
       },
+    },
+    displayFilterList() {
+      if (!this.isMainSearch) return this.filterList;
+      return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
     },
     /**
      * variable to return if autocomplete functionality should be shown (= results fetched
