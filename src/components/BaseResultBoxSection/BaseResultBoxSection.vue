@@ -680,7 +680,7 @@ export default {
      * @returns {number}
      */
     pages() {
-      return this.total || this.entryListInt.length
+      return (this.total || this.entryListInt.length) && this.visibleNumberOfItems >= 0
         ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
     },
     /**
