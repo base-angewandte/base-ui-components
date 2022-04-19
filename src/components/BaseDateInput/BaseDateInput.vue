@@ -452,7 +452,7 @@ export default {
        * variable for toggling format between date and year for date_year format
        * @type {string}
        */
-      dateFormatInt: 'DD.MM.YYYY',
+      dateFormatInt: '',
       /**
        * variable to store the date when switching from date to year in order to be
        * able to restore exact date when switching back
@@ -712,6 +712,23 @@ export default {
   },
   watch: {
     /**
+     * watch format and set correct dateFormat
+     */
+    format: {
+      handler(val) {
+        if (val === 'year') {
+          this.dateFormatInt = 'YYYY';
+          return;
+        }
+        if (val === 'month') {
+          this.dateFormatInt = 'MM.YYYY';
+          return;
+        }
+        this.dateFormatInt = 'DD.MM.YYYY';
+      },
+      immediate: true,
+    },
+    /**
      * watch input set from outside and set internal inputInt accordingly as well as
      * set the correct display format
      */
@@ -808,6 +825,7 @@ export default {
     if (this.$refs.baseIcon) {
       this.iconWidth = this.$refs.baseIcon.$el.clientWidth;
     }
+
     // initialize the resize observer to calculate fade out when component is resized
     this.initObserver();
   },
