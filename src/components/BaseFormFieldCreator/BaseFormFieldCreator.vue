@@ -554,7 +554,7 @@ export default {
     },
     // as above but specific for multiline text input field
     setInputValue(val) {
-      if (!val || typeof val === 'string') {
+      if (!val || typeof val === 'string' || typeof val === 'number') {
         this.fieldValueInt = val;
       } else {
         this.fieldValueInt = { ...this.fieldValueInt, ...JSON.parse(JSON.stringify(val)) };
