@@ -867,14 +867,14 @@ export default {
      * @param {string} dateString - the date string in YYYY-MM-DD format
      */
     dateDisplay(dateString) {
-      return dateString.split('-').reverse().join('.');
+      return dateString ? dateString.split('-').reverse().join('.') : '';
     },
     /**
      * transform the date to the correct storage format
      * @param {string} dateString - the date string in DD.MM.YYYY format
      */
     dateStorage(dateString) {
-      return dateString.split('.').reverse().join('-');
+      return dateString ? dateString.split('.').reverse().join('-') : '';
     },
     /**
      * checks done on keydown events
