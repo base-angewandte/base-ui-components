@@ -39,6 +39,13 @@ export default {
           },
         },
         {
+          label: 'data is an object without a label',
+          data: {
+            value: 'Dolore magna aliquyam erat',
+            url: 'mailto:base@uni-ak.ac.at',
+          },
+        },
+        {
           label: 'data is array of objects',
           data: [
             {
