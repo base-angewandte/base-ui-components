@@ -92,8 +92,9 @@
             </button>
             <div
               v-if="loadable"
-              :class="['base-input__loader', { 'base-input__loader__hidden': !isLoading}]">
-              <BaseLoader />
+              class="base-input__loader">
+              <BaseLoader
+                :hide="!isLoading" />
             </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
@@ -696,10 +697,6 @@ export default {
             margin: 0 $spacing;
             transform: scale(0.5);
             pointer-events: none;
-
-            &__hidden {
-              visibility: hidden;
-            }
           }
         }
       }
