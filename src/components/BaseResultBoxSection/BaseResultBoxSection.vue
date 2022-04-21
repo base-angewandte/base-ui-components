@@ -119,6 +119,7 @@
               :aria-label="getPropValue(titlePropertyName, entry)"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
+                       { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
                        `base-result-box-section__box-item-${elementId}`,
                        { 'base-result-box-section__result-box-item-draggable':
                          draggable && editModeActive }]">
@@ -1152,6 +1153,10 @@ export default {
         flex: 0 0 calc(((100% - ((var(--items-per-row) - 1) * #{$spacing}))
         / var(--items-per-row)) - 0.01rem);
         height: 100%;
+
+        &__hidden {
+          visibility: hidden;
+        }
 
         &:focus:not(focus-visible) {
           outline: none;
