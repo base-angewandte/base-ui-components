@@ -26,6 +26,7 @@
       :set-focus-on-active="false"
       :clearable="false"
       :assistive-text="assistiveText"
+      :date-field-delay="dateFieldDelay"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       v-bind="$listeners"
@@ -616,6 +617,13 @@ export default {
     applyBoxShadow: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * use this prop to set a delay in ms before date input calender is displayed
+     */
+    dateFieldDelay: {
+      type: Number,
+      default: 0,
     },
   },
   data() {

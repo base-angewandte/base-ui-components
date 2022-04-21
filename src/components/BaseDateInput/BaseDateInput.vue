@@ -48,7 +48,7 @@
             v-model="inputFrom"
             :label="label"
             :show-label="false"
-            :is-active.sync="fromOpen"
+            :is-active="fromOpen"
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
@@ -61,6 +61,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('fromOpen', $event)"
             v-on="inputListeners">
             <template v-slot:input>
               <div
@@ -129,7 +130,7 @@
             v-model="inputTo"
             :label="label"
             :show-label="false"
-            :is-active.sync="toOpen"
+            :is-active="toOpen"
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
@@ -141,6 +142,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('toOpen', $event)"
             v-on="inputListeners">
             <template v-slot:input>
               <div
@@ -425,6 +427,13 @@ export default {
     isActive: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * use this prop to set a delay in ms before calender is displayed
+     */
+    isActiveDelay: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
@@ -1336,6 +1345,24 @@ export default {
           }
         }
       });
+    },
+    /**
+     * add delay before value is set
+     *
+     * @param {String} key
+     * @param {boolean} value
+     */
+    isActiveHandler(key, value) {
+      // if false set value immediately
+      if (!value) {
+        this[key] = value;
+        return;
+      }
+
+      // otherwise add a delay
+      setTimeout(() => {
+        this[key] = value;
+      }, this.isActiveDelay);
     },
   },
 };

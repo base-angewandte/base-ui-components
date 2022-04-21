@@ -18,6 +18,7 @@
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
         :assistive-text="assistiveText"
+        :date-field-delay="dateFieldDelay"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
@@ -39,6 +40,7 @@
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
       :assistive-text="assistiveText"
+      :date-field-delay="dateFieldDelay"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, mainFilterIndex)" />
@@ -314,6 +316,13 @@ export default {
     applyBoxShadow: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * use this prop to set a delay in ms before date input calender is displayed
+     */
+    dateFieldDelay: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
