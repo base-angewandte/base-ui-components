@@ -27,6 +27,7 @@
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
       :assistive-text="isFieldTypeChips ? assistiveText: false"
+      :is-active-delay="dateFieldDelay"
       input-class="base-search__input-field"
       field-type="search"
       class="base-search__input"
@@ -265,6 +266,13 @@ export default {
     assistiveText: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * use this prop to set a delay in ms before date input calender is displayed
+     */
+    dateFieldDelay: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
