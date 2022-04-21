@@ -352,9 +352,9 @@ export default {
     filtersLoadingState() {
       return [
         ...this.appliedFiltersInt
-          .map((filter, index) => (this.autocompleteIndex === index + 1)),
+          .map((filter, index) => (this.autocompleteIndex === index)),
         // add one at the end for main search field (not added to applied filters array yet)
-        this.autocompleteIndex === 0,
+        this.autocompleteIndex === this.appliedFiltersInt.length,
       ];
     },
     /**
