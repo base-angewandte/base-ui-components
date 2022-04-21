@@ -207,6 +207,14 @@ export default {
   },
   watch: {
     /**
+     * in case
+     */
+    $route(to) {
+      if (this.useLinkElement && to && to.query && to.query.page && to.query.page !== this.active) {
+        this.active = Number(to.query.page);
+      }
+    },
+    /**
      * if active number changes inform parent
      * @param {number} val - the new page number active
      */
@@ -272,8 +280,11 @@ export default {
      * @param {number} page - the new page number
      */
     setActivePage(page) {
-      // set internal variable to new page number
-      this.active = page;
+      // if new page is not set via url set it here manually
+      if (!this.useLinkElement) {
+        // set internal variable to new page number
+        this.active = page;
+      }
     },
     /**
      * get the correct link in case element is a link element
