@@ -1154,16 +1154,25 @@ export default {
           !== (this.activeCollection || collectionId
             || this.defaultFilter[this.identifierPropertyName.filter])) {
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
-          === (this.activeCollection || collectionId)) || this.defaultFilter;
-        this.filter = {
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
+          === (this.activeCollection || collectionId)) || this.defaultFilter;
+        // since default filter could be other than chips at least safeguard against type 'text'
+        // TODO: this assumes filter type is 'text'! needs further handling if other filter
+        // types could be default
+        const newValue = newFilter[this.identifierPropertyName.filter]
+        === this.defaultFilter[this.identifierPropertyName.filter]
+          ? [].concat(entry[this.labelPropertyName.autocompleteOption]) : [].concat(entry);
+        this.filter = {
           ...newFilter,
-          // also add the filter values property which does not exist in the filterList filters
-          filter_values: this.setFilterValues(newFilter),
+          // check for filter_values property which does not exist in the filterList filters
+          filter_values: this.filter.filter_values
+            ? this.filter.filter_values.concat(newValue)
+            : [].concat(newValue),
         };
+      } else {
+        this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
       }
-      this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
       // if filter type is text only use string for search on enter
       if (this.filter.type !== 'text') {
         // reset everything
