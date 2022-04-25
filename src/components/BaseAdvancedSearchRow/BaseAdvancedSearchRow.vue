@@ -1181,6 +1181,9 @@ export default {
         || !this.displayedOptions.length)) {
         // reset everything
         this.resetAllInput();
+      } else {
+        // else just empty the previously selected controlled vocabulary entry
+        this.activeControlledVocabularyEntry = null;
       }
 
       // if filter row is not controlled vocabulary close the filter to be able to see search
