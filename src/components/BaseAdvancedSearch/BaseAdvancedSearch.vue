@@ -448,9 +448,6 @@ export default {
         const originalMainFilterHasData = !!this.originalMainFilter
           && !!this.originalMainFilter.filter_values
           && hasData(this.originalMainFilter.filter_values);
-        console.log(mainFilterHasData);
-        console.log(val.filter_values);
-        console.log(originalMainFilterHasData);
         // now check a) if originalMainFilter exists already and
         // b) filter itself has switched (and there are actually data to search for)
         // c) original data and current data diverge (only one of them does not have data)
@@ -460,7 +457,6 @@ export default {
           || (mainFilterHasData && originalMainFilterHasData
           && (JSON.stringify(this.originalMainFilter.filter_values
               !== JSON.stringify(val.filter_values)))))) {
-          console.log('main filer changed');
           // if so - update original data
           this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // and trigger search
@@ -511,7 +507,6 @@ export default {
      * @param {number} index - the index of the filter
      */
     updateFilter(filter, index) {
-      console.log('update filer');
       this.$set(this.appliedFiltersInt, index, JSON.parse(JSON.stringify(filter)));
       // trigger search to update search results
       this.search();

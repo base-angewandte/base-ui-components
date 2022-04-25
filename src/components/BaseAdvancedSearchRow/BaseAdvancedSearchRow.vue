@@ -1082,9 +1082,11 @@ export default {
         // compatible
         const previousInput = this.currentInput;
         // set newly selected filter as current filter
-        this.filter = JSON.parse(JSON.stringify(selectedFilter));
-        // set filter values separately to be able to keep some values
-        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter, previousFilter));
+        this.filter = {
+          ...selectedFilter,
+          // set filter values separately to be able to keep some values
+          filter_values: this.setFilterValues(selectedFilter, previousFilter),
+        };
         // reset all input variables
         this.resetAllInput();
         this.activeFilter = null;
@@ -1173,8 +1175,10 @@ export default {
       } else {
         this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
       }
-      // if filter type is text only use string for search on enter
-      if (this.filter.type !== 'text') {
+      // if filter type is text only use string for search on enter so dont remove the input
+      // new addition: also controlled vocabulary input should stay as long as options available
+      if (this.filter.type !== 'text' && (this.filter.type !== 'chips' || this.filter.freetext_allowed
+        || !this.displayedOptions.length)) {
         // reset everything
         this.resetAllInput();
       }
