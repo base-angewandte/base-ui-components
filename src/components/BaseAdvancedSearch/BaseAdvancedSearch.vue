@@ -19,6 +19,7 @@
         :advanced-search-text="advancedSearchText"
         :assistive-text="assistiveText"
         :date-field-delay="dateFieldDelay"
+        :language="language"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
@@ -41,6 +42,7 @@
       :advanced-search-text="advancedSearchText"
       :assistive-text="assistiveText"
       :date-field-delay="dateFieldDelay"
+      :language="language"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, mainFilterIndex)" />
