@@ -2,7 +2,9 @@
   <div
     :class="['base-toggle',
              {'base-toggle--checked': checkedInt },
-             {'base-toggle--disabled': disabled }]">
+             {'base-toggle--disabled': disabled }]"
+    @mouseover="animate = true"
+    @mouseleave="animate = false">
     <label
       class="base-toggle__container">
       <input
@@ -14,10 +16,13 @@
         :aria-disabled="disabled"
         :type="'checkbox'"
         value=""
-        class="base-toggle__input">
+        class="base-toggle__input"
+        @focus="animate = true"
+        @blur="animate = false">
 
       <div class="base-switch">
-        <span class="base-switch__control">
+        <span
+          :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
           <base-icon
             v-if="checkedInt"
             :title="hideLabel ? label : ''"
@@ -112,6 +117,7 @@ export default {
   data() {
     return {
       checkedInt: false,
+      animate: false,
     };
   },
   watch: {
@@ -154,7 +160,7 @@ export default {
       opacity: 0;
       z-index: map-get($zindex, boxcontent);
 
-      &:focus-visible ~ .base-switch-container {
+      &:focus-visible ~ .base-switch {
         border: 1px solid $app-color;
       }
     }
@@ -184,8 +190,11 @@ export default {
         height: $spacing;
         border-radius: 50%;
         background-color: $switch-color;
-        transition: all 250ms ease-in-out;
         pointer-events: none;
+
+        &--animate {
+          transition: all 250ms ease-in-out;
+        }
 
         svg {
           width: $spacing / 2;
