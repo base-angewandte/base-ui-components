@@ -41,7 +41,7 @@
                    { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
           @click.native="centeredMarker = index"
           @mouseenter.native="highlightedMarker = index"
-          @mouseleave.native="highlightedMarker = null" />
+          @mouseleave.native="resetMarker" />
       </template>
     </div>
   </div>
@@ -239,6 +239,10 @@ export default {
   methods: {
     highlightLocation(value) {
       this.highlightedLocation = value;
+    },
+    resetMarker() {
+      this.highlightedMarker = null;
+      this.centeredMarker = null;
     },
   },
 };
