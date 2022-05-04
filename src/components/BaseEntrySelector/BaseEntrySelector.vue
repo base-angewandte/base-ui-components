@@ -167,7 +167,7 @@
 </template>
 
 <script>
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.

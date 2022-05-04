@@ -166,7 +166,7 @@ export default {
     }
 
     .base-toggle__label {
-      padding-left: $spacing / 2;
+      padding-left: $spacing-small;
     }
 
     .base-switch {
