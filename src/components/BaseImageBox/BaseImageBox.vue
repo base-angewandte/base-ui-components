@@ -667,6 +667,7 @@ export default {
         display: -webkit-box;
         text-overflow: ellipsis;
         -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
         height: 100%;
         line-height: $line-height; /* fallback */
       }

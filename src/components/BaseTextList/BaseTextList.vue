@@ -63,7 +63,7 @@
                     name="tooltip" />
                 </template>
                 <!-- add directly after to avoid additional spaces -->
-              </BaseLink>{{ objectIndex !== item.data.length - 1 ? ', ' : '' }}
+              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 ? ', ' : '' }}
               <!-- eslint-enable -->
             </template>
           </div>

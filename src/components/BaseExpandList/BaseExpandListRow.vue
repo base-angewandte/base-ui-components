@@ -118,6 +118,7 @@
             :icon="itemVisible ? 'eye': 'eye-hide'"
             :text="''"
             :has-background-color="false"
+            :disabled="disabled"
             :aria-label="`${itemVisible ? editHideText : editShowText } ${dataInt.label}`"
             icon-size="large"
             icon-position="left"
@@ -125,6 +126,7 @@
           <BaseToggle
             v-else-if="controlType === 'toggle'"
             v-model="itemVisible"
+            :disabled="disabled"
             :hide-label="true"
             :label="`${editShowText} ${dataInt.label}`"
             class="base-expand-item__toggle" />
@@ -218,6 +220,13 @@ export default {
     parentIndex: {
       type: [Number, String],
       default: 0,
+    },
+    /**
+     * option to disable the edit functionalities of the element (toggle and draggable)
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

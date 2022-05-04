@@ -1,39 +1,54 @@
 <template>
-  <label
-    :class="['base-toggle-container',
-             {'base-toggle-container-checked': checkedInt },
-             {'base-toggle-container-disabled': disabled }]">
+  <div
+    :class="['base-toggle',
+             {'base-toggle--checked': checkedInt },
+             {'base-toggle--disabled': disabled }]"
+    @mouseover="animate = true"
+    @mouseleave="animate = false">
+    <label
+      class="base-toggle__container">
+      <input
+        v-model="checkedInt"
+        :name="name"
+        :checked="checkedInt"
+        :disabled="disabled"
+        :aria-checked="checkedInt"
+        :aria-disabled="disabled"
+        :type="'checkbox'"
+        value=""
+        class="base-toggle__input"
+        @focus="animate = true"
+        @blur="animate = false">
 
-    <input
-      v-model="checkedInt"
-      :name="name"
-      :checked="checkedInt"
-      :disabled="disabled"
-      :aria-checked="checkedInt"
-      :aria-disabled="disabled"
-      :type="'checkbox'"
-      value=""
-      class="base-toggle-input">
+      <div class="base-switch">
+        <span
+          :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
+          <base-icon
+            v-if="checkedInt"
+            :title="hideLabel ? label : ''"
+            name="check-mark" />
+          <base-icon
+            v-if="!checkedInt"
+            :title="hideLabel ? label : ''"
+            name="remove" />
+        </span>
+      </div>
 
-    <div
-      :class="['base-switch-container']">
-      <span class="base-switch">
-        <base-icon
-          v-if="checkedInt"
-          :title="hideLabel ? label : ''"
-          name="check-mark" />
-        <base-icon
-          v-if="!checkedInt"
-          :title="hideLabel ? label : ''"
-          name="remove" />
+      <span
+        v-if="!hideLabel"
+        class="base-toggle__label">
+        {{ label }}
       </span>
-    </div>
+    </label>
+
     <span
-      v-if="!hideLabel"
-      class="base-toggle__label">
-      {{ label }}
+      v-if="(!!$slots.default && checked && bindSlotToState)
+        || (!!$slots.default && !bindSlotToState)"
+      class="base-toggle__subtext">
+      <!-- @slot slot after the label -->
+      <slot />
     </span>
-  </label>
+  </div>
 </template>
 
 <script>
@@ -84,7 +99,17 @@ export default {
       type: [Boolean, String],
       default: false,
     },
+    /**
+     * specify visibility of the label
+     */
     hideLabel: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * bind visibility of slot content to components checked state<br>
+     */
+    bindSlotToState: {
       type: Boolean,
       default: false,
     },
@@ -92,6 +117,7 @@ export default {
   data() {
     return {
       checkedInt: false,
+      animate: false,
     };
   },
   watch: {
@@ -119,68 +145,74 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-toggle-container {
-    position: relative;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    display: flex;
-    align-items: center;
+  .base-toggle {
 
-    .base-toggle-input {
+    .base-toggle__container {
+      position: relative;
+      user-select: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .base-toggle__input {
       position: absolute;
+      left: -1000px;
       opacity: 0;
       z-index: map-get($zindex, boxcontent);
 
-      &:focus-visible ~ .base-switch-container {
+      &:focus-visible ~ .base-switch {
         border: 1px solid $app-color;
       }
     }
 
-    .base-switch-container {
+    .base-toggle__label {
+      padding-left: $spacing / 2;
+    }
+
+    .base-switch {
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: flex-start;
       height: calc(#{$spacing} + 2px);
-      min-width: 30px;
+      width: 30px;
       background-color: $switch-container-color;
       border-radius: calc((#{$spacing} + 2px) / 2);
       border: 1px solid $switch-container-color;
-      cursor: pointer;
       transition: border-color 250ms ease-in-out;
 
-      .base-switch {
+      .base-switch__control {
         position: absolute;
-        right: 0;
+        left: 0;
         display: flex;
         justify-content: center;
         width: $spacing;
         height: $spacing;
         border-radius: 50%;
         background-color: $switch-color;
-        cursor: pointer;
-        transition: all 250ms ease-in-out;
+        pointer-events: none;
+
+        &--animate {
+          transition: all 250ms ease-in-out;
+        }
 
         svg {
           width: $spacing-small;
           fill: $switch-svg-color;
+          pointer-events: none;
         }
       }
     }
 
-    &-disabled {
+    &--disabled {
       color: $font-color-second;
       cursor: not-allowed;
     }
 
-    &-checked {
-      .base-switch-container {
-        justify-content: flex-end;
-
-        .base-switch {
-          right: calc(100% - #{$spacing});
+    &--checked {
+      .base-switch {
+        .base-switch__control {
+          left: calc(100% - #{$spacing});
           background-color: $switch-checked-color;
 
           svg {
@@ -190,8 +222,16 @@ export default {
       }
     }
 
-    .base-toggle__label {
-      padding-left: $spacing-small;
+    &:not(.base-toggle--disabled) {
+      .base-switch {
+        cursor: pointer;
+      }
     }
+  }
+
+  .base-toggle__subtext {
+    display: block;
+    margin-left: calc(30px + #{$spacing-small} );
+    font-size: $font-size-small;
   }
 </style>

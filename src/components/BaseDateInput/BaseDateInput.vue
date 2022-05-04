@@ -48,7 +48,7 @@
             v-model="inputFrom"
             :label="label"
             :show-label="false"
-            :is-active.sync="fromOpen"
+            :is-active="fromOpen"
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
@@ -61,6 +61,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('fromOpen', $event)"
             v-on="inputListeners">
             <template v-slot:input>
               <div
@@ -129,7 +130,7 @@
             v-model="inputTo"
             :label="label"
             :show-label="false"
-            :is-active.sync="toOpen"
+            :is-active="toOpen"
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
@@ -141,6 +142,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('toOpen', $event)"
             v-on="inputListeners">
             <template v-slot:input>
               <div
@@ -426,6 +428,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * use this prop to set a delay in ms before calender is displayed
+     */
+    isActiveDelay: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -452,7 +461,7 @@ export default {
        * variable for toggling format between date and year for date_year format
        * @type {string}
        */
-      dateFormatInt: 'DD.MM.YYYY',
+      dateFormatInt: '',
       /**
        * variable to store the date when switching from date to year in order to be
        * able to restore exact date when switching back
@@ -712,6 +721,23 @@ export default {
   },
   watch: {
     /**
+     * watch format and set correct dateFormat
+     */
+    format: {
+      handler(val) {
+        if (val === 'year') {
+          this.dateFormatInt = 'YYYY';
+          return;
+        }
+        if (val === 'month') {
+          this.dateFormatInt = 'MM.YYYY';
+          return;
+        }
+        this.dateFormatInt = 'DD.MM.YYYY';
+      },
+      immediate: true,
+    },
+    /**
      * watch input set from outside and set internal inputInt accordingly as well as
      * set the correct display format
      */
@@ -808,6 +834,7 @@ export default {
     if (this.$refs.baseIcon) {
       this.iconWidth = this.$refs.baseIcon.$el.clientWidth;
     }
+
     // initialize the resize observer to calculate fade out when component is resized
     this.initObserver();
   },
@@ -849,14 +876,14 @@ export default {
      * @param {string} dateString - the date string in YYYY-MM-DD format
      */
     dateDisplay(dateString) {
-      return dateString.split('-').reverse().join('.');
+      return dateString ? dateString.split('-').reverse().join('.') : '';
     },
     /**
      * transform the date to the correct storage format
      * @param {string} dateString - the date string in DD.MM.YYYY format
      */
     dateStorage(dateString) {
-      return dateString.split('.').reverse().join('-');
+      return dateString ? dateString.split('.').reverse().join('-') : '';
     },
     /**
      * checks done on keydown events
@@ -1318,6 +1345,24 @@ export default {
           }
         }
       });
+    },
+    /**
+     * add delay before value is set
+     *
+     * @param {String} key
+     * @param {boolean} value
+     */
+    isActiveHandler(key, value) {
+      // if false set value immediately
+      if (!value) {
+        this[key] = value;
+        return;
+      }
+
+      // otherwise add a delay
+      setTimeout(() => {
+        this[key] = value;
+      }, this.isActiveDelay);
     },
   },
 };

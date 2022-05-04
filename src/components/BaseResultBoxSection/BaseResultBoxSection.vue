@@ -119,6 +119,7 @@
               :aria-label="getPropValue(titlePropertyName, entry)"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
+                       { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
                        `base-result-box-section__box-item-${elementId}`,
                        { 'base-result-box-section__result-box-item-draggable':
                          draggable && editModeActive }]">
@@ -572,6 +573,16 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * specify an initial number of items per row that should be assumed before
+     * rendering the page
+     */
+    // this is necessary because otherwise in SSR serverside and client side DOM tree
+    // might not match
+    initialItemsPerRow: {
+      type: Number,
+      default: 6,
+    },
   },
   data() {
     return {
@@ -587,7 +598,7 @@ export default {
       // store collapsed state on action start
       wasExpanded: false,
       // how many items do fit in one row
-      itemsPerRow: 6,
+      itemsPerRow: null,
       // try to only do initial box size calculation once
       initialBoxCalcDone: false,
       // to manipulate selectedList internally
@@ -670,7 +681,7 @@ export default {
      * @returns {number}
      */
     pages() {
-      return this.total || this.entryListInt.length
+      return (this.total || this.entryListInt.length) && this.visibleNumberOfItems >= 0
         ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
     },
     /**
@@ -772,9 +783,6 @@ export default {
       },
       immediate: true,
     },
-    itemsPerRow(val) {
-      this.$emit('items-per-row-changed', val);
-    },
     // if expanded variable is set from outside change
     // internal variable accordingly
     expanded: {
@@ -849,6 +857,7 @@ export default {
     if (!this.useExpandMode) {
       this.expandedInt = true;
     }
+    this.itemsPerRow = this.initialItemsPerRow;
   },
   mounted() {
     // create an element id to have an unique id to assign javascript calculated styles to
@@ -1023,6 +1032,13 @@ export default {
             margin-right: var(--spacing-regular);
           }`;
         this.initialBoxCalcDone = true;
+        /**
+         * communicate to parent when items per row changed, either after initial
+         * render space calculations or when window was resized
+         * @event items-per-row-changed
+         * @type {number}
+         */
+        this.$emit('items-per-row-changed', this.itemsPerRow);
       }
     },
     /** PAGINATION */
@@ -1137,6 +1153,10 @@ export default {
         flex: 0 0 calc(((100% - ((var(--items-per-row) - 1) * #{$spacing}))
         / var(--items-per-row)) - 0.01rem);
         height: 100%;
+
+        &__hidden {
+          visibility: hidden;
+        }
 
         &:focus:not(focus-visible) {
           outline: none;

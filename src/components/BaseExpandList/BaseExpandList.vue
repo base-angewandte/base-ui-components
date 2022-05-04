@@ -49,6 +49,7 @@
             v-model="dataInt"
             :draggable="'.base-expand-list__draggable__item'"
             :handle="dragHandle"
+            :disabled="disabled"
             animation="150"
             class="base-expand-list__draggable">
             <base-expand-list-row
@@ -60,6 +61,7 @@
               :edit-hide-text="editHideText"
               :edit-show-text="editShowText"
               :control-type="controlType"
+              :disabled="disabled"
               class="base-expand-list__draggable__item"
               @supportive="supportive($event, index)"
               @sorted="sort($event, index)"
@@ -200,6 +202,13 @@ export default {
     expanded: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * option to disable the edit functionalities of the element (toggle and draggable)
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

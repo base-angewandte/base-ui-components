@@ -18,6 +18,8 @@
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
         :assistive-text="assistiveText"
+        :date-field-delay="dateFieldDelay"
+        :language="language"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
@@ -39,6 +41,8 @@
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
       :assistive-text="assistiveText"
+      :date-field-delay="dateFieldDelay"
+      :language="language"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, mainFilterIndex)" />
@@ -315,6 +319,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * use this prop to set a delay in ms before date input calender is displayed
+     */
+    dateFieldDelay: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -352,9 +363,9 @@ export default {
     filtersLoadingState() {
       return [
         ...this.appliedFiltersInt
-          .map((filter, index) => (this.autocompleteIndex === index + 1)),
+          .map((filter, index) => (this.autocompleteIndex === index)),
         // add one at the end for main search field (not added to applied filters array yet)
-        this.autocompleteIndex === 0,
+        this.autocompleteIndex === this.appliedFiltersInt.length,
       ];
     },
     /**
@@ -436,8 +447,8 @@ export default {
         const mainFilterHasData = hasData(val.filter_values);
         // for original filter also check right here if property filter_values actually
         // exists
-        const originalMainFilterHasData = this.originalMainFilter
-          && this.originalMainFilter.filter_values
+        const originalMainFilterHasData = !!this.originalMainFilter
+          && !!this.originalMainFilter.filter_values
           && hasData(this.originalMainFilter.filter_values);
         // now check a) if originalMainFilter exists already and
         // b) filter itself has switched (and there are actually data to search for)

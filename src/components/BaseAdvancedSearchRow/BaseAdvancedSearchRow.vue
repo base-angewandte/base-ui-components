@@ -26,6 +26,7 @@
       :set-focus-on-active="false"
       :clearable="false"
       :assistive-text="assistiveText"
+      :date-field-delay="dateFieldDelay"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       v-bind="$listeners"
@@ -160,7 +161,7 @@
                     role="listbox"
                     class="base-advanced-search-row__filter-list">
                     <li
-                      v-for="(singleFilter, index) in filterList"
+                      v-for="(singleFilter, index) in displayFilterList"
                       :id="`filter-option-${singleFilter[identifierPropertyName.filter]}`"
                       :key="index"
                       ref="filterOption"
@@ -617,6 +618,13 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * use this prop to set a delay in ms before date input calender is displayed
+     */
+    dateFieldDelay: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -737,6 +745,10 @@ export default {
         // return current filter object as array
         return [this.filter];
       },
+    },
+    displayFilterList() {
+      if (!this.isMainSearch) return this.filterList;
+      return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
     },
     /**
      * variable to return if autocomplete functionality should be shown (= results fetched
@@ -1070,9 +1082,11 @@ export default {
         // compatible
         const previousInput = this.currentInput;
         // set newly selected filter as current filter
-        this.filter = JSON.parse(JSON.stringify(selectedFilter));
-        // set filter values separately to be able to keep some values
-        this.$set(this.filter, 'filter_values', this.setFilterValues(selectedFilter, previousFilter));
+        this.filter = {
+          ...selectedFilter,
+          // set filter values separately to be able to keep some values
+          filter_values: this.setFilterValues(selectedFilter, previousFilter),
+        };
         // reset all input variables
         this.resetAllInput();
         this.activeFilter = null;
@@ -1142,20 +1156,34 @@ export default {
           !== (this.activeCollection || collectionId
             || this.defaultFilter[this.identifierPropertyName.filter])) {
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
-          === (this.activeCollection || collectionId)) || this.defaultFilter;
-        this.filter = {
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
+          === (this.activeCollection || collectionId)) || this.defaultFilter;
+        // since default filter could be other than chips at least safeguard against type 'text'
+        // TODO: this assumes filter type is 'text'! needs further handling if other filter
+        // types could be default
+        const newValue = newFilter[this.identifierPropertyName.filter]
+        === this.defaultFilter[this.identifierPropertyName.filter]
+          ? [].concat(entry[this.labelPropertyName.autocompleteOption]) : [].concat(entry);
+        this.filter = {
           ...newFilter,
-          // also add the filter values property which does not exist in the filterList filters
-          filter_values: this.setFilterValues(newFilter),
+          // check for filter_values property which does not exist in the filterList filters
+          filter_values: this.filter.filter_values
+            ? this.filter.filter_values.concat(newValue)
+            : [].concat(newValue),
         };
+      } else {
+        this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
       }
-      this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
-      // if filter type is text only use string for search on enter
-      if (this.filter.type !== 'text') {
+      // if filter type is text only use string for search on enter so dont remove the input
+      // new addition: also controlled vocabulary input should stay as long as options available
+      if (this.filter.type !== 'text' && (this.filter.type !== 'chips' || this.filter.freetext_allowed
+        || !this.displayedOptions.length)) {
         // reset everything
         this.resetAllInput();
+      } else {
+        // else just empty the previously selected controlled vocabulary entry
+        this.activeControlledVocabularyEntry = null;
       }
 
       // if filter row is not controlled vocabulary close the filter to be able to see search
