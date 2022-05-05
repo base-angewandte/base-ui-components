@@ -227,7 +227,7 @@ export default {
         return this.dataSorted || this.data;
       },
       set(val) {
-        this.dataSorted = this.addParams(val);
+        this.dataSorted = val;
       },
     },
   },
@@ -333,15 +333,6 @@ export default {
      */
     updateData(rowData, index) {
       this.$set(this.dataSorted, index, rowData);
-    },
-    /**
-     * add additional parameters e.g: order for sorting
-     *
-     * @param {array} data
-     * @returns {Array}
-     */
-    addParams(data) {
-      return data.map((obj, index) => ({ ...obj, order: index }));
     },
     /**
      * sort list
