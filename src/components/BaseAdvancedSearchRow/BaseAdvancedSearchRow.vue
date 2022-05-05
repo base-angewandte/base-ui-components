@@ -1166,12 +1166,14 @@ export default {
         const newValue = newFilter[this.identifierPropertyName.filter]
         === this.defaultFilter[this.identifierPropertyName.filter]
           ? [].concat(entry[this.labelPropertyName.autocompleteOption]) : [].concat(entry);
+        const oldFilterValues = this.filter.filter_values && this.filter.filter_values.length === 1
+          && typeof this.filter.filter_values[0] === 'string' ? [{
+            [this.labelPropertyName.autocompleteOption]: this.filter.filter_values[0],
+          }] : [];
         this.filter = {
           ...newFilter,
           // check for filter_values property which does not exist in the filterList filters
-          filter_values: this.filter.filter_values
-            ? this.filter.filter_values.concat(newValue)
-            : [].concat(newValue),
+          filter_values: oldFilterValues.concat(newValue),
         };
       } else {
         this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
