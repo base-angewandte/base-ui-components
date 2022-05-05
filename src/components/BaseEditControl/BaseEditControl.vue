@@ -38,6 +38,7 @@
 
       <base-button
         v-if="edit"
+        :disabled="disabled"
         :has-background-color="false"
         :icon="saveButtonIcon"
         :text="getI18nTerm(saveButtonTextInt)"
