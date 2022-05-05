@@ -1090,7 +1090,6 @@ export default {
         // reset all input variables
         this.resetAllInput();
         this.activeFilter = null;
-        console.log(previousFilter.filter_values[0] === previousInput);
         // now restore the input value if it makes sense (=filter type is autocomplete filter and
         // type stays the same or switches to other autocomplete type (chips, text))
         if (['text', 'chips'].includes(selectedFilter.type)
