@@ -1090,10 +1090,12 @@ export default {
         // reset all input variables
         this.resetAllInput();
         this.activeFilter = null;
+        console.log(previousFilter.filter_values[0] === previousInput);
         // now restore the input value if it makes sense (=filter type is autocomplete filter and
         // type stays the same or switches to other autocomplete type (chips, text))
-        if (previousFilter.type === 'chips' && previousFilter.freetext_allowed
-          && this.useAutocompleteFunctionality) {
+        if (['text', 'chips'].includes(selectedFilter.type)
+          && ['text', 'chips'].includes(previousFilter.type)
+          && !(previousFilter.type === 'text' && previousFilter.filter_values[0] === previousInput)) {
           this.currentInput = previousInput;
         }
         // if filter type date sync current input
