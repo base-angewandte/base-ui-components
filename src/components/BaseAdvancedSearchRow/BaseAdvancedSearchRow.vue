@@ -1003,8 +1003,18 @@ export default {
           // else reset all input
           this.resetAllInput();
         }
+        // if filter type is text and the value was not added in that form yet also add it
+        // (which will trigger search)
+      } else if (!val && this.filter.type === 'text' && this.currentInput
+        && this.filter.filter_values.join() !== this.currentInput) {
+        this.addOption(this.currentInput);
       }
-      this.$emit('is-active');
+      /**
+       * event emitted when input field becomes active / inactive
+       * @event is-active
+       * @type {boolean}
+       */
+      this.$emit('is-active', val);
     },
   },
   mounted() {
@@ -1041,8 +1051,9 @@ export default {
        *
        * @event add-filter-row
        * @property {Filter} filter - the filter object in question
+       * @property {string} input - the current input
        */
-      this.$emit('add-filter-row', this.filter);
+      this.$emit('add-filter-row', { filter: this.filter, input: this.currentInput });
     },
     removeFilter() {
       if (this.isMainSearch) {

@@ -486,12 +486,47 @@ export default {
     /**
      * function to add a filter row after '+' icon was triggered
      */
-    addFilterRow() {
-      this.appliedFiltersInt.push(this.mainFilter);
+    addFilterRow({ filter, input }) {
+      // first handle remaining input and add it to filter values if necessary
+      // therefore have separate variable and assign the original values first (in case no
+      // modifications are necessary)
+      let newFilterValues = filter.type.includes('date') ? filter.filter_values
+        : [...filter.filter_values];
+      // have variable for search trigger in case additional values are added and should trigger
+      // search
+      let triggerSearch = false;
+      // now check if type is text and the current value saved in filter does not equal text input
+      if (filter.type === 'text' && input.trim() && (!filter.filter_values || !filter.filter_values.length
+        || this.mainFilter.filter_values[0] !== input.trim())) {
+        // in that case assign new value and set search trigger true
+        newFilterValues = [input];
+        triggerSearch = true;
+        // else if type is freetext chips add the value at the end of the array
+      } else if (filter.type === 'chips' && filter.freetext_allowed && input.trim()) {
+        newFilterValues = [
+          ...filter.filter_values,
+          {
+            [this.labelPropertyName.autocompleteOption]: input,
+          },
+        ];
+        // also here triger search after
+        triggerSearch = true;
+      }
+      // now finally add filter to internal filter list
+      this.appliedFiltersInt.push({
+        ...filter,
+        filter_values: newFilterValues,
+      });
+      // and reset the main filter
       this.mainFilter = {
         ...this.defaultFilter,
       };
+      // and store the main filter to compare to later
       this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
+      // now check if search should be triggered
+      if (triggerSearch) {
+        this.search();
+      }
     },
     /**
      * remove filter after 'x' was triggered
