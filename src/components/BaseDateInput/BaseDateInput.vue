@@ -946,7 +946,7 @@ export default {
     checkDate(event, origin) {
       // get the value in question
       const value = this[`input${origin}`];
-      const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin === 'to');
+      const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
       const charToAdd = isTimeField ? ':' : '.';
       // check if value is present and if input type is other than 'deleteContentBackward' because
       // otherwise the dots can not be deleted anymore
@@ -979,7 +979,7 @@ export default {
       if (value) {
         // important and mostly different checks to make depending if value is date or time
         // so save that in variable
-        const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin === 'to');
+        const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
         // also save the current format length
         const formatLength = isTimeField ? 5 : this.dateFormatInt.length;
         // get the separator depending on time or date field
