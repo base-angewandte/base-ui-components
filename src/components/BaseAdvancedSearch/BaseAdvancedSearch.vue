@@ -23,7 +23,7 @@
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
-        @fetch-autocomplete-results="fetchAutocomplete($event, filter, index)" />
+        @fetch-autocomplete-results="fetchAutocomplete($event, index)" />
     </template>
 
     <BaseAdvancedSearchRow
@@ -45,7 +45,7 @@
       :language="language"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
-      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilter, mainFilterIndex)" />
+      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)" />
   </div>
 </template>
 
@@ -553,7 +553,7 @@ export default {
      * @param {Filter} filter - the filter the autocomplete was triggered for
      * @param {number} index - the index of the filter
      */
-    fetchAutocomplete(string, filter, index) {
+    fetchAutocomplete({ input, filter }, index) {
       // set autocomplete variable to correct filter row
       this.autocompleteIndex = index;
       /**
@@ -565,7 +565,7 @@ export default {
        * @property {Filter} filter - the filter object
        * @property {number} index - the filter index of all filters (main and applied)
        */
-      this.$emit('fetch-autocomplete', { searchString: string, filter, index });
+      this.$emit('fetch-autocomplete', { searchString: input, filter, index });
     },
     /**
      * search function

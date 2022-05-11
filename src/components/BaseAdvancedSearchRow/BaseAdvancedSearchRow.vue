@@ -972,9 +972,10 @@ export default {
          * event emitted when input string for text or chips filter changes
          *
          * @event fetch-autocomplete-results
-         * @property {Object} val - the input string
+         * @property {string} input - the input string
+         * @property {Filter} filter - the filter currently applied
          */
-        this.$emit('fetch-autocomplete-results', val);
+        this.$emit('fetch-autocomplete-results', { input: val, filter: this.filter });
       }
     },
     /**
@@ -1106,7 +1107,15 @@ export default {
         if (['text', 'chips'].includes(selectedFilter.type)
           && ['text', 'chips'].includes(previousFilter.type)
           && !(previousFilter.type === 'text' && previousFilter.filter_values[0] === previousInput)) {
+          // restore the input value
           this.currentInput = previousInput;
+          // now - if there is an input value and there are no autocomplete results available for
+          // the category of the new filter - trigger the autocomplete fetch again
+          if ((selectedFilter.type === 'text' || (selectedFilter.type === 'chips' && selectedFilter.freetext_allowed))
+            && this.currentInput && !this.autocompleteResults
+            .some(category => category.filter_id === selectedFilter.id)) {
+            this.$emit('fetch-autocomplete-results', { input: this.currentInput, filter: this.filter });
+          }
         }
         // if filter type date sync current input
         if (this.filter.type.includes('date')) {
