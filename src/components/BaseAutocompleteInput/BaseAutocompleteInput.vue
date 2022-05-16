@@ -22,8 +22,8 @@
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"
-      @keydown.space.prevent="onSpaceKey"
       @keydown.up.down.prevent="onArrowKey"
+      @keydown="onKeydown"
       v-on="inputListeners">
       <template v-slot:below-input>
         <BaseDropDownList
@@ -38,7 +38,14 @@
           class="base-autocomplete-input__drop-down"
           @click.native.stop=""
           @touchstart.native.stop=""
-          @update:selected-option="selectOption" />
+          @update:selected-option="selectOption">
+          <template #option="{ option }">
+            <!-- @slot provide custom drop down options -->
+            <slot
+              :item="option"
+              name="drop-down-entry" />
+          </template>
+        </BaseDropDownList>
       </template>
       <template
         v-slot:label-addition>
@@ -47,12 +54,24 @@
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="label-addition" />
       </template>
+      <template v-slot:pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual
+        input field<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="pre-input-field" />
+      </template>
       <template
         v-slot:input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field \<div\>
           (before \<input\>) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-before" />
+      </template>
+      <template v-slot:input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap<br>
+        for an example see [BaseInput](#baseinput)-->
+        <slot name="input-field-inline-before" />
       </template>
       <template v-slot:input-field-addition-after>
         <!-- @slot for adding elements after input -->
@@ -83,8 +102,13 @@ import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
 import { createId } from '@/utils/utils';
 import navigateMixin from '@/mixins/navigateList';
 
+/**
+ * Input component allowing to select single values from a drop down that are filled into
+ * the input field as string
+ */
+
 export default {
-  name: 'BaseAutocompleteInput2',
+  name: 'BaseAutocompleteInput',
   components: {
     BaseInput,
     BaseDropDownList,
@@ -257,6 +281,10 @@ export default {
       type: String,
       default: 'No options available',
     },
+    /**
+     * if this is true parent needs to take care of filling the options list on string
+     * input etc. - useful for fetching autocomplete options from a backend
+     */
     dynamicFetch: {
       type: Boolean,
       default: true,
@@ -269,6 +297,11 @@ export default {
        * @type {?string|Object}
        */
       inputInt: null,
+      /**
+       * needed for navigation via keyboard in drop down list
+       * the index of the current active option in the list array
+       * @type {number}
+       */
       activeOptionIndex: -1,
       /**
        * internal representation for active state of input and drop down
@@ -286,7 +319,7 @@ export default {
         ...{
           // keep this input from propagating and use own event
           // (handled this way because this input event is only triggered on
-          // keyboard input not when i select from the drop down)
+          // keyboard input not when I select from the drop down)
           input: () => {},
         },
       };
@@ -305,12 +338,21 @@ export default {
           [this.identifierPropertyName]: `${option}-${createId()}`,
         }));
     },
+    /**
+     * additionally if the list is not fetched dynamically filter already selected
+     * options from the  list
+     * (since inputInt is always only string now this can only be done by comparing
+     * the label!)
+     */
     filteredListInt() {
+      // check if list content is fetched dynamically
       if (!this.dynamicFetch) {
+        // if not filter input string by label property
         return this.listInt
           .filter(option => option[this.labelPropertyName].toLowerCase()
             .includes(this.inputInt.toLowerCase()));
       }
+      // else just return the unmodified list
       return this.listInt;
     },
     /**
@@ -318,7 +360,7 @@ export default {
      * @returns {boolean}
      */
     optionsIsListOfStrings() {
-      return this.list && !!this.list.length && typeof this.list[0] === 'string';
+      return !!this.list && !!this.list.length && typeof this.list[0] === 'string';
     },
     /**
      * the currently active option object
@@ -365,6 +407,7 @@ export default {
          */
         this.$emit('input', val);
       }
+      // if options should be fetched dynamically trigger event when inputInt changes
       if (this.dynamicFetch) {
         /**
          * an event specifically triggered when drop down should be fetched anew
@@ -377,13 +420,23 @@ export default {
       }
     },
     isActive: {
+      /**
+       * watch prop isActive to sync with internal variable
+       * @param {boolean} val - is input active
+       */
       handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.isActiveInt)) {
+        // check first if internal and external variable differ
+        if (val !== this.isActiveInt) {
           this.isActiveInt = val;
         }
       },
       immediate: true,
     },
+    /**
+     * watch internal is active variable to be able to inform parent about
+     * changes
+     * @param {boolean} val
+     */
     isActiveInt(val) {
       // if input is not active anymore reset the active option index
       if (!val) {
@@ -391,6 +444,12 @@ export default {
       }
       // also inform parent of the state changes
       if (JSON.stringify(val) !== JSON.stringify(this.isActive)) {
+        /**
+         * update when active state of input field changes
+         * the .sync modifier can be used on this event
+         * @event update:is-active
+         * @type {boolean}
+         */
         this.$emit('update:is-active', val);
       }
     },
@@ -409,6 +468,7 @@ export default {
           this.listInt,
           event.key === 'ArrowDown',
           this.activeOptionIndex,
+          false,
           true,
         );
       }
@@ -424,30 +484,50 @@ export default {
         // if enter was not pressed to add an option from the drop down
         // use it to toggle the drop down
       } else {
-        this.toggleDropDown();
+        this.isActiveInt = false;
       }
     },
-    onSpaceKey() {
-      // if there is no input use space bar to toggle drop down
-      if (!this.inputInt) {
-        this.toggleDropDown();
+    /**
+     * if user continues typing after 'enter' (which closes the drop down)
+     * the dropdown should open again
+     */
+    onKeydown(event) {
+      const { key } = event;
+      if (!['Tab', 'Enter'].includes(key)) {
+        this.isActiveInt = true;
       }
     },
+    /**
+     * function to toggle the drop down e.g. on space or enter key
+     */
     toggleDropDown() {
       this.isActiveInt = !this.isActiveInt;
     },
     /**
-     * @param {Object} selectedOption
+     * @param {Object} selectedOption - the option selected from drop down or by keyboard
+     * enter - always an object due to internal identifier prop added in case it was a string
      */
     selectOption(selectedOption) {
-      this.inputInt = selectedOption[this.labelPropertyName] || selectedOption;
-      const originalOption = this.list.find((option) => {
-        if (this.optionsIsListOfStrings) {
-          return option === selectedOption[this.labelPropertyName];
-        }
-        return option[this.identifierPropertyName] === selectedOption[this.identifierPropertyName];
-      });
-      this.$emit('selected', originalOption);
+      // assign the newly selected value to the input field (only the string from label prop!)
+      this.inputInt = selectedOption[this.labelPropertyName];
+      // if options list was objects also inform parent which option was selected separately
+      if (!this.optionsIsListOfStrings) {
+        // therefore identify the selected option from the list
+        const originalOption = this.list
+          .find(option => option[this.identifierPropertyName]
+            === selectedOption[this.identifierPropertyName]);
+        this.$emit('selected', originalOption);
+      } else {
+        /**
+         * inform parent when an option was selected with all information provided in options list
+         * (mainly useful when options list was array of objects - if strings this information
+         * is provided with input event anyways)
+         * @event selected
+         * @type {string | Object}
+         */
+        this.$emit('selected', this.inputInt);
+      }
+      // close the drop down and blur input
       this.isActiveInt = false;
     },
   },
