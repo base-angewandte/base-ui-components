@@ -67,12 +67,24 @@
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="label-addition" />
       </template>
+      <template v-slot:pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual
+        input field<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="pre-input-field" />
+      </template>
       <template
         v-slot:input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field \<div\>
           (before \<input\>) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-before" />
+      </template>
+      <template v-slot:input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="input-field-inline-before" />
       </template>
       <template v-slot:input-field-addition-after>
         <!-- @slot for adding elements after input -->
