@@ -548,7 +548,7 @@ export default {
       this.isActiveInt = val;
     },
     handleInputTab(event) {
-      if (!(this.showRemoveIcon && !!this.inputInt)) {
+      if (!this.showRemoveIcon || event.shiftKey) {
         this.setFieldState(false);
       }
       this.$emit('keydown', event);
