@@ -5,14 +5,26 @@
              { 'base-chip__linked': isLinked },
              { 'base-chip__active': chipActive }]">
     <div
+      ref="chipText"
       :style="textStyling"
+      :contenteditable="editable ? 'true' : false"
+      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
+      enterkeyhint="search"
       class="base-chip__text"
+      @blur="updateText"
+      @keydown.enter.prevent="updateText"
       @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox">
       {{ entryInt }}
     </div>
+    <span
+      v-if="assistiveText"
+      :id="`${internalId}_aria-label`"
+      class="hide">
+      {{ assistiveText }}
+    </span>
     <div
       v-if="isRemovable"
       class="base-chip__icon"
@@ -30,6 +42,7 @@
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
 
 /**
@@ -91,10 +104,33 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * define true if chip should be editable on click
+     * <br>
+     * CAVEAT: chips can not showhoverBoxContent as soon as it is editable
+     * respectively - if both are set true edit functionality takes precedent - chip will
+     *  not be draggable, hoverBoxContent will not be shown!
+     */
+    editable: {
+      type: Boolean,
+      default: false,
+    },
+    assistiveText: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
-      entryInt: {},
+      /**
+       * internal represenation of string provided by parent
+       * @type {string}
+       */
+      entryInt: '',
+      /**
+       * handle showing of HoverBox
+       * @type {boolean}
+       */
       showInfoBox: false,
     };
   },
@@ -102,28 +138,54 @@ export default {
     hoverBoxEnabled() {
       return this.isLinked && !!Object.keys(this.hoverBoxContent).length;
     },
-  },
-  watch: {
-    entry(val) {
-      this.entryInt = val;
+    internalId() {
+      return createId();
     },
   },
-  created() {
-    this.entryInt = this.entry;
+  watch: {
+    entry: {
+      handler(val) {
+        if (val !== this.entryInt) {
+          this.entryInt = val;
+        }
+      },
+      immediate: true,
+    },
   },
   methods: {
+    /**
+     * update the internal text variable if chip is editable and
+     * inform parent
+     * @param {KeyboardEvent} event
+     */
+    updateText(event) {
+      const textString = event.target.innerText;
+      if (this.editable && textString !== this.entryInt) {
+        this.entryInt = textString;
+        /**
+         * if chip is editable value is updated with this event
+         *
+         * @event value-changed
+         * @type {string}
+         */
+        this.$emit('value-changed', this.entryInt);
+      }
+    },
     clickAction(e) {
-      /**
-       * event emitted when chip is clicked
-       *
-       * @event clicked
-       *
-       */
-      this.$emit('clicked');
-      if (this.isLinked) {
-        this.$emit('hoverbox-active', true);
-        this.$refs.hoverBox.setPosition(e);
-        this.showInfoBox = !this.showInfoBox;
+      if (!this.editable) {
+        e.stopPropagation();
+        /**
+         * event emitted when chip is clicked
+         *
+         * @event clicked
+         *
+         */
+        this.$emit('clicked');
+        if (this.isLinked) {
+          this.$emit('hoverbox-active', true);
+          this.$refs.hoverBox.setPosition(e);
+          this.showInfoBox = !this.showInfoBox;
+        }
       }
     },
     moveBox(e) {

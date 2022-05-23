@@ -25,6 +25,7 @@ import eyeHide from './eye-hide';
 import eye from './eye';
 import fileObject from './file-object';
 import forbidden from './forbidden';
+import home from './home';
 import imageObject from './image-object';
 import information from './information';
 import licence from './licence';
@@ -37,6 +38,7 @@ import play from './play';
 import plus from './plus';
 import prev from './prev';
 import print from './print';
+import refresh from './refresh';
 import remove from './remove';
 import saveFile from './save-file';
 import share from './share';
@@ -76,6 +78,7 @@ export default {
   eye,
   fileObject,
   forbidden,
+  home,
   imageObject,
   information,
   licence,
@@ -88,6 +91,7 @@ export default {
   plus,
   prev,
   print,
+  refresh,
   remove,
   saveFile,
   share,

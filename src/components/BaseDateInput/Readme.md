@@ -10,8 +10,7 @@ Date range input fields
         :show-label="true"
         v-model="datepicked"
         type="daterange"
-        placeholder="enter a date"
-        />
+        placeholder="enter a date" />
       <div>{{ datepicked }}</div>
   </div>
 

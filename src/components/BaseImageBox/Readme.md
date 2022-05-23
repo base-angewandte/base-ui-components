@@ -56,6 +56,7 @@ A variety of possibilities with image box
         :showTitle="false"
         :box-size="{ width: 'calc(25% - 12px)' }"
         icon="file-object"
+        :iconSize="iconSize"
         title="box with no title, icon"
         description="icon & showtitle false"
         class="box"
@@ -67,10 +68,15 @@ A variety of possibilities with image box
         :box-size="{ width: 'calc(25% - 12px)' }"
         :play-icon="true"
         icon="audio-object"
+        :iconSize="iconSize"
         title="box with no title, icon and play-icon"
         description="icon, play icon & showtitle false"
         class="box"
-        @select-triggered="handleBoxArray($event, '7')" />
+        @select-triggered="handleBoxArray($event, '7')">
+        <template slot="footer">
+          <span>00:04:22</span>
+        </template>
+      </base-image-box>
     </div>
     <div class="button-area">
       <BaseButton
@@ -90,12 +96,12 @@ export default {
     return {
       selectActive: false,
       selectedBoxes: [],
+      iconSize: null,
     };
   },
   computed: {
     imgUrl() {
-      const url = 'https://placeimg.com/460/341/arch';
-      return url;
+      return 'https://placeimg.com/460/341/arch';
     },
   },
   methods: {
@@ -106,7 +112,21 @@ export default {
         this.selectedBoxes.splice(this.selectedBoxes.indexOf(num), 1);
       }
     },
+    resizeHandler() {
+      if (window.outerWidth > 800) {
+        this.iconSize = 'xxlarge';
+        return;
+      }
+      this.iconSize = 'large';
+    },
   },
+  mounted() {
+    this.resizeHandler();
+    window.addEventListener('resize', this.resizeHandler);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.resizeHandler);
+  }
 };
 </script>
 <style>

@@ -192,6 +192,21 @@ h1, h2, h3 {
   }
 }
 
+.base-text-fade-out-left {
+  position: relative;
+
+  &::before {
+    content: '';
+    width: calc(#{$fade-out-width} + #{$spacing});
+    height: $row-height-large;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0) , white);
+    z-index: map-get($zindex, fadeout);
+  }
+}
+
 .base-text-fade-out-background {
   position: relative;
 
@@ -224,4 +239,5 @@ h1, h2, h3 {
   width: 1px;
   margin-left: -1px;
   overflow: hidden;
+  visibility: hidden;
 }

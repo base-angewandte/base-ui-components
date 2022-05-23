@@ -2,7 +2,9 @@
   <div
     :style="{...position, ...{ '--loader-color': loaderColor } }"
     class="base-loader">
-    <svg class="base-loader-circular">
+    <svg
+      v-if="!hide"
+      class="base-loader-circular">
       <circle
         class="base-loader-path"
         cx="50"
@@ -34,6 +36,14 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * set this to true if you want to keep element (with height and width) but dont
+     * want the loader to show
+     */
+    hide: {
+      type: Boolean,
+      default: false,
+    },
   },
 };
 </script>
@@ -48,6 +58,7 @@ export default {
     top: 20%;
     left: 50%;
     transform: translate(-50%,-50%);
+    overflow: hidden;
 
     .base-loader-circular{
       animation: rotate 2s linear infinite;

@@ -60,12 +60,31 @@ const executeFire = function(){
       icon-size="large"
       @clicked="executeFire"/>
   <base-button
+      style="margin-right: 16px;"
       :active="true"
       text="Button Active"
       icon="add-new-object"
       button-style="row"
       icon-size="large"
       @clicked="executeFire"/>
+  <base-button
+    style="margin-right: 16px;"
+    description="Custom Text"
+    text="Custom Text"
+    icon="file-object"
+    button-style="row"
+    icon-size="large"
+    @clicked="executeFire">
+    <template>Custom Text</template>
+  </base-button>
+  <base-button
+    style="margin-right: 16px;"
+    description="No Text"
+    text=""
+    button-style="row"
+    icon="plus"
+    icon-size="large"
+    @clicked="executeFire" />
 </div>
 
 ```

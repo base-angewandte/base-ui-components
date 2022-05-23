@@ -16,12 +16,12 @@
         <div
           v-if="showTitle"
           ref="headerBox"
-          :class="[
-            'base-image-box-header',
-            { 'base-image-box-header-centered': centerHeader}]">
+          :class="['base-image-box-header',
+                   { 'base-image-box-header-centered': centerHeader }]">
           <div
             :title="title"
-            class="base-image-box-title">
+            :class="['base-image-box-title',
+                     { 'base-image-box-header-2-lines': !subtext } ]">
             {{ title }}
           </div>
           <div
@@ -57,13 +57,13 @@
           <BaseIcon
             v-if="icon"
             :name="icon"
-            class="base-image-box-icon" />
+            :class="['base-image-box-icon', 'base-image-box-icon--' + iconSize]" />
 
           <!-- display optional play icon e.g. for video, audio -->
           <BaseIcon
             v-if="playIcon"
             name="play"
-            class="base-image-box-icon-play" />
+            :class="['base-image-box-icon-play', 'base-image-box-icon--' + iconSize]" />
 
           <div
             v-if="!imageUrl || !displayImage"
@@ -231,6 +231,14 @@ export default {
       default: '',
     },
     /**
+     * set optional icon size <br>
+     */
+    iconSize: {
+      type: String,
+      default: 'xxlarge',
+      validator: val => ['small', 'medium', 'large', 'xlarge', 'xxlarge'].includes(val),
+    },
+    /**
      * display play icon <br>
      * e.g. for Video, Audio files
      */
@@ -275,7 +283,7 @@ export default {
       default: false,
     },
     /**
-     * specifiy position of image
+     * specify position of image
      */
     imageFirst: {
       type: Boolean,
@@ -358,10 +366,16 @@ export default {
   },
   mounted() {
     this.selectedInt = this.selected;
-    this.calcTextHeight();
+
     if (window) {
       window.addEventListener('resize', this.resizeTriggered);
     }
+
+    // calcTextHeight when component is really mounted, even in ssr mode
+    // otherwise the calculation will be wrong and not set as style attribute
+    this.$nextTick(() => {
+      this.calcTextHeight();
+    });
   },
   destroyed() {
     window.removeEventListener('resize', this.resizeTriggered);
@@ -547,6 +561,13 @@ export default {
 
         .base-image-box-title {
           font-weight: bold;
+
+          &.base-image-box-header-2-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 2 ;
+            max-height: 100%;
+            white-space: normal;
+          }
         }
 
         &.base-image-box-header-centered {
@@ -564,24 +585,42 @@ export default {
         height: 100%;
       }
 
-      .base-image-box-icon {
+      .base-image-box-icon,
+      .base-image-box-icon-play {
         position: absolute;
         top: 50%;
         left: 50%;
-        fill: $font-color-second;
-        max-width: $icon-xxlarge;
         transform: translate(-50%, -50%);
+
+        &.base-image-box-icon--xxlarge {
+          max-width: $icon-xxlarge;
+        }
+
+        &.base-image-box-icon--xlarge {
+          max-width: $icon-xlarge;
+        }
+
+        &.base-image-box-icon--large {
+          max-width: $icon-large;
+        }
+
+        &.base-image-box-icon--medium {
+          max-width: $icon-medium;
+        }
+
+        &.base-image-box-icon-small {
+          max-width: $icon-small;
+        }
+      }
+
+      .base-image-box-icon {
+        fill: $font-color-second;
       }
 
       .base-image-box-icon-play {
         opacity: 0;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         z-index: 1;
         fill: $app-color;
-        max-width: $icon-xlarge;
       }
 
       .base-image-box-img-wrapper {
@@ -628,6 +667,7 @@ export default {
         display: -webkit-box;
         text-overflow: ellipsis;
         -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
         height: 100%;
         line-height: $line-height; /* fallback */
       }
@@ -754,7 +794,7 @@ export default {
         fill: white;
         height: $icon-medium;
         width: $icon-medium;
-        margin-right: $spacing-small / 2;
+        margin-right: $spacing-small-half;
       }
     }
 

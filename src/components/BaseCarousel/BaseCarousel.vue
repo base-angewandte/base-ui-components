@@ -45,11 +45,11 @@
 
 <script>
 import 'lazysizes';
-import Swiper, { Autoplay, Keyboard, Pagination } from 'swiper';
+import Swiper, { Autoplay, Keyboard, Navigation, Pagination } from 'swiper';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
-Swiper.use([Autoplay, Keyboard, Pagination]);
+Swiper.use([Autoplay, Keyboard, Navigation, Pagination]);
 
 export default {
   name: 'BaseCarousel',
@@ -199,6 +199,7 @@ export default {
       &:focus,
       &:hover {
         fill: $app-color;
+        cursor: pointer;
       }
 
       &-prev {

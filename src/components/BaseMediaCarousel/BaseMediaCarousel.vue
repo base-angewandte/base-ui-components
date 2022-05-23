@@ -219,14 +219,20 @@ export default {
         media.$el.focus();
       });
 
+      // calc of slide width is wrong on first initialization using component in ssr
+      // quickfix is to trigger resize after swiper init
+      // TODO: clarify and find better solution
+      this.swiper.on('init', () => {
+        // edge needs somehow setTimeout to trigger resize
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 0);
+      });
+
       this.swiper.init();
 
       // set focus to opened slide/media - otherwise esc key won't work on first slide
       this.$refs.baseMedia[this.swiper.activeIndex].$el.focus();
-
-      // calc of slide width is wrong on first initialization using component in ssr
-      // quickfix is to trigger resize after init
-      window.dispatchEvent(new Event('resize'));
     },
     /**
      * pause media on previous slide
@@ -359,7 +365,7 @@ export default {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
     }
 
     &__close {
@@ -392,8 +398,9 @@ export default {
 
       .swiper-button {
         display: block;
-        width: $icon-large;
-        height: $icon-large;
+        width: calc(#{$icon-large} + (2 * #{$spacing-small}));
+        padding: 0 $spacing-small;
+        height: 50%;
         fill: white;
         transform: translateY(-50%);
         transition: fill 250ms ease-in-out;

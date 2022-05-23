@@ -3,10 +3,13 @@
     class="base-select-options"
     :style="{ '--direction': flexDirection}">
     <div class="base-select-options__number-selected">
-      {{ `${numberSelected} ${selectedNumberText}` }}
+      <slot name="selectedText">
+        {{ `${numberSelected} ${selectedNumberText}` }}
+      </slot>
     </div>
     <BaseButton
-      :text="allSelectedX ? deselectText : selectText"
+      :text="allSelected ? deselectText : selectText"
+      :disabled="selectAllDisabled"
       button-style="secondary"
       class="base-select-options__select-button"
       @clicked="select" />
@@ -62,6 +65,13 @@ export default {
       default: () => [],
     },
     /**
+     * disable the button by setting this prop to true
+     */
+    selectAllDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * By default, the "All/None" button appears on the right, and the counter of
      * selected items appears on the left. Set this to `true` to reverse the order.
      */
@@ -81,7 +91,7 @@ export default {
     numberSelected() {
       return this.selectedList.length;
     },
-    allSelectedX() {
+    allSelected() {
       // not just calc comparing selectedList with list because with pagination
       // selectedList can contain entries that are currently not incluced in list
       const idList = this.selectedList.length && this.selectedList[0].id
@@ -92,7 +102,7 @@ export default {
     },
   },
   watch: {
-    allSelectedX: {
+    allSelected: {
       handler(val) {
         if (val !== this.selectedInt) {
           this.selectedInt = val;
@@ -135,7 +145,7 @@ export default {
     .base-select-options__number-selected {
       font-size: $font-size-small;
       color: $font-color-second;
-      margin: $spacing-small/2 $spacing-small;
+      margin: $spacing-small-half $spacing-small;
     }
   }
 </style>

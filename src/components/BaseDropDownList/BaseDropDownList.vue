@@ -371,7 +371,7 @@ export default {
   @import "../../styles/variables";
 
   .base-drop-down-list__container {
-    background: white;
+    background: inherit;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;
@@ -388,7 +388,7 @@ export default {
         display: flex;
         align-items: center;
         min-height: $row-height-small;
-        padding: $spacing-small/2 $spacing;
+        padding: $spacing-small-half $spacing;
         line-height: $line-height;
         width: 100%;
         transition: all 0.2s ease;

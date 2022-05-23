@@ -372,7 +372,7 @@ export default {
 
         .base-drop-down-option {
           min-height: $row-height-small;
-          padding: $spacing-small/2 $spacing;
+          padding: $spacing-small-half $spacing;
           line-height: $line-height;
           width: 100%;
           transition: all 0.2s ease;

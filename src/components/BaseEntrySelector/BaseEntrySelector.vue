@@ -86,7 +86,19 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        @selected="changeAllSelectState" />
+        :select-all-disabled="!(selectableEntries.length
+          < (maxSelectedEntries - selectedListIds.length)
+          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
+        @selected="changeAllSelectState">
+        <template v-slot:selectedText>
+          {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
+          ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
+          <span
+            v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
+            {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
+          </span>
+        </template>
+      </BaseSelectOptions>
     </div>
 
     <!-- BODY -->
@@ -118,7 +130,7 @@
           :select-active="showOptions"
           :list="entries"
           :active-entry="activeEntry"
-          :selected-list="selectedList"
+          :selected-list="selectedListIds"
           class="base-entry-selector__body__entries"
           @clicked="entryClicked"
           @selected="selectEntry">
@@ -155,7 +167,7 @@
 </template>
 
 <script>
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -204,6 +216,14 @@ export default {
     entriesSelectable: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * specify a maximum number of entries that can be selected<br>
+     * specify '0' if there should be no limit
+     */
+    maxSelectedEntries: {
+      type: Number,
+      default: 0,
     },
     /**
      * specify a custom height - mainly useful if component is within a pop up.
@@ -331,6 +351,7 @@ export default {
         selectAll: 'Select All',
         selectNone: 'Select None',
         entriesSelected: 'entries selected',
+        maxEntriesReached: 'Maximum Number Exceeded!',
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => [
@@ -341,6 +362,7 @@ export default {
         'selectAll',
         'selectNone',
         'entriesSelected',
+        'maxEntriesReached',
       ]
         .every(prop => Object.keys(val).includes(prop))
           && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
@@ -396,7 +418,7 @@ export default {
      * BaseMenuList components needs a list of id's for selected entries
      * @returns {string[]}
      */
-    selectedList() {
+    selectedListIds() {
       return this.selectedEntries.map(entry => entry.id);
     },
     /**
@@ -500,21 +522,27 @@ export default {
       }
     },
     fetchEntries() {
-      /**
-       * Event emitted to fetch entries
-       *
-       * @event fetch-entries
-       * @property {string} page - current pagination page
-       * @property {string} query - the search string
-       * @property {object} sort - the sort filter
-       * @property {object} type - the type filter
-       */
-      this.$emit('fetch-entries', {
-        page: this.pageNumber,
-        query: this.filterString,
-        sort: this.sortParam,
-        type: this.filterType,
-      });
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+      }
+      this.timeout = setTimeout(() => {
+        /**
+         * Event emitted to fetch entries
+         *
+         * @event fetch-entries
+         * @property {string} page - current pagination page
+         * @property {string} query - the search string
+         * @property {object} sort - the sort filter
+         * @property {object} type - the type filter
+         */
+        this.$emit('fetch-entries', {
+          page: this.pageNumber,
+          query: this.filterString,
+          sort: this.sortParam,
+          type: this.filterType,
+        });
+      }, 600);
     },
     filterEntries(value, type) {
       if (type === 'type') {
@@ -581,7 +609,7 @@ export default {
 
     &__head {
       position: sticky;
-      z-index: map-get($zindex, dropdown);
+      z-index: map-get($zindex, entry-selector-head);
       padding-top: $spacing;
       background-color: $background-color;
       flex: 0 0 auto;

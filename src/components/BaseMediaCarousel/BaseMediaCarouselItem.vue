@@ -21,8 +21,10 @@
       @error="displayImage = false">
     <div
       v-else-if="fileType === 'image' && !displayImage"
-      class="base-media-preview-error">
-      An error occured displaying this image.
+      class="base-media-preview-not-supported base-media-preview-error">
+      <p class="base-media-preview-not-supported-file-name">
+        An error occured displaying this image.
+      </p>
     </div>
     <base-hls-video
       v-else-if="fileType === 'video'"
@@ -58,7 +60,8 @@
           class="base-media-preview__button base-media-preview-not-supported-button"
           @clicked="download" />
         <BaseButton
-          v-if="!isMobile && fileEnding === 'pdf'"
+          v-if="(!isMobile && fileEnding === 'pdf')
+            || (!allowDownload && fileEnding === 'pdf')"
           :text="getI18nTerm(infoTexts.view)"
           icon="eye"
           icon-position="right"
@@ -80,7 +83,7 @@
                base-media-preview__info__col1
                base-media-preview__info-text-wrapper">
         <p class="base-media-preview-info-text">
-          {{ fileName }}
+          {{ displayName }}
         </p>
         <template v-if="additionalInfo.length">
           <p
@@ -100,9 +103,9 @@
         </p>
       </div>
       <div
+        v-if="allowDownload"
         class="base-media-preview__info__col base-media-preview__info__col3">
         <BaseButton
-          v-if="allowDownload"
           :text="infoTexts.download"
           icon="download"
           icon-position="right"
@@ -266,10 +269,7 @@ export default {
       return '';
     },
     fileName() {
-      if (this.displayName) {
-        return this.displayName;
-      }
-      const match = this.downloadUrl.match(/([^/]+)$/);
+      const match = this.sourceUrl.match(/([^/]+)$/);
       return match ? decodeURI(match[1]) : '';
     },
     fileEnding() {
@@ -325,12 +325,14 @@ export default {
     justify-content: center;
     align-items: center;
     outline: none;
+    padding: 0 $spacing-small;
 
     .base-media-preview-image {
-      max-height: calc(100% - #{$spacing}*4);
-      max-width: calc(100% - #{$spacing}*4);
-      padding: $spacing;
+      width: 100%;
+      max-height: 90%;
+      max-width: 100%;
       margin-top: auto;
+      object-fit: scale-down;
 
       &.base-media-preview-rotation-2 {
         transform: scaleX(-1);
@@ -381,13 +383,14 @@ export default {
       justify-content: center;
       color: whitesmoke;
       margin-top: auto;
+      padding: $spacing;
 
       @media screen and (max-width: $mobile) {
         width: 75%;
       }
 
       .base-media-preview-not-supported-file-name {
-        margin-bottom: $spacing-small;
+        margin-bottom: $spacing;
         padding: 0 $spacing;
         font-weight: 600;
         word-break: break-all;
@@ -398,19 +401,21 @@ export default {
         justify-content: center;
 
         .base-media-preview-not-supported-button {
-          margin: $spacing $spacing-small;
-          min-width: 200px;
+          margin: 0 $spacing-small $spacing;
+          min-width: 150px;
         }
       }
 
       .base-media-preview__not-supported-additional {
         font-size: $font-size-small;
+        word-break: break-all;
       }
     }
 
     .base-media-preview-video {
-      max-height: 95%;
-      max-width: 95%;
+      width: auto;
+      max-height: 90%;
+      max-width: 100%;
       margin-top: auto;
     }
 
@@ -425,7 +430,7 @@ export default {
     }
 
     .base-media-preview-info {
-      width: 100%;
+      width: calc(100% + #{$spacing});
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -433,10 +438,12 @@ export default {
       color: whitesmoke;
       padding: $spacing-small;
       margin-top: auto;
+      margin-left: -$spacing-small;
+      margin-right: -$spacing-small;
 
       .base-media-preview__info__col1,
       .base-media-preview__info__col3 {
-        width: calc(50% - 50px);
+        flex: 1;
       }
 
       .base-media-preview__info__col1 {
@@ -444,9 +451,9 @@ export default {
       }
 
       .base-media-preview__info__col2 {
-        padding: 0 15px;
         text-align: center;
         font-size: $font-size-small;
+        align-self: flex-end;
       }
 
       .base-media-preview__info__col3 {
@@ -458,7 +465,7 @@ export default {
         margin-right: $spacing;
 
         .base-media-preview-info-text {
-          padding-bottom: $spacing-small/2;
+          padding-bottom: $spacing-small-half;
           margin-bottom: 0;
         }
 
@@ -483,11 +490,14 @@ export default {
   }
 
   @media screen and (max-width: $mobile) {
-    .base-media-preview-image-stage,
     .base-media-preview-not-supported,
     .base-media-preview-not-supported-buttons {
       flex-wrap: wrap;
+    }
 
+    .base-media-preview-image-stage,
+    .base-media-preview-not-supported,
+    .base-media-preview-not-supported-buttons {
       .base-media-preview-not-supported-button {
         margin: $spacing-small;
         min-width: 125px;
