@@ -14,6 +14,7 @@
     <base-icon
       v-if="icon"
       :name="icon"
+      :title="iconTitle"
       :class="['base-button-icon',
                'base-button-icon-' + iconSize,
                { 'base-button-icon-colored': iconColored },
@@ -22,10 +23,15 @@
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
 
-    <span
-      :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
-      {{ text }}
-    </span>
+    <!-- @slot have your own text element which also allows for easier custom styling -->
+    <slot name="text">
+      <span
+        v-if="text"
+        :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
+        {{ text }}
+      </span>
+    </slot>
+
     <!-- @slot create custom content (e.g. icon) right of text -->
     <slot name="right-of-text" />
 
@@ -35,7 +41,6 @@
     <span
       v-if="description"
       :id="internalId"
-      :aria-hidden="true"
       class="hide">
       {{ description }}
     </span>
@@ -127,6 +132,13 @@ export default {
       },
     },
     /**
+     * set a title for the icon that is shown as a tooltip on hover
+     */
+    iconTitle: {
+      type: String,
+      default: '',
+    },
+    /**
      * set button inactive
      */
     disabled: {
@@ -181,10 +193,10 @@ export default {
       default: true,
     },
   },
-  computed: {
-    internalId() {
-      return createId();
-    },
+  data() {
+    return {
+      internalId: createId(),
+    };
   },
   methods: {
     clicked(event) {
@@ -277,15 +289,6 @@ export default {
       }
     }
 
-    &.base-button-secondary {
-      font-size: $font-size-small;
-      color: $font-color-second;
-
-      &.base-button-background {
-        background-color: $button-header-color;
-      }
-    }
-
     &.base-button-active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
@@ -311,15 +314,18 @@ export default {
     }
 
     &.base-button-icon-left {
-      .base-button-icon {
-        margin-right: #{$spacing};
+      .base-button-icon + .base-button-text {
+        margin-left: $spacing;
       }
     }
 
     &.base-button-icon-right {
       .base-button-icon {
         order: 1;
-        margin-left: #{$spacing};
+
+        & + .base-button-text {
+          margin-right: $spacing;
+        }
       }
     }
 
@@ -344,6 +350,23 @@ export default {
 
       &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
         color: $graytext-color;
+      }
+    }
+
+    &.base-button-secondary {
+      font-size: $font-size-small;
+      color: $font-color-second;
+
+      &.base-button-background {
+        background-color: $button-header-color;
+      }
+
+      &:disabled {
+        color: $font-color-third;
+
+        &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
+          color: $font-color-third;
+        }
       }
     }
 

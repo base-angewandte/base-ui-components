@@ -11,7 +11,7 @@
       :use-form-field-styling="false"
       :show-input-border="false"
       :label="label"
-      :placeholder="placeholder"
+      :placeholder="placeholderInt"
       :linked-list-option="linkedListOption"
       :drop-down-list-id="dropDownListId || false.toString()"
       :is-loading="isLoading"
@@ -19,11 +19,15 @@
       :invalid="invalid"
       :show-error-icon="showErrorIcon"
       :language="languageInt"
-      :allow-unknown-entries="isFieldTypeChips && type === 'chips'"
+      :allow-unknown-entries="type === 'chips'"
+      :loadable="loadable"
+      :chips-editable="type === 'chips'"
       :label-property-name="isFieldTypeChips ? labelPropertyName : false"
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
+      :assistive-text="isFieldTypeChips ? assistiveText: false"
+      :is-active-delay="dateFieldDelay"
       input-class="base-search__input-field"
       field-type="search"
       class="base-search__input"
@@ -32,6 +36,11 @@
         <!-- @slot add elements within search but before all other elements <br>
           for an example see [BaseInput](#baseinput) -->
         <slot name="pre-input-field" />
+      </template>
+      <template v-slot:input-field-addition-before>
+        <!-- @slot add elements within search but before all other elements <br>
+          for an example see [BaseInput](#baseinput) -->
+        <slot name="input-field-addition-before" />
       </template>
       <template v-slot:input-field-inline-before>
         <div
@@ -115,10 +124,11 @@ export default {
       default: () => ([]),
     },
     /**
-     * placeholder to show for input
+     * placeholder to show for input; either just a string or an object with
+     * different text for each search type (text, chips, date)
      */
     placeholder: {
-      type: String,
+      type: [String, Object],
       default: 'Search your works and events',
     },
     /**
@@ -166,6 +176,14 @@ export default {
     linkedListOption: {
       type: String,
       default: null,
+    },
+    /**
+     * if true space is reserved for a loader that can be activated
+     * with the 'isLoading' prop
+     */
+    loadable: {
+      type: Boolean,
+      default: false,
     },
     /**
      * is loading indicator - showing loader if true
@@ -238,6 +256,23 @@ export default {
     setFocusOnActive: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for type chips)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
+    },
+    /**
+     * use this prop to set a delay in ms before date input calender is displayed
+     */
+    dateFieldDelay: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
@@ -375,6 +410,18 @@ export default {
      */
     idInt() {
       return this.id || createId();
+    },
+    placeholderInt() {
+      if (typeof this.placeholder === 'string') {
+        return this.placeholder;
+      }
+      if (this.type.includes('date')) {
+        return this.placeholder.date;
+      }
+      if (this.type === 'controlled') {
+        return this.placeholder.chips;
+      }
+      return this.placeholder[this.type];
     },
   },
   watch: {

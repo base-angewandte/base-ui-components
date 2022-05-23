@@ -11,9 +11,9 @@
         { 'base-pagination__arrow-icon-inactive': active <= 1 }
       ]"
       aria-label="Go to previous page"
-      @click.prevent="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @click.native.prevent="active - 1 > 0 ? setActivePage(active - 1) : false"
-      @keypress.enter="active - 1 > 0 ? setActivePage(active - 1) : false">
+      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
+      @click.native.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
+      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
         name="arrow-left" />
@@ -30,7 +30,7 @@
           :aria-current="active === n ? 'true' : false"
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n}]"
-          @keypress.enter="setActivePage(n)"
+          @keydown.enter="setActivePage(n)"
           @click.native.prevent="setActivePage(n)"
           @click.prevent="setActivePage(n)">
           {{ n }}
@@ -45,7 +45,7 @@
           :aria-current="active === 1 ? 'true' : false"
           :aria-label="`${active === 1 ? 'Current Page, Page' : 'Go to page'} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1}]"
-          @keypress.enter="setActivePage(1)"
+          @keydown.enter="setActivePage(1)"
           @click.native.prevent="setActivePage(1)"
           @click.prevent="setActivePage(1)">
           {{ 1 }}
@@ -62,7 +62,7 @@
           :aria-current="active === n ? 'true' : false"
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n}]"
-          @keypress.enter="setActivePage(n)"
+          @keydown.enter="setActivePage(n)"
           @click.native.prevent="setActivePage(n)"
           @click.prevent="setActivePage(n)">
           {{ n }}
@@ -79,7 +79,7 @@
           :aria-label="`${active === total ? 'Current Page, Page' : 'Go to page'} ${total}`"
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total}]"
-          @keypress.enter="setActivePage(total)"
+          @keydown.enter="setActivePage(total)"
           @click.native.prevent="setActivePage(total)"
           @click.prevent="setActivePage(total)">
           {{ total }}
@@ -96,9 +96,10 @@
         { 'base-pagination__arrow-icon-inactive': active >= total }
       ]"
       aria-label="Go to next Page"
-      @click.prevent="active + 1 <= total ? setActivePage(active + 1) : false"
-      @click.native.prevent.prevent="active + 1 <= total ? setActivePage(active + 1) : false"
-      @keypress.enter="active + 1 <= total ? setActivePage(active + 1) : false">
+      @click.prevent="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false"
+      @click.native.prevent.prevent="active + 1 <= total && !useLinkElement
+        ? setActivePage(active + 1) : false"
+      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
         name="arrow-left" />
@@ -206,6 +207,14 @@ export default {
   },
   watch: {
     /**
+     * in case
+     */
+    $route(to) {
+      if (this.useLinkElement && to && to.query && to.query.page && to.query.page !== this.active) {
+        this.active = Number(to.query.page);
+      }
+    },
+    /**
      * if active number changes inform parent
      * @param {number} val - the new page number active
      */
@@ -271,8 +280,11 @@ export default {
      * @param {number} page - the new page number
      */
     setActivePage(page) {
-      // set internal variable to new page number
-      this.active = page;
+      // if new page is not set via url set it here manually
+      if (!this.useLinkElement) {
+        // set internal variable to new page number
+        this.active = page;
+      }
     },
     /**
      * get the correct link in case element is a link element

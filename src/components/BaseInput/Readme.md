@@ -35,6 +35,8 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
       :show-label="showLabel"
       :show-error-icon="showErrorIcon"
       :field-type="type.value"
+      :loadable="true"
+      :is-loading="isLoading"
       error-message="Your field is invalid"
       label="This label says Specify any text below"
       placeholder="A custom placeholder"
@@ -63,15 +65,9 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
         </div>
       </template>
       <template v-slot:input-field-addition-after>
-        <div
-          v-if="isLoading"
-          :style="{
-              margin: '0 16px',
-              transform: 'scale(0.5)',
-               ['pointer-events']: 'none',
-          }">
-          <BaseLoader/>
-        </div>
+        <span class="input-field-addition-after">
+          input-field-addition-after
+        </span>
       </template>
       <template v-slot:post-input-field>
         <span class="post-input-field">
@@ -223,6 +219,10 @@ export default {
 
 .input-field-inline-before{
   background: darkseagreen;
+}
+
+.input-field-addition-after {
+  background: violet;
 }
 
 .pre-input-field {

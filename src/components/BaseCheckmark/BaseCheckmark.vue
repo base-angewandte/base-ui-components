@@ -6,7 +6,7 @@
       :id="internalId"
       v-model="checkedInt"
       :name="label"
-      :value="label"
+      :value="radioValueInt"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
       :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]"
       @keydown.enter.prevent="">
@@ -14,7 +14,7 @@
       :class="[
         'base-checkmark-container',
         'base-checkmark-container-' + checkBoxSize,
-        {'base-radiomark': markStyle === 'radio' && checkedInt === label }]">
+        {'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
       <base-icon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
@@ -65,6 +65,14 @@ export default {
       default: 'select',
     },
     /**
+     * specify a value for the radio button - if none is specified the label will be used to
+     * determine if radio button should be active!
+     */
+    radioValue: {
+      type: String,
+      default: '',
+    },
+    /**
      * define if label should be visible - default set false because
      * currentyl not needed in base project
      */
@@ -103,6 +111,9 @@ export default {
     internalId() {
       return createId();
     },
+    radioValueInt() {
+      return this.radioValue || this.label;
+    },
   },
   watch: {
     checked: {
@@ -114,14 +125,16 @@ export default {
   },
   methods: {
     clicked() {
-      this.checkedInt = !this.checkedInt;
+      if (this.markStyle === 'checkbox') {
+        this.checkedInt = !this.checkedInt;
+      }
       /**
        * event emitted on radio button / checkmark click,
        * emitting input label
        *
        * @type {string | boolean}
        */
-      this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.label);
+      this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
     },
   },
 };
@@ -196,8 +209,8 @@ export default {
       .base-checkmark-small {
         height: $spacing-small;
         width: $spacing-small;
-        top: $spacing-small/2;
-        left: $spacing-small/2;
+        top: $spacing-small-half;
+        left: $spacing-small-half;
       }
     }
 
@@ -209,23 +222,23 @@ export default {
       .base-checkmark-large {
         height: $spacing;
         width: $spacing;
-        top: $spacing/2;
-        left: $spacing/2;
+        top: $spacing-small;
+        left: $spacing-small;
         color: white;
       }
     }
 
     .base-radiomark {
       &:after {
+        position: absolute;
         content: "";
-        left: 4px;
-        top: 8px;
-        width: 8px;
-        height: 8px;
+        left: $spacing-small;
+        top: 50%;
+        width: $spacing-small;
+        height: $spacing-small;
         background-color: black;
-        border-width: 4px;
-        border-radius: 8px;
-
+        border-radius: $spacing-small;
+        transform: translate(-50%, -50%);
       }
     }
 

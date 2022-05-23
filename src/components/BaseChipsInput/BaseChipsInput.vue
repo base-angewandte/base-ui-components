@@ -12,6 +12,7 @@
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :return-as-string="returnAsString"
       :is-active.sync="isActive"
+      :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
       @click-input-field="onInputFocus"
@@ -381,6 +382,28 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * define true if chip should be editable on click
+     * <br>
+     * CAVEAT: chips can not be both draggable AND editable and it can not show
+     *  hoverBoxContent as soon as it is editable respectively - if both are set true edit
+     *  functionality takes precedent - chip will not be draggable, hoverBoxContent will not
+     *  be shown!
+     */
+    chipsEditable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for editable chips)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -533,7 +556,7 @@ export default {
         if (val.length && !this.activeOption) {
           // set first option in list as active option
           this.activeOptionIndex = 0;
-        } else if (!val.length) {
+        } else if (!val.length && (!this.allowUnknownEntries || !this.input)) {
           this.activeOptionIndex = -1;
         }
       },
@@ -546,7 +569,7 @@ export default {
        */
       handler(val) {
         // if list changed externally - reset index to 0
-        this.activeOptionIndex = val.length ? 0 : -1;
+        this.activeOptionIndex = val.length || (this.allowUnknownEntries && this.input) ? 0 : -1;
         // check if list should be returned as array of strings
         if (!this.returnAsString && val && val.length && typeof val[0] === 'string') {
           this.returnAsString = true;

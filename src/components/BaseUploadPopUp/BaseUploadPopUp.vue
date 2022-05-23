@@ -267,7 +267,7 @@ export default {
     margin-top: $spacing;
 
     .upload-dropdown {
-      width: calc(50% - #{$spacing} / 2);
+      width: calc(50% - #{$spacing-small});
       flex: 0 0 auto;
     }
   }

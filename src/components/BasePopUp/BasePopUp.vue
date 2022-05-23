@@ -1,7 +1,8 @@
 <template>
   <div
     v-if="showInt"
-    class="base-pop-up">
+    :class="['base-pop-up',
+             { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
     <div class="base-pop-up-background" />
     <div
       ref="popUpBody"
@@ -103,7 +104,7 @@ export default {
       default: 'Pop Up',
     },
     /**
-     * specify the id of the element containing a description - for acessibility only
+     * specify the id of the element containing a description - for accessibility only
      */
     descriptionElementId: {
       type: String,
@@ -151,12 +152,19 @@ export default {
       type: Boolean,
       default: false,
     },
-    /*
-     * Selector to focus if popup is open
+    /**
+     * selector to focus if popup is open
      */
     isOpenFocus: {
       type: String,
       default: '',
+    },
+    /**
+     * specify to render component with max height and width
+     */
+    fullscreenOnMobile: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -313,9 +321,11 @@ export default {
   }
 
   @media screen and (max-width: $tablet) {
-    .popup-box {
-      max-width: 100%;
-      width: 70%;
+    .base-pop-up {
+      .popup-box {
+        max-width: 100%;
+        width: 70%;
+      }
     }
   }
 
@@ -343,18 +353,42 @@ export default {
           }
         }
       }
+
+      &.base-pop-up--fullscreen-on-mobile {
+        .popup-box {
+          top: 0;
+          width: 100%;
+          min-height: 100%;
+          height: 100%;
+
+          .popup-content {
+            display: flex;
+            flex: auto;
+            flex-direction: column;
+
+            .body {
+              flex: auto;
+              align-content: flex-start;
+            }
+          }
+        }
+      }
     }
   }
 
   @media screen and (max-height: 1042px) {
-    .popup-box {
-      top: 10vh;
+    .base-pop-up {
+      .popup-box {
+        top: 10vh;
+      }
     }
   }
 
   @media screen and (max-height: 500px) {
-    .popup-box {
-      top: 2vh;
+    .base-pop-up {
+      .popup-box {
+        top: 2vh;
+      }
     }
   }
 </style>

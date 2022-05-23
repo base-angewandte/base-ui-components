@@ -19,6 +19,7 @@
       :required="required"
       :disabled="disabled"
       :clearable="clearable"
+      :loadable="loadable"
       :error-message="errorMessage"
       :show-error-icon="showErrorIcon"
       :is-loading="isLoading"
@@ -55,7 +56,7 @@
         <div
           v-if="displayChipsInline"
           class="base-chips-input-field__chips">
-          <template v-if="draggable">
+          <template v-if="draggable && !chipsEditable">
             <draggable
               v-model="selectedListInt"
               :set-data="setDragElement"
@@ -125,10 +126,13 @@
                   :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                   :entry="getLangLabel(entry[labelPropertyName], true)"
                   :hover-box-content="hoverboxContent"
+                  :editable="chipsEditable"
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                     || !!entry[identifierPropertyName]"
                   :chip-active="chipActiveForRemove === index"
+                  :assistive-text="assistiveText.selectedOption"
                   @remove-entry="removeEntry(entry, index)"
+                  @value-changed="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
               </slot>
             </template>
@@ -426,6 +430,14 @@ export default {
       default: false,
     },
     /**
+     * if true space is reserved for a loader that can be activated
+     * with the 'isLoading' prop
+     */
+    loadable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * possibility to steer input field active state from outside<br>
      * it is possible to use the .sync modifier here
      */
@@ -447,6 +459,28 @@ export default {
     setFocusOnActive: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * define true if chip should be editable on click
+     * <br>
+     * CAVEAT: chips can not be both draggable AND editable and it can not show
+     *  hoverBoxContent as soon as it is editable respectively - if both are set true edit
+     *  functionality takes precedent - chip will not be draggable, hoverBoxContent will not
+     *  be shown!
+     */
+    chipsEditable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers<br>
+     * properties:<br>
+     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     *  working for editable chips)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -702,6 +736,21 @@ export default {
         // reset the input
         this.inputInt = '';
       }
+    },
+    modifyListEntry(newString, index) {
+      // since this is also checked when assigning value to chip we should also check
+      // here if label is lang object (e.g. {de: '', en: '' })
+      if (typeof this.selectedListInt[index][this.labelPropertyName] === 'object'
+        && this.selectedListInt[index][this.labelPropertyName][this.language] !== undefined) {
+        // if so then assign the new value to the current language
+        this.selectedListInt[index][this.labelPropertyName][this.language] = newString;
+        // else check if label prop is string and assign it directly
+        // (otherwise this case (an object with unknown properties) can not be handled)
+      } else if (typeof this.selectedListInt[index][this.labelPropertyName] === 'string') {
+        this.selectedListInt[index][this.labelPropertyName] = newString;
+      }
+      // trigger change propagation to parent
+      this.updateParentList(this.selectedListInt);
     },
     /**
      * function called when parent needs to be informed of selected

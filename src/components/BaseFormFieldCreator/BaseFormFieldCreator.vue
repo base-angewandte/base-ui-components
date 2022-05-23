@@ -170,12 +170,21 @@
     </div>
 
     <!-- FIELD BOOLEAN -->
-    <BaseToggle
-      v-else-if="fieldType === 'boolean'"
-      :name="fieldKey"
-      :label="labelInt"
-      :checked="fieldValue"
-      @clicked="$emit('field-value-changed', $event)" />
+    <template
+      v-else-if="fieldType === 'boolean'">
+      <BaseToggle
+        :name="fieldKey"
+        :label="labelInt"
+        :checked="fieldValue"
+        :bind-slot-to-state="true"
+        @clicked="$emit('field-value-changed', $event)">
+        <BaseLink
+          v-if="field['x-attrs'] && field['x-attrs'].subtext && field['x-attrs'].subtext.value"
+          :source="field['x-attrs'].subtext.source ? field['x-attrs'].subtext.source : ''"
+          :url="field['x-attrs'].subtext.url ? field['x-attrs'].subtext.url : ''"
+          :value="field['x-attrs'].subtext.value" />
+      </BaseToggle>
+    </template>
   </div>
 </template>
 
@@ -193,6 +202,7 @@ export default {
     BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
     BaseForm: () => import('../BaseForm/BaseForm'),
     BaseToggle: () => import('../BaseToggle/BaseToggle'),
+    BaseLink: () => import('../BaseLink/BaseLink'),
   },
   mixins: [i18n],
   props: {
@@ -544,7 +554,7 @@ export default {
     },
     // as above but specific for multiline text input field
     setInputValue(val) {
-      if (!val || typeof val === 'string') {
+      if (!val || typeof val === 'string' || typeof val === 'number') {
         this.fieldValueInt = val;
       } else {
         this.fieldValueInt = { ...this.fieldValueInt, ...JSON.parse(JSON.stringify(val)) };

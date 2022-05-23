@@ -8,7 +8,7 @@
       @clicked-outside="insideInput = false"
       @focus="onInputFocus"
       @keydown.up.down.prevent="triggerArrowKey"
-      @keypress.enter.prevent="selectEntry()"
+      @keydown.enter.prevent="selectEntry()"
       @input="$emit('autocomplete', inputTextInt)">
       <template v-slot:input-field-addition-after>
         <div

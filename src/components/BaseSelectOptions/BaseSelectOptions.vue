@@ -1,10 +1,15 @@
 <template>
-  <div class="base-select-options">
+  <div
+    class="base-select-options"
+    :style="{ '--direction': flexDirection}">
     <div class="base-select-options__number-selected">
-      {{ `${numberSelected} ${selectedNumberText}` }}
+      <slot name="selectedText">
+        {{ `${numberSelected} ${selectedNumberText}` }}
+      </slot>
     </div>
     <BaseButton
-      :text="allSelectedX ? deselectText : selectText"
+      :text="allSelected ? deselectText : selectText"
+      :disabled="selectAllDisabled"
       button-style="secondary"
       class="base-select-options__select-button"
       @clicked="select" />
@@ -59,17 +64,34 @@ export default {
       type: Array,
       default: () => [],
     },
+    /**
+     * disable the button by setting this prop to true
+     */
+    selectAllDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * By default, the "All/None" button appears on the right, and the counter of
+     * selected items appears on the left. Set this to `true` to reverse the order.
+     */
+    reverse: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       selectedInt: false,
+      // used to change the flex direction of select options from 'row' to 'row-reverse' (#1692)
+      flexDirection: 'row',
     };
   },
   computed: {
     numberSelected() {
       return this.selectedList.length;
     },
-    allSelectedX() {
+    allSelected() {
       // not just calc comparing selectedList with list because with pagination
       // selectedList can contain entries that are currently not incluced in list
       const idList = this.selectedList.length && this.selectedList[0].id
@@ -80,7 +102,7 @@ export default {
     },
   },
   watch: {
-    allSelectedX: {
+    allSelected: {
       handler(val) {
         if (val !== this.selectedInt) {
           this.selectedInt = val;
@@ -88,6 +110,10 @@ export default {
       },
       immediate: true,
     },
+  },
+  created() {
+    // swap position of select options based on the 'reverse' prop (#1692)
+    this.flexDirection = this.reverse ? 'row-reverse' : 'row';
   },
   methods: {
     select() {
@@ -109,7 +135,8 @@ export default {
 
   .base-select-options {
     display: flex;
-    flex-direction: row;
+    // flex direction can be 'row' or 'row-reverse' and depends on the 'reverse' prop (#1692)
+    flex-direction: var(--direction);
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
@@ -118,11 +145,7 @@ export default {
     .base-select-options__number-selected {
       font-size: $font-size-small;
       color: $font-color-second;
-      margin: $spacing-small/2 $spacing-small;
-    }
-
-    .base-select-options__select-button {
-      margin-left: auto;
+      margin: $spacing-small-half $spacing-small;
     }
   }
 </style>

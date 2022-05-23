@@ -5,7 +5,7 @@
       'base-expand': !edit,
       'expanded': expanded }]">
     <template
-      v-if="!edit && data.label">
+      v-if="!edit && dataInt.label">
       <button
         :id="'base-expand-control-' + _uid"
         :aria-expanded="expanded ? 'true' : 'false'"
@@ -15,10 +15,10 @@
         @click="expand">
         <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
           <span
-            class="base-expand__head__label">{{ data.label }}</span>
+            class="base-expand__head__label">{{ dataInt.label }}</span>
           <span
             class="base-expand__head__additional">
-            ({{ data.data.length }})
+            ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
           </span>
         </span>
         <base-icon
@@ -40,12 +40,13 @@
           class="base-expand__body">
           <!-- Todo: limit levels (counter) -->
           <base-expand-list-row
-            v-for="(items, index) in data.data"
+            v-for="(items, index) in dataInt.data"
             ref="baseExpandListRow"
-            :key="'item_' + index"
+            :key="`${parentIndex}-${index}`"
             :data="items"
             :multiple="multiple"
-            render-as="li">
+            render-as="li"
+            @expanded-state="emitExpandedState">
             <template
               v-slot:content="dataNextLevel">
               <!-- @slot a slot to provide customized entry row in next level -->
@@ -59,14 +60,20 @@
     </template>
 
     <template
-      v-if="!edit && data.value">
-      <div class="base-expand-item base-expand-item--intend">
-        <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
+      v-if="!edit && dataInt.value">
+      <div
+        :class="['base-expand-item',
+                 'base-expand-item--intend',
+                 { 'base-text-fade-out-left': fadeOutLeft,
+                   'base-text-fade-out': fadeOutRight }]">
+        <span
+          ref="listItemScrollable"
+          class="base-expand-item__col base-expand-item__label">
           <!-- @slot a slot to provide customized entry row -->
           <slot
             name="content"
-            :data="data">
-            {{ data.value }}
+            :data="dataInt">
+            {{ dataInt.value }}
           </slot>
         </span>
       </div>
@@ -78,37 +85,51 @@
         :class="['base-expand-item', { 'base-expand-item--movable': movable }]">
         <span
           ref="baseExpandItemHandle"
-          :title="data.label"
+          :title="dataInt.label"
           tabindex="0"
           class="base-expand-item__col base-expand-item__handle"
-          @keyup.down="moveItem('down')"
-          @keyup.up="moveItem('up')"
-          @keyup.space="movable =! movable"
-          @keyup.esc="movable = false"
+          @keydown.down.prevent.stop="moveItem('down')"
+          @keydown.up.prevent.stop="moveItem('up')"
+          @keydown.space.prevent.stop="movable =! movable"
           @focus="supportiveText('activate')"
-          @blur="movable = false">
+          @keyup.esc="cancelMovable"
+          @blur="cancelMovable">
           <base-icon
             name="drag-lines" />
         </span>
         <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
+          <div
+            v-if="!itemVisible"
+            class="base-expand-item__overlay" />
           <span
             :class="[
               'base-expand__head__label',
-              { 'base-expand__head__label--disabled': data.hidden }]">{{ data.label }}</span>
+              { 'base-expand__head__label--disabled': !itemVisible }]">
+            {{ dataInt.label }}
+          </span>
           <span
             class="base-expand__head__additional">
-            ({{ data.data.length }})
+            ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
           </span>
         </div>
         <div class="base-expand-item__col base-expand-item__controls">
           <base-button
-            :icon="data.hidden ? 'eye': 'eye-hide'"
-            :text="data.hidden ? editShowText : editHideText"
+            v-if="controlType === 'button'"
+            :icon="itemVisible ? 'eye': 'eye-hide'"
+            :text="''"
             :has-background-color="false"
-            :aria-label="`${data.hidden ? editShowText : editHideText} ${data.label}`"
+            :disabled="disabled"
+            :aria-label="`${itemVisible ? editHideText : editShowText } ${dataInt.label}`"
             icon-size="large"
-            align-text="left"
-            @clicked="setVisibility" />
+            icon-position="left"
+            @clicked="setVisibility(!itemVisible)" />
+          <BaseToggle
+            v-else-if="controlType === 'toggle'"
+            v-model="itemVisible"
+            :disabled="disabled"
+            :hide-label="true"
+            :label="`${editShowText} ${dataInt.label}`"
+            class="base-expand-item__toggle" />
         </div>
       </div>
     </template>
@@ -119,23 +140,28 @@
 // eslint-disable-next-line
 import BaseExpandListRow from '@/components/BaseExpandList/BaseExpandListRow';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseButton from '@/components/BaseButton/BaseButton';
 import i18n from '../../mixins/i18n';
 
 export default {
   name: 'BaseExpandListRow',
   components: {
-    BaseButton,
+    BaseToggle: () => import('../BaseToggle/BaseToggle'),
+    BaseButton: () => import('../BaseButton/BaseButton'),
     BaseExpandListRow,
     BaseIcon,
   },
   mixins: [i18n],
   props: {
     /**
-     * data object: { label: 'String', data: [{ value: 'String', }] } <br><br>
+     * data object: { label: 'String', data: [{ value: 'String', }],
+     *  [hidden]: boolean, [count]: number }<br><br>
+     * optional properties:<br>
+     *  count: used for the number shown in brackets
+     *    (else the array length will be used)<br>
+     *  hidden: used to set visibility and is set in edit mode to toggle item<br><br>
      * rendered variants: <br>
-     * expandable row: data object contains property 'label'<br>
-     * entry row: data object contains property 'value'
+     *  expandable row: data object contains property 'label'<br>
+     *  entry row: data object contains property 'value'
      */
     data: {
       type: Object,
@@ -177,15 +203,56 @@ export default {
       type: String,
       default: 'Show',
     },
+    /**
+     * specify the type of visibility switch in edit mode<br>
+     *  <b>button</b>: a [BaseButton](#basebutton) without text<br>
+     *  <b>button</b>: a [BaseToggle](#basetoggle) element without text<br>
+     */
+    controlType: {
+      type: String,
+      default: 'button',
+      validator: val => ['button', 'toggle'].includes(val),
+    },
+    /**
+     * index of parent element
+     * used to expand item from outside
+     */
+    parentIndex: {
+      type: [Number, String],
+      default: 0,
+    },
+    /**
+     * option to disable the edit functionalities of the element (toggle and draggable)
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      // toggle item
       expanded: false,
       // referenced in BaseExpandList
       movable: false,
       // referenced in BaseExpandList
       useSupportiveText: true,
+      // internal representation of data
+      dataInt: null,
+      // fade out overlays
+      fadeOutLeft: false,
+      fadeOutRight: true,
     };
+  },
+  computed: {
+    itemVisible: {
+      set(val) {
+        this.$set(this.dataInt, 'hidden', !val);
+      },
+      get() {
+        return !this.dataInt.hidden;
+      },
+    },
   },
   watch: {
     /**
@@ -209,14 +276,61 @@ export default {
       // enable supportive text (disabled by moveItem())
       this.useSupportiveText = true;
     },
+    dataInt: {
+      handler(val) {
+        // check if data has values (and is not initial null) and if it differs
+        // from parent data
+        if (!!val && JSON.stringify(val) !== JSON.stringify(this.data)) {
+          // if yes update parent data
+          this.$emit('update:data', val);
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+    data: {
+      handler(val) {
+        // check if parent data differ from internal data - if yes update
+        if (JSON.stringify(val) !== JSON.stringify(this.dataInt)) {
+          this.dataInt = JSON.parse(JSON.stringify(val));
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
+  mounted() {
+    if (this.$refs.listItemScrollable) {
+      const scrollable = this.$refs.listItemScrollable;
+      scrollable.addEventListener('scroll', () => this.scrollHandler(scrollable));
+    }
+  },
+  destroyed() {
+    if (this.$refs.listItemScrollable) {
+      const scrollable = this.$refs.listItemScrollable;
+      scrollable.removeEventListener('scroll', () => this.scrollHandler(scrollable));
+    }
   },
   methods: {
     /**
-     * set visibility and force update
+     * cancel movable state, stop propagation if needed<br>
+     *   e.g. further esc key event
+     * @param {KeyboardEvent} e - event
      */
-    setVisibility() {
-      this.data.hidden = !this.data.hidden;
-      this.$forceUpdate();
+    cancelMovable(e) {
+      if (this.movable) {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        e.cancelBubble = false;
+        this.movable = false;
+      }
+    },
+    /**
+     * set visibility if button was clicked
+     */
+    setVisibility(val) {
+      this.itemVisible = val;
     },
     /**
      * move item
@@ -230,7 +344,6 @@ export default {
         this.movable = false;
         this.$emit('sorted', {
           direction,
-          order: this.data.order,
         });
       }
     },
@@ -238,8 +351,14 @@ export default {
      * expand item
      */
     expand() {
+      // which element(s) are currently expanded
+      // eg: level1, first item = 0; level2, second item: 0-1
+      const currentState = this.$vnode.key.toString().split('-');
+
       if (this.expanded) {
         this.expanded = false;
+        // remove current level and emit expanded state
+        this.emitExpandedState(currentState.length > 1 ? currentState.slice(-1) : '');
         return;
       }
 
@@ -256,6 +375,23 @@ export default {
       }
 
       this.expanded = true;
+      this.emitExpandedState(currentState);
+    },
+    /**
+     * emit expanded state of items
+     * each array element represents the index of the expanded item per level
+     * eg: [0,1]: level1 first item, level2 second item is expanded
+     *
+     * @param {Array} value - value to emit
+     */
+    emitExpandedState(value) {
+      /**
+       * event triggered when expanded state changes
+       *
+       * @event expanded-state
+       * @type { array }
+       */
+      this.$emit('expanded-state', value);
     },
     /**
      * calc max height for transition
@@ -264,7 +400,7 @@ export default {
      */
     maxHeight(el) {
       const elementHeight = this.$el.querySelector('.base-expand-item').offsetHeight;
-      const maxHeight = elementHeight + elementHeight * this.data.data.length;
+      const maxHeight = elementHeight + elementHeight * this.dataInt.data.length;
 
       el.setAttribute('style', `max-height: ${maxHeight}px`);
     },
@@ -325,10 +461,19 @@ export default {
       /**
        * event emitted on dragHandle toggle
        *
-       * @event
+       * @event supportive
        * @property {string} type
        */
       this.$emit('supportive', type);
+    },
+    /**
+     * set fadeOut elements depending on scroll position
+     *
+     * @param {object} row
+     */
+    scrollHandler(row) {
+      this.fadeOutLeft = !!row.scrollLeft;
+      this.fadeOutRight = row.scrollWidth - row.scrollLeft !== row.offsetWidth;
     },
   },
 };
@@ -347,6 +492,7 @@ export default {
   outline: 1px solid $background-color;
   border-left: $border-active-width solid transparent;
   transition: border-left-color 500ms ease-in-out;
+  overflow: hidden;
 
   a {
     color: $app-color;
@@ -363,6 +509,7 @@ export default {
     display: flex;
     align-items: center;
     min-height: $row-height-large;
+    overflow: hidden;
   }
 
   &__handle {
@@ -386,13 +533,46 @@ export default {
 
   &__label {
     flex-grow: 1;
-    overflow: hidden;
     white-space: nowrap;
+    // enable scroll and hide scrollBars
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar { /* WebKit */
+      width: 0;
+      height: 0;
+    }
+
+    & .base-expand-item__overlay {
+      position: absolute;
+      content: '';
+      height: 100%;
+      width: 100%;
+      background: rgba(255, 255, 255, 40%);
+    }
   }
 
   &__controls {
     justify-self: flex-end;
     border-left: $border-width solid $background-color;
+    margin-right: -$spacing;
+
+    .base-expand-item__toggle {
+      margin: 0 $spacing;
+    }
+  }
+
+  &.base-text-fade-out::after {
+    right: $spacing-small;
+  }
+
+  &.base-text-fade-out-left::before {
+    left: calc(#{$spacing-large} - #{$border-active-width});
+
+    @media screen and (max-width: $mobile) {
+      left: calc(#{$spacing} - #{$border-active-width});
+    }
   }
 
   &--intend {

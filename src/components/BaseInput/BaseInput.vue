@@ -91,9 +91,10 @@
               </slot>
             </button>
             <div
-              v-if="isLoading"
+              v-if="loadable"
               class="base-input__loader">
-              <BaseLoader />
+              <BaseLoader
+                :hide="!isLoading" />
             </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
@@ -281,6 +282,14 @@ export default {
      * all input at once
      */
     clearable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if true space is reserved for a loader that can be activated
+     * with the 'isLoading' prop
+     */
+    loadable: {
       type: Boolean,
       default: false,
     },
@@ -653,7 +662,7 @@ export default {
             }
 
             .base-input__input {
-              padding: $spacing-small/2 0;
+              padding: $spacing-small-half 0;
               min-height: $row-height-small;
               width: 100%;
 

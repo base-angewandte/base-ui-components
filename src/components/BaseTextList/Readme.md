@@ -19,11 +19,11 @@ export default {
     return {
       data: [
         {
-          label: 'Vero eos et accusam',
+          label: 'Data is string',
           data: 'no sea takimata sanctus est Lorem ipsum dolor sit amet.',
         },
         {
-          label: 'Vero eos et accusam',
+          label: 'Data is array of strings',
           data: [
             'Lorem ipsum dolor sit amet',
             'Consetetur sadipscing elitr, sed diam nonumy',
@@ -31,7 +31,22 @@ export default {
           ],
         },
         {
-          label: 'Vero eos et accusam',
+          label: 'data is an object',
+          data: {
+            label: 'Labore',
+            value: 'Dolore magna aliquyam erat',
+            url: 'mailto:base@uni-ak.ac.at',
+          },
+        },
+        {
+          label: 'data is an object without a label',
+          data: {
+            value: 'Dolore magna aliquyam erat',
+            url: 'mailto:base@uni-ak.ac.at',
+          },
+        },
+        {
+          label: 'data is array of objects',
           data: [
             {
               label: 'www',
@@ -50,7 +65,7 @@ export default {
           ],
         },
         {
-          label: 'Vero eos et accusam',
+          label: 'data is array of objects with additional info in tooltip',
           data: [
             {
               value: 'additional info in toolip',
