@@ -330,8 +330,8 @@ export default {
     allowMultiply(el) {
       // field can be multiplied if it is an array and not a chips or chips-below
       // field
-      return el.type === 'array' && el['x-attrs']
-        && !['chips', 'chips-below'].includes(el['x-attrs'].field_type);
+      return el.type === 'array' && (!el['x-attrs'] || !el['x-attrs'].field_type || (el['x-attrs']
+        && !['chips', 'chips-below'].includes(el['x-attrs'].field_type)));
     },
     // triggered on user clicking multiply button
     multiplyField(field) {
@@ -437,8 +437,8 @@ export default {
         if (typeof value === 'object' && value && value.length) {
           return [].concat(value);
         }
-        if (field['x-attrs'] && !field['x-attrs'].field_type.includes('chips')
-          && field.items.type === 'object') {
+        if (!field['x-attrs'] || !field['x-attrs'].field_type
+          || (field['x-attrs'] && !field['x-attrs'].field_type.includes('chips'))) {
           return [].concat(this.getInitialFieldValue(field.items));
         }
         // else return empty array
