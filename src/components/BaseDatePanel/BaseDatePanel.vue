@@ -30,7 +30,7 @@
         :editable="false"
         :inline="isInline"
         :input="input"
-        :lang="language"
+        :lang="lang[language]"
         :type="type"
         :format="'YYYY-MM-DD'"
         :open="isOpen"
@@ -42,12 +42,12 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
-import BaseIcon from '../BaseIcon/BaseIcon';
 
-// languages needed for datepicker locale
-import 'vue2-datepicker/locale/de';
-import 'vue2-datepicker/locale/en';
-import 'vue2-datepicker/locale/fr';
+import en from 'vue2-datepicker/locale/en';
+import de from 'vue2-datepicker/locale/de';
+import fr from 'vue2-datepicker/locale/fr';
+
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Date Panel
@@ -139,6 +139,15 @@ export default {
     return {
       inputInt: null,
       isOpen: false,
+      /**
+       * datepicker localisations
+       *   using object fixes problem of missing localisation files in rollup-esm-build
+       */
+      lang: {
+        de,
+        en,
+        fr,
+      },
     };
   },
   computed: {

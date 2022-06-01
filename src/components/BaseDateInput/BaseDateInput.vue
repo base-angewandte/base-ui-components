@@ -72,7 +72,7 @@
                   :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
-                  :lang="language"
+                  :lang="lang[language]"
                   :open="fromOpen"
                   :type="isFromTimeField ? 'time' : minDateView"
                   :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
@@ -153,7 +153,7 @@
                   :placeholder="isToTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
-                  :lang="language"
+                  :lang="lang[language]"
                   :open="toOpen"
                   :type="isToTimeField ? 'time' : minDateView"
                   :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
@@ -215,10 +215,10 @@
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
 
-// languages needed for datepicker locale
-import 'vue2-datepicker/locale/de';
-import 'vue2-datepicker/locale/en';
-import 'vue2-datepicker/locale/fr';
+import en from 'vue2-datepicker/locale/en';
+import de from 'vue2-datepicker/locale/de';
+import fr from 'vue2-datepicker/locale/fr';
+
 import BaseInput from '@/components/BaseInput/BaseInput';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
@@ -511,6 +511,15 @@ export default {
        * @type {?ResizeObserver}
        */
       resizeObserver: null,
+      /**
+       * datepicker localisations
+       *   using object fixes problem of missing localisation files in rollup-esm-build
+       */
+      lang: {
+        de,
+        en,
+        fr,
+      },
     };
   },
   computed: {
