@@ -23,7 +23,7 @@
       v-else-if="fileType === 'image' && !displayImage"
       class="base-media-preview-not-supported base-media-preview-error">
       <p class="base-media-preview-not-supported-file-name">
-        An error occured displaying this image.
+        An error occurred displaying this image.
       </p>
     </div>
     <base-hls-video

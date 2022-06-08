@@ -400,7 +400,6 @@ export default {
         display: block;
         width: calc(#{$icon-large} + (2 * #{$spacing-small}));
         padding: 0 $spacing-small;
-        height: 50%;
         fill: white;
         transform: translateY(-50%);
         transition: fill 250ms ease-in-out;
