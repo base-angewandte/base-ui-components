@@ -52,10 +52,13 @@ export default {
         },
         {
           title: 'Video',
-          additionalInfo: ['Taken from: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'],
+          additionalInfo: [
+            'Taken from: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+            'Archive Id: A987s4e1fsffeABXX57',
+          ],
           mediaUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
           mediaPosterUrl: 'https://placeimg.com/1200/650/arch.jpg',
-          displaySize: { width: '1000px' },
+          displaySize: { 'width': '100%', 'max-width': '1000px' },
         },
         {
           title: 'Audio',

@@ -1,5 +1,7 @@
 <template>
-  <div class="base-media-preview-image-stage">
+  <div
+    :style="{ '--footer-height': footerHeight + 'px' }"
+    class="base-media-preview-image-stage">
     <!-- container 'base-media-preview-preloader' is removed by swiper after image is loaded -->
     <!-- class is also defined in swiper setup -->
     <div
@@ -78,6 +80,7 @@
       </p>
     </div>
     <div
+      ref="footer"
       class="base-media-preview-info">
       <div
         class="base-media-preview__info__col
@@ -252,6 +255,8 @@ export default {
       displayImage: true,
       targetName: 'mediaStage',
       isMobile: false,
+      // variable to store calculated footer height
+      footerHeight: null,
     };
   },
   computed: {
@@ -299,6 +304,11 @@ export default {
   },
   mounted() {
     this.isMobile = window.innerWidth <= 640;
+    this.setFooterHeight();
+    this.resizeObserver().observe(document.body);
+  },
+  beforeDestroy() {
+    this.resizeObserver().unobserve(document.body);
   },
   methods: {
     download() {
@@ -316,6 +326,34 @@ export default {
     },
     openPdf() {
       window.open(this.mediaUrl);
+    },
+    /**
+     * set footer height
+     */
+    setFooterHeight() {
+      if (!this.$refs.footer) {
+        return;
+      }
+      this.footerHeight = this.$refs.footer.offsetHeight;
+    },
+    /**
+     * check if document width changes and calc/set footer height
+     */
+    resizeObserver() {
+      return new ResizeObserver(this.throttle(() => this.setFooterHeight(), 500));
+    },
+    /**
+     * throttle event until user action is finished
+     * @param {function} callback - callback function
+     * @param {number} delay - time to delay in ms
+     * @returns {(function(...[*]=): void)|*}
+     */
+    throttle(callback, delay) {
+      let timer = 0;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => callback.apply(this, args), delay);
+      };
     },
   },
 };
@@ -337,7 +375,7 @@ export default {
 
     .base-media-preview-image {
       width: 100%;
-      max-height: 90%;
+      max-height: calc(100vh - var(--footer-height) - #{$spacing});
       max-width: 100%;
       margin-top: auto;
       object-fit: scale-down;
@@ -422,7 +460,7 @@ export default {
 
     .base-media-preview-video {
       width: auto;
-      max-height: 90%;
+      max-height: calc(100vh - var(--footer-height) - #{$spacing});
       max-width: 100%;
       margin-top: auto;
     }
