@@ -253,7 +253,6 @@ export default {
     return {
       // variable for display image error handling
       displayImage: true,
-      targetName: 'mediaStage',
       isMobile: false,
       // variable to store calculated footer height
       footerHeight: null,
@@ -311,6 +310,9 @@ export default {
     this.resizeObserver().unobserve(document.body);
   },
   methods: {
+    /**
+     * function to trigger download action
+     */
     download() {
       // check again if user is allowed to download
       if (this.allowDownload || (!this.allowDownload && this.fileType === '')) {
@@ -324,6 +326,9 @@ export default {
         this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
       }
     },
+    /**
+     * function to open pdf
+     */
     openPdf() {
       window.open(this.mediaUrl);
     },
