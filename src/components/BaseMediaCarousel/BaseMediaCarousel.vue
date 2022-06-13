@@ -47,6 +47,7 @@
               :media-type="media.mediaType"
               :orientation="media.orientation"
               :previews="media.previews"
+              :hls-start-level="media.hlsStartLevel"
               tabindex="1"
               @download="download" />
           </div>

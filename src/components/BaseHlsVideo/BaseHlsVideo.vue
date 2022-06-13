@@ -74,6 +74,13 @@ export default {
       type: String,
       default: 'Play',
     },
+    /**
+     * define startLevel (size) of hls-video
+     */
+    hlsStartLevel: {
+      type: Number,
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -103,7 +110,9 @@ export default {
       if (this.video) {
         if (Hls.isSupported()) {
           if (!this.hls) {
-            this.hls = new Hls();
+            this.hls = new Hls({
+              startLevel: this.hlsStartLevel,
+            });
             this.hls.loadSource(this.mediaUrl);
             this.hls.attachMedia(this.video);
             this.hls.on(Hls.Events.MANIFEST_PARSED, () => {

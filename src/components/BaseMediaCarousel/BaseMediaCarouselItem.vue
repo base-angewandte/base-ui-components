@@ -33,6 +33,7 @@
       :media-url="mediaUrl"
       :media-poster-url="mediaPosterUrl"
       :autoplay="autoplay"
+      :hls-start-level="hlsStartLevel"
       class="base-media-preview-image base-media-preview-video" />
     <audio
       v-else-if="fileType === 'audio'"
@@ -236,6 +237,13 @@ export default {
     currentSlideInfo: {
       type: String,
       default: '',
+    },
+    /**
+     * define startLevel (size) of hls-video
+     */
+    hlsStartLevel: {
+      type: Number,
+      default: undefined,
     },
   },
   data() {
