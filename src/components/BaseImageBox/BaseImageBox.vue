@@ -36,7 +36,8 @@
           :class="[
             'base-image-box-body',
             { 'base-image-box-inner-shadow-bottom-top': selectable && imageUrl && !showTitle },
-            { 'base-image-box-inner-shadow-bottom': !icon },
+            { 'base-image-box-inner-shadow-bottom': !icon
+              && (!showTitleOnHover || (showTitleOnHover && additional)) },
             { 'base-image-box-order-first': imageFirst },
             imageShadowClass]">
           <div
