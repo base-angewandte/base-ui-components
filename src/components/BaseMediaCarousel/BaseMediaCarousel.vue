@@ -37,7 +37,7 @@
               :autoplay="index === initialSlide"
               :additional-info="media.additionalInfo"
               :allow-download="allowDownload"
-              :current-slide-info="`${index + 1} / ${items.length}`"
+              :current-slide-info="items.length > 1 ? `${index + 1} / ${items.length}` : ''"
               :display-name="media.title"
               :display-size="media.displaySize"
               :download-url="media.downloadUrl"
