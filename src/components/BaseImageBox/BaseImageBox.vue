@@ -479,51 +479,55 @@ export default {
       }
     }
 
-    &.base-image-box-hover {
-      cursor: pointer;
+    // check if device is capable to handle hover state
+    // prevents double clicks on touch devices
+    @media (hover: hover) {
+      &.base-image-box-hover {
+        cursor: pointer;
 
-      &:after {
-        opacity: 0;
-        position: absolute;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        content: '';
-        background-color: rgba(255, 255, 255, .8);
-        transition: opacity 250ms ease;
-      }
-
-      &:hover {
         &:after {
-          opacity: 1;
+          opacity: 0;
+          position: absolute;
+          top: 0;
+          height: 100%;
+          width: 100%;
+          content: '';
+          background-color: rgba(255, 255, 255, .8);
+          transition: opacity 250ms ease;
         }
 
-        .base-image-box-content {
-          .base-image-box-icon-play {
+        &:hover {
+          &:after {
             opacity: 1;
-            transition: opacity 500ms ease;
+          }
+
+          .base-image-box-content {
+            .base-image-box-icon-play {
+              opacity: 1;
+              transition: opacity 500ms ease;
+            }
+          }
+
+          .base-image-box-icon-play-small {
+            opacity: 0;
+          }
+
+          .base-image-box-footer-body,
+          .base-image-box-footer-right {
+            color: $font-color;
           }
         }
-
-        .base-image-box-icon-play-small {
-          opacity: 0;
-        }
-
-        .base-image-box-footer-body,
-        .base-image-box-footer-right {
-          color: $font-color;
-        }
       }
-    }
 
-    &.base-image-box-hover-show-title {
-      &:hover {
-        .base-image-box-footer-text {
-          display: none;
-        }
+      &.base-image-box-hover-show-title {
+        &:hover {
+          .base-image-box-footer-text {
+            display: none;
+          }
 
-        .base-image-box-footer-title {
-          display: inherit;
+          .base-image-box-footer-title {
+            display: inherit;
+          }
         }
       }
     }
@@ -591,6 +595,7 @@ export default {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        pointer-events: none;
 
         &.base-image-box-icon--xxlarge {
           max-width: $icon-xxlarge;
