@@ -15,7 +15,6 @@
       :show-preview="showPreview"
       :initial-slide="initialSlide"
       :items="media"
-      :autoplay-media="true"
       :allow-download="false"
       @hide="showPreview = false" />
   </div>
