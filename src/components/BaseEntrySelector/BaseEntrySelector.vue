@@ -674,6 +674,7 @@ export default {
     &__dropdowns {
       display: flex;
       justify-content: flex-end;
+      width: 100%;
 
       &__dropdown {
         &:not(:first-of-type) {
