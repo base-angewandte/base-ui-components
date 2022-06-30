@@ -330,6 +330,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-end;
     margin-bottom: -$spacing-small-half;
 
     .base-multiline-text-input__tabs {
