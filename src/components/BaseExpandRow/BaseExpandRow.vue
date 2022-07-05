@@ -142,11 +142,18 @@ export default {
   },
   watch: {
     /**
-     * Guard for changes to expanded/collapsed state made from outside
-     * bypassing the click event (e.g. from a parent component like accordion)
+     * watch for expanded/collapsed state changes from outside
+     * @param {boolean} val - the prop value set from outside
      */
     isExpanded(val) {
       this.isExpandedInternal = val;
+    },
+    /**
+     * watch for select state changes from outside
+     * @param {boolean} val - the prop value set from outside
+     */
+    isSelected(val) {
+      this.isSelectedInternal = val;
     },
   },
   created() {
