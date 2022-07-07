@@ -224,7 +224,7 @@ export default {
           overflow: hidden;
 
           .base-expand-row-title {
-            color: $font-color-second;
+            color: $font-color;
             text-align: left;
             white-space: nowrap;
           }
@@ -282,7 +282,7 @@ export default {
 
     &.base-expand-row--expandable {
 
-      .base-expand-row-header {
+      .base-expand-row-button {
 
         &:focus,
         &:hover {
