@@ -1,6 +1,7 @@
 <template>
   <div
     v-click-outside="() => showDropDown = false"
+    ref="baseDropdown"
     class="base-drop-down">
     <div
       :class="['base-drop-down-label-wrapper',
@@ -192,6 +193,7 @@ export default {
       keySelectedIndex: -1,
       showFadeOut: false,
       maxDropDownHeight: '0',
+      resizeObserver: null,
     };
   },
   computed: {
@@ -213,14 +215,20 @@ export default {
     },
   },
   mounted() {
-    this.setOverflow();
+    this.initObserver();
   },
-  updated() {
-    if (!this.showDropDown) {
-      this.setOverflow();
-    }
+  beforeDestroy() {
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDropdown);
   },
   methods: {
+    initObserver() {
+      // create an observer with the set overflow calc function
+      const resizeObserver = new ResizeObserver(() => this.setOverflow());
+      // put it on the relevant element
+      resizeObserver.observe(this.$refs.baseDropdown);
+      // store it
+      this.resizeObserver = resizeObserver;
+    },
     // event triggered by clicking on option or Enter after
     // selecting via keys
     selectValue(option) {
