@@ -81,6 +81,7 @@
       <!-- SELECTOR OPTIONS -->
       <BaseSelectOptions
         v-if="showOptions"
+        ref="selectOptions"
         :select-text="getI18nTerm(entrySelectorText.selectAll)"
         :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
