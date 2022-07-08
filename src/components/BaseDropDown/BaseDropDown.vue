@@ -1,7 +1,7 @@
 <template>
   <div
-    v-click-outside="() => showDropDown = false"
     ref="baseDropdown"
+    v-click-outside="() => showDropDown = false"
     class="base-drop-down">
     <div
       :class="['base-drop-down-label-wrapper',
