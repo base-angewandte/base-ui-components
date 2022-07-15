@@ -13,13 +13,16 @@ The example entry below has three thumbnail icons. Note that icons appear stacke
           v-slot:thumbnails>
           <base-icon
             name="eye"
-            title="eye" />
+            title="eye"
+            class="icon" />
           <base-icon
             name="archive-arrow"
-            title="archived" />
+            title="archived"
+            class="icon" />
           <base-icon
             name="people"
-            title="shared" />
+            title="shared"
+            class="icon" />
         </template>
     </base-menu-entry>
   </div>
@@ -31,6 +34,10 @@ export default {};
 .background {
   padding: 16px;
   background-color: rgb(240, 240, 240);
+}
+.icon {
+  width: 12px;
+  height: 12px;
 }
 </style>
 

@@ -306,6 +306,8 @@ export default {
 
       &::v-deep svg {
         vertical-align: top;
+        height: 100%;
+        width: 100%;
       }
 
       @media screen and (min-width: $mobile-min-width) {

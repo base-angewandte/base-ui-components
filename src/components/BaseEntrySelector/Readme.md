@@ -123,6 +123,7 @@
         <template v-if="useThumbnailsSlot">
           <BaseIcon
             v-if="item.has_media"
+            :style="{ width: '14px' }"
             name="eye"/>
         </template>
       </template>
