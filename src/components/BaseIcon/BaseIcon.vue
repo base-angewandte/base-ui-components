@@ -9,6 +9,7 @@
       v-if="desc"
       :id="'desc_' + id">{{ desc }}</desc>
     <use
+      v-if="icon"
       :href="icon" />
   </svg>
 </template>
@@ -55,8 +56,8 @@ export default {
   },
   data() {
     return {
-      // path to base-ui-icons.svg (public/base-ui-icons.svg)
-      baseIcons: '/base-ui-icons.svg',
+      // path to base-ui-icons.svg
+      baseIcons: null,
     };
   },
   computed: {
@@ -82,7 +83,9 @@ export default {
     // window.base_ui_icons could be adapted in parent frontend project
     if (window.base_ui_icons) {
       this.baseIcons = window.base_ui_icons;
+      return;
     }
+    this.baseIcons = '/base-ui-icons.svg';
   },
 };
 </script>
