@@ -22,7 +22,7 @@ npm run styleguilde:build
 # lint files
 npm run lint
 
-# create styleable components from svg icons
+# create svg spriteSheet
 npm run svg
 
 # create index file for every component (if it does not exist yet)

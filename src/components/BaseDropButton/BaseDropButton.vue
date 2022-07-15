@@ -383,6 +383,7 @@ export default {
       }
 
       .base-drop-button__drop-icon {
+        height: $icon-small;
         width: $icon-small;
         transition: $drop-down-arrow-animation;
 

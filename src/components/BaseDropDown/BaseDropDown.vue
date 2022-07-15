@@ -356,6 +356,7 @@ export default {
       .base-drop-down-icon {
         transition: $drop-down-arrow-animation;
         height: $icon-small;
+        width: $icon-small;
         flex-shrink: 0;
 
         &.base-drop-down-icon-rotated {

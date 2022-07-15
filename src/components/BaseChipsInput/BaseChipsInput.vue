@@ -818,6 +818,7 @@ export default {
       .base-chips-input__single-dropdown-icon {
         transition:  $drop-down-arrow-animation;
         height: $icon-small;
+        width: $icon-small;
         flex-shrink: 0;
 
         &.base-chips-input__single-dropdown-icon-rotated {
