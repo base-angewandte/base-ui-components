@@ -14,7 +14,7 @@
     "prepublishOnly": "npm run build",
     "styleguide": "vue-cli-service styleguidist",
     "styleguide:build": "vue-cli-service styleguidist:build",
-    "svg": "node ./build/generate-index-files.js",
+    "svg": "node ./build/generate-svg-sprite-sheet.js",
     "test:unit": "vue-cli-service test:unit",
     "updateindex": "node build/generate-index-files.js",
     "updateindex:all": "node build/generate-index-files.js --force true"
