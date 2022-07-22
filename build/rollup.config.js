@@ -118,8 +118,8 @@ const baseConfig = {
     copy: {
       targets: [
         {
-          src: 'src/public/base-ui-icons.svg',
-          dest: 'dist'
+          src: path.resolve(projectRoot, 'public/base-ui-icons.svg'),
+          dest: path.resolve(projectRoot, 'dist'),
         },
       ],
     },
