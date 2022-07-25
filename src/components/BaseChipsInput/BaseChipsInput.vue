@@ -139,7 +139,7 @@ export default {
   ],
   model: {
     prop: 'selectedList',
-    event: 'selected',
+    event: 'selected-changed',
   },
   // currently this has all the props from BaseChipsInput v1 to ensure
   // backwards compatibility
@@ -723,7 +723,7 @@ export default {
          * @event selected
          * @property {(Object[]|string[])} tempList - the altered selectedList
          */
-        this.$emit('selected', tempList);
+        this.$emit('selected-changed', tempList);
       }
     },
 
