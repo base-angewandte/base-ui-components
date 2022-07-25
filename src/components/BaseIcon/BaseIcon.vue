@@ -9,7 +9,7 @@
       v-if="desc"
       :id="'desc_' + id">{{ desc }}</desc>
     <use
-      v-if="icon"
+      v-if="baseIcons"
       :href="icon" />
   </svg>
 </template>
