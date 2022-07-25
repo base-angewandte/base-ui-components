@@ -58,6 +58,12 @@
               </slot>
             </template>
           </template>
+          <template
+            v-slot:no-options>
+            <!-- @slot a slot to customize messages in case of no options present in drop down -->
+            <slot
+              name="no-options" />
+          </template>
         </BaseDropDownList>
       </template>
       <template
