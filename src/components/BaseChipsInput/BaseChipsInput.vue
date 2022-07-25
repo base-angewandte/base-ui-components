@@ -5,7 +5,7 @@
     <BaseChipsInputField
       ref="baseInput"
       v-model="input"
-      v-bind="$props"
+      v-bind="chipsFieldInputProps"
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
@@ -182,7 +182,7 @@ export default {
       default: null,
     },
     /**
-     * message displayed when no selectable obtions are available
+     * message displayed when no selectable options are available
      */
     dropDownNoOptionsInfo: {
       type: String,
@@ -211,13 +211,6 @@ export default {
     allowDynamicDropDownEntries: {
       type: Boolean,
       default: false,
-    },
-    /**
-     * define if chips should be displayed in the input field (inline) or below
-     */
-    chipsInline: {
-      type: Boolean,
-      default: true,
     },
     /**
      * this prop was added because there was some action needed to be done before entry was added
@@ -465,6 +458,19 @@ export default {
     };
   },
   computed: {
+    /**
+     * clean props from props not available in ChipsInputField component
+     * (e.g. because they are only needed for drop down component)
+     */
+    chipsFieldInputProps() {
+      const newProps = { ...this.$props };
+      delete newProps.dropDownNoOptionsInfo;
+      delete newProps.allowDynamicDropDownEntries;
+      delete newProps.addNewChipText;
+      // drop down options
+      delete newProps.list;
+      return newProps;
+    },
     /**
      * internal representation of options list, filtered for already selected entries
      * and also handling input string matching with options list in case of
