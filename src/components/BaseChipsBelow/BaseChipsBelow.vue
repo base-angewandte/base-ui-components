@@ -4,23 +4,55 @@
       ref="chipsInput"
       v-model="selectedBelowListInt"
       v-bind="chipsInputProps"
-      :chips-inline="false"
       :sortable="true"
       :is-loading="isLoading"
       :sort-text="sortText"
       :sort-name="sortName"
       :display-chips-inline="false"
-      @selected="addedEntry"
+      @selected-changed="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
-        v-slot:drop-down-entry="props">
+        #drop-down-entry="props">
         <!-- @slot a slot to provide customized drop down options -->
         <slot
           :item="props.item"
           name="drop-down-entry" />
       </template>
       <template
-        v-slot:no-options>
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
+          (e.g. language tabs)) <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="label-addition" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field \<div\>
+          (before \<input\>) <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot for adding elements after input (e.g. used to add loader <br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="remove-icon" />
+      </template>
+      <template
+        #no-options>
         <!-- @slot a slot to customize messages in case of no options present in drop down -->
         <slot
           name="no-options" />
@@ -67,15 +99,15 @@
               @remove-entry="removeEntry($event, index)" />
           </div>
           <BaseChipsInput
-            :id="`${id}_roles_${entry[identifierPropertyNameInt] || entry.idInt}`"
+            :id="`${id}_${additionalPropertyName}_${entry[identifierPropertyName] || entry.idInt}`"
             :key="'input_' + entry.idInt"
-            v-model="entry.roles"
+            v-model="entry[additionalPropertyName]"
             :show-label="false"
-            :label="label + '-roles'"
-            :list="roleOptions"
+            :label="label + '-' + additionalPropertyName"
+            :list="additionalPropOptions"
             :show-input-border="false"
             :allow-dynamic-drop-down-entries="false"
-            :placeholder="rolesPlaceholder"
+            :placeholder="additionalPropPlaceholder"
             :always-linked="true"
             :language="language"
             :draggable="true"
@@ -83,7 +115,7 @@
             :identifier-property-name="identifierPropertyName"
             :label-property-name="labelPropertyName"
             class="base-chips-below-chips-input"
-            @selected="updateRoles($event, index)" />
+            @selected-changed="updateAdditionalProperty($event, index)" />
         </div>
       </div>
     </draggable>
@@ -98,7 +130,7 @@ import BaseChip from '../BaseChip/BaseChip';
 
 /**
  * A very specialized component based on [BaseChipsInput](#basechipsinput)
- * in order to assign roles to selected entries)]
+ * in order to assign additional values (e.g. roles) to selected entries)]
  *
  * slots 'drop-down-entry' and 'no-options' of component [BaseChipsInput](#basechipsinput)
  * are available here as well
@@ -115,11 +147,12 @@ export default {
   },
   model: {
     prop: 'selectedList',
-    event: 'list-change',
+    event: 'selected-changed',
   },
   props: {
     /**
-     * list of selectable options (strings or objects)
+     * list of selectable options objects with at least an identifier and a label property<br>
+     * property names can be set with props identifierPropertyName and labelPropertyName
      */
     list: {
       type: Array,
@@ -128,7 +161,11 @@ export default {
     /**
      * @model
      *
-     * list of already selected options (strings or objects), displayed as chips
+     * list of already selected options objects with at least an identifier and a label property
+     * and a property to use for the secondary drop down ('additional property'), displayed as
+     * chips<br>
+     * property names can be set with props identifierPropertyName, labelPropertyName and
+     * additionalPropertyName
      */
     selectedList: {
       type: Array,
@@ -163,7 +200,7 @@ export default {
       default: null,
     },
     /**
-     * message displayed when no selectable obtions are available
+     * message displayed when no selectable options are available
      */
     dropDownNoOptionsInfo: {
       type: String,
@@ -203,16 +240,18 @@ export default {
       default: true,
     },
     /**
-     * Role options will set the roles available for the selected entries
+     * Additional property options will set the drop down available for the selected entries<br>
+     * needs to be an object with at least a label and an identifier property, using names set in
+     * identifierPropertyName and labelPropertyName
      */
-    roleOptions: {
+    additionalPropOptions: {
       type: Array,
       default: () => [],
     },
     /**
-     * specify a placeholder of the roles input field
+     * specify a placeholder of the additional property input field
      */
-    rolesPlaceholder: {
+    additionalPropPlaceholder: {
       type: String,
       default: 'Select role(s)',
     },
@@ -255,16 +294,89 @@ export default {
       default: '',
     },
     /**
+     * set a chips text for adding a new chip
+     * (alternatively add a 'form.Add' value to your localization files)
+     * if allowUnknownEntries is true please add this in one form or another!
+     */
+    addNewChipText: {
+      type: String,
+      default: '',
+    },
+    /**
      * specify the object property that should be used as identifier
      */
     identifierPropertyName: {
       type: String,
-      default: '',
+      default: 'id',
     },
     /**
      * specify the object property that should be used as value to be displayed
      */
     labelPropertyName: {
+      type: String,
+      default: 'label',
+    },
+    /**
+     * define the name of the property that is relevant for the additional drop down
+     * once a value was selected from the primary drop down
+     */
+    additionalPropertyName: {
+      type: String,
+      default: 'roles',
+    },
+    /**
+     * mark as required field (currently only used for aria-required)
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set true if input field should be disabled<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if true a remove icon will be shown allowing to remove
+     * all input at once<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * specify additional input field styling
+     */
+    inputClass: {
       type: String,
       default: '',
     },
@@ -277,14 +389,16 @@ export default {
     };
   },
   computed: {
-    // need to filter language from $props for chips input component since only needed for roles!
+    // need to filter language from $props for chips input component since only needed for
+    // additonal property (roles)!
     // leads to unwanted behaviour else (creating multilang object)
     chipsInputProps() {
       const newProps = { ...this.$props };
       delete newProps.language;
-      // also remove role related props since unknown to chips input component
-      delete newProps.roleOptions;
-      delete newProps.rolesPlaceholder;
+      // also remove additional property related props since unknown to chips input component
+      delete newProps.additionalPropOptions;
+      delete newProps.additionalPropPlaceholder;
+      delete newProps.additionalPropertyName;
       return newProps;
     },
   },
@@ -300,14 +414,22 @@ export default {
     addedEntry(list) {
       this.emitInternalList(list.map((entry) => {
         if (typeof entry === 'object') {
-          return { ...entry, ...{ roles: entry.roles || [] } };
+          return {
+            ...entry,
+            [this.additionalPropertyName]: entry[this.additionalPropertyName] || [],
+          };
         }
-        return { ...{ [this.labelPropertyName]: entry, roles: entry.roles || [] } };
+        return {
+          ...{
+            [this.labelPropertyName]: entry,
+            [this.additionalPropertyName]: entry[this.additionalPropertyName] || [],
+          },
+        };
       }));
     },
     removeEntry(evt, index) {
       const item = this.selectedBelowListInt.splice(index, 1);
-      this.$set(item, 'roles', {});
+      this.$set(item, this.additionalPropertyName, {});
       this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
@@ -318,15 +440,15 @@ export default {
       }
       this.emitInternalList(list);
     },
-    updateRoles(evt, index) {
-      this.$set(this.selectedBelowListInt[index], 'roles', evt);
+    updateAdditionalProperty(evt, index) {
+      this.$set(this.selectedBelowListInt[index], this.additionalPropertyName, evt);
       this.emitInternalList(this.selectedBelowListInt);
     },
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
           return { ...{
-            roles: [],
+            [this.additionalPropertyName]: [],
             idInt: this.identifierPropertyName && (entry[this.identifierPropertyName] === 0
               || entry[this.identifierPropertyName])
               ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + index,
@@ -334,11 +456,13 @@ export default {
           ...entry,
           };
         }
-        return { ...{
-          [this.labelPropertyName]: entry,
-          idInt: this.list.length + index,
-          roles: [],
-        } };
+        return {
+          ...{
+            [this.labelPropertyName]: entry,
+            idInt: this.list.length + index,
+            [this.additionalPropertyName]: [],
+          },
+        };
       });
     },
     emitInternalList(val) {
@@ -348,11 +472,11 @@ export default {
       /**
        * propagate list change from dragging event to parent
        *
-       * @event list-change
+       * @event selected-changed
        * @param {Object} sendArr - the altered list
        *
        */
-      this.$emit('list-change', sendArr);
+      this.$emit('selected-changed', sendArr);
     },
     modifyChipValue(event, index) {
       if (!event) {

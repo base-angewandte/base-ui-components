@@ -105,8 +105,10 @@
       :language="(field['x-attrs'] && field['x-attrs'].set_label_language)
         || fieldType === 'chips-below' ? language : ''"
       :drop-down-no-options-info="getI18nTerm('form.noMatch')"
-      :role-options="fieldType === 'chips-below' ? secondaryDropdown : false"
-      :roles-placeholder="fieldType === 'chips-below' ? getI18nTerm('form.selectRoles') : false"
+      :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : false"
+      :additional-prop-placeholder="fieldType === 'chips-below'
+        ? getI18nTerm('form.selectRoles') : false"
+      :additional-property-name="fieldType === 'chips-below' ? 'roles' : false"
       :invalid="invalid"
       :required="required"
       :error-message="errorMessage"
