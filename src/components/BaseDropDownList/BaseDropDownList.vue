@@ -41,21 +41,21 @@
           </slot>
         </li>
       </template>
-      <!--
-        @slot customize what is displayed when no drop down options are available
-      -->
-      <slot
+      <div
         v-if="!dropDownOptions.length"
-        name="no-options">
-        <div
+        :class="[
+          'base-drop-down-list__option',
+          'base-drop-down-list__no-options',
+        ]">
+        <!--
+          @slot customize what is displayed when no drop down options are available
+        -->
+        <slot
           v-if="!dropDownOptions.length"
-          :class="[
-            'base-drop-down-list__option',
-            'base-drop-down-list__no-options',
-          ]">
+          name="no-options">
           {{ dropDownNoOptionsInfo }}
-        </div>
-      </slot>
+        </slot>
+      </div>
     </ul>
     <!-- @slot to add elements after the options list -->
     <slot name="after-list" />
