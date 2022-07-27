@@ -251,8 +251,9 @@ export default {
     align-items: center;
 
     .icon {
-      max-height: $icon-large;
+      height: $icon-large;
       width: $icon-large;
+      max-width: $icon-large;
 
       &.base-uploader-user-warning-icon {
         margin-right: $spacing-small;

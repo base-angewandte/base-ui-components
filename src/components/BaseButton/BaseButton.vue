@@ -235,6 +235,7 @@ export default {
 
     .base-button-icon {
       height: $icon-small;
+      width: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;
 
@@ -252,11 +253,13 @@ export default {
 
       .base-button-icon-large {
         height: $icon-large;
+        width: $icon-large;
         max-width: $icon-large;
       }
 
       .base-button-icon-small {
         height: $icon-medium;
+        width: $icon-medium;
         max-width: $icon-medium;
       }
 
@@ -276,11 +279,13 @@ export default {
 
       .base-button-icon-large {
         height: $icon-medium;
+        width: $icon-medium;
         max-width: $icon-medium;
       }
 
       .base-button-icon-small {
         height: $icon-small;
+        width: $icon-small;
         max-width: $icon-small;
       }
 

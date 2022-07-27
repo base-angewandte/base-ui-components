@@ -411,6 +411,7 @@ export default {
         .base-drop-button__action-icon {
           height: $icon-medium;
           width: $icon-medium;
+          max-width: $icon-medium;
           flex: 0 0 auto;
           margin-right: $spacing;
         }

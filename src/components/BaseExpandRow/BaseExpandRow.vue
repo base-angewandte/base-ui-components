@@ -254,7 +254,6 @@ export default {
           transition: $drop-down-arrow-animation;
           height: $icon-small;
           width: $icon-small;
-          min-width: $icon-small;
           color: $font-color;
         }
 
