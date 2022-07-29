@@ -76,7 +76,7 @@
           v-model="fieldValueInt"
           :label="field.properties.time_from.title"
           :show-label="false"
-          :placeholder="placeholderInt"
+          :placeholder="placeholderInt.time"
           :range-separator="getI18nTerm('form.until')"
           type="timerange"
           class="base-form-field-creator__date-field" />
