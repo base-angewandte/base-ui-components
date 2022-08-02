@@ -437,7 +437,7 @@ export default {
         if (typeof value === 'object' && value && value.length) {
           return [].concat(value);
         }
-        if (field['x-attrs'] && !field['x-attrs'].field_type.includes('chips')
+        if (field['x-attrs'] && field['x-attrs'].field_type && !field['x-attrs'].field_type.includes('chips')
           && field.items.type === 'object') {
           return [].concat(this.getInitialFieldValue(field.items));
         }
