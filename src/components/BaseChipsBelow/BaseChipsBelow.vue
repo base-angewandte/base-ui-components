@@ -61,6 +61,7 @@
     <draggable
       v-model="selectedBelowListInt"
       :animation="200"
+      :force-fallback="true"
       group="people"
       handle=".base-chips-below-list-icon-wrapper"
       @end="updateList($event, selectedBelowListInt)">
@@ -403,12 +404,12 @@ export default {
     },
   },
   watch: {
-    selectedList(val) {
-      this.createInternalList(val);
+    selectedList: {
+      handler(val) {
+        this.createInternalList(val);
+      },
+      immediate: true,
     },
-  },
-  created() {
-    this.createInternalList(this.selectedList);
   },
   methods: {
     addedEntry(list) {
@@ -433,11 +434,6 @@ export default {
       this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
-      // destroy drag element again
-      const elem = document.getElementById('chip-below-drag');
-      if (elem) {
-        // elem.parentNode.removeChild(elem);
-      }
       this.emitInternalList(list);
     },
     updateAdditionalProperty(evt, index) {
