@@ -398,7 +398,6 @@ export default {
        * component users
        */
       timeout: null,
-      windowWidth: null,
     };
   },
   computed: {
@@ -496,18 +495,10 @@ export default {
     // add scroll listener to determine if head shadow should be displayed
     this.$refs.body
       .addEventListener('scroll', this.scroll);
-
-    // set window width to compare on resize event
-    this.windowWidth = window.innerWidth;
-
-    // TODO: should this really be in here??
-    // add resize listener and adapt the number of entries shown on each page there
-    window.addEventListener('resize', this.resizeHandler);
   },
   beforeDestroy() {
     this.$refs.body
       .removeEventListener('scroll', this.scroll);
-    window.removeEventListener('resize', this.resizeHandler);
   },
   methods: {
     /**
@@ -528,6 +519,7 @@ export default {
       }
     },
     fetchEntries() {
+      console.log(typeof this.timeout);
       if (this.timeout) {
         clearTimeout(this.timeout);
         this.timeout = null;
@@ -565,18 +557,6 @@ export default {
         }, 600);
       }
       this.pageNumber = 1;
-    },
-    /**
-     * check window width has actually changed and adapt the number of entries shown on each page
-     */
-    resizeHandler() {
-      // Check window width has actually changed and
-      // it's not just iOS triggering a resize event on scroll
-      if (window.innerWidth !== this.windowWidth) {
-        // Update the window width for next time
-        this.windowWidth = window.innerWidth;
-        this.fetchEntries();
-      }
     },
     scroll() {
       if (this.$refs.body.scrollTop) {
