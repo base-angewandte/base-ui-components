@@ -519,7 +519,6 @@ export default {
       }
     },
     fetchEntries() {
-      console.log(typeof this.timeout);
       if (this.timeout) {
         clearTimeout(this.timeout);
         this.timeout = null;
