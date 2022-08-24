@@ -1,5 +1,6 @@
 <template>
   <nav
+    ref="pagination"
     class="base-pagination">
     <component
       :is="numberElement"
@@ -182,6 +183,12 @@ export default {
        * @type {number}
        */
       maxNumbers: 10,
+      /**
+       * an observer to adjust displayed numbers according to component
+       * width
+       * @type {?ResizeObserver}
+       */
+      resizeObserver: null,
     };
   },
   computed: {
@@ -243,31 +250,48 @@ export default {
   mounted() {
     // initialize the start and end variable in case not all numbers can be displayed
     this.setStartEnd();
-    // add an resize event listener
-    window.addEventListener('resize', this.setStartEnd);
+    // add an resize observer to adapt visible page numbers to component width
+    this.initObserver();
   },
-  destroyed() {
-    // remove the resize event listener
-    window.removeEventListener('resize', this.setStartEnd);
+  beforeDestroy() {
+    // remove observer again
+    if (this.resizeObserver) this.resizeObserver.disconnect();
   },
   methods: {
+    /**
+     * function to initialize the resize observer necessary to adapt
+     * pagination to component width at all times
+     */
+    initObserver() {
+      // create an observer with the set overflow calc function
+      const tempResizeObserver = new ResizeObserver(() => {
+        this.setStartEnd();
+      });
+      // put it on the relevant element
+      tempResizeObserver.observe(this.$refs.pagination);
+      // store it
+      this.resizeObserver = tempResizeObserver;
+    },
     /**
      * depending on with of the parent element of the pagination calculate
      * how many page numbers can be displayed
      */
     setStartEnd() {
       // get parent width
-      const parentWidth = this.$parent.$el.clientWidth
-        || this.$parent.clientWidth || window.innerWidth;
+      const elementWidth = this.$refs.pagination.clientWidth;
       // set the subset and the max number accordingly
-      if (parentWidth < 390) {
+      if (elementWidth < 400) {
         this.subsetNumber = 1;
         this.maxNumbers = 5;
-      } else if (parentWidth < 570) {
+      } else if (elementWidth < 550) {
         this.subsetNumber = 3;
         this.maxNumbers = 8;
-      } else if (parentWidth < 710) {
+      } else if (elementWidth < 700) {
         this.subsetNumber = 5;
+        this.maxNumbers = 8;
+      } else {
+        this.subsetNumber = 7;
+        this.maxNumbers = 10;
       }
       // calc start and end number from the subset number
       this.start = this.active - this.subsetNumber / 2 > 0
