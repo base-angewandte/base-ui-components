@@ -80,7 +80,7 @@ export default {
      */
     title: {
       type: String,
-      default: 'Title',
+      default: '',
     },
     /**
      * Optional subtitle of the row.
