@@ -42,7 +42,7 @@
         </li>
       </template>
       <div
-        v-if="!dropDownOptions.length"
+        v-if="!dropDownOptions.length && (noOptionsSlotHasData || dropDownNoOptionsInfo)"
         :class="[
           'base-drop-down-list__option',
           'base-drop-down-list__no-options',
@@ -159,7 +159,7 @@ export default {
      */
     dropDownNoOptionsInfo: {
       type: String,
-      default: 'No options available',
+      default: '',
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
@@ -224,6 +224,13 @@ export default {
             === this.activeOption[this.identifierPropertyName]);
       }
       return this.dropDownOptions.indexOf(this.activeOption);
+    },
+    /**
+     * determine if no-options slot has data
+     * @returns {Boolean}
+     */
+    noOptionsSlotHasData() {
+      return !!this.$slots['no-options'];
     },
   },
   mounted() {

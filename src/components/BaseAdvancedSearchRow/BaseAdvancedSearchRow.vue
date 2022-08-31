@@ -121,9 +121,10 @@
           @click.native.stop="">
           <template v-slot:before-list>
             <div
-              class="base-advanced-search-row__above-list-area
-                 base-advanced-search-row__above-list-area-filters
-                 base-advanced-search-row__area-padding">
+              :class="['base-advanced-search-row__above-list-area',
+                       'base-advanced-search-row__area-padding',
+                       { 'base-advanced-search-row__above-list-area-filters':
+                         useAutocompleteFunctionality }]">
               <!-- FILTER SELECT LIST -->
               <div
                 class="base-advanced-search-row__filter-area-wrapper">
@@ -301,9 +302,9 @@
           <template
             v-slot:no-options>
             <div
+              v-if="useAutocompleteFunctionality"
               :class="[
                 'base-advanced-search-row__no-options',
-                'base-advanced-search-row__area-padding',
                 { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality }
               ]">
               <div
@@ -1627,6 +1628,7 @@ export default {
 
     .base-advanced-search-row__icon-button {
       display: flex;
+      flex: 0 0 auto;
       align-self: center;
       height: 100%;
       padding: $spacing;
