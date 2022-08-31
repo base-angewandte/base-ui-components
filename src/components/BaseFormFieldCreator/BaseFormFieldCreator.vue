@@ -386,7 +386,7 @@ export default {
   computed: {
     /**
      * import the relevant component
-     * @returns {(function(): *)|null|}
+     * @returns {(function(): *)|null}
      */
     fieldElement() {
       if (this.fieldType === 'text') {
