@@ -165,7 +165,7 @@ export default {
      *   object that needs to have the following properties:<br>
      *   <b>activate</b>: Text read when item is focused, use variable {state} to
      *    announce item visibility - specify text used in properties 'hidden' and 'visible'
-     *   <b>activated</b>: Text read after item was activated (selected by spacebar)
+     *   <b>activated</b>: Text read after item was activated (selected by enter key)
      *   <b>description</b>: Text read on initial list focus
      *   <b>moved</b>: Text read after item was moved
      *   <b>visible</b>: string substituted to 'activate' text for state variable if item is visible
@@ -176,7 +176,7 @@ export default {
     supportiveText: {
       type: Object,
       default: () => ({
-        activate: 'Click Spacebar to select item. Item is currently {state}',
+        activate: 'Use the Enter key to select item. Item is currently {state}',
         activated: 'Item selected. Use arrow keys to order item.',
         description: 'Use Tab key to navigate to item an order item.',
         moved: 'Item moved: {pos} of {total}',
