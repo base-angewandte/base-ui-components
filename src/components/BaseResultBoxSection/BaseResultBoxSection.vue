@@ -1055,7 +1055,7 @@ export default {
           // else use it to leave edit mode
         } else {
           this.editModeActive = false;
-          this.supportiveText = '';
+          this.currentSupportiveText = '';
         }
       }
     },
