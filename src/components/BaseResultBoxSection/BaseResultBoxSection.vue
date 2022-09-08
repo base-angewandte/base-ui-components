@@ -114,6 +114,8 @@
             :animation="draggable ? 150 : false"
             :tag="draggable ? 'ul' : false"
             :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
+            :aria-label="headerText"
+            tabindex="0"
             handle=".base-result-box-section__result-box-item__draggable .base-image-box-content"
             force-fallback="true"
             role="list"
@@ -136,12 +138,11 @@
                        { 'base-result-box-section__result-box-item__dragging':
                          movableElementId === entry.id }]"
               role="listitem"
-              @keydown.enter="editModeActive && draggable
-                ? onEnterKey($event, entry, index) : false"
+              @keydown.enter="onEnterKey($event, entry, index)"
               @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
                 ? moveEntry($event, index) : false"
-              @keydown.space.prevent="entrySelected(
-                getPropValue(identifierPropertyName, entry), !isEntrySelected(entry))"
+              @keydown.space.prevent="editModeActive ? entrySelected(
+                getPropValue(identifierPropertyName, entry), !isEntrySelected(entry)) : false"
               @keydown.tab="cancelDragMode">
               <!-- @slot result-box - for custom result boxes -->
               <slot
@@ -304,7 +305,9 @@ export default {
       default: true,
     },
     /**
-     * title of section
+     * title of section<br>
+     * it is recommended to also set the headerText even if slot is used for header
+     * for accessibility reasons
      */
     headerText: {
       type: String,
@@ -1066,17 +1069,21 @@ export default {
      * @param {number} index - the index of the entry in the visibleBoxes array
      */
     onEnterKey(event, entry, index) {
-      event.preventDefault();
-      // check if movableElementId is null
-      if (!this.movableElementId) {
-        // if yes activate drag mode by assigning the entry id as movableElementId
-        this.movableElementId = entry.id;
-        // add supportive text for the screen reader
-        this.currentSupportiveText = this.supportiveText.activated
-          .replace('{pos}', (index + 1).toString());
+      if (this.editModeActive && this.draggable) {
+        event.preventDefault();
+        // check if movableElementId is null
+        if (!this.movableElementId) {
+          // if yes activate drag mode by assigning the entry id as movableElementId
+          this.movableElementId = entry.id;
+          // add supportive text for the screen reader
+          this.currentSupportiveText = this.supportiveText.activated
+            .replace('{pos}', (index + 1).toString());
+        } else {
+          // if drag mode was active before - cancel it
+          this.cancelDragMode();
+        }
       } else {
-        // if drag mode was active before - cancel it
-        this.cancelDragMode();
+        this.entryClicked(this.getPropValue(this.identifierPropertyName, entry));
       }
     },
     /**
