@@ -189,14 +189,13 @@ export default {
       default: 'router-link',
     },
     /**
-     * specify how data-list (label, value) should be rendered:
+     * specify how data-list (label, value) should be rendered
+     * @values horizontal, vertical
      */
     listType: {
       type: String,
       default: 'horizontal',
-      validate(val) {
-        return ['horizontal', 'vertical'].includes(val);
-      },
+      validate: val => ['horizontal', 'vertical'].includes(val),
     },
   },
   methods: {
