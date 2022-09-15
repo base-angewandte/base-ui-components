@@ -126,8 +126,8 @@ export default {
       default: false,
     },
     /**
-     * specify an icon that is displayed before the title
-     * available values: see ***
+     * specify an icon that is displayed before the title<br>
+     * see [BaseIcon](#baseicon) for available icons<br>
      */
     icon: {
       type: String,
