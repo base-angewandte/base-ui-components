@@ -28,7 +28,7 @@
       :clearable="clearable"
       @keydown.enter="onEnter"
       @input="setInputValue($event)"
-      @autocomplete="$emit('fetch-autocomplete', {
+      @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
         source: field['x-attrs'].source
@@ -626,7 +626,7 @@ export default {
       if (this.fieldType !== 'multiline') {
         event.preventDefault();
       } else {
-        this.$emit('keydodwn', event);
+        this.$emit('keydown', event);
       }
     },
   },

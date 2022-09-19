@@ -1,33 +1,34 @@
-Form Input Field with Dynamic Autocomplete
+Form Input Field with Dynamic Autocomplete.
+The Toggle lets you choose if the options are provided as array of strings or objects.
 
 ```vue
 
 <template>
-<div class="form-field base-styling">
-      <base-autocomplete-input
-        :list="dropDownInput"
-        :placeholder="'Select Your Favourite Subject'"
-        :label-property-name="'title'"
-        v-model="autocompleteInput"
-        label="Favourite Subject"
-        @autocomplete="fetch"/>
-</div>
+  <div class="form-field base-styling">
+    <BaseToggle
+      v-model="listIsObjects"
+      label="Options is Array of Objects" />
+    <base-autocomplete-input
+      v-model="autocompleteInput"
+      :list="autocompleteResults"
+      :placeholder="'Select Your Favourite Subject'"
+      :dynamic-fetch="true"
+      :identifier-property-name="'value'"
+      :label-property-name="'displayValue'"
+      label="Favourite Subject" />
+  </div>
 </template>
 
 <script>
+import BaseToggle from '../BaseToggle/BaseToggle';
+
 export default {
+  components: {
+    BaseToggle,
+  },
   data() {
     return {
-      dropDownInput: [
-        'Biology',
-        'Math',
-        'English',
-        'Philosophy',
-        'Physical Education',
-        'Physics',
-        'Chemistry',
-        'Psychology',
-      ],
+      listIsObjects: false,
       autocompleteInput: '',
       list: [
         'Biology',
@@ -39,18 +40,42 @@ export default {
         'Chemistry',
         'Psychology',
       ],
+      list2: [
+        {
+          displayValue: 'Biologie',
+          value: 'biology',
+        },
+        {
+          displayValue: 'Math',
+          value: 'math',
+        },
+        {
+          displayValue: 'English',
+          value: 'english',
+        },
+        {
+          displayValue: 'Philosophy',
+          value: 'philosophy',
+        },
+        {
+          displayValue: 'Physics',
+          value: 'physics',
+        },
+      ],
     }
   },
-  methods: {
-    fetch(event) {
-
-      if (event) {
-        this.dropDownInput = this.list.filter(entry => entry.toLowerCase().includes(event.toLowerCase()));
-      } else {
-        this.dropDownInput = [].concat(this.list);
+  computed: {
+    initialResults() {
+      return this.listIsObjects ? this.list2 : this.list;
+    },
+    autocompleteResults() {
+      if (this.autocompleteInput) {
+        return this.initialResults.filter((option) => (option.displayValue || option).toLowerCase()
+          .includes(this.autocompleteInput.toLowerCase()));
       }
+      return this.initialResults;
     }
-  }
+  },
 }
 </script>
 ```
