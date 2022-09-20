@@ -639,24 +639,10 @@ export default {
          * @property {string} type - the labelPropertyName that was specified
          */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.labelPropertyName });
-        // TODO: code there for backwards compatibility - event not necessary anymore
-        // since now all input events are forwarded! remove for v2!
-      } else {
-        /**
-         * event to fetch drop down entries with changing input<br>
-         *   (this event is deprecated and will be removed in future versions -
-         *   just use the standard &lt;input> @input event in future!)
-         *
-         * @event text-input
-         * @property {string} val
-         *
-         */
-        // still inform parent of the text input
-        this.$emit('text-input', val);
       }
     },
     /**
-     * watching drop down active to do neccessary actions once drop down opens
+     * watching drop down active to do necessary actions once drop down opens
      * a) to fetch drop down entries for static drop downs on first show only
      * b) to calculate actual drop down width (TODO: do i need this?)
      * c) to inform parent of drop down state changes
@@ -738,7 +724,7 @@ export default {
         }
         /**
          * inform parent of changes to selectedList
-         * @event selected
+         * @event selected-changed
          * @property {(Object[]|string[])} tempList - the altered selectedList
          */
         this.$emit('selected-changed', tempList);

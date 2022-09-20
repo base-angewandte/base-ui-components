@@ -117,7 +117,7 @@
       :identifier-property-name="identifierPropertyName"
       :label-property-name="labelPropertyName"
       @fetch-dropdown-entries="fetchAutocomplete"
-      @text-input="textInput = $event"
+      @input="textInput = $event"
       @hoverbox-active="$emit('fetch-info-data')">
       <template
         v-slot:drop-down-entry="props">
@@ -538,6 +538,10 @@ export default {
     }
   },
   methods: {
+    test(val) {
+      console.log('Still worköingggg');
+      this.textInput = val;
+    },
     // function for setting internal field value breaking all potential links to
     // value passed from parent
     setFieldValue(val) {
