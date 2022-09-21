@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.1 (2022-09-21)
+
+### Improvements
+
+* Adding version number of base components to styleguide
+
+### Bugfixes
+* [BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearch):
+  * Filter row in mobile view not displayed correctly due to changes in [BaseIcon](https://base-angewandte.github.io/base-ui-components/#baseicon).
+  * Fixed controlled Vocabulary options row styling issues.
+
 ## 2.0.0 (2022-09-14)
 
 ### Breaking Changes
