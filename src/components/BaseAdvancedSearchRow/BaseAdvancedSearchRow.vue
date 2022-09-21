@@ -124,7 +124,7 @@
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
                        { 'base-advanced-search-row__above-list-area-filters':
-                         useAutocompleteFunctionality }]">
+                         filter.type === 'text' || filter.type === 'chips' }]">
               <!-- FILTER SELECT LIST -->
               <div
                 class="base-advanced-search-row__filter-area-wrapper">
@@ -1831,6 +1831,7 @@ export default {
 
   .base-advanced-search-row__filter-area-close-icon {
     width: $icon-medium;
+    height: $icon-medium;
   }
 }
 
