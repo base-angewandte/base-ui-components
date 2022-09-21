@@ -126,8 +126,8 @@ export default {
       default: false,
     },
     /**
-     * specify an icon that is displayed before the title
-     * available values: see ***
+     * specify an icon that is displayed before the title<br>
+     * see [BaseIcon](#baseicon) for available icons<br>
      */
     icon: {
       type: String,
@@ -280,6 +280,7 @@ export default {
     }
 
     .base-menu-entry-icon {
+      height: $icon-large;
       max-height: $icon-large;
       width: $icon-large;
       margin: 0 $spacing;
@@ -417,7 +418,7 @@ export default {
       width: calc(var(--cols) * #{$icon-small} + (var(--cols) - 1) * #{$spacing} + #{$spacing});
       // width and height of each thumbnail icon
       ::v-deep .svg-icon {
-        max-height: $icon-small;
+        height: $icon-small;
         width: $icon-small;
       }
     }

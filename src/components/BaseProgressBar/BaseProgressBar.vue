@@ -273,6 +273,7 @@ export default {
 
       .base-progress-bar__status-icon {
         height: $icon-medium;
+        width: $icon-medium;
         flex-shrink: 0;
         margin-left: $spacing;
 

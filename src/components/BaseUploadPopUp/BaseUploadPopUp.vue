@@ -251,8 +251,9 @@ export default {
     align-items: center;
 
     .icon {
-      max-height: $icon-large;
+      height: $icon-large;
       width: $icon-large;
+      max-width: $icon-large;
 
       &.base-uploader-user-warning-icon {
         margin-right: $spacing-small;
@@ -281,7 +282,7 @@ export default {
   }
 
   .popup-upload-area {
-    max-height: ($row-height-small + $spacing) * 10;
+    max-height: 50vh;
     overflow-y: auto;
 
     .upload-bar:not(:last-child) {
@@ -328,6 +329,27 @@ export default {
     .base-upload-bar-button + .base-upload-bar-button {
       margin-left: 0;
       margin-top: $spacing;
+    }
+  }
+
+  @media screen and (max-height: 600px) {
+    .popup-upload-area {
+      max-height: 40vh;
+    }
+  }
+  @media screen and (max-height: 500px) {
+    .popup-upload-area {
+      max-height: 40vh;
+    }
+  }
+  @media screen and (max-height: 400px) {
+    .popup-upload-area {
+      max-height: 30vh;
+    }
+  }
+  @media screen and (max-height: 300px) {
+    .popup-upload-area {
+      max-height: 20vh;
     }
   }
 </style>

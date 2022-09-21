@@ -11,6 +11,7 @@
                { 'base-image-box-hover': (playIcon || showTitleOnHover) && !selectable },
                { 'base-image-box-hover-show-title': showTitleOnHover && !selectable },
                { 'base-image-box-selectable': selectable },
+               { 'base-image-box-draggable': draggable },
                { 'base-image-box-selected': selectable && selectedInt }]">
       <div class="base-image-box-content">
         <div
@@ -255,6 +256,13 @@ export default {
       default: false,
     },
     /**
+     * set prop true if box can be dragged - used solely for styling purposes
+     */
+    draggable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * set select status (checkbox checked) from outside
      */
     selected: {
@@ -463,6 +471,10 @@ export default {
       .base-image-box-title {
         width: 80%;
       }
+    }
+
+    &.base-image-box-draggable {
+      cursor: move;
     }
 
     &.base-image-box-selected {

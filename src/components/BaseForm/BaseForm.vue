@@ -438,7 +438,7 @@ export default {
           return [].concat(value);
         }
         if (!field['x-attrs'] || !field['x-attrs'].field_type
-          || (field['x-attrs'] && !field['x-attrs'].field_type.includes('chips'))) {
+          || (field['x-attrs'] && field['x-attrs'].field_type && !field['x-attrs'].field_type.includes('chips'))) {
           return [].concat(this.getInitialFieldValue(field.items));
         }
         // else return empty array

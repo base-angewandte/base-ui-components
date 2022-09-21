@@ -100,6 +100,11 @@
           :list="visibleBoxes"
           :selected-list="selectedListInt"
           @selected="selectAllTriggered" />
+        <span
+          aria-live="assertive"
+          class="supportive-text">
+          {{ currentSupportiveText }}
+        </span>
         <!-- BOXES AREA -->
         <template v-if="entryListInt.length">
           <component
@@ -109,20 +114,36 @@
             :animation="draggable ? 150 : false"
             :tag="draggable ? 'ul' : false"
             :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
-            handle=".base-result-box-section__result-box-item-draggable .base-image-box-content"
+            :aria-label="headerText"
+            tabindex="0"
+            handle=".base-result-box-section__result-box-item__draggable .base-image-box-content"
             force-fallback="true"
+            role="list"
             class="base-result-box-section__boxes-container">
             <li
               v-for="(entry, index) of visibleBoxes"
+              :id="`li-${entry.id}`"
               :key="getPropValue(identifierPropertyName, entry)"
-              :tabindex="editModeActive ? -1 : 0"
+              ref="resultBoxItem"
+              :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
               :aria-label="getPropValue(titlePropertyName, entry)"
+              :aria-grabbed="(movableElementId === entry.id).toString()"
+              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : false"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
                        `base-result-box-section__box-item-${elementId}`,
-                       { 'base-result-box-section__result-box-item-draggable':
-                         draggable && editModeActive }]">
+                       { 'base-result-box-section__result-box-item__draggable':
+                         draggable && editModeActive },
+                       { 'base-result-box-section__result-box-item__dragging':
+                         movableElementId === entry.id }]"
+              role="listitem"
+              @keydown.enter="onEnterKey($event, entry, index)"
+              @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
+                ? moveEntry($event, index) : false"
+              @keydown.space.prevent="editModeActive ? entrySelected(
+                getPropValue(identifierPropertyName, entry), !isEntrySelected(entry)) : false"
+              @keydown.tab="cancelDragMode">
               <!-- @slot result-box - for custom result boxes -->
               <slot
                 :item="entry"
@@ -134,6 +155,7 @@
                 <BaseImageBox
                   :key="getPropValue(identifierPropertyName, entry)"
                   :selectable="imageBoxesSelectable"
+                  :draggable="editModeActive && draggable"
                   :selected="isEntrySelected(entry)"
                   :box-size="{ width: 'auto' }"
                   :box-ratio="100"
@@ -228,6 +250,7 @@
 
 <script>
 import { extractNestedPropertyValue } from '@/utils/utils';
+import navigateList from '@/mixins/navigateList';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 
@@ -245,7 +268,7 @@ export default {
     BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton').then(m => m.default || m),
     BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
   },
-  mixins: [i18n],
+  mixins: [i18n, navigateList],
   model: {
     prop: 'entryList',
     event: 'entries-changed',
@@ -282,7 +305,9 @@ export default {
       default: true,
     },
     /**
-     * title of section
+     * title of section<br>
+     * it is recommended to also set the headerText even if slot is used for header
+     * for accessibility reasons
      */
     headerText: {
       type: String,
@@ -583,6 +608,37 @@ export default {
       type: Number,
       default: 6,
     },
+    /**
+     * add text for screen reader users that helps them navigate list and use edit mode
+     * functionalities<br>
+     * object should have the following properties:<br>
+     *   <b>description</b>: Text read on edit mode activation<br>
+     *   <b>activated</b>: Text read after item was activated for reordering
+     *    (selected by enter key)<br>
+     *    property moved can contain variable {pos} which will be filled with current
+     *    position<br>
+     *   <b>moved</b>: Text read after item was moved<br>
+     *    property moved can contain variables {pos} (new position) and {total} (total number
+     *    of list items)
+     */
+    supportiveText: {
+      type: Object,
+      default: () => ({
+        description: 'Select items via space bar to carry out actions or use enter key to select an item for reordering. Use Tab key to navigate between items.',
+        activated: 'Item at position {pos} selected for reordering. Use arrow keys to order item.',
+        moved: 'Item moved to position {pos} of {total}',
+      }),
+    },
+    /**
+     * BaseResultBoxSection is for example used to display search results - which contain a link
+     * to the entry - in this case the focus should be on the link element so that navigation to
+     * route link triggers on enter and focus on the list element itself is disabled (if not edit
+     * mode!)
+     */
+    disableListElementFocus: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -608,6 +664,16 @@ export default {
       elementId: null,
       // store state if component is mounted and window is present
       initialized: false,
+      /**
+       * variable for keyboard sorting - is element currently selected for moving
+       * @type {?string}
+       */
+      movableElementId: null,
+      /**
+       * add supportive text especially to ease use of drag mode accessibly
+       * @type {string}
+       */
+      currentSupportiveText: '',
     };
   },
   computed: {
@@ -815,6 +881,29 @@ export default {
       setTimeout(() => {
         this.imageBoxesSelectable = val;
       }, 50);
+      setTimeout(() => {
+        if (val) {
+          this.$nextTick(() => {
+            if (this.$refs.resultBoxItem && this.$refs.resultBoxItem.length) {
+              this.$refs.resultBoxItem.forEach((element) => {
+                const inputElement = element.getElementsByTagName('input');
+                inputElement[0].setAttribute('tabindex', '-1');
+              });
+              // it appears refs are not reactive and do not reflect reordering so we need
+              // to look for the actual current first element in the visibleBoxes array
+              const firstElement = this.$refs.resultBoxItem
+                .find(element => element.id.includes(this.visibleBoxes[0].id));
+              firstElement.focus({ preventScroll: true });
+            }
+          });
+        }
+      }, 500);
+      if (val) {
+        this.currentSupportiveText = this.supportiveText.description;
+      } else {
+        this.movableElementId = null;
+        this.currentSupportiveText = '';
+      }
       if (val !== this.editMode) {
         /**
          * emitted on edit mode toggle (options toggle)<br>
@@ -963,8 +1052,86 @@ export default {
      */
     escEventHandler(e) {
       if (e.key === 'Escape') {
-        this.editModeActive = false;
+        // first use escape key to leave drag mode
+        if (this.movableElementId) {
+          this.cancelDragMode();
+          // else use it to leave edit mode
+        } else {
+          this.editModeActive = false;
+          this.currentSupportiveText = '';
+        }
       }
+    },
+    /**
+     * event handler on keydown 'Enter'
+     * @param {KeyboardEvent} event - the keydown event
+     * @param {Object} entry - the entry the event was triggered on
+     * @param {number} index - the index of the entry in the visibleBoxes array
+     */
+    onEnterKey(event, entry, index) {
+      if (this.editModeActive && this.draggable) {
+        event.preventDefault();
+        // check if movableElementId is null
+        if (!this.movableElementId) {
+          // if yes activate drag mode by assigning the entry id as movableElementId
+          this.movableElementId = entry.id;
+          // add supportive text for the screen reader
+          this.currentSupportiveText = this.supportiveText.activated
+            .replace('{pos}', (index + 1).toString());
+        } else {
+          // if drag mode was active before - cancel it
+          this.cancelDragMode();
+        }
+      } else {
+        this.entryClicked(this.getPropValue(this.identifierPropertyName, entry));
+      }
+    },
+    /**
+     * event handler on keydown with arrow keys
+     * @param {KeyboardEvent} event - the keydown event
+     * @param {number} index - the index of the entry on which the event was triggered
+     *  in the visibleBoxes array
+     */
+    moveEntry(event, index) {
+      // reset supportive text
+      this.currentSupportiveText = '';
+      // get key that was pressed
+      const { key } = event;
+      // determine if element should be moved up or down in the list
+      const shiftDown = ['ArrowRight', 'ArrowDown'].includes(key);
+      // get the corresponding number to add to the array index
+      const shiftIndex = shiftDown ? 1 : -1;
+      // get new Index
+      const newIndex = index + shiftIndex;
+      // check if move is possible or if item is first or last respectively already
+      if (this.isWithinArrayLimit(this.visibleBoxes, shiftDown, newIndex)) {
+        // assign box list to variable so the set() of visibleBoxes is actually triggered
+        // when it is assigned again later on (doing it directly on visibleBoxes or entryListInt
+        // has no effect)
+        const newArray = this.visibleBoxes;
+        // do swapping with array destructuring
+        [newArray[index], newArray[newIndex]] = [newArray[newIndex], newArray[index]];
+        // assign it again to visibleBoxes variable
+        this.visibleBoxes = newArray;
+        // next tick so there is time to repaint and get new order
+        this.$nextTick(() => {
+          // get all box elements
+          const movedElement = document.getElementById(`li-${this.movableElementId}`);
+          // element is loosing focus in the process of swapping so refocus here
+          movedElement.focus();
+        });
+        // add matching supportive text informing the user of the move and the new position
+        this.currentSupportiveText = this.supportiveText.moved
+          .replace('{pos}', newIndex + 1)
+          .replace('{total}', this.visibleBoxes.length);
+      }
+    },
+    /**
+     * reset drag related variable and supportive text
+     */
+    cancelDragMode() {
+      this.movableElementId = null;
+      this.currentSupportiveText = '';
     },
 
     /** BOX DISPLAY FUNCTIONALITIES */
@@ -1158,17 +1325,35 @@ export default {
           visibility: hidden;
         }
 
-        &:focus:not(focus-visible) {
+        &:focus-within:after {
+          content: '';
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          right: 0;
+          border: 1px solid $app-color-secondary;
+          pointer-events: none;
+        }
+
+        &:focus:not(:focus-visible) {
           outline: none;
         }
       }
 
       .base-result-box-section__result-box-item {
         box-shadow: $box-shadow-reg;
+        cursor: pointer;
 
-        &-draggable {
+        &__draggable {
           box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.25);
-          cursor: url('../../static/images/drag-n-drop-cursor.svg'), auto;
+          cursor: move;
+        }
+
+        &__dragging {
+          &:focus-within:after {
+            border: 1px solid $app-color;
+          }
         }
       }
 
@@ -1226,7 +1411,7 @@ export default {
           margin-bottom: $spacing-small;
         }
 
-        .base-result-box-section__result-box-item-draggable {
+        .base-result-box-section__result-box-item__draggable {
           box-shadow: $box-shadow-reg;
         }
       }

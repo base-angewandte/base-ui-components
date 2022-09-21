@@ -80,7 +80,7 @@ export default {
      */
     title: {
       type: String,
-      default: 'Title',
+      default: '',
     },
     /**
      * Optional subtitle of the row.
@@ -142,11 +142,18 @@ export default {
   },
   watch: {
     /**
-     * Guard for changes to expanded/collapsed state made from outside
-     * bypassing the click event (e.g. from a parent component like accordion)
+     * watch for expanded/collapsed state changes from outside
+     * @param {boolean} val - the prop value set from outside
      */
     isExpanded(val) {
       this.isExpandedInternal = val;
+    },
+    /**
+     * watch for select state changes from outside
+     * @param {boolean} val - the prop value set from outside
+     */
+    isSelected(val) {
+      this.isSelectedInternal = val;
     },
   },
   created() {
@@ -217,7 +224,7 @@ export default {
           overflow: hidden;
 
           .base-expand-row-title {
-            color: $font-color-second;
+            color: $font-color;
             text-align: left;
             white-space: nowrap;
           }
@@ -275,7 +282,7 @@ export default {
 
     &.base-expand-row--expandable {
 
-      .base-expand-row-header {
+      .base-expand-row-button {
 
         &:focus,
         &:hover {

@@ -5,7 +5,7 @@
     <BaseChipsInputField
       ref="baseInput"
       v-model="input"
-      v-bind="$props"
+      v-bind="chipsFieldInputProps"
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
@@ -58,6 +58,12 @@
               </slot>
             </template>
           </template>
+          <template
+            v-slot:no-options>
+            <!-- @slot a slot to customize messages in case of no options present in drop down -->
+            <slot
+              name="no-options" />
+          </template>
         </BaseDropDownList>
       </template>
       <template
@@ -67,12 +73,24 @@
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="label-addition" />
       </template>
+      <template v-slot:pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual
+        input field<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="pre-input-field" />
+      </template>
       <template
         v-slot:input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field \<div\>
           (before \<input\>) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-before" />
+      </template>
+      <template v-slot:input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap<br>
+        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <slot name="input-field-inline-before" />
       </template>
       <template v-slot:input-field-addition-after>
         <!-- @slot for adding elements after input -->
@@ -133,7 +151,7 @@ export default {
   ],
   model: {
     prop: 'selectedList',
-    event: 'selected',
+    event: 'selected-changed',
   },
   // currently this has all the props from BaseChipsInput v1 to ensure
   // backwards compatibility
@@ -176,7 +194,7 @@ export default {
       default: null,
     },
     /**
-     * message displayed when no selectable obtions are available
+     * message displayed when no selectable options are available
      */
     dropDownNoOptionsInfo: {
       type: String,
@@ -205,13 +223,6 @@ export default {
     allowDynamicDropDownEntries: {
       type: Boolean,
       default: false,
-    },
-    /**
-     * define if chips should be displayed in the input field (inline) or below
-     */
-    chipsInline: {
-      type: Boolean,
-      default: true,
     },
     /**
      * this prop was added because there was some action needed to be done before entry was added
@@ -460,6 +471,19 @@ export default {
   },
   computed: {
     /**
+     * clean props from props not available in ChipsInputField component
+     * (e.g. because they are only needed for drop down component)
+     */
+    chipsFieldInputProps() {
+      const newProps = { ...this.$props };
+      delete newProps.dropDownNoOptionsInfo;
+      delete newProps.allowDynamicDropDownEntries;
+      delete newProps.addNewChipText;
+      // drop down options
+      delete newProps.list;
+      return newProps;
+    },
+    /**
      * internal representation of options list, filtered for already selected entries
      * and also handling input string matching with options list in case of
      * no dynamic autocomplete fetching
@@ -615,24 +639,10 @@ export default {
          * @property {string} type - the labelPropertyName that was specified
          */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.labelPropertyName });
-        // TODO: code there for backwards compatibility - event not necessary anymore
-        // since now all input events are forwarded! remove for v2!
-      } else {
-        /**
-         * event to fetch drop down entries with changing input<br>
-         *   (this event is deprecated and will be removed in future versions -
-         *   just use the standard &lt;input> @input event in future!)
-         *
-         * @event text-input
-         * @property {string} val
-         *
-         */
-        // still inform parent of the text input
-        this.$emit('text-input', val);
       }
     },
     /**
-     * watching drop down active to do neccessary actions once drop down opens
+     * watching drop down active to do necessary actions once drop down opens
      * a) to fetch drop down entries for static drop downs on first show only
      * b) to calculate actual drop down width (TODO: do i need this?)
      * c) to inform parent of drop down state changes
@@ -714,10 +724,10 @@ export default {
         }
         /**
          * inform parent of changes to selectedList
-         * @event selected
+         * @event selected-changed
          * @property {(Object[]|string[])} tempList - the altered selectedList
          */
-        this.$emit('selected', tempList);
+        this.$emit('selected-changed', tempList);
       }
     },
 
@@ -818,6 +828,7 @@ export default {
       .base-chips-input__single-dropdown-icon {
         transition:  $drop-down-arrow-animation;
         height: $icon-small;
+        width: $icon-small;
         flex-shrink: 0;
 
         &.base-chips-input__single-dropdown-icon-rotated {

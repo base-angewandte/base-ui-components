@@ -40,7 +40,6 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
       error-message="Your field is invalid"
       label="This label says Specify any text below"
       placeholder="A custom placeholder"
-      @keydown.tab="inputActive = false"
       @click-input-field="inputActive = true"
       @clicked-outside="inputActive = false">
       <template v-slot:label-addition>

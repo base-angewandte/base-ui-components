@@ -28,7 +28,7 @@
       :clearable="clearable"
       @keydown.enter="onEnter"
       @input="setInputValue($event)"
-      @autocomplete="$emit('fetch-autocomplete', {
+      @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
         source: field['x-attrs'].source
@@ -76,7 +76,7 @@
           v-model="fieldValueInt"
           :label="field.properties.time_from.title"
           :show-label="false"
-          :placeholder="placeholderInt"
+          :placeholder="placeholderInt.time"
           :range-separator="getI18nTerm('form.until')"
           type="timerange"
           class="base-form-field-creator__date-field" />
@@ -105,8 +105,10 @@
       :language="(field['x-attrs'] && field['x-attrs'].set_label_language)
         || fieldType === 'chips-below' ? language : ''"
       :drop-down-no-options-info="getI18nTerm('form.noMatch')"
-      :role-options="fieldType === 'chips-below' ? secondaryDropdown : false"
-      :roles-placeholder="fieldType === 'chips-below' ? getI18nTerm('form.selectRoles') : false"
+      :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : false"
+      :additional-prop-placeholder="fieldType === 'chips-below'
+        ? getI18nTerm('form.selectRoles') : false"
+      :additional-property-name="fieldType === 'chips-below' ? 'roles' : false"
       :invalid="invalid"
       :required="required"
       :error-message="errorMessage"
@@ -115,7 +117,7 @@
       :identifier-property-name="identifierPropertyName"
       :label-property-name="labelPropertyName"
       @fetch-dropdown-entries="fetchAutocomplete"
-      @text-input="textInput = $event"
+      @input="textInput = $event"
       @hoverbox-active="$emit('fetch-info-data')">
       <template
         v-slot:drop-down-entry="props">
@@ -384,7 +386,7 @@ export default {
   computed: {
     /**
      * import the relevant component
-     * @returns {(function(): *)|null|}
+     * @returns {(function(): *)|null}
      */
     fieldElement() {
       if (this.fieldType === 'text') {
@@ -536,6 +538,10 @@ export default {
     }
   },
   methods: {
+    test(val) {
+      console.log('Still worköingggg');
+      this.textInput = val;
+    },
     // function for setting internal field value breaking all potential links to
     // value passed from parent
     setFieldValue(val) {
@@ -624,7 +630,7 @@ export default {
       if (this.fieldType !== 'multiline') {
         event.preventDefault();
       } else {
-        this.$emit('keydodwn', event);
+        this.$emit('keydown', event);
       }
     },
   },

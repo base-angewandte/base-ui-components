@@ -12,6 +12,8 @@ import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
+// Copy files
+import copy from "rollup-plugin-copy";
 // Import JPG, PNG, GIF and SVG images.
 import image from '@rollup/plugin-image';
 // show generated bundle sizes
@@ -112,6 +114,14 @@ const baseConfig = {
       preventAssignment: true,
       // remove logger from hls.js due problems with ssr
       'Object(_utils_logger__WEBPACK_IMPORTED_MODULE_2__["enableLogs"])(config.debug); // signal end of worker init': '',
+    },
+    copy: {
+      targets: [
+        {
+          src: path.resolve(projectRoot, 'public/base-ui-icons.svg'),
+          dest: path.resolve(projectRoot, 'dist'),
+        },
+      ],
     },
   },
 };
@@ -259,6 +269,7 @@ const unpkgConfig = {
   },
   inlineDynamicImports: true,
   plugins: [
+    copy(baseConfig.plugins.copy),
     bundleSize(),
     replace(baseConfig.plugins.replace),
     ...baseConfig.plugins.preVue,

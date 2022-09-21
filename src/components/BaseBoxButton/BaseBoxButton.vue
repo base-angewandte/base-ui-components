@@ -234,6 +234,7 @@ export default {
           line-height: $icon-max;
           margin-bottom: $spacing;
           height: $icon-max;
+          width: $icon-max;
 
           .button-box-plus-container {
             position: absolute;
@@ -241,8 +242,9 @@ export default {
             left: calc(50% - 54px);
 
             .button-box-plus {
+              height: $icon-large;
               width: $icon-large;
-              max-height: $icon-large;
+              max-width: $icon-large;
             }
           }
 
@@ -252,8 +254,9 @@ export default {
             left: calc(50% - #{$icon-large});
 
             .button-box-icon {
-              max-height: $icon-max;
+              height: $icon-max;
               width: $icon-max;
+              max-width: $icon-max;
             }
           }
         }
@@ -291,8 +294,9 @@ export default {
     .button-box-icon-small {
       flex-shrink: 0;
       margin-right: $spacing;
+      height: $icon-large;
       width: $icon-large;
-      max-height: $icon-large;
+      max-width: $icon-large;
     }
   }
 </style>

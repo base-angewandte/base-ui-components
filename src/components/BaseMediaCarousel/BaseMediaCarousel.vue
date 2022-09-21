@@ -384,6 +384,11 @@ export default {
         cursor: pointer;
         color: $app-color;
       }
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     &__slide {

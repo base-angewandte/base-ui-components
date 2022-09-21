@@ -90,7 +90,7 @@
           class="base-expand-item__col base-expand-item__handle"
           @keydown.down.prevent.stop="moveItem('down')"
           @keydown.up.prevent.stop="moveItem('up')"
-          @keydown.space.prevent.stop="movable =! movable"
+          @keydown.enter.prevent.stop="movable =! movable"
           @focus="supportiveText('activate')"
           @keyup.esc="cancelMovable"
           @blur="cancelMovable">

@@ -81,14 +81,15 @@
       <!-- SELECTOR OPTIONS -->
       <BaseSelectOptions
         v-if="showOptions"
+        ref="selectOptions"
         :select-text="getI18nTerm(entrySelectorText.selectAll)"
         :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        :select-all-disabled="!(selectableEntries.length
+        :select-all-disabled="!!maxSelectedEntries && (!(selectableEntries.length
           < (maxSelectedEntries - selectedListIds.length)
-          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
+          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
         @selected="changeAllSelectState">
         <template v-slot:selectedText>
           {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
@@ -494,14 +495,10 @@ export default {
     // add scroll listener to determine if head shadow should be displayed
     this.$refs.body
       .addEventListener('scroll', this.scroll);
-    // add resize listener to adapt the number of entries shown on each page
-    // TODO: should this really be in here??
-    window.addEventListener('resize', this.fetchEntries);
   },
   beforeDestroy() {
     this.$refs.body
       .removeEventListener('scroll', this.scroll);
-    window.removeEventListener('resize', this.fetchEntries);
   },
   methods: {
     /**
@@ -674,6 +671,7 @@ export default {
     &__dropdowns {
       display: flex;
       justify-content: flex-end;
+      width: 100%;
 
       &__dropdown {
         &:not(:first-of-type) {

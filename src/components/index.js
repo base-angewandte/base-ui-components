@@ -37,7 +37,6 @@ import Search from './BaseSearch';
 import SelectOptions from './BaseSelectOptions';
 import SwitchButton from './BaseSwitchButton';
 import Toggle from './BaseToggle';
-import UploadBar from './BaseUploadBar';
 import UploadPopUp from './BaseUploadPopUp';
 import Checkmark from './BaseCheckmark';
 import Map from './BaseMap';
@@ -91,7 +90,6 @@ export {
   SelectOptions as BaseSelectOptions,
   SwitchButton as BaseSwitchButton,
   Toggle as BaseToggle,
-  UploadBar as BaseUploadBar,
   UploadPopUp as BaseUploadPopUp,
   Checkmark as BaseCheckmark,
   Map as BaseMap,

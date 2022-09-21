@@ -254,7 +254,11 @@ export default {
       /**
        * resize observer for specific element (instead of window)
        */
-      observer: null,
+      resizeObserver: null,
+      /**
+       * mutation observer for specific element
+       */
+      mutationObserver: null,
     };
   },
   computed: {
@@ -376,13 +380,23 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.observer) this.observer.unobserve(this.$refs.optionsRow);
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.optionsRow);
+    if (this.mutationObserver && this.afterSlotHasData) this.mutationObserver.disconnect();
   },
   methods: {
     initObserver() {
-      const observer = new ResizeObserver(this.resizeActions);
-      observer.observe(this.$refs.optionsRow);
-      this.observer = observer;
+      const resizeObserver = new ResizeObserver(this.resizeActions);
+      resizeObserver.observe(this.$refs.optionsRow);
+      this.resizeObserver = resizeObserver;
+
+      if (this.afterSlotHasData) {
+        const mutationObserver = new MutationObserver(this.calcOptionsWidth);
+        mutationObserver.observe(this.$refs.afterOptions, {
+          childList: true,
+          subtree: true,
+        });
+        this.mutationObserver = mutationObserver;
+      }
     },
     optionTriggered(value) {
       /**

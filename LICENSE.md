@@ -37,14 +37,18 @@ Drag by ProSymbols, from the Noun Project
 
 success by Trident from the Noun Project
 
+Home by il Capitano from the Noun Project
+
+Refresh by Hea Poh Lin from the Noun Project
+
+Attachment by Free Icons from the Noun Project
+
 Download by scott desmond from the Noun Project
 
 text by Bohdan Burmich from the Noun Project
 
-Info by Jason Santos from the Noun Project
+Information by Arfan Khan Kamol from the Noun Project
 
 Archive with sheets, Archive with arrow by bezier master from the Noun Project
 
-Home by il Capitano from the Noun Project
-
-Refresh by Hea Poh Lin from the Noun Project
+Info by Jason Santos from the Noun Project

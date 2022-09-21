@@ -41,21 +41,21 @@
           </slot>
         </li>
       </template>
-      <!--
-        @slot customize what is displayed when no drop down options are available
-      -->
-      <slot
-        v-if="!dropDownOptions.length"
-        name="no-options">
-        <div
+      <div
+        v-if="!dropDownOptions.length && (noOptionsSlotHasData || dropDownNoOptionsInfo)"
+        :class="[
+          'base-drop-down-list__option',
+          'base-drop-down-list__no-options',
+        ]">
+        <!--
+          @slot customize what is displayed when no drop down options are available
+        -->
+        <slot
           v-if="!dropDownOptions.length"
-          :class="[
-            'base-drop-down-list__option',
-            'base-drop-down-list__no-options',
-          ]">
+          name="no-options">
           {{ dropDownNoOptionsInfo }}
-        </div>
-      </slot>
+        </slot>
+      </div>
     </ul>
     <!-- @slot to add elements after the options list -->
     <slot name="after-list" />
@@ -159,7 +159,7 @@ export default {
      */
     dropDownNoOptionsInfo: {
       type: String,
-      default: 'No options available',
+      default: '',
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
@@ -224,6 +224,13 @@ export default {
             === this.activeOption[this.identifierPropertyName]);
       }
       return this.dropDownOptions.indexOf(this.activeOption);
+    },
+    /**
+     * determine if no-options slot has data
+     * @returns {Boolean}
+     */
+    noOptionsSlotHasData() {
+      return !!this.$slots['no-options'];
     },
   },
   mounted() {

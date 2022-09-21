@@ -13,13 +13,16 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
           v-slot:thumbnails="{ item }">
           <base-icon
             v-if="item.published"
-            name="eye" />
+            name="eye"
+            class="icon" />
           <base-icon
             v-if="item.shared"
-            name="people" />
+            name="people"
+            class="icon" />
           <base-icon
             v-if="item.error"
-            name="attention" />
+            name="attention"
+            class="icon" />
         </template>
     </BaseMenuList>
     <BaseButton
@@ -88,6 +91,10 @@ export default {
   }
   .show {
     margin-top: 16px;
+  }
+  .icon {
+    width: 12px;
+    height: 12px;
   }
 </style>
 

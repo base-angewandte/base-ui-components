@@ -147,5 +147,12 @@ export default {
       color: $font-color-second;
       margin: $spacing-small-half $spacing-small;
     }
+
+    .base-select-options__select-button {
+      &:hover,
+      &:focus {
+        color: $app-color;
+      }
+    }
   }
 </style>

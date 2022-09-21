@@ -7,21 +7,39 @@ and default (base project specific) role selection
     <base-chips-below
       v-model="selectedList"
       :chips-editable="true"
-      :list="['Herbert Marcuse', 'Erich From', 'Georg Weerth']"
-      :role-options="[
+      :list="[
+          {
+            id: 'Herbert Marcuse',
+            label: 'Herbert Marcuse',
+          },
+          {
+            id: 'Erich From',
+            label: 'Erich From',
+          },
+          {
+            id: 'Georg Weerth',
+            label: 'Georg Weerth',
+          }
+      ]"
+      :additional-prop-options="[
         {
-          name: 'Actor',
+          label: 'Actor',
         },
         {
-          name: 'Magician',
+          label: 'Magician',
         },
         {
-          name: 'Priest',
+          label: 'Priest',
         },
         {
-          name: 'ActFarmeror',
+          label: 'Farmer',
         }]"
-      label="Select a Person"/>
+      label="Select a Person">
+      <template
+        #drop-down-entry="{ item }">
+        {{ item.label }}
+      </template>
+    </base-chips-below>
   </div>
 </template>
 

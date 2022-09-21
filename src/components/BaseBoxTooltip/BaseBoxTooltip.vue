@@ -54,7 +54,8 @@ export default {
     }
 
     .base-box-tooltip-icon {
-      width: 100%;
+      height: 20px;
+      width: 20px;
       max-width: 20px;
       vertical-align: middle;
     }
