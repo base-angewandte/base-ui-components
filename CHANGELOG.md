@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2 (2022-09-22)
+
+### Bugfixes
+* [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/#basechipsinputfield): chips should not retain id (and therefore background color) after being edited.
+* Fixing styleguide build linting issues.
+
 ## 2.0.1 (2022-09-21)
 
 ### Improvements
