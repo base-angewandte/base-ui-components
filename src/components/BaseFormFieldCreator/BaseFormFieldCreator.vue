@@ -538,10 +538,6 @@ export default {
     }
   },
   methods: {
-    test(val) {
-      console.log('Still worköingggg');
-      this.textInput = val;
-    },
     // function for setting internal field value breaking all potential links to
     // value passed from parent
     setFieldValue(val) {

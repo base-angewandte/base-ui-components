@@ -1,8 +1,10 @@
 /* eslint-disable */
 const path = require('path');
+const pjson = require('./package.json');
+
 module.exports = {
   // set your styleguidist configuration here
-  title: 'Base UI Components',
+  title: `Base UI Components v${pjson.version}`,
   template: {
     head: {
       meta: [

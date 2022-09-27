@@ -743,11 +743,21 @@ export default {
       if (typeof this.selectedListInt[index][this.labelPropertyName] === 'object'
         && this.selectedListInt[index][this.labelPropertyName][this.language] !== undefined) {
         // if so then assign the new value to the current language
-        this.selectedListInt[index][this.labelPropertyName][this.language] = newString;
+        // and also remove the id since the entry was altered and is not identical with the entry
+        // belonging to this id anymore
+        this.selectedListInt[index] = {
+          [this.labelPropertyName]: {
+            [this.language]: newString,
+          },
+        };
         // else check if label prop is string and assign it directly
         // (otherwise this case (an object with unknown properties) can not be handled)
       } else if (typeof this.selectedListInt[index][this.labelPropertyName] === 'string') {
-        this.selectedListInt[index][this.labelPropertyName] = newString;
+        // and also remove the id since the entry was altered and is not identical with the entry
+        // belonging to this id anymore
+        this.selectedListInt[index] = {
+          [this.labelPropertyName]: newString,
+        };
       }
       // trigger change propagation to parent
       this.updateParentList(this.selectedListInt);

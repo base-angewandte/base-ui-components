@@ -164,6 +164,7 @@ export default {
       // eslint-disable-next-line
       this.$refs.draggable._sortable.nativeDraggable = this.dragAndDropCapable;
     } else {
+      // eslint-disable-next-line
       console.warn('The option "nativeDraggable" in sortableJS is missing. '
         + 'Please check for changes https://github.com/SortableJS/sortablejs.');
     }
