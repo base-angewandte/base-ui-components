@@ -1,10 +1,12 @@
 # Changelog
 
-## 2.0.2 (2022-09-22)
+## 2.0.2 (2022-09-28)
 
 ### Bugfixes
 * [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/#basechipsinputfield): chips should not retain id (and therefore background color) after being edited.
 * Fixing styleguide build linting issues.
+* [BaseMenuList](https://base-angewandte.github.io/base-ui-components/#basemenulist): drag image not displayed in Chrome.
+* [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/#basechipsbelow): Drag & Drop sorting broken in Firefox.
 
 ## 2.0.1 (2022-09-21)
 
