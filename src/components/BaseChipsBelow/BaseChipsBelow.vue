@@ -20,6 +20,7 @@
       </template>
       <template
         #label-addition>
+        {{ isDragDropCapable }}
         <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
           (e.g. language tabs)) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
@@ -61,8 +62,9 @@
     <draggable
       v-model="selectedBelowListInt"
       :animation="200"
-      :force-fallback="true"
-      group="people"
+      :force-fallback="!isDragDropCapable"
+      :fallback-on-body="!isDragDropCapable"
+      :group="{ name: 'people' }"
       handle=".base-chips-below-list-icon-wrapper"
       @end="updateList($event, selectedBelowListInt)">
       <div
@@ -401,6 +403,22 @@ export default {
       delete newProps.additionalPropPlaceholder;
       delete newProps.additionalPropertyName;
       return newProps;
+    },
+    isDragDropCapable() {
+      if (window) {
+        // TODO: due to vue draggable safari related bug
+        //  https://github.com/SortableJS/Vue.Draggable/issues/743 we need to check
+        // specifically for safari to use forceFallback true for Safari browsers
+        const isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1
+          && navigator.userAgent
+          // leaving chrome check in since it is currently working with forceFallback true
+          && navigator.userAgent.indexOf('CriOS') === -1;
+          // taking firefox out since it it is not working anymore with forceFallback true
+          // and need to check first if it is also affected by the Safari bug.
+          // && navigator.userAgent.indexOf('FxiOS') === -1;
+        return !isSafari && 'DragEvent' in window;
+      }
+      return false;
     },
   },
   watch: {
