@@ -11,6 +11,7 @@
       :id="fieldKey"
       :key="fieldKey"
       :label="labelInt"
+      :show-label="showLabel"
       :placeholder="placeholderInt"
       :tabs="fieldType === 'multiline' ? tabs : false"
       :tab-labels="fieldType === 'multiline' ? tabs.map(tab => getI18nTerm(tab)) : false"
@@ -60,6 +61,7 @@
           :key="fieldKey + '_date'"
           v-model="fieldValueInt"
           :label="label"
+          :show-label="showLabel"
           :placeholder="placeholderInt"
           :range-separator="getI18nTerm('form.until')"
           :format="field['x-attrs'].date_format"
@@ -92,6 +94,7 @@
       v-model="fieldValueInt"
       :placeholder="placeholderInt"
       :label="label"
+      :show-label="showLabel"
       :list="dropDownList"
       :allow-dynamic-drop-down-entries="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest"
       :allow-multiple-entries="!isChipsSingleSelect"
@@ -235,6 +238,13 @@ export default {
     label: {
       type: String,
       default: '',
+    },
+    /**
+     * define if field label should be shown
+     */
+    showLabel: {
+      type: Boolean,
+      default: true,
     },
     /**
      * a placeholder for the field<br>
