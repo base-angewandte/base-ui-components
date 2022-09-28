@@ -23,12 +23,14 @@
           :ref="element.name"
           :key="`${element.name}_${index}_${valueIndex}_${formId}_wrapper`"
           :class="['base-form-field',
+                   { 'base-form-field__multiple__inline': multiplyButtonsInline(element) },
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
                    { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
           <BaseFormFieldCreator
             :key="`${element.name}_${index}_${valueIndex}_${formId}`"
             v-bind="formFieldComponentProps(element, index, valueIndex)"
+            class="base-form-field__multiple__inline-element"
             @field-value-changed="setFieldValue(
               $event,
               element.name,
@@ -39,8 +41,8 @@
 
           <!-- if there is field content show a 'remove all content' button -->
           <div
-            v-if="checkFieldContent(valueList[element.name])
-              || valueListInt[element.name].length > 1"
+            v-if="!multiplyButtonsInline && (checkFieldContent(valueList[element.name])
+              || valueListInt[element.name].length > 1)"
             :key="`${index}_button_${valueIndex}_${formId}`"
             class="group-add">
             <button
@@ -59,9 +61,39 @@
               </span>
             </button>
           </div>
+          <template
+            v-if="multiplyButtonsInline(element)">
+            <div
+              class="base-form__inline-icons">
+              <base-icon
+                v-if="checkFieldContent(valueList[element.name])
+                  || valueListInt[element.name].length > 1"
+                :title="valueListInt[element.name].length === 1
+                  ? getI18nTerm('form.clearField') || 'Clear'
+                  : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) })"
+                role="button"
+                tabindex="0"
+                class="base-form__inline-icon"
+                name="remove"
+                @click.native="removeField(element, valueIndex)"
+                @keydown.enter.native="removeField(element, valueIndex)" />
+              <base-icon
+                v-if="valueIndex === (valueListInt[element.name].length - 1)"
+                :title="getI18nTerm('form.addGroup', -1, {
+                  fieldType: getFieldName(element)
+                })"
+                role="button"
+                tabindex="0"
+                class="base-form__inline-icon"
+                name="plus"
+                @click.native="multiplyField(element)"
+                @keydown.enter.native="multiplyField(element)" />
+            </div>
+          </template>
         </div>
         <!-- multiply button -->
         <div
+          v-if="!multiplyButtonsInline(element)"
           :key="'multiplyButton' + index"
           class="group-multiply">
           <button
@@ -333,6 +365,9 @@ export default {
       return el.type === 'array' && (!el['x-attrs'] || !el['x-attrs'].field_type || (el['x-attrs']
         && !['chips', 'chips-below'].includes(el['x-attrs'].field_type)));
     },
+    multiplyButtonsInline(el) {
+      return !['group', 'multiline'].includes(el['x-attrs'].field_type);
+    },
     // triggered on user clicking multiply button
     multiplyField(field) {
       this.valueListInt[field.name]
@@ -378,6 +413,8 @@ export default {
       return {
         field: element,
         label: this.getFieldName(element),
+        showLabel: !this.allowMultiply(element)
+          || !this.multiplyButtonsInline(element) || valueIndex === 0,
         dropDownList: this.dropDownLists[element.name],
         secondaryDropdown: this.dropDownLists[`${element.name}_secondary`],
         language: this.language,
@@ -543,6 +580,27 @@ export default {
 
       &:focus .field-group-icon {
         fill: $app-color;
+      }
+    }
+  }
+
+  .base-form-field__multiple__inline {
+    display: flex;
+    align-items: flex-end;
+
+    .base-form-field__multiple__inline-element {
+      flex: 1 1 auto;
+    }
+
+    .base-form__inline-icons {
+      margin-left: $spacing-small;
+
+      .base-form__inline-icon {
+        height: $icon-medium;
+        width: $icon-medium;
+        color: $font-color-second;
+        margin: $spacing-small;
+        cursor: pointer;
       }
     }
   }
