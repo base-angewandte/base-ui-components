@@ -418,10 +418,12 @@ export default {
      */
     dateType() {
       // check if date is an Object with properties or just string (= single date)
-      if (!this.field.properties) {
+      // also need to check items in case date field is repeatable
+      const props = this.field.properties || (this.field.items && this.field.items.properties)
+        ? Object.keys(this.field.properties || this.field.items.properties) : [];
+      if (!this.field.properties && !this.field.items && !this.field.items.properties) {
         return 'single';
       }
-      const props = Object.keys(this.field.properties);
       if (props.includes('date_to') && props.includes('time_to')) {
         return 'daterangetimerange';
       }
@@ -441,7 +443,7 @@ export default {
      * @returns {Object}
      */
     groupFormFields() {
-      // check if field group is a list (=multiplyable) or not
+      // check if field group is a list (=repeatable) or not
       if (this.field.type === 'array') {
         return this.field.items.properties;
       }
