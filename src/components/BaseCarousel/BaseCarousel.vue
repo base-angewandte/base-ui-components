@@ -21,7 +21,8 @@
             :center-header="true"
             :render-element-as="vueRouterAvailable ? renderLinkElementAs : 'div'"
             :link-to="vueRouterAvailable && item.href ? item.href : ''"
-            style="margin-right: 0" />
+            style="margin-right: 0"
+            @clicked="boxClicked(item)" />
         </div>
       </div>
 
@@ -61,10 +62,10 @@ export default {
     /**
      * specify array of items to render<br>
      *   the item object should have the following properties:<br>
-     *     title - the title to display<br>
-     *     subtext - the text below the title<br>
-     *     description - the type of item<br>
-     *     additional - additional information (e.g. dates)<br>
+     *     title {?string} - the title to display<br>
+     *     subtext {?string} - the text below the title<br>
+     *     description {?string} - the type of item<br>
+     *     additional {?string} - additional information (e.g. dates)<br>
      *     href - a url to follow upon item click<br>
      *     previews - an array of image urls in different sizes in the following form:<br>
      *     e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
@@ -159,6 +160,13 @@ export default {
     },
     subtext(value) {
       return typeof value === 'object' && typeof value[0] === 'string' ? value.join(', ') : value;
+    },
+    boxClicked(item) {
+      /**
+       * @event clicked
+       * @type {Object}
+       */
+      this.$emit('clicked', item);
     },
   },
 };

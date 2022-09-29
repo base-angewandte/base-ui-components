@@ -45,8 +45,6 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung 1',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/arch',
-          href: 'http://base.uni-ak.ac.at',
           previews: [
             {
               '460w': 'https://placeimg.com/460/341/arch',
@@ -65,7 +63,6 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung 2',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/tech',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -84,8 +81,6 @@ export default {
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 3',
-          // additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/nature',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -105,7 +100,6 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung 4',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/animal',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -125,7 +119,6 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/people',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -145,7 +138,6 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/641/480/arch',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
