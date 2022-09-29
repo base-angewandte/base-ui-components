@@ -594,6 +594,7 @@ export default {
 
     .base-form__inline-icons {
       margin-left: $spacing-small;
+      flex: 0 0 auto;
 
       .base-form__inline-icon {
         height: $icon-medium;
