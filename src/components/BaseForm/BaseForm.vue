@@ -193,12 +193,8 @@ export default {
      */
     fieldProps: {
       type: Object,
-      default: () => ({
-        required: false,
-        invalid: false,
-        errorMessage: '',
-      }),
-      validator: val => Object.values(val)
+      default: () => ({}),
+      validator: val => Object.keys(val).length === 0 || Object.values(val)
         .every(fieldProps => Object.keys(fieldProps)
           .every(fieldProp => ['required', 'invalid', 'errorMessage'].includes(fieldProp))),
     },
@@ -374,8 +370,9 @@ export default {
     },
     formFieldComponentProps(element, index, valueIndex) {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
-      const elementProps = this.fieldProps[element.name];
+      const elementProps = this.fieldProps[element.name] || {};
       return {
+        ...elementProps,
         field: element,
         label: this.getFieldName(element),
         dropDownList: this.dropDownLists[element.name],
@@ -393,9 +390,6 @@ export default {
           ? this.$props : null,
         clearable: this.clearable,
         showErrorIcon: this.showErrorIcon,
-        required: elementProps ? elementProps.required : false,
-        errorMessage: elementProps ? elementProps.errorMessage : '',
-        invalid: elementProps ? elementProps.invalid : false,
       };
     },
     setFieldValue(value, fieldName, index) {
@@ -455,7 +449,7 @@ export default {
 
       // check if field is boolean
       if (field.type === 'boolean') {
-        return value;
+        return value || false;
       }
 
       // if it is not a array or object simply return value from list or empty string
