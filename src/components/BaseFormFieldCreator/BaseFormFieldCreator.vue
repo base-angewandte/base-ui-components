@@ -421,7 +421,7 @@ export default {
       // also need to check items in case date field is repeatable
       const props = this.field.properties || (this.field.items && this.field.items.properties)
         ? Object.keys(this.field.properties || this.field.items.properties) : [];
-      if (!this.field.properties && !this.field.items && !this.field.items.properties) {
+      if (!this.field.properties && (!this.field.items || !this.field.items.properties)) {
         return 'single';
       }
       if (props.includes('date_to') && props.includes('time_to')) {
