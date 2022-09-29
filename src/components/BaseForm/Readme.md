@@ -76,7 +76,7 @@ export default {
                 },
                 additionalProperties: false,
               },
-              title: 'Beteiligung',
+              title: 'Beteiligung (chips-below)',
               'x-attrs': {
                 field_type: 'chips-below',
                 placeholder: 'Beteiligung eintragen',
@@ -90,6 +90,57 @@ export default {
                 order: 2,
               },
             },
+            actors: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  label: {
+                    type: 'string',
+                  },
+                  source: {
+                    type: 'string',
+                    'x-attrs': {
+                      hidden: true,
+                    },
+                  },
+                },
+                additionalProperties: false,
+              },
+              title: 'Actors (Multi-select)',
+              'x-attrs': {
+                field_type: 'chips',
+                placeholder: 'Enter Actors',
+                source: '/autosuggest/v1/contributors/',
+                allow_unknown_entries: true,
+                dynamic_autosuggest: true,
+                order: 3,
+              },
+            },
+            type: {
+              type: 'object',
+              properties: {
+                label: {
+                  type: 'string',
+                },
+                source: {
+                  type: 'string',
+                  'x-attrs': {
+                    hidden: true,
+                  },
+                },
+              },
+              additionalProperties: false,
+              title: 'Type (Single-select)',
+              'x-attrs': {
+                field_type: 'chips',
+                placeholder: 'Select Type',
+                source: '/autosuggest/v1/contributors/',
+                allow_unknown_entries: true,
+                dynamic_autosuggest: true,
+                order: 4,
+              },
+            },
             published_in: {
               type: 'string',
               title: 'erschienen in',
@@ -97,7 +148,7 @@ export default {
                 placeholder: 'erschienen in eintragen',
                 field_type: 'text',
                 field_format: 'half',
-                order: 3,
+                order: 5,
               },
             },
             url: {
@@ -105,8 +156,18 @@ export default {
               title: 'URL',
               'x-attrs': {
                 placeholder: 'URL eintragen',
-                order: 4,
+                order: 6,
                 field_format: 'half',
+              },
+            },
+            display_in_showroom: {
+              type: 'boolean',
+              title: 'Display in Showroom',
+              'x-attrs': {
+                placeholder: 'Display in Showroom',
+                order: 7,
+                field_format: 'full',
+                field_type: 'boolean',
               },
             },
             isan: {
@@ -114,10 +175,30 @@ export default {
               items: {
                 type: 'string',
               },
-              title: 'ISAN',
+              title: 'ISAN (repeatable)',
               'x-attrs': {
                 placeholder: 'ISAN eintragen',
-                order: 5,
+                order: 8,
+              },
+            },
+            date: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  date_from: {
+                    type: 'string',
+                  },
+                  date_to: {
+                    type: 'string',
+                  }
+                }
+              },
+              title: 'Repeatable Date',
+              'x-attrs': {
+                placeholder: 'Enter Date',
+                order: 9,
+                field_type: 'date',
               },
             },
             date_location: {
@@ -214,7 +295,7 @@ export default {
               'x-attrs': {
                 field_type: 'group',
                 show_label: false,
-                order: 6,
+                order: 10,
               },
             },
           },
@@ -234,7 +315,7 @@ Following options are available:
 |-----------------------|----------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | hidden                | all                              | False                                                                    | True, False                                                                                                                       | indicate if this data attribute should be considered for form creation (e.g. true for id)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | field_format          | all                              | full                                                                     | full, half                                                                                                                        |  specify if the field should fill full width or half in a form<br> (in case it is a 'half' field make sure it has a second 'half' field as well, otherwise the space will be empty)<br>CAVEAT: if field is multiply-able this value needs to be `full` |
-| field_type            | all                              | text                                                                     | text, autocomplete, chips, chips-below, date, multiline, group                                                                    | which kind of field should be shown front-end:<br>**text**: simple text field<br> **autocomplete**: text field with autocomplete functionality (source needed!)<br> **chips**: input field with options (optional: dynamic autocomplete) that creates chips out of selected options<br>(if single or multi chips will be determined automatically from field type being an array or object)<br> **chips-below**: same as chips, however chips are not added inline but below the input field<br> **date**: a date field (different formats)<br> **multiline**: a multiline text field<br> **group**: indicates that the fields specified within should be grouped |
+| field_type            | all                              | text                                                                     | text, autocomplete, chips, chips-below, date, multiline, group, boolean                                                                    | which kind of field should be shown front-end:<br>**text**: simple text field<br> **autocomplete**: text field with autocomplete functionality (source needed!)<br> **chips**: input field with options (optional: dynamic autocomplete) that creates chips out of selected options<br>(if single or multi-select chips will be determined automatically from field type being an array or object (see below))<br> **chips-below**: same as chips, however chips are not added inline but below the input field<br> **date**: a date field (different formats - decided from the swagger definition (see below))<br> **multiline**: a multiline text field<br> **group**: indicates that the fields specified within should be grouped<br>**boolean** will create a toggle element |
 | placeholder           | all                              | -                                                                        | string or object                                                                                                                  | Add a placeholder displayed in the input field<br>  A string for all fields except date fields - there it should be an object with 'date' and (if necessary) 'time' attributes that contain the relevant string<br> default placeholder ('Enter xxx') can be added with utils function `placeholder_lazy(label)`                                                                                                                                                                                                                                                                                                                       |
 | order                 | all                              | this should be specified for all fields otherwise sorting will be random | number                                                                                                                            | this will specify the order in which the fields are displayed in the form                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | source                | chips, chips-below, autocomplete | -                                                                        | a API endpoint                                                                                                                    | if the field has a autocomplete functionality (autocomplete field or dynamic chips inputs (`dynamic_autosuggest = true`) or options (`dynamic_autosuggest = false`) this route is **required** to fetch these options<br> (the base url for the API is specified in the front end configuration)                                                                                                                                                                                                                                                                                                                                                   |
@@ -250,4 +331,14 @@ Following options are available:
 | show`_`label            | groups                           | False                                                                    | True, False                                                                                                                       | indicates if field groups should have a label                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | subtext               | toggle                           | -                                                                        | object                                                                                                                            | specify object with at mandatory property **value** and optional property **url** (external link) or **source** (internal link) - (atm only used for _fieldType:_ _boolean_)                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
-
+Additionally, some features are derived from the swagger definition:<br>
+* **Repeatable input fields**: fields with `field_type` other than 'chips' and 'chips-below' will be repeatable when the swagger definition `type` is 'array'.
+* **Single or multi-select chips input fields**: chips input fields are single select when the definition `type` is 'object' (otherwise should be 'array').
+* **Date fields**: fields are also rendered according to the `type` and `properties` of the swagger definition:<br>
+  * `type` 'string': rendering a single date field.
+  * `type` 'object' with `properties` `date_from` and `date_to`: rendering a date range.
+  * `type` 'object' with `properties` `date` and `time`: rendering a date and a time field.
+  * `type` 'object' with `properties` `date`, `time_from` and `time_to`: rendering a single date field and time range fields.
+  * `type` 'object' with `properties` `date_from`, `date_to`, `time_from` and `time_to`: rendering date range fields and time range fields.
+  * If none of these definitions are met a single date field will be rendered.
+  * As specified above, all of these definitions could also be wrapped in `type` 'array' to make the field(s) repeatable.
