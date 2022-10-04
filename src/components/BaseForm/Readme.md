@@ -334,6 +334,7 @@ Following options are available:
 Additionally, some features are derived from the swagger definition:<br>
 * **Repeatable input fields**: fields with `field_type` other than 'chips' and 'chips-below' will be repeatable when the swagger definition `type` is 'array'.
 * **Single or multi-select chips input fields**: chips input fields are single select when the definition `type` is 'object' (otherwise should be 'array').
+* **chips input fields**: are draggable as soon as they are multi-select but this can be overwritten via `fieldProps`.
 * **Date fields**: fields are also rendered according to the `type` and `properties` of the swagger definition:<br>
   * `type` 'string': rendering a single date field.
   * `type` 'object' with `properties` `date_from` and `date_to`: rendering a date range.

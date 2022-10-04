@@ -218,21 +218,24 @@ export default {
       default: false,
     },
     /**
-     * provide an object with settings and properties for each field, this is used to set
-     * `required`, `invalid`, `errorMessage` for each field this is applicable to<br>
-     * for an example on how these properties look on an individual form field
-     * see [BaseInput](#baseinput)
+     * provide an object with settings and properties for each field. This takes an object
+     * with the field name as properties with the props nested.<br>
+     * { fieldName1: { required: false, ... }, fieldName2: { ... } }<br>
+     * <br>
+     * find the possible variables at the respective input components: <br>
+     * [BaseInput](#baseinput)<br>
+     * [BaseAutocompleteInput](#baseautocompleteinput)<br>
+     * [BaseMultilineTextInput](#basemultilinetextinput)<br>
+     * [BaseChipsInput](#basechipsinput)<br>
+     * [BaseChipsBelow](#basechipsbelow)<br>
+     * [BaseDateInput](#basedateinput)<br>
+     * [BaseToggle](#basetoggle)<br>
      */
     fieldProps: {
       type: Object,
-      default: () => ({
-        required: false,
-        invalid: false,
-        errorMessage: '',
-      }),
-      validator: val => Object.values(val)
-        .every(fieldProps => Object.keys(fieldProps)
-          .every(fieldProp => ['required', 'invalid', 'errorMessage'].includes(fieldProp))),
+      default: () => ({}),
+      validator: val => Object.keys(val).length === 0 || Object.values(val)
+        .every(fieldProps => Object.keys(fieldProps)),
     },
   },
   data() {
@@ -409,10 +412,10 @@ export default {
     },
     formFieldComponentProps(element, index, valueIndex) {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
-      const elementProps = this.fieldProps[element.name];
       return {
         field: element,
         label: this.getFieldName(element),
+        fieldProps: this.fieldProps[element.name] || {},
         showLabel: !this.allowMultiply(element)
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
         dropDownList: this.dropDownLists[element.name],
@@ -430,9 +433,6 @@ export default {
           ? this.$props : null,
         clearable: this.clearable,
         showErrorIcon: this.showErrorIcon,
-        required: elementProps ? elementProps.required : false,
-        errorMessage: elementProps ? elementProps.errorMessage : '',
-        invalid: elementProps ? elementProps.invalid : false,
       };
     },
     setFieldValue(value, fieldName, index) {
@@ -492,7 +492,7 @@ export default {
 
       // check if field is boolean
       if (field.type === 'boolean') {
-        return value;
+        return value || false;
       }
 
       // if it is not a array or object simply return value from list or empty string
