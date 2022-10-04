@@ -20,7 +20,6 @@
       </template>
       <template
         #label-addition>
-        {{ isDragDropCapable }}
         <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
           (e.g. language tabs)) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
