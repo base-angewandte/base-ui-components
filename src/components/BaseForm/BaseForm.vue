@@ -429,7 +429,6 @@ export default {
     formFieldComponentProps(element, index, valueIndex) {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
       return {
-        ...elementProps,
         field: element,
         label: this.getFieldName(element),
         fieldProps: this.fieldProps[element.name] || {},
