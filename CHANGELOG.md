@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.3 (2022-10-06)
+
+### Features
+* [BaseCarousel](https://base-angewandte.github.io/base-ui-components/#basecarousel): add 'clicked' event to be able to manually trigger action on box click.
+
+###Improvements
+* [BaseCarousel](https://base-angewandte.github.io/base-ui-components/#basecarousel): improve documentation, removing unnecessary properties from example data.
+
+### Bugfixes
+* [BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform): wrong default object for fieldProps, boolean field needs default value, improve adding of fieldProps to field properties.
+* [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/#basechipsbelow): remove leftover test code.
+* [BaseInput](https://base-angewandte.github.io/base-ui-components/#baseinput) / [BaseSearch](https://base-angewandte.github.io/base-ui-components/#basesearch): prevent scaling of X remove icon.
+
+
 ## 2.0.2 (2022-09-28)
 
 ### Bugfixes
