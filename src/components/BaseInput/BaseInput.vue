@@ -689,6 +689,7 @@ export default {
             .base-input__remove-icon {
               height: $icon-medium;
               width: $icon-medium;
+              min-width: $icon-medium;
               margin: $spacing-small;
             }
           }
