@@ -596,6 +596,10 @@ export default {
         color: $font-color-second;
         margin: $spacing-small;
         cursor: pointer;
+
+        &:hover, &:focus, &:active {
+          color: $app-color;
+        }
       }
     }
   }
