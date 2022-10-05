@@ -78,16 +78,18 @@
                 @click.native="removeField(element, valueIndex)"
                 @keydown.enter.native="removeField(element, valueIndex)" />
               <base-icon
-                v-if="valueIndex === (valueListInt[element.name].length - 1)"
-                :title="getI18nTerm('form.addGroup', -1, {
-                  fieldType: getFieldName(element)
-                })"
+                :title="valueIndex !== (valueListInt[element.name].length - 1)
+                  ? getI18nTerm('form.addGroupBelow', -1, {
+                    fieldType: getFieldName(element)
+                  }) : getI18nTerm('form.addGroup', -1, {
+                    fieldType: getFieldName(element)
+                  })"
                 role="button"
                 tabindex="0"
                 class="base-form__inline-icon"
                 name="plus"
-                @click.native="multiplyField(element)"
-                @keydown.enter.native="multiplyField(element)" />
+                @click.native="multiplyField(element, valueIndex)"
+                @keydown.enter.native="multiplyField(element, valueIndex)" />
             </div>
           </template>
         </div>
@@ -241,7 +243,7 @@ export default {
   data() {
     return {
       /**
-       * variable to be able to focus to the field after multipy
+       * variable to be able to focus to the field after multiply
        * @type {?Object}
        * @property {number} index - the index of the new field in the array
        * @property {string} name - the name of the field
@@ -372,10 +374,24 @@ export default {
       return !['group', 'multiline'].includes(el['x-attrs'].field_type);
     },
     // triggered on user clicking multiply button
-    multiplyField(field) {
-      this.valueListInt[field.name]
-        .push(this.getInitialFieldValue(field.items));
-      this.multiplyParams = { index: this.valueListInt[field.name].length - 1, name: field.name };
+    multiplyField(field, index) {
+      // get the initialized new field values
+      const newFieldValues = this.getInitialFieldValue(field.items);
+      // check if function call is coming from an input field where field can only be
+      // inserted at last position
+      if (!index && index !== 0) {
+        // add field at the end of array
+        this.valueListInt[field.name].push(newFieldValues);
+        // else its coming from an inline repeatable field
+      } else {
+        // insert at the correct level
+        this.valueListInt[field.name].splice(index + 1, 0, newFieldValues);
+      }
+      this.multiplyParams = {
+        index: !index && index !== 0
+          ? this.valueListInt[field.name].length - 1 : index + 1,
+        name: field.name,
+      };
       // inform parent of changes
       this.propagateValueListChanges();
     },
@@ -413,6 +429,7 @@ export default {
     formFieldComponentProps(element, index, valueIndex) {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
       return {
+        ...elementProps,
         field: element,
         label: this.getFieldName(element),
         fieldProps: this.fieldProps[element.name] || {},
@@ -602,6 +619,10 @@ export default {
         color: $font-color-second;
         margin: $spacing-small;
         cursor: pointer;
+
+        &:hover, &:focus, &:active {
+          color: $app-color;
+        }
       }
     }
   }
