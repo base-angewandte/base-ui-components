@@ -14,6 +14,14 @@ This is a basic (autocomplete functionality not working here) example how a form
         :form-field-json="fields"
         :value-list="valueList"
         :available-locales="['de', 'en']"
+        :field-props="{
+          actors: {
+            label: 'Actors Label (overwritten via fieldProps)',
+          },
+          contributors: {
+            sortText: 'Sorting text from fieldProps',
+          }
+        }"
         language="en"
         :field-is-loading="fieldIsLoading"
         class="form"
@@ -331,7 +339,7 @@ Following options are available:
 | show`_`label            | groups                           | False                                                                    | True, False                                                                                                                       | indicates if field groups should have a label                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | subtext               | toggle                           | -                                                                        | object                                                                                                                            | specify object with at mandatory property **value** and optional property **url** (external link) or **source** (internal link) - (atm only used for _fieldType:_ _boolean_)                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
-Additionally, some features are derived from the swagger definition:<br>
+Additionally, some features are derived from the swagger definitions:<br>
 * **Repeatable input fields**: fields with `field_type` other than 'chips' and 'chips-below' will be repeatable when the swagger definition `type` is 'array'.
 * **Single or multi-select chips input fields**: chips input fields are single select when the definition `type` is 'object' (otherwise should be 'array').
 * **chips input fields**: are draggable as soon as they are multi-select but this can be overwritten via `fieldProps`.
