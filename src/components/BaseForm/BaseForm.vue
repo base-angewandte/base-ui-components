@@ -430,7 +430,8 @@ export default {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
       return {
         field: element,
-        label: this.getFieldName(element),
+        label: this.fieldProps[element.name] && this.fieldProps[element.name].label
+          ? this.fieldProps[element.name].label : this.getFieldName(element),
         fieldProps: this.fieldProps[element.name] || {},
         showLabel: !this.allowMultiply(element)
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
