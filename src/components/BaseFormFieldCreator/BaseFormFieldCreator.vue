@@ -11,6 +11,7 @@
       :id="fieldKey"
       :key="fieldKey"
       :label="labelInt"
+      :show-label="showLabel"
       :placeholder="placeholderInt"
       :tabs="fieldType === 'multiline' ? tabs : false"
       :tab-labels="fieldType === 'multiline' ? tabs.map(tab => getI18nTerm(tab)) : false"
@@ -60,6 +61,7 @@
           :key="fieldKey + '_date'"
           v-model="fieldValueInt"
           :label="label"
+          :show-label="showLabel"
           :placeholder="placeholderInt"
           :range-separator="getI18nTerm('form.until')"
           :format="field['x-attrs'].date_format"
@@ -92,6 +94,7 @@
       v-model="fieldValueInt"
       :placeholder="placeholderInt"
       :label="label"
+      :show-label="showLabel"
       :list="dropDownList"
       :allow-dynamic-drop-down-entries="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest"
       :allow-multiple-entries="!isChipsSingleSelect"
@@ -235,6 +238,13 @@ export default {
     label: {
       type: String,
       default: '',
+    },
+    /**
+     * define if field label should be shown
+     */
+    showLabel: {
+      type: Boolean,
+      default: true,
     },
     /**
      * a placeholder for the field<br>
@@ -408,10 +418,12 @@ export default {
      */
     dateType() {
       // check if date is an Object with properties or just string (= single date)
-      if (!this.field.properties) {
+      // also need to check items in case date field is repeatable
+      const props = this.field.properties || (this.field.items && this.field.items.properties)
+        ? Object.keys(this.field.properties || this.field.items.properties) : [];
+      if (!this.field.properties && (!this.field.items || !this.field.items.properties)) {
         return 'single';
       }
-      const props = Object.keys(this.field.properties);
       if (props.includes('date_to') && props.includes('time_to')) {
         return 'daterangetimerange';
       }
@@ -431,7 +443,7 @@ export default {
      * @returns {Object}
      */
     groupFormFields() {
-      // check if field group is a list (=multiplyable) or not
+      // check if field group is a list (=repeatable) or not
       if (this.field.type === 'array') {
         return this.field.items.properties;
       }
