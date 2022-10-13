@@ -28,7 +28,8 @@ Base Carousel
            slidesPerGroup: 3,
          },
        },
-     }" />
+     }"
+      @clicked="boxClicked" />
 </template>
 
 <script>
@@ -40,32 +41,15 @@ export default {
     return {
       items: [
         {
-          id: '1',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 1',
-          additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/arch',
-          href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/460/341/arch',
-            },
-            {
-              '640w': 'https://placeimg.com/640/480/arch',
-            },
-            {
-              '768w': 'https://placeimg.com/768/576/arch',
-            },
-          ],
         },
         {
-          id: '2',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 2',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/tech',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -80,12 +64,9 @@ export default {
           ],
         },
         {
-          id: '3',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 3',
-          // additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/nature',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -100,12 +81,10 @@ export default {
           ],
         },
         {
-          id: '4',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 4',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/animal',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -120,12 +99,10 @@ export default {
           ],
         },
         {
-          id: '5',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/640/480/people',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -140,12 +117,10 @@ export default {
           ],
         },
         {
-          id: '6',
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
-          imageUrl: 'https://placeimg.com/641/480/arch',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -161,6 +136,11 @@ export default {
         },
       ],
     };
+  },
+  methods: {
+    boxClicked(item) {
+      window.alert(`Box with title '${item.title || 'No title'}' was clicked`);
+    },
   },
 };
 </script>

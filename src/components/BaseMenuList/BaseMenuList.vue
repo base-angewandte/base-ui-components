@@ -10,6 +10,7 @@
     :fallback-on-body="!dragAndDropCapable"
     tag="ul"
     class="base-menu-list"
+    @choose="getDragImage"
     @start="dragStart"
     @end="dragEnd">
     <li
@@ -120,6 +121,12 @@ export default {
       dragAndDropCapable: false,
       isDraggable: true,
       resizeTimeout: null,
+      /**
+       * chrome can not deal with delay if drag image is cloned from dom on setData directly
+       * so image needs to be set previously and stored in variable
+       * @type {?SVGElement}
+       */
+      dragImg: null,
     };
   },
   watch: {
@@ -204,20 +211,17 @@ export default {
         this.$set(this.entryProps[this.activeEntry], 'active', true);
       }
     },
-    dragStart() {
-      this.dragging = true;
-    },
-    dragEnd() {
-      this.dragging = false;
-    },
-    modifyDragItem(dataTransfer, dragEl) {
-      const entryIcon = dragEl.getElementsByTagName('svg')[0];
+    /**
+     * get the relevant icon image from the dom and save it in a variable
+     * (Chrome could not deal with setting it in modifyDragItem directly)
+     * @param {CustomEvent} event
+     */
+    getDragImage(event) {
+      // get the relevant svg element from the base menu entry
+      const entryIcon = event.item.getElementsByTagName('svg')[0];
+      // get the size to be able to set it to the drag image as well
       const size = `${(entryIcon.clientHeight * 2)}px`;
-      // remove previous drag items from the body again if necessary
-      const elem = document.getElementById('drag-icon');
-      if (elem) {
-        elem.parentNode.removeChild(elem);
-      }
+
       // clone the svg used in this entry
       const pic = entryIcon.cloneNode(true);
       pic.id = 'drag-icon';
@@ -228,12 +232,26 @@ export default {
       pic.style.position = 'absolute';
       pic.style.top = '-99999px';
       pic.style.left = '-99999px';
-
-      // add the element to the dom
-      document.body.appendChild(pic);
+      // store it in the variable
+      this.dragImg = pic;
+    },
+    dragStart() {
+      this.dragging = true;
+    },
+    dragEnd() {
+      this.dragging = false;
+      // remove drag item from the body again if necessary after drag ended
+      const elem = document.getElementById('drag-icon');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
+      }
+    },
+    modifyDragItem(dataTransfer) {
+      // add the element retrieved in choose event (getDragImage()) to the dom
+      document.body.appendChild(this.dragImg);
       // Edge does not support setDragImage
       if (typeof DataTransfer.prototype.setDragImage === 'function') {
-        dataTransfer.setDragImage(pic, 0, 0);
+        dataTransfer.setDragImage(this.dragImg, 0, 0);
       }
       dataTransfer.setData('draggable', '');
     },
