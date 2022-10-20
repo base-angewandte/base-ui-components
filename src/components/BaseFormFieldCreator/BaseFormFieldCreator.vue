@@ -38,10 +38,15 @@
         source: field['x-attrs'].source
       })">
       <template
-        v-if="fieldType === 'multiline' && field.items
-          && field.items.properties && field.items.properties.type"
-        v-slot:label-addition>
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
+          (e.g. language tabs)) -->
+        <slot
+          :field-name="field.name"
+          name="label-addition" />
         <BaseDropDown
+          v-if="fieldType === 'multiline' && field.items
+            && field.items.properties && field.items.properties.type"
           :id="fieldKey"
           :selected-option="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
             ? fieldValueInt.type : textTypeDefault"
@@ -51,6 +56,60 @@
           value-prop="source"
           class="base-form-field-creator__multiline-dropdown"
           @value-selected="setMultilineDropDown" />
+      </template>
+      <template #pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual
+        input field<br>
+        for an example see [BaseInput](#baseinput)-->
+        <slot
+          :field-name="field.name"
+          name="pre-input-field" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field \<div\>
+          (before \<input\>) -->
+        <slot
+          :field-name="field.name"
+          name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap<br>
+        for an example see [BaseInput](#baseinput)-->
+        <slot
+          :field-name="field.name"
+          name="input-field-inline-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot
+          :field-name="field.name"
+          name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height -->
+        <slot
+          :field-name="field.name"
+          name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <slot
+          :field-name="field.name"
+          name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <slot
+          :field-name="field.name"
+          name="remove-icon" />
+      </template>
+      <template #below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
+        <slot
+          :field-name="field.name"
+          name="below-input" />
       </template>
     </component>
 
@@ -78,7 +137,70 @@
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
-          class="base-form-field-creator__date-field" />
+          class="base-form-field-creator__date-field">
+          <template
+            #label-addition>
+            <!-- @slot Slot to allow for additional elements on the right side of the label
+            row \<div\> (e.g. language tabs)) -->
+            <slot
+              :field-name="field.name"
+              name="label-addition" />
+          </template>
+          <template #pre-input-field>
+            <!-- @slot slot to add elements within the form field but in a row before the actual
+            input field<br>
+            for an example see [BaseInput](#baseinput)-->
+            <slot
+              :field-name="field.name"
+              name="pre-input-field" />
+          </template>
+          <template
+            #input-field-addition-before>
+            <!-- @slot Slot to allow for additional elements in the input field \<div\>
+              (before \<input\>) -->
+            <slot
+              :field-name="field.name"
+              name="input-field-addition-before" />
+          </template>
+          <template #input-field-inline-before>
+            <!-- @slot to add elements directly inline before the input
+                (contrary to input-field-addition-before this does not wrap<br>
+            for an example see [BaseInput](#baseinput)-->
+            <slot
+              :field-name="field.name"
+              name="input-field-inline-before" />
+          </template>
+          <template #input-field-addition-after>
+            <!-- @slot for adding elements after input -->
+            <slot
+              :field-name="field.name"
+              name="input-field-addition-after" />
+          </template>
+          <template #post-input-field>
+            <!-- @slot for adding elements at the end covering the whole height -->
+            <slot
+              :field-name="field.name"
+              name="post-input-field" />
+          </template>
+          <template #error-icon>
+            <!-- @slot use a custom icon instead of standard error/warning icon -->
+            <slot
+              :field-name="field.name"
+              name="error-icon" />
+          </template>
+          <template #remove-icon>
+            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <slot
+              :field-name="field.name"
+              name="remove-icon" />
+          </template>
+          <template #below-input>
+            <!-- @slot below-input slot added to e.g. add drop down -->
+            <slot
+              :field-name="field.name"
+              name="below-input" />
+          </template>
+        </BaseDateInput>
         <BaseDateInput
           v-if="dateType.includes('timerange')"
           :id="fieldKey"
@@ -139,7 +261,7 @@
       @input="textInput = $event"
       @hoverbox-active="$emit('fetch-info-data')">
       <template
-        v-slot:drop-down-entry="props">
+        #drop-down-entry="props">
         <span>
           {{ getLabel(props.item.label) }}
         </span>
@@ -150,7 +272,7 @@
           {{ props.item.source_name }}
         </span>
       </template>
-      <template v-slot:no-options>
+      <template #no-options>
         <span v-if="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest && !fieldInput">
           {{ getI18nTerm('form.startTyping') }}
         </span>
@@ -163,6 +285,68 @@
         <span v-else>
           {{ getI18nTerm('form.fetchingResults') }}
         </span>
+      </template>
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
+          (e.g. language tabs)) -->
+        <slot
+          :field-name="field.name"
+          name="label-addition" />
+      </template>
+      <template #pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual
+        input field<br>
+        for an example see [BaseInput](#baseinput)-->
+        <slot
+          :field-name="field.name"
+          name="pre-input-field" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field \<div\>
+          (before \<input\>) -->
+        <slot
+          :field-name="field.name"
+          name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input
+            (contrary to input-field-addition-before this does not wrap<br>
+        for an example see [BaseInput](#baseinput)-->
+        <slot
+          :field-name="field.name"
+          name="input-field-inline-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot
+          :field-name="field.name"
+          name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height -->
+        <slot
+          :field-name="field.name"
+          name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <slot
+          :field-name="field.name"
+          name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <slot
+          :field-name="field.name"
+          name="remove-icon" />
+      </template>
+      <template #below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
+        <slot
+          :field-name="field.name"
+          name="below-input" />
       </template>
     </component>
 
@@ -199,12 +383,13 @@
         :name="fieldKey"
         :label="labelInt"
         :checked="fieldValue"
-        :bind-slot-to-state="true"
+        :bind-slot-to-state="fieldProps.bindSlotToState || true"
+        class="base-form-field-creator__toggle"
         @clicked="$emit('field-value-changed', $event)">
         <BaseLink
           v-if="field['x-attrs'] && field['x-attrs'].subtext && field['x-attrs'].subtext.value"
-          :source="field['x-attrs'].subtext.source ? field['x-attrs'].subtext.source : ''"
-          :url="field['x-attrs'].subtext.url ? field['x-attrs'].subtext.url : ''"
+          :source="field['x-attrs'].subtext.source || ''"
+          :url="field['x-attrs'].subtext.url || ''"
           :value="field['x-attrs'].subtext.value" />
       </BaseToggle>
     </template>
@@ -749,6 +934,12 @@ export default {
 
   .base-form-field-creator__date-fieldset {
     display: contents;
+  }
+
+  .base-form-field-creator__toggle {
+    min-height: $row-height-small;
+    display: flex;
+    align-items: center;
   }
 
   @media screen and (max-width: 1260px) {
