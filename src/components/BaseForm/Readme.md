@@ -14,24 +14,46 @@ This is a basic (autocomplete functionality not working here) example how a form
         :form-field-json="fields"
         :value-list="valueList"
         :available-locales="['de', 'en']"
+        :show-error-icon="true"
         :field-props="{
           actors: {
             label: 'Actors Label (overwritten via fieldProps)',
           },
           contributors: {
             sortText: 'Sorting text from fieldProps',
+          },
+          type: {
+            invalid: true,
+            errorMessage: 'This invalid message was set via fieldProps.'
           }
         }"
         language="en"
         :field-is-loading="fieldIsLoading"
         class="form"
-        @values-changed="valueList = { ...$event }" />
+        @values-changed="valueList = { ...$event }">
+        <template #label-addition="{ fieldName }">
+          <template v-if="fieldName === 'published_in'">
+            only for published in
+          </template>
+        </template>
+        <template #error-icon="{ fieldName }">
+          <BaseIcon
+            v-if="fieldName = 'type'"
+            name="eye"
+            class="custom-icon" />
+        </template>
+      </BaseForm>
   </div>
 
 </template>
 
 <script>
+import BaseIcon from '../BaseIcon/BaseIcon.vue';
+
 export default {
+    components: {
+      BaseIcon,
+    },
     data() {
         return {
           valueList: {},
@@ -98,6 +120,15 @@ export default {
                 order: 2,
               },
             },
+            url4: {
+              type: 'string',
+              title: 'URL',
+              'x-attrs': {
+                placeholder: 'URL eintragen',
+                order: 3,
+                field_format: 'half',
+              },
+            },
             actors: {
               type: 'array',
               items: {
@@ -123,6 +154,7 @@ export default {
                 allow_unknown_entries: true,
                 dynamic_autosuggest: true,
                 order: 3,
+                field_format: 'half',
               },
             },
             type: {
@@ -174,8 +206,17 @@ export default {
               'x-attrs': {
                 placeholder: 'Display in Showroom',
                 order: 7,
-                field_format: 'full',
+                field_format: 'half',
                 field_type: 'boolean',
+              },
+            },
+            url2: {
+              type: 'string',
+              title: 'URL',
+              'x-attrs': {
+                placeholder: 'URL eintragen',
+                order: 7,
+                field_format: 'half',
               },
             },
             isan: {
@@ -313,6 +354,13 @@ export default {
 }
 </script>
 
+<style>
+.custom-icon {
+  height: 16px;
+  width: 16px;
+}
+</style>
+
 
 ```
 
@@ -343,6 +391,8 @@ Additionally, some features are derived from the swagger definitions:<br>
 * **Repeatable input fields**: fields with `field_type` other than 'chips' and 'chips-below' will be repeatable when the swagger definition `type` is 'array'.
 * **Single or multi-select chips input fields**: chips input fields are single select when the definition `type` is 'object' (otherwise should be 'array').
 * **chips input fields**: are draggable as soon as they are multi-select but this can be overwritten via `fieldProps`.
+* **Multiline input fields**: Will have an additional drop down when `field_type` is 'multiline' and the swagger json field properties have the property `type` included.<br>
+  Also language tabs can either be set via `fieldProps` or will be derived automatically if swagger json properties include a `language` property.
 * **Date fields**: fields are also rendered according to the `type` and `properties` of the swagger definition:<br>
   * `type` 'string': rendering a single date field.
   * `type` 'object' with `properties` `date_from` and `date_to`: rendering a date range.
