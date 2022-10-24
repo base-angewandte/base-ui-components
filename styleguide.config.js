@@ -2,7 +2,7 @@
 const path = require('path');
 const pjson = require('./package.json');
 
-module.exports = {
+config = {
   // set your styleguidist configuration here
   title: `Base UI Components v${pjson.version}`,
   template: {
@@ -89,4 +89,15 @@ module.exports = {
     'src/components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
     'src/components/BaseAdvancedSearchRow/*',
   ],
+};
+
+if (process.env.NODE_ENV === 'production') {
+  // Set icon path to github pages
+  config.template = {
+    body: {
+      raw: '<script>var base_ui_icons = "https://base-angewandte.github.io/base-ui-components/base-ui-icons.svg";</script>',
+    },
+  };
 }
+
+module.exports = config;
