@@ -54,9 +54,10 @@ A file upload bar
     <div
       class="spacer" />
     <BaseProgressBar
-      :progress="100"
+      :progress="0"
       :show-remove="false"
       status="fail"
+      error-message="Unfortunately an error has occurred."
       file-name="myFileToUploadFailed.txt"
       file-size="22kB" />
     <div

@@ -28,6 +28,7 @@
             :file-name="file.name"
             :file-size="userQuotaExceeded ? convertSpace(file.size) : ''"
             :status="getStatus(file.name)"
+            :error-message="getErrorMessage(file.name)"
             :show-remove="currentStatus === 'initial' && fileList.length > 1"
             class="upload-bar"
             @remove-item="removeFile(index)" />
@@ -169,6 +170,24 @@ export default {
       type: Array,
       default: () => [],
     },
+    /**
+     * define errors for rejected files<br>
+     * array with objects
+     * eg: [{ name: 'foo.txt', message: 'The file may include a virus' }]<br>
+     * Note: each object must contain: name, message
+     */
+    fileErrors: {
+      type: Array,
+      default: () => [],
+      // checking if all necessary properties are part of the provided object
+      validator: (val) => {
+        if (val.length) {
+          return !['name', 'message']
+            .every(prop => Object.keys(val).includes(prop));
+        }
+        return true;
+      },
+    },
   },
   computed: {
     buttonText() {
@@ -208,6 +227,13 @@ export default {
       }
       if (this.rejectedFiles.includes(fileName)) {
         return 'fail';
+      }
+      return '';
+    },
+    getErrorMessage(fileName) {
+      if (this.fileErrors.find(file => file.name === fileName)) {
+        const { message } = this.fileErrors.find(file => file.name === fileName);
+        return message;
       }
       return '';
     },

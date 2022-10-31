@@ -6,55 +6,63 @@
     aria-valuemin="0"
     aria-valuemax="100"
     class="base-progress-bar">
-    <div
-      ref="progressBarProgress"
-      :style="{ width: `${progress}%` }"
-      class="base-progress-bar__progress" />
-    <div
-      ref="progressBarContent"
-      class="base-progress-bar__content">
+    <div class="base-progress-bar__container">
       <div
-        ref="progressBarFileName"
-        class="base-progress-bar__file-name">
-        {{ fileName }}
+        ref="progressBarProgress"
+        :style="{ width: `${progress}%` }"
+        class="base-progress-bar__progress" />
+      <div
+        ref="progressBarContent"
+        class="base-progress-bar__content">
         <div
-          v-if="showFadeOut"
-          ref="progressBarFadeOut"
-          :class="['base-progress-bar__fade-out',
-                   { 'base-progress-bar__fade-out-hide': fadeOutDarkWidth === 0 }]" />
-        <div
-          v-if="showFadeOut"
-          :class="[
-            'base-progress-bar__fade-out-dark-window',
-            { 'base-progress-bar__fade-out-dark-window-show': showDarkFadeOut },
-          ]">
+          ref="progressBarFileName"
+          class="base-progress-bar__file-name">
+          {{ fileName }}
           <div
-            :style="{ transform: `translateX(-${fadeOutDarkWidth}px)` }"
-            class="base-progress-bar__fade-out-dark-cover">
+            v-if="showFadeOut"
+            ref="progressBarFadeOut"
+            :class="['base-progress-bar__fade-out',
+                     { 'base-progress-bar__fade-out-hide': fadeOutDarkWidth === 0 }]" />
+          <div
+            v-if="showFadeOut"
+            :class="[
+              'base-progress-bar__fade-out-dark-window',
+              { 'base-progress-bar__fade-out-dark-window-show': showDarkFadeOut },
+            ]">
             <div
-              :style="{ transform: `translateX(${fadeOutDarkWidth}px)` }"
-              class="base-progress-bar__fade-out-dark" />
+              :style="{ transform: `translateX(-${fadeOutDarkWidth}px)` }"
+              class="base-progress-bar__fade-out-dark-cover">
+              <div
+                :style="{ transform: `translateX(${fadeOutDarkWidth}px)` }"
+                class="base-progress-bar__fade-out-dark" />
+            </div>
           </div>
         </div>
+        <span
+          v-if="fileSize"
+          class="base-progress-bar__file-size">
+          {{ fileSize }}
+        </span>
+        <base-icon
+          v-if="status === 'success'"
+          class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
+          name="success" />
+        <base-icon
+          v-if="status === 'fail'"
+          :title="errorMessage"
+          class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
+          name="attention" />
+        <base-icon
+          v-if="showRemove"
+          class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
+          name="remove"
+          @click="remove" />
       </div>
-      <span
-        v-if="fileSize"
-        class="base-progress-bar__file-size">
-        {{ fileSize }}
-      </span>
-      <base-icon
-        v-if="status === 'success'"
-        class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
-        name="success" />
-      <base-icon
-        v-if="status === 'fail'"
-        class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
-        name="attention" />
-      <base-icon
-        v-if="showRemove"
-        class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
-        name="remove"
-        @click="remove" />
+    </div>
+    <div
+      v-if="status === 'fail' && errorMessage"
+      class="base-progress-bar__error-message">
+      {{ errorMessage }}
     </div>
   </div>
 </template>
@@ -73,6 +81,13 @@ export default {
     BaseIcon,
   },
   props: {
+    /**
+     * additional error message
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
     /**
      * filename that will be displayed in the bar
      */
@@ -177,13 +192,15 @@ export default {
   @import '../../styles/variables';
 
   .base-progress-bar {
-    font-family: inherit;
-    font-size: inherit;
-    position: relative;
-    width: 100%;
-    height: $row-height-small;
-    background-color: $button-header-color;
-    line-height: $row-height-small;
+    .base-progress-bar__container {
+      font-family: inherit;
+      font-size: inherit;
+      position: relative;
+      width: 100%;
+      height: $row-height-small;
+      background-color: $button-header-color;
+      line-height: $row-height-small;
+    }
 
     .base-progress-bar__progress {
       transition: width 0.5s;
@@ -290,6 +307,11 @@ export default {
           fill: $font-color-third;
         }
       }
+    }
+
+    .base-progress-bar__error-message {
+      font-size: $font-size-small;
+      color: $warning-color;
     }
   }
 </style>
