@@ -91,11 +91,13 @@ config = {
   ],
 };
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'build') {
+  const __CACHE_HASH__ = Date.now().toString();
+
   // Set icon path to github pages
   config.template = {
     body: {
-      raw: '<script>var base_ui_icons = "https://base-angewandte.github.io/base-ui-components/base-ui-icons.svg";</script>',
+      raw: `<script>var base_ui_icons = "https://base-angewandte.github.io/base-ui-components/base-ui-icons.svg?${__CACHE_HASH__}";</script>`,
     },
   };
 }
