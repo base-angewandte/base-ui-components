@@ -17,7 +17,8 @@
     "svg": "node ./build/generate-svg-sprite-sheet.js",
     "test:unit": "vue-cli-service test:unit",
     "updateindex": "node build/generate-index-files.js",
-    "updateindex:all": "node build/generate-index-files.js --force true"
+    "updateindex:all": "node build/generate-index-files.js --force true",
+    "prepare": "husky install"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -42,6 +43,8 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
+    "@commitlint/cli": "^17.2.0",
+    "@commitlint/config-conventional": "^17.2.0",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^14.0.0",
@@ -62,6 +65,7 @@
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-vue": "^6.2.2",
+    "husky": "^8.0.2",
     "minimist": "^1.2.6",
     "postcss-cli": "^7.1.2",
     "postcss-discard-comments": "^4.0.2",
@@ -104,5 +108,8 @@
   "sideEffects": [
     "*.css",
     "*.scss"
-  ]
+  ],
+  "lint-staged": {
+    "*.{js,vue}": "npm run lint"
+  }
 }
