@@ -18,7 +18,8 @@
     "test:unit": "vue-cli-service test:unit",
     "updateindex": "node build/generate-index-files.js",
     "updateindex:all": "node build/generate-index-files.js --force true",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "changelog": "gulp changelog"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -29,6 +30,8 @@
   ],
   "dependencies": {
     "body-scroll-lock": "^2.6.4",
+    "gulp": "^4.0.2",
+    "gulp-conventional-changelog": "^2.0.35",
     "hls.js": "^0.14.17",
     "lazysizes": "^5.3.0",
     "leaflet": "^1.8.0",

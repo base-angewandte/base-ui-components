@@ -1,5 +1,3 @@
-# Changelog
-
 ## 2.0.4 (2022-10-31)
 
 ### Features
