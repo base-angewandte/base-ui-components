@@ -35,7 +35,7 @@ gulp.task('changelog', (cb) => {
         // define groups for which order is fixed here
         // (everything else will come after)
         // TODO: is this the order we want?
-        const sortOrder = ['fix', 'change', 'feat', 'remove', 'deprecate'];
+        const sortOrder = ['feat', 'change', 'deprecate', 'remove', 'fix', 'security'];
         const val1Index = sortOrder.indexOf(val1.title);
         const val2Index = sortOrder.indexOf(val2.title);
         // if val1 does not exist in the order array sort val2 before val1
@@ -89,10 +89,8 @@ gulp.task('changelog', (cb) => {
           ...context,
           // create custom section headers instead of the default type derived ones
           commitGroups: context.commitGroups.map((group) => {
-            // in order to exclude all groups that are not defined in the documentation
-            // (https://hedgedoc.uni-ak.ac.at/#Changelog)
-            // if undefined groups should be left in there just leave first condition!
-            if (group.title && Object.keys(changelogGroups).includes(group.title)) {
+            // only return groups that have a title
+            if (group.title) {
               const newTitleString = changelogGroups[group.title] || group.title;
               return {
                 ...group,
