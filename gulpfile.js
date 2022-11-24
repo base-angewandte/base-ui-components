@@ -1,6 +1,9 @@
 const gulp = require('gulp');
 const fs = require('fs');
+const { argv } = require('yargs');
 const conventionalChangelog = require('gulp-conventional-changelog');
+
+const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-componentsx/';
 
 gulp.task('changelog', (cb) => {
   // check if the file exists and create it if necessary
@@ -64,7 +67,7 @@ gulp.task('changelog', (cb) => {
           // map the retrieved array and supplement the component name with the link markdown
           // TODO: see if this should be configurable
           const alteredArray = componentNameArray
-            .map(component => `[${component}](https://base-angewandte.github.io/base-ui-components/#${component.toLowerCase()})`);
+            .map(component => `[${component}](${styleguidePath}#${component.toLowerCase()})`);
           // join altered strings array to one string again
           modifiedProps.scope = alteredArray.join(', ');
         }

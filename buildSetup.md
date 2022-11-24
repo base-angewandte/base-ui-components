@@ -37,6 +37,11 @@ npm run updateindex
 # force index update (also if index.js already exists)
 npm run updateindex:all
 
+# create a changelog for the newest version adding to CHANGELOG.md
+npm run changelog
+
+# an argument specifying the styleguide path to correctly link components may be specified like so
+npm run changelog -- --styleguide-path=https://base-angewandte.github.io/base-ui-components/
 ```
 
 ```bash
