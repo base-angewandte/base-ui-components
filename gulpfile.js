@@ -3,7 +3,7 @@ const fs = require('fs');
 const { argv } = require('yargs');
 const conventionalChangelog = require('gulp-conventional-changelog');
 
-const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-componentsx/';
+const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/';
 
 gulp.task('changelog', (cb) => {
   // check if the file exists and create it if necessary
@@ -37,7 +37,6 @@ gulp.task('changelog', (cb) => {
       commitGroupsSort: (val1, val2) => {
         // define groups for which order is fixed here
         // (everything else will come after)
-        // TODO: is this the order we want?
         const sortOrder = ['feat', 'change', 'deprecate', 'remove', 'fix', 'security'];
         const val1Index = sortOrder.indexOf(val1.title);
         const val2Index = sortOrder.indexOf(val2.title);
@@ -65,7 +64,6 @@ gulp.task('changelog', (cb) => {
           // remove space characters and split components listed in scope by comma
           const componentNameArray = commit.scope.replace(' ', '').split(',');
           // map the retrieved array and supplement the component name with the link markdown
-          // TODO: see if this should be configurable
           const alteredArray = componentNameArray
             .map(component => `[${component}](${styleguidePath}#${component.toLowerCase()})`);
           // join altered strings array to one string again
