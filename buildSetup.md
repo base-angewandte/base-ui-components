@@ -64,4 +64,4 @@ or see [styleguide](https://base-angewandte.github.io/base-ui-components/).
 The v2 of this component library is currently build via [rollup](https://rollupjs.org).
 
 This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
-available on request.
+available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
