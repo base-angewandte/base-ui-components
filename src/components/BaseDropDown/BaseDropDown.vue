@@ -6,6 +6,8 @@
     <div
       :class="['base-drop-down-label-wrapper',
                { 'hide': !getLangLabel(label, true) || !showLabel }]">
+      <!-- TODO: check if this is correct HTML - label associated with button? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
         :for="getLangLabel(label) + '-' + id"
         class="base-drop-down-label">
@@ -61,6 +63,10 @@
                 && option[valueProp] === selectedOption[valueProp] },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
+            :aria-selected="selectedOption
+              && option[valueProp] === selectedOption[valueProp].toString()"
+            tabindex="0"
+            @keydown.enter="selectValue(option)"
             @click="selectValue(option)">
             {{ getLangLabel(option.label, true) }}
           </li>

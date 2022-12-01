@@ -18,7 +18,7 @@
       @click-input-field="onInputFocus"
       @clicked-outside="onInputBlur"
       v-on="$listeners">
-      <template v-slot:below-input>
+      <template #below-input>
         <BaseDropDownList
           v-if="isActive"
           ref="dropDownList"
@@ -35,7 +35,7 @@
           @within-drop-down="dropDownActive = $event"
           @click.native.stop=""
           @touchstart.native.stop="">
-          <template v-slot:option="entry">
+          <template #option="entry">
             <span
               v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
               ref="option"
@@ -59,7 +59,7 @@
             </template>
           </template>
           <template
-            v-slot:no-options>
+            #no-options>
             <!-- @slot a slot to customize messages in case of no options present in drop down -->
             <slot
               name="no-options" />
@@ -67,42 +67,43 @@
         </BaseDropDownList>
       </template>
       <template
-        v-slot:label-addition>
+        #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
           (e.g. language tabs)) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="label-addition" />
       </template>
-      <template v-slot:pre-input-field>
+      <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual
         input field<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="pre-input-field" />
       </template>
       <template
-        v-slot:input-field-addition-before>
+        #input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field \<div\>
           (before \<input\>) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-before" />
       </template>
-      <template v-slot:input-field-inline-before>
+      <template #input-field-inline-before>
         <!-- @slot to add elements directly inline before the input
             (contrary to input-field-addition-before this does not wrap<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-inline-before" />
       </template>
-      <template v-slot:input-field-addition-after>
+      <template #input-field-addition-after>
         <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <!-- @slot for adding elements at the end covering the whole height <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="post-input-field" />
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
+          @keydown.enter="isActive = !isActive"
           @click.stop="isActive = !isActive">
           <BaseIcon
             :class="[
@@ -113,12 +114,12 @@
             name="drop-down" />
         </div>
       </template>
-      <template v-slot:error-icon>
+      <template #error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="error-icon" />
       </template>
-      <template v-slot:remove-icon>
+      <template #remove-icon>
         <!-- @slot for adding elements after input (e.g. used to add loader <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="remove-icon" />

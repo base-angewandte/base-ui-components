@@ -5,9 +5,9 @@ module.exports = {
     },
     {
       name: 'removeAttrs',
-      params: { attrs: 'fill' }
+      params: { attrs: 'fill' },
     },
     'removeStyleElement',
-    'removeDimensions'
-  ]
+    'removeDimensions',
+  ],
 };

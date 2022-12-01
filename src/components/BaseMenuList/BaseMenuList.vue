@@ -1,7 +1,7 @@
 <template>
   <draggable
     ref="draggable"
-    v-model="list"
+    :value="list"
     :sort="false"
     :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
@@ -31,7 +31,7 @@
         @clicked="activateItem(index)"
         @selected="selectItem(index, $event)">
         <template
-          v-slot:thumbnails>
+          #thumbnails>
           <!-- @slot Use this scoped slot to supply a list of thumbnails
           (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is one list element.
           See also the example below.-->

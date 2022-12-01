@@ -7,6 +7,7 @@
         'base-date-panel__label',
         {'base-date-panel__label--hover': !isInline },
       ]"
+      @keydown.enter="isOpen = !isOpen"
       @click.stop="isOpen = !isOpen">
       <base-icon
         v-if="!isInline"
@@ -14,7 +15,9 @@
         :class="['base-date-panel__icon',
                  { 'base-date-panel__icon--active': isOpen },
                  { 'base-date-panel__icon--right': iconPosition === 'right' }]" />
-
+      <!-- TODO: check if this is correct HTML - label associated Datepicker?
+       but also: is this currently accessible?? (should there be a (hidden) input field?? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
         v-if="showLabel || !isInline">
         {{ labelInt || label }}
@@ -22,7 +25,7 @@
     </div>
 
     <div @click.stop="">
-      <date-picker
+      <DatePicker
         ref="datePanel"
         v-model="inputInt"
         :append-to-body="false"

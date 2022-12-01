@@ -40,7 +40,9 @@
           :class="['base-map-locations__list__group',
                    { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
           @click.native="centeredMarker = index"
+          @focusin.native="highlightedMarker = index"
           @mouseenter.native="highlightedMarker = index"
+          @focusout.native="resetMarker"
           @mouseleave.native="resetMarker" />
       </template>
     </div>

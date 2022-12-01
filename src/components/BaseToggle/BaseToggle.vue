@@ -3,11 +3,15 @@
     :class="['base-toggle',
              {'base-toggle--checked': checkedInt },
              {'base-toggle--disabled': disabled }]"
+    @focusin="animate = true"
     @mouseover="animate = true"
+    @focusout="animate = false"
     @mouseleave="animate = false">
     <label
+      :for="`toggle-input-${idInt}`"
       class="base-toggle__container">
       <input
+        :id="`toggle-input-${idInt}`"
         v-model="checkedInt"
         :name="name"
         :checked="checkedInt"

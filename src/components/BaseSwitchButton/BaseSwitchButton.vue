@@ -21,6 +21,8 @@
                  { 'base-switch-button-input-active': option.value === selectedOption }]"
         type="radio"
         @keydown.enter.prevent="">
+      <!-- need to disable because label has associated control (above)? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
         :key="option.value + 'label'"
         :for="optionIds[index]"

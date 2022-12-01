@@ -32,6 +32,8 @@
             v-for="(media, index) in items"
             :key="index"
             class="swiper-slide">
+            <!-- TODO: remove positive tab index -->
+            <!-- eslint-disable-next-line vuejs-accessibility/tabindex-no-positive -->
             <base-media-carousel-item
               ref="baseMedia"
               :autoplay="index === initialSlide"

@@ -96,6 +96,7 @@ export default {
     return {
       swiper: undefined,
       swiperIsActive: false,
+      swiperOptionsInt: {},
     };
   },
   computed: {
@@ -110,11 +111,17 @@ export default {
     data() {
       this.swiper.update();
     },
+    swiperOptions: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.swiperOptionsInt)) {
+          this.swiperOptionsInt = JSON.parse(JSON.stringify(val));
+        }
+      },
+      immediate: true,
+    },
   },
   mounted() {
-    if (process.browser) {
-      this.initSwiper();
-    }
+    this.initSwiper();
   },
   methods: {
     getImageSrc(object, value) {
@@ -134,20 +141,20 @@ export default {
     },
     initSwiper() {
       this.swiperIsActive = true;
-      this.swiperOptions.init = false;
-      if (this.swiperOptions.autoplay) {
-        this.swiperOptions.autoplay = {};
-        this.swiperOptions.autoplay.delay = this.swiperOptions.autoplayDelay || 3000;
-        this.swiperOptions.autoplay.disableOnInteraction = true;
+      this.swiperOptionsInt.init = false;
+      if (this.swiperOptionsInt.autoplay) {
+        this.swiperOptionsInt.autoplay = {};
+        this.swiperOptionsInt.autoplay.delay = this.swiperOptionsInt.autoplayDelay || 3000;
+        this.swiperOptionsInt.autoplay.disableOnInteraction = true;
       }
 
-      this.swiperOptions.navigation = {
+      this.swiperOptionsInt.navigation = {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       };
 
       setTimeout(() => {
-        this.swiper = new Swiper('.swiper-container', this.swiperOptions);
+        this.swiper = new Swiper('.swiper-container', this.swiperOptionsInt);
         this.swiper.init();
         /**
          * event triggered when slider is initialized

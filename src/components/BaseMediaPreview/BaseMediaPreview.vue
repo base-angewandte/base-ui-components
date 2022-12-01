@@ -4,6 +4,7 @@
     class="base-media-preview-background">
     <div
       class="base-media-preview-close"
+      @keydown.enter="$emit('hide-preview')"
       @click="$emit('hide-preview')">
       <base-icon
         name="remove"

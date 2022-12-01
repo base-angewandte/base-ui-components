@@ -37,7 +37,7 @@
       <template
         v-if="fieldType === 'multiline' && field.items
           && field.items.properties && field.items.properties.type"
-        v-slot:label-addition>
+        #label-addition>
         <BaseDropDown
           :id="fieldKey"
           :selected-option="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
@@ -123,7 +123,7 @@
       @input="textInput = $event"
       @hoverbox-active="$emit('fetch-info-data')">
       <template
-        v-slot:drop-down-entry="props">
+        #drop-down-entry="props">
         <span>
           {{ getLabel(props.item.label) }}
         </span>
@@ -134,7 +134,7 @@
           {{ props.item.source_name }}
         </span>
       </template>
-      <template v-slot:no-options>
+      <template #no-options>
         <span v-if="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest && !fieldInput">
           {{ getI18nTerm('form.startTyping') }}
         </span>

@@ -16,7 +16,7 @@
         @selected-changed="selectedEntries = $event"
         @toggle-options="toggleOptions">
         <template
-          v-slot:optionActions>
+          #optionActions>
           <BaseButton
             :text="'publish'"
             :disabled="isLoading"

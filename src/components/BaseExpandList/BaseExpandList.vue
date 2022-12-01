@@ -16,7 +16,7 @@
           render-as="li"
           @expanded-state="emitExpandedState">
           <template
-            v-slot:content="props">
+            #content="props">
             <!-- @slot a slot to provide customized entry row -->
             <slot
               name="content"

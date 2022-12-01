@@ -25,7 +25,7 @@
       @keydown.up.down.prevent="onArrowKey"
       @keydown="onKeydown"
       v-on="inputListeners">
-      <template v-slot:below-input>
+      <template #below-input>
         <BaseDropDownList
           v-if="isActiveInt"
           :drop-down-options="filteredListInt"
@@ -48,46 +48,46 @@
         </BaseDropDownList>
       </template>
       <template
-        v-slot:label-addition>
+        #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
           (e.g. language tabs)) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="label-addition" />
       </template>
-      <template v-slot:pre-input-field>
+      <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual
         input field<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="pre-input-field" />
       </template>
       <template
-        v-slot:input-field-addition-before>
+        #input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field \<div\>
           (before \<input\>) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-before" />
       </template>
-      <template v-slot:input-field-inline-before>
+      <template #input-field-inline-before>
         <!-- @slot to add elements directly inline before the input
             (contrary to input-field-addition-before this does not wrap<br>
         for an example see [BaseInput](#baseinput)-->
         <slot name="input-field-inline-before" />
       </template>
-      <template v-slot:input-field-addition-after>
+      <template #input-field-addition-after>
         <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <!-- @slot for adding elements at the end covering the whole height <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="post-input-field" />
       </template>
-      <template v-slot:error-icon>
+      <template #error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="error-icon" />
       </template>
-      <template v-slot:remove-icon>
+      <template #remove-icon>
         <!-- @slot for adding elements after input (e.g. used to add loader <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="remove-icon" />

@@ -9,10 +9,10 @@
       :class="{ 'base-drop-button__button__multi': buttonsInt && buttonsInt.length }"
       @clicked="fireAction(primaryButtonInt[identifierPropertyName])">
       <!-- @slot create custom content (e.g. icon) left of text -->
-      <template v-slot:left-of-text>
+      <template #left-of-text>
         <slot name="left-of-text" />
       </template>
-      <template v-slot:right-of-text>
+      <template #right-of-text>
         <!-- @slot create custom content (e.g. icon) right of text -->
         <slot name="right-of-text" />
       </template>
@@ -52,7 +52,7 @@
           `base-drop-button__drop-down__${dropDownPosition.horizontal}`,
           `base-drop-button__drop-down__${dropDownPosition.vertical}`,
         ]">
-        <template v-slot:option="{ option }">
+        <template #option="{ option }">
           <button
             :id="`button-${option[identifierPropertyName]}`"
             :class="[
@@ -257,9 +257,7 @@ export default {
       // get the current index needed for navigate function
       const currentIndex = this.buttonsInt.indexOf(this.activeOption);
       // call mixin navigate function that returns the new active option
-      this.activeOption = this.navigate(
-        this.buttonsInt, isArrowDown, currentIndex, true,
-      );
+      this.activeOption = this.navigate(this.buttonsInt, isArrowDown, currentIndex, true);
     },
     /**
      * function to inform parent that action was triggered (by click or enter)

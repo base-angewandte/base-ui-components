@@ -16,7 +16,7 @@ module.exports = {
     '@vue/airbnb',
   ],
   // add your custom rules here
-  'rules': {
+  rules: {
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': ['error', {
@@ -29,13 +29,13 @@ module.exports = {
     }],
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
-      'js': 'never',
-      'vue': 'never'
+      js: 'never',
+      vue: 'never',
     }],
-    "object-curly-newline": "off",
+    'object-curly-newline': 'off',
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {
-      'optionalDependencies': ['test/unit/index.js']
+      optionalDependencies: ['test/unit/index.js'],
     }],
     'vue/html-closing-bracket-newline': ['error', {
       singleline: 'never',
@@ -48,16 +48,19 @@ module.exports = {
     'arrow-parens': ['error', 'as-needed', {
       requireForBlockBody: true,
     }],
+    // unfortunately our audio and video files do not have the required format
+    // (.vtt files) included -->
+    'vuejs-accessibility/media-has-caption': 0,
   },
   overrides: [
     {
       files: [
         '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)'
+        '**/tests/unit/**/*.spec.{j,t}s?(x)',
       ],
       env: {
-        jest: true
-      }
-    }
-  ]
-}
+        jest: true,
+      },
+    },
+  ],
+};

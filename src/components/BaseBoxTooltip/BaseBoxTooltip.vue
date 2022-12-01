@@ -2,6 +2,8 @@
   <span
     role="button"
     class="base-box-tooltip"
+    tabindex="0"
+    @keydown.enter="clicked"
     @click="clicked">
     <base-icon
       name="information"

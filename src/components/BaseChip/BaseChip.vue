@@ -28,6 +28,7 @@
     <div
       v-if="isRemovable"
       class="base-chip__icon"
+      @keydown.enter.stop="removeClicked"
       @click.stop="removeClicked">
       <img
         :src="require('../../static/icons/remove.svg')"

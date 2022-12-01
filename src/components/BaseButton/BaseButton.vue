@@ -265,7 +265,7 @@ export default {
 
       &.base-button-active {
         /* TODO: adjust this to style guide if necessary */
-        box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
+        box-shadow: $box-shadow-reg, inset 0 0 (-$border-active-width) 0 $app-color;
         z-index: map-get($zindex, button-active);
       }
     }
@@ -296,7 +296,7 @@ export default {
 
     &.base-button-active {
       /* TODO: adjust this to style guide if necessary */
-      box-shadow: $box-shadow-reg, inset 0 0 -$border-active-width 0 $app-color;
+      box-shadow: $box-shadow-reg, inset 0 0 (-$border-active-width) 0 $app-color;
       z-index: map-get($zindex, button-active);
     }
 

@@ -15,7 +15,7 @@
     :use-fade-out="false"
     class="base-multiline-text-input"
     v-on="$listeners">
-    <template v-slot:label-addition>
+    <template #label-addition>
       <div class="base-multiline-text-input__additions">
         <!-- @slot to add drop down needed for text input field (base specific)
           or any other element deemed necessary -->
@@ -28,7 +28,7 @@
           :active-tab="activeTab"
           class="base-multiline-text-input__tabs">
           <template
-            v-slot:right-of-text="tab">
+            #right-of-text="tab">
             <BaseIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input__text-icon"
@@ -37,11 +37,13 @@
         </BaseSwitchButton>
       </div>
     </template>
-    <template v-slot:input>
+    <template #input>
       <div
         ref="textareaWrapper"
         :class="['base-multiline-text-input__textarea-wrapper',
                  { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut }]">
+        <!-- need to disable because label is there - it is just in BaseInput component -->
+        <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
         <textarea
           :id="idInt"
           ref="textarea"
@@ -59,26 +61,26 @@
       </div>
     </template>
     <template
-      v-slot:input-field-addition-before>
+      #input-field-addition-before>
       <!-- @slot Slot to allow for additional elements in the input field \<div\>
         (before \<input\>) -->
       <slot name="input-field-addition-before" />
     </template>
-    <template v-slot:input-field-addition-after>
+    <template #input-field-addition-after>
       <!-- @slot for adding elements after input -->
       <slot name="input-field-addition-after" />
     </template>
-    <template v-slot:post-input-field>
+    <template #post-input-field>
       <!-- @slot elements after the actual input element but within the input field container <br>
       for an example see [BaseChipsInputField](#basechipsinputfield)-->
       <slot name="post-input-field" />
     </template>
-    <template v-slot:error-icon>
+    <template #error-icon>
       <!-- @slot use a custom icon instead of standard error/warning icon<br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
       <slot name="error-icon" />
     </template>
-    <template v-slot:remove-icon>
+    <template #remove-icon>
       <!-- @slot for adding elements after input (e.g. used to add loader) <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
       <slot name="remove-icon" />
@@ -302,8 +304,11 @@ export default {
         const propName = this.activeTabInt || 'default';
         this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
       } else {
-        this.tabs.forEach(tab => this.$set(this.fieldContent, tab,
-          val[tab]));
+        this.tabs.forEach(tab => this.$set(
+          this.fieldContent,
+          tab,
+          val[tab],
+        ));
       }
     },
     emitFieldContent() {

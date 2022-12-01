@@ -48,7 +48,7 @@
             render-as="li"
             @expanded-state="emitExpandedState">
             <template
-              v-slot:content="dataNextLevel">
+              #content="dataNextLevel">
               <!-- @slot a slot to provide customized entry row in next level -->
               <slot
                 name="content"

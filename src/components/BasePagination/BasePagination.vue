@@ -201,8 +201,10 @@ export default {
       // array from total - subsetNumber
       const subsetStart = this.start + this.subsetNumber > this.total
         ? this.total - this.subsetNumber + 1 : this.start;
-      return Array.from({ length: this.subsetNumber },
-        (v, k) => k + subsetStart);
+      return Array.from(
+        { length: this.subsetNumber },
+        (v, k) => k + subsetStart,
+      );
     },
     /**
      * check if element should be displayed as a link element, otherwise make it a <span>

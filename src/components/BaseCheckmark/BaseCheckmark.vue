@@ -1,6 +1,7 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
+    @keydown.stop="clicked"
     @click.stop="clicked">
     <input
       :id="internalId"
@@ -20,6 +21,8 @@
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
         name="check-mark" />
     </div>
+    <!-- need to disable because label is there - it is just in BaseInput component -->
+    <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
     <label
       :for="internalId"
       :class="['base-checkbox-labeltext', { 'hide': !showLabel }]">{{ label }}</label>

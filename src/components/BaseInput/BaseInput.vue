@@ -4,6 +4,8 @@
     <!-- LABEL ROW -->
     <div
       :class="['base-input__label-row', { 'hide': !showLabelRow }]">
+      <!-- need to disable because label is there (below)? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
         :for="idInt"
         :class="['base-input__label', { 'hide': !showLabel }]">
@@ -23,6 +25,7 @@
                { 'base-input__input-frame__disabled': disabled },
                { 'base-input__input-frame__invalid': invalid }]"
       @focusin="clickedInside"
+      @keydown.enter="clickedInside"
       @click="clickedInside">
       <!-- one class __active for pseudo-class :focus-within, one class __is-active
       for manually setting input active -->
@@ -55,6 +58,8 @@
                   id: idInt,
                 }"
                 name="input">
+                <!-- need to disable because label is there (below)? -->
+                <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                 <input
                   :id="idInt"
                   ref="input"
