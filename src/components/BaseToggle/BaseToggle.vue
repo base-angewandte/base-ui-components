@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
@@ -113,12 +114,30 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * if field is occurring more then once - set an id<br>
+     * in case a custom input is used with the input slot it is important to
+     * assign the same id to the input element
+     */
+    id: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
       checkedInt: false,
       animate: false,
     };
+  },
+  computed: {
+    /**
+     * check if an id was provided (to handle label input connection), if not create one
+     * @returns {String|string}
+     */
+    idInt() {
+      return this.id || createId();
+    },
   },
   watch: {
     checked: {
