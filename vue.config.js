@@ -24,15 +24,6 @@ module.exports = {
       .clear()
       .add('./dev-docs/docs.js');
 
-    // added due to source maps error: (DevTools failed to load SourceMap:...)
-    config.module
-      .rule('source-map')
-      .test(/\.js$/)
-      .enforce('pre')
-      .use('source-map-loader')
-      .loader('source-map-loader')
-      .end();
-
     // safari ignores the disable cache property for injected js files, so we add a hash
     // for js files
     if (process.env.NODE_ENV === 'development') {

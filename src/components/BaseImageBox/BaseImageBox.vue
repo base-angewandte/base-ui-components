@@ -22,7 +22,7 @@
           <div
             :title="title"
             :class="['base-image-box-title',
-                     { 'base-image-box-header-2-lines': !subtext } ]">
+                     { 'base-image-box-header-2-lines': !subtext }]">
             {{ title }}
           </div>
           <div
@@ -37,8 +37,10 @@
           :class="[
             'base-image-box-body',
             { 'base-image-box-inner-shadow-bottom-top': selectable && imageUrl && !showTitle },
-            { 'base-image-box-inner-shadow-bottom': !icon
-              && (!showTitleOnHover || (showTitleOnHover && additional)) },
+            {
+              'base-image-box-inner-shadow-bottom': !icon
+                && (!showTitleOnHover || (showTitleOnHover && additional)),
+            },
             { 'base-image-box-order-first': imageFirst },
             imageShadowClass]">
           <div
@@ -111,7 +113,7 @@
                 :title="description"
                 :class="[
                   'base-image-box-footer-text',
-                  { 'bold': !additional }]">
+                  { bold: !additional }]">
                 {{ description }}
               </div>
               <div

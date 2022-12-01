@@ -8,11 +8,11 @@
       'base-expand-box',
       'base-expand-box-padding-' + padding,
       { 'base-expand-box-auto-height': autoHeight },
-      { 'base-expand-box-open': expandInt },]">
+      { 'base-expand-box-open': expandInt }]">
     <div
       :class="[
         'base-expand-box-content',
-        { 'base-expand-box-content-fade-out': (!initialized ||!expandInt && showButton) }]">
+        { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">
       <div
         class="base-expand-box-content-inner">
         <!-- div is needed for calculation of content height -->

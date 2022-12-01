@@ -32,7 +32,7 @@
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
-        source: field['x-attrs'].source
+        source: field['x-attrs'].source,
       })">
       <template
         v-if="fieldType === 'multiline' && field.items
@@ -67,7 +67,7 @@
           :format="field['x-attrs'].date_format"
           :type="dateType.includes('timerange') ? dateType.includes('daterange')
             ? 'daterange' : 'single' : dateType"
-          :date-format-labels="{date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
+          :date-format-labels="{ date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
           :format-tabs-legend="getI18nTerm('form.dateTabsLegend')"
           :language="language"
           class="base-form-field-creator__date-field" />

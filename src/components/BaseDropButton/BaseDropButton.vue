@@ -57,8 +57,10 @@
             :id="`button-${option[identifierPropertyName]}`"
             :class="[
               'base-drop-button__action',
-              { 'base-drop-button__action__active': activeOption
-                && option[identifierPropertyName] === activeOption[identifierPropertyName] }]"
+              {
+                'base-drop-button__action__active': activeOption
+                  && option[identifierPropertyName] === activeOption[identifierPropertyName],
+              }]"
             type="button"
             @keydown.up.down.prevent=""
             @click.prevent="fireAction(option[identifierPropertyName])">

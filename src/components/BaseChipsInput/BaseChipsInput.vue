@@ -43,7 +43,7 @@
               {{ addNewChipText
                 ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
                 : `${getI18nTerm('form.Add', -1, {
-                  value: getLangLabel(entry.option[labelPropertyName], true)
+                  value: getLangLabel(entry.option[labelPropertyName], true),
                 })} ...` }}
             </span>
             <template
@@ -108,8 +108,10 @@
           <BaseIcon
             :class="[
               'base-chips-input__single-dropdown-icon',
-              { 'base-chips-input__single-dropdown-icon-rotated':
-                isActive }
+              {
+                'base-chips-input__single-dropdown-icon-rotated':
+                  isActive,
+              },
             ]"
             name="drop-down" />
         </div>
@@ -143,7 +145,7 @@ export default {
   name: 'BaseChipsInput',
   components: {
     BaseIcon,
-    BaseDropDownList: () => import('../BaseDropDownList/BaseDropDownList'),
+    BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList'),
     BaseChipsInputField,
   },
   mixins: [

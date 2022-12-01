@@ -26,7 +26,7 @@
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
-      :assistive-text="isFieldTypeChips ? assistiveText: false"
+      :assistive-text="isFieldTypeChips ? assistiveText : false"
       :is-active-delay="dateFieldDelay"
       input-class="base-search__input-field"
       field-type="search"

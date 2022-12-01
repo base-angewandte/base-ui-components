@@ -5,7 +5,7 @@
     <div
       :class="[
         'base-date-panel__label',
-        {'base-date-panel__label--hover': !isInline },
+        { 'base-date-panel__label--hover': !isInline },
       ]"
       @keydown.enter="isOpen = !isOpen"
       @click.stop="isOpen = !isOpen">

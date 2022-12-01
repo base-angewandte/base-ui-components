@@ -1,8 +1,8 @@
 <template>
   <div
     :class="['base-toggle',
-             {'base-toggle--checked': checkedInt },
-             {'base-toggle--disabled': disabled }]"
+             { 'base-toggle--checked': checkedInt },
+             { 'base-toggle--disabled': disabled }]"
     @focusin="animate = true"
     @mouseover="animate = true"
     @focusout="animate = false"

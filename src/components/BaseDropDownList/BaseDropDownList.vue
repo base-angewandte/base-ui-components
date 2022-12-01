@@ -24,12 +24,18 @@
           :class="[
             'base-drop-down-list__option',
             { 'base-drop-down-list__option__hover': activeStyled },
-            { 'base-drop-down-list__option__selected': selectStyled
-              && option === selectedOption },
-            { 'base-drop-down-list__option__active': activeStyled
-              && optionIndex === activeOptionIndex },
-            { 'base-drop-down-list__option__active-custom': useCustomOptionActiveBackgroundColor
-              && optionIndex === activeOptionIndex }]"
+            {
+              'base-drop-down-list__option__selected': selectStyled
+                && option === selectedOption,
+            },
+            {
+              'base-drop-down-list__option__active': activeStyled
+                && optionIndex === activeOptionIndex,
+            },
+            {
+              'base-drop-down-list__option__active-custom': useCustomOptionActiveBackgroundColor
+                && optionIndex === activeOptionIndex,
+            }]"
           role="option"
           tabindex="0"
           @keydown.enter="selected(option)"

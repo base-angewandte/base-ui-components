@@ -10,7 +10,7 @@
         :class="['base-form-field',
                  formFieldsHalf.indexOf(element) >= 0
                    ? 'base-form-field-half' : 'base-form-field-full',
-                 { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
+                 { 'base-form-field-left-margin': isHalfFieldSecond(element) }]"
         v-bind="formFieldComponentProps(element, index)"
         @field-value-changed="setFieldValue($event, element.name)"
         @fetch-autocomplete="fetchAutocomplete" />
@@ -26,7 +26,7 @@
                    { 'base-form-field__multiple__inline': multiplyButtonsInline(element) },
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
-                   { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
+                   { 'base-form-field-left-margin': isHalfFieldSecond(element) }]">
           <BaseFormFieldCreator
             :key="`${element.name}_${index}_${valueIndex}_${formId}`"
             v-bind="formFieldComponentProps(element, index, valueIndex)"
@@ -80,9 +80,9 @@
               <base-icon
                 :title="valueIndex !== (valueListInt[element.name].length - 1)
                   ? getI18nTerm('form.addGroupBelow', -1, {
-                    fieldType: getFieldName(element)
+                    fieldType: getFieldName(element),
                   }) : getI18nTerm('form.addGroup', -1, {
-                    fieldType: getFieldName(element)
+                    fieldType: getFieldName(element),
                   })"
                 role="button"
                 tabindex="0"
@@ -104,7 +104,7 @@
             @click.prevent="multiplyField(element)">
             <span>
               {{ getI18nTerm('form.addGroup', -1, {
-                fieldType: getFieldName(element)
+                fieldType: getFieldName(element),
               }) }}
             </span>
             <span>

@@ -18,7 +18,7 @@
       <component
         :is="expandable ? 'button' : 'div'"
         :type="expandable ? 'button' : null"
-        :class="[ 'base-expand-row-button', {'selectable': isSelectable}]"
+        :class="['base-expand-row-button', { selectable: isSelectable }]"
         @click="expandable ? clicked() : null">
         <div
           v-if="icon || hasIconSlot"
@@ -52,7 +52,7 @@
       role="region"
       :aria-labelledby="'base-expand-row-' + id"
       :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
-      :class="['base-expand-row-body', {'base-expand-row-body-bg': bodyHasBackground}]">
+      :class="['base-expand-row-body', { 'base-expand-row-body-bg': bodyHasBackground }]">
       <!-- @slot slot for expanded content -->
       <slot />
     </div>

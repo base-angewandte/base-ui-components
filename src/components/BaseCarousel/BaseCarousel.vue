@@ -8,7 +8,7 @@
           v-for="(item, index) in items"
           v-show="swiperIsActive"
           :key="index"
-          :class="['base-carousel-slide', {'swiper-slide': swiperIsActive}]">
+          :class="['base-carousel-slide', { 'swiper-slide': swiperIsActive }]">
           <BaseImageBox
             :title="item.title"
             :subtext="subtext(item.subtext)"

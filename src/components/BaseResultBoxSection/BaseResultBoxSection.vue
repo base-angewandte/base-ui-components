@@ -71,8 +71,10 @@
 
       <div
         :class="['base-result-box-section__background',
-                 { 'base-result-box-section__background--white':
-                   editModeWhiteBackground && editModeActive }]">
+                 {
+                   'base-result-box-section__background--white':
+                     editModeWhiteBackground && editModeActive,
+                 }]">
         <!-- MESSAGE AND FOLLOW UP ACTION AREA FOR EDIT MODE -->
         <!-- MESSAGE AREA -->
         <div
@@ -133,10 +135,14 @@
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
                        `base-result-box-section__box-item-${elementId}`,
-                       { 'base-result-box-section__result-box-item__draggable':
-                         draggable && editModeActive },
-                       { 'base-result-box-section__result-box-item__dragging':
-                         movableElementId === entry.id }]"
+                       {
+                         'base-result-box-section__result-box-item__draggable':
+                           draggable && editModeActive,
+                       },
+                       {
+                         'base-result-box-section__result-box-item__dragging':
+                           movableElementId === entry.id,
+                       }]"
               @keydown.enter="onEnterKey($event, entry, index)"
               @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
                 ? moveEntry($event, index) : false"
@@ -191,7 +197,7 @@
                   box-style="small"
                   box-type="button"
                   :class="['base-result-box-section__box-item',
-                           `base-result-box-section__box-item-${elementId}`,]"
+                           `base-result-box-section__box-item-${elementId}`]"
                   @clicked="submitAction(action.value)" />
               </template>
             </slot>
@@ -203,7 +209,7 @@
               text=""
               box-type="button"
               :class="['base-result-box-section__box-item',
-                       `base-result-box-section__box-item-${elementId}`,]"
+                       `base-result-box-section__box-item-${elementId}`]"
               @clicked="expandedInt = !expandedInt">
               <template #default>
                 <!-- needed to add v-if here again - otherwise strange side effects -->

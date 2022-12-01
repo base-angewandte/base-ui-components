@@ -5,7 +5,8 @@
       {
         'base-text-list-2-cols': cols2,
         'base-text-list-2-cols-single-content':
-          cols2 && data.length === 1 && typeof data[0].data === 'string' }]">
+          cols2 && data.length === 1 && typeof data[0].data === 'string',
+      }]">
     <div
       v-for="(item, index) in data"
       :key="index"

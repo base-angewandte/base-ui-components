@@ -59,14 +59,20 @@
           :input-class="filterSlotName === 'input-field-addition-before'
             ? '' : 'base-advanced-search-row__input-field'"
           :class="['base-advanced-search-row__first-column',
-                   { 'base-advanced-search-row__first-column__small':
-                     filterSlotName === 'input-field-addition-before' },
+                   {
+                     'base-advanced-search-row__first-column__small':
+                       filterSlotName === 'input-field-addition-before',
+                   },
                    'base-advanced-search-row__filter-input',
-                   { 'hide' : isMainSearch && filter
-                     [identifierPropertyName.filter] === defaultFilter
-                       [identifierPropertyName.filter] },
-                   { 'base-advanced-search-row__filter-input__date':
-                     filter.type.includes('date') }]"
+                   {
+                     hide: isMainSearch && filter
+                       [identifierPropertyName.filter] === defaultFilter
+                         [identifierPropertyName.filter],
+                   },
+                   {
+                     'base-advanced-search-row__filter-input__date':
+                       filter.type.includes('date'),
+                   }]"
           @click="isActive = true"
           @keydown="handleKeyDownEvent"
           @keydown.tab="handleDropDownOnTabKey"
@@ -123,8 +129,10 @@
             <div
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
-                       { 'base-advanced-search-row__above-list-area-filters':
-                         filter.type === 'text' || filter.type === 'chips' }]">
+                       {
+                         'base-advanced-search-row__above-list-area-filters':
+                           filter.type === 'text' || filter.type === 'chips',
+                       }]">
               <!-- FILTER SELECT LIST -->
               <div
                 class="base-advanced-search-row__filter-area-wrapper">
@@ -153,10 +161,14 @@
                 <div
                   :class="['base-advanced-search-row__columns',
                            'base-advanced-search-row__filter-list-wrapper',
-                           { 'base-advanced-search-row__filter-list-wrapper__fade-right':
-                             filterFade.right },
-                           { 'base-advanced-search-row__filter-list-wrapper__fade-left':
-                             filterFade.left }]">
+                           {
+                             'base-advanced-search-row__filter-list-wrapper__fade-right':
+                               filterFade.right,
+                           },
+                           {
+                             'base-advanced-search-row__filter-list-wrapper__fade-left':
+                               filterFade.left,
+                           }]">
                   <ul
                     :id="'filter-options-' + internalRowId"
                     ref="filterBox"
@@ -171,11 +183,15 @@
                         === singleFilter[identifierPropertyName.filter]).toString()"
                       tabindex="-1"
                       class="base-advanced-search-row__filter base-advanced-search-row__column-item"
-                      :class="[{ 'base-advanced-search-row__filter-active':
-                                 activeFilter === singleFilter },
-                               { 'base-advanced-search-row__filter-selected':
-                                 filter && filter[identifierPropertyName.filter]
-                                   === singleFilter[identifierPropertyName.filter] }]"
+                      :class="[{
+                                 'base-advanced-search-row__filter-active':
+                                   activeFilter === singleFilter,
+                               },
+                               {
+                                 'base-advanced-search-row__filter-selected':
+                                   filter && filter[identifierPropertyName.filter]
+                                     === singleFilter[identifierPropertyName.filter],
+                               }]"
                       role="option"
                       @keydown.enter.stop="selectFilter(singleFilter)"
                       @click.stop="selectFilter(singleFilter)">
@@ -215,7 +231,7 @@
                 class="base-advanced-search-row__autocomplete-options"
                 @update:active-option="setCollection(slotProps
                   .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption($event,slotProps
+                @update:selected-option="addOption($event, slotProps
                   .option[autocompletePropertyNames.id])" />
             </div>
           </template>
@@ -230,8 +246,10 @@
                  base-advanced-search-row__area-padding">
               <div
                 :class="['base-advanced-search-row__chips-row',
-                         { 'base-advanced-search-row__chips-row__no-options':
-                           filter.type === 'chips' && !displayedOptions.length }]">
+                         {
+                           'base-advanced-search-row__chips-row__no-options':
+                             filter.type === 'chips' && !displayedOptions.length,
+                         }]">
                 <div
                   class="base-advanced-search-row__controlled-options-title
                          base-advanced-search-row__first-column">
@@ -309,7 +327,7 @@
               v-if="useAutocompleteFunctionality"
               :class="[
                 'base-advanced-search-row__no-options',
-                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality }
+                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality },
               ]">
               <div
                 v-if="!currentInput

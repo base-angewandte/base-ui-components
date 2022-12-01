@@ -3,12 +3,12 @@
     class="base-input">
     <!-- LABEL ROW -->
     <div
-      :class="['base-input__label-row', { 'hide': !showLabelRow }]">
+      :class="['base-input__label-row', { hide: !showLabelRow }]">
       <!-- need to disable because label is there (below)? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
         :for="idInt"
-        :class="['base-input__label', { 'hide': !showLabel }]">
+        :class="['base-input__label', { hide: !showLabel }]">
         {{ getLangLabel(label) }}
       </label>
       <div class="base-input__label-spacer" />
@@ -31,13 +31,15 @@
       for manually setting input active -->
       <div
         :class="['base-input__input-container',
-                 { 'base-input__input-container__is-active':
-                   isActiveInt && useFormFieldStyling}]">
+                 {
+                   'base-input__input-container__is-active':
+                     isActiveInt && useFormFieldStyling,
+                 }]">
         <!-- @slot elements before the actual input line but within the input field container -->
         <slot name="pre-input-field" />
         <div
           :class="['base-input__input-line-container',
-                   { 'base-input__input-line-container__wrap': !hideInputField}]">
+                   { 'base-input__input-line-container__wrap': !hideInputField }]">
           <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
           (before \<input\>) -->
           <slot name="input-field-addition-before" />
@@ -47,8 +49,10 @@
             <slot name="input-field-inline-before" />
             <div
               :class="['base-input__input-wrapper',
-                       { 'base-input__input-wrapper__fade-out':
-                         useFadeOut && !isActiveInt && !hideInputField }]">
+                       {
+                         'base-input__input-wrapper__fade-out':
+                           useFadeOut && !isActiveInt && !hideInputField,
+                       }]">
               <!-- @slot replace native HTML input element with custom input
                     @binding { string } id - the id of the base input component - if
                       id is not provided in props this is an internal id that should

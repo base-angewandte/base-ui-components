@@ -5,7 +5,7 @@
     class="base-drop-down">
     <div
       :class="['base-drop-down-label-wrapper',
-               { 'hide': !getLangLabel(label, true) || !showLabel }]">
+               { hide: !getLangLabel(label, true) || !showLabel }]">
       <!-- TODO: check if this is correct HTML - label associated with button? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
@@ -19,7 +19,7 @@
       :aria-expanded="String(showDropDown)"
       :style="{ 'background-color': headerBackgroundColor }"
       :disabled="isDisabled"
-      :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing}]"
+      :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing }]"
       aria-haspopup="listbox"
       type="button"
       @click.prevent="showDropDown = !showDropDown"
@@ -28,7 +28,7 @@
       <div
         ref="dropDownButton"
         :class="['base-drop-down-head-text-wrapper',
-                 {'base-drop-down-head-text-fade-out': showFadeOut }]">
+                 { 'base-drop-down-head-text-fade-out': showFadeOut }]">
         <span
           ref="headText"
           class="base-drop-down-head-text">
@@ -45,7 +45,7 @@
     <div
       v-if="showDropDown"
       ref="dropdownContainer"
-      :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight}"
+      :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight }"
       class="base-drop-down-body">
       <!-- @slot create custom drop down body -->
       <slot>
@@ -59,8 +59,10 @@
             :key="option[valueProp]"
             :class="[
               'base-drop-down-option',
-              { 'base-drop-down-option-selected': selectedOption
-                && option[valueProp] === selectedOption[valueProp] },
+              {
+                'base-drop-down-option-selected': selectedOption
+                  && option[valueProp] === selectedOption[valueProp],
+              },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
             :aria-selected="selectedOption
