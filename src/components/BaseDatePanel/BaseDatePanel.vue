@@ -12,6 +12,7 @@
       <base-icon
         v-if="!isInline"
         name="calendar-many"
+        :title="label"
         :class="['base-date-panel__icon',
                  { 'base-date-panel__icon--active': isOpen },
                  { 'base-date-panel__icon--right': iconPosition === 'right' }]" />
@@ -54,6 +55,9 @@ import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Date Panel
+ *
+ * >CAVEAT: this component is currently not production ready since it is not
+ * >accessible and is therefore excluded from the styleguide. Using it is not recommended.
  */
 export default {
   name: 'BaseDatePanel',
