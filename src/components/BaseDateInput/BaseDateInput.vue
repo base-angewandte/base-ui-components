@@ -26,10 +26,11 @@
     </div>
 
     <!-- FORM FIELDS -->
+    <!-- keydown event is counter productive to workflow here -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
       v-click-outside="clickedOutside"
       class="base-date-input__field-wrapper"
-      @keydown.enter="clickedInside"
       @click="clickedInside">
       <!-- @slot to add elements within form field but before the input element line<br>
         for an example see [BaseInput](#baseinput)-->
