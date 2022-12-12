@@ -1,7 +1,7 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @keydown.stop="clicked"
+    @keydown.enter.stop="clicked"
     @click.stop="clicked">
     <input
       :id="internalId"
