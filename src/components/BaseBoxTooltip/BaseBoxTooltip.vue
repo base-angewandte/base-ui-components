@@ -50,8 +50,11 @@ export default {
       right: $spacing-small;
     }
 
-    &:hover {
+    &:hover, &:focus, &:active {
       color: $app-color;
+    }
+
+    &:hover {
       cursor: pointer;
     }
 
