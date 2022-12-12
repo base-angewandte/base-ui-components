@@ -50,7 +50,7 @@
       <!-- @slot create custom drop down body -->
       <slot>
         <ul
-          tabindex="-1"
+          :aria-labelledby="getLangLabel(label) + '-' + id"
           role="listbox"
           class="base-drop-down-body-list">
           <li
@@ -65,10 +65,11 @@
               },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
-            :aria-selected="selectedOption
-              && option[valueProp] === selectedOption[valueProp].toString()"
+            :aria-selected="(selectedOption
+              && option[valueProp] === selectedOption[valueProp]).toString()"
             tabindex="0"
             @keydown.enter="selectValue(option)"
+            @keydown.tab="selectByKey"
             @click="selectValue(option)">
             {{ getLangLabel(option.label, true) }}
           </li>
@@ -251,22 +252,24 @@ export default {
     },
     // adding key navigation for accessibility
     selectByKey(event) {
-      if (event.key === 'ArrowDown') {
-        this.showDropDown = true;
-        if (this.keySelectedIndex < this.options.length - 1) {
-          this.keySelectedIndex += 1;
-        }
-      } else if (event.key === 'ArrowUp') {
+      const { key } = event;
+      if (key === 'Space') {
+        this.showDropDown = !this.showDropDown;
+      } else if (this.showDropDown && (key === 'ArrowUp' || (event.shiftKey && key === 'Tab'))) {
         if (this.keySelectedIndex > 0) {
           this.keySelectedIndex -= 1;
         }
-      } else if (event.key === 'Enter') {
+      } else if (this.showDropDown && (key === 'ArrowDown' || key === 'Tab')) {
+        if (this.keySelectedIndex < this.options.length - 1) {
+          this.keySelectedIndex += 1;
+        }
+      } else if (key === 'Enter') {
         if (this.showDropDown && this.keySelectedIndex >= 0) {
           this.selectValue(this.options[this.keySelectedIndex]);
-        } else if (!this.showDropDown) {
-          this.showDropDown = true;
+        } else {
+          this.showDropDown = !this.showDropDown;
         }
-      } else if (event.key === 'Escape' || event.key === 'Tab') {
+      } else if (key === 'Escape') {
         this.showDropDown = false;
       }
       if (this.$refs.option && this.$refs.option[this.keySelectedIndex]
