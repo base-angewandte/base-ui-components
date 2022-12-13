@@ -32,8 +32,6 @@
             v-for="(media, index) in items"
             :key="index"
             class="swiper-slide">
-            <!-- TODO: remove positive tab index -->
-            <!-- eslint-disable-next-line vuejs-accessibility/tabindex-no-positive -->
             <base-media-carousel-item
               ref="baseMedia"
               :autoplay="index === initialSlide"
@@ -50,7 +48,7 @@
               :orientation="media.orientation"
               :previews="media.previews"
               :hls-start-level="media.hlsStartLevel"
-              tabindex="1"
+              tabindex="0"
               @download="download" />
           </div>
         </div>
@@ -284,7 +282,7 @@ export default {
      * @return array
      */
     getFocusableItems() {
-      const focusable = 'button, audio, video[tabindex="1"]';
+      const focusable = 'button, audio, video[tabindex="0"]';
       const focusableBySlide = [];
 
       this.$refs.baseMedia.forEach((slide) => {
@@ -319,7 +317,7 @@ export default {
       });
 
       if (direction === 'next') {
-        if (items[currentSlide][currentFocus + 1]) {
+        if (items[currentSlide] && items[currentSlide][currentFocus + 1]) {
           items[currentSlide][currentFocus + 1].focus();
           return;
         }
@@ -327,7 +325,7 @@ export default {
       }
 
       if (direction === 'prev') {
-        if (items[currentSlide][currentFocus - 1]) {
+        if (items[currentSlide] && items[currentSlide][currentFocus - 1]) {
           items[currentSlide][currentFocus - 1].focus();
           return;
         }

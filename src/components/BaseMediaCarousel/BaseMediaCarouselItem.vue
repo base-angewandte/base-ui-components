@@ -15,7 +15,7 @@
       :data-srcset="imageSourceSet"
       :data-src="sourceUrl"
       :style="displaySize"
-      :alt="displayName"
+      :alt="fileName"
       :class="[
         'swiper-lazy',
         'base-media-preview-image',
