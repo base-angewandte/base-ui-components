@@ -18,6 +18,9 @@
     </div>
 
     <!-- ACTUAL INPUT FIELD -->
+    <!-- keydown event would have unwanted side effects here and is not relevant for
+      accessibility -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
       v-click-outside="clickedOutsideInput"
       :class="['base-input__input-frame',
@@ -25,7 +28,6 @@
                { 'base-input__input-frame__disabled': disabled },
                { 'base-input__input-frame__invalid': invalid }]"
       @focusin="clickedInside"
-      @keydown.enter="clickedInside"
       @click="clickedInside">
       <!-- one class __active for pseudo-class :focus-within, one class __is-active
       for manually setting input active -->

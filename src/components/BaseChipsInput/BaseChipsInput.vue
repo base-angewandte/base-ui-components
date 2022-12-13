@@ -103,7 +103,7 @@
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
-          @keydown.enter="isActive = !isActive"
+          @keydown.enter.stop="isActive = !isActive"
           @click.stop="isActive = !isActive">
           <BaseIcon
             :class="[

@@ -33,7 +33,9 @@
     <div class="base-map-locations__list">
       <template
         v-for="(location, index) in locationsFiltered">
-        <baseTextList
+        <!-- TODO: leaving focusin and focusout events for now even though they have no effect
+          because component is not accessible at all in general -->
+        <BaseTextList
           v-if="location.latLng || location.coordinates"
           :key="index"
           :data="[location]"
