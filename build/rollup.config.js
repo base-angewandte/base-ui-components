@@ -172,7 +172,7 @@ const mapComponent = name => ({
     ...baseConfig.plugins.preVue,
     bundleSize(),
     css({
-      output: `dist/components/${name}/${name}.css`,
+      output: `./dist/components/${name}/${name}.css`,
     }),
     vue({
       ...baseConfig.plugins.vue,
