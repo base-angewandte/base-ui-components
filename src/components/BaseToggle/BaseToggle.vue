@@ -20,9 +20,7 @@
         :aria-disabled="disabled"
         :type="'checkbox'"
         value=""
-        class="base-toggle__input"
-        @focus="animate = true"
-        @blur="animate = false">
+        class="base-toggle__input">
 
       <div class="base-switch">
         <span
