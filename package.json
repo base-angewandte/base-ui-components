@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
@@ -13,11 +13,13 @@
     "postversion": "./postversion.sh",
     "prepublishOnly": "npm run build",
     "styleguide": "vue-cli-service styleguidist",
-    "styleguide:build": "vue-cli-service styleguidist:build",
+    "styleguide:build": "cross-env NODE_ENV=build vue-cli-service styleguidist:build",
     "svg": "node ./build/generate-svg-sprite-sheet.js",
     "test:unit": "vue-cli-service test:unit",
     "updateindex": "node build/generate-index-files.js",
-    "updateindex:all": "node build/generate-index-files.js --force true"
+    "updateindex:all": "node build/generate-index-files.js --force true",
+    "prepare": "husky install",
+    "changelog": "gulp changelog"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -33,6 +35,7 @@
     "leaflet": "^1.8.0",
     "leaflet-responsive-popup": "^0.6.4",
     "leaflet.markercluster": "^1.5.3",
+    "lint-staged": "^13.1.0",
     "normalize.css": "^8.0.1",
     "swiper": "^6.8.4",
     "vue-click-outside": "^1.1.0",
@@ -42,6 +45,8 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
+    "@commitlint/cli": "^17.2.0",
+    "@commitlint/config-conventional": "^17.2.0",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^14.0.0",
@@ -62,6 +67,9 @@
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-vue": "^6.2.2",
+    "gulp": "^4.0.2",
+    "gulp-conventional-changelog": "^2.0.35",
+    "husky": "^8.0.2",
     "minimist": "^1.2.6",
     "postcss-cli": "^7.1.2",
     "postcss-discard-comments": "^4.0.2",
@@ -81,7 +89,8 @@
     "svgstore-cli": "^2.0.1",
     "vue": "^2.6.14",
     "vue-cli-plugin-styleguidist": "~4.35.0",
-    "vue-template-compiler": "^2.6.14"
+    "vue-template-compiler": "^2.6.14",
+    "yargs": "^17.6.2"
   },
   "peerDependencies": {
     "vue": "^2.6.13"
@@ -104,5 +113,8 @@
   "sideEffects": [
     "*.css",
     "*.scss"
-  ]
+  ],
+  "lint-staged": {
+    "*.{js,vue}": "npm run lint"
+  }
 }

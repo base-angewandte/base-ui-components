@@ -1,11 +1,21 @@
-# Changelog
+## 2.0.4 (2022-10-31)
+
+### Features
+* [BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform): add compact view for field-groups.
+
+### Improvements
+* [BaseProgressBar](https://base-angewandte.github.io/base-ui-components/#baseprogressbar): display error message below progress bar.
+* Decrease size of x in remove.svg to remove visual effect of it appearing larger than other icons.
+
+### Bugfixes
+* Fixing base-ui-icons path for styleguide on github pages.
 
 ## 2.0.3 (2022-10-06)
 
 ### Features
 * [BaseCarousel](https://base-angewandte.github.io/base-ui-components/#basecarousel): add 'clicked' event to be able to manually trigger action on box click.
 
-###Improvements
+### Improvements
 * [BaseCarousel](https://base-angewandte.github.io/base-ui-components/#basecarousel): improve documentation, removing unnecessary properties from example data.
 
 ### Bugfixes
