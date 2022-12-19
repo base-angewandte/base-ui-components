@@ -50,8 +50,8 @@
 </template>
 
 <script>
-import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
 import { createId, hasData, sort } from '@/utils/utils';
+import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow';
 
 /**
  * @typedef Filter

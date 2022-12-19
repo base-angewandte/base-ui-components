@@ -138,7 +138,6 @@
 
 <script>
 // eslint-disable-next-line
-import BaseExpandListRow from '@/components/BaseExpandList/BaseExpandListRow';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import i18n from '../../mixins/i18n';
 
@@ -147,7 +146,8 @@ export default {
   components: {
     BaseToggle: () => import('../BaseToggle/BaseToggle'),
     BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseExpandListRow,
+    // eslint-disable-next-line import/no-self-import
+    BaseExpandListRow: () => import('./BaseExpandListRow'),
     BaseIcon,
   },
   mixins: [i18n],

@@ -166,7 +166,7 @@ import BaseImage from '../BaseImage/BaseImage';
 export default {
   name: 'BaseImageBox',
   components: {
-    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
+    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark'),
     BaseIcon,
     BaseBox,
     BaseImage,

@@ -1,76 +1,279 @@
 <template>
-  <div
-    id="app"
-    style="max-width: 1400px; margin: 20px auto; padding: 16px;">
-    <div>
-      <base-entry-selector
-        ref="entrySelector"
-        :entries="baseEntrySelectorEntries"
-        :entries-number="baseEntrySelector.length"
-        :entries-per-page="entriesPerPage"
-        :entries-selectable="entriesSelectable"
-        :entry-types="entryTypes"
-        :height="'calc(60vh - 32px)'"
-        :is-loading="isLoading"
-        :sort-options="sortOptions"
-        @selected-changed="selectedEntries = $event"
-        @toggle-options="toggleOptions">
-        <template
-          v-slot:optionActions>
-          <BaseButton
-            :text="'publish'"
-            :disabled="isLoading"
-            :has-background-color="false"
-            icon-size="large"
-            icon="eye"
-            button-style="single"
-            @clicked="handleAction('publish')" />
-          <BaseButton
-            :text="'offline'"
-            :disabled="isLoading"
-            :has-background-color="false"
-            icon-size="large"
-            icon="forbidden"
-            button-style="single"
-            @clicked="handleAction('offline')" />
-          <BaseButton
-            :text="'duplicate'"
-            :disabled="isLoading"
-            :has-background-color="false"
-            icon-size="large"
-            icon="duplicate"
-            button-style="single"
-            @clicked="handleAction('offline')" />
-          <BaseButton
-            :text="'delete'"
-            :disabled="isLoading"
-            :has-background-color="false"
-            icon-size="large"
-            icon="waste-bin"
-            button-style="single"
-            @clicked="handleAction('delete')" />
-        </template>
-      </base-entry-selector>
+  <div style="background-color: rgb(240, 240, 240); padding: 16px;">
+    <div class="controls">
+      <BaseToggle
+        v-model="selectMode"
+        label="Select Mode"
+        class="control" />
+      <BaseToggle
+        v-model="showOptions"
+        label="Show Options"
+        class="control" />
+      <BaseToggle
+        v-model="showSort"
+        label="Show Sorting Drop Down"
+        class="control" />
+      <BaseToggle
+        v-model="showTypesFilter"
+        label="Show Types Filter"
+        class="control" />
+      <BaseToggle
+        v-model="isLoading"
+        label="Is Loading"
+        class="control" />
+      <BaseToggle
+        v-model="useCustomText"
+        label="Use Custom Texts"
+        class="control"
+        @clicked="selectMode = true; noResults = true" />
+      <BaseToggle
+        v-model="noResults"
+        label="No search Results"
+        class="control" />
+      <BaseToggle
+        v-model="showPagination"
+        label="Show Pagination"
+        class="control" />
     </div>
+    <div class="controls">
+      <BaseToggle
+        v-model="useHeadSlot"
+        label="Use 'head' Slot"
+        class="control" />
+      <BaseToggle
+        v-model="useActionsSlot"
+        label="Use 'option-actions' Slot"
+        class="control"
+        @clicked="selectMode = true" />
+      <BaseToggle
+        v-model="useAfterOptionsSlot"
+        label="Use 'after-options' Slot"
+        class="control" />
+      <BaseToggle
+        v-model="useEntriesSlot"
+        label="Use 'entries' Slot"
+        class="control"
+        @clicked="useThumbnailsSlot = false" />
+      <BaseToggle
+        v-model="useThumbnailsSlot"
+        :disabled="useEntriesSlot"
+        label="Use 'thumbnails' Slot"
+        class="control" />
+    </div>
+    <BaseEntrySelector
+      :entries="baseEntrySelectorEntries"
+      :entries-total="entries.length"
+      :entries-per-page="entriesPerPage"
+      :active-entry="baseEntrySelectorEntries.map(entry => entry.id).indexOf(activeEntry)"
+      :entries-selectable.sync="selectMode"
+      :options-hidden="!showOptions"
+      :sort-options="showSort ? sortOptions : []"
+      :sort-config="{
+        label: 'Sort Entries',
+        default: {
+          label: 'A - Z',
+          value: 'title',
+        },
+        valuePropertyName: 'value',
+      }"
+      :entry-types="showTypesFilter ? entryTypes : []"
+      :entry-types-config="{
+        label: 'Filter By Type',
+        default: {
+          label: {
+            de: 'Alle Typen',
+            en: 'All Types',
+          },
+          source: '',
+        },
+        valuePropertyName: 'source',
+      }"
+      :is-loading="isLoading"
+      language="de"
+      v-bind="entrySelectorText"
+      @selected-changed="selectedEntries = $event"
+      @fetch-entries="getNewEntries"
+      @entry-clicked="activeEntry = $event">
+      <template v-slot:head>
+        <template v-if="useHeadSlot">
+          <div class="custom-slot">
+            Put your custom head slot elements here
+          </div>
+        </template>
+      </template>
+      <template v-slot:option-actions>
+        <template v-if="useActionsSlot">
+          <div class="custom-slot">
+            <BaseButton
+              text="Publish"
+              icon="eye" />
+          </div>
+        </template>
+      </template>
+      <template v-slot:after-options>
+        <template v-if="useAfterOptionsSlot">
+          <div class="custom-slot">
+            Custom after-options element
+          </div>
+        </template>
+      </template>
+      <template v-slot:thumbnails="{ item }">
+        <template v-if="useThumbnailsSlot">
+          <BaseIcon
+            v-if="item.has_media"
+            :style="{ width: '14px' }"
+            name="eye" />
+        </template>
+      </template>
+      <template v-slot:entries="{ entries, selectEntry }">
+        <template v-if="useEntriesSlot">
+          <div class="custom-slot">
+            This could be your custom entries display
+            <BaseButton
+              v-if="selectMode"
+              text="Select Entry"
+              icon="plus"
+              @clicked="selectEntry({
+                index: 0,
+                selected: true,
+              })" />
+            <div>
+              <b>Selected Entries:</b>
+              {{ selectedEntries.map(entry => entry.id) }}
+            </div>
+          </div>
+        </template>
+      </template>
+    </BaseEntrySelector>
+
+    <div v-if="editExpandList">
+      <BaseCheckmark
+        v-model="toggleElements"
+        :radio-value="'button'"
+        :show-label="true"
+        label="Use button elements"
+        mark-style="radio" />
+      <BaseCheckmark
+        v-model="toggleElements"
+        :radio-value="'toggle'"
+        :show-label="true"
+        label="Use toggle elements"
+        mark-style="radio" />
+    </div>
+    <BaseEditControl
+      title="Activities"
+      :controls="true"
+      :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
+      :edit="editExpandList"
+      @activated="activateExpandList"
+      @canceled="cancelExpandList"
+      @saved="saveExpandList" />
+
+    <BaseExpandList
+      ref="baseExpandList"
+      :data.sync="displayData"
+      :edit="editExpandList"
+      :control-type="toggleElements"
+      @saved="saveExpandListEdit">
+      <template
+        v-slot:content="props">
+        <BaseLink
+          :url="props.data.url"
+          :value="props.data.value"
+          :source="props.data.source"
+          :space-after="!!props.data.additional"
+          :tooltip="props.data.additional"
+          :type="props.data.type" />
+        <template v-if="props.data.attributes">
+          - {{ props.data.attributes.join(', ') }}
+        </template>
+      </template>
+    </BaseExpandList>
   </div>
 </template>
 
 <script>
+import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark';
+import BaseExpandList from '@/components/BaseExpandList/BaseExpandList';
+import BaseLink from '@/components/BaseLink/BaseLink';
+import BaseEditControl from '@/components/BaseEditControl/BaseEditControl';
+
+import BaseToggle from '@/components/BaseToggle/BaseToggle';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseButton from '@/components/BaseButton/BaseButton';
 import BaseEntrySelector from '@/components/BaseEntrySelector/BaseEntrySelector';
 
 export default {
-  name: 'App',
   components: {
+    BaseCheckmark,
+    BaseEditControl,
+    BaseExpandList,
+    BaseLink,
     BaseButton,
+    BaseIcon,
+    BaseToggle,
     BaseEntrySelector,
   },
   data() {
     return {
-      isLoading: false,
+      entries: [
+        {
+          id: '9WMh6vEFRZv83g5CSNxWX',
+          icon: 'file-object',
+          has_media: true,
+          description: 'An advanced project',
+          title: 'Portfolio & Showroom',
+        },
+        {
+          id: 'b9TWZjUg268vrFAKwD3c3X',
+          icon: 'file-object',
+          has_media: true,
+          title: 'Album of Airbrushes',
+          description: 'More to come',
+        },
+        {
+          id: '9WMh6vEFRZ5e83g5CSNxWX',
+          icon: 'file-object',
+          has_media: true,
+          title: 'More Entries',
+          description: 'And it continues',
+        },
+        {
+          id: '9WMh6vEFRZ5e83g5CSNxWg',
+          icon: 'file-object',
+          has_media: true,
+          title: 'My List',
+          description: 'Nowhere',
+        },
+        {
+          id: '9WMh6sfgsr465e83g5CSNxWX',
+          icon: 'calendar-many',
+          has_media: true,
+          title: 'The Road',
+          description: 'Oh so long',
+        },
+      ],
+      page: 1,
+      activeEntry: -1,
       selectedEntries: [],
-      entriesSelectable: false,
-      entriesPerPage: null,
+      showSort: true,
+      showTypesFilter: true,
+      selectMode: false,
+      showOptions: true,
+      isLoading: false,
+      useCustomText: false,
+      noResults: false,
+      showPagination: true,
+      sortOptions: [
+        {
+          label: 'By Type',
+          value: 'type_en',
+        },
+        {
+          label: 'A - Z',
+          value: 'title',
+        },
+      ],
       entryTypes: [
         {
           label: {
@@ -86,321 +289,288 @@ export default {
           },
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
         },
+      ],
+      useHeadSlot: false,
+      useEntriesSlot: false,
+      useThumbnailsSlot: true,
+      useActionsSlot: false,
+      useAfterOptionsSlot: false,
+      editExpandList: false,
+      baseExpandList: [
         {
-          label: {
-            de: 'Animationsfilm',
-            en: 'Animated Film',
-          },
-          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/animated_film',
+          label: 'Monographien',
+          hidden: false,
+          data: [
+            {
+              label: 'Beiträge in Sammelband',
+              data: [
+                {
+                  value: 'qui nesciunt officiis quisquam officiis',
+                  attributes: [
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
+                  ],
+                  source: 'asdfasdf',
+                },
+                {
+                  value: 'animi voluptates',
+                  attributes: [
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
+                  ],
+                  additional: [
+                    {
+                      label: 'label',
+                      value: 'value',
+                    },
+                  ],
+                },
+                {
+                  value: 'officiis quisquam',
+                  attributes: [
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
+                  ],
+                  url: '#',
+                },
+              ],
+            },
+            {
+              label: 'Konferenzbeiträge',
+              data: [
+                {
+                  value: 'qui reiciendis',
+                  attributes: [
+                    'rerum corporis voluptatibus',
+                    'beatae occaecati non',
+                  ],
+                  url: '#',
+                },
+                {
+                  value: 'quia quisquam',
+                  attributes: [
+                    'quae laudantium expedita',
+                    'maxime omnis accusamus',
+                  ],
+                  url: '#',
+                },
+                {
+                  value: 'qui nesciunt',
+                  attributes: [
+                    'molestiae commodi ipsum',
+                    'eos dolorem in',
+                  ],
+                  url: '#',
+                },
+              ],
+            },
+          ],
         },
         {
-          label: {
-            de: 'Forschungsprojekt',
-            en: 'Research Project',
-          },
-          source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/research_project',
+          label: 'Film/Video',
+          hidden: false,
+          data: [
+            {
+              value: 'qui fugit',
+              attributes: [
+                'consequatur consequatur ipsa',
+                'et sunt delectus',
+              ],
+              url: '#',
+            },
+            {
+              value: 'molestiae error',
+              attributes: [
+                'nobis voluptatibus quae',
+                'iusto et voluptate',
+              ],
+              url: '#',
+            },
+            {
+              value: 'cum ut',
+              attributes: [
+                'sed ut perferendis',
+                'velit dicta voluptatem',
+              ],
+              url: '#',
+            },
+            {
+              value: 'totam tenetur',
+              attributes: [
+                'laudantium temporibus cupiditate',
+                'ducimus quos quia',
+              ],
+              url: '#',
+            },
+          ],
+        },
+        {
+          label: 'Audio',
+          hidden: false,
+          data: [
+            {
+              value: 'sed et',
+              attributes: [
+                'est quos sed',
+                'sed molestiae veritatis',
+              ],
+              url: '#',
+            },
+            {
+              value: 'quis quis',
+              attributes: [
+                'non possimus possimus',
+                'nobis recusandae sed',
+              ],
+              url: '#',
+            },
+            {
+              value: 'mollitia quo',
+              attributes: [
+                'non magnam eius',
+                'harum exercitationem non',
+              ],
+              url: '#',
+            },
+          ],
+        },
+        {
+          label: 'Preise und Stipendien',
+          hidden: false,
+          data: [
+            {
+              value: 'qui fugit',
+              attributes: [
+                'consequatur consequatur ipsa',
+                'et sunt delectus',
+              ],
+              url: '#',
+            },
+            {
+              value: 'molestiae error',
+              attributes: [
+                'nobis voluptatibus quae',
+                'iusto et voluptate',
+              ],
+              url: '#',
+            },
+            {
+              value: 'cum ut',
+              attributes: [
+                'sed ut perferendis',
+                'velit dicta voluptatem',
+              ],
+              url: '#',
+            },
+            {
+              value: 'totam tenetur',
+              attributes: [
+                'laudantium temporibus cupiditate',
+                'ducimus quos quia',
+              ],
+              url: '#',
+            },
+          ],
+        },
+        {
+          label: 'Konferenzen & Symposien',
+          hidden: false,
+          data: [
+            {
+              value: 'qui fugit',
+              attributes: [
+                'consequatur consequatur ipsa',
+                'et sunt delectus',
+              ],
+              url: '#',
+            },
+            {
+              value: 'molestiae error',
+              attributes: [
+                'nobis voluptatibus quae',
+                'iusto et voluptate',
+              ],
+              url: '#',
+            },
+            {
+              value: 'cum ut',
+              attributes: [
+                'sed ut perferendis',
+                'velit dicta voluptatem',
+              ],
+              url: '#',
+            },
+            {
+              value: 'totam tenetur',
+              attributes: [
+                'laudantium temporibus cupiditate',
+                'ducimus quos quia',
+              ],
+              url: '#',
+            },
+          ],
         },
       ],
-      sortOptions: [
-        {
-          label: 'By Type',
-          value: 'type_en',
-        },
-        {
-          label: 'A - Z',
-          value: 'title',
-        },
-        {
-          label: 'Z - A',
-          value: '-title',
-        },
-        {
-          label: 'Last Created',
-          value: '-date_created',
-        },
-        {
-          label: 'First Created',
-          value: 'date_created',
-        },
-        {
-          label: 'Last Modified',
-          value: 'date_modified',
-        },
-      ],
-      baseEntrySelector: [
-        {
-          id: '9WMh6vEFRZv83g5CSNxWX',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-12-03T11:30:18.159091+01:00',
-          date_changed: '2021-12-09T10:53:04.685280+01:00',
-          title: 'Portfolio & Showroom',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Forschungsprojekt',
-              en: 'Research Project',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/research_project',
-          },
-          notes: null,
-          reference: null,
-          keywords: null,
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: 'b9TWZjUg268vrFAKwD3c3X',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-10-15T14:35:23.365935+02:00',
-          date_changed: '2021-12-15T14:49:13.351234+01:00',
-          title: 'Album of Airbrushes',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Album',
-              en: 'Album',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          },
-          notes: '',
-          reference: null,
-          keywords: [],
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: '9WMh6vEFRZ5e83g5CSNxWX',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-12-03T11:30:18.159091+01:00',
-          date_changed: '2021-12-09T10:53:04.685280+01:00',
-          title: 'Portfolio & Showroom',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Forschungsprojekt',
-              en: 'Research Project',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/research_project',
-          },
-          notes: null,
-          reference: null,
-          keywords: null,
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: 'b9TWZjUg268vrFrD3c3X',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-10-15T14:35:23.365935+02:00',
-          date_changed: '2021-12-15T14:49:13.351234+01:00',
-          title: 'Album of Airbrushes',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Album',
-              en: 'Album',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          },
-          notes: '',
-          reference: null,
-          keywords: [],
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: '9WMh6vEFRZ5Z83g5CSNxWX',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-12-03T11:30:18.159091+01:00',
-          date_changed: '2021-12-09T10:53:04.685280+01:00',
-          title: 'Portfolio & Showroom',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Forschungsprojekt',
-              en: 'Research Project',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/research_project',
-          },
-          notes: null,
-          reference: null,
-          keywords: null,
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: 'b9TWZjUg888vrFAKHD3c3X',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-10-15T14:35:23.365935+02:00',
-          date_changed: '2021-12-15T14:49:13.351234+01:00',
-          title: 'Album of Airbrushes',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Album',
-              en: 'Album',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          },
-          notes: '',
-          reference: null,
-          keywords: [],
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: '9WMh6vEFRZ7773g5CSNxWX',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-12-03T11:30:18.159091+01:00',
-          date_changed: '2021-12-09T10:53:04.685280+01:00',
-          title: 'Portfolio & Showroom',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Forschungsprojekt',
-              en: 'Research Project',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/research_project',
-          },
-          notes: null,
-          reference: null,
-          keywords: null,
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: 'b9TWZjUg666vrFAKHD3c3X',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-10-15T14:35:23.365935+02:00',
-          date_changed: '2021-12-15T14:49:13.351234+01:00',
-          title: 'Album of Airbrushes',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Album',
-              en: 'Album',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          },
-          notes: '',
-          reference: null,
-          keywords: [],
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: '9WMh6vEFRZ5553g5CSNxWX',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-12-03T11:30:18.159091+01:00',
-          date_changed: '2021-12-09T10:53:04.685280+01:00',
-          title: 'Portfolio & Showroom',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Forschungsprojekt',
-              en: 'Research Project',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/research_project',
-          },
-          notes: null,
-          reference: null,
-          keywords: null,
-          texts: [],
-          published: false,
-          data: {},
-        },
-        {
-          id: 'b9TWZjUg444vrFAKHD3c3X',
-          parents: [],
-          relations: [],
-          icon: '/portfolio/s/img/sheet-empty.svg',
-          has_media: true,
-          date_created: '2021-10-15T14:35:23.365935+02:00',
-          date_changed: '2021-12-15T14:49:13.351234+01:00',
-          title: 'Album of Airbrushes',
-          subtitle: '',
-          type: {
-            label: {
-              de: 'Album',
-              en: 'Album',
-            },
-            source: 'https://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          },
-          notes: '',
-          reference: null,
-          keywords: [],
-          texts: [],
-          published: false,
-          data: {},
-        },
-      ],
+      toggleElements: 'toggle',
     };
   },
   computed: {
     baseEntrySelectorEntries() {
-      return this.baseEntrySelector.slice(0, this.entriesPerPage);
+      if (!this.noResults) {
+        const start = (this.page - 1) * this.entriesPerPage;
+        return this.entries.slice(start, start + this.entriesPerPage);
+      }
+      return [];
     },
-  },
-  watch: {},
-  mounted() {
-    this.entriesPerPage = this.calcEntriesPerPage();
+    entrySelectorText() {
+      if (this.useCustomText) {
+        return {
+          entrySelectorText: {
+            noEntriesTitle: 'Custom No Match Title',
+            noEntriesSubtext: 'Custom No Match Subtext.',
+            options: {
+              show: 'Custom Options',
+              hide: 'Custom Exit',
+            },
+            search: 'Custom Search Text',
+            selectAll: 'Custom Select All',
+            selectNone: 'Custom Select None',
+            entriesSelected: 'Custom Items Selected',
+          },
+        };
+      }
+      return {};
+    },
+    entriesPerPage() {
+      return this.showPagination ? 2 : 5;
+    },
+    displayData: {
+      set(val) {
+        this.baseExpandList = val;
+      },
+      get() {
+        return this.editExpandList ? this.baseExpandList
+          : this.baseExpandList.filter(item => !item.hidden);
+      },
+    },
   },
   methods: {
-    toggleOptions(value) {
-      this.entriesSelectable = value;
+    getNewEntries({ page }) {
+      this.page = Number(page);
     },
-    handleAction(action) {
-      console.log('action', action);
-      console.log('selected entries', this.selectedEntries);
+    activateExpandList() {
+      this.editExpandList = true;
     },
-    calcEntriesPerPage() {
-      const { entrySelector } = this.$refs;
-      let bodyHeight = entrySelector.$refs.body.clientHeight;
-      // if pagination element is not present yet (on initial render) deduct height and spacing
-      // from sidebar height
-      if (!entrySelector.$refs.pagination) {
-        bodyHeight = bodyHeight - 48 - 16;
-      }
-      // hardcoded because unfortunately no other possibility found
-      const entryHeight = this.isMobile ? 48 : 57;
-      const numberOfEntries = Math.floor(bodyHeight / entryHeight) - 1;
-
-      return numberOfEntries > 4 ? numberOfEntries : 4;
+    cancelExpandList() {
+      this.editExpandList = false;
+      this.$refs.baseExpandList.reset();
+    },
+    saveExpandList() {
+      this.editExpandList = false;
+      this.$refs.baseExpandList.save();
+    },
+    saveExpandListEdit(val) {
+      this.baseExpandList = val;
     },
   },
 };
@@ -409,77 +579,4 @@ export default {
 <style lang="scss">
 @import "../src/styles/variables";
 
-.base-advanced-search {
-  margin-top: 32px;
-}
-
-.activity-showcase {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.activity-showcase__header {
-  font-size: $font-size-regular;
-  margin: 0 0 0 $spacing;
-}
-
-.activity-showcase-after {
-  display: flex;
-}
-
-.dropdown-extended {
-  border-top: $separation-line;
-  padding: $spacing;
-
-  .show-more-toggle {
-    color: $app-color;
-  }
-}
-
-  .canvas {
-    padding: 16px;
-  }
-
-  .flex {
-    display: flex;
-  }
-
-  .row {
-    max-height: 300px;
-  }
-
-  div > .base-box-button {
-    margin: 8px;
-  }
-
-  button {
-    display:block;
-  }
-
-  .popup-text {
-    display: flex;
-    align-items: flex-end;
-  }
-
-  .popup-text > div:first-of-type {
-    margin-right: 16px;
-  }
-
-  .form-field {
-    background-color: white;
-    padding: 16px;
-    margin-bottom: 32px;
-  }
-
-  .image-box {
-    margin: 8px;
-  }
-
-  .multiline-dropdown {
-    margin-bottom: -4px;
-  }
-  .spacer {
-    height: 50px;
-  }
 </style>

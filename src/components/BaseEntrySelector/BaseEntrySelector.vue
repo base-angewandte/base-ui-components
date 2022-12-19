@@ -87,9 +87,8 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        :select-all-disabled="!!maxSelectedEntries && (!(selectableEntries.length
-          < (maxSelectedEntries - selectedListIds.length)
-          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
+        :select-all-disabled="!!maxSelectedEntries && (maxSelectedEntries <= selectedListIds.length
+          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
         @selected="changeAllSelectState">
         <template v-slot:selectedText>
           {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
@@ -177,13 +176,13 @@ import i18n from '@/mixins/i18n';
 export default {
   name: 'BaseEntrySelector',
   components: {
-    BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
-    BaseMenuList: () => import('../BaseMenuList/BaseMenuList').then(m => m.default || m),
-    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
-    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
-    BaseSearch: () => import('../BaseSearch/BaseSearch').then(m => m.default || m),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
+    BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
+    BaseLoader: () => import('../BaseLoader/BaseLoader'),
+    BaseMenuList: () => import('../BaseMenuList/BaseMenuList'),
+    BaseOptions: () => import('../BaseOptions/BaseOptions'),
+    BasePagination: () => import('../BasePagination/BasePagination'),
+    BaseSearch: () => import('../BaseSearch/BaseSearch'),
+    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions'),
   },
   mixins: [i18n],
   props: {
@@ -277,7 +276,7 @@ export default {
      * provided<br>
      * Needs to be an object with the following properties:<br>
      *  *label*: specify a label for the sort options drop down (purely for accessibility purposes)
-     *  *default*: specify a default option that the drop down is initialized with<br>
+     *  *default*: specify a default option that the dropdown is initialized with<br>
      *    this needs to have the same object structure as the objects in 'entryTypes'<br>
      *    if no default is provided the first option in the list will be selected
      *  *valuePropertyName*: specify the name of the property that contains a unique value
@@ -305,7 +304,7 @@ export default {
      * provided<br>
      * Needs to be an object with the following properties:<br>
      *  *label*: specify a label for the sort options drop down (purely for accessibility purposes)
-     *  *default*: specify a default option that the drop down is initialized with.
+     *  *default*: specify a default option that the dropdown is initialized with.
      *    if none is specified the first type in the 'sortOptions' will be used.<br>
      *    This needs to be an object with the same properties as 'sortOptions'.
      *  *valuePropertyName*: specify the name of the property that contains a unique value
@@ -317,7 +316,8 @@ export default {
         default: null,
         valuePropertyName: 'value',
       }),
-      validator: value => !value || Object.keys(value).every(key => ['label', 'default', 'valuePropertyName'].includes(key)),
+      validator: value => !value || Object.keys(value).every(key => [
+        'label', 'default', 'valuePropertyName'].includes(key)),
     },
     /**
      * specify informational texts for the component (especially helpful to provide language
@@ -333,7 +333,7 @@ export default {
      *     <b>selectAll</b>: Text for Select All button <br>
      *     <b>selectNone</b>: Text for Select None button <br>
      *     <b>entriesSelected</b>: Text for number of entries (x) selected information displayed as
-     *      'x {provided text} <br>
+     *      x {provided text} <br>
      *  <br>
      *  The values of this object might be plain string or a key for an i18n file (in case it is not
      *  an object that is required! - in that case the above applies to the values within that

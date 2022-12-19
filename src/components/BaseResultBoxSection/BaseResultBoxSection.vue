@@ -261,12 +261,12 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
-    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
-    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton').then(m => m.default || m),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
+    BaseLoader: () => import('../BaseLoader/BaseLoader'),
+    BaseOptions: () => import('../BaseOptions/BaseOptions'),
+    BaseButton: () => import('../BaseButton/BaseButton'),
+    BasePagination: () => import('../BasePagination/BasePagination'),
+    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton'),
+    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions'),
   },
   mixins: [i18n, navigateList],
   model: {
