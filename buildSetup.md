@@ -10,9 +10,6 @@ npm run build
 # add postcss transformations to base-ui-components.css
 npm run build:transform-css
 
-# build library components with rollup and rebuild on changes
-npm run build:watch
-
 # serve with hot reload at localhost:8080
 npm run dev
 
@@ -30,12 +27,6 @@ npm run svg
 
 # run unit tests
 npm run test:unit
-
-# create index file for every component (if it does not exist yet)
-npm run updateindex
-
-# force index update (also if index.js already exists)
-npm run updateindex:all
 
 # create a changelog for the newest version adding to CHANGELOG.md
 npm run changelog
