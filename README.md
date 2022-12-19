@@ -29,8 +29,15 @@ import 'base-ui-components/dist/components/BaseCarousel/BaseCarousel.css';
 import 'base-ui-components/dist/base-ui-components-common.css';
 import App from './App';
 
-Vue.use(BaseAutocompleteInput);
-Vue.use(BaseCarousel);
+const components = {
+  BaseAutcompleteInput,
+  BaseCarousel,
+};
+
+Object.entries(components)
+  .forEach(([name, component]) => {
+    Vue.component(name, component);
+  });
 
 new Vue({
   el: '#app',
@@ -47,12 +54,15 @@ main.js
 
 import Vue from 'vue';
 // import the complete components bundle
-import BaseUiComponents from 'base-ui-components';
+import * as BaseUiComponents from 'base-ui-components';
 // and the css
 import 'base-ui-components/dist/base-ui-components.css';
 import App from './App';
 
-Vue.use(BaseUiComponents);
+Object.entries(BaseUiComponents)
+  .forEach(([name, component]) => {
+    Vue.component(name, component);
+  });
 
 new Vue({
   el: '#app',
