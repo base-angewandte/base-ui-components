@@ -52,7 +52,7 @@ or see [styleguide](https://base-angewandte.github.io/base-ui-components/).
 
 ## Development
 
-The v2 of this component library is currently build via [rollup](https://rollupjs.org).
+The v2 of this component library is currently build via [Vite](https://vitejs.dev).
 
 This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
 available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
