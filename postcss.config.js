@@ -3,11 +3,11 @@ module.exports = {
     autoprefixer: {},
     // needed for import of external css (e.g. leaflet)
     // needs to be before postcss-url to have leaflet background-images included
-    postcssImport: {},
+    'postcss-import': {},
     // TODO: still needed?
     // needed to inline svg-files - e.g. BaseSearch magnifier
-    postcssUrl: { url: 'inline' },
+    'postcss-url': { url: 'inline' },
     // remove comments
-    postcssDiscardComments: { removeAll: true },
+    'postcss-discard-comments': { removeAll: true },
   },
 };
