@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# make css out of merged components css files
+for d in dist/src/components/*/; do
+  # merge rollup built css files
+  cat $d*.css > $d/`basename "$d"`.css;
+  # delete rollup built css files
+  rm -rf cat $d*.vue*.css
+done
+
 # make css out of all components css
 cat dist/src/components/*/*.css > dist/base-ui-components.css;
-
-# make css out of merged components css
-for d in dist/src/components/*/; do
-  cat $d*.css > $d/`basename "$d"`.css;
-done
 
 # make css out of lib.scss file and use postcss autoprefixer
 sass src/styles/lib.scss | postcss --use autoprefixer -o lib.post.css;

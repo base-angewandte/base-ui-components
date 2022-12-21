@@ -24,8 +24,8 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/components/index.js'),
       name: 'BaseUiComponents',
-      fileName: '[name]',
       formats: ['es', 'cjs'],
+      fileName: format => `[name].${format}.js`,
     },
     rollupOptions: {
       external: [
