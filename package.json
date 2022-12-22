@@ -4,10 +4,13 @@
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "homepage": "https://base.uni-ak.ac.at",
   "scripts": {
-    "build": "vite build && npm run build:transform-css",
+    "build": "vite build && npm run build:transform-css && npm run build:update-package-exports",
     "build:watch": "npm run build && vite build --watch",
     "build:transform-css": "sh build/transform-css.sh",
+    "build:update-package-exports": "node build/update-package-exports.js",
     "dev": "vite",
     "lint": "vue-cli-service lint",
     "postversion": "./postversion.sh",
@@ -26,8 +29,8 @@
       "import": "./dist/src/components/index.es.js",
       "require": "./dist/src/components/index.cjs.js"
     },
-    "./dist/base-ui-components.css": "./dist/base-ui-components.css",
     "./dist/base-ui-components-common.css": "./dist/base-ui-components-common.css",
+    "./dist/base-ui-components.css": "./dist/base-ui-components.css",
     "./dist/src/components/BaseAdvancedSearch/BaseAdvancedSearch.css": "./dist/src/components/BaseAdvancedSearch/BaseAdvancedSearch.css",
     "./dist/src/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow.css": "./dist/src/components/BaseAdvancedSearchRow/BaseAdvancedSearchRow.css",
     "./dist/src/components/BaseAutocompleteInput/BaseAutocompleteInput.css": "./dist/src/components/BaseAutocompleteInput/BaseAutocompleteInput.css",
@@ -145,8 +148,6 @@
     "node": ">= 4.0.0",
     "npm": ">= 3.0.0"
   },
-  "homepage": "https://base.uni-ak.ac.at",
-  "license": "SEE LICENSE IN LICENSE.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/base-angewandte/base-ui-components.git"
