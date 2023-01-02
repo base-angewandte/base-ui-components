@@ -10,7 +10,7 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
         @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
         @clicked="activeEntry = $event">
         <template
-          v-slot:thumbnails="{ item }">
+          #thumbnails="{ item }">
           <base-icon
             v-if="item.published"
             name="eye"
@@ -41,6 +41,7 @@ export default {
       list: [
         {
           id: '1',
+          icon: 'file-object',
           title: 'Active Entry',
           type: 'Bild',
           error: false,
