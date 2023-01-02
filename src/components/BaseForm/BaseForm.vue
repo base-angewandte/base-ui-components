@@ -13,7 +13,53 @@
                  { 'base-form-field-left-margin': isHalfFieldSecond(element) }]"
         v-bind="formFieldComponentProps(element, index)"
         @field-value-changed="setFieldValue($event, element.name)"
-        @fetch-autocomplete="fetchAutocomplete" />
+        @fetch-autocomplete="fetchAutocomplete">
+        <template #label-addition="{ fieldName }">
+          <!-- @slot Slot to allow for additional elements on the right side of the label row
+          \<div\> (e.g. language tabs)) -->
+          <slot
+            name="label-addition"
+            :field-name="fieldName" />
+        </template>
+        <template #pre-input-field>
+          <!-- @slot slot to add elements within the form field but in a row before the actual
+          input field<br>
+          for an example see [BaseInput](#baseinput)-->
+          <slot name="pre-input-field" />
+        </template>
+        <template
+          #input-field-addition-before>
+          <!-- @slot Slot to allow for additional elements in the input field \<div\>
+            (before \<input\>) -->
+          <slot name="input-field-addition-before" />
+        </template>
+        <template #input-field-inline-before>
+          <!-- @slot to add elements directly inline before the input
+              (contrary to input-field-addition-before this does not wrap<br>
+          for an example see [BaseInput](#baseinput)-->
+          <slot name="input-field-inline-before" />
+        </template>
+        <template #input-field-addition-after>
+          <!-- @slot for adding elements after input -->
+          <slot name="input-field-addition-after" />
+        </template>
+        <template #post-input-field>
+          <!-- @slot for adding elements at the end covering the whole height -->
+          <slot name="post-input-field" />
+        </template>
+        <template #error-icon>
+          <!-- @slot use a custom icon instead of standard error/warning icon -->
+          <slot name="error-icon" />
+        </template>
+        <template #remove-icon>
+          <!-- @slot for adding elements after input (e.g. used to add loader -->
+          <slot name="remove-icon" />
+        </template>
+        <template #below-input>
+          <!-- @slot below-input slot added to e.g. add drop down -->
+          <slot name="below-input" />
+        </template>
+      </BaseFormFieldCreator>
 
       <!-- ALLOW FOR MULTIPLE VALUES PER FIELD -->
       <template v-else>
@@ -220,17 +266,24 @@ export default {
       default: false,
     },
     /**
-     * provide an object with settings and properties for each field, this is used to set
-     * `required`, `invalid`, `errorMessage` for each field this is applicable to<br>
-     * for an example on how these properties look on an individual form field
-     * see [BaseInput](#baseinput)
+     * provide an object with settings and properties for each field. This takes an object
+     * with the field name as properties with the props nested.<br>
+     * { fieldName1: { required: false, ... }, fieldName2: { ... } }<br>
+     * <br>
+     * find the possible variables at the respective input components: <br>
+     * [BaseInput](#baseinput)<br>
+     * [BaseAutocompleteInput](#baseautocompleteinput)<br>
+     * [BaseMultilineTextInput](#basemultilinetextinput)<br>
+     * [BaseChipsInput](#basechipsinput)<br>
+     * [BaseChipsBelow](#basechipsbelow)<br>
+     * [BaseDateInput](#basedateinput)<br>
+     * [BaseToggle](#basetoggle)<br>
      */
     fieldProps: {
       type: Object,
       default: () => ({}),
       validator: val => Object.keys(val).length === 0 || Object.values(val)
-        .every(fieldProps => Object.keys(fieldProps)
-          .every(fieldProp => ['required', 'invalid', 'errorMessage'].includes(fieldProp))),
+        .every(fieldProps => Object.keys(fieldProps)),
     },
   },
   data() {
@@ -421,11 +474,11 @@ export default {
     },
     formFieldComponentProps(element, index, valueIndex) {
       const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
-      const elementProps = this.fieldProps[element.name] || {};
       return {
-        ...elementProps,
         field: element,
-        label: this.getFieldName(element),
+        label: this.fieldProps[element.name] && this.fieldProps[element.name].label
+          ? this.fieldProps[element.name].label : this.getFieldName(element),
+        fieldProps: this.fieldProps[element.name] || {},
         showLabel: !this.allowMultiply(element)
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
         dropDownList: this.dropDownLists[element.name],
@@ -537,7 +590,7 @@ export default {
   .base-form {
     background-color: white;
     display: flex;
-    align-items: baseline;
+    align-items: flex-end;
     flex-wrap: wrap;
     padding: $spacing $spacing 0;
 

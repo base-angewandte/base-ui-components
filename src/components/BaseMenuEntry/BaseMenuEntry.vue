@@ -281,6 +281,7 @@ export default {
       }
     }
 
+    // this class name is used in BaseMenuList for setting the drag image!!
     .base-menu-entry-icon {
       height: $icon-large;
       max-height: $icon-large;

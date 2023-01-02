@@ -217,23 +217,29 @@ export default {
      * @param {CustomEvent} event
      */
     getDragImage(event) {
-      // get the relevant svg element from the base menu entry
-      const entryIcon = event.item.getElementsByTagName('svg')[0];
-      // get the size to be able to set it to the drag image as well
-      const size = `${(entryIcon.clientHeight * 2)}px`;
+      // get the relevant svg element from the base menu entry by class name
+      // (necessary to use class name so thumbnail sgvs are not used if no icon is provided in list)
+      const entryIcon = event.item.getElementsByClassName('base-menu-entry-icon')[0];
+      // check if icon was set
+      if (entryIcon) {
+        // get the size to be able to set it to the drag image as well
+        const size = `${(entryIcon.clientHeight * 2)}px`;
 
-      // clone the svg used in this entry
-      const pic = entryIcon.cloneNode(true);
-      pic.id = 'drag-icon';
-      pic.style.height = size;
-      pic.style.maxHeight = size;
-      pic.style.width = size;
-      pic.style.backgroundColor = 'white';
-      pic.style.position = 'absolute';
-      pic.style.top = '-99999px';
-      pic.style.left = '-99999px';
-      // store it in the variable
-      this.dragImg = pic;
+        // clone the svg used in this entry
+        const pic = entryIcon.cloneNode(true);
+        pic.id = 'drag-icon';
+        pic.style.height = size;
+        pic.style.maxHeight = size;
+        pic.style.width = size;
+        pic.style.backgroundColor = 'white';
+        pic.style.position = 'absolute';
+        pic.style.top = '-99999px';
+        pic.style.left = '-99999px';
+        // store it in the variable
+        this.dragImg = pic;
+      } else {
+        this.dragImg = null;
+      }
     },
     dragStart() {
       this.dragging = true;
@@ -247,11 +253,14 @@ export default {
       }
     },
     modifyDragItem(dataTransfer) {
-      // add the element retrieved in choose event (getDragImage()) to the dom
-      document.body.appendChild(this.dragImg);
-      // Edge does not support setDragImage
-      if (typeof DataTransfer.prototype.setDragImage === 'function') {
-        dataTransfer.setDragImage(this.dragImg, 0, 0);
+      // check if drag image was set (not the case if no icon was provided in list items)
+      if (this.dragImg) {
+        // add the element retrieved in choose event (getDragImage()) to the dom
+        document.body.appendChild(this.dragImg);
+        // Edge does not support setDragImage
+        if (typeof DataTransfer.prototype.setDragImage === 'function') {
+          dataTransfer.setDragImage(this.dragImg, 0, 0);
+        }
       }
       dataTransfer.setData('draggable', '');
     },
