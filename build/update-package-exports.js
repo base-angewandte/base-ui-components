@@ -15,8 +15,8 @@ const config = {
   // default object where the css exports are appended
   exports: {
     '.': {
-      import: './dist/src/components/index.es.js',
-      require: './dist/src/components/index.cjs.js'
+      import: './dist/components/index.es.js',
+      require: './dist/components/index.cjs.js'
     }
   }
 }
