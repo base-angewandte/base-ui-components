@@ -29,10 +29,10 @@
       v-if="isRemovable"
       class="base-chip__icon"
       @click.stop="removeClicked">
-      <img
-        :src="require('../../static/icons/remove.svg')"
+      <BaseIcon
+        name="remove"
         alt="remove"
-        class="base-chip__icon-img">
+        class="base-chip__icon-svg" />
     </div>
     <base-hover-box
       ref="hoverBox"
@@ -44,6 +44,7 @@
 <script>
 import { createId } from '@/utils/utils';
 import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
+import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Basic Chip component
@@ -53,6 +54,7 @@ export default {
   name: 'BaseChip',
   components: {
     BaseHoverBox,
+    BaseIcon,
   },
   model: {
     prop: 'entry',
@@ -287,9 +289,9 @@ export default {
       cursor: pointer;
       display: flex;
 
-      .base-chip__icon-img {
+      .base-chip__icon-svg {
         height: $icon-min;
-        vertical-align: middle;
+        width: $icon-min;
       }
     }
   }
