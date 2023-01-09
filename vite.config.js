@@ -1,6 +1,8 @@
 import path from 'path';
 import { defineConfig } from 'vite';
+import babel from '@rollup/plugin-babel';
 import vue from '@vitejs/plugin-vue2';
+
 // Todo: implement eslint
 // import eslint from 'vite-plugin-eslint';
 
@@ -8,6 +10,12 @@ import vue from '@vitejs/plugin-vue2';
 export default defineConfig({
   plugins: [
     vue(),
+    babel({
+      exclude: 'node_modules/**',
+      // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
+      // user 'runtime' for libraries for improved code deduplication
+      babelHelpers: 'runtime',
+    }),
     // eslint({ cache: false }),
   ],
   resolve: {
