@@ -4,7 +4,7 @@
 # install dependencies
 npm install
 
-# build library components with rollup
+# build library components
 npm run build
 
 # add postcss transformations to base-ui-components.css
@@ -13,20 +13,11 @@ npm run build:transform-css
 # serve with hot reload at localhost:8080
 npm run dev
 
-# run styleguide for development purposes
-npm run styleguide
-
-# build styleguide docs
-npm run styleguilde:build
-
 # lint files
 npm run lint
 
 # create svg spriteSheet
 npm run svg
-
-# run unit tests
-npm run test:unit
 
 # create a changelog for the newest version adding to CHANGELOG.md
 npm run changelog
@@ -43,12 +34,6 @@ npm link
 # in target project
 npm link base-ui-components
 ```
-
-## Base Components
-
-For a list of components included in the build and their options run ```npm run styleguide```
-or see [styleguide](https://base-angewandte.github.io/base-ui-components/).
-
 
 ## Development
 

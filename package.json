@@ -15,8 +15,6 @@
     "lint": "vue-cli-service lint",
     "postversion": "./postversion.sh",
     "prepublishOnly": "npm run build",
-    "styleguide": "vue-cli-service styleguidist",
-    "styleguide:build": "cross-env NODE_ENV=build vue-cli-service styleguidist:build",
     "svg": "node ./build/generate-svg-sprite-sheet.js",
     "prepare": "husky install",
     "changelog": "gulp changelog"
@@ -133,7 +131,6 @@
     "svgstore-cli": "^2.0.1",
     "vite": "^3.2.3",
     "vue": "^2.7.14",
-    "vue-cli-plugin-styleguidist": "^4.54.4",
     "vue-template-compiler": "^2.7.14",
     "yargs": "^17.6.2"
   },
