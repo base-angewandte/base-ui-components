@@ -5,8 +5,10 @@
       :class="[
         'base-options__row',
         `base-options__row-${alignOptions}`,
-        { 'base-options__row-wrap': !showOptionsInline
-          || (!useOptionsButton && remainingActionsWidth < actionButtonsWidth) },
+        {
+          'base-options__row-wrap': !showOptionsInline
+            || (!useOptionsButton && remainingActionsWidth < actionButtonsWidth),
+        },
       ]">
       <div
         v-if="beforeSlotHasData"

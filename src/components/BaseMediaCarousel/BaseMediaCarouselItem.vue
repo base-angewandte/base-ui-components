@@ -15,10 +15,11 @@
       :data-srcset="imageSourceSet"
       :data-src="sourceUrl"
       :style="displaySize"
+      :alt="fileName"
       :class="[
         'swiper-lazy',
         'base-media-preview-image',
-        'base-media-preview-rotation-' + orientation.toString()
+        'base-media-preview-rotation-' + orientation.toString(),
       ]"
       @error="displayImage = false">
     <div

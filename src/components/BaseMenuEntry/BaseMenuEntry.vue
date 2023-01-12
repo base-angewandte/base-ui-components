@@ -4,15 +4,17 @@
     :tabindex="isSelectable && selectActive ? -1 : 0"
     :href="'#' + title"
     :class="['base-menu-entry',
-             {'base-menu-entry-activatable': isActivatable && !isDisabled,
-              'base-menu-entry-active': isActive,
-              'base-menu-entry-no-icon': !icon,
-              'base-menu-entry-disabled' : isDisabled,
-              'base-menu-entry-text-fade-out' : !showThumbnails }]"
+             {
+               'base-menu-entry-activatable': isActivatable && !isDisabled,
+               'base-menu-entry-active': isActive,
+               'base-menu-entry-no-icon': !icon,
+               'base-menu-entry-disabled': isDisabled,
+               'base-menu-entry-text-fade-out': !showThumbnails,
+             }]"
     :role="isSelectable && selectActive ? '' : 'link'"
     @keyup.enter.prevent="clicked"
     @click="clicked">
-    <base-icon
+    <BaseIcon
       v-if="icon"
       ref="entryIcon"
       :name="icon"
@@ -21,7 +23,7 @@
     <div
       :class="[
         'base-menu-entry-text-wrapper',
-        { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable}
+        { 'base-menu-entry-text-slide-overlay': showThumbnails && isSelectable },
       ]">
       <div class="base-menu-entry-title-description-wrapper">
         <div class="base-menu-entry__title-subtext-wrapper">
@@ -279,6 +281,7 @@ export default {
       }
     }
 
+    // this class name is used in BaseMenuList for setting the drag image!!
     .base-menu-entry-icon {
       height: $icon-large;
       max-height: $icon-large;

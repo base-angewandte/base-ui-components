@@ -90,7 +90,7 @@
         :select-all-disabled="!!maxSelectedEntries && (maxSelectedEntries <= selectedListIds.length
           || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
         @selected="changeAllSelectState">
-        <template v-slot:selectedText>
+        <template #selectedText>
           {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
           ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
           <span
@@ -135,7 +135,7 @@
           @clicked="entryClicked"
           @selected="selectEntry">
           <template
-            v-slot:thumbnails="{ item }">
+            #thumbnails="{ item }">
             <!-- @slot add custom elements at the end of the item row
               (see also [BaseMenuList](#basemenulist))<br>
               this slot can only be be used if the 'entries' slot is not used -->

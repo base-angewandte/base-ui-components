@@ -8,7 +8,7 @@
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index]"
         :filter-list="displayedFilters"
-        :applied-filter.sync="filter"
+        :applied-filter="filter"
         :is-loading="filtersLoadingState[index]"
         :default-filter="defaultFilter"
         :placeholder="placeholder.filterRow || placeholder"

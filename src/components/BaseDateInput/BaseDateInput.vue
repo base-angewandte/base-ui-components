@@ -26,6 +26,8 @@
     </div>
 
     <!-- FORM FIELDS -->
+    <!-- keydown event is counter productive to workflow here -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
       v-click-outside="clickedOutside"
       class="base-date-input__field-wrapper"
@@ -63,7 +65,7 @@
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('fromOpen', $event)"
             v-on="inputListeners">
-            <template v-slot:input>
+            <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
@@ -81,7 +83,10 @@
                   @pick="datePicked('from')"
                   @click.native.prevent.stop=""
                   @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
-                  <template v-slot:input>
+                  <template #input>
+                    <!-- need to disable because label is there - it is just in BaseInput
+                    component -->
+                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
                       :id="label + '-' + id"
                       ref="inputFrom"
@@ -103,13 +108,13 @@
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
                   is not used -->
-                  <template v-slot:icon-calendar>
+                  <template #icon-calendar>
                     <div class="base-date-input__icon-wrapper" />
                   </template>
                 </DatePicker>
               </div>
             </template>
-            <template v-slot:post-input-field>
+            <template #post-input-field>
               <BaseIcon
                 v-if="showIcons"
                 ref="baseIcon"
@@ -144,7 +149,7 @@
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('toOpen', $event)"
             v-on="inputListeners">
-            <template v-slot:input>
+            <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
@@ -162,7 +167,10 @@
                   @pick="datePicked('to')"
                   @click.native.prevent.stop=""
                   @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
-                  <template v-slot:input>
+                  <template #input>
+                    <!-- need to disable because label is there - it is just in BaseInput
+                      component -->
+                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
                       :id="label + '-to-' + id"
                       ref="inputTo"
@@ -184,13 +192,13 @@
                   </template>
                   <!-- this empty element is here so that the default icon of
                   datepicker is not used -->
-                  <template v-slot:icon-calendar>
+                  <template #icon-calendar>
                     <div class="base-date-input__icon-wrapper" />
                   </template>
                 </DatePicker>
               </div>
             </template>
-            <template v-slot:post-input-field>
+            <template #post-input-field>
               <BaseIcon
                 v-if="showIcons"
                 :name="isToTimeField ? 'clock' : 'calendar-many'"

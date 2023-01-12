@@ -29,7 +29,7 @@
       @keydown="checkKeyEvent"
       v-on="$listeners">
       <template
-        v-slot:label-addition>
+        #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
           (e.g. language tabs)) -->
         <slot name="label-addition" />
@@ -42,14 +42,14 @@
           {{ sortText }}
         </button>
       </template>
-      <template v-slot:pre-input-field>
+      <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual
         input field<br>
         for an example see [BaseInput](#baseinput)-->
         <slot name="pre-input-field" />
       </template>
       <template
-        v-slot:input-field-addition-before>
+        #input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field \<div\>
           (before \<input\>) -->
         <slot name="input-field-addition-before" />
@@ -139,29 +139,29 @@
           </template>
         </div>
       </template>
-      <template v-slot:input-field-inline-before>
+      <template #input-field-inline-before>
         <!-- @slot to add elements directly inline before the input
             (contrary to input-field-addition-before this does not wrap<br>
         for an example see [BaseInput](#baseinput)-->
         <slot name="input-field-inline-before" />
       </template>
-      <template v-slot:input-field-addition-after>
+      <template #input-field-addition-after>
         <!-- @slot for adding elements after input -->
         <slot name="input-field-addition-after" />
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <!-- @slot for adding elements at the end covering the whole height -->
         <slot name="post-input-field" />
       </template>
-      <template v-slot:error-icon>
+      <template #error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon -->
         <slot name="error-icon" />
       </template>
-      <template v-slot:remove-icon>
+      <template #remove-icon>
         <!-- @slot for adding elements after input (e.g. used to add loader -->
         <slot name="remove-icon" />
       </template>
-      <template v-slot:below-input>
+      <template #below-input>
         <!-- @slot below-input slot added to e.g. add drop down -->
         <slot name="below-input" />
       </template>
@@ -170,9 +170,9 @@
 </template>
 
 <script>
+import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput';
-import Draggable from 'vuedraggable';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
 

@@ -5,7 +5,7 @@
     :data-srcset="lazyload ? sourceSet : null"
     :src="lazyload ? clearPng : source"
     :srcset="lazyload ? null : sourceSet"
-    :class="['base-image', { 'lazyload': lazyload }]"
+    :class="['base-image', { lazyload: lazyload }]"
     @error="emitError">
 </template>
 

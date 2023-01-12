@@ -67,7 +67,7 @@
       handle=".base-chips-below-list-icon-wrapper"
       @end="updateList($event, selectedBelowListInt)">
       <div
-        v-for="(entry,index) in selectedBelowListInt"
+        v-for="(entry, index) in selectedBelowListInt"
         :key="'item' + entry.idInt"
         :name="entry[labelPropertyName]"
         class="base-chips-below-list-item"

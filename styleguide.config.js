@@ -88,6 +88,8 @@ config = {
     'src/components/BaseExpandList/BaseExpandListRow.vue',
     'src/components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
     'src/components/BaseAdvancedSearchRow/*',
+    // excluded because of accessibility issues
+    'src/components/BaseDatePanel/*',
   ],
 };
 

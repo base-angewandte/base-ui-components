@@ -1,13 +1,17 @@
 <template>
   <div
     :class="['base-toggle',
-             {'base-toggle--checked': checkedInt },
-             {'base-toggle--disabled': disabled }]"
+             { 'base-toggle--checked': checkedInt },
+             { 'base-toggle--disabled': disabled }]"
+    @focusin="animate = true"
     @mouseover="animate = true"
+    @focusout="animate = false"
     @mouseleave="animate = false">
     <label
+      :for="`toggle-input-${idInt}`"
       class="base-toggle__container">
       <input
+        :id="`toggle-input-${idInt}`"
         v-model="checkedInt"
         :name="name"
         :checked="checkedInt"
@@ -16,9 +20,7 @@
         :aria-disabled="disabled"
         :type="'checkbox'"
         value=""
-        class="base-toggle__input"
-        @focus="animate = true"
-        @blur="animate = false">
+        class="base-toggle__input">
 
       <div class="base-switch">
         <span
@@ -52,6 +54,7 @@
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
@@ -113,12 +116,30 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * if field is occurring more then once - set an id<br>
+     * in case a custom input is used with the input slot it is important to
+     * assign the same id to the input element
+     */
+    id: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
       checkedInt: false,
       animate: false,
     };
+  },
+  computed: {
+    /**
+     * check if an id was provided (to handle label input connection), if not create one
+     * @returns {String|string}
+     */
+    idInt() {
+      return this.id || createId();
+    },
   },
   watch: {
     checked: {

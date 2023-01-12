@@ -6,6 +6,7 @@
       ref="playButton"
       :title="`${getI18nTerm(buttonTitle)} Video`"
       class="base-media-video__control"
+      @keydown.enter.space="play"
       @click="play">
       <base-icon
         name="play"
@@ -17,7 +18,7 @@
       ref="videoPlayer"
       :style="displaySize"
       :poster="mediaPosterUrl"
-      :tabindex="playButton ? '-1' : '1'"
+      :tabindex="playButton ? '-1' : '0'"
       class="base-media-video__video">
       Your browser does not support the video tag.
     </video>

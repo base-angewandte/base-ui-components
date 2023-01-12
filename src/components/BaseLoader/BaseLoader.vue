@@ -1,6 +1,6 @@
 <template>
   <div
-    :style="{...position, ...{ '--loader-color': loaderColor } }"
+    :style="{ ...position, ...{ '--loader-color': loaderColor } }"
     class="base-loader">
     <svg
       v-if="!hide"

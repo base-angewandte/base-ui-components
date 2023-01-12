@@ -26,23 +26,23 @@
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
-      :assistive-text="isFieldTypeChips ? assistiveText: false"
+      :assistive-text="isFieldTypeChips ? assistiveText : false"
       :is-active-delay="dateFieldDelay"
       input-class="base-search__input-field"
       field-type="search"
       class="base-search__input"
       v-on="$listeners">
-      <template v-slot:pre-input-field>
+      <template #pre-input-field>
         <!-- @slot add elements within search but before all other elements <br>
           for an example see [BaseInput](#baseinput) -->
         <slot name="pre-input-field" />
       </template>
-      <template v-slot:input-field-addition-before>
+      <template #input-field-addition-before>
         <!-- @slot add elements within search but before all other elements <br>
           for an example see [BaseInput](#baseinput) -->
         <slot name="input-field-addition-before" />
       </template>
-      <template v-slot:input-field-inline-before>
+      <template #input-field-inline-before>
         <div
           :class="[dateFieldType && showPreInputIcon
             ? 'base-search__spacing-date' : 'base-search__spacing']" />
@@ -56,28 +56,28 @@
                      { 'base-search__magnifier-icon__active': isActiveInt }]" />
         </slot>
       </template>
-      <template v-slot:input-field-addition-after>
+      <template #input-field-addition-after>
         <!-- @slot for adding elements after input <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="input-field-addition-after" />
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <!-- @slot elements after the actual input element but within the input field container <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="post-input-field" />
         <div :class="{ 'base-search__spacing': dateFieldType }" />
       </template>
-      <template v-slot:error-icon>
+      <template #error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon<br>
           for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="error-icon" />
       </template>
-      <template v-slot:remove-icon>
+      <template #remove-icon>
         <!-- @slot for adding custom input remove icon <br>
         for an example see [BaseChipsInputField](#basechipsinputfield)-->
         <slot name="remove-icon" />
       </template>
-      <template v-slot:below-input>
+      <template #below-input>
         <!-- @slot below-input slot added to e.g. add drop down -->
         <slot name="below-input" />
       </template>
