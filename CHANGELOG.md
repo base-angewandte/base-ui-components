@@ -1,3 +1,22 @@
+## 2.0.5 (2023-01-12)
+
+
+### Added
+
+* **[BaseToggle](https://base-angewandte.github.io/base-ui-components/#basetoggle)**: add prop id and internal id.
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform) / [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/#baseformfieldcreator)**: expand prop fieldProps to take (nearly) all input component props.
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform) / [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/#baseformfieldcreator)**: add input field slots to make BaseForm customizable + minor styling changes.
+* Add automated changelog creation (via [conventional-changelog](https://github.com/conventional-changelog/conventional-changelog)) and [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) set up.
+* Improve documentation for [BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform) and [build setup](buildSetup.md).
+
+### Fixed
+
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform):** remove button missing for repeatable fields.
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform)**: prioritize fieldProps set label over automated extraction from swagger json title attribute.
+* **[BaseMenuList](https://base-angewandte.github.io/base-ui-components/#basemenulist):** error on drag if list items without icon.
+* [Styleguide](https://base-angewandte.github.io/base-ui-components/) is missing icons.
+
+
 ## 2.0.4 (2022-10-31)
 
 ### Features
