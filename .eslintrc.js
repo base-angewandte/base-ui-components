@@ -12,8 +12,8 @@ module.exports = {
     node: true,
   },
   extends: [
+    '@vue/eslint-config-airbnb',
     'plugin:vue/recommended',
-    '@vue/airbnb',
   ],
   // add your custom rules here
   rules: {
@@ -24,7 +24,7 @@ module.exports = {
       ignorePropertyModificationsFor: [
         'state', // for vuex state
         'acc', // for reduce accumulators
-        'e', // for e.returnvalue
+        'e', // for e.return value
       ],
     }],
     // don't require .vue extension when importing
@@ -58,9 +58,7 @@ module.exports = {
         '**/__tests__/*.{j,t}s?(x)',
         '**/tests/unit/**/*.spec.{j,t}s?(x)',
       ],
-      env: {
-        jest: true,
-      },
+      env: {},
     },
   ],
 };

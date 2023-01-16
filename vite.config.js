@@ -2,10 +2,8 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import babel from '@rollup/plugin-babel';
 import vue from '@vitejs/plugin-vue2';
+import eslint from 'vite-plugin-eslint';
 import pkg from './package.json';
-
-// Todo: implement eslint
-// import eslint from 'vite-plugin-eslint';
 
 // generate external pattern
 // taken from: https://github.com/rollup/rollup-plugin-babel/issues/148#issuecomment-399696316
@@ -34,7 +32,7 @@ export default defineConfig({
       configFile: false,
       plugins: ['@babel/plugin-transform-runtime'],
     }),
-    // eslint({ cache: false }),
+    eslint(),
   ],
   resolve: {
     extensions: ['*', '.js', '.vue', '.json'],
