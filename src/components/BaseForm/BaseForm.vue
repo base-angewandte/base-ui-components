@@ -185,6 +185,16 @@ import i18n from '../../mixins/i18n';
  * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard
  */
 
+// list all the fieldProps here that can be set individually for each repeatable field
+const INDIVIDUAL_REPEATABLE_FIELDPROPS = [
+  'errorMessage',
+  'invalid',
+  'isActive',
+  'isLoading',
+  'linkedListOption',
+  'activeTab',
+];
+
 export default {
   name: 'BaseForm',
   components: {
@@ -290,6 +300,13 @@ export default {
      * [BaseChipsBelow](#basechipsbelow)<br>
      * [BaseDateInput](#basedateinput)<br>
      * [BaseToggle](#basetoggle)<br>
+     *<br>
+     * **special case repeatable fields**: the following field props can be set individually
+     * per repeated field:<br>
+     *  `errorMessage`, `invalid`, `isActive`, `isLoading`,
+     *  `linkedListOption`, `activeTab`<br>
+     *  the field property value should be set as object specifying the field index as key:<br>
+     *  `{ [fieldIndex]: [value to be set] }` (e.g. `{ required: { 0: false }}`)
      */
     fieldProps: {
       type: Object,
@@ -506,23 +523,70 @@ export default {
       return val.title || this.getI18nTerm(`form.${val.name}` || val.name);
     },
     formFieldComponentProps(element, index, valueIndex) {
-      const comboIndex = valueIndex >= 0 ? `${index}_${valueIndex}` : index;
+      // get the element.name for easier access
+      const { name } = element;
+      // get all fieldProps of that field if set, otherwise set empty array
+      // important to create an independent copy because properties eventually get deleted
+      // later on
+      let singleFieldProps = this.fieldProps[name]
+        ? JSON.parse(JSON.stringify(this.fieldProps[name])) : {};
+      // store in variable if field is repeatable
+      const fieldRepeatable = valueIndex >= 0;
+      // check if field is repeatable
+      if (fieldRepeatable) {
+        // if yes get the field Props that are actually settable for each field individually
+        // and present in the fieldProps object
+        const existingIndividualFieldProps = Object.entries(singleFieldProps)
+          .filter(([key]) => INDIVIDUAL_REPEATABLE_FIELDPROPS.includes(key));
+        // now check if any individually settable field props were found for the field
+        if (existingIndividualFieldProps.length) {
+          // now get an object that only contains the fieldProps of repeatable fields where the
+          // index is present in the value object
+          // otherwise delete the value object from the fieldProps completely (since usually not
+          // compatible with actual fieldProp type and values not usable
+          const repeatableFieldProps = existingIndividualFieldProps.reduce((prev, [key, value]) => {
+            // check if the input field index exists as a key in the value object
+            if (Object.keys(value).includes(valueIndex.toString())) {
+              // if yes - add it to the object with the appropriate value
+              return {
+                ...prev,
+                [key]: value[valueIndex.toString()],
+              };
+            }
+            // else delete the fieldProp from the fieldProps object completely
+            delete singleFieldProps[key];
+            // and just return the unmodified object
+            return prev;
+          }, {});
+          // finally actually combine the original fieldProps object with the properties settable
+          // per repeated field
+          singleFieldProps = {
+            ...singleFieldProps,
+            ...repeatableFieldProps,
+
+          };
+        }
+      }
+      // create a unique string for identifier(key) purposes out of field index
+      // and (if field is repeatable) value index
+      const comboIndex = fieldRepeatable ? `${index}_${valueIndex}` : index;
+
       return {
         field: element,
-        label: this.fieldProps[element.name] && this.fieldProps[element.name].label
-          ? this.fieldProps[element.name].label : this.getFieldName(element),
-        fieldProps: this.fieldProps[element.name] || {},
+        label: singleFieldProps && singleFieldProps.label
+          ? singleFieldProps.label : this.getFieldName(element),
+        fieldProps: singleFieldProps,
         showLabel: !this.allowMultiply(element)
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
-        dropDownList: this.dropDownLists[element.name],
-        secondaryDropdown: this.dropDownLists[`${element.name}_secondary`],
+        dropDownList: this.dropDownLists[name],
+        secondaryDropdown: this.dropDownLists[`${name}_secondary`],
         language: this.language,
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
-        fieldKey: `${element.name}_${comboIndex}_${this.formId}`,
-        fieldValue: valueIndex >= 0 ? this.valueListInt[element.name][valueIndex]
-          : this.valueListInt[element.name],
-        autocompleteLoading: this.fieldIsLoading === element.name,
+        fieldKey: `${name}_${comboIndex}_${this.formId}`,
+        fieldValue: fieldRepeatable ? this.valueListInt[name][valueIndex]
+          : this.valueListInt[name],
+        autocompleteLoading: this.fieldIsLoading === name,
         // add component props to form fields creator props if list contains a field_type 'group'
         fieldGroupParams: this.formFieldListInt
           .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')

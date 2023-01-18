@@ -24,8 +24,15 @@ This is a basic (autocomplete functionality not working here) example how a form
           },
           type: {
             invalid: true,
-            errorMessage: 'This invalid message was set via fieldProps.'
-          }
+            errorMessage: 'This invalid message was set via fieldProps.',
+          },
+          isan: {
+            invalid: {
+              1: true,
+              3: true,
+            },
+            placeholder: 'aaaaaaa',
+          },
         }"
         language="en"
         :field-is-loading="fieldIsLoading"
