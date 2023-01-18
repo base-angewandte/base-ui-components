@@ -27,36 +27,52 @@
           @fetch-autocomplete="fetchAutocomplete">
           <template #label-addition="{ fieldName }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row
-            \<div\> (e.g. language tabs)) -->
+            \<div\> (e.g. language tabs))
+            @binding {string} fieldName - the name of the displayed field -->
             <slot
               name="label-addition"
               :field-name="fieldName" />
           </template>
-          <template #pre-input-field>
+          <template #pre-input-field="{ fieldName }">
             <!-- @slot slot to add elements within the form field but in a row before the actual
             input field<br>
-            for an example see [BaseInput](#baseinput)-->
-            <slot name="pre-input-field" />
+            for an example see [BaseInput](#baseinput)
+            @binding {string} fieldName - the name of the displayed field -->
+            <slot
+              name="pre-input-field"
+              :field-name="fieldName" />
           </template>
           <template
-            #input-field-addition-before>
+            #input-field-addition-before="{ fieldName }">
             <!-- @slot Slot to allow for additional elements in the input field \<div\>
-              (before \<input\>) -->
-            <slot name="input-field-addition-before" />
+              (before \<input\>)
+            @binding {string} fieldName - the name of the displayed field -->
+            <slot
+              name="input-field-addition-before"
+              :field-name="fieldName" />
           </template>
-          <template #input-field-inline-before>
+          <template #input-field-inline-before="{ fieldName }">
             <!-- @slot to add elements directly inline before the input
                 (contrary to input-field-addition-before this does not wrap<br>
-            for an example see [BaseInput](#baseinput)-->
-            <slot name="input-field-inline-before" />
+            for an example see [BaseInput](#baseinput)
+            @binding {string} fieldName - the name of the displayed field -->
+            <slot
+              name="input-field-inline-before"
+              :field-name="fieldName" />
           </template>
-          <template #input-field-addition-after>
-            <!-- @slot for adding elements after input -->
-            <slot name="input-field-addition-after" />
+          <template #input-field-addition-after="{ fieldName }">
+            <!-- @slot for adding elements after input
+            @binding {string} fieldName - the name of the displayed field -->
+            <slot
+              name="input-field-addition-after"
+              :field-name="fieldName" />
           </template>
-          <template #post-input-field>
-            <!-- @slot for adding elements at the end covering the whole height -->
-            <slot name="post-input-field" />
+          <template #post-input-field="{ fieldName }">
+            <!-- @slot for adding elements at the end covering the whole height
+            @binding {string} fieldName - the name of the displayed field -->
+            <slot
+              name="post-input-field"
+              :field-name="fieldName" />
           </template>
           <template #error-icon>
             <!-- @slot use a custom icon instead of standard error/warning icon -->
@@ -66,13 +82,16 @@
             <!-- @slot for adding elements after input (e.g. used to add loader -->
             <slot name="remove-icon" />
           </template>
-          <template #below-input>
-            <!-- @slot below-input slot added to e.g. add drop down -->
-            <slot name="below-input" />
+          <template #below-input="{ fieldName }">
+            <!-- @slot below-input slot added to e.g. add drop down
+            @binding {string} fieldName - the name of the displayed field -->
+            <slot
+              name="below-input"
+              :field-name="fieldName" />
           </template>
         </BaseFormFieldCreator>
 
-        <!-- ALLOW FOR MULTIPLE VALUES PER FIELD -->
+        <!-- REPEATABLE FIELDS - ALLOW FOR MULTIPLE VALUES PER FIELD -->
         <template v-else>
           <!-- wrapper around form field group and remove button -->
           <div
@@ -94,7 +113,86 @@
                 valueIndex,
                 (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
               @fetch-autocomplete="fetchAutocomplete"
-              @subform-input="setFieldValue($event, element.name, valueIndex)" />
+              @subform-input="setFieldValue($event, element.name, valueIndex)">
+              <template #label-addition="{ fieldName }">
+                <!-- @slot Slot to allow for additional elements on the right side of the label row
+                \<div\> (e.g. language tabs))
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="label-addition"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+              <template #pre-input-field="{ fieldName }">
+                <!-- @slot slot to add elements within the form field but in a row before the actual
+                input field<br>
+                for an example see [BaseInput](#baseinput)
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="pre-input-field"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+              <template
+                #input-field-addition-before="{ fieldName }">
+                <!-- @slot Slot to allow for additional elements in the input field \<div\>
+                  (before \<input\>)
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="input-field-addition-before"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+              <template #input-field-inline-before="{ fieldName }">
+                <!-- @slot to add elements directly inline before the input
+                    (contrary to input-field-addition-before this does not wrap<br>
+                for an example see [BaseInput](#baseinput)
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="input-field-inline-before"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+              <template #input-field-addition-after="{ fieldName }">
+                <!-- @slot for adding elements after input
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="input-field-addition-after"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+              <template #post-input-field="{ fieldName }">
+                <!-- @slot for adding elements at the end covering the whole height
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="post-input-field"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+              <template #error-icon>
+                <!-- @slot use a custom icon instead of standard error/warning icon -->
+                <slot name="error-icon" />
+              </template>
+              <template #remove-icon>
+                <!-- @slot for adding elements after input (e.g. used to add loader -->
+                <slot name="remove-icon" />
+              </template>
+              <template #below-input="{ fieldName }">
+                <!-- @slot below-input slot added to e.g. add drop down
+                @binding {string} fieldName - the name of the displayed field
+                @binding {number} index - the array index of field values -->
+                <slot
+                  name="below-input"
+                  :field-name="fieldName"
+                  :index="valueIndex" />
+              </template>
+            </BaseFormFieldCreator>
 
             <!-- if there is field content show a 'remove all content' button -->
             <div

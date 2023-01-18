@@ -43,9 +43,18 @@ This is a basic (autocomplete functionality not working here) example how a form
             only for published in
           </template>
         </template>
-        <template #error-icon="{ fieldName }">
+        <template #label-addition="{ fieldName }">
+          <template v-if="fieldName === 'isan'">
+            test
+          </template>
+        </template>
+        <template #input-field-addition-before="{ fieldName, index }">
+          <template v-if="fieldName === 'isan' && index === 0">
+            slot input-field-addition-before for single field
+          </template>
+        </template>
+        <template #error-icon>
           <BaseIcon
-            v-if="fieldName = 'type'"
             name="eye"
             class="custom-icon" />
         </template>
