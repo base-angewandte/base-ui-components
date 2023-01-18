@@ -2,166 +2,178 @@
   <div
     class="base-form"
     :style="formStyle">
-    <template v-for="(element, index) in formFieldListInt">
-      <!-- SINGLE FORM FIELD -->
-      <BaseFormFieldCreator
-        v-if="!allowMultiply(element)"
-        :key="`${element.name}_${index}_${formId}`"
-        :class="['base-form-field',
-                 formFieldsHalf.indexOf(element) >= 0
-                   ? 'base-form-field-half' : 'base-form-field-full',
-                 { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
-        v-bind="formFieldComponentProps(element, index)"
-        @field-value-changed="setFieldValue($event, element.name)"
-        @fetch-autocomplete="fetchAutocomplete">
-        <template #label-addition="{ fieldName }">
-          <!-- @slot Slot to allow for additional elements on the right side of the label row
-          \<div\> (e.g. language tabs)) -->
-          <slot
-            name="label-addition"
-            :field-name="fieldName" />
-        </template>
-        <template #pre-input-field>
-          <!-- @slot slot to add elements within the form field but in a row before the actual
-          input field<br>
-          for an example see [BaseInput](#baseinput)-->
-          <slot name="pre-input-field" />
-        </template>
-        <template
-          #input-field-addition-before>
-          <!-- @slot Slot to allow for additional elements in the input field \<div\>
-            (before \<input\>) -->
-          <slot name="input-field-addition-before" />
-        </template>
-        <template #input-field-inline-before>
-          <!-- @slot to add elements directly inline before the input
-              (contrary to input-field-addition-before this does not wrap<br>
-          for an example see [BaseInput](#baseinput)-->
-          <slot name="input-field-inline-before" />
-        </template>
-        <template #input-field-addition-after>
-          <!-- @slot for adding elements after input -->
-          <slot name="input-field-addition-after" />
-        </template>
-        <template #post-input-field>
-          <!-- @slot for adding elements at the end covering the whole height -->
-          <slot name="post-input-field" />
-        </template>
-        <template #error-icon>
-          <!-- @slot use a custom icon instead of standard error/warning icon -->
-          <slot name="error-icon" />
-        </template>
-        <template #remove-icon>
-          <!-- @slot for adding elements after input (e.g. used to add loader -->
-          <slot name="remove-icon" />
-        </template>
-        <template #below-input>
-          <!-- @slot below-input slot added to e.g. add drop down -->
-          <slot name="below-input" />
-        </template>
-      </BaseFormFieldCreator>
-
-      <!-- ALLOW FOR MULTIPLE VALUES PER FIELD -->
-      <template v-else>
-        <!-- wrapper around form field group and remove button -->
-        <div
-          v-for="(value, valueIndex) in valueListInt[element.name]"
-          :ref="element.name"
-          :key="`${element.name}_${index}_${valueIndex}_${formId}_wrapper`"
+    <!-- OPTIONAL HEADER -->
+    <component
+      :is="renderHeaderAs"
+      v-if="formHeader"
+      class="base-form__header">
+      {{ formHeader }}
+    </component>
+    <!-- FORM -->
+    <div
+      class="base-form__body">
+      <template
+        v-for="(element, index) in formFieldListInt">
+        <!-- SINGLE FORM FIELD -->
+        <BaseFormFieldCreator
+          v-if="!allowMultiply(element)"
+          :key="`${element.name}_${index}_${formId}`"
           :class="['base-form-field',
-                   { 'base-form-field__multiple__inline': multiplyButtonsInline(element) },
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
-                   { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
-          <BaseFormFieldCreator
-            :key="`${element.name}_${index}_${valueIndex}_${formId}`"
-            v-bind="formFieldComponentProps(element, index, valueIndex)"
-            class="base-form-field__multiple__inline-element"
-            @field-value-changed="setFieldValue(
-              $event,
-              element.name,
-              valueIndex,
-              (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
-            @fetch-autocomplete="fetchAutocomplete"
-            @subform-input="setFieldValue($event, element.name, valueIndex)" />
+                   { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
+          v-bind="formFieldComponentProps(element, index)"
+          @field-value-changed="setFieldValue($event, element.name)"
+          @fetch-autocomplete="fetchAutocomplete">
+          <template #label-addition="{ fieldName }">
+            <!-- @slot Slot to allow for additional elements on the right side of the label row
+            \<div\> (e.g. language tabs)) -->
+            <slot
+              name="label-addition"
+              :field-name="fieldName" />
+          </template>
+          <template #pre-input-field>
+            <!-- @slot slot to add elements within the form field but in a row before the actual
+            input field<br>
+            for an example see [BaseInput](#baseinput)-->
+            <slot name="pre-input-field" />
+          </template>
+          <template
+            #input-field-addition-before>
+            <!-- @slot Slot to allow for additional elements in the input field \<div\>
+              (before \<input\>) -->
+            <slot name="input-field-addition-before" />
+          </template>
+          <template #input-field-inline-before>
+            <!-- @slot to add elements directly inline before the input
+                (contrary to input-field-addition-before this does not wrap<br>
+            for an example see [BaseInput](#baseinput)-->
+            <slot name="input-field-inline-before" />
+          </template>
+          <template #input-field-addition-after>
+            <!-- @slot for adding elements after input -->
+            <slot name="input-field-addition-after" />
+          </template>
+          <template #post-input-field>
+            <!-- @slot for adding elements at the end covering the whole height -->
+            <slot name="post-input-field" />
+          </template>
+          <template #error-icon>
+            <!-- @slot use a custom icon instead of standard error/warning icon -->
+            <slot name="error-icon" />
+          </template>
+          <template #remove-icon>
+            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <slot name="remove-icon" />
+          </template>
+          <template #below-input>
+            <!-- @slot below-input slot added to e.g. add drop down -->
+            <slot name="below-input" />
+          </template>
+        </BaseFormFieldCreator>
 
-          <!-- if there is field content show a 'remove all content' button -->
+        <!-- ALLOW FOR MULTIPLE VALUES PER FIELD -->
+        <template v-else>
+          <!-- wrapper around form field group and remove button -->
           <div
-            v-if="!multiplyButtonsInline(element) && (checkFieldContent(valueList[element.name])
-              || valueListInt[element.name].length > 1)"
-            :key="`${index}_button_${valueIndex}_${formId}`"
-            class="group-add">
+            v-for="(value, valueIndex) in valueListInt[element.name]"
+            :ref="element.name"
+            :key="`${element.name}_${index}_${valueIndex}_${formId}_wrapper`"
+            :class="['base-form-field',
+                     { 'base-form-field__multiple__inline': multiplyButtonsInline(element) },
+                     formFieldsHalf.indexOf(element) >= 0
+                       ? 'base-form-field-half' : 'base-form-field-full',
+                     { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
+            <BaseFormFieldCreator
+              :key="`${element.name}_${index}_${valueIndex}_${formId}`"
+              v-bind="formFieldComponentProps(element, index, valueIndex)"
+              class="base-form-field__multiple__inline-element"
+              @field-value-changed="setFieldValue(
+                $event,
+                element.name,
+                valueIndex,
+                (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
+              @fetch-autocomplete="fetchAutocomplete"
+              @subform-input="setFieldValue($event, element.name, valueIndex)" />
+
+            <!-- if there is field content show a 'remove all content' button -->
+            <div
+              v-if="!multiplyButtonsInline(element) && (checkFieldContent(valueList[element.name])
+                || valueListInt[element.name].length > 1)"
+              :key="`${index}_button_${valueIndex}_${formId}`"
+              class="group-add">
+              <button
+                class="field-group-button"
+                type="button"
+                @click.prevent="removeField(element, valueIndex)">
+                <span>
+                  {{ valueListInt[element.name].length === 1
+                    ? getI18nTerm('form.clearField') || 'Clear'
+                    : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}
+                </span>
+                <span>
+                  <base-icon
+                    class="field-group-icon"
+                    name="remove" />
+                </span>
+              </button>
+            </div>
+            <template
+              v-if="multiplyButtonsInline(element)">
+              <div
+                class="base-form__inline-icons">
+                <base-icon
+                  v-if="checkFieldContent(valueList[element.name])
+                    || valueListInt[element.name].length > 1"
+                  :title="valueListInt[element.name].length === 1
+                    ? getI18nTerm('form.clearField') || 'Clear'
+                    : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) })"
+                  role="button"
+                  tabindex="0"
+                  class="base-form__inline-icon"
+                  name="remove"
+                  @click.native="removeField(element, valueIndex)"
+                  @keydown.enter.native="removeField(element, valueIndex)" />
+                <base-icon
+                  :title="valueIndex !== (valueListInt[element.name].length - 1)
+                    ? getI18nTerm('form.addGroupBelow', -1, {
+                      fieldType: getFieldName(element)
+                    }) : getI18nTerm('form.addGroup', -1, {
+                      fieldType: getFieldName(element)
+                    })"
+                  role="button"
+                  tabindex="0"
+                  class="base-form__inline-icon"
+                  name="plus"
+                  @click.native="multiplyField(element, valueIndex)"
+                  @keydown.enter.native="multiplyField(element, valueIndex)" />
+              </div>
+            </template>
+          </div>
+          <!-- multiply button -->
+          <div
+            v-if="!multiplyButtonsInline(element)"
+            :key="'multiplyButton' + index"
+            class="group-multiply">
             <button
               class="field-group-button"
               type="button"
-              @click.prevent="removeField(element, valueIndex)">
+              @click.prevent="multiplyField(element)">
               <span>
-                {{ valueListInt[element.name].length === 1
-                  ? getI18nTerm('form.clearField') || 'Clear'
-                  : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}
+                {{ getI18nTerm('form.addGroup', -1, {
+                  fieldType: getFieldName(element)
+                }) }}
               </span>
               <span>
                 <base-icon
                   class="field-group-icon"
-                  name="remove" />
+                  name="plus" />
               </span>
             </button>
           </div>
-          <template
-            v-if="multiplyButtonsInline(element)">
-            <div
-              class="base-form__inline-icons">
-              <base-icon
-                v-if="checkFieldContent(valueList[element.name])
-                  || valueListInt[element.name].length > 1"
-                :title="valueListInt[element.name].length === 1
-                  ? getI18nTerm('form.clearField') || 'Clear'
-                  : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) })"
-                role="button"
-                tabindex="0"
-                class="base-form__inline-icon"
-                name="remove"
-                @click.native="removeField(element, valueIndex)"
-                @keydown.enter.native="removeField(element, valueIndex)" />
-              <base-icon
-                :title="valueIndex !== (valueListInt[element.name].length - 1)
-                  ? getI18nTerm('form.addGroupBelow', -1, {
-                    fieldType: getFieldName(element)
-                  }) : getI18nTerm('form.addGroup', -1, {
-                    fieldType: getFieldName(element)
-                  })"
-                role="button"
-                tabindex="0"
-                class="base-form__inline-icon"
-                name="plus"
-                @click.native="multiplyField(element, valueIndex)"
-                @keydown.enter.native="multiplyField(element, valueIndex)" />
-            </div>
-          </template>
-        </div>
-        <!-- multiply button -->
-        <div
-          v-if="!multiplyButtonsInline(element)"
-          :key="'multiplyButton' + index"
-          class="group-multiply">
-          <button
-            class="field-group-button"
-            type="button"
-            @click.prevent="multiplyField(element)">
-            <span>
-              {{ getI18nTerm('form.addGroup', -1, {
-                fieldType: getFieldName(element)
-              }) }}
-            </span>
-            <span>
-              <base-icon
-                class="field-group-icon"
-                name="plus" />
-            </span>
-          </button>
-        </div>
+        </template>
       </template>
-    </template>
+    </div>
   </div>
 </template>
 
@@ -285,6 +297,14 @@ export default {
       validator: val => Object.keys(val).length === 0 || Object.values(val)
         .every(fieldProps => Object.keys(fieldProps)),
     },
+    /**
+     * in case the field `form_group_title` was added to the `x-attrs` field, this is
+     * is rendered as a header above the form and here the HTML tag may be defined.
+     */
+    renderHeaderAs: {
+      type: String,
+      default: 'div',
+    },
   },
   data() {
     return {
@@ -348,6 +368,19 @@ export default {
           }
           return -1;
         });
+    },
+    /**
+     * get the title string for the form header if one was set in the OpenAPI definition
+     * @returns {string}
+     */
+    formHeader() {
+      // find a field with the x-attr form_group_title (formFieldListInt is already sorted
+      // by order x-attr so the the title of the field with the lowest order will automatically
+      // be chosen
+      const groupTitleField = this.formFieldListInt
+        .find(field => field['x-attrs'] && field['x-attrs'].form_group_title);
+      // return the title string for the header to set if one was found
+      return groupTitleField ? groupTitleField['x-attrs'].form_group_title : '';
     },
   },
   watch: {
@@ -588,61 +621,68 @@ export default {
   @import "../../styles/variables.scss";
 
   .base-form {
-    background-color: white;
-    display: flex;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    padding: $spacing $spacing 0;
-
-    .base-form-field {
-      margin-bottom: $spacing;
-    }
-
-    .base-form-field-full, .group-multiply {
-      flex: 0 0 100%;
-    }
-
-    .base-form-field-half {
-      // needed to add the 0.01rem for edge...
-      flex: 0 1 calc(50% - #{$spacing-small} - 0.01rem);
-    }
-
-    .base-form-field-left-margin {
-      margin-left: $spacing;
-    }
-
-    .group-multiply {
-      margin-bottom: $spacing + $spacing-small;
-    }
-
-    .group-add {
-      margin-top: $spacing;
-    }
-
-    .field-group-button {
+    .base-form__header {
+      margin: $spacing-small $spacing;
       color: $font-color-second;
-      cursor: pointer;
+    }
+
+    .base-form__body {
+      background-color: white;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-      background-color: inherit;
-      border: none;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      padding: $spacing $spacing 0;
 
-      &:hover {
-        color: $app-color;
-        fill: $app-color;
+      .base-form-field {
+        margin-bottom: $spacing;
       }
 
-      .field-group-icon {
-        flex: 0 0 auto;
-        margin: 0 $spacing;
-        height: $icon-small;
-        width: $icon-small;
+      .base-form-field-full, .group-multiply {
+        flex: 0 0 100%;
       }
 
-      &:focus .field-group-icon {
-        fill: $app-color;
+      .base-form-field-half {
+        // needed to add the 0.01rem for edge...
+        flex: 0 1 calc(50% - #{$spacing-small} - 0.01rem);
+      }
+
+      .base-form-field-left-margin {
+        margin-left: $spacing;
+      }
+
+      .group-multiply {
+        margin-bottom: $spacing + $spacing-small;
+      }
+
+      .group-add {
+        margin-top: $spacing;
+      }
+
+      .field-group-button {
+        color: $font-color-second;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        background-color: inherit;
+        border: none;
+
+        &:hover {
+          color: $app-color;
+          fill: $app-color;
+        }
+
+        .field-group-icon {
+          flex: 0 0 auto;
+          margin: 0 $spacing;
+          height: $icon-small;
+          width: $icon-small;
+        }
+
+        &:focus .field-group-icon {
+          fill: $app-color;
+        }
       }
     }
   }
@@ -675,35 +715,40 @@ export default {
 
   @media screen and (max-width: 870px) {
     .base-form {
-      .base-form-field-half {
-        flex: 0 0 100%;
-      }
+      .base-form__body {
+        .base-form-field-half {
+          flex: 0 0 100%;
+        }
 
-      .base-form-field-left-margin {
-        margin-left: 0;
+        .base-form-field-left-margin {
+          margin-left: 0;
+        }
       }
     }
+
   }
 
   @media screen and (max-width: $mobile) {
     .base-form {
-      padding: $spacing $spacing-small $spacing-small;
+      .base-form__body {
+        padding: $spacing $spacing-small $spacing-small;
 
-      .base-form-field {
-        margin-bottom: $spacing-small;
-      }
+        .base-form-field {
+          margin-bottom: $spacing-small;
+        }
 
-      .base-form-field-half {
-        flex: 0 0 100%;
-      }
+        .base-form-field-half {
+          flex: 0 0 100%;
+        }
 
-      .base-form-field-left-margin {
-        margin-left: 0;
-      }
+        .base-form-field-left-margin {
+          margin-left: 0;
+        }
 
-      .group-multiply {
-        margin-bottom: $spacing-small + $spacing-small-half;
-        margin-top: $spacing-small;
+        .group-multiply {
+          margin-bottom: $spacing-small + $spacing-small-half;
+          margin-top: $spacing-small;
+        }
       }
     }
   }
