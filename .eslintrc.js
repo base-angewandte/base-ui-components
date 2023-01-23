@@ -12,9 +12,17 @@ module.exports = {
     node: true,
   },
   extends: [
-    '@vue/eslint-config-airbnb',
+    'airbnb-base',
     'plugin:vue/recommended',
   ],
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['@', './src/']],
+        extensions: ['.js', '.jsx', '.vue'],
+      },
+    },
+  },
   // add your custom rules here
   rules: {
     // disallow reassignment of function parameters
