@@ -1,5 +1,6 @@
 import path from 'path';
 import { defineConfig } from 'vite';
+import { execSync } from 'child_process';
 import babel from '@rollup/plugin-babel';
 import vue from '@vitejs/plugin-vue2';
 import eslint from 'vite-plugin-eslint';
@@ -23,6 +24,15 @@ const externalPattern = (arr) => {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    {
+      // run after build or build:watch process
+      // https://rollupjs.org/plugin-development/#build-hooks
+      name: 'post-commands',
+      closeBundle: async () => {
+        await execSync('npm run build:post-commands');
+        console.log('build:post-commands completed');
+      },
+    },
     vue(),
     babel({
       exclude: ['node_modules/@babel/**', 'node_modules/**'],

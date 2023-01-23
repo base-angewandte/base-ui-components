@@ -7,10 +7,11 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "homepage": "https://base.uni-ak.ac.at",
   "scripts": {
-    "build": "vite build && npm run build:transform-css && npm run build:update-package-exports",
-    "build:watch": "npm run build && vite build --watch",
+    "build": "vite build",
+    "build:watch": "vite build --watch",
     "build:transform-css": "sh build/transform-css.sh",
     "build:update-package-exports": "node build/update-package-exports.js",
+    "build:post-commands": "npm run build:transform-css && npm run build:update-package-exports",
     "dev": "vite",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",

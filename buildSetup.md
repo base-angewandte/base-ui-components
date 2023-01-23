@@ -7,8 +7,17 @@ npm install
 # build library components
 npm run build
 
+# build library components and rebuild on changes
+npm run build:watch
+
 # add postcss transformations to base-ui-components.css
 npm run build:transform-css
+
+# collect css files, generate and update package.json exports property
+npm run build:update-package-exports
+
+# commands run after build (build:transform-css, build:transform-css)
+npm run build:post-commands
 
 # serve with hot reload at localhost:8080
 npm run dev
