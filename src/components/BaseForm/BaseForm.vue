@@ -87,7 +87,7 @@
 
           <!-- if there is field content show a 'remove all content' button -->
           <div
-            v-if="!multiplyButtonsInline && (checkFieldContent(valueList[element.name])
+            v-if="!multiplyButtonsInline(element) && (checkFieldContent(valueList[element.name])
               || valueListInt[element.name].length > 1)"
             :key="`${index}_button_${valueIndex}_${formId}`"
             class="group-add">
