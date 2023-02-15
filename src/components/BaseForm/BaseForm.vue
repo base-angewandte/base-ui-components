@@ -860,10 +860,14 @@ export default {
     .base-form__inline-icons {
       margin-left: $spacing-small;
       flex: 0 0 auto;
+      min-height: $row-height-small;
+      display: flex;
+      align-items: center;
 
       .base-form__inline-icon {
         height: $icon-medium;
         width: $icon-medium;
+        flex: 0 0 auto;
         color: $font-color-second;
         margin: $spacing-small;
         cursor: pointer;

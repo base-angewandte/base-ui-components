@@ -4,33 +4,254 @@
     style="max-width: 1400px; margin: 20px auto; padding: 16px;">
     {{ valueList }}
     <div>
-      <BaseFormGroups
+      <BaseInput
+        label="test"
+        field-type="number"
+        :decimals="2"
+        :decimal-separator="','">
+        <template #label-addition>
+          test
+        </template>
+      </BaseInput>
+      <BaseFormFieldCreator
+        field-key="singleChipsInput"
+        :field="fieldInformation2"
+        :field-value="2"
+        label="Select Director"
+        :drop-down-list="list"
+        :autocomplete-loading="showInfo"
+        :field-props="{
+          fieldType: 'number',
+          decimalSeparator: ',',
+        }"
+        language="en"
+        :available-locales="['de', 'en']"
+        :placeholder="null"
+        sort-text="Sort"
+        @field-value-changed="value = [...$event]">
+        <template #label-addition>
+          test2
+        </template>
+      </BaseFormFieldCreator>
+      <BaseForm
+        key="extended-form"
+        ref="formExtension"
+        form-id="formTest"
         :form-field-json="fields"
         :value-list="valueList"
-        @values-changed="handleInput">
-        <template #pre-input-field>
-          <!--          <template v-if="fieldName === 'url'">-->
-          <!--            {{ fieldName }}-->
-          <!--          </template>-->
-          {{ 'bla' }}
-        </template>
-      </BaseFormGroups>
+        :available-locales="['de', 'en']"
+        :drop-down-lists="typeList"
+        :field-props="{
+          texts: {
+            tabLabels: ['English', 'German']
+          },
+        }"
+        language="en"
+        :field-is-loading="fieldIsLoading"
+        class="form"
+        @values-changed="valueList = { ...$event }" />
     </div>
   </div>
 </template>
 
 <script>
-import BaseFormGroups from '@/components/BaseFormGroups/BaseFormGroups';
+import BaseInput from '@/components/BaseInput/BaseInput';
+import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator';
+import BaseForm from '@/components/BaseForm/BaseForm';
 
 export default {
   name: 'App',
   components: {
-    BaseFormGroups,
+    BaseInput,
+    BaseFormFieldCreator,
+    BaseForm,
   },
   data() {
     return {
       valueList: {},
+      fieldIsLoading: '',
       fields: {
+        date2: {
+          type: 'array',
+          title: 'Datum',
+          items: {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+              },
+              type: {
+                type: 'string',
+              },
+            },
+          },
+          additionalProperties: false,
+          pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
+          'x-attrs': {
+            field_format: 'full',
+            field_type: 'date',
+            date_format: 'year',
+            placeholder: {
+              date: 'Datum eintragen',
+              type: 'Typ eintragen',
+            },
+            order: 1,
+            primary_property: 'date',
+            secondary_properties: ['type'],
+            source_type: '/autosuggest/v1/source_type/',
+            prefetch: [
+              'source_type',
+            ],
+          },
+        },
+        texts2: {
+          title: 'Notes',
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              notes: {
+                type: 'string',
+              },
+              type: {
+                type: 'object',
+                properties: {
+                  label: {
+                    type: 'object',
+                    properties: {
+                      en: {
+                        type: 'string',
+                      },
+                      de: {
+                        type: 'string',
+                      },
+                      fr: {
+                        type: 'string',
+                      },
+                    },
+                    additionalProperties: false,
+                  },
+                  source: {
+                    type: 'string',
+                    'x-attrs': {
+                      hidden: true,
+                    },
+                  },
+                },
+                additionalProperties: false,
+                title: 'Typ',
+              },
+            },
+            additionalProperties: false,
+          },
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'multiline',
+            source_type: '/autosuggest/v1/texttypes/',
+            prefetch: [
+              'source_type',
+            ],
+            order: 2,
+            placeholder: 'Text eintragen',
+            secondary_properties: ['type'],
+          },
+        },
+        texts: {
+          title: 'Text',
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              type: {
+                type: 'object',
+                properties: {
+                  label: {
+                    type: 'object',
+                    properties: {
+                      en: {
+                        type: 'string',
+                      },
+                      de: {
+                        type: 'string',
+                      },
+                      fr: {
+                        type: 'string',
+                      },
+                    },
+                    additionalProperties: false,
+                  },
+                  source: {
+                    type: 'string',
+                    'x-attrs': {
+                      hidden: true,
+                    },
+                  },
+                },
+                additionalProperties: false,
+                title: 'Typ',
+              },
+              data: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    language: {
+                      type: 'object',
+                      properties: {
+                        label: {
+                          type: 'object',
+                          properties: {
+                            en: {
+                              type: 'string',
+                            },
+                            de: {
+                              type: 'string',
+                            },
+                            fr: {
+                              type: 'string',
+                            },
+                          },
+                          additionalProperties: false,
+                        },
+                        source: {
+                          type: 'string',
+                          enum: [
+                            'http://base.uni-ak.ac.at/portfolio/languages/en',
+                            'http://base.uni-ak.ac.at/portfolio/languages/de',
+                          ],
+                          'x-attrs': {
+                            hidden: true,
+                          },
+                        },
+                      },
+                      additionalProperties: false,
+                    },
+                    text: {
+                      type: 'string',
+                      title: 'Text',
+                    },
+                  },
+                  required: [
+                    'text',
+                  ],
+                  additionalProperties: false,
+                },
+              },
+            },
+            additionalProperties: false,
+          },
+          'x-nullable': true,
+          'x-attrs': {
+            field_type: 'multiline',
+            source_type: '/autosuggest/v1/texttypes/',
+            prefetch: [
+              'source_type',
+            ],
+            order: 3,
+            placeholder: 'Text eintragen',
+            secondary_properties: ['type'],
+          },
+        },
         contributors: {
           type: 'array',
           items: {
@@ -78,10 +299,10 @@ export default {
             },
             additionalProperties: false,
           },
-          title: 'Beteiligung (chips-below)',
+          title: 'Beteiligung',
           'x-attrs': {
             field_type: 'chips-below',
-            placeholder: 'Enter Beteiligung',
+            placeholder: 'Beteiligung eintragen',
             source: '/autosuggest/v1/contributors/',
             source_role: '/autosuggest/v1/roles/',
             prefetch: [
@@ -89,117 +310,99 @@ export default {
             ],
             allow_unknown_entries: true,
             dynamic_autosuggest: true,
-            order: 1,
-            form_group: 1,
-            form_group_title: 'Form Group 1',
-          },
-        },
-        url4: {
-          type: 'string',
-          title: 'URL',
-          'x-attrs': {
-            placeholder: 'Enter URL',
-            order: 2,
-            field_format: 'half',
-            form_group: 1,
-            form_group_title: 'This title will be ignored',
-          },
-        },
-        actors: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              label: {
-                type: 'string',
-              },
-              source: {
-                type: 'string',
-                'x-attrs': {
-                  hidden: true,
-                },
-              },
-            },
-            additionalProperties: false,
-          },
-          title: 'Actors (Multi-select)',
-          'x-attrs': {
-            field_type: 'chips',
-            placeholder: 'Enter Actors',
-            source: '/autosuggest/v1/contributors/',
-            allow_unknown_entries: true,
-            dynamic_autosuggest: true,
-            order: 3,
-            field_format: 'half',
-            form_group: 1,
-          },
-        },
-        type: {
-          type: 'object',
-          additionalProperties: false,
-          title: 'Type (Single-select)',
-          'x-attrs': {
-            field_type: 'chips',
-            placeholder: 'Select Type',
-            source: '/autosuggest/v1/contributors/',
-            allow_unknown_entries: true,
-            dynamic_autosuggest: true,
-            order: 1,
-            form_group: 2,
-          },
-          properties: {
-            label: {
-              type: 'string',
-            },
-            source: {
-              type: 'string',
-              'x-attrs': {
-                hidden: true,
-              },
-            },
+            order: 4,
           },
         },
         published_in: {
           type: 'string',
           title: 'erschienen in',
           'x-attrs': {
-            placeholder: 'Enter erschienen in',
+            placeholder: 'erschienen in eintragen',
             field_type: 'text',
             field_format: 'half',
-            form_group: 2,
-            form_group_title: 'Second Group',
-            order: 2,
+            order: 5,
+            primary_property: 'text',
+            secondary_properties: ['type'],
+            textBefore: 'bla',
+            textAfter: '%',
+          },
+        },
+        published_in2: {
+          type: 'string',
+          title: 'erschienen in',
+          'x-attrs': {
+            placeholder: 'erschienen in eintragen',
+            field_type: 'text',
+            field_format: 'half',
+            order: 6,
+            primary_property: 'text',
+            secondary_properties: ['type'],
+            textBefore: 'bla',
+            textAfter: '%',
           },
         },
         url: {
-          type: 'string',
-          title: 'URL',
+          type: 'array',
+          title: 'URL - no placeholder',
+          items: {
+            type: 'string',
+          },
           'x-attrs': {
-            placeholder: 'Enter URL',
-            order: 3,
-            field_format: 'half',
-            form_group: 2,
+            placeholder: '',
+            order: 7,
+            field_format: 'full',
+            textBefore: 'bla',
+            textAfter: '%',
           },
         },
-        field: {
-          type: 'string',
-          title: 'A form group without form_group_title',
+        contact_person: {
+          type: 'array',
+          title: 'Kontakt',
+          items: {
+            type: 'object',
+            properties: {
+              text: {
+                type: 'string',
+              },
+              type: {
+                type: 'object',
+                title: 'Typ des Kontakts',
+                properties: {
+                  label: {
+                    type: 'string',
+                  },
+                  source: {
+                    type: 'string',
+                  },
+                },
+              },
+              language: {
+                type: 'object',
+                properties: {
+                  label: {
+                    type: 'string',
+                  },
+                  source: {
+                    type: 'string',
+                  },
+                },
+                title: 'Sprache',
+              },
+            },
+          },
           'x-attrs': {
-            placeholder: 'Enter String',
-            order: 1,
-            field_format: 'half',
-            form_group: 3,
+            placeholder: 'Sprache eintragen',
+            order: 8,
+            field_format: 'full',
+            field_type: 'chips',
           },
         },
-        display_in_showroom: {
-          type: 'boolean',
-          title: 'Display in Showroom',
+        isan: {
+          type: 'string',
+          title: 'ISAN',
           'x-attrs': {
-            placeholder: 'Display in Showroom',
-            order: 2,
-            field_format: 'half',
-            field_type: 'boolean',
-            form_group: 3,
+            placeholder: 'ISAN eintragen',
+            order: 9,
           },
         },
         date_location: {
@@ -211,23 +414,29 @@ export default {
                 type: 'string',
                 title: 'Ortsbeschreibung',
                 'x-attrs': {
-                  placeholder: 'Enter Ortsbeschreibung',
+                  placeholder: 'Ortsbeschreibung eintragen',
                   field_type: 'text',
                   order: 3,
                 },
               },
               date: {
-                type: 'string',
+                type: 'array',
                 title: 'Datum',
+                items: {
+                  type: 'object',
+                  properties: {
+                    date: {
+                      type: 'string',
+                    },
+                  },
+                },
                 additionalProperties: false,
                 pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
                 'x-attrs': {
                   field_format: 'half',
                   field_type: 'date',
                   date_format: 'date_year',
-                  placeholder: {
-                    date: 'Datum eintragen',
-                  },
+                  placeholder: 'Datum eintragen',
                   order: 1,
                 },
               },
@@ -285,7 +494,7 @@ export default {
                   field_type: 'chips',
                   dynamic_autosuggest: true,
                   source: '/autosuggest/v1/places/',
-                  placeholder: 'Enter Ort',
+                  placeholder: 'Ort eintragen',
                   order: 2,
                 },
               },
@@ -296,53 +505,152 @@ export default {
           'x-attrs': {
             field_type: 'group',
             show_label: false,
-            order: 3,
-            form_group: 3,
-          },
-        },
-        url2: {
-          type: 'string',
-          title: 'URL - fields without form group added last',
-          'x-attrs': {
-            placeholder: 'Enter URL',
-            order: 7,
-            field_format: 'half',
-          },
-        },
-        isan: {
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-          title: 'ISAN (repeatable)',
-          'x-attrs': {
-            placeholder: 'Enter ISAN',
-            field_format: 'half',
-            order: 8,
-          },
-        },
-        date: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              date_from: {
-                type: 'string',
-              },
-              date_to: {
-                type: 'string',
-              },
-            },
-          },
-          title: 'Repeatable Date',
-          'x-attrs': {
-            placeholder: 'Enter Date',
-            order: 9,
-            field_type: 'date',
+            order: 10,
           },
         },
       },
+      typeList: {
+        language: [
+          {
+            label: 'Deutsch',
+            source: 'http://base.uni-ak.ac.at/portfolio/german',
+          },
+          {
+            label: 'Englisch',
+            source: 'http://base.uni-ak.ac.at/portfolio/english',
+          },
+        ],
+      },
+      defaultOptions: {
+        contact_person: {
+          type: {
+            label: 'Biography',
+            source: 'http://base.uni-ak.ac.at/portfolio/biography',
+          },
+        },
+        texts: {
+          label: 'No Type',
+          source: '',
+        },
+        published_in: {
+          label: 'Keine Angabe',
+          source: '',
+        },
+      },
       isLoading: false,
+      fieldInformation2: {
+        type: 'string',
+        title: 'ISAN',
+        'x-attrs': {
+          placeholder: 'ISAN eintragen',
+          order: 5,
+        },
+      },
+      fieldInformation: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            roles: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  label: {
+                    type: 'object',
+                    properties: {
+                      en: {
+                        type: 'string',
+                      },
+                      de: {
+                        type: 'string',
+                      },
+                      fr: {
+                        type: 'string',
+                      },
+                    },
+                    additionalProperties: false,
+                  },
+                  source: {
+                    type: 'string',
+                    'x-attrs': {
+                      hidden: true,
+                    },
+                  },
+                },
+                additionalProperties: false,
+              },
+            },
+            label: {
+              type: 'string',
+            },
+            source: {
+              type: 'string',
+              'x-attrs': {
+                hidden: true,
+              },
+            },
+          },
+          additionalProperties: false,
+        },
+        title: 'Regie',
+        'x-attrs': {
+          default_role: 'http://base.uni-ak.ac.at/portfolio/vocabulary/director',
+          equivalent: 'contributors',
+          field_type: 'chips',
+          placeholder: 'Regie eintragen',
+          sortable: true,
+          source: '/autosuggest/v1/contributors/',
+          allow_unknown_entries: true,
+          dynamic_autosuggest: true,
+          order: 1,
+        },
+      },
+      value: [],
+      showInfo: false,
+      timeout: null,
+      list: [
+        {
+          source: 'https://d-nb.info/gnd/139643028',
+          label: 'Gibson, Regie | Schriftsteller',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/172566460',
+          label: 'Stites, Regie Dean | 1955-',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/1041768044',
+          label: 'Schmidt, Jürgen | Regisseur',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/133665283',
+          label: 'Regier, Marc-Ulrich | 1976- | Arzt, Radiologe',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/172948134',
+          label: 'Morgenroth, Matthias | 1966- | Regisseur, Geschäftsführer, Dozent',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/1202447430',
+          label: 'Karrenbrock, Mirjam | Autorin',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/1021408786',
+          label: 'Fairfield, Reginald | Regie',
+          source_name: 'GND',
+        },
+        {
+          source: 'https://d-nb.info/gnd/130131903',
+          label: 'Regierer, Anne C. | Ärztin',
+          source_name: 'GND',
+        },
+      ],
       selectedEntries: [],
       entriesSelectable: false,
       entriesPerPage: null,
@@ -653,12 +961,6 @@ export default {
   },
   watch: {},
   methods: {
-    handleInput(newInput) {
-      this.valueList = {
-        ...this.valueList,
-        ...newInput,
-      };
-    },
     toggleOptions(value) {
       this.entriesSelectable = value;
     },
@@ -666,20 +968,6 @@ export default {
       console.log('action', action);
       console.log('selected entries', this.selectedEntries);
     },
-    // calcEntriesPerPage() {
-    //   const { entrySelector } = this.$refs;
-    //   let bodyHeight = entrySelector.$refs.body.clientHeight;
-    //   // if pagination element is not present yet (on initial render) deduct height and spacing
-    //   // from sidebar height
-    //   if (!entrySelector.$refs.pagination) {
-    //     bodyHeight = bodyHeight - 48 - 16;
-    //   }
-    //   // hardcoded because unfortunately no other possibility found
-    //   const entryHeight = this.isMobile ? 48 : 57;
-    //   const numberOfEntries = Math.floor(bodyHeight / entryHeight) - 1;
-    //
-    //   return numberOfEntries > 4 ? numberOfEntries : 4;
-    // },
   },
 };
 </script>
