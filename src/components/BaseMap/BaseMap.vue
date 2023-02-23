@@ -6,6 +6,7 @@
 </template>
 
 <script>
+
 /**
  * A component to display a Leaflet-map with multiple locations
  */
@@ -248,26 +249,20 @@ export default {
     this.observer.disconnect();
   },
   mounted() {
-    // Execute only on clientside
-    if (!process.browser) {
-      return;
-    }
-
     // Add observer to check if component is in viewport and init map
     this.observer.observe(this.$el);
   },
   methods: {
-    init() {
+    async init() {
       // Check if leaflet map is already initialized
       if (this.L) {
         return;
       }
 
-      /* eslint-disable global-require */
-      this.L = require('leaflet');
-      require('leaflet-responsive-popup');
-      require('leaflet.markercluster');
-      /* eslint-enable global-require */
+      // Import Leaflet and related plugins
+      this.L = await import('leaflet');
+      const { ResponsivePopup } = await import('leaflet-responsive-popup');
+      const { MarkerClusterGroup } = await import('leaflet.markercluster');
 
       // Initialize Leaflet map
       this.map = this.L.map(this.$refs.mapElement, {
@@ -307,7 +302,7 @@ export default {
       const markerIcon = this.L.divIcon(iconOptions);
 
       // Define Leaflet clusterGroup
-      this.markerCluster = this.L.markerClusterGroup({
+      this.markerCluster = new MarkerClusterGroup({
         maxClusterRadius: 50,
         showCoverageOnHover: false,
         iconCreateFunction: (cluster) => {
@@ -339,7 +334,7 @@ export default {
       });
 
       this.markerFiltered.forEach((item, index) => {
-        const popup = this.L.responsivePopup(this.popupOptions);
+        const popup = new ResponsivePopup(this.popupOptions);
         const markerOptions = {
           id: index,
           icon: markerIcon,
