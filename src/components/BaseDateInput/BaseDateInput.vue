@@ -30,17 +30,13 @@
       v-click-outside="clickedOutside"
       class="base-date-input__field-wrapper"
       @click="clickedInside">
-      <!-- @slot to add elements within form field but before the input element line<br>
-        for an example see [BaseInput](#baseinput)-->
+      <!-- @slot to add elements within form field but before the input element line for an example see [BaseInput](BaseInput)-->
       <slot name="pre-input-field" />
       <div class="base-date-input__input-fields">
-        <!-- @slot add elements within input form field but before all other elements - this
-        field wraps if necessary <br>
-        for an example see [BaseInput](#baseinput) -->
+        <!-- @slot add elements within input form field but before all other elements - this field wraps if necessary for an example see [BaseInput](BaseInput) -->
         <slot name="input-field-addition-before" />
         <div class="base-date-input__input-line">
-          <!-- @slot add elements directly in the input line (no wrapping)<br>
-          for an example see [BaseInput](#baseinput)-->
+          <!-- @slot add elements directly in the input line (no wrapping) for an example see [BaseInput](BaseInput)-->
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
@@ -63,7 +59,7 @@
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('fromOpen', $event)"
             v-on="inputListeners">
-            <template v-slot:input>
+            <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
@@ -81,7 +77,7 @@
                   @pick="datePicked('from')"
                   @click.native.prevent.stop=""
                   @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
-                  <template v-slot:input>
+                  <template #input>
                     <input
                       :id="label + '-' + id"
                       ref="inputFrom"
@@ -103,13 +99,13 @@
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
                   is not used -->
-                  <template v-slot:icon-calendar>
+                  <template #icon-calendar>
                     <div class="base-date-input__icon-wrapper" />
                   </template>
                 </DatePicker>
               </div>
             </template>
-            <template v-slot:post-input-field>
+            <template #post-input-field>
               <BaseIcon
                 v-if="showIcons"
                 ref="baseIcon"
@@ -144,7 +140,7 @@
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('toOpen', $event)"
             v-on="inputListeners">
-            <template v-slot:input>
+            <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
@@ -162,7 +158,7 @@
                   @pick="datePicked('to')"
                   @click.native.prevent.stop=""
                   @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
-                  <template v-slot:input>
+                  <template #input>
                     <input
                       :id="label + '-to-' + id"
                       ref="inputTo"
@@ -184,13 +180,13 @@
                   </template>
                   <!-- this empty element is here so that the default icon of
                   datepicker is not used -->
-                  <template v-slot:icon-calendar>
+                  <template #icon-calendar>
                     <div class="base-date-input__icon-wrapper" />
                   </template>
                 </DatePicker>
               </div>
             </template>
-            <template v-slot:post-input-field>
+            <template #post-input-field>
               <BaseIcon
                 v-if="showIcons"
                 :name="isToTimeField ? 'clock' : 'calendar-many'"
@@ -205,7 +201,7 @@
     </div>
 
     <div class="base-date-input__below">
-      <!-- @slot below-input slot added to e.g. add drop down -->
+      <!-- @slot Slot to add elements below input fields e.g. add drop down -->
       <slot name="below-input" />
     </div>
   </div>
@@ -256,9 +252,7 @@ export default {
       },
     },
     /**
-     * @model
-     *
-     * input field settable from outside<br>
+     * input field settable from outside.
      *   attention: if this is an object it needs to contain all the
      *   properties (e.g. date_from, time_to) already otherwise only
      *   a string will be returned
@@ -296,8 +290,9 @@ export default {
       default: '–',
     },
     /**
-     * specify date format<br>
-     *  'date_year': display tabs that allow for toggle between only choosing year
+     * specify date format.
+     *
+     *  **date_year**: display tabs that allow for toggle between only choosing year
      *   or complete date
      */
     format: {
@@ -308,8 +303,8 @@ export default {
       },
     },
     /**
-     * specify labels displayed instead of 'DD.MM.YYYY' and 'YYYY' <br>
-     *   should have the form { date: 'xxx', year: 'yyy' }
+     * specify labels displayed instead of 'DD.MM.YYYY' and 'YYYY'
+     *   should have the form `{ date: 'xxx', year: 'yyy' }`
      */
     dateFormatLabels: {
       type: Object,
@@ -327,7 +322,8 @@ export default {
       default: 'Switch between date formats',
     },
     /**
-     * set calendar language (ISO 639-1) (currently only 'en', 'de' and 'fr' are supported)
+     * set calendar language (ISO 639-1).
+     * **caveat**: currently only `en`, `de` and `fr` are supported
      *  @values de, en, fr
      */
     language: {
@@ -366,41 +362,41 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * set true if input field should be disabled<br>
-     * for an example see [BaseInput](#baseinput)
+     * set `true` if input field should be disabled
+     * for an example see [BaseInput](BaseInput)
      */
     disabled: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
+     * add an error message to be displayed below form field if field is invalid
+     * for an example see [BaseInput](BaseInput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
       default: true,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * if `true` a remove icon will be shown allowing to remove
+     * all input at once
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -697,7 +693,7 @@ export default {
              * propagate this one
              *
              * @event update:is-active
-             * @type {boolean}
+             * @param {boolean} - is input field active
              */
             this.$emit('update:is-active', this.isActiveInt);
           },
@@ -719,7 +715,7 @@ export default {
            * Event emitted on input, passing input string
            *
            * @event input
-           * @param {string} value - the input event value however
+           * @param {string} - the input event value however
            * passing only the event.target.value
            *
            */
@@ -1152,6 +1148,7 @@ export default {
        * after date validation
        *
        * @event value-validated
+       * @param {string, Object} - the validated string or input object
        */
       this.$emit('value-validated', data);
     },
@@ -1192,7 +1189,7 @@ export default {
        * emit a custom clicked-outside event instead of BaseInput event (propagation stopped)
        *
        * @event clicked-outside
-       * @type {MouseEvent}
+       * @param {MouseEvent} - the native Event
        */
       this.$emit('clicked-outside', event);
     },
@@ -1207,7 +1204,7 @@ export default {
        * set field active if component sourroundings are clicked
        *
        * @event click-input-field
-       * @type {MouseEvent}
+       * @param {MouseEvent} - the native Event
        */
       this.$emit('click-input-field', event);
     },
@@ -1222,7 +1219,7 @@ export default {
        * emit an event when focus leaves the input
        *
        * @event selected
-       * @type {string | Object}
+       * @param {string, Object} - the input string or object
        */
       this.$emit('selected', data);
     },
@@ -1256,7 +1253,7 @@ export default {
     },
     /**
      * if input was just a single string return that otherwise
-     * only return the properties provided by external input <br>
+     * only return the properties provided by external input
      * if input is empty set value to empty string instead of null (default vue2-datepicker)
      * @returns {string | Object}
      */

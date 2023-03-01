@@ -1,6 +1,8 @@
+## Demo
+
 Example of BaseExpandBox to display expandable text, unordered list, datalist elements
 
-```vue
+```vue live
 <template>
   <div>
     <BaseExpandBox>
@@ -8,7 +10,7 @@ Example of BaseExpandBox to display expandable text, unordered list, datalist el
         render-label-as="h2"
         :data="data"
         :cols2="true" />
-      <template v-slot:footer>
+      <template #footer>
         <div style="display: flex;">
           <BaseButton
             :icon-colored="true"
@@ -33,16 +35,7 @@ Example of BaseExpandBox to display expandable text, unordered list, datalist el
 </template>
 
 <script>
-import BaseExpandBox from './BaseExpandBox';
-import BaseButton from '../BaseButton/BaseButton';
-import BaseTextList from '../BaseTextList/BaseTextList';
-
 export default {
-  components: {
-    BaseExpandBox,
-    BaseButton,
-    BaseTextList,
-  },
   data() {
     return {
       data: [

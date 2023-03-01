@@ -5,16 +5,20 @@
     <div
       :class="[
         'base-date-panel__label',
-        {'base-date-panel__label--hover': !isInline },
+        { 'base-date-panel__label--hover': !isInline },
       ]"
+      @keydown.enter="isOpen = !isOpen"
       @click.stop="isOpen = !isOpen">
       <base-icon
         v-if="!isInline"
         name="calendar-many"
+        :title="label"
         :class="['base-date-panel__icon',
                  { 'base-date-panel__icon--active': isOpen },
                  { 'base-date-panel__icon--right': iconPosition === 'right' }]" />
-
+      <!-- TODO: check if this is correct HTML - label associated Datepicker?
+       but also: is this currently accessible?? (should there be a (hidden) input field?? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
         v-if="showLabel || !isInline">
         {{ labelInt || label }}
@@ -22,7 +26,7 @@
     </div>
 
     <div @click.stop="">
-      <date-picker
+      <DatePicker
         ref="datePanel"
         v-model="inputInt"
         :append-to-body="false"
@@ -51,6 +55,9 @@ import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Date Panel
+ *
+ * >CAVEAT: this component is currently not production ready since it is not
+ * >accessible and is therefore excluded from the styleguide. Using it is not recommended.
  */
 export default {
   name: 'BaseDatePanel',
@@ -67,8 +74,7 @@ export default {
   },
   props: {
     /**
-     * specify if icon should be displayed left or right <br>
-     * valid values: 'left' | 'right'
+     * specify if icon should be displayed left or right
      */
     iconPosition: {
       type: String,
@@ -78,10 +84,8 @@ export default {
       },
     },
     /**
-     * @model
-     *
-     * set input field from outside<br>
-     * format: { date: 'yyyy-MM-dd' }
+     * set input field from outside.
+     * format: `{ date: 'yyyy-MM-dd' }`
      */
     input: {
       type: Object,
@@ -96,7 +100,7 @@ export default {
     },
     /**
      * label, required for usability purposes, handle
-     * showing of label with property showLabel
+     * showing of label with property `showLabel`
      */
     label: {
       type: String,
@@ -117,8 +121,7 @@ export default {
       default: true,
     },
     /**
-     * select type of calendar <br>
-     * valid values: 'date' | 'week'
+     * select type of calendar
      */
     type: {
       type: String,
@@ -128,7 +131,7 @@ export default {
       },
     },
     /**
-     * label will be replace with selected date unless this is set false
+     * label will be replaced with selected date unless this is set `false`
      */
     showDateSelected: {
       type: Boolean,
@@ -201,12 +204,12 @@ export default {
      */
     emitData(value) {
       /**
-       * emit event when date or week is selected<br>
-       * format: { date: 'yyyy-MM-dd' }
+       * emit event when date or week is selected
+       * format: `{ date: 'yyyy-MM-dd' }`
        *
        * @event selected
-       * @param {Object} value - an object with the following properties:
-       * @property {string} date - the date string in format 'YYYY-MM-DD'
+       * @type {Object} value - an object with the following properties:
+       * @property {string} date - the date string in format `YYYY-MM-DD`
        * @property {string} week - if type is 'week' also the week is emitted
        */
       this.$emit('selected', this.emitObject(value));

@@ -1,7 +1,7 @@
 <template>
   <draggable
     ref="draggable"
-    v-model="list"
+    :value="list"
     :sort="false"
     :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
@@ -32,9 +32,7 @@
         @selected="selectItem(index, $event)">
         <template
           #thumbnails>
-          <!-- @slot Use this scoped slot to supply a list of thumbnails
-          (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is one list element.
-          See also the example below.-->
+          <!-- @slot Use this scoped slot to supply a list of thumbnails (i.e. [BaseIcon](BaseIcon)) for `item`, where `item` is one list element. See also the example below.-->
           <slot
             name="thumbnails"
             :item="item" />
@@ -49,7 +47,7 @@ import Draggable from 'vuedraggable';
 import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
 
 /**
- * Base Component for SideBar Menu Entries<br>
+ * Base Component for SideBar Menu Entries
  *   (this component is currently not ssr-capable)
  */
 
@@ -68,20 +66,22 @@ export default {
       default: false,
     },
     /**
-     * list of menu entries - array of objects <br>
-     *   Entry properties that can be displayed: <br>
-     *     *required*:<br>
-     *      **id** {string}: give every item an unique id<br>
-     *     *optional*:<br>
-     *      **title** {string}: main text line in the list item<br>
-     *      **description**: {string}: second text line in the list item<br>
-     *      **active** { boolean}: steer from outside if item should be displayed active (with left
-     *        side color border)<br>
-     *      **selected** {boolean}: steer from outside if entry select box should be checked<br>
-     *      **disabled** {boolean}: steer from outside if entry select box should be disabled<br>
-     *      **icon** {string}: a valid [BaseIcon](#baseicon) icon name<br>
-     *      <br>
-     *      Also see [BaseMenuEntry](#basemenuentry) component for more information on
+     * list of menu entries - array of objects
+     *   Entry properties that can be displayed:
+     *
+     *     *required*:
+     *      **id** `string` - give every item an unique id
+     *
+     *     *optional*:
+     *      **title** `string` - main text line in the list item
+     *      **description** `string` - second text line in the list item
+     *      **active** `boolean` - steer from outside if item should be displayed active (with left
+     *        side color border)
+     *      **selected** `boolean` - steer from outside if entry select box should be checked
+     *      **disabled** `boolean` - steer from outside if entry select box should be disabled
+     *      **icon** `string` - a valid [BaseIcon](BaseIcon) icon name
+     *
+     *      Also see [BaseMenuEntry](BaseMenuEntry) component for more information on
      *        the mentioned properties.
      */
     list: {
@@ -181,10 +181,9 @@ export default {
     activateItem(index) {
       /**
        * event emitted when a menu entry is clicked
-       * - returning the index of the respective entry
        *
        * @event clicked
-       * @type { String }
+       * @param { String } - the index of the respective entry
        */
       this.$emit('clicked', index);
     },
@@ -192,10 +191,11 @@ export default {
       this.$set(this.entryProps[index], 'selected', selected);
       /**
        * event emitted when entry is clicked and select is active
-       * - returns the index and selected (true/false)
        *
        * @event selected
        * @type { Object }
+       * @property {string} index - the index of the selected item
+       * @property {boolean} selected - was items selected
        */
       this.$emit('selected', { index, selected });
     },

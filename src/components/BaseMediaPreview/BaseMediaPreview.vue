@@ -116,7 +116,7 @@ import popUpLock from '../../mixins/popUpLock';
  * Component allowing for the display of images or streaming of
  * audio and video (currently only hls format) and by using browser pdf viewer also pdfs
  *
- * CAVEAT: this component will be deprecated and replaced by BaseMediaCarousel!<br>
+ * CAVEAT: this component will be deprecated and replaced by BaseMediaCarousel!
  * Usage not recommended!
  */
 
@@ -169,8 +169,7 @@ export default {
       default: '',
     },
     /**
-     * define the media type <br>
-     *     options: 'image'|'video'|'audio'|'pdf'
+     * define the media type
      */
     mediaType: {
       type: String,
@@ -211,8 +210,8 @@ export default {
       default: 0,
     },
     /**
-     * specify an image srcset as an array of objects in the form <br>
-     *     { 'mediawidth': 'url' }
+     * specify an image srcset as an array of objects in the form
+     *     `{ [mediawidth]: 'url' }`
      */
     previews: {
       type: Array,
@@ -299,10 +298,9 @@ export default {
       // --> to prevent immediate closure
       if (event.target.className === 'base-media-preview-image-stage') {
         /**
-         * triggered on clicking outside image area
+         * triggered on clicking outside image area or when close action is triggered
          *
          * @event hide-preview
-         * @type { None }
          *
          */
         this.$emit('hide-preview');
@@ -315,7 +313,8 @@ export default {
          * download button clicked
          *
          * @event download
-         * @type { Object }
+         * @property {string} url - the download url
+         * @property {string} name - the file name
          *
          */
         this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
@@ -326,14 +325,6 @@ export default {
     },
   },
 };
-
-/**
- * emitted when a close action is triggered
- *
- * @event hide-preview
- * @type none
- *
- */
 </script>
 
 <style lang="scss" scoped>

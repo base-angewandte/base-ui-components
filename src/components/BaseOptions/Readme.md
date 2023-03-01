@@ -1,6 +1,8 @@
+## Demo
+
 A simple example with options button and different `useOptionsButtonOn` settings.
 Resize to see the 'mobile' effect!
-```vue
+```vue live
 <template>
     <div class="options-background">
         <BaseOptions
@@ -42,9 +44,7 @@ Resize to see the 'mobile' effect!
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
 export default {
-  components: { BaseButton } ,
   data() {
     return {
       optionsToggle: false,
@@ -72,7 +72,7 @@ export default {
 ```
 
 Advanced example with all slots filled. Choose different settings for available properties below and resize to see the different effects!
-```vue
+```vue live
 <template>
     <div class="options-background">
       <BaseOptions
@@ -81,11 +81,11 @@ Advanced example with all slots filled. Choose different settings for available 
         :show-options.sync="optionsToggle"
         :show-after-options-below="showAfterOptionsBelow"
         :align-options="alignOptions">
-        <template v-slot:beforeOptions>
+        <template #beforeOptions>
           <div>beforeOptions slot</div>
         </template>
         <template
-            v-slot:options>
+            #options>
             <BaseButton
                 :text="'added via slot'"
                 :has-background-color="false"
@@ -99,7 +99,7 @@ Advanced example with all slots filled. Choose different settings for available 
                 icon="waste-bin"
                 button-style="single" />
         </template>
-        <template v-slot:afterOptions>
+        <template #afterOptions>
           <div>afterOptions slot element</div>
         </template>
       </BaseOptions>
@@ -190,7 +190,7 @@ export default {
 
 An more real-life example with after options slot rendered below options if space runs out.
 
-```vue
+```vue live
 <template>
   <div class="options-background">
         <BaseOptions
@@ -198,7 +198,7 @@ An more real-life example with after options slot rendered below options if spac
           :show-options.sync="showCheckbox"
           :show-after-options-below="true"
           align-options="left">
-          <template v-slot:afterOptions>
+          <template #afterOptions>
             <div
               ref="afterOptions"
               class="sidebar-drop-downs">
@@ -221,7 +221,7 @@ An more real-life example with after options slot rendered below options if spac
             </div>
           </template>
           <template
-            v-slot:options>
+            #options>
             <BaseButton
               :text="'Publish'"
               :has-background-color="false"
@@ -256,14 +256,7 @@ An more real-life example with after options slot rendered below options if spac
 </template>
 
 <script>
-import BaseDropDown from '../BaseDropDown/BaseDropDown';
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseDropDown,
-    BaseButton,
-  },
   data() {
     return {
       showCheckbox: false,

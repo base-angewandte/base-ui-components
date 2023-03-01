@@ -1,5 +1,5 @@
 <template>
-  <base-box-button
+  <BaseBoxButton
     v-bind="$props"
     :box-ratio="boxRatio"
     :render-element-as="renderElementAs"
@@ -38,7 +38,7 @@
         v-else
         ref="fileform" />
     </div>
-  </base-box-button>
+  </BaseBoxButton>
 </template>
 
 <script>
@@ -46,7 +46,7 @@ import Draggable from 'vuedraggable';
 import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
 
 /**
- * An Element for dropping files or other UI Elements into
+ * An Element to drop files or other UI Elements into
  */
 
 export default {
@@ -64,7 +64,7 @@ export default {
       default: null,
     },
     /**
-     * if true a plus sign is displayed in front of the icon
+     * if `true` a plus sign is displayed in front of the icon
      */
     showPlus: {
       type: Boolean,
@@ -93,7 +93,7 @@ export default {
     },
     /**
      * define the ratio of width and height of the box
-     * (in percent string, e.g. 1:1 --> '100', 1:2 --> '50')
+     * (in percent string, e.g. 1:1 --> `'100'`, 1:2 --> `'50'`)
      */
     boxRatio: {
       type: String,
@@ -107,8 +107,8 @@ export default {
       default: 'div',
     },
     /**
-     * specify the type of drops <br>
-     *     valid options: 'files'|'elements'
+     * specify the type of drops
+     *     @values files, elements
      */
     dropType: {
       type: String,
@@ -118,7 +118,7 @@ export default {
       },
     },
     /**
-     * if the dropType is 'element', specify the element group name
+     * if the `dropType` is `elements`, specify the element group name
      * this needs to match the group name of the draggable element that should
      * be dragged into this element
      */
@@ -127,7 +127,7 @@ export default {
       default: '',
     },
     /**
-     * if the dropType is 'element' specify a class name to limit interactions to a certain element
+     * if the `dropType` is `elements` specify a class name to limit interactions to a certain element
      */
     dragItemClass: {
       type: String,
@@ -170,7 +170,7 @@ export default {
          * event emitted when a file or an element is dropped on the box, emitting the type of event
          *
          * @event dropped-file
-         * @type { DragEvent }
+         * @param { DragEvent } - propagating the triggered event
          */
         this.$emit('dropped-file', e);
       });
@@ -219,7 +219,7 @@ export default {
            * event emitted when an element is dropped on the box, emitting the element data id
            *
            * @event dropped-element
-           * @type { String }
+           * @param { string } - the id of the dropped element
            */
           this.$emit('dropped-element', draggedElementId);
         }
@@ -249,10 +249,10 @@ export default {
       }
 
       /**
-       * Triggered when the box is clicked
+       * Triggered when the box or tooltip is clicked
        *
        * @event clicked
-       * @type {Event}
+       * @param {Event} - propagating the triggered click event
        */
       if (!this.disabled) {
         this.$emit('clicked', event);
@@ -260,10 +260,10 @@ export default {
     },
     onTooltip(event) {
       /**
-       * Triggered when the box is clicked
+       * Triggered when the box or tooltip is clicked
        *
        * @event clicked
-       * @type {Event}
+       * @param {Event} - propagating the triggered click event
        */
       this.$emit('clicked', event);
     },

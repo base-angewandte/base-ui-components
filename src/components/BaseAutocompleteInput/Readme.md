@@ -1,7 +1,9 @@
+## Demo
+
 Form Input Field with Dynamic Autocomplete.
 The Toggle lets you choose if the options are provided as array of strings or objects.
 
-```vue
+```vue live
 
 <template>
   <div class="form-field base-styling">
@@ -20,12 +22,7 @@ The Toggle lets you choose if the options are provided as array of strings or ob
 </template>
 
 <script>
-import BaseToggle from '../BaseToggle/BaseToggle';
-
 export default {
-  components: {
-    BaseToggle,
-  },
   data() {
     return {
       listIsObjects: false,

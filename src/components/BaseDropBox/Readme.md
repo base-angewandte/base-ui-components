@@ -1,10 +1,12 @@
+## Demo
+
 A box with event firing on drop
 
-```vue
+```vue live
 <template>
   <div>
     <div class="box-container">
-        <base-drop-box
+        <BaseDropBox
           :icon="'calendar-many'"
           text="Drop a file here"
           subtext="Add more info"
@@ -12,14 +14,14 @@ A box with event firing on drop
           @dropped-file="handleFileSelect($event)"
         />
 
-        <base-drop-box
+        <BaseDropBox
           :icon="'file-object'"
           :show-plus="true"
           text="Box with Plus"
           subtext="Add more info"
           class="drop-box"
         />
-        <base-drop-box
+        <BaseDropBox
           :icon="'file-object'"
           :box-size="{ width: 'calc(50%)' }"
           box-ratio="50"

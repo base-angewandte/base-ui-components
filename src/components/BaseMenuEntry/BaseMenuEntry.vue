@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <transition-group
+    <TransitionGroup
       ref="slideFade"
       name="slide-fade"
       class="slide-fade-group"
@@ -54,12 +54,10 @@
         ref="thumbnailContainer"
         class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out"
         :style="{ '--cols': columns }">
-        <!-- @slot Use this slot to supply a list of [BaseIcon](#baseicon) components that are
-        to be shown in the right area of the menu entry as thumbnails. If using the slot,
-        make sure that `showThumbnails` is true.-->
+        <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
         <slot name="thumbnails" />
       </div>
-      <base-checkmark
+      <BaseCheckmark
         v-if="isSelectable && selectActive && !isDisabled"
         :key="entryId + 'checkmark'"
         :checked="isSelected"
@@ -67,7 +65,7 @@
         mark-style="checkbox"
         class="base-menu-entry-checkbox"
         @clicked="clicked" />
-    </transition-group>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -126,8 +124,8 @@ export default {
       default: false,
     },
     /**
-     * specify an icon that is displayed before the title<br>
-     * see [BaseIcon](#baseicon) for available icons<br>
+     * specify an icon that is displayed before the title.
+     * see [BaseIcon](BaseIcon) for available icons
      */
     icon: {
       type: String,
@@ -155,7 +153,7 @@ export default {
       default: false,
     },
     /**
-     * define if entry is disabled - thus if checkboxes are available<br>
+     * define if entry is disabled - thus if checkboxes are available
      *   will overrule prop isSelectable
      */
     isDisabled: {
@@ -215,7 +213,7 @@ export default {
          * Event emitted when selectActive is true and the entry is clicked
          *
          * @event selected
-         * @type { Boolean }
+         * @param { Boolean } - was entry selected
          */
         this.$emit('selected', this.isSelectedInt);
       } else {
@@ -223,7 +221,6 @@ export default {
          * Event emitted when entry is clicked and selectActive is false (=checkbox not shown)
          *
          * @event clicked
-         * @type { None }
          */
         this.$emit('clicked');
       }

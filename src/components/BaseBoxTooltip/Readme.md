@@ -1,6 +1,8 @@
+## Demo
+
 Button Tooltip
 
-```js
+```js live
 
 const onTooltip = function(){
     alert('Tooltip clicked!');

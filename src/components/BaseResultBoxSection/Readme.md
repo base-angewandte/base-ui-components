@@ -1,6 +1,8 @@
+## Demo
+
 Test you component configuration on this example component!
 (Some settings only have an effect in edit mode or view mode respectively)
-```vue
+```vue live
 
 <template>
   <div class="section-canvas">
@@ -122,12 +124,7 @@ Test you component configuration on this example component!
 </template>
 
 <script>
-import BaseToggle from '../BaseToggle/BaseToggle';
-import BaseInput from '../BaseInput/BaseInput';
-
 export default {
-components: { BaseInput , BaseToggle } ,
-
   data() {
     return {
     isLoading: false,
@@ -409,7 +406,7 @@ components: { BaseInput , BaseToggle } ,
     margin: 8px;
   }
   .options-input {
-    width: 175px;
+    width: 30% !important;
     margin: 8px;
   }
 </style>
@@ -420,7 +417,7 @@ components: { BaseInput , BaseToggle } ,
 
 An example demonstrating slots
 
-```vue
+```vue live
 
 <template>
   <div class="section-canvas">
@@ -471,7 +468,7 @@ An example demonstrating slots
           @clicked="submit('publish')" />
       </template>
       <template
-        v-slot:resultBox="props">
+        #resultBox="props">
         <BaseImageBox
           :key="props.item.id"
           :selectable="props.selectActive"
@@ -492,7 +489,7 @@ An example demonstrating slots
           This is the options-message-area-after slot
         </div>
       </template>
-      <template #actionButtons="props">
+      <template #actionButtons="{ itemsPerRow, elementId }">
         <BaseBoxButton
           key="custom-action-button"
           text="custom button text"
@@ -500,8 +497,20 @@ An example demonstrating slots
           icon="eye"
           box-style="small"
           box-type="button"
-          class="custom-button"
-          :class="{ 'action-box-spacer': props.itemsPerRow < entriesList.length}"
+          :class="['custom-button',
+                   { 'action-box-spacer': itemsPerRow < entriesList.length},
+                   `base-result-box-section__box-item-${elementId}`]"
+          @clicked="submitAction('customValue')" />
+        <BaseBoxButton
+          key="custom-action-button-2"
+          text="custom button text 2"
+          :box-size="{ width: 'calc(((100% - (var(--items-per-row) * 8rem/19))/ var(--items-per-row)) - 0.01rem)', height: '100%' }"
+          icon="eye"
+          box-style="small"
+          box-type="button"
+          :class="['custom-button',
+                   { 'action-box-spacer': itemsPerRow < entriesList.length},
+                   `base-result-box-section__box-item-${elementId}`]"
           @clicked="submitAction('customValue')" />
       </template>
     </BaseResultBoxSection>
@@ -509,18 +518,7 @@ An example demonstrating slots
 </template>
 
 <script>
-import BaseDropDown from '../BaseDropDown/BaseDropDown';
-import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseDropDown,
-    BaseBoxButton,
-    BaseImageBox,
-    BaseButton,
-  },
   data() {
     return {
     selected: {},

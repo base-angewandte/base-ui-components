@@ -45,8 +45,8 @@ export default {
   },
   props: {
     /**
-     * choose the style <br>
-     * valid values: 'radio' | 'checkbox'
+     * choose the style
+     * @values radio, checkbox
      */
     markStyle: {
       type: String,
@@ -56,8 +56,8 @@ export default {
       },
     },
     /**
-     * specify a discriptive label <br>
-     * this will not be displayed but is only there for usability purposes <br>
+     * specify a descriptive label
+     * this will not be displayed but is only there for usability purposes
      * TODO: for radio button label should actually be visible!
      */
     label: {
@@ -74,7 +74,7 @@ export default {
     },
     /**
      * define if label should be visible - default set false because
-     * currentyl not needed in base project
+     * currently not needed in base project
      */
     showLabel: {
       type: Boolean,
@@ -83,16 +83,14 @@ export default {
     /**
      * checkbox checked or radio button checked can be set from outside, default
      * value depending on type of selector
-     *
-     * @model
      */
     checked: {
       type: [Boolean, String],
       default: false,
     },
     /**
-     * set the size of the checkBox <br>
-     * valid values: 'large' | 'small'
+     * set the size of the checkBox
+     * @values large, small
      */
     checkBoxSize: {
       type: String,
@@ -132,7 +130,8 @@ export default {
        * event emitted on radio button / checkmark click,
        * emitting input label
        *
-       * @type {string | boolean}
+       * @event clicked
+       * @param {string, boolean} - emitting boolean value for checkmark or radio value
        */
       this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
     },

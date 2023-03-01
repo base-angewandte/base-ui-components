@@ -15,10 +15,9 @@
     :use-fade-out="false"
     class="base-multiline-text-input"
     v-on="$listeners">
-    <template v-slot:label-addition>
+    <template #label-addition>
       <div class="base-multiline-text-input__additions">
-        <!-- @slot to add drop down needed for text input field (base specific)
-          or any other element deemed necessary -->
+        <!-- @slot to add drop down needed for text input field (base specific) or any other element deemed necessary -->
         <slot name="label-addition" />
         <BaseSwitchButton
           v-if="tabs && tabs[0] !== 'default'"
@@ -28,7 +27,7 @@
           :active-tab="activeTab"
           class="base-multiline-text-input__tabs">
           <template
-            v-slot:right-of-text="tab">
+            #right-of-text="tab">
             <BaseIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input__text-icon"
@@ -37,7 +36,7 @@
         </BaseSwitchButton>
       </div>
     </template>
-    <template v-slot:input>
+    <template #input>
       <div
         ref="textareaWrapper"
         :class="['base-multiline-text-input__textarea-wrapper',
@@ -59,28 +58,24 @@
       </div>
     </template>
     <template
-      v-slot:input-field-addition-before>
-      <!-- @slot Slot to allow for additional elements in the input field \<div\>
-        (before \<input\>) -->
+      #input-field-addition-before>
+      <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
       <slot name="input-field-addition-before" />
     </template>
-    <template v-slot:input-field-addition-after>
+    <template #input-field-addition-after>
       <!-- @slot for adding elements after input -->
       <slot name="input-field-addition-after" />
     </template>
-    <template v-slot:post-input-field>
-      <!-- @slot elements after the actual input element but within the input field container <br>
-      for an example see [BaseChipsInputField](#basechipsinputfield)-->
+    <template #post-input-field>
+      <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
       <slot name="post-input-field" />
     </template>
-    <template v-slot:error-icon>
-      <!-- @slot use a custom icon instead of standard error/warning icon<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+    <template #error-icon>
+      <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
       <slot name="error-icon" />
     </template>
-    <template v-slot:remove-icon>
-      <!-- @slot for adding elements after input (e.g. used to add loader) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+    <template #remove-icon>
+      <!-- @slot for adding elements after input (e.g. used to add loader). for an example see [BaseChipsInputField](BaseChipsInputField)-->
       <slot name="remove-icon" />
     </template>
   </BaseInput>
@@ -108,11 +103,9 @@ export default {
   },
   props: {
     /**
-     * input displayed in the textarea <br>
-     *   if tabs are set this needs to be an object with properties corresponding to
-     *   tab names
-     *
-     * @model
+     * input displayed in the textarea.
+     *   if `tabs` prop is set, this needs to be an object with properties corresponding to
+     *   tab names.
      */
     input: {
       type: [Object, String],
@@ -126,7 +119,7 @@ export default {
       default: '',
     },
     /**
-     * set true if label should be visible
+     * set `true` if label should be visible
      */
     showLabel: {
       type: Boolean,
@@ -184,7 +177,7 @@ export default {
       default: '',
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field (currently only used for `aria-required`)
      */
     required: {
       type: Boolean,
@@ -192,32 +185,32 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field.
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * set true if input field should be disabled<br>
-     * for an example see [BaseInput](#baseinput)
+     * set true if input field should be disabled.
+     * for an example see [BaseInput](BaseInput)
      */
     disabled: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
+     * add an error message to be displayed below form field if field is invalid.
+     * for an example see [BaseInput](BaseInput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown.
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -225,8 +218,8 @@ export default {
     },
     /**
      * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * all input at once.
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -263,7 +256,7 @@ export default {
              * Event emitted on input, passing input string or input object
              *
              * @event input
-             * @type {string | Object}
+             * @param {string, Object} - the altered field input
              */
             this.$emit('input', this.emitFieldContent());
           },
@@ -302,8 +295,11 @@ export default {
         const propName = this.activeTabInt || 'default';
         this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
       } else {
-        this.tabs.forEach(tab => this.$set(this.fieldContent, tab,
-          val[tab]));
+        this.tabs.forEach(tab => this.$set(
+          this.fieldContent,
+          tab,
+          val[tab],
+        ));
       }
     },
     emitFieldContent() {

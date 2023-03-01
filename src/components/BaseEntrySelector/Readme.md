@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 
 <template>
   <div class="body">
@@ -96,14 +98,14 @@
       @selected-changed="selectedEntries = $event"
       @fetch-entries="getNewEntries"
       @entry-clicked="activeEntry = $event">
-      <template v-slot:head>
+      <template #head>
         <template v-if="useHeadSlot">
           <div class="custom-slot">
             Put your custom head slot elements here
           </div>
         </template>
       </template>
-      <template v-slot:option-actions>
+      <template #option-actions>
         <template v-if="useActionsSlot">
           <div class="custom-slot">
             <BaseButton
@@ -112,14 +114,14 @@
           </div>
         </template>
       </template>
-      <template v-slot:after-options>
+      <template #after-options>
         <template v-if="useAfterOptionsSlot">
           <div class="custom-slot">
             Custom after-options element
           </div>
         </template>
       </template>
-      <template v-slot:thumbnails="{ item }">
+      <template #thumbnails="{ item }">
         <template v-if="useThumbnailsSlot">
           <BaseIcon
             v-if="item.has_media"
@@ -127,7 +129,7 @@
             name="eye"/>
         </template>
       </template>
-      <template v-slot:entries="{ entries, selectEntry }">
+      <template #entries="{ entries, selectEntry }">
         <template v-if="useEntriesSlot">
           <div class="custom-slot">
             This could be your custom entries display
@@ -151,17 +153,7 @@
 </template>
 
 <script>
-
-import BaseToggle from '../BaseToggle/BaseToggle';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseButton,
-    BaseIcon,
-    BaseToggle,
-  },
   data() {
     return {
       entries: [

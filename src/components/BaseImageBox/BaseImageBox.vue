@@ -71,9 +71,7 @@
             v-if="!imageUrl || !displayImage"
             ref="boxText"
             class="base-image-box__text-wrapper">
-            <!-- @slot to display more advanced text - if you use this please specify the
-            ref attribute with 'boxTextInner' that has the line-height css attribute set
-            - so the text display height can be calculated correctly! -->
+            <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
             <slot
               :text="boxText"
               name="text">
@@ -225,7 +223,7 @@ export default {
       default: null,
     },
     /**
-     * set optional icon <br>
+     * set optional icon
      * e.g. for items without image
      */
     icon: {
@@ -233,7 +231,7 @@ export default {
       default: '',
     },
     /**
-     * set optional icon size <br>
+     * set optional icon size
      */
     iconSize: {
       type: String,
@@ -241,7 +239,7 @@ export default {
       validator: val => ['small', 'medium', 'large', 'xlarge', 'xxlarge'].includes(val),
     },
     /**
-     * display play icon <br>
+     * display play icon
      * e.g. for Video, Audio files
      */
     playIcon: {
@@ -314,15 +312,16 @@ export default {
       default: 'div',
     },
     /**
-     * if element is rendered as vue link component, specify a value for the 'to' attribute
-     * can either be a string or a vue-router Location object (= object with 'path' property
-     * and optional 'params' or 'query' object)<br>
+     * if element is rendered as vue link component, specify a value for the `to` attribute
+     * can either be a string or a `vue-router` Location object (= object with `path` property
+     * and optional `params` or `query` object)
      * (this needs vue-router)
      */
     linkTo: {
       type: [String, Object],
       default: '',
-      validator: val => typeof val === 'string' || (val instanceof Object && Object.keys(val).includes('path')),
+      validator: val => typeof val === 'string'
+        || (val instanceof Object && Object.keys(val).includes('path')),
     },
   },
   data() {
@@ -359,7 +358,7 @@ export default {
          * event triggered when box is selectable and clicked upon
          *
          * @event select-triggered
-         * @type { Boolean }
+         * @param { Boolean } - was box selected
          */
         this.$emit('select-triggered', val);
       }

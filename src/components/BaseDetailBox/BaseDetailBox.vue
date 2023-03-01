@@ -34,8 +34,8 @@ export default {
   props: {
     /**
      * an array with objects to pass the data to be displayed, expecting an object with
-     * 'label' and 'value' properties - if different please use valuePropertyName
-     * and labelPropertyName respectively!
+     * `label` and `value` properties - if different please use `valuePropertyName`
+     * and `labelPropertyName` respectively!
      */
     data: {
       type: Array,
@@ -57,7 +57,7 @@ export default {
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
-     * e.g. { de: 'xxx', en: 'yyy' })
+     * e.g. `{ de: 'xxx', en: 'yyy' }`)
      */
     language: {
       type: String,

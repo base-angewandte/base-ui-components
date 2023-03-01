@@ -4,7 +4,7 @@ module.exports = {
   root: true,
   parserOptions: {
     sourceType: 'module',
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
   },
   env: {
     browser: true,
@@ -12,11 +12,19 @@ module.exports = {
     node: true,
   },
   extends: [
+    'airbnb-base',
     'plugin:vue/recommended',
-    '@vue/airbnb',
   ],
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['@', './src/']],
+        extensions: ['.js', '.jsx', '.vue'],
+      },
+    },
+  },
   // add your custom rules here
-  'rules': {
+  rules: {
     // disallow reassignment of function parameters
     // disallow parameter object manipulation except for specific exclusions
     'no-param-reassign': ['error', {
@@ -24,18 +32,18 @@ module.exports = {
       ignorePropertyModificationsFor: [
         'state', // for vuex state
         'acc', // for reduce accumulators
-        'e', // for e.returnvalue
+        'e', // for e.return value
       ],
     }],
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
-      'js': 'never',
-      'vue': 'never'
+      js: 'never',
+      vue: 'never',
     }],
-    "object-curly-newline": "off",
+    'object-curly-newline': 'off',
     // allow optionalDependencies
     'import/no-extraneous-dependencies': ['error', {
-      'optionalDependencies': ['test/unit/index.js']
+      optionalDependencies: ['test/unit/index.js'],
     }],
     'vue/html-closing-bracket-newline': ['error', {
       singleline: 'never',
@@ -48,16 +56,25 @@ module.exports = {
     'arrow-parens': ['error', 'as-needed', {
       requireForBlockBody: true,
     }],
+    // unfortunately our audio and video files do not have the required format
+    // (.vtt files) included -->
+    'vuejs-accessibility/media-has-caption': 0,
+    // need html comments in one line otherwise vuepress (docgen?) is not parsing them
+    'max-len': ['error', {
+      code: 110,
+      ignoreComments: true,
+      ignoreStrings: true,
+      ignoreTemplateLiterals: true,
+      ignorePattern: '(^\\s*<!--\\s+?@slot.*$|^\\s*@binding.*$)',
+    }],
   },
   overrides: [
     {
       files: [
         '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)'
+        '**/tests/unit/**/*.spec.{j,t}s?(x)',
       ],
-      env: {
-        jest: true
-      }
-    }
-  ]
-}
+      env: {},
+    },
+  ],
+};

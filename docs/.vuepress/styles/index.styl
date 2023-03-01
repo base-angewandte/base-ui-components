@@ -1,0 +1,72 @@
+/**
+ * Custom Styles here.
+ *
+ * ref：https://v1.vuepress.vuejs.org/config/#index-styl
+ */
+
+:root
+  --app-color #3f51b5
+  --app-color-secondary #8e99f3
+  --map-cluster-bg rgba(63, 81, 181, .4)
+  --map-cluster-bg-inner rgba(63, 81, 181, .85)
+  --map-cluster-bg-hover rgba(142, 153, 243, .4)
+  --map-cluster-bg-inner-hover rgba(142, 153, 243, .85)
+
+body {
+  font-size 19px!important
+  font-family "Source Sans Pro", serif
+}
+
+table
+  overflow-x: visible
+
+ul
+  display list-item
+
+li
+  list-style disc
+
+// leaflet is setting a tile z-index of 1000 so in order to prevent map overlaying sidebar
+.sidebar
+  z-index 1001
+
+.sidebar li
+  list-style none
+
+.home .hero img
+  max-width 450px!important
+
+.preview-code .preview
+  background-color white!important
+
+.prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea
+  background #282c34 !important
+
+// need to overwrite vuepress css! :(((
+.preview table
+  display table
+  margin 0
+  border-collapse separate
+  overflow-x unset
+
+.preview td, .preview th
+  border none
+
+.preview tr
+  background-color transparent
+  border-top none
+
+.preview a
+  color inherit
+
+.preview p, .preview ul, .preview ol
+  line-height unset
+
+.preview ul, .preview ol
+  padding-left unset
+  color inherit
+  list-style-type none
+
+.preview li {
+  list-style none
+}

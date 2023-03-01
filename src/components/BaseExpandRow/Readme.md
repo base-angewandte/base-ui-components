@@ -1,6 +1,8 @@
+## Demo
+
 Component to toggle content area
 
-```vue
+```vue live
 
 <template>
   <div class="container">
@@ -25,7 +27,7 @@ export default {};
 
 Selectable row in expanded state, having both a title and a subtitle, without icon:
 
-```vue
+```vue live
 <template>
   <BaseExpandRow
     title="Lorem ipsum"

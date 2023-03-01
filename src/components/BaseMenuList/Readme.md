@@ -1,5 +1,7 @@
+## Demo
+
 Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnails` slot.
-```vue
+```vue live
 <template>
   <div class="listcontainer">
     <BaseMenuList
@@ -11,15 +13,15 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
         @clicked="activeEntry = $event">
         <template
           #thumbnails="{ item }">
-          <base-icon
+          <BaseIcon
             v-if="item.published"
             name="eye"
             class="icon" />
-          <base-icon
+          <BaseIcon
             v-if="item.shared"
             name="people"
             class="icon" />
-          <base-icon
+          <BaseIcon
             v-if="item.error"
             name="attention"
             class="icon" />
@@ -41,7 +43,6 @@ export default {
       list: [
         {
           id: '1',
-          icon: 'file-object',
           title: 'Active Entry',
           type: 'Bild',
           error: false,

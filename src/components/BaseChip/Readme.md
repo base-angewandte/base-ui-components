@@ -1,13 +1,15 @@
+## Demo
+
 A chip that can be edited
 
-```vue
+```vue live
 <template>
   <div>
-      <base-chip
+      <BaseChip
           :entry="entry"
           :is-linked="false"
           @remove-entry="remove"/>
-      <base-chip
+      <BaseChip
           :entry="'Click me to see a hover box!'"
           :hover-box-content="{ title: 'More Info', subtext: 'Additional', boxText: ['Info 1', 'Info 2']}"
           :is-linked="true"

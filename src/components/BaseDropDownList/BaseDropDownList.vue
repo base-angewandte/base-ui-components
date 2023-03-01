@@ -32,8 +32,8 @@
               && optionIndex === activeOptionIndex }]"
           role="option"
           @click="selected(option)">
-          <!-- @slot a slot to customize every single option (e.g. display of
-          information other than [valuePorpoertyName]) -->
+          <!-- @slot a slot to customize every single option (e.g. display of information other than `[valuePropertyName]`)
+            @binding {Object} option - the current option in the options list-->
           <slot
             name="option"
             :option="option">
@@ -99,7 +99,7 @@ export default {
     },
     /**
      * specify the currently active option (will have gray background
-     * if not disabled by setting activeStyled false) for example for
+     * if not disabled by setting `activeStyled` `false`) for example for
      * combination with input and keyboard use
      */
     activeOption: {
@@ -108,16 +108,16 @@ export default {
     },
     /**
      * specify the currently selected option (will appear in app color if not disabled
-     * by setting selectStyled false, but also used for aria-selected)<br>
-     *   the .sync modifier can be used here
+     * by setting `selectStyled` `false`, but also used for `aria-selected`).
+     *   the `.sync` modifier can be used here
      */
     selectedOption: {
       type: [Object, String],
       default: () => ({}),
     },
     /**
-     * in order to link the drop down body to an input element specify a list
-     * id and use the list attribute on the input
+     * in order to link the drop down body to an <input> element specify a list
+     * id and use the `list` attribute on the input
      */
     listId: {
       type: String,
@@ -147,7 +147,7 @@ export default {
       default: false,
     },
     /**
-     * if true the element will be styled as a drop down element with
+     * if `true` the element will be styled as a drop down element with
      * box-shadow
      */
     displayAsDropDown: {
@@ -163,7 +163,7 @@ export default {
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
-     * e.g. { de: 'xxx', en: 'yyy' }
+     * e.g. `{ de: 'xxx', en: 'yyy' }`
      */
     language: {
       type: String,
@@ -171,7 +171,7 @@ export default {
     },
     /**
      * this adds the possibility of nested options (thus a second list nested within the first one),
-     * if this is set true this will have consequences for scroll adjustment of list on keyboard use
+     * if this is set `true` this will have consequences for scroll adjustment of list on keyboard use
      * and how the active option is determined (the identifier property will be used)
      */
     hasSubOptions: {
@@ -179,9 +179,9 @@ export default {
       default: false,
     },
     /**
-     * in case a custom option background should be set to the currently active option<br>
-     *   (this will also apply if 'activeStyled' is set false)<br>
-     * if you want to use this option please set the css variable --option-background
+     * in case a custom option background should be set to the currently active option
+     *   (this will also apply if `activeStyled` is set `false`).
+     * if you want to use this option please set the css variable `--option-background`
      * in your app
      */
     useCustomOptionActiveBackgroundColor: {
@@ -268,7 +268,7 @@ export default {
        * (the .sync modifier on prop selectedOption can be used)
        *
        * @event update:selected-option
-       * @property {Object} option - the selected option
+       * @param {Object} - the selected option
        */
       this.$emit('update:selected-option', option);
     },

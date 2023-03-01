@@ -134,8 +134,6 @@ export default {
     },
     /**
      * currently active page number
-     *
-     * @model
      */
     current: {
       type: Number,
@@ -144,8 +142,8 @@ export default {
     /**
      * specify if pagination elements should be links - specify a vue link element or
      * set the variable false if element should not be a link
-     * (this needs vue-router)<br>
-     * currently only vue components (like 'router-link' or 'nuxt-link') are supported!
+     * (this needs vue-router)
+     * currently only vue components (like 'RouterLink' or 'NuxtLink') are supported!
      */
     useLinkElement: {
       type: [String, Boolean],
@@ -201,8 +199,10 @@ export default {
       // array from total - subsetNumber
       const subsetStart = this.start + this.subsetNumber > this.total
         ? this.total - this.subsetNumber + 1 : this.start;
-      return Array.from({ length: this.subsetNumber },
-        (v, k) => k + subsetStart);
+      return Array.from(
+        { length: this.subsetNumber },
+        (v, k) => k + subsetStart,
+      );
     },
     /**
      * check if element should be displayed as a link element, otherwise make it a <span>
@@ -232,7 +232,7 @@ export default {
          * triggered on page select
          *
          * @event set-page
-         * @param {number} val - the new page number
+         * @param {number} - the new page number
          */
         this.$emit('set-page', val);
       }

@@ -5,7 +5,7 @@
       :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
       <ul
         v-if="!edit">
-        <base-expand-list-row
+        <BaseExpandListRow
           v-for="(items, index) in data"
           v-show="index < (showAll ? data.length : minItems)"
           ref="baseExpandListRow"
@@ -16,13 +16,14 @@
           render-as="li"
           @expanded-state="emitExpandedState">
           <template
-            v-slot:content="props">
-            <!-- @slot a slot to provide customized entry row -->
+            #content="props">
+            <!-- @slot a slot to provide customized entry row
+              @binding {Object} data - an object in `data` array -->
             <slot
               name="content"
               :data="props.data" />
           </template>
-        </base-expand-list-row>
+        </BaseExpandListRow>
       </ul>
 
       <!-- List items in draggable area -->
@@ -52,7 +53,7 @@
             :disabled="disabled"
             animation="150"
             class="base-expand-list__draggable">
-            <base-expand-list-row
+            <BaseExpandListRow
               v-for="(item, index) in dataInt"
               ref="baseExpandListRow"
               :key="index"
@@ -71,7 +72,7 @@
       </template>
     </div>
 
-    <base-button
+    <BaseButton
       v-if="!edit && data.length > minItems"
       :id="`base-expand-list-${_uid}`"
       :aria-expanded="showAll ? 'true' : 'false'"
@@ -97,15 +98,20 @@ export default {
   },
   props: {
     /**
-     * data object: [{ label: 'String', id: 'String', data: [{ value: 'String', }],
-     *  [hidden]: boolean, [count]: number }]<br><br>
-     * optional properties:<br>
-     *  count: used for the number shown in brackets
-     *    (else the array length will be used)<br>
-     *  hidden: used to set visibility and is set in edit mode to toggle item<br><br>
-     * rendered variants: <br>
-     *  expandable row: data object contains property 'label'<br>
-     *  entry row: data object contains property 'value'
+     * should be an object array with the following properties:
+     *  **label** `string` - the displayed label
+     *  **id** `string` - an identifier
+     *  **data** `Object[]` - an object array with the property:
+     *    \* **label** `string` (renders component as
+     *    expandable row) or
+     *    * **value** `string` (renders component as entry row)
+     *
+     * optional properties:
+     *  **count** `number` - used for the number shown in brackets
+     *    (else the array length will be used)
+     *  **hidden** `boolean` - used to set visibility and is set in edit mode to toggle item
+     *
+     *  the `.sync` modifier might be used on this prop
      */
     data: {
       type: Array,
@@ -161,17 +167,16 @@ export default {
       default: 'Show',
     },
     /**
-     * additional texts for screen-reader users to order items<br>
-     *   object that needs to have the following properties:<br>
-     *   <b>activate</b>: Text read when item is focused, use variable {state} to
+     * additional texts for screen-reader users to order items.
+     *   object that needs to have the following properties:
+     *   **activate**: Text read when item is focused, use variable {state} to
      *    announce item visibility - specify text used in properties 'hidden' and 'visible'
-     *   <b>activated</b>: Text read after item was activated (selected by enter key)
-     *   <b>description</b>: Text read on initial list focus
-     *   <b>moved</b>: Text read after item was moved
-     *   <b>visible</b>: string substituted to 'activate' text for state variable if item is visible
-     *   <b>hidden</b>: string substituted to 'activate' text for state variable if item is hidden
-     *   { activate: 'aaa', activated: 'bbb', description: 'ccc', moved: 'ddd' }<br>
-     *   property moved can contain variables {pos} and {total}
+     *   **activated**: Text read after item was activated (selected by enter key)
+     *   **description**: Text read on initial list focus
+     *   **moved**: Text read after item was moved; can contain variables {pos} (for new position) and {total}
+     *   **visible**: string substituted to 'activate' text for state variable if item is visible
+     *   **hidden**: string substituted to 'activate' text for state variable if item is hidden
+     *
      */
     supportiveText: {
       type: Object,
@@ -187,9 +192,9 @@ export default {
         .every(key => ['activate', 'activated', 'description', 'moved', 'visible', 'hidden'].includes(key)),
     },
     /**
-     * specify the type of visibility switch in edit mode<br>
-     *  <b>button</b>: a [BaseButton](#basebutton) without text<br>
-     *  <b>button</b>: a [BaseToggle](#basetoggle) element without text<br>
+     * specify the type of visibility switch in edit mode
+     *  **button**: a [BaseButton](BaseButton) without text
+     *  **toggle**: a [BaseToggle](BaseToggle) element without text
      */
     controlType: {
       type: String,
@@ -237,6 +242,13 @@ export default {
         // check if update is actually done by user during edit mode
         // (this is the only time internal data should change!)
         if (this.edit && JSON.stringify(val) !== JSON.stringify(this.data)) {
+          /**
+           * event emitted when data change internally (e.g. sorting, toggling hidden, etc.).
+           *  the `.sync` modifier may be used on the corresponding prop
+           *
+           * @event update:data
+           * @param {Object[]} - the modified data (e.g. from sorting)
+           */
           this.$emit('update:data', val);
         }
       },
@@ -321,7 +333,7 @@ export default {
        * event triggered when expanded state changes
        *
        * @event expanded-state
-       * @type { array }
+       * @param {Array} - array with indices of the expanded item per level; eg: [0, 1]: level1 first item, level2 second item is expanded
        */
       this.$emit('expanded-state', value);
     },
@@ -385,8 +397,8 @@ export default {
     save() {
       /**
        * triggered on button click
-       *
-       * @type {object}
+       * @event saved
+       * @param {object} - the data altered and ready for saving
        */
       this.$emit('saved', this.dataInt);
       // update reset data copy

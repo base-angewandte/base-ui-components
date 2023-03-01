@@ -1,6 +1,8 @@
+## Demo
+
 A simple progress bar
 
-```vue
+```vue live
 <template>
   <div>
     <BaseProgressBar
@@ -13,12 +15,7 @@ A simple progress bar
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseButton,
-  },
   data() {
     return {
       progress: 0,
@@ -42,7 +39,7 @@ export default {
 
 A file upload bar
 
-```vue
+```vue live
 <template>
   <div>
     <BaseProgressBar
@@ -84,12 +81,7 @@ A file upload bar
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseButton,
-  },
   data() {
     return {
       progress: 0,

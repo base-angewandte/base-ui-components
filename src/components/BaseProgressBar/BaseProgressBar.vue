@@ -114,7 +114,7 @@ export default {
       },
     },
     /**
-     * indicate the success or fail of an upload <br>
+     * indicate the success or fail of an upload
      *   @values success, fail, ''
      */
     status: {

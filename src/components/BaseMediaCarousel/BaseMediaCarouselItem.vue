@@ -168,7 +168,7 @@ export default {
       default: '',
     },
     /**
-     * define the media type <br>
+     * define the media type
      *     options: 'image'|'video'|'audio'|'pdf'
      */
     mediaType: {
@@ -179,7 +179,7 @@ export default {
       },
     },
     /**
-     * set height and with from outside <br>
+     * set height and with from outside
      * e.g. { width: 1280px, height: 720px }
      */
     displaySize: {
@@ -195,7 +195,7 @@ export default {
     },
     /**
      * define information texts for download and view (for pdfs) buttons in an
-     * object with the respective properties<br>
+     * object with the respective properties
      *   could be strings or path to i18n json as well
      */
     infoTexts: {
@@ -213,8 +213,8 @@ export default {
       default: 0,
     },
     /**
-     * specify an image srcset as an array of objects in the form <br>
-     *     { 'mediawidth': 'url' }
+     * specify an image srcset as an array of objects in the form
+     *     `{ [mediawidth]: 'url' }`
      */
     previews: {
       type: Array,
@@ -320,7 +320,8 @@ export default {
          * download button clicked
          *
          * @event download
-         * @type { Object }
+         * @property {string} url - the download url
+         * @property {string} name - the file name
          *
          */
         this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });

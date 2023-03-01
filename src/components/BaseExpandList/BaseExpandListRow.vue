@@ -48,7 +48,7 @@
             render-as="li"
             @expanded-state="emitExpandedState">
             <template
-              v-slot:content="dataNextLevel">
+              #content="dataNextLevel">
               <!-- @slot a slot to provide customized entry row in next level -->
               <slot
                 name="content"
@@ -154,13 +154,13 @@ export default {
   props: {
     /**
      * data object: { label: 'String', data: [{ value: 'String', }],
-     *  [hidden]: boolean, [count]: number }<br><br>
-     * optional properties:<br>
+     *  [hidden]: boolean, [count]: number }
+     * optional properties:
      *  count: used for the number shown in brackets
-     *    (else the array length will be used)<br>
-     *  hidden: used to set visibility and is set in edit mode to toggle item<br><br>
-     * rendered variants: <br>
-     *  expandable row: data object contains property 'label'<br>
+     *    (else the array length will be used)
+     *  hidden: used to set visibility and is set in edit mode to toggle item
+     * rendered variants:
+     *  expandable row: data object contains property 'label'
      *  entry row: data object contains property 'value'
      */
     data: {
@@ -204,9 +204,9 @@ export default {
       default: 'Show',
     },
     /**
-     * specify the type of visibility switch in edit mode<br>
-     *  <b>button</b>: a [BaseButton](#basebutton) without text<br>
-     *  <b>button</b>: a [BaseToggle](#basetoggle) element without text<br>
+     * specify the type of visibility switch in edit mode
+     *  **button**: a [BaseButton](BaseButton) without text
+     *  **button**: a [BaseToggle](BaseToggle) element without text
      */
     controlType: {
       type: String,
@@ -313,7 +313,7 @@ export default {
   },
   methods: {
     /**
-     * cancel movable state, stop propagation if needed<br>
+     * cancel movable state, stop propagation if needed
      *   e.g. further esc key event
      * @param {KeyboardEvent} e - event
      */
@@ -389,7 +389,7 @@ export default {
        * event triggered when expanded state changes
        *
        * @event expanded-state
-       * @type { array }
+       * @param {Array} - array with indices of the expanded item per level; eg: [0, 1]: level1 first item, level2 second item is expanded
        */
       this.$emit('expanded-state', value);
     },

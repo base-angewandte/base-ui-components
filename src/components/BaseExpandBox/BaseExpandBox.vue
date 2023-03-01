@@ -18,7 +18,7 @@
         <!-- div is needed for calculation of content height -->
         <div>
           <!--
-            @slot default slot
+            @slot add expand box content here
           -->
           <slot />
         </div>
@@ -71,8 +71,7 @@ export default {
       default: false,
     },
     /**
-     * define padding of the box<br>
-     * valid values: 'large' | 'small'
+     * define padding of the box
      */
     padding: {
       type: String,
@@ -179,8 +178,7 @@ export default {
         if (!this.expandInt) {
           /**
            * emitting box-height on resize
-           *
-           * @type {String}
+           * @param {number} - the element offset height
            */
           this.$emit('box-height', this.$el.offsetHeight);
         }
@@ -206,8 +204,7 @@ export default {
 
       /**
        * event emitted on button click
-       *
-       * @type {Event}
+       * @param {boolean} - is box expanded
        */
       this.$emit('update:expand', this.expandInt);
     },

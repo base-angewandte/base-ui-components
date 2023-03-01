@@ -1,6 +1,6 @@
-Base Carousel
+## Demo
 
-```vue
+```vue live
 <template>
     <BaseCarousel
       :items="items"
@@ -33,10 +33,7 @@ Base Carousel
 </template>
 
 <script>
-import BaseCarousel from './BaseCarousel';
-
 export default {
-  components: { BaseCarousel },
   data() {
     return {
       items: [
@@ -44,6 +41,7 @@ export default {
           title: 'Title',
           subtext: 'Subtitle',
           description: 'Austellung 1',
+          href: 'http://base.uni-ak.ac.at',
         },
         {
           title: 'Title',

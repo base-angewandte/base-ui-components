@@ -34,9 +34,7 @@
               :field-name="fieldName" />
           </template>
           <template #pre-input-field="{ fieldName }">
-            <!-- @slot slot to add elements within the form field but in a row before the actual
-            input field<br>
-            for an example see [BaseInput](#baseinput)
+            <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
             @binding {string} fieldName - the name of the displayed field -->
             <slot
               name="pre-input-field"
@@ -44,17 +42,14 @@
           </template>
           <template
             #input-field-addition-before="{ fieldName }">
-            <!-- @slot Slot to allow for additional elements in the input field \<div\>
-              (before \<input\>)
+            <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
             @binding {string} fieldName - the name of the displayed field -->
             <slot
               name="input-field-addition-before"
               :field-name="fieldName" />
           </template>
           <template #input-field-inline-before="{ fieldName }">
-            <!-- @slot to add elements directly inline before the input
-                (contrary to input-field-addition-before this does not wrap<br>
-            for an example see [BaseInput](#baseinput)
+            <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)
             @binding {string} fieldName - the name of the displayed field -->
             <slot
               name="input-field-inline-before"
@@ -79,7 +74,7 @@
             <slot name="error-icon" />
           </template>
           <template #remove-icon>
-            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="remove-icon" />
           </template>
           <template #below-input="{ fieldName }">
@@ -125,9 +120,7 @@
                   :index="valueIndex" />
               </template>
               <template #pre-input-field="{ fieldName }">
-                <!-- @slot slot to add elements within the form field but in a row before the actual
-                input field<br>
-                for an example see [BaseInput](#baseinput)
+                <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
                 <slot
@@ -147,9 +140,7 @@
                   :index="valueIndex" />
               </template>
               <template #input-field-inline-before="{ fieldName }">
-                <!-- @slot to add elements directly inline before the input
-                    (contrary to input-field-addition-before this does not wrap<br>
-                for an example see [BaseInput](#baseinput)
+                <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. for an example see [BaseInput](BaseInput)
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
                 <slot
@@ -196,7 +187,7 @@
 
             <!-- if there is field content show a 'remove all content' button -->
             <div
-              v-if="!multiplyButtonsInline(element) && (checkFieldContent(valueList[element.name])
+              v-if="!multiplyButtonsInline && (checkFieldContent(valueList[element.name])
                 || valueListInt[element.name].length > 1)"
               :key="`${index}_button_${valueIndex}_${formId}`"
               class="group-add">
@@ -277,6 +268,7 @@
 
 <script>
 import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseFormFieldCreator from '../BaseFormFieldCreator/BaseFormFieldCreator';
 import i18n from '../../mixins/i18n';
 
 /**
@@ -296,14 +288,15 @@ const INDIVIDUAL_REPEATABLE_FIELDPROPS = [
 export default {
   name: 'BaseForm',
   components: {
-    BaseFormFieldCreator: () => import('../BaseFormFieldCreator/BaseFormFieldCreator'),
+    BaseFormFieldCreator,
     BaseIcon,
   },
   mixins: [i18n],
   props: {
     /**
-     * the json object containing all the field information incl. x-attributes
-     * for placeholder, field type, etc.
+     * the json object containing all the field information incl. `x-attrs` custom field
+     * for placeholder, field type, etc. (for further documentation and configuration options see
+     * further down below [slots](BaseForm.html#slots))
      */
     formFieldJson: {
       type: Object,
@@ -339,7 +332,7 @@ export default {
     },
     /**
      * define additional style for the form
-     * should be an object eg. { 'padding-top': 0 }
+     * should be an object eg. `{ 'padding-top': 0 }`
      */
     formStyle: {
       type: Object,
@@ -369,17 +362,17 @@ export default {
       default: () => ({}),
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example on how it looks on an individual form field see [BaseInput](#baseinput)
+     * define if error icon should be shown.
+     * for an example on how it looks on an individual form field see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
       default: false,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example on how it looks on an individual form field see [BaseInput](#baseinput)
+     * if `true` a remove icon will be shown allowing to remove
+     * all input at once.
+     * for an example on how it looks on an individual form field see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -387,23 +380,23 @@ export default {
     },
     /**
      * provide an object with settings and properties for each field. This takes an object
-     * with the field name as properties with the props nested.<br>
-     * { fieldName1: { required: false, ... }, fieldName2: { ... } }<br>
-     * <br>
-     * find the possible variables at the respective input components: <br>
-     * [BaseInput](#baseinput)<br>
-     * [BaseAutocompleteInput](#baseautocompleteinput)<br>
-     * [BaseMultilineTextInput](#basemultilinetextinput)<br>
-     * [BaseChipsInput](#basechipsinput)<br>
-     * [BaseChipsBelow](#basechipsbelow)<br>
-     * [BaseDateInput](#basedateinput)<br>
-     * [BaseToggle](#basetoggle)<br>
-     *<br>
+     * with the field name as properties with the props nested.
+     * `{ [fieldName1]: { required: false, ... }, [fieldName2]: { ... } }`
+     *
+     * find the possible variables at the respective input components:
+     * [BaseInput](BaseInput)
+     * [BaseAutocompleteInput](BaseAutocompleteInput)
+     * [BaseMultilineTextInput](BaseMultilineTextInput)
+     * [BaseChipsInput](BaseChipsInput)
+     * [BaseChipsBelow](BaseChipsBelow)
+     * [BaseDateInput](BaseDateInput)
+     * [BaseToggle](BaseToggle)
+     *
      * **special case repeatable fields**: the following field props can be set individually
-     * per repeated field:<br>
+     * per repeated field:
      *  `errorMessage`, `invalid`, `isActive`, `isLoading`,
-     *  `linkedListOption`, `activeTab`<br>
-     *  the field property value should be set as object specifying the field index as key:<br>
+     *  `linkedListOption`, `activeTab`
+     *  the field property value should be set as object specifying the field index as key:
      *  `{ [fieldIndex]: [value to be set] }` (e.g. `{ required: { 0: false }}`)
      */
     fieldProps: {
@@ -548,12 +541,10 @@ export default {
        *
        * @event fetch-autocomplete
        *
-       * @param {Object} params - the spread object with following properties
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
        * @property {string} source - the url to request the data from
-       * @property {?string} equivalent - string specified for related fields
-       * e.g. for contributor roles equivalent is 'contributor'
+       * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
        */
       this.$emit('fetch-autocomplete', params);
     },
@@ -608,7 +599,7 @@ export default {
        * field was added or removed
        *
        * @event values-changed
-       * @param {Object[]} valueListInt
+       * @param {Object[]} - the changed value list
        */
       this.$emit('values-changed', this.valueListInt);
     },
@@ -780,7 +771,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables.scss";
+  @import "../../styles/variables";
 
   .base-form {
     .base-form__header {

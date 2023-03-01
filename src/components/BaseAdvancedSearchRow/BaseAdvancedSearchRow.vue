@@ -39,7 +39,7 @@
       @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
-      <template v-slot:[filterSlotName]>
+      <template #[filterSlotName]>
         <BaseChipsInputField
           :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
@@ -72,7 +72,7 @@
           @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
-          <template v-slot:chip="{ entry }">
+          <template #chip="{ entry }">
             <span
               :id="entry.idInt"
               :key="'chip-' + entry.idInt"
@@ -82,7 +82,7 @@
           </template>
         </BaseChipsInputField>
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <button
           v-if="!isMainSearch
             || filterHasValues"
@@ -98,7 +98,7 @@
       </template>
 
       <!-- DROP DOWN BODY -->
-      <template v-slot:below-input>
+      <template #below-input>
         <BaseDropDownList
           v-if="isActive"
           ref="dropDown"
@@ -119,7 +119,7 @@
           class="base-advanced-search-row__drop-down-body"
           @touchstart.native.stop=""
           @click.native.stop="">
-          <template v-slot:before-list>
+          <template #before-list>
             <div
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
@@ -187,7 +187,7 @@
 
           <!-- AUTOCOMPLETE OPTIONS LIST -->
           <template
-            v-slot:option="slotProps">
+            #option="slotProps">
             <div
               v-if="!filter || useAutocompleteFunctionality"
               class="base-advanced-search-row__autocomplete-body">
@@ -221,7 +221,7 @@
           <!-- CHIPS (CONTROLLED VOCABULARY OPTIONS) AREA -->
           <template
             v-if="filter.type === 'chips' && !filter.freetext_allowed"
-            v-slot:after-list>
+            #after-list>
             <div
               class="base-advanced-search-row__above-list-area
                  base-advanced-search-row__chips-area
@@ -300,7 +300,7 @@
             </div>
           </template>
           <template
-            v-slot:no-options>
+            #no-options>
             <div
               v-if="useAutocompleteFunctionality"
               :class="[
@@ -1286,7 +1286,8 @@ export default {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(
           this.displayedOptions,
-          isArrowDown, currentIndex,
+          isArrowDown,
+          currentIndex,
           true,
         );
         // else navigation is used for autocomplete options
@@ -1328,13 +1329,17 @@ export default {
           const currentEntryIndex = currentCollectionArray.indexOf(this.activeEntry);
           // check if the last or first entry of the options list is reached
           const isWithinListLimit = this.isWithinArrayLimit(
-            this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
+            this.resultListInt,
+            isArrowDown,
+            currentCollectionIndex + numberToAdd,
           );
-          // check if collection select is active and if not if the arrow action is
+          // check if collection select is active and if not, if the arrow action is
           // within the limits of the array
           if (!this.collectionSelect
             && this.isWithinArrayLimit(
-              currentCollectionArray, isArrowDown, currentEntryIndex + numberToAdd,
+              currentCollectionArray,
+              isArrowDown,
+              currentEntryIndex + numberToAdd,
             )) {
             // set new active entry
             this.activeEntry = this.navigate(
@@ -1541,8 +1546,10 @@ export default {
         const searchElementWidth = searchElement.$el.clientWidth;
         // set a css variable that is responsible for the number of items
         // (subtract 1/4 of elementWidth because of first column): 180px is assumed for each column
-        this.$el.style.setProperty('--col-number',
-          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1);
+        this.$el.style.setProperty(
+          '--col-number',
+          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1,
+        );
       }
       // check if it was found
       if (searchRowElement) {

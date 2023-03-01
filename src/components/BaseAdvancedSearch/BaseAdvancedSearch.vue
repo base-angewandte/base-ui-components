@@ -8,7 +8,7 @@
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index]"
         :filter-list="displayedFilters"
-        :applied-filter.sync="filter"
+        :applied-filter="filter"
         :is-loading="filtersLoadingState[index]"
         :default-filter="defaultFilter"
         :placeholder="placeholder.filterRow || placeholder"
@@ -77,21 +77,21 @@ export default {
   },
   props: {
     /**
-     * list of available filters, needs to be an array of objects with the following properties:<br>
-     *   <br>
-     *    <b>label</b> {string} - the label of the filter (displayed
+     * list of available filters, needs to be an array of objects with the following properties:
+     *
+     *    **label** `string` - the label of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
-     *      labelPropertyName.filter<br>
-     *    <b>id</b> {string} - the identifier of the filter (displayed
+     *      `labelPropertyName.filter`.
+     *    **id** `string` - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
-     *      identifierPropertyName.filter<br>
-     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
-     *    <b>hidden</b> {boolean} - filters with this attribute true will be filtered from
-     *      displayed filter list<br>
-     *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
-     *      property are used or autocomplete is used
-     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
-     *      vocabulary options
+     *      `identifierPropertyName.filter`.
+     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `date`, `daterange`.
+     *    **hidden** `boolean` - filters with this attribute true will be filtered from
+     *      displayed filter list.
+     *    **freetext_allowed** `boolean` - determines if predetermined options from `options`
+     *      property are used or autocomplete is used.
+     *    **options** `Object[]` - for filter type `chips` the controlled
+     *      vocabulary options.
      */
     filterList: {
       type: Array,
@@ -103,19 +103,19 @@ export default {
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
-     * see filterList (except options - these are not necessary for applied filters)
+     * see `filterList` (except `options` - this property is not necessary for applied filters)
      */
     appliedFilters: {
       type: Array,
       default: () => ([]),
-      // dont check for options on applied filters - not necessary
+      // don't check for options on applied filters - not necessary
       validator: val => !val.length || val.every(v => v.type),
     },
     /**
      * provide the component with the fetched autocomplete results
-     * (drop down options)<br>
+     * (drop down options).
      * this needs to be an object array with the properties specified in
-     * `autocompletePropertyNames`
+     * `autocompletePropertyNames`.
      */
     autocompleteResults: {
       type: Array,
@@ -123,19 +123,19 @@ export default {
     },
     /**
      * specify a default value for a filter that is set when none of the
-     * available filters is selected, should have the following properties:<br>
-     *   <br>
-     *    <b>label</b> {string} - the label of the filter (displayed
+     * available filters is selected, should have the following properties:
+     *
+     *    **label** `string` - the label of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
-     *      labelPropertyName.filter<br>
-     *    <b>id</b> {string} - the identifier of the filter (displayed
+     *      `labelPropertyName.filter`.
+     *    **id** `string` - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
-     *      identifierPropertyName.filter<br>
-     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
-     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
-     *      vocabulary options<br>
-     *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
-     *    or array of objects or strings for type 'text' and type 'chips'
+     *      `identifierPropertyName.filter`.
+     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `date`, `daterange`.
+     *    **options** `Object[]` - for filter type 'chips' the controlled
+     *      vocabulary options.
+     *    **filter_values** `Object[], string[], Object` - the values selected - object for date
+     *    or array of objects or strings for type `text` and type `chips`,
      */
     defaultFilter: {
       type: Object,
@@ -150,7 +150,7 @@ export default {
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
-     * e.g. { de: 'xxx', en: 'yyy' })
+     * e.g. `{ de: 'xxx', en: 'yyy' }`).
      */
     language: {
       type: String,
@@ -165,19 +165,19 @@ export default {
     },
     /**
      * specify informational texts for the component - this needs to be an object with the following
-     * properties (if you dont want to display any text leave an empty string:  <br>
-     *   <br>
-     *     <b>title</b>: text shown as first line on the drop down in filters area<br>
-     *     <b>subtext</b>: text shown as second line on the drop down in filters area<br>
-     *     <b>availableOptions</b>: text shown with chips options for controlled vocabulary
-     *     search<br>
-     *     <b>addFilter</b>: text/label used for add filter icon<br>
-     *     <b>removeFilter</b>: text/label used for remove filter icon<br>
-     *     <b>selectFilterLabel</b>: label (not visible) used for filter chips input field<br>
-     *     <b>searchLabel</b>: label (not visible) used for search input field<br>
-     *  <br>
-     *  The values of this object might be plain text or a key for an i18n file<br>
-     * This prop can be ignored when the 'no-options' slot is used.
+     * properties (if you don't want to display any text leave an empty string):
+     *
+     *     **title**: text shown as first line on the drop-down in filters area.
+     *     **subtext**: text shown as second line on the drop-down in filters area.
+     *     **availableOptions**: text shown with chips options for controlled vocabulary
+     *     search.
+     *     **addFilter**: text/label used for add filter icon.
+     *     **removeFilter**: text/label used for remove filter icon.
+     *     **selectFilterLabel**: label (not visible) used for filter chips input field.
+     *     **searchLabel**: label (not visible) used for search input field.
+     *
+     *  The values of this object might be plain text or a key for an i18n file.
+     * This prop can be ignored when the `no-options` slot is used.
      */
     advancedSearchText: {
       type: Object,
@@ -196,25 +196,25 @@ export default {
         .every(prop => Object.keys(val).includes(prop)),
     },
     /**
-     * specify informational texts for the drop down - this needs to be an object with the following
-     * properties:  <br>
-     *   <br>
-     *     <b>autocompleteNoOptions</b>: info text shown when autocomplete search does not yield
-     *        any results <br>
-     *     <b>autocompleteOngoing</b>: info text displayed while autocomplete search is ongoing
-     *        (and no previous results are displayed)<br>
-     *     <b>autocompleteInitial</b>: info text shown when user first opens the search
-     *        component<br>
-     *     <b>chipsNoOptions</b>: info text shown when no options for controlled vocabulary search
-     *        are available (anymore)<br>
-     *     <b>chipsMaxOptions</b>: text displayed if more than max number of options that can be
-     *        displayed are available (configure via prop maxNumberControlledOptions)<br>
-     *     <b>chipsNoMatch</b>: text displayed if string in input does not match any options<br>
-     *     <b>chipsOngoing</b>: info text shown when controlled vocabulary chips are being
-     *        fetched<br>
-     *  <br>
-     *  The values of this object might be plain text or a key for an i18n file<br>
-     * This prop can be ignored when the 'no-options' slot is used.
+     * specify informational texts for the drop-down - this needs to be an object with the following
+     * properties:
+     *
+     *     **autocompleteNoOptions**: info text shown when autocomplete search does not yield
+     *        any results.
+     *     **autocompleteOngoing**: info text displayed while autocomplete search is ongoing
+     *        (and no previous results are displayed).
+     *     **autocompleteInitial**: info text shown when user first opens the search
+     *        component.
+     *     **chipsNoOptions**: info text shown when no options for controlled vocabulary search
+     *        are available (anymore).
+     *     **chipsMaxOptions**: text displayed if more than max number of options that can be
+     *        displayed are available (configure via prop `maxNumberControlledOptions`).
+     *     **chipsNoMatch**: text displayed if string in input does not match any options.
+     *     **chipsOngoing**: info text shown when controlled vocabulary chips are being
+     *        fetched.
+     *
+     *  The values of this object might be plain text or a key for an i18n file
+     * This prop can be ignored when the `no-options` slot is used.
      */
     dropDownInfoTexts: {
       type: Object,
@@ -233,14 +233,14 @@ export default {
         .every(prop => Object.keys(val).includes(prop)),
     },
     /**
-     * add a place holder for the search input, either a string used for every row or
-     * add separate values for main filter row and already added filters<br>
-     * properties:<br>
-     *     <b>filterRow</b>: for already added filter rows<br>
-     *     <b>main</b>: for the primary search input field<br>
+     * add a placeholder for the search input, either a string used for every row or
+     * add separate values for main filter row and already added filters
+     * properties:
+     *     **filterRow**: for already added filter rows.
+     *     **main**: for the primary search input field.
      *
      *  each of these specific placeholders can again be a string or an object with different
-     *  placeholders for for each search type (text, chips, date)
+     *  placeholders for each search type (`text`, `chips`, `date`)
      */
     placeholder: {
       type: [Object, String],
@@ -253,13 +253,13 @@ export default {
     },
     /**
      * specify the object property that can be used for identification of filters,
-     * autocomplete options and controlled vocabulary options.<br>
-     *   Could be a string (used for all of the mentioned objects) or an object with the following
-     *   properties:<br>
-     *     <b>filter</b>: identifier property name in filter objects<br>
-     *     <b>autocompleteOption</b>: identifier property name in autocomplete option objects<br>
-     *     <b>controlledVocabularyOption</b>: identifier property name in controlled
-     *     vocabulary option objects<br>
+     * autocomplete options and controlled vocabulary options.
+     *   Could be a string (used for all the mentioned objects) or an object with the following
+     *   properties:
+     *     **filter**: identifier property name in filter objects.
+     *     **autocompleteOption**: identifier property name in autocomplete option objects.
+     *     **controlledVocabularyOption**: identifier property name in controlled
+     *     vocabulary option objects.
      */
     identifierPropertyName: {
       type: [Object, String],
@@ -271,13 +271,13 @@ export default {
     },
     /**
      * specify the object property that should be used for label display of filters,
-     * autocomplete options and controlled vocabulary options.<br>
-     *   Could be a string (used for all of the mentioned objects) or an object with the following
-     *   properties:<br>
-     *     <b>filter</b>: label property name in filter objects<br>
-     *     <b>autocompleteOption</b>: label property name in autocomplete option objects<br>
-     *     <b>controlledVocabularyOption</b>: label property name in controlled
-     *     vocabulary option objects<br>
+     * autocomplete options and controlled vocabulary options.
+     *   Could be a string (used for all the mentioned objects) or an object with the following
+     *   properties:
+     *     **filter**: label property name in filter objects.
+     *     **autocompleteOption**: label property name in autocomplete option objects.
+     *     **controlledVocabularyOption**: label property name in controlled
+     *     vocabulary option objects.
      */
     labelPropertyName: {
       type: [Object, String],
@@ -303,9 +303,9 @@ export default {
       validator: val => ['id', 'label', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
-     * this prop gives the option to add assistive text for screen readers<br>
-     * properties:<br>
-     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     * this prop gives the option to add assistive text for screen readers.
+     * properties:
+     * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
      */
     assistiveText: {
@@ -320,7 +320,7 @@ export default {
       default: true,
     },
     /**
-     * use this prop to set a delay in ms before date input calender is displayed
+     * use this prop to set a delay in ms before date input calendar is displayed
      */
     dateFieldDelay: {
       type: Number,
@@ -469,7 +469,7 @@ export default {
        * inform parent of changes in applied filters
        *
        * @event update:applied-filters
-       * @type {Filter[]}
+       * @param {Filter[]} - the list of updated applied filters
        */
       this.$emit('update:applied-filters', [...this.appliedFiltersInt, val]);
     },
@@ -575,7 +575,7 @@ export default {
        * inform parent that search should be triggered
        *
        * @event search
-       * @type {Filter[]}
+       * @param {Filter[]} - the updated list of applied filters
        */
       this.$emit('search', [...this.appliedFiltersInt, this.mainFilter]);
     },

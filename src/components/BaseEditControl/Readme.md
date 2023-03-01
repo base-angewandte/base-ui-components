@@ -1,6 +1,8 @@
+## Demo
+
 Example of BaseEditControl
 
-```vue
+```vue live
 
 <template>
   <div class="container">
@@ -31,14 +33,7 @@ Example of BaseEditControl
 </template>
 
 <script>
-import BaseEditControl from './BaseEditControl';
-import BaseToggle from '../BaseToggle/BaseToggle';
-
 export default {
-  components: {
-    BaseEditControl,
-    BaseToggle,
-  },
   data() {
     return {
       edit: false,

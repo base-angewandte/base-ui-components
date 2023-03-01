@@ -1,7 +1,9 @@
+## Demo
+
 Example with a BaseMenuList with BaseSelectOptions above.
 
 
-```vue
+```vue live
 <template>
   <div class="container">
         <BaseSelectOptions

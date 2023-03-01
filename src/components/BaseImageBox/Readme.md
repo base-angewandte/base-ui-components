@@ -1,6 +1,8 @@
+## Demo
+
 A variety of possibilities with image box
 
-```vue
+```vue live
 <template>
   <div>
     <div class="boxes-background">

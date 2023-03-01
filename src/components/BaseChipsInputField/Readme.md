@@ -1,10 +1,12 @@
+## Demo
+
 Simple chips input field example stand alone.
 
 Additionally, to custom events, this component also has all events available emitted by the native input element (e.g. focus or blur events).
 
 Also try to drag or sort the chips!
 
-```vue
+```vue live
 <template>
   <div>
     <BaseChipsInputField
@@ -44,7 +46,7 @@ export default {
 
 Example using the 'chip' slot with all props provided by the slot. Click the chip or use backspace to remove it.
 
-```vue
+```vue live
 <template>
   <BaseChipsInputField
     v-model="input"
@@ -59,7 +61,7 @@ Example using the 'chip' slot with all props provided by the slot. Click the chi
     :is-loading="true"
     placeholder="type + enter to add chips"
     label="Slot example">
-    <template v-slot:chip="slotProps">
+    <template #chip="slotProps">
       <!-- if element should be draggable it needs to contain the class 'base-chip__text' -->
       <div
         :key="slotProps.entry.idInt"
@@ -70,41 +72,41 @@ Example using the 'chip' slot with all props provided by the slot. Click the chi
         {{ slotProps.entry.label }}
       </div>
     </template>
-    <template v-slot:label-addition>
+    <template #label-addition>
       label-addition slot
     </template>
-    <template v-slot:pre-input-field>
+    <template #pre-input-field>
       <span class="pre-input-field">
         pre-input-field
       </span>
     </template>
-    <template v-slot:input-field-addition-before>
+    <template #input-field-addition-before>
       <div class="input-field-addition-before">input-field-addition-before</div>
     </template>
-    <template v-slot:input-field-inline-before>
+    <template #input-field-inline-before>
       <div class="input-field-inline-before">
         input-field-inline-before
       </div>
     </template>
-    <template v-slot:input-field-addition-after>
+    <template #input-field-addition-after>
       <div class="input-field-addition-after">input-field-addition-after</div>
     </template>
-    <template v-slot:post-input-field>
+    <template #post-input-field>
       <span class="post-input-field">
         post-input-field
       </span>
     </template>
-    <template v-slot:remove-icon>
+    <template #remove-icon>
       <BaseIcon
         :style="{ height: '16px', width: '16px' }"
         name="waste-bin" />
     </template>
-    <template v-slot:error-icon>
+    <template #error-icon>
       <BaseIcon
         :style="{ height: '24px', width: '24px' }"
         name="information" />
     </template>
-    <template v-slot:below-input>
+    <template #below-input>
       below-input slot
     </template>
   </BaseChipsInputField>
@@ -153,4 +155,4 @@ export default {
 </style>
 ```
 
-Also see one more example in combination with a BaseDropDownList [there](#basedropdownlist).
+Also see one more example in combination with a BaseDropDownList [there](there).

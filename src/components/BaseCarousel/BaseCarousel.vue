@@ -8,7 +8,7 @@
           v-for="(item, index) in items"
           v-show="swiperIsActive"
           :key="index"
-          :class="['base-carousel-slide', {'swiper-slide': swiperIsActive}]">
+          :class="['base-carousel-slide', { 'swiper-slide': swiperIsActive }]">
           <BaseImageBox
             :title="item.title"
             :subtext="subtext(item.subtext)"
@@ -61,14 +61,14 @@ export default {
   props: {
     /**
      * specify array of items to render<br>
-     *   the item object should have the following properties:<br>
-     *     title {?string} - the title to display<br>
-     *     subtext {?string} - the text below the title<br>
-     *     description {?string} - the type of item<br>
-     *     additional {?string} - additional information (e.g. dates)<br>
-     *     href - a url to follow upon item click<br>
-     *     previews - an array of image urls in different sizes in the following form:<br>
-     *     e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
+     *   the item object should have the following properties:
+     *     **title** `?string` - the title to display.
+     *     **subtext** `?string` - the text below the title.
+     *     **description** `?string` - the type of item.
+     *     **additional** `?string` - additional information (e.g. dates).
+     *     **href** `string` - an url to follow upon item click.
+     *     **previews** `Object[]`- an array of image urls in different sizes in the following form:
+     *     e.g. `[{ '460w': 'image-url' }, { '640w': 'image url' },...]`
      */
     items: {
       type: Array,
@@ -84,18 +84,19 @@ export default {
     },
     /**
      * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
+     * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router`
      * is necessary
      */
     renderLinkElementAs: {
       type: String,
-      default: 'router-link',
+      default: 'RouterLink',
     },
   },
   data() {
     return {
       swiper: undefined,
       swiperIsActive: false,
+      swiperOptionsInt: {},
     };
   },
   computed: {
@@ -110,11 +111,17 @@ export default {
     data() {
       this.swiper.update();
     },
+    swiperOptions: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.swiperOptionsInt)) {
+          this.swiperOptionsInt = JSON.parse(JSON.stringify(val));
+        }
+      },
+      immediate: true,
+    },
   },
   mounted() {
-    if (process.browser) {
-      this.initSwiper();
-    }
+    this.initSwiper();
   },
   methods: {
     getImageSrc(object, value) {
@@ -134,26 +141,26 @@ export default {
     },
     initSwiper() {
       this.swiperIsActive = true;
-      this.swiperOptions.init = false;
-      if (this.swiperOptions.autoplay) {
-        this.swiperOptions.autoplay = {};
-        this.swiperOptions.autoplay.delay = this.swiperOptions.autoplayDelay || 3000;
-        this.swiperOptions.autoplay.disableOnInteraction = true;
+      this.swiperOptionsInt.init = false;
+      if (this.swiperOptionsInt.autoplay) {
+        this.swiperOptionsInt.autoplay = {};
+        this.swiperOptionsInt.autoplay.delay = this.swiperOptionsInt.autoplayDelay || 3000;
+        this.swiperOptionsInt.autoplay.disableOnInteraction = true;
       }
 
-      this.swiperOptions.navigation = {
+      this.swiperOptionsInt.navigation = {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       };
 
       setTimeout(() => {
-        this.swiper = new Swiper('.swiper-container', this.swiperOptions);
+        this.swiper = new Swiper('.swiper-container', this.swiperOptionsInt);
         this.swiper.init();
         /**
          * event triggered when slider is initialized
          *
          * @event initialized
-         * @type { boolean }
+         * @param { boolean } - was carousel initialized
          */
         this.$emit('initialized', true);
       }, 0);
@@ -163,8 +170,10 @@ export default {
     },
     boxClicked(item) {
       /**
+       * event triggered by a ClickEvent on one of the carousel boxes
+       *
        * @event clicked
-       * @type {Object}
+       * @param {Object} - the carousel item that was clicked
        */
       this.$emit('clicked', item);
     },

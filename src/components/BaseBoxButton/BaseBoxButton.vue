@@ -52,6 +52,7 @@
         {{ text }}
       </div>
     </div>
+    <!-- undocumented slot? TODO: why is this here, whats the purpose? -->
     <slot />
   </base-box>
 </template>
@@ -81,7 +82,7 @@ export default {
       default: 'div',
     },
     /**
-     * Define type of button box style: <br>'large' | 'small'
+     * Define type of button box style: 'large' | 'small'
      */
     boxStyle: {
       type: String,
@@ -91,15 +92,15 @@ export default {
       },
     },
     /**
-     * specify icon name if desired, this uses the BaseIcon component; <br>
-     * see [BaseIcon](#baseicon) for available icons<br>
+     * specify icon name if desired, this uses the `BaseIcon` component;
+     * see [BaseIcon](BaseIcon) for available icons
      */
     icon: {
       type: String,
       default: null,
     },
     /**
-     * show a plus sign next to the icon if true <br>
+     * show a plus sign next to the icon if `true`
      * only available for large button style
      */
     showPlus: {
@@ -114,7 +115,7 @@ export default {
       default: '',
     },
     /**
-     * specify subtext for the button <br>
+     * specify subtext for the button
      * only available for large button style
      */
     subtext: {
@@ -168,7 +169,8 @@ export default {
       /**
        * event emitted on box click
        *
-       * @type {Event}
+       * @event clicked
+       * @param {Event} - the native event
        */
       this.$emit('clicked', event);
     },
@@ -176,9 +178,10 @@ export default {
       /**
        * event emitted on tooltip click
        *
-       * @type {Event}
+       * @event on-tooltip
+       * @param {Event} - the native event from tooltip triggered
        */
-      this.$emit('onTooltip', event);
+      this.$emit('on-tooltip', event);
     },
     setShowSubtext() {
       const subtextRef = this.$refs.baseBoxSubtext;

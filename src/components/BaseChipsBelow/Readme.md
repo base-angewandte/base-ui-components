@@ -1,10 +1,12 @@
+## Demo 
+
 A simple chips input form field with chips displayed below
 and default (base project specific) role selection
 
-```vue
+```vue live
 <template>
   <div class="container">
-    <base-chips-below
+    <BaseChipsBelow
       v-model="selectedList"
       :chips-editable="true"
       :list="[
@@ -39,7 +41,7 @@ and default (base project specific) role selection
         #drop-down-entry="{ item }">
         {{ item.label }}
       </template>
-    </base-chips-below>
+    </BaseChipsBelow>
   </div>
 </template>
 

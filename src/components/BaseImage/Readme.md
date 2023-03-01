@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div>
     <BaseImage
@@ -10,12 +12,8 @@
 </template>
 
 <script>
-import BaseImage from './BaseImage';
 
 export default {
-  components: {
-    BaseImage,
-  },
   data() {
     return {
       alt: 'description',

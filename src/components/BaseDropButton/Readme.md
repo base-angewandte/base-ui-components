@@ -1,14 +1,16 @@
+## Demo
+
 Examples on BaseDropButton usage
 
 1) Have a buttons array and specify the primaryButton as string only
 2) Have buttons array and primary button as object as well
 3) Have objects with custom properties for button text and identifier
 4) Have buttons array and primary button as object without the primary button being included in the buttons array
-5) dont specify a primary button (first item in buttons array will be used)
-6) dont specify a buttons array, which means button will appear like a regular base button (also possible: a buttons array with only one option that is also the primary option)
+5) don't specify a primary button (first item in buttons array will be used)
+6) don't specify a buttons array, which means button will appear like a regular base button (also possible: a buttons array with only one option that is also the primary option)
 7) like example 1 but switch primary button from outside
 
-```vue
+```vue live
 
 <template>
   <div class="flex">
@@ -56,14 +58,7 @@ Examples on BaseDropButton usage
   </div>
 </template>
 <script>
-import BaseDropButton from './BaseDropButton';
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseButton,
-    BaseDropButton,
-  },
   data() {
     return {
       buttons1: [{

@@ -7,7 +7,7 @@
       :id="'base-expand-row-' + id"
       class="base-expand-row-header"
       :aria-expanded="expandable ? isExpandedInternal.toString() : null">
-      <base-checkmark
+      <BaseCheckmark
         v-if="isSelectable"
         :key="id + 'checkmark'"
         title="checkbox"
@@ -23,9 +23,9 @@
         <div
           v-if="icon || hasIconSlot"
           class="base-expand-row-icon">
-          <!-- @slot slot to inject icon/image left side before label  -->
+          <!-- @slot slot to inject icon/image left side before label -->
           <slot name="icon">
-            <base-icon
+            <BaseIcon
               :name="icon"
               title="open" />
           </slot>
@@ -41,7 +41,7 @@
             {{ subtitle }}
           </div>
         </div>
-        <base-icon
+        <BaseIcon
           v-if="expandable"
           name="drop-down"
           title="open"
@@ -61,10 +61,12 @@
 
 <script>
 import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
 
 export default {
   name: 'BaseExpandRow',
   components: {
+    BaseCheckmark,
     BaseIcon,
   },
   props: {
@@ -91,7 +93,7 @@ export default {
     },
     /**
      * Lets you optionally specify an icon that is displayed before the title.
-     * For valid values, see [BaseIcon](#baseicon).
+     * For valid values, see [BaseIcon](BaseIcon).
      */
     icon: {
       type: String,
@@ -105,15 +107,15 @@ export default {
       default: true,
     },
     /**
-     * Set this to **true** if the row should be in expanded state.
+     * Set this to `true` if the row should be in expanded state.
      */
     isExpanded: {
       type: Boolean,
       default: false,
     },
     /**
-     * Lets you specify if the row is selectable. If **true**, a check box appears
-     * on the left side. The *isSelected* prop determines whether the check box is
+     * Lets you specify if the row is selectable. If `true`, a check box appears
+     * on the left side. The `isSelected` prop determines whether the check box is
      * actually selected or not.
      */
     isSelectable: {
@@ -170,7 +172,7 @@ export default {
        * The payload value `true` indicates expanded state, `false` indicates collapsed state.
        *
        * @event expanded
-       * @type {Boolean}
+       * @param {Boolean} - is row expanded
        */
       this.$emit('expanded', this.isExpandedInternal);
     },
@@ -182,7 +184,7 @@ export default {
        * The payload indicates the selected state (true or false).
        *
        * @event selected
-       * @type {Boolean}
+       * @param {Boolean} - was row selected
        */
       this.$emit('selected', this.isSelectedInternal);
     },

@@ -3,7 +3,7 @@
     role="button"
     class="base-box-tooltip"
     @click="clicked">
-    <base-icon
+    <BaseIcon
       name="information"
       alt="information"
       class="base-box-tooltip-icon" />
@@ -22,8 +22,8 @@ export default {
     clicked(event) {
       /**
        * event emitted on tooltip click
-       *
-       * @type {Event}
+       * @event clicked
+       * @param {MouseEvent} - the native mouse event on click
        */
       this.$emit('clicked', event);
     },
