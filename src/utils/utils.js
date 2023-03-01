@@ -1,8 +1,10 @@
 export const capitalizeString = (string) => {
   const newString2 = string.split('/')
-    .map(partialString => partialString.slice(0, 1).toUpperCase() + partialString.slice(1)).join('/');
+    .map(partialString => partialString.slice(0, 1)
+      .toUpperCase() + partialString.slice(1)).join('/');
   return newString2.split(' ')
-    .map(partialString => partialString.slice(0, 1).toUpperCase() + partialString.slice(1)).join(' ');
+    .map(partialString => partialString.slice(0, 1)
+      .toUpperCase() + partialString.slice(1)).join(' ');
 };
 
 export const createId = () => Math.random().toString(36).substr(2, 9);
@@ -13,10 +15,11 @@ export const createId = () => Math.random().toString(36).substr(2, 9);
  * @param {Object} object - the object from which the property value should be extracted
  * @returns {*} - the value contained in the nested object
  */
-export const extractNestedPropertyValue = (string, object) => string.split('.').reduce((a, b) => a[b], object);
+export const extractNestedPropertyValue = (string, object) => string
+  .split('.').reduce((a, b) => a[b], object);
 
 /**
- * function taking a string and returning returning any name format in an array
+ * function taking a string and returning any name format in an array
  * with primary compare value (=last name) first and
  * secondary compare value (=first name) second
  *
@@ -45,7 +48,12 @@ export const getNameSortValue = (compareString) => {
  * label
  * @returns {[*]}
  */
-export const sort = (list, objectProp = '', sortByName = false, valueFunction = null) => list.sort((a, b) => {
+export const sort = (
+  list,
+  objectProp = '',
+  sortByName = false,
+  valueFunction = null,
+) => list.sort((a, b) => {
   // assign respective list values to variables
   let compareValueA = a;
   let compareValueB = b;
@@ -83,11 +91,15 @@ export const hasData = (fieldValues) => {
   let hasContent = false;
   if (fieldValues && typeof fieldValues === 'object') {
     if (fieldValues.length >= 0) {
-      fieldValues.forEach((values) => { hasContent = hasData(values) || hasContent; });
+      fieldValues.forEach((values) => {
+        hasContent = hasData(values) || hasContent;
+      });
     } else {
       const objectKeys = Object.keys(fieldValues);
       objectKeys
-        .forEach((key) => { hasContent = hasData(fieldValues[key]) || hasContent; });
+        .forEach((key) => {
+          hasContent = hasData(fieldValues[key]) || hasContent;
+        });
     }
   } else {
     hasContent = fieldValues === 0 || !!fieldValues || hasContent;

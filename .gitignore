@@ -6,6 +6,7 @@ yarn-error.log*
 
 # Editor directories and files
 .idea
+./idea/**
 .vscode
 *.suo
 *.ntvs*
@@ -13,10 +14,13 @@ yarn-error.log*
 *.sln
 
 dist/
-styleguide/
 /index.html
 .history/
 
 # local env files
 .env.local
 .env.*.local
+
+# ignore styleguide build folder and generated component files
+/docs/components
+styleguide/

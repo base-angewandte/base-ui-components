@@ -1,4 +1,16 @@
-```vue
+Cluster colors might be set via following css variables:
+
+`  --map-cluster-bg: rgba(103, 58, 183, .4);`
+
+`  --map-cluster-bg-inner: rgba(103, 58, 183, .85);`
+
+`  --map-cluster-bg-hover: rgba(176, 133, 245, .4);`
+
+`  --map-cluster-bg-inner-hover: rgba(176, 133, 245, .85);`
+
+## Demo
+
+```vue live
 <template>
   <BaseMap
     :marker="marker"
@@ -52,3 +64,4 @@ export default {
 }
 </script>
 ```
+

@@ -13,23 +13,20 @@
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
         #drop-down-entry="props">
-        <!-- @slot a slot to provide customized drop down options -->
+        <!-- @slot a slot to provide customized drop down options
+          @binding {Object} item - an option in the options list  -->
         <slot
           :item="props.item"
           name="drop-down-entry" />
       </template>
       <template
         #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-          (e.g. language tabs)) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField) -->
         <slot name="label-addition" />
       </template>
       <template
         #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField) -->
         <slot name="input-field-addition-before" />
       </template>
       <template #input-field-addition-after>
@@ -37,18 +34,15 @@
         <slot name="input-field-addition-after" />
       </template>
       <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="post-input-field" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements after input (e.g. used to add loader. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="remove-icon" />
       </template>
       <template
@@ -131,11 +125,8 @@ import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
 
 /**
- * A very specialized component based on [BaseChipsInput](#basechipsinput)
+ * A very specialized component based on [BaseChipsInput](BaseChipsInput)
  * in order to assign additional values (e.g. roles) to selected entries)]
- *
- * slots 'drop-down-entry' and 'no-options' of component [BaseChipsInput](#basechipsinput)
- * are available here as well
  *
  */
 
@@ -153,28 +144,26 @@ export default {
   },
   props: {
     /**
-     * list of selectable options objects with at least an identifier and a label property<br>
-     * property names can be set with props identifierPropertyName and labelPropertyName
+     * list of selectable options objects with at least an identifier and a label property.
+     * property names can be set with props `identifierPropertyName` and `labelPropertyName`
      */
     list: {
       type: Array,
       default: () => [],
     },
     /**
-     * @model
-     *
      * list of already selected options objects with at least an identifier and a label property
      * and a property to use for the secondary drop down ('additional property'), displayed as
-     * chips<br>
-     * property names can be set with props identifierPropertyName, labelPropertyName and
-     * additionalPropertyName
+     * chips.
+     * property names can be set with props `identifierPropertyName`, `labelPropertyName` and
+     * `additionalPropertyName`
      */
     selectedList: {
       type: Array,
       default: () => [],
     },
     /**
-     if field is occuring more then once - set an id
+     if field is occurring more then once - set an id
      */
     id: {
       type: String,
@@ -242,7 +231,7 @@ export default {
       default: true,
     },
     /**
-     * Additional property options will set the drop down available for the selected entries<br>
+     * Additional property options will set the drop down available for the selected entries
      * needs to be an object with at least a label and an identifier property, using names set in
      * identifierPropertyName and labelPropertyName
      */
@@ -258,8 +247,8 @@ export default {
       default: 'Select role(s)',
     },
     /**
-     * set content for the info box activatable by click <br>
-     * see BaseHoverBox for more details
+     * set content for the info box activatable by click
+     * see [BaseHoverBox](BaseHoverBox) for more details
      */
     hoverboxContent: {
       type: Object,
@@ -281,7 +270,7 @@ export default {
       default: 'Sort A – Z',
     },
     /**
-     * if true sorting will consider the last string in a label or if a comma is
+     * if `true` sorting will consider the last string in a label or if a comma is
      * present the string before the comma
      */
     sortName: {
@@ -297,8 +286,8 @@ export default {
     },
     /**
      * set a chips text for adding a new chip
-     * (alternatively add a 'form.Add' value to your localization files)
-     * if allowUnknownEntries is true please add this in one form or another!
+     * (alternatively add a 'form.Add' value to your localization files).
+     * if `allowUnknownEntries` is `true` please add this in one form or another!
      */
     addNewChipText: {
       type: String,
@@ -327,7 +316,7 @@ export default {
       default: 'roles',
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field (currently only used for `aria-required`)
      */
     required: {
       type: Boolean,
@@ -335,32 +324,32 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field.
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * set true if input field should be disabled<br>
-     * for an example see [BaseInput](#baseinput)
+     * set `true` if input field should be disabled.
+     * for an example see [BaseInput](BaseInput)
      */
     disabled: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
+     * add an error message to be displayed below form field if field is invalid
+     * for an example see [BaseInput](BaseInput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown.
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -368,8 +357,8 @@ export default {
     },
     /**
      * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * all input at once.
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -486,7 +475,7 @@ export default {
        * propagate list change from dragging event to parent
        *
        * @event selected-changed
-       * @param {Object} sendArr - the altered list
+       * @param {Object} - the altered list
        *
        */
       this.$emit('selected-changed', sendArr);
@@ -509,9 +498,8 @@ export default {
        * if drop down entries dynamically set - fetch new entries on input
        *
        * @event fetch-dropdown-entries
-       * @param {Object} params - an Object with the following properties:
        * @property {string} value - the input string
-       * @property {string} type - the labelPropertyName that was specified
+       * @property {string} type - the `labelPropertyName` that was specified
        *
        */
       this.$emit('fetch-dropdown-entries', params);
@@ -519,9 +507,8 @@ export default {
     hoverBoxActive(value, entry) {
       /**
        * event emitted on show / hide hoverbox
-       *
-       * @param {Object} obj - an object with the following properties:
-       * @property {boolean} value - value describing if hoverbox active is true or false
+       * @event hoverbox-active
+       * @property {boolean} value - value describing if hoverbox active is `true` or `false`
        * @property {Object} option - the option for which the hoverbox was activated
        */
       this.$emit('hoverbox-active', { value, entry });

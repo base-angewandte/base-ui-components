@@ -1,6 +1,6 @@
 Example buttons with a 1:1 ratio (100%)
 
-```js
+```js live
 
 const executeFire = function(){
     alert('button clicked!');
@@ -26,7 +26,7 @@ const executeFire = function(){
 
 
 Example button with a 1:2 ratio (50%)
-```js
+```js live
 
 const executeFire = function(){
     alert('button clicked!');

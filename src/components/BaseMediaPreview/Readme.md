@@ -1,6 +1,8 @@
+## Demo
+
 Image View Box
 
-```vue
+```vue live
 <template>
   <div
   class="container">
@@ -27,7 +29,7 @@ export default {
   computed: {
     getImgUrl() {
       /* eslint-disable-next-line */
-      const url = require('@/../dev-docs/assets/images/img1.png');
+      const url = 'https://placeimg.com/640/400/arch/grayscale';
       return url;
     },
   },
@@ -49,7 +51,7 @@ export default {
 
 An audio example
 
-```vue
+```vue live
 <template>
   <div>
       <BaseButton
@@ -80,7 +82,7 @@ export default{
 
 An video example
 
-```vue
+```vue live
 <template>
   <div>
       <BaseButton
@@ -113,7 +115,7 @@ export default{
 
 An pdf example
 
-```vue
+```vue live
 <template>
   <div>
       <BaseButton

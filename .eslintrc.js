@@ -59,6 +59,14 @@ module.exports = {
     // unfortunately our audio and video files do not have the required format
     // (.vtt files) included -->
     'vuejs-accessibility/media-has-caption': 0,
+    // need html comments in one line otherwise vuepress (docgen?) is not parsing them
+    'max-len': ['error', {
+      code: 110,
+      ignoreComments: true,
+      ignoreStrings: true,
+      ignoreTemplateLiterals: true,
+      ignorePattern: '(^\\s*<!--\\s+?@slot.*$|^\\s*@binding.*$)',
+    }],
   },
   overrides: [
     {

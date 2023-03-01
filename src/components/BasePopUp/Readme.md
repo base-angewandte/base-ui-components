@@ -1,6 +1,8 @@
+## Demo
+
 A basic example
 
-```vue
+```vue live
 <template>
   <div
   class="container">

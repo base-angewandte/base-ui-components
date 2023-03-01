@@ -1,7 +1,7 @@
 export default {
   methods: {
     /**
-     * function to navigate a drop down list or similar via key up/down
+     * function to navigate a drop-down list or similar via key up/down
      * @param {Array} list - the list to navigate in
      * @param {boolean} isArrowDown - was key navigation up or down
      * @param {number} currentIndex - the index of the current active option in the array
@@ -11,11 +11,21 @@ export default {
      *  function will return null)
      * @returns {?Object|?string} - the new active element
      */
-    navigate(list, isArrowDown, currentIndex, loop = false, allowNegativeIndex = false) {
-      // depending if arrow was up or down set +/- one to add or subtract
+    navigate(
+      list,
+      isArrowDown,
+      currentIndex,
+      loop = false,
+      allowNegativeIndex = false,
+    ) {
+      // depending on if arrow was up or down set +/- one to add or subtract
       // generically
       const numberToAdd = isArrowDown ? 1 : -1;
-      if (this.isWithinArrayLimit(list, isArrowDown, currentIndex + numberToAdd)) {
+      if (this.isWithinArrayLimit(
+        list,
+        isArrowDown,
+        currentIndex + numberToAdd,
+      )) {
         // set new active entry
         return list[currentIndex + numberToAdd];
       }

@@ -39,8 +39,9 @@
       })">
       <template
         #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-          (e.g. language tabs)) -->
+        <!-- eslint max-len: ["error", { "ignorePattern": "^\\s*!--\\s+?.+" }]*/ -->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+          @binding {string} fieldName -->
         <slot
           :field-name="field.name"
           name="label-addition" />
@@ -58,55 +59,58 @@
           @value-selected="setMultilineDropDown" />
       </template>
       <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual
-        input field<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="pre-input-field" />
       </template>
       <template
         #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>) -->
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
+          @binding {string} fieldName - the name of the current field for identification purposes-->
         <slot
           :field-name="field.name"
           name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
+        <!-- @slot for adding elements after input
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-after" />
       </template>
       <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height -->
+        <!-- @slot for adding elements at the end covering the whole height
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="post-input-field" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <!-- @slot use a custom icon instead of standard error/warning icon
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <!-- @slot for adding elements after input (e.g. used to add loader
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="remove-icon" />
       </template>
       <template #below-input>
-        <!-- @slot below-input slot added to e.g. add drop down -->
+        <!-- @slot below-input slot added to e.g. add drop down
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="below-input" />
@@ -140,62 +144,65 @@
           class="base-form-field-creator__date-field">
           <template
             #label-addition>
-            <!-- @slot Slot to allow for additional elements on the right side of the label
-            row \<div\> (e.g. language tabs)) -->
+            <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+              @binding {string} fieldName -->
             <slot
               :field-name="field.name"
               name="label-addition" />
           </template>
           <template #pre-input-field>
-            <!-- @slot slot to add elements within the form field but in a row before the actual
-            input field<br>
-            for an example see [BaseInput](#baseinput)-->
+            <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="pre-input-field" />
           </template>
           <template
             #input-field-addition-before>
-            <!-- @slot Slot to allow for additional elements in the input field \<div\>
-              (before \<input\>) -->
+            <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-addition-before" />
           </template>
           <template #input-field-inline-before>
-            <!-- @slot to add elements directly inline before the input
-                (contrary to input-field-addition-before this does not wrap<br>
-            for an example see [BaseInput](#baseinput)-->
+            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-inline-before" />
           </template>
           <template #input-field-addition-after>
-            <!-- @slot for adding elements after input -->
+            <!-- @slot for adding elements after input
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-addition-after" />
           </template>
           <template #post-input-field>
-            <!-- @slot for adding elements at the end covering the whole height -->
+            <!-- @slot for adding elements at the end covering the whole height
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="post-input-field" />
           </template>
           <template #error-icon>
-            <!-- @slot use a custom icon instead of standard error/warning icon -->
+            <!-- @slot use a custom icon instead of standard error/warning icon
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="error-icon" />
           </template>
           <template #remove-icon>
-            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <!-- @slot for adding elements after input (e.g. used to add loader)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="remove-icon" />
           </template>
           <template #below-input>
-            <!-- @slot below-input slot added to e.g. add drop down -->
+            <!-- @slot below-input slot added to e.g. add drop down
+          @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="below-input" />
@@ -259,7 +266,7 @@
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
-      @hoverbox-active="$emit('fetch-info-data')">
+      @hoverbox-active="fetchBoxData">
       <template
         #drop-down-entry="props">
         <span>
@@ -288,32 +295,30 @@
       </template>
       <template
         #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-          (e.g. language tabs)) -->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="label-addition" />
       </template>
       <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual
-        input field<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="pre-input-field" />
       </template>
       <template
         #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>) -->
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-inline-before" />
@@ -325,25 +330,29 @@
           name="input-field-addition-after" />
       </template>
       <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height -->
+        <!-- @slot for adding elements at the end covering the whole height
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="post-input-field" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <!-- @slot use a custom icon instead of standard error/warning icon
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <!-- @slot for adding elements after input (e.g. used to add loader)
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="remove-icon" />
       </template>
       <template #below-input>
-        <!-- @slot below-input slot added to e.g. add drop down -->
+        <!-- @slot below-input slot added to e.g. add drop down
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="below-input" />
@@ -400,7 +409,7 @@
 import i18n from '../../mixins/i18n';
 
 /**
- * A component for form field creation via [openAPI](https://www.openapis.org/) standard
+ * A component for form field creation via [openAPI](https://spec.openapis.org/oas/v3.1.0/) standard
  */
 
 export default {
@@ -422,7 +431,7 @@ export default {
       required: true,
     },
     /**
-     * field information as provided by swagger standard
+     * field information as provided in [openAPI](https://spec.openapis.org/oas/v3.1.0#schema-object) standard
      */
     field: {
       type: Object,
@@ -436,26 +445,26 @@ export default {
       required: true,
     },
     /**
-     * add properties any input field can take and set values - find the respective variables at the
-     * respective input components: <br>
-     * [BaseInput](#baseinput)<br>
-     * [BaseAutocompleteInput](#baseautocompleteinput)<br>
-     * [BaseMultilineTextInput](#basemultilinetextinput)<br>
-     * [BaseChipsInput](#basechipsinput)<br>
-     * [BaseChipsBelow](#basechipsbelow)<br>
-     * [BaseDateInput](#basedateinput)<br>
-     * [BaseToggle](#basetoggle)<br>
-     * <br>
-     * CAVEAT: this means several input field properties are settable via separate props as well
-     * as via fieldProps (e.g. language, required, sortText) the logic here is the following:<br>
-     *  separate props will have priority over fieldProps values <b>unless</b> the separate
-     *  prop has a default value other than ones evaluating to false (boolean false,
-     *  empty string).<br>
-     *  Field props that are set via 'x-attrs' (e.g. allowUnknownEntries) in swagger definition
-     *  have priority over fieldProps set values.<br>
-     *  Fields for which a unified appearance makes sense (e.g. clearable, showErrorIcon) or that
-     *  are modified internally (e.g. input, selectedList) might not be settable
-     *  via fieldProps.
+     * add properties any input field can take and set values - find the possible variables at the
+     * respective input components:
+     * [BaseInput](BaseInput)
+     * [BaseAutocompleteInput](BaseAutocompleteInput)
+     * [BaseMultilineTextInput](BaseMultilineTextInput)
+     * [BaseChipsInput](BaseChipsInput)
+     * [BaseChipsBelow](BaseChipsBelow)
+     * [BaseDateInput](BaseDateInput)
+     * [BaseToggle](BaseToggle)
+     *
+     * **Caveat**: this means several input field properties are settable via separate props as well
+     * as via `fieldProps` (e.g. `language`, `required`, `sortText`) the logic here is the following:
+     *  separate props will have priority over `fieldProps` values **unless** the separate
+     *  prop has a default value other than ones evaluating to `false` (boolean false,
+     *  empty string).
+     *  Field props that are set via `x-attrs` (e.g. `allowUnknownEntries`) in the OpenAPI definition
+     *  have priority over `fieldProps` set values.
+     *  Fields for which a unified appearance makes sense (e.g. `clearable`, `showErrorIcon`) or that
+     *  are modified internally (e.g. `input`, `selectedList`) might not be settable
+     *  via `fieldProps`.
      */
     fieldProps: {
       type: Object,
@@ -476,8 +485,8 @@ export default {
       default: true,
     },
     /**
-     * a placeholder for the field<br>
-     * per default the placeholder attribute in swagger x-attributes will be used
+     * a placeholder for the field
+     * per default the placeholder attribute in OpenAPI `x-attrs` field will be used
      * (no need to specify that)
      */
     placeholder: {
@@ -485,7 +494,7 @@ export default {
       default: '',
     },
     /**
-     * provide a options list for autocomplete, chips or chips-below fields
+     * provide a options list for `autocomplete`, `chips` or `chips-below` fields
      */
     dropDownList: {
       type: Array,
@@ -507,7 +516,7 @@ export default {
       default: () => ({}),
     },
     /**
-     * possibility to steer field loading (chips, autocomplete) from outside
+     * possibility to steer field loading (`chips`, `autocomplete`) from outside
      */
     autocompleteLoading: {
       type: Boolean,
@@ -535,15 +544,15 @@ export default {
       default: 'Sort A - Z',
     },
     /**
-     * pass down all necessary options for potential subform<br>
-     *   @see [BaseForm props](#baseform)
+     * pass down all necessary options for potential subform.
+     *   see [BaseForm props](BaseForm)
      */
     fieldGroupParams: {
       type: Object,
       default: () => ({}),
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field (currently only used for `aria-required` attribute)
      */
     required: {
       type: Boolean,
@@ -551,33 +560,33 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field.
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
+     * add an error message to be displayed below form field if field is invalid.
+     * for an example see [BaseInput](BaseInput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown.
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
       default: true,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * if `true` a remove icon will be shown allowing to remove
+     * all input at once.
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -760,7 +769,7 @@ export default {
            * Event emitted when field value changed internally
            *
            * @event field-value-changed
-           * @property {Object | Array | String | Number} val - the changed field value
+           * @property {Object, Array, String, Number} - the changed field value
            */
           this.$emit('field-value-changed', val);
         }
@@ -813,16 +822,14 @@ export default {
       this.fetchingData = true;
       this.textInput = value;
       /**
-       * Event emitted for text input on autocomplete fields (autocomplete-input,
-       * chips-input, chips-below-input)
+       * Event emitted for text input on autocomplete fields (field types `autocomplete`,
+       * `chips`, `chips-below`)
        *
        * @event fetch-autocomplete
-       * @param {Object} valObject - the spread object which has the following properties
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
-       * @property {string} source]- the url to request the data from
-       * @property {?string} equivalent - string specified for related fields
-       * e.g. for contributor roles equivalent is 'contributor'
+       * @property {string} source - the url to request the data from
+       * @property {?string} equivalent - string specified for related fields e.g. for contributor roles equivalent is 'contributor'
        */
       this.$emit('fetch-autocomplete', {
         value,
@@ -868,8 +875,20 @@ export default {
       if (this.fieldType !== 'multiline') {
         event.preventDefault();
       } else {
+        /**
+         * event emitted by field type `multiline`
+         * @event keydown
+         * @param {KeyboardEvent} - the native keydown event
+         */
         this.$emit('keydown', event);
       }
+    },
+    fetchBoxData() {
+      /**
+       * event triggered when hover box data should be fetched
+       * @event fetch-info-data
+       */
+      this.$emit('fetch-info-data');
     },
   },
 };

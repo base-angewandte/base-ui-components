@@ -3,7 +3,7 @@ const fs = require('fs');
 const { argv } = require('yargs');
 const conventionalChangelog = require('gulp-conventional-changelog');
 
-const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/';
+const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/components/';
 
 gulp.task('changelog', (cb) => {
   // check if the file exists and create it if necessary
@@ -65,7 +65,7 @@ gulp.task('changelog', (cb) => {
           const componentNameArray = commit.scope.replace(' ', '').split(',');
           // map the retrieved array and supplement the component name with the link markdown
           const alteredArray = componentNameArray
-            .map(component => `[${component}](${styleguidePath}#${component.toLowerCase()})`);
+            .map(component => `[${component}](${styleguidePath}${component})`);
           // join altered strings array to one string again
           modifiedProps.scope = alteredArray.join(', ');
         }

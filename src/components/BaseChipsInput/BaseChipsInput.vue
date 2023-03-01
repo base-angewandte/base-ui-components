@@ -48,8 +48,8 @@
             </span>
             <template
               v-else-if="entry">
-              <!-- @slot a slot to provide more advanced drop down entries<br> per default only the
-                Object[labelPropertyName][?lang] will be displayed -->
+              <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
+                @binding {string, Object} item - the option passed to options list -->
               <slot
                 :item="entry.option"
                 name="drop-down-entry">
@@ -68,28 +68,20 @@
       </template>
       <template
         #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-          (e.g. language tabs)) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="label-addition" />
       </template>
       <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual
-        input field<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="pre-input-field" />
       </template>
       <template
         #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot Slot to allow for additional elements in the input field \<div\> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
@@ -97,8 +89,7 @@
         <slot name="input-field-addition-after" />
       </template>
       <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="post-input-field" />
         <div
           v-if="!allowMultipleEntries"
@@ -117,13 +108,11 @@
         </div>
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField).-->
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements after input (e.g. used to add loader). for an example see [BaseChipsInputField](BaseChipsInputField). -->
         <slot name="remove-icon" />
       </template>
     </BaseChipsInputField>
@@ -156,8 +145,6 @@ export default {
     prop: 'selectedList',
     event: 'selected-changed',
   },
-  // currently this has all the props from BaseChipsInput v1 to ensure
-  // backwards compatibility
   props: {
     /**
      * list of selectable options (strings or objects)
@@ -167,8 +154,6 @@ export default {
       default: () => [],
     },
     /**
-     * @model
-     *
      * list of already selected options (strings or objects), displayed as chips
      */
     selectedList: {
@@ -220,7 +205,7 @@ export default {
       default: true,
     },
     /**
-     * define if selectable list options should be fetched every time of if the
+     * define if selectable list options should be fetched every time or if the
      * list passed in the beginning is used
      */
     allowDynamicDropDownEntries: {
@@ -229,7 +214,7 @@ export default {
     },
     /**
      * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to selectedList directly but only in parent
+     * so this is possible if entry is not added to `selectedList` directly but only in parent
      * component
      */
     addSelectedEntryDirectly: {
@@ -244,7 +229,7 @@ export default {
       default: true,
     },
     /**
-     * if true a button with that functionality will be visible
+     * if `true` a button with that functionality will be visible
      */
     sortable: {
       type: Boolean,
@@ -265,8 +250,8 @@ export default {
       default: false,
     },
     /**
-     * set content for the info box activatable by click <br>
-     * see [BaseHoverBox](#basehoverbox) for more details
+     * set content for the info box activatable by click.
+     * see [BaseHoverBox](BaseHoverBox) for more details
      */
     hoverboxContent: {
       type: Object,
@@ -288,7 +273,7 @@ export default {
       default: 'Sort A – Z',
     },
     /**
-     * if true sorting will consider the last string in a label or if a comma is
+     * if `true` sorting will consider the last string in a label or if a comma is
      * present the string before the comma
      */
     sortName: {
@@ -303,8 +288,8 @@ export default {
       default: '',
     },
     /**
-     * set a chips text for adding a new chip
-     * (alternatively add a 'form.Add' value to your localization files)
+     * set a chips text for adding a new chip.
+     * (alternatively add a `form.Add` value to your localization files)
      * if allowUnknownEntries is true please add this in one form or another!
      */
     addNewChipText: {
@@ -333,7 +318,7 @@ export default {
       default: '',
     },
     /**
-     * property for special case 'chips-below' - if false in this case chips will
+     * property for special case in component [BaseChipsBelow](BaseChipsBelow) - if `false` in this case chips will
      * not be displayed in the input field
      */
     displayChipsInline: {
@@ -341,7 +326,7 @@ export default {
       default: true,
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field (currently only used for `aria-required` attribute)
      */
     required: {
       type: Boolean,
@@ -349,41 +334,41 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field.
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * set true if input field should be disabled<br>
-     * for an example see [BaseInput](#baseinput)
+     * set `true` if input field should be disabled.
+     * for an example see [BaseInput](BaseInput)
      */
     disabled: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
+     * add an error message to be displayed below form field if field is invalid.
+     * for an example see [BaseInput](BaseInput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown.
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
       default: false,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * if `true` a remove icon (or a custom icon if slot `remove-icon` is used) will be shown allowing to remove
+     * all input at once
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -397,11 +382,11 @@ export default {
       default: '',
     },
     /**
-     * define true if chip should be editable on click
-     * <br>
-     * CAVEAT: chips can not be both draggable AND editable and it can not show
-     *  hoverBoxContent as soon as it is editable respectively - if both are set true edit
-     *  functionality takes precedent - chip will not be draggable, hoverBoxContent will not
+     * set `true` if chip should be editable on click
+     *
+     * **Caveat**: chips can not be both `draggable` AND `editable` and it can not show
+     *  `hoverBoxContent` as soon as it is editable respectively - if both are set `true` edit
+     *  functionality takes precedent - chip will not be draggable, `hoverBoxContent` will not
      *  be shown!
      */
     chipsEditable: {
@@ -409,9 +394,9 @@ export default {
       default: false,
     },
     /**
-     * this prop gives the option to add assistive text for screen readers<br>
-     * properties:<br>
-     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
      */
     assistiveText: {
@@ -639,7 +624,7 @@ export default {
          *
          * @event fetch-dropdown-entries
          * @property {string} value - the input string
-         * @property {string} type - the labelPropertyName that was specified
+         * @property {string} type - the `labelPropertyName` that was specified
          */
         this.$emit('fetch-dropdown-entries', { value: val, type: this.labelPropertyName });
       }
@@ -728,7 +713,7 @@ export default {
         /**
          * inform parent of changes to selectedList
          * @event selected-changed
-         * @property {(Object[]|string[])} tempList - the altered selectedList
+         * @property {Object[], string[]} - the altered selectedList
          */
         this.$emit('selected-changed', tempList);
       }

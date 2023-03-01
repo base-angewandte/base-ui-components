@@ -1,6 +1,8 @@
+## Demo
+
 Adjust the number of pages and resize to see differences in the display.
 
-```vue
+```vue live
 
 <template>
   <div class="pagination-example">
@@ -16,10 +18,7 @@ Adjust the number of pages and resize to see differences in the display.
 </template>
 
 <script>
-import BaseInput from '../BaseInput/BaseInput';
-
 export default {
-  components: {BaseInput},
   data() {
     return {
       total: 10,

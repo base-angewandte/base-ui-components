@@ -1,5 +1,6 @@
-Date Panel
-```vue
+## Demo
+
+```vue live
 <template>
   <div>
     <BaseDatePanel
@@ -12,12 +13,7 @@ Date Panel
 </template>
 
 <script>
-import BaseDatePanel from './BaseDatePanel';
-
 export default {
-  components: {
-    BaseDatePanel
-  },
   data() {
     return {
       datePicked: { date: '2020-05-12' },
@@ -28,7 +24,7 @@ export default {
 ```
 
 Date Panel with date displayed, icon position 'right' and language 'de'
-```vue
+```vue live
 <template>
   <div>
     <BaseDatePanel
@@ -42,12 +38,7 @@ Date Panel with date displayed, icon position 'right' and language 'de'
 </template>
 
 <script>
-import BaseDatePanel from './BaseDatePanel';
-
 export default {
-  components: {
-    BaseDatePanel
-  },
   data() {
     return {
       datePicked: { date: '2020-05-12' },
@@ -59,7 +50,7 @@ export default {
 
 
 Date Panel: type week, displayed inline
-```vue
+```vue live
 <template>
   <div>
     <BaseDatePanel
@@ -74,12 +65,7 @@ Date Panel: type week, displayed inline
 </template>
 
 <script>
-import BaseDatePanel from './BaseDatePanel';
-
 export default {
-  components: {
-    BaseDatePanel
-  },
   data() {
     return {
       datePicked: {},

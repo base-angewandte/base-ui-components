@@ -1,3 +1,5 @@
+## Demo
+
 Note:<br>
 The spriteSheet 'base-ui-icons.svg' needs to be copied into the '/public' folder of your frontend project.<br>
 It is possible to set the path to the spriteSheet due a global variable in your frontend project: <br>
@@ -9,7 +11,7 @@ SVGs layers should be grouped and contain only simplified objects path.<br>
 
 Available icons:
 
-```vue
+```vue live
 <template>
   <div style="display: flex; flex-wrap: wrap">
     <div

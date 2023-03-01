@@ -40,7 +40,8 @@ export default {
     setLangLabels(key, locales) {
       return locales
         .reduce((prev, curr) => {
-          this.$set(prev, curr, this.$i18n ? this.$t(key, curr) : key.split('.').pop());
+          this.$set(prev, curr, this.$i18n
+            ? this.$t(key, curr) : key.split('.').pop());
           return prev;
         }, {});
     },
@@ -55,7 +56,8 @@ export default {
      * @returns {Object|string}
      */
     getLangLabel(value, useAny = false) {
-      const language = this.hasI18n ? this.language || this.$i18n.locale : this.language;
+      const language = this.hasI18n
+        ? this.language || this.$i18n.locale : this.language;
       if (typeof value === 'string') return value;
       if (value && language && value[language]) {
         return value[language];

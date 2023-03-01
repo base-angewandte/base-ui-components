@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { createId } from '@/utils/utils';
+import { createId } from '../../utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
@@ -71,8 +71,8 @@ export default {
     },
     // TODO: need to check if it is possible to use custom icons --> if yes description!
     /**
-     * icon displayed <br>
-     * see [BaseIcon](#baseicon) for available icons<br>
+     * icon displayed
+     * see [BaseIcon](BaseIcon) for available icons
      */
     icon: {
       type: String,
@@ -121,7 +121,7 @@ export default {
       default: false,
     },
     /**
-     * specify icon size<br>
+     * specify icon size
      *   this will have no effect on button-style: secondary - icon will always be small
      */
     iconSize: {
@@ -153,7 +153,7 @@ export default {
       default: 'button',
     },
     /**
-     * define alignment of button content<br>
+     * define alignment of button content
      * Info: has no effect, if iconPosition 'top' is set
      */
     alignText: {
@@ -202,8 +202,8 @@ export default {
     clicked(event) {
       /**
        * triggered on button click
-       *
-       * @type {Event}
+       * @event clicked
+       * @param {Event} - the native click event
        */
       this.$emit('clicked', event);
     },

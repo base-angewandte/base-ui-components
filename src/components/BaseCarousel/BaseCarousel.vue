@@ -61,14 +61,14 @@ export default {
   props: {
     /**
      * specify array of items to render<br>
-     *   the item object should have the following properties:<br>
-     *     title {?string} - the title to display<br>
-     *     subtext {?string} - the text below the title<br>
-     *     description {?string} - the type of item<br>
-     *     additional {?string} - additional information (e.g. dates)<br>
-     *     href - a url to follow upon item click<br>
-     *     previews - an array of image urls in different sizes in the following form:<br>
-     *     e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
+     *   the item object should have the following properties:
+     *     **title** `?string` - the title to display.
+     *     **subtext** `?string` - the text below the title.
+     *     **description** `?string` - the type of item.
+     *     **additional** `?string` - additional information (e.g. dates).
+     *     **href** `string` - an url to follow upon item click.
+     *     **previews** `Object[]`- an array of image urls in different sizes in the following form:
+     *     e.g. `[{ '460w': 'image-url' }, { '640w': 'image url' },...]`
      */
     items: {
       type: Array,
@@ -84,12 +84,12 @@ export default {
     },
     /**
      * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
+     * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router`
      * is necessary
      */
     renderLinkElementAs: {
       type: String,
-      default: 'router-link',
+      default: 'RouterLink',
     },
   },
   data() {
@@ -160,7 +160,7 @@ export default {
          * event triggered when slider is initialized
          *
          * @event initialized
-         * @type { boolean }
+         * @param { boolean } - was carousel initialized
          */
         this.$emit('initialized', true);
       }, 0);
@@ -170,8 +170,10 @@ export default {
     },
     boxClicked(item) {
       /**
+       * event triggered by a ClickEvent on one of the carousel boxes
+       *
        * @event clicked
-       * @type {Object}
+       * @param {Object} - the carousel item that was clicked
        */
       this.$emit('clicked', item);
     },

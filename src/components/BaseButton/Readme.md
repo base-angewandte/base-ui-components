@@ -1,6 +1,8 @@
+## Demo
+
 Button Single Style
 
-```js
+```js live
 
 const executeFire = function(){
     alert('button clicked!');
@@ -37,7 +39,7 @@ const executeFire = function(){
 ```
 
 Button Row Style
-```js
+```js live
 
 const executeFire = function(){
     alert('button clicked!');
@@ -90,7 +92,7 @@ const executeFire = function(){
 ```
 Button Secondary Style
 
-```js
+```js live
 
 const executeFire = function(){
     alert('button clicked!');

@@ -1,6 +1,8 @@
+## Demo
+
 Basic example with no extra settings
 
-```vue
+```vue live
 <template>
   <div>
     <BaseMultilineTextInput
@@ -24,7 +26,7 @@ export default {
 
 Example with Tabs
 
-```vue
+```vue live
 <template>
   <div>
     <BaseMultilineTextInput

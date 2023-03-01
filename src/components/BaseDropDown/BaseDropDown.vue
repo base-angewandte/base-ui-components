@@ -104,7 +104,7 @@ export default {
   },
   props: {
     /**
-     * specify options to choose from <br>
+     * specify options to choose from
      *   needs to be an array with label and value properties
      */
     options: {
@@ -127,8 +127,6 @@ export default {
       default: 'Select',
     },
     /**
-     * @model
-     *
      * the selected value
      */
     selectedOption: {
@@ -150,11 +148,12 @@ export default {
       default: 'inherit',
     },
     /**
-     * set a language ()
+     * set a language (ISO 639-1)
      */
     language: {
       type: String,
       default: '',
+      validator: val => !val || val.length === 2,
     },
     /**
      * set the name of the property that holds the value
@@ -246,7 +245,7 @@ export default {
        * Event emitted when an option is selected
        *
        * @event value-selected
-       * @type { Object }
+       * @param { Object } - the selected option
        */
       this.$emit('value-selected', option);
     },

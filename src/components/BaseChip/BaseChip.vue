@@ -25,16 +25,11 @@
       class="hide">
       {{ assistiveText }}
     </span>
-    <div
+    <BaseIcon
       v-if="isRemovable"
+      name="remove"
       class="base-chip__icon"
-      @keydown.enter.stop="removeClicked"
-      @click.stop="removeClicked">
-      <BaseIcon
-        name="remove"
-        alt="remove"
-        class="base-chip__icon-svg" />
-    </div>
+      @click.native.stop="removeClicked" />
     <base-hover-box
       ref="hoverBox"
       v-bind="hoverBoxContent"
@@ -44,8 +39,6 @@
 
 <script>
 import { createId } from '@/utils/utils';
-import BaseHoverBox from '../BaseHoverBox/BaseHoverBox';
-import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
  * Basic Chip component
@@ -54,8 +47,8 @@ import BaseIcon from '../BaseIcon/BaseIcon';
 export default {
   name: 'BaseChip',
   components: {
-    BaseHoverBox,
-    BaseIcon,
+    BaseHoverBox: () => import('../BaseHoverBox/BaseHoverBox'),
+    BaseIcon: () => import('../BaseIcon/BaseIcon'),
   },
   model: {
     prop: 'entry',
@@ -63,8 +56,6 @@ export default {
   },
   props: {
     /**
-     * @model
-     *
      * pass the text for the chip
      */
     entry: {
@@ -80,7 +71,7 @@ export default {
     },
     /**
      * if a hover box is associated with the chip add all relevant properties here
-     * (@see [BaseHoverBox](#basehoverbox) for details)
+     * (see [BaseHoverBox](BaseHoverBox) for details)
      */
     hoverBoxContent: {
       type: Object,
@@ -109,10 +100,10 @@ export default {
     },
     /**
      * define true if chip should be editable on click
-     * <br>
-     * CAVEAT: chips can not showhoverBoxContent as soon as it is editable
-     * respectively - if both are set true edit functionality takes precedent - chip will
-     *  not be draggable, hoverBoxContent will not be shown!
+     *
+     * **Caveat**: chips can not show `hoverBoxContent` as soon as it is editable
+     * respectively - if both are set `true` edit functionality takes precedent - chip will
+     *  not be draggable, `hoverBoxContent` will not be shown!
      */
     editable: {
       type: Boolean,
@@ -169,7 +160,7 @@ export default {
          * if chip is editable value is updated with this event
          *
          * @event value-changed
-         * @type {string}
+         * @param {string} - the displayed text string after edit
          */
         this.$emit('value-changed', this.entryInt);
       }
@@ -201,7 +192,8 @@ export default {
         /**
          * event indicating if hover box was set to show / hide
          *
-         * @type {Boolean}
+         * @event hoverbox-active
+         * @param {boolean} - is hoverbox active
          *
          */
         this.$emit('hoverbox-active', false);
@@ -212,7 +204,8 @@ export default {
       /**
        * event on mouse down, needed by base chips input to determine active chip
        *
-       * @type {Event}
+       * @event mouse-down
+       * @param {Event} - the native MouseEvent
        *
        */
       this.$emit('mouse-down', event);
@@ -222,7 +215,7 @@ export default {
        * triggered when the remove icon is clicked and returns the data behind the chip
        *
        * @event remove-entry
-       * @type {Object}
+       * @param {string} - the displayed chip string
        *
        */
       this.$emit('remove-entry', this.entryInt);
@@ -288,12 +281,10 @@ export default {
       padding: $spacing-small;
       right: 0;
       cursor: pointer;
+      width: calc((#{$spacing-small} * 2) + #{$icon-min});
       display: flex;
-
-      .base-chip__icon-svg {
-        height: $icon-min;
-        width: $icon-min;
-      }
+      justify-content: center;
+      align-items: center;
     }
   }
 

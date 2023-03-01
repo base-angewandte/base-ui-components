@@ -12,8 +12,7 @@
         {{ getLangLabel(label) }}
       </label>
       <div class="base-input__label-spacer" />
-      <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-      (e.g. language tabs)) -->
+      <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
       <slot name="label-addition" />
     </div>
 
@@ -37,17 +36,15 @@
                    'base-input__input-container__is-active':
                      isActiveInt && useFormFieldStyling,
                  }]">
-        <!-- @slot elements before the actual input line but within the input field container -->
+        <!-- @slot add elements before the actual input line but within the input field container -->
         <slot name="pre-input-field" />
         <div
           :class="['base-input__input-line-container',
                    { 'base-input__input-line-container__wrap': !hideInputField }]">
-          <!-- @slot Slot to allow for additional elements in the input field \<div\> (e.g. chips)
-          (before \<input\>) -->
+          <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips) (before <input>) -->
           <slot name="input-field-addition-before" />
           <div class="base-input__input-line">
-            <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap -->
+            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap -->
             <slot name="input-field-inline-before" />
             <div
               :class="['base-input__input-wrapper',
@@ -56,9 +53,7 @@
                            useFadeOut && !isActiveInt && !hideInputField,
                        }]">
               <!-- @slot replace native HTML input element with custom input
-                    @binding { string } id - the id of the base input component - if
-                      id is not provided in props this is an internal id that should
-                      also be set as input id -->
+                   @binding { string } id - the id of the BaseInput component - if `id` is not provided in props this is an internal id that should also be set as <input> `id` -->
               <slot
                 v-bind="{
                   id: idInt,
@@ -166,8 +161,6 @@ export default {
   },
   props: {
     /**
-     * @model
-     *
      * input field settable from outside
      */
     input: {
@@ -175,7 +168,7 @@ export default {
       default: '',
     },
     /** label for input field, required for usability purposes, handle
-     * showing of label with property showLabel
+     * showing of label with property `showLabel`
      */
     label: {
       type: String,
@@ -189,8 +182,8 @@ export default {
       default: true,
     },
     /**
-     * if field is occurring more then once - set an id<br>
-     * in case a custom input is used with the input slot it is important to
+     * if field is occurring more then once - set an `id`
+     * **caveat**: in case a custom input is used with the `input` slot it is important to
      * assign the same id to the input element
      */
     id: {
@@ -205,7 +198,7 @@ export default {
       default: 'Enter Text Here',
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field (currently only used for `aria-required`)
      */
     required: {
       type: Boolean,
@@ -251,8 +244,8 @@ export default {
       default: '',
     },
     /**
-     * specify a linked list option (e.g. drop down) <br>
-     *   (will be used in aria-activedescendant attribute)
+     * specify a linked list option (e.g. drop down)
+     *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
       type: String,
@@ -266,8 +259,8 @@ export default {
       default: false,
     },
     /**
-     * set input field in active state from outside<br>
-     * the .sync modifier can be used on this prop
+     * set input field in active state from outside
+     * the `.sync` modifier can be used on this prop
      */
     isActive: {
       type: Boolean,
@@ -289,7 +282,7 @@ export default {
       default: true,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
+     * if `true` a remove icon (or custom icon if slot `remove-icon` is used) will be shown allowing to remove
      * all input at once
      */
     clearable: {
@@ -297,8 +290,8 @@ export default {
       default: false,
     },
     /**
-     * if true space is reserved for a loader that can be activated
-     * with the 'isLoading' prop
+     * if `true` space is reserved for a loader that can be activated
+     * with the `isLoading` prop
      */
     loadable: {
       type: Boolean,
@@ -332,6 +325,7 @@ export default {
     language: {
       type: String,
       default: '',
+      validator: val => !val || val.length === 2,
     },
     /**
      * use this prop to deactivate automatic setting of focus as soon as input element
@@ -342,7 +336,7 @@ export default {
       default: true,
     },
     /**
-     * set true if input field should be disabled
+     * set `true` if input field should be disabled
      */
     disabled: {
       type: Boolean,
@@ -401,7 +395,7 @@ export default {
                * across browsers for number input
                *
                * @event keydown
-               * @param {KeyboardEvent} event
+               * @param {KeyboardEvent} - the native keyboard event
                *
                */
               this.$emit('keydown', event);
@@ -412,7 +406,7 @@ export default {
              * Event emitted on input, passing input string
              *
              * @event input
-             * @param {string} value - the input event value however
+             * @param {string} - the input event value however
              * passing only the event.target.value
              *
              */
@@ -491,7 +485,7 @@ export default {
         /**
          * propagate active state changes of input field to parent
          * @event update:is-active
-         * @param {boolean} val
+         * @param {boolean} - is input field active
          */
         this.$emit('update:is-active', val);
       }
@@ -518,10 +512,10 @@ export default {
       if (!this.disabled) {
         this.setFieldState(true);
         /**
-         * Event emitted on click on input field \<div\>
+         * Event emitted on click on input field <div>
          *
          * @event click-input-field
-         * @param {FocusEvent|MouseEvent} event - event triggered by focusin or click
+         * @param {FocusEvent, MouseEvent} - event triggered by focusin or click
          *
          */
         this.$emit('click-input-field', event);
@@ -534,10 +528,10 @@ export default {
     clickedOutsideInput(event) {
       this.setFieldState(false);
       /**
-       * Event emitted when click outside input field \<div\> is registered
+       * Event emitted when click outside input field <div> is registered
        *
        * @event clicked-outside
-       * @param {MouseEvent} event
+       * @param {MouseEvent} - the native mouse event
        *
        */
       this.$emit('clicked-outside', event);

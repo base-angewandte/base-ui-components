@@ -1,6 +1,8 @@
+## Demo
+
 A simple Search Component
 
-```vue
+```vue live
 <template>
   <div class="searchcontainer">
     <BaseSearch
@@ -38,8 +40,8 @@ export default {
 
 A component with more custom settings. Also demonstrating the different types available.
 
-For slot demonstrations see [BaseChipsInput](#basechipsinput) or [BaseInput](#baseinput).
-```vue
+For slot demonstrations see [BaseChipsInput](BaseChipsInput) or [BaseInput](BaseInput).
+```vue live
 <template>
   <div class="searchcontainer">
     <BaseSearch
@@ -79,12 +81,7 @@ For slot demonstrations see [BaseChipsInput](#basechipsinput) or [BaseInput](#ba
   </div>
 </template>
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseButton,
-  },
   data() {
     return {
       searchText: '',

@@ -21,20 +21,20 @@ export default {
   name: 'BaseTooltip',
   props: {
     /**
-     * HTMLElement to attach the tooltip<br>
+     * HTMLElement to attach the tooltip
      * eg.: vue ref element
      */
     attachTo: {
-      type: null,
+      type: HTMLElement,
       required: true,
     },
     /**
-     * additional styles<br>
-     * properties 'top, left, right' will be overwritten due position calculation
+     * add additional styling
+     * **caveat**: properties `top`, `left` and `right` will be overwritten due position calculation
      */
     styles: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
   },
   data() {

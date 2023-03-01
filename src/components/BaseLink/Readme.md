@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div>
     <h2>types</h2>
@@ -18,12 +20,7 @@
   </div>
 </template>
 <script>
-import BaseLink from './BaseLink';
-
 export default {
-  components: {
-    BaseLink,
-  },
   data() {
     return {
       links: [

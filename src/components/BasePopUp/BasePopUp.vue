@@ -45,7 +45,6 @@
               :icon-size="'small'"
               class="base-popup-button"
               @clicked="buttonLeft" />
-            <!-- @event buttonRight -->
             <BaseButton
               id="popup-right-button"
               :text="buttonRightText"
@@ -211,7 +210,6 @@ export default {
        * Event triggered on right top corner close action
        *
        * @event close
-       * @type { none }
        */
       this.$emit('close');
       this.showInt = false;
@@ -221,7 +219,6 @@ export default {
        * Event triggered with right button
        *
        * @event button-right
-       * @type { none }
        */
       this.$emit('button-right');
     },
@@ -230,7 +227,6 @@ export default {
        * Event triggered with left button
        *
        * @event button-left
-       * @type { none }
        */
       this.$emit('button-left');
     },

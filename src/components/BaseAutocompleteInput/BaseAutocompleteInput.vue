@@ -40,7 +40,8 @@
           @touchstart.native.stop=""
           @update:selected-option="selectOption">
           <template #option="{ option }">
-            <!-- @slot provide custom drop down options -->
+            <!-- @slot provide custom drop down options
+              @binding {string, Object} item - the option from provided options list -->
             <slot
               :item="option"
               name="drop-down-entry" />
@@ -49,28 +50,20 @@
       </template>
       <template
         #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-          (e.g. language tabs)) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="label-addition" />
       </template>
       <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual
-        input field<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="pre-input-field" />
       </template>
       <template
         #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>) <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)-->
         <slot name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
@@ -78,18 +71,15 @@
         <slot name="input-field-addition-after" />
       </template>
       <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="post-input-field" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon<br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements after input (e.g. used to add loader. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="remove-icon" />
       </template>
     </BaseInput>
@@ -100,7 +90,7 @@
 import BaseInput from '@/components/BaseInput/BaseInput';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
 import { createId } from '@/utils/utils';
-import navigateMixin from '@/mixins/navigateList';
+import navigateMixin from '../../mixins/navigateList';
 
 /**
  * Input component allowing to select single values from a drop down that are filled into
@@ -122,8 +112,6 @@ export default {
   },
   props: {
     /**
-     * @model
-     *
      * input field settable from outside
      */
     input: {
@@ -131,9 +119,9 @@ export default {
       default: '',
     },
     /**
-     * provide a list of options for the drop down<br>
+     * provide a list of options for the drop down.
      * could be a list of strings or objects - if it is objects if necessary please adapt
-     * the props labelPropertyName (value to be displayed) and identifierPropertyName (used for
+     * the props `labelPropertyName` (value to be displayed) and `identifierPropertyName` (used for
      * identification) for correct handling
      */
     list: {
@@ -141,7 +129,7 @@ export default {
       default: () => [],
     },
     /** label for input field, required for usability purposes, handle
-     * showing of label with property showLabel
+     * showing of label with property `showLabel`
      */
     label: {
       type: String,
@@ -155,7 +143,7 @@ export default {
       default: true,
     },
     /**
-     * if field is occurring more then once - set an id<br>
+     * if field is occurring more then once - set an id
      * in case a custom input is used with the input slot it is important to
      * assign the same id to the input element
      */
@@ -171,7 +159,7 @@ export default {
       default: 'Enter Text Here',
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field (currently only used for `aria-required`)
      */
     required: {
       type: Boolean,
@@ -200,8 +188,8 @@ export default {
       default: true,
     },
     /**
-     * set input field in active state from outside<br>
-     * the .sync modifier can be used on this prop
+     * set input field in active state from outside.
+     * the `.sync` modifier can be used on this prop
      */
     isActive: {
       type: Boolean,
@@ -223,7 +211,7 @@ export default {
       default: true,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
+     * if `true` a remove icon (or a custom icon if slot `remove-icon` is used) will be shown allowing to remove
      * all input at once
      */
     clearable: {
@@ -231,7 +219,7 @@ export default {
       default: false,
     },
     /**
-     * if true space is reserved for a loader that can be activated
+     * if `true` space is reserved for a loader that can be activated
      * with the 'isLoading' prop
      */
     loadable: {
@@ -254,7 +242,7 @@ export default {
       default: '',
     },
     /**
-     * set true if input field should be disabled
+     * set `true` if input field should be disabled
      */
     disabled: {
       type: Boolean,
@@ -282,7 +270,7 @@ export default {
       default: 'No options available',
     },
     /**
-     * if this is true parent needs to take care of filling the options list on string
+     * if this is `true` parent needs to take care of filling the options list on string
      * input etc. - useful for fetching autocomplete options from a backend
      */
     dynamicFetch: {
@@ -403,7 +391,7 @@ export default {
         /**
          * event triggered when input changes - part of v-model
          * @event input
-         * @type {string}
+         * @param {string} - the altered input string
          */
         this.$emit('input', val);
       }
@@ -411,9 +399,8 @@ export default {
       if (this.dynamicFetch) {
         /**
          * an event specifically triggered when drop down should be fetched anew
-         * when dynamicFetch is set true
+         * when `dynamicFetch` is set `true`
          * @event fetch-dropdown-entries
-         * @type {Object}
          * @property {string} value
          */
         this.$emit('fetch-dropdown-entries', { value: val });
@@ -446,9 +433,9 @@ export default {
       if (JSON.stringify(val) !== JSON.stringify(this.isActive)) {
         /**
          * update when active state of input field changes
-         * the .sync modifier can be used on this event
+         * the `.sync` modifier can be used on this event
          * @event update:is-active
-         * @type {boolean}
+         * @param {boolean} - is input field active
          */
         this.$emit('update:is-active', val);
       }
@@ -523,7 +510,7 @@ export default {
          * (mainly useful when options list was array of objects - if strings this information
          * is provided with input event anyways)
          * @event selected
-         * @type {string | Object}
+         * @param {string, Object} - selected option (if list of objects was provided the whole object)
          */
         this.$emit('selected', this.inputInt);
       }

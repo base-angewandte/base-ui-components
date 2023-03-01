@@ -1,17 +1,25 @@
-```vue
+## Demo
+
+```vue live
+
 <template>
   <BaseExpandBox
-    show-more-text="Show Map and Addresses"
-    show-less-text="Collapse Map and Addresses">
-    <base-map-locations
-      :locations="locations"
-      :options="{ layers: 'OSM-WMS' }"
-      attribution="Source: <a href='https://openstreetmap.org/'>OpenStreetMap contributors</a>"
-      attribution-position="topright"
-      copyright="<a href='https://creativecommons.org/licenses/by-sa/3.0/'>CC BY-SA 3.0</a>"
-      label="Addresses"
-      tile-layer-service="WMS"
-      url="https://ows.terrestris.de/osm-gray/service" />
+      show-more-text="Show Map and Addresses"
+      show-less-text="Collapse Map and Addresses">
+    <BaseMapLocations
+        :locations="locations"
+        :options="{
+            style: 'normal',
+            subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+            tileMatrixSet: 'google3857',
+            type: 'geolandbasemap',
+          }"
+        attribution-position="topright"
+        label="Addresses"
+        tile-layer-service="WMS"
+        attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
+        copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
+        url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
   </BaseExpandBox>
 </template>
 

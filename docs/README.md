@@ -95,9 +95,9 @@ Component.vue
 
 All available components, their usage and demos can be found in our [styleguide](https://base-angewandte.github.io/base-ui-components/).
 
-The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
+The code base is available at [GitHub](https://github.com/base-angewandte/base-ui-components).
 
-[Development Instructions](buildSetup.md)
+[Development Instructions](development/Readme.md)
 
 ### Customization
 
@@ -135,14 +135,14 @@ See [LICENSE](LICENSE.md)
 
 
 <!-- logo angewandte -->
-![alt text](static/angewandte-logo.svg "Angewandte")
+![alt text](../static/angewandte-logo.svg "Angewandte")
 <!-- logo base -->
-![alt text](static/base.png "base Angewandte")
+![alt text](../static/base.png "base Angewandte")
 <!-- logo zukunvt?  or anything else? -->
 
 ### Support
 
 This open-source project was developed (and more specifically - cross-browser tested) with the support of:
 
-[![Browserstack-logo](static/browserstack.svg)](https://www.browserstack.com)
+[![Browserstack-logo](../static/browserstack.svg)](https://www.browserstack.com)
 

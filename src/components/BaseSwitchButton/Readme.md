@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div>
     <BaseSwitchButton

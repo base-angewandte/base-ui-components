@@ -74,8 +74,7 @@ export default {
   },
   props: {
     /**
-     * specify if icon should be displayed left or right <br>
-     * valid values: 'left' | 'right'
+     * specify if icon should be displayed left or right
      */
     iconPosition: {
       type: String,
@@ -85,10 +84,8 @@ export default {
       },
     },
     /**
-     * @model
-     *
-     * set input field from outside<br>
-     * format: { date: 'yyyy-MM-dd' }
+     * set input field from outside.
+     * format: `{ date: 'yyyy-MM-dd' }`
      */
     input: {
       type: Object,
@@ -103,7 +100,7 @@ export default {
     },
     /**
      * label, required for usability purposes, handle
-     * showing of label with property showLabel
+     * showing of label with property `showLabel`
      */
     label: {
       type: String,
@@ -124,8 +121,7 @@ export default {
       default: true,
     },
     /**
-     * select type of calendar <br>
-     * valid values: 'date' | 'week'
+     * select type of calendar
      */
     type: {
       type: String,
@@ -135,7 +131,7 @@ export default {
       },
     },
     /**
-     * label will be replace with selected date unless this is set false
+     * label will be replaced with selected date unless this is set `false`
      */
     showDateSelected: {
       type: Boolean,
@@ -208,12 +204,12 @@ export default {
      */
     emitData(value) {
       /**
-       * emit event when date or week is selected<br>
-       * format: { date: 'yyyy-MM-dd' }
+       * emit event when date or week is selected
+       * format: `{ date: 'yyyy-MM-dd' }`
        *
        * @event selected
-       * @param {Object} value - an object with the following properties:
-       * @property {string} date - the date string in format 'YYYY-MM-DD'
+       * @type {Object} value - an object with the following properties:
+       * @property {string} date - the date string in format `YYYY-MM-DD`
        * @property {string} week - if type is 'week' also the week is emitted
        */
       this.$emit('selected', this.emitObject(value));

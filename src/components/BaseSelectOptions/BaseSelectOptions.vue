@@ -3,6 +3,7 @@
     class="base-select-options"
     :style="{ '--direction': flexDirection }">
     <div class="base-select-options__number-selected">
+      <!-- @slot here number of selected entries is indicated - replace with this slot for customization. -->
       <slot name="selectedText">
         {{ `${numberSelected} ${selectedNumberText}` }}
       </slot>
@@ -29,8 +30,8 @@ export default {
   },
   props: {
     /**
-     * specify the text displayed for number of selected entries
-     * x {selectText}
+     * specify the text displayed for number of selected entries:
+     * `x {selectedNumberText}`
      */
     selectedNumberText: {
       type: String,
@@ -122,7 +123,7 @@ export default {
        * emitted on select all button click
        *
        * @event selected
-       * @param {boolean} selectedInt
+       * @param {boolean} - were all entries selected
        */
       this.$emit('selected', this.selectedInt);
     },

@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div style="position: relative;">
     <div style="display: flex;">
@@ -21,14 +23,7 @@
 </template>
 
 <script>
-import BaseImageBox from '@/components/BaseImageBox/BaseImageBox';
-import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel';
-
 export default {
-  components: {
-    BaseImageBox,
-    BaseMediaCarousel,
-  },
   data() {
     return {
       initialSlide: null,

@@ -1355,7 +1355,7 @@ export default {
             isArrowDown,
             currentCollectionIndex + numberToAdd,
           );
-          // check if collection select is active and if not if the arrow action is
+          // check if collection select is active and if not, if the arrow action is
           // within the limits of the array
           if (!this.collectionSelect
             && this.isWithinArrayLimit(

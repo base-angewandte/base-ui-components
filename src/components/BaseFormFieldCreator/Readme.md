@@ -1,21 +1,22 @@
-With the FormFieldCreator component you can create any of the following form input fields with a [openAPI](https://www.openapis.org/) specification:
+With the FormFieldCreator component you can create any of the following form input fields with a [openAPI](https://spec.openapis.org/oas/v3.1.0/) specification:
 
-* [Plain Text](#baseinput) (type String or Number)
-* [Autocomplete](#baseautocompleteinput)
-* [Multiline Text Input](#basemultilinetextinput) (=Textarea) - with or without language tabs
-* [Chips Input](#basechipsinput)
-* [Chips Input with selected Items below](#basechipsbelow)
-* [Date Input](#basedateinput)
+* [Plain Text](BaseInput) (type String or Number)
+* [Autocomplete](BaseAutocompleteInput)
+* [Multiline Text Input](BaseMultilineTextInput) (=Textarea) - with or without language tabs
+* [Chips Input](BaseChipsInput)
+* [Chips Input with selected Items below](BaseChipsBelow)
+* [Date Input](BaseDateInput)
 * Nested Field Groups (a subform)
 
-For description of 'x-attributes' this field creation relies on please see [BaseForm](#baseform)
+For description of the `x-attrs` the field creation relies on, please see [BaseForm](BaseForm)
 
 >Please note that this component should be rendered client side (important for SSR projects). So for example if you have a Nuxt project you will have to wrap the component in a `<client-only>` tag.
 
+## Demo
 
 Example for a MultilineTextInput:
 
-```vue
+```vue live
 <template>
   <div>
     <BaseFormFieldCreator
@@ -157,7 +158,7 @@ export default {
 
 Example for a chips input:
 
-```vue
+```vue live
 
 <template>
   <div>
@@ -311,7 +312,7 @@ export default {
 
 Example for a field group:
 
-```vue
+```vue live
 
 <template>
   <div>

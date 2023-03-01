@@ -129,7 +129,7 @@ export default {
       default: 'h2',
     },
     /**
-     * define button text<br>
+     * define button text.
      * could be string or path to i18n json as well
      */
     editButtonText: {
@@ -137,7 +137,7 @@ export default {
       default: 'Edit',
     },
     /**
-     * define button text<br>
+     * define button text.
      * could be string or path to i18n json as well
      */
     cancelButtonText: {
@@ -145,7 +145,7 @@ export default {
       default: 'Cancel',
     },
     /**
-     * define button text<br>
+     * define button text.
      * could be string or path to i18n json as well
      */
     saveButtonText: {
@@ -153,10 +153,10 @@ export default {
       default: '',
     },
     /**
-     * decide on buttons presented in edit mode<br>
-     *  <b>save</b>: element has a 'save' and 'cancel' button
-     *  <b>done</b>: element solely has a 'done' button. this button is also emitting
-     *    a 'saved' event when clicked and uses the saveButtonText
+     * decide on buttons presented in edit mode.
+     *  **save**: element has a 'save' and 'cancel' button
+     *  **done**: element solely has a 'done' button. this button is also emitting
+     *    a `saved` event when clicked and uses the `saveButtonText`
      */
     editMode: {
       type: String,
@@ -199,23 +199,24 @@ export default {
       /**
        * event emitted by click on edit button
        *
-       * @type {PointerEvent}
+       * @event activated
+       * @param {PointerEvent} - the native pointer event
        */
       this.$emit('activated', event);
     },
     cancel(event) {
       /**
        * event emitted by click on cancel button
-       *
-       * @type {PointerEvent}
+       * @event canceled
+       * @param {PointerEvent} - the native pointer event
        */
       this.$emit('canceled', event);
     },
     save(event) {
       /**
        * event emitted by click on save button
-       *
-       * @type {PointerEvent}
+       * @event saved
+       * @param {PointerEvent} - the native pointer event
        */
       this.$emit('saved', event);
     },
