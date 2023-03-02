@@ -264,7 +264,7 @@
 
 <script>
 import { extractNestedPropertyValue } from '@/utils/utils';
-import navigateList from '@/mixins/navigateList';
+import navigateList from '../../mixins/navigateList';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 

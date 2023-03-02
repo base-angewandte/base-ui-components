@@ -31,6 +31,10 @@ module.exports = {
   defaultExamples: true,
   apiOptions: {
     jsx: false,
+    alias: {
+      styles: path.resolve(__dirname, './docs/.vuepress/styles'),
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   // create a file with .md ending instead of .vue
   getDestFile: (file, config) => path.join(config.outDir, file.split('/')[1]).replace(/\.vue$/, '.md'),
