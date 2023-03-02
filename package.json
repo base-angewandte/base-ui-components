@@ -111,6 +111,7 @@
     "@vitejs/plugin-vue2": "^2.1.0",
     "@vuepress/plugin-active-header-links": "^1.9.7",
     "@vuepress/plugin-back-to-top": "^1.9.7",
+    "acorn-dynamic-import": "^4.0.0",
     "autoprefixer": "^9.8.8",
     "axios": "^1.2.1",
     "clean-css-cli": "^5.6.1",
