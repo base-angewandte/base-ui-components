@@ -76,7 +76,7 @@ module.exports = async () => {
         },
         {
           text: 'Development',
-          link: '/development/',
+          link: '/buildSetup.md',
         },
       ],
       sidebar,
