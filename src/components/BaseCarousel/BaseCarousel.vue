@@ -19,7 +19,7 @@
             :lazyload="true"
             :image-first="true"
             :center-header="true"
-            :render-element-as="vueRouterAvailable ? renderLinkElementAs : 'div'"
+            :render-element-as="vueRouterAvailable && item.href ? renderLinkElementAs : 'div'"
             :link-to="vueRouterAvailable && item.href ? item.href : ''"
             style="margin-right: 0"
             @clicked="boxClicked(item)" />
@@ -66,9 +66,10 @@ export default {
      *     subtext {?string} - the text below the title<br>
      *     description {?string} - the type of item<br>
      *     additional {?string} - additional information (e.g. dates)<br>
-     *     href - a url to follow upon item click<br>
+     *     href - a url to follow upon item click - this is required if item should be rendered
+     *      as a link element<br>
      *     previews - an array of image urls in different sizes in the following form:<br>
-     *     e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
+     *      e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
      */
     items: {
       type: Array,
