@@ -34,9 +34,17 @@ module.exports = async () => {
      * ref：https://v1.vuepress.vuejs.org/config/#head
      */
     head: [
-      ['meta', { name: 'theme-color', content: '#3eaf7c' }],
+      ['meta', { name: 'theme-color', content: '#ffffff' }],
       ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
       ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
+      ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+      ['meta', { name: 'apple-mobile-web-app-title', content: 'base' }],
+      ['meta', { name: 'application-name', content: 'base' }],
+      ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
+      ['link', { rel: 'apple-touch-ico', sizes: '180x180', href: '/apple-touch-icon.png' }],
+      ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
+      ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
+      ['link', { rel: 'mask-icon', sizes: '180x180', href: '/safari-pinned-tab.svg' }],
     ],
     host: 'localhost',
     port: 6060,
