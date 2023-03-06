@@ -39,7 +39,7 @@
       @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
-      <template v-slot:[filterSlotName]>
+      <template #[filterSlotName]>
         <BaseChipsInputField
           :id="'filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
@@ -59,20 +59,26 @@
           :input-class="filterSlotName === 'input-field-addition-before'
             ? '' : 'base-advanced-search-row__input-field'"
           :class="['base-advanced-search-row__first-column',
-                   { 'base-advanced-search-row__first-column__small':
-                     filterSlotName === 'input-field-addition-before' },
+                   {
+                     'base-advanced-search-row__first-column__small':
+                       filterSlotName === 'input-field-addition-before',
+                   },
                    'base-advanced-search-row__filter-input',
-                   { 'hide' : isMainSearch && filter
-                     [identifierPropertyName.filter] === defaultFilter
-                       [identifierPropertyName.filter] },
-                   { 'base-advanced-search-row__filter-input__date':
-                     filter.type.includes('date') }]"
+                   {
+                     hide: isMainSearch && filter
+                       [identifierPropertyName.filter] === defaultFilter
+                         [identifierPropertyName.filter],
+                   },
+                   {
+                     'base-advanced-search-row__filter-input__date':
+                       filter.type.includes('date'),
+                   }]"
           @click="isActive = true"
           @keydown="handleKeyDownEvent"
           @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
-          <template v-slot:chip="{ entry }">
+          <template #chip="{ entry }">
             <span
               :id="entry.idInt"
               :key="'chip-' + entry.idInt"
@@ -82,7 +88,7 @@
           </template>
         </BaseChipsInputField>
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <button
           v-if="!isMainSearch
             || filterHasValues"
@@ -98,7 +104,7 @@
       </template>
 
       <!-- DROP DOWN BODY -->
-      <template v-slot:below-input>
+      <template #below-input>
         <BaseDropDownList
           v-if="isActive"
           ref="dropDown"
@@ -119,12 +125,14 @@
           class="base-advanced-search-row__drop-down-body"
           @touchstart.native.stop=""
           @click.native.stop="">
-          <template v-slot:before-list>
+          <template #before-list>
             <div
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
-                       { 'base-advanced-search-row__above-list-area-filters':
-                         filter.type === 'text' || filter.type === 'chips' }]">
+                       {
+                         'base-advanced-search-row__above-list-area-filters':
+                           filter.type === 'text' || filter.type === 'chips',
+                       }]">
               <!-- FILTER SELECT LIST -->
               <div
                 class="base-advanced-search-row__filter-area-wrapper">
@@ -143,6 +151,7 @@
                   </div>
                   <span
                     class="base-advanced-search-row__filter-area-close"
+                    @keydown.enter="isActive = false"
                     @click="isActive = false">
                     <BaseIcon
                       class="rotate-180 base-advanced-search-row__filter-area-close-icon"
@@ -152,10 +161,14 @@
                 <div
                   :class="['base-advanced-search-row__columns',
                            'base-advanced-search-row__filter-list-wrapper',
-                           { 'base-advanced-search-row__filter-list-wrapper__fade-right':
-                             filterFade.right },
-                           { 'base-advanced-search-row__filter-list-wrapper__fade-left':
-                             filterFade.left }]">
+                           {
+                             'base-advanced-search-row__filter-list-wrapper__fade-right':
+                               filterFade.right,
+                           },
+                           {
+                             'base-advanced-search-row__filter-list-wrapper__fade-left':
+                               filterFade.left,
+                           }]">
                   <ul
                     :id="'filter-options-' + internalRowId"
                     ref="filterBox"
@@ -170,12 +183,17 @@
                         === singleFilter[identifierPropertyName.filter]).toString()"
                       tabindex="-1"
                       class="base-advanced-search-row__filter base-advanced-search-row__column-item"
-                      :class="[{ 'base-advanced-search-row__filter-active':
-                                 activeFilter === singleFilter },
-                               { 'base-advanced-search-row__filter-selected':
-                                 filter && filter[identifierPropertyName.filter]
-                                   === singleFilter[identifierPropertyName.filter] }]"
+                      :class="[{
+                                 'base-advanced-search-row__filter-active':
+                                   activeFilter === singleFilter,
+                               },
+                               {
+                                 'base-advanced-search-row__filter-selected':
+                                   filter && filter[identifierPropertyName.filter]
+                                     === singleFilter[identifierPropertyName.filter],
+                               }]"
                       role="option"
+                      @keydown.enter.stop="selectFilter(singleFilter)"
                       @click.stop="selectFilter(singleFilter)">
                       {{ `#${singleFilter[labelPropertyName.filter]}` }}
                     </li>
@@ -187,7 +205,7 @@
 
           <!-- AUTOCOMPLETE OPTIONS LIST -->
           <template
-            v-slot:option="slotProps">
+            #option="slotProps">
             <div
               v-if="!filter || useAutocompleteFunctionality"
               class="base-advanced-search-row__autocomplete-body">
@@ -213,7 +231,7 @@
                 class="base-advanced-search-row__autocomplete-options"
                 @update:active-option="setCollection(slotProps
                   .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption($event,slotProps
+                @update:selected-option="addOption($event, slotProps
                   .option[autocompletePropertyNames.id])" />
             </div>
           </template>
@@ -221,15 +239,17 @@
           <!-- CHIPS (CONTROLLED VOCABULARY OPTIONS) AREA -->
           <template
             v-if="filter.type === 'chips' && !filter.freetext_allowed"
-            v-slot:after-list>
+            #after-list>
             <div
               class="base-advanced-search-row__above-list-area
                  base-advanced-search-row__chips-area
                  base-advanced-search-row__area-padding">
               <div
                 :class="['base-advanced-search-row__chips-row',
-                         { 'base-advanced-search-row__chips-row__no-options':
-                           filter.type === 'chips' && !displayedOptions.length }]">
+                         {
+                           'base-advanced-search-row__chips-row__no-options':
+                             filter.type === 'chips' && !displayedOptions.length,
+                         }]">
                 <div
                   class="base-advanced-search-row__controlled-options-title
                          base-advanced-search-row__first-column">
@@ -254,7 +274,9 @@
                     tabindex="0"
                     class="base-advanced-search-row__column-item"
                     @mouseenter="activeControlledVocabularyEntry = chip"
-                    @mouseleave="activeControlledVocabularyEntry = null">
+                    @focusin="activeControlledVocabularyEntry = chip"
+                    @mouseleave="activeControlledVocabularyEntry = null"
+                    @focusout="activeControlledVocabularyEntry = null">
                     <BaseChip
                       :is-removable="false"
                       :entry="getLangLabel(chip[labelPropertyName.controlledVocabularyOption])"
@@ -300,12 +322,12 @@
             </div>
           </template>
           <template
-            v-slot:no-options>
+            #no-options>
             <div
               v-if="useAutocompleteFunctionality"
               :class="[
                 'base-advanced-search-row__no-options',
-                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality }
+                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality },
               ]">
               <div
                 v-if="!currentInput
@@ -1286,7 +1308,8 @@ export default {
         const currentIndex = this.displayedOptions.indexOf(this.activeControlledVocabularyEntry);
         this.activeControlledVocabularyEntry = this.navigate(
           this.displayedOptions,
-          isArrowDown, currentIndex,
+          isArrowDown,
+          currentIndex,
           true,
         );
         // else navigation is used for autocomplete options
@@ -1328,13 +1351,17 @@ export default {
           const currentEntryIndex = currentCollectionArray.indexOf(this.activeEntry);
           // check if the last or first entry of the options list is reached
           const isWithinListLimit = this.isWithinArrayLimit(
-            this.resultListInt, isArrowDown, currentCollectionIndex + numberToAdd,
+            this.resultListInt,
+            isArrowDown,
+            currentCollectionIndex + numberToAdd,
           );
           // check if collection select is active and if not if the arrow action is
           // within the limits of the array
           if (!this.collectionSelect
             && this.isWithinArrayLimit(
-              currentCollectionArray, isArrowDown, currentEntryIndex + numberToAdd,
+              currentCollectionArray,
+              isArrowDown,
+              currentEntryIndex + numberToAdd,
             )) {
             // set new active entry
             this.activeEntry = this.navigate(
@@ -1541,8 +1568,10 @@ export default {
         const searchElementWidth = searchElement.$el.clientWidth;
         // set a css variable that is responsible for the number of items
         // (subtract 1/4 of elementWidth because of first column): 180px is assumed for each column
-        this.$el.style.setProperty('--col-number',
-          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1);
+        this.$el.style.setProperty(
+          '--col-number',
+          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1,
+        );
       }
       // check if it was found
       if (searchRowElement) {

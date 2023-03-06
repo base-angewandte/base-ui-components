@@ -1,13 +1,17 @@
 <template>
   <div
     :class="['base-toggle',
-             {'base-toggle--checked': checkedInt },
-             {'base-toggle--disabled': disabled }]"
+             { 'base-toggle--checked': checkedInt },
+             { 'base-toggle--disabled': disabled }]"
+    @focusin="animate = true"
     @mouseover="animate = true"
+    @focusout="animate = false"
     @mouseleave="animate = false">
     <label
+      :for="`toggle-input-${idInt}`"
       class="base-toggle__container">
       <input
+        :id="`toggle-input-${idInt}`"
         v-model="checkedInt"
         :name="name"
         :checked="checkedInt"
@@ -16,9 +20,7 @@
         :aria-disabled="disabled"
         :type="'checkbox'"
         value=""
-        class="base-toggle__input"
-        @focus="animate = true"
-        @blur="animate = false">
+        class="base-toggle__input">
 
       <div class="base-switch">
         <span

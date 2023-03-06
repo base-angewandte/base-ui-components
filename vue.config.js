@@ -33,7 +33,8 @@ module.exports = {
       .loader('source-map-loader')
       .end();
 
-    // safari ignores the disable cache property for injected js files, so we add a hash for js files
+    // safari ignores the disable cache property for injected js files, so we add a hash
+    // for js files
     if (process.env.NODE_ENV === 'development') {
       config
         .output

@@ -16,7 +16,7 @@
           render-as="li"
           @expanded-state="emitExpandedState">
           <template
-            v-slot:content="props">
+            #content="props">
             <!-- @slot a slot to provide customized entry row -->
             <slot
               name="content"
@@ -78,7 +78,7 @@
       :has-background-color="false"
       icon="drop-down"
       icon-position="right"
-      :text="showAll ? showLessText: showMoreText"
+      :text="showAll ? showLessText : showMoreText"
       :class="{ 'base-button-icon-rotate-180': showAll }"
       @clicked="showAll = !showAll" />
   </div>

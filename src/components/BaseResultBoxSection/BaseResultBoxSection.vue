@@ -22,7 +22,7 @@
           :options-button-text="optionsButtonText"
           use-options-button-on="always"
           @update:show-options="optionsToggle">
-          <template v-slot:beforeOptions>
+          <template #beforeOptions>
             <!-- @slot add a custom header instead of headerText -->
             <slot name="header">
               <h3
@@ -35,7 +35,7 @@
 
           <!-- ACTIONS FOR BOXES -->
           <template
-            v-slot:options>
+            #options>
             <!-- @slot add custom option/action elements in the header row -->
             <slot
               name="optionButtons"
@@ -71,8 +71,10 @@
 
       <div
         :class="['base-result-box-section__background',
-                 { 'base-result-box-section__background--white':
-                   editModeWhiteBackground && editModeActive }]">
+                 {
+                   'base-result-box-section__background--white':
+                     editModeWhiteBackground && editModeActive,
+                 }]">
         <!-- MESSAGE AND FOLLOW UP ACTION AREA FOR EDIT MODE -->
         <!-- MESSAGE AREA -->
         <div
@@ -133,11 +135,14 @@
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
                        `base-result-box-section__box-item-${elementId}`,
-                       { 'base-result-box-section__result-box-item__draggable':
-                         draggable && editModeActive },
-                       { 'base-result-box-section__result-box-item__dragging':
-                         movableElementId === entry.id }]"
-              role="listitem"
+                       {
+                         'base-result-box-section__result-box-item__draggable':
+                           draggable && editModeActive,
+                       },
+                       {
+                         'base-result-box-section__result-box-item__dragging':
+                           movableElementId === entry.id,
+                       }]"
               @keydown.enter="onEnterKey($event, entry, index)"
               @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
                 ? moveEntry($event, index) : false"
@@ -192,7 +197,7 @@
                   box-style="small"
                   box-type="button"
                   :class="['base-result-box-section__box-item',
-                           `base-result-box-section__box-item-${elementId}`,]"
+                           `base-result-box-section__box-item-${elementId}`]"
                   @clicked="submitAction(action.value)" />
               </template>
             </slot>
@@ -204,9 +209,9 @@
               text=""
               box-type="button"
               :class="['base-result-box-section__box-item',
-                       `base-result-box-section__box-item-${elementId}`,]"
+                       `base-result-box-section__box-item-${elementId}`]"
               @clicked="expandedInt = !expandedInt">
-              <template v-slot>
+              <template #default>
                 <!-- needed to add v-if here again - otherwise strange side effects -->
                 <div
                   v-if="!editModeActive"
@@ -712,8 +717,10 @@ export default {
           // slice taking into account current pagination and the total number of
           // visible items
           return this.entryListInt
-            .slice((this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
-              this.currentPageNumberInt * this.visibleNumberOfItems);
+            .slice(
+              (this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
+              this.currentPageNumberInt * this.visibleNumberOfItems,
+            );
         }
         if (this.fetchDataExternally) {
           return this.entryList.slice(0, this.visibleNumberOfItems);
@@ -1162,9 +1169,11 @@ export default {
       if (resultBoxesElement) {
         // get the element width
         const totalWidth = resultBoxesElement.clientWidth;
+        // create a copy of the prop to avoid direct prop mutation
+        const boxBreakpointsCopy = [...this.boxBreakpoints];
         // calculate how many items should be displayed according to
         // breakpoints set
-        this.itemsPerRow = this.boxBreakpoints
+        this.itemsPerRow = boxBreakpointsCopy
           // then also sorting should not be necessary anymore (maybe keep to
           // be on the save side?
           .sort((a, b) => a[0] > b[0])

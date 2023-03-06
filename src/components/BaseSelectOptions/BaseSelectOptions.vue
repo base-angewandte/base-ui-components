@@ -1,7 +1,7 @@
 <template>
   <div
     class="base-select-options"
-    :style="{ '--direction': flexDirection}">
+    :style="{ '--direction': flexDirection }">
     <div class="base-select-options__number-selected">
       <slot name="selectedText">
         {{ `${numberSelected} ${selectedNumberText}` }}

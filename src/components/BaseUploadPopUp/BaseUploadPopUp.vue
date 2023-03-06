@@ -11,8 +11,11 @@
         <BaseIcon
           name="attention"
           class="icon base-uploader-user-warning-icon" />
-        {{ getI18nTerm(getLangLabel(uploadText.quotaExceeded), 1, {
-          space: convertSpace(userSpace) }) }}
+        {{ getI18nTerm(
+          getLangLabel(uploadText.quotaExceeded),
+          1,
+          { space: convertSpace(userSpace) }
+        ) }}
       </div>
 
       <div

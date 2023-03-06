@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
+import BaseTextList from '@/components/BaseTextList/BaseTextList';
 
 describe('BaseTextList', () => {
   const build = () => {

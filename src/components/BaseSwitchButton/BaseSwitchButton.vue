@@ -8,23 +8,23 @@
     </legend>
     <template
       v-for="(option, index) in options">
-      <input
-        :id="optionIds[index]"
-        :key="option.value + 'input'"
-        v-model="selectedOption"
-        :tabindex="option.value === selectedOption ? 0 : -1"
-        :checked="option.value === selectedOption"
-        :aria-checked="option.value === selectedOption"
-        :value="option.value"
-        :name="label"
-        :class="['hide', 'base-switch-button-input',
-                 { 'base-switch-button-input-active': option.value === selectedOption }]"
-        type="radio"
-        @keydown.enter.prevent="">
       <label
         :key="option.value + 'label'"
         :for="optionIds[index]"
-        class="base-switch-button-label">
+        :class="['base-switch-button__label',
+                 { 'base-switch-button__label__active': option.value === selectedOption }]">
+        <input
+          :id="optionIds[index]"
+          :key="option.value + 'input'"
+          v-model="selectedOption"
+          :tabindex="option.value === selectedOption ? 0 : -1"
+          :checked="option.value === selectedOption"
+          :aria-checked="option.value === selectedOption"
+          :value="option.value"
+          :name="label"
+          :class="['hide', 'base-switch-button__input']"
+          type="radio"
+          @keydown.enter.prevent="">
         {{ option.label }}
         <!-- @slot slot to display something right of text (e.g. icon) -->
         <slot
@@ -116,22 +116,19 @@ export default {
     line-height: $row-height-small;
   }
 
-  input.base-switch-button-input {
+  .base-switch-button__label {
+    cursor: pointer;
+    background-color: inherit;
+    padding: $spacing-small-half $spacing;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0);
 
-    & + .base-switch-button-label {
-      cursor: pointer;
-      background-color: inherit;
-      padding: $spacing-small-half $spacing;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0);
-    }
-
-    &.base-switch-button-input-active + .base-switch-button-label {
+    &.base-switch-button__label__active {
       border: $input-field-border;
       transition: border 0.2s ease;
     }
 
-    &:focus + .base-switch-button-label {
+    &:focus-within {
       border-bottom-color: $app-color;
     }
   }
@@ -140,10 +137,8 @@ export default {
     .base-switch-buttons {
       margin: $spacing-small 0;
 
-      input.base-switch-button-input {
-        & + label {
-          padding: $spacing-small $spacing;
-        }
+      input.base-switch-button__label {
+        padding: $spacing-small $spacing;
       }
     }
   }

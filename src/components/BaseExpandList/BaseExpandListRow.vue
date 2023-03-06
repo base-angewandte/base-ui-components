@@ -3,7 +3,8 @@
     :is="renderAs"
     :class="[{
       'base-expand': !edit,
-      'expanded': expanded }]">
+      expanded: expanded,
+    }]">
     <template
       v-if="!edit && dataInt.label">
       <button
@@ -48,7 +49,7 @@
             render-as="li"
             @expanded-state="emitExpandedState">
             <template
-              v-slot:content="dataNextLevel">
+              #content="dataNextLevel">
               <!-- @slot a slot to provide customized entry row in next level -->
               <slot
                 name="content"
@@ -64,8 +65,10 @@
       <div
         :class="['base-expand-item',
                  'base-expand-item--intend',
-                 { 'base-text-fade-out-left': fadeOutLeft,
-                   'base-text-fade-out': fadeOutRight }]">
+                 {
+                   'base-text-fade-out-left': fadeOutLeft,
+                   'base-text-fade-out': fadeOutRight,
+                 }]">
         <span
           ref="listItemScrollable"
           class="base-expand-item__col base-expand-item__label">
@@ -90,7 +93,7 @@
           class="base-expand-item__col base-expand-item__handle"
           @keydown.down.prevent.stop="moveItem('down')"
           @keydown.up.prevent.stop="moveItem('up')"
-          @keydown.enter.prevent.stop="movable =! movable"
+          @keydown.enter.prevent.stop="movable = !movable"
           @focus="supportiveText('activate')"
           @keyup.esc="cancelMovable"
           @blur="cancelMovable">
@@ -115,7 +118,7 @@
         <div class="base-expand-item__col base-expand-item__controls">
           <base-button
             v-if="controlType === 'button'"
-            :icon="itemVisible ? 'eye': 'eye-hide'"
+            :icon="itemVisible ? 'eye' : 'eye-hide'"
             :text="''"
             :has-background-color="false"
             :disabled="disabled"

@@ -2,6 +2,8 @@
   <span
     role="button"
     class="base-box-tooltip"
+    tabindex="0"
+    @keydown.enter="clicked"
     @click="clicked">
     <base-icon
       name="information"
@@ -48,8 +50,11 @@ export default {
       right: $spacing-small;
     }
 
-    &:hover {
+    &:hover, &:focus, &:active {
       color: $app-color;
+    }
+
+    &:hover {
       cursor: pointer;
     }
 

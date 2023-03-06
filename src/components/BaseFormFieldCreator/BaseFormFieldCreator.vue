@@ -35,7 +35,7 @@
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
-        source: field['x-attrs'].source
+        source: field['x-attrs'].source,
       })">
       <template
         #label-addition>
@@ -131,7 +131,7 @@
           :type="dateType.includes('timerange') ? dateType.includes('daterange')
             ? 'daterange' : 'single' : dateType"
           :date-format-labels="fieldProps.dateFormatLabels
-            || {date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
+            || { date: getI18nTerm('form.date'), year: getI18nTerm('form.year') }"
           :format-tabs-legend="fieldProps.formatTabsLegend || getI18nTerm('form.dateTabsLegend')"
           :language="language"
           :invalid="invalid || fieldProps.invalid"

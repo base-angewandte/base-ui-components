@@ -12,6 +12,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
+import terser from '@rollup/plugin-terser';
 // Copy files
 import copy from "rollup-plugin-copy";
 // Import JPG, PNG, GIF and SVG images.
@@ -22,7 +23,6 @@ import bundleSize from 'rollup-plugin-bundle-size';
 import css from 'rollup-plugin-css-only';
 // make sure external dependencies are not included in bundle
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import { terser } from 'rollup-plugin-terser';
 import minimist from 'minimist';
 
 // access package.json e.g. for version information
@@ -172,7 +172,7 @@ const mapComponent = name => ({
     ...baseConfig.plugins.preVue,
     bundleSize(),
     css({
-      output: `dist/components/${name}/${name}.css`,
+      output: `./dist/components/${name}/${name}.css`,
     }),
     vue({
       ...baseConfig.plugins.vue,

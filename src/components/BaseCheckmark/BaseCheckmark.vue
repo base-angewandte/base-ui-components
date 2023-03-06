@@ -1,6 +1,7 @@
 <template>
   <div
     :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
+    @keydown.enter.stop="clicked"
     @click.stop="clicked">
     <input
       :id="internalId"
@@ -8,21 +9,23 @@
       :name="label"
       :value="radioValueInt"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', {'base-checkbox-checked': checkedInt }]"
+      :class="['base-checkbox-input', { 'base-checkbox-checked': checkedInt }]"
       @keydown.enter.prevent="">
     <div
       :class="[
         'base-checkmark-container',
         'base-checkmark-container-' + checkBoxSize,
-        {'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
+        { 'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
       <base-icon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
         name="check-mark" />
     </div>
+    <!-- need to disable because label is there - it is just in BaseInput component -->
+    <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
     <label
       :for="internalId"
-      :class="['base-checkbox-labeltext', { 'hide': !showLabel }]">{{ label }}</label>
+      :class="['base-checkbox-labeltext', { hide: !showLabel }]">{{ label }}</label>
   </div>
 </template>
 

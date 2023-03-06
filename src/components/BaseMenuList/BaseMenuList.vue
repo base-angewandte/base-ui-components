@@ -1,7 +1,7 @@
 <template>
   <draggable
     ref="draggable"
-    v-model="list"
+    :value="list"
     :sort="false"
     :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
