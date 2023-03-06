@@ -21,6 +21,7 @@
           :class="['base-form-field',
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
+                   { 'base-form-field-top-margin': element.type === 'boolean' },
                    { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
           v-bind="formFieldComponentProps(element, index)"
           @field-value-changed="setFieldValue($event, element.name)"
@@ -53,14 +54,24 @@
           </template>
           <template #input-field-inline-before="{ fieldName }">
             <!-- @slot to add elements directly inline before the input
-                (contrary to input-field-addition-before this does not wrap<br>
-            for an example see [BaseInput](#baseinput)
-            @binding {string} fieldName - the name of the displayed field -->
+              (contrary to input-field-addition-before this does not wrap<br>
+              for an example see [BaseInput](#baseinput)
+              @binding {string} fieldName - the name of the displayed field -->
             <slot
               name="input-field-inline-before"
               :field-name="fieldName" />
+            <span
+              v-if="element['x-attrs'] && element['x-attrs'].text_before"
+              class="base-form-field__text-before">
+              {{ element['x-attrs'].text_before }}
+            </span>
           </template>
           <template #input-field-addition-after="{ fieldName }">
+            <span
+              v-if="element['x-attrs'] && element['x-attrs'].text_after"
+              class="base-form-field__text-after">
+              {{ element['x-attrs'].text_after }}
+            </span>
             <!-- @slot for adding elements after input
             @binding {string} fieldName - the name of the displayed field -->
             <slot
@@ -100,6 +111,7 @@
             :key="`${element.name}_${index}_${valueIndex}_${formId}_wrapper`"
             :class="['base-form-field',
                      { 'base-form-field__multiple__inline': multiplyButtonsInline(element) },
+                     { 'base-form-field__multiple__inline--has-title': valueIndex === 0 },
                      formFieldsHalf.indexOf(element) >= 0
                        ? 'base-form-field-half' : 'base-form-field-full',
                      { 'base-form-field-left-margin': isHalfFieldSecond(element)}]">
@@ -147,6 +159,11 @@
                   :index="valueIndex" />
               </template>
               <template #input-field-inline-before="{ fieldName }">
+                <span
+                  v-if="element['x-attrs'] && element['x-attrs'].text_before"
+                  class="base-form-field__text-before">
+                  {{ element['x-attrs'].text_before }}
+                </span>
                 <!-- @slot to add elements directly inline before the input
                     (contrary to input-field-addition-before this does not wrap<br>
                 for an example see [BaseInput](#baseinput)
@@ -158,6 +175,11 @@
                   :index="valueIndex" />
               </template>
               <template #input-field-addition-after="{ fieldName }">
+                <span
+                  v-if="element['x-attrs'] && element['x-attrs'].text_after"
+                  class="base-form-field__text-after">
+                  {{ element['x-attrs'].text_after }}
+                </span>
                 <!-- @slot for adding elements after input
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
@@ -291,6 +313,7 @@ const INDIVIDUAL_REPEATABLE_FIELDPROPS = [
   'isLoading',
   'linkedListOption',
   'activeTab',
+  'validationTexts',
 ];
 
 export default {
@@ -419,6 +442,25 @@ export default {
     renderHeaderAs: {
       type: String,
       default: 'div',
+    },
+    /**
+     * define validation texts to be displayed below form field if input is invalid<br>
+     * for an example see [BaseInput](#baseinput)
+     */
+    validationTexts: {
+      type: Object,
+      default: () => ({
+        text: {
+          min: 'Value must be greater than or equal to {value}.',
+          max: 'Value must be less than or equal to {value}.',
+          minLength: 'Text must be at least {value} character(s) long.',
+          maxLength: 'Text cannot be longer than {value} characters.',
+        },
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['text'].every(prop => Object.keys(val).includes(prop))
+        && ['min', 'max', 'minLength', 'maxLength']
+          .every(prop => Object.keys(val.text).includes(prop)),
     },
   },
   data() {
@@ -691,6 +733,7 @@ export default {
           ? this.$props : null,
         clearable: this.clearable,
         showErrorIcon: this.showErrorIcon,
+        validationTexts: singleFieldProps.validationTexts || this.validationTexts,
       };
     },
     setFieldValue(value, fieldName, index) {
@@ -791,7 +834,7 @@ export default {
     .base-form__body {
       background-color: white;
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       flex-wrap: wrap;
       padding: $spacing $spacing 0;
 
@@ -810,6 +853,10 @@ export default {
 
       .base-form-field-left-margin {
         margin-left: $spacing;
+      }
+
+      .base-form-field-top-margin {
+        margin-top: $line-height + $spacing-small;
       }
 
       .group-multiply {
@@ -849,9 +896,23 @@ export default {
     }
   }
 
+  .base-form-field__text-before {
+    margin-right: $spacing-small;
+  }
+
+  .base-form-field__text-after {
+    margin-left: $spacing-small;
+  }
+
   .base-form-field__multiple__inline {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
+
+    &.base-form-field__multiple__inline--has-title {
+      .base-form__inline-icons {
+        margin-top: $line-height + $spacing-small;
+      }
+    }
 
     .base-form-field__multiple__inline-element {
       flex: 1 1 auto;

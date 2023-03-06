@@ -26,7 +26,7 @@
       :class="['base-input__input-frame',
                { 'base-input__input-frame__border': showInputBorder },
                { 'base-input__input-frame__disabled': disabled },
-               { 'base-input__input-frame__invalid': invalid }]"
+               { 'base-input__input-frame__invalid': invalidInt }]"
       @focusin="clickedInside"
       @click="clickedInside">
       <!-- one class __active for pseudo-class :focus-within, one class __is-active
@@ -71,15 +71,18 @@
                   ref="input"
                   v-model="inputInt"
                   :placeholder="placeholder"
-                  :type="fieldType"
+                  :type="fieldType === 'number' ? 'text' : fieldType"
                   :list="dropDownListId || false"
                   :disabled="disabled"
                   :aria-disabled="disabled.toString()"
                   :aria-activedescendant="linkedListOption"
                   :aria-describedby="idInt"
                   :aria-required="required.toString()"
-                  :required="required.toString()"
-                  :aria-invalid="invalid.toString()"
+                  :required="required"
+                  :aria-invalid="invalidInt.toString()"
+                  :minlength="minLength"
+                  :maxlength="maxLength"
+                  :inputmode="fieldType === 'number' && allowNegativeNumber ? 'decimal': null"
                   autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
@@ -112,7 +115,7 @@
           </div>
         </div>
         <div
-          v-if="showErrorIcon && invalid"
+          v-if="showErrorIcon && invalidInt"
           class="base-input__error-icon-wrapper">
           <!-- @slot use a custom icon instead of standard error/warning icon -->
           <slot name="error-icon">
@@ -133,9 +136,9 @@
       <slot name="below-input" />
     </div>
     <div
-      v-if="invalid && errorMessage"
+      v-if="invalidInt && errorMessageInt"
       class="base-input__invalid-message">
-      {{ getLangLabel(errorMessage) }}
+      {{ getLangLabel(errorMessageInt) }}
     </div>
   </div>
 </template>
@@ -205,7 +208,7 @@ export default {
       default: 'Enter Text Here',
     },
     /**
-     * mark as required field (currently only used for aria-required)
+     * mark as required field
      */
     required: {
       type: Boolean,
@@ -348,11 +351,73 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set min length of characters
+     */
+    minLength: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * set max length of characters
+     */
+    maxLength: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * set number of decimals (fieldType=number)<br>
+     * Note: -1 is used for endless decimals
+     */
+    decimals: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * set decimal separator character, e.g. ',' for german
+     */
+    decimalSeparator: {
+      type: String,
+      default: '.',
+    },
+    /**
+     * set minimum value to accept
+     */
+    min: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * set maximum value to accept
+     */
+    max: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * define validation messages
+     * currently just for type number
+     */
+    validationTexts: {
+      type: Object,
+      default: () => ({
+        min: 'Value must be greater than or equal to {value}.',
+        max: 'Value must be less than or equal to {value}.',
+        minLength: 'Text must be at least {value} character(s) long.',
+        maxLength: 'Text cannot be longer than {value} characters.',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['min', 'max', 'minLength', 'maxLength']
+        .every(prop => Object.keys(val).includes(prop)),
+    },
   },
   data() {
     return {
       isActiveInt: false,
       inputInt: '',
+      previousInput: '',
+      errorMessageInt: '',
+      invalidInt: '',
     };
   },
   computed: {
@@ -390,34 +455,115 @@ export default {
         ...this.$listeners,
         // and add custom listeners
         ...{
-          // for number fields: prevent the event if type is number (or e) but input is not
-          keydown: (event) => {
-            if (this.fieldType === 'number' && Number.isNaN(Number(event.key))
-              && !['e', 'ArrowLeft', 'ArrowRight', 'Backspace', 'Delete', 'Tab'].includes(event.key)) {
-              event.preventDefault();
-            } else {
-              /**
-               * keydown event, modified to have identical behaviour
-               * across browsers for number input
-               *
-               * @event keydown
-               * @param {KeyboardEvent} event
-               *
-               */
-              this.$emit('keydown', event);
-            }
-          },
+          // for number fields: filter characters except numbers, decimals, negative values, e
           input: (event) => {
+            let { value } = event.target;
+
+            // clear errorMessage
+            this.errorMessageInt = '';
+            this.invalidInt = false;
+
+            // Handle number inputs with input field type text.
+            // Use a regular expression to validate the number format.
+            // Invalid entries are restored with the previous valid value.
+            if (this.fieldType === 'number') {
+              const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
+              const bannedChars = new RegExp(`[^e0-9${decimalSeparator}\\+-]`, 'g');
+              const decimals = this.decimals && this.decimals !== Number('-1') ? `{0,${this.decimals}}` : '*';
+              const negativeNumber = this.allowNegativeNumber ? '-?' : '';
+              const eMinus = this.decimals && this.decimals !== Number('-1') ? '-' : '';
+              // pattern to match number: ^((-?[0-9]+(,|\.)?[0-9]{0,2}(e(-|\+)?[0-9]*)?)|-)$
+              // allow: optional -, numbers, optional decimal separator, e, optional +|-, numbers
+              const pattern = new RegExp(`^((${negativeNumber}[0-9]*${decimalSeparator}?([0-9]${decimals})(e(${eMinus}|\\+)?[0-9]*)?)|-)$`, 'g');
+              // dot or comma are allowed as decimal separators
+              // translate them beforehand
+              value = value.replace(',', this.decimalSeparator);
+              value = value.replace('.', this.decimalSeparator);
+              // remove banned characters
+              value = value.replace(bannedChars, '');
+              // remove multiple special characters
+              value = this.removeMultipleChars(value, this.decimalSeparator);
+              value = this.removeMultipleChars(value, 'e');
+              // update input
+              this.inputInt = value;
+              // round and crop decimals if decimals set
+              if (this.decimals && !Number.isNaN(Number(value))) {
+                value = this.roundDecimals(value);
+                this.inputInt = value;
+              }
+              // validate number format
+              if (value !== '' && !value.match(pattern)) {
+                this.inputInt = this.previousInput;
+                return;
+              }
+              // handle min values
+              if (this.min && value && Number(this.stringToFloat(value)) < this.min) {
+                this.errorMessageInt = this.validationTexts.min.replace('{value}', this.min.toString());
+                this.invalidInt = true;
+                return;
+              }
+              // handle max values
+              if (this.max && Number(this.stringToFloat(value)) > this.max) {
+                this.errorMessageInt = this.validationTexts.max.replace('{value}', this.max.toString());
+                this.invalidInt = true;
+                return;
+              }
+              // reset infinite values
+              if (Number(this.stringToFloat(value)) === Infinity) {
+                value = 0;
+                this.inputInt = value;
+              }
+              // do not emit cases which would be NaN
+              if (this.inputIsNaN(value)) {
+                return;
+              }
+              // store input to use/reset if validation fails
+              this.previousInput = value;
+              // format number
+              value = this.stringToFloat(value);
+            }
+
+            if (this.fieldType !== 'number') {
+              // handle min length
+              if (this.minLength && value && value.length < this.minLength) {
+                this.errorMessageInt = this.validationTexts.minLength.replace('{value}', this.minLength.toString());
+                this.invalidInt = true;
+                return;
+              }
+              // handle max length
+              if (this.maxLength && value.length > this.maxLength) {
+                this.errorMessageInt = this.validationTexts.maxLength.replace('{value}', this.maxLength.toString());
+                this.invalidInt = true;
+                return;
+              }
+            }
+
             /**
-             * Event emitted on input, passing input string
-             *
-             * @event input
-             * @param {string} value - the input event value however
-             * passing only the event.target.value
-             *
-             */
-            this.$emit('input', this.fieldType === 'number'
-              ? Number(event.target.value) : event.target.value);
+              * Event emitted on input, passing input string
+              *
+              * @event input
+              * @param {string} value - the input event value however
+              * passing only the event.target.value
+              *
+              */
+            this.$emit('input', value);
+          },
+          blur: (event) => {
+            const { value } = event.target;
+
+            if (this.fieldType === 'number') {
+              // clear value and return if value is NaN
+              if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
+                this.inputInt = '';
+                this.previousInput = '';
+                return;
+              }
+              // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
+              this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
+              // also update previous input so there are no funny effects if a type an
+              // invalid character after blur
+              this.previousInput = this.inputInt;
+            }
           },
         },
       };
@@ -444,6 +590,13 @@ export default {
       }
       return null;
     },
+    /**
+     * determines if a negative number|float is allowed
+     * @returns {boolean}
+     */
+    allowNegativeNumber() {
+      return this.min === null || this.min < 0;
+    },
   },
   watch: {
     /**
@@ -451,8 +604,14 @@ export default {
      */
     input: {
       handler(val) {
-        if (val !== this.inputInt) {
-          this.inputInt = val;
+        const data = this.fieldType === 'number'
+          ? this.translateFloat(val) : val;
+
+        if (data !== this.inputInt) {
+          this.inputInt = data;
+          this.previousInput = data;
+          // trigger input event to validate changes from parent (also initial value)
+          this.triggerInputEvent();
         }
       },
       immediate: true,
@@ -463,10 +622,20 @@ export default {
      * @param {string} val
      */
     inputInt(val) {
+      let data = val;
+
+      if (this.fieldType === 'number') {
+        // do not emit cases which would be NaN
+        if (this.inputIsNaN(data)) {
+          return;
+        }
+        // format value
+        data = this.stringToFloat(data);
+      }
       // check if the internal input element exists and if values are in sync
-      if (val !== this.input) {
+      if (data !== this.input) {
         // if not propagate change to parent
-        this.$emit('input', val);
+        this.$emit('input', data);
       }
     },
     /**
@@ -496,6 +665,44 @@ export default {
         this.$emit('update:is-active', val);
       }
     },
+    /**
+     * keep externally set errorMessage variable and internal errorMessage variable in sync
+     * @param {string} val
+     */
+    errorMessage(val) {
+      if (val !== this.errorMessageInt) {
+        this.errorMessageInt = val;
+      }
+    },
+    /**
+     * keep externally set invalid variable and internal invalid variable in sync
+     * @param {boolean} val
+     */
+    invalid(val) {
+      if (val !== this.invalidInt) {
+        this.invalidInt = val;
+      }
+    },
+    /**
+     * keep externally set invalid variable and internal invalid variable in sync
+     * @param {boolean} val
+     */
+    invalidInt(val) {
+      if (val !== this.invalid) {
+        /**
+         * propagate invalid state changes of input field to parent
+         * @event update:invalid
+         * @param {boolean} val
+         */
+        this.$emit('update:invalid', val);
+      }
+    },
+  },
+  mounted() {
+    // handle max value of initial input
+    if (this.max && Number(this.stringToFloat(this.input)) > this.max) {
+      this.inputInt = this.max;
+    }
   },
   methods: {
     /**
@@ -564,6 +771,77 @@ export default {
         this.setFieldState(false);
       }
       this.$emit('keydown', event);
+    },
+    /**
+     * replace dot with decimalSeparator
+     *
+     * @param {number} value
+     * @returns {string}
+     */
+    translateFloat(value) {
+      if (value == null) return '';
+      return value.toString().replace('.', this.decimalSeparator);
+    },
+    /**
+     * replace decimalSeparator with dot
+     *
+     * @param {string} value
+     * @returns {number}
+     */
+    stringToFloat(value) {
+      // number('') would be 0, so we leave it empty if necessary
+      return value ? Number(value.toString().replace(this.decimalSeparator, '.')) : '';
+    },
+    /**
+     * check if input would not be a valid number
+     *
+     * @param {string} value
+     * @returns {boolean}
+     */
+    inputIsNaN(value) {
+      const ds = this.decimalSeparator;
+      // eg: -|-,|-0|-0,0|1,|11,|-1,
+      const pattern = new RegExp(`^(-0|-?(([0-9]*\\${ds}([0]*)?)?|(\\${ds}([0-9]*)?)?))$`, 'g');
+      return value.length
+        && (value.toString().match(pattern) || Number.isNaN(this.stringToFloat(value)));
+    },
+    /**
+     * trigger input event
+     * e.g. to validate input changes from parent
+     */
+    triggerInputEvent() {
+      // Todo: find other solution to wait until inputInt has really changed
+      setTimeout(() => {
+        if (this.$refs.input) {
+          this.$refs.input.dispatchEvent(new Event('input'));
+        }
+      }, 0);
+    },
+    /**
+     * crop and round decimals if needed
+     * eg allowed decimals: 2 <br>
+     *   * 12.5e-2 => 0.125 => 0.12
+     *   * 0.01e-1 => 0.001 => 0
+     * @param value
+     * @returns {string}
+     */
+    roundDecimals(value) {
+      const chunks = value.split(this.decimalSeparator);
+      if (chunks[1] && chunks[1].length > this.decimals) {
+        return this.translateFloat(Number(Number(value).toFixed(this.decimals)));
+      }
+      return value;
+    },
+    /**
+     * remove multiple given character except first occurrence
+     * @param {String} value
+     * @param {String} char
+     * @returns {string}
+     */
+    removeMultipleChars(value, char) {
+      const pattern = new RegExp(`\\${char}`, 'g');
+      // eslint-disable-next-line
+      return value.replace(pattern, (c, i, text) => text.indexOf(c) === i ? c : '');
     },
   },
 };

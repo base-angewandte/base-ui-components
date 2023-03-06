@@ -1392,6 +1392,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+    position: relative;
 
     .base-date-input__label-row {
       display: flex;
@@ -1413,6 +1414,15 @@ export default {
       .base-date-input__format-tabs {
         align-self: center;
         flex-shrink: 0;
+        position: absolute;
+        right: 0;
+        top: -$spacing-small;
+
+        @media screen and (max-width: $mobile) {
+          position: inherit;
+          right: inherit;
+          top: inherit;
+        }
       }
     }
 
