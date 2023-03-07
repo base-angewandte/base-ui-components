@@ -56,55 +56,16 @@ export default {
 }
 .preview-code .prism-editor-wrapper {
   color: white;
-  padding: 0;
-}
-.preview-code .prism-editor-wrapper .prism-editor__textarea,
-.preview-code .prism-editor-wrapper .prism-editor__editor {
-  padding: 20px;
 }
 
 .editor {
   position: relative;
+  padding: 12px;
 }
 
 .editor__button {
   width: 150px;
-}
-
-.prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea {
-  margin: 0;
-  border: 0;
-  background-color: #282c34;
-  box-sizing: inherit;
-  display: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  font-style: inherit;
-  font-variant-ligatures: inherit;
-  font-weight: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-  tab-size: inherit;
-  text-indent: inherit;
-  text-rendering: inherit;
-  text-transform: inherit;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  padding: 0;
-}
-
-.prism-editor-wrapper .prism-editor__textarea {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  resize: none;
-  color: inherit;
-  overflow: hidden;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
 }
 
 @media only screen and (max-width: 568px) {

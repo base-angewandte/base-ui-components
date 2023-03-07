@@ -26,12 +26,16 @@ ul
 li
   list-style disc
 
+.go-to-top
+  bottom 4.5rem !important
+  right 1rem !important
+
 // leaflet is setting a tile z-index of 1000 so in order to prevent map overlaying sidebar
 .sidebar
   z-index 1001
 
-.sidebar li
-  list-style none
+.navbar
+  z-index 1002
 
 .home .hero img
   max-width 450px!important
@@ -41,6 +45,7 @@ li
 
 .prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea
   background #282c34 !important
+  padding 4px !important
 
 // need to overwrite vuepress css! :(((
 .preview table
@@ -62,11 +67,11 @@ li
 .preview p, .preview ul, .preview ol
   line-height unset
 
-.preview ul, .preview ol
+.preview ul, .preview ol, .suggestions
   padding-left unset
   color inherit
   list-style-type none
 
-.preview li {
+.preview li, .suggestion, .sidebar li {
   list-style none
 }
