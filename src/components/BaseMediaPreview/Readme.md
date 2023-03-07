@@ -15,6 +15,10 @@ Image View Box
       :display-size="{ 'max-width': '100%' }"
       :show-preview="showPreview"
       :media-url="getImgUrl"
+      :previews="[
+        { '640w': 'https://picsum.photos/seed/random/640/541.jpg' },
+        { '1024w': 'https://picsum.photos/seed/random/1024/741.jpg' },
+      ]"
       @hide-preview="showPreview = false"/>
 </div>
 </template>
@@ -29,7 +33,7 @@ export default {
   computed: {
     getImgUrl() {
       /* eslint-disable-next-line */
-      const url = 'https://placeimg.com/640/400/arch/grayscale';
+      const url = 'https://picsum.photos/seed/random/640/400';
       return url;
     },
   },
@@ -95,7 +99,7 @@ An video example
         :display-size="{}"
         display-name="Taken from https://test-streams.mux.dev"
         media-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-        media-poster-url="https://placeimg.com/1920/1200/arch.jpg"
+        media-poster-url="https://picsum.photos/seed/video/1920/1200"
         @hide-preview="showPreview = false"/>
   </div>
 </template>

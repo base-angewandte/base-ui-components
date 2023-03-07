@@ -31,18 +31,18 @@ export default {
       media: [
         {
           title: 'Image',
-          additionalInfo: ['Taken from: https://placeimg.com/1260/800/arch.jpg'],
-          mediaUrl: 'https://placeimg.com/1260/800/arch.jpg',
-          mediaUrlSmall: 'https://placeimg.com/400/300/arch.jpg',
+          additionalInfo: ['Taken from: https://picsum.photos'],
+          mediaUrl: 'https://picsum.photos/seed/firstimage/1260/800.jpg',
+          mediaUrlSmall: 'https://picsum.photos/seed/firstimage/400/300.jpg',
         },
         {
           title: 'Image',
           additionalInfo: [
-              'Taken from: https://placeimg.com/1260/800/arch.jpg',
+              'Taken from: https://picsum.photos',
               'Archive Id: 6548976543156498'
           ],
-          mediaUrl: 'https://placeimg.com/800/1260/arch.jpg',
-          mediaUrlSmall: 'https://placeimg.com/400/300/arch.jpg',
+          mediaUrl: 'https://picsum.photos/seed/anotherimage/1260/800.jpg',
+          mediaUrlSmall: 'https://picsum.photos/seed/anotherimage/400/300.jpg',
         },
         {
           title: 'Video',
@@ -51,7 +51,8 @@ export default {
             'Archive Id: A987s4e1fsffeABXX57',
           ],
           mediaUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          mediaPosterUrl: 'https://placeimg.com/1200/650/arch.jpg',
+          mediaPosterUrl: 'https://picsum.photos/seed/video/1200/650.jpg',
+          mediaUrlSmall: 'https://picsum.photos/seed/video/400/300.jpg',
           displaySize: { 'width': '100%', 'max-width': '1000px' },
         },
         {

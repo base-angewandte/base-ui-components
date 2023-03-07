@@ -147,7 +147,7 @@ export default {
           subtext: 'A subtext',
           description: 'Collaboration',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8vvvb3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzR4gfTLM4dJR',
@@ -156,7 +156,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzR4gfTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3123lllzRTLM4dJR',
@@ -165,7 +165,7 @@ export default {
           subtext: 'A subtext',
           description: 'Article',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3123lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3l323llzRTLM4dJR',
@@ -174,7 +174,7 @@ export default {
           subtext: 'A subtext',
           description: 'Scientific Paper',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3l323llzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzRTfgsdfgggggLM4dJR',
@@ -183,7 +183,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzRTfgsdfgggggLM4dJR/460/341',
         },
         {
           id: 'pCSLggvds3222i8b3lllzRTLM4dJR',
@@ -192,7 +192,7 @@ export default {
           subtext: 'Difference is the key',
           description: 'Performance & Art',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvds3222i8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllz444RTLM4dJR',
@@ -201,7 +201,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllz444RTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllz777RTLM4dJR',
@@ -210,7 +210,7 @@ export default {
           subtext: 'A subtext',
           description: 'Workshop',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllz777RTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b0003lllzRTLM4dJR',
@@ -219,7 +219,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b0003lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllz789RTLM4dJR',
@@ -228,7 +228,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllz789RTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsirtz8b3lllzRTLM4dJR',
@@ -237,7 +237,7 @@ export default {
           subtext: 'A subtext',
           description: 'Mission',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/nature',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsirtz8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3l456llzRTLM4dJR',
@@ -246,7 +246,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3l456llzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzRT456LM4dJR',
@@ -255,7 +255,7 @@ export default {
           subtext: 'A subtext',
           description: 'Conference',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzRT456LM4dJR/460/341',
         },
         {
           id: 'pCSLgg234vdsi8b3lllzRTLM4dJR',
@@ -264,7 +264,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLgg234vdsi8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzRTLM4dJR',
@@ -273,7 +273,7 @@ export default {
           subtext: 'A subtext',
           description: 'Exhibition',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/nature',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3zRdddTLM4dJR',
@@ -282,7 +282,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3zRdddTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8bbbb3zRTLM4dJR',
@@ -291,7 +291,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8bbbb3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8oiouiob3zRTLM4dJR',
@@ -300,7 +300,7 @@ export default {
           subtext: 'A subtext',
           description: 'Exhibition',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8oiouiob3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggasdfvdsi8b3zRTLM4dJR',
@@ -309,7 +309,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggasdfvdsi8b3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8asdb3zRTLM4dJR',
@@ -318,7 +318,7 @@ export default {
           subtext: 'A subtext',
           description: 'Master Work',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/nature',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8asdb3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8ffsdb3zRTLM4dJR',
@@ -327,7 +327,7 @@ export default {
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8ffsdb3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
@@ -336,7 +336,7 @@ export default {
           subtext: 'A different long subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -344,7 +344,7 @@ export default {
           title: 'Unknown',
           subtext: 'Lets find it out and look deeper',
           description: 'Bachelor',
-          imageUrl: 'https://placeimg.com/460/341/animal',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsiasdf8b3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
@@ -538,7 +538,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/nature',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8b3zRTLM4dJR/460/341',
           },
         },
         {
@@ -555,7 +555,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/animals',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8b3zRThhhhLM4dJR/460/341',
           },
         },
         {
@@ -572,7 +572,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/people',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8ffffb3zRTLM4dJR/460/341',
           },
         },
         {
@@ -588,7 +588,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/animal',
+            image: 'https://picsum.photos/seed/pCSLggvdsiasdf8b3zRTLM4dJR/460/341',
           },
         },
         {
@@ -605,7 +605,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/tech',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8b3fffzRTLM4dJR/460/341',
           },
         },
     ],

@@ -42,6 +42,17 @@ export default {
           subtext: 'Subtitle',
           description: 'Austellung 1',
           href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://picsum.photos/seed/firstonex/460/341',
+            },
+            {
+              '640w': 'https://picsum.photos/seed/firstonex/640/480',
+            },
+            {
+              '768w': 'https://picsum.photos/seed/firstonex/768/576',
+            },
+          ],
         },
         {
           title: 'Title',
@@ -51,13 +62,13 @@ export default {
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '460w': 'https://placeimg.com/460/341/tech',
+              '460w': 'https://picsum.photos/seed/tech/460/341',
             },
             {
-              '640w': 'https://placeimg.com/640/480/tech',
+              '640w': 'https://picsum.photos/seed/tech/640/480',
             },
             {
-              '768w': 'https://placeimg.com/768/576/tech',
+              '768w': 'https://picsum.photos/seed/tech/768/576',
             },
           ],
         },
@@ -68,13 +79,13 @@ export default {
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '460w': 'https://placeimg.com/460/341/nature',
+              '460w': 'https://picsum.photos/seed/exhibition/460/341',
             },
             {
-              '640w': 'https://placeimg.com/640/480/nature',
+              '640w': 'https://picsum.photos/seed/exhibition/640/480',
             },
             {
-              '768w': 'https://placeimg.com/768/576/nature',
+              '768w': 'https://picsum.photos/seed/exhibition/768/576',
             },
           ],
         },
@@ -86,13 +97,13 @@ export default {
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '460w': 'https://placeimg.com/460/341/animal',
+              '460w': 'https://picsum.photos/seed/moreexhibitions/460/341',
             },
             {
-              '640w': 'https://placeimg.com/640/480/animal',
+              '640w': 'https://picsum.photos/seed/moreexhibitions/640/480',
             },
             {
-              '768w': 'https://placeimg.com/768/576/animal',
+              '768w': 'https://picsum.photos/seed/moreexhibitions/768/576',
             },
           ],
         },
@@ -104,33 +115,22 @@ export default {
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '460w': 'https://placeimg.com/460/341/people',
+              '460w': 'https://picsum.photos/seed/nothing/460/341',
             },
             {
-              '640w': 'https://placeimg.com/640/480/people',
+              '640w': 'https://picsum.photos/seed/nothing/640/480',
             },
             {
-              '768w': 'https://placeimg.com/768/576/people',
+              '768w': 'https://picsum.photos/seed/nothing/768/576',
             },
           ],
         },
         {
           title: 'Title',
-          subtext: 'Subtitle',
+          subtext: 'An item with no images',
           description: 'Austellung',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
-          previews: [
-            {
-              '460w': 'https://placeimg.com/461/341/arch',
-            },
-            {
-              '640w': 'https://placeimg.com/641/480/arch',
-            },
-            {
-              '768w': 'https://placeimg.com/769/576/arch',
-            },
-          ],
         },
       ],
     };

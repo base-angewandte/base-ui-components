@@ -103,7 +103,7 @@ export default {
   },
   computed: {
     imgUrl() {
-      return 'https://placeimg.com/460/341/arch';
+      return 'https://picsum.photos/seed/arch/460/341';
     },
   },
   methods: {
