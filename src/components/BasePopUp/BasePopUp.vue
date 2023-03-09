@@ -84,8 +84,8 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseLoader: () => import('../BaseLoader/BaseLoader'),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   mixins: [popUpLock],
   props: {

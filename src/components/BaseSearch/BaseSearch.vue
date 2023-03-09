@@ -93,10 +93,10 @@ import { createId } from '@/utils/utils';
 export default {
   name: 'BaseSearch',
   components: {
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
-    BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField'),
-    BaseInput: () => import('../BaseInput/BaseInput'),
-    BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
+    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
+    BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField').then(m => m.default || m),
+    BaseInput: () => import('../BaseInput/BaseInput').then(m => m.default || m),
+    BaseDateInput: () => import('../BaseDateInput/BaseDateInput').then(m => m.default || m),
   },
   model: {
     prop: 'input',

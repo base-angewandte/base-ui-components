@@ -176,7 +176,7 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseForm',
   components: {
-    BaseFormFieldCreator: () => import('../BaseFormFieldCreator/BaseFormFieldCreator'),
+    BaseFormFieldCreator: () => import('../BaseFormFieldCreator/BaseFormFieldCreator').then(m => m.default || m),
     BaseIcon,
   },
   mixins: [i18n],

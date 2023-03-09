@@ -135,8 +135,8 @@ export default {
   name: 'BaseMedia',
   components: {
     BaseLoader,
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {

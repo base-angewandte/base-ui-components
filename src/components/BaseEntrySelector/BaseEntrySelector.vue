@@ -176,13 +176,13 @@ import i18n from '@/mixins/i18n';
 export default {
   name: 'BaseEntrySelector',
   components: {
-    BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
-    BaseLoader: () => import('../BaseLoader/BaseLoader'),
-    BaseMenuList: () => import('../BaseMenuList/BaseMenuList'),
-    BaseOptions: () => import('../BaseOptions/BaseOptions'),
-    BasePagination: () => import('../BasePagination/BasePagination'),
-    BaseSearch: () => import('../BaseSearch/BaseSearch'),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions'),
+    BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
+    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
+    BaseMenuList: () => import('../BaseMenuList/BaseMenuList').then(m => m.default || m),
+    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
+    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
+    BaseSearch: () => import('../BaseSearch/BaseSearch').then(m => m.default || m),
+    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {

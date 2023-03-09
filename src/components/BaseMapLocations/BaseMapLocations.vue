@@ -61,7 +61,7 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList';
 export default {
   name: 'BaseMapLocations',
   components: {
-    BaseMap: () => import('../BaseMap/BaseMap'),
+    BaseMap: () => import('../BaseMap/BaseMap').then(m => m.default || m),
     BaseTextList,
   },
   props: {
