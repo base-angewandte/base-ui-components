@@ -62,9 +62,10 @@ import Swiper, { Navigation, Lazy, Keyboard } from 'swiper';
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
-
-// init swiper plugins
-Swiper.use([Navigation, Lazy, Keyboard]);
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/css';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/css/navigation';
 
 /**
  * Component allowing sliding through images,
@@ -203,6 +204,7 @@ export default {
         // Threshold value in px.
         // If "touch distance" will be lower than this value then swiper will not move
         threshold: 10,
+        modules: [Navigation, Lazy, Keyboard],
       };
 
       this.swiper = new Swiper(`#${this.swiperId}`, {
@@ -348,8 +350,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/swiper.scss";
-  @import "swiper/components/navigation/navigation.scss";
 
   .base-media-carousel {
     position: fixed;

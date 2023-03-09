@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="base-carousel swiper-container">
+      class="base-carousel swiper">
       <div
         class="swiper-wrapper">
         <div
@@ -49,8 +49,16 @@ import 'lazysizes';
 import Swiper, { Autoplay, Keyboard, Navigation, Pagination } from 'swiper';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
-
-Swiper.use([Autoplay, Keyboard, Navigation, Pagination]);
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/scss';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/scss/navigation';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/scss/pagination';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/scss/autoplay';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import 'swiper/scss/keyboard';
 
 export default {
   name: 'BaseCarousel',
@@ -114,7 +122,10 @@ export default {
     swiperOptions: {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.swiperOptionsInt)) {
-          this.swiperOptionsInt = JSON.parse(JSON.stringify(val));
+          this.swiperOptionsInt = {
+            ...this.swiperOptionsInt,
+            ...JSON.parse(JSON.stringify(val)),
+          };
         }
       },
       immediate: true,
@@ -152,6 +163,7 @@ export default {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       };
+      this.swiperOptionsInt.modules = [Autoplay, Keyboard, Navigation, Pagination];
 
       setTimeout(() => {
         this.swiper = new Swiper('.swiper-container', this.swiperOptionsInt);
@@ -181,7 +193,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/swiper.scss";
 
   .base-carousel {
     max-width: 1400px;
