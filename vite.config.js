@@ -52,7 +52,6 @@ export default defineConfig({
     },
   },
   build: {
-    cssCodeSplit: true,
     minify: true,
     sourcemap: true,
     lib: {
@@ -77,7 +76,7 @@ export default defineConfig({
           swiper: 'Swiper',
         },
         preserveModules: true,
-        preserveModulesRoot: 'lib',
+        preserveModulesRoot: 'src',
       },
     },
   },
