@@ -86,7 +86,7 @@ export default defineConfig({
           'leaflet.markercluster': 'leaflet.markercluster',
         },
         preserveModules: true,
-        // preserveModulesRoot: 'lib',
+        preserveModulesRoot: 'src',
       },
     },
   },
