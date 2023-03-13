@@ -26,6 +26,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
   <div>
     <BaseInput
       id="withslot"
+      :key="'input_' + key"
       v-model="input"
       :invalid="invalid"
       :disabled="disabled"
@@ -38,6 +39,12 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
       :show-error-icon="showErrorIcon"
       :field-type="type.value"
       :loadable="true"
+      :decimals="decimals"
+      :decimal-separator="language.value === 'de' ? ',' : '.'"
+      :min="min"
+      :max="max"
+      :min-length="minLength"
+      :max-length="maxLength"
       :is-loading="isLoading"
       error-message="Your field is invalid"
       label="This label says Specify any text below"
@@ -172,7 +179,77 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
             },
         ]"
       :show-label="true"
-      label="Field type" />
+      label="Field type"/>
+
+    <template
+      v-if="type.value !== 'number'">
+      <div
+        class="row">
+        <BaseInput
+          v-model="minLength"
+          label="min-length"
+          fieldType="number"
+          placeholder="Number of minimal characters"
+          :min="0"
+          class="row__element"
+          @input="updateComponent($event, 'minLength')" />
+        <BaseInput
+          v-model="maxLength"
+          label="max-length"
+          fieldType="number"
+          placeholder="Number of maximal characters"
+          :min="1"
+          class="row__element"
+          @input="updateComponent($event, 'maxLength')" />
+      </div>
+    </template>
+    <template
+      v-if="type.value === 'number'">
+      <div
+        class="row">
+        <BaseInput
+          v-model="decimals"
+          label="Decimals"
+          fieldType="number"
+          placeholder="Number of decimals"
+          :min="0"
+          class="row__element"
+          @input="updateComponent($event, 'decimals', true)" />
+        <BaseDropDown
+          v-model="language"
+          :options="[
+            {
+              label: 'default',
+              value: 'en'
+            },
+            {
+              label: 'german',
+              value: 'de'
+            },
+          ]"
+          :show-label="true"
+          label="Decimal Separator"
+          class="row__element"
+          @value-selected="updateComponent" />
+      </div>
+      <div
+        class="row">
+        <BaseInput
+          v-model="min"
+          label="Minimal Value"
+          fieldType="number"
+          placeholder="Minimal Value"
+          class="row__element"
+          @input="updateComponent($event, 'min')" />
+        <BaseInput
+          v-model="max"
+          label="Maximal Value"
+          fieldType="number"
+          placeholder="Maximal Value"
+          class="row__element"
+          @input="updateComponent($event, 'max')" />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -197,7 +274,36 @@ export default {
         label: 'text',
         value: 'text',
       },
+      language: {
+        label: 'default',
+        value: 'en'
+      },
+      decimals: 0,
+      min: null,
+      max: null,
+      key: 0,
+      minLength: null,
+      maxLength: null,
     };
+  },
+  watch: {
+    type(val) {
+      if (val.value === 'number') {
+        this.input = '';
+      }
+    },
+  },
+  methods: {
+    updateComponent(value, key, resetInput = false) {
+      this.key += 1;
+      if (key && !value) {
+        this[key] = null;
+
+        if (resetInput) {
+          this.input = '';
+        }
+      }
+    }
   },
 };
 </script>
@@ -207,7 +313,7 @@ export default {
   background-color: lightblue;
 }
 
-.input-field-inline-before{
+.input-field-inline-before {
   background: darkseagreen;
 }
 
@@ -250,6 +356,16 @@ export default {
 
 .toggle {
   margin-right: 16px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.row__element {
+  width: calc(50% - 8px);
 }
 </style>
 

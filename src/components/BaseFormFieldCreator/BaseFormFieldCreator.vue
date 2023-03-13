@@ -24,22 +24,31 @@
         ? dropDownList.length ? dropDownList : fieldProps.list || [] : false"
       :is-loading="autocompleteLoading"
       :input="fieldValueInt"
-      :field-type="fieldProps.fieldType || (field.type === 'integer' ? 'number' : 'text')"
+      :field-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
       :invalid="invalid || fieldProps.invalid"
       :required="required || fieldProps.required"
       :error-message="errorMessage || fieldProps.errorMessage"
+      :validation-texts="fieldProps.validationTexts
+        ? (fieldProps.validationTexts[!isNumberField ? fieldType : 'text']
+          || fieldProps.validationTexts)
+        : validationTexts[!isNumberField ? fieldType : 'text']"
       :show-error-icon="showErrorIcon"
       :clearable="clearable"
+      :min-length="field.minLength || fieldProps.minLength"
+      :max-length="field.maxLength || fieldProps.maxLength"
+      :min="typeof formFieldXAttrs.min !== 'undefined' ? formFieldXAttrs.min : fieldProps.min"
+      :max="typeof formFieldXAttrs.max !== 'undefined' ? formFieldXAttrs.max : fieldProps.max"
+      :decimals="allowedDecimals"
+      :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
       @keydown.enter="onEnter"
       @input="setInputValue($event)"
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
-        source: field['x-attrs'].source,
+        source: formFieldXAttrs.source,
       })">
       <template
         #label-addition>
-        <!-- eslint max-len: ["error", { "ignorePattern": "^\\s*!--\\s+?.+" }]*/ -->
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
           @binding {string} fieldName -->
         <slot
@@ -131,7 +140,7 @@
           :show-label="fieldProps.showLabel || showLabel"
           :placeholder="placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
-          :format="field['x-attrs'].date_format || fieldProps.format"
+          :format="formFieldXAttrs.date_format || fieldProps.format"
           :type="dateType.includes('timerange') ? dateType.includes('daterange')
             ? 'daterange' : 'single' : dateType"
           :date-format-labels="fieldProps.dateFormatLabels
@@ -238,19 +247,19 @@
       :label="labelInt"
       :show-label="fieldProps.showLabel || showLabel"
       :list="dropDownList.length ? dropDownList : fieldProps.list || []"
-      :allow-dynamic-drop-down-entries="(field['x-attrs'] && field['x-attrs'].dynamic_autosuggest)
+      :allow-dynamic-drop-down-entries="formFieldXAttrs.dynamic_autosuggest
         || !!fieldProps.allowDynamicDropDownEntries"
       :allow-multiple-entries="!isChipsSingleSelect"
-      :allow-unknown-entries="field['x-attrs'] && field['x-attrs'].allow_unknown_entries
+      :allow-unknown-entries="formFieldXAttrs.allow_unknown_entries
         || !!fieldProps.allowUnknownEntries"
       :draggable="!!fieldProps.draggable || !isChipsSingleSelect"
       :hoverbox-content="hoverBoxData || fieldProps.hoverBoxData"
-      :sortable="field.name === 'keywords' || (field['x-attrs'] && field['x-attrs'].sortable)
+      :sortable="field.name === 'keywords' || formFieldXAttrs.sortable
         || !!fieldProps.sortable"
       :is-loading="autocompleteLoading"
       :sort-text="fieldProps.sortText || sortText"
       :sort-name="fieldProps.sortName || isContributorOrEquivalent"
-      :language="(field['x-attrs'] && field['x-attrs'].set_label_language)
+      :language="formFieldXAttrs.set_label_language
         || fieldType === 'chips-below' ? language : ''"
       :drop-down-no-options-info="fieldProps.dropDownNoOptionsInfo || getI18nTerm('form.noMatch')"
       :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : false"
@@ -280,10 +289,10 @@
         </span>
       </template>
       <template #no-options>
-        <span v-if="field['x-attrs'] && field['x-attrs'].dynamic_autosuggest && !fieldInput">
+        <span v-if="formFieldXAttrs.dynamic_autosuggest && !fieldInput">
           {{ getI18nTerm('form.startTyping') }}
         </span>
-        <span v-else-if="!(field['x-attrs'] && field['x-attrs'].dynamic_autosuggest) && textInput">
+        <span v-else-if="!formFieldXAttrs.dynamic_autosuggest && textInput">
           {{ getI18nTerm('form.noMatch') }}
         </span>
         <span v-else-if="fieldInput && !fetchingData && !autocompleteLoading">
@@ -365,7 +374,7 @@
       :key="fieldKey"
       class="base-form-field-creator__field-array">
       <div
-        v-if="field['x-attrs'] && field['x-attrs'].show_label"
+        v-if="formFieldXAttrs.show_label"
         class="base-form-field-creator__field-array-label">
         {{ `${labelInt}:` }}
       </div>
@@ -396,10 +405,10 @@
         class="base-form-field-creator__toggle"
         @clicked="$emit('field-value-changed', $event)">
         <BaseLink
-          v-if="field['x-attrs'] && field['x-attrs'].subtext && field['x-attrs'].subtext.value"
-          :source="field['x-attrs'].subtext.source || ''"
-          :url="field['x-attrs'].subtext.url || ''"
-          :value="field['x-attrs'].subtext.value" />
+          v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
+          :source="formFieldXAttrs.subtext.source || ''"
+          :url="formFieldXAttrs.subtext.url || ''"
+          :value="formFieldXAttrs.subtext.value" />
       </BaseToggle>
     </template>
   </div>
@@ -576,6 +585,25 @@ export default {
       default: '',
     },
     /**
+     * define validation texts to be displayed below form field if input is invalid.
+     * for an example see [BaseInput](BaseInput)
+     */
+    validationTexts: {
+      type: Object,
+      default: () => ({
+        text: {
+          min: 'Value must be greater than or equal to {value}.',
+          max: 'Value must be less than or equal to {value}.',
+          minLength: 'Text must be at least {value} character(s) long.',
+          maxLength: 'Text cannot be longer than {value} characters.',
+        },
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['text'].every(prop => Object.keys(val).includes(prop))
+        && ['min', 'max', 'minLength', 'maxLength']
+          .every(prop => Object.keys(val.text).includes(prop)),
+    },
+    /**
      * define if error icon should be shown.
      * for an example see [BaseInput](BaseInput)
      */
@@ -637,7 +665,7 @@ export default {
      * @returns {(function(): *)|null}
      */
     fieldElement() {
-      if (this.fieldType === 'text') {
+      if (this.fieldType === 'text' || this.fieldType === 'integer' || this.fieldType === 'float') {
         return () => import('../BaseInput/BaseInput');
       } if (this.fieldType === 'multiline') {
         return () => import('../BaseMultilineTextInput/BaseMultilineTextInput');
@@ -687,6 +715,11 @@ export default {
       }
       return this.field.properties;
     },
+    formFieldXAttrs() {
+      // x-attrs should exist however just in case if not return an empty object
+      // so that ['x-attrs'][xAttrProperty] does not throw errors
+      return this.field['x-attrs'] || {};
+    },
     // the type default for texts field
     textTypeDefault() {
       return {
@@ -702,7 +735,7 @@ export default {
     // for chips input fields - check if it is a contributors field
     isContributorOrEquivalent() {
       return this.field.name === 'contributors'
-        || (this.field['x-attrs'] && this.field['x-attrs'].equivalent === 'contributors');
+        || this.formFieldXAttrs.equivalent === 'contributors';
     },
     // to determine text display for chips input
     fieldInput() {
@@ -710,8 +743,8 @@ export default {
     },
     // check if chips input is a single select field
     isChipsSingleSelect() {
-      return (this.field['x-attrs'] && this.field['x-attrs'].field_type
-        && this.field['x-attrs'].field_type.includes('chips')
+      return (this.fieldType
+        && this.fieldType.includes('chips')
         && this.field.type === 'object');
     },
     // check if label was specified - if not defer from title or check if there is a localized term
@@ -727,13 +760,12 @@ export default {
       if (this.placeholder || this.fieldProps.placeholder) {
         return this.placeholder || this.fieldProps.placeholder;
       }
-      const internalPlaceholder = this.field['x-attrs'] && this.field['x-attrs'].placeholder
-        ? this.field['x-attrs'].placeholder : '';
+      const internalPlaceholder = this.formFieldXAttrs.placeholder || '';
       return internalPlaceholder || `${this.hasI18n ? this.getI18nTerm('form.select') : 'Select'} ${this.labelInt}`;
     },
     // compute field type
     fieldType() {
-      return this.field['x-attrs'] && this.field['x-attrs'].field_type ? this.field['x-attrs'].field_type : 'text';
+      return this.formFieldXAttrs.field_type || 'text';
     },
     tabs() {
       if (this.field.items && this.field.items.properties && this.field.items.properties.data
@@ -746,6 +778,43 @@ export default {
           .label.properties).filter(lang => this.availableLocales.includes(lang));
       }
       return [];
+    },
+    /**
+     * check if field is either type integer of float
+     * @returns {boolean}
+     */
+    isNumberField() {
+      return this.fieldType === 'integer'
+        || this.fieldType === 'float'
+        || this.field.type === 'integer'
+        // also need to check here for repeatable fields
+        || (this.field.items && this.field.items.type === 'integer')
+        || this.field.type === 'float'
+        // also need to check here for repeatable fields
+        || (this.field.items && this.field.items.type === 'float');
+    },
+    /**
+     * check allowed number of decimals
+     * @returns {number|null}
+     */
+    allowedDecimals() {
+      const decimals = this.formFieldXAttrs.decimals !== undefined
+        ? this.formFieldXAttrs.decimals : this.fieldProps.decimals;
+      // get field type and also consider repeatable fields
+      const numberFieldType = this.field.type === 'array' ? this.field.items.type : this.field.type;
+      // for type float allow endless decimals
+      if ((numberFieldType === 'float') && !(decimals || decimals === 0)) {
+        return -1;
+      }
+      // for type float and decimals set limit to decimals
+      if ((numberFieldType === 'float' || this.fieldProps.fieldType === 'number') && (decimals || decimals === 0)) {
+        return decimals;
+      }
+      // for type integer prevent decimals
+      if (numberFieldType === 'integer' || this.fieldProps.fieldType === 'number') {
+        return 0;
+      }
+      return null;
     },
   },
   watch: {
@@ -834,8 +903,8 @@ export default {
       this.$emit('fetch-autocomplete', {
         value,
         name: this.field.name,
-        source: this.field['x-attrs'].source,
-        equivalent: this.field['x-attrs'].equivalent,
+        source: this.formFieldXAttrs.source,
+        equivalent: this.formFieldXAttrs.equivalent,
       });
     },
     /**
