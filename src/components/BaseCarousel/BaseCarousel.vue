@@ -49,16 +49,6 @@ import 'lazysizes';
 import Swiper, { Autoplay, Keyboard, Navigation, Pagination } from 'swiper';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
-// eslint-disable-next-line import/extensions,import/no-unresolved
-import 'swiper/scss';
-// eslint-disable-next-line import/extensions,import/no-unresolved
-import 'swiper/scss/navigation';
-// eslint-disable-next-line import/extensions,import/no-unresolved
-import 'swiper/scss/pagination';
-// eslint-disable-next-line import/extensions,import/no-unresolved
-import 'swiper/scss/autoplay';
-// eslint-disable-next-line import/extensions,import/no-unresolved
-import 'swiper/scss/keyboard';
 
 export default {
   name: 'BaseCarousel',
@@ -166,7 +156,7 @@ export default {
       this.swiperOptionsInt.modules = [Autoplay, Keyboard, Navigation, Pagination];
 
       setTimeout(() => {
-        this.swiper = new Swiper('.swiper-container', this.swiperOptionsInt);
+        this.swiper = new Swiper('.swiper', this.swiperOptionsInt);
         this.swiper.init();
         /**
          * event triggered when slider is initialized
@@ -246,6 +236,13 @@ export default {
 <style lang="scss">
   @import "../../styles/variables";
 
+  // import swiper styles
+  @import '../node_modules/swiper/swiper.scss';
+  @import '../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../node_modules/swiper/modules/autoplay/autoplay.scss';
+
   .base-carousel {
     .base-image-box-image {
       max-width: inherit !important;
@@ -253,10 +250,10 @@ export default {
       transform: translate(-50%, -50%) !important;
     }
 
-    &.swiper-container {
+    &.swiper {
       opacity: 0;
 
-      &.swiper-container-initialized {
+      &.swiper-initialized {
         opacity: 1;
       }
     }
@@ -267,6 +264,7 @@ export default {
       @media screen and (min-width: $mobile-min-width) {
         display: flex;
         justify-content: center;
+        position: relative;
       }
     }
 
@@ -275,7 +273,7 @@ export default {
       height: 10px;
       border-radius: 50%;
       background: $pagination-bullet-color;
-      margin: $spacing-large $spacing-small $spacing;
+      margin: $spacing-large $spacing-small $spacing !important;
       cursor: pointer;
 
       &:focus {
