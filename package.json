@@ -22,8 +22,8 @@
     "prepare": "husky install",
     "changelog": "gulp changelog"
   },
-  "main": "./dist/src/components/index.cjs.js",
-  "module": "./dist/src/components/index.es.js",
+  "main": "./dist/components/index.cjs.js",
+  "module": "./dist/components/index.es.js",
   "exports": {
     ".": {
       "import": "./dist/components/index.es.js",
