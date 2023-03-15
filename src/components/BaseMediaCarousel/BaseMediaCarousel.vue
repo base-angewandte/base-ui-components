@@ -144,6 +144,7 @@ export default {
       swiper: null,
       // eslint-disable-next-line
       swiperId: `base-media-carousel__swiper${this._uid}`,
+      isMounted: false,
     };
   },
   watch: {
@@ -151,9 +152,12 @@ export default {
       this.showInt = val;
     },
   },
+  mounted() {
+    this.isMounted = true;
+  },
   updated() {
     this.$nextTick(() => {
-      if (process.browser && this.showInt && this.swiper === null) {
+      if (this.isMounted && this.showInt && this.swiper === null) {
         this.initSwiper();
         this.$el.addEventListener('keyup', e => this.escapeEvent(e));
         this.$el.addEventListener('keydown', e => this.tabEvents(e));
@@ -192,11 +196,7 @@ export default {
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev',
         },
-        preloadImages: false,
-        lazy: {
-          loadPrevNext: true,
-          preloaderClass: 'base-media-preview-preloader',
-        },
+        lazyPreloaderClass: 'base-media-preview-preloader',
         // Threshold value in px.
         // If "touch distance" will be lower than this value then swiper will not move
         threshold: 10,
