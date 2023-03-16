@@ -52,6 +52,7 @@ import Tooltip from './BaseTooltip';
 import Link from './BaseLink';
 import DropButton from './BaseDropButton';
 import EntrySelector from './BaseEntrySelector';
+import FormGroups from './BaseFormGroups';
 
 export {
   Loader as BaseLoader,
@@ -108,4 +109,5 @@ export {
   Tooltip as BaseTooltip,
   DropButton as BaseDropButton,
   EntrySelector as BaseEntrySelector,
+  FormGroups as BaseFormGroups,
 };
