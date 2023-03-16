@@ -1,3 +1,10 @@
+## 2.0.7 (2023-03-16)
+
+
+### Fixed
+
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/#baseformgroups):** add component to index file
+
 ## 2.0.6 (2023-03-07)
 
 
