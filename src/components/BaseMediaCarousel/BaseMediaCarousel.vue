@@ -124,7 +124,7 @@ export default {
       default: false,
     },
     /**
-     * swiper API: https://swiperjs.com/api/#parameters
+     * swiper API: https://swiperjs.com/swiper-api
      */
     swiperOptions: {
       type: Object,

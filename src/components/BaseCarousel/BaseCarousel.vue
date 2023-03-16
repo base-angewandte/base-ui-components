@@ -74,7 +74,7 @@ export default {
     },
     /**
      * specify swiper options
-     * swiper API: https://swiperjs.com/api/#parameters
+     * swiper API: https://swiperjs.com/swiper-api
      */
     swiperOptions: {
       type: Object,
