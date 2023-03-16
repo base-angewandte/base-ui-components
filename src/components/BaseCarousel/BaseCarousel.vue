@@ -237,11 +237,11 @@ export default {
   @import "../../styles/variables";
 
   // import swiper styles
-  @import '../node_modules/swiper/swiper.scss';
-  @import '../node_modules/swiper/modules/navigation/navigation.scss';
-  @import '../node_modules/swiper/modules/pagination/pagination.scss';
-  @import '../node_modules/swiper/modules/keyboard/keyboard.scss';
-  @import '../node_modules/swiper/modules/autoplay/autoplay.scss';
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
 
   .base-carousel {
     .base-image-box-image {
