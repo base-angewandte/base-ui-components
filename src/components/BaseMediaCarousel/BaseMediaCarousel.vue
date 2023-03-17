@@ -346,7 +346,13 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  // Note: swiper styles are imported globally in the component baseCarousel
+
+  // import swiper styles
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
 
   .base-media-carousel {
     position: fixed;

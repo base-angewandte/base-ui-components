@@ -184,6 +184,13 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
+  // import swiper styles
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
+
   .base-carousel {
     max-width: 1400px;
     margin: 0 auto;
@@ -235,13 +242,6 @@ export default {
 
 <style lang="scss">
   @import "../../styles/variables";
-
-  // import swiper styles
-  @import '../../../node_modules/swiper/swiper.scss';
-  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
-  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
-  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
-  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
 
   .base-carousel {
     .base-image-box-image {
