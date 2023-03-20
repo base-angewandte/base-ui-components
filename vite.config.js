@@ -39,6 +39,8 @@ export default defineConfig({
       // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
       // user 'runtime' for libraries for improved code deduplication
       babelHelpers: 'runtime',
+      // avoid missing source files
+      exclude: ['node_modules/**'],
     }),
     eslint(),
   ],
