@@ -11,6 +11,7 @@ import pkg from './package.json';
 const external = [
   ...Object.keys(pkg.peerDependencies || {}),
   ...Object.keys(pkg.dependencies || {}),
+  '@babel',
 ];
 
 const externalPattern = (arr) => {
@@ -35,12 +36,9 @@ export default defineConfig({
     },
     vue(),
     babel({
-      exclude: ['node_modules/@babel/**', 'node_modules/**'],
       // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
       // user 'runtime' for libraries for improved code deduplication
       babelHelpers: 'runtime',
-      configFile: false,
-      plugins: ['@babel/plugin-transform-runtime'],
     }),
     eslint(),
   ],
