@@ -12,15 +12,15 @@
     </div>
     <img
       v-if="displayImage && fileType === 'image'"
-      :data-srcset="imageSourceSet"
-      :data-src="sourceUrl"
+      :src="sourceUrl"
+      :srcset="imageSourceSet"
       :style="displaySize"
       :alt="fileName"
       :class="[
-        'swiper-lazy',
         'base-media-preview-image',
         'base-media-preview-rotation-' + orientation.toString(),
       ]"
+      loading="lazy"
       @error="displayImage = false">
     <div
       v-else-if="fileType === 'image' && !displayImage"
@@ -135,8 +135,8 @@ export default {
   name: 'BaseMedia',
   components: {
     BaseLoader,
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {
@@ -570,14 +570,5 @@ export default {
       top: 50%;
       transform: translate(-50%, -75%);
     }
-  }
-
-  .swiper-lazy {
-    opacity: 0;
-    transition: opacity 250ms ease-in-out;
-  }
-
-  .swiper-lazy-loaded {
-    opacity: 1;
   }
 </style>

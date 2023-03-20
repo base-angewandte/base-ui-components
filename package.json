@@ -11,7 +11,7 @@
     "build:watch": "vite build --watch",
     "build:transform-css": "sh build/transform-css.sh",
     "build:update-package-exports": "node build/update-package-exports.js",
-    "build:post-commands": "npm run build:transform-css && npm run build:update-package-exports",
+    "build:post-commands": "npm run build:transform-css",
     "dev": "vite",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
@@ -44,7 +44,7 @@
     "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
-    "swiper": "^6.8.4",
+    "swiper": "^9.1.0",
     "vue-click-outside": "^1.1.0",
     "vue2-datepicker": "^3.10.4",
     "vuedraggable": "^2.24.3"

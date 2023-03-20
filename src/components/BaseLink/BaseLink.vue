@@ -97,9 +97,9 @@ import ClickOutside from 'vue-click-outside';
 export default {
   name: 'BaseLink',
   components: {
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
-    BaseTooltip: () => import('../BaseTooltip/BaseTooltip'),
-    BaseLoader: () => import('../BaseLoader/BaseLoader'),
+    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
+    BaseTooltip: () => import('../BaseTooltip/BaseTooltip').then(m => m.default || m),
+    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   directives: {
     ClickOutside,

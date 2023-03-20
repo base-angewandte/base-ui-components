@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="base-carousel swiper-container">
+      class="base-carousel swiper">
       <div
         class="swiper-wrapper">
         <div
@@ -50,8 +50,6 @@ import Swiper, { Autoplay, Keyboard, Navigation, Pagination } from 'swiper';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
-Swiper.use([Autoplay, Keyboard, Navigation, Pagination]);
-
 export default {
   name: 'BaseCarousel',
   components: {
@@ -77,7 +75,7 @@ export default {
     },
     /**
      * specify swiper options
-     * swiper API: https://swiperjs.com/api/#parameters
+     * swiper API: https://swiperjs.com/swiper-api
      */
     swiperOptions: {
       type: Object,
@@ -115,7 +113,10 @@ export default {
     swiperOptions: {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.swiperOptionsInt)) {
-          this.swiperOptionsInt = JSON.parse(JSON.stringify(val));
+          this.swiperOptionsInt = {
+            ...this.swiperOptionsInt,
+            ...JSON.parse(JSON.stringify(val)),
+          };
         }
       },
       immediate: true,
@@ -153,9 +154,10 @@ export default {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       };
+      this.swiperOptionsInt.modules = [Autoplay, Keyboard, Navigation, Pagination];
 
       setTimeout(() => {
-        this.swiper = new Swiper('.swiper-container', this.swiperOptionsInt);
+        this.swiper = new Swiper('.swiper', this.swiperOptionsInt);
         this.swiper.init();
         /**
          * event triggered when slider is initialized
@@ -184,7 +186,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/swiper.scss";
 
   .base-carousel {
     max-width: 1400px;
@@ -238,6 +239,13 @@ export default {
 <style lang="scss">
   @import "../../styles/variables";
 
+  // import swiper styles
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
+
   .base-carousel {
     .base-image-box-image {
       max-width: inherit !important;
@@ -245,10 +253,10 @@ export default {
       transform: translate(-50%, -50%) !important;
     }
 
-    &.swiper-container {
+    &.swiper {
       opacity: 0;
 
-      &.swiper-container-initialized {
+      &.swiper-initialized {
         opacity: 1;
       }
     }
@@ -259,6 +267,7 @@ export default {
       @media screen and (min-width: $mobile-min-width) {
         display: flex;
         justify-content: center;
+        position: relative;
       }
     }
 
@@ -267,7 +276,7 @@ export default {
       height: 10px;
       border-radius: 50%;
       background: $pagination-bullet-color;
-      margin: $spacing-large $spacing-small $spacing;
+      margin: $spacing-large $spacing-small $spacing !important;
       cursor: pointer;
 
       &:focus {

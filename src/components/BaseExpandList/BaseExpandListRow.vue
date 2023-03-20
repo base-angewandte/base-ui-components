@@ -147,10 +147,10 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseExpandListRow',
   components: {
-    BaseToggle: () => import('../BaseToggle/BaseToggle'),
-    BaseButton: () => import('../BaseButton/BaseButton'),
+    BaseToggle: () => import('../BaseToggle/BaseToggle').then(m => m.default || m),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
     // eslint-disable-next-line import/no-self-import
-    BaseExpandListRow: () => import('./BaseExpandListRow'),
+    BaseExpandListRow: () => import('./BaseExpandListRow').then(m => m.default || m),
     BaseIcon,
   },
   mixins: [i18n],

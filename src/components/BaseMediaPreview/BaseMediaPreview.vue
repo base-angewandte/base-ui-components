@@ -124,10 +124,10 @@ import popUpLock from '../../mixins/popUpLock';
 export default {
   name: 'BaseMediaPreview',
   components: {
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
-    BaseImage: () => import('../BaseImage/BaseImage'),
-    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
+    BaseImage: () => import('../BaseImage/BaseImage').then(m => m.default || m),
+    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo').then(m => m.default || m),
   },
   directives: {
     VueClickOutside: () => import('vue-click-outside'),

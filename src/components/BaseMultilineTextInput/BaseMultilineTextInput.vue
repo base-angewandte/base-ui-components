@@ -97,7 +97,7 @@ export default {
   components: {
     BaseInput,
     BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton'),
+    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton').then(m => m.default || m),
   },
   model: {
     prop: 'input',

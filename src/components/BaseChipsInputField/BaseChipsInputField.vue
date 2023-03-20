@@ -172,7 +172,7 @@ export default {
   name: 'BaseChipsInputField',
   components: {
     BaseInput,
-    BaseChip: () => import('../BaseChip/BaseChip'),
+    BaseChip: () => import('@/components/BaseChip/BaseChip').then(m => m.default || m),
     Draggable,
   },
   mixins: [

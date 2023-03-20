@@ -134,7 +134,7 @@ export default {
   name: 'BaseChipsInput',
   components: {
     BaseIcon,
-    BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList'),
+    BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList').then(m => m.default || m),
     BaseChipsInputField,
   },
   mixins: [

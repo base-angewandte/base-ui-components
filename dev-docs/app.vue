@@ -1,6 +1,51 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
     <div class="controls">
+      <template
+        v-for="(link, index) in links">
+        <BaseLink
+          :key="index"
+          :source="link.source"
+          :tooltip="link.tooltip"
+          :tooltip-async="link.additional"
+          :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
+          :type="link.type"
+          :url="link.url"
+          :value="link.value" />
+      </template>
+      <BaseCarousel
+        :items="items"
+        :swiper-options="{
+          slidesPerView: 1,
+          slidesPerGroup: 1,
+          spaceBetween: 15,
+          autoplay: false,
+          loop: true,
+          speed: 750,
+          keyboard: {
+            enabled: true,
+          },
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          breakpoints: {
+            640: {
+              slidesPerView: 2,
+              slidesPerGroup: 2,
+            },
+            1024: {
+              slidesPerView: 3,
+              slidesPerGroup: 3,
+            },
+          },
+        }" />
+      <BaseMap
+        :marker="marker"
+        :options="options"
+        attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
+        copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
+        url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
       <BaseToggle
         v-model="selectMode"
         label="Select Mode"
@@ -197,6 +242,8 @@ import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark';
 import BaseExpandList from '@/components/BaseExpandList/BaseExpandList';
 import BaseLink from '@/components/BaseLink/BaseLink';
 import BaseEditControl from '@/components/BaseEditControl/BaseEditControl';
+import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
+import BaseMap from '@/components/BaseMap/BaseMap';
 
 import BaseToggle from '@/components/BaseToggle/BaseToggle';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
@@ -213,9 +260,153 @@ export default {
     BaseIcon,
     BaseToggle,
     BaseEntrySelector,
+    BaseCarousel,
+    BaseMap,
   },
   data() {
     return {
+      links: [
+        {
+          value: 'text',
+        },
+        {
+          value: 'external link',
+          url: 'https://base.uni-ak.ac.at',
+        },
+        {
+          value: 'email link',
+          url: 'mailto:email@uni-ak.ac.at',
+        },
+        {
+          value: 'internal link',
+          source: 'internal.link',
+        },
+        {
+          value: 'tooltip',
+          tooltip: [
+            {
+              label: 'label',
+              value: 'value',
+            },
+            {
+              label: 'label',
+              value: 'external link',
+              url: 'https://base.uni-ak.ac.at',
+            },
+          ],
+        },
+        {
+          value: 'aync tooltip',
+          additional: [
+            {
+              label: 'label',
+              value: 'value',
+            },
+          ],
+        },
+        {
+          value: 'internal link (chips)',
+          source: 'internal.link',
+          type: 'activity',
+        },
+      ],
+      items: [
+        {
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung 1',
+          href: 'http://base.uni-ak.ac.at',
+        },
+        {
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung 2',
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/tech',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/tech',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/tech',
+            },
+          ],
+        },
+        {
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung 3',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/nature',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/nature',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/nature',
+            },
+          ],
+        },
+        {
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung 4',
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/animal',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/animal',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/animal',
+            },
+          ],
+        },
+        {
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung',
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/460/341/people',
+            },
+            {
+              '640w': 'https://placeimg.com/640/480/people',
+            },
+            {
+              '768w': 'https://placeimg.com/768/576/people',
+            },
+          ],
+        },
+        {
+          title: 'Title',
+          subtext: 'Subtitle',
+          description: 'Austellung',
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://placeimg.com/461/341/arch',
+            },
+            {
+              '640w': 'https://placeimg.com/641/480/arch',
+            },
+            {
+              '768w': 'https://placeimg.com/769/576/arch',
+            },
+          ],
+        },
+      ],
       entries: [
         {
           id: '9WMh6vEFRZv83g5CSNxWX',
@@ -253,6 +444,41 @@ export default {
           description: 'Oh so long',
         },
       ],
+      marker: [
+        {
+          latLng: [48.208309, 16.382782],
+          data: [
+            'University of Applied Arts',
+            'Oskar Kokoschka-Platz 2',
+            '1010 Vienna',
+            'Austria',
+          ],
+        },
+        {
+          latLng: [48.208248, 16.384965],
+          data: [
+            'University of Applied Arts',
+            'Vordere Zollamtsstraße 7',
+            '1030 Vienna',
+            'Austria',
+          ],
+        },
+        {
+          latLng: [48.208248, 16.384965],
+          data: [
+            'base Angewandte',
+            'Vordere Zollamtsstraße 7',
+            '1030 Vienna',
+            'Austria',
+          ],
+        },
+      ],
+      options: {
+        style: 'normal',
+        subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+        tileMatrixSet: 'google3857',
+        type: 'geolandbasemap',
+      },
       page: 1,
       activeEntry: -1,
       selectedEntries: [],

@@ -155,7 +155,7 @@ export default {
   },
   components: {
     BaseIcon,
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader'),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader').then(m => m.default || m),
   },
   mixins: [i18n],
   model: {

@@ -289,8 +289,8 @@
 
 <script>
 import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseFormFieldCreator from '../BaseFormFieldCreator/BaseFormFieldCreator';
 import i18n from '../../mixins/i18n';
+import BaseFormFieldCreator from '../BaseFormFieldCreator/BaseFormFieldCreator';
 
 /**
  * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard

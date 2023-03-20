@@ -424,11 +424,11 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseFormFieldCreator',
   components: {
-    BaseDropDown: () => import('../BaseDropDown/BaseDropDown'),
-    BaseDateInput: () => import('../BaseDateInput/BaseDateInput'),
-    BaseForm: () => import('../BaseForm/BaseForm'),
-    BaseToggle: () => import('../BaseToggle/BaseToggle'),
-    BaseLink: () => import('../BaseLink/BaseLink'),
+    BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
+    BaseDateInput: () => import('../BaseDateInput/BaseDateInput').then(m => m.default || m),
+    BaseForm: () => import('../BaseForm/BaseForm').then(m => m.default || m),
+    BaseToggle: () => import('../BaseToggle/BaseToggle').then(m => m.default || m),
+    BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {

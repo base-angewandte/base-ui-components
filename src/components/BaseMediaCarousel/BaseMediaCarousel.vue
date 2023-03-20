@@ -58,13 +58,10 @@
 </template>
 
 <script>
-import Swiper, { Navigation, Lazy, Keyboard } from 'swiper';
+import Swiper, { Navigation, Keyboard } from 'swiper';
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
-
-// init swiper plugins
-Swiper.use([Navigation, Lazy, Keyboard]);
 
 /**
  * Component allowing sliding through images,
@@ -136,7 +133,7 @@ export default {
       default: false,
     },
     /**
-     * [swiper API options](https://swiperjs.com/api/#parameters)
+     * [swiper API options]: https://swiperjs.com/swiper-api
      */
     swiperOptions: {
       type: Object,
@@ -156,6 +153,7 @@ export default {
       swiper: null,
       // eslint-disable-next-line
       swiperId: `base-media-carousel__swiper${this._uid}`,
+      isMounted: false,
     };
   },
   watch: {
@@ -163,9 +161,12 @@ export default {
       this.showInt = val;
     },
   },
+  mounted() {
+    this.isMounted = true;
+  },
   updated() {
     this.$nextTick(() => {
-      if (document && this.showInt && this.swiper === null) {
+      if (this.isMounted && this.showInt && this.swiper === null) {
         this.initSwiper();
         this.$el.addEventListener('keyup', e => this.escapeEvent(e));
         this.$el.addEventListener('keydown', e => this.tabEvents(e));
@@ -203,14 +204,11 @@ export default {
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev',
         },
-        preloadImages: false,
-        lazy: {
-          loadPrevNext: true,
-          preloaderClass: 'base-media-preview-preloader',
-        },
+        lazyPreloaderClass: 'base-media-preview-preloader',
         // Threshold value in px.
         // If "touch distance" will be lower than this value then swiper will not move
         threshold: 10,
+        modules: [Navigation, Keyboard],
       };
 
       this.swiper = new Swiper(`#${this.swiperId}`, {
@@ -357,8 +355,13 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/swiper.scss";
-  @import "swiper/components/navigation/navigation.scss";
+
+  // import swiper styles
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
 
   .base-media-carousel {
     position: fixed;
