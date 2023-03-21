@@ -22,10 +22,10 @@ export default {
   props: {
     /**
      * HTMLElement to attach the tooltip
-     * eg.: vue ref element
+     * e.g.: vue ref element
      */
     attachTo: {
-      type: HTMLElement,
+      type: null, // HTMLElement makes troubles with nuxt/nuxt-bridge
       required: true,
     },
     /**
