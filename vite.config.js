@@ -23,7 +23,7 @@ const externalPattern = (arr) => {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     {
       // run after build or build:watch process
@@ -52,7 +52,7 @@ export default defineConfig({
     },
   },
   build: {
-    minify: true,
+    minify: command === 'build', // just minify build, dur ssr/nuxt-bride issues in linked dev mode
     sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, 'src/components/index.js'),
@@ -105,4 +105,4 @@ export default defineConfig({
   server: {
     port: 8080,
   },
-});
+}));
