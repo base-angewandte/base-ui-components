@@ -36,7 +36,6 @@ import BaseLoader from './BaseLoader/BaseLoader';
 import BaseMap from './BaseMap/BaseMap';
 import BaseMapLocations from './BaseMapLocations/BaseMapLocations';
 import BaseMediaCarousel from './BaseMediaCarousel/BaseMediaCarousel';
-import BaseMediaPreview from './BaseMediaPreview/BaseMediaPreview';
 import BaseMenuEntry from './BaseMenuEntry/BaseMenuEntry';
 import BaseMenuList from './BaseMenuList/BaseMenuList';
 import BaseMultilineTextInput from './BaseMultilineTextInput/BaseMultilineTextInput';
@@ -92,7 +91,6 @@ export {
   BaseMap,
   BaseMapLocations,
   BaseMediaCarousel,
-  BaseMediaPreview,
   BaseMenuEntry,
   BaseMenuList,
   BaseMultilineTextInput,
