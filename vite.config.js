@@ -8,11 +8,15 @@ import pkg from './package.json';
 
 // generate external pattern
 // taken from: https://github.com/rollup/rollup-plugin-babel/issues/148#issuecomment-399696316
-const external = [
+let external = [
   ...Object.keys(pkg.peerDependencies || {}),
   ...Object.keys(pkg.dependencies || {}),
   '@babel',
 ];
+// remove swiper from external list and thereby include it in node_modules
+// avoids 'require() of ES modules is not supported' error in ssr setup
+// Todo: find better solution to fix ^^
+external = external.filter(a => a !== 'swiper');
 
 const externalPattern = (arr) => {
   if (arr.length === 0) {
