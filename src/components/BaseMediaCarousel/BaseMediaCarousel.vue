@@ -58,7 +58,6 @@
 </template>
 
 <script>
-import Swiper, { Navigation, Keyboard } from 'swiper';
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
@@ -196,7 +195,14 @@ export default {
      * init Swiper
      * control media after swipe
      */
-    initSwiper() {
+    async initSwiper() {
+      // import swiper and plugins
+      // to avoid import/require issues in an SSR setup
+      // we import swiper when the component is already mounted
+      const { Swiper } = await import('swiper');
+      const { Keyboard } = await import('swiper');
+      const { Navigation } = await import('swiper');
+
       const additionalOptions = {
         init: false,
         initialSlide: this.initialSlide,

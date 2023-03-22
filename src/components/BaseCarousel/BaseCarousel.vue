@@ -46,7 +46,6 @@
 
 <script>
 import 'lazysizes';
-import Swiper, { Autoplay, Keyboard, Navigation, Pagination } from 'swiper';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
@@ -141,7 +140,16 @@ export default {
       }
       return imageSrc;
     },
-    initSwiper() {
+    async initSwiper() {
+      // import swiper and plugins
+      // to avoid import/require issues in an SSR setup
+      // we import swiper when the component is already mounted
+      const { Swiper } = await import('swiper');
+      const { Autoplay } = await import('swiper');
+      const { Keyboard } = await import('swiper');
+      const { Navigation } = await import('swiper');
+      const { Pagination } = await import('swiper');
+
       this.swiperIsActive = true;
       this.swiperOptionsInt.init = false;
       if (this.swiperOptionsInt.autoplay) {
