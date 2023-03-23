@@ -94,10 +94,10 @@
             :class="['base-image-box-footer',
                      { 'base-image-box-footer-invert': icon }]">
             <div
-              v-if="$slots.footerLeft"
+              v-if="$slots['footer-left']"
               class="base-image-box-footer-left">
-              <!-- @slot for featured icon of files -->
-              <slot name="footerLeft" />
+              <!-- @slot create custom content (e.g. featured icon for files) left of text -->
+              <slot name="footer-left" />
             </div>
             <div class="base-image-box-footer-body">
               <div
@@ -123,15 +123,15 @@
             </div>
 
             <div
-              v-if="$slots.footer || playIcon"
+              v-if="$slots['footer-right'] || playIcon"
               class="base-image-box-footer-right">
               <!-- display optional play icon e.g. for video, audio -->
               <BaseIcon
                 v-if="playIcon"
                 name="play"
                 class="base-image-box-icon-play-small" />
-              <!-- @slot for published icon of files -->
-              <slot name="footer" />
+              <!-- @slot create custom content (e.g. published icon for files) left of text -->
+              <slot name="footer-right" />
             </div>
           </div>
         </div>
@@ -775,7 +775,6 @@ export default {
     bottom: $spacing;
     left: $spacing;
     right: $spacing;
-    //justify-content: space-between;
     color: white;
     z-index: 1;
 
@@ -813,6 +812,7 @@ export default {
         fill: white;
         height: $icon-medium;
         width: $icon-medium;
+        min-width: $icon-medium;
         margin-right: $spacing-small-half;
       }
     }
