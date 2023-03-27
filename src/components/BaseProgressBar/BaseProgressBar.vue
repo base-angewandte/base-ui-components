@@ -56,7 +56,7 @@
           v-if="showRemove"
           class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
           name="remove"
-          @click="remove" />
+          @click.native="remove" />
       </div>
     </div>
     <div
