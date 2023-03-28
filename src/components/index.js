@@ -25,6 +25,7 @@ import BaseExpandList from './BaseExpandList/BaseExpandList';
 import BaseExpandRow from './BaseExpandRow/BaseExpandRow';
 import BaseForm from './BaseForm/BaseForm';
 import BaseFormFieldCreator from './BaseFormFieldCreator/BaseFormFieldCreator';
+import BaseFormGroups from './BaseFormGroups/BaseFormGroups';
 import BaseHlsVideo from './BaseHlsVideo/BaseHlsVideo';
 import BaseHoverBox from './BaseHoverBox/BaseHoverBox';
 import BaseIcon from './BaseIcon/BaseIcon';
@@ -80,6 +81,7 @@ export {
   BaseExpandRow,
   BaseForm,
   BaseFormFieldCreator,
+  BaseFormGroups,
   BaseHlsVideo,
   BaseHoverBox,
   BaseIcon,

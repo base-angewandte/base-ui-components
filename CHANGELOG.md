@@ -1,3 +1,16 @@
+## 2.0.8 (2023-03-27)
+
+### Fixed
+
+* **[BaseProgressBar](https://base-angewandte.github.io/base-ui-components/#baseprogressbar):** remove icon not emitting event
+
+## 2.0.7 (2023-03-16)
+
+
+### Fixed
+
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/#baseformgroups):** add component to index file
+
 ## 2.0.6 (2023-03-07)
 
 
