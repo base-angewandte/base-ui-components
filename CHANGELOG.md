@@ -2,45 +2,45 @@
 
 ### Fixed
 
-* **[BaseProgressBar](https://base-angewandte.github.io/base-ui-components/#baseprogressbar):** remove icon not emitting event
+* **[BaseProgressBar](https://base-angewandte.github.io/base-ui-components/components/BaseProgressBar):** remove icon not emitting event
 
 ## 2.0.7 (2023-03-16)
 
 
 ### Fixed
 
-* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/#baseformgroups):** add component to index file
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroups):** add component to index file
 
 ## 2.0.6 (2023-03-07)
 
 
 ### Added
 
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/#baseformfieldcreator):** handle new x-attributes for input fields , closes #2246
-* **[BaseInput](https://base-angewandte.github.io/base-ui-components/#baseinput):** add/handle new properties for input fields type text/number , closes #2244
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform):** adding optional header element settable by new `x-attrs` field `form_group_title` and new prop `renderHeaderAs` , closes #2238
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform):** allow to set fieldProps per actual input field for repeatable fields , closes #1978
-* **[BaseFormGroup](https://base-angewandte.github.io/base-ui-components/#baseformgroup):** new wrapper component for [BaseForm](#baseform) added , closes #2238
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** handle new x-attributes for input fields , closes #2246
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput):** add/handle new properties for input fields type text/number , closes #2244
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** adding optional header element settable by new `x-attrs` field `form_group_title` and new prop `renderHeaderAs` , closes #2238
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** allow to set fieldProps per actual input field for repeatable fields , closes #1978
+* **[BaseFormGroup](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroup):** new wrapper component for [BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm) added , closes #2238
 
 
 ### Removed
 
-* **[BaseDatePanel](https://base-angewandte.github.io/base-ui-components/#basedatepanel):** hide component due to accessibility issues
+* **[BaseDatePanel](https://base-angewandte.github.io/base-ui-components/components/BaseDatePanel):** hide component due to accessibility issues
 
 
 ### Fixed
 
-* **[BaseBoxTooltip](https://base-angewandte.github.io/base-ui-components/#baseboxtooltip):** also change icon color on focus and active
-* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/#basecarousel):** error if href missing in carousel list item , closes #1630
-* **[BaseCheckmark](https://base-angewandte.github.io/base-ui-components/#basecheckmark):** previous changes due to eslint errors now implemented correctly
-* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/#basedateinput):** remove keyboard event again added due to linter error
-* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/#basedropdown):** improve accessibility and existing problems with it
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform):** fix input field slot implementation , closes #1978
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform):** truly center plus icon of repeatable fields
-* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/#baseformgroups):** add missing index.js file for build , closes #2238
-* **[BaseHlsVideo](https://base-angewandte.github.io/base-ui-components/#basehlsvideo), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/#basemediacarousel):** accessibility improvements based on vuejs-accessibility
-* **[BaseInput](https://base-angewandte.github.io/base-ui-components/#baseinput), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/#basechipsinput), [ BaseMapLocations](https://base-angewandte.github.io/base-ui-components/# basemaplocations):** improve and fix accessibility changes
-* **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/#baseswitchbutton):** fixing label input linting error
+* **[BaseBoxTooltip](https://base-angewandte.github.io/base-ui-components/components/BaseBoxTooltip):** also change icon color on focus and active
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel):** error if href missing in carousel list item , closes #1630
+* **[BaseCheckmark](https://base-angewandte.github.io/base-ui-components/components/BaseCheckmark):** previous changes due to eslint errors now implemented correctly
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** remove keyboard event again added due to linter error
+* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/components/BaseDropDown):** improve accessibility and existing problems with it
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** fix input field slot implementation , closes #1978
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** truly center plus icon of repeatable fields
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroups):** add missing index.js file for build , closes #2238
+* **[BaseHlsVideo](https://base-angewandte.github.io/base-ui-components/components/BaseHlsVideo), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** accessibility improvements based on vuejs-accessibility
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput), [ BaseMapLocations](https://base-angewandte.github.io/base-ui-components/# basemaplocations):** improve and fix accessibility changes
+* **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton):** fixing label input linting error
 
 
 ## 2.0.5 (2023-01-12)
