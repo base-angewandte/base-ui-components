@@ -23,7 +23,7 @@ const externalPattern = (arr) => {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig(() => ({
+export default defineConfig({
   plugins: [
     {
       // run after build or build:watch process
@@ -105,4 +105,4 @@ export default defineConfig(() => ({
   server: {
     port: 8080,
   },
-}));
+});
