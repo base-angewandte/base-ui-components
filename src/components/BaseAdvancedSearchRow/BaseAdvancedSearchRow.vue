@@ -1,7 +1,9 @@
 <template>
+  <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
   <div
     ref="advancedSearchRow"
-    class="base-advanced-search-row">
+    class="base-advanced-search-row"
+    @click="openDropDown">
     <!-- SEARCH FIELD -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
@@ -1292,6 +1294,15 @@ export default {
 
     /** DROP DOWN NAVIGATION */
 
+    /**
+     * event triggered on row click to open drop down and focus main input
+     */
+    openDropDown() {
+      this.isActive = true;
+      if (this.searchInputElement) {
+        this.searchInputElement.focus();
+      }
+    },
     /**
      * primary drop down navigation deciding what arrow keys are used for
      * --> could be used for controlled vocabulary or autocomplete options
