@@ -23,7 +23,7 @@ const externalPattern = (arr) => {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig(() => ({
   plugins: [
     {
       // run after build or build:watch process
@@ -52,7 +52,7 @@ export default defineConfig(({ command }) => ({
     },
   },
   build: {
-    minify: command === 'build', // just minify build, dur ssr/nuxt-bride issues in linked dev mode
+    minify: true, // set to false in linked dev mode and using nuxt-bride
     sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, 'src/components/index.js'),

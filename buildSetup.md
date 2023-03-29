@@ -42,6 +42,8 @@ npm link
 
 # in target project
 npm link base-ui-components
+# Note: nuxt/bridge projects has issues with importing linked and minified modules -
+#       therefore disable minifying in vite.config.js: build.minify: false
 ```
 
 ## Development
