@@ -196,6 +196,7 @@ export default {
      * control media after swipe
      */
     async initSwiper() {
+      console.log('init swiperÄ');
       // import swiper and plugins
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
@@ -227,9 +228,12 @@ export default {
       });
 
       this.swiper.on('transitionEnd', () => {
-        // select active slide and set focus
-        const media = this.$refs.baseMedia[this.swiper.activeIndex];
-        media.$el.focus();
+        // check if swiper is still there since this event is also called on swiper hide
+        if (this.swiper) {
+          // select active slide and set focus
+          const media = this.$refs.baseMedia[this.swiper.activeIndex];
+          media.$el.focus();
+        }
       });
 
       // calc of slide width is wrong on first initialization using component in ssr
@@ -244,6 +248,7 @@ export default {
 
       this.swiper.init();
 
+      console.log('active index focus');
       // set focus to opened slide/media - otherwise esc key won't work on first slide
       this.$refs.baseMedia[this.swiper.activeIndex].$el.focus();
     },
