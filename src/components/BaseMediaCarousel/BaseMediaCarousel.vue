@@ -196,7 +196,6 @@ export default {
      * control media after swipe
      */
     async initSwiper() {
-      console.log('init swiperÄ');
       // import swiper and plugins
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
@@ -248,7 +247,6 @@ export default {
 
       this.swiper.init();
 
-      console.log('active index focus');
       // set focus to opened slide/media - otherwise esc key won't work on first slide
       this.$refs.baseMedia[this.swiper.activeIndex].$el.focus();
     },
