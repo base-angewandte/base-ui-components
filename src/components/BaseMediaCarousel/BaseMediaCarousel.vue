@@ -76,17 +76,18 @@ export default {
   mixins: [popUpLock],
   props: {
     /**
-     * array of objects with items to render
-     * following properties are **required**:
+     * items to display in a swiper carousel
+     *
+     * array of objects with the following **required** properties:
      *  **title** `string` - the asset title
      *  **mediaUrl** `string` - url of the medium to be displayed
      *
-     *  additionally type `video` also need the following:
+     *  additionally, type `video` also requires the following properties:
      *  **mediaPosterUrl** `string` - url of image for poster property in html5 video tag
      *  **displaySize** `Object` - set height and with from outside, needs to be an object with properties `height` and/or `width`.
      *
      *  **optional** properties:
-     *  **additionalInfo** `string[]` - additional info text below file name, an array of textlines.
+     *  **additionalInfo** `string[]` - additional info text below file name, an array of strings.
      *  **downloadUrl** `string` - url for downloading the file
      *  **mediaType** `string` - specify the media type - needs to be one of: `image`, `video`, `audio`, `pdf`. **Caveat**: if media type is not specified it is automatically determined from file ending!
      *  **orientation** `number` - define how the image should be rotated (EXIF orientation values) (only for type `image`)
@@ -132,7 +133,7 @@ export default {
       default: false,
     },
     /**
-     * [swiper API options]: https://swiperjs.com/swiper-api
+     * specify [swiper API options](https://swiperjs.com/swiper-api)
      */
     swiperOptions: {
       type: Object,

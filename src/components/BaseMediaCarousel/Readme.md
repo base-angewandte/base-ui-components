@@ -3,11 +3,11 @@
 ```vue live
 <template>
   <div style="position: relative;">
-    <div style="display: flex;">
+    <div style="display: flex; flex-wrap: wrap;">
       <BaseImageBox
         v-for="(item, index) in media"
         :key="index"
-        :box-size="{ width: 'calc(20% - 12px)' }"
+        :box-size="{ width: 'calc(25% - 10px)' }"
         :title="item.title"
         :image-url="item.mediaUrlSmall"
         style="margin-right: 10px"

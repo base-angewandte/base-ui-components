@@ -57,8 +57,9 @@ export default {
   },
   props: {
     /**
-     * specify array of items to render<br>
-     *   the item object should have the following properties:
+     * items to display
+     *
+     * array of objects with the following **required** properties:
      *     **title** `?string` - the title to display.
      *     **subtext** `?string` - the text below the title.
      *     **description** `?string` - the type of item.
@@ -73,17 +74,15 @@ export default {
       default: () => ([]),
     },
     /**
-     * specify swiper options
-     * swiper API: https://swiperjs.com/swiper-api
+     * specify [swiper API options](https://swiperjs.com/swiper-api)
      */
     swiperOptions: {
       type: Object,
       default: () => ({}),
     },
     /**
-     * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router`
-     * is necessary
+     * specify how the link element should be rendered -
+     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router` is necessary
      */
     renderLinkElementAs: {
       type: String,
