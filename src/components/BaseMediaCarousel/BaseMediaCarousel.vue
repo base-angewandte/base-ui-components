@@ -381,6 +381,7 @@ export default {
     height: 100%;
     z-index: map-get($zindex, modal_bg);
     display: flex;
+    overflow: hidden;
 
     &__background {
       position: absolute;
