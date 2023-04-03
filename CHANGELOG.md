@@ -1,3 +1,18 @@
+## 2.0.9 (2023-04-03)
+
+
+### Added
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/#basechipsinput):** add additional prop `displayChipsRemove`
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/#basesearch), [BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearchrow):** add new search type `chipssingle`
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearch):** fix autocomplete malfunctioning (options not displayed, select in styleguide not working).
+* **[BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearchrow):** open drop down on element click event.
+
+
 ## 2.0.8 (2023-03-27)
 
 ### Fixed
