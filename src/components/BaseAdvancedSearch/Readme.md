@@ -65,6 +65,17 @@ export default {
           ],
         },
         {
+          label: 'Filter Chips Single',
+          type: 'chipssingle',
+          freetext_allowed: false,
+          options: [
+            {
+              label: 'Test1',
+              id: 'Test1',
+            },
+          ],
+        },
+        {
           label: 'Filter Daterange',
           type: 'daterange',
         },
@@ -81,7 +92,7 @@ export default {
     addFilter() {
       alert('Filter added!');
     },
-    fetchAutocomplete({ searchString, filter, index }) {
+    fetchAutocomplete({ searchString, filter }) {
        if (searchString && (filter.type === 'text'
          || (filter.type === 'chips' && filter.freetext_allowed)) ) {
          setTimeout(() => {

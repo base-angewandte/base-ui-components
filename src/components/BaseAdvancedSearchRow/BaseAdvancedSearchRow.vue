@@ -415,10 +415,10 @@ export default {
      *    <b>id</b> {string} - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
-     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>type</b> {('text'|'chips'|'chipssingle'|'date'|'daterange')} - the filter type<br>
      *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
      *      property are used or autocomplete is used
-     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
+     *    <b>options</b> {Object[]} - for filter type 'chips' and 'chipssingle' the controlled
      *      vocabulary options
      */
     filterList: {
@@ -437,13 +437,13 @@ export default {
      *    <b>id</b> {string} - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
-     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>type</b> {('text'|'chips'|'chipssingle'|'date'|'daterange')} - the filter type<br>
      *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
      *      property are used or autocomplete is used
-     *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
+     *    <b>options</b> {Object[]} - for filter type 'chips' and 'chipssingle' the controlled
      *      vocabulary options<br>
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
-     *    or array of objects or strings for type 'text' and type 'chips'
+     *    or array of objects or strings for type 'text', type 'chips' and 'chipssingle'
      */
     defaultFilter: {
       type: Object,
@@ -464,11 +464,11 @@ export default {
      *    <b>id</b> {string} - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      identifierPropertyName.filter<br>
-     *    <b>type</b> {('text'|'chips'|'date'|'daterange')} - the filter type<br>
+     *    <b>type</b> {('text'|'chips'|'chipssingle'|'date'|'daterange')} - the filter type<br>
      *    <b>freetext_allowed</b> {boolean} - determines if predetermined options from 'options'
      *      property are used or autocomplete is used
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
-     *      or array of objects or strings for type 'text' and type 'chips'
+     *      or array of objects or strings for type 'text',  type 'chips' and 'chipssingle'
      */
     appliedFilter: {
       type: [Object, null],
@@ -803,7 +803,7 @@ export default {
          * not for date, daterange or text
          * @returns {Object[]|string[]}
          */
-        if (this.filter.type === 'chips') {
+        if (this.filter.type.includes('chips')) {
           return this.filter && this.filter.filter_values ? [...this.filter.filter_values] : [];
         }
         return [];
@@ -922,7 +922,7 @@ export default {
     searchType() {
       if (this.filter) {
         const { type } = this.filter;
-        // chips input filters that dont allow freetext need to have the type 'controlled'
+        // chips input filters that don't allow freetext need to have the type 'controlled'
         // in BaseSearchComponent
         if (type === 'chips' && !this.filter.freetext_allowed) {
           return 'controlled';
@@ -1146,6 +1146,9 @@ export default {
         if (this.filter.type.includes('date')) {
           this.currentInput = this.filter.filter_values;
         }
+        if (this.filter.type === 'chipssingle') {
+          this.addOption(this.filter.options[0]);
+        }
       }
       if (this.searchInputElement) {
         // in either case - focus on input field again after click on filter
@@ -1221,7 +1224,7 @@ export default {
           filter_values: oldFilterValues.concat(newValue),
         };
       } else {
-        this.$set(this.filter, 'filter_values', this.filter.filter_values.concat(entry));
+        this.selectedOptions = this.filter.filter_values.concat(entry);
       }
       // if filter type is text only use string for search on enter so dont remove the input
       // new addition: also controlled vocabulary input should stay as long as options available

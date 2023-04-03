@@ -28,6 +28,8 @@
       :add-selected-entry-directly="true"
       :assistive-text="isFieldTypeChips ? assistiveText : false"
       :is-active-delay="dateFieldDelay"
+      :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : false"
+      :chips-removable="type !== 'chipssingle'"
       input-class="base-search__input-field"
       field-type="search"
       class="base-search__input"
@@ -162,12 +164,12 @@ export default {
     },
     /**
      * specify the type of input field <br>
-     * @values: text, chips, controlled, date, daterange
+     * @values: text, chips, controlled, date, daterange, 'chipssingle'
      */
     type: {
       type: String,
       default: 'text',
-      validator: val => ['text', 'chips', 'controlled', 'date', 'daterange'].includes(val),
+      validator: val => ['text', 'chips', 'chipssingle', 'controlled', 'date', 'daterange'].includes(val),
     },
     /**
      * specify a linked list option (e.g. drop down) <br>
@@ -402,7 +404,7 @@ export default {
      * @returns {boolean}
      */
     isFieldTypeChips() {
-      return this.type === 'chips' || this.type === 'controlled';
+      return this.type.includes('chips') || this.type === 'controlled';
     },
     /**
      * internally used id - eiter provided by props or created internally with utils function
@@ -418,7 +420,7 @@ export default {
       if (this.type.includes('date')) {
         return this.placeholder.date;
       }
-      if (this.type === 'controlled') {
+      if (this.type === 'controlled' || this.type === 'chipssingle') {
         return this.placeholder.chips;
       }
       return this.placeholder[this.type];
