@@ -20,7 +20,7 @@ Example of BaseEditControl
         label="Mode 'save'"
         mark-style="radio"/>
     </div>
-    <baseEditControl
+    <BaseEditControl
       :controls="true"
       :edit="edit"
       :edit-mode="editMode"
@@ -50,7 +50,7 @@ export default {
     },
     save() {
       this.edit = false;
-      alert(`${editMode} clicked`);
+      alert(`${this.editMode} clicked`);
     },
   }
 }
