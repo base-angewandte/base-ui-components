@@ -95,6 +95,7 @@
                       :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                         || !!entry[identifierPropertyName]"
                       :chip-active="chipActiveForRemove === index"
+                      :is-removable="chipsRemovable"
                       @remove-entry="removeEntry(entry, index)"
                       @hoverbox-active="hoverBoxActive($event, entry)" />
                   </slot>
@@ -131,6 +132,7 @@
                     || !!entry[identifierPropertyName]"
                   :chip-active="chipActiveForRemove === index"
                   :assistive-text="assistiveText.selectedOption"
+                  :is-removable="chipsRemovable"
                   @remove-entry="removeEntry(entry, index)"
                   @value-changed="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
@@ -482,6 +484,16 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * define if selected options chips should come with a remove icon
+     * (usually desired usability wise just an additional option for `allowMultipleEntries`
+     * `false` if there is any other means of removal
+     * (e.g. [BaseAdvancedSearch](#baseadvancedsearch)))
+     */
+    chipsRemovable: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -623,7 +635,7 @@ export default {
         this.isActiveInt = false;
       }
       // if event was Delete check if a chip should be deleted
-      if (key === 'Backspace' || key === 'Delete') {
+      if (this.chipsRemovable && (key === 'Backspace' || key === 'Delete')) {
         // if backspace (once) is used make last chip active
         if (key === 'Backspace' && !this.fired
           && !this.inputInt && this.chipActiveForRemove < 0) {
