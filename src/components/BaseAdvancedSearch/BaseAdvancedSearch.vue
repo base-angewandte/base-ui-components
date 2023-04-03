@@ -379,7 +379,8 @@ export default {
       return sort(displayed, this.labelPropertyName.filter);
     },
     mainFilterIndex() {
-      return this.appliedFilters.length - 1;
+      const lastFilterIndex = this.appliedFilters.length - 1;
+      return lastFilterIndex > 0 ? lastFilterIndex : 0;
     },
   },
   watch: {
