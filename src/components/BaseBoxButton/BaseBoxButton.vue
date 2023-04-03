@@ -241,6 +241,9 @@ export default {
 
           .button-box-plus-container {
             position: absolute;
+            display: flex;
+            align-items: center;
+            transform: translate(0, 50%);
             width: 100%;
             left: calc(50% - 54px);
 
