@@ -118,9 +118,6 @@ This is a basic (autocomplete functionality not working here) example how a form
 
 <script>
 export default {
-    components: {
-      BaseIcon,
-    },
     data() {
         return {
           valueList: {},
