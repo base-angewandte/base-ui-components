@@ -35,6 +35,13 @@ npm run changelog
 npm run changelog -- --styleguide-path=https://base-angewandte.github.io/base-ui-components/
 ```
 
+## Development
+
+The v3 of this component library is built with [Vite](https://vitejs.dev).
+
+This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
+available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
+
 ```bash
 # to use locally for development
 # in this project
@@ -42,13 +49,6 @@ npm link
 
 # in target project
 npm link base-ui-components
-# Note: nuxt/bridge projects has issues with importing linked and minified modules -
+# Note: to date nuxt/bridge projects seem to have issues with importing linked and minified modules -
 #       therefore disable minifying in vite.config.js: build.minify: false
 ```
-
-## Development
-
-The v2 of this component library is currently built via [Vite](https://vitejs.dev).
-
-This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
-available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
