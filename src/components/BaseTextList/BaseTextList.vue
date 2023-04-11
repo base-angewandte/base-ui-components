@@ -56,7 +56,8 @@
                 :tooltip="objectItem.additional"
                 :type="objectItem.type"
                 :url="objectItem.url"
-                :value="objectItem.value">
+                :value="objectItem.value"
+                :class="[{ 'base-link--chip-text-list': isChip(objectItem) }]">
                 <template #tooltip>
                   <!-- @slot slot for tooltip content -->
                   <!-- @binding {array} data -  -->
@@ -65,7 +66,7 @@
                     name="tooltip" />
                 </template>
                 <!-- add directly after to avoid additional spaces -->
-              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 ? ', ' : '' }}
+              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 && !isChip(objectItem) ? ', ' : '' }}
               <!-- eslint-enable -->
             </template>
           </div>
@@ -206,6 +207,15 @@ export default {
       }
       return true;
     },
+    /**
+     * check if the object contains properties that indicate a chip type
+     *
+     * @param {object} data
+     * @returns {boolean}
+     */
+    isChip(data) {
+      return !!(data.source && data.type);
+    },
   },
 };
 </script>
@@ -296,6 +306,11 @@ export default {
           margin-bottom: $spacing-small;
           word-break: break-word;
         }
+      }
+
+      .base-link--chip-text-list {
+        margin-right: $spacing-small-half;
+        margin-bottom: 2px;
       }
     }
 

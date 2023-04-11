@@ -1,18 +1,25 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
     <div class="controls">
-      <template
-        v-for="(link, index) in links">
-        <BaseLink
-          :key="index"
-          :source="link.source"
-          :tooltip="link.tooltip"
-          :tooltip-async="link.additional"
-          :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
-          :type="link.type"
-          :url="link.url"
-          :value="link.value" />
-      </template>
+      <div style="background-color: #fff; padding: 16px; margin-bottom: 16px;">
+        <template
+          v-for="(link, index) in links">
+          <BaseLink
+            :key="index"
+            :source="link.source"
+            :tooltip="link.tooltip"
+            :tooltip-async="link.additional"
+            :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
+            :type="link.type"
+            :url="link.url"
+            :value="link.value" />
+        </template>
+      </div>
+      <div style="background-color: #fff; padding: 16px; margin-bottom: 16px;">
+        <BaseTextList
+          render-label-as="h2"
+          :data="baseTextListData" />
+      </div>
       <BaseCarousel
         :items="items"
         :swiper-options="{
@@ -241,6 +248,7 @@
 import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark';
 import BaseExpandList from '@/components/BaseExpandList/BaseExpandList';
 import BaseLink from '@/components/BaseLink/BaseLink';
+import BaseTextList from '@/components/BaseTextList/BaseTextList';
 import BaseEditControl from '@/components/BaseEditControl/BaseEditControl';
 import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
 import BaseMap from '@/components/BaseMap/BaseMap';
@@ -256,6 +264,7 @@ export default {
     BaseEditControl,
     BaseExpandList,
     BaseLink,
+    BaseTextList,
     BaseButton,
     BaseIcon,
     BaseToggle,
@@ -265,6 +274,73 @@ export default {
   },
   data() {
     return {
+      baseTextListData: [
+        {
+          label: 'data is array of objects, renders different base-link types',
+          data: [
+            {
+              value: 'some value',
+            },
+            {
+              value: 'Klassische Moderne',
+              source: 'internal.link',
+              type: 'activity',
+            },
+            {
+              value: 'additional info in toolip',
+              additional: [
+                {
+                  label: 'www',
+                  value: 'base',
+                  url: 'https://base.uni-ak.ac.at',
+                },
+                {
+                  label: 'label',
+                  value: 'some value',
+                },
+              ],
+            },
+            {
+              value: 'external link',
+              url: 'https://base.uni-ak.ac.at',
+            },
+            {
+              value: 'internal link',
+              source: 'some-id',
+            },
+            {
+              value: 'Klassische Moderne',
+              source: 'internal.link',
+              type: 'activity',
+            },
+            {
+              value: 'Romantik',
+              source: 'internal.link',
+              type: 'activity',
+            },
+            {
+              value: 'Malerei',
+              source: 'internal.link',
+              type: 'activity',
+            },
+            {
+              value: 'Architektur',
+              source: 'internal.link',
+              type: 'activity',
+            },
+            {
+              value: 'Wohnbau',
+              source: 'internal.link',
+              type: 'activity',
+            },
+            {
+              value: 'Malerei',
+              source: 'internal.link',
+              type: 'activity',
+            },
+          ],
+        },
+      ],
       links: [
         {
           value: 'text',
