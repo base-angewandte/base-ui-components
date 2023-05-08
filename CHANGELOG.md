@@ -1,3 +1,11 @@
+## 2.0.11 (2023-05-08)
+
+
+### Fixed
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/#basebutton):** fix active state style in a base-button-row
+
+
 ## 2.0.10 (2023-05-08)
 
 
