@@ -1,3 +1,51 @@
+## 3.0.0 (2023-05-17)
+
+### ⚠ BREAKING CHANGE
+* switch from [rollup.js](https://rollupjs.org/) and [Vue CLI](https://cli.vuejs.org/) to [Vite](https://vitejs.dev/) as build and development tool.
+  In course of that, the build configuration was changed in a way that components don't need to be added as plugins via `Vue.use` anymore but can just be registered as regular components again. See [Readme](README.md) for further details on how to add components to a project.
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/components/BaseImageBox):** Renaming of slots 'footerLeft' and 'footer' to 'footer-left', 'footer-right'.
+* **[BaseMediaPreview](https://base-angewandte.github.io/base-ui-components/components/BaseMediaPreview):** removing the deprecated component - use [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel) instead.
+
+
+### Added
+
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** add new icon 'people-filled'.
+
+
+### Changed
+* switch from [rollup.js](https://rollupjs.org/) and [Vue CLI](https://cli.vuejs.org/) to [Vite](https://vitejs.dev/) as build and development tool.
+* **styleguide:** implement new styleguide with [VuePress](https://vuepress.vuejs.org/) instead of [Vue Styleguidist](https://vue-styleguidist.github.io/).
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/components/BaseImageBox):** rename footer slots
+* update and rename `npm publish` pipeline
+* add "exports" field to package.json.
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** update swiper from v6 to v9
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** load swiper api only when component is mounted
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** fix swiper init and use the native browser lazy loading feature for images
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/components/BaseMap):** import leaflet and related plugins async
+* **[BaseChip](https://base-angewandte.github.io/base-ui-components/components/BaseChip):** use BaseIcon component for remove icon
+
+
+### Removed
+
+* **[BaseMediaPreview](https://base-angewandte.github.io/base-ui-components/components/BaseMediaPreview):** remove deprecated component, use [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel) instead.
+* remove obsolete update-package-exports build script.
+* remove obsolete test setup and jest.config.
+
+
+### Fixed
+
+* **[BaseTextList](https://base-angewandte.github.io/base-ui-components/components/BaseTextList):** avoid separators for chip rendered links
+* **[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/components/BaseBoxButton):** built in plus icon not centered
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** no activeIndex on swiper hide
+* **styleguide:** replace placeimg with picsum example images, since placeimg API not available anymore from June 2023.
+* **[BaseEditControl](https://base-angewandte.github.io/base-ui-components/components/BaseEditControl):** styleguide error with `editMode` `done`
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** demo not working
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel), [BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel):** clarify property descriptions
+* **[BaseExpandList](https://base-angewandte.github.io/base-ui-components/components/BaseExpandList):** avoid text glitches with class 'supportive-text'
+* **[BaseToolTip](https://base-angewandte.github.io/base-ui-components/components/BaseToolTip):** fix property type
+
+
+
 ## 2.0.11 (2023-05-08)
 
 
