@@ -13,9 +13,6 @@ npm run build:watch
 # add postcss transformations to base-ui-components.css
 npm run build:transform-css
 
-# collect css files, generate and update package.json exports property
-npm run build:update-package-exports
-
 # commands run after build (build:transform-css, build:transform-css)
 npm run build:post-commands
 
