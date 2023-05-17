@@ -72,7 +72,7 @@ new Vue({
 
 ```
 
-After adding the components as plugins, they can be used in your app globally, like so:
+After adding the components, they can be used in your app globally, like so:
 
 ```vue
 Component.vue

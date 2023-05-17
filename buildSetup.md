@@ -22,6 +22,12 @@ npm run dev
 # lint files
 npm run lint
 
+# lint files and fix problems
+npm run lint:fix
+
+# publish a new version
+npm run version-publish
+
 # create svg spriteSheet
 npm run svg
 
