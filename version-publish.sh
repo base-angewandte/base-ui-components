@@ -16,6 +16,8 @@ git push &&
 git push --tags &&
 # get main ready
 git checkout master &&
+# pull first in case there are commits by somebody else
+git pull &&
 git merge develop &&
 git push &&
 git push --tags &&
@@ -26,6 +28,9 @@ git push --tags github master &&
 npm publish &&
 # also create, commit and publish styleguide
 git checkout gh-pages &&
+# pull first in case there are new version made by somebody else
+git pull &&
+git merge master &&
 npm run styleguide:build &&
 git add . &&
 git commit -m "docs: styleguide for v$PACKAGE_VERSION" &&
