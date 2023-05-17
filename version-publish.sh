@@ -9,7 +9,7 @@ PACKAGE_VERSION=$(cat package.json \
 # commit the new version (incl. CHANGELOG)
 git add CHANGELOG.md package.json package-lock.json &&
 git commit -m "$PACKAGE_VERSION" &&
-git tag v$PACKAGE_VERSION
+git tag v$PACKAGE_VERSION &&
 
 # push develop branch
 git push &&
