@@ -1,6 +1,8 @@
+## Demo
+
 Example of BaseTextList to render data in one column
 
-```vue
+```vue live
 <template>
   <div>
     <BaseTextList
@@ -10,11 +12,7 @@ Example of BaseTextList to render data in one column
 </template>
 
 <script>
-import BaseTextList from './BaseTextList';
 export default {
-  components: {
-    BaseTextList,
-  },
   data() {
     return {
       data: [
@@ -100,7 +98,7 @@ export default {
 
 Example of BaseTextList to render data in two columns
 
-```vue
+```vue live
 <template>
   <div>
     <BaseTextList
@@ -111,11 +109,7 @@ Example of BaseTextList to render data in two columns
 </template>
 
 <script>
-import BaseTextList from './BaseTextList';
 export default {
-  components: {
-    BaseTextList,
-  },
   data() {
     return {
       data: [
@@ -159,7 +153,7 @@ export default {
 
 Note: If data is a single Object and field type is 'string', then data will be rendered in two columns
 
-```vue
+```vue live
 <template>
   <div>
     <BaseTextList
@@ -170,11 +164,7 @@ Note: If data is a single Object and field type is 'string', then data will be r
 </template>
 
 <script>
-import BaseTextList from './BaseTextList';
 export default {
-  components: {
-    BaseTextList,
-  },
   data() {
     return {
       data: [

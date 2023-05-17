@@ -58,13 +58,9 @@
 </template>
 
 <script>
-import Swiper, { Navigation, Lazy, Keyboard } from 'swiper';
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
-
-// init swiper plugins
-Swiper.use([Navigation, Lazy, Keyboard]);
 
 /**
  * Component allowing sliding through images,
@@ -80,21 +76,31 @@ export default {
   mixins: [popUpLock],
   props: {
     /**
-     * array of items to render <br>
-     * structure: [<br>
-     *   { title: 'Image', mediaUrl: 'path-to-file.file-format' },<br>
-     *   { title: 'Video', mediaUrl: 'path-to-file.m3u8',
-     *     mediaPosterUrl: 'path-to-file.file-format', displaySize: { width: '1000px' } },<br>
-     *   { title: 'Audio', mediaUrl: 'path-to-file.file-format' },<br>
-     *   { title: 'Document', mediaUrl: 'path-to-file.file-format' },<br>
-     * ]
+     * items to display in a swiper carousel
+     *
+     * array of objects with the following **required** properties:
+     *  **title** `string` - the asset title
+     *  **mediaUrl** `string` - url of the medium to be displayed
+     *
+     *  additionally, type `video` also requires the following properties:
+     *  **mediaPosterUrl** `string` - url of image for poster property in html5 video tag
+     *  **displaySize** `Object` - set height and with from outside, needs to be an object with properties `height` and/or `width`.
+     *
+     *  **optional** properties:
+     *  **additionalInfo** `string[]` - additional info text below file name, an array of strings.
+     *  **downloadUrl** `string` - url for downloading the file
+     *  **mediaType** `string` - specify the media type - needs to be one of: `image`, `video`, `audio`, `pdf`. **Caveat**: if media type is not specified it is automatically determined from file ending!
+     *  **orientation** `number` - define how the image should be rotated (EXIF orientation values) (only for type `image`)
+     *  **previews** `Object[]` - specify an image `srcset` as an array of objects in the form `{ [mediawidth]: 'url' }` (only for type `image`)
+     *  **hlsStartLevel** `number` - define startLevel (size) of hls-video
+     *
      */
     items: {
       type: Array,
-      default: () => [{}],
+      default: () => [],
     },
     /**
-     * index of initial slide<br>
+     * index of initial slide
      *   this NEEDS to be provided if carousel should start with any other
      *   than first image in items array
      */
@@ -127,7 +133,7 @@ export default {
       default: false,
     },
     /**
-     * swiper API: https://swiperjs.com/api/#parameters
+     * specify [swiper API options](https://swiperjs.com/swiper-api)
      */
     swiperOptions: {
       type: Object,
@@ -147,6 +153,7 @@ export default {
       swiper: null,
       // eslint-disable-next-line
       swiperId: `base-media-carousel__swiper${this._uid}`,
+      isMounted: false,
     };
   },
   watch: {
@@ -154,9 +161,12 @@ export default {
       this.showInt = val;
     },
   },
+  mounted() {
+    this.isMounted = true;
+  },
   updated() {
     this.$nextTick(() => {
-      if (process.browser && this.showInt && this.swiper === null) {
+      if (this.isMounted && this.showInt && this.swiper === null) {
         this.initSwiper();
         this.$el.addEventListener('keyup', e => this.escapeEvent(e));
         this.$el.addEventListener('keydown', e => this.tabEvents(e));
@@ -178,7 +188,6 @@ export default {
        * triggered by clicking on close button
        *
        * @event hide
-       * @type { None }
        *
        */
       this.$emit('hide');
@@ -187,7 +196,14 @@ export default {
      * init Swiper
      * control media after swipe
      */
-    initSwiper() {
+    async initSwiper() {
+      // import swiper and plugins
+      // to avoid import/require issues in an SSR setup
+      // we import swiper when the component is already mounted
+      const { Swiper } = await import('swiper');
+      const { Keyboard } = await import('swiper');
+      const { Navigation } = await import('swiper');
+
       const additionalOptions = {
         init: false,
         initialSlide: this.initialSlide,
@@ -195,14 +211,11 @@ export default {
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev',
         },
-        preloadImages: false,
-        lazy: {
-          loadPrevNext: true,
-          preloaderClass: 'base-media-preview-preloader',
-        },
+        lazyPreloaderClass: 'base-media-preview-preloader',
         // Threshold value in px.
         // If "touch distance" will be lower than this value then swiper will not move
         threshold: 10,
+        modules: [Navigation, Keyboard],
       };
 
       this.swiper = new Swiper(`#${this.swiperId}`, {
@@ -215,9 +228,12 @@ export default {
       });
 
       this.swiper.on('transitionEnd', () => {
-        // select active slide and set focus
-        const media = this.$refs.baseMedia[this.swiper.activeIndex];
-        media.$el.focus();
+        // check if swiper is still there since this event is also called on swiper hide
+        if (this.swiper) {
+          // select active slide and set focus
+          const media = this.$refs.baseMedia[this.swiper.activeIndex];
+          media.$el.focus();
+        }
       });
 
       // calc of slide width is wrong on first initialization using component in ssr
@@ -337,7 +353,8 @@ export default {
        * download button clicked
        *
        * @event download
-       * @type { Object }
+       * @property {string} url - the download url
+       * @property {string} name - the file name
        *
        */
       this.$emit('download', value);
@@ -348,8 +365,13 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/swiper.scss";
-  @import "swiper/components/navigation/navigation.scss";
+
+  // import swiper styles
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
 
   .base-media-carousel {
     position: fixed;
@@ -359,6 +381,7 @@ export default {
     height: 100%;
     z-index: map-get($zindex, modal_bg);
     display: flex;
+    overflow: hidden;
 
     &__background {
       position: absolute;

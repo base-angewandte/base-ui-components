@@ -1,6 +1,8 @@
+## Demo
+
 Drop Down Single Style without label
 
-```vue
+```vue live
 <template>
   <div>
       <base-drop-down
@@ -33,7 +35,7 @@ export default {
 
 Drop Down with label and with custom background color
 
-```vue
+```vue live
 <template>
   <div class="drop-down-wrapper">
       <base-drop-down

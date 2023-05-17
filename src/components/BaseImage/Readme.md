@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div>
     <BaseImage
@@ -10,22 +12,18 @@
 </template>
 
 <script>
-import BaseImage from './BaseImage';
 
 export default {
-  components: {
-    BaseImage,
-  },
   data() {
     return {
       alt: 'description',
-      src: 'https://placeimg.com/640/400/arch/grayscale',
+      src: 'https://picsum.photos/seed/test/460/341',
       srcset: [
         {
-          "640w": "https://placeimg.com/640/400/arch/grayscale"
+          "640w": "https://picsum.photos/seed/test/640/541"
         },
         {
-          "1024w": "https://placeimg.com/1024/800/arch/grayscale"
+          "1024w": "https://picsum.photos/seed/test/1024/741"
         },
       ],
     };

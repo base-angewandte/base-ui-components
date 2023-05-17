@@ -12,15 +12,15 @@
     </div>
     <img
       v-if="displayImage && fileType === 'image'"
-      :data-srcset="imageSourceSet"
-      :data-src="sourceUrl"
+      :src="sourceUrl"
+      :srcset="imageSourceSet"
       :style="displaySize"
       :alt="fileName"
       :class="[
-        'swiper-lazy',
         'base-media-preview-image',
         'base-media-preview-rotation-' + orientation.toString(),
       ]"
+      loading="lazy"
       @error="displayImage = false">
     <div
       v-else-if="fileType === 'image' && !displayImage"
@@ -135,8 +135,8 @@ export default {
   name: 'BaseMedia',
   components: {
     BaseLoader,
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo'),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {
@@ -169,7 +169,7 @@ export default {
       default: '',
     },
     /**
-     * define the media type <br>
+     * define the media type
      *     options: 'image'|'video'|'audio'|'pdf'
      */
     mediaType: {
@@ -180,7 +180,7 @@ export default {
       },
     },
     /**
-     * set height and with from outside <br>
+     * set height and with from outside
      * e.g. { width: 1280px, height: 720px }
      */
     displaySize: {
@@ -196,7 +196,7 @@ export default {
     },
     /**
      * define information texts for download and view (for pdfs) buttons in an
-     * object with the respective properties<br>
+     * object with the respective properties
      *   could be strings or path to i18n json as well
      */
     infoTexts: {
@@ -214,8 +214,8 @@ export default {
       default: 0,
     },
     /**
-     * specify an image srcset as an array of objects in the form <br>
-     *     { 'mediawidth': 'url' }
+     * specify an image srcset as an array of objects in the form
+     *     `{ [mediawidth]: 'url' }`
      */
     previews: {
       type: Array,
@@ -321,7 +321,8 @@ export default {
          * download button clicked
          *
          * @event download
-         * @type { Object }
+         * @property {string} url - the download url
+         * @property {string} name - the file name
          *
          */
         this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
@@ -569,14 +570,5 @@ export default {
       top: 50%;
       transform: translate(-50%, -75%);
     }
-  }
-
-  .swiper-lazy {
-    opacity: 0;
-    transition: opacity 250ms ease-in-out;
-  }
-
-  .swiper-lazy-loaded {
-    opacity: 1;
   }
 </style>

@@ -73,9 +73,7 @@
             v-if="!imageUrl || !displayImage"
             ref="boxText"
             class="base-image-box__text-wrapper">
-            <!-- @slot to display more advanced text - if you use this please specify the
-            ref attribute with 'boxTextInner' that has the line-height css attribute set
-            - so the text display height can be calculated correctly! -->
+            <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
             <slot
               :text="boxText"
               name="text">
@@ -96,10 +94,10 @@
             :class="['base-image-box-footer',
                      { 'base-image-box-footer-invert': icon }]">
             <div
-              v-if="$slots.footerLeft"
+              v-if="$slots['footer-left']"
               class="base-image-box-footer-left">
-              <!-- @slot for featured icon of files -->
-              <slot name="footerLeft" />
+              <!-- @slot create custom content (e.g. featured icon for files) left of text -->
+              <slot name="footer-left" />
             </div>
             <div class="base-image-box-footer-body">
               <div
@@ -125,15 +123,15 @@
             </div>
 
             <div
-              v-if="$slots.footer || playIcon"
+              v-if="$slots['footer-right'] || playIcon"
               class="base-image-box-footer-right">
               <!-- display optional play icon e.g. for video, audio -->
               <BaseIcon
                 v-if="playIcon"
                 name="play"
                 class="base-image-box-icon-play-small" />
-              <!-- @slot for published icon of files -->
-              <slot name="footer" />
+              <!-- @slot create custom content (e.g. published icon for files) left of text -->
+              <slot name="footer-right" />
             </div>
           </div>
         </div>
@@ -227,7 +225,7 @@ export default {
       default: null,
     },
     /**
-     * set optional icon <br>
+     * set optional icon
      * e.g. for items without image
      */
     icon: {
@@ -235,7 +233,7 @@ export default {
       default: '',
     },
     /**
-     * set optional icon size <br>
+     * set optional icon size
      */
     iconSize: {
       type: String,
@@ -243,7 +241,7 @@ export default {
       validator: val => ['small', 'medium', 'large', 'xlarge', 'xxlarge'].includes(val),
     },
     /**
-     * display play icon <br>
+     * display play icon
      * e.g. for Video, Audio files
      */
     playIcon: {
@@ -316,15 +314,16 @@ export default {
       default: 'div',
     },
     /**
-     * if element is rendered as vue link component, specify a value for the 'to' attribute
-     * can either be a string or a vue-router Location object (= object with 'path' property
-     * and optional 'params' or 'query' object)<br>
+     * if element is rendered as vue link component, specify a value for the `to` attribute
+     * can either be a string or a `vue-router` Location object (= object with `path` property
+     * and optional `params` or `query` object)
      * (this needs vue-router)
      */
     linkTo: {
       type: [String, Object],
       default: '',
-      validator: val => typeof val === 'string' || (val instanceof Object && Object.keys(val).includes('path')),
+      validator: val => typeof val === 'string'
+        || (val instanceof Object && Object.keys(val).includes('path')),
     },
   },
   data() {
@@ -361,7 +360,7 @@ export default {
          * event triggered when box is selectable and clicked upon
          *
          * @event select-triggered
-         * @type { Boolean }
+         * @param { Boolean } - was box selected
          */
         this.$emit('select-triggered', val);
       }
@@ -776,7 +775,6 @@ export default {
     bottom: $spacing;
     left: $spacing;
     right: $spacing;
-    //justify-content: space-between;
     color: white;
     z-index: 1;
 
@@ -814,6 +812,7 @@ export default {
         fill: white;
         height: $icon-medium;
         width: $icon-medium;
+        min-width: $icon-medium;
         margin-right: $spacing-small-half;
       }
     }

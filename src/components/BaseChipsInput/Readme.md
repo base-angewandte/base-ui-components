@@ -1,7 +1,9 @@
+## Demo
+
 Simple Single Choice Example with fixed dropdown, no unknown, not draggable
 
 Additionally to the custom events listed above also all native input events are available.
-```vue
+```vue live
 <template>
   <base-chips-input
     :list="list"
@@ -35,7 +37,7 @@ export default {
 
 Multiple Entries Example with fixed dropdown, no unknown and draggable
 
-```vue
+```vue live
 <template>
   <base-chips-input
     :list="list"

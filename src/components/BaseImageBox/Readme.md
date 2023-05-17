@@ -1,6 +1,8 @@
+## Demo
+
 A variety of possibilities with image box
 
-```vue
+```vue live
 <template>
   <div>
     <div class="boxes-background">
@@ -39,7 +41,31 @@ A variety of possibilities with image box
           class="box"
           description="no overlap with text"/>
     </div>
+
     <div class="boxes-background">
+      <base-image-box
+        :selectable="selectActive"
+        :image-url="imgUrl"
+        :box-size="{ width: 'calc(25% - 12px)' }"
+        title="Box with Image"
+        subtext="and title and subtitle"
+        description="and footer slots used"
+        class="box"
+        @select-triggered="handleBoxArray($event, '5')">
+        <template slot="footer-left">
+          <BaseIcon
+            name="subscribe"
+            title="icon in slot: footer-left"
+            class="base-image-box__footer-icon" />
+        </template>
+        <template slot="footer-right">
+          <BaseIcon
+            name="eye"
+            title="icon in slot: footer-right"
+            class="base-image-box__footer-icon" />
+        </template>
+      </base-image-box>
+
       <base-image-box
         :selectable="selectActive"
         :showTitle="false"
@@ -49,7 +75,7 @@ A variety of possibilities with image box
         title="box with no title"
         description="play icon & showtitle false"
         class="box"
-        @select-triggered="handleBoxArray($event, '5')" />
+        @select-triggered="handleBoxArray($event, '6')" />
 
       <base-image-box
         :selectable="selectActive"
@@ -60,7 +86,7 @@ A variety of possibilities with image box
         title="box with no title, icon"
         description="icon & showtitle false"
         class="box"
-        @select-triggered="handleBoxArray($event, '6')" />
+        @select-triggered="handleBoxArray($event, '7')" />
 
       <base-image-box
         :selectable="selectActive"
@@ -72,8 +98,8 @@ A variety of possibilities with image box
         title="box with no title, icon and play-icon"
         description="icon, play icon & showtitle false"
         class="box"
-        @select-triggered="handleBoxArray($event, '7')">
-        <template slot="footer">
+        @select-triggered="handleBoxArray($event, '8')">
+        <template slot="footer-right">
           <span>00:04:22</span>
         </template>
       </base-image-box>
@@ -90,8 +116,12 @@ A variety of possibilities with image box
 </template>
 
 <script>
+import BaseIcon from '../../src/components/BaseIcon/BaseIcon';
+
 export default {
-  components: {},
+  components: {
+    BaseIcon,
+  },
   data() {
     return {
       selectActive: false,
@@ -101,7 +131,7 @@ export default {
   },
   computed: {
     imgUrl() {
-      return 'https://placeimg.com/460/341/arch';
+      return 'https://picsum.photos/seed/arch/460/341';
     },
   },
   methods: {
@@ -147,6 +177,11 @@ export default {
 
   .button-area {
     margin-top: 16px;
+  }
+
+  .base-image-box__footer-icon {
+    width: 16px;
+    height: 16px;
   }
 </style>
 

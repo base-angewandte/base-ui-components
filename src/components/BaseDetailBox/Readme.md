@@ -1,6 +1,8 @@
+## Demo
+
 An Element to render data in datalist tags
 
-```vue
+```vue live
 <template>
   <BaseDetailBox
     :data="data" />
@@ -34,7 +36,7 @@ export default {
 ```
 Example with custom properties and language specific label
 
-```vue
+```vue live
 <template>
   <div>
       <BaseDetailBox
@@ -60,11 +62,7 @@ Example with custom properties and language specific label
 </template>
 
 <script>
-import BaseButton from '../../components/BaseButton/BaseButton';
-
 export default {
-components: { BaseButton } ,
-
   data() {
     return {
       lang: 'en',

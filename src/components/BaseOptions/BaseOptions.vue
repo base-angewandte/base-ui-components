@@ -91,8 +91,8 @@
 </template>
 
 <script>
-import BaseButton from '@/components/BaseButton/BaseButton';
-import i18n from '@/mixins/i18n';
+import BaseButton from '../BaseButton/BaseButton';
+import i18n from '../../mixins/i18n';
 
 /**
  * a row that can display options responsively either hidden behind an options button
@@ -107,8 +107,8 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * set showing of option buttons from outside<br>
-     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     * set showing of option buttons from outside.
+     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
      */
     showOptions: {
       type: Boolean,
@@ -130,9 +130,10 @@ export default {
       validator: val => ['left', 'right'].includes(val),
     },
     /**
-     * define in which scenario an options button should be shown<br>
-     *   **always**: always show the options button<br>
-     *   **mobile**: only show options button when window size < 640px<br>
+     * define in which scenario an options button should be shown:
+     *
+     *   **always**: always show the options button
+     *   **mobile**: only show options button when window size < 640px
      *   **never**: never show the options button - just show the available options directly
      */
     useOptionsButtonOn: {
@@ -142,8 +143,8 @@ export default {
     },
     /**
      * define the options button text as an object with `show` (=text that should be
-     * shown with options hidden) and `hide` (=text that should be shown with options visible)<br>
-     *   values can be either plain strings or a string leading to a localization file<br>
+     * shown with options hidden) and `hide` (=text that should be shown with options visible)
+     *   values can be either plain strings or a string leading to a localization file.
      *   (only relevant if `useOptionsButtonOn` is different from 'never')
      */
     optionsButtonText: {
@@ -156,8 +157,8 @@ export default {
     },
     /**
      * define the icon for the options button as an object with `show` (=icon that should be
-     * shown with options hidden) and `hide` (=icon that should be shown with options visible)<br>
-     *   see [BaseIcon](#baseicon) for available icons<br>
+     * shown with options hidden) and `hide` (=icon that should be shown with options visible)
+     *   see [BaseIcon](BaseIcon) for available icons.
      *   (only relevant if `useOptionsButtonOn` is different from 'never')
      */
     optionsButtonIcon: {
@@ -169,8 +170,8 @@ export default {
       validator: val => 'show' in val && 'hide' in val,
     },
     /**
-     * define if slot after-options should be shown before or after options
-     * if row wraps because of space issues<br>
+     * define if slot after-options should be shown before or after options.
+     * if row wraps because of space issues
      *   (only relevant with use of options button)
      */
     showAfterOptionsBelow: {
@@ -178,13 +179,14 @@ export default {
       default: true,
     },
     /**
-     * in order to display options one can either use the slot 'options' or specify a
-     * config via 'optionsConfig' prop. If the latter option is used the following properties
-     * need to be provided:<br>
-     *   **text** {string} - the text displayed in the button<br>
-     *   **icon** {string} - the icon name to display
-     *    (for available icons see [BaseIcon](#baseicon) )<br>
-     *   **value** {string} - the value emitted on button click<br>
+     * in order to display options one can either use the slot `options` or specify a
+     * config via `optionsConfig` prop. If the latter option is used the following properties
+     * need to be provided:
+     *
+     *   **text** `string` - the text displayed in the button
+     *   **icon** `string` - the icon name to display
+     *    (for available icons see [BaseIcon](BaseIcon) )
+     *   **value** `string` - the value emitted on button click
      */
     optionsConfig: {
       type: Array,
@@ -325,11 +327,11 @@ export default {
     showOptionsInt(val) {
       if (this.showOptions !== val) {
         /**
-         * emitted when options button is toggled (not relevant if 'useOptionsButtonOn' prop
-         * is set to 'never')<br>
-         *   the .sync modifier can be used on 'showOptions' prop here
+         * emitted when options button is toggled (not relevant if `useOptionsButtonOn` prop
+         * is set to 'never')
+         *   the `.sync` modifier can be used on `showOptions` prop here
          * @event update:show-options
-         * @param {boolean} val - was show value set true or false
+         * @param {boolean} - was show value set true or false
          */
         this.$emit('update:show-options', val);
       }
@@ -405,7 +407,7 @@ export default {
        * emitted if prop `optionsConfig` is used when an options button is clicked
        *
        * @event option-triggered
-       * @param {string} value - the value provided in `optionsConfig` object
+       * @param {string} - the value provided in `optionsConfig` object
        */
       this.$emit('option-triggered', value);
     },

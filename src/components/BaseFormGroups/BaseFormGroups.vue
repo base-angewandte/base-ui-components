@@ -9,56 +9,44 @@
       class="base-form-groups__group"
       v-on="$listeners">
       <template #label-addition="{ fieldName }">
-        <!-- @slot Slot to allow for additional elements on the right side of the label row
-        \<div\> (e.g. language tabs))
-        @binding {string} field-name - in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+        @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="label-addition"
           :field-name="fieldName" />
       </template>
       <template #pre-input-field="{ fieldName }">
-        <!-- @slot slot to add elements within the form field but in a row before the actual
-        input field<br>
-        for an example see [BaseInput](#baseinput)
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. For an example see [BaseInput](BaseInput).
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="pre-input-field"
           :field-name="fieldName" />
       </template>
       <template
         #input-field-addition-before="{ fieldName }">
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>)
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>).
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="input-field-addition-before"
           :field-name="fieldName" />
       </template>
       <template #input-field-inline-before="{ fieldName }">
-        <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap<br>
-        for an example see [BaseInput](#baseinput)
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. For an example see [BaseInput](BaseInput).
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="input-field-inline-before"
           :field-name="fieldName" />
       </template>
       <template #input-field-addition-after="{ fieldName }">
         <!-- @slot for adding elements after input
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="input-field-addition-after"
           :field-name="fieldName" />
       </template>
       <template #post-input-field="{ fieldName }">
         <!-- @slot for adding elements at the end covering the whole height
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="post-input-field"
           :field-name="fieldName" />
@@ -69,14 +57,12 @@
       </template>
       <template #remove-icon>
         <!-- @slot for adding elements after input (e.g. used to add loader)
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot name="remove-icon" />
       </template>
       <template #below-input="{ fieldName }">
         <!-- @slot below-input slot added to e.g. add drop down
-        @binding {string} field-name in order to use slot for only one field use a if condition
-          with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot
           name="below-input"
           :field-name="fieldName" />
@@ -98,9 +84,9 @@ export default {
     /**
      * the json object containing all the field information incl. `x-attrs` custom field
      * for placeholder, field type, etc. For more information on the attributes see
-     * [BaseForm](#baseform).<br>
+     * [BaseForm](BaseForm).
      * Most importantly the `x-attrs` needs to include the field `form_group` assigning
-     *  a number (1-based index!) to each form field by which fields are grouped.<br>
+     *  a number (1-based index!) to each form field by which fields are grouped.
      * Optional: add an attribute `form_group_title` to any group field (the field with the
      *  lowest order takes precedent) to add a form group header.
      */
@@ -132,8 +118,8 @@ export default {
     },
     /**
      * define additional style for the form
-     * should be an object eg. { 'padding-top': 0 }<br>
-     *  note: this applies to [BaseForm](#baseform) not the wrapper
+     * should be an object eg. `{ 'padding-top': 0 }`.
+     *  note: this applies to [BaseForm](BaseForm) not the wrapper
      *  component
      */
     formStyle: {
@@ -156,7 +142,7 @@ export default {
       default: '',
     },
     /**
-     * provide a object that contains the options list for all
+     * provide an object that contains the options list for all
      * fields with autocomplete / chips input
      */
     dropDownLists: {
@@ -164,8 +150,8 @@ export default {
       default: () => ({}),
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example on how it looks on an individual form field see [BaseInput](#baseinput)
+     * define if error icon should be shown.
+     * for an example on how it looks on an individual form field see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
@@ -173,8 +159,8 @@ export default {
     },
     /**
      * if `true` a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example on how it looks on an individual form field see [BaseInput](#baseinput)
+     * all input at once.
+     * for an example on how it looks on an individual form field see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -182,17 +168,17 @@ export default {
     },
     /**
      * provide an object with settings and properties for each field. This takes an object
-     * with the field name as properties with the props nested.<br>
-     * { fieldName1: { required: false, ... }, fieldName2: { ... } }<br>
-     * <br>
-     * find the possible variables at the respective input components: <br>
-     * [BaseInput](#baseinput)<br>
-     * [BaseAutocompleteInput](#baseautocompleteinput)<br>
-     * [BaseMultilineTextInput](#basemultilinetextinput)<br>
-     * [BaseChipsInput](#basechipsinput)<br>
-     * [BaseChipsBelow](#basechipsbelow)<br>
-     * [BaseDateInput](#basedateinput)<br>
-     * [BaseToggle](#basetoggle)<br>
+     * with the field name as properties with the props nested.
+     * `{ fieldName1: { required: false, ... }, fieldName2: { ... } }`.
+     *
+     * find the possible variables at the respective input components:
+     * [BaseInput](BaseInput)
+     * [BaseAutocompleteInput](BaseAutocompleteInput)
+     * [BaseMultilineTextInput](BaseMultilineTextInput)
+     * [BaseChipsInput](BaseChipsInput)
+     * [BaseChipsBelow](BaseChipsBelow)
+     * [BaseDateInput](BaseDateInput)
+     * [BaseToggle](BaseToggle)
      */
     fieldProps: {
       type: Object,
@@ -203,7 +189,7 @@ export default {
   },
   computed: {
     /**
-     * modify the component $props so they can be forwarded to BaseForm directly via
+     * modify the component $props, so they can be forwarded to BaseForm directly via
      * v-bind
      * @returns {{}}
      */

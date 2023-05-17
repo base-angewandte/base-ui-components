@@ -56,15 +56,17 @@
                 :tooltip="objectItem.additional"
                 :type="objectItem.type"
                 :url="objectItem.url"
-                :value="objectItem.value">
-                <!-- @slot slot for tooltip content -->
-                <template v-slot:tooltip>
+                :value="objectItem.value"
+                :class="[{ 'base-link--chip-text-list': isChip(objectItem) }]">
+                <template #tooltip>
+                  <!-- @slot slot for tooltip content -->
+                  <!-- @binding {array} data -  -->
                   <slot
                     :data="objectItem.additional"
                     name="tooltip" />
                 </template>
                 <!-- add directly after to avoid additional spaces -->
-              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 ? ', ' : '' }}
+              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 && !isChip(objectItem) ? ', ' : '' }}
               <!-- eslint-enable -->
             </template>
           </div>
@@ -124,29 +126,18 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * data structure for different rendered tags: <br>
-     * p: { label: 'String|Object', data: 'String' } <br>
-     * ul: { label: 'String|Object, data: ['String']}} <br>
-     * dt: {<br>
-     *  label: 'String|Object,<br>
-     *  data: [{
-     *    label: 'String|Object',
-     *    value: 'String',
-     *    url: 'String',
-     *    additional: 'Object' }]}} or<br>
-     * dt: {<br>
-     *  label: 'String|Object,<br>
-     *  data: {
-     *    label: 'String|Object',
-     *    value: 'String',
-     *    url: 'String'
-     *    additional: 'Object'}}}<br><br>
+     * data structure for different rendered tags:
      *
-     * label might be a string or a language object with ISO 639-1 as object properties
-     *  (e.g. { en: 'x', de: 'y' })<br>
-     *  additional property creates a tooltip and takes an object in the same format as
-     *    data: label, value and url<br>
-     * Note: for dt property 'url' will render 'value' as a link<br>
+     * **<p>**: `{ label: {string, Object}, data: {string} }`
+     * **<ul>**: `{ label: {string, Object}, data: {string[]}}`
+     * **<dt>**: `{ label: {string, Object}, data: [{ label: {string, Object}, value: {string}, url: {string}, additional: {Object} }]}` or
+     *  `{ label: {String, Object}, data: { label: {String, Object}, value: {string}, url: {string}, additional: {Object} }}`
+     *
+     * `label` might be a string or a language object with ISO 639-1 as object properties
+     *  (e.g. `{ en: 'x', de: 'y' }`).
+     *  `additional` property creates a tooltip and takes an object in the same format as
+     *    data: `label`, `value` and `url`.
+     * Note: for dt tag `url` will render `value` as a link
      */
     data: {
       type: Array,
@@ -182,12 +173,12 @@ export default {
     },
     /**
      * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
+     * valid vue link component (e.g. RouterLink, NuxtLink) and vue-router
      * is necessary
      */
     renderLinkAs: {
       type: String,
-      default: 'router-link',
+      default: 'RouterLinnk',
     },
     /**
      * specify how data-list (label, value) should be rendered
@@ -215,6 +206,15 @@ export default {
         }
       }
       return true;
+    },
+    /**
+     * check if the object contains properties that indicate a chip type
+     *
+     * @param {object} data
+     * @returns {boolean}
+     */
+    isChip(data) {
+      return !!(data.source && data.type);
     },
   },
 };
@@ -306,6 +306,11 @@ export default {
           margin-bottom: $spacing-small;
           word-break: break-word;
         }
+      }
+
+      .base-link--chip-text-list {
+        margin-right: $spacing-small-half;
+        margin-bottom: 2px;
       }
     }
 

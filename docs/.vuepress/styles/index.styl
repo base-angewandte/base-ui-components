@@ -1,0 +1,84 @@
+/**
+ * Custom Styles here.
+ *
+ * ref：https://v1.vuepress.vuejs.org/config/#index-styl
+ */
+
+:root
+  --app-color #3f51b5
+  --app-color-secondary #8e99f3
+  --map-cluster-bg rgba(63, 81, 181, .4)
+  --map-cluster-bg-inner rgba(63, 81, 181, .85)
+  --map-cluster-bg-hover rgba(142, 153, 243, .4)
+  --map-cluster-bg-inner-hover rgba(142, 153, 243, .85)
+
+body {
+  font-size 19px!important
+  font-family "Source Sans Pro", serif
+}
+
+table
+  overflow-x: auto
+
+ul
+  display list-item
+
+li
+  list-style disc
+
+.go-to-top
+  bottom 4.5rem !important
+  right 1rem !important
+
+// leaflet is setting a tile z-index of 1000 so in order to prevent map overlaying sidebar
+.sidebar
+  z-index 1001
+
+.navbar
+  z-index 1002
+
+.home .hero img
+  max-width 450px!important
+
+// have h2 in demo look different from regular styleguide h2
+.preview-code h2 {
+  font-size: 1.0em;
+  margin-bottom: 0;
+  border: 0;
+}
+
+.preview-code .preview
+  background-color white!important
+
+.prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea
+  background #282c34 !important
+  padding 4px !important
+
+// need to overwrite vuepress css! :(((
+.preview table
+  display table
+  margin 0
+  border-collapse separate
+  overflow-x unset
+
+.preview td, .preview th
+  border none
+
+.preview tr
+  background-color transparent
+  border-top none
+
+.preview a
+  color inherit
+
+.preview p, .preview ul, .preview ol
+  line-height unset
+
+.preview ul, .preview ol, .suggestions
+  padding-left unset
+  color inherit
+  list-style-type none
+
+.preview li, .suggestion, .sidebar li {
+  list-style none
+}

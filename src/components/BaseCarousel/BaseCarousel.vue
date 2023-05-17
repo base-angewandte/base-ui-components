@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="base-carousel swiper-container">
+      class="base-carousel swiper">
       <div
         class="swiper-wrapper">
         <div
@@ -46,11 +46,8 @@
 
 <script>
 import 'lazysizes';
-import Swiper, { Autoplay, Keyboard, Navigation, Pagination } from 'swiper';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
-
-Swiper.use([Autoplay, Keyboard, Navigation, Pagination]);
 
 export default {
   name: 'BaseCarousel',
@@ -60,37 +57,36 @@ export default {
   },
   props: {
     /**
-     * specify array of items to render<br>
-     *   the item object should have the following properties:<br>
-     *     title {?string} - the title to display<br>
-     *     subtext {?string} - the text below the title<br>
-     *     description {?string} - the type of item<br>
-     *     additional {?string} - additional information (e.g. dates)<br>
-     *     href - a url to follow upon item click - this is required if item should be rendered
-     *      as a link element<br>
-     *     previews - an array of image urls in different sizes in the following form:<br>
-     *      e.g. [{ '460w': 'image-url' }, { '640w': 'image url' },...]
+     * items to display
+     *
+     * array of objects with the following **required** properties:
+     *     **title** `?string` - the title to display.
+     *     **subtext** `?string` - the text below the title.
+     *     **description** `?string` - the type of item.
+     *     **additional** `?string` - additional information (e.g. dates).
+     *     **href** `string` - an url to follow upon item click - this is required if item should be rendered
+     *      as a link element.
+     *     **previews** `Object[]`- an array of image urls in different sizes in the following form:
+     *     e.g. `[{ '460w': 'image-url' }, { '640w': 'image url' },...]`
      */
     items: {
       type: Array,
       default: () => ([]),
     },
     /**
-     * specify swiper options
-     * swiper API: https://swiperjs.com/api/#parameters
+     * specify [swiper API options](https://swiperjs.com/swiper-api)
      */
     swiperOptions: {
       type: Object,
       default: () => ({}),
     },
     /**
-     * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
-     * is necessary
+     * specify how the link element should be rendered -
+     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router` is necessary
      */
     renderLinkElementAs: {
       type: String,
-      default: 'router-link',
+      default: 'RouterLink',
     },
   },
   data() {
@@ -115,7 +111,10 @@ export default {
     swiperOptions: {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.swiperOptionsInt)) {
-          this.swiperOptionsInt = JSON.parse(JSON.stringify(val));
+          this.swiperOptionsInt = {
+            ...this.swiperOptionsInt,
+            ...JSON.parse(JSON.stringify(val)),
+          };
         }
       },
       immediate: true,
@@ -140,7 +139,16 @@ export default {
       }
       return imageSrc;
     },
-    initSwiper() {
+    async initSwiper() {
+      // import swiper and plugins
+      // to avoid import/require issues in an SSR setup
+      // we import swiper when the component is already mounted
+      const { Swiper } = await import('swiper');
+      const { Autoplay } = await import('swiper');
+      const { Keyboard } = await import('swiper');
+      const { Navigation } = await import('swiper');
+      const { Pagination } = await import('swiper');
+
       this.swiperIsActive = true;
       this.swiperOptionsInt.init = false;
       if (this.swiperOptionsInt.autoplay) {
@@ -153,15 +161,16 @@ export default {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       };
+      this.swiperOptionsInt.modules = [Autoplay, Keyboard, Navigation, Pagination];
 
       setTimeout(() => {
-        this.swiper = new Swiper('.swiper-container', this.swiperOptionsInt);
+        this.swiper = new Swiper('.swiper', this.swiperOptionsInt);
         this.swiper.init();
         /**
          * event triggered when slider is initialized
          *
          * @event initialized
-         * @type { boolean }
+         * @param { boolean } - was carousel initialized
          */
         this.$emit('initialized', true);
       }, 0);
@@ -171,8 +180,10 @@ export default {
     },
     boxClicked(item) {
       /**
+       * event triggered by a ClickEvent on one of the carousel boxes
+       *
        * @event clicked
-       * @type {Object}
+       * @param {Object} - the carousel item that was clicked
        */
       this.$emit('clicked', item);
     },
@@ -182,7 +193,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../styles/variables";
-  @import "swiper/swiper.scss";
 
   .base-carousel {
     max-width: 1400px;
@@ -236,6 +246,13 @@ export default {
 <style lang="scss">
   @import "../../styles/variables";
 
+  // import swiper styles
+  @import '../../../node_modules/swiper/swiper.scss';
+  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
+
   .base-carousel {
     .base-image-box-image {
       max-width: inherit !important;
@@ -243,10 +260,10 @@ export default {
       transform: translate(-50%, -50%) !important;
     }
 
-    &.swiper-container {
+    &.swiper {
       opacity: 0;
 
-      &.swiper-container-initialized {
+      &.swiper-initialized {
         opacity: 1;
       }
     }
@@ -257,6 +274,7 @@ export default {
       @media screen and (min-width: $mobile-min-width) {
         display: flex;
         justify-content: center;
+        position: relative;
       }
     }
 
@@ -265,7 +283,7 @@ export default {
       height: 10px;
       border-radius: 50%;
       background: $pagination-bullet-color;
-      margin: $spacing-large $spacing-small $spacing;
+      margin: $spacing-large $spacing-small $spacing !important;
       cursor: pointer;
 
       &:focus {

@@ -1,6 +1,8 @@
+## Demo
+
 Component to render list data
 
-```vue
+```vue live
 
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
@@ -34,33 +36,22 @@ Component to render list data
       :control-type="toggleElements"
       @saved="saveExpandListEdit">
       <template
-        v-slot:content="props">
+        #content="{ data }">
         <BaseLink
-          :url="props.data.url"
-          :value="props.data.value"
-          :source="props.data.source"
-          :space-after="!!props.data.additional"
-          :tooltip="props.data.additional"
-          :type="props.data.type"/>
-        <template v-if="props.data.attributes"> - {{ props.data.attributes.join(', ') }}</template>
+          :url="data.url"
+          :value="data.value"
+          :source="data.source"
+          :space-after="!!data.additional"
+          :tooltip="data.additional"
+          :type="data.type"/>
+        <template v-if="data.attributes"> - {{ data.attributes.join(', ') }}</template>
       </template>
     </BaseExpandList>
   </div>
 </template>
 
 <script>
-import BaseEditControl from '../BaseEditControl/BaseEditControl';
-import BaseExpandList from './BaseExpandList';
-import BaseLink from '../BaseLink/BaseLink';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
-
 export default {
-  components: {
-    BaseCheckmark,
-    BaseEditControl,
-    BaseExpandList,
-    BaseLink,
-  },
   data() {
     return {
       editExpandList: false,

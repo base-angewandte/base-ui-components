@@ -8,8 +8,8 @@
       icon-size="large"
       :class="{ 'base-drop-button__button__multi': buttonsInt && buttonsInt.length }"
       @clicked="fireAction(primaryButtonInt[identifierPropertyName])">
-      <!-- @slot create custom content (e.g. icon) left of text -->
       <template #left-of-text>
+        <!-- @slot create custom content (e.g. icon) left of text -->
         <slot name="left-of-text" />
       </template>
       <template #right-of-text>
@@ -81,7 +81,7 @@ import ClickOutside from 'vue-click-outside';
 import BaseButton from '@/components/BaseButton/BaseButton';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import navigateList from '@/mixins/navigateList';
+import navigateList from '../../mixins/navigateList';
 
 /**
  * An Element to have the functionality of several buttons in one element
@@ -100,9 +100,9 @@ export default {
   props: {
     /**
      * array of button options
-     * specify an array with strings naming the action (in case label and icon are handled via slot)
-     * or an object with 'action', 'label' and 'icon' ('action' and 'label' may be customized
-     * via identifierPropertyName and labelPropertyName respectively)
+     * specify an array of strings naming the action (in case label and icon are handled via slot)
+     * or objects with `action`, `label` and `icon` (`action` and `label` may be customized
+     * via `identifierPropertyName` and `labelPropertyName` respectively)
      */
     buttons: {
       type: Array,
@@ -110,7 +110,7 @@ export default {
     },
     /**
      * specify either a button object or the identifier value of one of the items in
-     * the buttons array that should be shown as primary button - always visible<br>
+     * the buttons array that should be shown as primary button - always visible.
      * in case a string is provided an object with that identifier should be present in the buttons
      * array!
      */
@@ -119,7 +119,7 @@ export default {
       default: null,
     },
     /**
-     * add a description for the exand button - purely for accessibility
+     * add a description for the expand button - purely for accessibility
      * functionalities
      */
     expandButtonLabel: {
@@ -167,7 +167,7 @@ export default {
         vertical: 'bottom',
       },
       /**
-       * a variable to add additional styling to the drop down in case there is not enough space
+       * a variable to add additional styling to the drop-down in case there is not enough space
        * to handle positioning with css classes - since used for HTML attribute 'style' either an
        * object with 'transform' property or 'false' so that attribute is not shown
        * @type {boolean|Object}
@@ -206,10 +206,10 @@ export default {
   },
   watch: {
     buttonsInt() {
-      // if buttons changed the drop down size might have as well - recalculate
-      // the position of the drop down
+      // if buttons changed the drop-down size might have as well - recalculate
+      // the position of the drop-down
       // this might be obsolete now due to the v-click-outside but still leaving it here in case
-      // there might be any other scenario where drop down size changes
+      // there might be any other scenario where drop-down size changes
       this.calculateDropDownPosition();
     },
     showOptions(val) {
@@ -259,7 +259,12 @@ export default {
       // get the current index needed for navigate function
       const currentIndex = this.buttonsInt.indexOf(this.activeOption);
       // call mixin navigate function that returns the new active option
-      this.activeOption = this.navigate(this.buttonsInt, isArrowDown, currentIndex, true);
+      this.activeOption = this.navigate(
+        this.buttonsInt,
+        isArrowDown,
+        currentIndex,
+        true,
+      );
     },
     /**
      * function to inform parent that action was triggered (by click or enter)
@@ -272,7 +277,7 @@ export default {
        * fired upon any button click
        *
        * @event clicked
-       * @type {string}
+       * @param {string} - the action (string) that was provided for that button
        */
       this.$emit('clicked', actionType);
     },

@@ -1,6 +1,8 @@
+## Demo
+
 Toggle Button Example
 
-```vue
+```vue live
 <template>
   <div>
     <BaseToggle

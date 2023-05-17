@@ -36,7 +36,9 @@
           <!-- ACTIONS FOR BOXES -->
           <template
             #options>
-            <!-- @slot add custom option/action elements in the header row -->
+            <!-- @slot add custom option/action elements in the header row
+              @binding {Function} submit-action - the method that should be called after the action button was clicked
+            -->
             <slot
               name="optionButtons"
               :submit-action="submitAction">
@@ -149,7 +151,13 @@
               @keydown.space.prevent="editModeActive ? entrySelected(
                 getPropValue(identifierPropertyName, entry), !isEntrySelected(entry)) : false"
               @keydown.tab="cancelDragMode">
-              <!-- @slot result-box - for custom result boxes -->
+              <!-- @slot result-box - for custom result boxes
+                @binding {Object} item - one list item of boxes to be displayed
+                @binding {number} index - the index of the item
+                @binding {boolean} select-active - are items in select mode
+                @binding {boolean} is-entry-selected - is the particular item currently selected
+                @binding {Function} entry-selected - method that should be called when an entry was selected
+              -->
               <slot
                 :item="entry"
                 :index="index"
@@ -177,9 +185,10 @@
             </li>
 
             <!-- ACTION BUTTONS -->
-            <!-- @slot add custom elements after result elements list<br>
-             use scoped slot prop 'itemsPerRow' or dynamically adjusted css variable --items-per-row
-              to adjust element width in accordance with other boxes-->
+            <!-- @slot add custom elements after result elements list use scoped slot prop `itemsPerRow` or dynamically adjusted css variable `--items-per-row` to adjust element width in accordance with other boxes
+              @binding {number} items-per-row - items per row calculated from container or page width
+              @binding {string} element-id - add a class `base-result-box-section__box-item-${elementId}` to action button element to include it in box size and styling calculations
+            -->
             <slot
               v-if="showActionButtonBoxes && editModeActive"
               :items-per-row="itemsPerRow"
@@ -255,7 +264,7 @@
 
 <script>
 import { extractNestedPropertyValue } from '@/utils/utils';
-import navigateList from '@/mixins/navigateList';
+import navigateList from '../../mixins/navigateList';
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 import i18n from '../../mixins/i18n';
 
@@ -280,19 +289,18 @@ export default {
   },
   props: {
     /**
-     * @model
-     *
-     * actual entries list - if slot result-box is not used to use custom elements this
+     * actual entries list - if slot `result-box` is not used to use custom elements this
      * object array should have the following properties to be displayed
-     * in a [BaseImageBox](#baseimagebox):<br>
-     *    **id** {string} - a unique identifier<br>
-     *    **title** {?string} - the title of the box<br>
-     *    **subtext** {?string} - a subtitle<br>
-     *    **description** {?string} - text displayed at the bottom of the box<br>
-     *    **imageUrl** {?string} - url to display an image<br>
-     *    **text** {?string[]} - an array with strings that will be
-     *    displayed if no image is provided<br>
-     *    <br>
+     * in a [BaseImageBox](BaseImageBox):
+     *
+     *    **id** `string` - a unique identifier
+     *    **title** `?string` - the title of the box
+     *    **subtext** `?string` - a subtitle
+     *    **description** `?string` - text displayed at the bottom of the box
+     *    **imageUrl** `?string` - url to display an image
+     *    **text** `?string[]` - an array with strings that will be
+     *    displayed if no image is provided
+     *
      *    if a different schema is used please use the slot 'result-box' to create your own
      *    elements - only id and title should still be provided but can also
      *    be customized via `identifierPropertyName` and `titlePropertyName`
@@ -302,16 +310,16 @@ export default {
       default: () => [],
     },
     /**
-     * if false the header row (title and options) will not be available<br>
-     *   caveat: for draggable functionality this needs to be true
+     * if `false` the header row (title and options) will not be available
+     *   **Caveat**: for draggable functionality this needs to be true
      */
     showHeader: {
       type: Boolean,
       default: true,
     },
     /**
-     * title of section<br>
-     * it is recommended to also set the headerText even if slot is used for header
+     * title of section
+     * it is recommended to also set the `headerText` even if slot `header` is used for header
      * for accessibility reasons
      */
     headerText: {
@@ -326,9 +334,9 @@ export default {
       default: true,
     },
     /**
-     * set text for the options button if showOptions is true<br>
-     *   this needs to be an object with 'show' (displayed when options are hidden)
-     *   and 'hide' (displayed when options are visible) attributes
+     * set text for the options button if `showOptions` is `true`
+     *   this needs to be an object with `show` (displayed when options are hidden)
+     *   and `hide` (displayed when options are visible) attributes
      */
     optionsButtonText: {
       type: Object,
@@ -338,6 +346,12 @@ export default {
       }),
       validator: val => ['show', 'hide'].every(requiredProp => Object.keys(val).includes(requiredProp)),
     },
+    /**
+     * set the icon for the options button.
+     * if `showOptions` is `true` this needs to be an object with `show`
+     *  (displayed when options are hidden) and `hide` (displayed when
+     *  options are visible) attributes
+     */
     optionsButtonIcon: {
       type: Object,
       default: () => ({
@@ -348,17 +362,11 @@ export default {
     },
     /**
      * specify how many boxes should be displayed in a row in an array
-     * with "tupples" (array with min-size and number of boxes)
+     * with "tupples" (array with min-size and number of boxes).
      * depending on the size of the container (not screen width - unless
-     * `calcBoxNumberRelativeToWindow` is set to true)
-     * like the following:<br>
-     *   <code>
-     *   [<br>
-     *     \[0, [number of boxes]],<br>
-     *     \[[min px size for this number of boxes\], [number]],<br>
-     *     ...<br>
-     *   ]
-     *   </code>
+     * `calcBoxNumberRelativeToWindow` is set to `true`)
+     * like the following:
+     *   `[[0, [number of boxes]], [[min px size for this number of boxes], [number of boxes]], ...]`
      */
     boxBreakpoints: {
       type: Array,
@@ -380,15 +388,15 @@ export default {
     },
     /**
      * flag if component should be in edit mode (dragging, deleting,
-     * other custom options visible)<br>
-     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+     * other custom options visible)
+     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
      */
     editMode: {
       type: Boolean,
       default: false,
     },
     /**
-     * set this variable true if background-color should be white in editMode
+     * set this variable `true` if `background-color` should be white in edit mode
      */
     editModeWhiteBackground: {
       type: Boolean,
@@ -396,8 +404,8 @@ export default {
     },
     /**
      * provide a list of selected entries for select options (can
-     * be entry objects or entry ids)<br>
-     *  the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+     * be entry objects or entry ids).
+     *  the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
 
      */
     selectedList: {
@@ -405,7 +413,7 @@ export default {
       default: () => [],
     },
     /**
-     * set a text for 'x entries selected' and 'select all / none'<br>
+     * set a text for '[x] entries selected' and 'select all / none'
      */
     selectOptionsText: {
       type: Object,
@@ -416,10 +424,10 @@ export default {
       }),
     },
     /**
-     * if slot (options-message-area) is not used this variable
-     * can be used to customize message text<br>
-     *   this should be a string or an object with the actions needed (default: 'delete',
-     *   if 'draggable' is true than also a 'drag' text is needed)<br>
+     * if slot `options-message-area` is not used this variable
+     * can be used to customize message text.
+     *   this should be a string or an object with the actions needed (default: `delete`,
+     *   if `draggable` is `true` than also a `drag` property with suiting text is needed).
      *     in case of a string the same text is used for all actions
      */
     messageText: {
@@ -427,10 +435,10 @@ export default {
       default: 'Drag or Select',
     },
     /**
-     * if slot (options-message-area) is not used this variable
-     * can be used to customize message subtext<br>
-     *   this should be a string or an object with the actions needed (default: 'delete',
-     *   if 'draggable' is true than also a 'drag' text is needed)<br>
+     * if slot `options-message-area` is not used this variable
+     * can be used to customize message subtext.
+     *   this should be a string or an object with the actions needed (default: `delete`,
+     *   if `draggable` is `true` than also a `drag` property with suiting text is needed).
      *     in case of a string the same text is used for all actions
      */
     messageSubtext: {
@@ -438,7 +446,7 @@ export default {
       default: 'Drag\'n Drop to reorder or select the relevant items and choose an action',
     },
     /**
-     * determine if boxes can be dragged<br>
+     * determine if boxes can be dragged
      *   (only applicable if `showHeader` and `showOptions` is set to `true`)
      */
     draggable: {
@@ -446,15 +454,15 @@ export default {
       default: false,
     },
     /**
-     * set true if pagination should be used
+     * set `true` if pagination should be used
      */
     usePagination: {
       type: Boolean,
       default: false,
     },
     /**
-     * if 'usePagination' is set true this will determine the number of
-     * rows shown on one page<br>
+     * if `usePagination` is set `true` this will determine the number of
+     * rows shown on one page
      *   (only applicable if `usePagination` is set `true`)
      */
     maxRows: {
@@ -462,7 +470,7 @@ export default {
       default: 5,
     },
     /**
-     * set this true if only a limited number of boxes should be shown
+     * set this `true` if only a limited number of boxes should be shown
      * and rest can be displayed by clicking a "show more" button
      */
     useExpandMode: {
@@ -470,8 +478,8 @@ export default {
       default: false,
     },
     /**
-     * in 'expand mode' set the state of 'show more' from outside<br>
-     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     * if `useExpandMode` is `true` set the state of 'show more' from outside
+     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
      */
     expanded: {
       type: Boolean,
@@ -479,7 +487,7 @@ export default {
     },
     /**
      * Provide text that should be shown within the button with the
-     * expand / collapse functionality<br>
+     * expand / collapse functionality.
      *   should be an object with props `expand` for text to expand
      *   and `collapse` for text to collapse
      */
@@ -491,24 +499,23 @@ export default {
       }),
     },
     /**
-     * add a number of total elements (needed for expandMode and
-     * pagination
+     * add a number of total elements (needed for `useExpandMode` and
+     * `usePagination`)
      */
     total: {
       type: Number,
       default: null,
     },
     /**
-     * add a number of total elements (needed for expandMode and
-     * pagination<br>
-     *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     * set the current page number from outside if `usePagination` is `true`.
+     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
      */
     currentPageNumber: {
       type: Number,
       default: null,
     },
     /**
-     * how many rows should be shown with show more button (expandMode)<br>
+     * how many rows should be shown with show more button (expandMode)
      *   (only applicable with `useExpandMode true`)
      */
     maxShowMoreRows: {
@@ -516,7 +523,7 @@ export default {
       default: 1,
     },
     /**
-     * define if the section should scroll to top on page change<br>
+     * define if the section should scroll to top on page change
      *   (only applicable with `usePagination true`)
      */
     jumpToTop: {
@@ -531,16 +538,18 @@ export default {
       default: false,
     },
     /**
-     * set some config for each action used<br>
-     *   **text** {string} - the text displayed in the button<br>
-     *   **icon** {string} - the icon name to display
-     *    (for available icons see [BaseIcon](#baseicon) )<br>
-     *   **value** {string} - the value emitted on button click<br>
-     *   **[display='all']** {string} - define where the action should be displayed:<br>
-     *     top: only in top row<br>
-     *     bottom: only in action button box at bottom of list<br>
-     *     all: on top as well as bottom<br>
-     *   **disabled** {boolean} - disable button
+     * set some config for each action used - needs to be an array of objects with the
+     *  following properties:
+     *
+     *   **text** `string` - the text displayed in the button
+     *   **icon** `string` - the icon name to display
+     *    (for available icons see [BaseIcon](BaseIcon) )
+     *   **value** `string` - the value emitted on button click
+     *   **[display='all']** `?string` - define where the action should be displayed:
+     *     *top*: only in top row
+     *     *bottom*: only in action button box at bottom of list
+     *     *all*: on top as well as bottom
+     *   **disabled** `?boolean` - disable button
      */
     actionButtonsConfig: {
       type: Array,
@@ -560,9 +569,9 @@ export default {
     },
     /**
      * define a custom identifier property name for objects in your
-     * entryList array<br>
+     * `entryList` array.
      *   if relevant property is contained in a nested object the string can
-     *   be in dot notation. e.g. 'nestedObject.id'
+     *   be in dot notation. e.g. `nestedObject.id`
      */
     identifierPropertyName: {
       type: String,
@@ -570,9 +579,9 @@ export default {
     },
     /**
      * define a custom title property name for objects in your
-     * entryList array<br>
+     * `entryList` array.
      *   if relevant property is contained in a nested object the string can
-     *   be in dot notation. e.g. 'nestedObject.title'
+     *   be in dot notation. e.g. `nestedObject.title`
      */
     titlePropertyName: {
       type: String,
@@ -581,7 +590,8 @@ export default {
     /**
      * specify if pagination elements should be a link element - if pagination element should
      * be a link element - please specify the kind of element (currently only Vue components (e.g.
-     * 'router-link', 'nuxt-link') are supported)
+     * [`RouterLink`](https://router.vuejs.org/guide/#router-link),
+     * [`NuxtLink`](https://nuxtjs.org/docs/features/nuxt-components/#the-nuxtlink-component)) are supported)
      */
     usePaginationLinkElement: {
       type: [String, Boolean],
@@ -589,7 +599,7 @@ export default {
       validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
     },
     /**
-     * set this variable true if pagination is used and data fetching is done per page
+     * set this variable `true` if pagination is used and data fetching is done per page
      */
     fetchDataExternally: {
       type: Boolean,
@@ -615,27 +625,29 @@ export default {
     },
     /**
      * add text for screen reader users that helps them navigate list and use edit mode
-     * functionalities<br>
-     * object should have the following properties:<br>
-     *   <b>description</b>: Text read on edit mode activation<br>
-     *   <b>activated</b>: Text read after item was activated for reordering
-     *    (selected by enter key)<br>
-     *    property moved can contain variable {pos} which will be filled with current
-     *    position<br>
-     *   <b>moved</b>: Text read after item was moved<br>
-     *    property moved can contain variables {pos} (new position) and {total} (total number
+     * functionalities.
+     * object should have the following properties:
+     *
+     *   **description**: Text read on edit mode activation
+     *   **activated**: Text read after item was activated for reordering
+     *    (selected by enter key)
+     *    property moved can contain variable `{pos}` which will be filled with current
+     *    position
+     *   **moved**: Text read after item was moved
+     *    property moved can contain variables `{pos}` (new position) and `{total}` (total number
      *    of list items)
      */
     supportiveText: {
       type: Object,
       default: () => ({
-        description: 'Select items via space bar to carry out actions or use enter key to select an item for reordering. Use Tab key to navigate between items.',
+        description: 'Select items via space bar to carry out actions or use enter '
+          + 'key to select an item for reordering. Use Tab key to navigate between items.',
         activated: 'Item at position {pos} selected for reordering. Use arrow keys to order item.',
         moved: 'Item moved to position {pos} of {total}',
       }),
     },
     /**
-     * BaseResultBoxSection is for example used to display search results - which contain a link
+     * `BaseResultBoxSection` is for example used to display search results - which contain a link
      * to the entry - in this case the focus should be on the link element so that navigation to
      * route link triggers on enter and focus on the list element itself is disabled (if not edit
      * mode!)
@@ -780,10 +792,10 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.entryList)) {
           /**
            * event emitted when the list of entries changed internally
-           * (relevant if `draggable` is set true)
+           * (relevant if `draggable` is set `true`)
            *
            * @event entries-changed
-           * @param {Object[]} val - the updated list of entries
+           * @param {Object[]} - the updated list of entries
            */
           this.$emit('entries-changed', val);
         }
@@ -803,12 +815,12 @@ export default {
     selectedListInt(val) {
       if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
         /**
-         * inform the parent of the changes in the selected list and provide
-         * the ids of all selected<br>
-         *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         * inform the parent of the changes in `selectedList` and provide
+         * the ids of all selected.
+         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          *
          * @event update:selected-list
-         * @param {Array} val - the list of selected entry ids
+         * @param {Array} - the list of selected entry ids
          */
         this.$emit('update:selected-list', val);
       }
@@ -849,7 +861,7 @@ export default {
           /** emitted when pagination is used and page number was changed
            *
            * @event update:current-page-number
-           * @param {number} number - the new page number
+           * @param {number} - the new page number
           */
           this.$emit('update:current-page-number', this.currentPageNumberInt);
         }
@@ -875,10 +887,10 @@ export default {
       // inform parent of internal change
       if (val !== this.expanded) {
         /**
-         * event emitted on expand toggle<br>
-         *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         * event emitted on expand toggle.
+         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          * @event update:expanded
-         * @param { Boolean } val - true if list is expanded
+         * @param { Boolean } - true if list is expanded
          */
         this.$emit('update:expanded', val);
       }
@@ -913,11 +925,11 @@ export default {
       }
       if (val !== this.editMode) {
         /**
-         * emitted on edit mode toggle (options toggle)<br>
-         *   the [.sync modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         * emitted on edit mode toggle (options toggle).
+         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
          *
          * @event update:edit-mode
-         * @param {Boolean} val - flag for edit mode active
+         * @param {Boolean} - flag for edit mode active
          */
         this.$emit('update:edit-mode', val);
       }
@@ -1050,7 +1062,7 @@ export default {
        * event triggered when an action is triggered (after selecting boxes)
        *
        * @event submit-action
-       * @param {string} action - the action type
+       * @param {string} - the action type
        */
       this.$emit('submit-action', action);
     },
@@ -1212,7 +1224,7 @@ export default {
          * communicate to parent when items per row changed, either after initial
          * render space calculations or when window was resized
          * @event items-per-row-changed
-         * @type {number}
+         * @param {number} - the new number of items that fit in a row
          */
         this.$emit('items-per-row-changed', this.itemsPerRow);
       }
@@ -1242,7 +1254,6 @@ export default {
       /**
        * event emitted from default image box when clicked
        * @event entry-clicked
-       * @param {Object} object - an object with the following properties:
        * @property {string} entryId - the id of the clicked entry
        * the select mode was not active but the box was clicked
        */
@@ -1252,7 +1263,7 @@ export default {
      * get an internationalized string
      *
      * @param {string|Object} localizationArguments - string or object to look
-     * up in localization files<br>
+     * up in localization files
      *   if it is an object it should have the following properties:
      * @property {string} string - string to look up in a Locale messages file
      * @property {number} count - for pluralization

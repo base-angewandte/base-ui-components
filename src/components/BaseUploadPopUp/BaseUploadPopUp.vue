@@ -39,7 +39,7 @@
       </div>
     </transition-group>
 
-    <!-- @slot slot for additional content -->
+    <!-- @slot slot for additional content after upload bars but before buttons -->
     <slot />
 
     <template slot="button-row">
@@ -81,6 +81,10 @@ import BasePopUp from '../BasePopUp/BasePopUp';
 import BaseProgressBar from '../BaseProgressBar/BaseProgressBar';
 import i18n from '../../mixins/i18n';
 
+/**
+ * A component taking care of uploads within a pop up
+ */
+
 export default {
   name: 'BaseUploadPopUp',
   components: {
@@ -93,7 +97,7 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * register files to upload<br>
+     * register files to upload
      * array with file-object(s) from file-input field
      */
     fileList: {
@@ -101,8 +105,8 @@ export default {
       default: () => [],
     },
     /**
-     * define current status<br>
-     * possible values: 'initial' | 'saving' | 'success' | 'failed'
+     * define current status
+     * @values initial, saving, success, failed
      */
     currentStatus: {
       type: String,
@@ -112,7 +116,7 @@ export default {
       },
     },
     /**
-     * define button text<br>
+     * define button text
      * could be string or path to i18n json as well
      */
     cancelButtonText: {
@@ -121,15 +125,15 @@ export default {
     },
     /**
      * specify informational texts for the component -
-     * this needs to be an object with the following properties<br>
-     * <br>
-     *   <b>title</b>: text used in the popup header<br>
-     *   <b>upload</b>: default button text<br>
-     *   <b>done</b>: button text when upload finished<br>
-     *   <b>retry</b>: button text when an upload error occurs<br>
-     *   <b>quotaExceeded</b>: text used when user quota is exceeded<br>
-     * <br>
-     * The values of this object might be plain text or a key for an i18n file<br>
+     * this needs to be an object with the following properties:
+     *
+     *   **title** `string` - text used in the popup header
+     *   **upload** `string` - default button text
+     *   **done** `string` - button text when upload finished
+     *   **retry** `string` - button text when an upload error occurs
+     *   **quotaExceeded** `- string` text used when user quota is exceeded
+     *
+     * The values of this object might be plain text or a key for an i18n file
      */
     uploadText: {
       type: Object,
@@ -138,12 +142,13 @@ export default {
         upload: 'Upload',
         done: 'Done',
         retry: 'Try Again',
-        quotaExceeded: 'Unfortunately you exceeded your quota, because you have only {space} of space left. Please remove some files to enable uploading.',
+        quotaExceeded: 'Unfortunately you exceeded your quota, because you have '
+          + 'only {space} of space left. Please remove some files to enable uploading.',
       }),
     },
     /**
-     * current upload progress in percent per file<br>
-     * array with current upload progress per file<br>
+     * current upload progress in percent per file
+     * array with current upload progress per file
      * e.g. [11, 55, 100]
      */
     uploadPercentage: {
@@ -158,7 +163,7 @@ export default {
       default: 10000000,
     },
     /**
-     * define rejected files<br>
+     * define rejected files
      * array with filename(s)
      */
     rejectedFiles: {
@@ -166,7 +171,7 @@ export default {
       default: () => [],
     },
     /**
-     * define uploaded files<br>
+     * define uploaded files
      * array with filename(s)
      */
     uploadedFiles: {
@@ -174,10 +179,10 @@ export default {
       default: () => [],
     },
     /**
-     * define errors for rejected files<br>
+     * define errors for rejected files
      * array with objects
-     * eg: [{ name: 'foo.txt', message: 'The file may include a virus' }]<br>
-     * Note: each object must contain: name, message
+     * eg: `[{ name: 'foo.txt', message: 'The file may include a virus' }]`
+     * Note: each object must contain the properties: `name`, `message`
      */
     fileErrors: {
       type: Array,
@@ -244,26 +249,26 @@ export default {
       /**
        * Event emitted when cancel button is clicked
        *
-       * @type {Event}
+       * @event cancel-upload
        */
-      this.$emit('cancelUpload');
+      this.$emit('cancel-upload');
     },
     startUpload() {
       /**
        * Event emitted when upload button is clicked
        *
-       * @type {Event}
+       * @event start-upload
        */
-      this.$emit('startUpload');
+      this.$emit('start-upload');
     },
     removeFile(index) {
       /**
        * Event emitted when remove button on file entry is clicked
        *
-       * @type {Event}
-       * @property {number} index - index of the file entry
+       * @event remove-file
+       * @property {number} - index of the file entry
        */
-      this.$emit('removeFile', index);
+      this.$emit('remove-file', index);
     },
   },
 };

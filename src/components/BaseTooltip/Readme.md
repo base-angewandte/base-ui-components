@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div>
     <BaseTooltip
@@ -12,14 +14,7 @@
   </div>
 </template>
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-import BaseTooltip from '../BaseTooltip/BaseTooltip';
-
 export default {
-  components: {
-    BaseButton,
-    BaseTooltip,
-  },
   data() {
     return {
       tooltip: false,

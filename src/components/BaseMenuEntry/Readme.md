@@ -1,8 +1,10 @@
+## Demo
+
 The example entry below has three thumbnail icons. Note that icons appear stacked in columns, and each column accomodates a maximum of two icons. If you provide more thumbnails, they will continue to align according to this pattern along the x-axis, from right to left, and from top to bottom.
-```vue
+```vue live
 <template>
   <div class="background">
-    <base-menu-entry
+    <BaseMenuEntry
       entryId="single"
       description="Description"
       title="Title"
@@ -10,21 +12,21 @@ The example entry below has three thumbnail icons. Note that icons appear stacke
       icon="file-object"
       :showThumbnails="true">
       <template
-          v-slot:thumbnails>
-          <base-icon
+          #thumbnails>
+          <BaseIcon
             name="eye"
             title="eye"
             class="icon" />
-          <base-icon
+          <BaseIcon
             name="archive-arrow"
             title="archived"
             class="icon" />
-          <base-icon
+          <BaseIcon
             name="people"
             title="shared"
             class="icon" />
         </template>
-    </base-menu-entry>
+    </BaseMenuEntry>
   </div>
 </template>
 <script>
@@ -42,4 +44,4 @@ export default {};
 </style>
 
 ```
-For another example of using `BaseMenuEntry`, see [BaseMenuList](#basemenulist).
+For another example of using `BaseMenuEntry`, see [BaseMenuList](BaseMenuList).

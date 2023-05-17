@@ -1,8 +1,10 @@
+## Demo
+
 Search functionality with simple freetext and advanced search
 
 To see autocomplete results try typing 'zentrum'.
 
-```vue
+```vue live
 <template>
   <div class="background">
     <BaseAdvancedSearch

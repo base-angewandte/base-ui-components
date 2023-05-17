@@ -25,11 +25,11 @@
       <div class="base-switch">
         <span
           :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
-          <base-icon
+          <BaseIcon
             v-if="checkedInt"
             :title="hideLabel ? label : ''"
             name="check-mark" />
-          <base-icon
+          <BaseIcon
             v-if="!checkedInt"
             :title="hideLabel ? label : ''"
             name="remove" />
@@ -71,7 +71,7 @@ export default {
   },
   props: {
     /**
-     * specify a descriptive name <br>
+     * specify a descriptive name
      * this will not be displayed but is only there for usability purposes
      */
     name: {
@@ -93,13 +93,10 @@ export default {
       default: false,
     },
     /**
-     * checkbox checked or radio button checked can be set from outside, <br>
-     * default value depending on type of selector
-     *
-     * @model
+     * is toggle checked
      */
     checked: {
-      type: [Boolean, String],
+      type: Boolean,
       default: false,
     },
     /**
@@ -110,16 +107,14 @@ export default {
       default: false,
     },
     /**
-     * bind visibility of slot content to components checked state<br>
+     * bind visibility of slot content to components checked state
      */
     bindSlotToState: {
       type: Boolean,
       default: false,
     },
     /**
-     * if field is occurring more then once - set an id<br>
-     * in case a custom input is used with the input slot it is important to
-     * assign the same id to the input element
+     * if field is occurring more than once - set an id
      */
     id: {
       type: String,
@@ -152,10 +147,9 @@ export default {
     },
     checkedInt(val) {
       /**
-       * event emitted on radio button / checkmark click, <br>
-       * emitting input value
-       *
-       * @type {string | boolean}
+       * event emitted on radio button / checkmark click
+       * @event clicked
+       * @param {string, boolean} - emitted input value (string for Radio Button, boolean value for Checkmark)
        */
       this.$emit('clicked', val);
     },

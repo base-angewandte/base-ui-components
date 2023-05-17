@@ -20,7 +20,7 @@ export default {
   name: 'BaseImage',
   props: {
     /**
-     * set alt attribute
+     * set `alt` attribute
      */
     alt: {
       type: String,
@@ -34,19 +34,15 @@ export default {
       default: false,
     },
     /**
-     * set src attribute
+     * set `src` attribute
      */
     src: {
       type: String,
       default: '',
     },
     /**
-     * set srcSet attribute<br>
-     * structure: [
-     *   {
-     *     '640w': 'path'
-     *   },
-     * ]
+     * set `srcSet` attribute
+     * structure: `[{ '640w': 'path' }]`
      */
     srcset: {
       type: Array,
@@ -69,6 +65,10 @@ export default {
   },
   methods: {
     emitError(event) {
+      /**
+       * @event error
+       * @param {ErrorEvent} - the native <img> error event
+       */
       this.$emit('error', event);
     },
   },

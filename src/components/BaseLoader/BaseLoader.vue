@@ -32,12 +32,15 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * add positional properties like for a style object
+     */
     position: {
       type: Object,
       default: () => ({}),
     },
     /**
-     * set this to true if you want to keep element (with height and width) but dont
+     * set this to `true` if you want to keep element (with height and width) but dont
      * want the loader to show
      */
     hide: {

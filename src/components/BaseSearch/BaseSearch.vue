@@ -35,13 +35,11 @@
       class="base-search__input"
       v-on="$listeners">
       <template #pre-input-field>
-        <!-- @slot add elements within search but before all other elements <br>
-          for an example see [BaseInput](#baseinput) -->
+        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
         <slot name="pre-input-field" />
       </template>
       <template #input-field-addition-before>
-        <!-- @slot add elements within search but before all other elements <br>
-          for an example see [BaseInput](#baseinput) -->
+        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
         <slot name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
@@ -59,24 +57,20 @@
         </slot>
       </template>
       <template #input-field-addition-after>
-        <!-- @slot for adding elements after input <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding elements after input. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="input-field-addition-after" />
       </template>
       <template #post-input-field>
-        <!-- @slot elements after the actual input element but within the input field container <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="post-input-field" />
         <div :class="{ 'base-search__spacing': dateFieldType }" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon<br>
-          for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding custom input remove icon <br>
-        for an example see [BaseChipsInputField](#basechipsinputfield)-->
+        <!-- @slot for adding custom input remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="remove-icon" />
       </template>
       <template #below-input>
@@ -106,20 +100,18 @@ export default {
   },
   props: {
     /**
-     * set input value from outside <br>
-     *   for type daterange this needs to be an object with
-     *   date`_`from and date`_`to properties!
-     *
-     * @model
+     * set input value from outside
+     *   for type `daterange` this needs to be an object with
+     *   `date_from` and `date_to` properties!
      */
     input: {
       type: [String, Object],
       default: '',
     },
     /**
-     * if input type is chips this is the prop to
-     * pass selected options (chips)<br>
-     *  you may use the .sync modifier on this prop
+     * if input type is `chips` this is the prop to
+     * pass selected options (chips).
+     *  you may use the `.sync` modifier on this prop
      */
     selectedChips: {
       type: Array,
@@ -127,7 +119,7 @@ export default {
     },
     /**
      * placeholder to show for input; either just a string or an object with
-     * different text for each search type (text, chips, date)
+     * different text for each search type (`text`, `chips`, `date`)
      */
     placeholder: {
       type: [String, Object],
@@ -163,8 +155,8 @@ export default {
       default: '',
     },
     /**
-     * specify the type of input field <br>
-     * @values: text, chips, controlled, date, daterange, 'chipssingle'
+     * specify the type of input field
+     * @values text, chips, controlled, date, daterange, chipssingle
      */
     type: {
       type: String,
@@ -172,15 +164,15 @@ export default {
       validator: val => ['text', 'chips', 'chipssingle', 'controlled', 'date', 'daterange'].includes(val),
     },
     /**
-     * specify a linked list option (e.g. drop down) <br>
-     *   (will be used in aria-activedescendant attribute)
+     * specify a linked list option (e.g. drop down)
+     *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
       type: String,
       default: null,
     },
     /**
-     * if true space is reserved for a loader that can be activated
+     * if `true` space is reserved for a loader that can be activated
      * with the 'isLoading' prop
      */
     loadable: {
@@ -188,7 +180,7 @@ export default {
       default: false,
     },
     /**
-     * is loading indicator - showing loader if true
+     * is loading indicator - showing loader if `true`
      */
     isLoading: {
       type: Boolean,
@@ -204,7 +196,7 @@ export default {
     },
     /**
      * specify the object property that should be used as identifier (only needed
-     * for type 'chips'
+     * for type `chips`
      */
     identifierPropertyName: {
       type: String,
@@ -212,7 +204,7 @@ export default {
     },
     /**
      * specify the object property that should be used as value to be displayed (only needed
-     * for type 'chips'
+     * for type `chips`
      */
     labelPropertyName: {
       type: String,
@@ -220,25 +212,25 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field.
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
       default: true,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * if `true` a remove icon will be shown allowing to remove
+     * all input at once.
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
@@ -260,9 +252,10 @@ export default {
       default: true,
     },
     /**
-     * this prop gives the option to add assistive text for screen readers<br>
-     * properties:<br>
-     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips)
      */
     assistiveText: {
@@ -339,7 +332,7 @@ export default {
            * inform parent of changed input values (v-model)
            *
            * @event input
-           * @type {(string|Object)}
+           * @param {string, Object} - the altered input values
            */
           this.$emit('input', this.dateInputInt);
         } else if (this.type === 'daterange') {
@@ -478,7 +471,7 @@ export default {
          * inform parent of changes in selected chips
          *
          * @event update:selected-chips
-         * @type {Array}
+         * @param {Array} - the updated selected options list
          */
         this.$emit('update:selected-chips', val);
       }
@@ -503,7 +496,7 @@ export default {
          * to keep active state of component in sync
          *
          * @event update:is-active
-         * @type {boolean}
+         * @param {boolean} - is component active
          */
         this.$emit('update:is-active', val);
       }

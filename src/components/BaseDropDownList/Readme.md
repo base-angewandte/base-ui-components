@@ -1,6 +1,8 @@
+## Demo
+
 A list in drop down style. Click the button to display!
 
-```vue
+```vue live
 <template>
     <div class="drop-down-test">
         <div class="button-display-area">
@@ -23,12 +25,7 @@ A list in drop down style. Click the button to display!
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-    components: {
-        BaseButton,
-    },
     data() {
         return {
             showDropDown: false,
@@ -70,7 +67,7 @@ export default {
 
 An example connected with an input field (displayAsDropDown: false)
 
-```vue
+```vue live
 
 <template>
   <div>
@@ -92,21 +89,21 @@ An example connected with an input field (displayAsDropDown: false)
         list-id="aSimpleTestList"
         class="base-drop-down-list-example"
         @update:selected-option="addChipByClick">
-      <template v-slot:before-list>
+      <template #before-list>
           <div class="slot">
             This is a slot before the list
           </div>
       </template>
-      <template v-slot:after-list>
+      <template #after-list>
         <div class="slot">
           This is a slot after the list
         </div>
       </template>
-      <template v-slot:no-options>
+      <template #no-options>
         Add a custom text or elements when no options
         are available via 'no-options' slot
       </template>
-      <template v-slot:option="items">
+      <template #option="items">
         <div class="option">
           {{ items.option.value }}<span class="customized-option">this is customized via option slot!'</span>
         </div>
@@ -116,12 +113,7 @@ An example connected with an input field (displayAsDropDown: false)
 </template>
 
 <script>
-import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
-
 export default {
-  components: {
-    BaseChipsInputField,
-  },
   data() {
     return {
       input: '',
@@ -206,10 +198,4 @@ export default {
     margin-left: 16px;
   }
 </style>
-
-
-
-
-
 ```
-

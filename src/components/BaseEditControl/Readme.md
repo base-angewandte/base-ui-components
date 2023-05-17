@@ -1,6 +1,8 @@
+## Demo
+
 Example of BaseEditControl
 
-```vue
+```vue live
 
 <template>
   <div class="container">
@@ -18,7 +20,7 @@ Example of BaseEditControl
         label="Mode 'save'"
         mark-style="radio"/>
     </div>
-    <baseEditControl
+    <BaseEditControl
       :controls="true"
       :edit="edit"
       :edit-mode="editMode"
@@ -31,14 +33,7 @@ Example of BaseEditControl
 </template>
 
 <script>
-import BaseEditControl from './BaseEditControl';
-import BaseToggle from '../BaseToggle/BaseToggle';
-
 export default {
-  components: {
-    BaseEditControl,
-    BaseToggle,
-  },
   data() {
     return {
       edit: false,
@@ -55,7 +50,7 @@ export default {
     },
     save() {
       this.edit = false;
-      alert(`${editMode} clicked`);
+      alert(`${this.editMode} clicked`);
     },
   }
 }

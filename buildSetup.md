@@ -4,38 +4,29 @@
 # install dependencies
 npm install
 
-# build library components with rollup
+# build library components
 npm run build
+
+# build library components and rebuild on changes
+npm run build:watch
 
 # add postcss transformations to base-ui-components.css
 npm run build:transform-css
 
-# build library components with rollup and rebuild on changes
-npm run build:watch
+# collect css files, generate and update package.json exports property
+npm run build:update-package-exports
+
+# commands run after build (build:transform-css, build:transform-css)
+npm run build:post-commands
 
 # serve with hot reload at localhost:8080
 npm run dev
-
-# run styleguide for development purposes
-npm run styleguide
-
-# build styleguide docs
-npm run styleguilde:build
 
 # lint files
 npm run lint
 
 # create svg spriteSheet
 npm run svg
-
-# run unit tests
-npm run test:unit
-
-# create index file for every component (if it does not exist yet)
-npm run updateindex
-
-# force index update (also if index.js already exists)
-npm run updateindex:all
 
 # create a changelog for the newest version adding to CHANGELOG.md
 npm run changelog
@@ -44,6 +35,13 @@ npm run changelog
 npm run changelog -- --styleguide-path=https://base-angewandte.github.io/base-ui-components/
 ```
 
+## Development
+
+The v3 of this component library is built with [Vite](https://vitejs.dev).
+
+This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
+available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
+
 ```bash
 # to use locally for development
 # in this project
@@ -51,17 +49,6 @@ npm link
 
 # in target project
 npm link base-ui-components
+# Note: to date nuxt/bridge projects seem to have issues with importing linked and minified modules -
+#       therefore disable minifying in vite.config.js: build.minify: false
 ```
-
-## Base Components
-
-For a list of components included in the build and their options run ```npm run styleguide```
-or see [styleguide](https://base-angewandte.github.io/base-ui-components/).
-
-
-## Development
-
-The v2 of this component library is currently build via [rollup](https://rollupjs.org).
-
-This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
-available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).

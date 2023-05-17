@@ -7,8 +7,7 @@
       ref="head"
       :class="['base-entry-selector__head',
                { 'base-entry-selector__head--shadow': headHasShadow }]">
-      <!-- @slot per default this element contains the search element of the component.
-        Use this slot to replace it with your own elements -->
+      <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
       <slot name="head">
         <!-- default -->
         <BaseSearch
@@ -34,11 +33,10 @@
           :options-button-text="entrySelectorText.options"
           align-options="left">
           <template
-            slot="afterOptions">
+            #afterOptions>
             <div
               class="base-entry-selector__dropdowns">
-              <!-- @slot to add custom elements at the end of the options row,
-              e.g. custom drop downs -->
+              <!-- @slot to add custom elements at the end of the options row, e.g. custom drop downs -->
               <slot name="after-options">
                 <!-- default -->
                 <BaseDropDown
@@ -72,7 +70,7 @@
             </div>
           </template>
           <template
-            slot="options">
+            #options>
             <!-- @slot add custom action (buttons) -->
             <slot name="option-actions" />
           </template>
@@ -87,9 +85,8 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        :select-all-disabled="!!maxSelectedEntries && (!(selectableEntries.length
-          < (maxSelectedEntries - selectedListIds.length)
-          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
+        :select-all-disabled="!!maxSelectedEntries && (maxSelectedEntries <= selectedListIds.length
+          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
         @selected="changeAllSelectState">
         <template #selectedText>
           {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
@@ -113,12 +110,10 @@
           :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
       </div>
 
-      <!-- @slot the component [BaseMenuList](#basemenulist) is used per default to display the
-      list of entries - if something different is required use this slot. <br>
-      If an entry is selected, the public method 'selectEntry' should be triggered - this method
-      takes two arguments:<br>
-        **index {number}: the index of the element in the entries list<br>
-        **selected {boolean}: if element was selected or deselected -->
+      <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
+          @binding {Object[]} entries - list of entries to display
+          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
+          -->
       <slot
         name="entries"
         :entries="entries"
@@ -137,9 +132,7 @@
           @selected="selectEntry">
           <template
             #thumbnails="{ item }">
-            <!-- @slot add custom elements at the end of the item row
-              (see also [BaseMenuList](#basemenulist))<br>
-              this slot can only be be used if the 'entries' slot is not used -->
+            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used -->
             <slot
               :item="item"
               name="thumbnails" />
@@ -168,7 +161,7 @@
 </template>
 
 <script>
-import i18n from '@/mixins/i18n';
+import i18n from '../../mixins/i18n';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -188,8 +181,8 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * list of entries to display. Unless the slot 'entries' is used this should be an object with
-     * properties compatible with [BaseMenuList](#basemenulist) 'list' object array
+     * list of entries to display. Unless the slot `entries` is used this should be an object with
+     * properties compatible with [BaseMenuList](BaseMenuList) `list` object array
      */
     entries: {
       type: Array,
@@ -203,8 +196,8 @@ export default {
       default: null,
     },
     /**
-     * number of entries per page (this does not steer the number of entries displayed
-     * (the correct number needs to be provided by 'entries') but is solely
+     * number of entries per page (this does not steer the number of entries displayed.
+     * (the correct number needs to be provided by `entries`) but is solely
      * needed for correct pagination calculations)
      */
     entriesPerPage: {
@@ -219,17 +212,16 @@ export default {
       default: false,
     },
     /**
-     * specify a maximum number of entries that can be selected<br>
-     * specify '0' if there should be no limit
+     * specify a maximum number of entries that can be selected.
+     * specify `0` if there should be no limit
      */
     maxSelectedEntries: {
       type: Number,
       default: 0,
     },
     /**
-     * specify a custom height - mainly useful if component is within a pop up.
-     * Use a valid CSS height
-     * property value.
+     * specify a custom height - mainly useful if component is within a pop-up.
+     * Use a valid CSS height property value.
      */
     height: {
       type: String,
@@ -243,7 +235,7 @@ export default {
       default: false,
     },
     /**
-     * specify an entry to be marked active (color border on left side)
+     * specify the index of an entry to be marked active (color border on left side).
      */
     activeEntry: {
       type: Number,
@@ -251,7 +243,7 @@ export default {
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
-     * e.g. { de: 'xxx', en: 'yyy' })
+     * e.g. `{ de: 'xxx', en: 'yyy' }`)
      */
     language: {
       type: String,
@@ -266,21 +258,21 @@ export default {
     },
     /**
      * define options to filter entries
-     * structure e.g.: [{ label: { de: "Alle Typen", en: "All Types" }, source: "" }]
+     * structure e.g.: `[{ label: { de: "Alle Typen", en: "All Types" }, source: "" }]`
      */
     entryTypes: {
       type: Array,
       default: () => [],
     },
     /**
-     * specify config options for your sorting drop down element (if 'sortOptions are
-     * provided<br>
-     * Needs to be an object with the following properties:<br>
-     *  *label*: specify a label for the sort options drop down (purely for accessibility purposes)
-     *  *default*: specify a default option that the drop down is initialized with<br>
-     *    this needs to have the same object structure as the objects in 'entryTypes'<br>
-     *    if no default is provided the first option in the list will be selected
-     *  *valuePropertyName*: specify the name of the property that contains a unique value
+     * specify config options for your sorting drop down element (if `sortOptions` are
+     * provided).
+     * Needs to be an object with the following properties:
+     *  **label** `string` - specify a label for the sort options drop down (purely for accessibility purposes)
+     *  **default** `?Object` - specify a default option that the dropdown is initialized with.
+     *    this needs to have the same object structure as the objects in `entryTypes`.
+     *    if no default is provided the first option in the list will be selected.
+     *  **valuePropertyName** `string` - specify the name of the property that contains a unique value
      */
     entryTypesConfig: {
       type: Object,
@@ -293,22 +285,22 @@ export default {
         .every(key => Object.keys(value).includes(key)),
     },
     /**
-     * define options for sorting entries <br>
-     * structure e.g: [{ label: 'By Type', value: 'type_en' }]
+     * define options for sorting entries.
+     * structure e.g: `[{ label: 'By Type', value: 'type_en' }]`
      */
     sortOptions: {
       type: Array,
       default: () => [],
     },
     /**
-     * specify config options for your sorting drop down element (if 'sortOptions are
-     * provided<br>
-     * Needs to be an object with the following properties:<br>
-     *  *label*: specify a label for the sort options drop down (purely for accessibility purposes)
-     *  *default*: specify a default option that the drop down is initialized with.
-     *    if none is specified the first type in the 'sortOptions' will be used.<br>
-     *    This needs to be an object with the same properties as 'sortOptions'.
-     *  *valuePropertyName*: specify the name of the property that contains a unique value
+     * specify config options for your sorting drop down element (if `sortOptions` are
+     * provided).
+     * Needs to be an object with the following properties:
+     *  **label** `string` - specify a label for the sort options drop down (purely for accessibility purposes)
+     *  **default** `?Object` - specify a default option that the dropdown is initialized with.
+     *    this needs to have the same object structure as the objects in `entryTypes`.
+     *    if no default is provided the first option in the list will be selected.
+     *  **valuePropertyName** `string` - specify the name of the property that contains a unique value
      */
     sortConfig: {
       type: Object,
@@ -317,27 +309,28 @@ export default {
         default: null,
         valuePropertyName: 'value',
       }),
-      validator: value => !value || Object.keys(value).every(key => ['label', 'default', 'valuePropertyName'].includes(key)),
+      validator: value => !value || Object.keys(value).every(key => [
+        'label', 'default', 'valuePropertyName'].includes(key)),
     },
     /**
      * specify informational texts for the component (especially helpful to provide language
-     * specific text - this needs to be an object with the following
-     * properties (if you dont want to display any text leave an empty string:  <br>
-     *   <br>
-     *     <b>noEntriesTitle</b>: Header text shown if search for string returned no results<br>
-     *     <b>noEntriesSubtext</b>: subtext shown if search for string returned no result <br>
-     *     <b>options</b>: Text for title button<br>
-     *        This needs to be an object containing a 'show' and 'hide' property that are shown when
-     *        'entriesSelecable' is true or false respectively<br>
-     *     <b>search</b>: placeholder in search input field<br>
-     *     <b>selectAll</b>: Text for Select All button <br>
-     *     <b>selectNone</b>: Text for Select None button <br>
-     *     <b>entriesSelected</b>: Text for number of entries (x) selected information displayed as
-     *      'x {provided text} <br>
-     *  <br>
+     * specific text) - this needs to be an object with the following
+     * properties (if you don't want to display any text leave an empty string):
+     *
+     *     **noEntriesTitle**: Header text shown if search for string returned no results.
+     *     **noEntriesSubtext**: subtext shown if search for string returned no result.
+     *     **options**: Text for title button.
+     *        This needs to be an object containing a `show` and `hide` property that are shown when
+     *        `entriesSelectable` is `true` or `false` respectively.
+     *     **search**: placeholder in search input field.
+     *     **selectAll**: Text for 'Select All' button.
+     *     **selectNone**: Text for 'Select None' button.
+     *     **entriesSelected**: Text for number of entries (x) selected. information displayed as
+     *      `x {provided text}`.
+     *
      *  The values of this object might be plain string or a key for an i18n file (in case it is not
      *  an object that is required! - in that case the above applies to the values within that
-     *  object)<br>
+     *  object)
      */
     entrySelectorText: {
       type: Object,
@@ -463,9 +456,9 @@ export default {
       if (val !== this.entriesSelectable) {
         /**
          * emit event to inform parent about toggle triggered and keep prop variable
-         * entriesSelectable in sync
+         * `entriesSelectable` in sync
          * @event update:entries-selectable
-         * @type {boolean}
+         * @param {boolean} - are entries selectable
          */
         this.$emit('update:entries-selectable', this.showOptions);
       }
@@ -477,7 +470,7 @@ export default {
       /**
        * event emitted every time the selected entries change
        * @event selected-changed
-       * @type {Object[]}
+       * @param {Object[]} - array of updated selected entries
        */
       this.$emit('selected-changed', this.selectedEntries);
     },
@@ -565,7 +558,7 @@ export default {
       this.headHasShadow = false;
     },
     /**
-     *
+     * function to trigger from slot `entries` when an entry was selected
      * @param {Object} obj - selected entry
      * @property {boolean} obj.selected - variable indicating if entry was selected or deselected
      * @property {string} obj.index - the index of the selected or deselected entry in 'entries'
@@ -588,7 +581,7 @@ export default {
        * Triggered when the entry is clicked
        *
        * @event entry-clicked
-       * @type {string}
+       * @param {string} - the id of the clicked entry
        */
       this.$emit('entry-clicked', this.entries[index].id);
     },

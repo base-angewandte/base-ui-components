@@ -45,7 +45,6 @@
               :icon-size="'small'"
               class="base-popup-button"
               @clicked="buttonLeft" />
-            <!-- @event buttonRight -->
             <BaseButton
               id="popup-right-button"
               :text="buttonRightText"
@@ -84,8 +83,8 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: () => import('../BaseButton/BaseButton'),
-    BaseLoader: () => import('../BaseLoader/BaseLoader'),
+    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   mixins: [popUpLock],
   props: {
@@ -211,7 +210,6 @@ export default {
        * Event triggered on right top corner close action
        *
        * @event close
-       * @type { none }
        */
       this.$emit('close');
       this.showInt = false;
@@ -221,7 +219,6 @@ export default {
        * Event triggered with right button
        *
        * @event button-right
-       * @type { none }
        */
       this.$emit('button-right');
     },
@@ -230,7 +227,6 @@ export default {
        * Event triggered with left button
        *
        * @event button-left
-       * @type { none }
        */
       this.$emit('button-left');
     },

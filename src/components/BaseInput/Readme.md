@@ -1,6 +1,8 @@
+## Demo
+
 A simple example without label
 
-```vue
+```vue live
 <template>
   <BaseInput
     id="simpleexample"
@@ -13,12 +15,12 @@ export default{};
 
 ```
 
-A example with label and slot demonstrations. Also enter text to see clearable state or toggle controls to see various properties such as invalid state and the 'below-input' slot.<br>
-Also it is demonstrated here how to use the isActive prop.
+A example with label and slot demonstrations. Also enter text to see clearable state or toggle controls to see various properties such as invalid state and the `below-input` slot.
+Also it is demonstrated here how to use the `isActive` prop.
 
-All events emitted by the native input element (e.g. @keydown) contained in the BaseInput component are also available.
+All events emitted by the native input element (e.g. `@keydown`) contained in the BaseInput component are also available.
 
-```vue
+```vue live
 
 <template>
   <div>
@@ -49,44 +51,44 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
       placeholder="A custom placeholder"
       @click-input-field="inputActive = true"
       @clicked-outside="inputActive = false">
-      <template v-slot:label-addition>
+      <template #label-addition>
         <div>label-addition</div>
       </template>
-      <template v-slot:pre-input-field>
+      <template #pre-input-field>
         <div class="pre-input-field">
           pre-input-field
         </div>
       </template>
-      <template v-slot:input-field-addition-before>
+      <template #input-field-addition-before>
         <span class="input-field-addition-before">input-field-addition-before</span>
       </template>
-      <template v-slot:input-field-inline-before>
+      <template #input-field-inline-before>
         <span class="input-field-inline-before">input-field-inline-before</span>
       </template>
-      <template v-slot:below-input>
+      <template #below-input>
         <div
           v-if="dropdownActive"
           class="drop-down-slot">
           Text Box Below Input - e.g. for a drop down
         </div>
       </template>
-      <template v-slot:input-field-addition-after>
+      <template #input-field-addition-after>
         <span class="input-field-addition-after">
           input-field-addition-after
         </span>
       </template>
-      <template v-slot:post-input-field>
+      <template #post-input-field>
         <span class="post-input-field">
           post-input-field
         </span>
       </template>
-      <template v-slot:remove-icon>
+      <template #remove-icon>
         <BaseIcon
           v-if="useCustomRemoveIcon"
           name="clock"
           class="icon"/>
       </template>
-      <template v-slot:error-icon>
+      <template #error-icon>
         <BaseIcon
           v-if="useCustomErrorIcon"
           name="eye"
@@ -252,20 +254,7 @@ All events emitted by the native input element (e.g. @keydown) contained in the 
 </template>
 
 <script>
-import BaseToggle from '../BaseToggle/BaseToggle';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseLoader from '../BaseLoader/BaseLoader';
-import BaseDropDown from '../BaseDropDown/BaseDropDown';
-import BaseInput from './BaseInput';
-
 export default {
-  components: {
-    BaseInput,
-    BaseDropDown,
-    BaseLoader,
-    BaseIcon,
-    BaseToggle
-  },
   data() {
     return {
       invalid: false,

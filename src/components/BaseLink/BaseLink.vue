@@ -88,7 +88,7 @@
 
 <script>
 /**
- * component to display different type of links<br>
+ * component to display different type of links
  * eg.: internal, external, tooltip, chip
  */
 
@@ -107,52 +107,51 @@ export default {
   props: {
     /**
      * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. router-link, nuxt-link) and vue-router
+     * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router
      * is necessary
      */
     renderLinkAs: {
       type: String,
-      default: 'router-link',
+      default: 'RouterLink',
     },
     /**
-     * specify external link target<br>
-     * valid values: '_blank' | '_self'
+     * specify external link target
+     * @values _blank, _self
      */
     externalLinkTarget: {
       type: String,
       default: '_blank',
-      validator(val) {
-        return (val === '_blank' || val === '_self');
-      },
+      validator: val => (val === '_blank' || val === '_self'),
     },
     /**
-     * tooltip content<br>
-     * by default a list (label: value) is rendered<br>
-     * structure: [{ label: 'label', value: 'value', url: '#' }]<br>
-     * or use v-slot:tooltip to customize the content
+     * tooltip content
+     * by default a list (label: value) is rendered
+     * structure:
+     * `[{ label: 'label', value: 'value', url: '#' }]`
+     * or use #tooltip to customize the content
      */
     tooltip: {
       type: Array,
       default: () => [],
     },
     /**
-     * async tooltip content<br>
-     * if set, event @tooltipClicked with this object will be emitted
+     * async tooltip content
+     * if set, event `@tooltip-clicked` with this object will be emitted
      */
     tooltipAsync: {
       type: Array,
       default: () => [],
     },
     /**
-     * additional tooltip styles<br>
-     * properties 'top, left, right' will be overwritten due position calculation
+     * additional tooltip styles
+     * **caveat**: properties `top`, `left`, `right` will be overwritten due position calculation
      */
     tooltipStyles: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
     /**
-     * internal identifier to route to<br>
+     * internal identifier to route to
      */
     source: {
       type: String,
@@ -173,8 +172,8 @@ export default {
       default: '',
     },
     /**
-     * used in combination with property 'source' to render chip<br>
-     * type identifies source type for chip click-event<br>
+     * used in combination with property `source` to render chip.
+     * `type` identifies source type for chip click-event
      * eg: keyword | skill | object
      */
     type: {
@@ -182,7 +181,7 @@ export default {
       default: '',
     },
     /**
-     * add a space " " after element<br>
+     * add a space " " after element
      * useful for link-type tooltip in lists
      */
     spaceAfter: {
@@ -248,7 +247,12 @@ export default {
   },
   methods: {
     chipClicked() {
-      this.$emit('chipClicked', { source: this.source, type: this.type });
+      /**
+       * @event chip-clicked
+       * @property {string} source - internal identifier
+       * @property {string} type - source type for chip click-event
+       */
+      this.$emit('chip-clicked', { source: this.source, type: this.type });
     },
     async tooltipClicked() {
       if (this.tooltip.length) {
@@ -258,7 +262,12 @@ export default {
 
       if (this.tooltipAsync.length) {
         this.isLoading = true;
-        this.$emit('tooltipClicked', this.tooltipAsync);
+        /**
+         * @event tooltip-clicked
+         * @param {Array} - async tooltip content
+         *
+         */
+        this.$emit('tooltip-clicked', this.tooltipAsync);
       }
     },
     closeTooltip() {

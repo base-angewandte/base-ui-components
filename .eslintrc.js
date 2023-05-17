@@ -12,9 +12,17 @@ module.exports = {
     node: true,
   },
   extends: [
+    'airbnb-base',
     'plugin:vue/recommended',
-    '@vue/airbnb',
   ],
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['@', './src/']],
+        extensions: ['.js', '.jsx', '.vue'],
+      },
+    },
+  },
   // add your custom rules here
   rules: {
     // disallow reassignment of function parameters
@@ -24,7 +32,7 @@ module.exports = {
       ignorePropertyModificationsFor: [
         'state', // for vuex state
         'acc', // for reduce accumulators
-        'e', // for e.returnvalue
+        'e', // for e.return value
       ],
     }],
     // don't require .vue extension when importing
@@ -51,6 +59,14 @@ module.exports = {
     // unfortunately our audio and video files do not have the required format
     // (.vtt files) included -->
     'vuejs-accessibility/media-has-caption': 0,
+    // need html comments in one line otherwise vuepress (docgen?) is not parsing them
+    'max-len': ['error', {
+      code: 110,
+      ignoreComments: true,
+      ignoreStrings: true,
+      ignoreTemplateLiterals: true,
+      ignorePattern: '(^\\s*<!--\\s+?@slot.*$|^\\s*@binding.*$)',
+    }],
   },
   overrides: [
     {
@@ -58,9 +74,7 @@ module.exports = {
         '**/__tests__/*.{j,t}s?(x)',
         '**/tests/unit/**/*.spec.{j,t}s?(x)',
       ],
-      env: {
-        jest: true,
-      },
+      env: {},
     },
   ],
 };

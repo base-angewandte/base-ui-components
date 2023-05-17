@@ -1,4 +1,6 @@
-```vue
+## Demo
+
+```vue live
 <template>
   <div class="container">
     <BaseButton
@@ -19,9 +21,9 @@
       :rejected-files="rejectedFiles"
       :uploaded-files="uploadedFiles"
       :upload-text="uploadText"
-      @cancelUpload="cancelUpload"
-      @removeFile="removeFile"
-      @startUpload="startUpload">
+      @cancel-upload="cancelUpload"
+      @remove-file="removeFile"
+      @start-upload="startUpload">
       <div
         key="popup-text"
         class="popup-text">
@@ -51,14 +53,7 @@
   </div>
 </template>
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-import BaseUploadPopUp from './BaseUploadPopUp';
-
 export default {
-  components: {
-    BaseButton,
-    BaseUploadPopUp,
-  },
   data() {
     return {
       fileList: [],

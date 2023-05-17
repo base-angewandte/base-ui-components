@@ -1,6 +1,8 @@
+## Demo
+
 Date range input fields
 
-```vue
+```vue live
 <template>
   <div>
       <base-date-input
@@ -33,7 +35,7 @@ export default {
 
 Single date input with format date_year, enabling switching the format
 
-```vue
+```vue live
 <template>
   <base-date-input
     id="yearformatdemo"
@@ -62,7 +64,7 @@ export default {
 
 Date Time Input
 
-```vue
+```vue live
 <template>
   <div>
     <base-date-input

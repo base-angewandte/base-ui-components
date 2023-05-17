@@ -54,6 +54,7 @@ export default {
     },
     /**
      *  set boxShadow size
+     *  @values large, small
      */
     boxShadowSize: {
       type: String,
@@ -69,15 +70,15 @@ export default {
     },
     additionalAttributes: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
   },
   methods: {
     clicked(event) {
       /**
        * event emitted upon box click
-       *
-       * @type {Event}
+       * @event clicked
+       * @param {MouseEvent} - the native mouse event
        */
       this.$emit('clicked', event);
     },

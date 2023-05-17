@@ -30,8 +30,7 @@
       v-on="$listeners">
       <template
         #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row \<div\>
-          (e.g. language tabs)) -->
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
         <slot name="label-addition" />
         <button
           v-if="sortable"
@@ -43,15 +42,12 @@
         </button>
       </template>
       <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual
-        input field<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)-->
         <slot name="pre-input-field" />
       </template>
       <template
         #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\>
-          (before \<input\>) -->
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
         <slot name="input-field-addition-before" />
         <div
           v-if="displayChipsInline"
@@ -74,10 +70,8 @@
                   <!-- @slot a slot to provide customized chips
                     @binding { object } entry - one selected option displayed as chip
                     @binding { number } index - the index of the entry in the selectedList array
-                    @binding { number } chipActiveForRemove - the index of the chip that is
-                      currently active to be removed (for keyboard handling)
-                    @binding { function } removeEntry - function to remove the entry from
-                      selectedList, needs `entry` and `index` as arguments
+                    @binding { number } chipActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                    @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
                   -->
                   <slot
                     name="chip"
@@ -109,10 +103,8 @@
               <!-- @slot a slot to provide customized chips
                 @binding { object } entry - one selected option displayed as chip
                 @binding { number } index - the index of the entry in the selectedList array
-                @binding { number } chipActiveForRemove - the index of the chip that is
-                  currently active to be removed (for keyboard handling)
-                @binding { function } removeEntry - function to remove the entry from
-                  selectedList, needs `entry` and `index` as arguments
+                @binding { number } chipActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
               -->
               <slot
                 name="chip"
@@ -142,9 +134,7 @@
         </div>
       </template>
       <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input
-            (contrary to input-field-addition-before this does not wrap<br>
-        for an example see [BaseInput](#baseinput)-->
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap). for an example see [BaseInput](BaseInput)-->
         <slot name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
@@ -160,7 +150,7 @@
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader -->
+        <!-- @slot for adding elements after input (e.g. used to add loader) -->
         <slot name="remove-icon" />
       </template>
       <template #below-input>
@@ -184,7 +174,7 @@ export default {
   name: 'BaseChipsInputField',
   components: {
     BaseInput,
-    BaseChip: () => import('@/components/BaseChip/BaseChip'),
+    BaseChip: () => import('@/components/BaseChip/BaseChip').then(m => m.default || m),
     Draggable,
   },
   mixins: [
@@ -205,15 +195,13 @@ export default {
     },
     /**
      * list of selected options (strings or objects), displayed as chips
-     * (you can use the .sync modifier on this property)
+     * (you can use the `.sync` modifier on this property)
      */
     selectedList: {
       type: Array,
       default: () => [],
     },
     /**
-     * @model
-     *
      * input string
      */
     input: {
@@ -265,7 +253,7 @@ export default {
       default: false,
     },
     /**
-     * if true a button with that functionality will be visible
+     * if `true` a button with that functionality will be visible
      */
     sortable: {
       type: Boolean,
@@ -286,8 +274,8 @@ export default {
       default: false,
     },
     /**
-     * set content for the info box activatable by click <br>
-     * see [BaseHoverBox](#basehoverbox) for more details
+     * set content for the info box activatable by click.
+     * see [BaseHoverBox](BaseHoverBox) for more details
      */
     hoverboxContent: {
       type: Object,
@@ -309,7 +297,7 @@ export default {
       default: 'Sort A – Z',
     },
     /**
-     * if true sorting will consider the last string in a label or if a comma is
+     * if `true` sorting will consider the last string in a label or if a comma is
      * present the string before the comma
      */
     sortName: {
@@ -346,8 +334,8 @@ export default {
       default: '',
     },
     /**
-     * specify a linked list option (e.g. drop down) <br>
-     *   (will be used in aria-activedescendant attribute)
+     * specify a linked list option (e.g. drop down)
+     *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
       type: String,
@@ -368,14 +356,14 @@ export default {
       default: 'label',
     },
     /**
-     * specify true if selectedList array is a array of strings
+     * specify `true` if `selectedList` array is a array of strings
      */
     isStringArray: {
       type: Boolean,
       default: false,
     },
     /**
-     * property for special case 'chips-below' - if false in this case chips will
+     * property for special case component [BaseChipsBelow](BaseChipsBelow) - if `false` in this case chips will
      * not be displayed in the input field
      */
     displayChipsInline: {
@@ -391,48 +379,48 @@ export default {
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
-     * to display below the form field<br>
-     * for an example see [BaseInput](#baseinput)
+     * to display below the form field
+     * for an example see [BaseInput](BaseInput)
      */
     invalid: {
       type: Boolean,
       default: false,
     },
     /**
-     * set true if input field should be disabled<br>
-     * for an example see [BaseInput](#baseinput)
+     * set `true` if input field should be disabled
+     * for an example see [BaseInput](BaseInput)
      */
     disabled: {
       type: Boolean,
       default: false,
     },
     /**
-     * add an error message to be displayed below form field if field is invalid<br>
-     * for an example see [BaseInput](#baseinput)
+     * add an error message to be displayed below form field if field is invalid
+     * for an example see [BaseInput](BaseInput)
      */
     errorMessage: {
       type: String,
       default: '',
     },
     /**
-     * define if error icon should be shown<br>
-     * for an example see [BaseInput](#baseinput)
+     * define if error icon should be shown
+     * for an example see [BaseInput](BaseInput)
      */
     showErrorIcon: {
       type: Boolean,
       default: true,
     },
     /**
-     * if true a remove icon will be shown allowing to remove
-     * all input at once<br>
-     * for an example see [BaseInput](#baseinput)
+     * if `true` a remove icon will be shown allowing to remove
+     * all input at once
+     * for an example see [BaseInput](BaseInput)
      */
     clearable: {
       type: Boolean,
       default: false,
     },
     /**
-     * if true space is reserved for a loader that can be activated
+     * if `true` space is reserved for a loader that can be activated
      * with the 'isLoading' prop
      */
     loadable: {
@@ -440,8 +428,8 @@ export default {
       default: false,
     },
     /**
-     * possibility to steer input field active state from outside<br>
-     * it is possible to use the .sync modifier here
+     * possibility to steer input field active state from outside
+     * it is possible to use the `.sync` modifier here
      */
     isActive: {
       type: Boolean,
@@ -464,10 +452,10 @@ export default {
     },
     /**
      * define true if chip should be editable on click
-     * <br>
-     * CAVEAT: chips can not be both draggable AND editable and it can not show
-     *  hoverBoxContent as soon as it is editable respectively - if both are set true edit
-     *  functionality takes precedent - chip will not be draggable, hoverBoxContent will not
+     *
+     * **Caveat**: chips can not be both draggable AND editable and it can not show
+     *  `hoverBoxContent` as soon as it is editable respectively - if both are set `true` edit
+     *  functionality takes precedent - chip will not be draggable, `hoverBoxContent` will not
      *  be shown!
      */
     chipsEditable: {
@@ -475,9 +463,10 @@ export default {
       default: false,
     },
     /**
-     * this prop gives the option to add assistive text for screen readers<br>
-     * properties:<br>
-     * <b>selectedOption</b>: text read when a selected option is focused (currently only
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
      */
     assistiveText: {
@@ -577,7 +566,7 @@ export default {
          * event updating the is-active prop in case of internal changes
          *
          * @event update:is-active
-         * @type {boolean}
+         * @param {boolean} - is input field active
          */
         this.$emit('update:is-active', val);
       }
@@ -613,7 +602,7 @@ export default {
           /**
            * emitting the input string if changed internally
            * @event input
-           * @property {string} val - the new input string
+           * @param {string} - the new input string
            */
           this.$emit('input', val);
         }
@@ -700,7 +689,7 @@ export default {
        * which item was removed)
        *
        * @event removed
-       * @property {Object} option - the removed option
+       * @aram {Object} - the removed option
        */
       this.$emit('removed', option);
       // lay the focus on the input field
@@ -741,7 +730,7 @@ export default {
            * an option with the same value in the list of selected options
            *
            * @event duplicate
-           * @property {Object} duplicate - the option with the identical value
+           * @param {Object} - the option with the identical value
            */
           this.$emit('duplicate', duplicate);
         }
@@ -797,7 +786,7 @@ export default {
        * (you can use the .sync modifier on prop selectedList)
        *
        * @event update:selected-list
-       * @property {(Object[]|String[])} tempList - the modified list - array
+       * @param {(Object[], String[])} - the modified list - array
        * of strings is returned if isStringArray was set to true
        */
       this.$emit('update:selected-list', tempList);

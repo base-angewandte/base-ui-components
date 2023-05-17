@@ -6,6 +6,7 @@
 </template>
 
 <script>
+
 /**
  * A component to display a Leaflet-map with multiple locations
  */
@@ -21,15 +22,13 @@ export default {
       default: 'Source: <a href="https://openstreetmap.org/">OpenStreetMap contributors</a>',
     },
     /**
-     * define position of map attribution<br>
-     *   valid options: 'topright' | 'bottomleft' | 'bottomright'
+     * define position of map attribution
+     *   @values topright, bottomleft, bottomright
      */
     attributionPosition: {
       type: String,
       default: 'bottomright',
-      validate(val) {
-        return ['topright', 'bottomleft', 'bottomright'].includes(val);
-      },
+      validate: val => ['topright', 'bottomleft', 'bottomright'].includes(val),
     },
     /**
      * set array index of marker to center map from outside
@@ -39,9 +38,9 @@ export default {
       default: null,
     },
     /**
-     * define number of items for cluster sizes<br>
-     *   structure: { medium: 5, large: 20, xlarge: 100 }<br>
-     *   Note: medium, large, xlarge is mandatory
+     * define number of items for cluster sizes
+     *   structure: `{ medium: 5, large: 20, xlarge: 100 }`
+     *   Note: properties `medium`, `large`, `xlarge` are mandatory
      */
     clusterSizes: {
       type: Object,
@@ -62,11 +61,12 @@ export default {
       type: Number,
       default: null,
     },
-    /*
-     * define icon
+    /**
+     * define html code for a custom icon
      */
     icon: {
       type: String,
+      // eslint-disable-next-line max-len
       default: '<svg viewBox="0 0 70.866 70.866" xmlns="http://www.w3.org/2000/svg"><path d="m35.433 0a22.731 22.731 0 0 0-22.731 22.82 24.125 24.125 0 0 0 1.872 9.1814l19.611 38.063a1.3718 1.3718 0 0 0 2.496 0l19.611-38.063a22.249 22.249 0 0 0 1.872-9.1814 22.731 22.731 0 0 0-22.731-22.82zm0 32.858a10.216 10.216 0 1 1 10.216-10.216 10.241 10.241 0 0 1-10.216 10.216z" fill="#010101"/></svg>',
     },
     /**
@@ -77,28 +77,31 @@ export default {
       default: 32,
     },
     /**
-     * define custom options for map data<br>
+     * define custom options for map data
      *   e.g. {
      *          style: 'normal',
      *          subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
      *          tileMatrixSet: 'google3857',
      *          type: 'geolandbasemap'
-     *   }<br>
-     *   usage custom keys in url property:
+     *   }
+     *
+     *   usage custom keys in `url` property:
      *   https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png
+     *
+     *   for more information refer to the [Leaflet TileLayer documentation](https://leafletjs.com/reference.html#tilelayer)
      */
     options: {
       type: Object,
       default: () => ({}),
     },
     /**
-     * define marker<br>
-     *   structure: [{<br>
-     *     coordinates: [16.382782, 48.208309],<br>
-     *     latLng: [48.208309, 16.382782],<br>
+     * define marker
+     *   structure: [{
+     *     coordinates: [16.382782, 48.208309],
+     *     latLng: [48.208309, 16.382782],
      *     data: [ 'University of Applied Arts', 'Oskar Kokoschka-Platz 2',
-     *     '1010 Vienna', 'Austria']<br>
-     *   }]<br><br>
+     *     '1010 Vienna', 'Austria']
+     *   }]
      *   Note: either GeoJSON coordinates or latLng is mandatory
      */
     marker: {
@@ -128,8 +131,8 @@ export default {
       default: '',
     },
     /**
-     * specify service for the [tileLayer](https://leafletjs.com/examples/wms/wms.html)<br>
-     * valid values: 'WMTS' | 'TMS' | 'WMS'
+     * specify service for the [tileLayer](https://leafletjs.com/examples/wms/wms.html)
+     * @values WMTS, TMS, WMS'
      */
     tileLayerService: {
       type: String,
@@ -248,26 +251,20 @@ export default {
     this.observer.disconnect();
   },
   mounted() {
-    // Execute only on clientside
-    if (!process.browser) {
-      return;
-    }
-
     // Add observer to check if component is in viewport and init map
     this.observer.observe(this.$el);
   },
   methods: {
-    init() {
+    async init() {
       // Check if leaflet map is already initialized
       if (this.L) {
         return;
       }
 
-      /* eslint-disable global-require */
-      this.L = require('leaflet');
-      require('leaflet-responsive-popup');
-      require('leaflet.markercluster');
-      /* eslint-enable global-require */
+      // Import Leaflet and related plugins
+      this.L = await import('leaflet');
+      const { ResponsivePopup } = await import('leaflet-responsive-popup');
+      const { MarkerClusterGroup } = await import('leaflet.markercluster');
 
       // Initialize Leaflet map
       this.map = this.L.map(this.$refs.mapElement, {
@@ -307,7 +304,7 @@ export default {
       const markerIcon = this.L.divIcon(iconOptions);
 
       // Define Leaflet clusterGroup
-      this.markerCluster = this.L.markerClusterGroup({
+      this.markerCluster = new MarkerClusterGroup({
         maxClusterRadius: 50,
         showCoverageOnHover: false,
         iconCreateFunction: (cluster) => {
@@ -339,7 +336,7 @@ export default {
       });
 
       this.markerFiltered.forEach((item, index) => {
-        const popup = this.L.responsivePopup(this.popupOptions);
+        const popup = new ResponsivePopup(this.popupOptions);
         const markerOptions = {
           id: index,
           icon: markerIcon,
@@ -432,12 +429,12 @@ export default {
     },
     markerState(value) {
       /**
-       * Event emitted on mouseenter, mouseleave of a map marker<br>
-       * mouseenter: index of marker object in component property 'marker' array<br>
+       * Event emitted on mouseenter, mouseleave of a map marker
+       * mouseenter: index of marker object in component property 'marker' array
        * mouseleave: null
        *
        * @event highlighted
-       * @property {number} value - array index or null
+       * @property {number} - array index or null
        */
       this.$emit('highlighted', value);
     },

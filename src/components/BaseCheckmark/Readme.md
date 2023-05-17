@@ -1,6 +1,8 @@
+## Demo
+
 Radio Button
 
-```vue
+```vue live
 
 <template>
   <div>
@@ -30,10 +32,9 @@ export default {
 </script>
 
 ```
-
 Checkbox
 
-```vue
+```vue live
 <template>
   <div>
     <base-checkmark 

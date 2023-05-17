@@ -29,8 +29,15 @@ import 'base-ui-components/dist/components/BaseCarousel/BaseCarousel.css';
 import 'base-ui-components/dist/base-ui-components-common.css';
 import App from './App';
 
-Vue.use(BaseAutocompleteInput);
-Vue.use(BaseCarousel);
+const components = {
+  BaseAutcompleteInput,
+  BaseCarousel,
+};
+
+Object.entries(components)
+  .forEach(([name, component]) => {
+    Vue.component(name, component);
+  });
 
 new Vue({
   el: '#app',
@@ -47,12 +54,15 @@ main.js
 
 import Vue from 'vue';
 // import the complete components bundle
-import BaseUiComponents from 'base-ui-components';
+import * as BaseUiComponents from 'base-ui-components';
 // and the css
 import 'base-ui-components/dist/base-ui-components.css';
 import App from './App';
 
-Vue.use(BaseUiComponents);
+Object.entries(BaseUiComponents)
+  .forEach(([name, component]) => {
+    Vue.component(name, component);
+  });
 
 new Vue({
   el: '#app',
@@ -85,7 +95,7 @@ Component.vue
 
 All available components, their usage and demos can be found in our [styleguide](https://base-angewandte.github.io/base-ui-components/).
 
-The code base is available at [github](https://github.com/base-angewandte/base-ui-components).
+The code base is available at [GitHub](https://github.com/base-angewandte/base-ui-components).
 
 [Development Instructions](buildSetup.md)
 
@@ -125,14 +135,14 @@ See [LICENSE](LICENSE.md)
 
 
 <!-- logo angewandte -->
-![alt text](static/angewandte-logo.svg "Angewandte")
+![alt text](./static/angewandte-logo.svg "Angewandte")
 <!-- logo base -->
-![alt text](static/base.png "base Angewandte")
+![alt text](./static/base.png "base Angewandte")
 <!-- logo zukunvt?  or anything else? -->
 
 ### Support
 
 This open-source project was developed (and more specifically - cross-browser tested) with the support of:
 
-[![Browserstack-logo](static/browserstack.svg)](https://www.browserstack.com)
+[![Browserstack-logo](./static/browserstack.svg)](https://www.browserstack.com)
 

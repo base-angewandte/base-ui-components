@@ -1,6 +1,8 @@
+## Demo
+
 Test you component configuration on this example component!
 (Some settings only have an effect in edit mode or view mode respectively)
-```vue
+```vue live
 
 <template>
   <div class="section-canvas">
@@ -122,12 +124,7 @@ Test you component configuration on this example component!
 </template>
 
 <script>
-import BaseToggle from '../BaseToggle/BaseToggle';
-import BaseInput from '../BaseInput/BaseInput';
-
 export default {
-components: { BaseInput , BaseToggle } ,
-
   data() {
     return {
     isLoading: false,
@@ -150,7 +147,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Collaboration',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8vvvb3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzR4gfTLM4dJR',
@@ -159,7 +156,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzR4gfTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3123lllzRTLM4dJR',
@@ -168,7 +165,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Article',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3123lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3l323llzRTLM4dJR',
@@ -177,7 +174,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Scientific Paper',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3l323llzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzRTfgsdfgggggLM4dJR',
@@ -186,7 +183,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzRTfgsdfgggggLM4dJR/460/341',
         },
         {
           id: 'pCSLggvds3222i8b3lllzRTLM4dJR',
@@ -195,7 +192,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'Difference is the key',
           description: 'Performance & Art',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvds3222i8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllz444RTLM4dJR',
@@ -204,7 +201,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllz444RTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllz777RTLM4dJR',
@@ -213,7 +210,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Workshop',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllz777RTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b0003lllzRTLM4dJR',
@@ -222,7 +219,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b0003lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllz789RTLM4dJR',
@@ -231,7 +228,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllz789RTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsirtz8b3lllzRTLM4dJR',
@@ -240,7 +237,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Mission',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/nature',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsirtz8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3l456llzRTLM4dJR',
@@ -249,7 +246,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3l456llzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzRT456LM4dJR',
@@ -258,7 +255,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Conference',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzRT456LM4dJR/460/341',
         },
         {
           id: 'pCSLgg234vdsi8b3lllzRTLM4dJR',
@@ -267,7 +264,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLgg234vdsi8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3lllzRTLM4dJR',
@@ -276,7 +273,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Exhibition',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/nature',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3lllzRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3zRdddTLM4dJR',
@@ -285,7 +282,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3zRdddTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8bbbb3zRTLM4dJR',
@@ -294,7 +291,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8bbbb3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8oiouiob3zRTLM4dJR',
@@ -303,7 +300,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Exhibition',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/arch',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8oiouiob3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggasdfvdsi8b3zRTLM4dJR',
@@ -312,7 +309,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/tech',
+          imageUrl: 'https://picsum.photos/seed/pCSLggasdfvdsi8b3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8asdb3zRTLM4dJR',
@@ -321,7 +318,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Master Work',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/nature',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8asdb3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8ffsdb3zRTLM4dJR',
@@ -330,7 +327,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/animals',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8ffsdb3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3zRTLM4dJR',
@@ -339,7 +336,7 @@ components: { BaseInput , BaseToggle } ,
           subtext: 'A different long subtext',
           description: 'Performance',
           source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
-          imageUrl: 'https://placeimg.com/460/341/people',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsi8b3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsiasdf8b3zRTLM4dJR',
@@ -347,7 +344,7 @@ components: { BaseInput , BaseToggle } ,
           title: 'Unknown',
           subtext: 'Lets find it out and look deeper',
           description: 'Bachelor',
-          imageUrl: 'https://placeimg.com/460/341/animal',
+          imageUrl: 'https://picsum.photos/seed/pCSLggvdsiasdf8b3zRTLM4dJR/460/341',
         },
         {
           id: 'pCSLggvdsi8b3fffzRTLM4dJR',
@@ -409,7 +406,7 @@ components: { BaseInput , BaseToggle } ,
     margin: 8px;
   }
   .options-input {
-    width: 175px;
+    width: 30% !important;
     margin: 8px;
   }
 </style>
@@ -420,7 +417,7 @@ components: { BaseInput , BaseToggle } ,
 
 An example demonstrating slots
 
-```vue
+```vue live
 
 <template>
   <div class="section-canvas">
@@ -471,7 +468,7 @@ An example demonstrating slots
           @clicked="submit('publish')" />
       </template>
       <template
-        v-slot:resultBox="props">
+        #resultBox="props">
         <BaseImageBox
           :key="props.item.id"
           :selectable="props.selectActive"
@@ -492,7 +489,7 @@ An example demonstrating slots
           This is the options-message-area-after slot
         </div>
       </template>
-      <template #actionButtons="props">
+      <template #actionButtons="{ itemsPerRow, elementId }">
         <BaseBoxButton
           key="custom-action-button"
           text="custom button text"
@@ -500,8 +497,20 @@ An example demonstrating slots
           icon="eye"
           box-style="small"
           box-type="button"
-          class="custom-button"
-          :class="{ 'action-box-spacer': props.itemsPerRow < entriesList.length}"
+          :class="['custom-button',
+                   { 'action-box-spacer': itemsPerRow < entriesList.length},
+                   `base-result-box-section__box-item-${elementId}`]"
+          @clicked="submitAction('customValue')" />
+        <BaseBoxButton
+          key="custom-action-button-2"
+          text="custom button text 2"
+          :box-size="{ width: 'calc(((100% - (var(--items-per-row) * 8rem/19))/ var(--items-per-row)) - 0.01rem)', height: '100%' }"
+          icon="eye"
+          box-style="small"
+          box-type="button"
+          :class="['custom-button',
+                   { 'action-box-spacer': itemsPerRow < entriesList.length},
+                   `base-result-box-section__box-item-${elementId}`]"
           @clicked="submitAction('customValue')" />
       </template>
     </BaseResultBoxSection>
@@ -509,18 +518,7 @@ An example demonstrating slots
 </template>
 
 <script>
-import BaseDropDown from '../BaseDropDown/BaseDropDown';
-import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
-import BaseButton from '../BaseButton/BaseButton';
-
 export default {
-  components: {
-    BaseDropDown,
-    BaseBoxButton,
-    BaseImageBox,
-    BaseButton,
-  },
   data() {
     return {
     selected: {},
@@ -540,7 +538,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/nature',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8b3zRTLM4dJR/460/341',
           },
         },
         {
@@ -557,7 +555,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/animals',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8b3zRThhhhLM4dJR/460/341',
           },
         },
         {
@@ -574,7 +572,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/people',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8ffffb3zRTLM4dJR/460/341',
           },
         },
         {
@@ -590,7 +588,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/animal',
+            image: 'https://picsum.photos/seed/pCSLggvdsiasdf8b3zRTLM4dJR/460/341',
           },
         },
         {
@@ -607,7 +605,7 @@ export default {
               },
               source: 'http://base.uni-ak.ac.at/portfolio/taxonomy/album',
             },
-            image: 'https://placeimg.com/460/341/tech',
+            image: 'https://picsum.photos/seed/pCSLggvdsi8b3fffzRTLM4dJR/460/341',
           },
         },
     ],
