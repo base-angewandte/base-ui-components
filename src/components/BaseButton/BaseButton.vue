@@ -4,6 +4,7 @@
     :aria-disabled="disabled"
     :aria-describedby="internalId"
     :type="buttonType"
+    :title="text"
     :class="['base-button',
              `base-button-${buttonStyle}`,
              `base-button-icon-${iconPosition}`,
@@ -26,7 +27,7 @@
     <!-- @slot have your own text element which also allows for easier custom styling -->
     <slot name="text">
       <span
-        v-if="text"
+        v-if="text && buttonStyle !== 'circle'"
         :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
         {{ text }}
       </span>
@@ -110,7 +111,7 @@ export default {
       type: String,
       default: 'single',
       validator(val) {
-        return ['single', 'row', 'secondary'].includes(val);
+        return ['single', 'row', 'secondary', 'circle'].includes(val);
       },
     },
     /**
@@ -322,6 +323,23 @@ export default {
 
     .base-button-icon-hide {
       visibility: hidden;
+    }
+
+    /**
+     * button-style: circle
+     */
+    &.base-button-circle {
+      background-color: #ffffff;
+      border-radius: 50%;
+      color: $font-color-second;
+      border: 1px solid $font-color;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+
+      &:hover {
+        color: $font-color;
+      }
     }
 
     /**
