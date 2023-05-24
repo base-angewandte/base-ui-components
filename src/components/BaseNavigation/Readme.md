@@ -2,12 +2,12 @@
 
 <template>
   <BaseNavigation
-    :list="list" />
+    :list="list"
+    :placement="placement" />
 </template>
 
 <script>
 export default {
-  components: {BaseNavigation},
   data() {
     return {
       list: [
@@ -15,9 +15,17 @@ export default {
           id: '1',
           label: 'test',
           shortLabel: 'test',
-          route: '/',
+          route: '/home',
+        },
+        {
+          id: '2',
+          label: 'test2',
+          shortLabel: 'test2',
+          route: 'https://www.google.com/',
         },
       ],
+      placement: 'left',
+      renderAs: 'NuxtLink'
     }
   }
 };

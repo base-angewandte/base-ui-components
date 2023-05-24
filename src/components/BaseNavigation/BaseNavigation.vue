@@ -1,13 +1,18 @@
 <template>
-  <main>
+  <main class="base-navigation">
     <div
       :class="placement">
-      <ul
-        v-for="(_, element) in list"
-        :key="element">
-        <li>
+      <ul>
+        <li
+          v-for="element in list"
+          :key="element.id"
+          class="nav-item">
           <BaseButton
-            :text="element.label" />
+            :text="element.label"
+            button-style="row"
+            :render-link-as="element.renderAs"
+            :active="toggleActive(element.route)"
+            @clicked="onClick(element.route)" />
         </li>
       </ul>
     </div>
@@ -30,9 +35,34 @@ export default {
         route: '/',
       }],
     },
+    renderAs: {
+      type: String,
+      default: 'RouterLink',
+      validate: val => ['RouterLink', 'NuxtLink'].includes(val),
+    },
     placement: {
       type: String,
       default: 'left',
+      validate: val => ['left', 'right'].includes(val),
+    },
+  },
+  methods: {
+    onClick(target) {
+      if (this.$router) {
+        this.$router.push(target);
+      } else {
+        console.log(target);
+        window.location.href = target;
+      }
+    },
+    toggleActive(target) {
+      if (this.$route.path.startsWith(target)) {
+        console.log('path1: ', this.$route.path);
+        console.log('true');
+        return true;
+      }
+      console.log('path2: ', this.$route.path);
+      return this.$route.path === target;
     },
   },
 };
@@ -48,5 +78,9 @@ export default {
 .right {
   display: flex;
   justify-content: right;
+}
+
+.nav-item {
+  display: inline-block;
 }
 </style>
