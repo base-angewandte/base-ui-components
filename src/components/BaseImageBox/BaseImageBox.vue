@@ -17,19 +17,33 @@
         <div
           v-if="showTitle"
           ref="headerBox"
-          :class="['base-image-box-header',
-                   { 'base-image-box-header-centered': centerHeader }]">
+          :class="['base-image-box__header',
+                   { 'base-image-box__header--center-text': centerHeader }]">
           <div
-            :title="title"
-            :class="['base-image-box-title',
-                     { 'base-image-box-header-2-lines': !subtext }]">
-            {{ title }}
+            class="base-image-box__header__row">
+            <div
+              :title="title"
+              class=" "
+              :class="['base-image-box__header__text',
+                       'base-image-box__header__text--bold',
+                       { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]">
+              {{ title }}
+            </div>
+            <div
+              v-if="$slots['title-right']"
+              class="base-image-box__row__additional">
+              <!-- @slot create custom content (e.g. additional text or icon) right of the title -->
+              <slot name="title-right" />
+            </div>
           </div>
           <div
             v-if="subtext"
-            :title="subtext"
-            class="base-image-box-subtext">
-            {{ subtext }}
+            class="base-image-box__header__row">
+            <div
+              :title="subtext"
+              class="base-image-box__header__text">
+              {{ subtext }}
+            </div>
           </div>
         </div>
 
@@ -92,6 +106,7 @@
           </div>
           <div
             :class="['base-image-box-footer',
+                     'base-image-box-footer--position-margin-' + imageFooterMargin,
                      { 'base-image-box-footer-invert': icon }]">
             <div
               v-if="$slots['footer-left']"
@@ -203,12 +218,32 @@ export default {
       default: false,
     },
     /**
+     * define the number of rows before the title is truncated with ...
+     *
+     * **auto**: If subtext is defined, the title is displayed in one row, otherwise in two rows.
+     * **1**: Title is displayed in one row.
+     */
+    titleRows: {
+      type: [String, Number],
+      default: 'auto',
+      validator: val => ['auto', 1].includes(val),
+    },
+    /**
      * image url // TODO: should probably be required? otherwise we need definition of
      * what alternate content should be? (--> are there items without image? probably yes?)
      */
     imageUrl: {
       type: String,
       default: null,
+    },
+    /**
+     * define the margin (left, bottom, right) between the image footer and the image<br>
+     * @values large, small
+     */
+    imageFooterMargin: {
+      type: String,
+      default: 'large',
+      validator: val => ['large', 'small'].includes(val),
     },
     /**
      * descriptive element displayed at bottom of box (e.g. item type like "Bilderserie")
@@ -299,7 +334,7 @@ export default {
       default: false,
     },
     /**
-     * specify if header should be centered
+     * specify if header should be centered horizontally
      * (aligned left otherwise)
      */
     centerHeader: {
@@ -341,7 +376,7 @@ export default {
        */
       displayImage: true,
       /**
-       * timeout variable to only do height calcs after certain time
+       * timeout variable to only do height calculations after certain time
        */
       resizeTimeout: null,
     };
@@ -461,6 +496,59 @@ export default {
 <style lang="scss" scoped>
   @import '../../styles/variables.scss';
 
+  .base-image-box {
+    &__header {
+      display: flex;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      align-items: center;
+      padding: $spacing;
+      background-color: #fff;
+      line-height: $line-height; /* fallback */
+      height: $line-height * 2 + $spacing * 2;
+      width: 100%;
+
+      &--center-text {
+        .base-image-box__header__row {
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      &__row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        &__additional {
+          color: #666;
+          font-size: $font-size-small;
+          margin-left: $spacing-small;
+        }
+      }
+
+      &__text {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &--2-lines {
+          white-space: normal;
+          text-overflow: initial;
+
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          max-height: 100%;
+        }
+
+        &--bold {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
   .base-image-box-content-wrapper {
     position: absolute;
     height: 100%;
@@ -469,7 +557,7 @@ export default {
     &.base-image-box-selectable {
       cursor: pointer;
 
-      .base-image-box-title {
+      .base-image-box__header__row {
         width: 80%;
       }
     }
@@ -553,46 +641,6 @@ export default {
       height: 100%;
       width: 100%;
 
-      .base-image-box-header {
-        overflow: hidden;
-        display: block;
-        text-overflow: ellipsis;
-        -webkit-box-orient: vertical;
-        margin: $spacing;
-        -webkit-line-clamp: 2;
-        line-height: $line-height; /* fallback */
-        flex-shrink: 0;
-        height: $line-height * 2;
-
-        .base-image-box-title,
-        .base-image-box-subtext {
-          overflow: hidden;
-          display: block;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          -webkit-box-orient: vertical;
-          -webkit-line-clamp: 1;
-          line-height: $line-height;
-          flex-shrink: 0;
-          max-height: $line-height * 1;
-        }
-
-        .base-image-box-title {
-          font-weight: bold;
-
-          &.base-image-box-header-2-lines {
-            display: -webkit-box;
-            -webkit-line-clamp: 2 ;
-            max-height: 100%;
-            white-space: normal;
-          }
-        }
-
-        &.base-image-box-header-centered {
-          text-align: center;
-        }
-      }
-
       .base-image-box-order-first {
         order: -1;
       }
@@ -627,7 +675,7 @@ export default {
           max-width: $icon-medium;
         }
 
-        &.base-image-box-icon-small {
+        &.base-image-box-icon--small {
           max-width: $icon-small;
         }
       }
@@ -772,15 +820,24 @@ export default {
   /* footer with slot */
   .base-image-box-footer {
     position: absolute;
-    bottom: $spacing;
-    left: $spacing;
-    right: $spacing;
     color: white;
     z-index: 1;
 
     display: flex;
     justify-content: flex-start;
     align-items: center;
+
+    &--position-margin-large {
+      bottom: $spacing;
+      left: $spacing;
+      right: $spacing;
+    }
+
+    &--position-margin-small {
+      bottom: $spacing-small;
+      left: $spacing-small;
+      right: $spacing-small;
+    }
 
     &.base-image-box-footer-invert {
       color: $font-color;
