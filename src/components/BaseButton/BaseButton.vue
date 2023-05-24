@@ -67,7 +67,7 @@ export default {
      */
     text: {
       type: String,
-      default: 'Submit',
+      default: '',
     },
     // TODO: need to check if it is possible to use custom icons --> if yes description!
     /**
