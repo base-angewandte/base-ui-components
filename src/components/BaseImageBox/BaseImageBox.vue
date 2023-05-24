@@ -50,13 +50,11 @@
         <div
           :class="[
             'base-image-box-body',
-            { 'base-image-box-inner-shadow-bottom-top': selectable && imageUrl && !showTitle },
-            {
-              'base-image-box-inner-shadow-bottom': !icon
-                && (!showTitleOnHover || (showTitleOnHover && additional)),
-            },
+            { 'base-image-box-inner-shadow-bottom-top': imageShadowTop },
+            { 'base-image-box-inner-shadow-bottom': imageShadowBottom },
             { 'base-image-box-order-first': imageFirst },
-            imageShadowClass]">
+            { 'base-image-box-img-third': imageShadow && imageFirst },
+            { 'base-image-box-img-half': imageShadow && !imageFirst }]">
           <div
             v-if="imageUrl && displayImage"
             :class="['base-image-box-img-wrapper']">
@@ -237,6 +235,14 @@ export default {
       default: null,
     },
     /**
+     * display shadow overlays at the top and bottom of the image
+     * to make text easier to read
+     */
+    imageShadow: {
+      type: Boolean,
+      default: true,
+    },
+    /**
      * define the margin (left, bottom, right) between the image footer and the image<br>
      * @values large, small
      */
@@ -382,9 +388,14 @@ export default {
     };
   },
   computed: {
-    // determine if shadow should cover half or third of box
-    imageShadowClass() {
-      return this.imageFirst ? 'base-image-box-img-third' : 'base-image-box-img-half';
+    // determine if a shadow at the top of the image should be visible
+    imageShadowTop() {
+      return this.imageShadow && this.selectable && this.imageUrl && !this.showTitle;
+    },
+    // determine if a shadow at the bottom of the image should be visible
+    imageShadowBottom() {
+      return this.imageShadow && !this.icon
+        && (!this.showTitleOnHover || (this.showTitleOnHover && this.additional));
     },
   },
   watch: {
