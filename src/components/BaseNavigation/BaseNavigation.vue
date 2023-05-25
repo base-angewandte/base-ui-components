@@ -87,6 +87,6 @@ export default {
 
 .nav-item .base-button.base-button-row.base-button-active {
   box-shadow: 0px 0px 0px 0px transparent,
-    inset 0px -5px 0 -2px var(--app-color, #673ab7);
+  inset 0px -5px 0 -2px var(--app-color, #673ab7);
 }
 </style>
