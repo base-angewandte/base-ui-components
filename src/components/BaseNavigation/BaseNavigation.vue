@@ -1,7 +1,6 @@
 <template>
   <main class="base-navigation">
-    <div
-      :class="placement">
+    <div :class="placement">
       <ul>
         <li
           v-for="element in list"
@@ -28,12 +27,14 @@ export default {
   props: {
     list: {
       type: Array,
-      default: () => [{
-        id: '1',
-        label: 'Label',
-        shortLabel: 'Short Label',
-        route: '/',
-      }],
+      default: () => [
+        {
+          id: '1',
+          label: 'Label',
+          shortLabel: 'Short Label',
+          route: '/',
+        },
+      ],
     },
     renderAs: {
       type: String,
@@ -69,7 +70,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/variables.scss';
+@import "../../styles/variables.scss";
 
 .left {
   display: flex;
@@ -82,5 +83,10 @@ export default {
 
 .nav-item {
   display: inline-block;
+}
+
+.nav-item .base-button.base-button-row.base-button-active {
+  box-shadow: 0px 0px 0px 0px transparent,
+    inset 0px -5px 0 -2px var(--app-color, #673ab7);
 }
 </style>
