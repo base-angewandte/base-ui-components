@@ -1,9 +1,6 @@
 ```vue live
-
 <template>
-  <BaseNavigation
-    :list="list"
-    :placement="placement" />
+  <BaseNavigation :list="list" :placement="placement" />
 </template>
 
 <script>
@@ -12,23 +9,28 @@ export default {
     return {
       list: [
         {
-          id: '1',
-          label: 'test',
-          shortLabel: 'test',
-          route: '/home',
+          id: "0",
+          label: "BaseButton",
+          shortLabel: "BaseButton short",
+          route: "/components/BaseButton.html",
         },
         {
-          id: '2',
-          label: 'test2',
-          shortLabel: 'test2',
-          route: 'https://www.google.com/',
+          id: "1",
+          label: "BaseNavigation",
+          shortLabel: "BaseNavigation short",
+          route: "/components/BaseNavigation.html",
+        },
+        {
+          id: "2",
+          label: "BaseLink",
+          shortLabel: "BaseLink short",
+          route: "/components/BaseLink.html",
         },
       ],
-      placement: 'left',
-      renderAs: 'NuxtLink'
-    }
-  }
+      placement: "left",
+      renderAs: "NuxtLink",
+    };
+  },
 };
 </script>
-
 ```
