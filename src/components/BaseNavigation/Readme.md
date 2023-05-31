@@ -1,6 +1,6 @@
 ```vue live
 <template>
-  <BaseNavigation :list="list" :placement="placement" />
+  <BaseNavigation :list="list" />
 </template>
 
 <script>
@@ -13,21 +13,23 @@ export default {
           label: "BaseButton",
           shortLabel: "BaseButton short",
           route: "/components/BaseButton.html",
+          placement: "left",
         },
         {
           id: "1",
           label: "BaseNavigation",
           shortLabel: "BaseNavigation short",
           route: "/components/BaseNavigation.html",
+          placement: "right",
         },
         {
           id: "2",
           label: "BaseLink",
           shortLabel: "BaseLink short",
           route: "/components/BaseLink.html",
+          placement: "right",
         },
       ],
-      placement: "left",
       renderAs: "NuxtLink",
     };
   },
