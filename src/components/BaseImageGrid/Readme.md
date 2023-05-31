@@ -5,14 +5,14 @@
   <div
     class="container">
     <BaseBox
-      v-for="(image, index) in images"
+      v-for="(image, index) in src"
       :key="`box-${index}`"
       :box-size="boxSize"
       class="base-box">
       <div class="base-box__content">
         <BaseImageGrid
           :gap="gap"
-          :images="images.slice(0, index + 1)" />
+          :images="src.slice(0, index + 1)" />
       </div>
     </BaseBox>
   </div>
@@ -29,11 +29,31 @@ export default {
     return {
       boxSize: { width: 'calc(25% - 16px)' },
       gap: '3px',
-      images: [
+      // array structure to render single images
+      src: [
         'https://picsum.photos/seed/aa/460/341',
         'https://picsum.photos/seed/bb/460/341',
         'https://picsum.photos/seed/cc/460/341',
         'https://picsum.photos/seed/dd/460/341',
+      ],
+      // array structure to render responsive images
+      srcset: [
+        {
+          '460w': 'https://picsum.photos/seed/aa/460/341',
+          '768w': 'https://picsum.photos/seed/aa/768/534',
+        },
+        {
+          '460w': 'https://picsum.photos/seed/bb/460/341',
+          '768w': 'https://picsum.photos/seed/bb/768/534',
+        },
+        {
+          '460w': 'https://picsum.photos/seed/bb/460/341',
+          '768w': 'https://picsum.photos/seed/bb/768/534',
+        },
+        {
+          '460w': 'https://picsum.photos/seed/bb/460/341',
+          '768w': 'https://picsum.photos/seed/bb/768/534',
+        },
       ],
     };
   },

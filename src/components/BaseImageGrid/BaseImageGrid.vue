@@ -9,7 +9,8 @@
       class="base-image-grid__item">
       <BaseImage
         :lazyload="true"
-        :src="image" />
+        :src="src(image)"
+        :srcset="srcset(image)" />
     </div>
   </div>
 </template>
@@ -51,6 +52,10 @@ export default {
     },
     /**
      * specify images to display in a grid
+     *
+     * array variants to render a single image using `src` or `srcset` for a responsive image:
+     * **src**: `['path']`
+     * **srcset**: `[{ '640w': 'path' }]`
      */
     images: {
       type: Array,
@@ -71,6 +76,29 @@ export default {
      */
     style() {
       return { '--gap': this.gap };
+    },
+  },
+  methods: {
+    /**
+     * get single src
+     *
+     * @param {string|object} data
+     * @returns {string}
+     */
+    src(data) {
+      return typeof data === 'string'
+        ? data
+        // get last array elements path
+        : Object.entries(data).slice(-1)[0][1];
+    },
+    /**
+     * get srcset
+     *
+     * @param {object} data
+     * @returns {array}
+     */
+    srcset(data) {
+      return typeof data === 'object' ? [data] : [];
     },
   },
 };

@@ -63,9 +63,18 @@
             ref="image"
             :alt="title"
             :lazyload="lazyload"
-            :src="images && images.length === 1 ? images[0] : imageUrl"
+            :src="images && images.length === 1 ? src(images[0]) : src(imageUrl)"
+            :srcset="images && images.length === 1 ? srcset(images[0]) : srcset(imageUrl)"
             :class="['base-image-box__body__image']"
             @error="displayImage = false" />
+
+          <!-- image grid -->
+          <BaseImageGrid
+            v-if="images && images.length > 1"
+            :alt="title"
+            :gap="gridGap"
+            :images="images"
+            :lazyload="lazyload" />
         </template>
 
         <!-- ICONS -->
@@ -182,7 +191,6 @@
 <script>
 import BaseBox from '../BaseBox/BaseBox';
 import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseImage from '../BaseImage/BaseImage';
 
 /**
  * A component with the primary purpose to display
@@ -193,9 +201,10 @@ export default {
   name: 'BaseImageBox',
   components: {
     BaseBox,
-    BaseImage,
     BaseIcon,
     BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
+    BaseImage: () => import('../BaseImage/BaseImage').then(m => m.default || m),
+    BaseImageGrid: () => import('../BaseImageGrid/BaseImageGrid').then(m => m.default || m),
   },
   props: {
     /**
@@ -239,13 +248,21 @@ export default {
     },
     /**
      * define a url to a single image
+     *
+     * data variants to render a single image using `src` or `srcset` for a responsive image:
+     * **src**: `'path'`
+     * **srcset**: `{ '640w': 'path' }`
      */
     imageUrl: {
-      type: String,
+      type: [String, Object],
       default: null,
     },
     /**
-     * define up to 4 image urls to be displayed in a grid
+     * define up to 4 image url to be displayed in a grid
+     *
+     * array variants to render a single image using `src` or `srcset` for a responsive image:
+     * **src**: `['path']`
+     * **srcset**: `[{ '640w': 'path' }]`
      */
     images: {
       type: Array,
@@ -260,7 +277,7 @@ export default {
       default: true,
     },
     /**
-     * define the margin (left, bottom, right) between the image footer and the image<br>
+     * define the margin (left, bottom, right) between the image footer and the image
      * @values large, small
      */
     imageFooterMargin: {
@@ -382,6 +399,13 @@ export default {
       default: '',
       validator: val => typeof val === 'string'
         || (val instanceof Object && Object.keys(val).includes('path')),
+    },
+    /**
+     * specify the grid gap with a unit
+     */
+    gridGap: {
+      type: String,
+      default: '3px',
     },
   },
   data() {
@@ -521,6 +545,27 @@ export default {
           '-webkit-line-clamp': lines,
         };
       }
+    },
+    /**
+     * get single src
+     *
+     * @param {string|object} data
+     * @returns {string}
+     */
+    src(data) {
+      return typeof data === 'string'
+        ? data
+        // get last array elements path
+        : Object.entries(data).slice(-1)[0][1];
+    },
+    /**
+     * get srcset
+     *
+     * @param {array} data
+     * @returns {array}
+     */
+    srcset(data) {
+      return typeof data === 'object' ? [data] : [];
     },
   },
 };
