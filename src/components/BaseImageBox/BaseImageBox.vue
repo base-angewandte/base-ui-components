@@ -7,150 +7,163 @@
     box-ratio="100"
     @clicked="boxSelect">
     <div
-      :class="['base-image-box-content-wrapper',
-               { 'base-image-box-hover': (playIcon || showTitleOnHover) && !selectable },
-               { 'base-image-box-hover-show-title': showTitleOnHover && !selectable },
-               { 'base-image-box-selectable': selectable },
-               { 'base-image-box-draggable': draggable },
-               { 'base-image-box-selected': selectable && selectedInt }]">
-      <div class="base-image-box-content">
+      :class="['base-image-box',
+               { 'base-image-box--hover': (playIcon || showTitleOnHover) && !selectable },
+               { 'base-image-box--hover-show-title': showTitleOnHover && !selectable },
+               { 'base-image-box--selectable': selectable },
+               { 'base-image-box--draggable': draggable }, // needs to be after selectable
+               { 'base-image-box--selected': selectable && selectedInt }]">
+      <!-- HEADER -->
+      <div
+        v-if="showTitle"
+        ref="headerBox"
+        :class="['base-image-box__header',
+                 { 'base-image-box__header--bottom': imageFirst },
+                 { 'base-image-box__header--center-text': centerHeader }]">
         <div
-          v-if="showTitle"
-          ref="headerBox"
-          :class="['base-image-box__header',
-                   { 'base-image-box__header--center-text': centerHeader }]">
+          class="base-image-box__header__row">
           <div
-            class="base-image-box__header__row">
-            <div
-              :title="title"
-              class=" "
-              :class="['base-image-box__header__text',
-                       'base-image-box__header__text--bold',
-                       { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]">
-              {{ title }}
-            </div>
-            <div
-              v-if="$slots['title-right']"
-              class="base-image-box__row__additional">
-              <!-- @slot create custom content (e.g. additional text or icon) right of the title -->
-              <slot name="title-right" />
-            </div>
+            :title="title"
+            :class="['base-image-box__header__text',
+                     'base-image-box__header__text--bold',
+                     { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]">
+            {{ title }}
           </div>
           <div
-            v-if="subtext"
-            class="base-image-box__header__row">
-            <div
-              :title="subtext"
-              class="base-image-box__header__text">
-              {{ subtext }}
-            </div>
+            v-if="$slots['title-right']"
+            class="base-image-box__header__row__additional">
+            <!-- @slot create custom content (e.g. additional text or icon) right of the title -->
+            <slot name="title-right" />
           </div>
         </div>
-
         <div
-          :class="[
-            'base-image-box-body',
-            { 'base-image-box-inner-shadow-bottom-top': imageShadowTop },
-            { 'base-image-box-inner-shadow-bottom': imageShadowBottom },
-            { 'base-image-box-order-first': imageFirst },
-            { 'base-image-box-img-third': imageShadow && imageFirst },
-            { 'base-image-box-img-half': imageShadow && !imageFirst }]">
+          v-if="subtext"
+          class="base-image-box__header__row">
           <div
-            v-if="imageUrl && displayImage"
-            :class="['base-image-box-img-wrapper']">
-            <BaseImage
-              ref="image"
-              :alt="title"
-              :lazyload="lazyload"
-              :src="imageUrl"
-              :class="['base-image-box-image',
-                       { 'base-image-box__image-second': !imageFirst },
-                       { 'base-image-box-no-title': !showTitle }]"
-              @error="displayImage = false" />
-          </div>
-
-          <!-- display optional icon for entries without an image -->
-          <BaseIcon
-            v-if="icon"
-            :name="icon"
-            :class="['base-image-box-icon', 'base-image-box-icon--' + iconSize]" />
-
-          <!-- display optional play icon e.g. for video, audio -->
-          <BaseIcon
-            v-if="playIcon"
-            name="play"
-            :class="['base-image-box-icon-play', 'base-image-box-icon--' + iconSize]" />
-
-          <div
-            v-if="!imageUrl || !displayImage"
-            ref="boxText"
-            class="base-image-box__text-wrapper">
-            <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
-            <slot
-              :text="boxText"
-              name="text">
-              <!-- default -->
-              <div
-                ref="boxTextInner"
-                :style="boxTextStyle"
-                class="base-image-box-text">
-                <div
-                  v-for="(entry, index) in boxText"
-                  :key="index">
-                  {{ entry }}
-                </div>
-              </div>
-            </slot>
-          </div>
-          <div
-            :class="['base-image-box-footer',
-                     'base-image-box-footer--position-margin-' + imageFooterMargin,
-                     { 'base-image-box-footer-invert': icon }]">
-            <div
-              v-if="$slots['footer-left']"
-              class="base-image-box-footer-left">
-              <!-- @slot create custom content (e.g. featured icon for files) left of text -->
-              <slot name="footer-left" />
-            </div>
-            <div class="base-image-box-footer-body">
-              <div
-                v-if="showTitleOnHover"
-                :title="title"
-                class="base-image-box-footer-title bold">
-                {{ title }}
-              </div>
-              <div
-                v-if="description"
-                :title="description"
-                :class="[
-                  'base-image-box-footer-text',
-                  { bold: !additional }]">
-                {{ description }}
-              </div>
-              <div
-                v-if="additional"
-                :title="additional"
-                class="base-image-box-footer-text bold">
-                {{ additional }}
-              </div>
-            </div>
-
-            <div
-              v-if="$slots['footer-right'] || playIcon"
-              class="base-image-box-footer-right">
-              <!-- display optional play icon e.g. for video, audio -->
-              <BaseIcon
-                v-if="playIcon"
-                name="play"
-                class="base-image-box-icon-play-small" />
-              <!-- @slot create custom content (e.g. published icon for files) left of text -->
-              <slot name="footer-right" />
-            </div>
+            :title="subtext"
+            class="base-image-box__header__text">
+            {{ subtext }}
           </div>
         </div>
       </div>
+
+      <!-- BODY -->
       <div
-        class="base-image-box-features">
+        :class="['base-image-box__body',
+                 { 'base-image-box__body__shadow--top': imageShadowTop },
+                 { 'base-image-box__body__shadow--bottom': imageShadowBottom },
+                 { 'base-image-box__body__shadow--height-1-3': imageShadow && imageFirst },
+                 { 'base-image-box__body__shadow--height-1-2': imageShadow && !imageFirst }]">
+        <!-- IMAGE / IMAGE-GRID -->
+        <template
+          v-if="(imageUrl || images.length) && displayImage">
+          <!-- single image (handle errors, e.g. for uploads) -->
+          <BaseImage
+            v-if="imageUrl || (images && images.length === 1)"
+            ref="image"
+            :alt="title"
+            :lazyload="lazyload"
+            :src="images && images.length === 1 ? images[0] : imageUrl"
+            :class="['base-image-box__body__image']"
+            @error="displayImage = false" />
+        </template>
+
+        <!-- ICONS -->
+        <!-- display optional icon for entries without an image -->
+        <BaseIcon
+          v-if="icon"
+          :name="icon"
+          :class="['base-image-box__body__icon',
+                   'base-image-box__icon',
+                   'base-image-box__icon--' + iconSize]" />
+
+        <!-- display optional play icon e.g. for video, audio -->
+        <BaseIcon
+          v-if="playIcon"
+          name="play"
+          :class="['base-image-box__body__icon',
+                   'base-image-box__icon',
+                   'base-image-box__icon--play',
+                   'base-image-box__icon--' + iconSize]" />
+
+        <!-- BODY TEXT -->
+        <!-- alternative text, when no images are set -->
+        <div
+          v-if="!hasImages || !displayImage"
+          ref="boxText"
+          class="base-image-box__body__text">
+          <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
+          <slot
+            :text="boxText"
+            name="text">
+            <!-- default -->
+            <div
+              ref="boxTextInner"
+              :style="boxTextStyle"
+              class="base-image-box__body__text__inner">
+              <div
+                v-for="(entry, index) in boxText"
+                :key="index">
+                {{ entry }}
+              </div>
+            </div>
+          </slot>
+        </div>
+
+        <!-- FOOTER -->
+        <div
+          :class="['base-image-box__body__footer',
+                   'base-image-box__body__footer--position-margin-' + imageFooterMargin,
+                   { 'base-image-box__body__footer--invert': icon }]">
+          <div
+            v-if="$slots['footer-left']"
+            class="base-image-box__body__footer__left">
+            <!-- @slot create custom content (e.g. featured icon for files) left of text -->
+            <slot name="footer-left" />
+          </div>
+
+          <div class="base-image-box__body__footer__center">
+            <div
+              v-if="showTitleOnHover"
+              :title="title"
+              class="base-image-box__body__footer__title base-image-box__body__footer--bold">
+              {{ title }}
+            </div>
+            <div
+              v-if="description"
+              :title="description"
+              :class="['base-image-box__body__footer__text',
+                       { 'base-image-box__body__footer__text--bold': !additional }]">
+              {{ description }}
+            </div>
+            <div
+              v-if="additional"
+              :title="additional"
+              :class="['base-image-box__body__footer__text',
+                       'base-image-box__body__footer__text--bold']">
+              {{ additional }}
+            </div>
+          </div>
+
+          <div
+            v-if="$slots['footer-right'] || playIcon"
+            class="base-image-box__body__footer__right">
+            <!-- display optional play icon e.g. for video, audio -->
+            <BaseIcon
+              v-if="playIcon"
+              name="play"
+              :class="['base-image-box__icon',
+                       'base-image-box__icon--small',
+                       'base-image-box__icon--play']" />
+            <!-- @slot create custom content (e.g. published icon for files) left of text -->
+            <slot name="footer-right" />
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <div
+        class="base-image-box__features">
         <transition
           name="slide-fade">
           <BaseCheckmark
@@ -159,7 +172,7 @@
             :label="title"
             mark-style="checkbox"
             check-box-size="large"
-            class="base-image-box-checkbox"
+            class="base-image-box__checkbox"
             @clicked="boxSelect" />
         </transition>
       </div>
@@ -179,16 +192,14 @@ import BaseImage from '../BaseImage/BaseImage';
 export default {
   name: 'BaseImageBox',
   components: {
-    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
-    BaseIcon,
     BaseBox,
     BaseImage,
+    BaseIcon,
+    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
   },
   props: {
     /**
      * The title of the item in question (max 2 lines), also used as img alt text
-     * (atm - TODO: should there be a separate alt text (then again - what would that be since
-     * file uploads dont have any properties)?)
      */
     title: {
       type: String,
@@ -227,12 +238,18 @@ export default {
       validator: val => ['auto', 1].includes(val),
     },
     /**
-     * image url // TODO: should probably be required? otherwise we need definition of
-     * what alternate content should be? (--> are there items without image? probably yes?)
+     * define a url to a single image
      */
     imageUrl: {
       type: String,
       default: null,
+    },
+    /**
+     * define up to 4 image urls to be displayed in a grid
+     */
+    images: {
+      type: Array,
+      default: () => ([]),
     },
     /**
      * display shadow overlays at the top and bottom of the image
@@ -390,12 +407,17 @@ export default {
   computed: {
     // determine if a shadow at the top of the image should be visible
     imageShadowTop() {
-      return this.imageShadow && this.selectable && this.imageUrl && !this.showTitle;
+      return (this.selectable && this.hasImages && !this.showTitle)
+        || (this.selectable && this.hasImages && this.imageFirst);
     },
     // determine if a shadow at the bottom of the image should be visible
     imageShadowBottom() {
       return this.imageShadow && !this.icon
         && (!this.showTitleOnHover || (this.showTitleOnHover && this.additional));
+    },
+    // determine if there is one or more images to display
+    hasImages() {
+      return !!(this.imageUrl || (this.images && this.images.length));
     },
   },
   watch: {
@@ -508,23 +530,25 @@ export default {
   @import '../../styles/variables.scss';
 
   .base-image-box {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+
+    // set absolute to keep baseBox ratio
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    /* HEADER */
     &__header {
       display: flex;
       flex-wrap: wrap;
       flex-shrink: 0;
       align-items: center;
       padding: $spacing;
-      background-color: #fff;
       line-height: $line-height; /* fallback */
       height: $line-height * 2 + $spacing * 2;
       width: 100%;
-
-      &--center-text {
-        .base-image-box__header__row {
-          justify-content: center;
-          text-align: center;
-        }
-      }
 
       &__row {
         width: 100%;
@@ -557,27 +581,268 @@ export default {
           font-weight: bold;
         }
       }
-    }
-  }
 
-  .base-image-box-content-wrapper {
-    position: absolute;
-    height: 100%;
-    width: 100%;
+      &--center-text {
+        .base-image-box__header__row {
+          justify-content: center;
+          text-align: center;
+        }
+      }
 
-    &.base-image-box-selectable {
-      cursor: pointer;
-
-      .base-image-box__header__row {
-        width: 80%;
+      &--bottom {
+        order: 1;
       }
     }
 
-    &.base-image-box-draggable {
+    /* ICONS */
+    &__icon {
+
+      &--xxlarge {
+        height: $icon-xxlarge;
+        max-width: $icon-xxlarge;
+        width: $icon-xxlarge;
+      }
+
+      &--xlarge {
+        height: $icon-xlarge;
+        max-width: $icon-xlarge;
+        width: $icon-xlarge;
+      }
+
+      &--large {
+        height: $icon-large;
+        max-width: $icon-large;
+        width: $icon-large;
+      }
+
+      &--medium {
+        height: $icon-medium;
+        max-width: $icon-medium;
+        width: $icon-medium;
+      }
+
+      &--small {
+        height: $icon-small;
+        max-width: $icon-small;
+        width: $icon-small;
+      }
+
+      &--play {
+        opacity: 0;
+        z-index: 1;
+        fill: $app-color;
+      }
+    }
+
+    /* BODY */
+    &__body {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+
+      &__image {
+        object-fit: cover;
+        height: 100% !important; // TODO: add to baseImage
+        width: 100%;
+      }
+
+      &__icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        fill: $font-color-second;
+      }
+
+      &__text {
+        display: flex;
+        margin: 0 $spacing $spacing;
+        width: calc(100% - 2 * #{$spacing});
+
+        &__inner {
+          overflow-wrap: break-word;
+          overflow: hidden;
+          display: -webkit-box;
+          text-overflow: ellipsis;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 1;
+          height: 100%;
+          line-height: $line-height; /* fallback */
+        }
+      }
+
+      &__footer {
+        position: absolute;
+        color: #ffffff;
+        z-index: 1;
+
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        &__left {
+          display: flex;
+          margin-right: $spacing-small;
+        }
+
+        &__center {
+          flex-grow: 1;
+          overflow: hidden;
+        }
+
+        &__right {
+          display: flex;
+          align-items: center;
+          margin-left: $spacing;
+
+          .base-image-box__icon--play {
+            opacity: 1;
+            fill: white;
+            height: $icon-medium;
+            width: $icon-medium;
+            min-width: $icon-medium;
+            margin-right: $spacing-small-half;
+          }
+        }
+
+        &__title,
+        &__text {
+          flex: 1;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+
+          &--bold {
+            font-weight: bold;
+          }
+        }
+
+        &__title {
+          display: none;
+        }
+
+        &--position-margin-large {
+          bottom: $spacing;
+          left: $spacing;
+          right: $spacing;
+        }
+
+        &--position-margin-small {
+          bottom: $spacing-small;
+          left: $spacing-small;
+          right: $spacing-small;
+        }
+
+        &--invert {
+          color: $font-color;
+
+          .base-image-box__body__footer__right {
+
+            .base-image-box__icon--play {
+              fill: $font-color;
+            }
+          }
+        }
+      }
+
+      &__shadow {
+        &--top {
+          &:before {
+            content: "";
+            width: 100%;
+            min-height: $row-height-large;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 1;
+            background: linear-gradient(
+                to top, hsla(0, 0%, 0%, 0) 0%,
+                hsla(0, 0%, 0%, 0.017) 11.9%,
+                hsla(0, 0%, 0%, 0.062) 22.5%,
+                hsla(0, 0%, 0%, 0.13) 32.2%,
+                hsla(0, 0%, 0%, 0.211) 41.2%,
+                hsla(0, 0%, 0%, 0.3) 50%,
+                hsla(0, 0%, 0%, 0.389) 58.8%,
+                hsla(0, 0%, 0%, 0.47) 67.8%,
+                hsla(0, 0%, 0%, 0.538) 77.5%,
+                hsla(0, 0%, 0%, 0.583) 88.1%,
+                hsla(0, 0%, 0%, 0.6) 100%);
+          }
+        }
+
+        &--bottom {
+          &:after {
+            content: "";
+            width: 100%;
+            min-height: $row-height-large;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                to bottom, hsla(0, 0%, 0%, 0) 0%,
+                hsla(0, 0%, 0%, 0.017) 11.9%,
+                hsla(0, 0%, 0%, 0.062) 22.5%,
+                hsla(0, 0%, 0%, 0.13) 32.2%,
+                hsla(0, 0%, 0%, 0.211) 41.2%,
+                hsla(0, 0%, 0%, 0.3) 50%,
+                hsla(0, 0%, 0%, 0.389) 58.8%,
+                hsla(0, 0%, 0%, 0.47) 67.8%,
+                hsla(0, 0%, 0%, 0.538) 77.5%,
+                hsla(0, 0%, 0%, 0.583) 88.1%,
+                hsla(0, 0%, 0%, 0.6) 100%);
+          }
+        }
+
+        &--height-1-3:after {
+          height: 33%;
+        }
+
+        &--height-1-2:after {
+          height: 50%;
+        }
+      }
+    }
+
+    /* FEATURES */
+    &__features {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: flex-end;
+
+      .base-image-box__checkbox {
+        margin-top: $spacing-small;
+        margin-right: $spacing-small;
+      }
+    }
+
+    &:not(.base-image-box--selected) {
+      &::v-deep .base-image-box__features .base-checkmark-container {
+        border-color: $app-color;
+      }
+    }
+
+    /* Modifiers */
+    &.base-image-box--draggable {
       cursor: move;
     }
 
-    &.base-image-box-selected {
+    &--selectable {
+      cursor: pointer;
+
+      // if header is aligned to bottom (image first),
+      // we dont need to shorten the header container
+      .base-image-box__header:not(.base-image-box__header--bottom) {
+        .base-image-box__header__row {
+          width: 80%;
+        }
+      }
+    }
+
+    &--selected {
       &:after {
         content: '';
         width: 100%;
@@ -591,11 +856,13 @@ export default {
         z-index: 1;
       }
     }
+  }
 
-    // check if device is capable to handle hover state
-    // prevents double clicks on touch devices
-    @media (hover: hover) {
-      &.base-image-box-hover {
+  // check if device is capable to handle hover state
+  // prevents double clicks on touch devices
+  @media (hover: hover) {
+    .base-image-box {
+      &--hover {
         cursor: pointer;
 
         &:after {
@@ -614,297 +881,45 @@ export default {
             opacity: 1;
           }
 
-          .base-image-box-content {
-            .base-image-box-icon-play {
+          .base-image-box__body {
+            .base-image-box__icon--play {
               opacity: 1;
               transition: opacity 500ms ease;
             }
+
+            &__footer {
+              .base-image-box__icon {
+                opacity: 0;
+              }
+            }
           }
 
-          .base-image-box-icon-play-small {
-            opacity: 0;
-          }
-
-          .base-image-box-footer-body,
-          .base-image-box-footer-right {
+          .base-image-box__body__footer__center,
+          .base-image-box__body__footer__right {
             color: $font-color;
           }
         }
       }
 
-      &.base-image-box-hover-show-title {
+      &--hover-show-title {
         &:hover {
-          .base-image-box-footer-text {
+          .base-image-box__footer__text {
             display: none;
           }
 
-          .base-image-box-footer-title {
+          .base-image-box__footer__title {
             display: inherit;
           }
         }
       }
     }
-
-    .base-image-box-content {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-
-      .base-image-box-order-first {
-        order: -1;
-      }
-
-      .base-image-box-body {
-        position: relative;
-        display: flex;
-        height: 100%;
-      }
-
-      .base-image-box-icon,
-      .base-image-box-icon-play {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-
-        &.base-image-box-icon--xxlarge {
-          max-width: $icon-xxlarge;
-        }
-
-        &.base-image-box-icon--xlarge {
-          max-width: $icon-xlarge;
-        }
-
-        &.base-image-box-icon--large {
-          max-width: $icon-large;
-        }
-
-        &.base-image-box-icon--medium {
-          max-width: $icon-medium;
-        }
-
-        &.base-image-box-icon--small {
-          max-width: $icon-small;
-        }
-      }
-
-      .base-image-box-icon {
-        fill: $font-color-second;
-      }
-
-      .base-image-box-icon-play {
-        opacity: 0;
-        z-index: 1;
-        fill: $app-color;
-      }
-
-      .base-image-box-img-wrapper {
-        flex: 1 1 auto;
-        position: relative;
-        overflow: hidden;
-
-        .base-image-box-image {
-          display: block;
-          margin: auto;
-          max-width: 100%;
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          transition: opacity 250ms ease-in-out;
-
-          &.base-image-box__image-second {
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-          }
-
-          // &.lazyload,
-          &.lazyloading {
-            opacity: 0;
-            transition: opacity 400ms;
-          }
-
-          &.lazyloaded {
-            opacity: 1;
-          }
-        }
-      }
-
-      .base-image-box__text-wrapper {
-        display: flex;
-        margin: 0 $spacing $spacing;
-        width: calc(100% - 2 * #{$spacing});
-      }
-
-      .base-image-box-text {
-        overflow-wrap: break-word;
-        overflow: hidden;
-        display: -webkit-box;
-        text-overflow: ellipsis;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        height: 100%;
-        line-height: $line-height; /* fallback */
-      }
-    }
-
-    .base-image-box-img-third:after {
-      height: 33%;
-    }
-
-    .base-image-box-img-half:after {
-      height: 50%;
-    }
-
-    &:not(&.base-image-box-selected) {
-      &::v-deep .base-image-box-features .base-checkmark-container {
-        border-color: $app-color;
-      }
-    }
   }
 
-  .base-image-box-inner-shadow-bottom-top {
-    &:before {
-      content: "";
-      width: 100%;
-      min-height: $row-height-large;
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 1;
-      background: linear-gradient(
-          to top, hsla(0, 0%, 0%, 0) 0%,
-          hsla(0, 0%, 0%, 0.017) 11.9%,
-          hsla(0, 0%, 0%, 0.062) 22.5%,
-          hsla(0, 0%, 0%, 0.13) 32.2%,
-          hsla(0, 0%, 0%, 0.211) 41.2%,
-          hsla(0, 0%, 0%, 0.3) 50%,
-          hsla(0, 0%, 0%, 0.389) 58.8%,
-          hsla(0, 0%, 0%, 0.47) 67.8%,
-          hsla(0, 0%, 0%, 0.538) 77.5%,
-          hsla(0, 0%, 0%, 0.583) 88.1%,
-          hsla(0, 0%, 0%, 0.6) 100%);
-    }
-  }
-
-  .base-image-box-inner-shadow-bottom {
-    &:after {
-      content: "";
-      width: 100%;
-      min-height: $row-height-large;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      background: linear-gradient(
-          to bottom, hsla(0, 0%, 0%, 0) 0%,
-          hsla(0, 0%, 0%, 0.017) 11.9%,
-          hsla(0, 0%, 0%, 0.062) 22.5%,
-          hsla(0, 0%, 0%, 0.13) 32.2%,
-          hsla(0, 0%, 0%, 0.211) 41.2%,
-          hsla(0, 0%, 0%, 0.3) 50%,
-          hsla(0, 0%, 0%, 0.389) 58.8%,
-          hsla(0, 0%, 0%, 0.47) 67.8%,
-          hsla(0, 0%, 0%, 0.538) 77.5%,
-          hsla(0, 0%, 0%, 0.583) 88.1%,
-          hsla(0, 0%, 0%, 0.6) 100%);
-    }
-  }
-
-  /* checkbox */
-  .base-image-box-features {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 10;
-    display: flex;
-    justify-content: flex-end;
-
-    .base-image-box-checkbox {
-      margin-top: $spacing-small;
-      margin-right: $spacing-small;
-    }
-  }
-
-  /* footer with slot */
-  .base-image-box-footer {
-    position: absolute;
-    color: white;
-    z-index: 1;
-
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    &--position-margin-large {
-      bottom: $spacing;
-      left: $spacing;
-      right: $spacing;
-    }
-
-    &--position-margin-small {
-      bottom: $spacing-small;
-      left: $spacing-small;
-      right: $spacing-small;
-    }
-
-    &.base-image-box-footer-invert {
-      color: $font-color;
-
-      .base-image-box-footer-right {
-        .base-image-box-icon-play-small {
-          fill: $font-color;
-        }
-      }
-    }
-
-    .base-image-box-footer-left {
-      display: flex;
-      margin-right: $spacing-small;
-    }
-
-    .base-image-box-footer-body {
-      flex-grow: 1;
-      overflow: hidden;
-    }
-
-    .base-image-box-footer-right {
-      display: flex;
-      align-items: center;
-      margin-left: $spacing;
-
-      .base-image-box-icon-play-small {
-        opacity: 1;
-        fill: white;
-        height: $icon-medium;
-        width: $icon-medium;
-        min-width: $icon-medium;
-        margin-right: $spacing-small-half;
-      }
-    }
-
-    .base-image-box-footer-title,
-    .base-image-box-footer-text {
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      flex: 1;
-    }
-
-    .base-image-box-footer-title {
-      display: none;
-    }
-
-    .bold {
-      font-weight: bold;
-    }
-  }
-
+  /* TRANSITIONS */
   .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
     transition: all 0.5s ease;
   }
+
   .slide-fade-enter, .slide-fade-leave-to {
     opacity: 0;
     transform: translateX(#{$spacing});

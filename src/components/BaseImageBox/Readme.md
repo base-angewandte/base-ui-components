@@ -14,16 +14,16 @@ A variety of possibilities with image box
           subtext="and title and subtitle"
           description="and description"
           class="box"
-          @select-triggered="handleBoxArray($event, '1')"/>
+          @select-triggered="handleBoxArray($event, '1')" />
         <base-image-box
           :selectable="selectActive"
-          :showTitle="false"
+          :show-title="false"
           :image-url="imgUrl"
           :box-size="{ width: 'calc(25% - 12px)' }"
           title="box with no title"
-          description="showtitle false"
+          description="show-title false"
           class="box"
-          @select-triggered="handleBoxArray($event, '2')"/>
+          @select-triggered="handleBoxArray($event, '2')" />
         <base-image-box
           :selectable="selectActive"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
@@ -31,7 +31,7 @@ A variety of possibilities with image box
           title="text only"
           subtext="no description"
           class="box"
-          @select-triggered="handleBoxArray($event, '3')"/>
+          @select-triggered="handleBoxArray($event, '3')" />
         <base-image-box
           :selectable="selectActive"
           :box-size="{ width: 'calc(25% - 12px)' }"
@@ -39,7 +39,7 @@ A variety of possibilities with image box
           title="text only"
           subtext="with description"
           class="box"
-          description="no overlap with text"/>
+          description="no overlap with text" />
     </div>
 
     <div class="boxes-background">
@@ -52,13 +52,13 @@ A variety of possibilities with image box
         description="and footer slots used"
         class="box"
         @select-triggered="handleBoxArray($event, '5')">
-        <template slot="footer-left">
+        <template #footer-left>
           <BaseIcon
             name="subscribe"
             title="icon in slot: footer-left"
             class="base-image-box__footer-icon" />
         </template>
-        <template slot="footer-right">
+        <template #footer-right>
           <BaseIcon
             name="eye"
             title="icon in slot: footer-right"
@@ -68,38 +68,38 @@ A variety of possibilities with image box
 
       <base-image-box
         :selectable="selectActive"
-        :showTitle="false"
+        :show-title="false"
         :image-url="imgUrl"
         :box-size="{ width: 'calc(25% - 12px)' }"
         :play-icon="true"
         title="box with no title"
-        description="play icon & showtitle false"
+        description="play icon & show-title false"
         class="box"
         @select-triggered="handleBoxArray($event, '6')" />
 
       <base-image-box
         :selectable="selectActive"
-        :showTitle="false"
+        :show-title="false"
         :box-size="{ width: 'calc(25% - 12px)' }"
         icon="file-object"
         :iconSize="iconSize"
         title="box with no title, icon"
-        description="icon & showtitle false"
+        description="icon & show-title false"
         class="box"
         @select-triggered="handleBoxArray($event, '7')" />
 
       <base-image-box
         :selectable="selectActive"
-        :showTitle="false"
+        :show-title="false"
         :box-size="{ width: 'calc(25% - 12px)' }"
         :play-icon="true"
         icon="audio-object"
         :iconSize="iconSize"
         title="box with no title, icon and play-icon"
-        description="icon, play icon & showtitle false"
+        description="icon, play icon & show-title false"
         class="box"
         @select-triggered="handleBoxArray($event, '8')">
-        <template slot="footer-right">
+        <template #footer-right>
           <span>00:04:22</span>
         </template>
       </base-image-box>
@@ -107,10 +107,10 @@ A variety of possibilities with image box
     <div class="button-area">
       <BaseButton
         text="Toggle Select"
-        @clicked="selectActive = !selectActive"/>
+        @clicked="selectActive = !selectActive" />
     </div>
     <div class="button-area">
-      {{ 'Selected boxes: ' + selectedBoxes}}
+      {{ 'Selected boxes: ' + selectedBoxes }}
     </div>
   </div>
 </template>
@@ -131,7 +131,7 @@ export default {
   },
   computed: {
     imgUrl() {
-      return 'https://picsum.photos/seed/arch/460/341';
+      return 'https://picsum.photos/seed/bb/460/341';
     },
   },
   methods: {
