@@ -558,6 +558,7 @@ export default {
               // invalid character after blur
               this.previousInput = this.inputInt;
             }
+            this.$emit('blur', event);
           },
         },
       };
