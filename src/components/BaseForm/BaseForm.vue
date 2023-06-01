@@ -455,6 +455,22 @@ export default {
         && ['min', 'max', 'minLength', 'maxLength']
           .every(prop => Object.keys(val.text).includes(prop)),
     },
+    /**
+     * specify the object property that should be used as identifier.
+     * used for chips input as well as dropdowns.
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'id',
+    },
+    /**
+     * specify the object property that should be used as value to be displayed.
+     * used for chips input as well as dropdowns.
+     */
+    labelPropertyName: {
+      type: String,
+      default: 'label',
+    },
   },
   data() {
     return {
@@ -725,6 +741,8 @@ export default {
         clearable: this.clearable,
         showErrorIcon: this.showErrorIcon,
         validationTexts: singleFieldProps.validationTexts || this.validationTexts,
+        identifierPropertyName: this.identifierPropertyName,
+        labelPropertyName: this.labelPropertyName,
       };
     },
     setFieldValue(value, fieldName, index) {
