@@ -21,8 +21,9 @@
           :class="['base-form-field',
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
-                   { 'base-form-field-top-margin': element.type === 'boolean' },
-                   { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
+                   { 'base-form-field-top-margin': formFieldsHalf.indexOf(element) >= 0
+                     && element.type === 'boolean' },
+                   { 'base-form-field-left-margin': isHalfFieldSecond(element) }]"
           v-bind="formFieldComponentProps(element, index)"
           @field-value-changed="setFieldValue($event, element.name)"
           @fetch-autocomplete="fetchAutocomplete">
