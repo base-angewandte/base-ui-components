@@ -19,7 +19,9 @@
         ref="headerBox"
         :class="['base-image-box__header',
                  { 'base-image-box__header--bottom': imageFirst },
-                 { 'base-image-box__header--center-text': centerHeader }]">
+                 { 'base-image-box__header--center-text': centerHeader },
+                 { 'base-image-box__header--separator-top': !hasImages && !imageShadow && imageFirst },
+                 { 'base-image-box__header--separator-bottom': !hasImages && !imageShadow && !imageFirst }]">
         <div
           class="base-image-box__header__row">
           <div
@@ -78,13 +80,22 @@
         </template>
 
         <!-- ICONS -->
-        <!-- display optional icon for entries without an image -->
-        <BaseIcon
-          v-if="icon"
-          :name="icon"
+        <div
+          v-if="icon || !!$slots.icon"
           :class="['base-image-box__body__icon',
                    'base-image-box__icon',
-                   'base-image-box__icon--' + iconSize]" />
+                   'base-image-box__icon--' + iconSize]">
+          <!-- @slot create custom content (e.g. folder icons) -->
+          <slot
+            :icon="icon"
+            name="icon">
+            <!-- display optional icon for entries without an image -->
+            <BaseIcon
+              :name="icon"
+              :class="['base-image-box__icon',
+                       'base-image-box__icon--' + iconSize]" />
+          </slot>
+        </div>
 
         <!-- display optional play icon e.g. for video, audio -->
         <BaseIcon
@@ -636,6 +647,14 @@ export default {
 
       &--bottom {
         order: 1;
+      }
+
+      &--separator-top  {
+        border-top: 3px solid $background-color;
+      }
+
+      &--separator-bottom  {
+        border-bottom: 3px solid $background-color;
       }
     }
 
