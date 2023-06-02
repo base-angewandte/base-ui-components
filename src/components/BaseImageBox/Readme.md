@@ -5,11 +5,13 @@ A variety of possibilities with image box
 ```vue live
 <template>
   <div>
-    <div class="boxes-background">
+    <div
+      ref="boxesContainer"
+      class="boxes-background">
         <base-image-box
           :selectable="selectActive"
           :image-url="imgUrl"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           title="Box with Image"
           subtext="and title and subtitle"
           description="and description"
@@ -19,7 +21,7 @@ A variety of possibilities with image box
           :selectable="selectActive"
           :show-title="false"
           :image-url="imgUrl"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           title="box with no title"
           description="show-title false"
           class="box"
@@ -27,26 +29,24 @@ A variety of possibilities with image box
         <base-image-box
           :selectable="selectActive"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           title="text only"
           subtext="no description"
           class="box"
           @select-triggered="handleBoxArray($event, '3')" />
         <base-image-box
           :selectable="selectActive"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
           title="text only"
           subtext="with description"
           class="box"
           description="no overlap with text" />
-    </div>
 
-    <div class="boxes-background">
       <base-image-box
         :selectable="selectActive"
         :image-url="imgUrl"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         title="Box with Image"
         subtext="and title and subtitle"
         description="and footer slots used"
@@ -70,7 +70,7 @@ A variety of possibilities with image box
         :selectable="selectActive"
         :show-title="false"
         :image-url="imgUrl"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         :play-icon="true"
         title="box with no title"
         description="play icon & show-title false"
@@ -80,7 +80,7 @@ A variety of possibilities with image box
       <base-image-box
         :selectable="selectActive"
         :show-title="false"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         icon="file-object"
         :iconSize="iconSize"
         title="box with no title, icon"
@@ -91,7 +91,7 @@ A variety of possibilities with image box
       <base-image-box
         :selectable="selectActive"
         :show-title="false"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         :play-icon="true"
         icon="audio-object"
         :iconSize="iconSize"
@@ -103,14 +103,13 @@ A variety of possibilities with image box
           <span>00:04:22</span>
         </template>
       </base-image-box>
-    </div>
-    <div class="boxes-background">
-    <BaseImageBox
+
+      <BaseImageBox
         :selectable="selectActive"
         :image-first="true"
         :image-shadow="false"
         :images="images.slice(0, 1)"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         :title-rows="1"
         title="Box with Image first"
         subtext="and slot title-right used"
@@ -141,7 +140,7 @@ A variety of possibilities with image box
         :image-first="true"
         :image-shadow="false"
         :images="images.slice(0, 2)"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         title="Box with 2 Images"
         subtext="Image Grid"
         class="box"
@@ -152,7 +151,7 @@ A variety of possibilities with image box
         :image-first="true"
         :image-shadow="false"
         :images="images.slice(0, 3)"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         title="Box with 3 Images"
         subtext="Image Grid"
         class="box"
@@ -163,11 +162,28 @@ A variety of possibilities with image box
         :image-first="true"
         :image-shadow="false"
         :images="images.slice(0, 4)"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         title="Box with 4 Images"
         subtext="Image Grid"
         class="box"
         @select-triggered="handleBoxArray($event, '12')" />
+
+      <base-image-box
+        :selectable="selectActive"
+        :image-first="true"
+        :image-shadow="false"
+        :iconSize="iconSize"
+        :box-size="boxSize"
+        title="Box with title using title slot"
+        class="box"
+        @select-triggered="handleBoxArray($event, '13')">
+        <template #icon>
+          <img
+            src="https://base.uni-ak.ac.at/bs/img/icons/image.svg"
+            alt=""
+            style="width: 100%;" />
+        </template>
+      </base-image-box>
     </div>
     <div class="button-area">
       <BaseButton
@@ -191,7 +207,8 @@ export default {
     return {
       selectActive: false,
       selectedBoxes: [],
-      iconSize: null,
+      iconSize: 'xxlarge',
+      boxSize: { width: 'calc(25% - 16px)' },
     };
   },
   computed: {
@@ -215,21 +232,27 @@ export default {
         this.selectedBoxes.splice(this.selectedBoxes.indexOf(num), 1);
       }
     },
-    resizeHandler() {
-      if (window.outerWidth > 800) {
-        this.iconSize = 'xxlarge';
-        return;
-      }
-      this.iconSize = 'large';
-    },
+    boxResizeHandler() {
+      return new ResizeObserver((entries) => {
+        const currentWidth = entries[0].contentRect.width;
+
+        if (currentWidth > 400) {
+          this.iconSize = 'xxlarge';
+        } else {
+          this.iconSize = 'large';
+        }
+
+        if (currentWidth > 800) {
+          this.boxSize = { width: 'calc(25% - 16px)' };
+        } else {
+          this.boxSize = { width: 'calc(50% - 16px)' };
+        }
+      });
+    }
   },
   mounted() {
-    this.resizeHandler();
-    window.addEventListener('resize', this.resizeHandler);
+    this.boxResizeHandler().observe(this.$refs.boxesContainer);
   },
-  destroyed() {
-    window.removeEventListener('resize', this.resizeHandler);
-  }
 };
 </script>
 <style>
@@ -237,15 +260,12 @@ export default {
     display: flex;
     flex-wrap: wrap;
     background-color: rgb(240, 240, 240);
-    padding: 16px;
+    padding: 16px 0 16px 16px;
   }
 
   .box {
     margin-right: 16px;
-  }
-
-  .box:last-of-type {
-    margin-right: 0;
+    margin-bottom: 16px;
   }
 
   .button-area {
@@ -284,5 +304,4 @@ export default {
     }
   }
 </style>
-
 ```
