@@ -174,7 +174,9 @@ A variety of possibilities with image box
         :image-shadow="false"
         :iconSize="iconSize"
         :box-size="boxSize"
-        title="Box with title using title slot"
+        title="Box with centered header"
+        subtext="and icon slots used"
+        center-header="true"
         class="box"
         @select-triggered="handleBoxArray($event, '13')">
         <template #icon>
