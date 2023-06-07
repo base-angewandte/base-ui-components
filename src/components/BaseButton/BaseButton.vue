@@ -4,7 +4,6 @@
     :aria-disabled="disabled"
     :aria-describedby="internalId"
     :type="buttonType"
-    :title="text"
     :class="['base-button',
              `base-button-${buttonStyle}`,
              `base-button-icon-${iconPosition}`,
