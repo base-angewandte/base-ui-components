@@ -174,9 +174,9 @@ A variety of possibilities with image box
         :image-shadow="false"
         :iconSize="iconSize"
         :box-size="boxSize"
+        :center-header="true"
         title="Box with centered header"
         subtext="and icon slots used"
-        center-header="true"
         class="box"
         @select-triggered="handleBoxArray($event, '13')">
         <template #icon>
@@ -199,12 +199,8 @@ A variety of possibilities with image box
 </template>
 
 <script>
-import BaseIcon from '../../src/components/BaseIcon/BaseIcon';
 
 export default {
-  components: {
-    BaseIcon,
-  },
   data() {
     return {
       selectActive: false,
@@ -257,7 +253,8 @@ export default {
   },
 };
 </script>
-<style>
+
+<style lang="scss" scoped>
   .boxes-background {
     display: flex;
     flex-wrap: wrap;

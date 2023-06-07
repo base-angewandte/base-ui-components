@@ -19,12 +19,8 @@
 </template>
 
 <script>
-import BaseBox from '../../src/components/BaseBox/BaseBox';
 
 export default {
-  components: {
-    BaseBox,
-  },
   data() {
     return {
       boxSize: { width: 'calc(25% - 16px)' },
@@ -60,7 +56,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
   .container {
     display: flex;
     flex-wrap: wrap;
