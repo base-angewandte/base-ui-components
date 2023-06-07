@@ -31,6 +31,7 @@ import BaseHoverBox from './BaseHoverBox/BaseHoverBox';
 import BaseIcon from './BaseIcon/BaseIcon';
 import BaseImage from './BaseImage/BaseImage';
 import BaseImageBox from './BaseImageBox/BaseImageBox';
+import BaseImageGrid from './BaseImageGrid/BaseImageGrid';
 import BaseInput from './BaseInput/BaseInput';
 import BaseLink from './BaseLink/BaseLink';
 import BaseLoader from './BaseLoader/BaseLoader';
@@ -87,6 +88,7 @@ export {
   BaseIcon,
   BaseImage,
   BaseImageBox,
+  BaseImageGrid,
   BaseInput,
   BaseLink,
   BaseLoader,
