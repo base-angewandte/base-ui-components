@@ -12,20 +12,20 @@ const executeFire = function(){
     text="No Icon"
     description="i'm a button with no icon example"
     style="margin-right: 16px;"
-    @clicked="executeFire"/>
+    @clicked="executeFire" />
   <base-button
     style="margin-right: 16px;"
     description="a buttton with a small icon example"
     icon="waste-bin"
     text="Small Icon"
-    @clicked="executeFire"/>
+    @clicked="executeFire" />
   <base-button
     style="margin-right: 16px;"
     description="button with large icon example"
     icon="waste-bin"
     icon-size="large"
     text="Large Icon"
-    @clicked="executeFire"/>
+    @clicked="executeFire" />
   <base-button
     style="margin-right: 16px;"
     description="active button example"
@@ -33,7 +33,7 @@ const executeFire = function(){
     icon-size="large"
     text="Button Active"
     :active="true"
-    @clicked="executeFire"/>
+    @clicked="executeFire" />
 </div>
 
 ```
@@ -60,7 +60,7 @@ const executeFire = function(){
       icon="add-new-object"
       button-style="row"
       icon-size="large"
-      @clicked="executeFire"/>
+      @clicked="executeFire" />
   <base-button
       style="margin-right: 16px;"
       :active="true"
@@ -68,7 +68,7 @@ const executeFire = function(){
       icon="add-new-object"
       button-style="row"
       icon-size="large"
-      @clicked="executeFire"/>
+      @clicked="executeFire" />
   <base-button
     style="margin-right: 16px;"
     description="Custom Text"
