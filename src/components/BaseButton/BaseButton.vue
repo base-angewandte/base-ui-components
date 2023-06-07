@@ -122,7 +122,7 @@ export default {
     },
     /**
      * specify icon size
-     *   this will have no effect on button-style: secondary - icon will always be small
+     * **Caveat**: this will have no effect on `buttonStyle`: `secondary` | `circle` - icon will always be small
      */
     iconSize: {
       type: String,
