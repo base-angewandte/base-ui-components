@@ -103,7 +103,25 @@ const executeFire = function(){
     style="margin-right: 16px;"
     icon="waste-bin"
     text="With Icon"
-    @clicked="executeFire"/>
+    @clicked="executeFire" />
+</div>
+
+```
+
+Button Circle Style
+
+```js live
+
+const executeFire = function(){
+    alert('button clicked!');
+}
+<div style="display: flex;">
+  <base-button
+    button-style="circle"
+    style="margin-right: 16px;"
+    icon="waste-bin"
+    icon-title="button type 'circle'"
+    @clicked="executeFire" />
 </div>
 
 ```
