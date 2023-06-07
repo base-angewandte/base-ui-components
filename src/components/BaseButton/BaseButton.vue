@@ -332,13 +332,18 @@ export default {
       background-color: #ffffff;
       border-radius: 50%;
       color: $font-color-second;
-      border: 1px solid $font-color;
+      border: 1px solid $font-color-second;
       padding: 0;
       width: 24px;
       height: 24px;
 
       &:hover {
-        color: $font-color;
+        color: $app-color;
+        border-color: $app-color;
+      }
+
+      &:focus {
+        color: $app-color;
       }
     }
 
