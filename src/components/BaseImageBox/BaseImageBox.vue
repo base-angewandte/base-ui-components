@@ -74,7 +74,6 @@
           <BaseImageGrid
             v-if="images && images.length > 1"
             :alt="title"
-            :gap="gridGap"
             :images="images"
             :lazyload="lazyload" />
         </template>
@@ -410,15 +409,6 @@ export default {
       default: '',
       validator: val => typeof val === 'string'
         || (val instanceof Object && Object.keys(val).includes('path')),
-    },
-    /**
-     * specify the image grid gap with a unit
-     * allowed units: px | em | rem
-     */
-    gridGap: {
-      type: String,
-      default: '3px',
-      validator: val => (/^[0-9]+\.?[0-9]*(px|em|rem)\b$/g).test(val),
     },
   },
   data() {

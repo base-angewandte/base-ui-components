@@ -1,6 +1,5 @@
 <template>
   <div
-    :style="style"
     :class="['base-image-grid',
              'base-image-grid--' + imagesInt.length]">
     <div
@@ -35,15 +34,6 @@ export default {
       default: '',
     },
     /**
-     * specify the grid gap with a unit
-     * allowed units: px | em | rem
-     */
-    gap: {
-      type: String,
-      default: '3px',
-      validator: val => (/^[0-9]+\.?[0-9]*(px|em|rem)\b$/g).test(val),
-    },
-    /**
      * specify lazy image loading
      */
     lazyload: {
@@ -69,13 +59,6 @@ export default {
      */
     imagesInt() {
       return this.images.slice(0, 4);
-    },
-    /**
-     * define css variable
-     * @returns {{'--gap': string}}
-     */
-    style() {
-      return { '--gap': this.gap };
     },
   },
   methods: {
@@ -110,7 +93,7 @@ export default {
 $baseImageGrid: base-image-grid;
 .#{$baseImageGrid} {
   display: grid;
-  grid-gap: var(--gap);
+  grid-gap: 3px;
   height: 100%;
   width: 100%;
 
