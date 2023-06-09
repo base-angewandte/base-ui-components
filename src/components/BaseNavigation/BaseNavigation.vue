@@ -1,50 +1,65 @@
 <template>
   <main class="base-navigation">
     <div>
-      <ul class="nav-item">
-        <li
-          v-for="element in list"
-          :key="element.id"
-          :class="element.placement">
-          <BaseButton
-            v-if="element.placement === 'left'"
-            :text="element.label"
-            button-style="row"
-            :render-link-as="element.renderAs"
-            :active="toggleActive(element.route)"
-            @clicked="onClick(element.route)">
-            <!-- @slot slot to inject content  -->
-            <slot />
-          </BaseButton>
-          <BaseButton
-            v-if="element.placement === 'right'"
-            :text="element.label"
-            button-style="row"
-            :render-link-as="element.renderAs"
-            :active="toggleActive(element.route)"
-            @clicked="onClick(element.route)">
-            <!-- @slot slot to inject content  -->
-            <slot />
-          </BaseButton>
-        </li>
-      </ul>
-      <ul class="hamburger-menu-toggle">
-        <li
-          v-for="element in list"
-          :key="element.id"
-          class="left">
-          <BaseButton
-            v-if="toggleActive(element.route)"
-            :text="element.shortLabel || element.label"
-            button-style="row"
-            :render-link-as="element.renderAs"
-            :active="true"
-            @clicked="onClick(element.route)">
-            <!-- @slot slot to inject content  -->
-            <slot />
-          </BaseButton>
-        </li>
-        <li>
+      <nav
+        ref="fullSizeNavigation"
+        class="nav-item">
+        <div class="nav-sub-container-left">
+          <div
+            v-for="element in list.filter(e => e.placement === 'left')"
+            :key="element.id"
+            :class="element.placement">
+            <BaseButton
+              v-if="element.placement === 'left'"
+              :text="showShortLabel ? element.shortLabel || element.label : element.label"
+              button-style="row"
+              :render-link-as="element.renderAs"
+              :active="toggleActive(element.route)"
+              @clicked="onClick(element.route)">
+              <!-- @slot slot to inject content  -->
+              <slot />
+            </BaseButton>
+          </div>
+        </div>
+        <div class="nav-sub-container-right">
+          <div
+            v-for="element in list.filter(e => e.placement === 'right')"
+            :key="element.id"
+            :class="element.placement">
+            <BaseButton
+              v-if="element.placement === 'right'"
+              :text="showShortLabel ? element.shortLabel || element.label : element.label"
+              button-style="row"
+              :render-link-as="element.renderAs"
+              :active="toggleActive(element.route)"
+              @clicked="onClick(element.route)">
+              <!-- @slot slot to inject content  -->
+              <slot />
+            </BaseButton>
+          </div>
+        </div>
+      </nav>
+      <nav
+        ref="mobileViewNavigation"
+        class="hamburger-menu-toggle">
+        <div class="active-nav-item">
+          <div
+            v-for="element in list"
+            :key="element.id"
+            class="left">
+            <BaseButton
+              v-if="toggleActive(element.route)"
+              :text="showShortLabel ? element.shortLabel || element.label : element.label"
+              button-style="row"
+              :render-link-as="element.renderAs"
+              :active="true"
+              @clicked="onClick(element.route)">
+              <!-- @slot slot to inject content  -->
+              <slot />
+            </BaseButton>
+          </div>
+        </div>
+        <div class="hamburger-button-container">
           <BaseButton
             button-style="row"
             text=""
@@ -52,27 +67,29 @@
             :icon="sideMenuIcon"
             :class="{active:navOpen, right: true}"
             @clicked="toggleHamburger" />
-        </li>
-      </ul>
+        </div>
+      </nav>
       <transition name="translateY">
-        <nav v-if="navOpen">
+        <nav
+          v-if="navOpen">
           <div>
-            <ul class="hamburger-menu">
-              <li
+            <div class="hamburger-menu">
+              <div
                 v-for="element in list"
                 :key="element.id">
                 <BaseButton
                   v-if="!toggleActive(element.route)"
-                  :text="element.shortLabel || element.label"
+                  :text="showShortLabel ? element.shortLabel || element.label : element.label"
                   button-style="row"
                   :render-link-as="element.renderAs"
                   :active="toggleActive(element.route)"
+                  align-text="left"
                   @clicked="onClick(element.route)">
                   <!-- @slot slot to inject content  -->
                   <slot />
                 </BaseButton>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </nav>
       </transition>
@@ -114,7 +131,18 @@ export default {
     return {
       navOpen: false,
       sideMenuIcon: 'drag-lines',
+      showShortLabel: false,
+      resizeTimeout: null,
     };
+  },
+  mounted() {
+    this.calcTextWidth();
+    if (window) {
+      window.addEventListener('resize', this.resizeTriggered);
+    }
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.resizeTriggered);
   },
   methods: {
     onClick(target) {
@@ -127,11 +155,11 @@ export default {
     },
     toggleActive(target) {
       if (this.$route.path.startsWith(target)) {
-        console.log('path1: ', this.$route.path);
-        console.log('true');
+        // console.log('path1: ', this.$route.path);
+        // console.log('true');
         return true;
       }
-      console.log('path2: ', this.$route.path);
+      // console.log('path2: ', this.$route.path);
       return this.$route.path === target;
     },
     toggleHamburger() {
@@ -139,6 +167,41 @@ export default {
       if (this.sideMenuIcon === 'drag-lines') {
         this.sideMenuIcon = 'remove';
       } else this.sideMenuIcon = 'drag-lines';
+    },
+    calcTextWidth() {
+      let anyElementTooLong = false;
+      const refsToCheck = ['fullSizeNavigation', 'mobileViewNavigation'];
+      const maxWidth = {
+        mobileViewNavigation: 0,
+        fullSizeNavigation: -15,
+      };
+      refsToCheck.forEach((ref) => {
+        // clone ref to compute item length with full length labels
+        const clonedNavigation = this.$refs[ref].cloneNode(true);
+        clonedNavigation.style.maxWidth = `${this.$refs[ref].clientWidth}px`;
+        this.$refs[ref].parentElement.append(clonedNavigation);
+        [...clonedNavigation.childNodes]
+          .map(childNode => [...childNode.childNodes]).flat()
+          .forEach((li, idx) => {
+            const innermostChild = li.getElementsByClassName('base-button-text')[0];
+            if (!innermostChild) { return; }
+            innermostChild.innerText = this.list[idx].label;
+            if (li.clientWidth - li.scrollWidth < maxWidth[`${ref}`]) { anyElementTooLong = true; }
+          });
+        clonedNavigation.remove();
+      });
+
+      this.showShortLabel = anyElementTooLong;
+    },
+    resizeTriggered() {
+      // check if there is a timeout already set and clear it if yes
+      if (this.resizeTimeout) {
+        clearTimeout(this.resizeTimeout);
+        this.resizeTimeout = null;
+      }
+      this.resizeTimeout = setTimeout(() => {
+        this.calcTextWidth();
+      }, 300);
     },
   },
 };
@@ -150,18 +213,39 @@ base-navigation {
   display: flex;
 }
 .left {
-  float: left;
   margin-right: auto;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .right {
   margin-left: auto;
-  float: right;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.nav-sub-container-right{
+  display: flex;
+  margin-left: auto;
+  overflow: hidden;
+}
+.nav-sub-container-left{
+  overflow: hidden;
+  display: flex;
+}
+.active-nav-item{
+  overflow: hidden;
+}
+.active-nav-item .base-button{
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
 }
 
 .nav-item {
-  display: inline-block;
+  display: flex;
   width: 100%;
   background: $box-color;
+
+  overflow: hidden;
 }
 
 .hamburger-menu-toggle {
@@ -170,6 +254,10 @@ base-navigation {
 
 .hamburger-menu {
   display: none;
+}
+
+.hamburger-button-container{
+  margin-left: auto;
 }
 
 .nav-item .base-button.base-button-row.base-button-active {
@@ -197,7 +285,7 @@ base-navigation {
     display: none;
   }
   .hamburger-menu-toggle {
-    display: inline-block;
+    display: flex;
     width: 100%;
     background: $box-color;
   }
