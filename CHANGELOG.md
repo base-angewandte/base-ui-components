@@ -1,3 +1,10 @@
+## 3.0.2 (2023-06-12)
+
+### Fixed
+
+* **styleguide:** add base-ui-icons path for github pages
+
+
 ## 3.0.1 (2023-05-23)
 
 
