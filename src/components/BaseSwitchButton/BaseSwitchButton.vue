@@ -11,8 +11,11 @@
       <label
         :key="option.value + 'label'"
         :for="optionIds[index]"
-        :class="['base-switch-button__label',
-                 { 'base-switch-button__label__active': option.value === selectedOption }]">
+        :class="['base-switch-button',
+                 {'base-switch-button__type-a': type === 'a'},
+                 { 'base-switch-button__type-a__active': option.value === selectedOption && type === 'a'},
+                 {'base-switch-button__type-b': type === 'b'},
+                 { 'base-switch-button__type-b__active': option.value === selectedOption && type === 'b'}]">
         <input
           :id="optionIds[index]"
           :key="option.value + 'input'"
@@ -25,13 +28,19 @@
           :class="['hide', 'base-switch-button__input']"
           type="radio"
           @keydown.enter.prevent="">
-        {{ option.label }}
+        <span
+          :class="{ hide: !showLabel }">
+          {{ option.label }}
+        </span>
         <!-- @slot slot to display something right of text (e.g. icon)
         @binding {string} value - the value of the option object
         --->
         <slot
           :value="option.value"
-          name="right-of-text" />
+          name="icon" />
+        <div
+          v-if="option.value === selectedOption && type === 'b'"
+          class="active-state" />
       </label>
     </template>
   </fieldset>
@@ -70,6 +79,22 @@ export default {
     label: {
       type: String,
       required: true,
+    },
+    /**
+     * set a type for the button's active state rendering style
+     */
+    type: {
+      type: String,
+      default() {
+        return 'b';
+      },
+      validator: val => val === 'a' || val === 'b',
+    },
+    showLabel: {
+      type: Boolean,
+      default() {
+        return false;
+      },
     },
   },
   data() {
@@ -112,18 +137,36 @@ export default {
 
   .base-switch-buttons {
     clear: both;
+    display: flex;
+    gap: 12px;
     position: relative;
     line-height: $row-height-small;
   }
-
-  .base-switch-button__label {
+  .base-switch-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
     background-color: inherit;
-    padding: $spacing-small-half $spacing;
-    position: relative;
+  }
+  .base-switch-button__type-b {
+    padding: $spacing-small $spacing $spacing-small $spacing;
+    border: $input-field-border;
+    &.base-switch-button__type-b__active {
+      color: var(--app-color);
+      transition: border 0.1s ease;
+    }
+
+    &:focus-within {
+      border-color: $app-color;
+    }
+  }
+  .base-switch-button__type-a {
+    padding: $spacing-small $spacing $spacing-small $spacing;
     border: 1px solid rgba(255, 255, 255, 0);
 
-    &.base-switch-button__label__active {
+    &.base-switch-button__type-a__active {
       border: $input-field-border;
       transition: border 0.2s ease;
     }
@@ -131,6 +174,13 @@ export default {
     &:focus-within {
       border-bottom-color: $app-color;
     }
+  }
+  .active-state {
+    position: absolute;
+    bottom: 0;
+    background: var(--app-color);
+    height: 3px;
+    inset-inline: 0;
   }
 
   @media screen and (max-width: $mobile) {
