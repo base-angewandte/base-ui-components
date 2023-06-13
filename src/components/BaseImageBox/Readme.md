@@ -129,7 +129,7 @@ A variety of possibilities with image box
               text="Download" />
             <BaseButton
               button-style="circle"
-              icon="waste-bin"
+              icon="information-solo"
               text="Remove" />
           </div>
         </template>
