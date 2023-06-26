@@ -12,7 +12,11 @@
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :return-as-string="returnAsString"
       :is-active.sync="isActive"
+      :chips-removable="chipsRemovable"
       :loadable="allowDynamicDropDownEntries"
+      :error-message="errorMessage"
+      :show-error-icon="showErrorIcon"
+      :invalid="invalid"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
       @click-input-field="onInputFocus"
@@ -402,6 +406,13 @@ export default {
     assistiveText: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * define if selected options chips should come with a remove icon
+     */
+    chipsRemovable: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
