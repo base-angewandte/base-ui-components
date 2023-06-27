@@ -40,6 +40,7 @@
       :max="typeof formFieldXAttrs.max !== 'undefined' ? formFieldXAttrs.max : fieldProps.max"
       :decimals="allowedDecimals"
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
+      v-on="inputListeners"
       @keydown.enter="onEnter"
       @input="setInputValue($event)"
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
@@ -150,7 +151,8 @@
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
-          class="base-form-field-creator__date-field">
+          class="base-form-field-creator__date-field"
+          v-on="inputListeners">
           <template
             #label-addition>
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
@@ -231,7 +233,8 @@
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
-          class="base-form-field-creator__date-field" />
+          class="base-form-field-creator__date-field"
+          v-on="inputListeners" />
       </div>
     </fieldset>
 
@@ -273,6 +276,7 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
+      v-on="inputListeners"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
@@ -388,6 +392,7 @@
           :field-props="fieldProps"
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
+          v-on="inputListeners"
           @values-changed="$emit('field-value-changed', $event)"
           @fetch-autocomplete="subFormFetchAutocomplete" />
       </div>
@@ -660,6 +665,39 @@ export default {
     };
   },
   computed: {
+    inputListeners() {
+      // console.log('create input listeners', this.$listeners);
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          blur: (event) => {
+            /**
+             * event emitted by field type `multiline`
+             * @event blur
+             * @param {KeyboardEvent} event - the native keydown event
+             * @param {Object} field - the field information in order to be able
+             *  to have the information from which field the event came from
+             */
+            this.$emit('blur', event, this.field);
+          },
+          keydown: (event) => {
+            /**
+             * event emitted by field type `multiline`
+             * @event keydown
+             * @param {KeyboardEvent} event - the native keydown event
+             * @param {Object} field - the field information in order to be able
+             *  to have the information from which field the event came from
+             */
+            this.$emit('keydown', event, this.field);
+          },
+          // stop custom events from bubbling up - we just want native events from input
+          'values-changed': () => {},
+          'fetch-autocomplete': () => {},
+        },
+      };
+    },
     /**
      * import the relevant component
      * @returns {(function(): *)|null}
@@ -943,13 +981,6 @@ export default {
     onEnter(event) {
       if (this.fieldType !== 'multiline') {
         event.preventDefault();
-      } else {
-        /**
-         * event emitted by field type `multiline`
-         * @event keydown
-         * @param {KeyboardEvent} - the native keydown event
-         */
-        this.$emit('keydown', event);
       }
     },
     fetchBoxData() {

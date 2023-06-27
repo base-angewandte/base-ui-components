@@ -26,7 +26,8 @@
                    { 'base-form-field-left-margin': isHalfFieldSecond(element) }]"
           v-bind="formFieldComponentProps(element, index)"
           @field-value-changed="setFieldValue($event, element.name)"
-          @fetch-autocomplete="fetchAutocomplete">
+          @fetch-autocomplete="fetchAutocomplete"
+          v-on="inputListeners">
           <template #label-addition="{ fieldName }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row
             \<div\> (e.g. language tabs))
@@ -121,7 +122,8 @@
                 valueIndex,
                 (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
               @fetch-autocomplete="fetchAutocomplete"
-              @subform-input="setFieldValue($event, element.name, valueIndex)">
+              @subform-input="setFieldValue($event, element.name, valueIndex)"
+              v-on="inputListeners">
               <template #label-addition="{ fieldName }">
                 <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
                 @binding {string} fieldName - the name of the displayed field
@@ -501,6 +503,20 @@ export default {
     };
   },
   computed: {
+    inputListeners() {
+      // console.log('base form, create input listeners', this.$listeners);
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          // stop custom events from bubbling up - we just want native events from input
+          'field-value-changed': () => {},
+          'values-changed': () => {},
+          'fetch-autocomplete': () => {},
+        },
+      };
+    },
     /**
      * get a list of all form fields that are taking half of the
      * width of a form
