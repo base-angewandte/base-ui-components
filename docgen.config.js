@@ -11,6 +11,7 @@ const ignore = [
   'components/BaseExpandList/BaseExpandListRow.vue',
   'components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
   'components/BaseAdvancedSearchRow/*',
+  'components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue',
   'components/BaseDatePanel/*',
 ];
 
