@@ -255,8 +255,6 @@ export default {
     },
     /**
      * specify additional options as required
-     * Note: Validation can be triggered by executing `this.$refs.baseChipsBelow.validate();` from parent.
-     *       Therefore, the component must have a reference set.
      */
     additionalPropRequired: {
       type: Boolean,
@@ -350,9 +348,7 @@ export default {
       default: 'roles',
     },
     /**
-     * mark as required field (currently only used for `aria-required`)
-     * Note: Validation can be triggered by executing `this.$refs.baseChipsBelow.validate();` from parent.
-     *       Therefore, the component must have a reference set.
+     * mark as required field
      */
     required: {
       type: Boolean,
@@ -466,7 +462,7 @@ export default {
   watch: {
     /**
      * create internal list and reset errors
-     * @param {array<object>} val
+     * @param {Object[]} val
      */
     selectedList: {
       handler(val) {
@@ -555,7 +551,7 @@ export default {
        * Note: useful when validation is done from the parent
        *
        * @event additional-property-changed
-       * @param {object} index position in selected list
+       * @param {Object} obj - changed object
        */
       this.$emit('additional-property-changed', this.selectedList[index]);
     },
@@ -640,7 +636,7 @@ export default {
     },
     /**
      * check if chips should be removable
-     * @param {object} obj
+     * @param {Object} obj
      * @returns {boolean}
      */
     isChipsRemovable(obj) {
@@ -700,8 +696,9 @@ export default {
       return this.selectedBelowListInt.length ? !this.additionalPropErrors.length : true;
     },
     /**
-     * validate component
-     * Note: can/will be called directly from parent!
+     * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelow.validate();` from parent.<br>
+     * Therefore, the component must have a reference set.
+     * @public
      * @returns {boolean} - components validation state
      */
     validate() {

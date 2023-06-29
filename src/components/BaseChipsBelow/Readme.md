@@ -92,10 +92,10 @@ A chips input form field with chips displayed below and optional validation
         ref="baseChipsBelow"
         v-model="selectedList"
         :list="list"
-        :draggable="draggable"
+        :draggable="false"
         :sortable="sortable"
         :required="required"
-        :show-error-icon="showErrorIcon"
+        :show-error-icon="true"
         :additional-prop-allow-multiple-entries="additionalPropAllowMultipleEntries"
         :additional-prop-options="additionalPropOptions"
         :additional-prop-required="additionalPropRequired"
@@ -131,9 +131,7 @@ export default {
       additionalPropAllowMultipleEntries: false,
       required: true,
       additionalPropRequired: false,
-      draggable: false,
       sortable: false,
-      showErrorIcon: true,
       prefill: false,
       // data
       additionalPropOptions: [
