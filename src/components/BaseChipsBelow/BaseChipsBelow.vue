@@ -6,13 +6,10 @@
       v-bind="chipsInputProps"
       :is-loading="isLoading"
       :display-chips-inline="false"
-      :sortable="sortable"
       :sort-text="sortText"
       :sort-name="sortName"
       :invalid="invalidInt"
       :error-message="errorMessageInt"
-      :show-error-icon="showErrorIcon"
-      :required="required"
       @selected-changed="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
