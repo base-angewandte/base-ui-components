@@ -419,7 +419,7 @@ export default {
      */
     draggable: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   data() {
