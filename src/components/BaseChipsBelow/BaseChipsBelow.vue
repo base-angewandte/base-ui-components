@@ -765,18 +765,16 @@ export default {
         }
       }
 
-      .base-chips-below-list-item--draggable {
-        .base-chips-below-list-item-line {
-          .base-chips-below-list-item-chip-wrapper {
-            margin-left: $spacing-small;
-            max-width: calc(50% - (2 * #{$spacing}));
-            flex: 1 0 calc(50% - (2 * #{$spacing}));
-          }
+      &.base-chips-below-list-item--draggable {
+        .base-chips-below-list-item-chip-wrapper {
+          margin-left: $spacing-small;
+          max-width: calc(50% - (2 * #{$spacing}));
+          flex: 1 0 calc(50% - (2 * #{$spacing}));
+        }
 
-          .base-chips-below-chips-input {
-            max-width: calc(50% - #{$spacing-small} - #{$spacing-small-half});
-            flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small-half});
-          }
+        .base-chips-below-chips-input {
+          max-width: calc(50% - #{$spacing-small} - #{$spacing-small-half});
+          flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small-half});
         }
       }
 
