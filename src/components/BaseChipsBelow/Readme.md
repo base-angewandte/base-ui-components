@@ -78,9 +78,10 @@ A chips input form field with chips displayed below and optional validation
         label="allow multiple additional options"
         class="control" />
       <BaseToggle
-        v-model="prefill"
+        v-model="additionalPropDefaultOption"
         label="set default additional options"
-        class="control" />
+        class="control"
+        @clicked="setAdditionalPropOptions" />
       <BaseToggle
         v-model="sortable"
         label="sort entries"
@@ -132,7 +133,7 @@ export default {
       required: true,
       additionalPropRequired: false,
       sortable: false,
-      prefill: false,
+      additionalPropDefaultOption: false,
       // data
       additionalPropOptions: [
         {
@@ -148,17 +149,14 @@ export default {
         {
           id: 'Herbert Marcuse',
           label: 'Herbert Marcuse',
-          // roles: [{ label: 'Read' }],
         },
         {
           id: 'Erich From',
           label: 'Erich From',
-          // roles: [{ label: 'Read' }],
         },
         {
           id: 'Georg Weerth',
           label: 'Georg Weerth',
-          // roles: [{ label: 'Read' }],
         },
       ],
       selectedList: [
@@ -171,16 +169,17 @@ export default {
       ],
     };
   },
-  watch: {
-    prefill(val) {
-      let roles = [];
-      if (val) {
-        roles = [{ label: 'Read' }];
-      }
-      this.list = this.list.map(item => ({ ...item, roles }));
-    },
-  },
   methods: {
+    /**
+     * set additional prop options considering a default value
+     * @param {boolean} defaultValue
+     * @returns {Object[]} - list of options
+     */
+    setAdditionalPropOptions(defaultValue) {
+      this.additionalPropOptions = defaultValue
+        ? [{ label: 'Read', default: true }, { label: 'Edit' }]
+        : [{ label: 'Read' }, { label: 'Edit' }];
+    },
     /**
      * validate component from outside
      */

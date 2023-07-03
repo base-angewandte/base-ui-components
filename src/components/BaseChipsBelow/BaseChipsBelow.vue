@@ -118,6 +118,7 @@
             :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
             :show-error-icon="showErrorIcon"
             :required="additionalPropRequired"
+            :default-entry="additionalPropDefaultOption"
             class="base-chips-below-chips-input"
             @selected-changed="updateAdditionalProperty($event, index)" />
         </div>
@@ -423,6 +424,7 @@ export default {
       chipsArray: [],
       selectedBelowListInt: [],
       chipActive: -1,
+      additionalPropDefaultOption: null,
       // error handling
       invalidInt: false,
       errorMessageInt: '',
@@ -515,6 +517,17 @@ export default {
           this.additionalPropErrors = [];
         }
       },
+    },
+    /**
+     * get additional prop default options
+     */
+    additionalPropOptions: {
+      handler(val) {
+        if (val) {
+          this.additionalPropDefaultOption = this.getAdditionalPropDefaultOption(val);
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -633,6 +646,18 @@ export default {
         return this.validationTexts.required;
       }
       return '';
+    },
+    /**
+     * get default obj (where attribute default is defined)
+     * @param {Object[]} data - list of options
+     * @returns {Object|null} - default object or null
+     */
+    getAdditionalPropDefaultOption(data) {
+      const defaultObj = data.find(obj => obj.default);
+      if (defaultObj === undefined) return null;
+
+      delete defaultObj.default;
+      return defaultObj;
     },
     /**
      * check if chips should be removable

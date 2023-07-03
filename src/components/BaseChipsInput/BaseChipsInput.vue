@@ -410,6 +410,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    defaultEntry: {
+      type: [Object, null],
+      default: null,
+    },
   },
   data() {
     return {
@@ -669,6 +673,11 @@ export default {
     const elems = this.$el.getElementsByTagName('input');
     if (elems && elems.length) {
       [this.inputElem] = elems;
+    }
+
+    // add default entry to list
+    if (this.defaultEntry) {
+      this.selectedListInt.push(this.defaultEntry);
     }
   },
   methods: {
