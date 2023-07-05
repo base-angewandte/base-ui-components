@@ -15,6 +15,9 @@
 
 /**
  * Component to display a tooltip
+ *
+ * CAVEAT: this component will be deprecated and replaced by BaseTooltipBox!
+ * Usage not recommended!
  */
 
 export default {
