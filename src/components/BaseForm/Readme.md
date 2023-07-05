@@ -288,7 +288,7 @@ export default {
                     'x-attrs': {
                       field_format: 'half',
                       field_type: 'date',
-                      date_format: 'date_year',
+                      date_format: 'date_month_year',
                       placeholder: {
                         date: 'Datum eintragen',
                       },
