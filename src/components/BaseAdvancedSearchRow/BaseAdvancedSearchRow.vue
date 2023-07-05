@@ -1714,6 +1714,8 @@ export default {
       .base-advanced-search-row__columns {
         column-gap: $spacing;
         column-count: var(--col-number, 4);
+        // this is used in the script part to calculate columns! (~line 1589)
+        column-width: 180px;
         display: block;
         width: 100%;
 
@@ -1954,6 +1956,7 @@ export default {
           .base-advanced-search-row__filter-list {
             column-count: unset;
             column-gap: unset;
+            column-width: unset;
             display: flex;
             align-items: center;
             flex-direction: row;
