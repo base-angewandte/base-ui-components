@@ -7,21 +7,26 @@
                { 'base-date-input__label-row_visible': showLabel }]">
       <legend
         v-if="showLabel"
+        ref="label"
         class="base-date-input__label"
         @click.prevent="">
         {{ label }}
       </legend>
-      <div class="base-date-input__label-additions">
+      <div
+        ref="labelAdditions"
+        class="base-date-input__label-additions">
         <!-- @slot to add additional elements to the label row -->
         <slot name="label-addition" />
         <div
           v-if="isSwitchableFormat"
+          ref="dateSwitch"
           class="base-date-input__format-tabs">
           <BaseSwitchButton
             v-model="dateFormatInt"
             :options="tabSwitchOptions"
             :label="formatTabsLegend"
-            :active-tab="dateFormatInt" />
+            :active-tab="dateFormatInt"
+            class="base-date-input__switch-buttons" />
         </div>
       </div>
     </div>
@@ -680,6 +685,10 @@ export default {
     isSwitchableFormat() {
       return this.format === 'date_month_year' || this.format === 'date_year';
     },
+    /**
+     * return the format options for date, month, year switches
+     * @returns {[{label: string, value: string}]}
+     */
     tabSwitchOptions() {
       // minimal options
       const options = [
@@ -941,7 +950,12 @@ export default {
   methods: {
     initObserver() {
       // create an observer with the fade out calc function
-      const tempResizeObserver = new ResizeObserver(() => this.calcFadeOut(['From', 'To']));
+      const tempResizeObserver = new ResizeObserver((entries) => {
+        if (this.isSwitchableFormat) {
+          this.calcLabelAdditionsWidth(entries[0].contentRect.width);
+        }
+        this.calcFadeOut(['From', 'To']);
+      });
       // put it on the relevant element
       tempResizeObserver.observe(this.$refs.baseDateInput);
       // store it in variable
@@ -1453,6 +1467,32 @@ export default {
       });
     },
     /**
+     * function to correctly style the date format switch buttons and prevent
+     * overlay with label
+     */
+    calcLabelAdditionsWidth(observableWidth) {
+      // get the label margin
+      const labelMargin = Number(getComputedStyle(this.$refs.label)['margin-right'].replace('px', ''));
+      // calculate the remaining container space after label, label margin and date switch width
+      const spacingLeft = observableWidth
+        - this.$refs.label.clientWidth
+        - labelMargin
+        - this.$refs.dateSwitch.clientWidth;
+      // if no space is left set the label additions width to 100%
+      if (spacingLeft < 0) {
+        this.$refs.labelAdditions.style.setProperty(
+          'width',
+          '100%',
+        );
+      } else {
+        // else reset the width
+        this.$refs.labelAdditions.style.setProperty(
+          'width',
+          'unset',
+        );
+      }
+    },
+    /**
      * add delay before value is set
      *
      * @param {String} key
@@ -1503,19 +1543,25 @@ export default {
       }
 
       .base-date-input__label-additions {
+        position: relative;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: flex-end;
         flex: 1 1 auto;
+        height: $input-field-line-height;
       }
 
       .base-date-input__format-tabs {
-        align-self: center;
-        flex-shrink: 0;
         position: absolute;
         right: 0;
-        top: -$spacing-small;
+        bottom: 0;
+        margin-bottom: calc(-#{$spacing-small-half} / 2);
+
+        .base-date-input__switch-buttons {
+          display: flex;
+          line-height: $line-height;
+        }
 
         @media screen and (max-width: $mobile) {
           position: inherit;
