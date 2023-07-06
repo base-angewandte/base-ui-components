@@ -1,12 +1,12 @@
 <template>
   <div :class="className">
     <span
-      v-for="(_, index) in routes"
+      v-for="(entry, index) in routes"
       :key="index">
       <BaseLink
         external-link-target="_self"
-        :source="routes[index]"
-        :value="labels[index]" />
+        :source="entry.route"
+        :value="entry.label" />
       <span v-if="index < routes.length - 1">
         >
       </span>
@@ -25,26 +25,18 @@ export default {
   components: { BaseLink },
   props: {
     /**
-     * specify labels shown in the single navigation entries - has to be
-     * the same length and order as `routes`
-     */
-    labels: {
-      type: Array,
-      default: () => [],
-    },
-    /**
-     * specify routes that should be used for navigation when
+     * specify routes and labels that should be used for navigation when
      * clicking on a label with the same index - these have to be internal
      * links, i.e. without a protocol like `http:` or `mailto:` in the url
      */
     routes: {
       type: Array,
-      default: () => [],
+      default: () => [{ route: '', label: '' }],
       validator: arr => !arr.some(
-        val => val
-            && (val.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
-              || val.match(/^mailto:/)
-              || val.match(/^tel:/)),
+        val => val.route
+            && (val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
+              || val.route.match(/^mailto:/)
+              || val.route.match(/^tel:/)),
       ),
     },
     /**

@@ -2,14 +2,13 @@ BaseBreadCrumbs
 
 ```vue live
 <template>
-  <BaseBreadCrumbs :routes="routes" :labels="labels" />
+  <BaseBreadCrumbs :routes="routes" />
 </template>
 <script>
 export default {
   data() {
     return {
-      routes: ["/", "/moderne-plastik"],
-      labels: ["Übersicht", "Moderne Plastik"]
+      routes: [{label: "Übersicht", route: "/"}, {label: "Moderne Plastik", route: "/moderne-plastik"}]
     };
   }
 };
