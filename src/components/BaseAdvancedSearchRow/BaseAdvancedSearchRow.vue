@@ -420,6 +420,9 @@ export default {
      *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' and 'chipssingle' the controlled
      *      vocabulary options
+     *    <b>subsets</b> {string[]} - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add these filter ids here
      */
     filterList: {
       type: Array,
@@ -443,7 +446,10 @@ export default {
      *    <b>options</b> {Object[]} - for filter type 'chips' and 'chipssingle' the controlled
      *      vocabulary options<br>
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
-     *    or array of objects or strings for type 'text', type 'chips' and 'chipssingle'
+     *      or array of objects or strings for type 'text', type 'chips' and 'chipssingle'
+     *
+     *    defaultFilter does not need the property subsets since results for all filters are
+     *    shown per default
      */
     defaultFilter: {
       type: Object,
@@ -469,6 +475,9 @@ export default {
      *      property are used or autocomplete is used
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
      *      or array of objects or strings for type 'text',  type 'chips' and 'chipssingle'
+     *    <b>subsets</b> {string[]} - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add these filter ids here
      */
     appliedFilter: {
       type: [Object, null],
@@ -537,7 +546,7 @@ export default {
       }),
     },
     /**
-     * autocomplete results need a label and a data property that contains all the actual
+     * autocomplete results need a label, an id and a data property that contains all the actual
      * autocomplete results for that specific category
      * TODO: make category optional
      */
@@ -552,7 +561,7 @@ export default {
       validator: val => ['label', 'id', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
-     * add a place holder for the search input; either just a string or an object with
+     * add a placeholder for the search input; either just a string or an object with
      * different text for each search type (text, chips, date)
      */
     placeholder: {
@@ -561,7 +570,7 @@ export default {
     },
     /**
      * specify informational texts for the component - this needs to be an object with the following
-     * properties (if you dont want to display any text leave an empty string:  <br>
+     * properties (if you dont want to display any text leave an empty string):  <br>
      *   <br>
      *     <b>title</b>: text shown as first line on the drop down in filters area<br>
      *     <b>subtext</b>: text shown as second line on the drop down in filters area<br>
@@ -868,9 +877,13 @@ export default {
         // have same category as selected text filter
         if (this.filter[this.identifierPropertyName.filter]
           !== this.defaultFilter[this.identifierPropertyName.filter]) {
+          // filter for identical autocomplete section id OR if a filter has the
+          // prop `subsets` specified also filter for the ids specified in that array
           resultsToDisplay = resultsToDisplay
             .filter(section => section[this.autocompletePropertyNames.id]
-              === this.filter[this.identifierPropertyName.filter]);
+              === this.filter[this.identifierPropertyName.filter]
+              || (this.filter.subsets && this.filter.subsets.length
+                && this.filter.subsets.includes(section[this.autocompletePropertyNames.id])));
         }
         // filter empty collections
         resultsToDisplay = resultsToDisplay
@@ -1195,15 +1208,23 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
+      // get the result category of the selected option (on key navigation this.activeCollection
+      // should be set, if selected from drop down by click the collectionId is passed to the function
+      // else the default filter category is assumed
+      const selectedOptionCollection = this.activeCollection || collectionId
+        || this.defaultFilter[this.identifierPropertyName.filter];
       // if option is coming from autocomplete drop down list (=has an id)
-      // and currently active filter is not identical
-      // with the category of the selected item (if everything is going right this should
-      // be 'default') then set the category of the selected item as current filter
       if (this.useAutocompleteFunctionality
         && entry[this.identifierPropertyName.autocompleteOption]
+        // and currently active filter is not identical
+        // with the category of the selected item
         && this.filter[this.identifierPropertyName.filter]
-          !== (this.activeCollection || collectionId
-            || this.defaultFilter[this.identifierPropertyName.filter])) {
+          !== selectedOptionCollection
+        // and selected item is not from a subset (so
+        // if everything goes right category should be 'default')
+        && !(this.filter.subsets && this.filter.subsets.length
+          && this.filter.subsets.includes(selectedOptionCollection))) {
+        // then set the category of the selected item as current filter
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
@@ -1494,6 +1515,12 @@ export default {
       }
       // check if both are autocomplete chips filters
       if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
+        // check if new filter is a superset filter of the previous filter (=previous
+        // filter id is included in current filter 'subsets' property
+        if (newFilter.subsets
+          && newFilter.subsets.includes(previousFilter[this.identifierPropertyName.filter])) {
+          return previousFilterValues;
+        }
         // if both are chips with freetext keep options without id (=not specific entries)
         return previousFilterValues && previousFilterValues.length ? previousFilterValues
           .filter(value => !value[this.identifierPropertyName.autocompleteOption]) : [];

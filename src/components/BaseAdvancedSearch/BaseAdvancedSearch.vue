@@ -68,6 +68,9 @@ import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvanc
  *  freetext_allowed false
  * @property {Object[]|string[]|string|Object} [filter_values] - the values a filter contains - only
  *  relevant for applied filters, not for filters coming from backend presented in the drop down
+ * @property {string[]} [subsets] - if a filter of `type` 'text' or 'chips' with `freetext_allowed`
+ *      (thus triggering autocomplete) has subordinate filters for which the autosuggest results
+ *      should also be shown - add these filter ids here
  */
 
 export default {
@@ -92,6 +95,9 @@ export default {
      *      property are used or autocomplete is used.
      *    **options** `Object[]` - for filter type `chips` the controlled
      *      vocabulary options.
+     *     **subsets** `string[]` - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add the filter identifiers here
      */
     filterList: {
       type: Array,
@@ -136,6 +142,9 @@ export default {
      *      vocabulary options.
      *    **filter_values** `Object[], string[], Object` - the values selected - object for date
      *    or array of objects or strings for type `text` and type `chips`,
+     *
+     *    defaultFilter does not need the property `subsets` since results for all filters are
+     *    shown per default
      */
     defaultFilter: {
       type: Object,
@@ -288,7 +297,7 @@ export default {
       }),
     },
     /**
-     * autocomplete results need a label and a data property that contains all the actual
+     * autocomplete results need a label, and id and a data property that contains all the actual
      * autocomplete results for that specific category
      * TODO: make category optional
      */
