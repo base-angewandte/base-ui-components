@@ -92,7 +92,7 @@ export default {
     type: {
       type: String,
       default() {
-        return 'b';
+        return 'a';
       },
       validator: val => val === 'a' || val === 'b',
     },
@@ -163,9 +163,10 @@ export default {
   .base-switch-button__type-b {
     padding: $spacing-small $spacing $spacing-small $spacing;
     border: $input-field-border;
+    transition: border 0.2s ease;
     &.base-switch-button__type-b__active {
       color: var(--app-color);
-      transition: border 0.1s ease;
+      transition: border 0.2s ease;
     }
 
     &:focus-within {
@@ -174,7 +175,7 @@ export default {
   }
   .base-switch-button__type-a {
     padding: $spacing-small $spacing $spacing-small $spacing;
-    border: $input-field-border;
+    border: 1px solid rgba(255, 255, 255, 0);
 
     &.base-switch-button__type-a__active {
       border: $input-field-border;
