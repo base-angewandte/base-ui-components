@@ -71,41 +71,42 @@
       </nav>
       <transition name="translateY">
         <nav
-          v-if="navOpen">
-          <div>
-            <div class="hamburger-menu">
-              <div
-                v-for="element in list.filter(e => e.placement === 'left')"
-                :key="element.id">
-                <BaseButton
-                  v-if="!toggleActive(element.route)"
-                  :text="showShortLabel ? element.shortLabel || element.label : element.label"
-                  button-style="row"
-                  :render-link-as="element.renderAs"
-                  :active="toggleActive(element.route)"
-                  @clicked="onClick(element.route)">
-                  <!-- @slot slot to inject content  -->
-                  <slot />
-                </BaseButton>
-              </div>
-              <div
-                v-if="list.filter(e => e.placement === 'left').length > 0
-                  &&list.filter(e => e.placement === 'right').length > 0"
-                class="separator-line" />
-              <div
-                v-for="element in list.filter(e => e.placement === 'right')"
-                :key="element.id">
-                <BaseButton
-                  v-if="!toggleActive(element.route)"
-                  :text="showShortLabel ? element.shortLabel || element.label : element.label"
-                  button-style="row"
-                  :render-link-as="element.renderAs"
-                  :active="toggleActive(element.route)"
-                  @clicked="onClick(element.route)">
-                  <!-- @slot slot to inject content  -->
-                  <slot />
-                </BaseButton>
-              </div>
+          v-if="navOpen"
+          ref="mobileViewDropdown">
+          <div class="hamburger-menu">
+            <div
+              v-for="element in list.filter(e => e.placement === 'left')"
+              :key="element.id"
+              :class="element.placement">
+              <BaseButton
+                v-if="!toggleActive(element.route)"
+                :text="showShortLabel ? element.shortLabel || element.label : element.label"
+                button-style="row"
+                :render-link-as="element.renderAs"
+                :active="toggleActive(element.route)"
+                @clicked="onClick(element.route)">
+                <!-- @slot slot to inject content  -->
+                <slot />
+              </BaseButton>
+            </div>
+            <div
+              v-if="list.filter(e => e.placement === 'left').length > 0
+                &&list.filter(e => e.placement === 'right').length > 0"
+              class="separator-line" />
+            <div
+              v-for="element in list.filter(e => e.placement === 'right')"
+              :key="element.id"
+              :class="element.placement">
+              <BaseButton
+                v-if="!toggleActive(element.route)"
+                :text="showShortLabel ? element.shortLabel || element.label : element.label"
+                button-style="row"
+                :render-link-as="element.renderAs"
+                :active="toggleActive(element.route)"
+                @clicked="onClick(element.route)">
+                <!-- @slot slot to inject content  -->
+                <slot />
+              </BaseButton>
             </div>
           </div>
         </nav>
@@ -184,25 +185,31 @@ export default {
       if (this.sideMenuIcon === 'drag-lines') {
         this.sideMenuIcon = 'remove';
       } else this.sideMenuIcon = 'drag-lines';
+      if (this.navOpen) { this.$nextTick(this.calcTextWidth); }
     },
     calcTextWidth() {
       let anyElementTooLong = false;
-      const refsToCheck = ['fullSizeNavigation', 'mobileViewNavigation'];
+      const refsToCheck = ['fullSizeNavigation', 'mobileViewNavigation', 'mobileViewDropdown'];
       const maxWidth = {
         mobileViewNavigation: 0,
         fullSizeNavigation: -15,
+        mobileViewDropdown: 0,
       };
       refsToCheck.forEach((ref) => {
+        if (!this.$refs[ref]) { return; }
         // clone ref to compute item length with full length labels
         const clonedNavigation = this.$refs[ref].cloneNode(true);
         clonedNavigation.style.maxWidth = `${this.$refs[ref].clientWidth}px`;
         this.$refs[ref].parentElement.append(clonedNavigation);
         [...clonedNavigation.childNodes]
           .map(childNode => [...childNode.childNodes]).flat()
+          .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-button-text')[0])
           .forEach((li, idx) => {
             const innermostChild = li.getElementsByClassName('base-button-text')[0];
-            if (!innermostChild) { return; }
-            innermostChild.innerText = this.list[idx].label;
+            console.log(ref, li, innermostChild, idx);
+            if (ref === 'mobileViewDropdown') {
+              innermostChild.innerText = this.list.filter(e => !this.toggleActive(e.route))[idx].label;
+            } else { innermostChild.innerText = this.list[idx].label; }
             if (li.clientWidth - li.scrollWidth < maxWidth[`${ref}`]) { anyElementTooLong = true; }
           });
         clonedNavigation.remove();
