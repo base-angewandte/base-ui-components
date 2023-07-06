@@ -75,7 +75,7 @@
           <div>
             <div class="hamburger-menu">
               <div
-                v-for="element in list"
+                v-for="element in list.filter(e => e.placement === 'left')"
                 :key="element.id">
                 <BaseButton
                   v-if="!toggleActive(element.route)"
@@ -83,7 +83,24 @@
                   button-style="row"
                   :render-link-as="element.renderAs"
                   :active="toggleActive(element.route)"
-                  align-text="left"
+                  @clicked="onClick(element.route)">
+                  <!-- @slot slot to inject content  -->
+                  <slot />
+                </BaseButton>
+              </div>
+              <div
+                v-if="list.filter(e => e.placement === 'left').length > 0
+                  &&list.filter(e => e.placement === 'right').length > 0"
+                class="separator-line" />
+              <div
+                v-for="element in list.filter(e => e.placement === 'right')"
+                :key="element.id">
+                <BaseButton
+                  v-if="!toggleActive(element.route)"
+                  :text="showShortLabel ? element.shortLabel || element.label : element.label"
+                  button-style="row"
+                  :render-link-as="element.renderAs"
+                  :active="toggleActive(element.route)"
                   @clicked="onClick(element.route)">
                   <!-- @slot slot to inject content  -->
                   <slot />
@@ -209,9 +226,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../styles/variables.scss";
-base-navigation {
-  display: flex;
-}
+
 .left {
   margin-right: auto;
   white-space: nowrap;
@@ -280,6 +295,10 @@ base-navigation {
   opacity: 0;
 }
 
+.separator-line{
+  border-bottom: $separation-line;
+}
+
 @media screen and (max-width: $mobile) {
   .nav-item {
     display: none;
@@ -298,4 +317,11 @@ base-navigation {
   }
 }
 
+</style>
+<style lang="scss">
+@media screen and (max-width: $mobile) {
+.base-button .base-button-text {
+    text-align: left !important;
+  }
+}
 </style>
