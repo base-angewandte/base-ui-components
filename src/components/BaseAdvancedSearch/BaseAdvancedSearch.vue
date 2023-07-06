@@ -68,6 +68,9 @@ import { createId, hasData, sort } from '@/utils/utils';
  *  freetext_allowed false
  * @property {Object[]|string[]|string|Object} [filter_values] - the values a filter contains - only
  *  relevant for applied filters, not for filters coming from backend presented in the drop down
+ * @property {string[]} [subsets] - if a filter of `type` 'text' or 'chips' with `freetext_allowed`
+ *      (thus triggering autocomplete) has subordinate filters for which the autosuggest results
+ *      should also be shown - add these filter ids here
  */
 
 export default {
@@ -92,6 +95,9 @@ export default {
      *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options
+     *    <b>subsets</b> {string[]} - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add these filter ids here
      */
     filterList: {
       type: Array,
@@ -103,7 +109,7 @@ export default {
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
-     * see filterList (except options - these are not necessary for applied filters)
+     * see filterList (except options and subsets - these are not necessary for applied filters)
      */
     appliedFilters: {
       type: Array,
@@ -135,7 +141,10 @@ export default {
      *    <b>options</b> {Object[]} - for filter type 'chips' the controlled
      *      vocabulary options<br>
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
-     *    or array of objects or strings for type 'text' and type 'chips'
+     *      or array of objects or strings for type 'text' and type 'chips'
+     *
+     *    defaultFilter does not need the property subsets since results for all filters are
+     *    shown per default
      */
     defaultFilter: {
       type: Object,
@@ -233,14 +242,14 @@ export default {
         .every(prop => Object.keys(val).includes(prop)),
     },
     /**
-     * add a place holder for the search input, either a string used for every row or
+     * add a placeholder for the search input, either a string used for every row or
      * add separate values for main filter row and already added filters<br>
      * properties:<br>
      *     <b>filterRow</b>: for already added filter rows<br>
      *     <b>main</b>: for the primary search input field<br>
      *
      *  each of these specific placeholders can again be a string or an object with different
-     *  placeholders for for each search type (text, chips, date)
+     *  placeholders for each search type (text, chips, date)
      */
     placeholder: {
       type: [Object, String],
@@ -288,7 +297,7 @@ export default {
       }),
     },
     /**
-     * autocomplete results need a label and a data property that contains all the actual
+     * autocomplete results need a label, and id and a data property that contains all the actual
      * autocomplete results for that specific category
      * TODO: make category optional
      */
