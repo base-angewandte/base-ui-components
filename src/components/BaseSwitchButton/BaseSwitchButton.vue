@@ -32,12 +32,16 @@
           :class="{ hide: !showLabel }">
           {{ option.label }}
         </span>
+        <base-icon
+          v-if="option.icon && option.icon.length > 0"
+          :name="option.icon"
+          size="small"
+          class="iconSize" />
         <!-- @slot slot to display something right of text (e.g. icon)
         @binding {string} value - the value of the option object
         --->
         <slot
-          :value="option.value"
-          name="icon" />
+          :value="option.value" />
         <div
           v-if="option.value === selectedOption && type === 'b'"
           class="active-state" />
@@ -47,11 +51,13 @@
 </template>
 
 <script>
+import BaseIcon from '../BaseIcon/BaseIcon';
 /**
  * accessible tab switch buttons
  */
 export default {
   name: 'BaseSwitchButton',
+  components: { BaseIcon },
   model: {
     prop: 'activeTab',
     event: 'switch',
@@ -62,7 +68,7 @@ export default {
      */
     options: {
       type: Array,
-      default: () => [{ label: 'tab', value: 'tab' }],
+      default: () => [{ label: 'tab', value: 'tab', icon: '' }],
     },
     /**
      * set the currently active tab (specify the value of the object not the label)
@@ -135,10 +141,14 @@ export default {
 <style lang="scss" scoped>
   @import '../../styles/variables.scss';
 
+  .iconSize {
+    width: 1em;
+    height: 1em;
+  }
   .base-switch-buttons {
     clear: both;
     display: flex;
-    gap: 12px;
+    gap: 16px;
     position: relative;
     line-height: $row-height-small;
   }
@@ -164,7 +174,7 @@ export default {
   }
   .base-switch-button__type-a {
     padding: $spacing-small $spacing $spacing-small $spacing;
-    border: 1px solid rgba(255, 255, 255, 0);
+    border: $input-field-border;
 
     &.base-switch-button__type-a__active {
       border: $input-field-border;

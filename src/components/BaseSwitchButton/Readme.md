@@ -6,16 +6,14 @@
   <div>
     <BaseSwitchButton
       :options="[
-        { label: 'German', value: 'drag-lines' },
-        { label: 'English', value: 'people' },
+        { label: 'German', value: 'de', icon: 'drag-lines' },
+        { label: 'English', value: 'en', icon: 'people' },
       ]"
       v-model="activeLang"
       label="Select Language"
-      :show-label="false">
-      <template
-        v-slot:icon="{ value }">
-        <BaseIcon :style="{ width: '16px', height: '16px' }" :name="value" />
-      </template>
+      :show-label="true"
+      type="b">
+      
     </BaseSwitchButton>
     <div>{{ 'active lang: ' + activeLang }}</div>
   </div>
