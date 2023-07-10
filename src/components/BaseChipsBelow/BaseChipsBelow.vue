@@ -112,8 +112,8 @@
             :drop-down-no-options-info="dropDownNoOptionsInfo"
             :identifier-property-name="identifierPropertyName"
             :label-property-name="labelPropertyName"
-            :invalid="isInvalidAdditionalOption(entry[labelPropertyName])"
-            :error-message="additionalOptionsErrorMessage(entry[labelPropertyName])"
+            :invalid="isInvalidAdditionalOption(entry[labelPropertyName], index)"
+            :error-message="additionalOptionsErrorMessage(entry[labelPropertyName], index)"
             :allow-multiple-entries="additionalPropAllowMultipleEntries"
             :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
             :show-error-icon="showErrorIcon"
@@ -172,7 +172,7 @@ export default {
       default: () => [],
     },
     /**
-     if field is occurring more then once - set an id
+     if field is occurring more than once - set an id
      */
     id: {
       type: String,
@@ -473,6 +473,13 @@ export default {
         if (val.length) {
           this.invalidInt = false;
         }
+        // check if allowUnknownEntries are allowed and reset errors,
+        // due new entries do not have an id set initially and
+        // the error matching with index breaks
+        if (this.allowUnknownEntries
+          && this.additionalPropErrors.length) {
+          this.additionalPropErrors = [];
+        }
       },
       immediate: true,
     },
@@ -638,11 +645,13 @@ export default {
     },
     /**
      * get additional options error message
-     * @param {string} id
+     * @param {string} id - objects id
+     * @param {number} index - index in selectedList (needed for unknown entries)
      * @returns {string}
      */
-    additionalOptionsErrorMessage(id) {
-      if (this.additionalPropErrors.filter(obj => obj.id === id).length) {
+    additionalOptionsErrorMessage(id, index) {
+      if (this.additionalPropErrors.filter(obj => obj.id === id).length
+            || typeof this.additionalPropErrors[index] !== 'undefined') {
         return this.validationTexts.required;
       }
       return '';
@@ -680,7 +689,7 @@ export default {
       if (!this.selectedList.length) {
         this.invalidInt = true;
         // consider also optional errorMessage
-        this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`;
+        this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`.trim();
         return false;
       }
       // otherwise everything is fine
@@ -689,10 +698,12 @@ export default {
     /**
      * check if a single additional option is invalid
      * @param {string} id
+     * @param {number} index
      * @returns {boolean}
      */
-    isInvalidAdditionalOption(id) {
-      return !!this.additionalPropErrors.filter(obj => obj.id === id).length;
+    isInvalidAdditionalOption(id, index) {
+      return !!this.additionalPropErrors.filter(obj => obj.id === id).length
+        || typeof this.additionalPropErrors[index] !== 'undefined';
     },
     /**
      * validate single or all additional option or all from selectedList
@@ -717,6 +728,7 @@ export default {
       this.additionalPropErrors = this.selectedList
         .filter(entry => !entry[this.additionalPropertyName] || !entry[this.additionalPropertyName].length)
         .map(entry => ({ id: entry.id }));
+
       // return validation state
       return this.selectedBelowListInt.length ? !this.additionalPropErrors.length : true;
     },
@@ -724,7 +736,7 @@ export default {
      * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelow.validate();` from parent.<br>
      * Therefore, the component must have a reference set.
      * @public
-     * @returns {boolean} - components validation state
+     * @returns {boolean} - components error state
      */
     validate() {
       // clear errors
@@ -734,7 +746,12 @@ export default {
       // validate
       const isValidChipsInput = this.isValidChipsInput();
       const isValidAdditionalOptions = this.isValidAdditionalOptions(null);
-      return isValidChipsInput && isValidAdditionalOptions;
+      // return error state
+      // nice to have would be to return an object or array with more information
+      // e.g. { label: this.label, error: this.errorMessageInt },
+      // but how to deal with the additionalOptions
+      // for now a boolean is enough
+      return !(isValidChipsInput && isValidAdditionalOptions);
     },
   },
 };

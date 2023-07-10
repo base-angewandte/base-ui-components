@@ -117,7 +117,7 @@ A chips input form field with chips displayed below and optional validation
         text="Validate"
         @clicked="validate(null)" />
       <div>
-        Errors: {{ isValid }}
+        Errors: {{ hasError }}
       </div>
     </template>
   </div>
@@ -143,7 +143,7 @@ export default {
           label: 'Edit',
         },
       ],
-      isValid: 'not validated yet.',
+      hasError: 'not validated yet.',
       // Note: set optional default role value(s)
       list: [
         {
@@ -184,7 +184,7 @@ export default {
      * validate component from outside
      */
     validate() {
-      this.isValid = !this.$refs.baseChipsBelow.validate();
+      this.hasError = this.$refs.baseChipsBelow.validate();
     },
   },
 };

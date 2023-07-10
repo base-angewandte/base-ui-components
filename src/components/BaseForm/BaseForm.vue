@@ -17,6 +17,7 @@
         <!-- SINGLE FORM FIELD -->
         <BaseFormFieldCreator
           v-if="!allowMultiply(element)"
+          ref="baseFormField"
           :key="`${element.name}_${index}_${formId}`"
           :class="['base-form-field',
                    formFieldsHalf.indexOf(element) >= 0
@@ -112,6 +113,7 @@
                      { 'base-form-field-left-margin': isHalfFieldSecond(element) }]">
             <BaseFormFieldCreator
               :key="`${element.name}_${index}_${valueIndex}_${formId}`"
+              ref="baseFormField"
               v-bind="formFieldComponentProps(element, index, valueIndex)"
               class="base-form-field__multiple__inline-element"
               @field-value-changed="setFieldValue(
@@ -447,6 +449,9 @@ export default {
           max: 'Value must be less than or equal to {value}.',
           minLength: 'Text must be at least {value} character(s) long.',
           maxLength: 'Text cannot be longer than {value} characters.',
+        },
+        chips: {
+          required: 'Select an option.',
         },
       }),
       // checking if all necessary properties are part of the provided object
@@ -807,6 +812,35 @@ export default {
         hasContent = fieldValues === 0 || !!fieldValues || hasContent;
       }
       return hasContent;
+    },
+    /**
+     * Trigger public validate function for each form component
+     * Note: Currently a validation function is only implemented for baseChipsBelow
+     *
+     * @public
+     * @returns {boolean} - forms error state
+     */
+    validate() {
+      const errors = [];
+      // get form elements to iterate through
+      const formFields = this.$refs.baseFormField;
+      // iterate through all form fields, trigger components validation function and
+      // set error state if needed
+      formFields.forEach((field) => {
+        if (Object.keys(field.$refs).length) {
+          // get first ref name
+          const refName = Object.keys(field.$refs)[0];
+          // check if component has a validate function
+          if (field.$refs[refName].validate !== undefined) {
+            // validate component
+            const hasErrors = field.$refs[refName].validate();
+            // set error state if needed
+            if (hasErrors) { errors.push(hasErrors); }
+          }
+        }
+      });
+      // return error state
+      return !!errors.length;
     },
   },
 };

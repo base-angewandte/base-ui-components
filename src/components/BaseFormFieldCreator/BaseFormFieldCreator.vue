@@ -240,6 +240,7 @@
       :is="fieldElement"
       v-else-if="fieldType === 'chips' || fieldType === 'chips-below'"
       :id="fieldKey"
+      :ref="fieldType + fieldKey"
       :key="fieldKey"
       v-model="fieldValueInt"
       v-bind="fieldProps"
@@ -267,9 +268,12 @@
         ? fieldProps.additionalPropPlaceholder || getI18nTerm('form.selectRoles') : false"
       :additional-property-name="fieldType === 'chips-below'
         ? fieldProps.additionalPropertyName || 'roles' : false"
+      :additional-prop-required="fieldType === 'chips-below'
+        ? formFieldXAttrs.additionalPropRequired : null"
       :invalid="invalid || fieldProps.invalid"
-      :required="required || fieldProps.required"
+      :required="field.required || required || fieldProps.required"
       :error-message="errorMessage || fieldProps.errorMessage"
+      :validation-texts="validationTexts.chips || fieldProps.validationTexts.chips"
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
@@ -596,6 +600,9 @@ export default {
           max: 'Value must be less than or equal to {value}.',
           minLength: 'Text must be at least {value} character(s) long.',
           maxLength: 'Text cannot be longer than {value} characters.',
+        },
+        chips: {
+          required: 'Select an option.',
         },
       }),
       // checking if all necessary properties are part of the provided object
