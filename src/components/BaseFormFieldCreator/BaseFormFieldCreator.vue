@@ -386,6 +386,7 @@
           :value-list="fieldValueInt"
           :form-id="fieldKey + '_' + field.name"
           :field-props="fieldProps"
+          :drop-down-lists="fieldGroupDropDownLists"
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
           @values-changed="$emit('field-value-changed', $event)"
@@ -503,10 +504,13 @@ export default {
       default: '',
     },
     /**
-     * provide a options list for `autocomplete`, `chips` or `chips-below` fields
+     * provide an options list for `autocomplete`, `chips` or `chips-below` fields
+     * for field type `group` provide a nested object with field names
+     * as properties and an array for each field to ensure the correct options are assigned
+     * even if field names within different groups are identical
      */
     dropDownList: {
-      type: Array,
+      type: [Array, Object],
       default: () => [],
     },
     /**
@@ -715,6 +719,23 @@ export default {
       }
       return this.field.properties;
     },
+    /**
+     * function to check if dropdowns for field groups are nested. Nesting was necessary
+     * to ensure every field group gets their own dropdown even if field names are identical.
+     * For backwards compatibility keep using direct base level fieldName array as fallback.
+     * @returns {{ [fieldName]: Object[] }}
+     */
+    fieldGroupDropDownLists() {
+      // get field name
+      const fieldName = this.field.name;
+      // get parent BaseForm $props.dropDownLists that were passed to BaseFormFieldCreator
+      // as fieldGroupParams
+      const { dropDownLists } = this.fieldGroupParams;
+      // check if the nested object with the fieldName exists, if not fall back to use
+      // field name directly
+      return dropDownLists && dropDownLists[fieldName]
+        ? dropDownLists[fieldName] : dropDownLists;
+    },
     formFieldXAttrs() {
       // x-attrs should exist however just in case if not return an empty object
       // so that ['x-attrs'][xAttrProperty] does not throw errors
@@ -845,8 +866,11 @@ export default {
       },
       deep: true,
     },
-    dropDownList() {
-      this.fetchingData = false;
+    dropDownList: {
+      handler() {
+        this.fetchingData = false;
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -899,6 +923,7 @@ export default {
        * @property {string} name - the name of the field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields e.g. for contributor roles equivalent is 'contributor'
+       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
        */
       this.$emit('fetch-autocomplete', {
         value,
@@ -913,7 +938,12 @@ export default {
      * @param {Object} autocompleteInformation
      */
     subFormFetchAutocomplete(autocompleteInformation) {
-      this.$emit('fetch-autocomplete', autocompleteInformation);
+      const parentFieldsArary = autocompleteInformation.parentFields || [];
+      parentFieldsArary.unshift(this.field.name);
+      this.$emit('fetch-autocomplete', {
+        ...autocompleteInformation,
+        parentFields: parentFieldsArary,
+      });
     },
     /**
      * function getting label from all possible label structures (lang object (--> get

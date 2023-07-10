@@ -376,8 +376,11 @@ export default {
       default: '',
     },
     /**
-     * provide a object that contains the options list for all
+     * provide an object that contains the options list for all
      * fields with autocomplete / chips input
+     * for field type `group` provide a nested object with field names
+     * as properties and an array for each field to ensure the correct options are assigned
+     * even if field names within different groups are identical
      */
     dropDownLists: {
       type: Object,
@@ -586,6 +589,7 @@ export default {
        * @property {string} name - the name of the field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
+       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
        */
       this.$emit('fetch-autocomplete', params);
     },
