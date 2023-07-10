@@ -384,8 +384,11 @@ export default {
       default: '',
     },
     /**
-     * provide a object that contains the options list for all
+     * provide an object that contains the options list for all
      * fields with autocomplete / chips input
+     * for field type `group` provide a nested object with field names
+     * as properties and an array for each field to ensure the correct options are assigned
+     * even if field names within different groups are identical
      */
     dropDownLists: {
       type: Object,

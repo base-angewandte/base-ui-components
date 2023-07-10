@@ -36,6 +36,42 @@ This is a basic (autocomplete functionality not working here) example how a form
         }"
         language="en"
         :field-is-loading="fieldIsLoading"
+        :drop-down-lists="{
+          date_location: {
+            location: [
+              {
+                label: 'Wien',
+                source: 'http://base.uni-ak.ac.at/portfolio/vienna',
+              },
+              {
+                label: 'Berlin',
+                source: 'http://base.uni-ak.ac.at/portfolio/berlin',
+              },
+            ],
+          },
+          date_location2: {
+            location: [
+              {
+                label: 'Ottowa',
+                source: 'http://base.uni-ak.ac.at/portfolio/ottowa',
+              },
+              {
+                label: 'New York',
+                source: 'http://base.uni-ak.ac.at/portfolio/newyork',
+              },
+            ],
+          },
+          location: [
+              {
+                label: 'Identical Options for all location fields 1',
+                source: 'http://base.uni-ak.ac.at/portfolio/identical1',
+              },
+              {
+                label: 'Identical Options for all location fields 2',
+                source: 'http://base.uni-ak.ac.at/portfolio/identical2',
+              },
+            ],
+        }"
         class="form"
         @values-changed="valueList = { ...$event }">
         <template #label-addition="{ fieldName }">
@@ -363,9 +399,105 @@ export default {
                 order: 10,
               },
             },
+            date_location2: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  location_description: {
+                    type: 'string',
+                    title: 'Ortsbeschreibung',
+                    'x-attrs': {
+                      placeholder: 'Ortsbeschreibung eintragen',
+                      field_type: 'text',
+                      order: 3,
+                    },
+                  },
+                  date: {
+                    type: 'string',
+                    title: 'Datum',
+                    additionalProperties: false,
+                    pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
+                    'x-attrs': {
+                      field_format: 'half',
+                      field_type: 'date',
+                      date_format: 'date_month_year',
+                      placeholder: {
+                        date: 'Datum eintragen',
+                      },
+                      order: 1,
+                    },
+                  },
+                  location: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        geometry: {
+                          type: 'object',
+                          properties: {
+                            coordinates: {
+                              type: 'array',
+                              items: {
+                                type: 'number',
+                                format: 'float',
+                              },
+                            },
+                            type: {
+                              type: 'string',
+                            },
+                          },
+                          additionalProperties: false,
+                        },
+                        region: {
+                          type: 'string',
+                        },
+                        house_number: {
+                          type: 'string',
+                        },
+                        street: {
+                          type: 'string',
+                        },
+                        postcode: {
+                          type: 'string',
+                        },
+                        locality: {
+                          type: 'string',
+                        },
+                        country: {
+                          type: 'string',
+                        },
+                        label: {
+                          type: 'string',
+                        },
+                        source: {
+                          type: 'string',
+                        },
+                      },
+                      additionalProperties: false,
+                    },
+                    title: 'Ort',
+                    'x-attrs': {
+                      field_format: 'half',
+                      field_type: 'chips',
+                      dynamic_autosuggest: true,
+                      source: '/autosuggest/v1/places/',
+                      placeholder: 'Ort eintragen',
+                      order: 2,
+                    },
+                  },
+                },
+                additionalProperties: false,
+              },
+              title: 'A Second Group with identical Field Names',
+              'x-attrs': {
+                field_type: 'group',
+                show_label: true,
+                order: 11,
+              },
+            },
           },
         }
-
     }
 }
 </script>
