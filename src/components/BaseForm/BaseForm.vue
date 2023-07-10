@@ -984,12 +984,6 @@ export default {
         max-width: calc(100% - #{$spacing} * 2);
       }
 
-      .base-form-field-left-margin {
-        .base-drop-down-list__container {
-          right: $spacing;
-        }
-      }
-
       .base-form-subform-wrapper {
         .base-drop-down-list__container {
           max-width: calc(100% - #{$spacing} * 4.5 - 3px);
