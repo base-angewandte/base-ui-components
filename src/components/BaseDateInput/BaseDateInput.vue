@@ -4,7 +4,7 @@
     class="base-date-input">
     <div
       :class="['base-date-input__label-row',
-               { 'base-date-input__label-row_visible': showLabel }]">
+               { 'base-date-input__label-row__visible': showLabel }]">
       <legend
         v-if="showLabel"
         ref="label"
@@ -13,6 +13,7 @@
         {{ label }}
       </legend>
       <div
+        v-if="showLabel"
         ref="labelAdditions"
         class="base-date-input__label-additions">
         <!-- @slot to add additional elements to the label row -->
@@ -1530,7 +1531,7 @@ export default {
       height: 100%;
       justify-content: space-between;
 
-      &.base-date-input__label-row_visible {
+      &.base-date-input__label-row__visible {
         margin-bottom: $spacing-small-half;
       }
 
