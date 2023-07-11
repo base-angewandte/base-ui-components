@@ -34,7 +34,7 @@
         <div
           ref="bodyInner"
           class="base-tooltip-box__body__inner">
-          <!-- @slot slot to inject content  -->
+          <!-- @slot slot to inject box content -->
           <slot>
             <i>use default slot</i>
           </slot>
