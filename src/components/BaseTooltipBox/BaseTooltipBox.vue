@@ -345,7 +345,7 @@ export default {
     visibility: hidden;
     opacity: 0;
     transition: opacity 150ms ease-in;
-    filter: drop-shadow(0 0px 6px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow($tooltip-drop-shadow);
 
     &__inner {
       position: relative;
