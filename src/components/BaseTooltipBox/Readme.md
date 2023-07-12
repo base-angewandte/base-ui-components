@@ -40,7 +40,7 @@ export default {
 
 <style lang="scss" scoped>
   .base-tooltip-box {
-    @media only screen and (min-width: 641px) {
+    @media screen and (min-width: 641px) {
       max-width: 400px;
       /* needs to be at least the same as the styleguide sidebar element (z-index: 1001)
          and lower than the styleguide navbar element (z-index: 1002) */
@@ -78,11 +78,11 @@ export default {
           </button>
 
           <BaseTooltipBox
-            v-if="box.action.info.active"
+            v-if="activeTooltipBoxId === box.id"
             :attach-to="$refs['button_' + box.id][0]"
             :direction-order="directionOrder"
             :modal-title="box.title"
-            @is-active="toggleBox(box.id, false)">
+            @is-active="toggleBox(box.id)">
             <BaseTextList
               :data="box.action.info.data"
               class="base-tooltip-box-body" />
@@ -104,6 +104,7 @@ export default {
     return {
       directionOrder: ['right', 'left', 'top', 'bottom'],
       boxSize: { width: 'calc(25% - 16px)' },
+      activeTooltipBoxId: null,
       boxes: [
         {
           id: 'a1',
@@ -111,7 +112,6 @@ export default {
           imageUrl: 'https://picsum.photos/seed/aa/460/400',
           action: {
             info: {
-              active: false,
               data: [
                 {
                   label: 'Typ',
@@ -195,7 +195,6 @@ export default {
           imageUrl: 'https://picsum.photos/seed/bb/460/400',
           action: {
             info: {
-              active: false,
               data: [
                 {
                   label: 'Typ',
@@ -225,7 +224,6 @@ export default {
           imageUrl: 'https://picsum.photos/seed/cc/460/400',
           action: {
             info: {
-              active: false,
               data: [
                 {
                   label: 'Typ',
@@ -255,7 +253,6 @@ export default {
           imageUrl: 'https://picsum.photos/seed/dd/460/400',
           action: {
             info: {
-              active: false,
               data: [
                 {
                   label: 'Typ',
@@ -298,20 +295,8 @@ export default {
         }
       });
     },
-    toggleBox(id, value) {
-      // close all info boxes beforehand
-      this.boxes = this.boxes.map(obj => ({
-        ...obj,
-        action: {
-          info: {
-            active: false,
-            data: obj.action.info.data,
-          },
-        },
-      }));
-
-      // toggle selected box
-      this.boxes[this.boxes.findIndex(obj => obj.id === id)].action.info.active = value;
+    toggleBox(id) {
+      this.activeTooltipBoxId = this.activeTooltipBoxId !== id ? id : null;
     },
   },
 };
@@ -367,8 +352,8 @@ export default {
     }
   }
 
-  .base-tooltip-box {
-    @media only screen and (min-width: 641px) {
+  @media screen and (min-width: 641px) {
+    .base-tooltip-box {
       width: 300px;
       height: 192px;
       /* needs to be at least the same as the styleguide sidebar element (z-index: 1001)
