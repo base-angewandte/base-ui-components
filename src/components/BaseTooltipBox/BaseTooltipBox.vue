@@ -6,8 +6,9 @@
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
-             { 'base-tooltip-box--modal-on-mobile': modalOnMobile || fullscreenOnMobile },
-             { 'base-tooltip-box--fullscreen-on-mobile': fullscreenOnMobile },
+             { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
+              || typeOnMobile === 'fullscreen' },
+             { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
       class="base-tooltip-box__inner">
@@ -88,25 +89,23 @@ export default {
       default: () => ({}),
     },
     /**
-     * specify to render component as a modal popup
-     */
-    modalOnMobile: {
-      type: Boolean,
-      default: true,
-    },
-    /**
-     * specify to render component with max height and width
-     */
-    fullscreenOnMobile: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * title of the modal popup on mobile
      */
     modalTitle: {
       type: String,
       default: '',
+    },
+    /**
+     * specify how the component is rendered on mobile resolutions
+     *
+     * *box*: component is rendered at the `attachTo` HTMLElement
+     * *modal*: component is rendered as a modal popup
+     * *fullscreen*: component is rendered as ap popup with max height and width
+     */
+    typeOnMobile: {
+      type: String,
+      default: 'modal',
+      validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
   },
   data() {
@@ -176,8 +175,7 @@ export default {
      * @returns {boolean}
      */
     isPopUpLockEnabled() {
-      return (this.modalOnMobile
-        || this.fullscreenOnMobile)
+      return (this.typeOnMobile === 'modal' || this.typeOnMobile === 'fullscreen')
         && window.innerWidth <= 640;
     },
     /**
