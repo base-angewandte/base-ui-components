@@ -550,13 +550,20 @@ export default {
       this.search();
     },
     /**
-     * @param {string} string - the search string to autocomplete
+     * @param {string} input - the search string to autocomplete
      * @param {Filter} filter - the filter the autocomplete was triggered for
      * @param {number} index - the index of the filter
      */
     fetchAutocomplete({ input, filter }, index) {
-      // set autocomplete variable to correct filter row
-      this.autocompleteIndex = index;
+      if (input) {
+        // if input string present set autocomplete variable to correct filter row
+        this.autocompleteIndex = index;
+      } else {
+        // else reset the autocomplete results
+        this.$set(this.filtersAutocompleteResults, index, []);
+      }
+      // stil emit fetch-autocomplete no matter if input string present or not to give
+      // parent opportunity to also update
       /**
        * inform parent to fetch autocomplete data for the provided filter
        *
