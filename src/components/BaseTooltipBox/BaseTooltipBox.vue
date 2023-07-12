@@ -273,7 +273,7 @@ export default {
         this.css.left = '';
         this.css.right = `${this.spacing}px`;
         this.css['--triangle-left'] = `${boxWidth + this.spacing
-        - (window.innerWidth - (attachToRect.right - attachToRect.width / 2))}px`;
+          - (document.body.clientWidth - (attachToRect.right - attachToRect.width / 2))}px`;
       }
     },
     /**
