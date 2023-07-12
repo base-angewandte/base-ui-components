@@ -1,3 +1,24 @@
+## 2.1.0 (2023-07-12)
+
+
+### Added
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearch), [BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearchrow):** new filter config option `subsets` to indicate filter relations
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/#basedateinput):** adding a month switch option to BaseDateInput, new prop `format` value `date_month_year`
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/#baseentryselector):** make search field element optional with new prop `useSearch`
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/#baseicon):** add new icon 'institution'
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearch):** loader set true on option select, causing it to never disappear
+* **[BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearchrow):** filter columns overflowing filter container
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/#basedateinput):** correct label and switch button overlap
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/#baseformfieldcreator):** use nested objects for prop `dropDownLists` to allow for identical field names in field groups
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform):** form group field dropdowns shifted to the left
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/#baseformfieldcreator):** date format switch label missing for new option month
+
+
 ## 2.0.11 (2023-05-08)
 
 
