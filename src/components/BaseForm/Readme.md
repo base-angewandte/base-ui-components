@@ -49,25 +49,13 @@ This is a basic (autocomplete functionality not working here) example how a form
               },
             ],
           },
-          date_location2: {
-            location: [
-              {
-                label: 'Ottowa',
-                source: 'http://base.uni-ak.ac.at/portfolio/ottowa',
-              },
-              {
-                label: 'New York',
-                source: 'http://base.uni-ak.ac.at/portfolio/newyork',
-              },
-            ],
-          },
           location: [
               {
-                label: 'Identical Options for all location fields 1',
+                label: 'Base level options 1',
                 source: 'http://base.uni-ak.ac.at/portfolio/identical1',
               },
               {
-                label: 'Identical Options for all location fields 2',
+                label: 'Base level options 2',
                 source: 'http://base.uni-ak.ac.at/portfolio/identical2',
               },
             ],
@@ -494,6 +482,64 @@ export default {
                 field_type: 'group',
                 show_label: true,
                 order: 11,
+              },
+            },
+            location: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  geometry: {
+                    type: 'object',
+                    properties: {
+                      coordinates: {
+                        type: 'array',
+                        items: {
+                          type: 'number',
+                          format: 'float',
+                        },
+                      },
+                      type: {
+                        type: 'string',
+                      },
+                    },
+                    additionalProperties: false,
+                  },
+                  region: {
+                    type: 'string',
+                  },
+                  house_number: {
+                    type: 'string',
+                  },
+                  street: {
+                    type: 'string',
+                  },
+                  postcode: {
+                    type: 'string',
+                  },
+                  locality: {
+                    type: 'string',
+                  },
+                  country: {
+                    type: 'string',
+                  },
+                  label: {
+                    type: 'string',
+                  },
+                  source: {
+                    type: 'string',
+                  },
+                },
+                additionalProperties: false,
+              },
+              title: 'Ort',
+              'x-attrs': {
+                field_format: 'full',
+                field_type: 'chips',
+                dynamic_autosuggest: true,
+                source: '/autosuggest/v1/places/',
+                placeholder: 'Ort eintragen',
+                order: 12,
               },
             },
           },
