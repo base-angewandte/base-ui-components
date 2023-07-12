@@ -335,8 +335,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  $component: base-tooltip-box;
-  .#{$component} {
+  .base-tooltip-box {
     position: absolute;
     z-index: 1;
     min-width: 200px;
@@ -429,7 +428,7 @@ export default {
     }
 
     // on mobile
-    &.#{$component}--modal-on-mobile {
+    &.base-tooltip-box--modal-on-mobile {
       @media screen and (max-width: $mobile) {
         position: fixed;
         top: 0 !important;
@@ -439,7 +438,7 @@ export default {
         background-color: transparent;
         z-index: map-get($zindex, modal);
 
-        .#{$component}__inner {
+        .base-tooltip-box__inner {
           position: relative;
           margin: 10vh auto 0;
           width: 90%;
@@ -447,7 +446,7 @@ export default {
           background-color: #fff;
         }
 
-        .#{$component}__header {
+        .base-tooltip-box__header {
           background-color: $button-header-color;
           height: $row-height-large;
           padding: 0 #{$spacing};
@@ -462,7 +461,7 @@ export default {
           display: none;
         }
 
-        .#{$component}__body--fade-out--top {
+        .base-tooltip-box__body--fade-out--top {
           &::before {
             top: $row-height-large + $spacing;
           }
@@ -470,9 +469,9 @@ export default {
       }
     }
 
-    &.#{$component}--fullscreen-on-mobile {
+    &.base-tooltip-box--fullscreen-on-mobile {
       @media screen and (max-width: $mobile) {
-        .#{$component}__inner {
+        .base-tooltip-box__inner {
           margin: 0;
           width: 100%;
           height: 100vh;
