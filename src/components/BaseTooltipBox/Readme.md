@@ -8,7 +8,7 @@
       :attach-to="$refs.button.$el"
       :modal-on-mobile="false"
       class="base-tooltip-box"
-      @is-active="tooltip = $event">
+      @close="tooltip = !tooltip">
       <p>{{ data }}</p>
     </BaseTooltipBox>
     <BaseButton
@@ -31,7 +31,6 @@ export default {
   },
   methods: {
     blur() {
-      console.log('blur');
       this.tooltip = false;
     },
   },
@@ -82,7 +81,7 @@ export default {
             :attach-to="$refs['button_' + box.id][0]"
             :direction-order="directionOrder"
             :modal-title="box.title"
-            @is-active="toggleBox(box.id)">
+            @close="toggleBox(box.id)">
             <BaseTextList
               :data="box.action.info.data"
               class="base-tooltip-box-body" />

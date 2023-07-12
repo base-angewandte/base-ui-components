@@ -201,8 +201,7 @@ export default {
      */
     calcPosition() {
       // anchor elements current position
-      const { attachTo } = this;
-      const attachToRect = attachTo.getBoundingClientRect();
+      const attachToRect = this.attachTo.getBoundingClientRect();
 
       // sizes
       const box = this.$el;
@@ -294,11 +293,11 @@ export default {
      */
     close() {
       /**
-       * event emitted when component becomes inactive
-       * @event is-active
+       * Event emitted when close button is clicked or clicked-outside is triggered
+       * @event close
        * @type {boolean}
        */
-      this.$emit('is-active', false);
+      this.$emit('close');
     },
     /**
      * intercept click-outside event and close the component
