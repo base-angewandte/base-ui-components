@@ -6,7 +6,7 @@
     <BaseTooltipBox
       v-if="tooltip"
       :attach-to="$refs.button.$el"
-      :type-on-mobile="box"
+      :type-on-mobile="'box'"
       class="base-tooltip-box"
       @close="tooltip = !tooltip">
       <p>{{ data }}</p>

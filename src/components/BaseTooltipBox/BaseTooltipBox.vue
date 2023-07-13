@@ -120,7 +120,7 @@ export default {
   data() {
     return {
       isActive: false,
-      direction: 'top',
+      direction: null,
       css: {
         top: '0',
         left: '-10000px',
@@ -215,7 +215,12 @@ export default {
       // and choose the first direction which fits and leave the loop
       this.directionOrder.every((direction) => {
         if (direction === 'left'
-          && attachToRect.left > boxWidth + triangleWidth) {
+          // check if fits to the left
+          && attachToRect.left > boxWidth + triangleWidth
+          // check if box overlaps the window top
+          && !(attachToRect.y < boxHeight / 2)
+          // check if box overlaps the window bottom
+          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
           this.direction = 'left';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.left - boxWidth - triangleWidth - this.thresholdX}px`;
@@ -223,7 +228,12 @@ export default {
         }
 
         if (direction === 'right'
-          && window.innerWidth - attachToRect.right > boxWidth + triangleWidth) {
+          // check if fits to the right
+          && window.innerWidth - attachToRect.right > boxWidth + triangleWidth
+          // check if box overlaps the window top
+          && !(attachToRect.y < boxHeight / 2)
+          // check if box overlaps the window bottom
+          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
           this.direction = 'right';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.right + triangleWidth + this.thresholdX}px`;
@@ -231,6 +241,7 @@ export default {
         }
 
         if (direction === 'top'
+          // check if fits to the top
           && attachToRect.top > boxHeight + triangleHeight) {
           this.direction = 'top';
           this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
@@ -239,6 +250,7 @@ export default {
         }
 
         if (direction === 'bottom'
+          // check if fits to the bottom
           && window.innerHeight - attachToRect.bottom > boxHeight + triangleHeight) {
           this.direction = 'bottom';
           this.css.top = `${attachToRect.bottom + triangleHeight + this.thresholdY + scrollY}px`;
@@ -350,6 +362,7 @@ export default {
     position: absolute;
     z-index: 1;
     min-width: 200px;
+    max-height: 50vh;
     color: $font-color;
     background-color: #fff;
     visibility: hidden;
@@ -361,10 +374,7 @@ export default {
       position: relative;
       display: flex;
       flex-direction: column;
-
-      @media screen and (min-width: $mobile-min-width) {
-        height: 100%;
-      }
+      height: 100%;
     }
 
     &__header {
@@ -446,6 +456,7 @@ export default {
         left: 0 !important;
         width: 100vw;
         height: 100vh;
+        max-height: 100vh;
         background-color: transparent;
         z-index: map-get($zindex, modal);
 
@@ -454,6 +465,7 @@ export default {
           margin: 10vh auto 0;
           width: 90%;
           max-height: 80vh;
+          height: initial;
           background-color: #fff;
         }
 
