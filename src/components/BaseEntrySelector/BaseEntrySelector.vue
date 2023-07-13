@@ -114,7 +114,7 @@
 
       <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
           @binding {Object[]} entries - list of entries to display
-          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
+          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
           -->
       <slot
         name="entries"
@@ -132,9 +132,28 @@
           class="base-entry-selector__body__entries"
           @clicked="entryClicked"
           @selected="selectEntry">
+          <template #entry-text-content="{ item }">
+            <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
+            @binding {Object} item - the data of one single selector entry provided with `entries` -->
+            <slot
+              name="entry-text-content"
+              :item="item" />
+          </template>
+          <template #entry-right-side-elements="{ isSelected, item }">
+            <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
+               @binding { Object } item - the complete entry provided by list
+               @binding { boolean } is-selected - was item selected
+               @binding { boolean } select-active - is select mode of entry selector active -->
+            <slot
+              name="entry-right-side-elements"
+              :is-selected="isSelected"
+              :select-active="showOptions"
+              :item="item" />
+          </template>
           <template
             #thumbnails="{ item }">
-            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used -->
+            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
+              @binding { Object } item - the data of one entry provided by `entries` prop -->
             <slot
               :item="item"
               name="thumbnails" />
