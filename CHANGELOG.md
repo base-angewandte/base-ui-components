@@ -1,3 +1,11 @@
+## 2.1.1 (2023-07-13)
+
+
+### Added
+
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/#basemenuentry), [BaseMenuList](https://base-angewandte.github.io/base-ui-components/#basemenulist), [BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/#baseentryselector):** new slots `text-content` / `entry-text-content` and `right-side-elements` / `entry-right-side-elements`
+
+
 ## 2.1.0 (2023-07-12)
 
 
