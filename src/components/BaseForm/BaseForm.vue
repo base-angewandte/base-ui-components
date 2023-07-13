@@ -598,7 +598,10 @@ export default {
        * @property {string} name - the name of the field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields
-       * e.g. for contributor roles equivalent is 'contributor'
+       *  e.g. for contributor roles equivalent is 'contributor'
+       * @property {?string[]} parentFields - in case the autocomplete event originates from
+       *  a subform the subform id's (field property names) are specififed in this array
+       *  (most nested property last)
        */
       this.$emit('fetch-autocomplete', params);
     },
