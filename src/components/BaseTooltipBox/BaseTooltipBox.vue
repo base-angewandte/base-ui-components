@@ -108,6 +108,15 @@ export default {
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
   },
+  computed: {
+    /**
+     * compare body and inner height and evaluate if body is scrollable
+     * @returns {boolean}
+     */
+    isScrollable() {
+      return this.bodyInnerHeight > this.bodyHeight;
+    },
+  },
   data() {
     return {
       isActive: false,
@@ -123,6 +132,8 @@ export default {
       bodyInnerHeight: null,
       fadeOutTop: false,
       fadeOutBottom: false,
+      // resize observer for specific element
+      resizeObserver: null,
       // guard for click-outside-event
       isClickOutsideActive: false,
       // this is needed for popUpLock mixin
@@ -141,30 +152,25 @@ export default {
       this.isClickOutsideActive = true;
     }, 0);
 
-    // make sure the move to the new location is completed before we proceed.
-    this.$nextTick(() => {
-      // calc components position and activate it
-      this.calcPosition();
-      this.isActive = true;
+    // calc components position and activate it
+    this.calcPosition();
+    this.isActive = true;
 
-      // calc components body and body inner height
-      this.calcContentHeight();
+    // block body scrolling
+    this.showInt = this.isPopUpLockEnabled();
 
-      // block body scrolling
-      this.showInt = this.isPopUpLockEnabled();
+    // initialize the resize observer to calculate fade outs when content is resized
+    this.initObserver();
 
-      // set content fade-out-bottom if needed
-      this.setFadeOuts();
-
-      // add additional event listeners
-      this.$refs.body.addEventListener('scroll', this.scrollHandler);
-      window.addEventListener('resize', this.resizeHandler);
-      window.addEventListener('keyup', this.escEventHandler);
-    });
+    // add additional event listeners
+    this.$refs.body.addEventListener('scroll', this.scrollHandler);
+    window.addEventListener('resize', this.resizeHandler);
+    window.addEventListener('keyup', this.escEventHandler);
   },
   beforeDestroy() {
     this.isActive = false;
     this.showInt = false;
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
     this.$refs.body.removeEventListener('scroll', this.scrollHandler);
     window.removeEventListener('resize', this.resizeHandler);
     window.removeEventListener('keyup', this.escEventHandler);
@@ -179,16 +185,10 @@ export default {
         && window.innerWidth <= 640;
     },
     /**
-     * compare body and inner height and evaluate if body is scrollable
-     * @returns {boolean}
-     */
-    isScrollable() {
-      return this.bodyInnerHeight > this.bodyHeight;
-    },
-    /**
      * calc content related heights
      */
     calcContentHeight() {
+      if (!this.$refs.body || !this.$refs.bodyInner) return;
       // use getBoundingClientRect() to get the precise height and
       // round up to avoid up to 1 pixel inaccuracy
       this.bodyHeight = Math.ceil(this.$refs.body.getBoundingClientRect().height);
@@ -276,8 +276,8 @@ export default {
     /**
      * evaluate if fade-outs (top, bottom) are displayed based on current scroll position
      */
-    setFadeOuts() {
-      if (!this.isScrollable()) return;
+    calcFadeOuts() {
+      if (!this.isScrollable || !this.$refs.body) return;
 
       // get current scroll position
       const { scrollTop } = this.$refs.body;
@@ -306,6 +306,20 @@ export default {
       }
     },
     /**
+     * create resize observer for the content container
+     */
+    initObserver() {
+      // create an observer with the calc heights and calc fadeout functions
+      const resizeObserver = new ResizeObserver(() => {
+        this.calcContentHeight();
+        this.calcFadeOuts();
+      });
+      // attach to relevant element
+      resizeObserver.observe(this.$refs.bodyInner);
+      // store it in variable
+      this.resizeObserver = resizeObserver;
+    },
+    /**
      * intercept resize event and close the component
      */
     resizeHandler() {
@@ -315,7 +329,7 @@ export default {
      * intercept scroll event and set fade-outs
      */
     scrollHandler() {
-      this.setFadeOuts();
+      this.calcFadeOuts();
     },
     /**
      * intercept escape key event and reset edit mode
