@@ -137,6 +137,27 @@
           class="base-entry-selector__body__entries"
           @clicked="entryClicked"
           @selected="selectEntry">
+          <template #entry-text-content="{ item }">
+            <!-- @slot text-content - use this slot to individualize the displayed text per
+              selector entry. -->
+            <slot
+              name="entry-text-content"
+              :item="item" />
+          </template>
+          <template #entry-right-side-elements="{ isSelected, item }">
+            <!-- @slot use this slot to add elements to the right side of an entry. This slot
+              content will be rendered in place of thumbnails and select checkbox so it will
+              effectively disable the display of selection elements and if select mode is desired,
+              custom elements should be provided
+               @binding { Object } item - the complete entry provided by list
+               @binding { boolean } isSelected - was item selected
+               @binding { boolean } selectActive - is select mode of entry selector active -->
+            <slot
+              name="entry-right-side-elements"
+              :is-selected="isSelected"
+              :select-active="showOptions"
+              :item="item" />
+          </template>
           <template
             #thumbnails="{ item }">
             <!-- @slot add custom elements at the end of the item row

@@ -30,11 +30,31 @@
         :select-active="selectActive"
         @clicked="activateItem(index)"
         @selected="selectItem(index, $event)">
+        <template #text-content>
+          <!-- @slot use this slot to individualize the displayed text per
+            menu entry.
+            @binding { Object } item - the complete entry provided by list -->
+          <slot
+            name="entry-text-content"
+            :item="item" />
+        </template>
+        <template #right-side-elements="{ isSelected }">
+          <!-- @slot use this slot to add elements to the right side of an entry. This slot content
+            will be rendered in place of thumbnails and select checkbox so it will effectively
+            disable the display of selection elements and if select mode is desired, custom elements
+            should be provided
+             @binding { Object } item - the complete entry provided by list
+             @binding { boolean } isSelected - was item selected -->
+          <slot
+            name="entry-right-side-elements"
+            :is-selected="isSelected"
+            :item="item" />
+        </template>
         <template
           #thumbnails>
           <!-- @slot Use this scoped slot to supply a list of thumbnails
-          (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is one list element.
-          See also the example below.-->
+         (i.e. [BaseIcon](#baseicon)) for `item`, where `item` is one list element.
+         See also the example below.-->
           <slot
             name="thumbnails"
             :item="item" />

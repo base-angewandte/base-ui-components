@@ -10,11 +10,11 @@
       <BaseToggle
         v-model="showOptions"
         label="Show Options"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="showSort"
         label="Show Sorting Drop Down"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="showTypesFilter"
         label="Show Types Filter"
@@ -22,7 +22,7 @@
       <BaseToggle
         v-model="isLoading"
         label="Is Loading"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useCustomText"
         label="Use Custom Texts"
@@ -31,22 +31,22 @@
       <BaseToggle
         v-model="noResults"
         label="No search Results"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="showPagination"
         label="Show Pagination"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useSearch"
         :disabled="useHeadSlot"
         label="Use Search"
-        class="control"/>
+        class="control" />
     </div>
     <div class="controls">
       <BaseToggle
         v-model="useHeadSlot"
         label="Use 'head' Slot"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useActionsSlot"
         label="Use 'option-actions' Slot"
@@ -55,17 +55,28 @@
       <BaseToggle
         v-model="useAfterOptionsSlot"
         label="Use 'after-options' Slot"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useEntriesSlot"
         label="Use 'entries' Slot"
         class="control"
-        @clicked="useThumbnailsSlot = false"/>
+        @clicked="useThumbnailsSlot = false; useEntryTextContentSlot = false; useEntryRightSideSlot = false" />
+      <BaseToggle
+        v-model="useEntryTextContentSlot"
+        :disabled="useEntriesSlot"
+        label="Use 'entry-text-content' Slot"
+        class="control" />
+      <BaseToggle
+        v-model="useEntryRightSideSlot"
+        :disabled="useEntriesSlot"
+        label="Use 'entry-right-side-elements' Slot"
+        class="control"
+        @clicked="useThumbnailsSlot = false" />
       <BaseToggle
         v-model="useThumbnailsSlot"
-        :disabled="useEntriesSlot"
+        :disabled="useEntriesSlot || useEntryRightSideSlot"
         label="Use 'thumbnails' Slot"
-        class="control"/>
+        class="control" />
     </div>
     <BaseEntrySelector
       :entries="baseEntrySelectorEntries"
@@ -124,6 +135,27 @@
             Custom after-options element
           </div>
         </template>
+      </template>
+      <template
+        #entry-text-content="{ item }"
+        v-if="useEntryTextContentSlot">
+        {{ 'create your custom content here' + item.title }}
+      </template>
+      <template
+        #entry-right-side-elements
+        v-if="useEntryRightSideSlot">
+        <div class="custom-right-side">
+          <BaseButton
+            button-style="row"
+            icon="edit"
+            text="Edit"
+            class="custom-buttons" />
+          <BaseButton
+            button-style="row"
+            icon="remove"
+            text="Remove"
+            class="custom-buttons" />
+        </div>
       </template>
       <template v-slot:thumbnails="{ item }">
         <template v-if="useThumbnailsSlot">
@@ -250,6 +282,8 @@ export default {
       useThumbnailsSlot: true,
       useActionsSlot: false,
       useAfterOptionsSlot: false,
+      useEntryTextContentSlot: false,
+      useEntryRightSideSlot: false,
     };
   },
   computed: {
@@ -301,6 +335,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
+  margin-bottom: 16px;
 }
 
 .control {
@@ -311,6 +346,13 @@ export default {
   border: 1px solid red;
   padding: 16px;
   text-align: center;
+}
+.custom-right-side {
+  display: flex;
+  flex-direction: row;
+}
+.custom-buttons {
+  border-left: 2px solid rgb(240, 240, 240);
 }
 </style>
 ```

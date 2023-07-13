@@ -2,7 +2,7 @@ The example entry below has three thumbnail icons. Note that icons appear stacke
 ```vue
 <template>
   <div class="background">
-    <base-menu-entry
+    <BaseMenuEntry
       entryId="single"
       description="Description"
       title="Title"
@@ -11,20 +11,20 @@ The example entry below has three thumbnail icons. Note that icons appear stacke
       :showThumbnails="true">
       <template
           v-slot:thumbnails>
-          <base-icon
+          <BaseIcon
             name="eye"
             title="eye"
             class="icon" />
-          <base-icon
+          <BaseIcon
             name="archive-arrow"
             title="archived"
             class="icon" />
-          <base-icon
+          <BaseIcon
             name="people"
             title="shared"
             class="icon" />
         </template>
-    </base-menu-entry>
+    </BaseMenuEntry>
   </div>
 </template>
 <script>
@@ -39,7 +39,70 @@ export default {};
   width: 12px;
   height: 12px;
 }
+
+.custom-right-side {
+  display: flex;
+  flex-direction: row;
+}
 </style>
 
 ```
+An example filling the row with custom content through slots `text-content` and `right-side-elements`.
+
+```vue
+<template>
+  <div class="background">
+    <BaseMenuEntry
+      entryId="single"
+      description="Description"
+      title="Title"
+      subtext="Subtext"
+      icon="file-object"
+      :showThumbnails="false">
+      <template #text-content>
+        Custom Entry Text
+      </template>
+      <template
+          v-slot:right-side-elements>
+          <div class="custom-right-side">
+            <BaseButton
+              button-style="row"
+              icon="edit"
+              text="Edit"
+              class="custom-buttons" />
+            <BaseButton
+              button-style="row"
+              icon="remove"
+              text="Remove"
+              class="custom-buttons" />
+          </div>
+        </template>
+    </BaseMenuEntry>
+  </div>
+</template>
+<script>
+export default {};
+</script>
+<style scoped>
+.background {
+  padding: 16px;
+  background-color: rgb(240, 240, 240);
+}
+.icon {
+  width: 12px;
+  height: 12px;
+}
+
+.custom-right-side {
+  display: flex;
+  flex-direction: row;
+}
+.custom-buttons {
+  border-left: 2px solid rgb(240, 240, 240);
+}
+</style>
+
+```
+
+
 For another example of using `BaseMenuEntry`, see [BaseMenuList](#basemenulist).
