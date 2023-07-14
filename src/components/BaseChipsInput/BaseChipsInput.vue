@@ -681,8 +681,8 @@ export default {
       [this.inputElem] = elems;
     }
 
-    // add default entry to list
-    if (this.defaultEntry) {
+    // add optional default entry to empty selectedList only
+    if (this.defaultEntry && !this.selectedList.length) {
       this.selectedListInt.push(this.defaultEntry);
     }
   },
