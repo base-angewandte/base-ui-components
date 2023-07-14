@@ -247,12 +247,21 @@ export default {
     },
     /**
      * Additional property options will set the drop down available for the selected entries
-     * needs to be an object with at least a label and an identifier property, using names set in
-     * identifierPropertyName and labelPropertyName
+     * needs to be an object with following attributes:
+     * **label**: label name set in labelPropertyName
+     * **id**: identifier set in identifierPropertyName (optional)
      */
     additionalPropOptions: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * define a default option for additional props
+     * see `defaultEntry` at [BaseChipsInput props](BaseChipsInput) for more details
+     */
+    additionalPropDefaultOption: {
+      type: [Object, null],
+      default: null,
     },
     /**
      * specify additional options as required
@@ -424,7 +433,6 @@ export default {
       chipsArray: [],
       selectedBelowListInt: [],
       chipActive: -1,
-      additionalPropDefaultOption: null,
       // error handling
       invalidInt: false,
       errorMessageInt: '',
@@ -524,17 +532,6 @@ export default {
           this.additionalPropErrors = [];
         }
       },
-    },
-    /**
-     * get additional prop default options
-     */
-    additionalPropOptions: {
-      handler(val) {
-        if (val) {
-          this.additionalPropDefaultOption = this.getAdditionalPropDefaultOption(val);
-        }
-      },
-      immediate: true,
     },
   },
   methods: {
@@ -655,18 +652,6 @@ export default {
         return this.validationTexts.required;
       }
       return '';
-    },
-    /**
-     * get default obj (where attribute default is defined)
-     * @param {Object[]} data - list of options
-     * @returns {Object|null} - default object or null
-     */
-    getAdditionalPropDefaultOption(data) {
-      const defaultObj = data.find(obj => obj.default);
-      if (defaultObj === undefined) return null;
-
-      delete defaultObj.default;
-      return defaultObj;
     },
     /**
      * check if chips should be removable

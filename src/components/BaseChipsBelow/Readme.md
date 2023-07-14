@@ -78,10 +78,10 @@ A chips input form field with chips displayed below and optional validation
         label="allow multiple additional options"
         class="control" />
       <BaseToggle
-        v-model="additionalPropDefaultOption"
+        v-model="defaultOption"
         label="set default additional options"
         class="control"
-        @clicked="setAdditionalPropOptions" />
+        @clicked="setDefaultOption"/>
       <BaseToggle
         v-model="sortable"
         label="sort entries"
@@ -100,6 +100,7 @@ A chips input form field with chips displayed below and optional validation
         :additional-prop-allow-multiple-entries="additionalPropAllowMultipleEntries"
         :additional-prop-options="additionalPropOptions"
         :additional-prop-required="additionalPropRequired"
+        :additional-prop-default-option="additionalPropDefaultOption"
         additional-prop-placeholder="Select Role"
         label="Invite persons to edit"
         placeholder="Select persons">
@@ -115,7 +116,7 @@ A chips input form field with chips displayed below and optional validation
         button-style="row"
         style="margin: 8px 0;"
         text="Validate"
-        @clicked="validate(null)" />
+        @clicked="validate()" />
       <div>
         Errors: {{ hasError }}
       </div>
@@ -133,16 +134,18 @@ export default {
       required: true,
       additionalPropRequired: false,
       sortable: false,
-      additionalPropDefaultOption: false,
+      defaultOption: false,
       // data
       additionalPropOptions: [
         {
           label: 'Read',
+          default: true,
         },
         {
           label: 'Edit',
         },
       ],
+      additionalPropDefaultOption: null,
       hasError: 'not validated yet.',
       // Note: set optional default role value(s)
       list: [
@@ -169,16 +172,32 @@ export default {
       ],
     };
   },
+  mounted() {
+    this.setDefaultOption(this.defaultOption);
+  },
   methods: {
     /**
-     * set additional prop options considering a default value
-     * @param {boolean} defaultValue
-     * @returns {Object[]} - list of options
+     * set additional prop options
+     * @param {boolean} val
+     * @returns {Object|null} - list of options
      */
-    setAdditionalPropOptions(defaultValue) {
-      this.additionalPropOptions = defaultValue
-        ? [{ label: 'Read', default: true }, { label: 'Edit' }]
-        : [{ label: 'Read' }, { label: 'Edit' }];
+    setDefaultOption(val) {
+      this.additionalPropDefaultOption = val
+        ? this.getDefaultObj(JSON.parse(JSON.stringify(this.additionalPropOptions)))
+        : null;
+    },
+    /**
+     * get default obj (where attribute default is defined)
+     * @param {Object[]} data - list of options
+     * @returns {Object|null} - default object or null
+     */
+    getDefaultObj(data) {
+      const defaultObj = data.find(obj => obj.default);
+
+      if (defaultObj === undefined) return null;
+
+      delete defaultObj.default;
+      return defaultObj;
     },
     /**
      * validate component from outside
