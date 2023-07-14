@@ -179,7 +179,7 @@ export default {
                 },
                 additionalProperties: false,
               },
-              title: 'Beteiligung (chips-below)',
+              title: 'Beteiligung (chips-below) (required)',
               required: true,
               'x-attrs': {
                 field_type: 'chips-below',
