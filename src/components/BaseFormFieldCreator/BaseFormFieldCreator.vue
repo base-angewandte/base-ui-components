@@ -565,7 +565,11 @@ export default {
       default: () => ({}),
     },
     /**
-     * mark as required field (currently only used for `aria-required` attribute)
+     * mark as required field
+     *
+     * **Caveat**: currently the required prop is only used to trigger [BaseChipsBelow](BaseChipsBelow) validation -
+     *             for all other form fields it is only used for the `aria-required` attributes
+     * **Note**: the required value is set via OpenAPI JSON
      */
     required: {
       type: Boolean,
