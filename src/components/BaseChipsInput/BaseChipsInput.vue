@@ -410,6 +410,12 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * define a default entry
+     * will be added when component is mounted and selected list is initially empty
+     * properties:
+     * **label**: text for the default value
+     */
     defaultEntry: {
       type: [Object, null],
       default: null,
