@@ -269,7 +269,7 @@
       :additional-property-name="fieldType === 'chips-below'
         ? fieldProps.additionalPropertyName || 'roles' : false"
       :additional-prop-required="fieldType === 'chips-below'
-        ? formFieldXAttrs.additionalPropRequired : null"
+        ? formFieldXAttrs.additional_prop_required : null"
       :invalid="invalid || fieldProps.invalid"
       :required="field.required || required || fieldProps.required"
       :error-message="errorMessage || fieldProps.errorMessage"
