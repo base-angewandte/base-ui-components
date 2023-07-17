@@ -12,10 +12,12 @@
         :key="option.value + 'label'"
         :for="optionIds[index]"
         :class="['base-switch-button',
-                 {'base-switch-button__type-a': type === 'a'},
-                 { 'base-switch-button__type-a__active': option.value === selectedOption && type === 'a'},
-                 {'base-switch-button__type-b': type === 'b'},
-                 { 'base-switch-button__type-b__active': option.value === selectedOption && type === 'b'}]">
+                 {'base-switch-button__type-normal': type === 'normal'},
+                 { 'base-switch-button__type-normal__active':
+                   option.value === selectedOption && type === 'normal'},
+                 {'base-switch-button__type-bold': type === 'bold'},
+                 { 'base-switch-button__type-bold__active':
+                   option.value === selectedOption && type === 'bold'}]">
         <input
           :id="optionIds[index]"
           :key="option.value + 'input'"
@@ -28,14 +30,21 @@
           :class="['hide', 'base-switch-button__input']"
           type="radio"
           @keydown.enter.prevent="">
+        <base-icon
+          v-if="option.icon && option.icon.length > 0 && iconPosition === 'left'"
+          :name="option.icon"
+          size="small"
+          :title="label"
+          class="iconSize" />
         <span
           :class="{ hide: !showLabel }">
           {{ option.label }}
         </span>
         <base-icon
-          v-if="option.icon && option.icon.length > 0"
+          v-if="option.icon && option.icon.length > 0 && iconPosition === 'right'"
           :name="option.icon"
           size="small"
+          :title="label"
           class="iconSize" />
         <!-- @slot slot to display something right of text (e.g. icon)
         @binding {string} value - the value of the option object
@@ -43,7 +52,7 @@
         <slot
           :value="option.value" />
         <div
-          v-if="option.value === selectedOption && type === 'b'"
+          v-if="option.value === selectedOption && type === 'bold'"
           class="active-state" />
       </label>
     </template>
@@ -69,15 +78,14 @@ export default {
     options: {
       type: Array,
       default: () => [{ label: 'tab', value: 'tab', icon: '' }],
+      validator: val => val.every(item => item.label !== null && item.value !== null),
     },
     /**
      * set the currently active tab (specify the value of the object not the label)
      */
     activeTab: {
       type: String,
-      default() {
-        return this.options[0] ? this.options[0].value : 'tab';
-      },
+      default: () => (this.options[0] ? this.options[0].value : 'tab'),
     },
     /**
      * set a label for the switches, not visible but needed for accessibility
@@ -91,16 +99,17 @@ export default {
      */
     type: {
       type: String,
-      default() {
-        return 'a';
-      },
-      validator: val => val === 'a' || val === 'b',
+      default: () => 'normal',
+      validator: val => val === 'normal' || val === 'bold',
     },
     showLabel: {
       type: Boolean,
-      default() {
-        return false;
-      },
+      default: () => true,
+    },
+    iconPosition: {
+      type: String,
+      default: () => 'right',
+      validator: val => val === 'right' || val === 'left',
     },
   },
   data() {
@@ -160,11 +169,11 @@ export default {
     cursor: pointer;
     background-color: inherit;
   }
-  .base-switch-button__type-b {
+  .base-switch-button__type-bold {
     padding: $spacing-small $spacing $spacing-small $spacing;
     border: $input-field-border;
     transition: border 0.2s ease;
-    &.base-switch-button__type-b__active {
+    &.base-switch-button__type-bold__active {
       color: var(--app-color);
       transition: border 0.2s ease;
     }
@@ -173,11 +182,11 @@ export default {
       border-color: $app-color;
     }
   }
-  .base-switch-button__type-a {
+  .base-switch-button__type-normal {
     padding: $spacing-small $spacing $spacing-small $spacing;
     border: 1px solid rgba(255, 255, 255, 0);
 
-    &.base-switch-button__type-a__active {
+    &.base-switch-button__type-normal__active {
       border: $input-field-border;
       transition: border 0.2s ease;
     }

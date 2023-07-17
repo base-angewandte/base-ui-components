@@ -12,8 +12,9 @@
       v-model="activeLang"
       label="Select Language"
       :show-label="true"
-      type="b">
-      
+      type="normal"
+      icon-position="right">
+
     </BaseSwitchButton>
     <div>{{ 'active lang: ' + activeLang }}</div>
   </div>
