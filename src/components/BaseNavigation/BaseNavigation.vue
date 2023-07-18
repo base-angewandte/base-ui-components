@@ -91,8 +91,8 @@
                 </component>
               </li>
               <li
-                v-if="list.filter(e => e.placement === 'left').length > 0
-                  &&list.filter(e => e.placement === 'right').length > 0
+                v-if="list.filter(e => !toggleActive(e.route) && e.placement === 'left').length > 0
+                  &&list.filter(e => !toggleActive(e.route) && e.placement === 'right').length > 0
                   &&list.filter(e => !toggleActive(e.route)).length > 2"
                 class="separator-line" />
               <li
