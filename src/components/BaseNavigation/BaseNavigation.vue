@@ -188,9 +188,6 @@ export default {
       }
     },
     toggleActive(target) {
-      if (this.$route.path.startsWith(target)) {
-        return true;
-      }
       return this.$route.path === target;
     },
     toggleHamburger() {
