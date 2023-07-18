@@ -19,15 +19,6 @@
               <!-- @slot slot to inject content  -->
               <slot />
             </component>
-            <!-- <BaseLink
-              v-if="element.placement === 'left'"
-              :class="{'base-button-row': true, 'base-button-active': toggleActive(element.route)}"
-              :value="showShortLabel ? element.shortLabel || element.label : element.label"
-              :render-link-as="renderAs"
-              :tooltip-styles="{'display': 'none'}"
-              :source="element.route">
-
-            </BaseLink> -->
           </li>
         </ul>
         <ul class="nav-sub-container-right">
@@ -132,27 +123,36 @@ export default {
   name: 'BaseNavigation',
   components: { BaseLink },
   props: {
+    /**
+     * list of navigation items, containing a unique ID,
+     * a label to be shown in the navigation,
+     * an optional short label in case the label is too long for small screens,
+     * the route that should be navigated to,
+     * and a placement value to specify if the item should be rendered in the left-
+     * or right-hand-side of the navigation.
+     */
     list: {
       type: Array,
       default: () => [
         {
           id: '1',
           label: 'Label',
-          shortLabel: 'Short Label',
+          shortLabel: '',
           route: '/',
           placement: 'left',
         },
       ],
+      validator: arr => arr.every(entry => ['left', 'right'].includes(entry.placement) && entry.label.length > 0),
     },
+    /**
+     * specify how link element should be rendered - this needs to be a
+     * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router
+     * is necessary
+     */
     renderAs: {
       type: String,
       default: 'RouterLink',
       validate: val => ['RouterLink', 'NuxtLink'].includes(val),
-    },
-    placement: {
-      type: String,
-      default: 'left',
-      validate: val => ['left', 'right'].includes(val),
     },
   },
   data() {
