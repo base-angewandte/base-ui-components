@@ -4,8 +4,8 @@
       <nav
         ref="fullSizeNavigation"
         class="nav-item">
-        <div class="nav-sub-container-left">
-          <div
+        <ul class="nav-sub-container-left">
+          <li
             v-for="element in list.filter(e => e.placement === 'left')"
             :key="element.id"
             :class="element.placement">
@@ -19,10 +19,10 @@
               <!-- @slot slot to inject content  -->
               <slot />
             </BaseButton>
-          </div>
-        </div>
-        <div class="nav-sub-container-right">
-          <div
+          </li>
+        </ul>
+        <ul class="nav-sub-container-right">
+          <li
             v-for="element in list.filter(e => e.placement === 'right')"
             :key="element.id"
             :class="element.placement">
@@ -36,8 +36,8 @@
               <!-- @slot slot to inject content  -->
               <slot />
             </BaseButton>
-          </div>
-        </div>
+          </li>
+        </ul>
       </nav>
       <nav
         ref="mobileViewNavigation"
@@ -73,8 +73,8 @@
         <nav
           v-if="navOpen"
           ref="mobileViewDropdown">
-          <div class="hamburger-menu">
-            <div
+          <ul class="hamburger-menu">
+            <li
               v-for="element in list.filter(e => e.placement === 'left')"
               :key="element.id"
               :class="element.placement">
@@ -88,12 +88,12 @@
                 <!-- @slot slot to inject content  -->
                 <slot />
               </BaseButton>
-            </div>
-            <div
+            </li>
+            <li
               v-if="list.filter(e => e.placement === 'left').length > 0
                 &&list.filter(e => e.placement === 'right').length > 0"
               class="separator-line" />
-            <div
+            <li
               v-for="element in list.filter(e => e.placement === 'right')"
               :key="element.id"
               :class="element.placement">
@@ -107,8 +107,8 @@
                 <!-- @slot slot to inject content  -->
                 <slot />
               </BaseButton>
-            </div>
-          </div>
+            </li>
+          </ul>
         </nav>
       </transition>
     </div>
