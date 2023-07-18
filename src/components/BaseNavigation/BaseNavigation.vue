@@ -182,17 +182,13 @@ export default {
       if (this.$router) {
         this.$router.push(target);
       } else {
-        console.log(target);
         window.location.href = target;
       }
     },
     toggleActive(target) {
       if (this.$route.path.startsWith(target)) {
-        // console.log('path1: ', this.$route.path);
-        // console.log('true');
         return true;
       }
-      // console.log('path2: ', this.$route.path);
       return this.$route.path === target;
     },
     toggleHamburger() {
@@ -221,8 +217,6 @@ export default {
           .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-link')[0])
           .forEach((li, idx) => {
             const innermostChild = li.getElementsByClassName('base-link')[0];
-            console.log(ref, li, innermostChild, idx);
-            console.log(li.clientWidth, li.scrollWidth);
             if (ref === 'mobileViewDropdown') {
               innermostChild.innerText = this.list.filter(e => !this.toggleActive(e.route))[idx].label;
             } else { innermostChild.innerText = this.list[idx].label; }
