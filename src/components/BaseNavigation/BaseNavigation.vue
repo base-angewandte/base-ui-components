@@ -9,16 +9,25 @@
             v-for="element in list.filter(e => e.placement === 'left')"
             :key="element.id"
             :class="element.placement">
-            <BaseButton
-              v-if="element.placement === 'left'"
-              :text="showShortLabel ? element.shortLabel || element.label : element.label"
-              button-style="row"
-              :render-link-as="element.renderAs"
-              :active="toggleActive(element.route)"
-              @clicked="onClick(element.route)">
+            <component
+              :is="renderAs"
+              :href="!routerAvailable ? element.route : null"
+              :to="routerAvailable ? element.route : null"
+              :class="{'base-link': true, 'base-button-row': true,
+                       'base-button-active': toggleActive(element.route)}">
+              {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
               <!-- @slot slot to inject content  -->
               <slot />
-            </BaseButton>
+            </component>
+            <!-- <BaseLink
+              v-if="element.placement === 'left'"
+              :class="{'base-button-row': true, 'base-button-active': toggleActive(element.route)}"
+              :value="showShortLabel ? element.shortLabel || element.label : element.label"
+              :render-link-as="renderAs"
+              :tooltip-styles="{'display': 'none'}"
+              :source="element.route">
+
+            </BaseLink> -->
           </li>
         </ul>
         <ul class="nav-sub-container-right">
@@ -26,16 +35,16 @@
             v-for="element in list.filter(e => e.placement === 'right')"
             :key="element.id"
             :class="element.placement">
-            <BaseButton
-              v-if="element.placement === 'right'"
-              :text="showShortLabel ? element.shortLabel || element.label : element.label"
-              button-style="row"
-              :render-link-as="element.renderAs"
-              :active="toggleActive(element.route)"
-              @clicked="onClick(element.route)">
+            <component
+              :is="renderAs"
+              :href="!routerAvailable ? element.route : null"
+              :to="routerAvailable ? element.route : null"
+              :class="{'base-link': true, 'base-button-row': true,
+                       'base-button-active': toggleActive(element.route)}">
+              {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
               <!-- @slot slot to inject content  -->
               <slot />
-            </BaseButton>
+            </component>
           </li>
         </ul>
       </nav>
@@ -44,19 +53,19 @@
         class="hamburger-menu-toggle">
         <div class="active-nav-item">
           <div
-            v-for="element in list"
+            v-for="element in list.filter(e => toggleActive(e.route))"
             :key="element.id"
             class="left">
-            <BaseButton
-              v-if="toggleActive(element.route)"
-              :text="showShortLabel ? element.shortLabel || element.label : element.label"
-              button-style="row"
-              :render-link-as="element.renderAs"
-              :active="true"
-              @clicked="onClick(element.route)">
+            <component
+              :is="renderAs"
+              :href="!routerAvailable ? element.route : null"
+              :to="routerAvailable ? element.route : null"
+              :class="{'base-link': true, 'base-button-row': true,
+                       'base-button-active': toggleActive(element.route)}">
+              {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
               <!-- @slot slot to inject content  -->
               <slot />
-            </BaseButton>
+            </component>
           </div>
         </div>
         <div class="hamburger-button-container">
@@ -75,19 +84,19 @@
           ref="mobileViewDropdown">
           <ul class="hamburger-menu">
             <li
-              v-for="element in list.filter(e => e.placement === 'left')"
+              v-for="element in list.filter(e => !toggleActive(e.route) && e.placement === 'left')"
               :key="element.id"
               :class="element.placement">
-              <BaseButton
-                v-if="!toggleActive(element.route)"
-                :text="showShortLabel ? element.shortLabel || element.label : element.label"
-                button-style="row"
-                :render-link-as="element.renderAs"
-                :active="toggleActive(element.route)"
-                @clicked="onClick(element.route)">
+              <component
+                :is="renderAs"
+                :href="!routerAvailable ? element.route : null"
+                :to="routerAvailable ? element.route : null"
+                :class="{'base-link': true, 'base-button-row': true,
+                         'base-button-active': toggleActive(element.route)}">
+                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
                 <!-- @slot slot to inject content  -->
                 <slot />
-              </BaseButton>
+              </component>
             </li>
             <li
               v-if="list.filter(e => e.placement === 'left').length > 0
@@ -95,19 +104,19 @@
                 &&list.filter(e => !toggleActive(e.route)).length > 2"
               class="separator-line" />
             <li
-              v-for="element in list.filter(e => e.placement === 'right')"
+              v-for="element in list.filter(e => !toggleActive(e.route) && e.placement === 'right')"
               :key="element.id"
               :class="element.placement">
-              <BaseButton
-                v-if="!toggleActive(element.route)"
-                :text="showShortLabel ? element.shortLabel || element.label : element.label"
-                button-style="row"
-                :render-link-as="element.renderAs"
-                :active="toggleActive(element.route)"
-                @clicked="onClick(element.route)">
+              <component
+                :is="renderAs"
+                :href="!routerAvailable ? element.route : null"
+                :to="routerAvailable ? element.route : null"
+                :class="{'base-link': true, 'base-button-row': true,
+                         'base-button-active': toggleActive(element.route)}">
+                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
                 <!-- @slot slot to inject content  -->
                 <slot />
-              </BaseButton>
+              </component>
             </li>
           </ul>
         </nav>
@@ -117,11 +126,11 @@
 </template>
 
 <script>
-import BaseButton from '@/components/BaseButton/BaseButton';
+import BaseLink from '@/components/BaseLink/BaseLink';
 
 export default {
   name: 'BaseNavigation',
-  components: { BaseButton },
+  components: { BaseLink },
   props: {
     list: {
       type: Array,
@@ -153,6 +162,11 @@ export default {
       showShortLabel: false,
       resizeTimeout: null,
     };
+  },
+  computed: {
+    routerAvailable() {
+      return this.$router;
+    },
   },
   mounted() {
     this.calcTextWidth();
@@ -204,10 +218,11 @@ export default {
         this.$refs[ref].parentElement.append(clonedNavigation);
         [...clonedNavigation.childNodes]
           .map(childNode => [...childNode.childNodes]).flat()
-          .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-button-text')[0])
+          .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-link')[0])
           .forEach((li, idx) => {
-            const innermostChild = li.getElementsByClassName('base-button-text')[0];
+            const innermostChild = li.getElementsByClassName('base-link')[0];
             console.log(ref, li, innermostChild, idx);
+            console.log(li.clientWidth, li.scrollWidth);
             if (ref === 'mobileViewDropdown') {
               innermostChild.innerText = this.list.filter(e => !this.toggleActive(e.route))[idx].label;
             } else { innermostChild.innerText = this.list[idx].label; }
@@ -324,12 +339,43 @@ export default {
     border-top: $separation-line;
   }
 }
+.base-navigation .base-link{
+  display:flex;
+  box-sizing: border-box;
+  position: relative;
+  padding: 0 $spacing;
+  cursor: pointer;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  color: inherit;
+  background-color: white;
+  text-align: center;
+  white-space: nowrap;
 
-</style>
-<style lang="scss">
+  &:hover {
+    text-decoration: none;
+    color: $app-color;
+  }
+  &.base-button-row {
+    min-height: $row-height-large;
+
+    &.base-button-active {
+      /* TODO: adjust this to style guide if necessary */
+      box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
+      z-index: map-get($zindex, button-active);
+    }
+  }
+}
+.base-link--tooltip, .base-tooltip__label, .base-tooltip__row{
+  display: none;
+}
+
 @media screen and (max-width: $mobile) {
-.base-button .base-button-text {
+.base-link {
     text-align: left !important;
   }
 }
+</style>
+<style lang="scss">
+
 </style>
