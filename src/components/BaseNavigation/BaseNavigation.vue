@@ -91,7 +91,8 @@
             </li>
             <li
               v-if="list.filter(e => e.placement === 'left').length > 0
-                &&list.filter(e => e.placement === 'right').length > 0"
+                &&list.filter(e => e.placement === 'right').length > 0
+                &&list.filter(e => !toggleActive(e.route)).length > 2"
               class="separator-line" />
             <li
               v-for="element in list.filter(e => e.placement === 'right')"
