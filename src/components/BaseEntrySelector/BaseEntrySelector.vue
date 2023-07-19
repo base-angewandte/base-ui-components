@@ -6,11 +6,13 @@
     <div
       ref="head"
       :class="['base-entry-selector__head',
-               { 'base-entry-selector__head--shadow': headHasShadow }]">
+               { 'base-entry-selector__head--shadow': headHasShadow },
+               { 'base-entry-selector__head--padding': useSearch }]">
       <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
       <slot name="head">
         <!-- default -->
         <BaseSearch
+          v-if="useSearch"
           v-model="filterString"
           :show-image="true"
           :placeholder="getI18nTerm(entrySelectorText.search)"
@@ -361,6 +363,14 @@ export default {
         .every(prop => Object.keys(val).includes(prop))
           && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
     },
+    /**
+     * define if search field should be shown.
+     * this will have no effect if `head` slot is used.
+     */
+    useSearch: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -600,13 +610,15 @@ export default {
     &__head {
       position: sticky;
       z-index: map-get($zindex, entry-selector-head);
-      padding-top: $spacing;
       background-color: $background-color;
       flex: 0 0 auto;
 
+      &--padding {
+        padding-top: $spacing;
+      }
+
       &--shadow {
-        //box-shadow: 0 $spacing-small $spacing-small -$spacing-small rgba(0, 0, 0, 0.25);
-        box-shadow: 0 8px 8px -8px rgba(0,0,0,0.25);
+        box-shadow: 0 $spacing-small $spacing-small (-$spacing-small) rgba(0, 0, 0, 0.25);
       }
 
       &__search-bar {

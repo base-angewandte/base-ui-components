@@ -38,6 +38,11 @@
         v-model="showPagination"
         label="Show Pagination"
         class="control"/>
+      <BaseToggle
+        v-model="useSearch"
+        :disabled="useHeadSlot"
+        label="Use Search"
+        class="control"/>
     </div>
     <div class="controls">
       <BaseToggle
@@ -93,6 +98,7 @@
         valuePropertyName: 'source',
       }"
       :is-loading="isLoading"
+      :use-search="useSearch"
       language="de"
       v-bind="entrySelectorText"
       @selected-changed="selectedEntries = $event"
@@ -204,6 +210,7 @@ export default {
       useCustomText: false,
       noResults: false,
       showPagination: true,
+      useSearch: true,
       sortOptions: [
         {
           label: 'By Type',
