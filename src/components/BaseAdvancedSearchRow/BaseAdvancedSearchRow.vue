@@ -1209,8 +1209,8 @@ export default {
      */
     addOption(entry, collectionId = '') {
       // get the result category of the selected option (on key navigation this.activeCollection
-      // should be set, if selected from drop down by click the collectionId is passed to the function
-      // else the default filter category is assumed
+      // should be set, if selected from drop down by click the collectionId is passed to the
+      // function else the default filter category is assumed
       const selectedOptionCollection = this.activeCollection || collectionId
         || this.defaultFilter[this.identifierPropertyName.filter];
       // if option is coming from autocomplete drop down list (=has an id)
