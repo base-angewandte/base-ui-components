@@ -109,7 +109,7 @@ export default {
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
-     * see filterList (except options and subsets - these are not necessary for applied filters)
+     * see `filterList` (except 'options' - this property is not necessary for applied filters)
      */
     appliedFilters: {
       type: Array,
@@ -329,7 +329,7 @@ export default {
       default: true,
     },
     /**
-     * use this prop to set a delay in ms before date input calender is displayed
+     * use this prop to set a delay in ms before date input calendar is displayed
      */
     dateFieldDelay: {
       type: Number,

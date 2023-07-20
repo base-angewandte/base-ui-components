@@ -1208,15 +1208,23 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
+      // get the result category of the selected option (on key navigation this.activeCollection
+      // should be set, if selected from drop down by click the collectionId is passed to the
+      // function else the default filter category is assumed
+      const selectedOptionCollection = this.activeCollection || collectionId
+        || this.defaultFilter[this.identifierPropertyName.filter];
       // if option is coming from autocomplete drop down list (=has an id)
-      // and currently active filter is not identical
-      // with the category of the selected item (if everything is going right this should
-      // be 'default') then set the category of the selected item as current filter
       if (this.useAutocompleteFunctionality
         && entry[this.identifierPropertyName.autocompleteOption]
+        // and currently active filter is not identical
+        // with the category of the selected item
         && this.filter[this.identifierPropertyName.filter]
-          !== (this.activeCollection || collectionId
-            || this.defaultFilter[this.identifierPropertyName.filter])) {
+          !== selectedOptionCollection
+        // and selected item is not from a subset (so
+        // if everything goes right category should be 'default')
+        && !(this.filter.subsets && this.filter.subsets.length
+          && this.filter.subsets.includes(selectedOptionCollection))) {
+        // then set the category of the selected item as current filter
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
