@@ -801,34 +801,42 @@ export default {
      * @returns {boolean}
      */
     isNumberField() {
-      return this.fieldType === 'integer'
-        || this.fieldType === 'float'
-        || this.field.type === 'integer'
-        // also need to check here for repeatable fields
-        || (this.field.items && this.field.items.type === 'integer')
-        || this.field.type === 'float'
-        // also need to check here for repeatable fields
-        || (this.field.items && this.field.items.type === 'float');
+      // get OpenAPI json field type and check if its a repeatable field (array)
+      const openAPIFieldType = this.field.items ? this.field.items.type : this.field.type;
+      if (this.field.name === 'percent') {
+        console.log(['integer', 'number'].includes(openAPIFieldType));
+        console.log(['integer', 'float', 'text'].includes(this.fieldType));
+      }
+      // valid OpenAPI number field types are 'integer' and 'number'
+      return ['integer', 'number'].includes(openAPIFieldType)
+        // include 'text' here for backwards compatibility
+        && ['integer', 'float', 'text'].includes(this.fieldType);
     },
     /**
      * check allowed number of decimals
      * @returns {number|null}
      */
     allowedDecimals() {
-      const decimals = this.formFieldXAttrs.decimals !== undefined
-        ? this.formFieldXAttrs.decimals : this.fieldProps.decimals;
-      // get field type and also consider repeatable fields
+      // check if decimals were configured with priority for x-attrs
+      const decimals = this.formFieldXAttrs.decimals || this.fieldProps.decimals;
+      // get OpenAPI definition field type and also consider repeatable fields
       const numberFieldType = this.field.type === 'array' ? this.field.items.type : this.field.type;
-      // for type float allow endless decimals
-      if ((numberFieldType === 'float') && !(decimals || decimals === 0)) {
+      // get the OpenAPI definition field format
+      const numberFieldFormat = this.field.type === 'array' ? this.field.items.format : this.field.format;
+      // for OpenAPI data type 'number', that have format specified allow endless decimals
+      // only 'float' and 'double' are defined in OpenAPI but it is an "open string-valued property"
+      // so adding 'decimal' since backend model has data type Decimal
+      if ((numberFieldType === 'number' && ['float', 'double', 'decimal'].includes(numberFieldFormat))
+        && !(decimals || decimals === 0)) {
         return -1;
       }
       // for type float and decimals set limit to decimals
-      if ((numberFieldType === 'float' || this.fieldProps.fieldType === 'number') && (decimals || decimals === 0)) {
+      if ((numberFieldType === 'number' || this.fieldProps.fieldType === 'number')
+        && ['float', 'double', 'decimal'].includes(numberFieldFormat) && (decimals || decimals === 0)) {
         return decimals;
       }
       // for type integer prevent decimals
-      if (numberFieldType === 'integer' || this.fieldProps.fieldType === 'number') {
+      if (numberFieldType === 'integer' || this.fieldProps.fieldType === 'number' || decimals === 0) {
         return 0;
       }
       return null;
