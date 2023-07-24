@@ -749,34 +749,40 @@ export default {
       });
     },
     getInitialFieldValue(field) {
+      // get the current field value
       const value = this.valueList[field.name];
-      if (field.type === 'integer') {
-        return value ? value.toString() : '';
+      // get the OpenAPI definition field type
+      const { type } = field;
+      // get the OpenAPI x-attrs (that we use for form config) field type
+      const xAttrsFieldType = field['x-attrs'] && field['x-attrs'].field_type
+        ? field['x-attrs'].field_type : undefined;
+      // valid types in OpenAPI definition are 'number' and 'integer'
+      if (['number', 'integer'].includes(type)) {
+        return value || '';
       }
       // check special case single-choice chips (is chips but is saved as
       // (multilang) object on backend)
-      if (field['x-attrs'] && field['x-attrs'].field_type
-        && field['x-attrs'].field_type.includes('chips')
-        && field.type === 'object') {
+      if (xAttrsFieldType && xAttrsFieldType.includes('chips')
+        && type === 'object') {
         if (value && Object.keys(value).length) {
           return [].concat(value);
         }
         return [];
       }
       // check if field is array
-      if (field.type === 'array') {
+      if (type === 'array') {
         // check if values are already present and set those if yes
         if (typeof value === 'object' && value && value.length) {
           return [].concat(value);
         }
         if (!field['x-attrs'] || !field['x-attrs'].field_type
-          || (field['x-attrs'] && field['x-attrs'].field_type && !field['x-attrs'].field_type.includes('chips'))) {
+          || (xAttrsFieldType && !xAttrsFieldType.includes('chips'))) {
           return [].concat(this.getInitialFieldValue(field.items));
         }
         // else return empty array
         return [];
         // check if field is object
-      } if (field.type === 'object') {
+      } if (type === 'object') {
         const initObj = {};
         // for each property in the object also get initial values
         Object.keys(field.properties).forEach((key) => {
@@ -786,11 +792,10 @@ export default {
       }
 
       // check if field is boolean
-      if (field.type === 'boolean') {
+      if (type === 'boolean') {
         return value || false;
       }
-
-      // if it is not a array or object simply return value from list or empty string
+      // if it is not an array or object simply return value from list or empty string
       return (typeof value === 'string' ? value : '');
     },
     checkFieldContent(fieldValues) {
