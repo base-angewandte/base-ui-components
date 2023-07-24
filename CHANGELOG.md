@@ -1,3 +1,11 @@
+## 2.1.2 (2023-07-24)
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearch):** do not switch filter on subset option select
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/#baseform), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/#baseformfieldcreator):** OpenAPI data type `number`: initial field value not set correctly
+
 ## 2.1.1 (2023-07-13)
 
 
