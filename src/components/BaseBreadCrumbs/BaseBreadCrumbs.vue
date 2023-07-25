@@ -6,7 +6,10 @@
       <BaseLink
         external-link-target="_self"
         :source="entry.route"
-        :value="entry.label" />
+        :value="entry.label"
+        :render-link-as="renderLinkAs"
+        :class="{'padding-left': index > 0, 'padding-right': true,
+                 'route-underline': index === routes.length - 1}" />
       <span v-if="index < routes.length - 1">
         >
       </span>
@@ -46,6 +49,15 @@ export default {
       type: String,
       default: 'base-bread-crumbs',
     },
+    /**
+     * specify how link element should be rendered - this needs to be a
+     * valid vue link component (e.g. RouterLink, NuxtLink) and vue-router
+     * is necessary
+     */
+    renderLinkAs: {
+      type: String,
+      default: 'RouterLink',
+    },
   },
 };
 </script>
@@ -55,8 +67,18 @@ export default {
 
 .base-bread-crumbs {
   color: $font-color-second;
+  font-size: $font-size-small;
   .base-link {
     color: $font-color-second;
   }
+}
+.padding-left {
+  padding-left: $spacing-small-half;
+}
+.padding-right {
+  padding-right: $spacing-small-half;
+}
+.route-underline {
+  text-decoration: underline;
 }
 </style>
