@@ -12,12 +12,8 @@
         :key="option.value + 'label'"
         :for="optionIds[index]"
         :class="['base-switch-button',
-                 {'base-switch-button__type-normal': type === 'normal'},
-                 { 'base-switch-button__type-normal__active':
-                   option.value === selectedOption && type === 'normal'},
-                 {'base-switch-button__type-bold': type === 'bold'},
-                 { 'base-switch-button__type-bold__active':
-                   option.value === selectedOption && type === 'bold'}]">
+                 `base-switch-button__type-${type}`,
+                 { [`base-switch-button__type-${type}__active`]: option.value === selectedOption }]">
         <input
           :id="optionIds[index]"
           :key="option.value + 'input'"
@@ -45,7 +41,7 @@
           :name="option.icon"
           size="small"
           :title="label"
-          class="iconSize" />
+          :class="{iconSize: true, iconPadding: !showLabel}" />
         <!-- @slot slot to display something right of text (e.g. icon)
         @binding {string} value - the value of the option object
         --->
@@ -73,18 +69,19 @@ export default {
   },
   props: {
     /**
-     * specify the tabs as array of object with `value` and `label` properties
+     * specify the tabs as array of object with `value` and `label` properties, also specify the icon for an option
      */
     options: {
       type: Array,
       default: () => [{ label: 'tab', value: 'tab', icon: '' }],
-      validator: val => val.every(item => item.label !== null && item.value !== null),
+      validator: arr => arr.every(val => ['label', 'value'].every(prop => Object.keys(val).includes(prop))),
     },
     /**
      * set the currently active tab (specify the value of the object not the label)
      */
     activeTab: {
       type: String,
+      required: true,
       default: () => (this.options[0] ? this.options[0].value : 'tab'),
     },
     /**
@@ -99,16 +96,22 @@ export default {
      */
     type: {
       type: String,
-      default: () => 'normal',
+      default: 'normal',
       validator: val => val === 'normal' || val === 'bold',
     },
+    /**
+     * set if the label is shown (or only the icon)
+     */
     showLabel: {
       type: Boolean,
-      default: () => true,
+      default: true,
     },
+    /**
+     * specify where the icon should be rendered
+     */
     iconPosition: {
       type: String,
-      default: () => 'right',
+      default: 'right',
       validator: val => val === 'right' || val === 'left',
     },
   },
@@ -151,9 +154,16 @@ export default {
   @import '../../styles/variables.scss';
 
   .iconSize {
-    width: 1em;
-    height: 1em;
+    width: 16px;
+    height: 16px;
   }
+  .iconPadding {
+    width: 24px;
+    height: 24px;
+    padding-top: $spacing-small-half;
+    padding-bottom: $spacing-small-half;
+  }
+
   .base-switch-buttons {
     clear: both;
     display: flex;
@@ -177,13 +187,18 @@ export default {
       color: var(--app-color);
       transition: border 0.2s ease;
     }
+    .iconPadding {
+      width: 24px;
+      height: 24px;
+    }
 
     &:focus-within {
       border-color: $app-color;
     }
   }
   .base-switch-button__type-normal {
-    padding: $spacing-small $spacing $spacing-small $spacing;
+    padding-right: $spacing-small;
+    padding-left: $spacing-small;
     border: 1px solid rgba(255, 255, 255, 0);
 
     &.base-switch-button__type-normal__active {
