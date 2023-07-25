@@ -1,129 +1,128 @@
 <template>
-  <main class="base-navigation">
+  <div
+    class="base-navigation"
+    :aria-label="navigationLabel">
     <div>
       <nav
         ref="fullSizeNavigation"
-        class="nav-item">
-        <ul class="nav-sub-container-left">
+        class="base-navigation__nav-item">
+        <ul class="base-navigation__nav-sub-container-left">
           <li
             v-for="element in list.filter(e => e.placement === 'left')"
             :key="element.id"
             :class="element.placement">
             <component
-              :is="renderAs"
-              :href="!routerAvailable ? element.route : null"
-              :to="routerAvailable ? element.route : null"
-              :class="{'base-link': true, 'base-button-row': true,
-                       'base-button-active': toggleActive(element.route)}">
+              :is="routerAvailable ? renderAs : 'a'"
+              :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
+              :aria-current="element === activeElement ? 'page' : null"
+              :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
+              :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
+                       'base-navigation__base-button--active': toggleActive(element.route)}">
               {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-              <!-- @slot slot to inject content  -->
-              <slot />
             </component>
           </li>
         </ul>
-        <ul class="nav-sub-container-right">
+        <ul class="base-navigation__nav-sub-container-right">
           <li
             v-for="element in list.filter(e => e.placement === 'right')"
             :key="element.id"
             :class="element.placement">
             <component
-              :is="renderAs"
-              :href="!routerAvailable ? element.route : null"
-              :to="routerAvailable ? element.route : null"
-              :class="{'base-link': true, 'base-button-row': true,
-                       'base-button-active': toggleActive(element.route)}">
+              :is="routerAvailable ? renderAs : 'a'"
+              :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
+              :aria-current="element === activeElement ? 'page' : null"
+              :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
+              :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
+                       'base-navigation__base-button--active': toggleActive(element.route)}">
               {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-              <!-- @slot slot to inject content  -->
-              <slot />
             </component>
           </li>
         </ul>
       </nav>
-      <div class="mobile-navigation-container">
-        <nav
+      <nav class="base-navigation__mobile-navigation-container">
+        <div
           ref="mobileViewNavigation"
-          class="hamburger-menu-toggle">
-          <div class="active-nav-item">
+          class="base-navigation__hamburger-menu-toggle">
+          <div class="base-navigation__active-nav-item">
             <div
-              v-for="element in list.filter(e => toggleActive(e.route))"
-              :key="element.id"
               class="left">
               <component
-                :is="renderAs"
-                :href="!routerAvailable ? element.route : null"
-                :to="routerAvailable ? element.route : null"
-                :class="{'base-link': true, 'base-button-row': true,
-                         'base-button-active': toggleActive(element.route)}">
-                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-                <!-- @slot slot to inject content  -->
-                <slot />
+                :is="routerAvailable ? renderAs : 'a'"
+                :href="(!routerAvailable || renderAs === 'a') ? activeElement.route : null"
+                :to="(routerAvailable && renderAs !== 'a') ? activeElement.route : null"
+                class="base-navigation__base-link base-navigation__base-button-row
+                       base-navigation__base-button--active"
+                aria-current="page">
+                {{ showShortLabel && activeElement.shortLabel ?
+                  activeElement.shortLabel : activeElement.label }}
               </component>
             </div>
           </div>
-          <div class="hamburger-button-container">
+          <div class="base-navigation__hamburger-button-container">
             <BaseButton
               button-style="row"
               text=""
               label=""
               :icon="sideMenuIcon"
               :class="{active:navOpen, right: true}"
+              :aria-expanded="navOpen.toString()"
               @clicked="toggleHamburger" />
           </div>
-        </nav>
+        </div>
         <transition name="translateY">
-          <nav
+          <div
             v-if="navOpen"
-            ref="mobileViewDropdown">
-            <ul class="hamburger-menu">
+            ref="mobileViewDropdown"
+            class="base-navigation__hamburger-menu">
+            <ul>
               <li
                 v-for="element in list.filter(e => !toggleActive(e.route) && e.placement === 'left')"
                 :key="element.id"
                 :class="element.placement">
                 <component
-                  :is="renderAs"
-                  :href="!routerAvailable ? element.route : null"
-                  :to="routerAvailable ? element.route : null"
-                  :class="{'base-link': true, 'base-button-row': true,
-                           'base-button-active': toggleActive(element.route)}">
+                  :is="routerAvailable ? renderAs : 'a'"
+                  :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
+                  :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
+                  :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
+                           'base-navigation__base-button--active': toggleActive(element.route)}">
                   {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-                  <!-- @slot slot to inject content  -->
-                  <slot />
                 </component>
               </li>
-              <li
-                v-if="list.filter(e => !toggleActive(e.route) && e.placement === 'left').length > 0
-                  &&list.filter(e => !toggleActive(e.route) && e.placement === 'right').length > 0
-                  &&list.filter(e => !toggleActive(e.route)).length > 2"
-                class="separator-line" />
+            </ul>
+            <div
+              v-if="list.filter(e => !toggleActive(e.route) && e.placement === 'left').length > 0
+                &&list.filter(e => !toggleActive(e.route) && e.placement === 'right').length > 0
+                &&list.filter(e => !toggleActive(e.route)).length > 2"
+              class="base-navigation__separator-line" />
+            <ul>
               <li
                 v-for="element in list.filter(e => !toggleActive(e.route) && e.placement === 'right')"
                 :key="element.id"
                 :class="element.placement">
                 <component
-                  :is="renderAs"
-                  :href="!routerAvailable ? element.route : null"
-                  :to="routerAvailable ? element.route : null"
-                  :class="{'base-link': true, 'base-button-row': true,
-                           'base-button-active': toggleActive(element.route)}">
+                  :is="routerAvailable ? renderAs : 'a'"
+                  :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
+                  :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
+                  :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
+                           'base-navigation__base-button--active': toggleActive(element.route)}">
                   {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-                  <!-- @slot slot to inject content  -->
-                  <slot />
                 </component>
               </li>
             </ul>
-          </nav>
+          </div>
         </transition>
-      </div>
+      </nav>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
 import BaseLink from '@/components/BaseLink/BaseLink';
+import BaseButton from '@/components/BaseButton/BaseButton';
 
 export default {
   name: 'BaseNavigation',
-  components: { BaseLink },
+  components: { BaseLink, BaseButton },
   props: {
     /**
      * list of navigation items, containing a unique ID,
@@ -153,8 +152,15 @@ export default {
      */
     renderAs: {
       type: String,
-      default: 'RouterLink',
-      validate: val => ['RouterLink', 'NuxtLink'].includes(val),
+      default: 'a',
+      validate: val => ['RouterLink', 'NuxtLink', 'a'].includes(val),
+    },
+    /**
+     * specify a label for the navigation bar - for accessibility reasons
+     */
+    navigationLabel: {
+      type: String,
+      default: 'Main Navigation',
     },
   },
   data() {
@@ -169,6 +175,9 @@ export default {
     routerAvailable() {
       return this.$router;
     },
+    activeElement() {
+      return this.list.find(e => this.toggleActive(e.route));
+    },
   },
   mounted() {
     this.calcTextWidth();
@@ -180,13 +189,6 @@ export default {
     window.removeEventListener('resize', this.resizeTriggered);
   },
   methods: {
-    onClick(target) {
-      if (this.$router) {
-        this.$router.push(target);
-      } else {
-        window.location.href = target;
-      }
-    },
     toggleActive(target) {
       return this.$route.path === target;
     },
@@ -213,9 +215,9 @@ export default {
         this.$refs[ref].parentElement.append(clonedNavigation);
         [...clonedNavigation.childNodes]
           .map(childNode => [...childNode.childNodes]).flat()
-          .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-link')[0])
+          .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-navigation__base-link')[0])
           .forEach((li, idx) => {
-            const innermostChild = li.getElementsByClassName('base-link')[0];
+            const innermostChild = li.getElementsByClassName('base-navigation__base-link')[0];
             if (ref === 'mobileViewDropdown') {
               innermostChild.innerText = this.list.filter(e => !this.toggleActive(e.route))[idx].label;
             } else { innermostChild.innerText = this.list[idx].label; }
@@ -253,47 +255,48 @@ export default {
   white-space: nowrap;
   overflow: hidden;
 }
-.nav-sub-container-right{
+.base-navigation__nav-sub-container-right{
   display: flex;
   margin-left: auto;
   overflow: hidden;
 }
-.nav-sub-container-left{
+.base-navigation__nav-sub-container-left{
   overflow: hidden;
   display: flex;
 }
-.active-nav-item{
+.base-navigation__active-nav-item{
   overflow: hidden;
 }
-.active-nav-item .base-button{
+.base-navigation__active-nav-item .base-navigation__base-button{
   width: 100%;
   box-sizing: border-box;
   display: block;
 }
 
-.nav-item {
+.base-navigation__nav-item {
   display: flex;
   width: 100%;
   background: $box-color;
-
   overflow: hidden;
 }
 
-.hamburger-menu-toggle {
+.base-navigation__hamburger-menu-toggle {
   display: none;
 }
 
-.hamburger-menu {
+.base-navigation__hamburger-menu {
   display: none;
 }
 
-.hamburger-button-container{
+.base-navigation__hamburger-button-container{
   margin-left: auto;
 }
 
-.nav-item .base-button.base-button-row.base-button-active {
+.base-navigation__nav-item
+.base-navigation__base-button
+.base-navigation__base-button-row .base-navigation__base-button--active {
   box-shadow: 0 0 0 0 transparent,
-  inset 0px -5px 0 -2px var(--app-color, #673ab7);
+  inset 0px -5px 0 -2px $app-color;
 }
 
 .translateY-enter{
@@ -311,35 +314,16 @@ export default {
   opacity: 0;
 }
 
-.separator-line{
+.base-navigation__separator-line{
   border-bottom: $separation-line;
 }
 
-.mobile-navigation-container{
+.base-navigation__mobile-navigation-container{
   position: relative;
   z-index: 2;
 }
 
-@media screen and (max-width: $mobile) {
-  .nav-item {
-    display: none;
-  }
-  .hamburger-menu-toggle {
-    display: flex;
-    width: 100%;
-    background: $box-color;
-  }
-  .hamburger-menu {
-    position: absolute;
-    display: inline-block;
-    width: 100%;
-    background: $box-color;
-    box-shadow: $drop-shadow;
-    border-top: $separation-line;
-
-  }
-}
-.base-navigation .base-link{
+.base-navigation .base-navigation__base-link{
   display:flex;
   box-sizing: border-box;
   position: relative;
@@ -352,30 +336,41 @@ export default {
   text-align: center;
   white-space: nowrap;
 
-  &:hover {
+  &:hover, &:focus, &:active, &:focus-within {
     text-decoration: none;
     color: $app-color;
   }
-  &.base-button-row {
+  &.base-navigation__base-button-row {
     min-height: $row-height-large;
 
-    &.base-button-active {
+    &.base-navigation__base-button--active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
       z-index: map-get($zindex, button-active);
     }
   }
 }
-.base-link--tooltip, .base-tooltip__label, .base-tooltip__row{
-  display: none;
-}
 
 @media screen and (max-width: $mobile) {
-.base-link {
+  .base-navigation__nav-item {
+    display: none;
+  }
+  .base-navigation__hamburger-menu-toggle {
+    display: flex;
+    width: 100%;
+    background: $box-color;
+  }
+  .base-navigation__hamburger-menu {
+    position: absolute;
+    display: inline-block;
+    width: 100%;
+    background: $box-color;
+    box-shadow: $drop-shadow;
+    border-top: $separation-line;
+
+  }
+  .base-navigation__base-link {
     text-align: left !important;
   }
 }
-</style>
-<style lang="scss">
-
 </style>
