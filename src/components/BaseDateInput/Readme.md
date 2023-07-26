@@ -32,16 +32,16 @@ export default {
 </script>
 
 ```
-
-Single date input with format date_year, enabling switching the format
+<br>
+Single date input with format 'date_month_year', enabling switching the format
 
 ```vue live
 <template>
   <base-date-input
     id="yearformatdemo"
     :label="'Enter A Year'"
-    :format="'date_year'"
-    :showLabel="true"
+    :format="'date_month_year'"
+    :show-label="true"
     v-model="datepicked"
     type="single"
     placeholder="enter a year"
@@ -61,7 +61,7 @@ export default {
 </script>
 
 ```
-
+<br>
 Date Time Input
 
 ```vue live
@@ -71,7 +71,7 @@ Date Time Input
       id="datetimeformatdemo"
       :label="'Enter A Date'"
       :format="'day'"
-      :showLabel="true"
+      :show-label="true"
       v-model="datepicked"
       type="datetime"
       placeholder="enter a date"
