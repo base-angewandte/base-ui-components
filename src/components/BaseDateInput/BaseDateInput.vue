@@ -3,8 +3,9 @@
     ref="baseDateInput"
     class="base-date-input">
     <div
+      v-if="showLabelRow"
       :class="['base-date-input__label-row',
-               { 'base-date-input__label-row__visible': showLabel }]">
+               { 'base-date-input__label-row--visible': showLabel }]">
       <legend
         v-if="showLabel"
         ref="label"
@@ -13,16 +14,19 @@
         {{ label }}
       </legend>
       <div
-        v-if="showLabel"
-        ref="labelAdditions"
-        class="base-date-input__label-additions">
-        <!-- @slot to add additional elements to the label row -->
-        <slot name="label-addition" />
+        :class="['base-date-input__label-additions',
+                 {'base-date-input__label-additions--switch-height': isSwitchableFormat },
+                 {'base-date-input__label-additions--wrap': wrapLabelRow }]">
         <div
-          v-if="isSwitchableFormat"
-          ref="dateSwitch"
-          class="base-date-input__format-tabs">
+          ref="labelAdditions"
+          :class="['base-date-input__label-additions-inner',
+                   {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
+                   {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
+                     && !showLabel }]">
+          <!-- @slot to add additional elements to the label row -->
+          <slot name="label-addition" />
           <BaseSwitchButton
+            v-if="isSwitchableFormat"
             v-model="dateFormatInt"
             :options="tabSwitchOptions"
             :label="formatTabsLegend"
@@ -229,6 +233,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
+import { debounce } from '@/utils/utils';
 
 import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
@@ -240,7 +245,7 @@ import BaseIcon from '../BaseIcon/BaseIcon';
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
  *
- * for date also a format switch between date | year is available
+ * for date also a format switch between date | year and date | month | year is available
  *
  */
 
@@ -529,6 +534,11 @@ export default {
        */
       resizeObserver: null,
       /**
+       * function needs to be triggered when date switch is populated
+       * @type {?ResizeObserver}
+       */
+      labelAdditionsObserver: null,
+      /**
        * datepicker localisations
        *   using object fixes problem of missing localisation files in rollup-esm-build
        */
@@ -537,6 +547,11 @@ export default {
         en,
         fr,
       },
+      /**
+       * variable to set css class according to label elements wrapping or not
+       * @type {boolean}
+       */
+      wrapLabelRow: false,
     };
   },
   computed: {
@@ -765,13 +780,32 @@ export default {
            * Event emitted on input, passing input string
            *
            * @event input
-           * @param {string} value - the input event value however
+           * @type {string} - the input event value however
            * passing only the event.target.value
            *
            */
           this.$emit('input', this.getInputData());
         },
       };
+    },
+    /**
+     * check if label-addition slot exists is filled
+     */
+    labelRowSlotsHaveData() {
+      // get label-addition slot
+      const slotElements = this.$slots['label-addition'];
+      // check if slot exists and has data and actually has content
+      // (this did not work with SSR otherwise...)
+      return !!slotElements && !!slotElements.length
+        && slotElements.some(elem => elem.tag || elem.text);
+    },
+    /**
+     * determines if label row should be shown
+     * @returns {Boolean|boolean}
+     */
+    showLabelRow() {
+      // show label when prop is set true or a label addition was added via slot
+      return this.showLabel || this.isSwitchableFormat || this.labelRowSlotsHaveData;
     },
   },
   watch: {
@@ -922,7 +956,7 @@ export default {
     }
 
     // initialize the resize observer to calculate fade out when component is resized
-    this.initObserver();
+    this.initObservers();
   },
   updated() {
     // this hack is necessary because otherwise keyboard navigation was impaired by the datepicker
@@ -949,18 +983,30 @@ export default {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDateInput);
   },
   methods: {
-    initObserver() {
+    initObservers() {
       // create an observer with the fade out calc function
-      const tempResizeObserver = new ResizeObserver((entries) => {
-        if (this.isSwitchableFormat) {
-          this.calcLabelAdditionsWidth(entries[0].contentRect.width);
+      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
+        if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
+          this.calcLabelAdditionsWidth();
         }
         this.calcFadeOut(['From', 'To']);
-      });
+      }));
       // put it on the relevant element
       tempResizeObserver.observe(this.$refs.baseDateInput);
       // store it in variable
       this.resizeObserver = tempResizeObserver;
+
+      if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
+        // second observer to trigger label additions width calc as soon as element is rendered
+        const tempLabelAdditionsObserver = new ResizeObserver(debounce(50, (entries) => {
+          // only do calc when element is filled
+          if (entries[0].contentRect.width > 0) {
+            this.calcLabelAdditionsWidth(this.$refs.baseDateInput.clientWidth);
+          }
+        }));
+        tempLabelAdditionsObserver.observe(this.$refs.labelAdditions);
+        this.labelAdditionsObserver = tempLabelAdditionsObserver;
+      }
     },
     /**
      * transform the date to the correct display format
@@ -1234,6 +1280,7 @@ export default {
        * after date validation
        *
        * @event value-validated
+       * @type {string, Object} - the validated string or input object
        */
       this.$emit('value-validated', data);
     },
@@ -1471,27 +1518,21 @@ export default {
      * function to correctly style the date format switch buttons and prevent
      * overlay with label
      */
-    calcLabelAdditionsWidth(observableWidth) {
+    calcLabelAdditionsWidth() {
+      // get the complete element width
+      const observableWidth = this.$refs.baseDateInput.clientWidth;
       // get the label margin
-      const labelMargin = Number(getComputedStyle(this.$refs.label)['margin-right'].replace('px', ''));
+      const labelMargin = this.showLabel
+        ? Number(getComputedStyle(this.$refs.label)['margin-right'].replace('px', '')) : 0;
+      const labelWidth = this.showLabel ? this.$refs.label.clientWidth : 0;
       // calculate the remaining container space after label, label margin and date switch width
       const spacingLeft = observableWidth
-        - this.$refs.label.clientWidth
+        - labelWidth
         - labelMargin
-        - this.$refs.dateSwitch.clientWidth;
-      // if no space is left set the label additions width to 100%
-      if (spacingLeft < 0) {
-        this.$refs.labelAdditions.style.setProperty(
-          'width',
-          '100%',
-        );
-      } else {
-        // else reset the width
-        this.$refs.labelAdditions.style.setProperty(
-          'width',
-          'unset',
-        );
-      }
+        - this.$refs.labelAdditions.clientWidth;
+      // if no space is left set a class that sets label additions width to 100% so element has
+      // to wrap
+      this.wrapLabelRow = spacingLeft < 0;
     },
     /**
      * add delay before value is set
@@ -1530,8 +1571,9 @@ export default {
       width: 100%;
       height: 100%;
       justify-content: space-between;
+      align-items: center;
 
-      &.base-date-input__label-row__visible {
+      &.base-date-input__label-row--visible {
         margin-bottom: $spacing-small-half;
       }
 
@@ -1550,24 +1592,48 @@ export default {
         align-items: center;
         justify-content: flex-end;
         flex: 1 1 auto;
-        height: $input-field-line-height;
-      }
+        height: $line-height;
 
-      .base-date-input__format-tabs {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        margin-bottom: calc(-#{$spacing-small-half} / 2);
+        &.base-date-input__label-additions--switch-height {
+          height: calc(#{$line-height} + #{$spacing-small-half});
 
-        .base-date-input__switch-buttons {
-          display: flex;
-          line-height: $line-height;
+          &.base-date-input__label-additions--wrap {
+            margin-top: 2px;
+          }
         }
 
-        @media screen and (max-width: $mobile) {
-          position: inherit;
-          right: inherit;
-          top: inherit;
+        &.base-date-input__label-additions--wrap {
+          width: 100%;
+        }
+      }
+
+      .base-date-input__label-additions-inner {
+        position: absolute;
+        right: 0;
+        display: flex;
+        align-items: center;
+        margin-bottom: $spacing-small-half;
+
+        &.base-date-input__label-additions-inner--switch {
+          bottom: 0;
+          margin-bottom: calc(-#{$spacing-small-half} / 2);
+
+          @media screen and (max-width: $mobile) {
+            margin-bottom: calc(-#{$spacing-small} - 2px);
+          }
+        }
+        &.base-date-input__label-additions-inner--no-label-switch {
+          margin-bottom:  2px;
+
+          @media screen and (max-width: $mobile) {
+            margin-bottom: calc(-#{$spacing-small} + 1px);
+          }
+        }
+
+        .base-date-input__switch-buttons {
+          bottom: 0;
+          display: flex;
+          line-height: $line-height;
         }
       }
     }
@@ -1639,7 +1705,6 @@ export default {
   @media screen and (max-width: $mobile) {
     .base-date-input .base-date-input__label-row .base-date-input__label-additions {
       align-items: center;
-      margin-bottom: -$spacing-small-half;
     }
   }
 </style>

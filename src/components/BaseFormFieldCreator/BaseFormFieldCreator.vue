@@ -144,7 +144,7 @@
             || {
               date: getI18nTerm('form.date'),
               month: getI18nTerm('form.month'),
-              year: getI18nTerm('form.year')
+              year: getI18nTerm('form.year'),
             }"
           :format-tabs-legend="fieldProps.formatTabsLegend || getI18nTerm('form.dateTabsLegend')"
           :language="language"

@@ -1,17 +1,18 @@
 Date range input fields
 
 ```vue
+
 <template>
   <div>
-      <base-date-input
-        id="dayformatdemo"
-        :label="'Enter A Date'"
-        :format="'day'"
-        :show-label="true"
-        v-model="datepicked"
-        type="daterange"
-        placeholder="enter a date" />
-      <div>{{ datepicked }}</div>
+    <BaseDateInput
+      id="dayformatdemo"
+      :label="'Enter A Date'"
+      :format="'day'"
+      :show-label="true"
+      v-model="datepicked"
+      type="daterange"
+      placeholder="enter a date"/>
+    <div>{{ datepicked }}</div>
   </div>
 
 </template>
@@ -35,15 +36,14 @@ Single date input with format `date_month_year`, enabling switching the format
 
 ```vue
 <template>
-  <base-date-input
+  <BaseDateInput
     id="yearformatdemo"
     :label="'Enter A Year'"
     :format="'date_month_year'"
-    :showLabel="true"
+    :show-label="true"
     v-model="datepicked"
     type="single"
-    placeholder="enter a year"
-    />
+    placeholder="enter a year" />
 </template>
 
 <script>
@@ -65,15 +65,14 @@ Date Time Input
 ```vue
 <template>
   <div>
-    <base-date-input
+    <BaseDateInput
       id="datetimeformatdemo"
       :label="'Enter A Date'"
       :format="'day'"
-      :showLabel="true"
+      :show-label="true"
       v-model="datepicked"
       type="datetime"
-      placeholder="enter a date"
-      />
+      placeholder="enter a date" />
     <div>{{ datepicked }}</div>
   </div>
 </template>
