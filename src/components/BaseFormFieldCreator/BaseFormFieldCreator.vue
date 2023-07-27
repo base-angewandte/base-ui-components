@@ -811,10 +811,6 @@ export default {
     isNumberField() {
       // get OpenAPI json field type and check if its a repeatable field (array)
       const openAPIFieldType = this.field.items ? this.field.items.type : this.field.type;
-      if (this.field.name === 'percent') {
-        console.log(['integer', 'number'].includes(openAPIFieldType));
-        console.log(['integer', 'float', 'text'].includes(this.fieldType));
-      }
       // valid OpenAPI number field types are 'integer' and 'number'
       return ['integer', 'number'].includes(openAPIFieldType)
         // include 'text' here for backwards compatibility
