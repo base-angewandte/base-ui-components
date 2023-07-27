@@ -12,7 +12,7 @@
       :key="fieldKey"
       v-bind="fieldProps"
       :label="labelInt"
-      :show-label="fieldProps.showLabel || showLabel"
+      :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
       :placeholder="placeholderInt"
       :tabs="fieldType === 'multiline' ? fieldProps.tabs || tabs : false"
       :tab-labels="fieldType === 'multiline'
@@ -133,7 +133,7 @@
           v-model="fieldValueInt"
           v-bind="fieldProps"
           :label="labelInt"
-          :show-label="fieldProps.showLabel || showLabel"
+          :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
           :placeholder="placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
           :format="formFieldXAttrs.date_format || fieldProps.format"
@@ -241,7 +241,7 @@
       v-bind="fieldProps"
       :placeholder="placeholderInt"
       :label="labelInt"
-      :show-label="fieldProps.showLabel || showLabel"
+      :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
       :list="dropDownList.length ? dropDownList : fieldProps.list || []"
       :allow-dynamic-drop-down-entries="formFieldXAttrs.dynamic_autosuggest
         || !!fieldProps.allowDynamicDropDownEntries"
