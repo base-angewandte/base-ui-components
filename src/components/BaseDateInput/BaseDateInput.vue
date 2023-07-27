@@ -975,8 +975,8 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDateInput);
-    if (this.labelAdditionsObserver) this.labelAdditionsObserver.unobserve(this.$refs.labelAdditions);
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },
   methods: {
     initObservers() {
@@ -994,12 +994,14 @@ export default {
 
       if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
         // second observer to trigger label additions width calc as soon as element is rendered
-        const tempLabelAdditionsObserver = new ResizeObserver(debounce(50, (entries) => {
+        const tempLabelAdditionsObserver = new ResizeObserver((entries, observer) => {
           // only do calc when element is filled
           if (entries[0].contentRect.width > 0) {
             this.calcLabelAdditionsWidth(this.$refs.baseDateInput.clientWidth);
+            // only do this once as soon as elements are rendered - then disconnect!
+            observer.disconnect();
           }
-        }));
+        });
         tempLabelAdditionsObserver.observe(this.$refs.labelAdditions);
         this.labelAdditionsObserver = tempLabelAdditionsObserver;
       }
