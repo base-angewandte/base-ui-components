@@ -96,7 +96,7 @@
             <slot name="error-icon" />
           </template>
           <template #remove-icon>
-            <!-- @slot for adding elements after input (e.g. used to add loader -->
+            <!-- @slot use a custom icon instead of standard remove icon -->
             <slot name="remove-icon" />
           </template>
           <template #below-input="{ fieldName, groupNames }">
@@ -210,7 +210,7 @@
                 <slot name="error-icon" />
               </template>
               <template #remove-icon>
-                <!-- @slot for adding elements after input (e.g. used to add loader -->
+                <!-- @slot use a custom icon instead of standard remove icon -->
                 <slot name="remove-icon" />
               </template>
               <template #below-input="{ fieldName, groupNames }">

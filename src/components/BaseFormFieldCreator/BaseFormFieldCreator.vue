@@ -104,17 +104,13 @@
           name="post-input-field" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
         <slot
-          :field-name="field.name"
           name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+        <!-- @slot use a custom icon instead of standard remove icon -->
         <slot
-          :field-name="field.name"
           name="remove-icon" />
       </template>
       <template #below-input>
@@ -165,7 +161,7 @@
           </template>
           <template #pre-input-field>
             <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="pre-input-field" />
@@ -173,49 +169,45 @@
           <template
             #input-field-addition-before>
             <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-addition-before" />
           </template>
           <template #input-field-inline-before>
             <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-inline-before" />
           </template>
           <template #input-field-addition-after>
             <!-- @slot for adding elements after input
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-addition-after" />
           </template>
           <template #post-input-field>
             <!-- @slot for adding elements at the end covering the whole height
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="post-input-field" />
           </template>
           <template #error-icon>
-            <!-- @slot use a custom icon instead of standard error/warning icon
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+            <!-- @slot use a custom icon instead of standard error/warning icon -->
             <slot
-              :field-name="field.name"
               name="error-icon" />
           </template>
           <template #remove-icon>
-            <!-- @slot for adding elements after input (e.g. used to add loader)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+            <!-- @slot use a custom icon instead of standard remove icon -->
             <slot
-              :field-name="field.name"
               name="remove-icon" />
           </template>
           <template #below-input>
             <!-- @slot below-input slot added to e.g. add drop down
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} fieldName - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="below-input" />
@@ -337,7 +329,8 @@
           name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
+        <!-- @slot for adding elements after input
+          @binding {string} fieldName - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-after" />
@@ -350,18 +343,14 @@
           name="post-input-field" />
       </template>
       <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
         <slot
-          :field-name="field.name"
           name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+        <!-- @slot use a custom icon instead of standard remove icon -->
         <slot
-          :field-name="field.name"
-          name="remove-icon" />
+          :field-name="field.name" />
       </template>
       <template #below-input>
         <!-- @slot below-input slot added to e.g. add drop down

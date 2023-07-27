@@ -56,7 +56,7 @@
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader)
+        <!-- @slot use a custom icon instead of standard remove icon
         @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot name="remove-icon" />
       </template>
