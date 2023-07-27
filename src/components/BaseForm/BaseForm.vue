@@ -26,59 +26,70 @@
           v-bind="formFieldComponentProps(element, index)"
           @field-value-changed="setFieldValue($event, element.name)"
           @fetch-autocomplete="fetchAutocomplete">
-          <template #label-addition="{ fieldName }">
-            <!-- @slot Slot to allow for additional elements on the right side of the label row
-            \<div\> (e.g. language tabs))
-            @binding {string} fieldName - the name of the displayed field -->
+          <template #label-addition="{ fieldName, groupNames }">
+            <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+            @binding {string} fieldName - the name of the displayed field
+            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="label-addition"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
           </template>
-          <template #pre-input-field="{ fieldName }">
+          <template #pre-input-field="{ fieldName, groupNames }">
             <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-            @binding {string} fieldName - the name of the displayed field -->
+            @binding {string} fieldName - the name of the displayed field
+            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="pre-input-field"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
           </template>
           <template
-            #input-field-addition-before="{ fieldName }">
+            #input-field-addition-before="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-            @binding {string} fieldName - the name of the displayed field -->
+            @binding {string} fieldName - the name of the displayed field
+            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="input-field-addition-before"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
           </template>
-          <template #input-field-inline-before="{ fieldName }">
+          <template #input-field-inline-before="{ fieldName, groupNames }">
             <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)
-            @binding {string} fieldName - the name of the displayed field -->
+            @binding {string} fieldName - the name of the displayed field
+            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="input-field-inline-before"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
             <span
               v-if="element['x-attrs'] && element['x-attrs'].text_before"
               class="base-form-field__text-before">
               {{ element['x-attrs'].text_before }}
             </span>
           </template>
-          <template #input-field-addition-after="{ fieldName }">
+          <template #input-field-addition-after="{ fieldName, groupNames }">
             <span
               v-if="element['x-attrs'] && element['x-attrs'].text_after"
               class="base-form-field__text-after">
               {{ element['x-attrs'].text_after }}
             </span>
             <!-- @slot for adding elements after input
-            @binding {string} fieldName - the name of the displayed field -->
+            @binding {string} fieldName - the name of the displayed field
+            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="input-field-addition-after"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
           </template>
-          <template #post-input-field="{ fieldName }">
+          <template #post-input-field="{ fieldName, groupNames }">
             <!-- @slot for adding elements at the end covering the whole height
-            @binding {string} fieldName - the name of the displayed field -->
+            @binding {string} fieldName - the name of the displayed field
+            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="post-input-field"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
           </template>
           <template #error-icon>
             <!-- @slot use a custom icon instead of standard error/warning icon -->
@@ -88,12 +99,13 @@
             <!-- @slot for adding elements after input (e.g. used to add loader -->
             <slot name="remove-icon" />
           </template>
-          <template #below-input="{ fieldName }">
+          <template #below-input="{ fieldName, groupNames }">
             <!-- @slot below-input slot added to e.g. add drop down
             @binding {string} fieldName - the name of the displayed field -->
             <slot
               name="below-input"
-              :field-name="fieldName" />
+              :field-name="fieldName"
+              :group-names="groupNames" />
           </template>
         </BaseFormFieldCreator>
 
@@ -121,26 +133,28 @@
                 (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
               @fetch-autocomplete="fetchAutocomplete"
               @subform-input="setFieldValue($event, element.name, valueIndex)">
-              <template #label-addition="{ fieldName }">
+              <template #label-addition="{ fieldName, groupNames }">
                 <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
                 <slot
                   name="label-addition"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
-              <template #pre-input-field="{ fieldName }">
+              <template #pre-input-field="{ fieldName, groupNames }">
                 <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
                 <slot
                   name="pre-input-field"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
               <template
-                #input-field-addition-before="{ fieldName }">
+                #input-field-addition-before="{ fieldName, groupNames }">
                 <!-- @slot Slot to allow for additional elements in the input field \<div\>
                   (before \<input\>)
                 @binding {string} fieldName - the name of the displayed field
@@ -148,9 +162,10 @@
                 <slot
                   name="input-field-addition-before"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
-              <template #input-field-inline-before="{ fieldName }">
+              <template #input-field-inline-before="{ fieldName, groupNames }">
                 <span
                   v-if="element['x-attrs'] && element['x-attrs'].text_before"
                   class="base-form-field__text-before">
@@ -162,9 +177,10 @@
                 <slot
                   name="input-field-inline-before"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
-              <template #input-field-addition-after="{ fieldName }">
+              <template #input-field-addition-after="{ fieldName, groupNames }">
                 <span
                   v-if="element['x-attrs'] && element['x-attrs'].text_after"
                   class="base-form-field__text-after">
@@ -176,15 +192,17 @@
                 <slot
                   name="input-field-addition-after"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
-              <template #post-input-field="{ fieldName }">
+              <template #post-input-field="{ fieldName, groupNames }">
                 <!-- @slot for adding elements at the end covering the whole height
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
                 <slot
                   name="post-input-field"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
               <template #error-icon>
@@ -195,13 +213,14 @@
                 <!-- @slot for adding elements after input (e.g. used to add loader -->
                 <slot name="remove-icon" />
               </template>
-              <template #below-input="{ fieldName }">
+              <template #below-input="{ fieldName, groupNames }">
                 <!-- @slot below-input slot added to e.g. add drop down
                 @binding {string} fieldName - the name of the displayed field
                 @binding {number} index - the array index of field values -->
                 <slot
                   name="below-input"
                   :field-name="fieldName"
+                  :group-names="groupNames"
                   :index="valueIndex" />
               </template>
             </BaseFormFieldCreator>
