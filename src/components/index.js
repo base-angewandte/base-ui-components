@@ -4,6 +4,7 @@ import BaseAutocompleteInput from './BaseAutocompleteInput/BaseAutocompleteInput
 import BaseBox from './BaseBox/BaseBox';
 import BaseBoxButton from './BaseBoxButton/BaseBoxButton';
 import BaseBoxTooltip from './BaseBoxTooltip/BaseBoxTooltip';
+import BaseBreadCrumbs from './BaseBreadCrumbs/BaseBreadCrumbs';
 import BaseButton from './BaseButton/BaseButton';
 import BaseCarousel from './BaseCarousel/BaseCarousel';
 import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
@@ -60,6 +61,7 @@ export {
   BaseBox,
   BaseBoxButton,
   BaseBoxTooltip,
+  BaseBreadCrumbs,
   BaseButton,
   BaseCarousel,
   BaseCheckmark,

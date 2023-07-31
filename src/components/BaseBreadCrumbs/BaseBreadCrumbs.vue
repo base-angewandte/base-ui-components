@@ -1,19 +1,18 @@
 <template>
   <div :class="className">
-    <span
-      v-for="(entry, index) in routes"
-      :key="index">
+    <template
+      v-for="(entry, index) in routes">
       <BaseLink
+        :key="index"
         external-link-target="_self"
         :source="entry.route"
         :value="entry.label"
         :render-link-as="renderLinkAs"
-        :class="{'padding-left': index > 0, 'padding-right': true,
-                 'route-underline': index === routes.length - 1}" />
-      <span v-if="index < routes.length - 1">
-        >
-      </span>
-    </span>
+        class="base-bread-crumbs__link" /><span
+          v-if="index < routes.length - 1"
+          :key="`${index}-separator`"
+          class="base-bread-crumbs__separator">></span>
+    </template>
   </div>
 </template>
 
@@ -28,8 +27,8 @@ export default {
   components: { BaseLink },
   props: {
     /**
-     * specify routes and labels that should be used for navigation when
-     * clicking on a label with the same index - these have to be internal
+     * specify an array with the properties `route` and `label` that should be used for
+     * navigation - these have to be internal
      * links, i.e. without a protocol like `http:` or `mailto:` in the url
      */
     routes: {
@@ -72,13 +71,16 @@ export default {
     color: $font-color-second;
   }
 }
-.padding-left {
-  padding-left: $spacing-small-half;
-}
-.padding-right {
+
+.base-bread-crumbs__link {
   padding-right: $spacing-small-half;
-}
-.route-underline {
-  text-decoration: underline;
+
+  &:nth-child(n+2) {
+    padding-left: $spacing-small-half;
+  }
+
+  &:last-child {
+    text-decoration: underline;
+  }
 }
 </style>
