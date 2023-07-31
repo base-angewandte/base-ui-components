@@ -9,13 +9,15 @@ PACKAGE_VERSION=$(cat package.json \
 # commit the new version (incl. CHANGELOG)
 git add CHANGELOG.md package.json package-lock.json &&
 git commit -m "$PACKAGE_VERSION" &&
-git tag v$PACKAGE_VERSION
+git tag v$PACKAGE_VERSION &&
 
 # push develop branch
 git push &&
 git push --tags &&
 # get main ready
 git checkout master &&
+# pull first in case there are commits by somebody else
+git pull &&
 git merge develop &&
 git push &&
 git push --tags &&
@@ -26,8 +28,11 @@ git push --tags github master &&
 npm publish &&
 # also create, commit and publish styleguide
 git checkout gh-pages &&
+# pull first in case there are new version made by somebody else
+git pull &&
+git merge master &&
 npm run styleguide:build &&
-git add . &&
+git add styleguide/* &&
 git commit -m "docs: styleguide for v$PACKAGE_VERSION" &&
 git push &&
 npm run update-pages &&

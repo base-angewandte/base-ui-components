@@ -91,6 +91,7 @@
 </template>
 
 <script>
+import { debounce } from '@/utils/utils';
 import BaseButton from '../BaseButton/BaseButton';
 import i18n from '../../mixins/i18n';
 
@@ -389,7 +390,7 @@ export default {
   },
   methods: {
     initObserver() {
-      const resizeObserver = new ResizeObserver(this.resizeActions);
+      const resizeObserver = new ResizeObserver(debounce(50, this.resizeActions));
       resizeObserver.observe(this.$refs.optionsRow);
       this.resizeObserver = resizeObserver;
 

@@ -80,6 +80,7 @@
 </template>
 
 <script>
+import { debounce } from '@/utils/utils';
 import ClickOutside from 'vue-click-outside';
 import i18n from '../../mixins/i18n';
 import BaseIcon from '../BaseIcon/BaseIcon';
@@ -231,7 +232,7 @@ export default {
   methods: {
     initObserver() {
       // create an observer with the set overflow calc function
-      const resizeObserver = new ResizeObserver(() => this.setOverflow());
+      const resizeObserver = new ResizeObserver(debounce(50, () => this.setOverflow()));
       // put it on the relevant element
       resizeObserver.observe(this.$refs.baseDropdown);
       // store it

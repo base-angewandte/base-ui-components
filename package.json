@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.2",
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
@@ -8,9 +8,8 @@
   "homepage": "https://base.uni-ak.ac.at",
   "scripts": {
     "build": "vite build",
-    "build:watch": "vite build --watch",
+    "build:watch": "vite build && vite build --watch",
     "build:transform-css": "sh build/transform-css.sh",
-    "build:update-package-exports": "node build/update-package-exports.js",
     "build:post-commands": "npm run build:transform-css",
     "dev": "vite",
     "lint": "npm run lint:js",

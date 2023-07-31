@@ -6,7 +6,7 @@ Following options are available:
 |-----------------------|----------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | hidden                | all                              | `False`                                                                  | `True`, `False`                                                                                                                   | indicate if this data attribute should be considered for form creation (e.g. `true` for id)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | field_format          | all                              | `full`                                                                   | `full`, `half`                                                                                                                    | specify if the field should fill full width or half in a form<br> (in case it is a `half` field make sure it has a second 'half' field as well, otherwise the space will be empty)<br>**Caveat**: if field is multiply-able this value needs to be `full`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| field_type            | all                              | `text`                                                                   | `text`, `autocomplete`, `chips`, `chips-below`, `date`, `multiline`, `group`, `boolean`                                           | which kind of field should be shown front-end:<br>**text**: simple text field<br> **autocomplete**: text field with autocomplete functionality (`source` property needed!)<br> **chips**: input field with options (optional: dynamic autocomplete) that creates chips out of selected options<br>(if single or multi-select chips will be determined automatically from field type being an array or object (see below))<br> **chips-below**: same as chips, however chips are not added inline but below the input field<br> **date**: a date field (different formats - decided from the OpenAPI definition (see below))<br> **multiline**: a multiline text field<br> **group**: indicates that the fields specified within should be grouped<br> **boolean** will create a toggle element<br>**integer** creates a number field with integer numbers allowed<br>**float** will create a number field with float values allowed. |
+| field_type            | all                              | `text`                                                                   | `text`, `autocomplete`, `chips`, `chips-below`, `date`, `multiline`, `group`, `boolean`, `integer`, `float`                        | which kind of field should be shown front-end:<br>**text**: simple text field<br> **autocomplete**: text field with autocomplete functionality (`source` property needed!)<br> **chips**: input field with options (optional: dynamic autocomplete) that creates chips out of selected options<br>(if single or multi-select chips will be determined automatically from field type being an array or object (see below))<br> **chips-below**: same as chips, however chips are not added inline but below the input field<br> **date**: a date field (different formats - decided from the OpenAPI definition (see below))<br> **multiline**: a multiline text field<br> **group**: indicates that the fields specified within should be grouped<br> **boolean** will create a toggle element<br>**integer** creates a number field with integer numbers allowed<br>**float** will create a number field with float values allowed. |
 | placeholder           | all                              | -                                                                        | `{string, Object}`                                                                                                                | Add a placeholder displayed in the input field<br>  A `{string}` for all fields except date fields - there it should be an `{object}` with `date` and (if necessary) `time` attributes that contain the relevant string                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | order                 | all                              | this should be specified for all fields otherwise sorting will be random | `{number}`                                                                                                                        | this will specify the order in which the fields are displayed in the form                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | source                | chips, chips-below, autocomplete | -                                                                        | an API endpoint                                                                                                                   | if the field has a autocomplete functionality (autocomplete field or dynamic chips inputs (`dynamic_autosuggest = true`) or options (`dynamic_autosuggest = false`) this route is **required** to fetch these options (the base url for the API is specified in the front end configuration)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -90,6 +90,30 @@ This is a basic (autocomplete functionality not working here) example how a form
         }"
         language="en"
         :field-is-loading="fieldIsLoading"
+        :drop-down-lists="{
+          date_location: {
+            location: [
+              {
+                label: 'Wien',
+                source: 'http://base.uni-ak.ac.at/portfolio/vienna',
+              },
+              {
+                label: 'Berlin',
+                source: 'http://base.uni-ak.ac.at/portfolio/berlin',
+              },
+            ],
+          },
+          location: [
+              {
+                label: 'Base level options 1',
+                source: 'http://base.uni-ak.ac.at/portfolio/identical1',
+              },
+              {
+                label: 'Base level options 2',
+                source: 'http://base.uni-ak.ac.at/portfolio/identical2',
+              },
+            ],
+        }"
         class="form"
         @values-changed="valueList = { ...$event }">
       <template #label-addition="{ fieldName }">
@@ -411,9 +435,163 @@ export default {
                 order: 10,
               },
             },
+            date_location2: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  location_description: {
+                    type: 'string',
+                    title: 'Ortsbeschreibung',
+                    'x-attrs': {
+                      placeholder: 'Ortsbeschreibung eintragen',
+                      field_type: 'text',
+                      order: 3,
+                    },
+                  },
+                  date: {
+                    type: 'string',
+                    title: 'Datum',
+                    additionalProperties: false,
+                    pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
+                    'x-attrs': {
+                      field_format: 'half',
+                      field_type: 'date',
+                      date_format: 'date_month_year',
+                      placeholder: {
+                        date: 'Datum eintragen',
+                      },
+                      order: 1,
+                    },
+                  },
+                  location: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        geometry: {
+                          type: 'object',
+                          properties: {
+                            coordinates: {
+                              type: 'array',
+                              items: {
+                                type: 'number',
+                                format: 'float',
+                              },
+                            },
+                            type: {
+                              type: 'string',
+                            },
+                          },
+                          additionalProperties: false,
+                        },
+                        region: {
+                          type: 'string',
+                        },
+                        house_number: {
+                          type: 'string',
+                        },
+                        street: {
+                          type: 'string',
+                        },
+                        postcode: {
+                          type: 'string',
+                        },
+                        locality: {
+                          type: 'string',
+                        },
+                        country: {
+                          type: 'string',
+                        },
+                        label: {
+                          type: 'string',
+                        },
+                        source: {
+                          type: 'string',
+                        },
+                      },
+                      additionalProperties: false,
+                    },
+                    title: 'Ort',
+                    'x-attrs': {
+                      field_format: 'half',
+                      field_type: 'chips',
+                      dynamic_autosuggest: true,
+                      source: '/autosuggest/v1/places/',
+                      placeholder: 'Ort eintragen',
+                      order: 2,
+                    },
+                  },
+                },
+                additionalProperties: false,
+              },
+              title: 'A Second Group with identical Field Names',
+              'x-attrs': {
+                field_type: 'group',
+                show_label: true,
+                order: 11,
+              },
+            },
+            location: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  geometry: {
+                    type: 'object',
+                    properties: {
+                      coordinates: {
+                        type: 'array',
+                        items: {
+                          type: 'number',
+                          format: 'float',
+                        },
+                      },
+                      type: {
+                        type: 'string',
+                      },
+                    },
+                    additionalProperties: false,
+                  },
+                  region: {
+                    type: 'string',
+                  },
+                  house_number: {
+                    type: 'string',
+                  },
+                  street: {
+                    type: 'string',
+                  },
+                  postcode: {
+                    type: 'string',
+                  },
+                  locality: {
+                    type: 'string',
+                  },
+                  country: {
+                    type: 'string',
+                  },
+                  label: {
+                    type: 'string',
+                  },
+                  source: {
+                    type: 'string',
+                  },
+                },
+                additionalProperties: false,
+              },
+              title: 'Ort',
+              'x-attrs': {
+                field_format: 'full',
+                field_type: 'chips',
+                dynamic_autosuggest: true,
+                source: '/autosuggest/v1/places/',
+                placeholder: 'Ort eintragen',
+                order: 12,
+              },
+            },
           },
         }
-
     }
 }
 </script>

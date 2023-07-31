@@ -77,7 +77,7 @@
       <slot name="error-icon" />
     </template>
     <template #remove-icon>
-      <!-- @slot for adding elements after input (e.g. used to add loader). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
       <slot name="remove-icon" />
     </template>
   </BaseInput>
