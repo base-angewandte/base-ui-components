@@ -1,3 +1,10 @@
+## 2.1.3 (2023-07-31)
+
+
+### Added
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/#basedateinput):** improvements for BaseDateInput format switch
+
 ## 2.1.2 (2023-07-24)
 
 
