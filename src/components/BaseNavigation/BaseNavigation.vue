@@ -2,117 +2,107 @@
   <div
     class="base-navigation"
     :aria-label="navigationLabel">
-    <div>
-      <nav
-        ref="fullSizeNavigation"
-        class="base-navigation__nav-item">
-        <ul class="base-navigation__nav-sub-container-left">
-          <li
-            v-for="element in list.filter(e => e.placement === 'left')"
-            :key="element.id"
-            :class="element.placement">
+    <nav
+      ref="fullSizeNavigation"
+      class="base-navigation__nav-item">
+      <ul class="base-navigation__nav-sub-container-left">
+        <li
+          v-for="element in leftSideElements"
+          :key="element.id"
+          :class="element.placement">
+          <component
+            :is="routerAvailable ? renderAs : 'a'"
+            v-bind="linkAttributes(element)"
+            :aria-current="element === activeElement ? 'page' : null"
+            :class="['base-navigation__base-link', 'base-navigation__base-button-row',
+                     { 'base-navigation__base-button--active': activeElementId === element.id }]">
+            {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
+          </component>
+        </li>
+      </ul>
+      <ul class="base-navigation__nav-sub-container-right">
+        <li
+          v-for="element in rightSideElements"
+          :key="element.id"
+          :class="element.placement">
+          <component
+            :is="routerAvailable ? renderAs : 'a'"
+            v-bind="linkAttributes(element)"
+            :aria-current="element === activeElement ? 'page' : null"
+            :class="['base-navigation__base-link', 'base-navigation__base-button-row',
+                     { 'base-navigation__base-button--active': activeElementId === element.id }]">
+            {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
+          </component>
+        </li>
+      </ul>
+    </nav>
+    <nav class="base-navigation__mobile-navigation-container">
+      <div
+        ref="mobileViewNavigation"
+        class="base-navigation__hamburger-menu-toggle">
+        <div class="base-navigation__active-nav-item">
+          <div
+            class="left">
             <component
               :is="routerAvailable ? renderAs : 'a'"
-              :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
-              :aria-current="element === activeElement ? 'page' : null"
-              :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
-              :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
-                       'base-navigation__base-button--active': toggleActive(element.route)}">
-              {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
+              v-bind="linkAttributes(activeElement)"
+              class="base-navigation__base-link base-navigation__base-button-row
+                     base-navigation__base-button--active"
+              aria-current="page">
+              {{ showShortLabel && activeElement.shortLabel ?
+                activeElement.shortLabel : activeElement.label }}
             </component>
-          </li>
-        </ul>
-        <ul class="base-navigation__nav-sub-container-right">
-          <li
-            v-for="element in list.filter(e => e.placement === 'right')"
-            :key="element.id"
-            :class="element.placement">
-            <component
-              :is="routerAvailable ? renderAs : 'a'"
-              :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
-              :aria-current="element === activeElement ? 'page' : null"
-              :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
-              :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
-                       'base-navigation__base-button--active': toggleActive(element.route)}">
-              {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-            </component>
-          </li>
-        </ul>
-      </nav>
-      <nav class="base-navigation__mobile-navigation-container">
-        <div
-          ref="mobileViewNavigation"
-          class="base-navigation__hamburger-menu-toggle">
-          <div class="base-navigation__active-nav-item">
-            <div
-              class="left">
-              <component
-                :is="routerAvailable ? renderAs : 'a'"
-                :href="(!routerAvailable || renderAs === 'a') ? activeElement.route : null"
-                :to="(routerAvailable && renderAs !== 'a') ? activeElement.route : null"
-                class="base-navigation__base-link base-navigation__base-button-row
-                       base-navigation__base-button--active"
-                aria-current="page">
-                {{ showShortLabel && activeElement.shortLabel ?
-                  activeElement.shortLabel : activeElement.label }}
-              </component>
-            </div>
-          </div>
-          <div class="base-navigation__hamburger-button-container">
-            <BaseButton
-              button-style="row"
-              text=""
-              label=""
-              :icon="sideMenuIcon"
-              :class="{active:navOpen, right: true}"
-              :aria-expanded="navOpen.toString()"
-              @clicked="toggleHamburger" />
           </div>
         </div>
-        <transition name="translateY">
-          <div
-            v-if="navOpen"
-            ref="mobileViewDropdown"
-            class="base-navigation__hamburger-menu">
-            <ul>
-              <li
-                v-for="element in list.filter(e => !toggleActive(e.route) && e.placement === 'left')"
-                :key="element.id"
-                :class="element.placement">
-                <component
-                  :is="routerAvailable ? renderAs : 'a'"
-                  :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
-                  :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
-                  :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
-                           'base-navigation__base-button--active': toggleActive(element.route)}">
-                  {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-                </component>
-              </li>
-            </ul>
-            <div
-              v-if="list.filter(e => !toggleActive(e.route) && e.placement === 'left').length > 0
-                &&list.filter(e => !toggleActive(e.route) && e.placement === 'right').length > 0
-                &&list.filter(e => !toggleActive(e.route)).length > 2"
-              class="base-navigation__separator-line" />
-            <ul>
-              <li
-                v-for="element in list.filter(e => !toggleActive(e.route) && e.placement === 'right')"
-                :key="element.id"
-                :class="element.placement">
-                <component
-                  :is="routerAvailable ? renderAs : 'a'"
-                  :href="(!routerAvailable || renderAs === 'a') ? element.route : null"
-                  :to="(routerAvailable && renderAs !== 'a') ? element.route : null"
-                  :class="{'base-navigation__base-link': true, 'base-navigation__base-button-row': true,
-                           'base-navigation__base-button--active': toggleActive(element.route)}">
-                  {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-                </component>
-              </li>
-            </ul>
-          </div>
-        </transition>
-      </nav>
-    </div>
+        <div class="base-navigation__hamburger-button-container">
+          <BaseButton
+            button-style="row"
+            text=""
+            :icon-title="menuButtonLabel"
+            :icon="navOpen ? 'remove' : 'drag-lines'"
+            :class="['right', { active: navOpen }]"
+            :aria-expanded="navOpen.toString()"
+            @clicked="toggleHamburger" />
+        </div>
+      </div>
+      <transition name="translateY">
+        <div
+          v-if="navOpen"
+          ref="mobileViewDropdown"
+          class="base-navigation__hamburger-menu">
+          <ul>
+            <li
+              v-for="element in mobileLeftElements"
+              :key="element.id"
+              :class="element.placement">
+              <component
+                :is="routerAvailable ? renderAs : 'a'"
+                v-bind="linkAttributes(element)"
+                :class="['base-navigation__base-link', 'base-navigation__base-button-row',
+                         { 'base-navigation__base-link--left': mobileLeftElements.length
+                           + mobileRightElements.length > 2 },
+                         { 'base-navigation__base-button--active': activeElementId === element.id }]">
+                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
+              </component>
+            </li>
+          </ul>
+          <ul>
+            <li
+              v-for="element in mobileRightElements"
+              :key="element.id"
+              :class="element.placement">
+              <component
+                :is="routerAvailable ? renderAs : 'a'"
+                v-bind="linkAttributes(element)"
+                :class="['base-navigation__base-link', 'base-navigation__base-button-row',
+                         { 'base-navigation__base-button--active': activeElementId === element.id }]">
+                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
+              </component>
+            </li>
+          </ul>
+        </div>
+      </transition>
+    </nav>
   </div>
 </template>
 
@@ -125,12 +115,15 @@ export default {
   components: { BaseLink, BaseButton },
   props: {
     /**
-     * list of navigation items, containing a unique ID,
-     * a label to be shown in the navigation,
-     * an optional short label in case the label is too long for small screens,
-     * the route that should be navigated to,
-     * and a placement value to specify if the item should be rendered in the left-
-     * or right-hand-side of the navigation.
+     * list of navigation items, with the following properties:
+     *
+     *    **id** `string` - a unique id
+     *    **label** `string` - a label for the route to be displayed
+     *    **shortLabel** `?string` - a shorter version of the label to be shown if the regular label does not
+     *      fit the element anymore
+     *    **route** `string` - the route of the element should navigate to
+     *    **placement** `string` - should navigation element be displayed left or right side
+     *      valid options: `left`, `right`
      */
     list: {
       type: Array,
@@ -143,7 +136,8 @@ export default {
           placement: 'left',
         },
       ],
-      validator: arr => arr.every(entry => ['left', 'right'].includes(entry.placement) && entry.label.length > 0),
+      validator: arr => arr.every(entry => ['left', 'right'].includes(entry.placement)
+        && !['id', 'label', 'route', 'placement'].some(property => !Object.keys(entry).includes(property))),
     },
     /**
      * specify how link element should be rendered - this needs to be a
@@ -160,28 +154,97 @@ export default {
      */
     navigationLabel: {
       type: String,
-      default: 'Main Navigation',
+      default: 'App Navigation',
+    },
+    /**
+     * provide a accessible label for the mobile menu icon
+     */
+    menuButtonLabel: {
+      type: String,
+      default: 'Toggle Navigation',
     },
   },
   data() {
     return {
+      /**
+       * variable to control navigation drop down on mobile
+       * @type {boolean}
+       */
       navOpen: false,
-      sideMenuIcon: 'drag-lines',
+      /**
+       * after calculating all the element widths - should short label be shown?
+       * @type {boolean}
+       */
       showShortLabel: false,
+      /**
+       * resize observer to recalculate if label fits or short label should be shown
+       * @type {any}
+       */
       resizeTimeout: null,
     };
   },
   computed: {
+    /**
+     * determine if router is available
+     * @returns {boolean}
+     */
     routerAvailable() {
-      return this.$router;
+      return !!this.$router;
     },
+    /**
+     * return the active list element or an empty object if $route not initialized yet
+     * (empty object to avoid undefined errors)
+     * @returns {{}|Object}
+     */
     activeElement() {
-      return this.list.find(e => this.toggleActive(e.route));
+      if (this.$route) {
+        return this.list.find(e => e.route === this.$route.path);
+      }
+      return {};
+    },
+    /**
+     * the id of the currently active element
+     * @returns {?string}
+     */
+    activeElementId() {
+      return this.activeElement.id;
+    },
+    /**
+     * return all elements that should appear on the right side of the navigation bar
+     * @returns {Object[]}
+     */
+    rightSideElements() {
+      return this.list.filter(e => e.placement === 'right');
+    },
+    /**
+     * return all elements that should appear on the left side of the navigation bar
+     * @returns {Object[]}
+     */
+    leftSideElements() {
+      return this.list.filter(e => e.placement === 'left');
+    },
+    /**
+     * return all elements that should appear in the mobile drop down below the separation line
+     * (filtering out the active item)
+     * @returns {Object[]}
+     */
+    mobileRightElements() {
+      return this.rightSideElements.filter(e => e.id !== this.activeElementId);
+    },
+    /**
+     * return all elements that should appear in the mobile drop down above the separation line
+     * (filtering out the active item)
+     * @returns {Object[]}
+     */
+    mobileLeftElements() {
+      return this.leftSideElements.filter(e => e.id !== this.activeElementId);
     },
   },
   mounted() {
+    // get an initial calculation of the label and element widths
     this.calcTextWidth();
     if (window) {
+      // add an event listener to re-calculate on window resize
       window.addEventListener('resize', this.resizeTriggered);
     }
   },
@@ -189,16 +252,32 @@ export default {
     window.removeEventListener('resize', this.resizeTriggered);
   },
   methods: {
-    toggleActive(target) {
-      return this.$route.path === target;
+    /**
+     * dynamically determine the attributes of the link tag
+     *  (due to href disappearing if set null with RouterLink or NuxtLink and elements not
+     *  accessible anymore)
+     * @param {Object} element - the navigation element in the list
+     * @returns {Object}
+     */
+    linkAttributes(element) {
+      return {
+        [this.routerAvailable
+        && this.renderAs.toLowerCase().includes('link') ? 'to' : 'href']: element.route,
+      };
     },
+    /**
+     * toggle drop down and menu icon
+     */
     toggleHamburger() {
       this.navOpen = !this.navOpen;
-      if (this.sideMenuIcon === 'drag-lines') {
-        this.sideMenuIcon = 'remove';
-      } else this.sideMenuIcon = 'drag-lines';
-      if (this.navOpen) { this.$nextTick(this.calcTextWidth); }
+      if (this.navOpen) {
+        // if nav opened re-calculate the label widths
+        this.$nextTick(this.calcTextWidth);
+      }
     },
+    /**
+     * determine if labels fit the navigation element or if short labels should be used
+     */
     calcTextWidth() {
       let anyElementTooLong = false;
       const refsToCheck = ['fullSizeNavigation', 'mobileViewNavigation', 'mobileViewDropdown'];
@@ -218,16 +297,24 @@ export default {
           .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-navigation__base-link')[0])
           .forEach((li, idx) => {
             const innermostChild = li.getElementsByClassName('base-navigation__base-link')[0];
+            // check if current navigation element needs to be filtered from list (since it is not in drop down)
             if (ref === 'mobileViewDropdown') {
-              innermostChild.innerText = this.list.filter(e => !this.toggleActive(e.route))[idx].label;
-            } else { innermostChild.innerText = this.list[idx].label; }
-            if (li.clientWidth - li.scrollWidth < maxWidth[`${ref}`]) { anyElementTooLong = true; }
+              innermostChild.innerText = this.list.filter(e => e.id !== this.activeElementId)[idx].label;
+            } else {
+              innermostChild.innerText = this.list[idx].label;
+            }
+            if (li.clientWidth - li.scrollWidth < maxWidth[`${ref}`]) {
+              anyElementTooLong = true;
+            }
           });
         clonedNavigation.remove();
       });
 
       this.showShortLabel = anyElementTooLong;
     },
+    /**
+     * resize function with timeout to minimize number of label display recalculations
+     */
     resizeTriggered() {
       // check if there is a timeout already set and clear it if yes
       if (this.resizeTimeout) {
@@ -245,6 +332,10 @@ export default {
 <style lang="scss" scoped>
 @import "../../styles/variables.scss";
 
+.base-navigation {
+  box-shadow: $box-shadow-reg;
+}
+
 .left {
   margin-right: auto;
   white-space: nowrap;
@@ -255,16 +346,16 @@ export default {
   white-space: nowrap;
   overflow: hidden;
 }
-.base-navigation__nav-sub-container-right{
+.base-navigation__nav-sub-container-right {
   display: flex;
   margin-left: auto;
   overflow: hidden;
 }
-.base-navigation__nav-sub-container-left{
+.base-navigation__nav-sub-container-left {
   overflow: hidden;
   display: flex;
 }
-.base-navigation__active-nav-item{
+.base-navigation__active-nav-item {
   overflow: hidden;
 }
 .base-navigation__active-nav-item .base-navigation__base-button{
@@ -288,7 +379,7 @@ export default {
   display: none;
 }
 
-.base-navigation__hamburger-button-container{
+.base-navigation__hamburger-button-container {
   margin-left: auto;
 }
 
@@ -299,12 +390,12 @@ export default {
   inset 0px -5px 0 -2px $app-color;
 }
 
-.translateY-enter{
+.translateY-enter {
   transform:translateY(-10px);
   opacity: 0;
 }
 
-.translateY-enter-active,.translateY-leave-active{
+.translateY-enter-active,.translateY-leave-active {
   transform-origin: top left 0;
   transition:.2s ease;
 }
@@ -314,16 +405,12 @@ export default {
   opacity: 0;
 }
 
-.base-navigation__separator-line{
-  border-bottom: $separation-line;
-}
-
-.base-navigation__mobile-navigation-container{
+.base-navigation__mobile-navigation-container {
   position: relative;
   z-index: 2;
 }
 
-.base-navigation .base-navigation__base-link{
+.base-navigation .base-navigation__base-link {
   display:flex;
   box-sizing: border-box;
   position: relative;
@@ -335,6 +422,10 @@ export default {
   background-color: white;
   text-align: center;
   white-space: nowrap;
+
+  &.base-navigation__base-link--left:last-of-type {
+    border-bottom: $separation-line;
+  }
 
   &:hover, &:focus, &:active, &:focus-within {
     text-decoration: none;
