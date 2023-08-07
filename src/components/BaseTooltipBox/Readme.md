@@ -339,26 +339,29 @@ export default {
   }
 
   .base-tooltip-box-body {
-    width: 250px;
-
-    &::v-deep .base-text-list-group .base-text-list-label {
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    &::v-deep .base-text-list-group:first-of-type .base-text-list-label {
-      margin-top: 0 !important;
-    }
+    width: 252px;
   }
 
   @media screen and (min-width: 641px) {
     .base-tooltip-box {
       width: 300px;
-      height: 192px;
+      height: 195px;
       /* needs to be at least the same as the styleguide sidebar element (z-index: 1001)
          and lower than the styleguide navbar element (z-index: 1002) */
       z-index: 1001 !important;
     }
   }
+</style>
+
+<style>
+	/* use deep selector (>>>) to overwrite baseTextList styles */
+    >>> .base-text-list-label {
+      font-weight: bold;
+      margin-top: 8px !important;
+    }
+    
+    >>> .base-text-list-group:first-of-type .base-text-list-label {
+      margin-top: 0 !important;
+    }
 </style>
 ```
