@@ -1,11 +1,12 @@
 <template>
   <!-- REMINDER: fieldset tag does not work with flexbox (in chrome and edge) -->
   <fieldset
-    class="base-switch-buttons">
-    <legend
-      class="hide">
-      {{ label }}
-    </legend>
+    :class="{'base-switch-buttons': true, 'base-switch-buttons-gap': type === 'bold'}">
+    <span :class="{'base-switch-buttons-legend': true, 'hide': type === 'normal'}">
+      <legend>
+        {{ label }}
+      </legend>
+    </span>
     <template
       v-for="(option, index) in options">
       <label
@@ -153,23 +154,22 @@ export default {
 <style lang="scss" scoped>
   @import '../../styles/variables.scss';
 
+  .base-switch-buttons-legend {
+    display: flex;
+  }
   .iconSize {
     width: 16px;
     height: 16px;
-  }
-  .iconPadding {
-    width: 24px;
-    height: 24px;
-    padding-top: $spacing-small-half;
-    padding-bottom: $spacing-small-half;
   }
 
   .base-switch-buttons {
     clear: both;
     display: flex;
-    gap: 16px;
     position: relative;
     line-height: $row-height-small;
+  }
+  .base-switch-buttons-gap {
+    gap: 16px;
   }
   .base-switch-button {
     position: relative;
@@ -178,6 +178,7 @@ export default {
     gap: 10px;
     cursor: pointer;
     background-color: inherit;
+    height: $row-height-small;
   }
   .base-switch-button__type-bold {
     padding: $spacing-small $spacing $spacing-small $spacing;
@@ -187,10 +188,6 @@ export default {
       color: var(--app-color);
       transition: border 0.2s ease;
     }
-    .iconPadding {
-      width: 24px;
-      height: 24px;
-    }
 
     &:focus-within {
       border-color: $app-color;
@@ -199,6 +196,7 @@ export default {
   .base-switch-button__type-normal {
     padding-right: $spacing-small;
     padding-left: $spacing-small;
+    height: 34px;
     border: 1px solid rgba(255, 255, 255, 0);
 
     &.base-switch-button__type-normal__active {
