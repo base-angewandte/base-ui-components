@@ -19,7 +19,7 @@
         'base-link--space-after': spaceAfter,
       },
     ]"
-    @click="source && type ? { click: chipClicked } : {}">
+    v-on="source && type ? { click: chipClicked } : {}">
     <template
       v-if="!tooltip.length && !tooltipAsync.length">
       {{ value }}
