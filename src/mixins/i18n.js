@@ -22,6 +22,7 @@ export default {
      * @returns {string}
      */
     getI18nTerm(key, count = -1, variables = {}) {
+      if (!key) return '';
       if (this.hasI18n && this.$te(key)) {
         if (count >= 0) {
           return this.$tc(key, count, variables);
