@@ -1,11 +1,12 @@
 <template>
   <div
+    :style="isSingleTextObject ? { '--columns': colsSingleTextObject } : null"
     :class="[
       'base-text-list',
+      'base-text-list--row-gap-' + rowGap,
       {
-        'base-text-list-2-cols': cols2,
-        'base-text-list-2-cols-single-content':
-          cols2 && data.length === 1 && typeof data[0].data === 'string',
+        'base-text-list--cols': hasColumns || isSingleTextObject && colsSingleTextObject > 1,
+        'base-text-list--cols-single-content': isSingleTextObject && colsSingleTextObject > 1,
       }]">
     <div
       v-for="(item, index) in data"
@@ -18,20 +19,33 @@
         {{ getLangLabel(item.label) }}
       </component>
 
+      <!-- Array as multiple columns -->
+      <template v-if="typeof item === 'object' && typeof item[0] === 'object'">
+        <BaseTextList
+          ref="baseTextList"
+          :style="{ '--columns': cols }"
+          :render-label-as="renderLabelAs"
+          :label-margin-bottom="labelMarginBottom"
+          :cols="cols"
+          :data="item"
+          @chip-clicked="emitChipData" />
+      </template>
+
       <!-- String as text -->
       <!-- eslint-disable vue/multiline-html-element-content-newline -->
       <!-- get rid of prepending white-space -->
       <p
-        v-if="typeof item.data === 'string'"
+        v-else-if="item.data && typeof item.data === 'string'"
         :class="[
           'base-text-list-content',
           'base-text-list-content-pre-line',
-          { 'base-text-list-2-cols': data.length === 1 }]">{{ item.data }}</p>
+          // render single content in columns
+          { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
       <!-- eslint-enable vue/multiline-html-element-content-newline-->
 
       <!-- Array as unordered list -->
       <ul
-        v-else-if="typeof item.data === 'object' && typeof item.data[0] === 'string'"
+        v-else-if="item.data && typeof item.data === 'object' && typeof item.data[0] === 'string'"
         class="base-text-list-content">
         <li
           v-for="(arrayItem, listIndex) in item.data"
@@ -42,7 +56,7 @@
 
       <!-- Array/Objects -->
       <template
-        v-else-if="typeof item.data === 'object'">
+        v-else-if="item.data && typeof item.data === 'object'">
         <!-- render as comma separated list -->
         <template
           v-if="!containKeys([].concat(item.data), 'label')">
@@ -54,10 +68,11 @@
                 :key="objectIndex"
                 :source="objectItem.source"
                 :tooltip="objectItem.additional"
-                :type="objectItem.type"
+                :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
-                :class="[{ 'base-link--chip-text-list': isChip(objectItem) }]">
+                :class="[{ 'base-link--chip-text-list': item.id }]"
+                @chip-clicked="emitChipData">
                 <template #tooltip>
                   <!-- @slot slot for tooltip content -->
                   <!-- @binding {array} data -  -->
@@ -66,7 +81,7 @@
                     name="tooltip" />
                 </template>
                 <!-- add directly after to avoid additional spaces -->
-              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 && !isChip(objectItem) ? ', ' : '' }}
+              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ', ' : '' }}
               <!-- eslint-enable -->
             </template>
           </div>
@@ -96,9 +111,10 @@
                   :render-link-as="renderLinkAs"
                   :source="objectItem.source"
                   :tooltip="objectItem.additional"
-                  :type="objectItem.type"
+                  :type="item.id"
                   :url="objectItem.url"
-                  :value="objectItem.value">
+                  :value="objectItem.value"
+                  @chip-clicked="emitChipData">
                   <!-- @slot slot for tooltip content -->
                   <slot name="tooltip" />
                 </BaseLink>
@@ -121,6 +137,8 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseTextList',
   components: {
+    // eslint-disable-next-line import/no-self-import
+    BaseTextList: () => import('./BaseTextList').then(m => m.default || m),
     BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
   },
   mixins: [i18n],
@@ -130,8 +148,9 @@ export default {
      *
      * **<p>**: `{ label: {string, Object}, data: {string} }`
      * **<ul>**: `{ label: {string, Object}, data: {string[]}}`
-     * **<dt>**: `{ label: {string, Object}, data: [{ label: {string, Object}, value: {string}, url: {string}, additional: {Object} }]}` or
-     *  `{ label: {String, Object}, data: { label: {String, Object}, value: {string}, url: {string}, additional: {Object} }}`
+     * **<dt>**: `{ label: {string, Object}, data: {Object, Object[]}}`
+     *           **data: {Object}**: `{ label: {String, Object}, data: { label: {String, Object}, value: {string}, url: {string}, additional: {Object} }}`
+     *           **data: {Object[]}**: `[{ label: {string, Object}, value: {string}, url: {string}, additional: {Object} }]`
      *
      * `label` might be a string or a language object with ISO 639-1 as object properties
      *  (e.g. `{ en: 'x', de: 'y' }`).
@@ -158,18 +177,20 @@ export default {
       default: false,
     },
     /**
-     * render content in two columns
+     * specify number of columns to render array nested objects
      */
-    cols2: {
-      type: Boolean,
-      default: false,
+    cols: {
+      type: Number,
+      default: 2,
+      validate: val => val > 0,
     },
     /**
-     * set box height to auto
+     * specify number of columns to render a single object typeof string
      */
-    autoHeight: {
-      type: Boolean,
-      default: false,
+    colsSingleTextObject: {
+      type: Number,
+      default: 1,
+      validate: val => val > 0,
     },
     /**
      * specify how link element should be rendered - this needs to be a
@@ -178,7 +199,7 @@ export default {
      */
     renderLinkAs: {
       type: String,
-      default: 'RouterLinnk',
+      default: 'RouterLink',
     },
     /**
      * specify how data-list (label, value) should be rendered
@@ -189,6 +210,39 @@ export default {
       default: 'horizontal',
       validate: val => ['horizontal', 'vertical'].includes(val),
     },
+    /**
+     * specify gap between content rows
+     */
+    rowGap: {
+      type: String,
+      default: 'large',
+      validate: val => ['large', 'small'].includes(val),
+    },
+  },
+  data() {
+    return {
+      /**
+       * variable for handling columns class
+       * Note: is finally evaluated in created lifecycle hook
+       * @type {boolean}
+       */
+      hasColumns: false,
+    };
+  },
+  computed: {
+    /**
+     * evaluate if data is a single object and typeof string
+     * @returns {boolean}
+     */
+    isSingleTextObject() {
+      return this.data.length === 1
+          && this.data[0].data
+          && typeof this.data[0].data === 'string';
+    },
+  },
+  created() {
+    // If parent component is type `BaseTextList` we assume that the current `BaseTextList` has columns
+    this.hasColumns = this.$parent.$options.name === 'BaseTextList';
   },
   methods: {
     /**
@@ -216,6 +270,18 @@ export default {
     isChip(data) {
       return !!(data.source && data.type);
     },
+    /**
+     * function to emit event and data
+     *
+     * @param {Object} obj
+     */
+    emitChipData(obj) {
+      /**
+       * @event chip-clicked
+       * @property {Object} obj - chip object
+       */
+      this.$emit('chip-clicked', obj);
+    },
   },
 };
 </script>
@@ -223,17 +289,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../styles/variables";
 
-  .base-text-list-2-cols {
-    columns: 2;
-    column-gap: $spacing-large;
-
-    @media screen and (max-width: $mobile) {
-      columns: inherit;
-    }
-  }
-
   .base-text-list {
-
     .base-text-list-group {
       page-break-inside: avoid;
       break-inside: avoid;
@@ -245,7 +301,6 @@ export default {
       }
 
       .base-text-list-label {
-        margin-top: $line-height;
         margin-bottom: 0;
 
         &.base-text-list-label-mb {
@@ -314,9 +369,36 @@ export default {
       }
     }
 
-    &.base-text-list-2-cols-single-content {
-      display: flex;
-      height: calc(100% - #{$line-height});
+    // spacing below elements
+    &.base-text-list--row-gap-small {
+      margin-bottom: -$spacing;
+
+      .base-text-list-group {
+        padding-bottom: $spacing;
+      }
     }
+
+    &.base-text-list--row-gap-large {
+      margin-bottom: -$line-height;
+
+      .base-text-list-group {
+        padding-bottom: $line-height;
+      }
+    }
+  }
+
+  // columns
+  .base-text-list--cols {
+    columns: var(--columns);
+    column-gap: $spacing-large;
+
+    @media screen and (max-width: $mobile) {
+      columns: inherit;
+    }
+  }
+
+  .base-text-list--cols-single-content {
+    display: flex;
+    height: calc(100% - #{$line-height});
   }
 </style>
