@@ -251,8 +251,13 @@ export default {
        * @event chip-clicked
        * @property {string} source - internal identifier
        * @property {string} type - source type for chip click-event
+       * @property {string} value
        */
-      this.$emit('chip-clicked', { source: this.source, type: this.type });
+      this.$emit('chip-clicked', {
+        source: this.source,
+        type: this.type,
+        value: this.value,
+      });
     },
     async tooltipClicked() {
       if (this.tooltip.length) {
