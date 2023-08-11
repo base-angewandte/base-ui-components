@@ -11,11 +11,11 @@
     <div
       v-for="(item, index) in data"
       :key="index"
-      class="base-text-list-group">
+      class="base-text-list__group">
       <component
         :is="renderLabelAs"
         v-if="item.label"
-        :class="['base-text-list-label', { 'base-text-list-label-mb': labelMarginBottom }]">
+        :class="['base-text-list__label', { 'base-text-list__label--mb': labelMarginBottom }]">
         {{ getLangLabel(item.label) }}
       </component>
 
@@ -37,8 +37,8 @@
       <p
         v-else-if="item.data && typeof item.data === 'string'"
         :class="[
-          'base-text-list-content',
-          'base-text-list-content-pre-line',
+          'base-text-list__content',
+          'base-text-list__content--pre-line',
           // render single content in columns
           { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
       <!-- eslint-enable vue/multiline-html-element-content-newline-->
@@ -46,7 +46,7 @@
       <!-- Array as unordered list -->
       <ul
         v-else-if="item.data && typeof item.data === 'object' && typeof item.data[0] === 'string'"
-        class="base-text-list-content">
+        class="base-text-list__content">
         <li
           v-for="(arrayItem, listIndex) in item.data"
           :key="listIndex">
@@ -60,7 +60,7 @@
         <!-- render as comma separated list -->
         <template
           v-if="!containKeys([].concat(item.data), 'label')">
-          <div class="base-text-list-content">
+          <div class="base-text-list__content">
             <template
               v-for="(objectItem, objectIndex) in [].concat(item.data)">
               <!-- eslint-disable -->
@@ -92,8 +92,8 @@
           v-if="containKeys([].concat(item.data), 'label')">
           <dl
             v-if="typeof item.data === 'object'"
-            :class="['base-text-list-content',
-                     'base-text-list-content--' + listType]">
+            :class="['base-text-list__content',
+                     'base-text-list__content--' + listType]">
             <template
               v-for="(objectItem, objectIndex) in [].concat(item.data)">
               <dt
@@ -290,49 +290,33 @@ export default {
   @import "../../styles/variables";
 
   .base-text-list {
-    .base-text-list-group {
+    .base-text-list__group {
       page-break-inside: avoid;
       break-inside: avoid;
 
-      &:first-of-type {
-        .base-text-list-label {
-          margin-top: 0;
-        }
-      }
-
-      .base-text-list-label {
+      .base-text-list__label {
+        margin-top: 0;
         margin-bottom: 0;
+        overflow-wrap: break-word;
 
-        &.base-text-list-label-mb {
+        &.base-text-list__label--mb {
           margin-bottom: $spacing;
         }
       }
 
-      .base-text-list-content,
-      .base-text-list-label {
+      // class gets modified in component baseMapLocations
+      .base-text-list__content {
+        color: $font-color-second;
+        height: 100%;
         overflow-wrap: break-word;
       }
 
-      // class gets modified in component baseMapLocations
-      .base-text-list-content {
-        color: $font-color-second;
-        height: 100%;
-
-        .base-text-list__content-link {
-          color: $app-color;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      .base-text-list-content-pre-line {
+      .base-text-list__content--pre-line {
         white-space: pre-line;
         break-inside: avoid;
       }
 
-      .base-text-list-content--horizontal {
+      .base-text-list__content--horizontal {
         .base-text-list__content__label {
           display: inline;
         }
@@ -348,7 +332,7 @@ export default {
         }
       }
 
-      .base-text-list-content--vertical {
+      .base-text-list__content--vertical {
         line-height: $line-height;
 
         .base-text-list__content__label {
@@ -373,7 +357,7 @@ export default {
     &.base-text-list--row-gap-small {
       margin-bottom: -$spacing;
 
-      .base-text-list-group {
+      .base-text-list__group {
         padding-bottom: $spacing;
       }
     }
@@ -381,7 +365,7 @@ export default {
     &.base-text-list--row-gap-large {
       margin-bottom: -$line-height;
 
-      .base-text-list-group {
+      .base-text-list__group {
         padding-bottom: $line-height;
       }
     }
@@ -399,6 +383,5 @@ export default {
 
   .base-text-list--cols-single-content {
     display: flex;
-    height: calc(100% - #{$line-height});
   }
 </style>
