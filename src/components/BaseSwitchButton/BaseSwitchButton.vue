@@ -1,20 +1,21 @@
 <template>
-  <!-- REMINDER: fieldset tag does not work with flexbox (in chrome and edge) -->
   <fieldset
-    :class="{'base-switch-buttons': true, 'base-switch-buttons-gap': type === 'bold'}">
-    <span :class="{'base-switch-buttons-legend': true, 'hide': type === 'normal'}">
+    :class="['base-switch-buttons', { 'base-switch-buttons--gap': type === 'prominent' }]">
+    <span
+      :class="['base-switch-buttons__legend', { 'hide': !showLabel }]">
       <legend>
         {{ label }}
       </legend>
     </span>
+
     <template
       v-for="(option, index) in options">
       <label
         :key="option.value + 'label'"
         :for="optionIds[index]"
-        :class="['base-switch-button',
-                 `base-switch-button__type-${type}`,
-                 { [`base-switch-button__type-${type}__active`]: option.value === selectedOption }]">
+        :class="['base-switch-buttons__button',
+                 `base-switch-buttons__button--${type}`,
+                 { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption }]">
         <input
           :id="optionIds[index]"
           :key="option.value + 'input'"
@@ -24,33 +25,31 @@
           :aria-checked="option.value === selectedOption"
           :value="option.value"
           :name="label"
-          :class="['hide', 'base-switch-button__input']"
+          class="hide"
           type="radio"
           @keydown.enter.prevent="">
-        <base-icon
-          v-if="option.icon && option.icon.length > 0 && iconPosition === 'left'"
+        <BaseIcon
+          v-if="option?.icon?.length > 0 && iconPosition === 'left'"
           :name="option.icon"
           size="small"
           :title="label"
-          class="iconSize" />
+          class="base-switch-buttons__icon" />
         <span
-          :class="{ hide: !showLabel }">
+          :class="{ hide: !showButtonsLabelInt }">
           {{ option.label }}
         </span>
-        <base-icon
-          v-if="option.icon && option.icon.length > 0 && iconPosition === 'right'"
+        <BaseIcon
+          v-if="option?.icon?.length > 0 && iconPosition === 'right'"
           :name="option.icon"
           size="small"
           :title="label"
-          :class="{iconSize: true, iconPadding: !showLabel}" />
-        <!-- @slot slot to display something right of text (e.g. icon)
+          class="base-switch-buttons__icon" />
+        <!-- @slot slot to display something right of text (e.g. icon), or if `showButtonsLabel` false - generally right of the button content
         @binding {string} value - the value of the option object
         --->
         <slot
-          :value="option.value" />
-        <div
-          v-if="option.value === selectedOption && type === 'bold'"
-          class="active-state" />
+          :value="option.value"
+          name="right-of-content" />
       </label>
     </template>
   </fieldset>
@@ -70,7 +69,7 @@ export default {
   },
   props: {
     /**
-     * specify the tabs as array of object with `value` and `label` properties, also specify the icon for an option
+     * specify the tabs as array of object with `value`, `label` and (optional) `icon` properties
      */
     options: {
       type: Array,
@@ -98,14 +97,24 @@ export default {
     type: {
       type: String,
       default: 'normal',
-      validator: val => val === 'normal' || val === 'bold',
+      validator: val => val === 'normal' || val === 'prominent',
     },
     /**
-     * set if the label is shown (or only the icon)
+     * set if the switch label is shown
      */
     showLabel: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    /**
+     * define if the label of the single buttons should be shown (or just icons). This
+     * property is default undefined and is determined internally individually for each type:
+     *  **normal**: default is `true`
+     *  **prominent**: default is `false`
+     */
+    showButtonsLabel: {
+      type: Boolean,
+      default: undefined,
     },
     /**
      * specify where the icon should be rendered
@@ -125,6 +134,12 @@ export default {
     // to ensure a unique id (made problems on field duplication)
     optionIds() {
       return this.options.map(option => this.generateId(option.value));
+    },
+    defaultShowButtonsLabel() {
+      return this.type === 'normal';
+    },
+    showButtonsLabelInt() {
+      return this.showButtonsLabel ?? this.defaultShowButtonsLabel;
     },
   },
   watch: {
@@ -154,74 +169,80 @@ export default {
 <style lang="scss" scoped>
   @import '../../styles/variables.scss';
 
-  .base-switch-buttons-legend {
-    display: flex;
-  }
-  .iconSize {
-    width: 16px;
-    height: 16px;
-  }
-
   .base-switch-buttons {
     clear: both;
     display: flex;
     position: relative;
-    line-height: $row-height-small;
-  }
-  .base-switch-buttons-gap {
-    gap: 16px;
-  }
-  .base-switch-button {
-    position: relative;
-    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    background-color: inherit;
-    height: $row-height-small;
-  }
-  .base-switch-button__type-bold {
-    padding: $spacing-small $spacing $spacing-small $spacing;
-    border: $input-field-border;
-    transition: border 0.2s ease;
-    &.base-switch-button__type-bold__active {
-      color: var(--app-color);
+
+    &.base-switch-buttons--gap {
+      gap: $spacing;
+    }
+
+    .base-switch-buttons__legend {
+      display: flex;
+    }
+
+    .base-switch-buttons__button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-small;
+      padding: $spacing-small-half $spacing;
+      cursor: pointer;
+      background-color: inherit;
+      flex: 0 0 auto;
       transition: border 0.2s ease;
-    }
 
-    &:focus-within {
-      border-color: $app-color;
-    }
-  }
-  .base-switch-button__type-normal {
-    padding-right: $spacing-small;
-    padding-left: $spacing-small;
-    height: 34px;
-    border: 1px solid rgba(255, 255, 255, 0);
+      &.base-switch-buttons__button--normal {
+        // white border to prevent twitching when adding colored border
+        border: 1px solid rgba(255, 255, 255, 0);
 
-    &.base-switch-button__type-normal__active {
-      border: $input-field-border;
-      transition: border 0.2s ease;
-    }
+        &.base-switch-buttons__button--normal-active {
+          border: $input-field-border;
+        }
 
-    &:focus-within {
-      border-bottom-color: $app-color;
+        &:focus-within {
+          border-bottom-color: $app-color;
+        }
+      }
+
+      &.base-switch-buttons__button--prominent {
+        border: $input-field-border;
+        height: $row-height-small;
+
+        &.base-switch-buttons__button--prominent-active {
+          box-shadow: inset 0 -#{$border-width} 0 0 #{$app-color};
+        }
+
+        &:focus-within {
+          border-color: $app-color;
+        }
+      }
+
+      .base-switch-buttons__icon {
+        height: $icon-medium;
+        width: $icon-medium;
+        flex: 0 0 auto;
+      }
+
+      &:hover .base-switch-buttons__icon,
+      &:active .base-switch-buttons__icon {
+        color: $app-color;
+      }
     }
-  }
-  .active-state {
-    position: absolute;
-    bottom: 0;
-    background: var(--app-color);
-    height: 3px;
-    inset-inline: 0;
   }
 
   @media screen and (max-width: $mobile) {
     .base-switch-buttons {
       margin: $spacing-small 0;
 
-      input.base-switch-button__label {
+      .base-switch-buttons__button {
         padding: $spacing-small $spacing;
+
+        &.base-switch-buttons__button--prominent {
+          height: calc(#{$row-height-small} + #{$spacing-small});
+        }
       }
     }
   }

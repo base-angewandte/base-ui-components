@@ -6,15 +6,19 @@
   <div>
     <BaseSwitchButton
       :options="[
-        { label: 'German', value: 'de', icon: 'drag-lines' },
-        { label: 'English', value: 'en', icon: 'people' },
+        { label: 'German', value: 'de' },
+        { label: 'English', value: 'en' },
       ]"
       v-model="activeLang"
       label="Select Language"
-      :show-label="true"
       type="normal"
       icon-position="right">
-
+      <template #right-of-content="{ value }">
+        <BaseIcon
+          v-if="value === 'en'"
+          name="text"
+          class="icon" />
+      </template>
     </BaseSwitchButton>
     <div>{{ 'active lang: ' + activeLang }}</div>
   </div>
@@ -30,9 +34,16 @@ export default {
 };
 </script>
 
+<style>
+  .icon {
+    height: 10px;
+    width: 10px;
+  }
+</style>
+
 ```
 
-### Bold mode
+### Prominent mode
 
 ```vue live
 
@@ -40,17 +51,18 @@ export default {
   <div>
     <BaseSwitchButton
       :options="[
-        { label: 'German', value: 'de', icon: 'drag-lines' },
-        { label: 'English', value: 'en', icon: 'people' },
+        { label: 'List', value: 'list', icon: 'drag-lines' },
+        { label: 'Stars', value: 'stars', icon: 'subscribe' },
       ]"
-      v-model="activeLang"
-      label="Select Language"
+      v-model="activeMode"
+      label="Select Mode"
       :show-label="true"
-      type="bold"
-      icon-position="right">
-
+      type="prominent">
+      <templage>
+        test
+      </templage>
     </BaseSwitchButton>
-    <div>{{ 'active lang: ' + activeLang }}</div>
+    <div>{{ 'active mode: ' + activeMode }}</div>
   </div>
 
 </template>
@@ -59,7 +71,7 @@ export default {
 
 export default {
   data: () => ({
-    activeLang: 'en',
+    activeMode: 'stars',
   }),
 };
 </script>
