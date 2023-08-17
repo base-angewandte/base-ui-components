@@ -1,5 +1,11 @@
 ## Demo
-### Normal mode
+### Type: `normal`
+<br>
+Type <code>normal</code> gives the switch a more subtle, more condensed look with active item only indicated by grey border,
+buttons have a label per default (<code>showButtonsLabel</code> is <code>true</code>).
+<br>
+<br>
+
 ```vue live
 
 <template>
@@ -43,7 +49,14 @@ export default {
 
 ```
 
-### Prominent mode
+### Type: `prominent`
+<br>
+Type <code>prominent</code> has larger buttons with more spacing and permanent border around each item, active item is
+indicated by a 2px (app-)colored bottom border, button labels are not shown per default (<code>showButtonsLabel</code> is <code>false</code>)
+so the property <code>icon</code> should be set for each switch item in <code>options</code>.
+<br>
+<br>
+
 
 ```vue live
 

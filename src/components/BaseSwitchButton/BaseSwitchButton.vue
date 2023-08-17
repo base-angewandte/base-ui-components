@@ -85,7 +85,7 @@ export default {
       default: () => (this.options[0] ? this.options[0].value : 'tab'),
     },
     /**
-     * set a label for the switches, not visible but needed for accessibility
+     * set a label for the switches, not visible per default (set `showLabel` to `true` if label should be shown) but required for accessibility
      */
     label: {
       type: String,
@@ -93,11 +93,16 @@ export default {
     },
     /**
      * set a type for the button's active state rendering style
+     *  **normal**: gives the switch a more subtle, more condensed look with active item only indicated by grey border,
+     *    buttons have a label per default (`showButtonsLabel` is `true`).
+     *  **prominent**: larger buttons with more spacing and permanent border around each item, active item is
+     *    indicated by a 2px (app-)colored bottom border, button labels are not shown per default (`showButtonsLabel` is `false`)
+     *    so the property `icon` should be set for each switch item in `options`.
      */
     type: {
       type: String,
       default: 'normal',
-      validator: val => val === 'normal' || val === 'prominent',
+      validator: val => ['normal', 'prominent'].includes(val),
     },
     /**
      * set if the switch label is shown
@@ -122,7 +127,7 @@ export default {
     iconPosition: {
       type: String,
       default: 'right',
-      validator: val => val === 'right' || val === 'left',
+      validator: val => ['right', 'left'].includes(val),
     },
   },
   data() {
