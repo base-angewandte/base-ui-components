@@ -1128,9 +1128,8 @@ export default {
   }
 
   .base-form-field-creator__toggle {
-    min-height: $row-height-small;
     display: flex;
-    align-items: center;
+    flex-direction: column;
   }
 
   @media screen and (max-width: 1260px) {

@@ -868,6 +868,7 @@ export default {
       .base-form-field-half {
         // needed to add the 0.01rem for edge...
         flex: 0 1 calc(50% - #{$spacing-small} - 0.01rem);
+        max-width: calc(50% - #{$spacing-small} - 0.01rem);
       }
 
       .base-form-field-left-margin {
