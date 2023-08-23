@@ -965,10 +965,15 @@ export default {
       .base-form__body {
         .base-form-field-half {
           flex: 0 0 100%;
+          max-width: 100%;
         }
 
         .base-form-field-left-margin {
           margin-left: 0;
+        }
+
+        .base-form-field-top-margin {
+          margin-top: 0;
         }
       }
     }
