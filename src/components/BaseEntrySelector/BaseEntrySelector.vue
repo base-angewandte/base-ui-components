@@ -87,8 +87,9 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        :select-all-disabled="!!maxSelectedEntries && (maxSelectedEntries <= selectedListIds.length
-          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
+        :select-all-disabled="!!maxSelectedEntries
+          && (!(selectableEntries.length < (maxSelectedEntries - selectedListIds.length)
+            || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
         @selected="changeAllSelectState">
         <template #selectedText>
           {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
