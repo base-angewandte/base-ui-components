@@ -439,11 +439,12 @@ export default {
       return this.entriesPerPage ? Math.ceil(this.entriesTotal / this.entriesPerPage) : 0;
     },
     /**
-     * BaseMenuList components needs a list of id's for selected entries
+     * BaseMenuList components needs a list of unique IDs for selected entries
      * @returns {string[]}
      */
     selectedListIds() {
-      return this.selectedEntries.map(entry => entry.id);
+      // deduplicate by creating set and convert back to array
+      return [...new Set(this.selectedEntries.map(entry => entry.id))];
     },
     /**
      * to calc the correct max-with for the sort and type drop downs we need to know how
