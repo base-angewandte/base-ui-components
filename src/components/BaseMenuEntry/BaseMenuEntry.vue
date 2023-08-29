@@ -56,30 +56,33 @@
     <slot
       name="right-side-elements"
       :is-selected="isSelectedInt">
-      <TransitionGroup
-        ref="slideFade"
-        name="slide-fade"
-        class="slide-fade-group"
-        @leave="slideFadeLeave"
-        @after-leave="slideFadeAfterLeave">
-        <div
-          v-if="showThumbnails"
-          :key="entryId + 'thumbnail'"
-          ref="thumbnailContainer"
-          class="base-menu-entry-thumbnail-container base-menu-entry-text-fade-out"
-          :style="{ '--cols': columns }">
-          <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
-          <slot name="thumbnails" />
-        </div>
-        <BaseCheckmark
-          v-if="isSelectable && selectActive && !isDisabled"
-          :key="entryId + 'checkmark'"
-          :checked="isSelected"
-          title="checkbox"
-          mark-style="checkbox"
-          class="base-menu-entry-checkbox"
-          @clicked="clicked" />
-      </TransitionGroup>
+      <div
+        class="base-menu-entry-transition-container base-menu-entry-text-fade-out">
+        <TransitionGroup
+          ref="slideFade"
+          name="slide-fade"
+          class="slide-fade-group"
+          @leave="slideFadeLeave"
+          @after-leave="slideFadeAfterLeave">
+          <div
+            v-if="showThumbnails"
+            :key="entryId + 'thumbnail'"
+            ref="thumbnailContainer"
+            class="base-menu-entry-thumbnail-container"
+            :style="{ '--cols': columns }">
+            <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
+            <slot name="thumbnails" />
+          </div>
+          <BaseCheckmark
+            v-if="isSelectable && selectActive && !isDisabled"
+            :key="entryId + 'checkmark'"
+            :checked="isSelected"
+            title="checkbox"
+            mark-style="checkbox"
+            class="base-menu-entry-checkbox"
+            @clicked="clicked" />
+        </TransitionGroup>
+      </div>
     </slot>
   </div>
 </template>
@@ -415,13 +418,22 @@ export default {
       }
     }
 
+    .base-menu-entry-transition-container {
+      position: absolute;
+      right: 0;
+      margin-right: $spacing;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      background: $box-color;
+    }
+
     .base-menu-entry-thumbnail-container {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap-reverse;
       height: $row-height-large;
       justify-content: center;
-      background-color: white;
       align-items: flex-start;
       padding-left: $spacing;
       gap: $spacing;
@@ -437,15 +449,15 @@ export default {
     }
 
     .base-menu-entry-checkbox {
+      background: $box-color;
+      height: 100%;
       padding-left: $spacing;
     }
 
     .slide-fade-group {
-      position: absolute;
-      right: 0;
-      margin-right: $spacing;
       display: flex;
       align-items: center;
+      height: 100%;
     }
 
     .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
