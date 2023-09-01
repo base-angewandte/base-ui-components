@@ -112,6 +112,7 @@
       :use-search="useSearch"
       language="de"
       v-bind="entrySelectorText"
+      class="entrySelector"
       @selected-changed="selectedEntries = $event"
       @fetch-entries="getNewEntries"
       @entry-clicked="activeEntry = $event">
@@ -339,12 +340,14 @@ export default {
   padding: 16px;
   text-align: center;
 }
-.custom-right-side {
-  display: flex;
-  flex-direction: row;
-}
+
 .custom-buttons {
   border-left: 2px solid rgb(240, 240, 240);
+}
+
+.entrySelector >>> .custom-right-side {
+  display: flex;
+  flex-direction: row;
 }
 </style>
 ```
