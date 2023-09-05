@@ -1,3 +1,45 @@
+## 3.1.0 (2023-09-05)
+
+
+### Added
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch), [BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearchRow):** new filter config option `subsets` to indicate filter relations
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** add `date_month_year` option to BaseDateInput
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** make search field element optional
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** add new icon 'institution'
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/components/BaseMenuEntry), [BaseMenuList](https://base-angewandte.github.io/base-ui-components/components/BaseMenuList), [ BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** new slots `text-content` / `entry-text-content` and `right-side-elements` / `entry-right-side-elements`
+* added new component **[BaseBreadCrumbs](https://base-angewandte.github.io/base-ui-components/components/BaseBreadCrumbs)**
+
+
+### Changed
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** improve ResizeObserver usage and disconnect unneeded observers
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** loader set true on option select
+* **[BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearchRow):** filter columns overflowing filter container
+* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/components/BaseDropDown), [BaseOptions](https://base-angewandte.github.io/base-ui-components/components/BaseOptions), [ BasePagination](https://base-angewandte.github.io/base-ui-components/components/BasePagination):** add debounce to component resizeObservers
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** 'select none' visibility incorrect
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** add missing background in selection mode without thumbnails
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** amount of selected entries by 'select all' button incorrect
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** field type number initial field value not set correctly
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** input field slots not working for group fields
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** use nested `dropDownLists` to allow for identical field names in field groups
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** form group field drop downs shifted to the left
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** margin of BaseToggle is not fitting all use cases
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** `showLabel` set via `fieldProps` is not working (if false)
+* **styleguide:** link base-ui-icons.svg instead of copy
+
+
+## 2.1.3 (2023-07-31)
+
+
+### Added
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/#basedateinput):** improvements for BaseDateInput format switch
+
 ## 2.1.2 (2023-07-24)
 
 
