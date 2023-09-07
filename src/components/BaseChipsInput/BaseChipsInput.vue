@@ -811,7 +811,9 @@ export default {
     }
 
     .base-chips-input__single-dropdown {
-      padding: $spacing-small;
+      display: flex;
+      align-items: center;
+      padding: 0 $spacing-small;
 
       .base-chips-input__single-dropdown-icon {
         transition:  $drop-down-arrow-animation;
