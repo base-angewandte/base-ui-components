@@ -43,6 +43,11 @@
         :disabled="useHeadSlot"
         label="Use Search"
         class="control" />
+      <BaseToggle
+        v-model="showOptionsRow"
+        :disabled="useHeadSlot"
+        label="Show Options Row"
+        class="control" />
     </div>
     <div class="controls">
       <BaseToggle
@@ -51,11 +56,13 @@
         class="control" />
       <BaseToggle
         v-model="useActionsSlot"
+        :disabled="!showOptionsRow"
         label="Use 'option-actions' Slot"
         class="control"
         @clicked="selectMode = true" />
       <BaseToggle
         v-model="useAfterOptionsSlot"
+        :disabled="!showOptionsRow"
         label="Use 'after-options' Slot"
         class="control" />
       <BaseToggle
@@ -88,6 +95,8 @@
       :entries-selectable.sync="selectMode"
       :options-hidden="!showOptions"
       :sort-options="showSort ? sortOptions : []"
+      :use-search="useSearch"
+      :show-options-row="showOptionsRow"
       :sort-config="{
         label: 'Sort Entries',
         default: {
@@ -109,7 +118,6 @@
         valuePropertyName: 'source',
       }"
       :is-loading="isLoading"
-      :use-search="useSearch"
       language="de"
       v-bind="entrySelectorText"
       class="entrySelector"
@@ -244,6 +252,7 @@ export default {
       noResults: false,
       showPagination: true,
       useSearch: true,
+      showOptionsRow: true,
       sortOptions: [
         {
           label: 'By Type',
