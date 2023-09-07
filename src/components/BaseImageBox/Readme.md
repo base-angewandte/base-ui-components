@@ -5,60 +5,60 @@ A variety of possibilities with image box
 ```vue live
 <template>
   <div>
-    <div class="boxes-background">
+    <div
+      ref="boxesContainer"
+      class="boxes-background">
         <base-image-box
           :selectable="selectActive"
           :image-url="imgUrl"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           title="Box with Image"
           subtext="and title and subtitle"
           description="and description"
           class="box"
-          @select-triggered="handleBoxArray($event, '1')"/>
+          @select-triggered="handleBoxArray($event, '1')" />
         <base-image-box
           :selectable="selectActive"
-          :showTitle="false"
+          :show-title="false"
           :image-url="imgUrl"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           title="box with no title"
-          description="showtitle false"
+          description="show-title false"
           class="box"
-          @select-triggered="handleBoxArray($event, '2')"/>
+          @select-triggered="handleBoxArray($event, '2')" />
         <base-image-box
           :selectable="selectActive"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           title="text only"
           subtext="no description"
           class="box"
-          @select-triggered="handleBoxArray($event, '3')"/>
+          @select-triggered="handleBoxArray($event, '3')" />
         <base-image-box
           :selectable="selectActive"
-          :box-size="{ width: 'calc(25% - 12px)' }"
+          :box-size="boxSize"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
           title="text only"
           subtext="with description"
           class="box"
-          description="no overlap with text"/>
-    </div>
+          description="no overlap with text" />
 
-    <div class="boxes-background">
       <base-image-box
         :selectable="selectActive"
         :image-url="imgUrl"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         title="Box with Image"
         subtext="and title and subtitle"
         description="and footer slots used"
         class="box"
         @select-triggered="handleBoxArray($event, '5')">
-        <template slot="footer-left">
+        <template #footer-left>
           <BaseIcon
             name="subscribe"
             title="icon in slot: footer-left"
             class="base-image-box__footer-icon" />
         </template>
-        <template slot="footer-right">
+        <template #footer-right>
           <BaseIcon
             name="eye"
             title="icon in slot: footer-right"
@@ -68,70 +68,158 @@ A variety of possibilities with image box
 
       <base-image-box
         :selectable="selectActive"
-        :showTitle="false"
+        :show-title="false"
         :image-url="imgUrl"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :box-size="boxSize"
         :play-icon="true"
         title="box with no title"
-        description="play icon & showtitle false"
+        description="play icon & show-title false"
         class="box"
         @select-triggered="handleBoxArray($event, '6')" />
 
       <base-image-box
         :selectable="selectActive"
-        :showTitle="false"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :show-title="false"
+        :box-size="boxSize"
         icon="file-object"
         :iconSize="iconSize"
         title="box with no title, icon"
-        description="icon & showtitle false"
+        description="icon & show-title false"
         class="box"
         @select-triggered="handleBoxArray($event, '7')" />
 
       <base-image-box
         :selectable="selectActive"
-        :showTitle="false"
-        :box-size="{ width: 'calc(25% - 12px)' }"
+        :show-title="false"
+        :box-size="boxSize"
         :play-icon="true"
         icon="audio-object"
         :iconSize="iconSize"
         title="box with no title, icon and play-icon"
-        description="icon, play icon & showtitle false"
+        description="icon, play icon & show-title false"
         class="box"
         @select-triggered="handleBoxArray($event, '8')">
-        <template slot="footer-right">
+        <template #footer-right>
           <span>00:04:22</span>
+        </template>
+      </base-image-box>
+
+      <BaseImageBox
+        :selectable="selectActive"
+        :image-first="true"
+        :image-shadow="false"
+        :images="images.slice(0, 1)"
+        :box-size="boxSize"
+        :title-rows="1"
+        title="Box with Image first"
+        subtext="and slot title-right used"
+        image-footer-margin="small"
+        class="box"
+        @select-triggered="handleBoxArray($event, '9')">
+        <template #title-right>
+          <div class="slot-title-right">
+            <span class="slot-title-right__text">(3)</span>
+          </div>
+        </template>
+        <template #footer-right>
+          <div class="quick-actions">
+            <BaseButton
+              button-style="circle"
+              icon="download"
+              text="Download" />
+            <BaseButton
+              button-style="circle"
+              icon="information-solo"
+              text="Remove" />
+          </div>
+        </template>
+      </BaseImageBox>
+
+      <BaseImageBox
+        :selectable="selectActive"
+        :image-first="true"
+        :image-shadow="false"
+        :images="images.slice(0, 2)"
+        :box-size="boxSize"
+        title="Box with 2 Images"
+        subtext="Image Grid"
+        class="box"
+        @select-triggered="handleBoxArray($event, '10')" />
+
+      <BaseImageBox
+        :selectable="selectActive"
+        :image-first="true"
+        :image-shadow="false"
+        :images="images.slice(0, 3)"
+        :box-size="boxSize"
+        title="Box with 3 Images"
+        subtext="Image Grid"
+        class="box"
+        @select-triggered="handleBoxArray($event, '11')" />
+
+      <BaseImageBox
+        :selectable="selectActive"
+        :image-first="true"
+        :image-shadow="false"
+        :images="images.slice(0, 4)"
+        :box-size="boxSize"
+        title="Box with 4 Images"
+        subtext="Image Grid"
+        class="box"
+        @select-triggered="handleBoxArray($event, '12')" />
+
+      <base-image-box
+        :selectable="selectActive"
+        :image-first="true"
+        :image-shadow="false"
+        :iconSize="iconSize"
+        :box-size="boxSize"
+        :center-header="true"
+        title="Box with centered header"
+        subtext="and icon slots used"
+        class="box"
+        @select-triggered="handleBoxArray($event, '13')">
+        <template #icon>
+          <img
+            src="https://base.uni-ak.ac.at/bs/img/icons/image.svg"
+            alt=""
+            style="width: 100%;" />
         </template>
       </base-image-box>
     </div>
     <div class="button-area">
       <BaseButton
         text="Toggle Select"
-        @clicked="selectActive = !selectActive"/>
+        @clicked="selectActive = !selectActive" />
     </div>
     <div class="button-area">
-      {{ 'Selected boxes: ' + selectedBoxes}}
+      {{ 'Selected boxes: ' + selectedBoxes }}
     </div>
   </div>
 </template>
 
 <script>
-import BaseIcon from '../../src/components/BaseIcon/BaseIcon';
 
 export default {
-  components: {
-    BaseIcon,
-  },
   data() {
     return {
       selectActive: false,
       selectedBoxes: [],
-      iconSize: null,
+      iconSize: 'xxlarge',
+      boxSize: { width: 'calc(25% - 16px)' },
     };
   },
   computed: {
     imgUrl() {
-      return 'https://picsum.photos/seed/arch/460/341';
+      return 'https://picsum.photos/seed/bb/460/341';
+    },
+    images() {
+      return [
+        'https://picsum.photos/seed/aa/460/341',
+        'https://picsum.photos/seed/bb/460/341',
+        'https://picsum.photos/seed/cc/460/341',
+        'https://picsum.photos/seed/dd/460/341'
+      ];
     },
   },
   methods: {
@@ -142,37 +230,41 @@ export default {
         this.selectedBoxes.splice(this.selectedBoxes.indexOf(num), 1);
       }
     },
-    resizeHandler() {
-      if (window.outerWidth > 800) {
-        this.iconSize = 'xxlarge';
-        return;
-      }
-      this.iconSize = 'large';
-    },
+    boxResizeHandler() {
+      return new ResizeObserver((entries) => {
+        const currentWidth = entries[0].contentRect.width;
+
+        if (currentWidth > 400) {
+          this.iconSize = 'xxlarge';
+        } else {
+          this.iconSize = 'large';
+        }
+
+        if (currentWidth > 800) {
+          this.boxSize = { width: 'calc(25% - 16px)' };
+        } else {
+          this.boxSize = { width: 'calc(50% - 16px)' };
+        }
+      });
+    }
   },
   mounted() {
-    this.resizeHandler();
-    window.addEventListener('resize', this.resizeHandler);
+    this.boxResizeHandler().observe(this.$refs.boxesContainer);
   },
-  destroyed() {
-    window.removeEventListener('resize', this.resizeHandler);
-  }
 };
 </script>
-<style>
+
+<style lang="scss" scoped>
   .boxes-background {
     display: flex;
     flex-wrap: wrap;
     background-color: rgb(240, 240, 240);
-    padding: 16px;
+    padding: 16px 0 16px 16px;
   }
 
   .box {
     margin-right: 16px;
-  }
-
-  .box:last-of-type {
-    margin-right: 0;
+    margin-bottom: 16px;
   }
 
   .button-area {
@@ -183,6 +275,32 @@ export default {
     width: 16px;
     height: 16px;
   }
-</style>
 
+  .quick-actions {
+    display: flex;
+  }
+
+  .slot-title-right {
+    display: flex;
+    align-items: center;
+    color: $font-color-second;
+    font-size: $font-size-small;
+  }
+
+  .slot-title-right__text > *:not(:last-child) {
+    margin-right: 8px;
+  }
+
+  .slot-title-right__icon {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+  }
+
+  .quick-actions .base-button {
+    &:not(:last-child) {
+      margin-right: 4px;
+    }
+  }
+</style>
 ```

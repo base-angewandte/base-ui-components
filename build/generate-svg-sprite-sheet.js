@@ -3,7 +3,7 @@
  *
  * SVGs layers should be grouped and contain only simplified objects path.
  * https://jakearchibald.github.io/svgomg/ or https://icomoon.io/ would be
- * services to harmonize sizes and optimize the icons beforehand.
+ * services to harmonize sizes and optimise the icons beforehand.
  */
 
 const { optimize } = require('svgo');
@@ -16,7 +16,10 @@ const config = {
   // directory with icons
   src: '../src/static/icons',
   // directory to store spriteSheet
-  dest: '../public',
+  dest: [
+    '../public',
+    '../docs/.vuepress/public',
+  ],
   // temporally directory to store optimized icons (will be removed afterwards)
   tmp: '../_optimizedIcons',
   // name of created spriteSheet
@@ -80,7 +83,6 @@ const svgOptimise = async (options) => {
 const svgSprite = (options) => {
   // define paths
   const src = path.join(__dirname, options.tmp);
-  const dest = path.join(__dirname, options.dest);
 
   // init sprite object
   let sprite = svgStore(options.svgStore.svgAttrs);
@@ -103,16 +105,23 @@ const svgSprite = (options) => {
   // remove xml tag
   sprite = /<svg(.+)/.exec(sprite)[0];
 
-  // create directory if needed
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
+  // save file to destination(s)
+  config.dest.forEach(dest => {
+    const destPath = path.join(__dirname, dest);
 
-  // save svg sprite
-  fs.writeFileSync(`${dest}/${options.name}`, sprite);
+    // create directory if needed
+    if (!fs.existsSync(destPath)) {
+      fs.mkdirSync(destPath, { recursive: true });
+      // inform user
+      console.info(`Path has been created: ${destPath}`);
+    }
 
-  // inform user
-  console.info(`SVG SpriteSheet has been created: ${dest}/${options.name}`);
+    // save svg sprite
+    fs.writeFileSync(`${destPath}/${options.name}`, sprite);
+
+    // inform user
+    console.info(`SVG SpriteSheet has been created: ${destPath}/${options.name}`);
+  });
 }
 
 /**
