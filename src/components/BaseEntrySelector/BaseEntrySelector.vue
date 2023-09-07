@@ -17,12 +17,15 @@
           v-model="filterString"
           :show-image="true"
           :placeholder="getI18nTerm(entrySelectorText.search)"
-          class="base-entry-selector__head__search-bar"
+          :class="['base-entry-selector__head__search-bar',
+                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
           @input="filterEntries($event, 'title')" />
       </slot>
 
       <!-- BASE OPTIONS ROW -->
-      <div class="base-entry-selector__options">
+      <div
+        v-if="showOptionsRow"
+        class="base-entry-selector__options">
         <BaseOptions
           ref="baseOptions"
           :show-options.sync="showOptions"
@@ -36,7 +39,7 @@
           :options-button-text="entrySelectorText.options"
           align-options="left">
           <template
-            slot="afterOptions">
+            #afterOptions>
             <div
               class="base-entry-selector__dropdowns">
               <!-- @slot to add custom elements at the end of the options row,
@@ -74,7 +77,7 @@
             </div>
           </template>
           <template
-            slot="options">
+            #options>
             <!-- @slot add custom action (buttons) -->
             <slot name="option-actions" />
           </template>
@@ -282,6 +285,7 @@ export default {
     },
     /**
      * hide options completely (necessary if only before or after slot elements should remain)
+     * if the complete options row should be hidden set `showOptionsRow` to `false` instead!
      */
     optionsHidden: {
       type: Boolean,
@@ -396,6 +400,15 @@ export default {
      * this will have no effect if `head` slot is used.
      */
     useSearch: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * this will remove the complete row between search and entries list.
+     * This means also the slots `options` and `afterOptions` are not available anymore!
+     * (if only the options menu should be hidden use `optionsHidden` instead)
+     */
+    showOptionsRow: {
       type: Boolean,
       default: true,
     },
@@ -651,6 +664,10 @@ export default {
 
       &__search-bar {
         margin-bottom: $spacing-small;
+      }
+
+      &__search-bar--margin-large {
+        margin-bottom: $spacing;
       }
     }
 
