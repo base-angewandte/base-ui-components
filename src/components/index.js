@@ -53,6 +53,7 @@ import BaseSwitchButton from './BaseSwitchButton/BaseSwitchButton';
 import BaseTextList from './BaseTextList/BaseTextList';
 import BaseToggle from './BaseToggle/BaseToggle';
 import BaseTooltip from './BaseTooltip/BaseTooltip';
+import BaseTooltipBox from './BaseTooltipBox/BaseTooltipBox';
 import BaseUploadPopUp from './BaseUploadPopUp/BaseUploadPopUp';
 
 export {
@@ -111,5 +112,6 @@ export {
   BaseTextList,
   BaseToggle,
   BaseTooltip,
+  BaseTooltipBox,
   BaseUploadPopUp,
 };
