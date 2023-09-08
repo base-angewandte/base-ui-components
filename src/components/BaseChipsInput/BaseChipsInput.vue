@@ -403,6 +403,23 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * define if selected options chips should come with a remove icon
+     */
+    chipsRemovable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define a default entry
+     * will be added when component is mounted and selected list is initially empty
+     * properties:
+     * **label**: text for the default value
+     */
+    defaultEntry: {
+      type: [Object, null],
+      default: null,
+    },
   },
   data() {
     return {
@@ -662,6 +679,11 @@ export default {
     const elems = this.$el.getElementsByTagName('input');
     if (elems && elems.length) {
       [this.inputElem] = elems;
+    }
+
+    // add optional default entry to empty selectedList only
+    if (this.defaultEntry && !this.selectedList.length) {
+      this.selectedListInt.push(this.defaultEntry);
     }
   },
   methods: {

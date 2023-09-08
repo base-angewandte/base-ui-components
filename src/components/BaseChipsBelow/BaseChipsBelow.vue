@@ -4,11 +4,12 @@
       ref="chipsInput"
       v-model="selectedBelowListInt"
       v-bind="chipsInputProps"
-      :sortable="true"
       :is-loading="isLoading"
+      :display-chips-inline="false"
       :sort-text="sortText"
       :sort-name="sortName"
-      :display-chips-inline="false"
+      :invalid="invalidInt"
+      :error-message="errorMessageInt"
       @selected-changed="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
@@ -64,12 +65,14 @@
         v-for="(entry, index) in selectedBelowListInt"
         :key="'item' + entry.idInt"
         :name="entry[labelPropertyName]"
-        class="base-chips-below-list-item"
+        :class="['base-chips-below-list-item',
+                 { 'base-chips-below-list-item--draggable': draggable }]"
         @mousedown="chipActive = index">
         <div
           :key="'line' + entry.idInt"
           class="base-chips-below-list-item-line">
           <div
+            v-if="draggable"
             :key="'iconwrapper' + entry.idInt"
             class="base-chips-below-list-icon-wrapper">
             <base-icon
@@ -77,7 +80,6 @@
               name="drag-lines"
               class="svg-icon base-chips-below-list-icon" />
           </div>
-
           <div
             :key="'chip-wrapper' + entry.idInt"
             class="base-chips-below-list-item-chip-wrapper">
@@ -110,6 +112,13 @@
             :drop-down-no-options-info="dropDownNoOptionsInfo"
             :identifier-property-name="identifierPropertyName"
             :label-property-name="labelPropertyName"
+            :invalid="isInvalidAdditionalOption(entry[labelPropertyName], index)"
+            :error-message="additionalOptionsErrorMessage(entry[labelPropertyName], index)"
+            :allow-multiple-entries="additionalPropAllowMultipleEntries"
+            :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
+            :show-error-icon="showErrorIcon"
+            :required="additionalPropRequired"
+            :default-entry="additionalPropDefaultOption"
             class="base-chips-below-chips-input"
             @selected-changed="updateAdditionalProperty($event, index)" />
         </div>
@@ -163,7 +172,7 @@ export default {
       default: () => [],
     },
     /**
-     if field is occurring more then once - set an id
+     if field is occurring more than once - set an id
      */
     id: {
       type: String,
@@ -206,9 +215,8 @@ export default {
       default: false,
     },
     /**
-     * define only a single or multiple options can be selected
+     * define whether one or more entries can be selected from the drop-down menu
      */
-    // define if one or several entries can be selected from drop down menu
     allowMultipleEntries: {
       type: Boolean,
       default: true,
@@ -231,13 +239,36 @@ export default {
       default: true,
     },
     /**
+     * define whether one or more options can be selected from the drop-down menu
+     */
+    additionalPropAllowMultipleEntries: {
+      type: Boolean,
+      default: true,
+    },
+    /**
      * Additional property options will set the drop down available for the selected entries
-     * needs to be an object with at least a label and an identifier property, using names set in
-     * identifierPropertyName and labelPropertyName
+     * needs to be an object with following attributes:
+     * **label**: label name set in labelPropertyName
+     * **id**: identifier set in identifierPropertyName (optional)
      */
     additionalPropOptions: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * define a default option for additional props
+     * see `defaultEntry` at [BaseChipsInput props](BaseChipsInput) for more details
+     */
+    additionalPropDefaultOption: {
+      type: [Object, null],
+      default: null,
+    },
+    /**
+     * specify additional options as required
+     */
+    additionalPropRequired: {
+      type: Boolean,
+      default: false,
     },
     /**
      * specify a placeholder of the additional property input field
@@ -245,6 +276,17 @@ export default {
     additionalPropPlaceholder: {
       type: String,
       default: 'Select role(s)',
+    },
+    /**
+     * define validation messages
+     */
+    validationTexts: {
+      type: Object,
+      default: () => ({
+        required: 'Select an option.',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['required'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
      * set content for the info box activatable by click
@@ -316,7 +358,7 @@ export default {
       default: 'roles',
     },
     /**
-     * mark as required field (currently only used for `aria-required`)
+     * mark as required field
      */
     required: {
       type: Boolean,
@@ -371,17 +413,35 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * define if a button for sorting the entries is visible
+     */
+    sortable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define if chips should be draggable
+     */
+    draggable: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
       chipsArray: [],
       selectedBelowListInt: [],
       chipActive: -1,
+      // error handling
+      invalidInt: false,
+      errorMessageInt: '',
+      additionalPropErrors: [],
     };
   },
   computed: {
     // need to filter language from $props for chips input component since only needed for
-    // additonal property (roles)!
+    // additional property (roles)!
     // leads to unwanted behaviour else (creating multilang object)
     chipsInputProps() {
       const newProps = { ...this.$props };
@@ -410,11 +470,68 @@ export default {
     },
   },
   watch: {
+    /**
+     * create internal list and reset errors
+     * @param {Object[]} val
+     */
     selectedList: {
       handler(val) {
         this.createInternalList(val);
+        // reset error
+        if (val.length) {
+          this.invalidInt = false;
+        }
+        // check if allowUnknownEntries are allowed and reset errors,
+        // due new entries do not have an id set initially and
+        // the error matching with index breaks
+        if (this.allowUnknownEntries
+          && this.additionalPropErrors.length) {
+          this.additionalPropErrors = [];
+        }
       },
       immediate: true,
+    },
+    /**
+     * keep externally set invalid variable and internal invalid variable in sync
+     * @param {boolean} val
+     */
+    invalid: {
+      handler(val) {
+        this.invalidInt = val;
+      },
+      immediate: true,
+    },
+    /**
+     * keep externally set error message variable and internal error message variable in sync
+     * @param {string} val
+     */
+    errorMessage: {
+      handler(val) {
+        this.errorMessageInt = val;
+      },
+      immediate: true,
+    },
+    /**
+     * reset the invalid status when the required property is externally set to false.
+     * @param {boolean} val
+     */
+    required: {
+      handler(val) {
+        if (!val) {
+          this.invalidInt = false;
+        }
+      },
+    },
+    /**
+     * reset the additional prop errors when property is externally set to false.
+     * @param {boolean} val
+     */
+    additionalPropRequired: {
+      handler(val) {
+        if (!val) {
+          this.additionalPropErrors = [];
+        }
+      },
     },
   },
   methods: {
@@ -445,17 +562,27 @@ export default {
     updateAdditionalProperty(evt, index) {
       this.$set(this.selectedBelowListInt[index], this.additionalPropertyName, evt);
       this.emitInternalList(this.selectedBelowListInt);
+      this.isValidAdditionalOptions(this.selectedBelowListInt[index]);
+      /**
+       * propagate additional-property-changed change event to parent
+       * Note: useful when validation is done from the parent
+       *
+       * @event additional-property-changed
+       * @param {Object} obj - changed object
+       */
+      this.$emit('additional-property-changed', this.selectedList[index]);
     },
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
         if (typeof entry === 'object') {
-          return { ...{
-            [this.additionalPropertyName]: [],
-            idInt: this.identifierPropertyName && (entry[this.identifierPropertyName] === 0
+          return {
+            ...{
+              [this.additionalPropertyName]: [],
+              idInt: this.identifierPropertyName && (entry[this.identifierPropertyName] === 0
               || entry[this.identifierPropertyName])
-              ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + index,
-          },
-          ...entry,
+                ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + index,
+            },
+            ...entry,
           };
         }
         return {
@@ -513,6 +640,104 @@ export default {
        */
       this.$emit('hoverbox-active', { value, entry });
     },
+    /**
+     * get additional options error message
+     * @param {string} id - objects id
+     * @param {number} index - index in selectedList (needed for unknown entries)
+     * @returns {string}
+     */
+    additionalOptionsErrorMessage(id, index) {
+      if (this.additionalPropErrors.filter(obj => obj.id === id).length
+            || typeof this.additionalPropErrors[index] !== 'undefined') {
+        return this.validationTexts.required;
+      }
+      return '';
+    },
+    /**
+     * check if chips should be removable
+     * @param {Object} obj
+     * @returns {boolean}
+     */
+    isChipsRemovable(obj) {
+      return !this.additionalPropRequired
+        || (!!this.additionalPropAllowMultipleEntries && obj.length > 1);
+    },
+    /**
+     * validate chips input field
+     * @returns {boolean} - error state
+     */
+    isValidChipsInput() {
+      // if not set do anything
+      if (!this.required) return true;
+
+      // if no chips set, throw error
+      if (!this.selectedList.length) {
+        this.invalidInt = true;
+        // consider also optional errorMessage
+        this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`.trim();
+        return false;
+      }
+      // otherwise everything is fine
+      return true;
+    },
+    /**
+     * check if a single additional option is invalid
+     * @param {string} id
+     * @param {number} index
+     * @returns {boolean}
+     */
+    isInvalidAdditionalOption(id, index) {
+      return !!this.additionalPropErrors.filter(obj => obj.id === id).length
+        || typeof this.additionalPropErrors[index] !== 'undefined';
+    },
+    /**
+     * validate single or all additional option or all from selectedList
+     * @param {object|null} obj - single row object (optional)
+     * @returns {boolean} - valid state
+     */
+    isValidAdditionalOptions(obj) {
+      // if not set do anything
+      if (!this.additionalPropRequired) return true;
+
+      // validate single additional option
+      // if a chip is set (should always be if obj is specified)
+      if (obj && obj[this.additionalPropertyName].length) {
+        // remove the current object from the errors array
+        this.additionalPropErrors = this.additionalPropErrors
+          .filter(item => item.id !== obj.id);
+        // return validation state
+        return true;
+      }
+
+      // validate all selected entries and set errors
+      this.additionalPropErrors = this.selectedList
+        .filter(entry => !entry[this.additionalPropertyName] || !entry[this.additionalPropertyName].length)
+        .map(entry => ({ id: entry.id }));
+
+      // return validation state
+      return this.selectedBelowListInt.length ? !this.additionalPropErrors.length : true;
+    },
+    /**
+     * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelow.validate();` from parent.<br>
+     * Therefore, the component must have a reference set.
+     * @public
+     * @returns {boolean} - components error state
+     */
+    validate() {
+      // clear errors
+      this.invalidInt = false;
+      this.errorMessageInt = '';
+      this.additionalPropErrors = [];
+      // validate
+      const isValidChipsInput = this.isValidChipsInput();
+      const isValidAdditionalOptions = this.isValidAdditionalOptions(null);
+      // return error state
+      // nice to have would be to return an object or array with more information
+      // e.g. { label: this.label, error: this.errorMessageInt },
+      // but how to deal with the additionalOptions
+      // for now a boolean is enough
+      return !(isValidChipsInput && isValidAdditionalOptions);
+    },
   },
 };
 
@@ -523,9 +748,13 @@ export default {
 
   .base-chips-below {
     .base-chips-below-list-item {
-      padding: $spacing-small-half 0;
-      margin-bottom: -2px;
-      border-bottom: $separation-line;
+      padding: $spacing-small-half 0 0 0;
+
+      &:not(:last-of-type) {
+        margin-bottom: -2px;
+        border-bottom: $separation-line;
+        padding: $spacing-small-half 0;
+      }
 
       .base-chips-below-list-item-line {
         display: flex;
@@ -548,11 +777,23 @@ export default {
 
         .base-chips-below-list-item-chip-wrapper {
           width: 100%;
-          margin-left: $spacing-small;
           margin-right: $spacing;
+          max-width: calc(50% - #{$spacing});
+          flex: 1 0 calc(50% - #{$spacing});
+          text-align: left;
+        }
+
+        .base-chips-below-chips-input {
+          max-width: calc(50%);
+          flex: 1 0 calc(50%);
+        }
+      }
+
+      &.base-chips-below-list-item--draggable {
+        .base-chips-below-list-item-chip-wrapper {
+          margin-left: $spacing-small;
           max-width: calc(50% - (2 * #{$spacing}));
           flex: 1 0 calc(50% - (2 * #{$spacing}));
-          text-align: left;
         }
 
         .base-chips-below-chips-input {

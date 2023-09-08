@@ -663,19 +663,25 @@ export default {
      * keep externally set errorMessage variable and internal errorMessage variable in sync
      * @param {string} val
      */
-    errorMessage(val) {
-      if (val !== this.errorMessageInt) {
-        this.errorMessageInt = val;
-      }
+    errorMessage: {
+      handler(val) {
+        if (val !== this.errorMessageInt) {
+          this.errorMessageInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * keep externally set invalid variable and internal invalid variable in sync
      * @param {boolean} val
      */
-    invalid(val) {
-      if (val !== this.invalidInt) {
-        this.invalidInt = val;
-      }
+    invalid: {
+      handler(val) {
+        if (val !== this.invalidInt) {
+          this.invalidInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * keep externally set invalid variable and internal invalid variable in sync
