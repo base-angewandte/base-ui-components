@@ -66,7 +66,7 @@
               <!-- eslint-disable -->
               <BaseLink
                 :key="objectIndex"
-                :source="objectItem.source"
+                :source="objectItem.source || objectItem.id"
                 :tooltip="objectItem.additional"
                 :type="item.id"
                 :url="objectItem.url"
@@ -109,7 +109,7 @@
                 class="base-text-list__content__label base-text-list__content__value">
                 <BaseLink
                   :render-link-as="renderLinkAs"
-                  :source="objectItem.source"
+                  :source="objectItem.source || objectItem.id"
                   :tooltip="objectItem.additional"
                   :type="item.id"
                   :url="objectItem.url"
@@ -269,7 +269,7 @@ export default {
      * @returns {boolean}
      */
     isChip(data) {
-      return !!(data.source && data.type);
+      return !!((data.source || data.id) && data.type);
     },
     /**
      * function to emit event and data
