@@ -33,7 +33,7 @@ export default {
         return ['add-existing-collection', 'add-existing-object', 'add-new-collection', 'add-new-object', 'archive-arrow',
           'archive-empty', 'archive-sheets', 'arrow-left', 'attachment', 'attention', 'audio-object', 'calendar-many',
           'calendar-number', 'camera', 'check-mark', 'clock', 'collection', 'download', 'drag-lines', 'drag-n-drop',
-          'drop-down', 'duplicate', 'edit', 'eye-hide', 'eye', 'file-object', 'forbidden', 'home', 'image-object',
+          'drop-down', 'duplicate', 'edit', 'eye-hide', 'eye', 'file-object', 'forbidden', 'grid', 'home', 'image-object',
           'information', 'institution', 'information-solo', 'licence', 'logo', 'magnifier', 'next', 'options-menu', 'people',
           'people-filled', 'play', 'plus', 'prev', 'print', 'refresh', 'remove', 'save-file', 'share', 'sort', 'subscribe',
           'success', 'text', 'unsubscribe', 'video-object', 'waste-bin'].includes(val);

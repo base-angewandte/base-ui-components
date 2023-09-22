@@ -510,6 +510,7 @@ export default {
       display: inline-block;
       border-width: 8px;
       border-style: solid;
+      pointer-events: none;
     }
 
     &--top {
