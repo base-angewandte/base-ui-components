@@ -193,7 +193,7 @@ export default {
       validate: val => val > 0,
     },
     /**
-     * specify how link element should be rendered - this needs to be a
+     * specify how the link element should be rendered - this needs to be a
      * valid vue link component (e.g. RouterLink, NuxtLink) and vue-router
      * is necessary
      */
@@ -211,7 +211,8 @@ export default {
       validate: val => ['horizontal', 'vertical'].includes(val),
     },
     /**
-     * specify gap between content rows
+     * specify the gap between content rows
+     * @values large, small
      */
     rowGap: {
       type: String,
@@ -241,7 +242,7 @@ export default {
     },
   },
   created() {
-    // If parent component is type `BaseTextList` we assume that the current `BaseTextList` has columns
+    // If the parent component is type `BaseTextList` we assume that the current `BaseTextList` has columns
     this.hasColumns = this.$parent.$options.name === 'BaseTextList';
   },
   methods: {
