@@ -248,8 +248,8 @@ export default {
     /**
      * Additional property options will set the drop down available for the selected entries
      * needs to be an object with following attributes:
-     * **label**: label name set in labelPropertyName
-     * **id**: identifier set in identifierPropertyName (optional)
+     * **label|*** `string`: the label of the default option - use the property name set via prop `labelPropertyName`
+     * **id|*** `string?`: (optional) identifier of the default option - use the property name set via prop `identifierPropertyName`
      */
     additionalPropOptions: {
       type: Array,

@@ -569,7 +569,7 @@ export default {
      *
      * **Caveat**: currently the required prop is only used to trigger [BaseChipsBelow](BaseChipsBelow) validation -
      *             for all other form fields it is only used for the `aria-required` attributes
-     * **Note**: the required value is set via OpenAPI JSON
+     * **Note**: if required is also set via OpenAPI definition x-attrs (provided by prop `field`) this will overwrite the prop!
      */
     required: {
       type: Boolean,
