@@ -1,3 +1,16 @@
+## 3.1.1 (2023-10-02)
+
+
+### Added
+
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** add new prop `showOptionsRow` to allow for removing this element completely
+
+
+### Fixed
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):** single select higher than multiselect
+* saveguard i18n term function against key not being provided
+
 ## 3.1.0 (2023-09-05)
 
 
