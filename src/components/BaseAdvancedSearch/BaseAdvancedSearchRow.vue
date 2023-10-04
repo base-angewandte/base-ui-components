@@ -409,7 +409,7 @@ export default {
      */
     isMainSearch: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     /**
      * list of available filters, needs to be an array of objects with the following properties:<br>
