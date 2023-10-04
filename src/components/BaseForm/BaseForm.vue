@@ -652,7 +652,7 @@ export default {
         name: field.name,
       };
       // inform parent of changes
-      this.propagateValueListChanges();
+      this.propagateValueListChanges(field);
     },
     // remove multiplied field again
     removeField(field, index) {
@@ -665,9 +665,9 @@ export default {
         this.$set(fieldGroupValues, index, this.getInitialFieldValue(field.items));
       }
       // inform parent of changes
-      this.propagateValueListChanges();
+      this.propagateValueListChanges(field);
     },
-    propagateValueListChanges() {
+    propagateValueListChanges(field) {
       /**
        * event triggered when the values of a field were altered or a form
        * field was added or removed
@@ -675,7 +675,7 @@ export default {
        * @event values-changed
        * @param {Object[]} - the changed value list
        */
-      this.$emit('values-changed', this.valueListInt);
+      this.$emit('values-changed', this.valueListInt, field);
     },
     // check if field is half field and the second of two halves
     isHalfFieldSecond(field) {
@@ -768,7 +768,7 @@ export default {
       } else {
         this.$set(this.valueListInt, fieldName, value ? JSON.parse(JSON.stringify(value)) : value);
       }
-      this.$emit('values-changed', this.valueListInt);
+      this.$emit('values-changed', this.valueListInt, this.formFieldJson[fieldName]);
     },
     initializeValueObject() {
       this.formFieldListInt.forEach((field) => {
