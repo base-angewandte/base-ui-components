@@ -103,6 +103,8 @@
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
+        <!-- @slot add an element at the end of the search row (e.g. additional button) -->
+        <slot name="after" />
       </template>
 
       <!-- DROP DOWN BODY -->
@@ -207,23 +209,23 @@
 
           <!-- AUTOCOMPLETE OPTIONS LIST -->
           <template
-            #option="slotProps">
+            #option="{ option }">
             <div
               v-if="!filter || useAutocompleteFunctionality"
               class="base-advanced-search-row__autocomplete-body">
               <div
-                v-if="slotProps.option[autocompletePropertyNames.data].length"
+                v-if="option[autocompletePropertyNames.data].length"
                 :class="['base-advanced-search-row__first-column',
                          'base-advanced-search-row__autocomplete-collection',
                 ]">
                 <div class="base-advanced-search-row__autocomplete-collection-text">
-                  {{ slotProps.option[autocompletePropertyNames.label] }}
+                  {{ option[autocompletePropertyNames.label] }}
                 </div>
               </div>
 
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
-                :drop-down-options="slotProps.option[autocompletePropertyNames.data]"
+                :drop-down-options="option[autocompletePropertyNames.data]"
                 :active-option.sync="activeEntry"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
@@ -231,10 +233,11 @@
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
                 :label-property-name="labelPropertyName.autocompleteOption"
                 class="base-advanced-search-row__autocomplete-options"
-                @update:active-option="setCollection(slotProps
-                  .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption($event, slotProps
-                  .option[autocompletePropertyNames.id])" />
+                @update:active-option="setCollection(option[autocompletePropertyNames.id])"
+                @update:selected-option="addOption(
+                  $event,
+                  option[autocompletePropertyNames.id],
+                )" />
             </div>
           </template>
 
@@ -346,6 +349,8 @@
             </div>
           </template>
         </BaseDropDownList>
+        <!-- @slot add an element below the primary row (same styling (box-shadow) as primary row element) -->
+        <slot name="below" />
       </template>
     </BaseSearch>
     <BaseButton
