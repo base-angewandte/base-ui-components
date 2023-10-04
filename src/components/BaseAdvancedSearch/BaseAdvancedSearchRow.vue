@@ -129,7 +129,9 @@
           class="base-advanced-search-row__drop-down-body"
           @touchstart.native.stop=""
           @click.native.stop="">
-          <template #before-list>
+          <template
+            v-if="mode === 'list'"
+            #before-list>
             <div
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
@@ -354,7 +356,7 @@
       </template>
     </BaseSearch>
     <BaseButton
-      v-if="isMainSearch"
+      v-if="mode === 'list' && isMainSearch"
       icon="plus"
       button-style="row"
       icon-position="right"
@@ -401,6 +403,14 @@ export default {
     searchRowId: {
       type: String,
       default: '',
+    },
+    /**
+     *
+     */
+    mode: {
+      type: String,
+      default: 'list',
+      validator: val => ['list', 'form'].includes(val),
     },
     /**
      * property to distinguish between one of multiple filter rows
@@ -1200,11 +1210,15 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
-      // if option is coming from autocomplete drop down list (=has an id)
-      // and currently active filter is not identical
-      // with the category of the selected item (if everything is going right this should
-      // be 'default') then set the category of the selected item as current filter
-      if (this.useAutocompleteFunctionality
+      // check if filters were specified - if not assume the input is handled in parent component
+      if (!this.filterList || !this.filterList.length) {
+        this.$emit('option-selected', ({ entry, collectionId }));
+        this.resetAllInput();
+        // if option is coming from autocomplete drop down list (=has an id)
+        // and currently active filter is not identical
+        // with the category of the selected item (if everything is going right this should
+        // be 'default') then set the category of the selected item as current filter
+      } else if (this.useAutocompleteFunctionality
         && entry[this.identifierPropertyName.autocompleteOption]
         && this.filter[this.identifierPropertyName.filter]
           !== (this.activeCollection || collectionId
@@ -1214,7 +1228,7 @@ export default {
           // category but if everything fails - use default filter again
           === (this.activeCollection || collectionId)) || this.defaultFilter;
         // since default filter could be other than chips at least safeguard against type 'text'
-        // TODO: this assumes filter type is 'text'! needs further handling if other filter
+        // TODO: this assumes default filter type is 'text'! needs further handling if other filter
         // types could be default
         const newValue = newFilter[this.identifierPropertyName.filter]
         === this.defaultFilter[this.identifierPropertyName.filter]
@@ -1307,7 +1321,7 @@ export default {
      */
     openDropDown() {
       this.isActive = true;
-      if (this.searchInputElement) {
+      if (this.mode === 'list' && this.searchInputElement) {
         this.searchInputElement.focus();
       }
     },
@@ -1999,7 +2013,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@import '../../styles/variables';
 
 .base-advanced-search-row__input-field {
   height: calc(#{$row-height-large} - 4px);

@@ -1,279 +1,429 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
-    <div class="controls">
-      <div style="background-color: #fff; padding: 16px; margin-bottom: 16px;">
-        <template
-          v-for="(link, index) in links">
-          <BaseLink
-            :key="index"
-            :source="link.source"
-            :tooltip="link.tooltip"
-            :tooltip-async="link.additional"
-            :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
-            :type="link.type"
-            :url="link.url"
-            :value="link.value" />
-        </template>
-      </div>
-      <div style="background-color: #fff; padding: 16px; margin-bottom: 16px;">
-        <BaseTextList
-          render-label-as="h2"
-          :data="baseTextListData" />
-      </div>
-      <BaseCarousel
-        :items="items"
-        :swiper-options="{
-          slidesPerView: 1,
-          slidesPerGroup: 1,
-          spaceBetween: 15,
-          autoplay: false,
-          loop: true,
-          speed: 750,
-          keyboard: {
-            enabled: true,
-          },
-          pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-          },
-          breakpoints: {
-            640: {
-              slidesPerView: 2,
-              slidesPerGroup: 2,
-            },
-            1024: {
-              slidesPerView: 3,
-              slidesPerGroup: 3,
-            },
-          },
-        }" />
-      <BaseMap
-        :marker="marker"
-        :options="options"
-        attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
-        copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
-        url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
-      <BaseToggle
-        v-model="selectMode"
-        label="Select Mode"
-        class="control" />
-      <BaseToggle
-        v-model="showOptions"
-        label="Show Options"
-        class="control" />
-      <BaseToggle
-        v-model="showSort"
-        label="Show Sorting Drop Down"
-        class="control" />
-      <BaseToggle
-        v-model="showTypesFilter"
-        label="Show Types Filter"
-        class="control" />
-      <BaseToggle
-        v-model="isLoading"
-        label="Is Loading"
-        class="control" />
-      <BaseToggle
-        v-model="useCustomText"
-        label="Use Custom Texts"
-        class="control"
-        @clicked="selectMode = true; noResults = true" />
-      <BaseToggle
-        v-model="noResults"
-        label="No search Results"
-        class="control" />
-      <BaseToggle
-        v-model="showPagination"
-        label="Show Pagination"
-        class="control" />
-    </div>
-    <div class="controls">
-      <BaseToggle
-        v-model="useHeadSlot"
-        label="Use 'head' Slot"
-        class="control" />
-      <BaseToggle
-        v-model="useActionsSlot"
-        label="Use 'option-actions' Slot"
-        class="control"
-        @clicked="selectMode = true" />
-      <BaseToggle
-        v-model="useAfterOptionsSlot"
-        label="Use 'after-options' Slot"
-        class="control" />
-      <BaseToggle
-        v-model="useEntriesSlot"
-        label="Use 'entries' Slot"
-        class="control"
-        @clicked="useThumbnailsSlot = false" />
-      <BaseToggle
-        v-model="useThumbnailsSlot"
-        :disabled="useEntriesSlot"
-        label="Use 'thumbnails' Slot"
-        class="control" />
-    </div>
-    <BaseEntrySelector
-      :entries="baseEntrySelectorEntries"
-      :entries-total="entries.length"
-      :entries-per-page="entriesPerPage"
-      :active-entry="baseEntrySelectorEntries.map(entry => entry.id).indexOf(activeEntry)"
-      :entries-selectable.sync="selectMode"
-      :options-hidden="!showOptions"
-      :sort-options="showSort ? sortOptions : []"
-      :sort-config="{
-        label: 'Sort Entries',
-        default: {
-          label: 'A - Z',
-          value: 'title',
+    <BaseAdvancedSearch
+      mode="form"
+      :applied-filters.sync="appliedFilters"
+      :form-filter-list="formFilterList"
+      :autocomplete-results="autocompleteResults"
+      :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"
+      :form-props="{
+        fieldIsLoading: 'title',
+        fieldProps: {
+          title: {
+            addNewChipText: '{value} hinzufügen...'
+          }
         },
-        valuePropertyName: 'value',
-      }"
-      :entry-types="showTypesFilter ? entryTypes : []"
-      :entry-types-config="{
-        label: 'Filter By Type',
-        default: {
-          label: {
-            de: 'Alle Typen',
-            en: 'All Types',
-          },
-          source: '',
+        dropDownLists: {
+          title: [{
+            label: 'Type 1',
+            source: 'bla',
+          }],
+          place_of_creation: [{
+                                label: 'Type 1',
+                                source: 'bla',
+                              },
+                              {
+                                label: 'Type 2',
+                                source: 'bla1',
+                              }],
+          weekday: [{
+                      label: 'Montag',
+                      source: 'monday',
+                    },
+                    {
+                      label: 'Dienstag',
+                      source: 'tuesday',
+                    },
+                    {
+                      label: 'Mittwoch',
+                      source: 'wednesday',
+                    },
+                    {
+                      label: 'Donnerstag',
+                      source: 'thursday',
+                    },
+                    {
+                      label: 'Freitag',
+                      source: 'friday',
+                    },
+                    {
+                      label: 'Samstag',
+                      source: 'saturday',
+                    },
+                    {
+                      label: 'Sonntag',
+                      source: 'sunday',
+                    }],
         },
-        valuePropertyName: 'source',
+
       }"
-      :is-loading="isLoading"
-      language="de"
-      v-bind="entrySelectorText"
-      @selected-changed="selectedEntries = $event"
-      @fetch-entries="getNewEntries"
-      @entry-clicked="activeEntry = $event">
-      <template #head>
-        <template v-if="useHeadSlot">
-          <div class="custom-slot">
-            Put your custom head slot elements here
-          </div>
-        </template>
-      </template>
-      <template #option-actions>
-        <template v-if="useActionsSlot">
-          <div class="custom-slot">
-            <BaseButton
-              text="Publish"
-              icon="eye" />
-          </div>
-        </template>
-      </template>
-      <template #after-options>
-        <template v-if="useAfterOptionsSlot">
-          <div class="custom-slot">
-            Custom after-options element
-          </div>
-        </template>
-      </template>
-      <template #thumbnails="{ item }">
-        <template v-if="useThumbnailsSlot">
-          <BaseIcon
-            v-if="item.has_media"
-            :style="{ width: '14px' }"
-            name="eye" />
-        </template>
-      </template>
-      <template #entries="{ selectEntry }">
-        <template v-if="useEntriesSlot">
-          <div class="custom-slot">
-            This could be your custom entries display
-            <BaseButton
-              v-if="selectMode"
-              text="Select Entry"
-              icon="plus"
-              @clicked="selectEntry({
-                index: 0,
-                selected: true,
-              })" />
-            <div>
-              <b>Selected Entries:</b>
-              {{ selectedEntries.map(entry => entry.id) }}
-            </div>
-          </div>
-        </template>
-      </template>
-    </BaseEntrySelector>
-
-    <div v-if="editExpandList">
-      <BaseCheckmark
-        v-model="toggleElements"
-        :radio-value="'button'"
-        :show-label="true"
-        label="Use button elements"
-        mark-style="radio" />
-      <BaseCheckmark
-        v-model="toggleElements"
-        :radio-value="'toggle'"
-        :show-label="true"
-        label="Use toggle elements"
-        mark-style="radio" />
-    </div>
-    <BaseEditControl
-      title="Activities"
-      :controls="true"
-      :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
-      :edit="editExpandList"
-      @activated="activateExpandList"
-      @canceled="cancelExpandList"
-      @saved="saveExpandList" />
-
-    <BaseExpandList
-      ref="baseExpandList"
-      :data.sync="displayData"
-      :edit="editExpandList"
-      :control-type="toggleElements"
-      @saved="saveExpandListEdit">
-      <template
-        #content="props">
-        <BaseLink
-          :url="props.data.url"
-          :value="props.data.value"
-          :source="props.data.source"
-          :space-after="!!props.data.additional"
-          :tooltip="props.data.additional"
-          :type="props.data.type" />
-        <template v-if="props.data.attributes">
-          - {{ props.data.attributes.join(', ') }}
-        </template>
-      </template>
-    </BaseExpandList>
+      @fetch-autocomplete="fetchAutocomplete" />
+    <!--    <BaseAdvancedSearch-->
+    <!--      :applied-filters.sync="appliedFilters2"-->
+    <!--      :filter-list="filterList"-->
+    <!--      :autocomplete-results="autocompleteResults"-->
+    <!--      :identifier-property-name="{-->
+    <!--        filter: 'label',-->
+    <!--        autocompleteOption: 'id',-->
+    <!--        controlledVocabularyOption: 'id',-->
+    <!--      }"-->
+    <!--      :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"-->
+    <!--      @fetch-autocomplete="fetchAutocomplete" />-->
   </div>
 </template>
 
 <script>
-import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark';
-import BaseExpandList from '@/components/BaseExpandList/BaseExpandList';
-import BaseLink from '@/components/BaseLink/BaseLink';
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
-import BaseEditControl from '@/components/BaseEditControl/BaseEditControl';
-import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-import BaseMap from '@/components/BaseMap/BaseMap';
-
-import BaseToggle from '@/components/BaseToggle/BaseToggle';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseEntrySelector from '@/components/BaseEntrySelector/BaseEntrySelector';
+import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
 
 export default {
   components: {
-    BaseCheckmark,
-    BaseEditControl,
-    BaseExpandList,
-    BaseLink,
-    BaseTextList,
-    BaseButton,
-    BaseIcon,
-    BaseToggle,
-    BaseEntrySelector,
-    BaseCarousel,
-    BaseMap,
+    BaseAdvancedSearch,
   },
   data() {
     return {
+      appliedFilters: [],
+      appliedFilters2: [],
+      formFilterList: {
+        title: {
+          type: 'array',
+          title: 'Titel',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+            allow_unknown_entries: true,
+            source: '/autosuggest/v1/places/',
+            placeholder: 'URL eintragen',
+            order: 1,
+          },
+        },
+        boolean: {
+          type: 'boolean',
+          title: 'Genderspezifische Lehrveranstaltungen',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'boolean',
+            placeholder: 'URL eintragen',
+            order: 2,
+          },
+        },
+        number: {
+          type: 'integer',
+          title: 'Integer',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'integer',
+            placeholder: 'URL eintragen',
+            order: 3,
+          },
+        },
+        date_string: {
+          type: 'string',
+          title: 'String Date',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'date',
+            placeholder: 'URL eintragen',
+            order: 4,
+          },
+        },
+        artist: {
+          type: 'string',
+          title: 'Künstler*innen',
+          'x-attrs': {
+            placeholder: 'Künstler*innen eintragen',
+            order: 5,
+            field_format: 'half',
+            field_type: 'text',
+            dynamic_autosuggest: true,
+          },
+        },
+        place_of_creation: {
+          type: 'object',
+          title: 'Entstehungsort',
+          'x-attrs': {
+            placeholder: 'URL eintragen',
+            order: 6,
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+          },
+        },
+        location: {
+          type: 'array',
+          title: 'Standort',
+          'x-attrs': {
+            placeholder: 'URL eintragen',
+            order: 7,
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+          },
+        },
+        keywords: {
+          type: 'array',
+          title: 'Keywords',
+          items: {
+            type: 'string',
+          },
+          'x-attrs': {
+            placeholder: 'URL eintragen',
+            order: 8,
+            field_format: 'full',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+          },
+        },
+        url: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          title: 'URL',
+          'x-attrs': {
+            placeholder: 'URL eintragen',
+            order: 9,
+            field_format: 'full',
+            field_type: 'text',
+          },
+        },
+        date: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              date_from: {
+                type: 'string',
+              },
+              date_to: {
+                type: 'string',
+              },
+            },
+          },
+          title: 'Datierung von, bis',
+          additionalProperties: false,
+          pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
+          'x-attrs': {
+            field_format: 'full',
+            field_type: 'date',
+            date_format: 'day',
+            placeholder: {
+              date: 'Datum eintragen',
+            },
+            order: 10,
+          },
+        },
+        weekday_time: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              weekday: {
+                type: 'object',
+                title: 'Wochentag',
+                'x-attrs': {
+                  placeholder: 'Wochentag wählen',
+                  field_type: 'chips',
+                  dynamic_autosuggest: false,
+                  order: 1,
+                  source: '/autosuggest/v1/places/',
+                  field_format: 'full',
+                },
+              },
+              date: {
+                type: 'object',
+                properties: {
+                  date_from: {
+                    type: 'string',
+                  },
+                  date_to: {
+                    type: 'string',
+                  },
+                },
+                title: 'Datierung von, bis',
+                additionalProperties: false,
+                pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
+                'x-attrs': {
+                  field_format: 'full',
+                  field_type: 'date',
+                  date_format: 'day',
+                  placeholder: {
+                    date: 'Datum eintragen',
+                  },
+                  order: 2,
+                },
+              },
+              place_of_creation: {
+                type: 'array',
+                title: 'Entstehungsort',
+                'x-attrs': {
+                  placeholder: 'URL eintragen',
+                  order: 3,
+                  field_format: 'full',
+                  field_type: 'chips',
+                  dynamic_autosuggest: true,
+                },
+              },
+            },
+            additionalProperties: false,
+          },
+          title: 'Datum und Ort',
+          'x-attrs': {
+            field_type: 'group',
+            show_label: false,
+            order: 11,
+          },
+        },
+      },
+      formFilterListImage: {
+        title: {
+          type: 'array',
+          title: 'Titel',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+            allow_unknown_entries: true,
+            source: '/autosuggest/v1/titles/',
+            placeholder: 'Titel eintragen',
+            order: 1,
+          },
+        },
+        artist: {
+          type: 'array',
+          title: 'Künstler*in',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+            allow_unknown_entries: true,
+            source: '/autosuggest/v1/artists/',
+            placeholder: 'Künstler*in eintragen',
+            order: 2,
+          },
+        },
+        place_of_production: {
+          type: 'array',
+          title: 'Entstehungsort',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+            allow_unknown_entries: true,
+            source: '/autosuggest/v1/locations/',
+            placeholder: 'Entstehungsort eintragen',
+            order: 3,
+          },
+        },
+        current_location: {
+          type: 'array',
+          title: 'Standort',
+          'x-attrs': {
+            field_format: 'half',
+            field_type: 'chips',
+            dynamic_autosuggest: true,
+            allow_unknown_entries: true,
+            source: '/autosuggest/v1/locations/',
+            placeholder: 'Standort eintragen',
+            order: 4,
+          },
+        },
+        keywords: {
+          type: 'array',
+          title: 'Schlagwort',
+          'x-attrs': {
+            placeholder: 'Schlagwort eintragen',
+            order: 5,
+            field_format: 'full',
+            field_type: 'chips',
+            allow_unknown_entries: false,
+            dynamic_autosuggest: true,
+            source: '/autosuggest/v1/keywords/',
+          },
+        },
+        date: {
+          type: 'object',
+          properties: {
+            date_from: {
+              type: 'string',
+            },
+            date_to: {
+              type: 'string',
+            },
+          },
+          title: 'Datierung von, bis',
+          additionalProperties: false,
+          pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
+          'x-attrs': {
+            field_format: 'full',
+            field_type: 'date',
+            date_format: 'day',
+            placeholder: {
+              date: 'Datum eintragen',
+            },
+            order: 6,
+          },
+        },
+      },
+      filterList: [
+        {
+          label: 'Filter Text',
+          type: 'text',
+        },
+        {
+          label: 'Filter Chips Autocomplete',
+          type: 'chips',
+          freetext_allowed: true,
+        },
+        {
+          label: 'Filter Chips Autocomplete 2',
+          type: 'chips',
+          freetext_allowed: true,
+        },
+        {
+          label: 'Filter Chips Controlled',
+          type: 'chips',
+          freetext_allowed: false,
+          options: [
+            {
+              label: 'Test1',
+              id: 'Test1',
+            },
+            {
+              label: 'Test2',
+              id: 'Test2',
+            },
+          ],
+        },
+        {
+          label: 'Filter Chips Single',
+          type: 'chipssingle',
+          freetext_allowed: false,
+          options: [
+            {
+              label: 'Test1',
+              id: 'Test1',
+            },
+          ],
+        },
+        {
+          label: 'Filter Daterange',
+          type: 'daterange',
+        },
+        {
+          label: 'Filter Date',
+          type: 'date',
+        },
+      ],
+      autocompleteResults: [],
+      potentialResults: [
+        { filter_id: 'title', label: 'Titel', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
+        { filter_id: 'artist', label: 'Künstler*in', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
+        { filter_id: 'keywords', label: 'Schlagwörter', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
+        { filter_id: 'place_of_creation', label: 'Entstehungsort', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
+        { filter_id: 'location', label: 'Standort', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
+      ],
+      searchText: '',
       baseTextListData: [
         {
           label: 'data is array of objects, renders different base-link types',
@@ -857,6 +1007,26 @@ export default {
     },
   },
   methods: {
+    fetchAutocomplete({ searchString, filter }) {
+      if (searchString && (filter.type === 'text'
+        || (filter.type === 'chips' && filter.freetext_allowed))) {
+        setTimeout(() => {
+          // eslint-disable-next-line camelcase
+          this.autocompleteResults = this.potentialResults.map(({ label, filter_id, data }) => {
+            const filteredResults = data
+              .filter(entry => entry.title.toLowerCase()
+                .includes(searchString.toLowerCase()));
+            return {
+              label,
+              filter_id,
+              data: filteredResults,
+            };
+          });
+        }, 1000);
+      } else {
+        this.autocompleteResults = [];
+      }
+    },
     getNewEntries({ page }) {
       this.page = Number(page);
     },

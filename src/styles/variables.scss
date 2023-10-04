@@ -117,6 +117,8 @@ $zindex: (
   uploadbar: 100,
   button-active: 100,
   entry-selector-head: 150,
+  // needs to be higher than regular fadeout because chips text has z-index of 100
+  chips-fadeout: 150,
   dropdown: 200,
   uploadbar-content: 200,
   hoverbox: 500,

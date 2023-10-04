@@ -298,16 +298,22 @@ export default {
         && this.filtersInt[filterIndex].filter_values.filter(value => hasData(value)).length < 2) {
         // if yes - remove the complete filter
         this.filtersInt.splice(filterIndex, 1);
+        // case field group - check if type is an array of several types which indicates a field group
       } else if (typeof this.filtersInt[filterIndex].type === 'object'
-        && this.filtersInt[filterIndex].filter_values.filter(value => hasData(value)).length < 2) {
+        // now check how many values are left in the group and if it is more than one
+        && this.filtersInt[filterIndex].filter_values.reduce((prev, curr) => {
+          if (curr.length) {
+            return prev.concat(curr.filter(val => hasData(val)));
+          }
+          return hasData(curr) ? prev.push(curr) : prev;
+        }, []).length < 2) {
         this.filtersInt.splice(filterIndex, 1);
-      } else {
         // else just set the filter label to an empty string
         // this is done instead of slicing the whole value so the remaining values can
         // be reassigned to the correct property in case values are part of an object!
-        if (groupIndex >= 0) {
-          this.filtersInt[filterIndex].filter_values[valueIndex][groupIndex].label = '';
-        }
+      } else if (groupIndex >= 0) {
+        this.filtersInt[filterIndex].filter_values[valueIndex][groupIndex].label = '';
+      } else {
         this.filtersInt[filterIndex].filter_values[valueIndex].label = '';
       }
       if (this.filterListScrollable) {
