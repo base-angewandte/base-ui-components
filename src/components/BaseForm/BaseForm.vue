@@ -463,7 +463,7 @@ export default {
      */
     identifierPropertyName: {
       type: String,
-      default: 'id',
+      default: 'source',
     },
     /**
      * specify the object property that should be used as value to be displayed.
