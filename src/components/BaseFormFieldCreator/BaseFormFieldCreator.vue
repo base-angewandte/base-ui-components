@@ -700,7 +700,7 @@ export default {
     },
     /**
      * import the relevant component
-     * @returns {(function(): *)|null}
+     * @returns {(function(): Promise)|null}
      */
     fieldElement() {
       if (this.fieldType === 'text' || this.fieldType === 'integer' || this.fieldType === 'float') {
