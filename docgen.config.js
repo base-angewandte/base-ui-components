@@ -10,7 +10,7 @@ const ignore = [
   'components/BaseChip/*',
   'components/BaseExpandList/BaseExpandListRow.vue',
   'components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
-  'components/BaseAdvancedSearchRow/*',
+  'components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue',
   'components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue',
   'components/BaseDatePanel/*',
 ];
