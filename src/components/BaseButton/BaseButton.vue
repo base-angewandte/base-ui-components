@@ -238,6 +238,8 @@ export default {
       width: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;
+      // added for drop icon animation
+      transition: transform 0.5s ease;
 
       &.base-button-icon-colored {
         color: $app-color;
@@ -334,7 +336,7 @@ export default {
       }
     }
 
-    /* class is set in following components: baseExpandBox */
+    /* class is set in following components: baseExpandBox and BaseAdvancedSearch */
     &.base-button-icon-rotate-180 {
       .base-button-icon {
         transform: rotate(180deg);
