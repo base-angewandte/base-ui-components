@@ -297,8 +297,9 @@ export default {
       default: () => ({}),
     },
     /**
-     * show spinner to indicate that something is loading
-     * (for dynamically fetched entries that need to do backend requests)
+     * show spinner to indicate that something is loading.
+     *  This is meant for dynamically fetching entries from a backend and will only
+     *  have an effect if prop `allowDynamicDropDownEntries` is set true!
      */
     isLoading: {
       type: Boolean,
