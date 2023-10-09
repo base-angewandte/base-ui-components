@@ -164,6 +164,10 @@ export default {
           const propMissing = requiredProps.some(prop => !filterProps.includes(prop));
           // now also check if all filter.filter_values have a label to display
           const filterValuePropMissing = filter.filter_values.some((filterValue) => {
+            // cover special case boolean type filter which does not need a label
+            if (filter.type === 'boolean') {
+              return false;
+            }
             // check for special case field groups where filter_values has nested arrays - so
             // if filterValue has a length it is a nested array
             if (filterValue.length >= 0) {
