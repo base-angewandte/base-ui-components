@@ -194,7 +194,8 @@ export default {
       default: '',
     },
     /**
-     * list of selected options (strings or objects), displayed as chips
+     * list of selected options (strings or objects - set `isStringArray` `true` if it is an array of strings),
+     *  displayed as chips
      * (you can use the `.sync` modifier on this property)
      */
     selectedList: {

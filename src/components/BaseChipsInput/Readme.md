@@ -2,13 +2,18 @@
 
 Simple Single Choice Example with fixed dropdown, no unknown, not draggable
 
-Additionally to the custom events listed above also all native input events are available.
+Additionally, to the custom events listed above also all native input events are available.
 ```vue live
 <template>
   <base-chips-input
     :list="list"
     :allow-multiple-entries="false"
     :always-linked="true"
+    :default-entry="{
+      label: '...alle Verhältnisse umzuwerfen',
+    }"
+    identifier-property-name="id"
+    label-property-name="label"
     label="Single Choice with fixed DropDown"
     placeholder="Select Quote Snippet">
     <template #no-options>
@@ -22,11 +27,22 @@ export default {
   data() {
     return {
       list: [
-        '...alle Verhältnisse umzuwerfen',
-        'in denen der Mensch',
-        'ein erniedrigtes, ein geknechtetes',
-        'ein verlassenes, ein verächtliches',
-        'Wesen ist'
+        {
+          label: '...alle Verhältnisse umzuwerfen',
+          id: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          label: 'in denen der Mensch',
+          id: 'in denen der Mensch',
+        },
+        {
+          label: 'ein erniedrigtes, ein geknechtetes',
+          id: 'ein erniedrigtes, ein geknechtetes',
+        },
+        {
+          label: 'Wesen ist',
+          id: 'Wesen ist',
+        },
       ]
     }
   }
@@ -43,6 +59,8 @@ Multiple Entries Example with fixed dropdown, no unknown and draggable
     :list="list"
     :always-linked="true"
     :draggable="true"
+    identifier-property-name="id"
+    label-property-name="label"
     label="Multipe Choice with fixed DropDown"
     placeholder="Select Quote Snippet"
     />
@@ -53,11 +71,22 @@ export default {
   data() {
     return {
       list: [
-        '...alle Verhältnisse umzuwerfen',
-        'in denen der Mensch',
-        'ein erniedrigtes, ein geknechtetes',
-        'ein verlassenes, ein verächtliches',
-        'Wesen ist'
+        {
+          label: '...alle Verhältnisse umzuwerfen',
+          id: '...alle Verhältnisse umzuwerfen',
+        },
+        {
+          label: 'in denen der Mensch',
+          id: 'in denen der Mensch',
+        },
+        {
+          label: 'ein erniedrigtes, ein geknechtetes',
+          id: 'ein erniedrigtes, ein geknechtetes',
+        },
+        {
+          label: 'Wesen ist',
+          id: 'Wesen ist',
+        },
       ]
     }
   }
