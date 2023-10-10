@@ -32,6 +32,7 @@ import BaseHoverBox from './BaseHoverBox/BaseHoverBox';
 import BaseIcon from './BaseIcon/BaseIcon';
 import BaseImage from './BaseImage/BaseImage';
 import BaseImageBox from './BaseImageBox/BaseImageBox';
+import BaseImageGrid from './BaseImageGrid/BaseImageGrid';
 import BaseInput from './BaseInput/BaseInput';
 import BaseLink from './BaseLink/BaseLink';
 import BaseLoader from './BaseLoader/BaseLoader';
@@ -52,6 +53,7 @@ import BaseSwitchButton from './BaseSwitchButton/BaseSwitchButton';
 import BaseTextList from './BaseTextList/BaseTextList';
 import BaseToggle from './BaseToggle/BaseToggle';
 import BaseTooltip from './BaseTooltip/BaseTooltip';
+import BaseTooltipBox from './BaseTooltipBox/BaseTooltipBox';
 import BaseUploadPopUp from './BaseUploadPopUp/BaseUploadPopUp';
 
 export {
@@ -89,6 +91,7 @@ export {
   BaseIcon,
   BaseImage,
   BaseImageBox,
+  BaseImageGrid,
   BaseInput,
   BaseLink,
   BaseLoader,
@@ -109,5 +112,6 @@ export {
   BaseTextList,
   BaseToggle,
   BaseTooltip,
+  BaseTooltipBox,
   BaseUploadPopUp,
 };

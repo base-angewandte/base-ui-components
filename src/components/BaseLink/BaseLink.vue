@@ -49,9 +49,10 @@
         </span>
       </span>
 
-      <BaseTooltip
+      <BaseTooltipBox
         v-if="showTooltip"
         :attach-to="$refs.icon"
+        :modal-on-mobile="false"
         :styles="tooltipStyles">
         <!-- @slot slot to inject content  -->
         <slot
@@ -81,7 +82,7 @@
             <!-- eslint-enable -->
           </div>
         </slot>
-      </BaseTooltip>
+      </BaseTooltipBox>
     </template>
   </component>
 </template>
@@ -98,7 +99,7 @@ export default {
   name: 'BaseLink',
   components: {
     BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
-    BaseTooltip: () => import('../BaseTooltip/BaseTooltip').then(m => m.default || m),
+    BaseTooltipBox: () => import('../BaseTooltipBox/BaseTooltipBox').then(m => m.default || m),
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   directives: {

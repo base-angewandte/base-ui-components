@@ -43,4 +43,6 @@ text by Bohdan Burmich from the Noun Project
 Information by Arfan Khan Kamol from the Noun Project
 Archive with sheets, Archive with arrow by bezier master from the Noun Project
 Info by Jason Santos from the Noun Project
+Institution by Eko Purnomo from <a href="https://thenounproject.com/browse/icons/term/institution/" target="_blank" title="Institution Icons">Noun Project</a> (CC BY 3.0)
+grid view by Neha Tyagi from <a href="https://thenounproject.com/browse/icons/term/grid-view/" target="_blank" title="grid view Icons">Noun Project</a> (CC BY 3.0)
 ```

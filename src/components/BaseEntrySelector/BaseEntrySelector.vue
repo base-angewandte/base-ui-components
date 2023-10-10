@@ -16,12 +16,15 @@
           v-model="filterString"
           :show-image="true"
           :placeholder="getI18nTerm(entrySelectorText.search)"
-          class="base-entry-selector__head__search-bar"
+          :class="['base-entry-selector__head__search-bar',
+                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
           @input="filterEntries($event, 'title')" />
       </slot>
 
       <!-- BASE OPTIONS ROW -->
-      <div class="base-entry-selector__options">
+      <div
+        v-if="showOptionsRow"
+        class="base-entry-selector__options">
         <BaseOptions
           ref="baseOptions"
           :show-options.sync="showOptions"
@@ -87,8 +90,9 @@
         :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
         :list="selectableEntries"
         :selected-list="selectedEntries"
-        :select-all-disabled="!!maxSelectedEntries && (maxSelectedEntries <= selectedListIds.length
-          || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id)))"
+        :select-all-disabled="!!maxSelectedEntries
+          && (!(selectableEntries.length < (maxSelectedEntries - selectedListIds.length)
+            || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
         @selected="changeAllSelectState">
         <template #selectedText>
           {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
@@ -272,6 +276,7 @@ export default {
     },
     /**
      * hide options completely (necessary if only before or after slot elements should remain)
+     * if the complete options row should be hidden set `showOptionsRow` to `false` instead!
      */
     optionsHidden: {
       type: Boolean,
@@ -390,6 +395,15 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * this will remove the complete row between search and entries list.
+     * This means also the slots `options` and `afterOptions` are not available anymore!
+     * (if only the options menu should be hidden use `optionsHidden` instead)
+     */
+    showOptionsRow: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -438,11 +452,12 @@ export default {
       return this.entriesPerPage ? Math.ceil(this.entriesTotal / this.entriesPerPage) : 0;
     },
     /**
-     * BaseMenuList components needs a list of id's for selected entries
+     * BaseMenuList components needs a list of unique IDs for selected entries
      * @returns {string[]}
      */
     selectedListIds() {
-      return this.selectedEntries.map(entry => entry.id);
+      // deduplicate by creating set and convert back to array
+      return [...new Set(this.selectedEntries.map(entry => entry.id))];
     },
     /**
      * to calc the correct max-with for the sort and type drop downs we need to know how
@@ -642,6 +657,10 @@ export default {
 
       &__search-bar {
         margin-bottom: $spacing-small;
+      }
+
+      &__search-bar--margin-large {
+        margin-bottom: $spacing;
       }
     }
 

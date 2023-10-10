@@ -120,7 +120,7 @@
             :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
             :aria-label="headerText"
             tabindex="0"
-            handle=".base-result-box-section__result-box-item__draggable .base-image-box-content"
+            handle=".base-result-box-section__result-box-item__draggable .base-image-box"
             force-fallback="true"
             role="list"
             class="base-result-box-section__boxes-container">
