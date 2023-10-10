@@ -45,6 +45,7 @@ module.exports = async () => {
       ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
       ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
       ['link', { rel: 'mask-icon', sizes: '180x180', href: '/safari-pinned-tab.svg' }],
+      ['script', {}, 'var base_ui_icons = "/base-ui-components/base-ui-icons.svg";']
     ],
     host: 'localhost',
     port: 6060,

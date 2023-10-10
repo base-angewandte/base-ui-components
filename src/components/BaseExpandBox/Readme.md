@@ -10,6 +10,11 @@ Example of BaseExpandBox to display expandable text, unordered list, datalist el
         render-label-as="h2"
         :data="data"
         :cols2="true" />
+      <template #header>
+        <h1 class="base-headline">
+          Additional content in slot #header
+        </h1>
+      </template>
       <template #footer>
         <div style="display: flex;">
           <BaseButton
@@ -74,4 +79,10 @@ export default {
   },
 }
 </script>
+<style>
+  .base-headline {
+    margin-bottom: 16px;
+    font-size: 1.2em; 
+  }
+</style>
 ```

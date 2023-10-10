@@ -104,6 +104,9 @@ import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapse
  *  freetext_allowed false
  * @property {Object[]|string[]|string|Object} [filter_values] - the values a filter contains - only
  *  relevant for applied filters, not for filters coming from backend presented in the drop down
+ * @property {string[]} [subsets] - if a filter of `type` 'text' or 'chips' with `freetext_allowed`
+ *      (thus triggering autocomplete) has subordinate filters for which the autosuggest results
+ *      should also be shown - add these filter ids here
  */
 
 export default {
@@ -145,6 +148,9 @@ export default {
      *      property are used or autocomplete is used.
      *    **options** `Object[]` - for filter type `chips` the controlled
      *      vocabulary options.
+     *     **subsets** `string[]` - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add the filter identifiers here
      */
     filterList: {
       type: Array,
@@ -167,7 +173,7 @@ export default {
       validator: val => !val.length || val.every(v => v.type),
     },
     /**
-     * in mode 'list' specify a default value for a filter that is set when none of the
+     * in mode `list` specify a default value for a filter that is set when none of the
      * available filters is selected, should have the following properties:
      *
      *    **label** `string` - the label of the filter (displayed
@@ -182,7 +188,10 @@ export default {
      *    **filter_values** `Object[], string[], Object` - the values selected - object for date
      *    or array of objects or strings for type `text` and type `chips`,
      *
-     *  this property is not relevant in mode 'form'
+     *    defaultFilter does not need the property `subsets` since results for all filters are
+     *    shown per default
+     *
+     *  this property is not relevant in mode `form`
      */
     defaultFilter: {
       type: Object,
@@ -382,7 +391,7 @@ export default {
       }),
     },
     /**
-     * autocomplete results need a label and a data property that contains all the actual
+     * autocomplete results need a label, and id and a data property that contains all the actual
      * autocomplete results for that specific category
      * TODO: make category optional
      */
@@ -833,13 +842,20 @@ export default {
       // TODO?
     },
     /**
-     * @param {string} string - the search string to autocomplete
+     * @param {string} input - the search string to autocomplete
      * @param {Filter} filter - the filter the autocomplete was triggered for
      * @param {number} index - the index of the filter
      */
     fetchAutocomplete({ input, filter }, index) {
-      // set autocomplete variable to correct filter row
-      this.autocompleteIndex = index;
+      if (input) {
+        // if input string present set autocomplete variable to correct filter row
+        this.autocompleteIndex = index;
+      } else {
+        // else reset the autocomplete results
+        this.$set(this.filtersAutocompleteResults, index, []);
+      }
+      // stil emit fetch-autocomplete no matter if input string present or not to give
+      // parent opportunity to also update
       /**
        * inform parent to fetch autocomplete data for the provided filter
        *

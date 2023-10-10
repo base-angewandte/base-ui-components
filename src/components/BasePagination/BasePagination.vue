@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import { debounce } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
 /**
@@ -264,9 +265,9 @@ export default {
      */
     initObserver() {
       // create an observer with the set overflow calc function
-      const tempResizeObserver = new ResizeObserver(() => {
+      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
         this.setStartEnd();
-      });
+      }));
       // put it on the relevant element
       tempResizeObserver.observe(this.$refs.pagination);
       // store it

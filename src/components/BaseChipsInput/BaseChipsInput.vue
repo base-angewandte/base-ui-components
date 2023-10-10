@@ -10,7 +10,6 @@
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :return-as-string="returnAsString"
       :is-active.sync="isActive"
       :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
@@ -49,7 +48,7 @@
             <template
               v-else-if="entry">
               <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
-                @binding {string, Object} item - the option passed to options list -->
+                @binding {Object} item - the option passed to options list -->
               <slot
                 :item="entry.option"
                 name="drop-down-entry">
@@ -112,7 +111,7 @@
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader). for an example see [BaseChipsInputField](BaseChipsInputField). -->
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField). -->
         <slot name="remove-icon" />
       </template>
     </BaseChipsInputField>
@@ -147,14 +146,17 @@ export default {
   },
   props: {
     /**
-     * list of selectable options (strings or objects)
+     * list of selectable options. needs to be a list with at least an identifier and a label
+     *  (properties can be set via `identifierPropertyName` and `labelPropertyName`)
      */
     list: {
       type: Array,
       default: () => [],
     },
     /**
-     * list of already selected options (strings or objects), displayed as chips
+     * list of already selected options, displayed as chips
+     *  needs to be a list with at least an identifier and a label
+     *  (properties can be set via `identifierPropertyName` and `labelPropertyName`)
      */
     selectedList: {
       type: Array,
@@ -308,14 +310,14 @@ export default {
      */
     identifierPropertyName: {
       type: String,
-      default: '',
+      default: 'id',
     },
     /**
      * specify the object property that should be used as value to be displayed
      */
     labelPropertyName: {
       type: String,
-      default: '',
+      default: 'label',
     },
     /**
      * property for special case in component [BaseChipsBelow](BaseChipsBelow) - if `false` in this case chips will
@@ -403,6 +405,24 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    /**
+     * define if selected options chips should come with a remove icon
+     */
+    chipsRemovable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * define a default entry
+     * will be added when component is mounted and selected list is initially empty
+     * properties:
+     * **label|*** `string`: the label of the default option - use the property name set via prop `labelPropertyName`
+     * **id|*** `string?`: (optional) identifier of the default option - use the property name set via prop `identifierPropertyName`
+     */
+    defaultEntry: {
+      type: [Object, null],
+      default: null,
+    },
   },
   data() {
     return {
@@ -413,7 +433,7 @@ export default {
       input: '',
       /**
        * internal representation of selected options list
-       * @type {(string[]|Object[])}
+       * @type {Object[]}
        */
       selectedListInt: [],
       /**
@@ -439,11 +459,6 @@ export default {
        * @type {boolean}
        */
       dropDownActive: false,
-      /**
-       * variable for storing if external list was array of strings (or objects)
-       * @type {boolean}
-       */
-      returnAsString: false,
       /**
        * the minimal width of the drop down element (calculated in js because ? )
        * TODO: above...
@@ -478,15 +493,8 @@ export default {
      * @returns {Object[]}
      */
     listInt() {
-      let tempList = [];
-      if (this.list && this.list.length && typeof this.list[0] === 'string') {
-        tempList = this.list.map(option => ({
-          [this.labelPropertyName]: option,
-        }));
-      } else {
-        tempList = [...this.list];
-      }
-      // if unknown entries are allowed add a "Add InputSting ..." as first option
+      let tempList = [...this.list];
+      // if unknown entries are allowed add an "Add InputString ..." as first option
       if (this.allowUnknownEntries && this.input) {
         tempList.unshift({
           [this.labelPropertyName]: this.language ? { [this.language]: this.input } : this.input,
@@ -576,23 +584,19 @@ export default {
     },
     list: {
       /**
-       * watch list to determine if list should be returned as string
+       * watch list to reset active option index
        * @param {Object[]} val
        */
       handler(val) {
         // if list changed externally - reset index to 0
         this.activeOptionIndex = val.length || (this.allowUnknownEntries && this.input) ? 0 : -1;
-        // check if list should be returned as array of strings
-        if (!this.returnAsString && val && val.length && typeof val[0] === 'string') {
-          this.returnAsString = true;
-        }
       },
       immediate: true,
     },
     selectedList: {
       /**
        * get changes to selectedListInt as soon as selectedList changes
-       * @param {(string[]|Object[])} val
+       * @param {Object[]} val
        */
       handler(val) {
         this.selectedListInt = [...val];
@@ -601,7 +605,7 @@ export default {
     },
     /**
      * watch for changes to selectedListInt and propagate to parent if necessary
-     * @param {(string[]|Object[])} val
+     * @param {Object[]} val
      */
     selectedListInt(val) {
       if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
@@ -663,6 +667,11 @@ export default {
     if (elems && elems.length) {
       [this.inputElem] = elems;
     }
+
+    // add optional default entry to empty selectedList only
+    if (this.defaultEntry && !this.selectedList.length) {
+      this.selectedListInt.push(this.defaultEntry);
+    }
   },
   methods: {
     /** CHIPS (ADDING) FUNCTIONALITIES */
@@ -705,17 +714,12 @@ export default {
     updateParentSelectedList(updatedList) {
       // only emit if updated list is different from parent list
       if (JSON.stringify(this.selectedList) !== JSON.stringify(updatedList)) {
-        let tempList = [...updatedList];
-        // if list was provided as string also return selected list as string
-        if (this.returnAsString) {
-          tempList = tempList.map(selected => selected[this.labelPropertyName]);
-        }
         /**
          * inform parent of changes to selectedList
          * @event selected-changed
-         * @property {Object[], string[]} - the altered selectedList
+         * @property {Object[]} - the altered selectedList
          */
-        this.$emit('selected-changed', tempList);
+        this.$emit('selected-changed', [...updatedList]);
       }
     },
 
@@ -811,7 +815,9 @@ export default {
     }
 
     .base-chips-input__single-dropdown {
-      padding: $spacing-small;
+      display: flex;
+      align-items: center;
+      padding: 0 $spacing-small;
 
       .base-chips-input__single-dropdown-icon {
         transition:  $drop-down-arrow-animation;

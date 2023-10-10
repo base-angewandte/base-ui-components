@@ -32,7 +32,7 @@ git checkout gh-pages &&
 git pull &&
 git merge master &&
 npm run styleguide:build &&
-git add . &&
+git add styleguide/* &&
 git commit -m "docs: styleguide for v$PACKAGE_VERSION" &&
 git push &&
 npm run update-pages &&

@@ -12,11 +12,11 @@
       <BaseToggle
         v-model="showOptions"
         label="Show Options"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="showSort"
         label="Show Sorting Drop Down"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="showTypesFilter"
         label="Show Types Filter"
@@ -24,7 +24,7 @@
       <BaseToggle
         v-model="isLoading"
         label="Is Loading"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useCustomText"
         label="Use Custom Texts"
@@ -33,36 +33,59 @@
       <BaseToggle
         v-model="noResults"
         label="No search Results"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="showPagination"
         label="Show Pagination"
-        class="control"/>
+        class="control" />
+      <BaseToggle
+        v-model="useSearch"
+        :disabled="useHeadSlot"
+        label="Use Search"
+        class="control" />
+      <BaseToggle
+        v-model="showOptionsRow"
+        :disabled="useHeadSlot"
+        label="Show Options Row"
+        class="control" />
     </div>
     <div class="controls">
       <BaseToggle
         v-model="useHeadSlot"
         label="Use 'head' Slot"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useActionsSlot"
+        :disabled="!showOptionsRow"
         label="Use 'option-actions' Slot"
         class="control"
         @clicked="selectMode = true" />
       <BaseToggle
         v-model="useAfterOptionsSlot"
+        :disabled="!showOptionsRow"
         label="Use 'after-options' Slot"
-        class="control"/>
+        class="control" />
       <BaseToggle
         v-model="useEntriesSlot"
         label="Use 'entries' Slot"
         class="control"
-        @clicked="useThumbnailsSlot = false"/>
+        @clicked="useThumbnailsSlot = false; useEntryTextContentSlot = false; useEntryRightSideSlot = false" />
+      <BaseToggle
+        v-model="useEntryTextContentSlot"
+        :disabled="useEntriesSlot"
+        label="Use 'entry-text-content' Slot"
+        class="control" />
+      <BaseToggle
+        v-model="useEntryRightSideSlot"
+        :disabled="useEntriesSlot"
+        label="Use 'entry-right-side-elements' Slot"
+        class="control"
+        @clicked="useThumbnailsSlot = false" />
       <BaseToggle
         v-model="useThumbnailsSlot"
-        :disabled="useEntriesSlot"
+        :disabled="useEntriesSlot || useEntryRightSideSlot"
         label="Use 'thumbnails' Slot"
-        class="control"/>
+        class="control" />
     </div>
     <BaseEntrySelector
       :entries="baseEntrySelectorEntries"
@@ -72,6 +95,8 @@
       :entries-selectable.sync="selectMode"
       :options-hidden="!showOptions"
       :sort-options="showSort ? sortOptions : []"
+      :use-search="useSearch"
+      :show-options-row="showOptionsRow"
       :sort-config="{
         label: 'Sort Entries',
         default: {
@@ -95,6 +120,7 @@
       :is-loading="isLoading"
       language="de"
       v-bind="entrySelectorText"
+      class="entrySelector"
       @selected-changed="selectedEntries = $event"
       @fetch-entries="getNewEntries"
       @entry-clicked="activeEntry = $event">
@@ -120,6 +146,27 @@
             Custom after-options element
           </div>
         </template>
+      </template>
+      <template
+        #entry-text-content="{ item }"
+        v-if="useEntryTextContentSlot">
+        {{ 'create your custom content here' + item.title }}
+      </template>
+      <template
+        #entry-right-side-elements
+        v-if="useEntryRightSideSlot">
+        <div class="custom-right-side">
+          <BaseButton
+            button-style="row"
+            icon="edit"
+            text="Edit"
+            class="custom-buttons" />
+          <BaseButton
+            button-style="row"
+            icon="remove"
+            text="Remove"
+            class="custom-buttons" />
+        </div>
       </template>
       <template #thumbnails="{ item }">
         <template v-if="useThumbnailsSlot">
@@ -204,6 +251,8 @@ export default {
       useCustomText: false,
       noResults: false,
       showPagination: true,
+      useSearch: true,
+      showOptionsRow: true,
       sortOptions: [
         {
           label: 'By Type',
@@ -235,6 +284,8 @@ export default {
       useThumbnailsSlot: true,
       useActionsSlot: false,
       useAfterOptionsSlot: false,
+      useEntryTextContentSlot: false,
+      useEntryRightSideSlot: false,
     };
   },
   computed: {
@@ -286,6 +337,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
+  margin-bottom: 16px;
 }
 
 .control {
@@ -296,6 +348,15 @@ export default {
   border: 1px solid red;
   padding: 16px;
   text-align: center;
+}
+
+.custom-buttons {
+  border-left: 2px solid rgb(240, 240, 240);
+}
+
+.entrySelector >>> .custom-right-side {
+  display: flex;
+  flex-direction: row;
 }
 </style>
 ```

@@ -10,6 +10,12 @@
       { 'base-expand-box-auto-height': autoHeight },
       { 'base-expand-box-open': expandInt }]">
     <div
+      v-if="!!$slots.header"
+      class="base-expand-box-header">
+        <!-- @slot slot to add additional information before expandable content -->
+        <slot name="header" />
+    </div>
+    <div
       :class="[
         'base-expand-box-content',
         { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">

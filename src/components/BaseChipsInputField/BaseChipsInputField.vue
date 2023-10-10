@@ -150,7 +150,7 @@
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader) -->
+        <!-- @slot use a custom icon instead of standard remove icon -->
         <slot name="remove-icon" />
       </template>
       <template #below-input>
@@ -194,7 +194,8 @@ export default {
       default: '',
     },
     /**
-     * list of selected options (strings or objects), displayed as chips
+     * list of selected options (strings or objects - set `isStringArray` `true` if it is an array of strings),
+     *  displayed as chips
      * (you can use the `.sync` modifier on this property)
      */
     selectedList: {
