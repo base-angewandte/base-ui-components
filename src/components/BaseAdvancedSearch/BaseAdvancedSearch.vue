@@ -687,7 +687,12 @@ export default {
   },
   methods: {
     fillOptionToForm({ entry, collectionId }) {
-      if (this.mode === 'form') {
+      // check if mode is form
+      if (this.mode === 'form'
+        // and if option is already included in the selected options to prevent double key problems
+        && !this.formFilterValuesInt[collectionId]
+          ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
+          .includes(entry[this.identifierPropertyName.autocompleteOption])) {
         const fieldInformation = this.formFilterList[collectionId];
         const fieldXAttrs = fieldInformation['x-attrs'];
         // check the type of field that the value should be added to (we assume the only possibilities
@@ -720,6 +725,8 @@ export default {
           );
         }
         this.mainFilter.filter_values = [];
+        // this does not trigger an update event from BaseForm so search needs to be triggered manually here
+        this.search();
       }
     },
     fetchFormAutocomplete(params) {
