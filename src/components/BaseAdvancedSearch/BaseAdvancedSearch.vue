@@ -89,18 +89,18 @@ import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapse
 
 /**
  * @typedef Filter
- * @property {string} label|* - property 'label' indicating the label or an equivalent
+ * @property {string?} label|* - property 'label' indicating the label or an equivalent
  *  custom property defined in prop labelPropertyName.filter
  * @property {string} id|* - property 'id' used as unique identifier or an equivalent
  *  custom property defined in prop identifierPropertyName.filter
  * @property {string} type - a filter type defining the type of search element shown
  *  @values text, chips, date, daterange
- * @property {boolean} [hidden] - exclude filters that have this attribute true from display
- * @property {boolean} [freetext_allowed] - property specifc for type: chips determining
+ * @property {boolean?} [hidden] - exclude filters that have this attribute true from display
+ * @property {boolean?} [freetext_allowed] - property specifc for type: chips determining
  *  if options are autocompleted (true) or used from the options property (false)
- * @property {Object[]} [options] - the options used for chips filter types with
+ * @property {Object[]?} [options] - the options used for chips filter types with
  *  freetext_allowed false
- * @property {Object[]|string[]|string|Object} [filter_values] - the values a filter contains - only
+ * @property {Object[]|string[]|string|Object?} [filter_values] - the values a filter contains - only
  *  relevant for applied filters, not for filters coming from backend presented in the drop down
  * @property {string[]} [subsets] - if a filter of `type` 'text' or 'chips' with `freetext_allowed`
  *      (thus triggering autocomplete) has subordinate filters for which the autosuggest results
@@ -460,6 +460,7 @@ export default {
       formOpen: true,
       /**
        * internal representation of formFilterValues in order to be able to modify
+       * @type {Object}
        */
       formFilterValuesInt: {},
       /**
@@ -812,6 +813,7 @@ export default {
       this.search();
     },
     /**
+     * for mode 'list'
      * function called when a filter object within a filter row changes
      * @param {Filter} filter - the filter that was altered
      * @param {number} index - the index of the filter
@@ -921,6 +923,12 @@ export default {
       // call utils function to return a "random" string
       return createId();
     },
+    /**
+     * function to retrieve the filter values in reduced form the way CollapsedFilterRow needs them
+     * @param values
+     * @param fieldData
+     * @returns {[string, unknown]|[{label: string}]|string|{label: *}[]|boolean[]|[{label: (string|string)}]|*}
+     */
     getCollapsedFilterValue(values, fieldData) {
       const fieldType = fieldData['x-attrs'].field_type;
       if (fieldType === 'integer' || fieldType === 'float' || typeof values === 'number') {
