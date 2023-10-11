@@ -42,6 +42,7 @@
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
       v-on="inputListeners"
       @keydown.enter="onEnter"
+      @blur="emitCompletedInputValues"
       @input="setInputValue($event)"
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
@@ -152,6 +153,7 @@
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           class="base-form-field-creator__date-field"
+          @value-validated="emitCompletedInputValues"
           v-on="inputListeners">
           <template
             #label-addition>
@@ -230,6 +232,7 @@
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
           class="base-form-field-creator__date-field"
+          @date-validated="emitCompletedInputValues"
           v-on="inputListeners" />
       </div>
     </fieldset>
@@ -277,6 +280,7 @@
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
       v-on="inputListeners"
+      @selected-changed="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
@@ -481,7 +485,8 @@
         :name="fieldKey"
         :label="labelInt"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"
-        class="base-form-field-creator__toggle">
+        class="base-form-field-creator__toggle"
+        @clicked="emitCompletedInputValues">
         <BaseLink
           v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
           :source="formFieldXAttrs.subtext.source || ''"
@@ -745,11 +750,16 @@ export default {
        * @type {string}
        */
       activeTab: '',
+      /**
+       * store a copy of fieldValueInt to only trigger event when value
+       *  has changed
+       *  @type {any}
+       */
+      originalFieldValueInt: null,
     };
   },
   computed: {
     inputListeners() {
-      // console.log('create input listeners', this.$listeners);
       return {
         // add all the listeners from the parent
         ...this.$listeners,
@@ -1089,11 +1099,31 @@ export default {
     setMultilineDropDown(val) {
       // set texts type value if present - otherwise set empty
       this.$set(this.fieldValueInt, 'type', val.source ? val : null);
+      this.emitCompletedInputValues();
     },
     // prevent default action for everything except multiline
     onEnter(event) {
       if (this.fieldType !== 'multiline') {
         event.preventDefault();
+        // also emit event that input was completed (e.g. for triggering search)
+        this.emitCompletedInputValues();
+      }
+    },
+    /**
+     * function to trigger event informing parent that input on that specific input field was completed
+     */
+    emitCompletedInputValues() {
+      // check if the value actually changed
+      if (JSON.stringify(this.fieldValueInt) !== JSON.stringify(this.originalFieldValueInt)) {
+        // store the new reference value in the original variable
+        this.originalFieldValueInt = JSON.parse(JSON.stringify(this.fieldValueInt));
+        /**
+         * event emitted once an input was completed (e.g. an option selected in chips input or
+         *  an enter key triggered in BaseInput or after a date was validated)
+         *  @event input-complete
+         *  @property {string, number, Object, Array} - the updated value
+         */
+        this.$emit('input-complete', this.fieldValueInt);
       }
     },
     fetchBoxData() {

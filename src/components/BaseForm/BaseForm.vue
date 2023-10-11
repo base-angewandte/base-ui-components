@@ -28,6 +28,7 @@
           v-bind="formFieldComponentProps(element, index)"
           @field-value-changed="setFieldValue($event, element.name)"
           @fetch-autocomplete="fetchAutocomplete"
+          @input-complete="onInputComplete($event, element.name)"
           v-on="inputListeners">
           <template #label-addition="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
@@ -136,7 +137,10 @@
                 valueIndex,
                 (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
               @fetch-autocomplete="fetchAutocomplete"
-              @subform-input="setFieldValue($event, element.name, valueIndex)"
+              @input-complete="onInputComplete(
+                $event,
+                element.name,
+                valueIndex)"
               v-on="inputListeners">
               <template #label-addition="{ fieldName, groupNames }">
                 <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
@@ -531,7 +535,6 @@ export default {
   },
   computed: {
     inputListeners() {
-      // console.log('base form, create input listeners', this.$listeners);
       return {
         // add all the listeners from the parent
         ...this.$listeners,
@@ -541,6 +544,7 @@ export default {
           'field-value-changed': () => {},
           'values-changed': () => {},
           'fetch-autocomplete': () => {},
+          'input-complete': () => {},
         },
       };
     },
@@ -649,6 +653,25 @@ export default {
        * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
        */
       this.$emit('fetch-autocomplete', params);
+    },
+    /**
+     * function triggered when an input field input was completed (e.g. an option selected in chips input or
+     *  an enter key triggered in BaseInput or after a date was validated)
+     *
+     * @param {string|number|Object|Array} value - the updated value
+     * @param {string} fieldName - the name of the field in question
+     * @param {number} index - if field is repeatable - the index in the valueList array
+     */
+    onInputComplete(value, fieldName, index = -1) {
+      // update the valueListInt
+      this.setFieldValue(value, fieldName, index);
+      /**
+       * event emitted once an input was completed (e.g. an option selected in chips input or
+       *  an enter key triggered in BaseInput or after a date was validated)
+       *  @event input-complete
+       *  @property {string, number, Object, Array} - the updated value
+       */
+      this.$emit('input-complete', this.valueListInt);
     },
     // check if field can be multiplied
     allowMultiply(el) {
@@ -789,7 +812,7 @@ export default {
         labelPropertyName: this.labelPropertyName,
       };
     },
-    setFieldValue(value, fieldName, index) {
+    setFieldValue(value, fieldName, index = -1) {
       this.currentInputString = '';
       if (index >= 0) {
         this.$set(this.valueListInt[fieldName], index, JSON.parse(JSON.stringify(value)));
