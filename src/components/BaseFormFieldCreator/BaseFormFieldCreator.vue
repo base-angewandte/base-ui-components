@@ -476,13 +476,12 @@
     <template
       v-else-if="fieldType === 'boolean'">
       <BaseToggle
+        v-model="fieldValueInt"
         v-bind="fieldProps"
         :name="fieldKey"
         :label="labelInt"
-        :checked="fieldValue"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"
-        class="base-form-field-creator__toggle"
-        @clicked="$emit('field-value-changed', $event)">
+        class="base-form-field-creator__toggle">
         <BaseLink
           v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
           :source="formFieldXAttrs.subtext.source || ''"
