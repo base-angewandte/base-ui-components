@@ -229,7 +229,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
-import { debounce } from '@/utils/utils';
+import { capitalizeString, debounce } from '@/utils/utils';
 
 import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
@@ -1308,7 +1308,7 @@ export default {
         this[`${origin}Open`] = false;
       }
       // need this here because on blur() date is not updated
-      this.checkDateValidity(origin);
+      this.checkDateValidity(capitalizeString(origin));
     },
     /**
      * handle click outside event and adjust input active variable accordingly
