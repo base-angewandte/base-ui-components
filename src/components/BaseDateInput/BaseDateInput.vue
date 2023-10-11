@@ -634,6 +634,13 @@ export default {
         } else {
           this.inputInt.date = this.dateStorage(val);
         }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          console.log('emitting input int');
+          this.emitData();
+        }
       },
     },
     /**
@@ -670,6 +677,13 @@ export default {
           // else assume the type is datetime
         } else {
           this.inputInt.time = val;
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          console.log('emitting input int');
+          this.emitData();
         }
       },
     },
@@ -845,19 +859,6 @@ export default {
       },
       // to not need to do extra assignment in created()
       immediate: true,
-    },
-    /**
-     * if inputInt changes inform parent about it
-     */
-    inputInt: {
-      handler() {
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
-          this.emitData();
-        }
-      },
-      deep: true,
     },
     /**
      * in order to allow user to restore previous date after switching
