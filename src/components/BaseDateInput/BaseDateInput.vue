@@ -108,7 +108,7 @@
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
                       autocomplete="off"
-                      @blur="checkDateValidity('From')"
+                      @blur="onInputBlur($event, 'From')"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
                       v-on="dateInputListeners">
@@ -980,6 +980,12 @@ export default {
     if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },
   methods: {
+    onInputBlur(event, origin) {
+      // only check date validity when blur is coming from user input event not from
+      // date picker blur - they are distinguishable by relatedTarget!
+      if (event.relatedTarget?.className === 'mx-calendar-content') return;
+      this.checkDateValidity(origin);
+    },
     initObservers() {
       // create an observer with the fade out calc function
       const tempResizeObserver = new ResizeObserver(debounce(50, () => {
