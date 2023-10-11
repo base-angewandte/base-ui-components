@@ -69,9 +69,7 @@
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
           class="base-advanced-search__search-form"
-          @blur="inputDone"
-          @keydown.enter="inputDone"
-          @values-changed="updateFormFilters"
+          @input-complete="updateFormFilters"
           @fetch-autocomplete="fetchFormAutocomplete" />
         <div
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
@@ -464,6 +462,11 @@ export default {
        * internal representation of formFilterValues in order to be able to modify
        */
       formFilterValuesInt: {},
+      /**
+       * store filter values to see if filter values changed before triggering search
+       * @type {Object}
+       */
+      originalFilterValues: null,
     };
   },
   computed: {
@@ -601,6 +604,7 @@ export default {
           // if yes - update internal value
           [, ...this.appliedFiltersInt] = JSON.parse(JSON
             .stringify([val, ...val.slice(0, -1)]));
+          this.originalFilterValues = JSON.parse(JSON.stringify(this.appliedFiltersInt));
         }
         // also check if main filter is different separately!
         if (val && val.length >= 1
@@ -681,6 +685,7 @@ export default {
           && JSON.stringify(val) !== JSON.stringify(this.formFilterValuesInt)) {
           // if yes - update internal value
           this.formFilterValuesInt = JSON.parse(JSON.stringify(val));
+          this.search();
         }
       },
       immediate: true,
@@ -693,6 +698,8 @@ export default {
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     }
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
+    this.originalFilterValues = JSON.parse(JSON.stringify(this.mode === 'form'
+      ? this.formFilterValuesInt : this.appliedFiltersInt));
   },
   methods: {
     fillOptionToForm({ entry, collectionId }) {
@@ -748,14 +755,6 @@ export default {
        * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
        */
       this.$emit('fetch-form-autocomplete', params);
-    },
-    inputDone(event, field) {
-      // TODO: trigger on enter and blur oder is just blur sufficient??
-      // also question for chips input - only on blur or after every chips adding???
-      // TODO: check if more fields can / need to be added here
-      if (field && ['string', 'integer', 'float'].includes(field.type)) {
-        this.search();
-      }
     },
     /**
      * function to add a filter row after '+' icon was triggered
@@ -822,11 +821,14 @@ export default {
       // trigger search to update search results
       this.search();
     },
-    updateFormFilters(newFilterValueList, field) {
+    /**
+     * for mode 'form'
+     * update the form filters when an event is received from form that values have changed
+     * @param {Object} newFilterValueList - the new filter values object
+     */
+    updateFormFilters(newFilterValueList) {
       this.formFilterValuesInt = JSON.parse(JSON.stringify(newFilterValueList));
-      if (!['string', 'integer', 'float'].includes(field.type)) {
-        this.search();
-      }
+      this.search();
     },
     removeAllFilters() {
       this.formFilterValuesInt = {};
@@ -871,19 +873,44 @@ export default {
      * search function
      */
     search() {
-      // select the correct filters list depending on mode
-      // TODO: for form search currently this is triggered on every change so if field_type is text
-      // this means on every character change! see if this needs some delay at least
-      // or only trigger on blur and/or enter in future
-      // TODO: for form search check if 'type' is needed in backend (but i would guess not)
-      const filterList = this.mode === 'form' ? [...this.collapsedFiltersArray] : [...this.appliedFiltersInt];
-      /**
-       * inform parent that search should be triggered
-       *
-       * @event search
-       * @param {Filter[]} - the updated list of applied filters
-       */
-      this.$emit('search', [...filterList, this.mainFilter]);
+      // get the correct filter values list according to component mode
+      const searchFilterList = (this.mode === 'form' ? Object.entries(this.formFilterValuesInt)
+        // also only keep the filters that have filter values
+        .filter(([, filterValues]) => hasData(filterValues))
+        : Object.entries(this.appliedFiltersInt)
+          // also only keep the filters that have filter values
+          .filter(([, filterValues]) => hasData(filterValues.filter_values)))
+        .map(([filterKey, filterValues]) => ({
+          id: filterKey,
+          type: this.formFilterList[filterKey].type,
+          // only keep filter values that actually have values (relevant for groups!)
+          filter_values: typeof filterValues === 'object' && filterValues.length
+            && !this.formFilterList[filterKey].type.includes('chips')
+            ? filterValues.filter(filterValue => hasData(filterValue)) : filterValues,
+        }));
+      // check if filter values have actually changed
+      const filtersHaveChanges = JSON.stringify(this.originalFilterValues) !== JSON
+        .stringify(searchFilterList);
+      // if there are changes in filters or main filter trigger search
+      if (filtersHaveChanges
+        || JSON.stringify(this.mainFilter) !== JSON.stringify(this.originalMainFilter)) {
+        // update the original value
+        this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
+        // also minimize main filter
+        // TODO: think about also only emitting main filter when there are actually values
+        const minMainFilter = {
+          id: this.mainFilter.id,
+          type: this.mainFilter.type,
+          filter_values: this.mainFilter.filter_values,
+        };
+        /**
+         * inform parent that search should be triggered
+         *
+         * @event search
+         * @param {Filter[]} - the updated list of applied filters
+         */
+        this.$emit('search', [...searchFilterList, minMainFilter]);
+      }
     },
     /**
      * create an internal row id for unique identification of added filter rows
