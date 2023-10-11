@@ -638,7 +638,6 @@ export default {
         // the actual value is not needed here since data were transformed and
         // original object structure with correct data is retrieved with function getInputData
         if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
-          console.log('emitting input int');
           this.emitData();
         }
       },
@@ -682,7 +681,6 @@ export default {
         // the actual value is not needed here since data were transformed and
         // original object structure with correct data is retrieved with function getInputData
         if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
-          console.log('emitting input int');
           this.emitData();
         }
       },
