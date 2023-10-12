@@ -704,8 +704,9 @@ export default {
   },
   methods: {
     fillOptionToForm({ entry, collectionId }) {
-      // check if mode is form
-      if (this.mode === 'form'
+      // check if mode is form and if collection id is present
+      // (otherwise value is default filter string input)
+      if (this.mode === 'form' && collectionId
         // and if option is already included in the selected options to prevent double key problems
         && !this.formFilterValuesInt[collectionId]
           ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
@@ -894,8 +895,7 @@ export default {
       const filtersHaveChanges = JSON.stringify(this.originalFilterValues) !== JSON
         .stringify(searchFilterList);
       // if there are changes in filters or main filter trigger search
-      if (filtersHaveChanges
-        || JSON.stringify(this.mainFilter) !== JSON.stringify(this.originalMainFilter)) {
+      if (filtersHaveChanges) {
         // update the original value
         this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
         // also minimize main filter
