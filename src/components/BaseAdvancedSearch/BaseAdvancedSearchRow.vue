@@ -43,7 +43,7 @@
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
-          :id="'filter-select-' + internalRowId"
+          :id="'search-filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
           :allow-unknown-entries="false"
@@ -1469,15 +1469,18 @@ export default {
     handleDropDownOnTabKey(event) {
       // get all input elements
       const inputElements = this.$el.getElementsByTagName('input');
+      // create an array out of input elements found
+      const searchInputArray = Array.from(inputElements)
+        // and filter only for elements that are connected to search (necessary for mode
+        // 'form' which has additional input fields)
+        .filter(element => element.id.includes('search'));
       // check if some where found
       if (inputElements) {
-        // create an array out of input elements found
-        const inputArray = Array.from(inputElements);
         // get the index of the element the event came from
-        const eventInputIndex = inputArray.indexOf(event.target);
+        const eventInputIndex = searchInputArray.indexOf(event.target);
         // check if element is either the last input element and no shift key was used or
         // it is the first element and shift key was used --> if true --> close drop down
-        if ((!event.shiftKey && eventInputIndex >= inputArray.length - 1)
+        if ((!event.shiftKey && eventInputIndex >= searchInputArray.length - 1)
           || (event.shiftKey && eventInputIndex <= 0)) {
           this.isActive = false;
         }
