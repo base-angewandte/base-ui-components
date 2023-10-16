@@ -56,7 +56,8 @@
                         class="base-collapsed-filter-row__icon" />
                       <BaseIcon
                         name="remove"
-                        class="base-collapsed-filter-row__icon-remove" />
+                        class="base-collapsed-filter-row__icon-remove"
+                        @click.native.stop="removeChip(filterIndex, valueIndex, groupIndex)" />
                     </div>
                     <span
                       v-if="filter.type[valueIndex] === 'date'
@@ -91,7 +92,8 @@
                       class="base-collapsed-filter-row__icon" />
                     <BaseIcon
                       name="remove"
-                      class="base-collapsed-filter-row__icon-remove" />
+                      class="base-collapsed-filter-row__icon-remove"
+                      @click.native.stop="removeChip(filterIndex, valueIndex)" />
                   </div>
                   <span
                     v-if="filter.type === 'date'
@@ -520,16 +522,16 @@ export default {
             display: flex;
             align-items: center;
             background: $background-color;
-            padding: $spacing-small-half $spacing-small;
+            padding: $spacing-small-half 0 $spacing-small-half $spacing-small;
 
             .base-collapsed-filter-row__icon {
               height: $icon-medium;
               width: $icon-medium;
             }
             .base-collapsed-filter-row__icon-remove {
-              margin-left: $spacing-small;
-              height: $icon-min;
-              width: $icon-min;
+              padding: $spacing-small;
+              height: calc(#{$icon-min} + (2 * #{$spacing-small}));
+              width: calc(#{$icon-min} + (2 * #{$spacing-small}));
               cursor: pointer;
             }
           }
