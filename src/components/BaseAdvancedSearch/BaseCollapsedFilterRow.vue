@@ -48,7 +48,7 @@
                       @mousedown.native.stop=""
                       @remove-entry="removeChip(filterIndex, valueIndex, groupIndex)" />
                     <div
-                      v-else-if="filter.type[groupIndex] === 'boolean'"
+                      v-else-if="groupValue && filter.type[valueIndex] === 'boolean'"
                       :key="`${filter.label}-${valueIndex}-${groupIndex}`"
                       class="base-collapsed-filter-row__boolean-value">
                       <BaseIcon

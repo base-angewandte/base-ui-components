@@ -524,8 +524,9 @@ export default {
                 label: formFilterData.title,
                 id: `${key}-group-${index}`,
                 type: formFilterData['x-attrs'].field_type === 'group'
-                  ? Object.values(formFilterData.properties || formFilterData.items.properties)
-                    .map(prop => prop['x-attrs'].field_type) : formFilterData['x-attrs'].field_type,
+                  ? Object.keys(repeatableEntry)
+                    .map(fieldKey => formFilterData.items.properties[fieldKey]['x-attrs'].field_type)
+                  : formFilterData['x-attrs'].field_type,
                 filter_values: this.getCollapsedFilterValue(repeatableEntry, formFilterData),
               }));
             }
