@@ -38,72 +38,27 @@
                 v-for="(value, valueIndex) in filter.filter_values">
                 <template v-if="typeof value === 'object' && value.length">
                   <template v-for="(groupValue, groupIndex) in value">
-                    <BaseChip
-                      v-if="groupValue && groupValue.label"
-                      :key="groupValue.id || `${groupValue.label}-${valueIndex}-${groupIndex}`"
-                      :entry="groupValue.label"
-                      :is-linked="true"
-                      role="listitem"
-                      class="base-collapsed-filter-row__chip"
-                      @mousedown.native.stop=""
-                      @remove-entry="removeChip(filterIndex, valueIndex, groupIndex)" />
-                    <div
-                      v-else-if="groupValue && filter.type[valueIndex] === 'boolean'"
-                      :key="`${filter.label}-${valueIndex}-${groupIndex}`"
-                      class="base-collapsed-filter-row__boolean-value">
-                      <BaseIcon
-                        name="check-mark"
-                        class="base-collapsed-filter-row__icon" />
-                      <BaseIcon
-                        name="remove"
-                        class="base-collapsed-filter-row__icon-remove"
-                        @click.native.stop="removeChip(filterIndex, valueIndex, groupIndex)" />
-                    </div>
-                    <span
-                      v-if="filter.type[valueIndex] === 'date'
-                        && filter.filter_values[valueIndex].length === 2
-                        && filterValuesHaveData(filter.filter_values[valueIndex])
+                    <BaseCollapsedFilterItem
+                      :key="groupValue.id
+                        || `${groupValue.label}-${valueIndex}-${groupIndex}`"
+                      :value="groupValue"
+                      :type="filter.type[valueIndex]"
+                      :append-until="value.length === 2
+                        && filterValuesHaveData(value)
                         && groupIndex === 0"
-                      :key="`${value.label}-${valueIndex}-${groupIndex}-until`"
-                      :class="[
-                        'base-collapsed-filter-row__until',
-                        {'base-collapsed-filter-row__until__spacing-left':
-                          filter.filter_values[valueIndex][0].label }]">
-                      &#x2012;
-                    </span>
+                      :apply-spacing-left="!!filter.filter_values[valueIndex][0].label"
+                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
                 <template v-else>
-                  <BaseChip
-                    v-if="value && value.label"
+                  <BaseCollapsedFilterItem
                     :key="value.id || `${value.label}-${valueIndex}`"
-                    :entry="value.label"
-                    :is-linked="true"
-                    role="listitem"
-                    class="base-collapsed-filter-row__chip"
-                    @mousedown.native.stop=""
-                    @remove-entry="removeChip(filterIndex, valueIndex)" />
-                  <div
-                    v-else-if="filter.type === 'boolean'"
-                    :key="`${filter.label}-${valueIndex}`"
-                    class="base-collapsed-filter-row__boolean-value">
-                    <BaseIcon
-                      name="check-mark"
-                      class="base-collapsed-filter-row__icon" />
-                    <BaseIcon
-                      name="remove"
-                      class="base-collapsed-filter-row__icon-remove"
-                      @click.native.stop="removeChip(filterIndex, valueIndex)" />
-                  </div>
-                  <span
-                    v-if="filter.type === 'date'
-                      && filter.filter_values.length === 2 && valueIndex === 0"
-                    :key="`${value.label}-${valueIndex}-until`"
-                    :class="[
-                      'base-collapsed-filter-row__until',
-                      {'base-collapsed-filter-row__until__spacing-left': filter.filter_values[0].label }]">
-                    &#x2012;
-                  </span>
+                    :value="value"
+                    :type="filter.type"
+                    :append-until="filter.filter_values.length === 2
+                      && valueIndex === 0"
+                    :apply-spacing-left="!!filter.filter_values[0].label"
+                    @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
             </ul>
@@ -126,9 +81,9 @@
 </template>
 
 <script>
-import BaseChip from '@/components/BaseChip/BaseChip';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import { hasData } from '../../utils/utils';
+import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem';
+import { hasData } from '@/utils/utils';
 
 /**
  * component for BaseAdvancedSearch 'form' mode to display form filter values efficiently
@@ -136,7 +91,7 @@ import { hasData } from '../../utils/utils';
 export default {
   name: 'BaseCollapsedFilterRow',
   components: {
-    BaseChip,
+    BaseCollapsedFilterItem,
     BaseIcon,
   },
   props: {
@@ -524,7 +479,7 @@ export default {
             display: flex;
             align-items: center;
             background: $background-color;
-            padding: $spacing-small-half 0 $spacing-small-half $spacing-small;
+            padding: $chips-spacing 0 $chips-spacing $spacing-small;
 
             .base-collapsed-filter-row__icon {
               height: $icon-medium;
