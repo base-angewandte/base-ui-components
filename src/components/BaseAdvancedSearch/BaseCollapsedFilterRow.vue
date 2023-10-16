@@ -175,7 +175,9 @@ export default {
             if (filterValue.length >= 0) {
               // if yes check for each array if it has content and if yes, if it has the label property
               return filterValue.length !== 0 && filterValue
-                .some(nestedFilterValue => !Object.keys(nestedFilterValue).includes('label'));
+                // also account here for special case boolean which does not need a label
+                .some(nestedFilterValue => typeof nestedFilterValue !== 'boolean'
+                    && !Object.keys(nestedFilterValue).includes('label'));
             }
             // else check for each filterValue if label property is there
             return !Object.keys(filterValue).includes('label');
