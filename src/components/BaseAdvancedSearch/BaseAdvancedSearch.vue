@@ -560,6 +560,8 @@ export default {
             [filterId]: groupMatch ? previousValues.concat(filterValues) : filterValues,
           };
         }, {});
+        // trigger search after filters changed
+        this.search();
       },
     },
   },
