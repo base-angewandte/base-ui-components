@@ -207,7 +207,9 @@ export default {
      *  to provide a list of filters instead.
      * for mode 'form' provide a specification for the form fields in the form of [OpenAPi
      *  schema object](https://swagger.io/specification/#schema-object).
-     *  see also [BaseForm](BaseForm) `form-field-json` prop.
+     *  see also [BaseForm](BaseForm) `form-field-json` prop - currently all field types except
+     *    `multiline` and `chips-below` are supported. Also field groups are supported but maximum
+     *    nesting level is 1.
      */
     formFilterList: {
       type: Object,
@@ -216,7 +218,7 @@ export default {
     /**
      * this variable is just used in mode `form`, for mode `list` leave it empty and use property `appliedFilters`
      *  to provide values per filter instead.
-     * provide values for the fields specified in formFilterList.
+     * provide values for the fields specified in `formFilterList`.
      */
     formFilterValues: {
       type: Object,
@@ -504,39 +506,40 @@ export default {
     collapsedFiltersArray: {
       /**
        * use formFieldValuesInt to create the correct structure for BaseCollapsedFilterRow
-       * @returns {{ filter_values: Object[]|Object[[]], label: string, id: string, type: string|string[] }[]}
+       * @returns {{
+         *  filter_values: { values: Object[], fieldType: string, fieldId: string },
+         *  label: string,
+         *  id: string,
+       *  }[]}
        */
       get() {
         return Object.entries(this.formFilterValuesInt)
+          // only use filters that have values
           .filter(([, value]) => hasData(value))
+          // sort the values in the order of the form so the collapsed display has the same order
           .sort(([key1], [key2]) => {
             if (this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
               return 1;
             }
             return -1;
           })
+          // map data to collapsed filter array structure
           .map(([key, value]) => {
+            // get the OpenAPI json field information for the field in question
             const formFilterData = this.formFilterList[key];
-            // check here if field is repeatable and create a separate filter entry for each
-            // repetition
-            if (formFilterData.type === 'array' && !formFilterData['x-attrs'].field_type.includes('chips')) {
-              return value.map((repeatableEntry, index) => ({
-                label: formFilterData.title,
-                id: `${key}-group-${index}`,
-                type: formFilterData['x-attrs'].field_type === 'group'
-                  ? Object.keys(repeatableEntry)
-                    .map(fieldKey => formFilterData.items.properties[fieldKey]['x-attrs'].field_type)
-                  : formFilterData['x-attrs'].field_type,
-                filter_values: this.getCollapsedFilterValue(repeatableEntry, formFilterData),
-              }));
-            }
-            // else create just one filter entry for the field
-            return ({
+            // check here if field is repeatable
+            const isRepeatableField = formFilterData.type === 'array' && !formFilterData['x-attrs'].field_type.includes('chips');
+            // if value list is not already an array (because it is a repeatable field) make it an array
+            const valueList = isRepeatableField ? value : [value];
+            return valueList.map((repeatableEntry, index) => ({
+              // label that will be displayed on top of each collapsed filter
               label: formFilterData.title,
-              id: key,
-              type: formFilterData['x-attrs'].field_type,
-              filter_values: this.getCollapsedFilterValue(value, formFilterData),
-            });
+              // add a special id that allows to identify repeatable fields (applied in reverse mapping
+              // ~line 555)
+              id: `${key}${isRepeatableField ? `-group-${index}` : ''}`,
+              // the actual filter values and filter information for each field (important for field groups)
+              filter_values: this.getCollapsedFilterValue(repeatableEntry, formFilterData, key),
+            }));
           })
           .flat();
       },
@@ -545,19 +548,23 @@ export default {
        * @param {{ filter_values: Object[]|Object[[]], label: string, id: string, type: string|string[] }[]} val - changed collapsed filter values
        */
       set(val) {
+        // loop through every collapsed filter array value and create a form filter values compatible
+        // object structure out of it again
         this.formFilterValuesInt = val.reduce((prev, filter) => {
-          // necessary because of field groups to remove index (added in line 505) from id
+          // necessary because of field groups to remove index (added in line 538) from id
           // get actual field id and indicator if field was repeatable field
           const [, filterId, groupMatch] = filter.id.match(/(.*?)(-group-\d*)?$/);
           // get the form field data for the id
           const filterData = this.formFilterList[filterId];
           // get the correctly mapped filter values
-          const filterValues = this.setFormFilterValues(filter.filter_values, filterData, filterData['x-attrs']);
+          const filterValues = this.setFormFilterValues(filter.filter_values, filterData);
           // if field is repeatable - check if there are already values field into the object property
           // if yes store them in a value to be able to concat or use an empty array
           const previousValues = groupMatch && prev && prev[filterId] ? prev[filterId] : [];
           return {
             ...prev,
+            // if field is repeatable join the previous values with the new values otherwise just
+            // set currently retrieved values
             [filterId]: groupMatch ? previousValues.concat(filterValues) : filterValues,
           };
         }, {});
@@ -928,107 +935,145 @@ export default {
     },
     /**
      * function to retrieve the filter values in reduced form the way CollapsedFilterRow needs them
-     * @param values
-     * @param fieldData
+     * @param {any} values - the form field values
+     * @param {Object} fieldData - the OpenAPI json field information
+     * @param {string} fieldId - the id of the field to transform
      * @returns {[string, unknown]|[{label: string}]|string|{label: *}[]|boolean[]|[{label: (string|string)}]|*}
      */
-    getCollapsedFilterValue(values, fieldData) {
+    getCollapsedFilterValue(values, fieldData, fieldId) {
       const fieldType = fieldData['x-attrs'].field_type;
       if (fieldType === 'integer' || fieldType === 'float' || typeof values === 'number') {
-        return [{
-          label: values.toString(),
-        }];
+        return {
+          values: [{
+            label: values.toString(),
+          }],
+          fieldId,
+          fieldType,
+        };
       }
       if (fieldType === 'boolean' || typeof values === 'boolean') {
-        return [values];
+        return {
+          values: [{
+            label: values,
+          }],
+          fieldId,
+          fieldType,
+        };
       }
       if (fieldType === 'text' || fieldType === 'autocomplete' || typeof values === 'string') {
-        return [{
-          // if fieldType is date convert to de date locale for display
-          label: fieldType === 'date' ? values.split('-').reverse().join('.') : values,
-        }];
+        return {
+          values: [{
+            // if fieldType is date convert to de date locale for display
+            label: fieldType === 'date' && values ? values.split('-').reverse().join('.') : values,
+          }],
+          fieldId,
+          fieldType,
+        };
       }
       if (fieldType === 'chips') {
-        return values.map(chipValue => ({
-          // TODO: check if label property needs to be customized
-          label: chipValue[this.labelPropertyName.formInputs] || chipValue,
-          id: chipValue[this.identifierPropertyName.formInputs] || '',
-        }));
+        return {
+          values: values.map(chipValue => ({
+            // TODO: check if label property needs to be customized
+            label: chipValue[this.labelPropertyName.formInputs] || chipValue,
+            id: chipValue[this.identifierPropertyName.formInputs] || '',
+          })),
+          fieldId,
+          fieldType,
+        };
       }
       if (fieldType === 'group') {
-        return Object.entries(values)
-          .reduce((prev, [fieldKey, fieldValue]) => {
-            // add an array for each field in the group
-            prev.push(this.getCollapsedFilterValue(
-              fieldValue,
-              // depending if group is repeatable or not get to properties attribute
-              fieldData.items ? fieldData.items.properties[fieldKey] : fieldData.properties[fieldKey],
-            ));
-            return prev;
-          }, []);
+        return {
+          values: Object.entries(values)
+            .reduce((prev, [fieldKey, fieldValue]) => {
+              // add an array for each field in the group
+              prev.push(this.getCollapsedFilterValue(
+                fieldValue,
+                // depending if group is repeatable or not get to properties attribute
+                fieldData.items ? fieldData.items.properties[fieldKey] : fieldData.properties[fieldKey],
+                fieldKey,
+              ));
+              return prev;
+            }, []),
+          fieldType,
+          fieldId,
+        };
       }
-      // any date or time range fieldtransition: transform 0.5s ease;
+      // any date or time range field
       if (fieldType === 'date' && typeof values !== 'string') {
-        return Object.values(values)
-          .map(chipValue => ({
-            // convert to de date locale for display
-            label: chipValue.split('-').reverse().join('.'),
-          }));
+        return {
+          values: Object.values(values)
+            .map(chipValue => ({
+              // convert to de date locale for display
+              label: chipValue ? chipValue.split('-').reverse().join('.') : '',
+            })),
+          fieldId,
+          fieldType,
+        };
       }
-      // TODO: multiline (but maybe we dont need it)
-      // chips below
+      // NOT COVERED: multiline and chips below
       return values;
     },
     /**
      * function to transform collapsed values to form field values (necessary if something changed
      * in collapsed values, e.g. a filter value was removed)
-     * @param {Object[]|[[]]} collapsedValues
-     * @param filterData
-     * @param filterXAttrs
-     * @returns {null}
+     * @param {{ values: Object[], fieldId: string, fieldType: string }} collapsedValues - the updated collapsed
+     *  values coming from collapsed filter row
+     * @param {Object} filterData - the relevant OpenAPI form field information
+     * @returns {any} - value returned depending on the filter type
      */
-    setFormFilterValues(collapsedValues, filterData, filterXAttrs) {
-      let filterValues = null;
+    setFormFilterValues(collapsedValues, filterData) {
+      // get the relevant information out of collapsed values
+      const { values, fieldType } = collapsedValues;
+      // case string
       if (filterData.type === 'string') {
-        filterValues = collapsedValues[0].label;
-      } else if (filterData.type === 'boolean') {
-        [filterValues] = collapsedValues;
-      } else if (filterData.type === 'integer' || filterData.type === 'float') {
-        filterValues = Number(collapsedValues[0].label);
+        return values[0].label;
+      }
+      // case boolean value
+      if (filterData.type === 'boolean') {
+        return values[0].label;
+      }
+      // case number value
+      if (filterData.type === 'integer' || filterData.type === 'float') {
+        return Number(values[0].label);
         // date could be string if it is just a single date or an object in all other cases
-      } else if (filterXAttrs && filterXAttrs.field_type === 'date' && filterData.type === 'object') {
+      }
+      // case date field
+      if (fieldType === 'date' && filterData.type === 'object') {
         const objectProperties = Object.keys(filterData.properties);
-        filterValues = collapsedValues.reduce((valueObject, value, index) => ({
+        return values.reduce((valueObject, value, index) => ({
           ...valueObject,
           [objectProperties[index]]: value.label,
         }), {});
-      } else if (filterXAttrs && filterXAttrs.field_type.includes('chips')) {
-        filterValues = collapsedValues.filter(filterValue => !!filterValue.label)
+      }
+      // case chips input field
+      if (fieldType.includes('chips')) {
+        return values.filter(filterValue => !!filterValue.label)
           .map(filterValue => ({
             [this.labelPropertyName.formInputs]: filterValue.label,
             [this.identifierPropertyName.formInputs]: filterValue.id,
           }));
-      } else if (filterXAttrs && !filterXAttrs.field_type.includes('chips') && filterData.type === 'array') {
-        filterValues = this.setFormFilterValues(
+      }
+      // case repeatable fields where every repeated field or field group is a separate filter entry
+      if (!fieldType.includes('chips') && filterData.type === 'array') {
+        return this.setFormFilterValues(
           collapsedValues,
           filterData.items,
-          filterXAttrs,
         );
-      } else if (filterXAttrs && filterXAttrs.field_type === 'group'
+      }
+      // case field groups
+      if (fieldType === 'group'
         && filterData.type === 'object') {
-        const objectProperties = Object.keys(filterData.properties);
-        filterValues = objectProperties
-          .reduce((o, k, i) => ({
+        return values
+          .filter(value => hasData(value.values))
+          .reduce((o, k) => ({
             ...o,
-            [k]: this.setFormFilterValues(
-              // concat to make sure it is always an array
-              [].concat(collapsedValues[i]),
-              filterData.properties[k],
-              filterData.properties[k]['x-attrs'],
+            [k.fieldId]: this.setFormFilterValues(
+              k,
+              filterData.properties[k.fieldId],
             ),
           }), {});
       }
-      return filterValues;
+      return null;
     },
   },
 };

@@ -1,15 +1,17 @@
 <template>
   <div
     class="base-collapsed-filter-item">
+    <!-- per default use BaseChip component except for type `boolean` -->
     <BaseChip
-      v-if="value && value.label"
+      v-if="!isBoolean && hasValue"
       :entry="value.label"
       :is-linked="true"
       role="listitem"
       @mousedown.native.stop=""
       @remove-entry="removeChip" />
+    <!-- for boolean we use a checkmark icon instead of text -->
     <div
-      v-else-if="value && type === 'boolean'"
+      v-else-if="isBoolean && hasValue"
       class="base-collapsed-filter-item__boolean-value">
       <BaseIcon
         name="check-mark"
@@ -19,6 +21,7 @@
         class="base-collapsed-filter-item__icon-remove"
         @click.native.stop="removeChip" />
     </div>
+    <!-- if value is date or time range it might need an 'until' character -->
     <span
       v-if="['date', 'time'].includes(type) && appendUntil"
       :class="[
@@ -42,13 +45,12 @@ export default {
   },
   props: {
     /**
-     * the chip object to be displayed. Either an object with id and label
-     *  or a boolean value for type `boolean`
+     * the chip object to be displayed. Needs to be an object with id (optional) and label
      */
     value: {
-      type: [Boolean, Object],
+      type: [Object],
       required: true,
-      validator: val => typeof val === 'boolean' || Object.keys(val)
+      validator: val => Object.keys(val)
         .includes('label'),
     },
     /**
@@ -75,8 +77,31 @@ export default {
       default: false,
     },
   },
+  computed: {
+    /**
+     * is the type of the value to be displayed boolean
+     * @returns {boolean}
+     */
+    isBoolean() {
+      return this.type === 'boolean';
+    },
+    /**
+     * does the provided value exist and have a label
+     * @returns {boolean}
+     */
+    hasValue() {
+      return !!this.value && !!this.value.label;
+    },
+  },
   methods: {
+    /**
+     * propagate to parent when the remove icon was clicked
+     */
     removeChip() {
+      /**
+       * inform parent about chip removeal
+       * @event remove-chip
+       */
       this.$emit('remove-chip');
     },
   },
@@ -87,11 +112,14 @@ export default {
 @import "../../styles/variables";
 
 .base-collapsed-filter-item {
+  flex-shrink: 0;
+
   .base-collapsed-filter-item__boolean-value {
     display: flex;
     align-items: center;
     background: $background-color;
     padding: $chips-spacing 0 $chips-spacing $spacing-small;
+    margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
 
     .base-collapsed-filter-item__icon {
       height: $icon-medium;
@@ -109,7 +137,7 @@ export default {
     margin: 0 #{$spacing-small-half} 0 0;
 
     &.base-collapsed-filter-item__until__spacing-left {
-      margin-left: -#{$spacing-small-half};
+      margin-left: -#{$spacing-small};
     }
   }
 }

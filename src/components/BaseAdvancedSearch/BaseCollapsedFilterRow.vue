@@ -25,8 +25,9 @@
           v-for="(filter, filterIndex) in filtersInt"
           :key="filter.id"
           :class="['base-collapsed-filter-row__filter',
-                   { 'base-collapsed-filter-row__filter__boolean': filter.type === 'boolean' }]">
-          <template v-if="filterValuesHaveData(filter.filter_values)">
+                   { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
+                     .fieldType === 'boolean' }]">
+          <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
             <div
               class="base-collapsed-filter-row__filter-label">
               {{ filter.label }}
@@ -34,19 +35,22 @@
             <!-- the chips for each filter -->
             <ul
               class="base-collapsed-filter-row__chips-list">
+              <!-- iterate through the filter values list -->
               <template
-                v-for="(value, valueIndex) in filter.filter_values">
-                <template v-if="typeof value === 'object' && value.length">
-                  <template v-for="(groupValue, groupIndex) in value">
+                v-for="(value, valueIndex) in filter.filter_values?.values">
+                <!-- check if filter.type is an array to determine if it belongs to a field group -->
+                <template v-if="filter.filter_values.fieldType === 'group'">
+                  <!-- if yes - also iterate through those values -->
+                  <template v-for="(groupValue, groupIndex) in value.values">
                     <BaseCollapsedFilterItem
                       :key="groupValue.id
                         || `${groupValue.label}-${valueIndex}-${groupIndex}`"
                       :value="groupValue"
-                      :type="filter.type[valueIndex]"
-                      :append-until="value.length === 2
-                        && filterValuesHaveData(value)
+                      :type="value.fieldType"
+                      :append-until="value.values.length === 2
+                        && filterValuesHaveData(value.values)
                         && groupIndex === 0"
-                      :apply-spacing-left="!!filter.filter_values[valueIndex][0].label"
+                      :apply-spacing-left="!!value.values[0].label"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
@@ -54,10 +58,10 @@
                   <BaseCollapsedFilterItem
                     :key="value.id || `${value.label}-${valueIndex}`"
                     :value="value"
-                    :type="filter.type"
-                    :append-until="filter.filter_values.length === 2
+                    :type="filter.filter_values.fieldType"
+                    :append-until="filter.filter_values?.values.length === 2
                       && valueIndex === 0"
-                    :apply-spacing-left="!!filter.filter_values[0].label"
+                    :apply-spacing-left="!!filter.filter_values?.values[0].label"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -99,52 +103,68 @@ export default {
      * provide a list of filters in array form, every array object that needs the following properties:
      *  **id** `string` - a filter identifier
      *  **label** `string` - a label shown for the filter
-     *  **type** `string|string[]` - the type of filter (e.g. `text`, `date`)
-     *    special case filter groups: in that case the value is an array with the type for each field
-     *  **filter_values** `{ label: string, id: string? }[]|{ label: string, id: string? }[[]]` - the
-     *    values that were selected for the filter (set by BaseAdvancedSearch internally), this is again
-     *    an array of objects with the properties `label` and `id` (optional)
-     *    special case filter groups: in that case the value is an array with an object array for each
-     *      field of the group
+     *  **filter_values** `{
+     *    values: { label: string|boolean, id: string? }[]|{ values: {}, fieldId: string, fieldType: string }[]
+     *    fieldId: string,
+     *    fieldType: string,
+     *   }[]` - the values that were selected for the filter (set by BaseAdvancedSearch internally), this is again
+     *    an array of objects with the properties
+     *      `values` - either containing the actual values to display (with `label` and `id` (optional) properties)
+     *      OR in case of field groups to have nested another object array with `fieldType`, `fieldId` and `values` properties
+     *      again (see below for description)
+     *    `fieldId`: the property of the form field in question
+     *    `fieldType`: the type of the field in question
      */
     filters: {
       type: Array,
       default: () => ([]),
       validator: (val) => {
         // define all required props here
-        const requiredProps = ['id', 'label', 'type', 'filter_values'];
+        const requiredProps = ['id', 'label', 'filter_values'];
+        const requiredFilterValueProps = ['values', 'fieldType', 'fieldId'];
         // iterate through the filter array - return true if NO prop is missing
         return !val.some((filter) => {
           // get the properties the filter has
           const filterProps = Object.keys(filter);
+          const filterValueProps = Object.keys(filter.filter_values);
           // check if any of those is missing
-          const propMissing = requiredProps.some(prop => !filterProps.includes(prop));
-          // now also check if all filter.filter_values have a label to display
-          const filterValuePropMissing = filter.filter_values.some((filterValue) => {
-            // cover special case boolean type filter which does not need a label
-            if (filter.type === 'boolean') {
-              return false;
+          let propMissing = requiredProps.some(prop => !filterProps.includes(prop));
+          // only continue checking if all props were found so far
+          if (!propMissing) {
+            propMissing = requiredFilterValueProps.some(prop => !filterValueProps.includes(prop));
+            // only continue checking if all props were found so far
+            if (!propMissing) {
+              // now also check if all filter.filter_values have a label to display
+              propMissing = filter.filter_values.values.some((filterValue) => {
+                // check for special case field groups where filter_values has nested arrays - so
+                // if filterValue has a length it is a nested array
+                if (filterValue?.values?.length >= 0) {
+                  const groupFilterValueProps = Object.keys(filterValue);
+                  // if yes check for each array if it has content and if yes, if it has the label property
+                  return filterValue.values.length !== 0
+                    && requiredFilterValueProps.some(prop => !groupFilterValueProps.includes(prop))
+                    && filterValue.values
+                      // also account here for special case boolean which does not need a label
+                      .some(nestedFilterValue => !Object.keys(nestedFilterValue).includes('label'));
+                }
+                // else check for each filterValue if label property is there
+                return !Object.keys(filterValue).includes('label');
+              });
             }
-            // check for special case field groups where filter_values has nested arrays - so
-            // if filterValue has a length it is a nested array
-            if (filterValue.length >= 0) {
-              // if yes check for each array if it has content and if yes, if it has the label property
-              return filterValue.length !== 0 && filterValue
-                // also account here for special case boolean which does not need a label
-                .some(nestedFilterValue => typeof nestedFilterValue !== 'boolean'
-                    && !Object.keys(nestedFilterValue).includes('label'));
-            }
-            // else check for each filterValue if label property is there
-            return !Object.keys(filterValue).includes('label');
-          });
+          }
           // return boolean value if prop is missing
-          return propMissing || filterValuePropMissing;
+          return propMissing;
         });
       },
     },
   },
   data() {
     return {
+      /**
+       * internal representation of filters list, for a list of object properties see
+       *  prop `filters`
+       * @type Object[]
+       */
       filtersInt: [],
       /**
        * variable to steer filter mobile display fade outs
@@ -249,22 +269,22 @@ export default {
      */
     removeChip(filterIndex, valueIndex, groupIndex) {
       // check if this is the last (or only) filter value currently selected
-      if (this.filtersInt.length === 1 && this.filtersInt[filterIndex].filter_values.length === 1) {
+      if (this.filtersInt.length === 1 && this.filtersInt[filterIndex].filter_values.values.length === 1) {
         // if yes - remove the complete row
         this.removeFilters();
         // else check if this is the only value for a specific filter
-      } else if (this.filtersInt[filterIndex].filter_values.length === 1) {
+      } else if (this.filtersInt[filterIndex].filter_values.values.length === 1) {
         // if yes - remove the complete filter
         this.filtersInt.splice(filterIndex, 1);
         // special case date object
       } else if (this.filtersInt[filterIndex].type === 'date'
-        && this.filtersInt[filterIndex].filter_values.filter(value => hasData(value)).length < 2) {
+        && this.filtersInt[filterIndex].filter_values.values.filter(value => hasData(value)).length < 2) {
         // if yes - remove the complete filter
         this.filtersInt.splice(filterIndex, 1);
         // case field group - check if type is an array of several types which indicates a field group
       } else if (typeof this.filtersInt[filterIndex].type === 'object'
         // now check how many values are left in the group and if it is more than one
-        && this.filtersInt[filterIndex].filter_values.reduce((prev, curr) => {
+        && this.filtersInt[filterIndex].filter_values.values.reduce((prev, curr) => {
           if (curr.length) {
             return prev.concat(curr.filter(val => hasData(val)));
           }
@@ -275,9 +295,9 @@ export default {
         // this is done instead of slicing the whole value so the remaining values can
         // be reassigned to the correct property in case values are part of an object!
       } else if (groupIndex >= 0) {
-        this.filtersInt[filterIndex].filter_values[valueIndex][groupIndex].label = '';
+        this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
       } else {
-        this.filtersInt[filterIndex].filter_values[valueIndex].label = '';
+        this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
       }
       if (this.filterListScrollable) {
         // wait until element was removed, then recalc fade out
@@ -371,7 +391,7 @@ export default {
      * determine if the provided filter values array has any label data in it
      * (could be kept in the filter values list even if empty in order to be able
      * to map again to the original formFieldValues)
-     * @param {Object[]|Object[[]]} filterValues
+     * @param {Object[]} filterValues
      * @returns {boolean}
      */
     filterValuesHaveData(filterValues) {
@@ -447,6 +467,8 @@ export default {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        flex: 0 0 auto;
+        overflow-y: hidden;
 
         + .base-collapsed-filter-row__filter {
           margin-left: $spacing;
@@ -475,30 +497,8 @@ export default {
           flex: 1 0 auto;
           height: calc(#{$line-height} + #{$spacing-small});
 
-          .base-collapsed-filter-row__boolean-value {
-            display: flex;
-            align-items: center;
-            background: $background-color;
-            padding: $chips-spacing 0 $chips-spacing $spacing-small;
-
-            .base-collapsed-filter-row__icon {
-              height: $icon-medium;
-              width: $icon-medium;
-            }
-            .base-collapsed-filter-row__icon-remove {
-              padding: $spacing-small;
-              height: calc(#{$icon-min} + (2 * #{$spacing-small}));
-              width: calc(#{$icon-min} + (2 * #{$spacing-small}));
-              cursor: pointer;
-            }
-          }
-
-          .base-collapsed-filter-row__until {
-            margin: 0 #{$spacing-small-half} 0 0;
-
-            &.base-collapsed-filter-row__until__spacing-left {
-              margin-left: -#{$spacing-small-half};
-            }
+          .base-collapsed-filter-row__group-chip--spacing-right {
+            margin-right: $spacing-small;
           }
         }
       }

@@ -57,6 +57,7 @@
         },
 
       }"
+      @search="search"
       @fetch-autocomplete="fetchAutocomplete" />
     <!--    <BaseAdvancedSearch-->
     <!--      :applied-filters.sync="appliedFilters2"-->
@@ -230,17 +231,27 @@ export default {
                   field_format: 'full',
                 },
               },
-              date: {
+              boolean: {
+                type: 'boolean',
+                title: 'Genderspezifische Lehrveranstaltungen group',
+                'x-attrs': {
+                  field_format: 'full',
+                  field_type: 'boolean',
+                  placeholder: 'URL eintragen',
+                  order: 2,
+                },
+              },
+              time: {
                 type: 'object',
                 properties: {
-                  date_from: {
+                  time: {
                     type: 'string',
                   },
-                  date_to: {
+                  date: {
                     type: 'string',
                   },
                 },
-                title: 'Datierung von, bis',
+                title: 'Time von, bis',
                 additionalProperties: false,
                 pattern: '^\\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\\d|3[01]))?$',
                 'x-attrs': {
@@ -249,6 +260,7 @@ export default {
                   date_format: 'day',
                   placeholder: {
                     date: 'Datum eintragen',
+                    time: 'Zeit eintragen',
                   },
                   order: 2,
                 },
@@ -1007,6 +1019,9 @@ export default {
     },
   },
   methods: {
+    search(val) {
+      console.log('trigger search', val);
+    },
     fetchAutocomplete({ searchString, filter }) {
       if (searchString && (filter.type === 'text'
         || (filter.type === 'chips' && filter.freetext_allowed))) {
