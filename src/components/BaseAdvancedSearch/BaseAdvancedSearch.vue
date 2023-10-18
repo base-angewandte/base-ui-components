@@ -647,8 +647,8 @@ export default {
         // c) original data and current data diverge (only one of them does not have data)
         // d) or both have data but data are different from each other
         if (this.originalMainFilter
-          && (this.originalMainFilter[this.identifierPropertyName.filter]
-            !== val[this.identifierPropertyName.filter]
+          && ((mainFilterHasData && this.originalMainFilter[this.identifierPropertyName.filter]
+            !== val[this.identifierPropertyName.filter])
           || mainFilterHasData !== originalMainFilterHasData
           || (mainFilterHasData && originalMainFilterHasData
           && (JSON.stringify(this.originalMainFilter.filter_values
@@ -656,7 +656,7 @@ export default {
           // if so - update original data
           this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // and trigger search
-          this.search();
+          this.search(true);
         }
       }
       /**
@@ -884,28 +884,43 @@ export default {
     },
     /**
      * search function
+     * @param {boolean} alwaysTrigger - set true if search should be triggered irrespective of
+     *  appliedFiltersInt changes (needed for changes in mainFilter which is checked in the
+     *  mainFilter watcher already)
      */
-    search() {
+    search(alwaysTrigger = false) {
+      // get the correct field information list
+      const modeFilterList = this.mode === 'form' ? this.formFilterList : this.filterList;
       // get the correct filter values list according to component mode
-      const searchFilterList = (this.mode === 'form' ? Object.entries(this.formFilterValuesInt)
-        // also only keep the filters that have filter values
-        .filter(([, filterValues]) => hasData(filterValues))
-        : Object.entries(this.appliedFiltersInt)
+      let searchFilterList = [];
+      if (this.mode === 'form') {
+        searchFilterList = Object.entries(this.formFilterValuesInt)
           // also only keep the filters that have filter values
-          .filter(([, filterValues]) => hasData(filterValues.filter_values)))
-        .map(([filterKey, filterValues]) => ({
-          id: filterKey,
-          type: this.formFilterList[filterKey].type,
-          // only keep filter values that actually have values (relevant for groups!)
-          filter_values: typeof filterValues === 'object' && filterValues.length
-            && !this.formFilterList[filterKey].type.includes('chips')
-            ? filterValues.filter(filterValue => hasData(filterValue)) : filterValues,
-        }));
-      // check if filter values have actually changed
-      const filtersHaveChanges = JSON.stringify(this.originalFilterValues) !== JSON
-        .stringify(searchFilterList);
-      // if there are changes in filters or main filter trigger search
-      if (filtersHaveChanges) {
+          .filter(([, filterValues]) => hasData(filterValues))
+          .map(([filterKey, filterValues]) => ({
+            id: filterKey,
+            type: modeFilterList[filterKey].type,
+            // only keep filter values that actually have values (relevant for groups!)
+            filter_values: typeof filterValues === 'object' && filterValues.length
+            && !modeFilterList[filterKey].type.includes('chips')
+              ? filterValues.filter(filterValue => hasData(filterValue)) : filterValues,
+          }));
+      } else {
+        searchFilterList = this.appliedFiltersInt
+          // also only keep the filters that have filter values
+          .filter(filterValues => hasData(filterValues.filter_values))
+          // and only keep the properties relevant for search
+          // eslint-disable-next-line camelcase
+          .map(({ id, type, filter_values }) => ({
+            id,
+            type,
+            filter_values,
+          }));
+      }
+      // if there are changes in filters or main filter trigger search (=if alwaysTrigger was
+      // set true in mainFilter watcher)
+      if (alwaysTrigger || JSON.stringify(this.originalFilterValues) !== JSON
+        .stringify(searchFilterList)) {
         // update the original value
         this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
         // also minimize main filter
