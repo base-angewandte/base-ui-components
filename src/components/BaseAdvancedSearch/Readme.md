@@ -276,60 +276,27 @@ Search mode `form` - adds the filters in the form of a form below the primary se
   <div class="background">
     <BaseAdvancedSearch
       mode="form"
-      :applied-filters.sync="appliedFilters"
+      :form-filter-values.sync="appliedFilters"
       :form-filter-list="formFilterList"
       :autocomplete-results="autocompleteResults"
       :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"
       :form-props="{
-        fieldIsLoading: 'title',
-        dropDownLists: {
-          title: [{
-            label: 'Type 1',
-            source: 'bla',
-          }],
-          place_of_creation: [{
-                                label: 'Type 1',
-                                source: 'bla',
-                              },
-                              {
-                                label: 'Type 2',
-                                source: 'bla1',
-                              }],
-          weekday: [{
-                      label: 'Montag',
-                      source: 'monday',
-                    },
-                    {
-                      label: 'Dienstag',
-                      source: 'tuesday',
-                    },
-                    {
-                      label: 'Mittwoch',
-                      source: 'wednesday',
-                    },
-                    {
-                      label: 'Donnerstag',
-                      source: 'thursday',
-                    },
-                    {
-                      label: 'Freitag',
-                      source: 'friday',
-                    },
-                    {
-                      label: 'Samstag',
-                      source: 'saturday',
-                    },
-                    {
-                      label: 'Sonntag',
-                      source: 'sunday',
-                    }],
+        fieldIsLoading: fieldLoading,
+        dropDownLists: formDropDownLists,
+        identifierPropertyName: 'id',
+        labelPropertyName: 'title',
+        fieldProps: {
+          title: {
+            addNewChipText: 'Add value'
+          },
         },
-
       }"
-      @update:form-filter-values="test"
       @fetch-autocomplete="fetchAutocomplete"
-      @fetch-form-autocomplete="fetchFormAutcomplete"
-      @search="search" />
+      @fetch-form-autocomplete="fetchFormAutcomplete" />
+    <div class="applied-filters-area">
+      Applied Search Filters:
+      {{ appliedFilters }}
+    </div>
   </div>
 </template>
 
@@ -337,11 +304,11 @@ Search mode `form` - adds the filters in the form of a form below the primary se
 export default {
   data() {
     return {
-      appliedFilters: [],
+      appliedFilters: {},
       formFilterList: {
         title: {
           type: 'array',
-          title: 'Chips Input Multiple Values',
+          title: 'Title (Chips Input)',
           'x-attrs': {
             field_format: 'half',
             field_type: 'chips',
@@ -352,7 +319,7 @@ export default {
             order: 1,
           },
         },
-        boolean: {
+        boolean_filter: {
           type: 'boolean',
           title: 'A Boolean Filter',
           'x-attrs': {
@@ -362,7 +329,7 @@ export default {
             order: 2,
           },
         },
-        number: {
+        number_filter: {
           type: 'integer',
           title: 'An Integer Filter',
           'x-attrs': {
@@ -382,62 +349,15 @@ export default {
             order: 4,
           },
         },
-        artist: {
-          type: 'string',
-          title: 'Text Field',
-          'x-attrs': {
-            placeholder: 'Enter a text string here',
-            order: 5,
-            field_format: 'half',
-            field_type: 'text',
-            dynamic_autosuggest: true,
-          },
-        },
-        place_of_creation: {
-          type: 'object',
-          title: 'Entstehungsort',
-          'x-attrs': {
-            placeholder: 'URL eintragen',
-            order: 6,
-            field_format: 'half',
-            field_type: 'chips',
-            dynamic_autosuggest: true,
-          },
-        },
-        location: {
-          type: 'array',
-          title: 'Repeatable Field Example',
-          'x-attrs': {
-            placeholder: 'URL eintragen',
-            order: 7,
-            field_format: 'half',
-            field_type: 'chips',
-            dynamic_autosuggest: true,
-          },
-        },
-        keywords: {
-          type: 'array',
-          title: 'Keywords',
-          items: {
-            type: 'string',
-          },
-          'x-attrs': {
-            placeholder: 'URL eintragen',
-            order: 8,
-            field_format: 'full',
-            field_type: 'chips',
-            dynamic_autosuggest: true,
-          },
-        },
         url: {
           type: 'array',
           items: {
             type: 'string',
           },
-          title: 'URL',
+          title: 'URL (repeatable)',
           'x-attrs': {
-            placeholder: 'URL eintragen',
-            order: 9,
+            placeholder: 'Enter URL',
+            order: 5,
             field_format: 'full',
             field_type: 'text',
           },
@@ -455,15 +375,15 @@ export default {
               },
             },
           },
-          title: 'Datierung von, bis',
+          title: 'Date (repeatable)',
           'x-attrs': {
             field_format: 'full',
             field_type: 'date',
             date_format: 'day',
             placeholder: {
-              date: 'Datum eintragen',
+              date: 'Enter Date',
             },
-            order: 10,
+            order: 6,
           },
         },
         weekday_time: {
@@ -473,9 +393,9 @@ export default {
             properties: {
               weekday: {
                 type: 'object',
-                title: 'Wochentag',
+                title: 'Weekday',
                 'x-attrs': {
-                  placeholder: 'Wochentag wählen',
+                  placeholder: 'Choose weekday',
                   field_type: 'chips',
                   dynamic_autosuggest: false,
                   order: 1,
@@ -486,33 +406,22 @@ export default {
               date: {
                 type: 'object',
                 properties: {
-                  date_from: {
+                  date: {
                     type: 'string',
                   },
-                  date_to: {
+                  time: {
                     type: 'string',
                   },
                 },
-                title: 'Datierung von, bis',
+                title: 'Date and Time',
                 'x-attrs': {
                   field_format: 'full',
                   field_type: 'date',
-                  date_format: 'day',
                   placeholder: {
-                    date: 'Datum eintragen',
+                    time: 'Enter Time',
+                    date: 'Enter Date',
                   },
                   order: 2,
-                },
-              },
-              place_of_creation: {
-                type: 'array',
-                title: 'Entstehungsort',
-                'x-attrs': {
-                  placeholder: 'URL eintragen',
-                  order: 3,
-                  field_format: 'full',
-                  field_type: 'chips',
-                  dynamic_autosuggest: true,
                 },
               },
             },
@@ -521,24 +430,60 @@ export default {
           'x-attrs': {
             field_type: 'group',
             show_label: false,
-            order: 11,
+            order: 7,
           },
         },
       },
       autocompleteResults: [],
+      formDropDownLists: {
+        title: [{
+          title: 'Type 1',
+          id: 'bla',
+        }],
+        place_of_creation: [{
+          title: 'Type 1',
+          id: 'bla',
+        },
+          {
+            title: 'Type 2',
+            id: 'bla1',
+          }],
+        weekday: [{
+          title: 'Montag',
+          id: 'monday',
+        },
+          {
+            title: 'Dienstag',
+            id: 'tuesday',
+          },
+          {
+            title: 'Mittwoch',
+            id: 'wednesday',
+          },
+          {
+            title: 'Donnerstag',
+            id: 'thursday',
+          },
+          {
+            title: 'Freitag',
+            id: 'friday',
+          },
+          {
+            title: 'Samstag',
+            id: 'saturday',
+          },
+          {
+            title: 'Sonntag',
+            id: 'sunday',
+          }],
+      },
       potentialResults: [
         { filter_id: 'title', label: 'Titel', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
-        { filter_id: 'artist', label: 'Artists', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
-        { filter_id: 'keywords', label: 'Keywords', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
-        { filter_id: 'place_of_creation', label: 'Place of Creation', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
-        { filter_id: 'location', label: 'Location', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
       ],
+      fieldLoading: '',
     };
   },
   methods: {
-    test(val) {
-      console.log('updated!', JSON.stringify(val));
-    },
     fetchAutocomplete({ searchString, filter }) {
       if (searchString && (filter.type === 'text'
         || (filter.type === 'chips' && filter.freetext_allowed))) {
@@ -559,11 +504,21 @@ export default {
         this.autocompleteResults = [];
       }
     },
-    fetchFormAutcomplete() {
-      console.log('fetch form autocomplete');
-    },
-    search(val) {
-      console.log('trigger search', val);
+    fetchFormAutcomplete({ value, name }) {
+      if (value) {
+        this.fieldLoading = name;
+        setTimeout(() => {
+          // eslint-disable-next-line camelcase
+          const formAutocompleteResults = this.potentialResults
+            .find(category => category.filter_id === name).data
+            .filter(entry => entry.title.toLowerCase()
+              .includes(value.toLowerCase()));
+          this.$set(this.formDropDownLists, name, formAutocompleteResults);
+          this.fieldLoading = '';
+        }, 1000);
+      } else {
+        this.$set(this.formDropDownLists, name, []);
+      }
     },
   },
 }
@@ -572,6 +527,10 @@ export default {
 <style>
 .background {
   background: rgb(240, 240, 240);
+  padding: 16px;
+}
+
+.applied-filters-area {
   padding: 16px;
 }
 </style>
