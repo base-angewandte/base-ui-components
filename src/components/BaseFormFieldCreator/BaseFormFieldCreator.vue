@@ -287,7 +287,7 @@
       <template
         #drop-down-entry="props">
         <span>
-          {{ getLabel(props.item.label) }}
+          {{ getLabel(props.item[labelPropertyName]) }}
         </span>
         <span class="base-form-field-creator__chips-dropdown-second">
           {{ props.item.additional }}
