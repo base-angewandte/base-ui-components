@@ -963,6 +963,10 @@ export default {
                 filter:alpha(opacity=0);
                 animation: all 500ms ease;
               }
+
+              &[type=search] {
+                appearance: none;
+              }
             }
           }
 

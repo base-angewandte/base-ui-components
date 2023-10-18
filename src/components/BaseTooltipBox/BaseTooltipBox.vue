@@ -369,6 +369,9 @@ export default {
     opacity: 0;
     transition: opacity 150ms ease-in;
     filter: drop-shadow($tooltip-drop-shadow);
+    // Use the GPU to render the element. Otherwise, the drop-shadow
+    // will disappear after the opacity transition finishes on MacOS Safari
+    transform: translateZ(0);
 
     &__inner {
       position: relative;
