@@ -75,7 +75,7 @@
                 @chip-clicked="emitChipData">
                 <template #tooltip>
                   <!-- @slot slot for tooltip content -->
-                  <!-- @binding {array} data -  -->
+                  <!-- @binding {array} data -->
                   <slot
                     :data="objectItem.additional"
                     name="tooltip" />
@@ -131,7 +131,7 @@
 import i18n from '../../mixins/i18n';
 
 /**
- * Component to render data in p | ul | dt tags depending on field type 'data'
+ * Component to render data in p | ul | dt tags depending on the data type of prop `data`
  */
 
 export default {
@@ -177,7 +177,7 @@ export default {
       default: false,
     },
     /**
-     * specify number of columns to render array nested objects
+     * specify the number of columns to render array nested objects
      */
     cols: {
       type: Number,
@@ -185,7 +185,7 @@ export default {
       validate: val => val > 0,
     },
     /**
-     * specify number of columns to render a single object typeof string
+     * specify the number of columns to render a single object typeof string
      */
     colsSingleTextObject: {
       type: Number,
@@ -242,7 +242,9 @@ export default {
     },
   },
   created() {
-    // If the parent component is type `BaseTextList` we assume that the current `BaseTextList` has columns
+    // Check if the parent component is type `BaseTextList`,
+    // and assume it is recursive, and the current `BaseTextList` has columns.
+    // With this workaround, we avoid problems with the CSS var `--columns` in the parent scope.
     this.hasColumns = this.$parent.$options.name === 'BaseTextList';
   },
   methods: {
@@ -261,15 +263,6 @@ export default {
         }
       }
       return true;
-    },
-    /**
-     * check if the object contains properties that indicate a chip type
-     *
-     * @param {object} data
-     * @returns {boolean}
-     */
-    isChip(data) {
-      return !!((data.source || data.id) && data.type);
     },
     /**
      * function to emit event and data
@@ -318,6 +311,7 @@ export default {
       }
 
       .base-text-list__content--horizontal {
+
         .base-text-list__content__label {
           display: inline;
         }
