@@ -1230,7 +1230,7 @@ export default {
         || this.defaultFilter[this.identifierPropertyName.filter];
       // check if filters were specified - if not assume the input is handled in parent component
       if (!this.filterList || !this.filterList.length) {
-        this.$emit('option-selected', ({ entry, collectionId }));
+        this.$emit('option-selected', ({ entry, collectionId: selectedOptionCollection }));
         this.resetAllInput();
         // if option is coming from autocomplete drop down list (=has an id)
         // and currently active filter is not identical
