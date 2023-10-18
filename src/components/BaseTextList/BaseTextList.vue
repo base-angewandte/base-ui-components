@@ -26,6 +26,7 @@
           :style="{ '--columns': cols }"
           :render-label-as="renderLabelAs"
           :label-margin-bottom="labelMarginBottom"
+          :list-type="listType"
           :cols="cols"
           :data="item"
           @chip-clicked="emitChipData" />
