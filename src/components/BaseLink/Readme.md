@@ -1,21 +1,35 @@
 ## Demo
 
+The different link types are selected by the properties passed.
+
+| types         | properties                       |
+|---------------|----------------------------------|
+| chip          | identifierPropertyValue && type  | 
+| external      | url                              | 
+| internal      | identifierPropertyValue && !type | 
+| text          |                                  |
+| tooltip       | tooltip                          | 
+| tooltip async | asyncTooltip                     | 
+
 ```vue live
 <template>
   <div>
-    <h2>types</h2>
+    <h2>examples of different link types:</h2>
     <template
       v-for="(link, index) in links">
       <BaseLink
         :key="index"
-        :source="link.source"
+        :identifier-property-name="'id'"
+        :identifier-property-value="link.id"
+        :chip-query-name="'chip-link'"
+        :path="link.path"
         :tooltip="link.tooltip"
         :tooltip-async="link.additional"
         :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
         :type="link.type"
         :url="link.url"
         :value="link.value"
-        @tooltipClicked="asyncTooltip($event, index)" /><!-- eslint-disable --><template v-if="index !== links.length - 1">, </template><!-- eslint-enable -->
+        @tooltip-clicked="asyncTooltip($event, index)" /><!-- eslint-disable --><template v-if="index !== links.length - 1">, </template><!-- eslint-enable -->
     </template>
   </div>
 </template>
@@ -37,7 +51,7 @@ export default {
         },
         {
           value: 'internal link',
-          source: 'internal.link',
+          id: '/internal.link',
         },
         {
           value: 'tooltip',
@@ -54,7 +68,7 @@ export default {
           ],
         },
         {
-          value: 'aync tooltip',
+          value: 'async tooltip',
           additional: [
             {
               label: 'label',
@@ -63,9 +77,10 @@ export default {
           ],
         },
         {
-          value: 'internal link (chips)',
-          source: 'internal.link',
-          type: 'activity'
+          path: '/some-path',
+          id: 'some-id',
+          type: 'keywords',
+          value: 'chip'
         },
       ],
     };
@@ -89,4 +104,11 @@ export default {
   },
 };
 </script>
+
+<style>
+  /* reset chip hover style due the styleguide css would overwrite the component ones */
+  .base-link.base-link--chip:hover {
+    text-decoration: none !important;
+  }
+</style>
 ```

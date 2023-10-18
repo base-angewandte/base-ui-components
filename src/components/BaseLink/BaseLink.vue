@@ -2,36 +2,33 @@
   <component
     :is="renderAs"
     v-click-outside="() => closeTooltip()"
-    :tabindex="source || hasValidUrl || (source && type) || tooltip.length ? 0 : null"
-    :role="tooltip.length ? 'button' : null"
-    :href="source || hasValidUrl ? source || url : null"
-    :to="vueRouterAvailable && source && !type ? '/' + source : null"
-    :target="hasValidUrl && externalLinkTarget === '_blank' ? '_blank' : null"
-    :title="source || hasValidUrl || (source && type) ? value : null"
+    :href="isChip || isInternal || isExternal ? href : null"
+    :to="routerTo"
+    :target="hasValidUrl ? externalLinkTarget : null"
+    :title="title"
     :class="[
       'base-link',
       {
-        'base-link--external': hasValidUrl,
-        'base-link--internal': source && !type,
-        'base-link--chip': source && type,
-        'base-link--tooltip': tooltip.length || tooltipAsync.length,
+        'base-link--chip': isChip,
+        'base-link--internal': isInternal,
+        'base-link--external': isExternal,
+        'base-link--tooltip': isTooltip,
         'base-link--active': showTooltip,
         'base-link--space-after': spaceAfter,
       },
     ]"
-    v-on="source && type ? { click: chipClicked } : {}">
+    @click="clickHandler">
+    <!-- chip, internal, external, text -->
     <template
-      v-if="!tooltip.length && !tooltipAsync.length">
+      v-if="!isTooltip">
       {{ value }}
     </template>
 
     <!-- (i) tooltip -->
     <template
-      v-if="(tooltip.length && !source) || (tooltipAsync.length && !source)">
+      v-if="isTooltip">
       <span
-        class="base-link__label"
-        @keydown.enter.prevent="tooltip.length ? { click: tooltipClicked } : {}"
-        @click="tooltipClicked">
+        class="base-link__label">
         {{ value }}
         <span
           ref="icon"
@@ -53,6 +50,7 @@
         v-if="showTooltip"
         :attach-to="$refs.icon"
         :modal-on-mobile="false"
+        :role="'tooltip'"
         :styles="tooltipStyles">
         <!-- @slot slot to inject content  -->
         <slot
@@ -89,8 +87,8 @@
 
 <script>
 /**
- * component to display different type of links
- * eg.: internal, external, tooltip, chip
+ * component to display different types of links
+ * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
  */
 
 import ClickOutside from 'vue-click-outside';
@@ -107,13 +105,11 @@ export default {
   },
   props: {
     /**
-     * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router
-     * is necessary
+     * specify a query parameter name for type `chip` links
      */
-    renderLinkAs: {
+    chipQueryName: {
       type: String,
-      default: 'RouterLink',
+      default: 'chip-link',
     },
     /**
      * specify external link target
@@ -125,15 +121,74 @@ export default {
       validator: val => (val === '_blank' || val === '_self'),
     },
     /**
-     * tooltip content
-     * by default a list (label: value) is rendered
-     * structure:
-     * `[{ label: 'label', value: 'value', url: '#' }]`
-     * or use #tooltip to customize the content
+     * specify the object property that should be used as identifier
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'source',
+    },
+    /**
+     * specify the internal identifier to route to
+     */
+    identifierPropertyValue: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify an internal path to link to
+     */
+    path: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify how a link element should be rendered
+     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router is necessary
+     */
+    renderLinkAs: {
+      type: String,
+      default: 'RouterLink',
+    },
+    /**
+     * add a space " " after an element
+     * useful for link-type tooltip in lists
+     */
+    spaceAfter: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * specify texts for the title tag depending on a link type (especially helpful to provide language-specific text)
+     * this needs to be an object with the following properties
+     * (if you don't want to display any specific text, leave an empty string):
+     *
+     *     **chip**: Text is shown on hover of a chip link and gets merged with the type and value attributes.
+     *     **tooltip**: Text is shown on hover of a tooltip link.
+     *     **type**: Text for a single chip type.
+     *       This needs to be an object containing properties matching the different chip types.
+     */
+    titleText: {
+      type: Object,
+      default: () => ({
+        chip: 'Open {type} {value} in search',
+        tooltip: 'Show more information',
+        type: {
+          artists: 'artist',
+          keywords: 'keyword',
+        },
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['chip', 'tooltip', 'type'].every(prop => Object.keys(val).includes(prop)),
+    },
+    /**
+     * specify tooltip list content
+     * structure: `[{ label: 'label', value: 'value', url: '#' }]` or use the slot `#tooltip` to customise the content
      */
     tooltip: {
       type: Array,
       default: () => [],
+      // check if all the necessary attributes are included in the provided array objects
+      validator: val => val.every(item => Object.keys(item).includes('label', 'value')),
     },
     /**
      * async tooltip content
@@ -152,42 +207,27 @@ export default {
       default: () => ({}),
     },
     /**
-     * internal identifier to route to
-     */
-    source: {
-      type: String,
-      default: '',
-    },
-    /**
-     * external url to link to
-     */
-    url: {
-      type: String,
-      default: '',
-    },
-    /**
-     * label of the entry
-     */
-    value: {
-      type: String,
-      default: '',
-    },
-    /**
-     * used in combination with property `source` to render chip.
-     * `type` identifies source type for chip click-event
-     * eg: keyword | skill | object
+     * used in combination with property `identifierPropertyValue` to render a type `chip` element.
+     * `type` identifies a source type for chip click-event e.g.: keyword | skill | object
      */
     type: {
       type: String,
       default: '',
     },
     /**
-     * add a space " " after element
-     * useful for link-type tooltip in lists
+     * external url to link to
+     * supported protocols: `http://`, `https://`, `mailto:`, `tel:`
      */
-    spaceAfter: {
-      type: Boolean,
-      default: false,
+    url: {
+      type: String,
+      default: '',
+    },
+    /**
+     * value of the entry
+     */
+    value: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -198,36 +238,142 @@ export default {
     };
   },
   computed: {
-    vueRouterAvailable() {
-      return !!this.$router;
+    /**
+     * object to be emitted when a chip is clicked
+     * @returns {Object}
+     */
+    chipObj() {
+      const obj = {};
+      obj[this.identifierPropertyName] = this.identifierPropertyValue;
+      obj.type = this.type;
+      obj.value = this.value;
+      return obj;
     },
     /**
-     * render component as span | a | button
-     * @returns {string}
+     * check if an url is set and includes a protocol
+     * e.g. 'http://', 'https://', 'mailto:' or 'tel:'
+     *
+     * @returns {boolean}
      */
-    renderAs() {
-      let tag = 'span';
-
-      if (this.hasValidUrl) {
-        tag = 'a';
-      }
-
-      if (this.source) {
-        tag = this.vueRouterAvailable ? this.renderLinkAs : 'a';
-      }
-
-      if (this.source && this.type) {
-        tag = 'button';
-      }
-
-      return tag;
-    },
     hasValidUrl() {
-      // check if url is set and includes a protocol (eg. 'http://', 'https://'), 'mailto:' or 'tel:'
-      return this.url
+      //
+      return !!(this.url
         && (this.url.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
             || this.url.match(/^mailto:/)
-            || this.url.match(/^tel:/));
+            || this.url.match(/^tel:/)));
+    },
+    /**
+     * href value depending on link type
+     * @returns {string}
+     */
+    href() {
+      // external
+      let href = this.url;
+      // internal
+      if (this.isInternal) {
+        href = this.path || this.identifierPropertyValue;
+      }
+      // chips
+      if (this.isChip) {
+        href = this.routerTo;
+      }
+      // return href
+      return href;
+    },
+    /**
+     * check if the link is type `chip`
+     * @returns {boolean}
+     */
+    isChip() {
+      return !!(this.identifierPropertyName && this.type);
+    },
+    /**
+     * check if the link is type `external`
+     * @returns {boolean}
+     */
+    isExternal() {
+      return this.hasValidUrl;
+    },
+    /**
+     * check if the link is type `internal`
+     * @returns {boolean}
+     */
+    isInternal() {
+      return !!(this.identifierPropertyValue && !this.type);
+    },
+    /**
+     * check if the link is type `tooltip`
+     * @returns {boolean}
+     */
+    isTooltip() {
+      return !!(this.tooltip.length || this.tooltipAsync.length);
+    },
+    /**
+     * render component with a specific tag
+     * @returns {'a' | 'button' | 'router-link' | 'span'}
+     */
+    renderAs() {
+      // external
+      if (this.isExternal) {
+        return 'a';
+      }
+      // internal, chip
+      if (this.isInternal || this.isChip) {
+        return this.vueRouterAvailable ? this.renderLinkAs : 'a';
+      }
+      // tooltip
+      if (this.isTooltip) {
+        return 'button';
+      }
+      return 'span';
+    },
+    /**
+     * router-to value depending on link type
+     * @returns {string|null}
+     */
+    routerTo() {
+      // check if needed
+      if (!(this.vueRouterAvailable && (this.isInternal || this.isChip))) {
+        return null;
+      }
+      // internal
+      let to = `${this.path}`;
+      // chip
+      if (this.isChip) {
+        to = `${this.path}?${this.chipQueryName}=${JSON.stringify(this.chipObj)}`;
+      }
+      // return value
+      return to;
+    },
+    /**
+     * build the title attribute depending on the current link type
+     * @returns {null|string}
+     */
+    title() {
+      if (this.isInternal || this.isExternal) {
+        return this.value;
+      }
+      if (this.isTooltip) {
+        return this.titleText.tooltip;
+      }
+      if (this.isChip) {
+        return this.titleText.chip
+          // replace the placeholder with a matching translated type, otherwise with an empty string
+          .replace('{type}', this.titleText.type[this.type] ? this.titleText.type[this.type] : '')
+          // replace the placeholder with the value (no translation needed)
+          .replace('{value}', this.value)
+          // remove multiple spaces with a single space
+          .replace(/\s+/g, ' ');
+      }
+      // default
+      return null;
+    },
+    /**
+     * check if vue router is available
+     * @returns {boolean}
+     */
+    vueRouterAvailable() {
+      return !!this.$router;
     },
   },
   watch: {
@@ -239,33 +385,41 @@ export default {
     },
   },
   mounted() {
-    window.addEventListener('scroll', this.scrollResize);
-    window.addEventListener('resize', this.scrollResize);
+    window.addEventListener('scroll', this.scrollResizeHandler);
+    window.addEventListener('resize', this.scrollResizeHandler);
   },
   destroyed() {
-    window.removeEventListener('scroll', this.scrollResize);
-    window.removeEventListener('resize', this.scrollResize);
+    window.removeEventListener('scroll', this.scrollResizeHandler);
+    window.removeEventListener('resize', this.scrollResizeHandler);
   },
   methods: {
-    chipClicked() {
-      /**
-       * @event chip-clicked
-       * @property {string} source - internal identifier
-       * @property {string} type - source type for chip click-event
-       * @property {string} value
-       */
-      this.$emit('chip-clicked', {
-        source: this.source,
-        type: this.type,
-        value: this.value,
-      });
+    /**
+     * handle click events for different link types
+     */
+    clickHandler() {
+      if (this.isTooltip) {
+        this.tooltipClicked();
+      }
     },
+    /**
+     * close an open tooltip
+     */
+    closeTooltip() {
+      if (!this.showTooltip) {
+        return;
+      }
+      this.showTooltip = false;
+    },
+    /**
+     * handle tooltip click event
+     */
     async tooltipClicked() {
+      // check if there is content to display
       if (this.tooltip.length) {
         this.showTooltip = !this.showTooltip;
         return;
       }
-
+      // check if there is async loaded content to display
       if (this.tooltipAsync.length) {
         this.isLoading = true;
         /**
@@ -276,13 +430,10 @@ export default {
         this.$emit('tooltip-clicked', this.tooltipAsync);
       }
     },
-    closeTooltip() {
-      if (!this.showTooltip) {
-        return;
-      }
-      this.showTooltip = false;
-    },
-    scrollResize() {
+    /**
+     * intercept scroll/resize event and close the tooltip
+     */
+    scrollResizeHandler() {
       // check if there is a timeout already set and clear it if yes
       if (this.scrollResizeTimeout) {
         clearTimeout(this.scrollResizeTimeout);
@@ -313,6 +464,7 @@ export default {
     }
 
     &__icon {
+      flex-shrink: 0;
       position: relative;
       display: inline-block;
       height: $icon-small;
@@ -364,12 +516,13 @@ export default {
       padding: 0 $spacing-small;
       margin-right: $spacing-small;
       background-color: $background-color;
+      text-decoration: none;
 
       &:focus,
       &:hover {
-        color: white;
         background-color: $app-color-secondary;
-        cursor: pointer;
+        color: white;
+        text-decoration: none;
       }
     }
 
@@ -386,8 +539,12 @@ export default {
         cursor: pointer;
 
         svg {
-          fill: $app-color-secondary
+          fill: $app-color-secondary;
         }
+      }
+
+      &:focus {
+        color: $app-color-secondary;
       }
     }
 

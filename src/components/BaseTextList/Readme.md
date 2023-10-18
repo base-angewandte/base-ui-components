@@ -8,9 +8,10 @@ Note: The column elements are defined via the data structure wrapped by an array
 <template>
   <div>
     <BaseTextList
-      render-label-as="h2"
       :cols="2"
       :data="data"
+      :identifier-property-name="'source'"
+      :render-label-as="'h2'"
       @chip-clicked="chipClicked" />
   </div>
 </template>
@@ -92,21 +93,22 @@ export default {
               },
               {
                 value: 'internal link',
-                source: 'some-id',
+                source: '/some-path',
               },
             ],
           },
           {
             label: 'data is array of objects rendered as chips',
-            id: 'source-type',
+            id: 'keywords',
+            path: '/components/BaseTextList.html',
             data: [
               {
                 value: 'dolore magna',
-                source: 'source-id',
+                source: 'keyword-1',
               },
               {
-                value: ' aliquyam erat',
-                source: 'source-id',
+                value: 'aliquyam erat',
+                source: 'keyword-2',
               },
             ],
           },
@@ -126,6 +128,13 @@ export default {
   },
 }
 </script>
+
+<style>
+  /* reset chip hover style due the styleguide css would overwrite the component ones */
+  >>> .base-link.base-link--chip:hover {
+    text-decoration: none !important;
+  }
+</style>
 ```
 
 <br>
@@ -136,9 +145,9 @@ Note: The number of columns can be defined with the 'colsSingleTextContent' prop
 <template>
   <div>
     <BaseTextList
-      render-label-as="h2"
       :data="data"
-      :cols-single-text-object="2" />
+      :cols-single-text-object="2"
+      :render-label-as="'h2'" />
   </div>
 </template>
 

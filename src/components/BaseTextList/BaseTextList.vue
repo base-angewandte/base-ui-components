@@ -23,12 +23,13 @@
       <template v-if="typeof item === 'object' && typeof item[0] === 'object'">
         <BaseTextList
           ref="baseTextList"
-          :style="{ '--columns': cols }"
-          :render-label-as="renderLabelAs"
-          :label-margin-bottom="labelMarginBottom"
-          :list-type="listType"
           :cols="cols"
           :data="item"
+          :identifier-property-name="identifierPropertyName"
+          :label-margin-bottom="labelMarginBottom"
+          :list-type="listType"
+          :render-label-as="renderLabelAs"
+          :style="{ '--columns': cols }"
           @chip-clicked="emitChipData" />
       </template>
 
@@ -67,7 +68,10 @@
               <!-- eslint-disable -->
               <BaseLink
                 :key="objectIndex"
-                :source="objectItem.source || objectItem.id"
+                :identifier-property-name="identifierPropertyName"
+                :identifier-property-value="objectItem[identifierPropertyName]"
+                :chip-query-name="chipQueryName"
+                :path="item.path"
                 :tooltip="objectItem.additional"
                 :type="item.id"
                 :url="objectItem.url"
@@ -108,9 +112,13 @@
               <dd
                 :key="'v' + objectIndex"
                 class="base-text-list__content__label base-text-list__content__value">
+                identifierPropertyName '{{ identifierPropertyName }}'
                 <BaseLink
                   :render-link-as="renderLinkAs"
-                  :source="objectItem.source || objectItem.id"
+                  :identifier-property-name="identifierPropertyName"
+                  :identifier-property-value="objectItem[identifierPropertyName]"
+                  :chip-query-name="chipQueryName"
+                  :path="item.path"
                   :tooltip="objectItem.additional"
                   :type="item.id"
                   :url="objectItem.url"
@@ -162,6 +170,20 @@ export default {
     data: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * specify the object property that should be used as identifier
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'source',
+    },
+    /**
+     * specify a query parameter name for type chip links
+     */
+    chipQueryName: {
+      type: String,
+      default: 'chip-link',
     },
     /**
      * render component as e.g.: 'h2' | 'h3'
