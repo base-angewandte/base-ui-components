@@ -200,10 +200,38 @@ export default {
      * calculate height of content inner
      */
     contentInnerHeight() {
-      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight;
+      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight - this.contentHeightOffset();
     },
     /**
+     * calculate an optional offset for the content inner height
      *
+     * In some base-components, e.g. BaseTextList,
+     * a negative margin-bottom is defined to handle exact element boundaries.
+     * Therefore, an offset is needed to calculate the contentInnerHeight.
+     *
+     * @returns {number}
+     */
+    contentHeightOffset() {
+      // default offset
+      let offset = 0;
+      // get content slot elements
+      const elements = this.$el.querySelectorAll('.base-expand-box-content-inner > div > *');
+
+      // iterate through elements, evaluate whether an offset is required
+      elements.forEach((elem) => {
+        // break if offset is already set
+        if (offset) return;
+        // get elements margin-bottom as a number
+        const marginBottom = parseFloat(window.getComputedStyle(elem, null).getPropertyValue('margin-bottom'));
+        // check if the number is negative, if so, set the offset as a positive number
+        if (marginBottom < 0) {
+          offset = Math.abs(marginBottom);
+        }
+      });
+
+      // return number
+      return offset;
+    },
      */
     clicked() {
       this.expandInt = !this.expandInt;
