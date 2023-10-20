@@ -112,7 +112,6 @@
               <dd
                 :key="'v' + objectIndex"
                 class="base-text-list__content__label base-text-list__content__value">
-                identifierPropertyName '{{ identifierPropertyName }}'
                 <BaseLink
                   :render-link-as="renderLinkAs"
                   :identifier-property-name="identifierPropertyName"
