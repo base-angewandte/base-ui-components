@@ -306,6 +306,7 @@ export default {
   @import "../../styles/variables";
 
   .base-text-list {
+
     .base-text-list__group {
       page-break-inside: avoid;
       break-inside: avoid;
@@ -371,6 +372,9 @@ export default {
     }
 
     // spacing below elements
+    // Note: Use a negative margin to get an exact bottom boundary
+    //       without extra spacing from paddings of the inner elements.
+    //       Could possibly be done with CSS Masonry layout once it's stable.
     &.base-text-list--row-gap-small {
       margin-bottom: -$spacing;
 

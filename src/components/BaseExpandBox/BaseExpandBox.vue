@@ -70,7 +70,7 @@ export default {
   },
   props: {
     /**
-     * expand box from outside
+     * expand box from the outside
      */
     expand: {
       type: Boolean,
@@ -100,6 +100,9 @@ export default {
       type: String,
       default: 'Show less',
     },
+    /**
+     * define whether box height depends on content
+     */
     autoHeight: {
       type: Boolean,
       default: false,
@@ -191,13 +194,15 @@ export default {
       });
     },
     /**
-     * calculate height of content
+     * calculate the content height
+     * @returns {number}
      */
     contentHeight() {
       return this.$el.querySelector('.base-expand-box-content').offsetHeight;
     },
     /**
-     * calculate height of content inner
+     * calculate the content inner height
+     * @returns {number}
      */
     contentInnerHeight() {
       return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight - this.contentHeightOffset();
@@ -232,6 +237,8 @@ export default {
       // return number
       return offset;
     },
+    /**
+     * click event for the show-more button
      */
     clicked() {
       this.expandInt = !this.expandInt;
