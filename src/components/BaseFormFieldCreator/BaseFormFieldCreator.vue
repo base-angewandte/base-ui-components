@@ -391,6 +391,7 @@
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
           @values-changed="setInputValue"
+          @input-complete="$emit('input-complete', $event);"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
             #label-addition="{ fieldName, groupNames }">
