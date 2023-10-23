@@ -32,8 +32,8 @@
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       v-bind="$listeners"
-      @clicked-outside="isActive = false"
-      @click="isActive = true"
+      @clicked-outside="onClickedOutsideSearch"
+      @click.native="onSearchClick"
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
@@ -762,6 +762,10 @@ export default {
        * @type {string}
        */
       filterSlotName: 'pre-input-field',
+      /**
+       *
+       */
+      stopSearchClick: false,
     };
   },
   computed: {
@@ -1597,6 +1601,53 @@ export default {
       if (!event.shiftKey) {
         // if no - set row active to false
         this.isActive = false;
+      }
+    },
+    /**
+     * for unknown reasons on mobile click-outside gets propagated before click event (on
+     *  desktop browsers it is the other way round). This leads to search drop down getting
+     *  triggered when an element INSIDE search was clicked (in case of desktop when click-outside
+     *  is propagated AFTER this leads to isActive = false again immediately after so no drop
+     *  down showing). Therefore, we need to check for mobile event and set variable stopSearchClick
+     *  to true so in event onSearchClick the click can be stopped from opening the drop-down.
+     *
+     * @param {MouseEvent|TouchEvent} event - the event provided by click-outside plugin
+     */
+    onClickedOutsideSearch(event) {
+      // do the regular action to set is active false (and close drop down)
+      this.isActive = false;
+      // get the event type
+      const { type } = event;
+      // if event type is 'touchstart' we assume mobile that was propagated before click event
+      if (type === 'touchstart') {
+        // therefore we set the click stop variable true
+        this.stopSearchClick = true;
+        // since this should only affect click events triggered directly after set
+        // the variable false again after a time out
+        setTimeout(() => {
+          this.stopSearchClick = false;
+        }, 500);
+      }
+    },
+    /**
+     * need to special handle search click event due to the reasons described above in function
+     *  onClickedOutsideSearch().
+     *
+     * @param {MouseEvent} event - the native click event
+     */
+    onSearchClick(event) {
+      // check if mobile variable to stop click being propagated after click-outside
+      // was set
+      if (!this.stopSearchClick) {
+        // if now - show drop down
+        this.isActive = true;
+      } else {
+        // if click-outside was propagated before click event stop the event here
+        // and don't open drop down
+        event.stopPropagation();
+        this.isActive = false;
+        // set variable false again after
+        this.stopSearchClick = false;
       }
     },
     initObservers() {
