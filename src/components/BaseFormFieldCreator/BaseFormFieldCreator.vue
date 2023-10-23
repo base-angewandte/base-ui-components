@@ -40,7 +40,6 @@
       :max="typeof formFieldXAttrs.max !== 'undefined' ? formFieldXAttrs.max : fieldProps.max"
       :decimals="allowedDecimals"
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
-      v-on="inputListeners"
       @keydown.enter="onEnter"
       @blur="emitCompletedInputValues"
       @input="setInputValue($event)"
@@ -153,8 +152,7 @@
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           class="base-form-field-creator__date-field"
-          @value-validated="emitCompletedInputValues"
-          v-on="inputListeners">
+          @value-validated="emitCompletedInputValues">
           <template
             #label-addition>
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
@@ -232,8 +230,7 @@
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
           class="base-form-field-creator__date-field"
-          @date-validated="emitCompletedInputValues"
-          v-on="inputListeners" />
+          @date-validated="emitCompletedInputValues" />
       </div>
     </fieldset>
 
@@ -279,7 +276,6 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
-      v-on="inputListeners"
       @selected-changed="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
@@ -394,7 +390,6 @@
           :drop-down-lists="fieldGroupDropDownLists"
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
-          v-on="inputListeners"
           @values-changed="setInputValue"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
@@ -759,38 +754,6 @@ export default {
     };
   },
   computed: {
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$listeners,
-        // and add custom listeners
-        ...{
-          blur: (event) => {
-            /**
-             * event emitted by field type `multiline`
-             * @event blur
-             * @param {KeyboardEvent} event - the native keydown event
-             * @param {Object} field - the field information in order to be able
-             *  to have the information from which field the event came from
-             */
-            this.$emit('blur', event, this.field);
-          },
-          keydown: (event) => {
-            /**
-             * event emitted by field type `multiline`
-             * @event keydown
-             * @param {KeyboardEvent} event - the native keydown event
-             * @param {Object} field - the field information in order to be able
-             *  to have the information from which field the event came from
-             */
-            this.$emit('keydown', event, this.field);
-          },
-          // stop custom events from bubbling up - we just want native events from input
-          'values-changed': () => {},
-          'fetch-autocomplete': () => {},
-        },
-      };
-    },
     /**
      * import the relevant component
      * @returns {(function(): Promise)|null}
