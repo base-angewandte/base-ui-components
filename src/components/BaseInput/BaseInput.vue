@@ -3,7 +3,8 @@
     class="base-input">
     <!-- LABEL ROW -->
     <div
-      :class="['base-input__label-row', { hide: !showLabelRow }]">
+      :class="['base-input__label-row', { hide: !showLabelRow }]"
+      @click.stop="">
       <!-- need to disable because label is there (below)? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label

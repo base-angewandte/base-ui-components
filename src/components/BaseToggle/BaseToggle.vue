@@ -20,7 +20,8 @@
         :aria-disabled="disabled"
         :type="'checkbox'"
         value=""
-        class="base-toggle__input">
+        class="base-toggle__input"
+        @click.stop="">
 
       <div class="base-switch">
         <span
