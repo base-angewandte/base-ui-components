@@ -19,6 +19,7 @@
         :class="[
           'base-collapsed-filter-row__filter-list',
           { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
+          { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
         ]"
         @mousedown="mouseDownHandler">
         <li
@@ -51,6 +52,8 @@
                         && filterValuesHaveData(value.values)
                         && groupIndex === 0"
                       :apply-spacing-left="!!value.values[0].label"
+                      :scrollable="filterListScrollable"
+                      :is-scrolling="isScrolling"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
@@ -62,6 +65,8 @@
                     :append-until="filter.filter_values?.values.length === 2
                       && valueIndex === 0"
                     :apply-spacing-left="!!filter.filter_values?.values[0].label"
+                    :scrollable="filterListScrollable"
+                    :is-scrolling="isScrolling"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -192,6 +197,12 @@ export default {
        * @type {?HTMLElement}
        */
       scrollContainer: null,
+      /**
+       * set cursor styling according to current scroll state
+       * use variable instead of setting css class directly so child component
+       *  BaseCollapsedFilter item can also be steered easily
+       */
+      isScrolling: false,
       /**
        * Resize Observer to trigger fade out calculations
        * @type {?ResizeObserver}
@@ -343,7 +354,7 @@ export default {
         document.addEventListener('mousemove', this.mouseMoveHandler);
         document.addEventListener('mouseup', this.mouseUpHandler);
         // Change the cursor and prevent user from selecting the text
-        this.scrollContainer.classList.add('base-collapsed-filter-row__filter-list__scrolling');
+        this.isScrolling = true;
       }
     },
     /**
@@ -372,7 +383,7 @@ export default {
       document.removeEventListener('mouseup', this.mouseUpHandler);
 
       // change the styling of the element back to normal
-      this.scrollContainer.classList.remove('base-collapsed-filter-row__filter-list__scrolling');
+      this.isScrolling = false;
     },
     /**
      * function to caclulate if filterList fade out should be shown on element left and/or right border

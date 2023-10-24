@@ -6,8 +6,8 @@
       v-if="!isBoolean && hasValue"
       :entry="value.label"
       :is-linked="true"
+      :text-styling="chipStyling"
       role="listitem"
-      @mousedown.native.stop=""
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
@@ -76,6 +76,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * needed for cursor styling if over chips if list is scrollable
+     */
+    isScrolling: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * needed for cursor styling if over chips
+     */
+    scrollable: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     /**
@@ -91,6 +105,17 @@ export default {
      */
     hasValue() {
       return !!this.value && !!this.value.label;
+    },
+    /**
+     * need to overwrite chips styling cursor and user-select in case
+     *  row is scrollable - if not return empty object
+     * @returns {{cursor: (string), userSelect: (string)}|{}}
+     */
+    chipStyling() {
+      return this.scrollable ? ({
+        cursor: this.isScrolling ? 'grabbing' : 'grab',
+        userSelect: this.isScrolling ? 'none' : 'unset',
+      }) : {};
     },
   },
   methods: {
