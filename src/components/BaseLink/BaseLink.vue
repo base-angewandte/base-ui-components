@@ -271,7 +271,7 @@ export default {
       let href = this.url;
       // internal
       if (this.isInternal) {
-        href = this.path || this.identifierPropertyValue;
+        href = this.identifierPropertyValue;
       }
       // chips
       if (this.isChip) {
@@ -337,7 +337,7 @@ export default {
         return null;
       }
       // internal
-      let to = `${this.path}`;
+      let to = this.identifierPropertyValue;
       // chip
       if (this.isChip) {
         to = `${this.path}?${this.chipQueryName}=${JSON.stringify(this.chipObj)}`;

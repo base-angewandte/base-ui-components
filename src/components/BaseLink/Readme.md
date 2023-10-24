@@ -51,7 +51,7 @@ export default {
         },
         {
           value: 'internal link',
-          id: '/internal.link',
+          id: '/components/BaseSearch',
         },
         {
           value: 'tooltip',
