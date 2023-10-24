@@ -228,6 +228,7 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.filters)) {
           this.$emit('update:filters', [...val]);
         }
+        this.$nextTick(() => this.calcFadeOut());
       },
       deep: true,
     },
@@ -238,9 +239,6 @@ export default {
     if (this.$refs.filterList) {
       // store the filter list element (which is the scroll container)
       this.scrollContainer = this.$refs.filterList;
-      // calculate if fade out should be shown (filter list element is larger
-      // than available space)
-      this.calcFadeOut();
     }
     // add a resize observer for the fade out and scroll functionalities
     this.initResizeObserver();
@@ -311,10 +309,6 @@ export default {
         }
       } else {
         this.filtersInt[filterIndex].filter_values.values.splice(valueIndex, 1);
-      }
-      if (this.filterListScrollable) {
-        // wait until element was removed, then recalc fade out
-        this.$nextTick(() => this.calcFadeOut());
       }
     },
 
