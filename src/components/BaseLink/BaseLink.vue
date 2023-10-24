@@ -2,6 +2,9 @@
   <component
     :is="renderAs"
     v-click-outside="() => closeTooltip()"
+    :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
+    :aria-expanded="isTooltip ? showTooltip.toString() : null"
+    :aria-label="isTooltip ? title : null"
     :href="isChip || isInternal || isExternal ? href : null"
     :to="routerTo"
     :target="hasValidUrl ? externalLinkTarget : null"
@@ -48,6 +51,7 @@
 
       <BaseTooltipBox
         v-if="showTooltip"
+        :id="`tooltipBox-${_uid}`"
         :attach-to="$refs.icon"
         :modal-on-mobile="false"
         :role="'tooltip'"
@@ -363,9 +367,6 @@ export default {
      * @returns {null|string}
      */
     title() {
-      if (this.isInternal || this.isExternal) {
-        return this.value;
-      }
       if (this.isTooltip) {
         return this.titleText.tooltip;
       }
