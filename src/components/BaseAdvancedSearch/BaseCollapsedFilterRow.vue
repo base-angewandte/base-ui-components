@@ -268,36 +268,49 @@ export default {
      *  within the group
      */
     removeChip(filterIndex, valueIndex, groupIndex) {
-      // check if this is the last (or only) filter value currently selected
-      if (this.filtersInt.length === 1 && this.filtersInt[filterIndex].filter_values.values.length === 1) {
+      const { fieldType, values } = this.filtersInt[filterIndex].filter_values;
+      // first check special case group
+      if (fieldType === 'group') {
+        // get all the concatenated values within the group
+        const concatValuesArray = values.reduce((prev, { values: groupFilterValues }) => prev
+          .concat(groupFilterValues.filter(val => hasData(val))), []);
+        // check if more than 1 value is left in the whole row
+        if (concatValuesArray.length < 2 && this.filtersInt.length < 2) {
+          this.removeFilters();
+          // now check if more than one value is left for the group
+        } else if (concatValuesArray.length > 1) {
+          if (values[valueIndex].type === 'date') {
+            // for date arrays just remove the label so the order of the date_from and date_to does not
+            // get mixed up by removing the complete value
+            this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
+          } else {
+            // if its not a date just splice the value out of the array
+            this.filtersInt[filterIndex].filter_values.values[valueIndex].values.splice(groupIndex, 1);
+          }
+          // else this means there is only 1 value in the group left and the whole filter group can be
+          // spliced away
+        } else {
+          // if no - just splice the complete filter group away
+          this.filtersInt.splice(filterIndex, 1);
+        }
+        // check if this is the last (or only) filter value currently selected
+      } else if (this.filtersInt.length === 1 && values.length === 1) {
         // if yes - remove the complete row
         this.removeFilters();
         // else check if this is the only value for a specific filter
-      } else if (this.filtersInt[filterIndex].filter_values.values.length === 1) {
+      } else if (values.length === 1) {
         // if yes - remove the complete filter
         this.filtersInt.splice(filterIndex, 1);
         // special case date object
-      } else if (this.filtersInt[filterIndex].type === 'date'
-        && this.filtersInt[filterIndex].filter_values.values.filter(value => hasData(value)).length < 2) {
-        // if yes - remove the complete filter
-        this.filtersInt.splice(filterIndex, 1);
-        // case field group - check if type is an array of several types which indicates a field group
-      } else if (typeof this.filtersInt[filterIndex].type === 'object'
-        // now check how many values are left in the group and if it is more than one
-        && this.filtersInt[filterIndex].filter_values.values.reduce((prev, curr) => {
-          if (curr.length) {
-            return prev.concat(curr.filter(val => hasData(val)));
-          }
-          return hasData(curr) ? prev.push(curr) : prev;
-        }, []).length < 2) {
-        this.filtersInt.splice(filterIndex, 1);
-        // else just set the filter label to an empty string
-        // this is done instead of slicing the whole value so the remaining values can
-        // be reassigned to the correct property in case values are part of an object!
-      } else if (groupIndex >= 0) {
-        this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
+      } else if (fieldType === 'date') {
+        if (values.filter(value => hasData(value)).length < 2) {
+          // if yes - remove the complete filter
+          this.filtersInt.splice(filterIndex, 1);
+        } else {
+          this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
+        }
       } else {
-        this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
+        this.filtersInt[filterIndex].filter_values.values.splice(valueIndex, 1);
       }
       if (this.filterListScrollable) {
         // wait until element was removed, then recalc fade out
