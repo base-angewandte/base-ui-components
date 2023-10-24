@@ -51,7 +51,8 @@
         :attach-to="$refs.icon"
         :modal-on-mobile="false"
         :role="'tooltip'"
-        :styles="tooltipStyles">
+        :styles="tooltipStyles"
+        :type-on-mobile="tooltipTypeOnMobile">
         <!-- @slot slot to inject content  -->
         <slot
           name="tooltip"
@@ -205,6 +206,18 @@ export default {
     tooltipStyles: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * specify how the tooltipBox component is rendered on mobile resolutions
+     *
+     * *box*: component is rendered at the `attachTo` HTMLElement
+     * *modal*: component is rendered as a modal popup
+     * *fullscreen*: component is rendered as ap popup with max height and width
+     */
+    tooltipTypeOnMobile: {
+      type: String,
+      default: 'box',
+      validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
     /**
      * used in combination with property `identifierPropertyValue` to render a type `chip` element.
