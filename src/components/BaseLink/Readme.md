@@ -9,7 +9,7 @@ The different link types are selected by the properties passed.
 | internal      | identifierPropertyValue && !type | 
 | text          |                                  |
 | tooltip       | tooltip                          | 
-| tooltip async | asyncTooltip                     | 
+| tooltip async | tooltipAsync                     | 
 
 ```vue live
 <template>
@@ -24,7 +24,7 @@ The different link types are selected by the properties passed.
         :chip-query-name="'chip-link'"
         :path="link.path"
         :tooltip="link.tooltip"
-        :tooltip-async="link.additional"
+        :tooltip-async="link.external"
         :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
         :type="link.type"
         :url="link.url"
@@ -69,10 +69,12 @@ export default {
         },
         {
           value: 'async tooltip',
-          additional: [
+          external: [
             {
-              label: 'label',
-              value: 'value',
+              // some id
+              id: '0000-0003-2731-3077',
+              // url to fetch data from
+              source: 'https://orcid.org/',
             },
           ],
         },
@@ -86,9 +88,15 @@ export default {
     };
   },
   methods: {
-    asyncTooltip(value, index) {
+    /**
+     * fetch the toolTip content
+     * @param {Object} value - data from the tooltipAsync prop
+     * @param {Number} id - internal id of the BaseLink which triggered the event
+     */
+    asyncTooltip(value, id) {
+      // fetch data with the data from value
       setTimeout(() => {
-        this.$set(this.links[index], 'tooltip', [
+        this.$set(this.links[id], 'tooltip', [
           {
             label: 'label',
             value: 'value',

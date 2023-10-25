@@ -140,7 +140,7 @@ export default {
       default: '',
     },
     /**
-     * specify an internal path to link to
+     * specify an internal path to link, only for type chip links
      */
     path: {
       type: String,
@@ -196,7 +196,7 @@ export default {
       validator: val => val.every(item => Object.keys(item).includes('label', 'value')),
     },
     /**
-     * async tooltip content
+     * async tooltip content, e.g. source, id where to fetch data from
      * if set, event `@tooltip-clicked` with this object will be emitted
      */
     tooltipAsync: {
@@ -433,7 +433,7 @@ export default {
         this.showTooltip = !this.showTooltip;
         return;
       }
-      // check if there is async loaded content to display
+      // check if there is a data definition to load async from
       if (this.tooltipAsync.length) {
         this.isLoading = true;
         /**
