@@ -76,8 +76,7 @@
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
-                :class="[{ 'base-link--chip-text-list': item.id }]"
-                @chip-clicked="emitChipData">
+                :class="[{ 'base-link--chip-text-list': item.id }]">
                 <template #tooltip>
                   <!-- @slot slot for tooltip content -->
                   <!-- @binding {array} data -->
@@ -121,8 +120,7 @@
                   :tooltip="objectItem.additional"
                   :type="item.id"
                   :url="objectItem.url"
-                  :value="objectItem.value"
-                  @chip-clicked="emitChipData">
+                  :value="objectItem.value">
                   <!-- @slot slot for tooltip content -->
                   <slot name="tooltip" />
                 </BaseLink>
@@ -139,7 +137,7 @@
 import i18n from '../../mixins/i18n';
 
 /**
- * Component to render data in p | ul | dt tags depending on the data type of prop `data`
+ * Component to render different types of text content depending on the data type of prop 'data'
  */
 
 export default {
@@ -152,19 +150,25 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * data structure for different rendered tags:
+     * specify a list of array objects to render different types of text content
      *
-     * **<p>**: `{ label: {string, Object}, data: {string} }`
-     * **<ul>**: `{ label: {string, Object}, data: {string[]}}`
-     * **<dt>**: `{ label: {string, Object}, data: {Object, Object[]}}`
-     *           **data: {Object}**: `{ label: {String, Object}, data: { label: {String, Object}, value: {string}, url: {string}, additional: {Object} }}`
-     *           **data: {Object[]}**: `[{ label: {string, Object}, value: {string}, url: {string}, additional: {Object} }]`
+     * single object structure: `{ label: {string, Object}, data: {string, Object, string[], Object[]} }`
      *
-     * `label` might be a string or a language object with ISO 639-1 as object properties
-     *  (e.g. `{ en: 'x', de: 'y' }`).
-     *  `additional` property creates a tooltip and takes an object in the same format as
-     *    data: `label`, `value` and `url`.
-     * Note: for dt tag `url` will render `value` as a link
+     * `data` attribute variants and their output (see readme.md for examples):
+     * - {string} - text
+     * - {Object} - chip | external ink | internal link | text | text with tooltip
+     * - {string[]} - unordered list
+     * - Object[] - multiple objects (see above)
+     *
+     *  `Object` attributes for `{ data : {Object, Object[]} }`:
+     * - id - for type chip
+     * - ['identifierPropertyName'] - for type chip, internal link
+     * - label - optional
+     * - path - for type chip
+     * - url - for external link
+     * - value - for all types
+     *
+     * Note: objects wrapped in an extra array are rendered as columns respecting the `cols` property.
      */
     data: {
       type: Array,
@@ -172,6 +176,10 @@ export default {
     },
     /**
      * specify the object property that should be used as identifier
+     *
+     * Note: only applies for chips and internal links:
+     * - chip: to build the link query data
+     * - internal: to set the link path
      */
     identifierPropertyName: {
       type: String,
@@ -225,6 +233,7 @@ export default {
     },
     /**
      * specify how data-list (label, value) should be rendered
+     * Note: Only applies to `{ data: {Object[]} }`.
      * @values horizontal, vertical
      */
     listType: {
@@ -285,18 +294,6 @@ export default {
         }
       }
       return true;
-    },
-    /**
-     * function to emit event and data
-     *
-     * @param {Object} obj
-     */
-    emitChipData(obj) {
-      /**
-       * @event chip-clicked
-       * @property {Object} obj - chip object
-       */
-      this.$emit('chip-clicked', obj);
     },
   },
 };

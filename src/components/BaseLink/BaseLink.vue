@@ -256,7 +256,7 @@ export default {
   },
   computed: {
     /**
-     * object to be emitted when a chip is clicked
+     * object added as value to `[chipQueryName]` query param when a chip is clicked
      * @returns {Object}
      */
     chipObj() {

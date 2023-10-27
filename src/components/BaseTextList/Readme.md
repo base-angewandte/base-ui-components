@@ -11,8 +11,7 @@ Note: The column elements are defined via the data structure wrapped by an array
       :cols="2"
       :data="data"
       :identifier-property-name="'source'"
-      :render-label-as="'h2'"
-      @chip-clicked="chipClicked" />
+      :render-label-as="'h2'" />
   </div>
 </template>
 
@@ -63,6 +62,11 @@ export default {
                 label: 'email',
                 value: 'base@uni-ak.ac.at',
                 url: 'mailto:base@uni-ak.ac.at',
+              },
+              {
+                label: 'internal',
+                value: 'internal link',
+                id: '/some-path',
               },
               {
                 label: 'Labore',
@@ -121,11 +125,6 @@ export default {
       ],
     }
   },
-  methods: {
-    chipClicked(obj) {
-      console.log(obj);
-    },
-  },
 }
 </script>
 
@@ -165,4 +164,55 @@ export default {
   }
 }
 </script>
+```
+
+<br>
+Example of a list of chips.
+
+Note:
+The attributes 'id' and 'path' are specified once for all chips in that object 
+and processed internally to prepare the structure for a single chip from [BaseLink](BaseLink).
+
+```vue live
+<template>
+  <div>
+    <BaseTextList
+      :data="data"
+      :identifier-property-name="'id'"
+      :render-label-as="'h2'" />
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      data: [
+        {
+          label: 'Vero eos et accusam',
+          id: 'keywords',
+          path: '/components/BaseTextList.html',
+          data: [
+            {
+              value: 'dolore magna',
+              id: 'keyword-1',
+            },
+            {
+              value: 'aliquyam erat',
+              id: 'keyword-2',
+            },
+          ],
+        },
+      ],
+    }
+  },
+}
+</script>
+
+<style>
+  /* reset chip hover style due the styleguide css would overwrite the component ones */
+  >>> .base-link.base-link--chip:hover {
+    text-decoration: none !important;
+  }
+</style>
 ```
