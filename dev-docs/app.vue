@@ -1,279 +1,51 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
-    <div class="controls">
-      <div style="background-color: #fff; padding: 16px; margin-bottom: 16px;">
-        <template
-          v-for="(link, index) in links">
-          <BaseLink
-            :key="index"
-            :source="link.source"
-            :tooltip="link.tooltip"
-            :tooltip-async="link.additional"
-            :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
-            :type="link.type"
-            :url="link.url"
-            :value="link.value" />
-        </template>
-      </div>
-      <div style="background-color: #fff; padding: 16px; margin-bottom: 16px;">
-        <BaseTextList
-          render-label-as="h2"
-          :data="baseTextListData" />
-      </div>
-      <BaseCarousel
-        :items="items"
-        :swiper-options="{
-          slidesPerView: 1,
-          slidesPerGroup: 1,
-          spaceBetween: 15,
-          autoplay: false,
-          loop: true,
-          speed: 750,
-          keyboard: {
-            enabled: true,
-          },
-          pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-          },
-          breakpoints: {
-            640: {
-              slidesPerView: 2,
-              slidesPerGroup: 2,
-            },
-            1024: {
-              slidesPerView: 3,
-              slidesPerGroup: 3,
-            },
-          },
-        }" />
-      <BaseMap
-        :marker="marker"
-        :options="options"
-        attribution="Source: <a href='http://basemap.at'>basemap.at</a>"
-        copyright="<a href=http://creativecommons.org/licenses/by-sa/3.0/>CC BY-SA 3.0</a>"
-        url="https://{s}.wien.gv.at/basemap/{type}/{style}/{tileMatrixSet}/{z}/{y}/{x}.png" />
-      <BaseToggle
-        v-model="selectMode"
-        label="Select Mode"
-        class="control" />
-      <BaseToggle
-        v-model="showOptions"
-        label="Show Options"
-        class="control" />
-      <BaseToggle
-        v-model="showSort"
-        label="Show Sorting Drop Down"
-        class="control" />
-      <BaseToggle
-        v-model="showTypesFilter"
-        label="Show Types Filter"
-        class="control" />
-      <BaseToggle
-        v-model="isLoading"
-        label="Is Loading"
-        class="control" />
-      <BaseToggle
-        v-model="useCustomText"
-        label="Use Custom Texts"
-        class="control"
-        @clicked="selectMode = true; noResults = true" />
-      <BaseToggle
-        v-model="noResults"
-        label="No search Results"
-        class="control" />
-      <BaseToggle
-        v-model="showPagination"
-        label="Show Pagination"
-        class="control" />
-    </div>
-    <div class="controls">
-      <BaseToggle
-        v-model="useHeadSlot"
-        label="Use 'head' Slot"
-        class="control" />
-      <BaseToggle
-        v-model="useActionsSlot"
-        label="Use 'option-actions' Slot"
-        class="control"
-        @clicked="selectMode = true" />
-      <BaseToggle
-        v-model="useAfterOptionsSlot"
-        label="Use 'after-options' Slot"
-        class="control" />
-      <BaseToggle
-        v-model="useEntriesSlot"
-        label="Use 'entries' Slot"
-        class="control"
-        @clicked="useThumbnailsSlot = false" />
-      <BaseToggle
-        v-model="useThumbnailsSlot"
-        :disabled="useEntriesSlot"
-        label="Use 'thumbnails' Slot"
-        class="control" />
-    </div>
-    <BaseEntrySelector
-      :entries="baseEntrySelectorEntries"
-      :entries-total="entries.length"
-      :entries-per-page="entriesPerPage"
-      :active-entry="baseEntrySelectorEntries.map(entry => entry.id).indexOf(activeEntry)"
-      :entries-selectable.sync="selectMode"
-      :options-hidden="!showOptions"
-      :sort-options="showSort ? sortOptions : []"
-      :sort-config="{
-        label: 'Sort Entries',
-        default: {
-          label: 'A - Z',
-          value: 'title',
-        },
-        valuePropertyName: 'value',
-      }"
-      :entry-types="showTypesFilter ? entryTypes : []"
-      :entry-types-config="{
-        label: 'Filter By Type',
-        default: {
-          label: {
-            de: 'Alle Typen',
-            en: 'All Types',
-          },
-          source: '',
-        },
-        valuePropertyName: 'source',
-      }"
-      :is-loading="isLoading"
-      language="de"
-      v-bind="entrySelectorText"
-      @selected-changed="selectedEntries = $event"
-      @fetch-entries="getNewEntries"
-      @entry-clicked="activeEntry = $event">
-      <template #head>
-        <template v-if="useHeadSlot">
-          <div class="custom-slot">
-            Put your custom head slot elements here
-          </div>
-        </template>
-      </template>
-      <template #option-actions>
-        <template v-if="useActionsSlot">
-          <div class="custom-slot">
-            <BaseButton
-              text="Publish"
-              icon="eye" />
-          </div>
-        </template>
-      </template>
-      <template #after-options>
-        <template v-if="useAfterOptionsSlot">
-          <div class="custom-slot">
-            Custom after-options element
-          </div>
-        </template>
-      </template>
-      <template #thumbnails="{ item }">
-        <template v-if="useThumbnailsSlot">
-          <BaseIcon
-            v-if="item.has_media"
-            :style="{ width: '14px' }"
-            name="eye" />
-        </template>
-      </template>
-      <template #entries="{ selectEntry }">
-        <template v-if="useEntriesSlot">
-          <div class="custom-slot">
-            This could be your custom entries display
-            <BaseButton
-              v-if="selectMode"
-              text="Select Entry"
-              icon="plus"
-              @clicked="selectEntry({
-                index: 0,
-                selected: true,
-              })" />
-            <div>
-              <b>Selected Entries:</b>
-              {{ selectedEntries.map(entry => entry.id) }}
-            </div>
-          </div>
-        </template>
-      </template>
-    </BaseEntrySelector>
-
-    <div v-if="editExpandList">
-      <BaseCheckmark
-        v-model="toggleElements"
-        :radio-value="'button'"
-        :show-label="true"
-        label="Use button elements"
-        mark-style="radio" />
-      <BaseCheckmark
-        v-model="toggleElements"
-        :radio-value="'toggle'"
-        :show-label="true"
-        label="Use toggle elements"
-        mark-style="radio" />
-    </div>
-    <BaseEditControl
-      title="Activities"
-      :controls="true"
-      :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
-      :edit="editExpandList"
-      @activated="activateExpandList"
-      @canceled="cancelExpandList"
-      @saved="saveExpandList" />
-
-    <BaseExpandList
-      ref="baseExpandList"
-      :data.sync="displayData"
-      :edit="editExpandList"
-      :control-type="toggleElements"
-      @saved="saveExpandListEdit">
-      <template
-        #content="props">
-        <BaseLink
-          :url="props.data.url"
-          :value="props.data.value"
-          :source="props.data.source"
-          :space-after="!!props.data.additional"
-          :tooltip="props.data.additional"
-          :type="props.data.type" />
-        <template v-if="props.data.attributes">
-          - {{ props.data.attributes.join(', ') }}
-        </template>
-      </template>
-    </BaseExpandList>
+    <BaseNavigation
+      :style="{ marginBottom: 50 }"
+      :render-as="renderAs"
+      :primary-items="primaryItems"
+      :secondary-items="secondaryItems" />
   </div>
 </template>
 
 <script>
-import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark';
-import BaseExpandList from '@/components/BaseExpandList/BaseExpandList';
-import BaseLink from '@/components/BaseLink/BaseLink';
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
-import BaseEditControl from '@/components/BaseEditControl/BaseEditControl';
-import BaseCarousel from '@/components/BaseCarousel/BaseCarousel';
-import BaseMap from '@/components/BaseMap/BaseMap';
-
-import BaseToggle from '@/components/BaseToggle/BaseToggle';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseEntrySelector from '@/components/BaseEntrySelector/BaseEntrySelector';
+import BaseNavigation from '@/components/BaseNavigation/BaseNavigation';
 
 export default {
   components: {
-    BaseCheckmark,
-    BaseEditControl,
-    BaseExpandList,
-    BaseLink,
-    BaseTextList,
-    BaseButton,
-    BaseIcon,
-    BaseToggle,
-    BaseEntrySelector,
-    BaseCarousel,
-    BaseMap,
+    BaseNavigation,
   },
   data() {
     return {
+      primaryItems: [
+        {
+          id: '0',
+          label: 'BaseNavigation',
+          shortLabel: 'BNavigation',
+          route: '/components/BaseNavigation.html',
+        },
+        {
+          id: '3',
+          label: 'BaseLink 2(this is a vershould cause a switch to shortLabel)',
+          shortLabel: 'BLink 2',
+          route: '/components/BaseLink.html',
+        },
+      ],
+      secondaryItems: [
+        {
+          id: '1',
+          label: 'BaseButton',
+          shortLabel: 'BButton',
+          route: '/components/BaseButton.html',
+        },
+        {
+          id: '2',
+          label: 'BaseLink',
+          shortLabel: 'BLink',
+          route: '/components/BaseLink.html',
+        },
+      ],
+      renderAs: 'RouterLink',
       baseTextListData: [
         {
           label: 'data is array of objects, renders different base-link types',
