@@ -119,12 +119,13 @@
 </template>
 
 <script>
-import BaseLink from '@/components/BaseLink/BaseLink';
 import BaseButton from '@/components/BaseButton/BaseButton';
 
 export default {
   name: 'BaseNavigation',
-  components: { BaseLink, BaseButton },
+  components: {
+    BaseButton,
+  },
   props: {
     /**
      * list of primary navigation items, with the following properties:
