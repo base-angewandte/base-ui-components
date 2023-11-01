@@ -29,7 +29,7 @@
         @clicked="activate">
         <template
           v-if="isLoading"
-          slot="left-of-text">
+          #left-of-text>
           <span class="base-edit-control__loader">
             <BaseLoader />
           </span>
@@ -46,7 +46,7 @@
         @clicked="save">
         <template
           v-if="isLoading"
-          slot="left-of-text">
+          #left-of-text>
           <span class="base-edit-control__loader">
             <BaseLoader />
           </span>

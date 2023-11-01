@@ -42,7 +42,7 @@
     <!-- @slot slot for additional content after upload bars but before buttons -->
     <slot />
 
-    <template slot="button-row">
+    <template #button-row>
       <BaseButton
         v-if="currentStatus === 'initial' || currentStatus === 'failed'"
         :text="getI18nTerm(cancelButtonText)"
@@ -63,7 +63,7 @@
         @clicked="startUpload">
         <template
           v-if="currentStatus === 'saving'"
-          slot="right-of-text">
+          #right-of-text>
           <span class="base-upload-bar-loader">
             <BaseLoader />
           </span>
