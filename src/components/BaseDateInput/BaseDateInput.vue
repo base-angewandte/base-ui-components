@@ -228,12 +228,12 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import DatePicker from 'vue2-datepicker';
+import DatePicker from 'vue-datepicker-next';
 import { capitalizeString, debounce } from '@/utils/utils';
 
-import en from 'vue2-datepicker/locale/en';
-import de from 'vue2-datepicker/locale/de';
-import fr from 'vue2-datepicker/locale/fr';
+import en from 'vue-datepicker-next/locale/en';
+import de from 'vue-datepicker-next/locale/de';
+import fr from 'vue-datepicker-next/locale/fr';
 
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';

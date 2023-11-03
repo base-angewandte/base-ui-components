@@ -46,7 +46,7 @@
     "normalize.css": "^8.0.1",
     "swiper": "^9.1.0",
     "vue-click-outside": "^1.1.0",
-    "vue2-datepicker": "^3.10.4",
+    "vue-datepicker-next": "^1.0.3",
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
