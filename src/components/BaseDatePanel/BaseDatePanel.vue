@@ -51,7 +51,7 @@ import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
 import fr from 'vue2-datepicker/locale/fr';
 
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * Date Panel

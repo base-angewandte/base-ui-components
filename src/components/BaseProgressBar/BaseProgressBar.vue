@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * Progress bar including file upload features (display filename or file size)

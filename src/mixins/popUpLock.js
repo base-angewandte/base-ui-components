@@ -27,7 +27,7 @@ export default {
       }
     }
   },
-  destroyed() {
+  unmounted() {
     clearAllBodyScrollLocks();
   },
 };

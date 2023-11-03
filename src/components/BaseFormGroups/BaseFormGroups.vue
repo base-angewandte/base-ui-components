@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import BaseForm from '@/components/BaseForm/BaseForm';
+import BaseForm from '@/components/BaseForm/BaseForm.vue';
 import { createId } from '@/utils/utils';
 
 export default {

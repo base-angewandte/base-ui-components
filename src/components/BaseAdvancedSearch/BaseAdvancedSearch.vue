@@ -83,9 +83,9 @@
 </template>
 
 <script>
+import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
+import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue';
 import { createId, hasData, sort } from '@/utils/utils';
-import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
-import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapsedFilterRow';
 
 /**
  * @typedef Filter
@@ -112,8 +112,8 @@ export default {
   components: {
     BaseCollapsedFilterRow,
     BaseAdvancedSearchRow,
-    BaseForm: () => import('@/components/BaseForm/BaseForm').then(m => m.default || m),
-    BaseButton: () => import('@/components/BaseButton/BaseButton').then(m => m.default || m),
+    BaseForm: () => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m),
+    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
   },
   props: {
     /**

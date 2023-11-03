@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
 
 /**
  * component to enable display of selected items and a select all

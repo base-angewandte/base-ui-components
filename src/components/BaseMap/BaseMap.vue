@@ -247,7 +247,7 @@ export default {
       }
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.observer.disconnect();
   },
   mounted() {

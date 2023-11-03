@@ -58,9 +58,9 @@
 </template>
 
 <script>
-import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import popUpLock from '../../mixins/popUpLock';
+import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import popUpLock from '@/mixins/popUpLock';
 
 /**
  * Component allowing sliding through images,

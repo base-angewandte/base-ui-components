@@ -85,8 +85,8 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue';
 import { hasData } from '@/utils/utils';
 
 /**
@@ -245,7 +245,7 @@ export default {
     // add a resize observer for the fade out and scroll functionalities
     this.initResizeObserver();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // remove resize observer from element
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.filterList);
   },

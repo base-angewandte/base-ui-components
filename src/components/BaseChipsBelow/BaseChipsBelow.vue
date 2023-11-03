@@ -129,9 +129,9 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
-import BaseChip from '../BaseChip/BaseChip';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
+import BaseChip from '@/components/BaseChip/BaseChip.vue';
 
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)

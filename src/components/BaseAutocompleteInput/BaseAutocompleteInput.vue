@@ -87,10 +87,10 @@
 </template>
 
 <script>
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import { createId } from '@/utils/utils';
-import navigateMixin from '../../mixins/navigateList';
+import navigateMixin from '@/mixins/navigateList';
 
 /**
  * Input component allowing to select single values from a drop down that are filled into

@@ -28,8 +28,8 @@
 <script>
 // eslint-disable-next-line import/extensions
 import Hls from 'hls.js/dist/hls.light.js';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import i18n from '../../mixins/i18n';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseHlsVideo',
@@ -98,7 +98,7 @@ export default {
       this.play();
     }
   },
-  destroyed() {
+  unmounted() {
     // destroy hls object to stop buffering and save bandwidth
     if (this.hls) {
       this.hls.destroy();

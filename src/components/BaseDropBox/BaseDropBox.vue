@@ -43,7 +43,7 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
 
 /**
  * An Element to drop files or other UI Elements into

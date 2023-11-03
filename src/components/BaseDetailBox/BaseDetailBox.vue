@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import BaseBox from '../BaseBox/BaseBox';
-import setLanguage from '../../mixins/i18n';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import setLanguage from '@/mixins/i18n';
 
 export default {
   name: 'BaseDetailBox',

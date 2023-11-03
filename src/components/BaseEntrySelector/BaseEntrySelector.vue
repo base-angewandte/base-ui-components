@@ -186,7 +186,7 @@
 </template>
 
 <script>
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -195,13 +195,13 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseEntrySelector',
   components: {
-    BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
-    BaseMenuList: () => import('../BaseMenuList/BaseMenuList').then(m => m.default || m),
-    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
-    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
-    BaseSearch: () => import('../BaseSearch/BaseSearch').then(m => m.default || m),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
+    BaseDropDown: () => import('@/components/BaseDropDown/BaseDropDown.vue').then(m => m.default || m),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
+    BaseMenuList: () => import('@/components/BaseMenuList/BaseMenuList.vue').then(m => m.default || m),
+    BaseOptions: () => import('@/components/BaseOptions/BaseOptions.vue').then(m => m.default || m),
+    BasePagination: () => import('@/components/BasePagination/BasePagination.vue').then(m => m.default || m),
+    BaseSearch: () => import('@/components/BaseSearch/BaseSearch.vue').then(m => m.default || m),
+    BaseSelectOptions: () => import('@/components/BaseSelectOptions/BaseSelectOptions.vue').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {
@@ -533,7 +533,7 @@ export default {
     this.$refs.body
       .addEventListener('scroll', this.scroll);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$refs.body
       .removeEventListener('scroll', this.scroll);
   },

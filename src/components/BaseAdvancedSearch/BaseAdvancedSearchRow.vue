@@ -375,15 +375,15 @@
 </template>
 
 <script>
-import BaseSearch from '@/components/BaseSearch/BaseSearch';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField';
-import BaseChip from '@/components/BaseChip/BaseChip';
-import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
+import BaseSearch from '@/components/BaseSearch/BaseSearch.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
+import BaseChip from '@/components/BaseChip/BaseChip.vue';
+import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import { createId, hasData, sort } from '@/utils/utils';
-import navigateMixin from '../../mixins/navigateList';
-import i18n from '../../mixins/i18n';
+import navigateMixin from '@/mixins/navigateList';
+import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseAdvancedSearchRow',
@@ -1086,10 +1086,10 @@ export default {
       this.$refs.filterBox.addEventListener('scroll', this.calcFadeOut);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.advancedSearchRow);
   },
-  destroyed() {
+  unmounted() {
     // remove event listener again if element exists
     if (this.$refs.filterBox) {
       this.$refs.filterBox.removeEventListener('scroll', this.calcFadeOut);

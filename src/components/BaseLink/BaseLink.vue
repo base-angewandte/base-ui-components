@@ -98,9 +98,9 @@ import ClickOutside from 'vue-click-outside';
 export default {
   name: 'BaseLink',
   components: {
-    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
-    BaseTooltipBox: () => import('../BaseTooltipBox/BaseTooltipBox').then(m => m.default || m),
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
+    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m),
+    BaseTooltipBox: () => import('@/components/BaseTooltipBox/BaseTooltipBox.vue').then(m => m.default || m),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
   },
   directives: {
     ClickOutside,
@@ -242,7 +242,7 @@ export default {
     window.addEventListener('scroll', this.scrollResize);
     window.addEventListener('resize', this.scrollResize);
   },
-  destroyed() {
+  unmounted() {
     window.removeEventListener('scroll', this.scrollResize);
     window.removeEventListener('resize', this.scrollResize);
   },

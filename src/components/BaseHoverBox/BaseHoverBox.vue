@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 
 /**
  * A box for information display after mouse hover or click

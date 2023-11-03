@@ -47,8 +47,8 @@ import { createId } from '@/utils/utils';
 export default {
   name: 'BaseChip',
   components: {
-    BaseHoverBox: () => import('../BaseHoverBox/BaseHoverBox'),
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseHoverBox: () => import('@/components/BaseHoverBox/BaseHoverBox.vue'),
+    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue'),
   },
   model: {
     prop: 'entry',

@@ -140,9 +140,9 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { createId } from '@/utils/utils';
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * Form Input Field Component
@@ -155,7 +155,7 @@ export default {
   },
   components: {
     BaseIcon,
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader').then(m => m.default || m),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
   },
   mixins: [i18n],
   model: {

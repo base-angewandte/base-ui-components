@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /** a multipurpose drop down list */
 
@@ -257,7 +257,7 @@ export default {
       }
     }
   },
-  destroyed() {
+  unmounted() {
     // check if there is an associated input element
     if (this.inputElement) {
       // if yes - remove the event listener again

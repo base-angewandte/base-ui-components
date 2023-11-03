@@ -82,8 +82,8 @@
 <script>
 import { debounce } from '@/utils/utils';
 import ClickOutside from 'vue-click-outside';
-import i18n from '../../mixins/i18n';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import i18n from '@/mixins/i18n';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * Accessible drop down component
@@ -226,7 +226,7 @@ export default {
   mounted() {
     this.initObserver();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDropdown);
   },
   methods: {

@@ -141,16 +141,16 @@
 
 <script>
 // eslint-disable-next-line
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import i18n from '../../mixins/i18n';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseExpandListRow',
   components: {
-    BaseToggle: () => import('../BaseToggle/BaseToggle').then(m => m.default || m),
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseToggle: () => import('@/components/BaseToggle/BaseToggle.vue').then(m => m.default || m),
+    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
     // eslint-disable-next-line import/no-self-import
-    BaseExpandListRow: () => import('./BaseExpandListRow').then(m => m.default || m),
+    BaseExpandListRow: () => import('@/components/BaseExpandList/BaseExpandListRow.vue').then(m => m.default || m),
     BaseIcon,
   },
   mixins: [i18n],
@@ -308,7 +308,7 @@ export default {
       scrollable.addEventListener('scroll', () => this.scrollHandler(scrollable));
     }
   },
-  destroyed() {
+  unmounted() {
     if (this.$refs.listItemScrollable) {
       const scrollable = this.$refs.listItemScrollable;
       scrollable.removeEventListener('scroll', () => this.scrollHandler(scrollable));

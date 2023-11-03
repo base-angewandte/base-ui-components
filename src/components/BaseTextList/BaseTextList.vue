@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * Component to render data in p | ul | dt tags depending on field type 'data'
@@ -121,7 +121,7 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseTextList',
   components: {
-    BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
+    BaseLink: () => import('@/components/BaseLink/BaseLink.vue').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {

@@ -60,8 +60,8 @@
 </template>
 
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
 
 export default {
   name: 'BaseExpandRow',

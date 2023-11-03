@@ -34,8 +34,8 @@
 
 <script>
 
-import BaseChip from '@/components/BaseChip/BaseChip';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseChip from '@/components/BaseChip/BaseChip.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 export default {
   name: 'BaseCollapsedFilterItem',

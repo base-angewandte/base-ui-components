@@ -7,7 +7,7 @@
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
              { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
-              || typeOnMobile === 'fullscreen' },
+               || typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
@@ -47,8 +47,8 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import popUpLock from '../../mixins/popUpLock';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import popUpLock from '@/mixins/popUpLock';
 
 /**
  * Component to display a tooltip
@@ -108,15 +108,6 @@ export default {
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
   },
-  computed: {
-    /**
-     * compare body and inner height and evaluate if body is scrollable
-     * @returns {boolean}
-     */
-    isScrollable() {
-      return this.bodyInnerHeight > this.bodyHeight;
-    },
-  },
   data() {
     return {
       isActive: false,
@@ -140,6 +131,15 @@ export default {
       targetName: 'popUpBody',
       showInt: false,
     };
+  },
+  computed: {
+    /**
+     * compare body and inner height and evaluate if body is scrollable
+     * @returns {boolean}
+     */
+    isScrollable() {
+      return this.bodyInnerHeight > this.bodyHeight;
+    },
   },
   mounted() {
     // move the component to the body node to position it absolutely in the document
@@ -167,7 +167,7 @@ export default {
     window.addEventListener('resize', this.resizeHandler);
     window.addEventListener('keyup', this.escEventHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.isActive = false;
     this.showInt = false;
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);

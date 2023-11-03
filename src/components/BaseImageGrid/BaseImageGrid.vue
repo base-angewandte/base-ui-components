@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import BaseImage from '@/components/BaseImage/BaseImage';
+import BaseImage from '@/components/BaseImage/BaseImage.vue';
 
 /**
  * Base Component to render 1 to 4 images in a static grid

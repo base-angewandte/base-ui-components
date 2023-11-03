@@ -123,9 +123,9 @@
 </template>
 
 <script>
-import BaseLoader from '@/components/BaseLoader/BaseLoader';
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import { debounce } from '@/utils/utils';
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * Component allowing for the display of images or streaming of
@@ -136,8 +136,8 @@ export default {
   name: 'BaseMedia',
   components: {
     BaseLoader,
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo').then(m => m.default || m),
+    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
+    BaseHlsVideo: () => import('@/components/BaseHlsVideo/BaseHlsVideo.vue').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {
@@ -308,7 +308,7 @@ export default {
     this.setFooterHeight();
     this.resizeObserver().observe(document.body);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.resizeObserver().unobserve(document.body);
   },
   methods: {

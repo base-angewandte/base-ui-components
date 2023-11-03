@@ -89,10 +89,10 @@ import { createId } from '@/utils/utils';
 export default {
   name: 'BaseSearch',
   components: {
-    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
-    BaseChipsInputField: () => import('../BaseChipsInputField/BaseChipsInputField').then(m => m.default || m),
-    BaseInput: () => import('../BaseInput/BaseInput').then(m => m.default || m),
-    BaseDateInput: () => import('../BaseDateInput/BaseDateInput').then(m => m.default || m),
+    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m),
+    BaseChipsInputField: () => import('@/components/BaseChipsInputField/BaseChipsInputField.vue').then(m => m.default || m),
+    BaseInput: () => import('@/components/BaseInput/BaseInput.vue').then(m => m.default || m),
+    BaseDateInput: () => import('@/components/BaseDateInput/BaseDateInput.vue').then(m => m.default || m),
   },
   model: {
     prop: 'input',

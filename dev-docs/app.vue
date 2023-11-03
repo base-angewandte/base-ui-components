@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
+import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch.vue';
 
 export default {
   components: {

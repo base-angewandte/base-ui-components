@@ -78,10 +78,10 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import navigateList from '../../mixins/navigateList';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import navigateList from '@/mixins/navigateList';
 
 /**
  * An Element to have the functionality of several buttons in one element
@@ -231,7 +231,7 @@ export default {
       window.addEventListener('resize', this.calculateDropDownPosition);
     }
   },
-  destroyed() {
+  unmounted() {
     window.removeEventListener('resize', this.calculateDropDownPosition);
   },
   methods: {

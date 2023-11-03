@@ -45,7 +45,7 @@ export default defineConfig({
     eslint(),
   ],
   resolve: {
-    extensions: ['*', '.js', '.vue', '.json'],
+    extensions: ['*', '.js', '.json'],
     alias: {
       '@': path.resolve(__dirname, './src'),
       '~': path.resolve(__dirname, ''),

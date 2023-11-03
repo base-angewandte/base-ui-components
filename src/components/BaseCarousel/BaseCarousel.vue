@@ -46,8 +46,8 @@
 
 <script>
 import 'lazysizes';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 
 export default {
   name: 'BaseCarousel',

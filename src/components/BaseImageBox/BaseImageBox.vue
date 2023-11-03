@@ -199,8 +199,8 @@
   </BaseBox>
 </template>
 <script>
-import BaseBox from '../BaseBox/BaseBox';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * A component with the primary purpose to display
@@ -212,9 +212,9 @@ export default {
   components: {
     BaseBox,
     BaseIcon,
-    BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
-    BaseImage: () => import('../BaseImage/BaseImage').then(m => m.default || m),
-    BaseImageGrid: () => import('../BaseImageGrid/BaseImageGrid').then(m => m.default || m),
+    BaseCheckmark: () => import('@/components/BaseCheckmark/BaseCheckmark.vue').then(m => m.default || m),
+    BaseImage: () => import('@/components/BaseImage/BaseImage.vue').then(m => m.default || m),
+    BaseImageGrid: () => import('@/components/BaseImageGrid/BaseImageGrid.vue').then(m => m.default || m),
   },
   props: {
     /**
@@ -482,7 +482,7 @@ export default {
       this.calcTextHeight();
     });
   },
-  destroyed() {
+  unmounted() {
     window.removeEventListener('resize', this.resizeTriggered);
   },
   methods: {

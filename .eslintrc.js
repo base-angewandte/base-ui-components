@@ -19,7 +19,7 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [['@', './src/']],
-        extensions: ['.js', '.jsx', '.vue'],
+        extensions: ['.js', '.jsx'],
       },
     },
   },
@@ -38,7 +38,6 @@ module.exports = {
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       js: 'never',
-      vue: 'never',
     }],
     'object-curly-newline': 'off',
     // allow optionalDependencies

@@ -24,7 +24,7 @@ import Vue from 'vue';
 import { BaseAutcompleteInput, BaseCarousel } from 'base-ui-components';
 // import the component css
 import 'base-ui-components/dist/base-ui-components.css';
-import App from './App';
+import App from './App.vue';
 
 const components = {
   BaseAutcompleteInput,
@@ -54,7 +54,7 @@ import Vue from 'vue';
 import * as BaseUiComponents from 'base-ui-components';
 // and the css
 import 'base-ui-components/dist/base-ui-components.css';
-import App from './App';
+import App from './App.vue';
 
 Object.entries(BaseUiComponents)
   .forEach(([name, component]) => {

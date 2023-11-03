@@ -86,8 +86,8 @@
 </template>
 
 <script>
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseExpandListRow from './BaseExpandListRow';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseExpandListRow from './BaseExpandListRow.vue';
 
 export default {
   name: 'BaseExpandList',

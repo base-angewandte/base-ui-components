@@ -58,9 +58,9 @@
 </template>
 
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseBox from '../BaseBox/BaseBox';
-import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import BaseBoxTooltip from '@/components/BaseBoxTooltip/BaseBoxTooltip.vue';
 
 /**
  * A Base Box Shaped Button

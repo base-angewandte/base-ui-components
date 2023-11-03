@@ -55,7 +55,7 @@
 
 <script>
 import { createId } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * Toggle Component

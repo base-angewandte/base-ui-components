@@ -119,10 +119,10 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
-import i18n from '../../mixins/i18n';
-import navigateMixin from '../../mixins/navigateList';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
+import i18n from '@/mixins/i18n';
+import navigateMixin from '@/mixins/navigateList';
 
 /**
  * Base Chips Input component with drop down and autocomplete functionality
@@ -133,7 +133,7 @@ export default {
   name: 'BaseChipsInput',
   components: {
     BaseIcon,
-    BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList').then(m => m.default || m),
+    BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList.vue').then(m => m.default || m),
     BaseChipsInputField,
   },
   mixins: [

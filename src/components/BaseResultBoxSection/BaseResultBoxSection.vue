@@ -264,9 +264,9 @@
 
 <script>
 import { extractNestedPropertyValue } from '@/utils/utils';
-import navigateList from '../../mixins/navigateList';
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
-import i18n from '../../mixins/i18n';
+import navigateList from '@/mixins/navigateList';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+import i18n from '@/mixins/i18n';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -275,12 +275,12 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
-    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
-    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton').then(m => m.default || m),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
+    BaseOptions: () => import('@/components/BaseOptions/BaseOptions.vue').then(m => m.default || m),
+    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
+    BasePagination: () => import('@/components/BasePagination/BasePagination.vue').then(m => m.default || m),
+    BaseBoxButton: () => import('@/components/BaseBoxButton/BaseBoxButton.vue').then(m => m.default || m),
+    BaseSelectOptions: () => import('@/components/BaseSelectOptions/BaseSelectOptions.vue').then(m => m.default || m),
   },
   mixins: [i18n, navigateList],
   model: {

@@ -88,8 +88,8 @@
 </template>
 
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseCheckmark from '../BaseCheckmark/BaseCheckmark';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
 
 /**
  * Component to be used in Menu Entry List or as a sort of header element

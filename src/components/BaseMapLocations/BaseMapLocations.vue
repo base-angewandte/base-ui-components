@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
+import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
 
 /**
  * A component to display Basemap, locations-list and interact with each other
@@ -61,7 +61,7 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList';
 export default {
   name: 'BaseMapLocations',
   components: {
-    BaseMap: () => import('../BaseMap/BaseMap').then(m => m.default || m),
+    BaseMap: () => import('@/components/BaseMap/BaseMap.vue').then(m => m.default || m),
     BaseTextList,
   },
   props: {
@@ -232,7 +232,7 @@ export default {
       return Array.from(new Set(this.locations.map(JSON.stringify))).map(JSON.parse);
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.observer.disconnect();
   },
   mounted() {

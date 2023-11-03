@@ -71,8 +71,8 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import popUpLock from '../../mixins/popUpLock';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import popUpLock from '@/mixins/popUpLock';
 
 /**
  * A component as overlay to display messages
@@ -83,8 +83,8 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
+    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
+    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
   },
   mixins: [popUpLock],
   props: {

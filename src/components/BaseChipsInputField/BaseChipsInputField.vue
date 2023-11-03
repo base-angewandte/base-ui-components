@@ -164,9 +164,9 @@
 <script>
 import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
-import BaseInput from '@/components/BaseInput/BaseInput';
-import i18n from '../../mixins/i18n';
-import navigateMixin from '../../mixins/navigateList';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import i18n from '@/mixins/i18n';
+import navigateMixin from '@/mixins/navigateList';
 
 /** input field with chips functionalities */
 
@@ -174,7 +174,7 @@ export default {
   name: 'BaseChipsInputField',
   components: {
     BaseInput,
-    BaseChip: () => import('@/components/BaseChip/BaseChip').then(m => m.default || m),
+    BaseChip: () => import('@/components/BaseChip/BaseChip.vue').then(m => m.default || m),
     Draggable,
   },
   mixins: [

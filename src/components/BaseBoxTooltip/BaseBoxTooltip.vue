@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 export default {
   name: 'BaseBoxTooltip',

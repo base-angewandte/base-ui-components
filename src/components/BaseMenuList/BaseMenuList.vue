@@ -64,7 +64,7 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import BaseMenuEntry from '../BaseMenuEntry/BaseMenuEntry';
+import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
 
 /**
  * Base Component for SideBar Menu Entries

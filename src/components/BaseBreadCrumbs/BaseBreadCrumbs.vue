@@ -20,7 +20,7 @@
 /**
  * component to display breadcrumb-style navigation
  */
-import BaseLink from '@/components/BaseLink/BaseLink';
+import BaseLink from '@/components/BaseLink/BaseLink.vue';
 
 export default {
   name: 'BaseBreadCrumbs',

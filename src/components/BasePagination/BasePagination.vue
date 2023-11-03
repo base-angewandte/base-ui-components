@@ -110,7 +110,7 @@
 
 <script>
 import { debounce } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * Pagination component
@@ -254,7 +254,7 @@ export default {
     // add an resize observer to adapt visible page numbers to component width
     this.initObserver();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // remove observer again
     if (this.resizeObserver) this.resizeObserver.disconnect();
   },

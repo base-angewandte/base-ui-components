@@ -12,8 +12,8 @@
     <div
       v-if="!!$slots.header"
       class="base-expand-box-header">
-        <!-- @slot slot to add additional information before expandable content -->
-        <slot name="header" />
+      <!-- @slot slot to add additional information before expandable content -->
+      <slot name="header" />
     </div>
     <div
       :class="[
@@ -55,8 +55,8 @@
 </template>
 
 <script>
-import BaseBox from '../BaseBox/BaseBox';
-import BaseButton from '../BaseButton/BaseButton';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
 
 /**
  * Component to render content in expandable container

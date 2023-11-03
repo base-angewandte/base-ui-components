@@ -93,7 +93,7 @@ export default {
 </template>
 
 <script>
-import BaseTextList from '@/components/BaseTextList/BaseTextList';
+import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
 
 export default {
   components: {

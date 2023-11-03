@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { createId } from '@/utils/utils';
 
 /**
@@ -97,7 +97,7 @@ export default {
   components: {
     BaseInput,
     BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton').then(m => m.default || m),
+    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton.vue').then(m => m.default || m),
   },
   model: {
     prop: 'input',

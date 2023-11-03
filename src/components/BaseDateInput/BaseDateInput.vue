@@ -235,8 +235,8 @@ import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
 import fr from 'vue2-datepicker/locale/fr';
 
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -250,7 +250,7 @@ export default {
   components: {
     BaseInput,
     BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton').then(m => m.default || m),
+    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton.vue').then(m => m.default || m),
     DatePicker,
   },
   directives: {
@@ -973,7 +973,7 @@ export default {
       });
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },

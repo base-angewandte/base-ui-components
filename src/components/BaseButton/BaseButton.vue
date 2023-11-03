@@ -48,9 +48,9 @@
 </template>
 
 <script>
-import { createId } from '../../utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseBoxTooltip from '@/components/BaseBoxTooltip/BaseBoxTooltip.vue';
+import { createId } from '@/utils/utils';
 
 /**
  * Standard buttons

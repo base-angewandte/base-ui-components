@@ -92,8 +92,8 @@
 
 <script>
 import { debounce } from '@/utils/utils';
-import BaseButton from '../BaseButton/BaseButton';
-import i18n from '../../mixins/i18n';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import i18n from '@/mixins/i18n';
 
 /**
  * a row that can display options responsively either hidden behind an options button
@@ -384,7 +384,7 @@ export default {
       this.calcOptionsWidth();
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.optionsRow);
     if (this.mutationObserver && this.afterSlotHasData) this.mutationObserver.disconnect();
   },

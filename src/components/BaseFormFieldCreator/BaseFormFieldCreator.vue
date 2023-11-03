@@ -498,7 +498,7 @@
 </template>
 
 <script>
-import i18n from '../../mixins/i18n';
+import i18n from '@/mixins/i18n';
 
 /**
  * A component for form field creation via [openAPI](https://spec.openapis.org/oas/v3.1.0/) standard
@@ -507,11 +507,11 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseFormFieldCreator',
   components: {
-    BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
-    BaseDateInput: () => import('../BaseDateInput/BaseDateInput').then(m => m.default || m),
-    BaseForm: () => import('../BaseForm/BaseForm').then(m => m.default || m),
-    BaseToggle: () => import('../BaseToggle/BaseToggle').then(m => m.default || m),
-    BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
+    BaseDropDown: () => import('@/components/BaseDropDown/BaseDropDown.vue').then(m => m.default || m),
+    BaseDateInput: () => import('@/components/BaseDateInput/BaseDateInput.vue').then(m => m.default || m),
+    BaseForm: () => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m),
+    BaseToggle: () => import('@/components/BaseToggle/BaseToggle.vue').then(m => m.default || m),
+    BaseLink: () => import('@/components/BaseLink/BaseLink.vue').then(m => m.default || m),
   },
   mixins: [i18n],
   props: {
@@ -797,15 +797,15 @@ export default {
      */
     fieldElement() {
       if (this.fieldType === 'text' || this.fieldType === 'integer' || this.fieldType === 'float') {
-        return () => import('../BaseInput/BaseInput');
+        return () => import('@/components/BaseInput/BaseInput.vue');
       } if (this.fieldType === 'multiline') {
-        return () => import('../BaseMultilineTextInput/BaseMultilineTextInput');
+        return () => import('@/components/BaseMultilineTextInput/BaseMultilineTextInput.vue');
       } if (this.fieldType === 'autocomplete') {
-        return () => import('../BaseAutocompleteInput/BaseAutocompleteInput');
+        return () => import('@/components/BaseAutocompleteInput/BaseAutocompleteInput.vue');
       } if (this.fieldType === 'chips') {
-        return () => import('../BaseChipsInput/BaseChipsInput');
+        return () => import('@/components/BaseChipsInput/BaseChipsInput.vue');
       } if (this.fieldType === 'chips-below') {
-        return () => import('../BaseChipsBelow/BaseChipsBelow');
+        return () => import('@/components/BaseChipsBelow/BaseChipsBelow.vue');
       }
       return null;
     },

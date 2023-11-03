@@ -74,12 +74,12 @@
 </template>
 
 <script>
-import BaseButton from '../BaseButton/BaseButton';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseLoader from '../BaseLoader/BaseLoader';
-import BasePopUp from '../BasePopUp/BasePopUp';
-import BaseProgressBar from '../BaseProgressBar/BaseProgressBar';
-import i18n from '../../mixins/i18n';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
+import BasePopUp from '@/components/BasePopUp/BasePopUp.vue';
+import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar.vue';
+import i18n from '@/mixins/i18n';
 
 /**
  * A component taking care of uploads within a pop up

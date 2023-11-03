@@ -319,7 +319,7 @@ validator: val => ['normal', 'prominent'].includes(val),
 
 ```javascript=
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 /**
  * accessible tab switch buttons
  */

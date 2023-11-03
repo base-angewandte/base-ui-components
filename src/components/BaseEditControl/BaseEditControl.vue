@@ -65,9 +65,9 @@
 </template>
 
 <script>
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseLoader from '@/components/BaseLoader/BaseLoader';
-import i18n from '../../mixins/i18n';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
+import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseEditControl',
