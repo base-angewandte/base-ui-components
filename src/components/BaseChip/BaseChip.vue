@@ -17,7 +17,7 @@
       @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox">
-      {{ entryInt }}
+      {{ modelValueInt }}
     </div>
     <span
       v-if="assistiveText"
@@ -50,15 +50,11 @@ export default {
     BaseHoverBox: () => import('@/components/BaseHoverBox/BaseHoverBox.vue'),
     BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue'),
   },
-  model: {
-    prop: 'entry',
-    event: 'value-changed',
-  },
   props: {
     /**
      * pass the text for the chip
      */
-    entry: {
+    modelValue: {
       type: String,
       required: true,
     },
@@ -120,7 +116,7 @@ export default {
        * internal represenation of string provided by parent
        * @type {string}
        */
-      entryInt: '',
+      modelValueInt: '',
       /**
        * handle showing of HoverBox
        * @type {boolean}
@@ -137,10 +133,10 @@ export default {
     },
   },
   watch: {
-    entry: {
+    modelValue: {
       handler(val) {
-        if (val !== this.entryInt) {
-          this.entryInt = val;
+        if (val !== this.modelValueInt) {
+          this.modelValueInt = val;
         }
       },
       immediate: true,
@@ -154,15 +150,15 @@ export default {
      */
     updateText(event) {
       const textString = event.target.innerText;
-      if (this.editable && textString !== this.entryInt) {
-        this.entryInt = textString;
+      if (this.editable && textString !== this.modelValueInt) {
+        this.modelValueInt = textString;
         /**
          * if chip is editable value is updated with this event
          *
-         * @event value-changed
+         * @event update:modelValue
          * @param {string} - the displayed text string after edit
          */
-        this.$emit('value-changed', this.entryInt);
+        this.$emit('update:modelValue', this.modelValueInt);
       }
     },
     clickAction(e) {
@@ -218,7 +214,7 @@ export default {
        * @param {string} - the displayed chip string
        *
        */
-      this.$emit('remove-entry', this.entryInt);
+      this.$emit('remove-entry', this.modelValueInt);
     },
   },
 };
