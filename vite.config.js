@@ -2,7 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
 import babel from '@rollup/plugin-babel';
-import vue from '@vitejs/plugin-vue2';
+import vue from '@vitejs/plugin-vue';
 import eslint from 'vite-plugin-eslint';
 import pkg from './package.json';
 
@@ -34,7 +34,15 @@ export default defineConfig({
         console.log('build:post-commands completed');
       },
     },
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          compatConfig: {
+            MODE: 3,
+          },
+        },
+      },
+    }),
     babel({
       // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
       // user 'runtime' for libraries for improved code deduplication
@@ -49,6 +57,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '~': path.resolve(__dirname, ''),
+      vue: '@vue/compat',
     },
   },
   build: {
@@ -70,7 +79,7 @@ export default defineConfig({
         exports: 'named',
         globals: {
           vue: 'Vue',
-          'vue2-datepicker': 'Datepicker',
+          'vue-datepicker-next': 'Datepicker',
           lazysizes: 'lazysizes',
           swiper: 'Swiper',
           leaflet: 'leaflet',
