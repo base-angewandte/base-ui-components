@@ -41,18 +41,17 @@
                 <!-- check if filter.type is an array to determine if it belongs to a field group -->
                 <template v-if="filter.filter_values.fieldType === 'group'">
                   <!-- if yes - also iterate through those values -->
-                  <template v-for="(groupValue, groupIndex) in value.values">
-                    <BaseCollapsedFilterItem
-                      :key="groupValue.id
-                        || `${groupValue.label}-${valueIndex}-${groupIndex}`"
-                      :value="groupValue"
-                      :type="value.fieldType"
-                      :append-until="value.values.length === 2
-                        && filterValuesHaveData(value.values)
-                        && groupIndex === 0"
-                      :apply-spacing-left="!!value.values[0].label"
-                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
-                  </template>
+                  <BaseCollapsedFilterItem
+                    v-for="(groupValue, groupIndex) in value.values"
+                    :key="groupValue.id
+                      || `${groupValue.label}-${valueIndex}-${groupIndex}`"
+                    :value="groupValue"
+                    :type="value.fieldType"
+                    :append-until="value.values.length === 2
+                      && filterValuesHaveData(value.values)
+                      && groupIndex === 0"
+                    :apply-spacing-left="!!value.values[0].label"
+                    @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                 </template>
                 <template v-else>
                   <BaseCollapsedFilterItem
