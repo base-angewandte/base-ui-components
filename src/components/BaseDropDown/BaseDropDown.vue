@@ -60,13 +60,13 @@
             :class="[
               'base-drop-down-option',
               {
-                'base-drop-down-option-selected': selectedOption
-                  && option[valueProp] === selectedOption[valueProp],
+                'base-drop-down-option-selected': modelValue
+                  && option[valueProp] === modelValue[valueProp],
               },
               { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
             role="option"
-            :aria-selected="(selectedOption
-              && option[valueProp] === selectedOption[valueProp]).toString()"
+            :aria-selected="(modelValue
+              && option[valueProp] === modelValue[valueProp]).toString()"
             tabindex="0"
             @keydown.enter="selectValue(option)"
             @keydown.tab="selectByKey"
@@ -99,10 +99,6 @@ export default {
   mixins: [
     i18n,
   ],
-  model: {
-    prop: 'selectedOption',
-    event: 'value-selected',
-  },
   props: {
     /**
      * specify options to choose from
@@ -130,7 +126,7 @@ export default {
     /**
      * the selected value
      */
-    selectedOption: {
+    modelValue: {
       type: Object,
       default: () => ({ value: '', label: '' }),
     },
@@ -207,7 +203,7 @@ export default {
   },
   computed: {
     selectedOptionInt() {
-      return this.getLangLabel(this.selectedOption.label, true) || this.placeholder || '';
+      return this.getLangLabel(this.modelValue.label, true) || this.placeholder || '';
     },
   },
   watch: {
@@ -245,10 +241,10 @@ export default {
       /**
        * Event emitted when an option is selected
        *
-       * @event value-selected
+       * @event update:modelValue
        * @param { Object } - the selected option
        */
-      this.$emit('value-selected', option);
+      this.$emit('update:modelValue', option);
     },
     // adding key navigation for accessibility
     selectByKey(event) {
