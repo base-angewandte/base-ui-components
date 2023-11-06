@@ -71,7 +71,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-vue": "^8.7.1",
+    "eslint-plugin-vue": "^9.18.1",
     "globby": "^10.0.2",
     "gulp": "^4.0.2",
     "gulp-conventional-changelog": "^2.0.35",

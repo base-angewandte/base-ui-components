@@ -13,7 +13,7 @@ module.exports = {
   },
   extends: [
     'airbnb-base',
-    'plugin:vue/recommended',
+    'plugin:vue/vue3-recommended',
   ],
   settings: {
     'import/resolver': {
