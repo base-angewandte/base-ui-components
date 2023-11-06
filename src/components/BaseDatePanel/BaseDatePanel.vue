@@ -33,7 +33,7 @@
         :clearable="false"
         :editable="false"
         :inline="isInline"
-        :input="input"
+        :input="modelValue"
         :lang="lang[language]"
         :type="type"
         :format="'YYYY-MM-DD'"
@@ -68,10 +68,6 @@ export default {
   directives: {
     ClickOutside,
   },
-  model: {
-    prop: 'input',
-    event: 'selected',
-  },
   props: {
     /**
      * specify if icon should be displayed left or right
@@ -87,7 +83,7 @@ export default {
      * set input field from outside.
      * format: `{ date: 'yyyy-MM-dd' }`
      */
-    input: {
+    modelValue: {
       type: Object,
       default: () => ({}),
     },
@@ -162,9 +158,9 @@ export default {
     },
   },
   watch: {
-    input: {
+    modelValue: {
       handler(val) {
-        // check if input string is different from inputInt
+        // check if modelValue string is different from inputInt
         if (val && this.inputInt && val.date !== this.inputInt) {
           this.inputInt = val.date;
         }
@@ -207,12 +203,12 @@ export default {
        * emit event when date or week is selected
        * format: `{ date: 'yyyy-MM-dd' }`
        *
-       * @event selected
+       * @event update:modelValue
        * @type {Object} value - an object with the following properties:
        * @property {string} date - the date string in format `YYYY-MM-DD`
        * @property {string} week - if type is 'week' also the week is emitted
        */
-      this.$emit('selected', this.emitObject(value));
+      this.$emit('update:modelValue', this.emitObject(value));
     },
   },
 };
