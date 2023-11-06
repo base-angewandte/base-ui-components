@@ -147,10 +147,6 @@ export default {
     BaseChip,
     BaseIcon,
   },
-  model: {
-    prop: 'selectedList',
-    event: 'selected-changed',
-  },
   props: {
     /**
      * list of selectable options objects with at least an identifier and a label property.
@@ -167,7 +163,7 @@ export default {
      * property names can be set with props `identifierPropertyName`, `labelPropertyName` and
      * `additionalPropertyName`
      */
-    selectedList: {
+    modelValue: {
       type: Array,
       default: () => [],
     },
@@ -475,7 +471,7 @@ export default {
      * create internal list and reset errors
      * @param {Object[]} val
      */
-    selectedList: {
+    modelValue: {
       handler(val) {
         this.createInternalList(val);
         // reset error
@@ -571,7 +567,7 @@ export default {
        * @event additional-property-changed
        * @param {Object} obj - changed object
        */
-      this.$emit('additional-property-changed', this.selectedList[index]);
+      this.$emit('additional-property-changed', this.modelValue[index]);
     },
     createInternalList(val) {
       this.selectedBelowListInt = val.map((entry, index) => {
@@ -602,11 +598,11 @@ export default {
       /**
        * propagate list change from dragging event to parent
        *
-       * @event selected-changed
+       * @event update:modelValue
        * @param {Object} - the altered list
        *
        */
-      this.$emit('selected-changed', sendArr);
+      this.$emit('update:modelValue', sendArr);
     },
     modifyChipValue(event, index) {
       if (!event) {
@@ -672,7 +668,7 @@ export default {
       if (!this.required) return true;
 
       // if no chips set, throw error
-      if (!this.selectedList.length) {
+      if (!this.modelValue.length) {
         this.invalidInt = true;
         // consider also optional errorMessage
         this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`.trim();
@@ -692,7 +688,7 @@ export default {
         || typeof this.additionalPropErrors[index] !== 'undefined';
     },
     /**
-     * validate single or all additional option or all from selectedList
+     * validate single or all additional option or all from the list of selected options
      * @param {object|null} obj - single row object (optional)
      * @returns {boolean} - valid state
      */
@@ -711,7 +707,8 @@ export default {
       }
 
       // validate all selected entries and set errors
-      this.additionalPropErrors = this.selectedList
+      // TODO: why not use internal variable here but modelValue?
+      this.additionalPropErrors = this.modelValue
         .filter(entry => !entry[this.additionalPropertyName] || !entry[this.additionalPropertyName].length)
         .map(entry => ({ id: entry.id }));
 
