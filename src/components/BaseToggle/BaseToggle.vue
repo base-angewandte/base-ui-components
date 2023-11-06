@@ -44,7 +44,7 @@
     </label>
 
     <span
-      v-if="(!!$slots.default && checked && bindSlotToState)
+      v-if="(!!$slots.default && checkedInt && bindSlotToState)
         || (!!$slots.default && !bindSlotToState)"
       class="base-toggle__subtext">
       <!-- @slot slot after the label -->
@@ -64,10 +64,6 @@ export default {
   name: 'BaseToggle',
   components: {
     BaseIcon,
-  },
-  model: {
-    prop: 'checked',
-    event: 'clicked',
   },
   props: {
     /**
@@ -95,7 +91,7 @@ export default {
     /**
      * is toggle checked
      */
-    checked: {
+    modelValue: {
       type: Boolean,
       default: false,
     },
@@ -137,7 +133,7 @@ export default {
     },
   },
   watch: {
-    checked: {
+    modelValue: {
       handler(val) {
         if (val !== this.checkedInt) {
           this.checkedInt = val;
@@ -148,10 +144,10 @@ export default {
     checkedInt(val) {
       /**
        * event emitted on radio button / checkmark click
-       * @event clicked
+       * @event update:modelValue
        * @param {string, boolean} - emitted input value (string for Radio Button, boolean value for Checkmark)
        */
-      this.$emit('clicked', val);
+      this.$emit('update:modelValue', val);
     },
   },
 };
