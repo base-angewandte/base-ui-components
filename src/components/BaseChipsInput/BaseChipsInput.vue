@@ -139,10 +139,6 @@ export default {
     i18n,
     navigateMixin,
   ],
-  model: {
-    prop: 'selectedList',
-    event: 'selected-changed',
-  },
   props: {
     /**
      * list of selectable options. needs to be a list with at least an identifier and a label
@@ -157,7 +153,7 @@ export default {
      *  needs to be a list with at least an identifier and a label
      *  (properties can be set via `identifierPropertyName` and `labelPropertyName`)
      */
-    selectedList: {
+    modelValue: {
       type: Array,
       default: () => [],
     },
@@ -215,7 +211,7 @@ export default {
     },
     /**
      * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to `selectedList` directly but only in parent
+     * so this is possible if entry is not added to `modelValue` directly but only in parent
      * component
      */
     addSelectedEntryDirectly: {
@@ -595,9 +591,9 @@ export default {
       },
       immediate: true,
     },
-    selectedList: {
+    modelValue: {
       /**
-       * get changes to selectedListInt as soon as selectedList changes
+       * get changes to selectedListInt as soon as modelValue changes
        * @param {Object[]} val
        */
       handler(val) {
@@ -610,7 +606,7 @@ export default {
      * @param {Object[]} val
      */
     selectedListInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
+      if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
         this.updateParentSelectedList(val);
       }
     },
@@ -670,8 +666,8 @@ export default {
       [this.inputElem] = elems;
     }
 
-    // add optional default entry to empty selectedList only
-    if (this.defaultEntry && !this.selectedList.length) {
+    // add optional default entry to empty modelValue selected list only
+    if (this.defaultEntry && !this.modelValue.length) {
       this.selectedListInt.push(this.defaultEntry);
     }
   },
@@ -715,13 +711,13 @@ export default {
      */
     updateParentSelectedList(updatedList) {
       // only emit if updated list is different from parent list
-      if (JSON.stringify(this.selectedList) !== JSON.stringify(updatedList)) {
+      if (JSON.stringify(this.modelValue) !== JSON.stringify(updatedList)) {
         /**
-         * inform parent of changes to selectedList
-         * @event selected-changed
+         * inform parent of changes to selected list
+         * @event update:modelValue
          * @property {Object[]} - the altered selectedList
          */
-        this.$emit('selected-changed', [...updatedList]);
+        this.$emit('update:modelValue', [...updatedList]);
       }
     },
 
