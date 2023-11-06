@@ -23,7 +23,7 @@
       :list="fieldType === 'autocomplete'
         ? dropDownList.length ? dropDownList : fieldProps.list || [] : false"
       :is-loading="autocompleteLoading"
-      :input="fieldValueInt"
+      :model-value="fieldValueInt"
       :field-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
       :invalid="invalid || fieldProps.invalid"
       :required="required || fieldProps.required"
@@ -42,7 +42,7 @@
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
       @keydown.enter="onEnter"
       @blur="emitCompletedInputValues"
-      @input="setInputValue($event)"
+      @update:modelValue="setInputValue($event)"
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,

@@ -3,9 +3,8 @@
     <component
       :is="inputComponent"
       :id="idInt"
-      v-model="inputInt"
+      v-model="searchValues"
       v-bind="$attrs"
-      :selected-list.sync="selectedChipsInt"
       :is-active.sync="isActiveInt"
       :type="dateFieldType"
       :show-label="false"
@@ -306,6 +305,23 @@ export default {
         return 'BaseDateInput';
       }
       return null;
+    },
+    /**
+     * since v-model of BaseInput, BaseDateInput and BaseChipsInput deliver different values
+     *  (one the string input, one the date string or date object and one the selected chips)
+     *  we need to set and get the correct input for v-model here
+     */
+    searchValues: {
+      get() {
+        return this.type === 'chips' ? this.selectedChipsInt : this.inputInt;
+      },
+      set(val) {
+        if (this.type === 'chips') {
+          this.selectedChipsInt = [...val];
+        } else {
+          this.inputInt = val;
+        }
+      },
     },
     /**
      * compute the inputInt used for BaseInput v-model

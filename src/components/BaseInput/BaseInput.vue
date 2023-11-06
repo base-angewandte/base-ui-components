@@ -158,15 +158,11 @@ export default {
     BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
   },
   mixins: [i18n],
-  model: {
-    prop: 'input',
-    event: 'input',
-  },
   props: {
     /**
      * input field settable from outside
      */
-    input: {
+    modelValue: {
       type: [String, Number],
       default: '',
     },
@@ -535,12 +531,12 @@ export default {
             /**
               * Event emitted on input, passing input string
               *
-              * @event input
+              * @event update:modelValue
               * @param {string} - the input event value however
               *   passing only the event.target.value
               *
               */
-            this.$emit('input', value);
+            this.$emit('update:modelValue', value);
           },
           onBlur: (event) => {
             const { value } = event.target;
@@ -595,9 +591,9 @@ export default {
   },
   watch: {
     /**
-     * watch input prop to sync with internal inputInt variable
+     * watch modelValue prop to sync with internal inputInt variable
      */
-    input: {
+    modelValue: {
       handler(val) {
         const data = this.fieldType === 'number'
           ? this.translateFloat(val) : val;
@@ -628,9 +624,9 @@ export default {
         data = this.stringToFloat(data);
       }
       // check if the internal input element exists and if values are in sync
-      if (data !== this.input) {
+      if (data !== this.modelValue) {
         // if not propagate change to parent
-        this.$emit('input', data);
+        this.$emit('update:modelValue', data);
       }
     },
     /**
@@ -701,7 +697,7 @@ export default {
   },
   mounted() {
     // handle max value of initial input
-    if (this.max && Number(this.stringToFloat(this.input)) > this.max) {
+    if (this.max && Number(this.stringToFloat(this.modelValue)) > this.max) {
       this.inputInt = this.max;
     }
   },

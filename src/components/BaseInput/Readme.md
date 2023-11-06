@@ -192,7 +192,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           placeholder="Number of minimal characters"
           :min="0"
           class="row__element"
-          @input="updateComponent($event, 'minLength')" />
+          @update:modelValue="updateComponent($event, 'minLength')" />
         <BaseInput
           v-model="maxLength"
           label="max-length"
@@ -200,7 +200,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           placeholder="Number of maximal characters"
           :min="1"
           class="row__element"
-          @input="updateComponent($event, 'maxLength')" />
+          @update:modelValue="updateComponent($event, 'maxLength')" />
       </div>
     </template>
     <template
@@ -214,7 +214,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           placeholder="Number of decimals"
           :min="0"
           class="row__element"
-          @input="updateComponent($event, 'decimals', true)" />
+          @update:modelValue="updateComponent($event, 'decimals', true)" />
         <BaseDropDown
           v-model="language"
           :options="[
@@ -240,14 +240,14 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           fieldType="number"
           placeholder="Minimal Value"
           class="row__element"
-          @input="updateComponent($event, 'min')" />
+          @update:modelValue="updateComponent($event, 'min')" />
         <BaseInput
           v-model="max"
           label="Maximal Value"
           fieldType="number"
           placeholder="Maximal Value"
           class="row__element"
-          @input="updateComponent($event, 'max')" />
+          @update:modelValue="updateComponent($event, 'max')" />
       </div>
     </template>
   </div>
