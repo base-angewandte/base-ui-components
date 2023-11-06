@@ -29,8 +29,7 @@
           :label-margin-bottom="labelMarginBottom"
           :list-type="listType"
           :render-label-as="renderLabelAs"
-          :style="{ '--columns': cols }"
-          @chip-clicked="emitChipData" />
+          :style="{ '--columns': cols }" />
       </template>
 
       <!-- String as text -->
