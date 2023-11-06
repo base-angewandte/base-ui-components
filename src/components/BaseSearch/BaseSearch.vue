@@ -94,17 +94,13 @@ export default {
     BaseInput: () => import('@/components/BaseInput/BaseInput.vue').then(m => m.default || m),
     BaseDateInput: () => import('@/components/BaseDateInput/BaseDateInput.vue').then(m => m.default || m),
   },
-  model: {
-    prop: 'input',
-    event: 'input',
-  },
   props: {
     /**
      * set input value from outside
      *   for type `daterange` this needs to be an object with
      *   `date_from` and `date_to` properties!
      */
-    input: {
+    modelValue: {
       type: [String, Object],
       default: '',
     },
@@ -263,7 +259,7 @@ export default {
       default: () => ({}),
     },
     /**
-     * use this prop to set a delay in ms before date input calender is displayed
+     * use this prop to set a delay in ms before date input calendar is displayed
      */
     dateFieldDelay: {
       type: Number,
@@ -331,16 +327,16 @@ export default {
           /**
            * inform parent of changed input values (v-model)
            *
-           * @event input
+           * @event update:modelValue
            * @param {string, Object} - the altered input values
            */
-          this.$emit('input', this.dateInputInt);
+          this.$emit('update:modelValue', this.dateInputInt);
         } else if (this.type === 'daterange') {
           this.dateInputInt = { ...val };
-          this.$emit('input', this.dateInputInt);
+          this.$emit('update:modelValue', this.dateInputInt);
         } else {
           this.textInputInt = val;
-          this.$emit('input', this.textInputInt);
+          this.$emit('update:modelValue', this.textInputInt);
         }
       },
       /**
@@ -421,10 +417,10 @@ export default {
   },
   watch: {
     /**
-     * watch input prop to sync with inputInt
+     * watch modelValue prop to sync with inputInt
      * @param {string|{date_from: string, date_to: string}} val
      */
-    input: {
+    modelValue: {
       handler(val) {
         // if value is empty clear all input (to be able to reset the component completely)
         if (!val) {
@@ -445,8 +441,8 @@ export default {
      * @param {string|{date_from: string, date_to: string}} val
      */
     inputInt(val) {
-      if (val !== this.input) {
-        this.$emit('input', val);
+      if (val !== this.modelValue) {
+        this.$emit('update:modelValue', val);
       }
     },
     /**
