@@ -106,15 +106,11 @@ export default {
   mixins: [
     navigateMixin,
   ],
-  model: {
-    prop: 'input',
-    event: 'input',
-  },
   props: {
     /**
      * input field settable from outside
      */
-    input: {
+    modelValue: {
       type: [String, Number],
       default: '',
     },
@@ -372,9 +368,9 @@ export default {
   },
   watch: {
     /**
-     * watch input prop to update internal representation
+     * watch modelValue prop to update internal representation
      */
-    input: {
+    modelValue: {
       handler(val) {
         if (val !== this.inputInt) {
           this.inputInt = val;
@@ -387,13 +383,13 @@ export default {
      * @param {Object|string} val
      */
     inputInt(val) {
-      if (val !== this.input) {
+      if (val !== this.modelValue) {
         /**
          * event triggered when input changes - part of v-model
-         * @event input
+         * @event update:modelValue
          * @param {string} - the altered input string
          */
-        this.$emit('input', val);
+        this.$emit('update:modelValue', val);
       }
       // if options should be fetched dynamically trigger event when inputInt changes
       if (this.dynamicFetch) {

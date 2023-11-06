@@ -10,7 +10,7 @@ The Toggle lets you choose if the options are provided as array of strings or ob
     <BaseToggle
       v-model="listIsObjects"
       label="Options is Array of Objects" />
-    <base-autocomplete-input
+    <BaseAutocompleteInput
       v-model="autocompleteInput"
       :list="autocompleteResults"
       :placeholder="'Select Your Favourite Subject'"
