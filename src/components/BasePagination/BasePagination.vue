@@ -121,10 +121,6 @@ export default {
   components: {
     BaseIcon,
   },
-  model: {
-    prop: 'current',
-    event: 'set-page',
-  },
   props: {
     /**
      * specify total number of pages
@@ -136,7 +132,7 @@ export default {
     /**
      * currently active page number
      */
-    current: {
+    modelValue: {
       type: Number,
       default: 1,
     },
@@ -158,7 +154,7 @@ export default {
        * currently active page number
        * @type {number}
        */
-      active: this.current,
+      active: this.modelValue,
       /**
        * number the displayed pages between '...' should start with
        * (only relevant if not all numbers can be displayed)
@@ -228,14 +224,14 @@ export default {
      */
     active(val) {
       // check if new number is different from prop value
-      if (this.current !== val) {
+      if (this.modelValue !== val) {
         /**
          * triggered on page select
          *
-         * @event set-page
+         * @event update:modelValue
          * @param {number} - the new page number
          */
-        this.$emit('set-page', val);
+        this.$emit('update:modelValue', val);
       }
       // adjust the start and end value accordingly (if not all numbers can be displayed)
       this.setStartEnd();
@@ -244,7 +240,7 @@ export default {
      * check if parent prop changes
      * @param {number} val - the page number provided by the parent component
      */
-    current(val) {
+    modelValue(val) {
       this.active = val;
     },
   },
