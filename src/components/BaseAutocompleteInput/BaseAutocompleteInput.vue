@@ -3,6 +3,7 @@
     <BaseInput
       :id="id"
       v-model="inputInt"
+      v-bind="inputListeners"
       :is-active.sync="isActiveInt"
       :label="label"
       :show-label="showLabel"
@@ -23,8 +24,7 @@
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
-      @keydown="onKeydown"
-      v-on="inputListeners">
+      @keydown="onKeydown">
       <template #below-input>
         <BaseDropDownList
           v-if="isActiveInt"
@@ -302,13 +302,13 @@ export default {
     inputListeners() {
       return {
         // add all the listeners from the parent
-        ...this.$listeners,
+        ...this.$attrs,
         // and add custom listeners
         ...{
           // keep this input from propagating and use own event
           // (handled this way because this input event is only triggered on
           // keyboard input not when I select from the drop down)
-          input: () => {},
+          onInput: () => {},
         },
       };
     },

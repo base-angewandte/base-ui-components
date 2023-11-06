@@ -6,8 +6,7 @@
       :key="`${groupsId}-${index}`"
       :form-field-json="formGroup"
       v-bind="formProps"
-      class="base-form-groups__group"
-      v-on="$listeners">
+      class="base-form-groups__group">
       <template #label-addition="{ fieldName }">
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
         @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property) -->
@@ -195,6 +194,7 @@ export default {
      */
     formProps() {
       const newProps = {
+        ...this.$attrs,
         ...this.$props,
       };
       // this will be added in html per group

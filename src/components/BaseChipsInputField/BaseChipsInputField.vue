@@ -6,6 +6,7 @@
       :id="id"
       ref="baseInput"
       v-model="inputInt"
+      v-bind="$attrs"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -26,8 +27,7 @@
       :input-class="inputClass"
       :set-focus-on-active="setFocusOnActive"
       @keydown.enter.prevent="addOption"
-      @keydown="checkKeyEvent"
-      v-on="$listeners">
+      @keydown="checkKeyEvent">
       <template
         #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->

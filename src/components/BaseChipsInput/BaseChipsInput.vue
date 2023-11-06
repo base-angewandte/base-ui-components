@@ -15,8 +15,7 @@
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
       @click-input-field="onInputFocus"
-      @clicked-outside="onInputBlur"
-      v-on="$listeners">
+      @clicked-outside="onInputBlur">
       <template #below-input>
         <BaseDropDownList
           v-if="isActive"
@@ -478,7 +477,10 @@ export default {
      * (e.g. because they are only needed for drop down component)
      */
     chipsFieldInputProps() {
-      const newProps = { ...this.$props };
+      const newProps = {
+        ...this.$attrs,
+        ...this.$props,
+      };
       delete newProps.dropDownNoOptionsInfo;
       delete newProps.allowDynamicDropDownEntries;
       delete newProps.addNewChipText;
@@ -616,7 +618,7 @@ export default {
      * input is watched for follow up actions needed after input
      * --> fetch autocomplete entries
      * --> inform parent of input (this however is not needed anymore since
-     * $listeners from input are now propagated to parent anyways!)
+     * events of $attrs (former $listeners) from input are now propagated to parent anyways!)
      * @param {string} val
      */
     input(val) {

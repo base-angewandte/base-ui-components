@@ -10,7 +10,7 @@
         && fieldType !== 'boolean'"
       :id="fieldKey"
       :key="fieldKey"
-      v-bind="fieldProps"
+      v-bind="fieldPropsInt"
       :label="labelInt"
       :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
       :placeholder="placeholderInt"
@@ -40,7 +40,6 @@
       :max="typeof formFieldXAttrs.max !== 'undefined' ? formFieldXAttrs.max : fieldProps.max"
       :decimals="allowedDecimals"
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
-      v-on="inputListeners"
       @keydown.enter="onEnter"
       @blur="emitCompletedInputValues"
       @input="setInputValue($event)"
@@ -133,7 +132,7 @@
           :id="fieldKey"
           :key="fieldKey + '_date'"
           v-model="fieldValueInt"
-          v-bind="fieldProps"
+          v-bind="fieldPropsInt"
           :label="labelInt"
           :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
           :placeholder="placeholderInt"
@@ -153,8 +152,7 @@
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           class="base-form-field-creator__date-field"
-          @value-validated="emitCompletedInputValues"
-          v-on="inputListeners">
+          @value-validated="emitCompletedInputValues">
           <template
             #label-addition>
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
@@ -222,7 +220,7 @@
           :id="fieldKey"
           :key="fieldKey + '_time'"
           v-model="fieldValueInt"
-          v-bind="fieldProps"
+          v-bind="fieldPropsInt"
           :label="field.properties.time_from.title"
           :show-label="false"
           :placeholder="placeholderInt.time"
@@ -232,8 +230,7 @@
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
           class="base-form-field-creator__date-field"
-          @date-validated="emitCompletedInputValues"
-          v-on="inputListeners" />
+          @date-validated="emitCompletedInputValues" />
       </div>
     </fieldset>
 
@@ -245,7 +242,7 @@
       :ref="fieldType + fieldKey"
       :key="fieldKey"
       v-model="fieldValueInt"
-      v-bind="fieldProps"
+      v-bind="fieldPropsInt"
       :placeholder="placeholderInt"
       :label="labelInt"
       :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
@@ -279,7 +276,6 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
-      v-on="inputListeners"
       @selected-changed="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
@@ -392,9 +388,8 @@
           :form-id="fieldKey + '_' + field.name"
           :field-props="fieldProps"
           :drop-down-lists="fieldGroupDropDownLists"
-          v-bind="fieldGroupParams"
+          v-bind="fieldGroupParamsInt"
           class="base-form-field-creator__subform"
-          v-on="inputListeners"
           @values-changed="setInputValue"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
@@ -481,7 +476,7 @@
       v-else-if="fieldType === 'boolean'">
       <BaseToggle
         v-model="fieldValueInt"
-        v-bind="fieldProps"
+        v-bind="fieldPropsInt"
         :name="fieldKey"
         :label="labelInt"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"
@@ -759,13 +754,33 @@ export default {
     };
   },
   computed: {
+    /**
+     * need internal variable to be able to add event listeners
+     * @returns {Object}
+     */
+    fieldPropsInt() {
+      return {
+        ...this.inputListeners,
+        ...this.fieldProps,
+      };
+    },
+    /**
+     * need internal variable to be able to add event listeners
+     * @returns {Object}
+     */
+    fieldGroupParamsInt() {
+      return {
+        ...this.inputListeners,
+        ...this.fieldGroupParams,
+      };
+    },
     inputListeners() {
       return {
         // add all the listeners from the parent
-        ...this.$listeners,
+        ...this.$attrs,
         // and add custom listeners
         ...{
-          blur: (event) => {
+          onBlur: (event) => {
             /**
              * event emitted by field type `multiline`
              * @event blur
@@ -775,7 +790,7 @@ export default {
              */
             this.$emit('blur', event, this.field);
           },
-          keydown: (event) => {
+          onKeydown: (event) => {
             /**
              * event emitted by field type `multiline`
              * @event keydown

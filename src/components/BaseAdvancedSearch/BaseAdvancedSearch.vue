@@ -46,7 +46,6 @@
       :assistive-text="assistiveText"
       :date-field-delay="dateFieldDelay"
       :language="language"
-      v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
       @option-selected="fillOptionToForm">

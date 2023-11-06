@@ -55,6 +55,7 @@
           <BaseInput
             :id="label + '-' + id"
             v-model="inputFrom"
+            v-bind="inputListeners"
             :label="label"
             :show-label="false"
             :is-active="fromOpen"
@@ -70,8 +71,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('fromOpen', $event)"
-            v-on="inputListeners">
+            @update:is-active="isActiveHandler('fromOpen', $event)">
             <template #input>
               <div
                 class="base-date-input__datepicker">
@@ -98,6 +98,7 @@
                       :id="label + '-' + id"
                       ref="inputFrom"
                       v-model="inputFrom"
+                      v-bind="dateInputListeners"
                       :placeholder="placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-' + id"
@@ -110,8 +111,7 @@
                       autocomplete="off"
                       @blur="onInputBlur($event, 'From')"
                       @input="checkDate($event, 'From')"
-                      @keydown="handleInputKeydown($event, 'From')"
-                      v-on="dateInputListeners">
+                      @keydown="handleInputKeydown($event, 'From')">
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
                   is not used -->
@@ -140,6 +140,7 @@
             v-if="type !== 'single'"
             :id="label + '-to-' + id"
             v-model="inputTo"
+            v-bind="inputListeners"
             :label="label"
             :show-label="false"
             :is-active="toOpen"
@@ -154,8 +155,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('toOpen', $event)"
-            v-on="inputListeners">
+            @update:is-active="isActiveHandler('toOpen', $event)">
             <template #input>
               <div
                 class="base-date-input__datepicker">
@@ -182,6 +182,7 @@
                       :id="label + '-to-' + id"
                       ref="inputTo"
                       v-model="inputTo"
+                      v-bind="dateInputListeners"
                       :placeholder="placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-to-' + id"
@@ -194,8 +195,7 @@
                       :class="['base-date-input__input', inputClass]"
                       @blur="checkDateValidity('To')"
                       @input="checkDate($event, 'To')"
-                      @keydown="handleInputKeydown($event, 'To')"
-                      v-on="dateInputListeners">
+                      @keydown="handleInputKeydown($event, 'To')">
                   </template>
                   <!-- this empty element is here so that the default icon of
                   datepicker is not used -->
@@ -743,14 +743,14 @@ export default {
       return this.type === 'datetime' || this.type === 'timerange';
     },
     /**
-     * compute an object that takes component $listeners and manipulate them for custom
+     * compute an object that takes component $attrs and manipulate some events for custom
      * needs
      * @returns {Object}
      */
     inputListeners() {
       return {
         // add all the listeners from the parent
-        ...this.$listeners,
+        ...this.$attrs,
         // and add custom listeners
         ...{
           // stop these BaseInput originating events to substitute them with the
@@ -774,16 +774,16 @@ export default {
       };
     },
     /**
-     * compute an object that takes component $listeners and manipulate them for custom
+     * compute an object that takes component $attrs and manipulate some events for custom
      * needs
      * @returns {Object}
      */
     dateInputListeners() {
       return {
         // add all the listeners from the parent
-        ...this.$listeners,
+        ...this.$attrs,
         // and add custom listeners
-        input: () => {
+        onInput: () => {
           /**
            * Event emitted on input, passing input string
            *

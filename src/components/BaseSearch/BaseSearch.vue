@@ -4,6 +4,7 @@
       :is="inputComponent"
       :id="idInt"
       v-model="inputInt"
+      v-bind="$attrs"
       :selected-list.sync="selectedChipsInt"
       :is-active.sync="isActiveInt"
       :type="dateFieldType"
@@ -32,8 +33,7 @@
       :chips-removable="type !== 'chipssingle'"
       input-class="base-search__input-field"
       field-type="search"
-      class="base-search__input"
-      v-on="$listeners">
+      class="base-search__input">
       <template #pre-input-field>
         <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
         <slot name="pre-input-field" />

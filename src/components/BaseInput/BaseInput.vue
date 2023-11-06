@@ -65,6 +65,7 @@
                   :id="idInt"
                   ref="input"
                   v-model="inputInt"
+                  v-bind="inputListeners"
                   :placeholder="placeholder"
                   :type="fieldType === 'number' ? 'text' : fieldType"
                   :list="dropDownListId || false"
@@ -81,8 +82,7 @@
                   autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
-                  @keydown.tab="handleInputTab"
-                  v-on="inputListeners">
+                  @keydown.tab="handleInputTab">
               </slot>
             </div>
             <!-- wrapped in a button for accessibility -->
@@ -446,11 +446,11 @@ export default {
     inputListeners() {
       return {
         // add all the listeners from the parent
-        ...this.$listeners,
+        ...this.$attrs,
         // and add custom listeners
         ...{
           // for number fields: filter characters except numbers, decimals, negative values, e
-          input: (event) => {
+          onInput: (event) => {
             let { value } = event.target;
 
             // clear errorMessage
@@ -542,7 +542,7 @@ export default {
               */
             this.$emit('input', value);
           },
-          blur: (event) => {
+          onBlur: (event) => {
             const { value } = event.target;
 
             if (this.fieldType === 'number') {

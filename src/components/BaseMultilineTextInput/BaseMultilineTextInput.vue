@@ -2,6 +2,7 @@
   <BaseInput
     :id="idInt"
     v-model="fieldContent[activeTabInt]"
+    v-bind="$attrs"
     :is-active.sync="isActive"
     :label="label"
     :show-label="showLabel"
@@ -13,8 +14,7 @@
     :error-message="errorMessage"
     :clearable="clearable"
     :use-fade-out="false"
-    class="base-multiline-text-input"
-    v-on="$listeners">
+    class="base-multiline-text-input">
     <template #label-addition>
       <div class="base-multiline-text-input__additions">
         <!-- @slot to add drop down needed for text input field (base specific) or any other element deemed necessary -->
@@ -47,6 +47,7 @@
           :id="idInt"
           ref="textarea"
           v-model="fieldContent[activeTabInt]"
+          v-bind="inputListeners"
           :required="required"
           :aria-required="required.toString()"
           :aria-describedby="idInt"
@@ -55,7 +56,6 @@
           :aria-disabled="disabled.toString()"
           :placeholder="placeholder"
           class="base-multiline-text-input__textarea"
-          v-on="inputListeners"
           @keydown.tab="isActive = false" />
       </div>
     </template>
@@ -250,10 +250,10 @@ export default {
     inputListeners() {
       return {
         // add all the listeners from the parent
-        ...this.$listeners,
+        ...this.$attrs,
         // and add custom listeners
         ...{
-          input: () => {
+          onInput: () => {
             /**
              * Event emitted on input, passing input string or input object
              *
