@@ -5,7 +5,7 @@ Drop Down Single Style without label
 ```vue live
 <template>
   <div>
-      <base-drop-down
+      <BaseDropDown
         :showLabel="false"
         v-model="selected"
         :options="[
@@ -38,7 +38,7 @@ Drop Down with label and with custom background color
 ```vue live
 <template>
   <div class="drop-down-wrapper">
-      <base-drop-down
+      <BaseDropDown
         :showLabel="true"
         v-model="selected1"
         :options="[
@@ -50,7 +50,7 @@ Drop Down with label and with custom background color
         label="Select a Color"
         class="drop-down"
         />
-    <base-drop-down
+    <BaseDropDown
         :showLabel="true"
         v-model="selected2"
         :options="[

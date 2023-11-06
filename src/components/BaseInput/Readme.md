@@ -230,7 +230,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           :show-label="true"
           label="Decimal Separator"
           class="row__element"
-          @value-selected="updateComponent" />
+          @update:modelValue="updateComponent" />
       </div>
       <div
         class="row">

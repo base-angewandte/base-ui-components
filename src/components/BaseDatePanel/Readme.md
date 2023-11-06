@@ -56,9 +56,9 @@ Date Panel: type week, displayed inline
     <BaseDatePanel
       label="Select a date"
       type="week"
-      :input="datePicked"
+      :model-value="datePicked"
       :is-inline="true"
-      @selected="selected" />
+      @update:modelValue="selected" />
     <br>
     <div>{{ datePicked }}</div>
   </div>

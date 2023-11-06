@@ -4,7 +4,7 @@
     <!-- per default use BaseChip component except for type `boolean` -->
     <BaseChip
       v-if="!isBoolean && hasValue"
-      :entry="value.label"
+      :model-value="value.label"
       :is-linked="true"
       role="listitem"
       @mousedown.native.stop=""

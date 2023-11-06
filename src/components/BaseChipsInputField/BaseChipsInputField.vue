@@ -84,7 +84,7 @@
                     <BaseChip
                       :id="entry.idInt"
                       :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                      :entry="getLangLabel(entry[labelPropertyName], true)"
+                      :model-value="getLangLabel(entry[labelPropertyName], true)"
                       :hover-box-content="hoverboxContent"
                       :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                         || !!entry[identifierPropertyName]"
@@ -117,7 +117,7 @@
                 <BaseChip
                   :id="entry.idInt"
                   :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                  :entry="getLangLabel(entry[labelPropertyName], true)"
+                  :model-value="getLangLabel(entry[labelPropertyName], true)"
                   :hover-box-content="hoverboxContent"
                   :editable="chipsEditable"
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
@@ -126,7 +126,7 @@
                   :assistive-text="assistiveText.selectedOption"
                   :is-removable="chipsRemovable"
                   @remove-entry="removeEntry(entry, index)"
-                  @value-changed="modifyListEntry($event, index)"
+                  @update:modelValue="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
               </slot>
             </template>

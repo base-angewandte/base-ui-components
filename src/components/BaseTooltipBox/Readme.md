@@ -359,7 +359,7 @@ export default {
       font-weight: bold;
       margin-top: 8px !important;
     }
-    
+
     >>> .base-text-list-group:first-of-type .base-text-list-label {
       margin-top: 0 !important;
     }

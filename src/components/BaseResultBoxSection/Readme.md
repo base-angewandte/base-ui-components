@@ -434,7 +434,7 @@ An example demonstrating slots
         #header>
         <div class="custom-header">
             <h2 class="header-text">This is a custom header</h2>
-            <base-drop-down
+            <BaseDropDown
               :showLabel="false"
               v-model="selected"
               :options="[

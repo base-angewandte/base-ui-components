@@ -59,14 +59,14 @@
           v-if="fieldType === 'multiline' && field.items
             && field.items.properties && field.items.properties.type"
           :id="fieldKey"
-          :selected-option="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
+          :model-value="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
             ? fieldValueInt.type : textTypeDefault"
           :options="textTypeOptions"
           :label="getI18nTerm('form.texttype')"
           :language="language"
           value-prop="source"
           class="base-form-field-creator__multiline-dropdown"
-          @value-selected="setMultilineDropDown" />
+          @update:modelValue="setMultilineDropDown" />
       </template>
       <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
@@ -276,7 +276,7 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
-      @selected-changed="emitCompletedInputValues"
+      @update:modelValue="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
@@ -481,7 +481,7 @@
         :label="labelInt"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"
         class="base-form-field-creator__toggle"
-        @clicked="emitCompletedInputValues">
+        @update:modelValue="emitCompletedInputValues">
         <BaseLink
           v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
           :source="formFieldXAttrs.subtext.source || ''"

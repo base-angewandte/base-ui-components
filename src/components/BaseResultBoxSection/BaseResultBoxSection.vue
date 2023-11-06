@@ -253,9 +253,9 @@
                 || (!editModeActive && expandedInt))"
             :key="'pagination-' + elementId"
             :total="pages"
-            :current="currentPageNumberInt"
+            :model-value="currentPageNumberInt"
             :use-link-element="usePaginationLinkElement"
-            @set-page="setPage" />
+            @update:modelValue="setPage" />
         </template>
       </div>
     </div>

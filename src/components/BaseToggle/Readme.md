@@ -19,9 +19,8 @@ Toggle Button Example
     <BaseToggle
       name="BaseToggle"
       label="Personal Showroom Page"
-      :checked="checked"
-      :bind-slot-to-state="true"
-      @clicked="checked = !checked">
+      v-model="checked"
+      :bind-slot-to-state="true">
         https://base.uni-ak.ac.at/showroom/PqZxTF9PdbQmdgcjcDgMBq
     </BaseToggle>
   </div>

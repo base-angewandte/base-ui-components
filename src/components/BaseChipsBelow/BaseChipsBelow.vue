@@ -10,7 +10,7 @@
       :sort-name="sortName"
       :invalid="invalidInt"
       :error-message="errorMessageInt"
-      @selected-changed="addedEntry"
+      @update:modelValue="addedEntry"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
         #drop-down-entry="props">
@@ -92,7 +92,7 @@
                 || !!entry[identifierPropertyName])"
               :hover-box-content="hoverboxContent"
               class="base-chips-input-chip"
-              @value-changed="modifyChipValue($event, index)"
+              @update:modelValue="modifyChipValue($event, index)"
               @hoverbox-active="hoverBoxActive($event, entry)"
               @remove-entry="removeEntry($event, index)" />
           </div>
@@ -120,7 +120,7 @@
             :required="additionalPropRequired"
             :default-entry="additionalPropDefaultOption"
             class="base-chips-below-chips-input"
-            @selected-changed="updateAdditionalProperty($event, index)" />
+            @update:modelValue="updateAdditionalProperty($event, index)" />
         </div>
       </div>
     </draggable>

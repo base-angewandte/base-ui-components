@@ -81,7 +81,7 @@ A chips input form field with chips displayed below and optional validation
         v-model="defaultOption"
         label="set default additional options"
         class="control"
-        @clicked="setDefaultOption"/>
+        @update:modelValue="setDefaultOption"/>
       <BaseToggle
         v-model="sortable"
         label="sort entries"

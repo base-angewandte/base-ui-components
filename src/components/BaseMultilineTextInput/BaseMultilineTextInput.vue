@@ -24,7 +24,6 @@
           v-model="activeTabInt"
           :options="switchTabs"
           :label="tabsLegend"
-          :active-tab="activeTab"
           class="base-multiline-text-input__tabs">
           <template
             #right-of-text="tab">

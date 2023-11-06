@@ -76,11 +76,11 @@
           <BaseCheckmark
             v-if="isSelectable && selectActive && !isDisabled"
             :key="entryId + 'checkmark'"
-            :checked="isSelected"
+            :model-value="isSelected"
             title="checkbox"
             mark-style="checkbox"
             class="base-menu-entry-checkbox"
-            @clicked="clicked" />
+            @update:modelValue="clicked" />
         </TransitionGroup>
       </div>
     </slot>

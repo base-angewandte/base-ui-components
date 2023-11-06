@@ -6,11 +6,11 @@ A chip that can be edited
 <template>
   <div>
       <BaseChip
-          :entry="entry"
+          :model-value="entry"
           :is-linked="false"
           @remove-entry="remove"/>
       <BaseChip
-          :entry="'Click me to see a hover box!'"
+          :model-value="'Click me to see a hover box!'"
           :hover-box-content="{ title: 'More Info', subtext: 'Additional', boxText: ['Info 1', 'Info 2']}"
           :is-linked="true"
           @remove-entry="remove"/>

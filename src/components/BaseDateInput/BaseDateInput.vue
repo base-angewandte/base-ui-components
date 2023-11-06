@@ -30,7 +30,6 @@
             v-model="dateFormatInt"
             :options="tabSwitchOptions"
             :label="formatTabsLegend"
-            :active-tab="dateFormatInt"
             class="base-date-input__switch-buttons" />
         </div>
       </div>

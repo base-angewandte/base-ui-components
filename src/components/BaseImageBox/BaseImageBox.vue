@@ -187,12 +187,12 @@
           name="slide-fade">
           <BaseCheckmark
             v-if="selectable"
-            :checked="selectedInt"
+            :model-value="selectedInt"
             :label="title"
             mark-style="checkbox"
             check-box-size="large"
             class="base-image-box__checkbox"
-            @clicked="boxSelect" />
+            @update:modelValue="boxSelect" />
         </transition>
       </div>
     </div>

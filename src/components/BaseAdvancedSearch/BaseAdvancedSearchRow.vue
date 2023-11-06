@@ -285,7 +285,7 @@
                     @focusout="activeControlledVocabularyEntry = null">
                     <BaseChip
                       :is-removable="false"
-                      :entry="getLangLabel(chip[labelPropertyName.controlledVocabularyOption])"
+                      :model-value="getLangLabel(chip[labelPropertyName.controlledVocabularyOption])"
                       :chip-active="activeControlledVocabularyEntry
                         && chip[identifierPropertyName.controlledVocabularyOption]
                           === activeControlledVocabularyEntry[identifierPropertyName
