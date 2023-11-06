@@ -9,11 +9,11 @@
       :id="'search-input-' + internalRowId"
       ref="baseSearch"
       v-model="currentInput"
+      v-model:selected-chips="selectedOptions"
       :show-pre-input-icon="isMainSearch
         && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
       :type="searchType"
-      :selected-chips.sync="selectedOptions"
       :loadable="filter.type === 'text' || filter.type === 'chips'"
       :is-loading="isLoading"
       :placeholder="placeholder"
@@ -43,7 +43,7 @@
       <template #[filterSlotName]>
         <BaseChipsInputField
           :id="'search-filter-select-' + internalRowId"
-          :selected-list.sync="selectedFilter"
+          v-model:selected-list="selectedFilter"
           :allow-multiple-entries="false"
           :allow-unknown-entries="false"
           :allow-dynamic-drop-down-entries="false"
@@ -226,8 +226,8 @@
 
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
+                v-model:active-option="activeEntry"
                 :drop-down-options="option[autocompletePropertyNames.data]"
-                :active-option.sync="activeEntry"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
@@ -967,8 +967,7 @@ export default {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.appliedFilter)) {
           /**
-           * event emitted when the applied filter changes<br>
-           *   (possible to use .sync modifier on prop appliedFilter)
+           * event emitted when the applied filter changes
            * @event update:applied-filter
            * @property {Filter} val - the new currently applied filter
            */

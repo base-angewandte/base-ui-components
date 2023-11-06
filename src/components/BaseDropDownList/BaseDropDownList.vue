@@ -117,7 +117,7 @@ export default {
     /**
      * specify the currently selected option (will appear in app color if not disabled
      * by setting `selectStyled` `false`, but also used for `aria-selected`).
-     *   the `.sync` modifier can be used here
+     *   the v-model directive can be used here
      */
     selectedOption: {
       type: [Object, String],

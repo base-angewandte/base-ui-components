@@ -389,7 +389,7 @@ export default {
     /**
      * flag if component should be in edit mode (dragging, deleting,
      * other custom options visible)
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     *   the v-model directive may be used on this prop
      */
     editMode: {
       type: Boolean,
@@ -405,7 +405,7 @@ export default {
     /**
      * provide a list of selected entries for select options (can
      * be entry objects or entry ids).
-     *  the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     *  the v-model directive may be used on this prop
 
      */
     selectedList: {
@@ -479,7 +479,7 @@ export default {
     },
     /**
      * if `useExpandMode` is `true` set the state of 'show more' from outside
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     *   the v-model directive may be used on this prop
      */
     expanded: {
       type: Boolean,
@@ -508,7 +508,7 @@ export default {
     },
     /**
      * set the current page number from outside if `usePagination` is `true`.
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     *   the v-model directive may be used on this prop
      */
     currentPageNumber: {
       type: Number,
@@ -817,7 +817,7 @@ export default {
         /**
          * inform the parent of the changes in `selectedList` and provide
          * the ids of all selected.
-         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         *   the v-model directive may be used on the corresponding prop
          *
          * @event update:selected-list
          * @param {Array} - the list of selected entry ids
@@ -888,7 +888,7 @@ export default {
       if (val !== this.expanded) {
         /**
          * event emitted on expand toggle.
-         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         *   the v-model directive may be used on the corresponding prop
          * @event update:expanded
          * @param { Boolean } - true if list is expanded
          */
@@ -926,7 +926,7 @@ export default {
       if (val !== this.editMode) {
         /**
          * emitted on edit mode toggle (options toggle).
-         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
+         *   the v-model directive may be used on the corresponding prop
          *
          * @event update:edit-mode
          * @param {Boolean} - flag for edit mode active

@@ -4,7 +4,7 @@
       :id="id"
       v-model="inputInt"
       v-bind="inputListeners"
-      :is-active.sync="isActiveInt"
+      v-model:is-active="isActiveInt"
       :label="label"
       :show-label="showLabel"
       :placeholder="placeholder"
@@ -28,8 +28,8 @@
       <template #below-input>
         <BaseDropDownList
           v-if="isActiveInt"
+          v-model:active-option="activeOption"
           :drop-down-options="filteredListInt"
-          :active-option.sync="activeOption"
           :identifier-property-name="identifierPropertyName"
           :label-property-name="labelPropertyName"
           :list-id="`${id}-list-identifier`"
@@ -185,7 +185,7 @@ export default {
     },
     /**
      * set input field in active state from outside.
-     * the `.sync` modifier can be used on this prop
+     * the v-model directive can be used on this prop
      */
     isActive: {
       type: Boolean,
@@ -429,7 +429,7 @@ export default {
       if (JSON.stringify(val) !== JSON.stringify(this.isActive)) {
         /**
          * update when active state of input field changes
-         * the `.sync` modifier can be used on this event
+         * the v-model directive can be used on this event
          * @event update:is-active
          * @param {boolean} - is input field active
          */

@@ -111,7 +111,7 @@ export default {
      *    (else the array length will be used)
      *  **hidden** `boolean` - used to set visibility and is set in edit mode to toggle item
      *
-     *  the `.sync` modifier might be used on this prop
+     *  the v-model directive might be used on this prop
      */
     data: {
       type: Array,
@@ -244,7 +244,7 @@ export default {
         if (this.edit && JSON.stringify(val) !== JSON.stringify(this.data)) {
           /**
            * event emitted when data change internally (e.g. sorting, toggling hidden, etc.).
-           *  the `.sync` modifier may be used on the corresponding prop
+           *  the v-model directive may be used on the corresponding prop
            *
            * @event update:data
            * @param {Object[]} - the modified data (e.g. from sorting)

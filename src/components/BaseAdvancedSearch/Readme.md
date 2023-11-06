@@ -10,7 +10,7 @@ To see autocomplete results try typing 'zentrum'.
 <template>
   <div class="background">
     <BaseAdvancedSearch
-      :applied-filters.sync="appliedFilters"
+      v-model:applied-filters="appliedFilters"
       :filter-list="filterList"
       :autocomplete-results="autocompleteResults"
       :label-property-name="{
@@ -275,8 +275,8 @@ Search mode `form` - adds the filters in the form of a form below the primary se
 <template>
   <div class="background">
     <BaseAdvancedSearch
+      v-model:form-filter-values="appliedFilters"
       mode="form"
-      :form-filter-values.sync="appliedFilters"
       :form-filter-list="formFilterList"
       :autocomplete-results="autocompleteResults"
       :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"

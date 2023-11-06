@@ -6,12 +6,12 @@
       :id="id"
       ref="baseInput"
       v-model="inputInt"
+      v-model:is-active="isActiveInt"
       v-bind="$attrs"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
       :show-input-border="showInputBorder"
-      :is-active.sync="isActiveInt"
       :use-form-field-styling="useFormFieldStyling"
       :drop-down-list-id="dropDownListId"
       :linked-list-option="linkedListOption"
@@ -196,7 +196,7 @@ export default {
     /**
      * list of selected options (strings or objects - set `isStringArray` `true` if it is an array of strings),
      *  displayed as chips
-     * (you can use the `.sync` modifier on this property)
+     * (you can use the v-model directive on this property)
      */
     selectedList: {
       type: Array,
@@ -430,7 +430,7 @@ export default {
     },
     /**
      * possibility to steer input field active state from outside
-     * it is possible to use the `.sync` modifier here
+     * it is possible to use the v-model directive here
      */
     isActive: {
       type: Boolean,
@@ -784,7 +784,7 @@ export default {
       }
       /**
        * inform parent of changes to selected option list
-       * (you can use the .sync modifier on prop selectedList)
+       * (you can use the v-model directive on prop selectedList)
        *
        * @event update:selected-list
        * @param {(Object[], String[])} - the modified list - array

@@ -88,11 +88,11 @@
         class="control" />
     </div>
     <BaseEntrySelector
+      v-model:entries-selectable="selectMode"
       :entries="baseEntrySelectorEntries"
       :entries-total="entries.length"
       :entries-per-page="entriesPerPage"
       :active-entry="baseEntrySelectorEntries.map(entry => entry.id).indexOf(activeEntry)"
-      :entries-selectable.sync="selectMode"
       :options-hidden="!showOptions"
       :sort-options="showSort ? sortOptions : []"
       :use-search="useSearch"

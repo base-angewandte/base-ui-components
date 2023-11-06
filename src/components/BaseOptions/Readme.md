@@ -6,7 +6,7 @@ Resize to see the 'mobile' effect!
 <template>
     <div class="options-background">
         <BaseOptions
-          :show-options.sync="optionsToggle"
+          v-model:show-options="optionsToggle"
           :options-config="[{
             text: 'button added via optionsConfig',
             icon: 'eye',
@@ -76,9 +76,9 @@ Advanced example with all slots filled. Choose different settings for available 
 <template>
     <div class="options-background">
       <BaseOptions
+        v-model:show-options="optionsToggle"
         :use-options-button-on="useOptionsButtonOn"
         :options-hidden="optionsHidden"
-        :show-options.sync="optionsToggle"
         :show-after-options-below="showAfterOptionsBelow"
         :align-options="alignOptions">
         <template #beforeOptions>
@@ -194,8 +194,8 @@ An more real-life example with after options slot rendered below options if spac
 <template>
   <div class="options-background">
         <BaseOptions
+          v-model:show-options="showCheckbox"
           :use-options-button-on="'always'"
-          :show-options.sync="showCheckbox"
           :show-after-options-below="true"
           align-options="left">
           <template #afterOptions>

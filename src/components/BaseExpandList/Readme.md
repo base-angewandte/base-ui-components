@@ -31,7 +31,7 @@ Component to render list data
 
     <BaseExpandList
       ref="baseExpandList"
-      :data.sync="displayData"
+      v-model:data="displayData"
       :edit="editExpandList"
       :control-type="toggleElements"
       @saved="saveExpandListEdit">

@@ -109,7 +109,7 @@ export default {
   props: {
     /**
      * set showing of option buttons from outside.
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
+     *   the v-model directive may be used on this prop
      */
     showOptions: {
       type: Boolean,
@@ -330,7 +330,7 @@ export default {
         /**
          * emitted when options button is toggled (not relevant if `useOptionsButtonOn` prop
          * is set to 'never')
-         *   the `.sync` modifier can be used on `showOptions` prop here
+         *   the v-model directive can be used on `showOptions` prop here
          * @event update:show-options
          * @param {boolean} - was show value set true or false
          */

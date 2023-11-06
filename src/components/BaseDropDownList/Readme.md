@@ -16,7 +16,7 @@ A list in drop down style. Click the button to display!
 
         <BaseDropDownList
             v-if="showDropDown"
-            :selected-option.sync="selected"
+            v-model:selected-option="selected"
             :select-styled="true"
             :drop-down-options="list"
             list-id="aSimpleTestList"
@@ -73,8 +73,8 @@ An example connected with an input field (displayAsDropDown: false)
   <div>
     <BaseChipsInputField
       v-model="input"
+      v-model:selected-list="selectedList"
       :show-label="false"
-      :selected-list.sync="selectedList"
       drop-down-list-id="aSimpleTestList"
       identifier-property-name="id"
       label-property-name="value"
@@ -83,7 +83,7 @@ An example connected with an input field (displayAsDropDown: false)
       @keydown.up.down.prevent="navigate"
       @keydown.enter.prevent="addChipByKeyboard"/>
     <BaseDropDownList
-        :active-option.sync="active"
+        v-model:active-option="active"
         :drop-down-options="optionsListInt"
         :display-as-drop-down="false"
         list-id="aSimpleTestList"

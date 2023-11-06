@@ -259,7 +259,7 @@ export default {
     },
     /**
      * set input field in active state from outside
-     * the `.sync` modifier can be used on this prop
+     * the v-model directive can be used on this prop
      */
     isActive: {
       type: Boolean,

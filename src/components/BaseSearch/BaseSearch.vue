@@ -4,8 +4,8 @@
       :is="inputComponent"
       :id="idInt"
       v-model="searchValues"
+      v-model:is-active="isActiveInt"
       v-bind="$attrs"
-      :is-active.sync="isActiveInt"
       :type="dateFieldType"
       :show-label="false"
       :use-form-field-styling="false"
@@ -106,7 +106,7 @@ export default {
     /**
      * if input type is `chips` this is the prop to
      * pass selected options (chips).
-     *  you may use the `.sync` modifier on this prop
+     *  you may use the v-model directive on this prop
      */
     selectedChips: {
       type: Array,

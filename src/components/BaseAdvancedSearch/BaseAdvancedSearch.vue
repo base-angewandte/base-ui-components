@@ -28,10 +28,10 @@
     </template>
 
     <BaseAdvancedSearchRow
+      v-model:applied-filter="mainFilter"
       :search-row-id="'main'"
       :is-main-search="true"
       :mode="mode"
-      :applied-filter.sync="mainFilter"
       :filter-list="displayedFilters"
       :form-filter-list="formFilterList"
       :default-filter="defaultFilter"
@@ -73,7 +73,7 @@
         <div
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
           <BaseCollapsedFilterRow
-            :filters.sync="collapsedFiltersArray"
+            v-model:filters="collapsedFiltersArray"
             @remove-all="removeAllFilters" />
         </div>
       </template>

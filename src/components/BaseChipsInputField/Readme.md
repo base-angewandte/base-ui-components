@@ -11,7 +11,7 @@ Also try to drag or sort the chips!
   <div>
     <BaseChipsInputField
       v-model="input"
-      :selected-list.sync="selectedList"
+      v-model:selected-list="selectedList"
       :allow-unknown-entries="true"
       :add-selected-entry-directly="true"
       :sortable="true"
@@ -50,7 +50,7 @@ Example using the 'chip' slot with all props provided by the slot. Click the chi
 <template>
   <BaseChipsInputField
     v-model="input"
-    :selected-list.sync="selectedList"
+    v-model:selected-list="selectedList"
     :allow-unknown-entries="true"
     :add-selected-entry-directly="true"
     :sortable="true"

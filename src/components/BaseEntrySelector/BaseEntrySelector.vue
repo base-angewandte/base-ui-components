@@ -27,7 +27,7 @@
         class="base-entry-selector__options">
         <BaseOptions
           ref="baseOptions"
-          :show-options.sync="showOptions"
+          v-model:show-options="showOptions"
           :options-hidden="optionsHidden"
           :use-options-button-on="'always'"
           :show-after-options-below="true"

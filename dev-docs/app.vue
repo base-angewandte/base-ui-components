@@ -1,8 +1,8 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
     <BaseAdvancedSearch
+      v-model:applied-filters="appliedFilters"
       mode="form"
-      :applied-filters.sync="appliedFilters"
       :form-filter-list="formFilterList"
       :autocomplete-results="autocompleteResults"
       :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"

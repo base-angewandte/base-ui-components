@@ -3,7 +3,7 @@
     :id="idInt"
     v-model="fieldContent[activeTabInt]"
     v-bind="$attrs"
-    :is-active.sync="isActive"
+    v-model:is-active="isActive"
     :label="label"
     :show-label="showLabel"
     :placeholder="placeholder"

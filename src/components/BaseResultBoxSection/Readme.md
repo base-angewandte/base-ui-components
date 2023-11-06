@@ -77,10 +77,11 @@ Test you component configuration on this example component!
     </div>
     <BaseResultBoxSection
       v-model="visibleBoxes"
+      v-model:selected-list="selectedBoxes"
+      v-model:edit-mode="editMode"
       :is-loading="isLoading"
       :show-header="showHeader"
       :showOptions="showOptions"
-      :selected-list.sync="selectedBoxes"
       :options-button-text="{
         show: 'Edit/Show Options',
         hide: 'Return/Hide Options',
@@ -96,7 +97,6 @@ Test you component configuration on this example component!
         [600, 4],
         [800, 5],
       ]"
-      :edit-mode.sync="editMode"
       :selectOptionsText="{
         selectAll: 'Custom select all',
         selectNone: 'Custom select none',
@@ -422,9 +422,9 @@ An example demonstrating slots
 <template>
   <div class="section-canvas">
     <BaseResultBoxSection
+      v-model:selected-list="selectedBoxes"
       :entry-list="entriesList"
       :is-loading="false"
-      :selected-list.sync="selectedBoxes"
       show-action-button-boxes
       title-property-name="parent.title"
       message-text="This is the custom message Text"
