@@ -42,10 +42,6 @@ export default {
   components: {
     BaseIcon,
   },
-  model: {
-    prop: 'checked',
-    event: 'clicked',
-  },
   props: {
     /**
      * choose the style
@@ -87,7 +83,7 @@ export default {
      * checkbox checked or radio button checked can be set from outside, default
      * value depending on type of selector
      */
-    checked: {
+    modelValue: {
       type: [Boolean, String],
       default: false,
     },
@@ -117,7 +113,7 @@ export default {
     },
   },
   watch: {
-    checked: {
+    modelValue: {
       handler(val) {
         this.checkedInt = val;
       },
@@ -133,10 +129,10 @@ export default {
        * event emitted on radio button / checkmark click,
        * emitting input label
        *
-       * @event clicked
+       * @event update:modelValue
        * @param {string, boolean} - emitting boolean value for checkmark or radio value
        */
-      this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
+      this.$emit('update:modelValue', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
     },
   },
 };
