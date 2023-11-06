@@ -63,10 +63,6 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 export default {
   name: 'BaseSwitchButton',
   components: { BaseIcon },
-  model: {
-    prop: 'activeTab',
-    event: 'switch',
-  },
   props: {
     /**
      * specify the tabs as array of object with `value`, `label` and (optional) `icon` properties
@@ -79,7 +75,7 @@ export default {
     /**
      * set the currently active tab (specify the value of the object not the label)
      */
-    activeTab: {
+    modelValue: {
       type: String,
       required: true,
       default: () => (this.options[0] ? this.options[0].value : 'tab'),
@@ -132,7 +128,7 @@ export default {
   },
   data() {
     return {
-      selectedOption: this.activeTab,
+      selectedOption: this.modelValue,
     };
   },
   computed: {
@@ -155,9 +151,9 @@ export default {
        * @event switch
        * @param { string } - the `value` of the selected option object
        */
-      this.$emit('switch', val);
+      this.$emit('update:modelValue', val);
     },
-    activeTab(val) {
+    modelValue(val) {
       if (val !== this.selectedOption) {
         this.selectedOption = val;
       }
