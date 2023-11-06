@@ -99,17 +99,13 @@ export default {
     BaseIcon,
     BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton.vue').then(m => m.default || m),
   },
-  model: {
-    prop: 'input',
-    event: 'input',
-  },
   props: {
     /**
      * input displayed in the textarea.
      *   if `tabs` prop is set, this needs to be an object with properties corresponding to
      *   tab names.
      */
-    input: {
+    modelValue: {
       type: [Object, String],
       default: '',
     },
@@ -257,10 +253,10 @@ export default {
             /**
              * Event emitted on input, passing input string or input object
              *
-             * @event input
+             * @event update:modelValue
              * @param {string, Object} - the altered field input
              */
-            this.$emit('input', this.emitFieldContent());
+            this.$emit('update:modelValue', this.emitFieldContent());
           },
         },
       };
@@ -275,7 +271,7 @@ export default {
   },
   watch: {
     // watch for input changes from outside
-    input: {
+    modelValue: {
       handler(val) {
         if ((typeof val === 'object' && JSON.stringify(val) !== JSON.stringify(this.fieldContent))
           || (typeof val === 'string' && val !== this.fieldContent[this.activeTabInt])) {
@@ -305,7 +301,7 @@ export default {
       }
     },
     emitFieldContent() {
-      if (typeof this.input === 'object') {
+      if (typeof this.modelValue === 'object') {
         return this.fieldContent;
       }
       return this.fieldContent[this.activeTabInt];
