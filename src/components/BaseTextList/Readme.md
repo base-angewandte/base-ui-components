@@ -2,7 +2,7 @@
 
 Example of different content types and multiple columns based on the data structure.
 
-Note: The column elements are defined via the data structure wrapped by an array. The number of columns can be defined with the 'cols' property.
+Note: The column elements are defined via the data structure wrapped by an array. The number of columns can be defined with the `cols` prop.
 
 ```vue live
 <template>
@@ -137,9 +137,9 @@ export default {
 ```
 
 <br>
-Example of a single data object rendered in two columns, where the data property is typeof 'string'.
+Example of a single data object rendered in two columns, where the data property is typeof <code>string</code>.
 
-Note: The number of columns can be defined with the 'colsSingleTextContent' property.
+Note: The number of columns can be defined with the `colsSingleTextContent` prop.
 ```vue live
 <template>
   <div>
@@ -170,7 +170,7 @@ export default {
 Example of a list of chips.
 
 Note:
-The attributes 'id' and 'path' are specified once for all chips in that object 
+The properties `id` and `path` are specified once for all chips in that object
 and processed internally to prepare the structure for a single chip from [BaseLink](BaseLink).
 
 ```vue live
