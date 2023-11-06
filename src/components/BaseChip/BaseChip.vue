@@ -14,7 +14,6 @@
       @blur="updateText"
       @keydown.enter.prevent="updateText"
       @click.stop="clickAction"
-      @mousedown="onMouseDown"
       @mousemove="moveBox"
       @mouseleave="hideBox">
       {{ modelValueInt }}
@@ -195,16 +194,6 @@ export default {
         this.$emit('hoverbox-active', false);
         this.showInfoBox = false;
       }
-    },
-    onMouseDown(event) {
-      /**
-       * event on mouse down, needed by base chips input to determine active chip
-       *
-       * @event mouse-down
-       * @param {Event} - the native MouseEvent
-       *
-       */
-      this.$emit('mouse-down', event);
     },
     removeClicked() {
       /**
