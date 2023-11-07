@@ -802,7 +802,7 @@ export default {
      */
     labelRowSlotsHaveData() {
       // get label-addition slot
-      const slotElements = this.$slots['label-addition'];
+      const slotElements = this.$slots['label-addition']() ?? null;
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       return !!slotElements && !!slotElements.length
