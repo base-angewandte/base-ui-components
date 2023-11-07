@@ -289,7 +289,8 @@ export default {
           this.removeFilters();
           // now check if more than one value is left for the group
         } else if (concatValuesArray.length > 1) {
-          if (values[valueIndex].type === 'date') {
+          // check for special case date and time fields
+          if (values[valueIndex].type.includes('date') || values[valueIndex].type.includes('time')) {
             // for date arrays just remove the label so the order of the date_from and date_to does not
             // get mixed up by removing the complete value
             this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
@@ -312,7 +313,7 @@ export default {
         // if yes - remove the complete filter
         this.filtersInt.splice(filterIndex, 1);
         // special case date object
-      } else if (fieldType === 'date') {
+      } else if (fieldType.includes('date') || fieldType.includes('time')) {
         if (values.filter(value => hasData(value)).length < 2) {
           // if yes - remove the complete filter
           this.filtersInt.splice(filterIndex, 1);

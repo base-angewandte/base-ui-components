@@ -1059,7 +1059,7 @@ export default {
         // date could be string if it is just a single date or an object in all other cases
       }
       // case date field
-      if (fieldType === 'date' && filterData.type === 'object') {
+      if ((fieldType.includes('date') || fieldType.includes('time')) && filterData.type === 'object') {
         const objectProperties = Object.keys(filterData.properties);
         return values.reduce((valueObject, value, index) => ({
           ...valueObject,
