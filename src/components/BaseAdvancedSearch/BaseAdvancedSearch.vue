@@ -1,5 +1,6 @@
 <template>
   <div class="base-advanced-search">
+    <!-- FILTER ROW LIST (MODE 'LIST') -->
     <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
       <BaseAdvancedSearchRow
         v-for="(filter, index) in appliedFiltersInt"
@@ -27,9 +28,9 @@
         @fetch-autocomplete-results="fetchAutocomplete($event, index)" />
     </template>
 
+    <!-- MAIN FILTER -->
     <BaseAdvancedSearchRow
       :search-row-id="'main'"
-      :is-main-search="true"
       :mode="mode"
       :applied-filter.sync="mainFilter"
       :filter-list="displayedFilters"
@@ -50,6 +51,7 @@
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
       @option-selected="fillOptionToForm">
+      <!-- SHOW ADVANCED SEARCH FORM BUTTON (MODE 'FORM') -->
       <template #after>
         <BaseButton
           v-if="mode === 'form'"
@@ -62,6 +64,7 @@
                    { 'base-button-icon-rotate-180': formOpen }]"
           @click.native.stop="openAdvancedSearch" />
       </template>
+      <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>
         <BaseForm
           v-if="mode === 'form' && formOpen"
@@ -87,7 +90,6 @@
 <script>
 import { createId, hasData, sort } from '@/utils/utils';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
-import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapsedFilterRow';
 
 /**
  * @typedef Filter
@@ -112,8 +114,8 @@ import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapse
 export default {
   name: 'BaseAdvancedSearch',
   components: {
-    BaseCollapsedFilterRow,
     BaseAdvancedSearchRow,
+    BaseCollapsedFilterRow: () => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow').then(m => m.default || m),
     BaseForm: () => import('@/components/BaseForm/BaseForm').then(m => m.default || m),
     BaseButton: () => import('@/components/BaseButton/BaseButton').then(m => m.default || m),
   },
@@ -494,7 +496,7 @@ export default {
       ];
     },
     /**
-     * the actually displayed filters
+     * the actually displayed filter categories (visible in the filter drop down for mode 'list')
      * @returns {Filter[]}
      */
     displayedFilters() {
@@ -503,6 +505,11 @@ export default {
       // sort them
       return sort(displayed, this.labelPropertyName.filter);
     },
+    /**
+     * main filter is always added to the emitted filter array last to maintain same order
+     *  to what is rendered (main filter lowest) so we need to get the last filter index
+     * @returns {number}
+     */
     mainFilterIndex() {
       const lastFilterIndex = this.appliedFilters.length - 1;
       return lastFilterIndex > 0 ? lastFilterIndex : 0;
@@ -591,12 +598,6 @@ export default {
         this.$set(this.filtersAutocompleteResults, this.autocompleteIndex, [...val]);
         this.autocompleteIndex = -1;
       }
-    },
-    /**
-     * set autocomplete loading from outside
-     */
-    isLoadingIndex() {
-      // this.autocompleteIndex = val;
     },
     /**
      * have appliedFilters in sync with parent to be able to set them from outside
@@ -715,164 +716,17 @@ export default {
       // if not set default filter
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     }
+    // copy these filter values to later be able to determine if filters changed before
+    // triggering search
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
     this.originalFilterValues = JSON.parse(JSON.stringify(this.mode === 'form'
       ? this.formFilterValuesInt : this.appliedFiltersInt));
   },
   methods: {
-    fillOptionToForm({ entry, collectionId }) {
-      // check if mode is form and if collection id is present
-      // (otherwise value is default filter string input)
-      if (this.mode === 'form' && collectionId
-        // and if option is already included in the selected options to prevent double key problems
-        && !this.formFilterValuesInt[collectionId]
-          ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
-          .includes(entry[this.identifierPropertyName.autocompleteOption])) {
-        const fieldInformation = this.formFilterList[collectionId];
-        const fieldXAttrs = fieldInformation['x-attrs'];
-        // check the type of field that the value should be added to (we assume the only possibilities
-        // are chips or text - other types are currently NOT implemented and would need to be added here!)
-        if (fieldXAttrs.field_type === 'chips') {
-          // map the information from the search autocomplete to the chips form field
-          // required values
-          const chipsFormFieldValue = {
-            // map search autocomplete result to chips form field required values
-            [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
-            [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
-          };
-          // for multi chips - add value to array
-          if (fieldInformation.type === 'array') {
-            // check if property exists already in formFilterValuesInt
-            if (this.formFilterValuesInt[collectionId]) {
-              this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
-            } else {
-              this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
-            }
-            // for single chips - replace value
-          } else if (fieldInformation.type === 'object') {
-            this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
-          }
-        } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
-          this.$set(
-            this.formFilterValuesInt,
-            collectionId,
-            entry[this.labelPropertyName.autocompleteOption] || entry,
-          );
-        }
-        this.mainFilter.filter_values = [];
-        // this does not trigger an update event from BaseForm so search needs to be triggered manually here
-        this.search();
-      }
-    },
-    fetchFormAutocomplete(params) {
-      /**
-       * @event fetch-form-autocomplete
-       *
-       * @property {string} value - the string to autocomplete
-       * @property {string} name - the name of the field
-       * @property {string} source - the url to request the data from
-       * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
-       */
-      this.$emit('fetch-form-autocomplete', params);
-    },
     /**
-     * function to add a filter row after '+' icon was triggered
+     * GENERAL FUNCTIONALITIES
      */
-    addFilterRow({ filter, input }) {
-      // first handle remaining input and add it to filter values if necessary
-      // therefore have separate variable and assign the original values first (in case no
-      // modifications are necessary)
-      let newFilterValues = filter.type.includes('date') ? filter.filter_values
-        : [...filter.filter_values];
-      // have variable for search trigger in case additional values are added and should trigger
-      // search
-      let triggerSearch = false;
-      // now check if type is text and the current value saved in filter does not equal text input
-      if (filter.type === 'text' && input.trim() && (!filter.filter_values || !filter.filter_values.length
-        || this.mainFilter.filter_values[0] !== input.trim())) {
-        // in that case assign new value and set search trigger true
-        newFilterValues = [input];
-        triggerSearch = true;
-        // else if type is freetext chips add the value at the end of the array
-      } else if (filter.type === 'chips' && filter.freetext_allowed && input.trim()) {
-        newFilterValues = [
-          ...filter.filter_values,
-          {
-            [this.labelPropertyName.autocompleteOption]: input,
-          },
-        ];
-        // also here triger search after
-        triggerSearch = true;
-      }
-      // now finally add filter to internal filter list
-      this.appliedFiltersInt.push({
-        ...filter,
-        filter_values: newFilterValues,
-      });
-      // and reset the main filter
-      this.mainFilter = {
-        ...this.defaultFilter,
-      };
-      // and store the main filter to compare to later
-      this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
-      // now check if search should be triggered
-      if (triggerSearch) {
-        this.search();
-      }
-    },
-    /**
-     * remove filter after 'x' was triggered
-     * @param {Filter} filter - the filter to remove
-     * @param {number} index - the index of the filter
-     */
-    removeFilter(filter, index) {
-      this.appliedFiltersInt.splice(index, 1);
-      // trigger search to update search results
-      this.search();
-    },
-    /**
-     * for mode 'list'
-     * function called when a filter object within a filter row changes
-     * @param {Filter} filter - the filter that was altered
-     * @param {number} index - the index of the filter
-     */
-    updateFilter(filter, index) {
-      this.$set(this.appliedFiltersInt, index, JSON.parse(JSON.stringify(filter)));
-      // trigger search to update search results
-      this.search();
-    },
-    /**
-     * for mode 'form'
-     * update the form filters when an event is received from form that values have changed
-     * @param {Object} newFilterValueList - the new filter values object
-     */
-    updateFormFilters(newFilterValueList) {
-      this.formFilterValuesInt = JSON.parse(JSON.stringify(newFilterValueList));
-      this.search();
-    },
-    removeAllFilters() {
-      this.formFilterValuesInt = {};
-      this.search();
-    },
-    /**
-     * reduce the flickering and flinching from base form fields rendering by
-     *  only making the element visible after component mount and additionally
-     *  apply a timeout
-     */
-    formIsMounted() {
-      setTimeout(() => {
-        this.formMounted = true;
-      }, 200);
-    },
-    /**
-     * function triggered when 'advanced search' button is clicked in 'form' mode
-     */
-    openAdvancedSearch() {
-      // toggle form
-      this.formOpen = !this.formOpen;
-      // if form is opened - close the drop down
-      // TODO?
-    },
+
     /**
      * @param {string} input - the search string to autocomplete
      * @param {Filter} filter - the filter the autocomplete was triggered for
@@ -957,6 +811,76 @@ export default {
       }
     },
     /**
+     * MODE 'LIST' FUNCTIONALITIES
+     */
+
+    /**
+     * function to add a filter row after '+' icon was triggered
+     */
+    addFilterRow({ filter, input }) {
+      // first handle remaining input and add it to filter values if necessary
+      // therefore have separate variable and assign the original values first (in case no
+      // modifications are necessary)
+      let newFilterValues = filter.type.includes('date') ? filter.filter_values
+        : [...filter.filter_values];
+      // have variable for search trigger in case additional values are added and should trigger
+      // search
+      let triggerSearch = false;
+      // now check if type is text and the current value saved in filter does not equal text input
+      if (filter.type === 'text' && input.trim() && (!filter.filter_values || !filter.filter_values.length
+        || this.mainFilter.filter_values[0] !== input.trim())) {
+        // in that case assign new value and set search trigger true
+        newFilterValues = [input];
+        triggerSearch = true;
+        // else if type is freetext chips add the value at the end of the array
+      } else if (filter.type === 'chips' && filter.freetext_allowed && input.trim()) {
+        newFilterValues = [
+          ...filter.filter_values,
+          {
+            [this.labelPropertyName.autocompleteOption]: input,
+          },
+        ];
+        // also here triger search after
+        triggerSearch = true;
+      }
+      // now finally add filter to internal filter list
+      this.appliedFiltersInt.push({
+        ...filter,
+        filter_values: newFilterValues,
+      });
+      // and reset the main filter
+      this.mainFilter = {
+        ...this.defaultFilter,
+      };
+      // and store the main filter to compare to later
+      this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
+      // now check if search should be triggered
+      if (triggerSearch) {
+        this.search();
+      }
+    },
+    /**
+     * remove filter after 'x' was triggered
+     * @param {Filter} filter - the filter to remove
+     * @param {number} index - the index of the filter
+     */
+    removeFilter(filter, index) {
+      this.appliedFiltersInt.splice(index, 1);
+      // trigger search to update search results
+      this.search();
+    },
+    /**
+     * for mode 'list'
+     * function called when a filter object within a filter row changes
+     * @param {Filter} filter - the filter that was altered
+     * @param {number} index - the index of the filter
+     */
+    updateFilter(filter, index) {
+      this.$set(this.appliedFiltersInt, index, JSON.parse(JSON.stringify(filter)));
+      // trigger search to update search results
+      this.search();
+    },
+    /**
      * create an internal row id for unique identification of added filter rows
      *
      * @returns {string}
@@ -964,6 +888,115 @@ export default {
     getRowId() {
       // call utils function to return a "random" string
       return createId();
+    },
+
+    /**
+     * MODE 'FORM' FUNCTIONALITIES
+     */
+
+    /**
+     * function called when an option was selected from main search autocomplete
+     *
+     * @param {Object} entry - the selected option
+     * @param {string} collectionId - the option category selected - this needs to match a
+     *  formFilter id
+     */
+    fillOptionToForm({ entry, collectionId }) {
+      // check if mode is form and if collection id is present
+      // (otherwise value is default filter string input)
+      if (this.mode === 'form' && collectionId
+        // and if option is already included in the selected options to prevent double key problems
+        && !this.formFilterValuesInt[collectionId]
+          ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
+          .includes(entry[this.identifierPropertyName.autocompleteOption])) {
+        const fieldInformation = this.formFilterList[collectionId];
+        const fieldXAttrs = fieldInformation['x-attrs'];
+        // check the type of field that the value should be added to (we assume the only possibilities
+        // are chips or text - other types are currently NOT implemented and would need to be added here!)
+        if (fieldXAttrs.field_type === 'chips') {
+          // map the information from the search autocomplete to the chips form field
+          // required values
+          const chipsFormFieldValue = {
+            // map search autocomplete result to chips form field required values
+            [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
+            [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
+          };
+          // for multi chips - add value to array
+          if (fieldInformation.type === 'array') {
+            // check if property exists already in formFilterValuesInt
+            if (this.formFilterValuesInt[collectionId]) {
+              this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
+            } else {
+              this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
+            }
+            // for single chips - replace value
+          } else if (fieldInformation.type === 'object') {
+            this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
+          }
+        } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
+          this.$set(
+            this.formFilterValuesInt,
+            collectionId,
+            entry[this.labelPropertyName.autocompleteOption] || entry,
+          );
+        }
+        // main filter filter values should remain empty
+        this.mainFilter.filter_values = [];
+        // this does not trigger an update event from BaseForm so search needs to be triggered manually here
+        this.search();
+      }
+    },
+    /**
+     * function called from form if one of the form fields needs autocomplete
+     *
+     * @param {Object} params - see event for object properties sent to parent
+     */
+    fetchFormAutocomplete(params) {
+      /**
+       * @event fetch-form-autocomplete
+       *
+       * @property {string} value - the string to autocomplete
+       * @property {string} name - the name of the field
+       * @property {string} source - the url to request the data from
+       * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
+       * @property {?string[]} params.parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specified in this array (most nested property last)
+       */
+      this.$emit('fetch-form-autocomplete', params);
+    },
+    /**
+     * for mode 'form'
+     * update the form filters when an event is received from form that values have changed
+     * @param {Object} newFilterValueList - the new filter values object
+     */
+    updateFormFilters(newFilterValueList) {
+      this.formFilterValuesInt = JSON.parse(JSON.stringify(newFilterValueList));
+      this.search();
+    },
+    /**
+     * function called by BaseCollapsedFilter row if 'x' was clicked to remove all filters
+     */
+    removeAllFilters() {
+      // reset form filter values
+      this.formFilterValuesInt = {};
+      // trigger search without filters
+      this.search();
+    },
+    /**
+     * reduce the flickering and flinching from base form fields rendering by
+     *  only making the element visible after component mount and additionally
+     *  apply a timeout
+     */
+    formIsMounted() {
+      setTimeout(() => {
+        this.formMounted = true;
+      }, 200);
+    },
+    /**
+     * function triggered when 'advanced search' button is clicked in 'form' mode
+     */
+    openAdvancedSearch() {
+      // toggle form
+      this.formOpen = !this.formOpen;
     },
     /**
      * function to retrieve the filter values in reduced form the way CollapsedFilterRow needs them

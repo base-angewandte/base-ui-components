@@ -682,8 +682,6 @@ export default {
        * @type {?string|?Object}
        */
       currentInput: '',
-      // current filter
-      // TODO: a) adjust to actual filter structure
       /**
        * the currently selected filter
        * @type {Filter}
@@ -763,7 +761,8 @@ export default {
        */
       filterSlotName: 'pre-input-field',
       /**
-       *
+       * variable for touch devices to stop the click event from opening the drop down
+       *  when click event was coming from elements within the search (e.g. BaseForm)
        */
       stopSearchClick: false,
     };
@@ -799,6 +798,11 @@ export default {
         return [this.filter];
       },
     },
+    /**
+     * for main filter do not display the default filter in the drop down list with
+     *  available filters (mode 'list')
+     * @returns {Filter[]}
+     */
     displayFilterList() {
       if (!this.isMainSearch) return this.filterList;
       return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
@@ -1604,7 +1608,8 @@ export default {
       }
     },
     /**
-     * for unknown reasons on mobile click-outside gets propagated before click event (on
+     * on touch devices click-outside is not only triggered by 'touchstart' instead of 'click'.
+     *  this means the 'click-outside' event gets propagated before the 'click' event on touch devices (on
      *  desktop browsers it is the other way round). This leads to search drop down getting
      *  triggered when an element INSIDE search was clicked (in case of desktop when click-outside
      *  is propagated AFTER this leads to isActive = false again immediately after so no drop
@@ -1639,7 +1644,7 @@ export default {
       // check if mobile variable to stop click being propagated after click-outside
       // was set
       if (!this.stopSearchClick) {
-        // if now - show drop down
+        // if no - show drop down
         this.isActive = true;
       } else {
         // if click-outside was propagated before click event stop the event here

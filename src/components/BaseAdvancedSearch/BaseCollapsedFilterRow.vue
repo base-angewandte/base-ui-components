@@ -78,15 +78,15 @@
     </div>
 
     <!-- remove all filters button -->
-    <div
+    <!-- TODO: add accessibility features -->
+    <button
       class="base-collapsed-filter-row__remove"
       @click="removeFilters">
       <BaseIcon
         name="remove"
         text=""
-        button-style="row"
         class="base-collapsed-filter-row__remove-icon" />
-    </div>
+    </button>
   </div>
 </template>
 
