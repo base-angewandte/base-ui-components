@@ -37,6 +37,7 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.21.0",
+    "@vueuse/components": "^10.5.0",
     "body-scroll-lock": "^3.1.5",
     "hls.js": "^1.2.9",
     "lazysizes": "^5.3.2",
@@ -45,7 +46,6 @@
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
     "swiper": "^9.1.0",
-    "vue-click-outside": "^1.1.0",
     "vue-datepicker-next": "^1.0.3",
     "vuedraggable": "^2.24.3"
   },

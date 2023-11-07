@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 import DatePicker from 'vue-datepicker-next';
 
 import en from 'vue-datepicker-next/locale/en';
@@ -66,7 +66,7 @@ export default {
     DatePicker,
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
   props: {
     /**

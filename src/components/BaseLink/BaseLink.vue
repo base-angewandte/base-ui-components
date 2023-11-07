@@ -93,7 +93,7 @@
  * eg.: internal, external, tooltip, chip
  */
 
-import ClickOutside from 'vue-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 
 export default {
   name: 'BaseLink',
@@ -103,7 +103,7 @@ export default {
     BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
   props: {
     /**

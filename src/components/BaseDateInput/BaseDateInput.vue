@@ -226,7 +226,7 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 import DatePicker from 'vue-datepicker-next';
 import { capitalizeString, debounce } from '@/utils/utils';
 
@@ -253,7 +253,7 @@ export default {
     DatePicker,
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
   model: {
     prop: 'input',

@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import popUpLock from '@/mixins/popUpLock';
 
@@ -60,7 +60,7 @@ export default {
     BaseIcon,
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
   mixins: [popUpLock],
   props: {

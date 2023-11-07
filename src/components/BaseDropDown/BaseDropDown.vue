@@ -81,7 +81,7 @@
 
 <script>
 import { debounce } from '@/utils/utils';
-import ClickOutside from 'vue-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 import i18n from '@/mixins/i18n';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
@@ -94,7 +94,7 @@ export default {
     BaseIcon,
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
   mixins: [
     i18n,

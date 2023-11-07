@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import ClickOutside from 'vue-click-outside';
+import { vOnClickOutside } from '@vueuse/components';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
@@ -94,7 +94,7 @@ export default {
     BaseIcon,
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
   mixins: [navigateList],
   props: {
