@@ -140,6 +140,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 // eslint-disable-next-line
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import i18n from '@/mixins/i18n';
@@ -147,10 +148,10 @@ import i18n from '@/mixins/i18n';
 export default {
   name: 'BaseExpandListRow',
   components: {
-    BaseToggle: () => import('@/components/BaseToggle/BaseToggle.vue').then(m => m.default || m),
-    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
+    BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
     // eslint-disable-next-line import/no-self-import
-    BaseExpandListRow: () => import('@/components/BaseExpandList/BaseExpandListRow.vue').then(m => m.default || m),
+    BaseExpandListRow: defineAsyncComponent(() => import('@/components/BaseExpandList/BaseExpandListRow.vue')),
     BaseIcon,
   },
   mixins: [i18n],

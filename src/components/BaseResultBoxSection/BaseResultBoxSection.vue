@@ -263,6 +263,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { extractNestedPropertyValue } from '@/utils/utils';
 import navigateList from '@/mixins/navigateList';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
@@ -275,12 +276,12 @@ export default {
   name: 'BaseResultBoxSection',
   components: {
     BaseImageBox,
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
-    BaseOptions: () => import('@/components/BaseOptions/BaseOptions.vue').then(m => m.default || m),
-    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
-    BasePagination: () => import('@/components/BasePagination/BasePagination.vue').then(m => m.default || m),
-    BaseBoxButton: () => import('@/components/BaseBoxButton/BaseBoxButton.vue').then(m => m.default || m),
-    BaseSelectOptions: () => import('@/components/BaseSelectOptions/BaseSelectOptions.vue').then(m => m.default || m),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
+    BaseOptions: defineAsyncComponent(() => import('@/components/BaseOptions/BaseOptions.vue')),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BasePagination: defineAsyncComponent(() => import('@/components/BasePagination/BasePagination.vue')),
+    BaseBoxButton: defineAsyncComponent(() => import('@/components/BaseBoxButton/BaseBoxButton.vue')),
+    BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
   },
   mixins: [i18n, navigateList],
   model: {

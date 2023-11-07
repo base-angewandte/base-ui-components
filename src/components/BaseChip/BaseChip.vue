@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { createId } from '@/utils/utils';
 
 /**
@@ -46,8 +47,8 @@ import { createId } from '@/utils/utils';
 export default {
   name: 'BaseChip',
   components: {
-    BaseHoverBox: () => import('@/components/BaseHoverBox/BaseHoverBox.vue'),
-    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue'),
+    BaseHoverBox: defineAsyncComponent(() => import('@/components/BaseHoverBox/BaseHoverBox.vue')),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
   props: {
     /**

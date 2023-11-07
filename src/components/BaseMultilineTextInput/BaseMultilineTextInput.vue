@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { createId } from '@/utils/utils';
@@ -96,7 +97,7 @@ export default {
   components: {
     BaseInput,
     BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton.vue').then(m => m.default || m),
+    BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
   },
   props: {
     /**

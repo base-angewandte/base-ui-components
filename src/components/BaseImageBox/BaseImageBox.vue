@@ -199,6 +199,7 @@
   </BaseBox>
 </template>
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
@@ -212,9 +213,9 @@ export default {
   components: {
     BaseBox,
     BaseIcon,
-    BaseCheckmark: () => import('@/components/BaseCheckmark/BaseCheckmark.vue').then(m => m.default || m),
-    BaseImage: () => import('@/components/BaseImage/BaseImage.vue').then(m => m.default || m),
-    BaseImageGrid: () => import('@/components/BaseImageGrid/BaseImageGrid.vue').then(m => m.default || m),
+    BaseCheckmark: defineAsyncComponent(() => import('@/components/BaseCheckmark/BaseCheckmark.vue')),
+    BaseImage: defineAsyncComponent(() => import('@/components/BaseImage/BaseImage.vue')),
+    BaseImageGrid: defineAsyncComponent(() => import('@/components/BaseImageGrid/BaseImageGrid.vue')),
   },
   props: {
     /**

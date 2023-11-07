@@ -82,6 +82,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
 import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue';
 import { createId, hasData, sort } from '@/utils/utils';
@@ -111,8 +112,8 @@ export default {
   components: {
     BaseCollapsedFilterRow,
     BaseAdvancedSearchRow,
-    BaseForm: () => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m),
-    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
+    BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue')),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
   },
   props: {
     /**

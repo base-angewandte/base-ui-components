@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
 
 /**
@@ -61,7 +62,7 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
 export default {
   name: 'BaseMapLocations',
   components: {
-    BaseMap: () => import('@/components/BaseMap/BaseMap.vue').then(m => m.default || m),
+    BaseMap: defineAsyncComponent(() => import('@/components/BaseMap/BaseMap.vue')),
     BaseTextList,
   },
   props: {

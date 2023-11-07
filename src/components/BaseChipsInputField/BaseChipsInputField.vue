@@ -162,6 +162,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
@@ -174,7 +175,7 @@ export default {
   name: 'BaseChipsInputField',
   components: {
     BaseInput,
-    BaseChip: () => import('@/components/BaseChip/BaseChip.vue').then(m => m.default || m),
+    BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
     Draggable,
   },
   mixins: [

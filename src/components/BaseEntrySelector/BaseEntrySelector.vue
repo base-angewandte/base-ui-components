@@ -186,6 +186,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import i18n from '@/mixins/i18n';
 
 /**
@@ -195,13 +196,13 @@ import i18n from '@/mixins/i18n';
 export default {
   name: 'BaseEntrySelector',
   components: {
-    BaseDropDown: () => import('@/components/BaseDropDown/BaseDropDown.vue').then(m => m.default || m),
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
-    BaseMenuList: () => import('@/components/BaseMenuList/BaseMenuList.vue').then(m => m.default || m),
-    BaseOptions: () => import('@/components/BaseOptions/BaseOptions.vue').then(m => m.default || m),
-    BasePagination: () => import('@/components/BasePagination/BasePagination.vue').then(m => m.default || m),
-    BaseSearch: () => import('@/components/BaseSearch/BaseSearch.vue').then(m => m.default || m),
-    BaseSelectOptions: () => import('@/components/BaseSelectOptions/BaseSelectOptions.vue').then(m => m.default || m),
+    BaseDropDown: defineAsyncComponent(() => import('@/components/BaseDropDown/BaseDropDown.vue')),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
+    BaseMenuList: defineAsyncComponent(() => import('@/components/BaseMenuList/BaseMenuList.vue')),
+    BaseOptions: defineAsyncComponent(() => import('@/components/BaseOptions/BaseOptions.vue')),
+    BasePagination: defineAsyncComponent(() => import('@/components/BasePagination/BasePagination.vue')),
+    BaseSearch: defineAsyncComponent(() => import('@/components/BaseSearch/BaseSearch.vue')),
+    BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
   },
   mixins: [i18n],
   props: {

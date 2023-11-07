@@ -226,6 +226,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import DatePicker from 'vue-datepicker-next';
 import { capitalizeString, debounce } from '@/utils/utils';
@@ -249,7 +250,7 @@ export default {
   components: {
     BaseInput,
     BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton.vue').then(m => m.default || m),
+    BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
     DatePicker,
   },
   directives: {

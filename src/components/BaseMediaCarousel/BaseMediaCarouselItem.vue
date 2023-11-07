@@ -123,6 +123,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import { debounce } from '@/utils/utils';
 import i18n from '@/mixins/i18n';
@@ -136,8 +137,8 @@ export default {
   name: 'BaseMedia',
   components: {
     BaseLoader,
-    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
-    BaseHlsVideo: () => import('@/components/BaseHlsVideo/BaseHlsVideo.vue').then(m => m.default || m),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseHlsVideo: defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue')),
   },
   mixins: [i18n],
   props: {

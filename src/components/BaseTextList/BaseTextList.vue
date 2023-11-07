@@ -112,6 +112,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import i18n from '@/mixins/i18n';
 
 /**
@@ -121,7 +122,7 @@ import i18n from '@/mixins/i18n';
 export default {
   name: 'BaseTextList',
   components: {
-    BaseLink: () => import('@/components/BaseLink/BaseLink.vue').then(m => m.default || m),
+    BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
   },
   mixins: [i18n],
   props: {

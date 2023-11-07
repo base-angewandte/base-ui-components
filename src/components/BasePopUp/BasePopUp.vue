@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import popUpLock from '@/mixins/popUpLock';
 
@@ -83,8 +84,8 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: () => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m),
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
   mixins: [popUpLock],
   props: {

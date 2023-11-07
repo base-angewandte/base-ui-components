@@ -118,6 +118,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 import i18n from '@/mixins/i18n';
@@ -132,7 +133,7 @@ export default {
   name: 'BaseChipsInput',
   components: {
     BaseIcon,
-    BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList.vue').then(m => m.default || m),
+    BaseDropDownList: defineAsyncComponent(() => import('@/components/BaseDropDownList/BaseDropDownList.vue')),
     BaseChipsInputField,
   },
   mixins: [

@@ -93,14 +93,15 @@
  * eg.: internal, external, tooltip, chip
  */
 
+import { defineAsyncComponent } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 
 export default {
   name: 'BaseLink',
   components: {
-    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m),
-    BaseTooltipBox: () => import('@/components/BaseTooltipBox/BaseTooltipBox.vue').then(m => m.default || m),
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseTooltipBox: defineAsyncComponent(() => import('@/components/BaseTooltipBox/BaseTooltipBox.vue')),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
   directives: {
     ClickOutside: vOnClickOutside,

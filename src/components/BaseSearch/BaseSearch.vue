@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { createId } from '@/utils/utils';
 /**
  * A basic text search to filter entries or files
@@ -88,10 +89,10 @@ import { createId } from '@/utils/utils';
 export default {
   name: 'BaseSearch',
   components: {
-    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m),
-    BaseChipsInputField: () => import('@/components/BaseChipsInputField/BaseChipsInputField.vue').then(m => m.default || m),
-    BaseInput: () => import('@/components/BaseInput/BaseInput.vue').then(m => m.default || m),
-    BaseDateInput: () => import('@/components/BaseDateInput/BaseDateInput.vue').then(m => m.default || m),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseChipsInputField: defineAsyncComponent(() => import('@/components/BaseChipsInputField/BaseChipsInputField.vue')),
+    BaseInput: defineAsyncComponent(() => import('@/components/BaseInput/BaseInput.vue')),
+    BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
   },
   props: {
     /**

@@ -493,6 +493,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import i18n from '@/mixins/i18n';
 
 /**
@@ -502,11 +503,11 @@ import i18n from '@/mixins/i18n';
 export default {
   name: 'BaseFormFieldCreator',
   components: {
-    BaseDropDown: () => import('@/components/BaseDropDown/BaseDropDown.vue').then(m => m.default || m),
-    BaseDateInput: () => import('@/components/BaseDateInput/BaseDateInput.vue').then(m => m.default || m),
-    BaseForm: () => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m),
-    BaseToggle: () => import('@/components/BaseToggle/BaseToggle.vue').then(m => m.default || m),
-    BaseLink: () => import('@/components/BaseLink/BaseLink.vue').then(m => m.default || m),
+    BaseDropDown: defineAsyncComponent(() => import('@/components/BaseDropDown/BaseDropDown.vue')),
+    BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
+    BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue')),
+    BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
+    BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
   },
   mixins: [i18n],
   props: {

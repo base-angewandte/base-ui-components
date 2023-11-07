@@ -139,6 +139,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { createId } from '@/utils/utils';
@@ -155,7 +156,7 @@ export default {
   },
   components: {
     BaseIcon,
-    BaseLoader: () => import('@/components/BaseLoader/BaseLoader.vue').then(m => m.default || m),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
   mixins: [i18n],
   props: {
