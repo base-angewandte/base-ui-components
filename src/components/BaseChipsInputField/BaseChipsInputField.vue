@@ -126,7 +126,7 @@
                   :assistive-text="assistiveText.selectedOption"
                   :is-removable="chipsRemovable"
                   @remove-entry="removeEntry(entry, index)"
-                  @update:modelValue="modifyListEntry($event, index)"
+                  @update:model-value="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
               </slot>
             </template>

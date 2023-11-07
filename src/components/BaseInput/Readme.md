@@ -192,7 +192,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           placeholder="Number of minimal characters"
           :min="0"
           class="row__element"
-          @update:modelValue="updateComponent($event, 'minLength')" />
+          @update:model-value="updateComponent($event, 'minLength')" />
         <BaseInput
           v-model="maxLength"
           label="max-length"
@@ -200,7 +200,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           placeholder="Number of maximal characters"
           :min="1"
           class="row__element"
-          @update:modelValue="updateComponent($event, 'maxLength')" />
+          @update:model-value="updateComponent($event, 'maxLength')" />
       </div>
     </template>
     <template
@@ -214,7 +214,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           placeholder="Number of decimals"
           :min="0"
           class="row__element"
-          @update:modelValue="updateComponent($event, 'decimals', true)" />
+          @update:model-value="updateComponent($event, 'decimals', true)" />
         <BaseDropDown
           v-model="language"
           :options="[
@@ -230,7 +230,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           :show-label="true"
           label="Decimal Separator"
           class="row__element"
-          @update:modelValue="updateComponent" />
+          @update:model-value="updateComponent" />
       </div>
       <div
         class="row">
@@ -240,14 +240,14 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           fieldType="number"
           placeholder="Minimal Value"
           class="row__element"
-          @update:modelValue="updateComponent($event, 'min')" />
+          @update:model-value="updateComponent($event, 'min')" />
         <BaseInput
           v-model="max"
           label="Maximal Value"
           fieldType="number"
           placeholder="Maximal Value"
           class="row__element"
-          @update:modelValue="updateComponent($event, 'max')" />
+          @update:model-value="updateComponent($event, 'max')" />
       </div>
     </template>
   </div>

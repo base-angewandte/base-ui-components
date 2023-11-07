@@ -58,7 +58,7 @@ Date Panel: type week, displayed inline
       type="week"
       :model-value="datePicked"
       :is-inline="true"
-      @update:modelValue="selected" />
+      @update:model-value="selected" />
     <br>
     <div>{{ datePicked }}</div>
   </div>

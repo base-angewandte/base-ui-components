@@ -42,7 +42,7 @@
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
       @keydown.enter="onEnter"
       @blur="emitCompletedInputValues"
-      @update:modelValue="setInputValue($event)"
+      @update:model-value="setInputValue($event)"
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
@@ -66,7 +66,7 @@
           :language="language"
           value-prop="source"
           class="base-form-field-creator__multiline-dropdown"
-          @update:modelValue="setMultilineDropDown" />
+          @update:model-value="setMultilineDropDown" />
       </template>
       <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
@@ -276,7 +276,7 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
-      @update:modelValue="emitCompletedInputValues"
+      @update:model-value="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
@@ -481,7 +481,7 @@
         :label="labelInt"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"
         class="base-form-field-creator__toggle"
-        @update:modelValue="emitCompletedInputValues">
+        @update:model-value="emitCompletedInputValues">
         <BaseLink
           v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
           :source="formFieldXAttrs.subtext.source || ''"

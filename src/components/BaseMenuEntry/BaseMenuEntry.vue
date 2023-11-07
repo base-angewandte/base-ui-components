@@ -80,7 +80,7 @@
             title="checkbox"
             mark-style="checkbox"
             class="base-menu-entry-checkbox"
-            @update:modelValue="clicked" />
+            @update:model-value="clicked" />
         </TransitionGroup>
       </div>
     </slot>

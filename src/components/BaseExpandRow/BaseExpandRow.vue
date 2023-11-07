@@ -14,7 +14,7 @@
         mark-style="checkbox"
         class="base-expand-row-checkbox"
         :model-value="isSelected"
-        @update:modelValue="checkboxClicked" />
+        @update:model-value="checkboxClicked" />
       <component
         :is="expandable ? 'button' : 'div'"
         :type="expandable ? 'button' : null"

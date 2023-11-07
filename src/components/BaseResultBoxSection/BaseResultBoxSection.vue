@@ -255,7 +255,7 @@
             :total="pages"
             :model-value="currentPageNumberInt"
             :use-link-element="usePaginationLinkElement"
-            @update:modelValue="setPage" />
+            @update:model-value="setPage" />
         </template>
       </div>
     </div>

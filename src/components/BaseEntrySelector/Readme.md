@@ -29,7 +29,7 @@
         v-model="useCustomText"
         label="Use Custom Texts"
         class="control"
-        @update:modelValue="selectMode = true; noResults = true" />
+        @update:model-value="selectMode = true; noResults = true" />
       <BaseToggle
         v-model="noResults"
         label="No search Results"
@@ -59,7 +59,7 @@
         :disabled="!showOptionsRow"
         label="Use 'option-actions' Slot"
         class="control"
-        @update:modelValue="selectMode = true" />
+        @update:model-value="selectMode = true" />
       <BaseToggle
         v-model="useAfterOptionsSlot"
         :disabled="!showOptionsRow"
@@ -69,7 +69,7 @@
         v-model="useEntriesSlot"
         label="Use 'entries' Slot"
         class="control"
-        @update:modelValue="useThumbnailsSlot = false; useEntryTextContentSlot = false; useEntryRightSideSlot = false" />
+        @update:model-value="useThumbnailsSlot = false; useEntryTextContentSlot = false; useEntryRightSideSlot = false" />
       <BaseToggle
         v-model="useEntryTextContentSlot"
         :disabled="useEntriesSlot"
@@ -80,7 +80,7 @@
         :disabled="useEntriesSlot"
         label="Use 'entry-right-side-elements' Slot"
         class="control"
-        @update:modelValue="useThumbnailsSlot = false" />
+        @update:model-value="useThumbnailsSlot = false" />
       <BaseToggle
         v-model="useThumbnailsSlot"
         :disabled="useEntriesSlot || useEntryRightSideSlot"

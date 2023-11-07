@@ -192,7 +192,7 @@
             mark-style="checkbox"
             check-box-size="large"
             class="base-image-box__checkbox"
-            @update:modelValue="boxSelect" />
+            @update:model-value="boxSelect" />
         </transition>
       </div>
     </div>

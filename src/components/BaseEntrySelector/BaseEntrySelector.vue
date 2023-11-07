@@ -18,7 +18,7 @@
           :placeholder="getI18nTerm(entrySelectorText.search)"
           :class="['base-entry-selector__head__search-bar',
                    { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
-          @update:modelValue="filterEntries($event, 'title')" />
+          @update:model-value="filterEntries($event, 'title')" />
       </slot>
 
       <!-- BASE OPTIONS ROW -->
@@ -56,7 +56,7 @@
                   :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
                   :value-prop="sortConfig.valuePropertyName"
                   class="base-entry-selector__dropdowns__dropdown"
-                  @update:modelValue="fetchEntries" />
+                  @update:model-value="fetchEntries" />
                 <BaseDropDown
                   v-if="entryTypes.length"
                   :id="`${entryTypesConfig.label}-types-drop-down`"
@@ -70,7 +70,7 @@
                   :value-prop="entryTypesConfig.valuePropertyName"
                   align-drop-down="right"
                   class="base-entry-selector__dropdowns__dropdown"
-                  @update:modelValue="filterEntries($event, 'type')" />
+                  @update:model-value="filterEntries($event, 'type')" />
               </slot>
             </div>
           </template>
@@ -181,7 +181,7 @@
       ref="pagination"
       :total="pageTotal"
       :model-value="pageNumber"
-      @update:modelValue="setPage" />
+      @update:model-value="setPage" />
   </div>
 </template>
 
