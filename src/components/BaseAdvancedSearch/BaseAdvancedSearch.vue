@@ -208,8 +208,8 @@ export default {
      * for mode 'form' provide a specification for the form fields in the form of [OpenAPi
      *  schema object](https://swagger.io/specification/#schema-object).
      *  see also [BaseForm](BaseForm) `form-field-json` prop - currently all field types except
-     *    `multiline` and `chips-below` are supported. Also field groups are supported but maximum
-     *    nesting level is 1.
+     *    `multiline` and `chips-below` and for date/time fields only single date, date range and date time fields
+     *    are supported. Also field groups are supported but maximum nesting level is 1.
      */
     formFilterList: {
       type: Object,
@@ -1022,7 +1022,13 @@ export default {
               label: chipValue ? chipValue.split('-').reverse().join('.') : '',
             })),
           fieldId,
-          fieldType,
+          // BaseCollapsedRow needs information if date is type daterange, timerange or datetime
+          // so alter to 'date' and 'time' for daterange and timerange respectively and 'datetime'
+          // for datetime.
+          fieldType: Object.keys(values).reduce((prev, key) => {
+            const currentType = key.split('_')[0];
+            return currentType !== prev ? prev + currentType : prev;
+          }, ''),
         };
       }
       // NOT COVERED: multiline and chips below
