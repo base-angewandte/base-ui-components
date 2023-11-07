@@ -620,6 +620,12 @@ export default {
       this.multiplyParams = null;
     }
   },
+  mounted() {
+    // inform parent that form was mounted
+    this.$nextTick(() => {
+      this.$emit('form-mounted');
+    });
+  },
   methods: {
     fetchAutocomplete(params) {
       this.currentInputString = params.value;
