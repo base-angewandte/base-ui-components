@@ -14,14 +14,14 @@
       :label="labelInt"
       :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
       :placeholder="placeholderInt"
-      :tabs="fieldType === 'multiline' ? fieldProps.tabs || tabs : false"
+      :tabs="fieldType === 'multiline' ? fieldProps.tabs || tabs : null"
       :tab-labels="fieldType === 'multiline'
-        ? fieldProps.tabLabels || tabs.map(tab => getI18nTerm(tab)) : false"
+        ? fieldProps.tabLabels || tabs.map(tab => getI18nTerm(tab)) : null"
       :tabs-legend="fieldType === 'multiline'
-        ? fieldProps.tabsLegend || getI18nTerm('form.textTabsLegend') : false"
-      :active-tab="fieldType === 'multiline' ? activeTab : false"
+        ? fieldProps.tabsLegend || getI18nTerm('form.textTabsLegend') : null"
+      :active-tab="fieldType === 'multiline' ? activeTab : null"
       :list="fieldType === 'autocomplete'
-        ? dropDownList.length ? dropDownList : fieldProps.list || [] : false"
+        ? dropDownList.length ? dropDownList : fieldProps.list || [] : null"
       :is-loading="autocompleteLoading"
       :model-value="fieldValueInt"
       :field-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
@@ -262,11 +262,11 @@
       :language="formFieldXAttrs.set_label_language
         || fieldType === 'chips-below' ? language : ''"
       :drop-down-no-options-info="fieldProps.dropDownNoOptionsInfo || getI18nTerm('form.noMatch')"
-      :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : false"
+      :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : null"
       :additional-prop-placeholder="fieldType === 'chips-below'
-        ? fieldProps.additionalPropPlaceholder || getI18nTerm('form.selectRoles') : false"
+        ? fieldProps.additionalPropPlaceholder || getI18nTerm('form.selectRoles') : null"
       :additional-property-name="fieldType === 'chips-below'
-        ? fieldProps.additionalPropertyName || 'roles' : false"
+        ? fieldProps.additionalPropertyName || 'roles' : null"
       :additional-prop-required="fieldType === 'chips-below'
         ? formFieldXAttrs.additional_prop_required : null"
       :invalid="invalid || fieldProps.invalid"

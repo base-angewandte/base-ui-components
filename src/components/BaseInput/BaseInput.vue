@@ -68,7 +68,7 @@
                   v-bind="inputListeners"
                   :placeholder="placeholder"
                   :type="fieldType === 'number' ? 'text' : fieldType"
-                  :list="dropDownListId || false"
+                  :list="dropDownListId || null"
                   :disabled="disabled"
                   :aria-disabled="disabled.toString()"
                   :aria-activedescendant="linkedListOption"

@@ -4,7 +4,7 @@
     class="base-pagination">
     <component
       :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : false"
+      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : null"
       :aria-disabled="active <= 1"
       :tabindex="active <= 1 ? -1 : 0"
       :class="[
@@ -12,8 +12,8 @@
         { 'base-pagination__arrow-icon-inactive': active <= 1 },
       ]"
       aria-label="Go to previous page"
-      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
-      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false">
+      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
+      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
         name="arrow-left" />
@@ -25,9 +25,9 @@
           :is="numberElement"
           v-for="n in total"
           :key="n"
-          :to="useLinkElement ? getLinkPath(n) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === n ? 'true' : false"
+          :to="useLinkElement ? getLinkPath(n) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === n ? 'true' : null"
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
@@ -39,9 +39,9 @@
         <component
           :is="numberElement"
           v-if="start !== 1"
-          :to="useLinkElement ? getLinkPath(1) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === 1 ? 'true' : false"
+          :to="useLinkElement ? getLinkPath(1) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === 1 ? 'true' : null"
           :aria-label="`${active === 1 ? 'Current Page, Page' : 'Go to page'} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
           @keydown.enter="setActivePage(1)"
@@ -55,9 +55,9 @@
           :is="numberElement"
           v-for="n in subset"
           :key="n"
-          :to="useLinkElement ? getLinkPath(n) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === n ? 'true' : false"
+          :to="useLinkElement ? getLinkPath(n) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === n ? 'true' : null"
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
@@ -70,9 +70,9 @@
         <component
           :is="numberElement"
           v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
-          :to="useLinkElement ? getLinkPath(total) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === total ? 'true' : false"
+          :to="useLinkElement ? getLinkPath(total) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === total ? 'true' : null"
           :aria-label="`${active === total ? 'Current Page, Page' : 'Go to page'} ${total}`"
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total }]"
@@ -84,7 +84,7 @@
     </div>
     <component
       :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : false"
+      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : null"
       :aria-disabled="active >= total"
       :tabindex="active >= total ? -1 : 0"
       :class="[
@@ -94,7 +94,7 @@
       aria-label="Go to next Page"
       @click.prevent="active + 1 <= total && !useLinkElement
         ? setActivePage(active + 1) : false"
-      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false">
+      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
         name="arrow-left" />

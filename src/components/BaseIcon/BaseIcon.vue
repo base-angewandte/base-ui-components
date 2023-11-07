@@ -1,6 +1,6 @@
 <template>
   <svg
-    :aria-labelledby="title || desc ? ariaAttribute : false"
+    :aria-labelledby="title || desc ? ariaAttribute : null"
     class="base-icon">
     <title
       v-if="title"

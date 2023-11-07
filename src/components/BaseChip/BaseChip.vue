@@ -7,8 +7,8 @@
     <div
       ref="chipText"
       :style="textStyling"
-      :contenteditable="editable ? 'true' : false"
-      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
+      :contenteditable="editable ? 'true' : null"
+      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : null"
       enterkeyhint="search"
       class="base-chip__text"
       @blur="updateText"

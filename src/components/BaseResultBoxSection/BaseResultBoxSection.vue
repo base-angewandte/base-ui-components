@@ -115,8 +115,8 @@
             :is="draggableComponent"
             ref="resultBoxesArea"
             v-model="visibleBoxes"
-            :animation="draggable ? 150 : false"
-            :tag="draggable ? 'ul' : false"
+            :animation="draggable ? 150 : null"
+            :tag="draggable ? 'ul' : null"
             :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
             :aria-label="headerText"
             tabindex="0"
@@ -132,7 +132,7 @@
               :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
               :aria-label="getPropValue(titlePropertyName, entry)"
               :aria-grabbed="(movableElementId === entry.id).toString()"
-              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : false"
+              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : null"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },

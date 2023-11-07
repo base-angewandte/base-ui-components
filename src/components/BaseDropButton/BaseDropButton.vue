@@ -44,7 +44,7 @@
         :active-option="activeOption"
         :active-styled="false"
         :style="dropDownTransformation"
-        :aria-activedescendant="activeOption ? `button-${activeOption.action}` : false"
+        :aria-activedescendant="activeOption ? `button-${activeOption.action}` : null"
         :identifier-property-name="identifierPropertyName"
         :label-property-name="labelPropertyName"
         :class="[

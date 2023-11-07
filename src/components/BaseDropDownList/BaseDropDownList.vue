@@ -9,7 +9,7 @@
     <ul
       :id="listId"
       :style="listBodyStyle"
-      :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : false"
+      :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : null"
       role="listbox"
       class="base-drop-down-list">
       <template v-for="(option, optionIndex) in dropDownOptions">
