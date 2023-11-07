@@ -21,7 +21,8 @@
           { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
           { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
         ]"
-        @mousedown="mouseDownHandler">
+        @mousedown="mouseDownHandler"
+        @touchstart="mouseDownHandler">
         <li
           v-for="(filter, filterIndex) in filtersInt"
           :key="filter.id"
@@ -347,12 +348,19 @@ export default {
           left: this.scrollContainer.scrollLeft,
           top: this.scrollContainer.scrollTop,
           // Get the current mouse position
-          x: event.clientX,
-          y: event.clientY,
+          x: event.clientX || event.touches[0]?.clientX,
+          y: event.clientY || event.touches[0]?.clientY,
         };
         // add event listeners for mousemove and mouseup to be able to trigger scroll
-        document.addEventListener('mousemove', this.mouseMoveHandler);
-        document.addEventListener('mouseup', this.mouseUpHandler);
+        // for touch devices add touch event listeners
+        if (event.type === 'touchstart') {
+          document.addEventListener('touchmove', this.mouseMoveHandler);
+          document.addEventListener('touchend', this.mouseUpHandler);
+        } else {
+          // else add mouse events
+          document.addEventListener('mousemove', this.mouseMoveHandler);
+          document.addEventListener('mouseup', this.mouseUpHandler);
+        }
         // Change the cursor and prevent user from selecting the text
         this.isScrolling = true;
       }
@@ -363,9 +371,13 @@ export default {
      * @param {MouseEvent} e
      */
     mouseMoveHandler(e) {
+      // get event position - touch event does not have clientX/clientY - fallback
+      // to touches position
+      const eventXPosition = e.clientX || e.touches[0]?.clientX || 0;
+      const eventYPosition = e.clientY || e.touches[0]?.clientY || 0;
       // How far the mouse has been moved
-      const dx = e.clientX - this.pos.x;
-      const dy = e.clientY - this.pos.y;
+      const dx = eventXPosition - this.pos.x;
+      const dy = eventYPosition - this.pos.y;
 
       // Scroll the element
       this.scrollContainer.scrollTop = this.pos.top - dy;
@@ -381,16 +393,18 @@ export default {
       // remove all the event listeners again
       document.removeEventListener('mousemove', this.mouseMoveHandler);
       document.removeEventListener('mouseup', this.mouseUpHandler);
+      document.removeEventListener('touchmove', this.mouseMoveHandler);
+      document.removeEventListener('touchend', this.mouseUpHandler);
 
       // change the styling of the element back to normal
       this.isScrolling = false;
     },
     /**
-     * function to caclulate if filterList fade out should be shown on element left and/or right border
+     * function to calculate if filterList fade out should be shown on element left and/or right border
      */
     calcFadeOut() {
       // get current element scroll position
-      const scrollPosition = this.scrollContainer.scrollLeft;
+      const scrollPosition = Math.floor(this.scrollContainer.scrollLeft);
       // get element max scroll position
       const scrollMax = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
       // set filter fade variables
