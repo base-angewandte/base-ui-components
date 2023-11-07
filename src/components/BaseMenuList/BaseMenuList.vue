@@ -132,6 +132,7 @@ export default {
       default: 'menuEntry',
     },
   },
+  emits: ['selected', 'clicked'],
   data() {
     return {
       // have internally necessary props in separate array to prevent issues with

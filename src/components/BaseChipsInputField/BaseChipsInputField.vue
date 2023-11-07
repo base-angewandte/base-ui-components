@@ -485,6 +485,7 @@ export default {
       default: true,
     },
   },
+  emits: ['hoverbox-active', 'update:selected-list', 'duplicate', 'removed', 'input', 'update:is-active'],
   data() {
     return {
       /**

@@ -31,8 +31,8 @@
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
           @within-drop-down="dropDownActive = $event"
-          @click.native.stop=""
-          @touchstart.native.stop="">
+          @click.stop=""
+          @touchstart.stop="">
           <template #option="entry">
             <span
               v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
@@ -419,6 +419,7 @@ export default {
       default: null,
     },
   },
+  emits: ['hoverbox-active', 'update:modelValue', 'fetch-dropdown-entries'],
   data() {
     return {
       /**

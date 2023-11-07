@@ -164,6 +164,7 @@ export default {
       validator: val => ['save', 'done'].includes(val),
     },
   },
+  emits: ['saved', 'canceled', 'activated'],
   computed: {
     /**
      * set icon depending on editMode

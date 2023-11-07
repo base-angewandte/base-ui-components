@@ -108,6 +108,7 @@ export default {
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
   },
+  emits: ['close'],
   data() {
     return {
       isActive: false,

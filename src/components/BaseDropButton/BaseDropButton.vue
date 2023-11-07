@@ -143,6 +143,7 @@ export default {
       default: 'label',
     },
   },
+  emits: ['clicked'],
   data() {
     return {
       /**

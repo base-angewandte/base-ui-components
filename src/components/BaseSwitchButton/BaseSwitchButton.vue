@@ -126,6 +126,7 @@ export default {
       validator: val => ['right', 'left'].includes(val),
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       selectedOption: this.modelValue,

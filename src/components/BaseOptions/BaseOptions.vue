@@ -203,6 +203,7 @@ export default {
       }),
     },
   },
+  emits: ['option-triggered', 'update:show-options'],
   data() {
     return {
       /**

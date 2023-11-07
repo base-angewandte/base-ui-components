@@ -145,6 +145,7 @@ export default {
       }),
     },
   },
+  emits: ['download', 'hide'],
   data() {
     return {
       showInt: this.showPreview,

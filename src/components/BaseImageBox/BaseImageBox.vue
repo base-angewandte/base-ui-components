@@ -411,6 +411,7 @@ export default {
         || (val instanceof Object && Object.keys(val).includes('path')),
     },
   },
+  emits: ['clicked', 'select-triggered'],
   data() {
     return {
       /**

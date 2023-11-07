@@ -36,8 +36,8 @@
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-autocomplete-input__drop-down"
-          @click.native.stop=""
-          @touchstart.native.stop=""
+          @click.stop=""
+          @touchstart.stop=""
           @update:selected-option="selectOption">
           <template #option="{ option }">
             <!-- @slot provide custom drop down options
@@ -274,6 +274,7 @@ export default {
       default: true,
     },
   },
+  emits: ['update:modelValue', 'fetch-dropdown-entries', 'update:is-active', 'selected'],
   data() {
     return {
       /**

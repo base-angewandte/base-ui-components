@@ -657,6 +657,7 @@ export default {
       default: false,
     },
   },
+  emits: ['entry-clicked', 'items-per-row-changed', 'submit-action', 'update:edit-mode', 'update:expanded', 'update:current-page-number', 'update:selected-list', 'entries-changed'],
   data() {
     return {
       // internal representation of entry list to be able to

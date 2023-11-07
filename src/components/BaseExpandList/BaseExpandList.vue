@@ -216,6 +216,7 @@ export default {
       default: false,
     },
   },
+  emits: ['saved', 'expanded-state', 'update:data'],
   data() {
     return {
       assertiveText: '',

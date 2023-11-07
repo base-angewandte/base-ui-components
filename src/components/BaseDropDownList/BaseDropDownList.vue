@@ -197,6 +197,7 @@ export default {
       default: false,
     },
   },
+  emits: ['update:selected-option'],
   data() {
     return {
       /**

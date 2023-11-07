@@ -166,6 +166,7 @@ export default {
       default: false,
     },
   },
+  emits: ['button-left', 'button-right', 'close'],
   data() {
     return {
       showInt: this.show,

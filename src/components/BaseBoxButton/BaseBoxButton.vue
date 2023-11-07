@@ -152,6 +152,7 @@ export default {
       default: false,
     },
   },
+  emits: ['clicked', 'on-tooltip'],
   data() {
     return {
       // to hide subtext if box is to small

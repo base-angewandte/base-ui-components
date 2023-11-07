@@ -723,6 +723,7 @@ export default {
       default: 'label',
     },
   },
+  emits: ['fetch-info-data', 'input-complete', 'fetch-autocomplete', 'field-value-changed', 'keydown', 'blur'],
   data() {
     return {
       /**

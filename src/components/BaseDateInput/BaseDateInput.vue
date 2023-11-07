@@ -87,7 +87,7 @@
                   :value-type="isFromTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('from')"
-                  @click.native.prevent.stop=""
+                  @click.prevent.stop=""
                   @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
@@ -171,7 +171,7 @@
                   :value-type="isToTimeField ? 'format' : datePickerValueFormat"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
-                  @click.native.prevent.stop=""
+                  @click.prevent.stop=""
                   @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
@@ -453,6 +453,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['click-input-field', 'selected', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
   data() {
     return {
       /**

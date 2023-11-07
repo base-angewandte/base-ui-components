@@ -130,6 +130,7 @@ export default {
       default: false,
     },
   },
+  emits: ['selected', 'expanded'],
   data() {
     return {
       id: null,

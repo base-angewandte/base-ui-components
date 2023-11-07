@@ -126,8 +126,8 @@
             'overflow-y': 'auto',
           }"
           class="base-advanced-search-row__drop-down-body"
-          @touchstart.native.stop=""
-          @click.native.stop="">
+          @touchstart.stop=""
+          @click.stop="">
           <template
             v-if="mode === 'list'"
             #before-list>
@@ -362,7 +362,7 @@
       :class="['base-advanced-search-row__add-filter-button',
                { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
       @clicked="addFilterRow"
-      @click.native.stop="">
+      @click.stop="">
       <template #text>
         <span
           class="base-advanced-search-row__add-filter-button__text">
@@ -674,6 +674,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['update:applied-filter', 'fetch-autocomplete-results', 'is-active', 'option-selected', 'remove-filter', 'add-filter-row'],
   data() {
     return {
       /**

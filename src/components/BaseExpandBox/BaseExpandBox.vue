@@ -119,6 +119,7 @@ export default {
       default: 54,
     },
   },
+  emits: ['update:expand', 'box-height'],
   data() {
     return {
       expandInt: false,

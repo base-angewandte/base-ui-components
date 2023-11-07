@@ -268,8 +268,8 @@
                   tabindex="0"
                   class="base-form__inline-icon"
                   name="remove"
-                  @click.native="removeField(element, valueIndex)"
-                  @keydown.enter.native="removeField(element, valueIndex)" />
+                  @click="removeField(element, valueIndex)"
+                  @keydown.enter="removeField(element, valueIndex)" />
                 <base-icon
                   :title="valueIndex !== (valueListInt[element.name].length - 1)
                     ? getI18nTerm('form.addGroupBelow', -1, {
@@ -281,8 +281,8 @@
                   tabindex="0"
                   class="base-form__inline-icon"
                   name="plus"
-                  @click.native="multiplyField(element, valueIndex)"
-                  @keydown.enter.native="multiplyField(element, valueIndex)" />
+                  @click="multiplyField(element, valueIndex)"
+                  @keydown.enter="multiplyField(element, valueIndex)" />
               </div>
             </template>
           </div>
@@ -503,6 +503,7 @@ export default {
       default: 'label',
     },
   },
+  emits: ['values-changed', 'input-complete', 'fetch-autocomplete'],
   data() {
     return {
       /**

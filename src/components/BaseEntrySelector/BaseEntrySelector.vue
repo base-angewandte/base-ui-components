@@ -405,6 +405,7 @@ export default {
       default: true,
     },
   },
+  emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
   data() {
     return {
       /**

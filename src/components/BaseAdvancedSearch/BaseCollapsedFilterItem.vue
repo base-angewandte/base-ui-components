@@ -7,7 +7,7 @@
       :model-value="value.label"
       :is-linked="true"
       role="listitem"
-      @mousedown.native.stop=""
+      @mousedown.stop=""
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
@@ -19,7 +19,7 @@
       <BaseIcon
         name="remove"
         class="base-collapsed-filter-item__icon-remove"
-        @click.native.stop="removeChip" />
+        @click.stop="removeChip" />
     </div>
     <!-- if value is date or time range it might need an 'until' character -->
     <span
@@ -77,6 +77,7 @@ export default {
       default: false,
     },
   },
+  emits: ['remove-chip'],
   computed: {
     /**
      * is the type of the value to be displayed boolean

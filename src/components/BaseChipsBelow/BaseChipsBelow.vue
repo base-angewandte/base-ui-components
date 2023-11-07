@@ -425,6 +425,7 @@ export default {
       default: true,
     },
   },
+  emits: ['additional-property-changed', 'hoverbox-active', 'fetch-dropdown-entries', 'update:modelValue'],
   data() {
     return {
       chipsArray: [],

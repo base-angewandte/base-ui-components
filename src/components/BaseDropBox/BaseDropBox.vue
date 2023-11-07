@@ -148,6 +148,7 @@ export default {
       default: false,
     },
   },
+  emits: ['clicked', 'dropped-element', 'dropped-file'],
   data() {
     return {
       dragAndDropCapable: false,

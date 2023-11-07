@@ -13,7 +13,6 @@
       ]"
       aria-label="Go to previous page"
       @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
-      @click.native.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
       @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false">
       <base-icon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
@@ -32,7 +31,6 @@
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
-          @click.native.prevent="setActivePage(n)"
           @click.prevent="setActivePage(n)">
           {{ n }}
         </component>
@@ -47,7 +45,6 @@
           :aria-label="`${active === 1 ? 'Current Page, Page' : 'Go to page'} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
           @keydown.enter="setActivePage(1)"
-          @click.native.prevent="setActivePage(1)"
           @click.prevent="setActivePage(1)">
           {{ 1 }}
         </component>
@@ -64,7 +61,6 @@
           :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
-          @click.native.prevent="setActivePage(n)"
           @click.prevent="setActivePage(n)">
           {{ n }}
         </component>
@@ -81,7 +77,6 @@
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total }]"
           @keydown.enter="setActivePage(total)"
-          @click.native.prevent="setActivePage(total)"
           @click.prevent="setActivePage(total)">
           {{ total }}
         </component>
@@ -97,8 +92,7 @@
         { 'base-pagination__arrow-icon-inactive': active >= total },
       ]"
       aria-label="Go to next Page"
-      @click.prevent="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false"
-      @click.native.prevent.prevent="active + 1 <= total && !useLinkElement
+      @click.prevent="active + 1 <= total && !useLinkElement
         ? setActivePage(active + 1) : false"
       @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false">
       <base-icon

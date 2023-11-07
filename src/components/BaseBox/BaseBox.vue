@@ -73,6 +73,7 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ['clicked'],
   methods: {
     clicked(event) {
       /**

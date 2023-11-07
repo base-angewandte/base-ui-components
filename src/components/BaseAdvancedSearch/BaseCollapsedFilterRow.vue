@@ -157,6 +157,7 @@ export default {
       },
     },
   },
+  emits: ['update:filters', 'remove-all'],
   data() {
     return {
       /**

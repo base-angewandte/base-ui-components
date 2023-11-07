@@ -197,6 +197,7 @@ export default {
       },
     },
   },
+  emits: ['remove-file', 'start-upload', 'cancel-upload'],
   computed: {
     buttonText() {
       if (this.currentStatus === 'initial' || this.currentStatus === 'saving') {

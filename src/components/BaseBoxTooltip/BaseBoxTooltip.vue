@@ -20,6 +20,7 @@ export default {
   components: {
     BaseIcon,
   },
+  emits: ['clicked'],
   methods: {
     clicked(event) {
       /**

@@ -232,6 +232,7 @@ export default {
       default: false,
     },
   },
+  emits: ['expanded-state', 'update:data', 'sorted', 'supportive'],
   data() {
     return {
       // toggle item

@@ -223,6 +223,7 @@ export default {
       default: false,
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       activeTabInt: this.activeTab || 'default',

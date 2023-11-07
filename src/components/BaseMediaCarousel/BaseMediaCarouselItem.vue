@@ -251,6 +251,7 @@ export default {
       default: undefined,
     },
   },
+  emits: ['download'],
   data() {
     return {
       // variable for display image error handling

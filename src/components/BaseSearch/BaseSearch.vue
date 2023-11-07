@@ -265,6 +265,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['update:is-active', 'update:selected-chips', 'update:modelValue'],
   data() {
     return {
       /**

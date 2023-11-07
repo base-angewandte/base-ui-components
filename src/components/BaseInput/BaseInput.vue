@@ -401,6 +401,7 @@ export default {
         .every(prop => Object.keys(val).includes(prop)),
     },
   },
+  emits: ['clicked-outside', 'click-input-field', 'keydown', 'update:invalid', 'update:is-active', 'blur', 'update:modelValue'],
   data() {
     return {
       isActiveInt: false,

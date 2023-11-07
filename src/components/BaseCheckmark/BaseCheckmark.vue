@@ -99,6 +99,7 @@ export default {
       },
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       checkedInt: false,

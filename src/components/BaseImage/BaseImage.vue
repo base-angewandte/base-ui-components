@@ -49,6 +49,7 @@ export default {
       default: () => [],
     },
   },
+  emits: ['error'],
   computed: {
     clearPng() {
       return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';

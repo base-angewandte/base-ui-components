@@ -149,6 +149,7 @@ export default {
       default: 16,
     },
   },
+  emits: ['highlighted'],
   data() {
     return {
       L: null,

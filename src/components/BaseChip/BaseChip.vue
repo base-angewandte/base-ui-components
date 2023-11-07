@@ -28,7 +28,7 @@
       v-if="isRemovable"
       name="remove"
       class="base-chip__icon"
-      @click.native.stop="removeClicked" />
+      @click.stop="removeClicked" />
     <base-hover-box
       ref="hoverBox"
       v-bind="hoverBoxContent"
@@ -109,6 +109,7 @@ export default {
       default: '',
     },
   },
+  emits: ['clicked', 'update:modelValue', 'hoverbox-active', 'remove-entry'],
   data() {
     return {
       /**

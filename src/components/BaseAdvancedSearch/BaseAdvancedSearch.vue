@@ -59,7 +59,7 @@
           icon-position="right"
           :class="['base-advanced-search__expand-button',
                    { 'base-button-icon-rotate-180': formOpen }]"
-          @click.native.stop="openAdvancedSearch" />
+          @click.stop="openAdvancedSearch" />
       </template>
       <template #below>
         <BaseForm
@@ -429,6 +429,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['update:applied-filters', 'update:form-filter-values', 'fetch-form-autocomplete', 'fetch-autocomplete', 'search'],
   data() {
     return {
       /**

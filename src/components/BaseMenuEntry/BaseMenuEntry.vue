@@ -200,6 +200,7 @@ export default {
       default: true,
     },
   },
+  emits: ['clicked', 'selected'],
   data() {
     return {
       isSelectedInt: false,

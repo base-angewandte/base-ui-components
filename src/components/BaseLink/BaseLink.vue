@@ -190,6 +190,7 @@ export default {
       default: false,
     },
   },
+  emits: ['tooltip-clicked', 'chip-clicked'],
   data() {
     return {
       isLoading: false,

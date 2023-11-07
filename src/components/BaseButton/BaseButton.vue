@@ -193,6 +193,7 @@ export default {
       default: true,
     },
   },
+  emits: ['clicked'],
   data() {
     return {
       internalId: createId(),

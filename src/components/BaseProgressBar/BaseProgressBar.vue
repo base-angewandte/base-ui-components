@@ -56,7 +56,7 @@
           v-if="showRemove"
           class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
           name="remove"
-          @click.native="remove" />
+          @click="remove" />
       </div>
     </div>
     <div
@@ -132,6 +132,7 @@ export default {
       default: false,
     },
   },
+  emits: ['remove-item'],
   data() {
     return {
       fadeOutDarkWidth: 30,

@@ -89,6 +89,7 @@ export default {
       default: 'RouterLink',
     },
   },
+  emits: ['initialized', 'clicked'],
   data() {
     return {
       swiper: undefined,
