@@ -68,9 +68,11 @@
           v-bind="formProps"
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
-          class="base-advanced-search__search-form"
+          :class="['base-advanced-search__search-form',
+                   { 'base-advanced-search__search-form--hidden': !formMounted}]"
           @input-complete="updateFormFilters"
-          @fetch-autocomplete="fetchFormAutocomplete" />
+          @fetch-autocomplete="fetchFormAutocomplete"
+          @form-mounted="formIsMounted" />
         <div
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
           <BaseCollapsedFilterRow
@@ -470,6 +472,11 @@ export default {
        * @type {Object}
        */
       originalFilterValues: null,
+      /**
+       * render BaseForm with delay to reduce flickering and flinching
+       * @type {boolean}
+       */
+      formMounted: false,
     };
   },
   computed: {
@@ -848,6 +855,16 @@ export default {
       this.search();
     },
     /**
+     * reduce the flickering and flinching from base form fields rendering by
+     *  only making the element visible after component mount and additionally
+     *  apply a timeout
+     */
+    formIsMounted() {
+      setTimeout(() => {
+        this.formMounted = true;
+      }, 200);
+    },
+    /**
      * function triggered when 'advanced search' button is clicked in 'form' mode
      */
     openAdvancedSearch() {
@@ -1114,5 +1131,9 @@ export default {
 
 .base-advanced-search__search-form {
   border-top: $separation-line;
+
+  &.base-advanced-search__search-form--hidden {
+    display: none;
+  }
 }
 </style>
