@@ -778,8 +778,6 @@ export default {
           }));
       } else {
         searchFilterList = this.appliedFiltersInt
-          // also only keep the filters that have filter values
-          .filter(filterValues => hasData(filterValues.filter_values))
           // and only keep the properties relevant for search
           // eslint-disable-next-line camelcase
           .map(({ id, type, filter_values }) => ({
@@ -795,7 +793,6 @@ export default {
         // update the original value
         this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
         // also minimize main filter
-        // TODO: think about also only emitting main filter when there are actually values
         const minMainFilter = {
           id: this.mainFilter.id,
           type: this.mainFilter.type,
