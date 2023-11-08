@@ -2,7 +2,6 @@
   <component
     :is="renderAs"
     v-clean-dom-nodes
-    v-click-outside="() => closeTooltip()"
     :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
     :aria-expanded="isTooltip ? showTooltip.toString() : null"
     :aria-label="isTooltip ? title : null"
@@ -60,7 +59,8 @@
         :modal-on-mobile="false"
         :role="'tooltip'"
         :styles="tooltipStyles"
-        :type-on-mobile="tooltipTypeOnMobile">
+        :type-on-mobile="tooltipTypeOnMobile"
+        @close="showTooltip = !showTooltip">
         <!-- @slot slot to inject content  -->
         <slot
           name="tooltip"
@@ -100,7 +100,6 @@
  * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
  */
 
-import ClickOutside from 'vue-click-outside';
 import cleanDomNodes from '@/directives/cleanDomNodes';
 
 export default {
@@ -112,7 +111,6 @@ export default {
   },
   directives: {
     cleanDomNodes,
-    ClickOutside,
   },
   props: {
     /**
