@@ -222,7 +222,7 @@ export default {
     /**
      * this variable is just used in mode `form`, for mode `list` leave it empty and use property `appliedFilters`
      *  to provide values per filter instead.
-     * provide values for the fields specified in `formFilterList`.
+     * provide values for the fields specified in `formFilterList`. Main filter can be filled by adding a `default` property.
      */
     formFilterValues: {
       type: Object,
@@ -674,6 +674,8 @@ export default {
        * @param {Filter[]} - the list of updated applied filters
        */
       this.$emit('update:applied-filters', [...this.appliedFiltersInt, val]);
+      // also emit updated form filter values at this point
+      this.$emit('update:form-filter-values', { ...this.formFilterValuesInt, default: this.mainFilter.filter_values });
     },
     /**
      * have formFilterValues in sync with parent to be able to set them from outside
@@ -686,10 +688,11 @@ export default {
           /**
            * inform parent of form filter value changes
            * @event update:form-filter-values
-           * @param {Object} - a form filter values object with a property for each filter field
+           * @param {Object} - a form filter values object with a property for each filter field - main filter values
+           *  are available under the default property
            *
            */
-          this.$emit('update:form-filter-values', { ...val });
+          this.$emit('update:form-filter-values', { ...val, default: this.mainFilter.filter_values });
         }
       },
       deep: true,
@@ -701,9 +704,17 @@ export default {
       handler(val) {
         // check if value is different from internal value
         if (val
-          && JSON.stringify(val) !== JSON.stringify(this.formFilterValuesInt)) {
-          // if yes - update internal value
-          this.formFilterValuesInt = JSON.parse(JSON.stringify(val));
+          && JSON.stringify(val) !== JSON.stringify({
+            ...this.formFilterValuesInt,
+            default: this.mainFilter.filter_values,
+          })) {
+          // remove the default key from the form filter values that should fill form
+          const { default: _, ...filterValuesNoMain } = val;
+          // update internal values
+          this.formFilterValuesInt = JSON.parse(JSON.stringify(filterValuesNoMain));
+          // set default property to mainFilter.filter_values
+          this.$set(this.mainFilter, 'filter_values', val.default || ['']);
+          // trigger search with updated values
           this.search();
         }
       },
