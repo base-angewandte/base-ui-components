@@ -66,26 +66,43 @@
             <template
               v-for="(objectItem, objectIndex) in [].concat(item.data)">
               <!-- eslint-disable -->
+              <!-- BaseLink: text, external, internal, text -->
               <BaseLink
+                v-if="!isTooltip(objectItem)"
                 :key="objectIndex"
                 :identifier-property-name="identifierPropertyName"
                 :identifier-property-value="objectItem[identifierPropertyName]"
                 :chip-query-name="chipQueryName"
                 :path="item.path"
-                :tooltip="objectItem.additional"
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
-                :class="[{ 'base-link--chip-text-list': item.id }]">
-                <template #tooltip>
-                  <!-- @slot slot for tooltip content -->
-                  <!-- @binding {array} data -->
-                  <slot
-                    :data="objectItem.additional"
-                    name="tooltip" />
-                </template>
-                <!-- add directly after to avoid additional spaces -->
-              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ', ' : '' }}
+                :class="[{ 'base-link--chip-text-list': item.id }]" />{{ !isTooltip(objectItem) && item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ', ' : '' }}
+              <!-- BaseLink: tooltip -->
+              <span
+                v-if="isTooltip(objectItem)"
+                class="base-link--wrapper">
+                <BaseLink
+                  :key="objectIndex"
+                  :identifier-property-name="identifierPropertyName"
+                  :identifier-property-value="objectItem[identifierPropertyName]"
+                  :chip-query-name="chipQueryName"
+                  :path="item.path"
+                  :tooltip="objectItem.additional"
+                  :type="item.id"
+                  :url="objectItem.url"
+                  :value="objectItem.value"
+                  :class="[{ 'base-link--chip-text-list': item.id }]">
+                  <template #tooltip>
+                    <!-- @slot slot for tooltip content -->
+                    <!-- @binding {array} data -->
+                    <slot
+                      :data="objectItem.additional"
+                      name="tooltip" />
+                  </template>
+                  <!-- add directly after to avoid additional spaces -->
+                </BaseLink>{{ isTooltip(objectItem) && item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}
+              </span>
               <!-- eslint-enable -->
             </template>
           </div>
@@ -295,6 +312,14 @@ export default {
       }
       return true;
     },
+    /**
+     * check if the link is type `tooltip`
+     * @param {Object} item
+     * @returns {boolean}
+     */
+    isTooltip(item) {
+      return !!item.additional;
+    },
   },
 };
 </script>
@@ -366,6 +391,11 @@ export default {
         margin-right: $spacing-small-half;
         margin-bottom: 2px;
       }
+    }
+
+    .base-link--wrapper {
+      display: inline-flex;
+      max-width: 100%;
     }
 
     // spacing below elements

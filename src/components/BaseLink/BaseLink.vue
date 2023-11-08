@@ -1,11 +1,13 @@
 <template>
   <component
     :is="renderAs"
+    v-clean-dom-nodes
     v-click-outside="() => closeTooltip()"
     :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
     :aria-expanded="isTooltip ? showTooltip.toString() : null"
     :aria-label="isTooltip ? title : null"
     :href="isChip || isInternal || isExternal ? href : null"
+    :tabindex="isTooltip ? 0 : null"
     :to="routerTo"
     :target="hasValidUrl ? externalLinkTarget : null"
     :title="title"
@@ -20,6 +22,7 @@
         'base-link--space-after': spaceAfter,
       },
     ]"
+    @keyup.enter="clickHandler"
     @click="clickHandler">
     <!-- chip, internal, external, text -->
     <template
@@ -33,20 +36,21 @@
       <span
         class="base-link__label">
         {{ value }}
-        <span
-          ref="icon"
-          class="base-link__icon">
-          <BaseIcon
-            v-show="!isLoading"
-            name="information" />
-        </span>
+      </span>
 
-        <span
-          v-if="isLoading"
-          class="base-link__loader">
-          <BaseLoader
-            v-if="isLoading" />
-        </span>
+      <span
+        ref="icon"
+        class="base-link__icon">
+        <BaseIcon
+          v-show="!isLoading"
+          name="information" />
+      </span>
+
+      <span
+        v-if="isLoading"
+        class="base-link__loader">
+        <BaseLoader
+          v-if="isLoading" />
       </span>
 
       <BaseTooltipBox
@@ -97,6 +101,7 @@
  */
 
 import ClickOutside from 'vue-click-outside';
+import cleanDomNodes from '@/directives/cleanDomNodes';
 
 export default {
   name: 'BaseLink',
@@ -106,6 +111,7 @@ export default {
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   directives: {
+    cleanDomNodes,
     ClickOutside,
   },
   props: {
@@ -338,10 +344,7 @@ export default {
       if (this.isInternal || this.isChip) {
         return this.vueRouterAvailable ? this.renderLinkAs : 'a';
       }
-      // tooltip
-      if (this.isTooltip) {
-        return 'button';
-      }
+      // default
       return 'span';
     },
     /**
@@ -467,14 +470,15 @@ export default {
   @import "../../styles/variables";
 
   .base-link {
-    display: inline-block;
     transition-property: color, text-decoration-color, background-color;
     transition-duration: 150ms;
     transition-timing-function: ease-in-out;
 
     &__label {
-      display: flex;
-      align-items: center;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     &__icon {
@@ -542,6 +546,9 @@ export default {
 
     &--tooltip {
       position: relative;
+      align-items: center;
+      display: inline-flex;
+      max-width: 100%;
 
       svg {
         display: inline-block;
@@ -551,14 +558,11 @@ export default {
       &:focus,
       &:hover {
         cursor: pointer;
+        color: $app-color-secondary;
 
         svg {
           fill: $app-color-secondary;
         }
-      }
-
-      &:focus {
-        color: $app-color-secondary;
       }
     }
 
