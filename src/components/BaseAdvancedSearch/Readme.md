@@ -1,8 +1,8 @@
 ## Demo
 
-Search functionality with simple freetext and advanced search with 'filters'.
+Search functionality with simple freetext and advanced search with 'filters' or a filter form.
 
-Search mode `list`.
+<h4>Search mode <code>list</code></h4>
 
 To see autocomplete results try typing 'zentrum'.
 
@@ -269,33 +269,51 @@ export default {
 
 ```
 
-Search mode `form` - adds the filters in the form of a form below the primary search row that can be collapsed.
+<h4>Search mode <code>form</code></h4>
 
+adds the filters in the form of a form below the primary search row that can be collapsed.
 ```vue live
 <template>
   <div class="background">
     <BaseAdvancedSearch
       mode="form"
-      :form-filter-values.sync="appliedFilters"
+      :form-filter-values.sync="formFilterValues"
       :form-filter-list="formFilterList"
       :autocomplete-results="autocompleteResults"
       :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"
+      :label-property-name="{
+        filter: 'label',
+        autocompleteOption: 'title',
+        controlledVocabularyOption: 'label',
+        formInputs: 'title',
+      }"
+      :identifier-property-name="{
+        filter: 'id',
+        autocompleteOption: 'id',
+        controlledVocabularyOption: 'id',
+        formInputs: 'id',
+      }"
       :form-props="{
         fieldIsLoading: fieldLoading,
         dropDownLists: formDropDownLists,
-        identifierPropertyName: 'id',
-        labelPropertyName: 'title',
         fieldProps: {
           title: {
-            addNewChipText: 'Add value'
+            addNewChipText: 'Add value',
           },
+          weekday_date: {
+            date: {
+              placeholder: {
+                date: 'custom placeholder via field props',
+              }
+            }
+          }
         },
       }"
       @fetch-autocomplete="fetchAutocomplete"
       @fetch-form-autocomplete="fetchFormAutcomplete" />
     <div class="applied-filters-area">
-      Applied Search Filters:
-      {{ appliedFilters }}
+      Applied Search Filter Values:
+      {{ formFilterValues }}
     </div>
   </div>
 </template>
@@ -304,7 +322,16 @@ Search mode `form` - adds the filters in the form of a form below the primary se
 export default {
   data() {
     return {
-      appliedFilters: {},
+      formFilterValues: {
+        default: ['Test'],
+        title: [
+          {
+            title: 'A knight in shining armor',
+            id: 'testval1',
+          }
+        ],
+        boolean_filter: true,
+      },
       formFilterList: {
         title: {
           type: 'array',
@@ -386,7 +413,7 @@ export default {
             order: 6,
           },
         },
-        weekday_time: {
+        weekday_date: {
           type: 'array',
           items: {
             type: 'object',
@@ -406,19 +433,18 @@ export default {
               date: {
                 type: 'object',
                 properties: {
-                  date: {
+                  date_from: {
                     type: 'string',
                   },
-                  time: {
+                  date_to: {
                     type: 'string',
                   },
                 },
-                title: 'Date and Time',
+                title: 'Date Range',
                 'x-attrs': {
                   field_format: 'full',
                   field_type: 'date',
                   placeholder: {
-                    time: 'Enter Time',
                     date: 'Enter Date',
                   },
                   order: 2,

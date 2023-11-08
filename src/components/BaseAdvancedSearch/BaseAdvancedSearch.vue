@@ -71,6 +71,8 @@
           v-bind="formProps"
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
+          :label-property-name="labelPropertyName.formInputs"
+          :identifier-property-name="identifierPropertyName.formInputs"
           :class="['base-advanced-search__search-form',
                    { 'base-advanced-search__search-form--hidden': !formMounted}]"
           @input-complete="updateFormFilters"
@@ -88,6 +90,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { createId, hasData, sort } from '@/utils/utils';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
 
@@ -115,9 +118,9 @@ export default {
   name: 'BaseAdvancedSearch',
   components: {
     BaseAdvancedSearchRow,
-    BaseCollapsedFilterRow: () => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow').then(m => m.default || m),
-    BaseForm: () => import('@/components/BaseForm/BaseForm').then(m => m.default || m),
-    BaseButton: () => import('@/components/BaseButton/BaseButton').then(m => m.default || m),
+    BaseCollapsedFilterRow: defineAsyncComponent(() => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow').then(m => m.default || m)),
+    BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm').then(m => m.default || m)),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton').then(m => m.default || m)),
   },
   props: {
     /**
@@ -361,7 +364,8 @@ export default {
      *     vocabulary option objects.
      *     **formInputs**: for mode 'form' in case the form contains chips or autocomplete input fields,
      *      the object properties for label and identifier need to be set here (in case they are different
-     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `identifierPropertyName`)
+     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `identifierPropertyName`))
+     *      if `identifierPropertyName` is also set via `fieldProps` the latter is the preferred value.
      */
     identifierPropertyName: {
       type: [Object, String],
@@ -383,7 +387,8 @@ export default {
      *     vocabulary option objects.
      *     **formInputs**: for mode 'form' in case the form contains chips or autocomplete input fields,
      *      the object properties for label and identifier need to be set here (in case they are different
-     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `labelPropertyName`)
+     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `labelPropertyName`))
+     *      if `labelPropertyName` is also set via `fieldProps` the latter is the preferred value.
      */
     labelPropertyName: {
       type: [Object, String],
@@ -434,6 +439,7 @@ export default {
       default: 0,
     },
   },
+  emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values'],
   data() {
     return {
       /**
@@ -532,7 +538,8 @@ export default {
           .filter(([, value]) => hasData(value))
           // sort the values in the order of the form so the collapsed display has the same order
           .sort(([key1], [key2]) => {
-            if (this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
+            if (this.formFilterList[key1] && this.formFilterList[key2]
+                && this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
               return 1;
             }
             return -1;
@@ -668,7 +675,7 @@ export default {
         }
       }
       /**
-       * inform parent of changes in applied filters
+       * inform parent of changes in applied filters - event emitted for mode `list`
        *
        * @event update:applied-filters
        * @param {Filter[]} - the list of updated applied filters
@@ -686,7 +693,7 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.formFilterValues)) {
           // if yes - inform parent
           /**
-           * inform parent of form filter value changes
+           * inform parent of form filter value changes - event emitted for mode `form`
            * @event update:form-filter-values
            * @param {Object} - a form filter values object with a property for each filter field - main filter values
            *  are available under the default property
@@ -771,9 +778,9 @@ export default {
      *  mainFilter watcher already)
      */
     search(alwaysTrigger = false) {
-      // get the correct field information list
-      const modeFilterList = this.mode === 'form' ? this.formFilterList : this.filterList;
       // get the correct filter values list according to component mode
+      const modeFilterList = this.mode === 'form' ? this.formFilterList : this.filterList;
+      // define variable to store modified filters list to be emitted
       let searchFilterList = [];
       if (this.mode === 'form') {
         searchFilterList = Object.entries(this.formFilterValuesInt)
@@ -781,10 +788,10 @@ export default {
           .filter(([, filterValues]) => hasData(filterValues))
           .map(([filterKey, filterValues]) => ({
             id: filterKey,
-            type: modeFilterList[filterKey].type,
+            type: modeFilterList[filterKey]?.type ?? 'text',
             // only keep filter values that actually have values (relevant for groups!)
             filter_values: typeof filterValues === 'object' && filterValues.length
-            && !modeFilterList[filterKey].type.includes('chips')
+            && !modeFilterList[filterKey]?.type.includes('chips')
               ? filterValues.filter(filterValue => hasData(filterValue)) : filterValues,
           }));
       } else {
@@ -813,7 +820,8 @@ export default {
          * inform parent that search should be triggered
          *
          * @event search
-         * @param {Filter[]} - the updated list of applied filters
+         * @param {Filter[]} - the updated list of applied filters - last filter in the list is always the main
+         *  filter (relevant especially for mode `form`)
          */
         this.$emit('search', [...searchFilterList, minMainFilter]);
       }
@@ -961,13 +969,15 @@ export default {
      */
     fetchFormAutocomplete(params) {
       /**
+       * event emitted when a form drop down (e.g. chips input field) needs autocomplete
+       *
        * @event fetch-form-autocomplete
        *
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
-       * @property {?string[]} params.parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specified in this array (most nested property last)
+       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specified in this array (most nested property last)
        */
       this.$emit('fetch-form-autocomplete', params);
     },
