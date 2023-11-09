@@ -118,5 +118,10 @@ export default {
   .base-link.base-link--chip:hover {
     text-decoration: none !important;
   }
+
+  /* set z-index equal or higher than styleguides sidebar */
+  >>> .base-tooltip-box {
+    z-index: 1001 !important;
+  }
 </style>
 ```
