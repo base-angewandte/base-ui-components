@@ -188,14 +188,16 @@ export default {
       validator: val => ['chip', 'tooltip', 'type'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
-     * specify tooltip list content
-     * structure: `[{ label: 'label', value: 'value', url: '#' }]` or use the slot `#tooltip` to customise the content
+     * specify tooltip content
+     * Prop must be either set true or an Object[] to render a type tooltip link.
+     * **Object[]**:
+     *   - `[{ label: 'label', value: 'value', url: '#' }]` to render a content list
+     *   - any other structure in combination with the slot `#tooltip`
+     * **Boolean**: use the slot `#tooltip` to customize the content
      */
     tooltip: {
-      type: Array,
-      default: () => [],
-      // check if all the necessary attributes are included in the provided array objects
-      validator: val => val.every(item => Object.keys(item).includes('label', 'value')),
+      type: [Boolean, Array],
+      default: false,
     },
     /**
      * async tooltip content, e.g. source, id where to fetch data from
@@ -314,7 +316,7 @@ export default {
      * @returns {boolean}
      */
     isTooltip() {
-      return !!(this.tooltip.length || this.tooltipAsync.length);
+      return !!(this.tooltip || this.tooltip.length || this.tooltipAsync.length);
     },
     /**
      * render component with a specific tag
@@ -416,7 +418,7 @@ export default {
      */
     async tooltipClicked() {
       // check if there is content to display
-      if (this.tooltip.length) {
+      if ((this.tooltip && this.$slots.tooltip) || this.tooltip.length) {
         this.showTooltip = !this.showTooltip;
         return;
       }
