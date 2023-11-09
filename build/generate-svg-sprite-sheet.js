@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Optimise SVGs from directory and create an SVG spriteSheet out of them.
  *
@@ -8,6 +9,7 @@
 
 const { optimize } = require('svgo');
 const { loadConfig } = require('svgo');
+// eslint-disable-next-line
 const svgStore = require('svgstore');
 const fs = require('fs');
 const path = require('path');

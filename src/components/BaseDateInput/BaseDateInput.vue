@@ -108,7 +108,7 @@
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
                       autocomplete="off"
-                      @blur="checkDateValidity('From')"
+                      @blur="onInputBlur($event, 'From')"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
                       v-on="dateInputListeners">
@@ -229,7 +229,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
-import { debounce } from '@/utils/utils';
+import { capitalizeString, debounce } from '@/utils/utils';
 
 import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
@@ -634,6 +634,12 @@ export default {
         } else {
           this.inputInt.date = this.dateStorage(val);
         }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          this.emitData();
+        }
       },
     },
     /**
@@ -670,6 +676,12 @@ export default {
           // else assume the type is datetime
         } else {
           this.inputInt.time = val;
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          this.emitData();
         }
       },
     },
@@ -847,19 +859,6 @@ export default {
       immediate: true,
     },
     /**
-     * if inputInt changes inform parent about it
-     */
-    inputInt: {
-      handler() {
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
-          this.emitData();
-        }
-      },
-      deep: true,
-    },
-    /**
      * in order to allow user to restore previous date after switching
      * from date to year and back store in temp variable (but only if previous date was full date
      * (check necessary for starting with year where format is switched to 'YYYY'
@@ -979,6 +978,12 @@ export default {
     if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },
   methods: {
+    onInputBlur(event, origin) {
+      // only check date validity when blur is coming from user input event not from
+      // date picker blur - they are distinguishable by relatedTarget!
+      if (event.relatedTarget?.className === 'mx-calendar-content') return;
+      this.checkDateValidity(origin);
+    },
     initObservers() {
       // create an observer with the fade out calc function
       const tempResizeObserver = new ResizeObserver(debounce(50, () => {
@@ -1307,7 +1312,7 @@ export default {
         this[`${origin}Open`] = false;
       }
       // need this here because on blur() date is not updated
-      this.checkDateValidity(origin);
+      this.checkDateValidity(capitalizeString(origin));
     },
     /**
      * handle click outside event and adjust input active variable accordingly

@@ -22,12 +22,13 @@
           :class="['base-form-field',
                    formFieldsHalf.indexOf(element) >= 0
                      ? 'base-form-field-half' : 'base-form-field-full',
-                   { 'base-form-field-top-margin': element.type === 'boolean'
-                     && formFieldsHalf.indexOf(element) >= 0 },
+                   { 'base-form-field-top-margin': formFieldsHalf.indexOf(element) >= 0
+                     && element.type === 'boolean' },
                    { 'base-form-field-left-margin': isHalfFieldSecond(element)}]"
           v-bind="formFieldComponentProps(element, index)"
           @field-value-changed="setFieldValue($event, element.name)"
-          @fetch-autocomplete="fetchAutocomplete">
+          @fetch-autocomplete="fetchAutocomplete"
+          @input-complete="onInputComplete($event, element.name)">
           <template #label-addition="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
             @binding {string} fieldName - the name of the displayed field
@@ -135,7 +136,10 @@
                 valueIndex,
                 (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
               @fetch-autocomplete="fetchAutocomplete"
-              @subform-input="setFieldValue($event, element.name, valueIndex)">
+              @input-complete="onInputComplete(
+                $event,
+                element.name,
+                valueIndex)">
               <template #label-addition="{ fieldName, groupNames }">
                 <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
                 @binding {string} fieldName - the name of the displayed field
@@ -482,6 +486,22 @@ export default {
         && ['min', 'max', 'minLength', 'maxLength']
           .every(prop => Object.keys(val.text).includes(prop)),
     },
+    /**
+     * specify the object property that should be used as identifier.
+     * used for chips input as well as dropdowns.
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'source',
+    },
+    /**
+     * specify the object property that should be used as value to be displayed.
+     * used for chips input as well as dropdowns.
+     */
+    labelPropertyName: {
+      type: String,
+      default: 'label',
+    },
   },
   data() {
     return {
@@ -600,6 +620,12 @@ export default {
       this.multiplyParams = null;
     }
   },
+  mounted() {
+    // inform parent that form was mounted
+    this.$nextTick(() => {
+      this.$emit('form-mounted');
+    });
+  },
   methods: {
     fetchAutocomplete(params) {
       this.currentInputString = params.value;
@@ -617,6 +643,25 @@ export default {
        * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
        */
       this.$emit('fetch-autocomplete', params);
+    },
+    /**
+     * function triggered when an input field input was completed (e.g. an option selected in chips input or
+     *  an enter key triggered in BaseInput or after a date was validated)
+     *
+     * @param {string|number|Object|Array} value - the updated value
+     * @param {string} fieldName - the name of the field in question
+     * @param {number} index - if field is repeatable - the index in the valueList array
+     */
+    onInputComplete(value, fieldName, index = -1) {
+      // update the valueListInt
+      this.setFieldValue(value, fieldName, index);
+      /**
+       * event emitted once an input was completed (e.g. an option selected in chips input or
+       *  an enter key triggered in BaseInput or after a date was validated)
+       *  @event input-complete
+       *  @property {string, number, Object, Array} - the updated value
+       */
+      this.$emit('input-complete', this.valueListInt);
     },
     // check if field can be multiplied
     allowMultiply(el) {
@@ -670,6 +715,7 @@ export default {
        *
        * @event values-changed
        * @param {Object[]} - the changed value list
+       * @param {Object} - the field information of the changed field
        */
       this.$emit('values-changed', this.valueListInt);
     },
@@ -753,9 +799,11 @@ export default {
         clearable: this.clearable,
         showErrorIcon: this.showErrorIcon,
         validationTexts: singleFieldProps.validationTexts || this.validationTexts,
+        identifierPropertyName: this.identifierPropertyName,
+        labelPropertyName: this.labelPropertyName,
       };
     },
-    setFieldValue(value, fieldName, index) {
+    setFieldValue(value, fieldName, index = -1) {
       this.currentInputString = '';
       if (index >= 0) {
         this.$set(this.valueListInt[fieldName], index, JSON.parse(JSON.stringify(value)));

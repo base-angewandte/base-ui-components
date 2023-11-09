@@ -41,6 +41,7 @@
       :decimals="allowedDecimals"
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
       @keydown.enter="onEnter"
+      @blur="emitCompletedInputValues"
       @input="setInputValue($event)"
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
@@ -150,7 +151,8 @@
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
-          class="base-form-field-creator__date-field">
+          class="base-form-field-creator__date-field"
+          @value-validated="emitCompletedInputValues">
           <template
             #label-addition>
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
@@ -227,7 +229,8 @@
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
-          class="base-form-field-creator__date-field" />
+          class="base-form-field-creator__date-field"
+          @date-validated="emitCompletedInputValues" />
       </div>
     </fieldset>
 
@@ -273,13 +276,14 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
+      @selected-changed="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
       <template
         #drop-down-entry="props">
         <span>
-          {{ getLabel(props.item.label) }}
+          {{ getLabel(props.item[labelPropertyName]) }}
         </span>
         <span class="base-form-field-creator__chips-dropdown-second">
           {{ props.item.additional }}
@@ -386,7 +390,8 @@
           :drop-down-lists="fieldGroupDropDownLists"
           v-bind="fieldGroupParams"
           class="base-form-field-creator__subform"
-          @values-changed="$emit('field-value-changed', $event)"
+          @values-changed="setInputValue"
+          @input-complete="$emit('input-complete', $event);"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
             #label-addition="{ fieldName, groupNames }">
@@ -471,13 +476,13 @@
     <template
       v-else-if="fieldType === 'boolean'">
       <BaseToggle
+        v-model="fieldValueInt"
         v-bind="fieldProps"
         :name="fieldKey"
         :label="labelInt"
-        :checked="fieldValue"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"
         class="base-form-field-creator__toggle"
-        @clicked="$emit('field-value-changed', $event)">
+        @clicked="emitCompletedInputValues">
         <BaseLink
           v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
           :source="formFieldXAttrs.subtext.source || ''"
@@ -741,12 +746,18 @@ export default {
        * @type {string}
        */
       activeTab: '',
+      /**
+       * store a copy of fieldValueInt to only trigger event when value
+       *  has changed
+       *  @type {any}
+       */
+      originalFieldValueInt: null,
     };
   },
   computed: {
     /**
      * import the relevant component
-     * @returns {(function(): *)|null}
+     * @returns {(function(): Promise)|null}
      */
     fieldElement() {
       if (this.fieldType === 'text' || this.fieldType === 'integer' || this.fieldType === 'float') {
@@ -1052,18 +1063,31 @@ export default {
     setMultilineDropDown(val) {
       // set texts type value if present - otherwise set empty
       this.$set(this.fieldValueInt, 'type', val.source ? val : null);
+      this.emitCompletedInputValues();
     },
     // prevent default action for everything except multiline
     onEnter(event) {
       if (this.fieldType !== 'multiline') {
         event.preventDefault();
-      } else {
+        // also emit event that input was completed (e.g. for triggering search)
+        this.emitCompletedInputValues();
+      }
+    },
+    /**
+     * function to trigger event informing parent that input on that specific input field was completed
+     */
+    emitCompletedInputValues() {
+      // check if the value actually changed
+      if (JSON.stringify(this.fieldValueInt) !== JSON.stringify(this.originalFieldValueInt)) {
+        // store the new reference value in the original variable
+        this.originalFieldValueInt = JSON.parse(JSON.stringify(this.fieldValueInt));
         /**
-         * event emitted by field type `multiline`
-         * @event keydown
-         * @param {KeyboardEvent} - the native keydown event
+         * event emitted once an input was completed (e.g. an option selected in chips input or
+         *  an enter key triggered in BaseInput or after a date was validated)
+         *  @event input-complete
+         *  @property {string, number, Object, Array} - the updated value
          */
-        this.$emit('keydown', event);
+        this.$emit('input-complete', this.fieldValueInt);
       }
     },
     fetchBoxData() {

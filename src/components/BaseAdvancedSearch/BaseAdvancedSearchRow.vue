@@ -32,8 +32,8 @@
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       v-bind="$listeners"
-      @clicked-outside="isActive = false"
-      @click="isActive = true"
+      @clicked-outside="onClickedOutsideSearch"
+      @click.native="onSearchClick"
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
@@ -43,7 +43,7 @@
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
-          :id="'filter-select-' + internalRowId"
+          :id="'search-filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
           :allow-unknown-entries="false"
@@ -103,6 +103,8 @@
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
+        <!-- @slot add an element at the end of the search row (e.g. additional button) -->
+        <slot name="after" />
       </template>
 
       <!-- DROP DOWN BODY -->
@@ -127,7 +129,9 @@
           class="base-advanced-search-row__drop-down-body"
           @touchstart.native.stop=""
           @click.native.stop="">
-          <template #before-list>
+          <template
+            v-if="mode === 'list'"
+            #before-list>
             <div
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
@@ -207,23 +211,23 @@
 
           <!-- AUTOCOMPLETE OPTIONS LIST -->
           <template
-            #option="slotProps">
+            #option="{ option }">
             <div
               v-if="!filter || useAutocompleteFunctionality"
               class="base-advanced-search-row__autocomplete-body">
               <div
-                v-if="slotProps.option[autocompletePropertyNames.data].length"
+                v-if="option[autocompletePropertyNames.data].length"
                 :class="['base-advanced-search-row__first-column',
                          'base-advanced-search-row__autocomplete-collection',
                 ]">
                 <div class="base-advanced-search-row__autocomplete-collection-text">
-                  {{ slotProps.option[autocompletePropertyNames.label] }}
+                  {{ option[autocompletePropertyNames.label] }}
                 </div>
               </div>
 
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
-                :drop-down-options="slotProps.option[autocompletePropertyNames.data]"
+                :drop-down-options="option[autocompletePropertyNames.data]"
                 :active-option.sync="activeEntry"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
@@ -231,10 +235,11 @@
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
                 :label-property-name="labelPropertyName.autocompleteOption"
                 class="base-advanced-search-row__autocomplete-options"
-                @update:active-option="setCollection(slotProps
-                  .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption($event, slotProps
-                  .option[autocompletePropertyNames.id])" />
+                @update:active-option="setCollection(option[autocompletePropertyNames.id])"
+                @update:selected-option="addOption(
+                  $event,
+                  option[autocompletePropertyNames.id],
+                )" />
             </div>
           </template>
 
@@ -346,10 +351,12 @@
             </div>
           </template>
         </BaseDropDownList>
+        <!-- @slot add an element below the primary row (same styling (box-shadow) as primary row element) -->
+        <slot name="below" />
       </template>
     </BaseSearch>
     <BaseButton
-      v-if="isMainSearch"
+      v-if="mode === 'list' && isMainSearch"
       icon="plus"
       button-style="row"
       icon-position="right"
@@ -398,13 +405,21 @@ export default {
       default: '',
     },
     /**
+     *
+     */
+    mode: {
+      type: String,
+      default: 'list',
+      validator: val => ['list', 'form'].includes(val),
+    },
+    /**
      * property to distinguish between one of multiple filter rows
      * and the main search field (where new filters are added) that has
      * a slightly different design and functionality
      */
     isMainSearch: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     /**
      * list of available filters, needs to be an array of objects with the following properties:<br>
@@ -667,8 +682,6 @@ export default {
        * @type {?string|?Object}
        */
       currentInput: '',
-      // current filter
-      // TODO: a) adjust to actual filter structure
       /**
        * the currently selected filter
        * @type {Filter}
@@ -747,6 +760,11 @@ export default {
        * @type {string}
        */
       filterSlotName: 'pre-input-field',
+      /**
+       * variable for touch devices to stop the click event from opening the drop down
+       *  when click event was coming from elements within the search (e.g. BaseForm)
+       */
+      stopSearchClick: false,
     };
   },
   computed: {
@@ -780,6 +798,11 @@ export default {
         return [this.filter];
       },
     },
+    /**
+     * for main filter do not display the default filter in the drop down list with
+     *  available filters (mode 'list')
+     * @returns {Filter[]}
+     */
     displayFilterList() {
       if (!this.isMainSearch) return this.filterList;
       return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
@@ -1213,8 +1236,15 @@ export default {
       // function else the default filter category is assumed
       const selectedOptionCollection = this.activeCollection || collectionId
         || this.defaultFilter[this.identifierPropertyName.filter];
-      // if option is coming from autocomplete drop down list (=has an id)
-      if (this.useAutocompleteFunctionality
+      // check if filters were specified - if not assume the input is handled in parent component
+      if (!this.filterList || !this.filterList.length) {
+        this.$emit('option-selected', ({ entry, collectionId: selectedOptionCollection }));
+        this.resetAllInput();
+        // if option is coming from autocomplete drop down list (=has an id)
+        // and currently active filter is not identical
+        // with the category of the selected item (if everything is going right this should
+        // be 'default') then set the category of the selected item as current filter
+      } else if (this.useAutocompleteFunctionality
         && entry[this.identifierPropertyName.autocompleteOption]
         // and currently active filter is not identical
         // with the category of the selected item
@@ -1230,7 +1260,7 @@ export default {
           // category but if everything fails - use default filter again
           === (this.activeCollection || collectionId)) || this.defaultFilter;
         // since default filter could be other than chips at least safeguard against type 'text'
-        // TODO: this assumes filter type is 'text'! needs further handling if other filter
+        // TODO: this assumes default filter type is 'text'! needs further handling if other filter
         // types could be default
         const newValue = newFilter[this.identifierPropertyName.filter]
         === this.defaultFilter[this.identifierPropertyName.filter]
@@ -1323,7 +1353,7 @@ export default {
      */
     openDropDown() {
       this.isActive = true;
-      if (this.searchInputElement) {
+      if (this.mode === 'list' && this.searchInputElement) {
         this.searchInputElement.focus();
       }
     },
@@ -1447,15 +1477,18 @@ export default {
     handleDropDownOnTabKey(event) {
       // get all input elements
       const inputElements = this.$el.getElementsByTagName('input');
+      // create an array out of input elements found
+      const searchInputArray = Array.from(inputElements)
+        // and filter only for elements that are connected to search (necessary for mode
+        // 'form' which has additional input fields)
+        .filter(element => element.id.includes('search'));
       // check if some where found
       if (inputElements) {
-        // create an array out of input elements found
-        const inputArray = Array.from(inputElements);
         // get the index of the element the event came from
-        const eventInputIndex = inputArray.indexOf(event.target);
+        const eventInputIndex = searchInputArray.indexOf(event.target);
         // check if element is either the last input element and no shift key was used or
         // it is the first element and shift key was used --> if true --> close drop down
-        if ((!event.shiftKey && eventInputIndex >= inputArray.length - 1)
+        if ((!event.shiftKey && eventInputIndex >= searchInputArray.length - 1)
           || (event.shiftKey && eventInputIndex <= 0)) {
           this.isActive = false;
         }
@@ -1572,6 +1605,54 @@ export default {
       if (!event.shiftKey) {
         // if no - set row active to false
         this.isActive = false;
+      }
+    },
+    /**
+     * on touch devices click-outside is not only triggered by 'touchstart' instead of 'click'.
+     *  this means the 'click-outside' event gets propagated before the 'click' event on touch devices (on
+     *  desktop browsers it is the other way round). This leads to search drop down getting
+     *  triggered when an element INSIDE search was clicked (in case of desktop when click-outside
+     *  is propagated AFTER this leads to isActive = false again immediately after so no drop
+     *  down showing). Therefore, we need to check for mobile event and set variable stopSearchClick
+     *  to true so in event onSearchClick the click can be stopped from opening the drop-down.
+     *
+     * @param {MouseEvent|TouchEvent} event - the event provided by click-outside plugin
+     */
+    onClickedOutsideSearch(event) {
+      // do the regular action to set is active false (and close drop down)
+      this.isActive = false;
+      // get the event type
+      const { type } = event;
+      // if event type is 'touchstart' we assume mobile that was propagated before click event
+      if (type === 'touchstart') {
+        // therefore we set the click stop variable true
+        this.stopSearchClick = true;
+        // since this should only affect click events triggered directly after set
+        // the variable false again after a time out
+        setTimeout(() => {
+          this.stopSearchClick = false;
+        }, 500);
+      }
+    },
+    /**
+     * need to special handle search click event due to the reasons described above in function
+     *  onClickedOutsideSearch().
+     *
+     * @param {MouseEvent} event - the native click event
+     */
+    onSearchClick(event) {
+      // check if mobile variable to stop click being propagated after click-outside
+      // was set
+      if (!this.stopSearchClick) {
+        // if no - show drop down
+        this.isActive = true;
+      } else {
+        // if click-outside was propagated before click event stop the event here
+        // and don't open drop down
+        event.stopPropagation();
+        this.isActive = false;
+        // set variable false again after
+        this.stopSearchClick = false;
       }
     },
     initObservers() {
@@ -2024,7 +2105,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@import '../../styles/variables';
 
 .base-advanced-search-row__input-field {
   height: calc(#{$row-height-large} - 4px);

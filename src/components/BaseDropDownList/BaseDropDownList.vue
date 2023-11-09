@@ -39,7 +39,7 @@
           role="option"
           tabindex="0"
           @keydown.enter="selected(option)"
-          @click="selected(option)">
+          @click.stop="selected(option)">
           <!-- @slot a slot to customize every single option (e.g. display of information other than `[valuePropertyName]`)
             @binding {Object} option - the current option in the options list-->
           <slot

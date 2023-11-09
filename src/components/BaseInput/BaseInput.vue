@@ -3,7 +3,8 @@
     class="base-input">
     <!-- LABEL ROW -->
     <div
-      :class="['base-input__label-row', { hide: !showLabelRow }]">
+      :class="['base-input__label-row', { hide: !showLabelRow }]"
+      @click.stop="">
       <!-- need to disable because label is there (below)? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
@@ -558,6 +559,7 @@ export default {
               // invalid character after blur
               this.previousInput = this.inputInt;
             }
+            this.$emit('blur', event);
           },
         },
       };
@@ -962,6 +964,10 @@ export default {
                 opacity: 0;
                 filter:alpha(opacity=0);
                 animation: all 500ms ease;
+              }
+
+              &[type=search] {
+                appearance: none;
               }
             }
           }

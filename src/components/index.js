@@ -1,5 +1,5 @@
 import BaseAdvancedSearch from './BaseAdvancedSearch/BaseAdvancedSearch';
-import BaseAdvancedSearchRow from './BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import BaseAdvancedSearchRow from './BaseAdvancedSearch/BaseAdvancedSearchRow';
 import BaseAutocompleteInput from './BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseBox from './BaseBox/BaseBox';
 import BaseBoxButton from './BaseBoxButton/BaseBoxButton';
