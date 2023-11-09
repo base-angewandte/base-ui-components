@@ -94,8 +94,8 @@
                   :value="objectItem.value"
                   :class="[{ 'base-link--chip-text-list': item.id }]">
                   <template #tooltip>
-                    <!-- @slot slot for tooltip content -->
-                    <!-- @binding {array} data -->
+                    <!-- @slot slot for tooltip content
+                         @binding {array} data -->
                     <slot
                       :data="objectItem.additional"
                       name="tooltip" />
@@ -138,8 +138,11 @@
                   :type="item.id"
                   :url="objectItem.url"
                   :value="objectItem.value">
-                  <!-- @slot slot for tooltip content -->
-                  <slot name="tooltip" />
+                  <!-- @slot slot for tooltip content
+                       @binding {array} data -->
+                  <slot
+                    name="tooltip"
+                    :data="objectItem.additional" />
                 </BaseLink>
               </dd>
             </template>
@@ -200,6 +203,7 @@ export default {
      *
      * Note: only applies for chips and internal links:
      * - chip: to build the link query data
+     *         e.g.: query: `path?chip-link={[identifierPropertyName]:'keyword',type:'keywords',value:'label'}`
      * - internal: to set the link path
      */
     identifierPropertyName: {
