@@ -59,7 +59,8 @@
         :styles="tooltipStyles"
         :type-on-mobile="tooltipTypeOnMobile"
         @close="showTooltip = !showTooltip">
-        <!-- @slot slot to inject content  -->
+        <!-- @slot slot to inject content
+          @binding {Object} item - a tooltip object -->
         <slot
           name="tooltip"
           :item="tooltip">
