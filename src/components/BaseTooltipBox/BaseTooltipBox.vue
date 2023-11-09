@@ -98,14 +98,26 @@ export default {
     /**
      * specify how the component is rendered on mobile resolutions
      *
-     * *box*: component is rendered at the `attachTo` HTMLElement
-     * *modal*: component is rendered as a modal popup
-     * *fullscreen*: component is rendered as ap popup with max height and width
+     * **box**: component is rendered at the `attachTo` HTMLElement
+     * **modal**: component is rendered as a modal popup
+     * **fullscreen**: component is rendered as ap popup with max height and width
      */
     typeOnMobile: {
       type: String,
       default: 'modal',
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
+    },
+    /**
+     * specify threshold value in px for the box top position calculation
+     * Useful to prevent top alignment of the TooltipBox,
+     * for example, when there is a fixed-positioned header (BaseHeader).
+     *
+     * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
+     *       The property will be overwritten by the CSS variable.
+     */
+    thresholdTop: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
@@ -118,7 +130,7 @@ export default {
       },
       thresholdX: 2, // px, distance between tooltip and attachTo element
       thresholdY: 2, // px, distance between tooltip and attachTo element
-      spacing: 8, // px, distance from window left or right side
+      spacing: 8, // px, distance from window's left or right boundary
       bodyHeight: null,
       bodyInnerHeight: null,
       fadeOutTop: false,
@@ -242,7 +254,7 @@ export default {
 
         if (direction === 'top'
           // check if fits to the top
-          && attachToRect.top > boxHeight + triangleHeight) {
+          && attachToRect.top - this.getThresholdTop() > boxHeight + triangleHeight) {
           this.direction = 'top';
           this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -330,6 +342,15 @@ export default {
       resizeObserver.observe(this.$refs.bodyInner);
       // store it in variable
       this.resizeObserver = resizeObserver;
+    },
+    /**
+     * get the thresholdTop value from the CSS variables if defined, otherwise use the component prop
+     * @returns {number}
+     */
+    getThresholdTop() {
+      const style = getComputedStyle(document.body);
+      const thresholdTopCssVar = Number(style.getPropertyValue('--base-tooltip-box-threshold-top'));
+      return thresholdTopCssVar || this.thresholdTop;
     },
     /**
      * intercept resize event and close the component
