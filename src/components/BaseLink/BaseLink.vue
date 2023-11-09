@@ -5,7 +5,7 @@
     v-clean-dom-nodes
     :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
     :aria-expanded="isTooltip ? showTooltip.toString() : null"
-    :aria-label="isTooltip ? title : null"
+    :aria-label="isChip || isTooltip ? title : null"
     :tabindex="isTooltip ? 0 : null"
     :title="title"
     :class="[
