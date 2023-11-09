@@ -1,14 +1,12 @@
 <template>
   <component
     :is="renderAs"
+    v-bind="linkAttributes"
     v-clean-dom-nodes
     :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
     :aria-expanded="isTooltip ? showTooltip.toString() : null"
     :aria-label="isTooltip ? title : null"
-    :href="isChip || isInternal || isExternal ? href : null"
     :tabindex="isTooltip ? 0 : null"
-    :to="routerTo"
-    :target="hasValidUrl ? externalLinkTarget : null"
     :title="title"
     :class="[
       'base-link',
@@ -284,24 +282,6 @@ export default {
             || this.url.match(/^tel:/)));
     },
     /**
-     * href value depending on link type
-     * @returns {string}
-     */
-    href() {
-      // external
-      let href = this.url;
-      // internal
-      if (this.isInternal) {
-        href = this.identifierPropertyValue;
-      }
-      // chips
-      if (this.isChip) {
-        href = this.routerTo;
-      }
-      // return href
-      return href;
-    },
-    /**
      * check if the link is type `chip`
      * @returns {boolean}
      */
@@ -323,6 +303,13 @@ export default {
       return !!(this.identifierPropertyValue && !this.type);
     },
     /**
+     * check if vue router is available
+     * @returns {boolean}
+     */
+    isRouterAvailable() {
+      return !!this.$router;
+    },
+    /**
      * check if the link is type `tooltip`
      * @returns {boolean}
      */
@@ -331,7 +318,7 @@ export default {
     },
     /**
      * render component with a specific tag
-     * @returns {'a' | 'button' | 'router-link' | 'span'}
+     * @returns {'a' | 'router-link' | 'span'}
      */
     renderAs() {
       // external
@@ -340,28 +327,34 @@ export default {
       }
       // internal, chip
       if (this.isInternal || this.isChip) {
-        return this.vueRouterAvailable ? this.renderLinkAs : 'a';
+        return this.isRouterAvailable ? this.renderLinkAs : 'a';
       }
-      // default
+      // default, e.g. tooltip
       return 'span';
     },
     /**
-     * router-to value depending on link type
-     * @returns {string|null}
+     * link attributes (href, target, to) to bind to the component
+     * depending on link type and router availability
+     * @returns {Object}
      */
-    routerTo() {
-      // check if needed
-      if (!(this.vueRouterAvailable && (this.isInternal || this.isChip))) {
-        return null;
+    linkAttributes() {
+      const router = this.isRouterAvailable ? 'to' : 'href';
+      const obj = {};
+
+      if (this.isExternal) {
+        obj.href = this.url;
+        obj.target = this.externalLinkTarget;
       }
-      // internal
-      let to = this.identifierPropertyValue;
-      // chip
+
+      if (this.isInternal) {
+        obj[router] = this.identifierPropertyValue;
+      }
+
       if (this.isChip) {
-        to = `${this.path}?${this.chipQueryName}=${JSON.stringify(this.chipObj)}`;
+        obj[router] = `${this.path}?${this.chipQueryName}=${JSON.stringify(this.chipObj)}`;
       }
-      // return value
-      return to;
+
+      return obj;
     },
     /**
      * build the title attribute depending on the current link type
@@ -382,13 +375,6 @@ export default {
       }
       // default
       return null;
-    },
-    /**
-     * check if vue router is available
-     * @returns {boolean}
-     */
-    vueRouterAvailable() {
-      return !!this.$router;
     },
   },
   watch: {
