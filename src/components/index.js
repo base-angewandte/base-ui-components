@@ -42,6 +42,7 @@ import BaseMediaCarousel from './BaseMediaCarousel/BaseMediaCarousel';
 import BaseMenuEntry from './BaseMenuEntry/BaseMenuEntry';
 import BaseMenuList from './BaseMenuList/BaseMenuList';
 import BaseMultilineTextInput from './BaseMultilineTextInput/BaseMultilineTextInput';
+import BaseNavigation from './BaseNavigation/BaseNavigation';
 import BaseOptions from './BaseOptions/BaseOptions';
 import BasePagination from './BasePagination/BasePagination';
 import BasePopUp from './BasePopUp/BasePopUp';
@@ -101,6 +102,7 @@ export {
   BaseMenuEntry,
   BaseMenuList,
   BaseMultilineTextInput,
+  BaseNavigation,
   BaseOptions,
   BasePagination,
   BasePopUp,
