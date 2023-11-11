@@ -55,9 +55,7 @@
               <!-- @slot replace native HTML input element with custom input
                    @binding { string } id - the id of the BaseInput component - if `id` is not provided in props this is an internal id that should also be set as <input> `id` -->
               <slot
-                v-bind="{
-                  id: idInt,
-                }"
+                :id="idInt"
                 name="input">
                 <!-- need to disable because label is there (below)? -->
                 <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
@@ -402,7 +400,7 @@ export default {
         .every(prop => Object.keys(val).includes(prop)),
     },
   },
-  emits: ['clicked-outside', 'click-input-field', 'keydown', 'update:invalid', 'update:is-active', 'blur', 'update:modelValue'],
+  emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'blur', 'keydown', 'update:model-value'],
   data() {
     return {
       isActiveInt: false,
@@ -426,7 +424,7 @@ export default {
      */
     showLabelRow() {
       // get label-addition slot
-      const slotElements = this.$slots['label-addition']() ?? null;
+      const slotElements = this.$slots['label-addition'] ? this.$slots['label-addition']() : null;
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       const slotsHaveData = !!slotElements && !!slotElements.length
@@ -533,12 +531,15 @@ export default {
             /**
               * Event emitted on input, passing input string
               *
-              * @event update:modelValue
+              * @event update:model-value
               * @param {string} - the input event value however
               *   passing only the event.target.value
               *
               */
-            this.$emit('update:modelValue', value);
+            this.$emit('update:model-value', value);
+          },
+          onKeydown: (event) => {
+            this.$emit('keydown', event);
           },
           onBlur: (event) => {
             const { value } = event.target;
@@ -628,7 +629,7 @@ export default {
       // check if the internal input element exists and if values are in sync
       if (data !== this.modelValue) {
         // if not propagate change to parent
-        this.$emit('update:modelValue', data);
+        this.$emit('update:model-value', data);
       }
     },
     /**
@@ -769,7 +770,6 @@ export default {
       if (!this.showRemoveIcon || event.shiftKey) {
         this.setFieldState(false);
       }
-      this.$emit('keydown', event);
     },
     /**
      * replace dot with decimalSeparator
