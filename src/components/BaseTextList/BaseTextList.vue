@@ -48,10 +48,10 @@
           v-if="!containKeys([].concat(item.data), 'label')">
           <div class="base-text-list-content">
             <template
-              v-for="(objectItem, objectIndex) in [].concat(item.data)">
+              v-for="(objectItem, objectIndex) in [].concat(item.data)"
+              :key="objectItem.value">
               <!-- eslint-disable -->
               <BaseLink
-                :key="objectIndex"
                 :source="objectItem.source"
                 :tooltip="objectItem.additional"
                 :type="objectItem.type"
@@ -80,9 +80,9 @@
             :class="['base-text-list-content',
                      'base-text-list-content--' + listType]">
             <template
-              v-for="(objectItem, objectIndex) in [].concat(item.data)">
+              v-for="(objectItem) in [].concat(item.data)"
+              :key="objectItem.value">
               <dt
-                :key="'l' + objectIndex"
                 class="base-text-list__content__label">
                 <template
                   v-if="objectItem.label">
@@ -90,7 +90,6 @@
                 </template>
               </dt>
               <dd
-                :key="'v' + objectIndex"
                 class="base-text-list__content__label base-text-list__content__value">
                 <BaseLink
                   :render-link-as="renderLinkAs"
@@ -189,6 +188,13 @@ export default {
       type: String,
       default: 'horizontal',
       validate: val => ['horizontal', 'vertical'].includes(val),
+    },
+    /**
+     * set a language (ISO 639-1)
+     */
+    language: {
+      type: String,
+      default: '',
     },
   },
   methods: {

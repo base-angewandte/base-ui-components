@@ -52,7 +52,6 @@
       <BaseTooltipBox
         v-if="showTooltip"
         :attach-to="$refs.icon"
-        :modal-on-mobile="false"
         :styles="tooltipStyles">
         <!-- @slot slot to inject content  -->
         <slot
@@ -316,7 +315,7 @@ export default {
       width: $icon-small;
       margin-left: $spacing-small-half;
 
-      &::v-deep svg {
+      &:deep(svg){
         vertical-align: top;
         height: 100%;
         width: 100%;
