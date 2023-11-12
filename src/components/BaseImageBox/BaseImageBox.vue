@@ -878,7 +878,7 @@ export default {
     }
 
     &:not(.base-image-box--selected) {
-      &::v-deep .base-image-box__features .base-checkmark-container {
+      &:deep(.base-image-box__features) .base-checkmark-container {
         border-color: $app-color;
       }
     }

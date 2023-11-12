@@ -443,7 +443,7 @@ export default {
       // the count of columns is calculated in the setThumbnailColumns() method.
       width: calc(var(--cols) * #{$icon-small} + (var(--cols) - 1) * #{$spacing} + #{$spacing});
       // width and height of each thumbnail icon
-      ::v-deep .svg-icon {
+      :deep(.svg-icon) {
         height: $icon-small;
         width: $icon-small;
       }

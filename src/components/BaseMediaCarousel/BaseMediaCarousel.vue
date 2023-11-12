@@ -421,18 +421,17 @@ export default {
       align-items: center;
     }
 
-    &::v-deep {
-      .swiper-container {
-        width: 100%;
-      }
+    &:deep(.swiper-container) {
+      width: 100%;
+    }
 
-      .swiper-button {
-        display: block;
-        width: calc(#{$icon-large} + (2 * #{$spacing-small}));
-        padding: 0 $spacing-small;
-        fill: white;
-        transform: translateY(-50%);
-        transition: fill 250ms ease-in-out;
+    &:deep(.swiper-button) {
+      display: block;
+      width: calc(#{$icon-large} + (2 * #{$spacing-small}));
+      padding: 0 $spacing-small;
+      fill: white;
+      transform: translateY(-50%);
+      transition: fill 250ms ease-in-out;
 
         &:focus,
         &:hover {

@@ -1438,7 +1438,7 @@ export default {
         }
       }
 
-      &::v-deep .base-button.base-button-secondary.base-button-background {
+      &:deep(.base-button.base-button-secondary.base-button-background){
         background-color: transparent;
       }
     }

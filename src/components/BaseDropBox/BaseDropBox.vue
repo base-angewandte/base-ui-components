@@ -335,7 +335,7 @@ export default {
     }
   }
 
-  .base-drop-box-drag-area ::v-deep .base-drop-box-ghost {
+  .base-drop-box-drag-area :deep(.base-drop-box-ghost) {
     visibility: hidden !important;
     position: absolute;
     top: auto;

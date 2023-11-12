@@ -288,8 +288,10 @@ export default {
         &--highlight :deep(.base-text-list-content) {
           color: $app-color !important;
         }
+      }
 
-        &:hover ::v-deep {
+      :deep(.base-map-locations__list__group) {
+        &:hover {
           cursor: pointer;
 
           .base-text-list-content {
