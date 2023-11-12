@@ -1,20 +1,19 @@
 <template>
-  <compontent
+  <component
     :is="renderElementAs"
     :style="boxSize"
     :class="['base-box',
-             'base-box-' + $props.boxRatio,
+             'base-box-' + boxRatio,
              'base-box-shadow-' + boxShadowSize,
              { 'base-box-hover': boxHover && !disabled }]"
-    :disabled="disabled"
+    :disabled="disabled || null"
     :type="(renderElementAs === 'button') ? 'button' : ''"
     v-bind="additionalAttributes"
     @click="clicked">
     <!-- @slot slot for box contents -->
     <slot />
-  </compontent>
+  </component>
 </template>
-
 <script>
 /**
  * Base Component for everything Box shaped
