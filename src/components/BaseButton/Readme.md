@@ -8,25 +8,25 @@ const executeFire = function(){
     alert('button clicked!');
 }
 <div style="display: flex;">
-  <base-button
+  <BaseButton
     text="No Icon"
     description="i'm a button with no icon example"
     style="margin-right: 16px;"
     @clicked="executeFire" />
-  <base-button
+  <BaseButton
     style="margin-right: 16px;"
     description="a buttton with a small icon example"
     icon="waste-bin"
     text="Small Icon"
     @clicked="executeFire" />
-  <base-button
+  <BaseButton
     style="margin-right: 16px;"
     description="button with large icon example"
     icon="waste-bin"
     icon-size="large"
     text="Large Icon"
     @clicked="executeFire" />
-  <base-button
+  <BaseButton
     style="margin-right: 16px;"
     description="active button example"
     icon="calendar-number"
@@ -46,7 +46,7 @@ const executeFire = function(){
 }
 
 <div style="display: flex; background-color: rgb(240, 240, 240); padding: 16px;">
-  <base-button
+  <BaseButton
     text="Small Icon Right"
     description="button with small icon right example"
     style="margin-right: 16px;"
@@ -54,14 +54,14 @@ const executeFire = function(){
     icon-position="right"
     button-style="row"
     @clicked="executeFire"/>
-  <base-button
+  <BaseButton
       text="Large Icon"
       style="margin-right: 16px;"
       icon="add-new-object"
       button-style="row"
       icon-size="large"
       @clicked="executeFire" />
-  <base-button
+  <BaseButton
       style="margin-right: 16px;"
       :active="true"
       text="Button Active"
@@ -69,7 +69,7 @@ const executeFire = function(){
       button-style="row"
       icon-size="large"
       @clicked="executeFire" />
-  <base-button
+  <BaseButton
     style="margin-right: 16px;"
     description="Custom Text"
     text="Custom Text"
@@ -78,8 +78,8 @@ const executeFire = function(){
     icon-size="large"
     @clicked="executeFire">
     <template>Custom Text</template>
-  </base-button>
-  <base-button
+  </BaseButton>
+  <BaseButton
     style="margin-right: 16px;"
     description="No Text"
     text=""
@@ -98,7 +98,7 @@ const executeFire = function(){
     alert('button clicked!');
 }
 <div style="display: flex;">
-  <base-button
+  <BaseButton
     button-style="secondary"
     style="margin-right: 16px;"
     icon="waste-bin"
@@ -116,7 +116,7 @@ const executeFire = function(){
     alert('button clicked!');
 }
 <div style="display: flex;">
-  <base-button
+  <BaseButton
     button-style="circle"
     style="margin-right: 16px;"
     icon="waste-bin"

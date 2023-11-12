@@ -11,7 +11,7 @@
              { 'base-button-background': hasBackgroundColor },
              { 'base-button-active': active }]"
     @click.prevent="clicked">
-    <base-icon
+    <BaseIcon
       v-if="icon"
       :name="icon"
       :title="iconTitle"

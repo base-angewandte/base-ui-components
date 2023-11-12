@@ -32,11 +32,11 @@
 
       <template
         v-if="items.length > 1">
-        <base-icon
+        <BaseIcon
           name="prev"
           class="swiper-button swiper-button-prev" />
 
-        <base-icon
+        <BaseIcon
           name="next"
           class="swiper-button swiper-button-next" />
       </template>

@@ -1,5 +1,5 @@
 <template>
-  <base-box
+  <BaseBox
     box-ratio="0"
     :box-size="{}"
     :box-hover="false"
@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <base-button
+    <BaseButton
       v-if="showButton"
       :text="expandInt ? showLessText : showMoreText"
       :has-background-color="false"
@@ -51,7 +51,7 @@
         <slot name="footer" />
       </div>
     </div>
-  </base-box>
+  </BaseBox>
 </template>
 
 <script>

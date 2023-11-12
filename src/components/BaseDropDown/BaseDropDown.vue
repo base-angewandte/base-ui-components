@@ -37,7 +37,7 @@
       </div>
       <!-- @slot place elements right of header -->
       <slot name="header-right">
-        <base-icon
+        <BaseIcon
           :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
           name="drop-down" />
       </slot>

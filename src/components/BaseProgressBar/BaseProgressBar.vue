@@ -43,16 +43,16 @@
           class="base-progress-bar__file-size">
           {{ fileSize }}
         </span>
-        <base-icon
+        <BaseIcon
           v-if="status === 'success'"
           class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
           name="success" />
-        <base-icon
+        <BaseIcon
           v-if="status === 'fail'"
           :title="errorMessage"
           class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
           name="attention" />
-        <base-icon
+        <BaseIcon
           v-if="showRemove"
           class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
           name="remove"

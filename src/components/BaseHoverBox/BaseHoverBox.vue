@@ -2,7 +2,7 @@
   <div
     :style="[boxSize, boxPosition]"
     class="base-hover-box">
-    <base-image-box v-bind="$props" />
+    <BaseImageBox v-bind="$props" />
   </div>
 </template>
 

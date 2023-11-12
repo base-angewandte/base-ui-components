@@ -6,10 +6,10 @@ A basic example
 <template>
   <div
   class="container">
-    <base-button
+    <BaseButton
       text="Click me"
       @clicked="showPopUp = true" />
-    <base-pop-up
+    <BasePopUp
       :show="showPopUp"
       title="An Example Pop Up"
       button-right-text="Custom Submit"
@@ -17,7 +17,7 @@ A basic example
       @button-left="showPopUp = false"
       @button-right="action">
       <div class="body">Specify Content here</div>
-    </base-pop-up>
+    </BasePopUp>
 </div>
 </template>
 

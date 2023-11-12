@@ -3,18 +3,18 @@
 ```vue live
 <template>
   <div class="container">
-    <div 
+    <div
       class="hover-box"
       @mouseenter="show($event)"
       @mousemove="move($event)"
       @mouseleave="showBox = false">Hover Me</div>
-    <base-hover-box
+    <BaseHoverBox
       ref="hoverBox"
       :boxText="['Info Number 1', 'Info Number 2']"
       title="An Example"
       subtext="Subtext"
       :class="['box', { 'hidden': !showBox }]"/>
-</div>
+  </div>
 </template>
 
 <script>
@@ -41,17 +41,17 @@ export default {
   .container {
     position: relative;
   }
-  
+
   .box {
     visibility: visible;
   }
-  
+
   .hover-box {
     height: 100px;
     width: 100px;
     background-color: cornflowerblue;
   }
-  
+
   .hidden {
     visibility: hidden;
   }

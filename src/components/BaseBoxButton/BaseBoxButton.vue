@@ -1,5 +1,5 @@
 <template>
-  <base-box
+  <BaseBox
     ref="baseBox"
     :render-element-as="renderElementAs"
     :box-size="boxSize"
@@ -14,14 +14,14 @@
         <div
           class="button-box-image-row">
           <div class="button-box-plus-container">
-            <base-icon
+            <BaseIcon
               v-if="showPlus"
               name="plus"
               alt="add"
               class="button-box-plus" />
           </div>
           <div class="button-box-icon-container">
-            <base-icon
+            <BaseIcon
               v-if="icon"
               :name="icon"
               class="button-box-icon" />
@@ -44,7 +44,7 @@
     <div
       v-else
       class="button-box-content-small">
-      <base-icon
+      <BaseIcon
         v-if="icon"
         :name="icon"
         class="button-box-icon-small" />
@@ -54,7 +54,7 @@
     </div>
     <!-- undocumented slot? TODO: why is this here, whats the purpose? -->
     <slot />
-  </base-box>
+  </BaseBox>
 </template>
 
 <script>

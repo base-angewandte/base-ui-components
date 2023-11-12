@@ -7,20 +7,20 @@ const executeFire = function(){
 }
 <div
   style="background-color: rgb(240, 240, 240); padding: 16px; display:flex;">
-  <base-box-button
+  <BaseBoxButton
        :show-plus="true"
        style="margin-right: 16px;"
        box-style="large"
        text="Large Style Button"
        icon="file-object"
        subtext="Click or Drag'n Drop"
-       @clicked="executeFire"/>
- <base-box-button
+       @clicked="executeFire" />
+ <BaseBoxButton
       box-style="small"
       text="Small Style Button"
       icon="save-file"
       subtext="Click or Drag'n Drop"
-      @clicked="executeFire"/>
+      @clicked="executeFire" />
 </div>
 ```
 
@@ -33,7 +33,7 @@ const executeFire = function(){
 }
 <div
   style="background-color: rgb(240, 240, 240); padding: 16px; display:flex;">
-  <base-box-button
+  <BaseBoxButton
        :show-plus="true"
        :box-size="{ width: '50%' }"
        box-ratio="50"

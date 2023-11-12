@@ -9,7 +9,7 @@
       <button
         class="base-media-carousel__close"
         @click="hide">
-        <base-icon
+        <BaseIcon
           name="remove" />
       </button>
 
@@ -18,11 +18,11 @@
         class="swiper-container">
         <template
           v-if="items.length > 1">
-          <base-icon
+          <BaseIcon
             name="prev"
             class="swiper-button swiper-button-prev" />
 
-          <base-icon
+          <BaseIcon
             name="next"
             class="swiper-button swiper-button-next" />
         </template>
@@ -32,7 +32,7 @@
             v-for="(media, index) in items"
             :key="index"
             class="swiper-slide">
-            <base-media-carousel-item
+            <BaseMediaCarouselItem
               ref="baseMedia"
               :autoplay="index === initialSlide"
               :additional-info="media.additionalInfo"

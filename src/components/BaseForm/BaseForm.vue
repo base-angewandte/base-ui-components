@@ -248,7 +248,7 @@
                     : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) }) }}
                 </span>
                 <span>
-                  <base-icon
+                  <BaseIcon
                     class="field-group-icon"
                     name="remove" />
                 </span>
@@ -258,7 +258,7 @@
               v-if="multiplyButtonsInline(element)">
               <div
                 class="base-form__inline-icons">
-                <base-icon
+                <BaseIcon
                   v-if="checkFieldContent(valueList[element.name])
                     || valueListInt[element.name].length > 1"
                   :title="valueListInt[element.name].length === 1
@@ -270,7 +270,7 @@
                   name="remove"
                   @click="removeField(element, valueIndex)"
                   @keydown.enter="removeField(element, valueIndex)" />
-                <base-icon
+                <BaseIcon
                   :title="valueIndex !== (valueListInt[element.name].length - 1)
                     ? getI18nTerm('form.addGroupBelow', -1, {
                       fieldType: getFieldName(element),
@@ -301,7 +301,7 @@
                 }) }}
               </span>
               <span>
-                <base-icon
+                <BaseIcon
                   class="field-group-icon"
                   name="plus" />
               </span>

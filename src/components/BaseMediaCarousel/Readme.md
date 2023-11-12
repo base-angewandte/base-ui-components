@@ -13,7 +13,7 @@
         style="margin-right: 10px"
         @clicked="preview(index)" />
     </div>
-    <base-media-carousel
+    <BaseMediaCarousel
       :show-preview="showPreview"
       :initial-slide="initialSlide"
       :items="media"

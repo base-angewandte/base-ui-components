@@ -19,7 +19,7 @@
     <div
       v-if="controls"
       class="base-edit-control__buttons">
-      <base-button
+      <BaseButton
         v-if="!edit"
         :disabled="disabled"
         :has-background-color="false"
@@ -34,9 +34,9 @@
             <BaseLoader />
           </span>
         </template>
-      </base-button>
+      </BaseButton>
 
-      <base-button
+      <BaseButton
         v-if="edit"
         :disabled="disabled"
         :has-background-color="false"
@@ -51,9 +51,9 @@
             <BaseLoader />
           </span>
         </template>
-      </base-button>
+      </BaseButton>
 
-      <base-button
+      <BaseButton
         v-if="editMode === 'save' && edit"
         :has-background-color="false"
         icon="remove"

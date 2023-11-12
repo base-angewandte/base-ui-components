@@ -14,7 +14,7 @@
       aria-label="Go to previous page"
       @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
       @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
-      <base-icon
+      <BaseIcon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
         name="arrow-left" />
     </component>
@@ -95,7 +95,7 @@
       @click.prevent="active + 1 <= total && !useLinkElement
         ? setActivePage(active + 1) : false"
       @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
-      <base-icon
+      <BaseIcon
         class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
         name="arrow-left" />
     </component>

@@ -9,7 +9,7 @@
       ]"
       @keydown.enter="isOpen = !isOpen"
       @click.stop="isOpen = !isOpen">
-      <base-icon
+      <BaseIcon
         v-if="!isInline"
         name="calendar-many"
         :title="label"

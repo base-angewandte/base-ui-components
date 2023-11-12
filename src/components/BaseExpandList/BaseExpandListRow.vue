@@ -22,7 +22,7 @@
             ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
           </span>
         </span>
-        <base-icon
+        <BaseIcon
           name="drop-down"
           class="base-expand-item__col base-expand__head__icon" />
       </button>
@@ -40,7 +40,7 @@
           :aria-hidden="!expanded ? 'true' : 'false'"
           class="base-expand__body">
           <!-- Todo: limit levels (counter) -->
-          <base-expand-list-row
+          <BaseExpandListRow
             v-for="(items, index) in dataInt.data"
             ref="baseExpandListRow"
             :key="`${parentIndex}-${index}`"
@@ -55,7 +55,7 @@
                 name="content"
                 :data="dataNextLevel.data" />
             </template>
-          </base-expand-list-row>
+          </BaseExpandListRow>
         </ul>
       </transition>
     </template>
@@ -97,7 +97,7 @@
           @focus="supportiveText('activate')"
           @keyup.esc="cancelMovable"
           @blur="cancelMovable">
-          <base-icon
+          <BaseIcon
             name="drag-lines" />
         </span>
         <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
@@ -116,7 +116,7 @@
           </span>
         </div>
         <div class="base-expand-item__col base-expand-item__controls">
-          <base-button
+          <BaseButton
             v-if="controlType === 'button'"
             :icon="itemVisible ? 'eye' : 'eye-hide'"
             :text="''"

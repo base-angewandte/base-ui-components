@@ -7,7 +7,7 @@
     <div
       v-if="displayImage && fileType === 'image'"
       class="base-media-preview-preloader">
-      <base-loader
+      <BaseLoader
         class="base-media-preview-preloader-loader" />
     </div>
     <img

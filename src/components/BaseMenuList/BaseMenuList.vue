@@ -17,7 +17,7 @@
       v-for="(item, index) in list"
       :key="item.id || item.title"
       class="base-menu-list__list-entry">
-      <base-menu-entry
+      <BaseMenuEntry
         ref="menuEntry"
         :entry-id="item.id"
         :title="item.title"
@@ -57,7 +57,7 @@
             name="thumbnails"
             :item="item" />
         </template>
-      </base-menu-entry>
+      </BaseMenuEntry>
     </li>
   </draggable>
 </template>

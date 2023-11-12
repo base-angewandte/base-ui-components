@@ -75,7 +75,7 @@
             v-if="draggable"
             :key="'iconwrapper' + entry.idInt"
             class="base-chips-below-list-icon-wrapper">
-            <base-icon
+            <BaseIcon
               :key="'icon' + entry.idInt"
               name="drag-lines"
               class="svg-icon base-chips-below-list-icon" />

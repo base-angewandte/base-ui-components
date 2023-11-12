@@ -1,5 +1,5 @@
 <template>
-  <base-box
+  <BaseBox
     :box-size="{ width: '100%' }"
     :box-hover="false"
     box-ratio="0"
@@ -16,7 +16,7 @@
         </dd>
       </template>
     </dl>
-  </base-box>
+  </BaseBox>
 </template>
 
 <script>

@@ -29,7 +29,7 @@
       name="remove"
       class="base-chip__icon"
       @click.stop="removeClicked" />
-    <base-hover-box
+    <BaseHoverBox
       ref="hoverBox"
       v-bind="hoverBoxContent"
       :class="{ 'base-chip__hover-box__hidden': !hoverBoxEnabled || !showInfoBox }" />

@@ -24,7 +24,7 @@
           aria-label="close pop up"
           class="base-popup__close-button"
           @click="close">
-          <base-icon
+          <BaseIcon
             class="popup-remove"
             name="remove" />
         </button>

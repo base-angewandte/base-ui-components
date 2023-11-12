@@ -16,7 +16,7 @@
         'base-checkmark-container',
         'base-checkmark-container-' + checkBoxSize,
         { 'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
-      <base-icon
+      <BaseIcon
         v-if="markStyle === 'checkbox' && checkedInt"
         :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
         name="check-mark" />

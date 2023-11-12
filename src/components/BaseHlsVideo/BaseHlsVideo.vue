@@ -8,7 +8,7 @@
       class="base-media-video__control"
       @keydown.enter.space="play"
       @click="play">
-      <base-icon
+      <BaseIcon
         name="play"
         class="base-media-video__icon" />
     </button>
