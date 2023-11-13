@@ -12,15 +12,16 @@
       :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : null"
       role="listbox"
       class="base-drop-down-list">
-      <template v-for="(option, optionIndex) in dropDownOptions">
+      <template
+        v-for="(option, optionIndex) in dropDownOptions"
+        :key="optionIndex">
         <li
           v-if="optionHasData(option[labelPropertyName])"
           :id="option[identifierPropertyName]"
           ref="option"
-          :key="optionIndex"
           :value="valueIsString ? getLangLabel(option[labelPropertyName], true)
             : option[identifierPropertyName]"
-          :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption"
+          :aria-selected="selectStyled && option[identifierPropertyName] === selectedOption || null"
           :class="[
             'base-drop-down-list__option',
             { 'base-drop-down-list__option__hover': activeStyled },
