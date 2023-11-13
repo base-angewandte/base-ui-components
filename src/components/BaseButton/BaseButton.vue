@@ -1,7 +1,7 @@
 <template>
   <button
-    :disabled="disabled"
-    :aria-disabled="disabled"
+    :disabled="disabled || null"
+    :aria-disabled="disabled || null"
     :aria-describedby="internalId"
     :type="buttonType"
     :class="['base-button',
