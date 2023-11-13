@@ -1,9 +1,9 @@
 <template>
   <div :class="className">
     <template
-      v-for="(entry, index) in routes">
+      v-for="(entry, index) in routes"
+      :key="index">
       <BaseLink
-        :key="index"
         external-link-target="_self"
         :source="entry.route"
         :value="entry.label"
