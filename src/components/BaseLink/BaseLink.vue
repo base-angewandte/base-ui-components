@@ -219,7 +219,7 @@ export default {
     /**
      * specify how the tooltipBox component is rendered on mobile resolutions
      *
-     * *box*: component is rendered at the `attachTo` HTMLElement
+     * *box*: component is rendered directly at the info icon
      * *modal*: component is rendered as a modal popup
      * *fullscreen*: component is rendered as ap popup with max height and width
      */
