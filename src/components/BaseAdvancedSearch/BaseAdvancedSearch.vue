@@ -788,7 +788,7 @@ export default {
           .filter(([, filterValues]) => hasData(filterValues))
           .map(([filterKey, filterValues]) => ({
             id: filterKey,
-            type: modeFilterList[filterKey]?.type ?? 'text',
+            type: modeFilterList[filterKey]?.['x-attrs']?.field_type ?? 'text',
             // only keep filter values that actually have values (relevant for groups!)
             filter_values: typeof filterValues === 'object' && filterValues.length
             && !modeFilterList[filterKey]?.type.includes('chips')
