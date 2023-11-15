@@ -152,6 +152,15 @@ export default {
     isScrollable() {
       return this.bodyInnerHeight > this.bodyHeight;
     },
+    /**
+     * get the thresholdTop value from the CSS variables if defined, otherwise use the component prop
+     * @returns {number}
+     */
+    getThresholdTop() {
+      const style = getComputedStyle(document.body);
+      const thresholdTopCssVar = Number(style.getPropertyValue('--base-tooltip-box-threshold-top'));
+      return thresholdTopCssVar || this.thresholdTop;
+    },
   },
   mounted() {
     // move the component to the body node to position it absolutely in the document
@@ -254,7 +263,7 @@ export default {
 
         if (direction === 'top'
           // check if fits to the top
-          && attachToRect.top - this.getThresholdTop() > boxHeight + triangleHeight) {
+          && attachToRect.top - this.getThresholdTop > boxHeight + triangleHeight) {
           this.direction = 'top';
           this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -342,15 +351,6 @@ export default {
       resizeObserver.observe(this.$refs.bodyInner);
       // store it in variable
       this.resizeObserver = resizeObserver;
-    },
-    /**
-     * get the thresholdTop value from the CSS variables if defined, otherwise use the component prop
-     * @returns {number}
-     */
-    getThresholdTop() {
-      const style = getComputedStyle(document.body);
-      const thresholdTopCssVar = Number(style.getPropertyValue('--base-tooltip-box-threshold-top'));
-      return thresholdTopCssVar || this.thresholdTop;
     },
     /**
      * intercept resize event and close the component
