@@ -113,15 +113,17 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
   /* reset chip hover style due the styleguide css would overwrite the component ones */
   .base-link.base-link--chip:hover {
     text-decoration: none !important;
   }
 
   /* set z-index equal or higher than styleguides sidebar */
-  >>> .base-tooltip-box {
-    z-index: 1001 !important;
+  @media screen and (min-width: $mobile) {
+    >>> .base-tooltip-box {
+      z-index: 1002 !important;
+    }
   }
 </style>
 ```
