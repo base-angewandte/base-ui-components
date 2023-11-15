@@ -8,6 +8,7 @@
       :attach-to="$refs.button.$el"
       :type-on-mobile="'box'"
       class="base-tooltip-box"
+      :threshold-top="70"
       @close="tooltip = !tooltip">
       <p>{{ data }}</p>
     </BaseTooltipBox>
@@ -81,6 +82,7 @@ export default {
             :attach-to="$refs['button_' + box.id][0]"
             :direction-order="directionOrder"
             :modal-title="box.title"
+            :threshold-top="70"
             @close="toggleBox(box.id)">
             <BaseTextList
               :data="box.action.info.data"
@@ -359,7 +361,7 @@ export default {
       font-weight: bold;
       margin-top: 8px !important;
     }
-    
+
     >>> .base-text-list-group:first-of-type .base-text-list-label {
       margin-top: 0 !important;
     }
