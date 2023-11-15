@@ -95,7 +95,7 @@
                   :class="[{ 'base-link--chip-text-list': item.id }]">
                   <template #tooltip>
                     <!-- @slot slot for tooltip content
-                         @binding {array} data -->
+                         @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
                     <slot
                       :data="objectItem.additional"
                       name="tooltip" />
@@ -139,7 +139,7 @@
                   :url="objectItem.url"
                   :value="objectItem.value">
                   <!-- @slot slot for tooltip content
-                       @binding {array} data -->
+                       @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
                   <slot
                     name="tooltip"
                     :data="objectItem.additional" />
@@ -203,7 +203,7 @@ export default {
      *
      * Note: only applies for chips and internal links:
      * - chip: to build the link query data
-     *         e.g.: query: `path?chip-link={[identifierPropertyName]:'keyword',type:'keywords',value:'label'}`
+     *         e.g.: query: `path?chip-link={[identifierPropertyName]:'keywordId',type:'dataObject.id',value:'keywordValue'}`
      * - internal: to set the link path
      */
     identifierPropertyName: {
