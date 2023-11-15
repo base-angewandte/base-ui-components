@@ -194,7 +194,7 @@ export default {
      */
     isPopUpLockEnabled() {
       return (this.typeOnMobile === 'modal' || this.typeOnMobile === 'fullscreen')
-        && window.innerWidth <= 640;
+        && window.innerWidth < 640;
     },
     /**
      * calc content related heights
@@ -384,6 +384,7 @@ export default {
     z-index: 1;
     min-width: 200px;
     max-height: 50vh;
+    max-width: calc(100% - $spacing);
     color: $font-color;
     background-color: #fff;
     visibility: hidden;
@@ -481,6 +482,7 @@ export default {
         width: 100vw;
         height: 100vh;
         max-height: 100vh;
+        max-width: inherit;
         background-color: transparent;
         z-index: map-get($zindex, modal);
 
@@ -518,6 +520,8 @@ export default {
 
     &.base-tooltip-box--fullscreen-on-mobile {
       @media screen and (max-width: $mobile) {
+        max-width: inherit;
+
         .base-tooltip-box__inner {
           margin: 0;
           width: 100%;
