@@ -109,8 +109,7 @@ export default {
     },
     /**
      * specify threshold value in px for the box top position calculation
-     * Useful to prevent top alignment of the TooltipBox,
-     * for example, when there is a fixed-positioned header (BaseHeader).
+     * Useful to prevent top alignment of the TooltipBox, for example, when there is a fixed-positioned header (BaseHeader).
      *
      * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
      *       The property will be overwritten by the CSS variable.
@@ -239,9 +238,9 @@ export default {
           // check if fits to the left
           && attachToRect.left > boxWidth + triangleWidth
           // check if box overlaps the window top
-          && !(attachToRect.y < boxHeight / 2)
+          && !(attachToRect.top + (attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
           // check if box overlaps the window bottom
-          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
+          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
           this.direction = 'left';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.left - boxWidth - triangleWidth - this.thresholdX}px`;
@@ -252,9 +251,9 @@ export default {
           // check if fits to the right
           && window.innerWidth - attachToRect.right > boxWidth + triangleWidth
           // check if box overlaps the window top
-          && !(attachToRect.y < boxHeight / 2)
+          && !((attachToRect.top + attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
           // check if box overlaps the window bottom
-          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
+          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
           this.direction = 'right';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.right + triangleWidth + this.thresholdX}px`;
@@ -263,7 +262,7 @@ export default {
 
         if (direction === 'top'
           // check if fits to the top
-          && attachToRect.top - this.getThresholdTop > boxHeight + triangleHeight) {
+          && attachToRect.top - this.getThresholdTop > boxHeight + triangleHeight + this.thresholdY) {
           this.direction = 'top';
           this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -272,7 +271,8 @@ export default {
 
         if (direction === 'bottom'
           // check if fits to the bottom
-          && window.innerHeight - attachToRect.bottom > boxHeight + triangleHeight) {
+          && window.innerHeight - attachToRect.bottom
+          > boxHeight + triangleHeight + this.thresholdY + this.spacing) {
           this.direction = 'bottom';
           this.css.top = `${attachToRect.bottom + triangleHeight + this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
