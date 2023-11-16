@@ -13,11 +13,14 @@
       class="popup-box">
       <!-- POP UP HEADER -->
       <div class="popup-header">
-        <div
-          id="popup-title"
-          class="popup-title">
-          {{ title }}
-        </div>
+        <!-- @slot add a custom header title instead of the text defined with the prop `title` -->
+        <slot name="header-title">
+          <div
+            id="popup-title"
+            class="popup-title">
+            {{ title }}
+          </div>
+        </slot>
         <!-- @event close -->
         <button
           type="button"
