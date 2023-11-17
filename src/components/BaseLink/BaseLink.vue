@@ -139,7 +139,7 @@ export default {
      * specify the internal identifier to route to
      */
     identifierPropertyValue: {
-      type: String,
+      type: [Number, String],
       default: '',
     },
     /**
