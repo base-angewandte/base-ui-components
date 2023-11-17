@@ -251,7 +251,7 @@ export default {
      *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
-      type: String,
+      type: [Number, String],
       default: null,
     },
     /**
