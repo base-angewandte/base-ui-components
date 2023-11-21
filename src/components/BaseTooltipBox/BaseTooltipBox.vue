@@ -108,7 +108,7 @@ export default {
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
     /**
-     * specify threshold value in px for the box top position calculation
+     * specify a threshold value in px for the box top position calculation
      * Useful to prevent top alignment of the TooltipBox, for example, when there is a fixed-positioned header (BaseHeader).
      *
      * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
@@ -152,13 +152,38 @@ export default {
       return this.bodyInnerHeight > this.bodyHeight;
     },
     /**
-     * get the thresholdTop value from the CSS variables if defined, otherwise use the component prop
+     * get the thresholdTop value from the CSS variables if defined,
+     * create a temporary ghost element and evaluate the computed style value,
+     * otherwise use the component prop
      * @returns {number}
      */
     getThresholdTop() {
+      // get optional global css variable
       const style = getComputedStyle(document.body);
-      const thresholdTopCssVar = Number(style.getPropertyValue('--base-tooltip-box-threshold-top'));
-      return thresholdTopCssVar || this.thresholdTop;
+      const thresholdTopCssVar = style.getPropertyValue('--base-tooltip-box-threshold-top');
+
+      // do nothing if the css variable is not defined
+      if (!thresholdTopCssVar) return this.thresholdTop;
+
+      // check if the css variable contains only digits and return it
+      if (/^\d+$/.test(thresholdTopCssVar)) return Number(thresholdTopCssVar);
+
+      // create a ghost node element to evaluate top value in px
+      const elem = document.createElement('div');
+      elem.style.position = 'absolute';
+      elem.style.top = thresholdTopCssVar;
+      elem.style.visibility = 'hidden';
+      // append the ghost element to body
+      document.body.appendChild(elem);
+      // get computed style value
+      const computedTop = window.getComputedStyle(elem).top;
+      // remove non digits (px unit)
+      const thresholdTopAsNumber = Number(computedTop.replace(/\D/g, ''));
+      // remove ghost element
+      elem.remove();
+
+      // return value
+      return thresholdTopAsNumber;
     },
   },
   mounted() {
