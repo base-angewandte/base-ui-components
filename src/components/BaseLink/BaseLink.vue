@@ -57,6 +57,7 @@
         :modal-on-mobile="false"
         :role="'tooltip'"
         :styles="tooltipStyles"
+        :threshold-top="tooltipThresholdTop"
         :type-on-mobile="tooltipTypeOnMobile"
         @close="showTooltip = !showTooltip">
         <!-- @slot slot to inject content
@@ -227,6 +228,16 @@ export default {
       type: String,
       default: 'box',
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
+    },
+    /**
+     * specify a threshold value in px for the [BaseTooltipBox](BaseTooltipBox) top position calculation
+     *
+     * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
+     *       The property will be overwritten by the CSS variable.
+     */
+    tooltipThresholdTop: {
+      type: Number,
+      default: 0,
     },
     /**
      * used in combination with property `identifierPropertyValue` to render a type `chip` element.

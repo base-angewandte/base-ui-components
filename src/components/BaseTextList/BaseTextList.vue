@@ -135,6 +135,7 @@
                   :chip-query-name="chipQueryName"
                   :path="item.path"
                   :tooltip="objectItem.additional"
+                  :tooltip-threshold-top="tooltipThresholdTop"
                   :type="item.id"
                   :url="objectItem.url"
                   :value="objectItem.value">
@@ -275,6 +276,16 @@ export default {
       type: String,
       default: 'large',
       validate: val => ['large', 'small'].includes(val),
+    },
+    /**
+     * specify a threshold value in px for the [BaseTooltipBox](BaseTooltipBox) top position calculation
+     *
+     * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
+     *       The property will be overwritten by the CSS variable.
+     */
+    tooltipThresholdTop: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
