@@ -300,7 +300,7 @@ export default {
      * @returns {boolean}
      */
     isChip() {
-      return !!(this.identifierPropertyName && this.type);
+      return !!(this.identifierPropertyValue && this.type);
     },
     /**
      * check if the link is type `external`
