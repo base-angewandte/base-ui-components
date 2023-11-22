@@ -2,16 +2,16 @@
 
 Example of different content types and multiple columns based on the data structure.
 
-Note: The column elements are defined via the data structure wrapped by an array. The number of columns can be defined with the 'cols' property.
+Note: The column elements are defined via the data structure wrapped by an array. The number of columns can be defined with the `cols` prop.
 
 ```vue live
 <template>
   <div>
     <BaseTextList
-      render-label-as="h2"
       :cols="2"
       :data="data"
-      @chip-clicked="chipClicked" />
+      :identifier-property-name="'source'"
+      :render-label-as="'h2'" />
   </div>
 </template>
 
@@ -64,6 +64,11 @@ export default {
                 url: 'mailto:base@uni-ak.ac.at',
               },
               {
+                label: 'internal',
+                value: 'internal link',
+                id: '/some-path',
+              },
+              {
                 label: 'Labore',
                 value: 'Dolore magna aliquyam erat',
               },
@@ -92,21 +97,22 @@ export default {
               },
               {
                 value: 'internal link',
-                source: 'some-id',
+                source: '/some-path',
               },
             ],
           },
           {
             label: 'data is array of objects rendered as chips',
-            id: 'source-type',
+            id: 'keywords',
+            path: '/components/BaseTextList.html',
             data: [
               {
                 value: 'dolore magna',
-                source: 'source-id',
+                source: 'keyword-1',
               },
               {
-                value: ' aliquyam erat',
-                source: 'source-id',
+                value: 'aliquyam erat',
+                source: 'keyword-2',
               },
             ],
           },
@@ -119,26 +125,28 @@ export default {
       ],
     }
   },
-  methods: {
-    chipClicked(obj) {
-      console.log(obj);
-    },
-  },
 }
 </script>
+
+<style>
+  /* reset chip hover style due the styleguide css would overwrite the component ones */
+  >>> .base-link.base-link--chip:hover {
+    text-decoration: none !important;
+  }
+</style>
 ```
 
 <br>
-Example of a single data object rendered in two columns, where the data property is typeof 'string'.
+Example of a single data object rendered in two columns, where the data property is typeof <code>string</code>.
 
-Note: The number of columns can be defined with the 'colsSingleTextContent' property.
+Note: The number of columns can be defined with the `colsSingleTextContent` prop.
 ```vue live
 <template>
   <div>
     <BaseTextList
-      render-label-as="h2"
       :data="data"
-      :cols-single-text-object="2" />
+      :cols-single-text-object="2"
+      :render-label-as="'h2'" />
   </div>
 </template>
 
@@ -156,4 +164,62 @@ export default {
   }
 }
 </script>
+```
+
+<br>
+Example of a list of chips.
+
+Note:
+The properties `id` and `path` are specified once for all chips in that object
+and processed internally to prepare the structure for a single chip from [BaseLink](BaseLink).
+
+```vue live
+<template>
+  <div>
+    <BaseTextList
+      :data="data"
+      :identifier-property-name="'id'"
+      :render-label-as="'h2'" />
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      data: [
+        {
+          label: 'Vero eos et accusam',
+          id: 'keywords',
+          path: '/components/BaseTextList.html',
+          data: [
+            {
+              value: 'dolore magna',
+              id: 'keyword-1',
+            },
+            {
+              value: 'aliquyam erat',
+              id: 'keyword-2',
+            },
+          ],
+        },
+      ],
+    }
+  },
+}
+</script>
+
+<style lang="scss">
+  /* reset chip hover style due the styleguide css would overwrite the component ones */
+  >>> .base-link.base-link--chip:hover {
+    text-decoration: none !important;
+  }
+
+  /* set z-index equal or higher than styleguides sidebar */
+  @media screen and (min-width: $mobile) {
+    >>> .base-tooltip-box {
+      z-index: 1002 !important;
+    }
+  }
+</style>
 ```

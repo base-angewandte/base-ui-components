@@ -23,16 +23,16 @@
       <template v-if="typeof item === 'object' && typeof item[0] === 'object'">
         <BaseTextList
           ref="baseTextList"
-          :style="{ '--columns': cols }"
-          :render-label-as="renderLabelAs"
-          :label-margin-bottom="labelMarginBottom"
           :cols="cols"
           :data="item"
-          @chip-clicked="emitChipData" />
+          :identifier-property-name="identifierPropertyName"
+          :label-margin-bottom="labelMarginBottom"
+          :list-type="listType"
+          :render-label-as="renderLabelAs"
+          :style="{ '--columns': cols }" />
       </template>
 
       <!-- String as text -->
-      <!-- eslint-disable vue/multiline-html-element-content-newline -->
       <!-- get rid of prepending white-space -->
       <p
         v-else-if="item.data && typeof item.data === 'string'"
@@ -40,8 +40,8 @@
           'base-text-list__content',
           'base-text-list__content--pre-line',
           // render single content in columns
+          // eslint-disable-next-line vue/multiline-html-element-content-newline
           { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
-      <!-- eslint-enable vue/multiline-html-element-content-newline-->
 
       <!-- Array as unordered list -->
       <ul
@@ -63,26 +63,47 @@
           <div class="base-text-list__content">
             <template
               v-for="(objectItem, objectIndex) in [].concat(item.data)">
-              <!-- eslint-disable -->
+              <!-- BaseLink: text, external, internal, text -->
+              <!-- eslint-disable max-len -->
               <BaseLink
+                v-if="!isTooltip(objectItem)"
                 :key="objectIndex"
-                :source="objectItem.source"
-                :tooltip="objectItem.additional"
+                :identifier-property-name="identifierPropertyName"
+                :identifier-property-value="objectItem[identifierPropertyName]"
+                :chip-query-name="chipQueryName"
+                :path="item.path"
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
-                :class="[{ 'base-link--chip-text-list': item.id }]"
-                @chip-clicked="emitChipData">
-                <template #tooltip>
-                  <!-- @slot slot for tooltip content -->
-                  <!-- @binding {array} data -  -->
-                  <slot
-                    :data="objectItem.additional"
-                    name="tooltip" />
-                </template>
-                <!-- add directly after to avoid additional spaces -->
-              </BaseLink>{{ item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ', ' : '' }}
+                :class="[{ 'base-link--chip-text-list': item.id }]" />{{ !isTooltip(objectItem) && item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ', ' : '' }}
               <!-- eslint-enable -->
+              <!-- BaseLink: tooltip -->
+              <span
+                v-if="isTooltip(objectItem)"
+                :key="objectIndex"
+                class="base-link--wrapper">
+                <BaseLink
+                  :key="objectIndex"
+                  :identifier-property-name="identifierPropertyName"
+                  :identifier-property-value="objectItem[identifierPropertyName]"
+                  :chip-query-name="chipQueryName"
+                  :path="item.path"
+                  :tooltip="objectItem.additional"
+                  :type="item.id"
+                  :url="objectItem.url"
+                  :value="objectItem.value"
+                  :class="[{ 'base-link--chip-text-list': item.id }]">
+                  <template #tooltip>
+                    <!-- @slot slot for tooltip content
+                         @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
+                    <slot
+                      :data="objectItem.additional"
+                      name="tooltip" />
+                  </template>
+                  <!-- add directly after to avoid additional spaces -->
+                  <!-- eslint-disable-next-line max-len -->
+                </BaseLink>{{ isTooltip(objectItem) && item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}
+              </span>
             </template>
           </div>
         </template>
@@ -109,14 +130,20 @@
                 class="base-text-list__content__label base-text-list__content__value">
                 <BaseLink
                   :render-link-as="renderLinkAs"
-                  :source="objectItem.source"
+                  :identifier-property-name="identifierPropertyName"
+                  :identifier-property-value="objectItem[identifierPropertyName]"
+                  :chip-query-name="chipQueryName"
+                  :path="item.path"
                   :tooltip="objectItem.additional"
+                  :tooltip-threshold-top="tooltipThresholdTop"
                   :type="item.id"
                   :url="objectItem.url"
-                  :value="objectItem.value"
-                  @chip-clicked="emitChipData">
-                  <!-- @slot slot for tooltip content -->
-                  <slot name="tooltip" />
+                  :value="objectItem.value">
+                  <!-- @slot slot for tooltip content
+                       @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
+                  <slot
+                    name="tooltip"
+                    :data="objectItem.additional" />
                 </BaseLink>
               </dd>
             </template>
@@ -131,7 +158,7 @@
 import i18n from '../../mixins/i18n';
 
 /**
- * Component to render data in p | ul | dt tags depending on field type 'data'
+ * Component to render different types of text content depending on the data type of prop `data`
  */
 
 export default {
@@ -144,23 +171,52 @@ export default {
   mixins: [i18n],
   props: {
     /**
-     * data structure for different rendered tags:
+     * specify a list of array objects to render different types of text content
      *
-     * **<p>**: `{ label: {string, Object}, data: {string} }`
-     * **<ul>**: `{ label: {string, Object}, data: {string[]}}`
-     * **<dt>**: `{ label: {string, Object}, data: {Object, Object[]}}`
-     *           **data: {Object}**: `{ label: {String, Object}, data: { label: {String, Object}, value: {string}, url: {string}, additional: {Object} }}`
-     *           **data: {Object[]}**: `[{ label: {string, Object}, value: {string}, url: {string}, additional: {Object} }]`
+     * single object structure: `{ label: {string, Object}, data: {string, Object, string[], Object[]} }`
+     *  **label** - a heading for the list section
+     * **data** property variants and their output (see readme.md for examples):
+     * - `{string}` - renders as simple text
+     * - `{Object}` - depending on object properties (see below) renders as chip | external ink | internal link | text | text with tooltip
+     * - `{string[]}` - renders as unordered list
+     * - `{Object[]}` - renders multiple objects (see above)
      *
-     * `label` might be a string or a language object with ISO 639-1 as object properties
-     *  (e.g. `{ en: 'x', de: 'y' }`).
-     *  `additional` property creates a tooltip and takes an object in the same format as
-     *    data: `label`, `value` and `url`.
-     * Note: for dt tag `url` will render `value` as a link
+     *  Possible object properties for `{ data : {Object, Object[]} }`:
+     *  - **value** `string` - the displayed text for all types
+     *  - **label** `string?` - an optional pretext in style of 'label:'
+     * - **[identifierPropertyName]** `string?` - specify the id of a chip or the path for internal link - specify the object property name with prop `identifierPropertyName`
+     * - **id** `string?` - for type chip - an identifier for the chip type (used in link generation)
+     * - **path** `string?` - for type chip (used in link generation)
+     * - **url** `string?` - for external link - the url to link to
+     * - **additional** `Object?` - used for tooltip content generation - an array of objects with properties:
+     *    `label`, `value` and (in case the item should render as link) `url`
+     *    **caveat**: even if tooltip content is created via slot this property needs to be present and filled in order for the tooltip to show
+     * - **data** `Object[]?` - for type chip - specify the list of chips to be displayed here - needs to be an object with `value` and `[identifierPropertyName]`
+     *
+     * Note: objects wrapped in an extra array are rendered as columns respecting the `cols` property.
      */
     data: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * specify the object property that should be used as identifier
+     *
+     * Note: only applies for chips and internal links:
+     * - chip: to build the link query data
+     *         e.g.: query: `path?chip-link={[identifierPropertyName]:'keywordId',type:'dataObject.id',value:'keywordValue'}`
+     * - internal: to set the link path
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'source',
+    },
+    /**
+     * specify a query parameter name for type chip links
+     */
+    chipQueryName: {
+      type: String,
+      default: 'chip-link',
     },
     /**
      * render component as e.g.: 'h2' | 'h3'
@@ -177,7 +233,7 @@ export default {
       default: false,
     },
     /**
-     * specify number of columns to render array nested objects
+     * specify the number of columns to render array nested objects
      */
     cols: {
       type: Number,
@@ -185,7 +241,7 @@ export default {
       validate: val => val > 0,
     },
     /**
-     * specify number of columns to render a single object typeof string
+     * specify the number of columns to render a single object typeof string
      */
     colsSingleTextObject: {
       type: Number,
@@ -193,9 +249,10 @@ export default {
       validate: val => val > 0,
     },
     /**
-     * specify how link element should be rendered - this needs to be a
+     * specify how the link element should be rendered - this needs to be a
      * valid vue link component (e.g. RouterLink, NuxtLink) and vue-router
      * is necessary
+     * if no routing plugin is found the element will be rendered as <a> tag
      */
     renderLinkAs: {
       type: String,
@@ -203,6 +260,7 @@ export default {
     },
     /**
      * specify how data-list (label, value) should be rendered
+     * Note: Only applies to `{ data: {Object[]} }`.
      * @values horizontal, vertical
      */
     listType: {
@@ -211,12 +269,23 @@ export default {
       validate: val => ['horizontal', 'vertical'].includes(val),
     },
     /**
-     * specify gap between content rows
+     * specify the gap between content rows
+     * @values large, small
      */
     rowGap: {
       type: String,
       default: 'large',
       validate: val => ['large', 'small'].includes(val),
+    },
+    /**
+     * specify a threshold value in px for the [BaseTooltipBox](BaseTooltipBox) top position calculation
+     *
+     * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
+     *       The property will be overwritten by the CSS variable.
+     */
+    tooltipThresholdTop: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
@@ -241,7 +310,9 @@ export default {
     },
   },
   created() {
-    // If parent component is type `BaseTextList` we assume that the current `BaseTextList` has columns
+    // Check if the parent component is type `BaseTextList`,
+    // and assume it is recursive, and the current `BaseTextList` has columns.
+    // With this workaround, we avoid problems with the CSS var `--columns` in the parent scope.
     this.hasColumns = this.$parent.$options.name === 'BaseTextList';
   },
   methods: {
@@ -253,34 +324,15 @@ export default {
      * @returns {boolean}
      */
     containKeys(data, key) {
-      // eslint-disable-next-line
-      for (const obj of data) {
-        if (!Object.keys(obj).includes(key)) {
-          return false;
-        }
-      }
-      return true;
+      return data.every(obj => Object.keys(obj).includes(key));
     },
     /**
-     * check if the object contains properties that indicate a chip type
-     *
-     * @param {object} data
+     * check if the link is type `tooltip`
+     * @param {Object} item
      * @returns {boolean}
      */
-    isChip(data) {
-      return !!(data.source && data.type);
-    },
-    /**
-     * function to emit event and data
-     *
-     * @param {Object} obj
-     */
-    emitChipData(obj) {
-      /**
-       * @event chip-clicked
-       * @property {Object} obj - chip object
-       */
-      this.$emit('chip-clicked', obj);
+    isTooltip(item) {
+      return !!item.additional;
     },
   },
 };
@@ -290,6 +342,7 @@ export default {
   @import "../../styles/variables";
 
   .base-text-list {
+
     .base-text-list__group {
       page-break-inside: avoid;
       break-inside: avoid;
@@ -317,6 +370,7 @@ export default {
       }
 
       .base-text-list__content--horizontal {
+
         .base-text-list__content__label {
           display: inline;
         }
@@ -353,7 +407,15 @@ export default {
       }
     }
 
+    .base-link--wrapper {
+      display: inline-flex;
+      max-width: 100%;
+    }
+
     // spacing below elements
+    // Note: Use a negative margin to get an exact bottom boundary
+    //       without extra spacing from paddings of the inner elements.
+    //       Could possibly be done with CSS Masonry layout once it's stable.
     &.base-text-list--row-gap-small {
       margin-bottom: -$spacing;
 
