@@ -480,7 +480,7 @@
         @clicked="$emit('field-value-changed', $event)">
         <BaseLink
           v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
-          :source="formFieldXAttrs.subtext.source || ''"
+          :identifier-property-value="formFieldXAttrs.subtext.source || ''"
           :url="formFieldXAttrs.subtext.url || ''"
           :value="formFieldXAttrs.subtext.value" />
       </BaseToggle>

@@ -7,7 +7,7 @@
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
              { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
-              || typeOnMobile === 'fullscreen' },
+               || typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
@@ -98,23 +98,25 @@ export default {
     /**
      * specify how the component is rendered on mobile resolutions
      *
-     * *box*: component is rendered at the `attachTo` HTMLElement
-     * *modal*: component is rendered as a modal popup
-     * *fullscreen*: component is rendered as ap popup with max height and width
+     * **box**: component is rendered at the `attachTo` HTMLElement
+     * **modal**: component is rendered as a modal popup
+     * **fullscreen**: component is rendered as ap popup with max height and width
      */
     typeOnMobile: {
       type: String,
       default: 'modal',
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
     },
-  },
-  computed: {
     /**
-     * compare body and inner height and evaluate if body is scrollable
-     * @returns {boolean}
+     * specify a threshold value in px for the box top position calculation
+     * Useful to prevent top alignment of the TooltipBox, for example, when there is a fixed-positioned header (BaseHeader).
+     *
+     * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
+     *       The property will be overwritten by the CSS variable.
      */
-    isScrollable() {
-      return this.bodyInnerHeight > this.bodyHeight;
+    thresholdTop: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
@@ -127,7 +129,7 @@ export default {
       },
       thresholdX: 2, // px, distance between tooltip and attachTo element
       thresholdY: 2, // px, distance between tooltip and attachTo element
-      spacing: 8, // px, distance from window left or right side
+      spacing: 8, // px, distance from window's left or right boundary
       bodyHeight: null,
       bodyInnerHeight: null,
       fadeOutTop: false,
@@ -140,6 +142,49 @@ export default {
       targetName: 'popUpBody',
       showInt: false,
     };
+  },
+  computed: {
+    /**
+     * compare body and inner height and evaluate if body is scrollable
+     * @returns {boolean}
+     */
+    isScrollable() {
+      return this.bodyInnerHeight > this.bodyHeight;
+    },
+    /**
+     * get the thresholdTop value from the CSS variables if defined,
+     * create a temporary ghost element and evaluate the computed style value,
+     * otherwise use the component prop
+     * @returns {number}
+     */
+    getThresholdTop() {
+      // get optional global css variable
+      const style = getComputedStyle(document.body);
+      const thresholdTopCssVar = style.getPropertyValue('--base-tooltip-box-threshold-top');
+
+      // do nothing if the css variable is not defined
+      if (!thresholdTopCssVar) return this.thresholdTop;
+
+      // check if the css variable contains only digits and return it
+      if (/^\d+$/.test(thresholdTopCssVar)) return Number(thresholdTopCssVar);
+
+      // create a ghost node element to evaluate top value in px
+      const elem = document.createElement('div');
+      elem.style.position = 'absolute';
+      elem.style.top = thresholdTopCssVar;
+      elem.style.visibility = 'hidden';
+      // append the ghost element to body
+      document.body.appendChild(elem);
+      // get computed style value
+      const computedTop = window.getComputedStyle(elem).top;
+      // remove non digits (px unit)
+      const thresholdTopAsNumber = Number(computedTop.replace(/\D/g, ''));
+      // remove ghost element
+      elem.remove();
+
+      // return value
+      return thresholdTopAsNumber;
+    },
   },
   mounted() {
     // move the component to the body node to position it absolutely in the document
@@ -182,7 +227,7 @@ export default {
      */
     isPopUpLockEnabled() {
       return (this.typeOnMobile === 'modal' || this.typeOnMobile === 'fullscreen')
-        && window.innerWidth <= 640;
+        && window.innerWidth < 640;
     },
     /**
      * calc content related heights
@@ -218,9 +263,9 @@ export default {
           // check if fits to the left
           && attachToRect.left > boxWidth + triangleWidth
           // check if box overlaps the window top
-          && !(attachToRect.y < boxHeight / 2)
+          && !(attachToRect.top + (attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
           // check if box overlaps the window bottom
-          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
+          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
           this.direction = 'left';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.left - boxWidth - triangleWidth - this.thresholdX}px`;
@@ -231,9 +276,9 @@ export default {
           // check if fits to the right
           && window.innerWidth - attachToRect.right > boxWidth + triangleWidth
           // check if box overlaps the window top
-          && !(attachToRect.y < boxHeight / 2)
+          && !((attachToRect.top + attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
           // check if box overlaps the window bottom
-          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
+          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
           this.direction = 'right';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.right + triangleWidth + this.thresholdX}px`;
@@ -242,7 +287,7 @@ export default {
 
         if (direction === 'top'
           // check if fits to the top
-          && attachToRect.top > boxHeight + triangleHeight) {
+          && attachToRect.top - this.getThresholdTop > boxHeight + triangleHeight + this.thresholdY) {
           this.direction = 'top';
           this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -251,7 +296,8 @@ export default {
 
         if (direction === 'bottom'
           // check if fits to the bottom
-          && window.innerHeight - attachToRect.bottom > boxHeight + triangleHeight) {
+          && window.innerHeight - attachToRect.bottom
+          > boxHeight + triangleHeight + this.thresholdY + this.spacing) {
           this.direction = 'bottom';
           this.css.top = `${attachToRect.bottom + triangleHeight + this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -363,6 +409,7 @@ export default {
     z-index: 1;
     min-width: 200px;
     max-height: 50vh;
+    max-width: calc(100% - $spacing);
     color: $font-color;
     background-color: #fff;
     visibility: hidden;
@@ -460,6 +507,7 @@ export default {
         width: 100vw;
         height: 100vh;
         max-height: 100vh;
+        max-width: inherit;
         background-color: transparent;
         z-index: map-get($zindex, modal);
 
@@ -497,6 +545,8 @@ export default {
 
     &.base-tooltip-box--fullscreen-on-mobile {
       @media screen and (max-width: $mobile) {
+        max-width: inherit;
+
         .base-tooltip-box__inner {
           margin: 0;
           width: 100%;
