@@ -17,8 +17,8 @@
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore src",
     "version-publish": "sh ./version-publish.sh",
     "prepublishOnly": "npm run build",
-    "styleguide": "concurrently \"vue-docgen --watch\" \"vuepress dev docs\"",
-    "styleguide:build": "vue-docgen && vuepress build docs",
+    "styleguide": "env NODE_OPTIONS=--openssl-legacy-provider concurrently \"vue-docgen --watch\" \"vuepress dev docs\"",
+    "styleguide:build": "vue-docgen && env NODE_OPTIONS=--openssl-legacy-provider vuepress build docs",
     "svg": "node ./build/generate-svg-sprite-sheet.js",
     "prepare": "husky install",
     "changelog": "gulp changelog"
@@ -106,8 +106,8 @@
     "last 2 versions"
   ],
   "engines": {
-    "node": ">= 4.0.0",
-    "npm": ">= 3.0.0"
+    "node": ">= 18.0.0",
+    "npm": ">= 9.0.0"
   },
   "repository": {
     "type": "git",
