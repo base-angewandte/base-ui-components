@@ -551,13 +551,13 @@ export default {
               if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
                 this.inputInt = '';
                 this.previousInput = '';
-                return;
+              } else {
+                // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
+                this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
+                // also update previous input so there are no funny effects if a type an
+                // invalid character after blur
+                this.previousInput = this.inputInt;
               }
-              // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
-              this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
-              // also update previous input so there are no funny effects if a type an
-              // invalid character after blur
-              this.previousInput = this.inputInt;
             }
             this.$emit('blur', event);
           },
