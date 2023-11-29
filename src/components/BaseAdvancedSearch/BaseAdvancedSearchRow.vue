@@ -1239,7 +1239,11 @@ export default {
       // check if filters were specified - if not assume the input is handled in parent component
       if (!this.filterList || !this.filterList.length) {
         this.$emit('option-selected', ({ entry, collectionId: selectedOptionCollection }));
-        this.resetAllInput();
+        // check if filter is not default filter
+        if (selectedOptionCollection !== this.defaultFilter[this.identifierPropertyName.filter]) {
+          // only then reset all input
+          this.resetAllInput();
+        }
         // if option is coming from autocomplete drop down list (=has an id)
         // and currently active filter is not identical
         // with the category of the selected item (if everything is going right this should

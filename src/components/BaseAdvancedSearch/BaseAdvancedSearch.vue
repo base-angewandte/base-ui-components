@@ -689,8 +689,11 @@ export default {
      */
     formFilterValuesInt: {
       handler(val) {
+        // get filters without default first to ensure comparability
+        const filtersWithoutDefault = { ...this.formFilterValues };
+        this.$delete(filtersWithoutDefault, 'default');
         // check if val is actually different from prop value
-        if (JSON.stringify(val) !== JSON.stringify(this.formFilterValues)) {
+        if (JSON.stringify(val) !== JSON.stringify(filtersWithoutDefault)) {
           // if yes - inform parent
           /**
            * inform parent of form filter value changes - event emitted for mode `form`
@@ -911,7 +914,8 @@ export default {
      */
 
     /**
-     * function called when an option was selected from main search autocomplete
+     * function called when an option was selected from main search autocomplete OR on
+     *  search input TAB keydown
      *
      * @param {Object} entry - the selected option
      * @param {string} collectionId - the option category selected - this needs to match a
@@ -926,38 +930,49 @@ export default {
           ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
           .includes(entry[this.identifierPropertyName.autocompleteOption])) {
         const fieldInformation = this.formFilterList[collectionId];
-        const fieldXAttrs = fieldInformation['x-attrs'];
-        // check the type of field that the value should be added to (we assume the only possibilities
-        // are chips or text - other types are currently NOT implemented and would need to be added here!)
-        if (fieldXAttrs.field_type === 'chips') {
-          // map the information from the search autocomplete to the chips form field
-          // required values
-          const chipsFormFieldValue = {
-            // map search autocomplete result to chips form field required values
-            [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
-            [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
-          };
-          // for multi chips - add value to array
-          if (fieldInformation.type === 'array') {
-            // check if property exists already in formFilterValuesInt
-            if (this.formFilterValuesInt[collectionId]) {
-              this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
-            } else {
-              this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
+        // check if there is actual field information --> default filter is not part of
+        // swagger list! so all but default filter will go here!
+        if (fieldInformation) {
+          const fieldXAttrs = fieldInformation['x-attrs'];
+          // check the type of field that the value should be added to (we assume the only possibilities
+          // are chips or text - other types are currently NOT implemented and would need to be added here!)
+          if (fieldXAttrs.field_type === 'chips') {
+            // map the information from the search autocomplete to the chips form field
+            // required values
+            const chipsFormFieldValue = {
+              // map search autocomplete result to chips form field required values
+              [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
+              [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
+            };
+            // for multi chips - add value to array
+            if (fieldInformation.type === 'array') {
+              // check if property exists already in formFilterValuesInt
+              if (this.formFilterValuesInt[collectionId]) {
+                this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
+              } else {
+                this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
+              }
+              // for single chips - replace value
+            } else if (fieldInformation.type === 'object') {
+              this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
             }
-            // for single chips - replace value
-          } else if (fieldInformation.type === 'object') {
-            this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
+          } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
+            this.$set(
+              this.formFilterValuesInt,
+              collectionId,
+              entry[this.labelPropertyName.autocompleteOption] || entry,
+            );
           }
-        } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
+          // main filter filter values should remain empty
+          this.mainFilter.filter_values = [];
+        } else {
+          // if it is main filter set the value to main filter instead
           this.$set(
-            this.formFilterValuesInt,
-            collectionId,
-            entry[this.labelPropertyName.autocompleteOption] || entry,
+            this.mainFilter,
+            'filter_values',
+            [entry],
           );
         }
-        // main filter filter values should remain empty
-        this.mainFilter.filter_values = [];
         // this does not trigger an update event from BaseForm so search needs to be triggered manually here
         this.search();
       }
