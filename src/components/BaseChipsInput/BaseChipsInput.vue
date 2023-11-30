@@ -32,8 +32,8 @@
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
           @within-drop-down="dropDownActive = $event"
-          @click.native.stop=""
-          @touchstart.native.stop="">
+          @click.native.stop="closeDropDown"
+          @touchstart.native.stop="closeDropDown">
           <template #option="entry">
             <span
               v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
@@ -396,6 +396,13 @@ export default {
       default: false,
     },
     /**
+     * set `true` if dropdown should be closed after selecting an option
+     */
+    closeDropdownOnOptionSelect: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * this prop gives the option to add assistive text for screen readers
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
@@ -620,6 +627,9 @@ export default {
      * @param {string} val
      */
     input(val) {
+      // open dropdown
+      this.isActive = true;
+
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
         /**
@@ -704,6 +714,8 @@ export default {
         this.chipsInputActive = false;
         this.inputElem.blur();
       }
+      // optional close dropdown after selection
+      this.closeDropDown();
     },
     /**
      * method for emitting selected list changes to parent
@@ -765,6 +777,9 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     onArrowKey(event) {
+      // open dropdown
+      this.isActive = true;
+
       // check if the list has any options
       if (this.listInt.length) {
         // if yes trigger the navigate function
@@ -798,6 +813,15 @@ export default {
       // see if it exists and has a width - if yes set drop down min width to the same
       if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
         this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
+      }
+    },
+    /**
+     * close dropdown
+     */
+    closeDropDown() {
+      // optional close dropdown after selection
+      if (this.closeDropdownOnOptionSelect && this.isActive) {
+        this.isActive = false;
       }
     },
   },
