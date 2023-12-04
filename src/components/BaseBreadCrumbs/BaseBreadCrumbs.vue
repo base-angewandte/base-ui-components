@@ -5,7 +5,7 @@
       <BaseLink
         :key="index"
         external-link-target="_self"
-        :source="entry.route"
+        :identifier-property-value="entry.route"
         :value="entry.label"
         :render-link-as="renderLinkAs"
         class="base-bread-crumbs__link" /><span

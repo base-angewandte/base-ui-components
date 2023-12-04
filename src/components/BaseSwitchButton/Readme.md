@@ -70,11 +70,7 @@ so the property <code>icon</code> should be set for each switch item in <code>op
       v-model="activeMode"
       label="Select Mode"
       :show-label="true"
-      type="prominent">
-      <templage>
-        test
-      </templage>
-    </BaseSwitchButton>
+      type="prominent" />
     <div>{{ 'active mode: ' + activeMode }}</div>
   </div>
 
