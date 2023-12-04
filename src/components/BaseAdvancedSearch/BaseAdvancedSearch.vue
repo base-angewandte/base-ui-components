@@ -30,7 +30,7 @@
 
     <!-- MAIN FILTER -->
     <BaseAdvancedSearchRow
-      :search-row-id="'main'"
+      :search-row-id="`main-${getRowId()}`"
       :mode="mode"
       :applied-filter.sync="mainFilter"
       :filter-list="displayedFilters"

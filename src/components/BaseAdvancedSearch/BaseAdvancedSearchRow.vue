@@ -1712,7 +1712,7 @@ export default {
      */
     getSearchInputElement() {
       // get input elements
-      const inputElements = document.getElementsByTagName('input');
+      const inputElements = this.$el.getElementsByTagName('input');
       // check if input elements were found
       if (inputElements && inputElements.length) {
         // if yes - transform HTMLElement list to Array and find the search input element
