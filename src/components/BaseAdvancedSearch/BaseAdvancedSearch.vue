@@ -630,7 +630,6 @@ export default {
           // if yes - update internal value
           [, ...this.appliedFiltersInt] = JSON.parse(JSON
             .stringify([val, ...val.slice(0, -1)]));
-          this.originalFilterValues = JSON.parse(JSON.stringify(this.appliedFiltersInt));
         }
         // also check if main filter is different separately!
         if (val && val.length >= 1
@@ -740,8 +739,6 @@ export default {
     // copy these filter values to later be able to determine if filters changed before
     // triggering search
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
-    this.originalFilterValues = JSON.parse(JSON.stringify(this.mode === 'form'
-      ? this.formFilterValuesInt : this.appliedFiltersInt));
   },
   methods: {
     /**
