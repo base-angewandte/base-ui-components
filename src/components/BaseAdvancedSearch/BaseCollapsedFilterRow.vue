@@ -40,34 +40,33 @@
               <!-- iterate through the filter values list -->
               <template
                 v-for="(value, valueIndex) in filter.filter_values?.values">
-                <!-- check if filter.type is an array to determine if it belongs to a field group -->
+                <!-- check if filter.fieldType is an array to determine if it belongs to a field group -->
                 <template v-if="filter.filter_values.fieldType === 'group'">
                   <!-- if yes - also iterate through those values -->
                   <template v-for="(groupValue, groupIndex) in value.values">
                     <BaseCollapsedFilterItem
+                      v-if="groupValue.label"
                       :key="groupValue.id
                         || `${groupValue.label}-${valueIndex}-${groupIndex}`"
                       :value="groupValue"
                       :type="value.fieldType"
-                      :append-until="value.values.length === 2
-                        && filterValuesHaveData(value.values)
-                        && groupIndex === 0"
-                      :apply-spacing-left="!!value.values[0].label"
+                      :range-indicator="getRangeIndicator(value, groupIndex)"
                       :scrollable="filterListScrollable"
                       :is-scrolling="isScrolling"
+                      :date-time-text="dateTimeText"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
                 <template v-else>
                   <BaseCollapsedFilterItem
+                    v-if="value.label"
                     :key="value.id || `${value.label}-${valueIndex}`"
                     :value="value"
                     :type="filter.filter_values.fieldType"
-                    :append-until="filter.filter_values?.values.length === 2
-                      && valueIndex === 0"
-                    :apply-spacing-left="!!filter.filter_values?.values[0].label"
+                    :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
                     :scrollable="filterListScrollable"
                     :is-scrolling="isScrolling"
+                    :date-time-text="dateTimeText"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -161,6 +160,22 @@ export default {
           // return boolean value if prop is missing
           return propMissing;
         });
+      },
+    },
+    /**
+     * set the text displayed for date or time values of ranges where only one field is
+     * filled.
+     */
+    dateTimeText: {
+      type: Object,
+      default: () => ({
+        from: 'from',
+        until: 'until',
+        range: 'to',
+      }),
+      validator: (val) => {
+        console.log(Object.keys(val), Object.keys(val).includes('from'));
+        return !['from', 'until', 'range'].some(property => !Object.keys(val).includes(property));
       },
     },
   },
@@ -290,7 +305,7 @@ export default {
           // now check if more than one value is left for the group
         } else if (concatValuesArray.length > 1) {
           // check for special case date and time fields
-          if (values[valueIndex].type.includes('date') || values[valueIndex].type.includes('time')) {
+          if (values[valueIndex].fieldType.includes('date') || values[valueIndex].fieldType.includes('time')) {
             // for date arrays just remove the label so the order of the date_from and date_to does not
             // get mixed up by removing the complete value
             this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
@@ -429,6 +444,23 @@ export default {
      */
     filterValuesHaveData(filterValues) {
       return hasData(filterValues);
+    },
+    getRangeIndicator(filterValues, index) {
+      // check if it is a filter with an array of exactly two values
+      if (filterValues.values.length === 2
+        && ['date', 'time'].includes(filterValues.fieldType)) {
+        if (!!filterValues.values[0].label
+          && !!filterValues.values[1].label && index === 1) {
+          return this.dateTimeText.range;
+        }
+        if (!filterValues.values[1].label && filterValues.values[0].label) {
+          return this.dateTimeText.from;
+        }
+        if (!filterValues.values[0].label && filterValues.values[1].label) {
+          return this.dateTimeText.until;
+        }
+      }
+      return '';
     },
   },
 };

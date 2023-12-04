@@ -82,6 +82,7 @@
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
           <BaseCollapsedFilterRow
             :filters.sync="collapsedFiltersArray"
+            :date-time-text="advancedSearchText.collapsedDateTime"
             @remove-all="removeAllFilters" />
         </div>
       </template>
@@ -277,6 +278,8 @@ export default {
      *     **removeFilter**: text/label used for remove filter icon.
      *     **selectFilterLabel**: label (not visible) used for filter chips input field.
      *     **searchLabel**: label (not visible) used for search input field.
+     *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
+     *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
      *
      *  The values of this object might be plain text or a key for an i18n file.
      * This prop can be ignored when the `no-options` slot is used.
@@ -291,11 +294,20 @@ export default {
         removeFilter: 'Remove filter',
         selectFilterLabel: 'Select filter',
         searchLabel: 'Search for Entries',
+        collapsedDateTime: {
+          from: 'from',
+          until: 'until',
+          range: 'to',
+        },
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => ['title', 'subtext', 'availableOptions',
+        // do not add collapsedDateTime here since only necessary for mode 'form'
         'addFilter', 'removeFilter', 'selectFilterLabel', 'searchLabel']
-        .every(prop => Object.keys(val).includes(prop)),
+        .every(prop => Object.keys(val).includes(prop)
+          // but check if collapsedDateTime is present and if check if necessary properties
+          && (!val.collapsedDateTime
+            || (val.collapsedDateTime.from && val.collapsedDateTime.until && val.collapsedDateTime.range))),
     },
     /**
      * specify informational texts for the drop-down - this needs to be an object with the following
