@@ -707,6 +707,7 @@ export default {
       }
       // inform parent of changes
       this.propagateValueListChanges();
+      this.$emit('input-complete', this.valueListInt);
     },
     propagateValueListChanges() {
       /**
