@@ -43,6 +43,7 @@
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
+          v-if="mode === 'list'"
           :id="'search-filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
