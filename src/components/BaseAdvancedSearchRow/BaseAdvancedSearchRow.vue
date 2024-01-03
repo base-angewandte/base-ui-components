@@ -428,7 +428,8 @@ export default {
       type: Array,
       default: () => ([]),
       validator: val => !val.length
-        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * specify a default value for a filter that is set when none of the
@@ -459,7 +460,9 @@ export default {
         type: 'text',
         options: [],
       }),
-      validator: val => val.type && (val.type !== 'chips' || val.freetext_allowed || val.options),
+      validator: val => !val.length
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>

@@ -105,7 +105,8 @@ export default {
       validator: val => !val.length
         // make sure a filter type is present and type is other than chips or freetext is
         // allowed - otherwise it needs to have an options property
-        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
+        || (val.every(v => !!v.type
+          && (!['chips', 'chipssingle'].includes(v.type) || v.freetext_allowed || !!v.options))),
     },
     /**
      * possibility to set applied filters from outside, for necessary object properties
@@ -155,7 +156,8 @@ export default {
         options: [],
         filter_values: [],
       }),
-      validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
+      validator: val => val === null || (val.type
+        && (!['chips', 'chipssingle'].includes(val.type) || val.options)),
     },
     /**
      * specify a language (ISO 639-1) (used for label if label is language specific object
