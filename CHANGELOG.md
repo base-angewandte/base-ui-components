@@ -1,3 +1,12 @@
+## 3.1.2 (2024-01-03)
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** add missing documentation for new filter type `chipssingle`
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** fix default defaultFilter used if prop not set immediately
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** include new type `chipssingle` in filter validation
+
 ## 3.1.1 (2023-10-02)
 
 
