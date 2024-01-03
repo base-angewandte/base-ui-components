@@ -60,7 +60,7 @@ import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearchRow/BaseAdvanc
  * @property {string} id|* - property 'id' used as unique identifier or an equivalent
  *  custom property defined in prop identifierPropertyName.filter
  * @property {string} type - a filter type defining the type of search element shown
- *  @values text, chips, date, daterange
+ *  @values text, chips, chipssingle, date, daterange
  * @property {boolean} [hidden] - exclude filters that have this attribute true from display
  * @property {boolean} [freetext_allowed] - property specifc for type: chips determining
  *  if options are autocompleted (true) or used from the options property (false)
@@ -88,12 +88,12 @@ export default {
      *    **id** `string` - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      `identifierPropertyName.filter`.
-     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `date`, `daterange`.
+     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `chipssingle`, `date`, `daterange`.
      *    **hidden** `boolean` - filters with this attribute true will be filtered from
      *      displayed filter list.
      *    **freetext_allowed** `boolean` - determines if predetermined options from `options`
      *      property are used or autocomplete is used.
-     *    **options** `Object[]` - for filter type `chips` the controlled
+     *    **options** `Object[]` - for filter type `chips` and `chipssingle` the controlled
      *      vocabulary options.
      *     **subsets** `string[]` - if a filter of `type` 'text' or 'chips' with
      *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
@@ -137,11 +137,11 @@ export default {
      *    **id** `string` - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      `identifierPropertyName.filter`.
-     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `date`, `daterange`.
-     *    **options** `Object[]` - for filter type 'chips' the controlled
+     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `chipssingle`, `date`, `daterange`.
+     *    **options** `Object[]` - for filter type `chips` and `chipssingle` the controlled
      *      vocabulary options.
      *    **filter_values** `Object[], string[], Object` - the values selected - object for date
-     *    or array of objects or strings for type `text` and type `chips`,
+     *    or array of objects or strings for type `text`, type `chips` and `chipssingle`,
      *
      *    defaultFilter does not need the property `subsets` since results for all filters are
      *    shown per default
