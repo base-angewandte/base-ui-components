@@ -723,20 +723,22 @@ export default {
      */
     formFilterValues: {
       handler(val) {
-        // check if value is different from internal value
-        if (val
-          && JSON.stringify(val) !== JSON.stringify({
-            ...this.formFilterValuesInt,
-            default: this.mainFilter.filter_values,
-          })) {
-          // remove the default key from the form filter values that should fill form
-          const { default: _, ...filterValuesNoMain } = val;
-          // update internal values
-          this.formFilterValuesInt = JSON.parse(JSON.stringify(filterValuesNoMain));
-          // set default property to mainFilter.filter_values
-          this.$set(this.mainFilter, 'filter_values', val.default || ['']);
-          // trigger search with updated values
-          this.search();
+        if (this.mode === 'form') {
+          // check if value is different from internal value
+          if (val
+            && JSON.stringify(val) !== JSON.stringify({
+              ...this.formFilterValuesInt,
+              default: this.mainFilter.filter_values,
+            })) {
+            // remove the default key from the form filter values that should fill form
+            const { default: _, ...filterValuesNoMain } = val;
+            // update internal values
+            this.formFilterValuesInt = JSON.parse(JSON.stringify(filterValuesNoMain));
+            // set default property to mainFilter.filter_values
+            this.$set(this.mainFilter, 'filter_values', val.default || ['']);
+            // trigger search with updated values
+            this.search();
+          }
         }
       },
       immediate: true,
