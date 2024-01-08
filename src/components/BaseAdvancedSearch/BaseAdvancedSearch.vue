@@ -57,7 +57,7 @@
       <template #after>
         <BaseButton
           v-if="mode === 'form'"
-          :text="showAdvancedSearchButtonText ? 'Advanced Search' : ''"
+          :text="showAdvancedSearchButtonText ? advancedSearchText.advancedButtonLabel : ''"
           button-style="row"
           icon="drop-down"
           icon-size="small"
@@ -272,16 +272,17 @@ export default {
      * specify informational texts for the component - this needs to be an object with the following
      * properties (if you don't want to display any text leave an empty string):
      *
-     *     **title**: text shown as first line on the drop-down in filters area.
-     *     **subtext**: text shown as second line on the drop-down in filters area.
+     *     **title**: text shown as first line on the drop-down in filters area for mode `list`.
+     *     **subtext**: text shown as second line on the drop-down in filters area for mode `list`.
      *     **availableOptions**: text shown with chips options for controlled vocabulary
-     *     search.
-     *     **addFilter**: text/label used for add filter icon.
-     *     **removeFilter**: text/label used for remove filter icon.
-     *     **selectFilterLabel**: label (not visible) used for filter chips input field.
+     *     search` for mode `list`.
+     *     **addFilter**: text/label used for add filter icon for mode `list`.
+     *     **removeFilter**: text/label used for remove filter icon for mode `list`.
+     *     **selectFilterLabel**: label (not visible) used for filter chips input field for mode `list`.
      *     **searchLabel**: label (not visible) used for search input field.
      *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
      *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
+     *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
      *
      *  The values of this object might be plain text or a key for an i18n file.
      * This prop can be ignored when the `no-options` slot is used.
@@ -301,15 +302,8 @@ export default {
           until: 'until',
           range: 'to',
         },
+        advancedButtonLabel: 'Advanced Search',
       }),
-      // checking if all necessary properties are part of the provided object
-      validator: val => ['title', 'subtext', 'availableOptions',
-        // do not add collapsedDateTime here since only necessary for mode 'form'
-        'addFilter', 'removeFilter', 'selectFilterLabel', 'searchLabel']
-        .every(prop => Object.keys(val).includes(prop)
-          // but check if collapsedDateTime is present and if check if necessary properties
-          && (!val.collapsedDateTime
-            || (val.collapsedDateTime.from && val.collapsedDateTime.until && val.collapsedDateTime.range))),
     },
     /**
      * specify informational texts for the drop-down - this needs to be an object with the following
@@ -499,6 +493,11 @@ export default {
        * @type {boolean}
        */
       formMounted: false,
+      /**
+       * resize observer for specific element (instead of window)
+       * (only mode `form`)
+       */
+      resizeObserver: null,
       /**
        * button text should only be shown if enough space is available
        * (only mode `form`)
