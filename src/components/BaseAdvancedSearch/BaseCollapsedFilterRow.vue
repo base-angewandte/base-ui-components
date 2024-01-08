@@ -173,10 +173,7 @@ export default {
         until: 'until',
         range: 'to',
       }),
-      validator: (val) => {
-        console.log(Object.keys(val), Object.keys(val).includes('from'));
-        return !['from', 'until', 'range'].some(property => !Object.keys(val).includes(property));
-      },
+      validator: val => !['from', 'until', 'range'].some(property => !Object.keys(val).includes(property)),
     },
   },
   data() {
