@@ -1,5 +1,7 @@
 <template>
-  <div class="base-advanced-search">
+  <div
+    ref="searchContainer"
+    class="base-advanced-search">
     <!-- FILTER ROW LIST (MODE 'LIST') -->
     <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
       <BaseAdvancedSearchRow
@@ -55,8 +57,8 @@
       <template #after>
         <BaseButton
           v-if="mode === 'form'"
+          :text="showAdvancedSearchButtonText ? 'Advanced Search' : ''"
           button-style="row"
-          text="Advanced Search"
           icon="drop-down"
           icon-size="small"
           icon-position="right"
@@ -92,7 +94,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { createId, hasData, sort } from '@/utils/utils';
+import { createId, debounce, hasData, sort } from '@/utils/utils';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
 
 /**
@@ -497,6 +499,11 @@ export default {
        * @type {boolean}
        */
       formMounted: false,
+      /**
+       * button text should only be shown if enough space is available
+       * (only mode `form`)
+       */
+      showAdvancedSearchButtonText: true,
     };
   },
   computed: {
@@ -754,11 +761,31 @@ export default {
     // triggering search
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
   },
+  mounted() {
+    // only add observer for mode `form`
+    if (this.mode === 'form') {
+      // to listen to element with instead of window width create an observer!
+      this.initObserver();
+    }
+  },
+  beforeDestroy() {
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.searchContainer);
+  },
   methods: {
     /**
      * GENERAL FUNCTIONALITIES
      */
 
+    /**
+     * initialize resize observer to steer advanced search button appearance
+     */
+    initObserver() {
+      const resizeObserver = new ResizeObserver(debounce(50, ([container]) => {
+        this.showAdvancedSearchButtonText = container.contentRect.width >= 460;
+      }));
+      resizeObserver.observe(this.$refs.searchContainer);
+      this.resizeObserver = resizeObserver;
+    },
     /**
      * @param {string} input - the search string to autocomplete
      * @param {Filter} filter - the filter the autocomplete was triggered for
@@ -1204,6 +1231,7 @@ export default {
 .base-advanced-search__expand-button {
   border-left: $separation-line;
   margin-left: $spacing-small;
+  padding-right: $spacing-small;
 }
 
 .base-advanced-search__search-form {
