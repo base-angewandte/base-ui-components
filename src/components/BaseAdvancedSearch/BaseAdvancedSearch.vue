@@ -446,8 +446,17 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * prop only relevant for mode `form`
+     * set advanced search (form) visibility from outside
+     * this can also be used to not show the advanced search after initial loading
+     */
+    advancedFormOpen: {
+      type: Boolean,
+      default: true,
+    },
   },
-  emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values'],
+  emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
   data() {
     return {
       /**
@@ -748,6 +757,15 @@ export default {
         }
       },
       immediate: true,
+    },
+    advancedFormOpen: {
+      handler(val) {
+        this.formOpen = val;
+      },
+      immediate: true,
+    },
+    formOpen(val) {
+      this.$emit('update:advanced-form-open', val);
     },
   },
   created() {
