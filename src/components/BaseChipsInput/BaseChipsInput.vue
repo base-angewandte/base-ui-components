@@ -766,6 +766,9 @@ export default {
      * a selected option
      */
     onEnter() {
+      // do nothing if dropdown should be closed on option select, and dropdown is not active
+      if (this.closeDropdownOnOptionSelect && !this.isActive) return;
+
       // check if there is a currently active option
       if (this.activeOption) {
         this.addSelectedOption(this.activeOption);
