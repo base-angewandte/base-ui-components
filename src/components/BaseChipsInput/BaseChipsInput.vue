@@ -8,7 +8,7 @@
       v-bind="chipsFieldInputProps"
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
-      :drop-down-list-id="id"
+      :drop-down-list-id="internalId"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :is-active.sync="isActive"
       :loadable="allowDynamicDropDownEntries"
@@ -26,7 +26,7 @@
           :selected-option.sync="selectedOption"
           :identifier-property-name="identifierPropertyName"
           :label-property-name="labelPropertyName"
-          :list-id="id"
+          :list-id="internalId"
           :style="{ 'min-width': dropDownMinWidth }"
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
@@ -119,6 +119,7 @@
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
@@ -549,6 +550,9 @@ export default {
       get() {
         return this.listInt[this.activeOptionIndex];
       },
+    },
+    internalId() {
+      return this.id || createId();
     },
   },
   watch: {
