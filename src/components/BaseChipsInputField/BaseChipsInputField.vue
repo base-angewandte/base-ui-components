@@ -6,6 +6,7 @@
       :id="id"
       ref="baseInput"
       v-model="inputInt"
+      :field-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -208,6 +209,15 @@ export default {
     input: {
       type: String,
       default: '',
+    },
+    /**
+     * specify input field type
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
     },
     /**
      * input field label

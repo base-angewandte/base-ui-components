@@ -6,6 +6,7 @@
       ref="baseInput"
       v-model="input"
       v-bind="chipsFieldInputProps"
+      :input-type="inputType"
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="id"
@@ -161,6 +162,15 @@ export default {
     selectedList: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * specify input field type
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
     },
     /**
      * input field label
