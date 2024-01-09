@@ -429,6 +429,13 @@ export default {
 
     &__header {
       display: none;
+
+      &__title {
+        margin-right: $spacing-small;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     &__body {
@@ -476,6 +483,7 @@ export default {
 
     &__button {
       display: flex;
+      flex-shrink: 0;
       transition: $link-transition;
 
       &__icon {
