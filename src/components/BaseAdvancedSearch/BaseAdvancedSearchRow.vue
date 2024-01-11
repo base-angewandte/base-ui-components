@@ -365,8 +365,9 @@
                { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
       @clicked="addFilterRow"
       @click.native.stop="">
-      <template #text>
+      <template #text="{ labelId }">
         <span
+          :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
           {{ getI18nTerm(getLangLabel(advancedSearchText.addFilter)) }}
         </span>
