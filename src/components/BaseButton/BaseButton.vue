@@ -2,7 +2,8 @@
   <button
     :disabled="disabled"
     :aria-disabled="disabled"
-    :aria-describedby="internalId"
+    :aria-labelledby="setLabelIdReference ? internalId : false"
+    :aria-describedby="description ? `${internalId}-description` : false"
     :type="buttonType"
     :class="['base-button',
              `base-button-${buttonStyle}`,
@@ -23,10 +24,14 @@
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
 
-    <!-- @slot have your own text element which also allows for easier custom styling -->
-    <slot name="text">
+    <!-- @slot have your own text element which also allows for easier custom styling.
+      @binding {string|number} label-id If you are using this slot please also set the id of your custom element to `label-id` since this id is used for the <button> `aria-labelledby` attribute -->
+    <slot
+      name="text"
+      :label-id="internalId">
       <span
         v-if="text && buttonStyle !== 'circle'"
+        :id="internalId"
         :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
         {{ text }}
       </span>
@@ -40,7 +45,7 @@
       @clicked="clicked" />
     <span
       v-if="description"
-      :id="internalId"
+      :id="`${internalId}-description`"
       class="hide">
       {{ description }}
     </span>
@@ -48,7 +53,7 @@
 </template>
 
 <script>
-import { createId } from '../../utils/utils';
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
@@ -64,6 +69,9 @@ export default {
   props: {
     /**
      * Button Text
+     *
+     * if button text is left empty and slot `text` is not used (so this is a button only
+     *  with an icon) please set at least the prop `description` or `iconTitle` for accessibility reasons!
      */
     text: {
       type: String,
@@ -197,6 +205,11 @@ export default {
     return {
       internalId: createId(),
     };
+  },
+  computed: {
+    setLabelIdReference() {
+      return !!this.text || !!this.$slots.text;
+    },
   },
   methods: {
     clicked(event) {
