@@ -5,6 +5,8 @@
     class="base-advanced-search-row"
     @click="openDropDown">
     <!-- SEARCH FIELD -->
+    <!-- note: the id is used in the javascript part as well as the parent component
+      BaseAdvancedSearch.vue - consider that when changing it! -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
       ref="baseSearch"

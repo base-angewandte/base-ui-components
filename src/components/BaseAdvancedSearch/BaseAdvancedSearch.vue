@@ -32,6 +32,7 @@
 
     <!-- MAIN FILTER -->
     <BaseAdvancedSearchRow
+      ref="mainSearch"
       :search-row-id="`main-${getRowId()}`"
       :mode="mode"
       :applied-filter.sync="mainFilter"
@@ -932,6 +933,14 @@ export default {
       if (triggerSearch) {
         this.search();
       }
+      // now focus new added row search input but wait until it is rendered
+      this.$nextTick(() => {
+        // get the correct field from all input fields of that element
+        const newSearchInputField = Array.from(this.$refs.mainSearch.$el
+          .getElementsByTagName('input'))
+          .find(element => element.id.includes('search-input'));
+        newSearchInputField.focus();
+      });
     },
     /**
      * remove filter after 'x' was triggered
