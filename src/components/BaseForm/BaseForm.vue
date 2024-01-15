@@ -31,8 +31,8 @@
           @input-complete="onInputComplete($event, element.name)">
           <template #label-addition="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-            @binding {string} fieldName - the name of the displayed field
-            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="label-addition"
               :field-name="fieldName"
@@ -40,8 +40,8 @@
           </template>
           <template #pre-input-field="{ fieldName, groupNames }">
             <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-            @binding {string} fieldName - the name of the displayed field
-            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="pre-input-field"
               :field-name="fieldName"
@@ -50,8 +50,8 @@
           <template
             #input-field-addition-before="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-            @binding {string} fieldName - the name of the displayed field
-            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="input-field-addition-before"
               :field-name="fieldName"
@@ -59,8 +59,8 @@
           </template>
           <template #input-field-inline-before="{ fieldName, groupNames }">
             <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)
-            @binding {string} fieldName - the name of the displayed field
-            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="input-field-inline-before"
               :field-name="fieldName"
@@ -78,8 +78,8 @@
               {{ element['x-attrs'].text_after }}
             </span>
             <!-- @slot for adding elements after input
-            @binding {string} fieldName - the name of the displayed field
-            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="input-field-addition-after"
               :field-name="fieldName"
@@ -87,8 +87,8 @@
           </template>
           <template #post-input-field="{ fieldName, groupNames }">
             <!-- @slot for adding elements at the end covering the whole height
-            @binding {string} fieldName - the name of the displayed field
-            @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="post-input-field"
               :field-name="fieldName"
@@ -104,7 +104,8 @@
           </template>
           <template #below-input="{ fieldName, groupNames }">
             <!-- @slot below-input slot added to e.g. add drop down
-            @binding {string} fieldName - the name of the displayed field -->
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               name="below-input"
               :field-name="fieldName"
@@ -142,8 +143,9 @@
                 valueIndex)">
               <template #label-addition="{ fieldName, groupNames }">
                 <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="label-addition"
                   :field-name="fieldName"
@@ -152,8 +154,9 @@
               </template>
               <template #pre-input-field="{ fieldName, groupNames }">
                 <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="pre-input-field"
                   :field-name="fieldName"
@@ -164,8 +167,9 @@
                 #input-field-addition-before="{ fieldName, groupNames }">
                 <!-- @slot Slot to allow for additional elements in the input field \<div\>
                   (before \<input\>)
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="input-field-addition-before"
                   :field-name="fieldName"
@@ -179,8 +183,9 @@
                   {{ element['x-attrs'].text_before }}
                 </span>
                 <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. for an example see [BaseInput](BaseInput)
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="input-field-inline-before"
                   :field-name="fieldName"
@@ -194,8 +199,9 @@
                   {{ element['x-attrs'].text_after }}
                 </span>
                 <!-- @slot for adding elements after input
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="input-field-addition-after"
                   :field-name="fieldName"
@@ -204,8 +210,9 @@
               </template>
               <template #post-input-field="{ fieldName, groupNames }">
                 <!-- @slot for adding elements at the end covering the whole height
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="post-input-field"
                   :field-name="fieldName"
@@ -222,8 +229,9 @@
               </template>
               <template #below-input="{ fieldName, groupNames }">
                 <!-- @slot below-input slot added to e.g. add drop down
-                @binding {string} fieldName - the name of the displayed field
-                @binding {number} index - the array index of field values -->
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {number} index - the array index of field values
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
                 <slot
                   name="below-input"
                   :field-name="fieldName"

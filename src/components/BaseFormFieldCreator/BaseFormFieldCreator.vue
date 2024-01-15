@@ -51,7 +51,7 @@
       <template
         #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-          @binding {string} fieldName -->
+          @binding {string} field-name -->
         <slot
           :field-name="field.name"
           name="label-addition" />
@@ -70,7 +70,7 @@
       </template>
       <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="pre-input-field" />
@@ -78,28 +78,28 @@
       <template
         #input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
         <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
-          @binding {string} fieldName - the name of the current field for identification purposes-->
+          @binding {string} field-name - the name of the current field for identification purposes-->
         <slot
           :field-name="field.name"
           name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
         <!-- @slot for adding elements after input
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-after" />
       </template>
       <template #post-input-field>
         <!-- @slot for adding elements at the end covering the whole height
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="post-input-field" />
@@ -116,7 +116,7 @@
       </template>
       <template #below-input>
         <!-- @slot below-input slot added to e.g. add drop down
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="below-input" />
@@ -159,14 +159,14 @@
           <template
             #label-addition>
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-              @binding {string} fieldName -->
+              @binding {string} field-name -->
             <slot
               :field-name="field.name"
               name="label-addition" />
           </template>
           <template #pre-input-field>
             <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-              @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} field-name - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="pre-input-field" />
@@ -174,28 +174,28 @@
           <template
             #input-field-addition-before>
             <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-              @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} field-name - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-addition-before" />
           </template>
           <template #input-field-inline-before>
             <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
-              @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} field-name - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-inline-before" />
           </template>
           <template #input-field-addition-after>
             <!-- @slot for adding elements after input
-              @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} field-name - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="input-field-addition-after" />
           </template>
           <template #post-input-field>
             <!-- @slot for adding elements at the end covering the whole height
-              @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} field-name - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="post-input-field" />
@@ -212,7 +212,7 @@
           </template>
           <template #below-input>
             <!-- @slot below-input slot added to e.g. add drop down
-              @binding {string} fieldName - the name of the current field for identification purposes -->
+              @binding {string} field-name - the name of the current field for identification purposes -->
             <slot
               :field-name="field.name"
               name="below-input" />
@@ -236,7 +236,70 @@
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
           class="base-form-field-creator__date-field"
-          @date-validated="emitCompletedInputValues" />
+          @date-validated="emitCompletedInputValues">
+          <!-- only add slot here if it there is no first (date) field row -->
+          <template
+            #label-addition>
+            <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added) -->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="label-addition" />
+          </template>
+          <template #pre-input-field>
+            <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added) -->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="pre-input-field" />
+          </template>
+          <template
+            #input-field-addition-before>
+            <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added)-->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="input-field-addition-before" />
+          </template>
+          <template #input-field-inline-before>
+            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added) -->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="input-field-inline-before" />
+          </template>
+          <template #input-field-addition-after>
+            <!-- @slot for adding elements after input
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added) -->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="input-field-addition-after" />
+          </template>
+          <template #post-input-field>
+            <!-- @slot for adding elements at the end covering the whole height
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added) -->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="post-input-field" />
+          </template>
+          <template #error-icon>
+            <!-- @slot use a custom icon instead of standard error/warning icon -->
+            <slot
+              name="error-icon" />
+          </template>
+          <template #remove-icon>
+            <!-- @slot use a custom icon instead of standard remove icon -->
+            <slot
+              name="remove-icon" />
+          </template>
+          <template #below-input>
+            <!-- @slot below-input slot added to e.g. add drop down
+              @binding {string} field-name - the name of the current field for identification purposes (for time range fields there is a '-time' suffix added) -->
+            <slot
+              :field-name="`${field.name}-time`"
+              name="below-input" />
+          </template>
+        </BaseDateInput>
       </div>
     </fieldset>
 
@@ -315,14 +378,14 @@
       <template
         #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="label-addition" />
       </template>
       <template #pre-input-field>
         <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="pre-input-field" />
@@ -330,28 +393,28 @@
       <template
         #input-field-addition-before>
         <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-before" />
       </template>
       <template #input-field-inline-before>
         <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-inline-before" />
       </template>
       <template #input-field-addition-after>
         <!-- @slot for adding elements after input
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="input-field-addition-after" />
       </template>
       <template #post-input-field>
         <!-- @slot for adding elements at the end covering the whole height
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="post-input-field" />
@@ -368,7 +431,7 @@
       </template>
       <template #below-input>
         <!-- @slot below-input slot added to e.g. add drop down
-          @binding {string} fieldName - the name of the current field for identification purposes -->
+          @binding {string} field-name - the name of the current field for identification purposes -->
         <slot
           :field-name="field.name"
           name="below-input" />
@@ -402,7 +465,7 @@
           <template
             #label-addition="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"
@@ -411,7 +474,7 @@
           </template>
           <template #pre-input-field="{ fieldName, groupNames }">
             <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"
@@ -421,7 +484,7 @@
           <template
             #input-field-addition-before="{ fieldName, groupNames }">
             <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"
@@ -430,7 +493,7 @@
           </template>
           <template #input-field-inline-before="{ fieldName, groupNames }">
             <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"
@@ -439,7 +502,7 @@
           </template>
           <template #input-field-addition-after="{ fieldName, groupNames }">
             <!-- @slot for adding elements after input
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"
@@ -448,7 +511,7 @@
           </template>
           <template #post-input-field="{ fieldName, groupNames }">
             <!-- @slot for adding elements at the end covering the whole height
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"
@@ -467,7 +530,7 @@
           </template>
           <template #below-input="{ fieldName, groupNames }">
             <!-- @slot below-input slot added to e.g. add drop down
-              @binding {string} fieldName - the name of the current field for identification purposes
+              @binding {string} field-name - the name of the current field for identification purposes
               @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
             <slot
               :field-name="fieldName"

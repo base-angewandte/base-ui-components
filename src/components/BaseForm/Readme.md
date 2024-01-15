@@ -118,14 +118,15 @@ This is a basic (autocomplete functionality not working here) example how a form
         }"
         class="form"
         @values-changed="valueList = { ...$event }">
-      <template #label-addition="{ fieldName }">
+      <template #label-addition="{ fieldName, groupNames }">
+        <template v-if="fieldName === 'isan'">
+          test
+        </template>
         <template v-if="fieldName === 'published_in'">
           only for published in
         </template>
-      </template>
-      <template #label-addition="{ fieldName }">
-        <template v-if="fieldName === 'isan'">
-          test
+        <template v-if="groupNames && groupNames.includes('date_location') && fieldName === 'location'">
+          using groupNames
         </template>
       </template>
       <template #input-field-addition-before="{ fieldName, index }">
