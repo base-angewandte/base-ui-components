@@ -45,6 +45,7 @@ Additionally, some features are derived from the OpenAPI definitions:<br>
   * `type` `{object}` with `properties` `date` and `time`: rendering a date and a time field.
   * `type` `{object}` with `properties` `date`, `time_from` and `time_to`: rendering a single date field and time range fields.
   * `type` `{object}` with `properties` `date_from`, `date_to`, `time_from` and `time_to`: rendering date range fields and time range fields.
+  * `type` `{object}` with `properties` `time_from` and `time_to` rendering a time range.
   * If none of these definitions are met a single date field will be rendered.
   * As specified above, all of these definitions could also be wrapped in `type` `{array}` to make the field(s) repeatable.
 * **Min or Max length**: a min length error message will be triggered  automatically if `type` is `text` if field minLength is set in the openAPI definition and the min length is not reached.

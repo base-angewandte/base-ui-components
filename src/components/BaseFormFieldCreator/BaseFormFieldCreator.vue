@@ -128,7 +128,10 @@
       v-else-if="fieldType === 'date'"
       class="base-form-field-creator__date-fieldset">
       <div class="base-form-field-creator__date-field-wrapper">
+        <!-- if any date is included in the object (`date`, `date_from` `date_to`) this component is
+          rendered -->
         <BaseDateInput
+          v-if="dateType === 'single' || dateType.includes('date')"
           :id="fieldKey"
           :key="fieldKey + '_date'"
           v-model="fieldValueInt"
@@ -215,14 +218,17 @@
               name="below-input" />
           </template>
         </BaseDateInput>
+        <!-- if any time range is included in the object this component is
+          rendered -->
         <BaseDateInput
           v-if="dateType.includes('timerange')"
           :id="fieldKey"
           :key="fieldKey + '_time'"
           v-model="fieldValueInt"
           v-bind="fieldProps"
-          :label="field.properties.time_from.title"
-          :show-label="false"
+          :label="dateType !== 'timerange' && field.properties.time_from.title
+            ? field.properties.time_from.title : labelInt"
+          :show-label="!dateType.includes('date')"
           :placeholder="placeholderInt.time || placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
           :invalid="invalid || fieldProps.invalid"
@@ -796,6 +802,9 @@ export default {
       }
       if (props.includes('date_to')) {
         return 'daterange';
+      }
+      if (props.includes('time_from') && props.includes('time_to')) {
+        return 'timerange';
       }
       return 'single';
     },
