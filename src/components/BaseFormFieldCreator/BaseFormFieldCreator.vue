@@ -254,7 +254,7 @@
         || !!fieldProps.allowUnknownEntries"
       :draggable="!!fieldProps.draggable || !isChipsSingleSelect"
       :hoverbox-content="hoverBoxData || fieldProps.hoverBoxData"
-      :sortable="field.name === 'keywords' || formFieldXAttrs.sortable
+      :sortable="formFieldXAttrs.sortable
         || !!fieldProps.sortable"
       :is-loading="autocompleteLoading"
       :sort-text="fieldProps.sortText || sortText"
