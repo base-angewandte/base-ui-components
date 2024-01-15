@@ -3,6 +3,7 @@
     ref="popUpBody"
     v-click-outside="() => clickedOutside()"
     role="dialog"
+    :aria-labelledby="`baseTooltipBox-title-${_uid}`"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
@@ -14,6 +15,7 @@
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
         <div
+          :id="`baseTooltipBox-title-${_uid}`"
           class="base-tooltip-box__header__title">
           {{ modalTitle }}
         </div>
