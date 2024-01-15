@@ -223,7 +223,7 @@
           v-bind="fieldProps"
           :label="field.properties.time_from.title"
           :show-label="false"
-          :placeholder="placeholderInt.time"
+          :placeholder="placeholderInt.time || placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"

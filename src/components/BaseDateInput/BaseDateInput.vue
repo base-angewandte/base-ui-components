@@ -98,7 +98,8 @@
                       :id="label + '-' + id"
                       ref="inputFrom"
                       v-model="inputFrom"
-                      :placeholder="placeholder.date || placeholder"
+                      :placeholder="isFromTimeField ? placeholder.time || placeholder
+                        : placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-' + id"
                       :aria-required="required.toString()"
@@ -182,7 +183,8 @@
                       :id="label + '-to-' + id"
                       ref="inputTo"
                       v-model="inputTo"
-                      :placeholder="placeholder.date || placeholder"
+                      :placeholder="isToTimeField ? placeholder.time || placeholder
+                        : placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-to-' + id"
                       :aria-required="required.toString()"
