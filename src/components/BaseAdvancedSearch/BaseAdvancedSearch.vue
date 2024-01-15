@@ -926,6 +926,7 @@ export default {
       // and reset the main filter
       this.mainFilter = {
         ...this.defaultFilter,
+        filter_values: null,
       };
       // and store the main filter to compare to later
       this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
