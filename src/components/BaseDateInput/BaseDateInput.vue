@@ -88,7 +88,7 @@
                   :value-type="isFromTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('from')"
-                  @click.native.prevent.stop=""
+                  @click.native.prevent="onInputClick"
                   @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
@@ -173,7 +173,7 @@
                   :value-type="isToTimeField ? 'format' : datePickerValueFormat"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
-                  @click.native.prevent.stop=""
+                  @click.native.prevent="onInputClick"
                   @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
@@ -985,6 +985,19 @@ export default {
       // date picker blur - they are distinguishable by relatedTarget!
       if (event.relatedTarget?.className === 'mx-calendar-content') return;
       this.checkDateValidity(origin);
+    },
+    /**
+     * since the complete datepicker lies within the BaseInput, the BaseInput click event
+     *  is triggered also when a date is picked from the date picker - this leads to the undesired
+     *  side effect that the date picker pop up is reopened when a date was selected there
+     *  therefore we only allow the click event to pass on when the user clicks on the input field
+     *  DIRECTLY
+     * @param {PointerEvent} event - the native click event
+     */
+    onInputClick(event) {
+      if (event.target.tagName !== 'INPUT') {
+        event.stopPropagation();
+      }
     },
     initObservers() {
       // create an observer with the fade out calc function
