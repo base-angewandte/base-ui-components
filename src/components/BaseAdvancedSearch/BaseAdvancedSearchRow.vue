@@ -1011,7 +1011,7 @@ export default {
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
             } else if (val.type === 'text') {
-              [this.currentInput] = val.filter_values;
+              this.currentInput = val.filter_values[0] || '';
             } else {
               this.currentInput = '';
             }
@@ -1055,7 +1055,7 @@ export default {
       }
       // if isActive becomes false and the drop down closes check for remaining input strings
       // if the filter is chips
-      if (!val && this.filter.type === 'chips' && this.currentInput && this.currentInput.trim()) {
+      if (!val && this.filter.type === 'chips' && !!this.currentInput && this.currentInput.trim()) {
         // check if the string can actually be added (freetext options allowed) and that the option
         // was not added previously
         if (this.filter.freetext_allowed && (!this.selectedOptions || !this.selectedOptions
