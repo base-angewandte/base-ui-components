@@ -70,7 +70,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('fromOpen', $event)"
+            @update:is-active="isActiveHandler('from', $event)"
             v-on="inputListeners">
             <template #input>
               <div
@@ -109,7 +109,6 @@
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
                       autocomplete="off"
-                      @blur="onInputBlur($event, 'From')"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
                       v-on="dateInputListeners">
@@ -155,7 +154,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('toOpen', $event)"
+            @update:is-active="isActiveHandler('to', $event)"
             v-on="inputListeners">
             <template #input>
               <div
@@ -194,7 +193,6 @@
                       :aria-disabled="disabled"
                       autocomplete="off"
                       :class="['base-date-input__input', inputClass]"
-                      @blur="checkDateValidity('To')"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
                       v-on="dateInputListeners">
@@ -980,12 +978,6 @@ export default {
     if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },
   methods: {
-    onInputBlur(event, origin) {
-      // only check date validity when blur is coming from user input event not from
-      // date picker blur - they are distinguishable by relatedTarget!
-      if (event.relatedTarget?.className === 'mx-calendar-content') return;
-      this.checkDateValidity(origin);
-    },
     /**
      * since the complete datepicker lies within the BaseInput, the BaseInput click event
      *  is triggered also when a date is picked from the date picker - this leads to the undesired
@@ -1081,7 +1073,7 @@ export default {
         event.preventDefault();
       }
       // when the user tries to leave the field check if input string is valid
-      if (key === 'Enter' && currentInputString) {
+      if (key === 'Enter') {
         this.checkDateValidity(origin);
         currentInputString = this[`input${origin}`];
       }
@@ -1128,6 +1120,7 @@ export default {
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     checkDateValidity(origin) {
+      console.log('check date validity');
       // get the value in question
       let value = this[`input${origin}`];
       // check if there is a value present
@@ -1311,21 +1304,24 @@ export default {
      */
     closeTimePicker(origin, time, type) {
       if (type === 'minute') {
+        // get capitalized origin here since needed 2x
+        const uppercaseOrigin = capitalizeString(origin);
+        // check date validity
+        this.checkDateValidity(uppercaseOrigin);
+        // close the drop down
         this[`${origin}Open`] = false;
         // check if the new date/time string needs a fade out
-        this.calcFadeOut([`${origin.charAt(0).toUpperCase()}${origin.slice(1)}`]);
+        this.calcFadeOut([uppercaseOrigin]);
       }
     },
     /**
      * function triggered on datepicker 'pick' event, handling date picker closing
      * and date validation
+     *  caveat: this event is just triggered for DATE picker - not time!
      * @param origin
-     * @param isTimeField
      */
-    datePicked(origin, isTimeField) {
-      if (!isTimeField) {
-        this[`${origin}Open`] = false;
-      }
+    datePicked(origin) {
+      this[`${origin}Open`] = false;
       // need this here because on blur() date is not updated
       this.checkDateValidity(capitalizeString(origin));
     },
@@ -1554,19 +1550,22 @@ export default {
     /**
      * add delay before value is set
      *
-     * @param {String} key
+     * @param {String} origin - is event originating from 'from' or 'to' field
      * @param {boolean} value
      */
-    isActiveHandler(key, value) {
+    isActiveHandler(origin, value) {
       // if false set value immediately
       if (!value) {
-        this[key] = value;
+        this[`${origin}Open`] = value;
+        // check for date validity here instead of blur event (necessary for time input
+        // which is not triggered otherwise)
+        this.checkDateValidity(capitalizeString(origin));
         return;
       }
 
       // otherwise add a delay
       setTimeout(() => {
-        this[key] = value;
+        this[`${origin}Open`] = value;
       }, this.isActiveDelay);
     },
   },
