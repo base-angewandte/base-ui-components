@@ -1120,7 +1120,6 @@ export default {
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     checkDateValidity(origin) {
-      console.log('check date validity');
       // get the value in question
       let value = this[`input${origin}`];
       // check if there is a value present
