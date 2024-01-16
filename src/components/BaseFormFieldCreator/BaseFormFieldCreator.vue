@@ -236,7 +236,7 @@
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
           class="base-form-field-creator__date-field"
-          @date-validated="emitCompletedInputValues">
+          @value-validated="emitCompletedInputValues">
           <!-- only add slot here if it there is no first (date) field row -->
           <template
             #label-addition>
