@@ -652,14 +652,12 @@ export default {
       if (this.inputElement && val && this.setFocusOnActive) {
         this.inputElement.focus();
       }
-      if (val !== this.isActive) {
-        /**
-         * propagate active state changes of input field to parent
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * propagate active state changes of input field to parent
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * keep externally set errorMessage variable and internal errorMessage variable in sync
