@@ -447,7 +447,8 @@ export default {
       type: Array,
       default: () => ([]),
       validator: val => !val.length
-        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * specify a default value for a filter that is set when none of the
@@ -478,7 +479,9 @@ export default {
         type: 'text',
         options: [],
       }),
-      validator: val => val.type && (val.type !== 'chips' || val.freetext_allowed || val.options),
+      validator: val => !val.length
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>
@@ -690,10 +693,7 @@ export default {
        * the currently selected filter
        * @type {Filter}
        */
-      filter: {
-        ...this.defaultFilter,
-        filter_values: this.setFilterValues(this.defaultFilter),
-      },
+      filter: null,
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Filter}
@@ -809,7 +809,8 @@ export default {
      */
     displayFilterList() {
       if (!this.isMainSearch) return this.filterList;
-      return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
+      return this.filterList.filter(filter => filter[this.identifierPropertyName.filter]
+        !== this.defaultFilter[[this.identifierPropertyName.filter]]);
     },
     /**
      * variable to return if autocomplete functionality should be shown (= results fetched
@@ -989,6 +990,20 @@ export default {
         }
       },
       deep: true,
+    },
+    defaultFilter: {
+      handler(val) {
+        // check if the props default defaultFilter is still applied
+        if (!this.filter || this.filter.id === 'default') {
+          this.filter = {
+            ...val,
+            // if filter is changed from outside this often means resetting a filter so previous
+            // values should not be taken over (=leave second argument of function empty here)
+            filter_values: this.setFilterValues(val),
+          };
+        }
+      },
+      immediate: true,
     },
     /**
      * watch if applied filter changes from outside

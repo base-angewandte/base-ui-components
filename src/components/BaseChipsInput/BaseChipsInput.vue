@@ -6,9 +6,10 @@
       ref="baseInput"
       v-model="input"
       v-bind="chipsFieldInputProps"
+      :input-type="inputType"
       :add-selected-entry-directly="false"
       :selected-list.sync="selectedListInt"
-      :drop-down-list-id="id"
+      :drop-down-list-id="internalId"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :is-active.sync="isActive"
       :loadable="allowDynamicDropDownEntries"
@@ -26,14 +27,14 @@
           :selected-option.sync="selectedOption"
           :identifier-property-name="identifierPropertyName"
           :label-property-name="labelPropertyName"
-          :list-id="id"
+          :list-id="internalId"
           :style="{ 'min-width': dropDownMinWidth }"
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
           @within-drop-down="dropDownActive = $event"
-          @click.native.stop=""
-          @touchstart.native.stop="">
+          @click.native.stop="closeDropDown"
+          @touchstart.native.stop="closeDropDown">
           <template #option="entry">
             <span
               v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
@@ -119,6 +120,7 @@
 </template>
 
 <script>
+import { createId } from '@/utils/utils';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
@@ -161,6 +163,15 @@ export default {
     selectedList: {
       type: Array,
       default: () => [],
+    },
+    /**
+     * specify input field type
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
     },
     /**
      * input field label
@@ -396,6 +407,13 @@ export default {
       default: false,
     },
     /**
+     * set `true` if dropdown should be closed after selecting an option
+     */
+    closeDropdownOnOptionSelect: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * this prop gives the option to add assistive text for screen readers
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
@@ -550,6 +568,9 @@ export default {
         return this.listInt[this.activeOptionIndex];
       },
     },
+    internalId() {
+      return this.id || createId();
+    },
   },
   watch: {
     /**
@@ -620,6 +641,9 @@ export default {
      * @param {string} val
      */
     input(val) {
+      // open dropdown
+      this.isActive = true;
+
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
         /**
@@ -704,6 +728,8 @@ export default {
         this.chipsInputActive = false;
         this.inputElem.blur();
       }
+      // optional close dropdown after selection
+      this.closeDropDown();
     },
     /**
      * method for emitting selected list changes to parent
@@ -754,6 +780,9 @@ export default {
      * a selected option
      */
     onEnter() {
+      // do nothing if dropdown should be closed on option select, and dropdown is not active
+      if (this.closeDropdownOnOptionSelect && !this.isActive) return;
+
       // check if there is a currently active option
       if (this.activeOption) {
         this.addSelectedOption(this.activeOption);
@@ -765,6 +794,9 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     onArrowKey(event) {
+      // open dropdown
+      this.isActive = true;
+
       // check if the list has any options
       if (this.listInt.length) {
         // if yes trigger the navigate function
@@ -798,6 +830,15 @@ export default {
       // see if it exists and has a width - if yes set drop down min width to the same
       if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
         this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
+      }
+    },
+    /**
+     * close dropdown
+     */
+    closeDropDown() {
+      // optional close dropdown after selection
+      if (this.closeDropdownOnOptionSelect && this.isActive) {
+        this.isActive = false;
       }
     },
   },

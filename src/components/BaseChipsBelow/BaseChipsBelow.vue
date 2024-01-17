@@ -4,6 +4,7 @@
       ref="chipsInput"
       v-model="selectedBelowListInt"
       v-bind="chipsInputProps"
+      :close-dropdown-on-option-select="closeDropdownOnOptionSelect"
       :is-loading="isLoading"
       :display-chips-inline="false"
       :sort-text="sortText"
@@ -406,6 +407,13 @@ export default {
     clearable: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * set `false` if dropdown should be still open after selecting an option
+     */
+    closeDropdownOnOptionSelect: {
+      type: Boolean,
+      default: true,
     },
     /**
      * specify additional input field styling

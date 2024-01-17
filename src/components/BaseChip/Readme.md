@@ -10,9 +10,10 @@ A chip that can be edited
           :is-linked="false"
           @remove-entry="remove"/>
       <BaseChip
-          :entry="'Click me to see a hover box!'"
-          :hover-box-content="{ title: 'More Info', subtext: 'Additional', boxText: ['Info 1', 'Info 2']}"
+          :entry="'i am linked and editable!'"
           :is-linked="true"
+          :editable="true"
+          assistive-text="testing this now???"
           @remove-entry="remove"/>
   </div>
 </template>

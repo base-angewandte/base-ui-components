@@ -3,6 +3,7 @@
     ref="popUpBody"
     v-click-outside="() => clickedOutside()"
     role="dialog"
+    :aria-labelledby="`baseTooltipBox-title-${_uid}`"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
@@ -14,6 +15,7 @@
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
         <div
+          :id="`baseTooltipBox-title-${_uid}`"
           class="base-tooltip-box__header__title">
           {{ modalTitle }}
         </div>
@@ -429,6 +431,13 @@ export default {
 
     &__header {
       display: none;
+
+      &__title {
+        margin-right: $spacing-small;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     &__body {
@@ -476,6 +485,7 @@ export default {
 
     &__button {
       display: flex;
+      flex-shrink: 0;
       transition: $link-transition;
 
       &__icon {
