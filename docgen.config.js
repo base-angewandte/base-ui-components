@@ -5,14 +5,13 @@ const cwd = path.join(__dirname, './src');
 
 // add files that should be ignored here
 const ignore = [
-  'components/BaseCheckBox/*',
   'components/BaseTooltip/*',
-  'components/BaseChip/*',
   'components/BaseExpandList/BaseExpandListRow.vue',
   'components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
   'components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue',
   'components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue',
   'components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue',
+  // currently hidden for accessibility reasons
   'components/BaseDatePanel/*',
 ];
 

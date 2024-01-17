@@ -6,6 +6,7 @@
       :id="id"
       ref="baseInput"
       v-model="inputInt"
+      :field-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -27,7 +28,7 @@
       :set-focus-on-active="setFocusOnActive"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
-      v-on="$listeners">
+      v-on="inputListeners">
       <template
         #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
@@ -208,6 +209,15 @@ export default {
     input: {
       type: String,
       default: '',
+    },
+    /**
+     * specify input field type
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
     },
     /**
      * input field label
@@ -526,6 +536,19 @@ export default {
       inputInt: '',
     };
   },
+  computed: {
+    inputListeners() {
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          // keep this BaseInput event from propagating and use component's own event
+          'update:is-active': () => {},
+        },
+      };
+    },
+  },
   watch: {
     /**
      * selectedList is watched to also change selectedListInt if necessary
@@ -561,16 +584,13 @@ export default {
      * @param {boolean} val - internal input field active value
      */
     isActiveInt(val) {
-      // check if values are in sync already
-      if (val !== this.isActive) {
-        /**
-         * event updating the is-active prop in case of internal changes
-         *
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * event updating the is-active prop in case of internal changes
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * watch for outside changes in the input field active state

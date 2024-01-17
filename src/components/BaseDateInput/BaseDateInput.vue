@@ -77,7 +77,6 @@
                 class="base-date-input__datepicker">
                 <DatePicker
                   v-model="inputFrom"
-                  :input-attr="{ id: label + '-' + id }"
                   :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
@@ -95,7 +94,7 @@
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="label + '-' + id"
+                      :id="`input-${id}-from` "
                       ref="inputFrom"
                       v-model="inputFrom"
                       :placeholder="placeholder.date || placeholder"
@@ -161,7 +160,6 @@
                 class="base-date-input__datepicker">
                 <DatePicker
                   v-model="inputTo"
-                  :input-attr="{ id: label + '-' + id }"
                   :placeholder="isToTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
@@ -169,7 +167,7 @@
                   :open="toOpen"
                   :type="isToTimeField ? 'time' : minDateView"
                   :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
-                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
+                  :value-type="isToTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
                   @click.native.prevent.stop=""
@@ -179,7 +177,7 @@
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="label + '-to-' + id"
+                      :id="`input-${id}-to` "
                       ref="inputTo"
                       v-model="inputTo"
                       :placeholder="placeholder.date || placeholder"
@@ -190,9 +188,9 @@
                       :required="required"
                       :disabled="disabled"
                       :aria-disabled="disabled"
-                      autocomplete="off"
                       :class="['base-date-input__input', inputClass]"
-                      @blur="checkDateValidity('To')"
+                      autocomplete="off"
+                      @blur="onInputBlur($event, 'To')"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
                       v-on="dateInputListeners">
