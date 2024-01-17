@@ -1360,10 +1360,15 @@ export default {
      * event triggered on row click to open drop down and focus main input
      */
     openDropDown() {
-      this.isActive = true;
-      if (this.mode === 'list' && this.searchInputElement) {
+      // set focus to input field when drop down opens only if
+      // a) drop down is not already open (e.g. otherwise this would always cause the first input field of a date
+      //    range to get focused on element click
+      // b) mode is 'list'
+      // c) search input element exists
+      if (!this.isActive && this.mode === 'list' && this.searchInputElement) {
         this.searchInputElement.focus();
       }
+      this.isActive = true;
     },
     /**
      * primary drop down navigation deciding what arrow keys are used for
