@@ -756,18 +756,9 @@ export default {
           'clicked-outside': (event) => {
             event.stopPropagation();
           },
-          // need to stop the event triggered in original BaseInput as well
-          // and replace it with the internal active state variable
-          'update:is-active': () => {
-            /**
-             * replace BaseInput state with BaseDateInput field active state and
-             * propagate this one
-             *
-             * @event update:is-active
-             * @param {boolean} - is input field active
-             */
-            this.$emit('update:is-active', this.isActiveInt);
-          },
+          // need to stop the event triggered in original BaseInput and only trigger
+          // when component isActiveInt has changed
+          'update:is-active': () => {},
         },
       };
     },
@@ -921,9 +912,14 @@ export default {
      * @param {boolean} val - the changed internal is active variable
      */
     isActiveInt(val) {
-      if (val !== this.isActive) {
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * replace BaseInput state with BaseDateInput field active state and
+       * propagate this one
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * also adjust internal variable when active state changes from outside
@@ -1554,6 +1550,7 @@ export default {
       // if false set value immediately
       if (!value) {
         this[`${origin}Open`] = value;
+        this.isActiveInt = this.fromOpen || this.toOpen;
         // check for date validity here instead of blur event (necessary for time input
         // which is not triggered otherwise)
         this.checkDateValidity(capitalizeString(origin));
@@ -1563,6 +1560,7 @@ export default {
       // otherwise add a delay
       setTimeout(() => {
         this[`${origin}Open`] = value;
+        this.isActiveInt = this.fromOpen || this.toOpen;
       }, this.isActiveDelay);
     },
   },
