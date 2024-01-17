@@ -487,20 +487,6 @@ export default {
       },
       immediate: true,
     },
-    /**
-     * propagate internal active state changes to parent
-     */
-    isActiveInt(val) {
-      if (val !== this.isActive) {
-        /**
-         * to keep active state of component in sync
-         *
-         * @event update:is-active
-         * @param {boolean} - is component active
-         */
-        this.$emit('update:is-active', val);
-      }
-    },
   },
 };
 </script>
