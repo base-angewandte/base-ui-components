@@ -794,7 +794,7 @@ export default {
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       return !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag || elem.text);
+        && slotElements.some(elem => elem.tag || elem.text?.trim());
     },
     /**
      * determines if label row should be shown
