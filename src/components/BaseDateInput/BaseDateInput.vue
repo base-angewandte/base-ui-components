@@ -1441,8 +1441,8 @@ export default {
      * @returns {string} - returns a string in format YYYY-MM-DD
      */
     getDateString(date) {
-      // there is always a year
-      let dateString = `${date.getFullYear().toString()}`;
+      // there is always a year // add padStart to always have 4 digits
+      let dateString = `${date.getFullYear().toString().padStart(4, '0')}`;
       // if date format is not 'year' only - add month
       if (this.dateFormatInt !== 'YYYY') {
         const month = (date.getMonth() + 1).toString();
