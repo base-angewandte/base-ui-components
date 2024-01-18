@@ -53,7 +53,7 @@
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            :id="label + '-' + id"
+            :id="`input-${id}-from`"
             v-model="inputFrom"
             :label="label"
             :show-label="false"
@@ -94,7 +94,7 @@
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-from` "
+                      :id="`input-${id}-from`"
                       ref="inputFrom"
                       v-model="inputFrom"
                       :placeholder="isFromTimeField ? placeholder.time || placeholder
@@ -137,7 +137,7 @@
           <!-- INPUT TO -->
           <BaseInput
             v-if="type !== 'single'"
-            :id="label + '-to-' + id"
+            :id="`input-${id}-to`"
             v-model="inputTo"
             :label="label"
             :show-label="false"
@@ -177,7 +177,7 @@
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-to` "
+                      :id="`input-${id}-to`"
                       ref="inputTo"
                       v-model="inputTo"
                       :placeholder="isToTimeField ? placeholder.time || placeholder
