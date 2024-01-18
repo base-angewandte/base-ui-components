@@ -234,8 +234,8 @@
 
             <!-- if there is field content show a 'remove all content' button -->
             <div
-              v-if="!multiplyButtonsInline(element) && (checkFieldContent(valueList[element.name])
-                || valueListInt[element.name].length > 1)"
+              v-if="!multiplyButtonsInline(element) && (valueListInt[element.name].length > 1
+                || checkFieldContent(element.name, 0))"
               :key="`${index}_button_${valueIndex}_${formId}`"
               class="group-add">
               <button
@@ -259,8 +259,8 @@
               <div
                 class="base-form__inline-icons">
                 <base-icon
-                  v-if="checkFieldContent(valueList[element.name])
-                    || valueListInt[element.name].length > 1"
+                  v-if="valueListInt[element.name].length > 1
+                    || checkFieldContent(element.name, 0)"
                   :title="valueListInt[element.name].length === 1
                     ? getI18nTerm('form.clearField') || 'Clear'
                     : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) })"
@@ -872,18 +872,22 @@ export default {
       // if it is not an array or object simply return value from list or empty string
       return (typeof value === 'string' ? value : '');
     },
-    checkFieldContent(fieldValues) {
+    checkFieldContent(fieldName, index = -1) {
+      return this.hasValues(index < 0
+        ? this.valueListInt[fieldName][index] : this.valueListInt[fieldName]);
+    },
+    hasValues(fieldValues) {
       let hasContent = false;
       if (fieldValues && typeof fieldValues === 'object') {
         if (fieldValues.length >= 0) {
           fieldValues.forEach((values) => {
-            hasContent = this.checkFieldContent(values) || hasContent;
+            hasContent = this.hasValues(values) || hasContent;
           });
         } else {
           const objectKeys = Object.keys(fieldValues);
           objectKeys
             .forEach((key) => {
-              hasContent = this.checkFieldContent(fieldValues[key]) || hasContent;
+              hasContent = this.hasValues(fieldValues[key]) || hasContent;
             });
         }
       } else {
