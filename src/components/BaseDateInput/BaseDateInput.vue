@@ -1058,12 +1058,14 @@ export default {
       // * if type is date and key was period and date format is year or last char in string was
       //    already a period
       // * if type is time and key was colon and last char was already a colon
-      if (!allowedKeysRegex.test(key)
+      // * and also make sure copy & paste is allowed!
+      if ((!allowedKeysRegex.test(key)
         || (disallowedKeysOnLengthRegex.test(key) && this[`input${origin}`].length >= formatLength
           && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
         || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
           || currentInputString.charAt(currentInputString.length - 1) === '.'))
-        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':')) {
+        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
+        && !(['c', 'v', 'x'].includes(key) && event.ctrlKey)) {
         event.preventDefault();
       }
       // when the user tries to leave the field check if input string is valid
