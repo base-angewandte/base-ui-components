@@ -433,7 +433,7 @@ export default {
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       const slotsHaveData = !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag);
+        && slotElements.some(elem => elem.tag || elem.text?.trim());
       // show label when prop is set true or a label addition was added via slot
       return this.showLabel || slotsHaveData;
     },
