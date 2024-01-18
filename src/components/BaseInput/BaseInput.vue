@@ -812,8 +812,11 @@ export default {
     triggerInputEvent() {
       // Todo: find other solution to wait until inputInt has really changed
       setTimeout(() => {
-        if (this.$refs.input) {
-          this.$refs.input.dispatchEvent(new Event('input'));
+        if (this.inputElement) {
+          // need to set element value manually here since in some devices (e.g. pixel) it was not updated
+          // yet when event is triggered (see ticket #2451)
+          this.inputElement.value = this.inputInt;
+          this.inputElement.dispatchEvent(new Event('input'));
         }
       }, 0);
     },
