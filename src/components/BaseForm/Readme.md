@@ -131,7 +131,7 @@ This is a basic (autocomplete functionality not working here) example how a form
       </template>
       <template #input-field-addition-before="{ fieldName, index }">
         <template v-if="fieldName === 'isan' && index === 0">
-          slot input-field-addition-before for single field
+          slot input-field-addition-before only for index 0 field
         </template>
       </template>
       <template #error-icon>

@@ -134,8 +134,7 @@
               @field-value-changed="setFieldValue(
                 $event,
                 element.name,
-                valueIndex,
-                (element['x-attrs'] ? element['x-attrs'].equivalent : ''))"
+                valueIndex)"
               @fetch-autocomplete="fetchAutocomplete"
               @input-complete="onInputComplete(
                 $event,
