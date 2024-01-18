@@ -1265,7 +1265,7 @@ export default {
             }
           }
           // since technically invalid dates (like 30.02.2000) will also be considered a
-          // vaild date by Date.parse() just convert to Date and back one more time
+          // valid date by Date.parse() just convert to Date and back one more time
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
           const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
@@ -1428,7 +1428,7 @@ export default {
     /**
      * convert a value to a date in local time at zero hours
      *
-     * @param value: the date string stored in db (format YYYY-MM-DD)
+     * @param {string} value - the date string stored in db (format YYYY-MM-DD)
      * @returns {Date} - (e.g. Fri Jul 30 2021 00:00:00 GMT+0200 (Central European Summer Time))
      */
     convertToDate(value) {
