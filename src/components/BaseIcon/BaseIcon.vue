@@ -35,8 +35,8 @@ export default {
           'calendar-number', 'camera', 'check-mark', 'clock', 'collection', 'download', 'drag-lines', 'drag-n-drop',
           'drop-down', 'duplicate', 'edit', 'eye-hide', 'eye', 'file-object', 'forbidden', 'grid', 'home', 'image-object',
           'information', 'institution', 'information-solo', 'licence', 'logo', 'magnifier', 'next', 'options-menu', 'people',
-          'people-filled', 'play', 'plus', 'prev', 'print', 'refresh', 'remove', 'save-file', 'share', 'sort', 'subscribe',
-          'success', 'text', 'unsubscribe', 'video-object', 'waste-bin'].includes(val);
+          'people-filled', 'play', 'plus', 'prev', 'print', 'refresh', 'remove', 'save-file', 'separator-vertical', 'share',
+          'sort', 'subscribe', 'success', 'text', 'unsubscribe', 'video-object', 'waste-bin'].includes(val);
       },
     },
     /**
