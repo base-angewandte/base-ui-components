@@ -638,10 +638,13 @@ export default {
      * keep externally set active variable and internal active variable in sync
      * @param {boolean} val
      */
-    isActive(val) {
-      if (val !== this.isActiveInt) {
-        this.isActiveInt = val;
-      }
+    isActive: {
+      handler(val) {
+        if (val !== this.isActiveInt) {
+          this.isActiveInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * keep externally set active variable and internal active variable in sync
@@ -702,6 +705,10 @@ export default {
     // handle max value of initial input
     if (this.max && Number(this.stringToFloat(this.input)) > this.max) {
       this.inputInt = this.max;
+    }
+    // on first render set the focus here manually
+    if (this.isActiveInt && this.inputElement) {
+      this.inputElement.focus();
     }
   },
   methods: {

@@ -8,7 +8,7 @@
         v-for="(filter, index) in appliedFiltersInt"
         :key="'filter-' + index"
         :mode="mode"
-        :search-row-id="getRowId()"
+        :search-row-id="`${rowId}-${filter[identifierPropertyName.filter]}-${index}`"
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index]"
         :filter-list="displayedFilters"
@@ -33,7 +33,7 @@
     <!-- MAIN FILTER -->
     <BaseAdvancedSearchRow
       ref="mainSearch"
-      :search-row-id="`main-${getRowId()}`"
+      :search-row-id="`main-${rowId}`"
       :mode="mode"
       :applied-filter.sync="mainFilter"
       :filter-list="displayedFilters"
@@ -623,6 +623,14 @@ export default {
         this.search();
       },
     },
+    /**
+     * create an internal row id for unique identification of added filter rows
+     *
+     * @returns {string}
+     */
+    rowId() {
+      return createId();
+    },
   },
   watch: {
     /**
@@ -965,15 +973,6 @@ export default {
       this.$set(this.appliedFiltersInt, index, JSON.parse(JSON.stringify(filter)));
       // trigger search to update search results
       this.search();
-    },
-    /**
-     * create an internal row id for unique identification of added filter rows
-     *
-     * @returns {string}
-     */
-    getRowId() {
-      // call utils function to return a "random" string
-      return createId();
     },
 
     /**
