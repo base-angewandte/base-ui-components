@@ -1,84 +1,28 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
-    <BaseAdvancedSearch
-      mode="form"
-      :applied-filters.sync="appliedFilters"
-      :form-filter-list="formFilterList"
-      :autocomplete-results="autocompleteResults"
-      :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"
-      :form-props="{
-        fieldIsLoading: 'title',
-        fieldProps: {
-          title: {
-            addNewChipText: '{value} hinzufügen...'
-          }
-        },
-        dropDownLists: {
-          title: [{
-            label: 'Type 1',
-            source: 'bla',
-          }],
-          place_of_creation: [{
-                                label: 'Type 1',
-                                source: 'bla',
-                              },
-                              {
-                                label: 'Type 2',
-                                source: 'bla1',
-                              }],
-          weekday: [{
-                      label: 'Montag',
-                      source: 'monday',
-                    },
-                    {
-                      label: 'Dienstag',
-                      source: 'tuesday',
-                    },
-                    {
-                      label: 'Mittwoch',
-                      source: 'wednesday',
-                    },
-                    {
-                      label: 'Donnerstag',
-                      source: 'thursday',
-                    },
-                    {
-                      label: 'Freitag',
-                      source: 'friday',
-                    },
-                    {
-                      label: 'Samstag',
-                      source: 'saturday',
-                    },
-                    {
-                      label: 'Sonntag',
-                      source: 'sunday',
-                    }],
-        },
-
-      }"
-      @search="search"
-      @fetch-autocomplete="fetchAutocomplete" />
-    <!--    <BaseAdvancedSearch-->
-    <!--      :applied-filters.sync="appliedFilters2"-->
-    <!--      :filter-list="filterList"-->
-    <!--      :autocomplete-results="autocompleteResults"-->
-    <!--      :identifier-property-name="{-->
-    <!--        filter: 'label',-->
-    <!--        autocompleteOption: 'id',-->
-    <!--        controlledVocabularyOption: 'id',-->
-    <!--      }"-->
-    <!--      :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"-->
-    <!--      @fetch-autocomplete="fetchAutocomplete" />-->
+    test
+    <div :style="{ padding: '32px', background: 'red' }">
+      <BaseInfoPanel
+        :buttons-config="[{
+          id: 'return',
+          label: 'Return',
+          icon: 'home',
+        }]"
+        icon-name="information"
+        :box-shadow="false"
+        panel-header-text="Error found"
+        panel-style="large"
+        text="Site was not found" />
+    </div>
   </div>
 </template>
 
 <script>
-import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
+import BaseInfoPanel from '@/components/BaseInfoPanel/BaseInfoPanel';
 
 export default {
   components: {
-    BaseAdvancedSearch,
+    BaseInfoPanel,
   },
   data() {
     return {
