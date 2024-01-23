@@ -408,7 +408,7 @@ export default {
 
   .base-tooltip-box {
     position: absolute;
-    z-index: 1;
+    z-index: map-get($zindex, modal);
     min-width: 200px;
     max-height: 50vh;
     max-width: calc(100% - $spacing);
