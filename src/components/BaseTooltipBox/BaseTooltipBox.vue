@@ -383,7 +383,7 @@ export default {
      * intercept resize event and close the component
      */
     resizeHandler() {
-      this.close();
+      this.calcPosition();
     },
     /**
      * intercept scroll event and set fade-outs
