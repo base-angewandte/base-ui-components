@@ -1,28 +1,61 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
     test
-    <div :style="{ padding: '32px', background: 'red' }">
-      <BaseInfoPanel
-        :buttons-config="[{
-          id: 'return',
-          label: 'Return',
-          icon: 'home',
-        }]"
-        icon-name="information"
-        :box-shadow="false"
-        panel-header-text="Error found"
-        panel-style="large"
-        text="Site was not found" />
+    <div>
+      <BaseExpandBox
+        :max-collapsed-height="200">
+        <BaseInfoPanel
+          :style="{ padding: 0 }"
+          align-icon="top"
+          :buttons-config="[{
+            id: 'return',
+            label: 'Return',
+            icon: 'home',
+          }]"
+          icon-name="information"
+          panel-header-text="Error found"
+          panel-style="medium"
+          :box-shadow="false"
+          :text="[
+            'Site was not found',
+            'Site was not found1',
+            'Site was not found2',
+            'Site was not found3',
+            'Site was not found4',
+            'Site was not found5',
+            'Site was not found6',
+            'Site was not found7',
+            'Site was not found8',
+            'Site was not found9',
+            'Site was not found0',
+          ]" />
+      </BaseExpandBox>
     </div>
+    <div :style="{ 'margin-bottom': '16px' }"></div>
+    <BaseInfoPanel
+      :buttons-config="[{
+        id: 'return',
+        label: 'Return',
+        icon: 'home',
+      }]"
+      :render-panel-header-as="'h1'"
+      icon-name="attention"
+      panel-header-text="Error found"
+      panel-style="large"
+      :text="[
+        'Site was not found',
+      ]" />
   </div>
 </template>
 
 <script>
 import BaseInfoPanel from '@/components/BaseInfoPanel/BaseInfoPanel';
+import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
 
 export default {
   components: {
     BaseInfoPanel,
+    BaseExpandBox,
   },
   data() {
     return {

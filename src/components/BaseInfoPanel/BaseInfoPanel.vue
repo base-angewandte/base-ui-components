@@ -1,15 +1,15 @@
 <template>
   <div
-    :class="['base-info-panel', { 'base-info-panel__box-shadow': boxShadow },
-             `base-info-panel__${panelStyle}`]">
+    :class="['base-info-panel', { 'base-info-panel--box-shadow': boxShadow },
+             `base-info-panel--${panelStyle}`]">
     <div
       v-if="useIconElement"
-      :class="['base-info-panel__icon-wrapper', `base-info-panel__icon-wrapper__${alignIcon}`]">
+      :class="['base-info-panel__icon-wrapper', `base-info-panel__icon-wrapper--${alignIcon}`]">
       <slot
         name="icon">
         <BaseIcon
           :name="iconName"
-          :class="['base-info-panel__icon', `base-info-panel__icon__${panelStyle}`]" />
+          :class="['base-info-panel__icon', `base-info-panel__icon--${panelStyle}`]" />
       </slot>
     </div>
     <div
@@ -27,7 +27,11 @@
         class="base-info-panel__text-body">
         <slot
           name="text">
-          {{ text }}
+          <p
+            v-for="paragraph in displayedText"
+            :key="paragraph">
+            {{ paragraph }}
+          </p>
         </slot>
       </div>
       <div
@@ -146,6 +150,12 @@ export default {
     useBottomElement() {
       return !!this.buttonsConfig.length || !!this.$slots.bottom;
     },
+    displayedText() {
+      if (this.text.length && typeof this.text === 'string') {
+        return [this.text];
+      }
+      return this.text;
+    },
   },
   methods: {
     emitAction(action) {
@@ -164,6 +174,7 @@ export default {
 @import "../../styles/variables";
 
 .base-info-panel {
+  position: relative;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -171,14 +182,14 @@ export default {
   gap: $spacing;
   padding: $spacing-large;
 
-  &.base-info-panel__box-shadow {
+  &.base-info-panel--box-shadow {
     box-shadow: $box-shadow-reg;
   }
 
   .base-info-panel__icon-wrapper {
     flex: 0 0 auto;
 
-    &.base-info-panel__icon__center {
+    &.base-info-panel__icon-wrapper--center {
       margin: auto 0;
     }
 
@@ -193,11 +204,14 @@ export default {
     flex: 1 1 auto;
 
     .base-info-panel__button-row {
-      margin-top: $spacing;
+      margin-top: $spacing-large;
+      display: flex;
+      flex-direction: row;
+      gap: $spacing;
     }
   }
 
-  &.base-info-panel__large {
+  &.base-info-panel--large {
     padding: $spacing-large;
 
     .base-info-panel__icon {
@@ -205,7 +219,7 @@ export default {
       width: $icon-max;
     }
   }
-  &.base-info-panel__medium {
+  &.base-info-panel--medium {
     padding: $spacing;
 
     .base-info-panel__icon {
