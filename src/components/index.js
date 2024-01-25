@@ -33,6 +33,7 @@ import BaseIcon from './BaseIcon/BaseIcon';
 import BaseImage from './BaseImage/BaseImage';
 import BaseImageBox from './BaseImageBox/BaseImageBox';
 import BaseImageGrid from './BaseImageGrid/BaseImageGrid';
+import BaseInfoPanel from './BaseInfoPanel/BaseInfoPanel';
 import BaseInput from './BaseInput/BaseInput';
 import BaseLink from './BaseLink/BaseLink';
 import BaseLoader from './BaseLoader/BaseLoader';
@@ -92,6 +93,7 @@ export {
   BaseImage,
   BaseImageBox,
   BaseImageGrid,
+  BaseInfoPanel,
   BaseInput,
   BaseLink,
   BaseLoader,
