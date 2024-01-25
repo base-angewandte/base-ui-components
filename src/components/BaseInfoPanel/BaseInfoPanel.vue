@@ -2,9 +2,11 @@
   <div
     :class="['base-info-panel', { 'base-info-panel--box-shadow': boxShadow },
              `base-info-panel--${panelStyle}`]">
+    <!-- LEFT SIDE - ICON -->
     <div
       v-if="useIconElement"
-      :class="['base-info-panel__icon-wrapper', `base-info-panel__icon-wrapper--${alignIcon}`]">
+      :class="['base-info-panel__icon-wrapper', `base-info-panel__icon-wrapper--${alignIconInt}`]">
+      <!-- @slot replace the left side icon element -->
       <slot
         name="icon">
         <BaseIcon
@@ -12,19 +14,28 @@
           :class="['base-info-panel__icon', `base-info-panel__icon--${panelStyle}`]" />
       </slot>
     </div>
+
+    <!-- RIGHT SIDE - TEXT -->
     <div
       class="base-info-panel__text-wrapper">
+      <!-- HEADER -->
       <component
         :is="renderPanelHeaderAs"
         v-if="useHeaderElement"
         class="base-info-panel__text-header">
+        <!-- @slot replace the header instead of using `panelHeaderText` -->
         <slot
           name="header">
           {{ panelHeaderText }}
         </slot>
       </component>
-      <div
+
+      <!-- BODY -->
+      <component
+        :is="textBodyWrapper"
+        v-bind="expandable ? expandBoxProps : false"
         class="base-info-panel__text-body">
+        <!-- @slot replace the text body with something custom e.g. BaseTextList -->
         <slot
           name="text">
           <p
@@ -33,25 +44,30 @@
             {{ paragraph }}
           </p>
         </slot>
-      </div>
-      <div
-        v-if="useBottomElement"
-        class="base-info-panel__button-row">
-        <template
-          v-if="!!buttonsConfig.length">
-          <BaseButton
-            v-for="{ id, label, icon, iconPosition, disabled } in buttonsConfig"
-            :key="id"
-            :text="label"
-            :icon="icon"
-            :disabled="disabled ?? false"
-            :icon-position="iconPosition || 'right'"
-            button-style="single"
-            icon-size="large"
-            @clicked="emitAction(id)" />
-        </template>
-        <slot name="bottom" />
-      </div>
+        <!-- BOTTOM AREA -->
+        <div
+          v-if="useBottomElement"
+          class="base-info-panel__text-body-bottom">
+          <div
+            class="base-info-panel__button-row">
+            <template
+              v-if="!!buttonsConfig.length">
+              <BaseButton
+                v-for="{ id, label, icon, iconPosition, disabled } in buttonsConfig"
+                :key="id"
+                :text="label"
+                :icon="icon"
+                :disabled="disabled ?? false"
+                :icon-position="iconPosition || 'right'"
+                button-style="single"
+                icon-size="large"
+                @clicked="emitAction(id)" />
+            </template>
+            <!-- @slot replace buttons with custom elements or add some other custom element. If body is expandable these elements are rendered within the expand box.  -->
+            <slot name="bottom" />
+          </div>
+        </div>
+      </component>
     </div>
   </div>
 </template>
@@ -65,24 +81,26 @@ export default {
   },
   props: {
     /**
-     * specify the name of the icon rendered on the left side or use slot `icon`
-     *  (see [BaseIcon](BaseIcon) for available icons)
-     *  if no icon should be displayed leave the section empty
+     * specify the name of the icon rendered on the left side or use slot `icon`.
+     *  (see [BaseIcon](BaseIcon) for available icons).
+     *  if no icon should be displayed leave the section empty.
      */
     iconName: {
       type: String,
       default: '',
     },
     /**
-     * define if icon should be aligned `top` or `center`
+     * define if icon should be aligned `top` or `center`.
+     *  if prop `expandable` is true the default is `top` otherwise the default is `center`.
+     *  @values top, center
      */
     alignIcon: {
       type: String,
-      default: 'center',
-      validator: val => ['top', 'center'].includes(val),
+      default: '',
+      validator: val => !val || ['top', 'center'].includes(val),
     },
     /**
-     * define the styling of the panel (influences e.g. icon size or padding)
+     * define the styling of the panel (influences e.g. icon size or padding).
      */
     panelStyle: {
       type: String,
@@ -91,28 +109,28 @@ export default {
     },
     /**
      * should box shadow be visible (useful to turn of if component should
-     *  be rendered inside another box e.g.)
+     *  be rendered inside another box e.g.).
      */
     boxShadow: {
       type: Boolean,
       default: true,
     },
     /**
-     * the panel header text or use slot `header` instead
+     * the panel header text or use slot `header` instead.
      */
     panelHeaderText: {
       type: String,
       default: '',
     },
     /**
-     * define the HTML element as which the header should be rendered
+     * define the HTML element as which the header should be rendered.
      */
     renderPanelHeaderAs: {
       type: String,
       default: 'h2',
     },
     /**
-     * define panel body text or use slot `text` instead
+     * define panel body text or use slot `text` instead.
      */
     text: {
       type: [String, Array],
@@ -120,8 +138,9 @@ export default {
     },
     /**
      * add buttons at the end of the text element via this config and it will
-     *  render base buttons - this should be an array of objects with the following
+     *  render [BaseButton](BaseButton) elements - this should be an array of objects with the following
      *  properties:
+     *
      *  **`id`**: identifier that will also be emitted via `action` event on button click
      *  **`label?`**: button label
      *  **`icon?`**: button icon to be displayed - for available options see [BaseIcon](BaseIcon)
@@ -129,7 +148,7 @@ export default {
      *    is `right`
      *  **`disabled?`**: set button disabled
      *
-     *  caveat: `label` and `icon` property are optional but at least one of them needs to be
+     *  **caveat**: `label` and `icon` property are optional but at least one of them needs to be
      *    specified!
      */
     buttonsConfig: {
@@ -138,26 +157,89 @@ export default {
       // see that every button at least has an id and text OR icon
       validator: val => val.every(({ id, label, icon }) => id && (label || icon)),
     },
+    /**
+     * if set true an [BaseExpandBox](BaseExpandBox) is rendered inside the text body
+     *  config for this BaseExpandBox can be set via `expandBoxConfig` prop.
+     */
+    expandable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if prop `expandable` is set true use this prop to configure the BaseExpandBox element.
+     *  See [BaseExpandBox](BaseExpandBox#props) for available options.
+     */
+    expandBoxConfig: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   emits: ['action'],
   computed: {
+    /**
+     * should icon HTML element be rendered
+     * @returns {boolean}
+     */
     useIconElement() {
       return !!this.iconName || !!this.$slots.icon;
     },
+    /**
+     * should header HTML element be rendered
+     * @returns {boolean}
+     */
     useHeaderElement() {
       return !!this.panelHeaderText || !!this.$slots.header;
     },
+    /**
+     * should text body HTML element be rendered
+     * @returns {boolean}
+     */
     useBottomElement() {
       return !!this.buttonsConfig.length || !!this.$slots.bottom;
     },
+    /**
+     * since prop `text` can be string or array unify for internal rendering
+     *  to always return an array
+     * @returns {string[]}
+     */
     displayedText() {
       if (this.text.length && typeof this.text === 'string') {
         return [this.text];
       }
       return this.text;
     },
+    /**
+     * if user has not set prop `alignIcon` choose value based on prop `expandable`
+     * @returns {string}
+     */
+    alignIconInt() {
+      return this.alignIcon || (this.expandable ? 'top' : 'center');
+    },
+    textBodyWrapper() {
+      if (this.expandable) {
+        return () => import('@/components/BaseExpandBox/BaseExpandBox');
+      }
+      return 'div';
+    },
+    /**
+     * assemble BaseExpandBox props from internal default settings and user specified
+     *  config
+     * @returns {Object}
+     */
+    expandBoxProps() {
+      return {
+        maxCollapsedHeight: 150,
+        boxShadow: !this.expandable,
+        padding: this.expandable ? 'none' : false,
+        ...this.expandBoxConfig,
+      };
+    },
   },
   methods: {
+    /**
+     * emit button click event
+     * @param {string} action - the id of the button clicked
+     */
     emitAction(action) {
       /**
        * inform parent of button click
@@ -203,11 +285,14 @@ export default {
   .base-info-panel__text-wrapper {
     flex: 1 1 auto;
 
-    .base-info-panel__button-row {
+    .base-info-panel__text-body-bottom {
       margin-top: $spacing-large;
-      display: flex;
-      flex-direction: row;
-      gap: $spacing;
+
+      .base-info-panel__button-row {
+        display: flex;
+        flex-direction: row;
+        gap: $spacing;
+      }
     }
   }
 
