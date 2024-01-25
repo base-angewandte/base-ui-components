@@ -84,7 +84,7 @@ export default {
       type: String,
       default: 'small',
       validator(val) {
-        return ['large', 'small'].includes(val);
+        return ['none', 'large', 'small'].includes(val);
       },
     },
     /**
@@ -266,6 +266,10 @@ export default {
 
   .base-expand-box {
     flex-direction: column;
+
+    &.base-expand-box-padding-none {
+      padding: 0;
+    }
 
     &.base-expand-box-padding-small {
       padding: $spacing;
