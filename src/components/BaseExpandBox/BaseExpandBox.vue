@@ -4,6 +4,7 @@
     :box-size="{}"
     :box-hover="false"
     :style="style"
+    :box-shadow-size="boxShadow ? 'small' : 'none'"
     :class="[
       'base-expand-box',
       'base-expand-box-padding-' + padding,
@@ -120,6 +121,13 @@ export default {
     showButtonHeight: {
       type: Number,
       default: 54,
+    },
+    /**
+     * option to disable the box shadow if element is nested into a box
+     */
+    boxShadow: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
