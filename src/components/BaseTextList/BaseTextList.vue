@@ -238,7 +238,7 @@ export default {
     cols: {
       type: Number,
       default: 2,
-      validate: val => val > 0,
+      validator: val => val > 0,
     },
     /**
      * specify the number of columns to render a single object typeof string
@@ -246,7 +246,7 @@ export default {
     colsSingleTextObject: {
       type: Number,
       default: 1,
-      validate: val => val > 0,
+      validator: val => val > 0,
     },
     /**
      * specify how the link element should be rendered - this needs to be a
@@ -266,7 +266,7 @@ export default {
     listType: {
       type: String,
       default: 'horizontal',
-      validate: val => ['horizontal', 'vertical'].includes(val),
+      validator: val => ['horizontal', 'vertical'].includes(val),
     },
     /**
      * specify the gap between content rows
@@ -275,7 +275,7 @@ export default {
     rowGap: {
       type: String,
       default: 'large',
-      validate: val => ['large', 'small'].includes(val),
+      validator: val => ['large', 'small'].includes(val),
     },
     /**
      * specify a threshold value in px for the [BaseTooltipBox](BaseTooltipBox) top position calculation
