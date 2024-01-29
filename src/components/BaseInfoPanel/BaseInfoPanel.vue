@@ -310,6 +310,7 @@ export default {
         display: flex;
         flex-direction: row;
         gap: $spacing;
+        flex-wrap: wrap;
 
         @media screen and (max-width: $mobile) {
           flex-direction: column;
