@@ -16,9 +16,20 @@ A simple example
       panel-header-text="Error found"
       :text="[
       'Site was not found',
-    ]" />
+    ]"
+    @action="alert" />
   </div>
 </template>
+
+<script>
+  export default {
+    methods: {
+      alert(action) {
+        window.alert(`action with id "${action}" triggered!`);
+      },
+    },
+  };
+</script>
 
 <style scoped>
   .background {
@@ -38,10 +49,8 @@ Expandable example using more config and slots
         panel-style="medium"
         :expandable="true"
         :expand-box-config="{
-          // maxCollapsedHeight: 100,
           showMoreText: 'Expand',
           showLessText: 'Collapse',
-          // autoHeight: true,
         }"
         class="expand-panel">
       <template #header>
@@ -70,11 +79,22 @@ Expandable example using more config and slots
       <BaseButton
         text="Download Curriculum"
         icon="download"
-        icon-position="right" />
+        icon-position="right"
+        @clicked="alert" />
       </template>
     </BaseInfoPanel>
   </div>
 </template>
+
+<script>
+  export default {
+    methods: {
+      alert() {
+        window.alert(`custom button was clicked!`);
+      },
+    },
+  };
+</script>
 
 <style lang="scss" scoped>
   .background {
