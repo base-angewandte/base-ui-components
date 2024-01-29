@@ -1,84 +1,61 @@
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
-    <BaseAdvancedSearch
-      mode="form"
-      :applied-filters.sync="appliedFilters"
-      :form-filter-list="formFilterList"
-      :autocomplete-results="autocompleteResults"
-      :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"
-      :form-props="{
-        fieldIsLoading: 'title',
-        fieldProps: {
-          title: {
-            addNewChipText: '{value} hinzufügen...'
-          }
-        },
-        dropDownLists: {
-          title: [{
-            label: 'Type 1',
-            source: 'bla',
-          }],
-          place_of_creation: [{
-                                label: 'Type 1',
-                                source: 'bla',
-                              },
-                              {
-                                label: 'Type 2',
-                                source: 'bla1',
-                              }],
-          weekday: [{
-                      label: 'Montag',
-                      source: 'monday',
-                    },
-                    {
-                      label: 'Dienstag',
-                      source: 'tuesday',
-                    },
-                    {
-                      label: 'Mittwoch',
-                      source: 'wednesday',
-                    },
-                    {
-                      label: 'Donnerstag',
-                      source: 'thursday',
-                    },
-                    {
-                      label: 'Freitag',
-                      source: 'friday',
-                    },
-                    {
-                      label: 'Samstag',
-                      source: 'saturday',
-                    },
-                    {
-                      label: 'Sonntag',
-                      source: 'sunday',
-                    }],
-        },
-
-      }"
-      @search="search"
-      @fetch-autocomplete="fetchAutocomplete" />
-    <!--    <BaseAdvancedSearch-->
-    <!--      :applied-filters.sync="appliedFilters2"-->
-    <!--      :filter-list="filterList"-->
-    <!--      :autocomplete-results="autocompleteResults"-->
-    <!--      :identifier-property-name="{-->
-    <!--        filter: 'label',-->
-    <!--        autocompleteOption: 'id',-->
-    <!--        controlledVocabularyOption: 'id',-->
-    <!--      }"-->
-    <!--      :autocomplete-property-names="{ id: 'filter_id', label: 'label', data: 'data' }"-->
-    <!--      @fetch-autocomplete="fetchAutocomplete" />-->
+    test
+    <div>
+      <BaseExpandBox
+        :max-collapsed-height="200">
+        <BaseInfoPanel
+          :style="{ padding: 0 }"
+          align-icon="top"
+          :buttons-config="[{
+            id: 'return',
+            label: 'Return',
+            icon: 'home',
+          }]"
+          icon-name="information"
+          panel-header-text="Error found"
+          panel-style="medium"
+          :box-shadow="false"
+          :text="[
+            'Site was not found',
+            'Site was not found1',
+            'Site was not found2',
+            'Site was not found3',
+            'Site was not found4',
+            'Site was not found5',
+            'Site was not found6',
+            'Site was not found7',
+            'Site was not found8',
+            'Site was not found9',
+            'Site was not found0',
+          ]" />
+      </BaseExpandBox>
+    </div>
+    <div :style="{ 'margin-bottom': '16px' }"></div>
+    <BaseInfoPanel
+      :buttons-config="[{
+        id: 'return',
+        label: 'Return',
+        icon: 'home',
+      }]"
+      :render-panel-header-as="'h1'"
+      icon-name="attention"
+      panel-header-text="Error found"
+      panel-style="large"
+      :text="[
+        'Site was not found',
+      ]" />
   </div>
 </template>
 
 <script>
-import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch';
+import BaseInfoPanel from '@/components/BaseInfoPanel/BaseInfoPanel';
+import BaseExpandBox from '@/components/BaseExpandBox/BaseExpandBox';
 
 export default {
   components: {
-    BaseAdvancedSearch,
+    BaseInfoPanel,
+    BaseExpandBox,
   },
   data() {
     return {

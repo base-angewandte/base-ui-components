@@ -54,12 +54,12 @@ export default {
     },
     /**
      *  set boxShadow size
-     *  @values large, small
+     *  @values large, small, none
      */
     boxShadowSize: {
       type: String,
       default: 'small',
-      validator: val => ['small', 'large'].includes(val),
+      validator: val => ['none', 'small', 'large'].includes(val),
     },
     /**
      * set disabled attribute (e.g. for button elements)
