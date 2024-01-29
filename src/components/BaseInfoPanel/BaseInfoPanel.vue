@@ -269,6 +269,10 @@ export default {
   gap: $spacing;
   padding: $spacing-large;
 
+  @media screen and (max-width: $mobile) {
+    padding: $spacing;
+  }
+
   &.base-info-panel--box-shadow {
     box-shadow: $box-shadow-reg;
   }
@@ -284,6 +288,11 @@ export default {
       height: $icon-max;
       width: $icon-max;
       color: $app-color;
+
+      @media screen and (max-width: $mobile) {
+        height: 32px;
+        width: 32px;
+      }
     }
   }
 
@@ -293,10 +302,20 @@ export default {
     .base-info-panel__text-body-bottom {
       margin-top: $spacing-large;
 
+      @media screen and (max-width: $mobile) {
+        margin-top: $spacing;
+      }
+
       .base-info-panel__button-row {
         display: flex;
         flex-direction: row;
         gap: $spacing;
+
+        @media screen and (max-width: $mobile) {
+          flex-direction: column;
+          gap: $spacing-small;
+          align-items: flex-start;
+        }
       }
     }
   }
@@ -304,17 +323,35 @@ export default {
   &.base-info-panel--large {
     padding: $spacing-large;
 
+    @media screen and (max-width: $mobile) {
+      padding: $spacing;
+    }
+
     .base-info-panel__icon {
       height: $icon-max;
       width: $icon-max;
+
+      @media screen and (max-width: $mobile) {
+        height: 32px;
+        width: 32px;
+      }
     }
   }
   &.base-info-panel--medium {
     padding: $spacing;
 
+    @media screen and (max-width: $mobile) {
+      padding: $spacing-small;
+    }
+
     .base-info-panel__icon {
       height: 32px;
       width: 32px;
+
+      @media screen and (max-width: $mobile) {
+        height: $icon-large;
+        width: $icon-large;
+      }
     }
   }
 }

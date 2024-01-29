@@ -108,6 +108,11 @@ Expandable example using more config and slots
     height: 32px;
     width: 32px;
     color: red;
+
+    @media screen and (max-width: 639px) {
+      height: 24px;
+      width: 24px;
+    }
   }
 
   .panel-body {
