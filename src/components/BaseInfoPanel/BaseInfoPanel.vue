@@ -87,7 +87,7 @@ export default {
      */
     iconName: {
       type: String,
-      default: '',
+      default: 'attention',
     },
     /**
      * define if icon should be aligned `top` or `center`.
