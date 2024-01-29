@@ -215,6 +215,11 @@ export default {
     alignIconInt() {
       return this.alignIcon || (this.expandable ? 'top' : 'center');
     },
+    /**
+     * return the body HTML element - either a native `<div>` or if component
+     *  is `expandable` then the BaseExpandBox component
+     * @returns {(function(): Promise<{VueComponent}>)|string}
+     */
     textBodyWrapper() {
       if (this.expandable) {
         return () => import('@/components/BaseExpandBox/BaseExpandBox');
@@ -244,7 +249,7 @@ export default {
       /**
        * inform parent of button click
        * @event action
-       * @type {string} - the id of the button clicked
+       * @param {string} - the id of the button clicked
        */
       this.$emit('action', action);
     },
