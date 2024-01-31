@@ -402,8 +402,9 @@ export default {
       }
 
       .base-link--chip-text-list {
+        display: inline-block;
         margin-right: $spacing-small-half;
-        margin-bottom: 2px;
+        margin-bottom: $spacing-small-half;
       }
     }
 
