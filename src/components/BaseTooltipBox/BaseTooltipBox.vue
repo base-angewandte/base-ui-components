@@ -138,6 +138,8 @@ export default {
       fadeOutBottom: false,
       // resize observer for specific element
       resizeObserver: null,
+      // mutation observer for specific element
+      mutationObserver: null,
       // guard for click-outside-event
       isClickOutsideActive: false,
       // this is needed for popUpLock mixin
@@ -188,36 +190,54 @@ export default {
       return thresholdTopAsNumber;
     },
   },
+  watch: {
+    /**
+     * watch if attachTo has changed and calculate the component position again
+     */
+    attachTo() {
+      this.$nextTick(() => {
+        this.calcContentHeight();
+        this.calcFadeOuts();
+        this.calcPosition();
+      });
+    },
+  },
   mounted() {
     // move the component to the body node to position it absolutely in the document
     document.querySelector('body')
       .appendChild(this.$el);
 
     // Note: the click-outside event is executed immediately when the component is initialized.
-    //       to prevent this timing problem, the guard variable is set with a delay.
+    //       To prevent this timing problem, the guard variable is set with a delay.
     setTimeout(() => {
       this.isClickOutsideActive = true;
     }, 0);
 
-    // calc components position and activate it
-    this.calcPosition();
-    this.isActive = true;
+    // In SSR environment, the first position calculation is wrong.
+    // To prevent this timing problem, the calc and further functions are executed with a delay.
+    // Using nextTick() has no effect for whatever reason.
+    setTimeout(() => {
+      // calc components position and activate it
+      this.calcPosition();
+      this.isActive = true;
 
-    // block body scrolling
-    this.showInt = this.isPopUpLockEnabled();
+      // block body scrolling
+      this.showInt = this.isPopUpLockEnabled();
 
-    // initialize the resize observer to calculate fade outs when content is resized
-    this.initObserver();
+      // initialize the resize observer to calculate fade outs when content is resized
+      this.initObserver();
 
-    // add additional event listeners
-    this.$refs.body.addEventListener('scroll', this.scrollHandler);
-    window.addEventListener('resize', this.resizeHandler);
-    window.addEventListener('keyup', this.escEventHandler);
+      // add additional event listeners
+      this.$refs.body.addEventListener('scroll', this.scrollHandler);
+      window.addEventListener('resize', this.resizeHandler);
+      window.addEventListener('keyup', this.escEventHandler);
+    }, 0);
   },
   beforeDestroy() {
     this.isActive = false;
     this.showInt = false;
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
+    if (this.mutationObserver) this.mutationObserver.disconnect();
     this.$refs.body.removeEventListener('scroll', this.scrollHandler);
     window.removeEventListener('resize', this.resizeHandler);
     window.removeEventListener('keyup', this.escEventHandler);
@@ -311,21 +331,21 @@ export default {
       // center the triangle by default
       this.css['--triangle-left'] = '50%';
 
-      // direction 'top' or 'bottom':
+      // Direction 'top' or 'bottom':
       // Check again if the box overlaps the window on the left or right side.
       // If so, reposition the box and adjust the triangle's position relative to the anchor point.
       if (!['top', 'bottom'].includes(this.direction)) {
         return;
       }
 
-      // box overlaps the window left side
+      // the box overlaps the window left side
       if (attachToRect.x < boxWidth / 2) {
         this.css.left = `${this.spacing}px`;
         this.css['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - this.spacing}px`;
         return;
       }
 
-      // box overlaps the window right side
+      // the box overlaps the window right side
       if (attachToRect.left + attachToRect.width / 2 + boxWidth / 2 > window.innerWidth) {
         this.css.left = '';
         this.css.right = `${this.spacing}px`;
@@ -366,18 +386,29 @@ export default {
       }
     },
     /**
-     * create resize observer for the content container
+     * create resize/mutation observer for the content container
      */
     initObserver() {
-      // create an observer with the calc heights and calc fadeout functions
+      // create a resize observer with calculation functions
       const resizeObserver = new ResizeObserver(() => {
         this.calcContentHeight();
         this.calcFadeOuts();
       });
-      // attach to relevant element
+
+      // create a mutation observer with calculation functions
+      const mutationObserver = new MutationObserver(() => {
+        this.calcContentHeight();
+        this.calcFadeOuts();
+        this.calcPosition();
+      });
+
+      // attach the observers to a specific element
       resizeObserver.observe(this.$refs.bodyInner);
-      // store it in variable
+      mutationObserver.observe(this.$refs.bodyInner, { childList: true, subtree: true });
+
+      // store them in variables
       this.resizeObserver = resizeObserver;
+      this.mutationObserver = mutationObserver;
     },
     /**
      * intercept resize event and close the component
