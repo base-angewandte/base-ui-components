@@ -1,9 +1,10 @@
 import BaseAdvancedSearch from './BaseAdvancedSearch/BaseAdvancedSearch';
-import BaseAdvancedSearchRow from './BaseAdvancedSearchRow/BaseAdvancedSearchRow';
+import BaseAdvancedSearchRow from './BaseAdvancedSearch/BaseAdvancedSearchRow';
 import BaseAutocompleteInput from './BaseAutocompleteInput/BaseAutocompleteInput';
 import BaseBox from './BaseBox/BaseBox';
 import BaseBoxButton from './BaseBoxButton/BaseBoxButton';
 import BaseBoxTooltip from './BaseBoxTooltip/BaseBoxTooltip';
+import BaseBreadCrumbs from './BaseBreadCrumbs/BaseBreadCrumbs';
 import BaseButton from './BaseButton/BaseButton';
 import BaseCarousel from './BaseCarousel/BaseCarousel';
 import BaseCheckmark from './BaseCheckmark/BaseCheckmark';
@@ -31,6 +32,8 @@ import BaseHoverBox from './BaseHoverBox/BaseHoverBox';
 import BaseIcon from './BaseIcon/BaseIcon';
 import BaseImage from './BaseImage/BaseImage';
 import BaseImageBox from './BaseImageBox/BaseImageBox';
+import BaseImageGrid from './BaseImageGrid/BaseImageGrid';
+import BaseInfoPanel from './BaseInfoPanel/BaseInfoPanel';
 import BaseInput from './BaseInput/BaseInput';
 import BaseLink from './BaseLink/BaseLink';
 import BaseLoader from './BaseLoader/BaseLoader';
@@ -52,6 +55,7 @@ import BaseSwitchButton from './BaseSwitchButton/BaseSwitchButton';
 import BaseTextList from './BaseTextList/BaseTextList';
 import BaseToggle from './BaseToggle/BaseToggle';
 import BaseTooltip from './BaseTooltip/BaseTooltip';
+import BaseTooltipBox from './BaseTooltipBox/BaseTooltipBox';
 import BaseUploadPopUp from './BaseUploadPopUp/BaseUploadPopUp';
 
 export {
@@ -61,6 +65,7 @@ export {
   BaseBox,
   BaseBoxButton,
   BaseBoxTooltip,
+  BaseBreadCrumbs,
   BaseButton,
   BaseCarousel,
   BaseCheckmark,
@@ -88,6 +93,8 @@ export {
   BaseIcon,
   BaseImage,
   BaseImageBox,
+  BaseImageGrid,
+  BaseInfoPanel,
   BaseInput,
   BaseLink,
   BaseLoader,
@@ -109,5 +116,6 @@ export {
   BaseTextList,
   BaseToggle,
   BaseTooltip,
+  BaseTooltipBox,
   BaseUploadPopUp,
 };

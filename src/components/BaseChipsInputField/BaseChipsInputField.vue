@@ -6,6 +6,7 @@
       :id="id"
       ref="baseInput"
       v-model="inputInt"
+      :field-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -27,7 +28,7 @@
       :set-focus-on-active="setFocusOnActive"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
-      v-on="$listeners">
+      v-on="inputListeners">
       <template
         #label-addition>
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
@@ -150,7 +151,7 @@
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader) -->
+        <!-- @slot use a custom icon instead of standard remove icon -->
         <slot name="remove-icon" />
       </template>
       <template #below-input>
@@ -194,7 +195,8 @@ export default {
       default: '',
     },
     /**
-     * list of selected options (strings or objects), displayed as chips
+     * list of selected options (strings or objects - set `isStringArray` `true` if it is an array of strings),
+     *  displayed as chips
      * (you can use the `.sync` modifier on this property)
      */
     selectedList: {
@@ -207,6 +209,15 @@ export default {
     input: {
       type: String,
       default: '',
+    },
+    /**
+     * specify input field type
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
     },
     /**
      * input field label
@@ -338,7 +349,7 @@ export default {
      *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
-      type: String,
+      type: [Number, String],
       default: null,
     },
     /**
@@ -525,6 +536,19 @@ export default {
       inputInt: '',
     };
   },
+  computed: {
+    inputListeners() {
+      return {
+        // add all the listeners from the parent
+        ...this.$listeners,
+        // and add custom listeners
+        ...{
+          // keep this BaseInput event from propagating and use component's own event
+          'update:is-active': () => {},
+        },
+      };
+    },
+  },
   watch: {
     /**
      * selectedList is watched to also change selectedListInt if necessary
@@ -560,16 +584,13 @@ export default {
      * @param {boolean} val - internal input field active value
      */
     isActiveInt(val) {
-      // check if values are in sync already
-      if (val !== this.isActive) {
-        /**
-         * event updating the is-active prop in case of internal changes
-         *
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * event updating the is-active prop in case of internal changes
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * watch for outside changes in the input field active state

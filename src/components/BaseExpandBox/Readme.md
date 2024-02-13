@@ -9,7 +9,12 @@ Example of BaseExpandBox to display expandable text, unordered list, datalist el
       <BaseTextList
         render-label-as="h2"
         :data="data"
-        :cols2="true" />
+        :cols="2" />
+      <template #header>
+        <h1 class="base-headline">
+          Additional content in slot #header
+        </h1>
+      </template>
       <template #footer>
         <div style="display: flex;">
           <BaseButton
@@ -39,39 +44,47 @@ export default {
   data() {
     return {
       data: [
-        {
-          label: 'Vero eos et accusam',
-          data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-
-            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`,
-        },
-        {
-          label: 'Vero eos et accusam',
-          data: [
-            'Lorem ipsum dolor sit amet',
-            'Consetetur sadipscing elitr, sed diam nonumy',
-            'Eirmod tempor invidunt',
-          ],
-        },
-        {
-          label: 'Vero eos et accusam',
-          data: [
-            {
-              label: 'www',
-              value: 'https://base.uni-ak.ac.at',
-              url: 'https://base.uni-ak.ac.at',
-            },
-            {
-              label: 'email',
-              value: 'base@uni-ak.ac.at',
-              url: 'mailto:base@uni-ak.ac.at',
-            },
-          ],
-        },
+        [
+          {
+            label: 'Vero eos et accusam',
+            data: `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+              At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+  
+              At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`,
+          },
+          {
+            label: 'Vero eos et accusam',
+            data: [
+              'Lorem ipsum dolor sit amet',
+              'Consetetur sadipscing elitr, sed diam nonumy',
+              'Eirmod tempor invidunt',
+            ],
+          },
+          {
+            label: 'Vero eos et accusam',
+            data: [
+              {
+                label: 'www',
+                value: 'https://base.uni-ak.ac.at',
+                url: 'https://base.uni-ak.ac.at',
+              },
+              {
+                label: 'email',
+                value: 'base@uni-ak.ac.at',
+                url: 'mailto:base@uni-ak.ac.at',
+              },
+            ],
+          }
+        ],
       ],
     };
   },
 }
 </script>
+<style>
+  .base-headline {
+    margin-bottom: 16px;
+    font-size: 1.2em; 
+  }
+</style>
 ```

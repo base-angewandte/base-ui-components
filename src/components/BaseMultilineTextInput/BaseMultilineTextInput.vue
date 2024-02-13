@@ -27,7 +27,7 @@
           :active-tab="activeTab"
           class="base-multiline-text-input__tabs">
           <template
-            #right-of-text="tab">
+            #right-of-content="tab">
             <BaseIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input__text-icon"
@@ -77,7 +77,7 @@
       <slot name="error-icon" />
     </template>
     <template #remove-icon>
-      <!-- @slot for adding elements after input (e.g. used to add loader). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
       <slot name="remove-icon" />
     </template>
   </BaseInput>

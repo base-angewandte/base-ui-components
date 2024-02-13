@@ -4,11 +4,18 @@
     :box-size="{}"
     :box-hover="false"
     :style="style"
+    :box-shadow-size="boxShadow ? 'small' : 'none'"
     :class="[
       'base-expand-box',
       'base-expand-box-padding-' + padding,
       { 'base-expand-box-auto-height': autoHeight },
       { 'base-expand-box-open': expandInt }]">
+    <div
+      v-if="!!$slots.header"
+      class="base-expand-box-header">
+      <!-- @slot slot to add additional information before expandable content -->
+      <slot name="header" />
+    </div>
     <div
       :class="[
         'base-expand-box-content',
@@ -64,7 +71,7 @@ export default {
   },
   props: {
     /**
-     * expand box from outside
+     * expand box from the outside
      */
     expand: {
       type: Boolean,
@@ -77,7 +84,7 @@ export default {
       type: String,
       default: 'small',
       validator(val) {
-        return ['large', 'small'].includes(val);
+        return ['none', 'large', 'small'].includes(val);
       },
     },
     /**
@@ -94,6 +101,9 @@ export default {
       type: String,
       default: 'Show less',
     },
+    /**
+     * define whether box height depends on content
+     */
     autoHeight: {
       type: Boolean,
       default: false,
@@ -111,6 +121,13 @@ export default {
     showButtonHeight: {
       type: Number,
       default: 54,
+    },
+    /**
+     * option to disable the box shadow if element is nested into a box
+     */
+    boxShadow: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -185,19 +202,51 @@ export default {
       });
     },
     /**
-     * calculate height of content
+     * calculate the content height
+     * @returns {number}
      */
     contentHeight() {
       return this.$el.querySelector('.base-expand-box-content').offsetHeight;
     },
     /**
-     * calculate height of content inner
+     * calculate the content inner height
+     * @returns {number}
      */
     contentInnerHeight() {
-      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight;
+      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight - this.contentHeightOffset();
     },
     /**
+     * calculate an optional offset for the content inner height
      *
+     * In some base-components, e.g. BaseTextList,
+     * a negative margin-bottom is defined to handle exact element boundaries.
+     * Therefore, an offset is needed to calculate the contentInnerHeight.
+     *
+     * @returns {number}
+     */
+    contentHeightOffset() {
+      // default offset
+      let offset = 0;
+      // get content slot elements
+      const elements = this.$el.querySelectorAll('.base-expand-box-content-inner > div > *');
+
+      // iterate through elements, evaluate whether an offset is required
+      elements.forEach((elem) => {
+        // break if offset is already set
+        if (offset) return;
+        // get elements margin-bottom as a number
+        const marginBottom = parseFloat(window.getComputedStyle(elem, null).getPropertyValue('margin-bottom'));
+        // check if the number is negative, if so, set the offset as a positive number
+        if (marginBottom < 0) {
+          offset = Math.abs(marginBottom);
+        }
+      });
+
+      // return number
+      return offset;
+    },
+    /**
+     * click event for the show-more button
      */
     clicked() {
       this.expandInt = !this.expandInt;
@@ -217,6 +266,10 @@ export default {
 
   .base-expand-box {
     flex-direction: column;
+
+    &.base-expand-box-padding-none {
+      padding: 0;
+    }
 
     &.base-expand-box-padding-small {
       padding: $spacing;

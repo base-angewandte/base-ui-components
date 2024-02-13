@@ -3,7 +3,8 @@
     class="base-input">
     <!-- LABEL ROW -->
     <div
-      :class="['base-input__label-row', { hide: !showLabelRow }]">
+      :class="['base-input__label-row', { hide: !showLabelRow }]"
+      @click.stop="">
       <!-- need to disable because label is there (below)? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
@@ -251,7 +252,7 @@ export default {
      *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
-      type: String,
+      type: [Number, String],
       default: null,
     },
     /**
@@ -432,7 +433,7 @@ export default {
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       const slotsHaveData = !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag);
+        && slotElements.some(elem => elem.tag || elem.text?.trim());
       // show label when prop is set true or a label addition was added via slot
       return this.showLabel || slotsHaveData;
     },
@@ -550,14 +551,15 @@ export default {
               if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
                 this.inputInt = '';
                 this.previousInput = '';
-                return;
+              } else {
+                // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
+                this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
+                // also update previous input so there are no funny effects if a type an
+                // invalid character after blur
+                this.previousInput = this.inputInt;
               }
-              // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
-              this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
-              // also update previous input so there are no funny effects if a type an
-              // invalid character after blur
-              this.previousInput = this.inputInt;
             }
+            this.$emit('blur', event);
           },
         },
       };
@@ -650,32 +652,36 @@ export default {
       if (this.inputElement && val && this.setFocusOnActive) {
         this.inputElement.focus();
       }
-      if (val !== this.isActive) {
-        /**
-         * propagate active state changes of input field to parent
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * propagate active state changes of input field to parent
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * keep externally set errorMessage variable and internal errorMessage variable in sync
      * @param {string} val
      */
-    errorMessage(val) {
-      if (val !== this.errorMessageInt) {
-        this.errorMessageInt = val;
-      }
+    errorMessage: {
+      handler(val) {
+        if (val !== this.errorMessageInt) {
+          this.errorMessageInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * keep externally set invalid variable and internal invalid variable in sync
      * @param {boolean} val
      */
-    invalid(val) {
-      if (val !== this.invalidInt) {
-        this.invalidInt = val;
-      }
+    invalid: {
+      handler(val) {
+        if (val !== this.invalidInt) {
+          this.invalidInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * keep externally set invalid variable and internal invalid variable in sync
@@ -806,8 +812,11 @@ export default {
     triggerInputEvent() {
       // Todo: find other solution to wait until inputInt has really changed
       setTimeout(() => {
-        if (this.$refs.input) {
-          this.$refs.input.dispatchEvent(new Event('input'));
+        if (this.inputElement) {
+          // need to set element value manually here since in some devices (e.g. pixel) it was not updated
+          // yet when event is triggered (see ticket #2451)
+          this.inputElement.value = this.inputInt;
+          this.inputElement.dispatchEvent(new Event('input'));
         }
       }, 0);
     },
@@ -956,6 +965,10 @@ export default {
                 opacity: 0;
                 filter:alpha(opacity=0);
                 animation: all 500ms ease;
+              }
+
+              &[type=search] {
+                appearance: none;
               }
             }
           }

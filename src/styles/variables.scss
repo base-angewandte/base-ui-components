@@ -17,6 +17,8 @@
 
   --warning-color: #ff4444;
   --pagination-bullet-color: #444444;
+
+  --base-tooltip-box-threshold-top: 0;
 }*/
 
 @use "sass:math";
@@ -76,6 +78,7 @@ $box-shadow-edit: 0 0 15px 5px rgba(0, 0, 0, 0.15);
 $drop-shadow: 0px 10px 10px 0px rgba(0,0,0,0.25);
 $pop-up-shadow: 0px 0px 36px 0px rgba(0,0,0,0.5);
 $pop-up-drop-shadow: 0px 10px 46px 0px rgba(0,0,0,0.25);
+$tooltip-drop-shadow: 0 0px 6px rgba(0,0,0,0.25);
 $input-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.2);
 $preview-box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.25);
 $box-transition: box-shadow 0.2s ease-in-out;
@@ -117,6 +120,8 @@ $zindex: (
   uploadbar: 100,
   button-active: 100,
   entry-selector-head: 150,
+  // needs to be higher than regular fadeout because chips text has z-index of 100
+  chips-fadeout: 150,
   dropdown: 200,
   uploadbar-content: 200,
   hoverbox: 500,

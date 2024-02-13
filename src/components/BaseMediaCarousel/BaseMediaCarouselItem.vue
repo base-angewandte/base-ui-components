@@ -124,6 +124,7 @@
 
 <script>
 import BaseLoader from '@/components/BaseLoader/BaseLoader';
+import { debounce } from '@/utils/utils';
 import i18n from '../../mixins/i18n';
 
 /**
@@ -347,20 +348,7 @@ export default {
      * check if document width changes and calc/set footer height
      */
     resizeObserver() {
-      return new ResizeObserver(this.throttle(() => this.setFooterHeight(), 500));
-    },
-    /**
-     * throttle event until user action is finished
-     * @param {function} callback - callback function
-     * @param {number} delay - time to delay in ms
-     * @returns {(function(...[*]=): void)|*}
-     */
-    throttle(callback, delay) {
-      let timer = 0;
-      return (...args) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => callback.apply(this, args), delay);
-      };
+      return new ResizeObserver(debounce(500, () => this.setFooterHeight()));
     },
   },
 };

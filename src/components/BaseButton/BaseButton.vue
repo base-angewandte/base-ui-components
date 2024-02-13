@@ -2,7 +2,8 @@
   <button
     :disabled="disabled"
     :aria-disabled="disabled"
-    :aria-describedby="internalId"
+    :aria-labelledby="setLabelIdReference ? internalId : false"
+    :aria-describedby="description ? `${internalId}-description` : false"
     :type="buttonType"
     :class="['base-button',
              `base-button-${buttonStyle}`,
@@ -23,10 +24,14 @@
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
 
-    <!-- @slot have your own text element which also allows for easier custom styling -->
-    <slot name="text">
+    <!-- @slot have your own text element which also allows for easier custom styling.
+      @binding {string|number} label-id If you are using this slot please also set the id of your custom element to `label-id` since this id is used for the <button> `aria-labelledby` attribute -->
+    <slot
+      name="text"
+      :label-id="internalId">
       <span
-        v-if="text"
+        v-if="text && buttonStyle !== 'circle'"
+        :id="internalId"
         :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
         {{ text }}
       </span>
@@ -40,7 +45,7 @@
       @clicked="clicked" />
     <span
       v-if="description"
-      :id="internalId"
+      :id="`${internalId}-description`"
       class="hide">
       {{ description }}
     </span>
@@ -48,7 +53,7 @@
 </template>
 
 <script>
-import { createId } from '../../utils/utils';
+import { createId } from '@/utils/utils';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseBoxTooltip from '../BaseBoxTooltip/BaseBoxTooltip';
 
@@ -64,10 +69,13 @@ export default {
   props: {
     /**
      * Button Text
+     *
+     * if button text is left empty and slot `text` is not used (so this is a button only
+     *  with an icon) please set at least the prop `description` or `iconTitle` for accessibility reasons!
      */
     text: {
       type: String,
-      default: 'Submit',
+      default: '',
     },
     // TODO: need to check if it is possible to use custom icons --> if yes description!
     /**
@@ -110,7 +118,7 @@ export default {
       type: String,
       default: 'single',
       validator(val) {
-        return ['single', 'row', 'secondary'].includes(val);
+        return ['single', 'row', 'secondary', 'circle'].includes(val);
       },
     },
     /**
@@ -122,7 +130,7 @@ export default {
     },
     /**
      * specify icon size
-     *   this will have no effect on button-style: secondary - icon will always be small
+     * **Caveat**: this will have no effect on `buttonStyle`: `secondary` | `circle` - icon will always be small
      */
     iconSize: {
       type: String,
@@ -198,6 +206,11 @@ export default {
       internalId: createId(),
     };
   },
+  computed: {
+    setLabelIdReference() {
+      return !!this.text || !!this.$slots.text;
+    },
+  },
   methods: {
     clicked(event) {
       /**
@@ -238,12 +251,17 @@ export default {
       width: $icon-small;
       max-width: $icon-small;
       flex: 0 0 auto;
+      // added for drop icon animation
+      transition: transform 0.5s ease;
 
       &.base-button-icon-colored {
         color: $app-color;
       }
     }
 
+    /**
+     * button-style: row
+     */
     &.base-button-row {
       min-height: $row-height-large;
 
@@ -270,6 +288,9 @@ export default {
       }
     }
 
+    /**
+     * button-style: single
+     */
     &.base-button-single {
       min-height: $row-height-small;
 
@@ -294,6 +315,55 @@ export default {
       }
     }
 
+    /**
+     * button-style: secondary
+     */
+    &.base-button-secondary {
+      font-size: $font-size-small;
+      color: $font-color-second;
+
+      &.base-button-background {
+        background-color: $button-header-color;
+      }
+
+      &:disabled {
+        color: $font-color-third;
+
+        &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
+          color: $font-color-third;
+        }
+      }
+    }
+
+    .base-button-icon-hide {
+      visibility: hidden;
+    }
+
+    /**
+     * button-style: circle
+     */
+    &.base-button-circle {
+      background-color: #ffffff;
+      border-radius: 50%;
+      color: $font-color-second;
+      border: 1px solid $font-color-second;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+
+      &:hover {
+        color: $app-color;
+        border-color: $app-color;
+      }
+
+      &:focus {
+        color: $app-color;
+      }
+    }
+
+    /**
+     * modifiers
+     */
     &.base-button-active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
@@ -334,7 +404,7 @@ export default {
       }
     }
 
-    /* class is set in following components: baseExpandBox */
+    /* class is set in following components: baseExpandBox and BaseAdvancedSearch */
     &.base-button-icon-rotate-180 {
       .base-button-icon {
         transform: rotate(180deg);
@@ -356,27 +426,6 @@ export default {
       &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
         color: $graytext-color;
       }
-    }
-
-    &.base-button-secondary {
-      font-size: $font-size-small;
-      color: $font-color-second;
-
-      &.base-button-background {
-        background-color: $button-header-color;
-      }
-
-      &:disabled {
-        color: $font-color-third;
-
-        &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
-          color: $font-color-third;
-        }
-      }
-    }
-
-    .base-button-icon-hide {
-      visibility: hidden;
     }
   }
 </style>

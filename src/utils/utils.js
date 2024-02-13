@@ -106,3 +106,11 @@ export const hasData = (fieldValues) => {
   }
   return hasContent;
 };
+
+export const debounce = (delay, f) => {
+  let timer = 0;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => f.apply(this, args), delay);
+  };
+};

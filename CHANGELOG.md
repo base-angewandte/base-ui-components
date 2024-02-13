@@ -1,3 +1,198 @@
+## 3.1.2 (2024-01-03)
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** add missing documentation for new filter type `chipssingle`
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** fix default defaultFilter used if prop not set immediately
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** include new type `chipssingle` in filter validation
+
+## 3.1.1 (2023-10-02)
+
+
+### Added
+
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** add new prop `showOptionsRow` to allow for removing this element completely
+
+
+### Fixed
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):** single select higher than multiselect
+* saveguard i18n term function against key not being provided
+
+## 3.1.0 (2023-09-05)
+
+
+### Added
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch), [BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearchRow):** new filter config option `subsets` to indicate filter relations
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** add `date_month_year` option to BaseDateInput
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** make search field element optional
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** add new icon 'institution'
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/components/BaseMenuEntry), [BaseMenuList](https://base-angewandte.github.io/base-ui-components/components/BaseMenuList), [ BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** new slots `text-content` / `entry-text-content` and `right-side-elements` / `entry-right-side-elements`
+* added new component **[BaseBreadCrumbs](https://base-angewandte.github.io/base-ui-components/components/BaseBreadCrumbs)**
+
+
+### Changed
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** improve ResizeObserver usage and disconnect unneeded observers
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** loader set true on option select
+* **[BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearchRow):** filter columns overflowing filter container
+* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/components/BaseDropDown), [BaseOptions](https://base-angewandte.github.io/base-ui-components/components/BaseOptions), [ BasePagination](https://base-angewandte.github.io/base-ui-components/components/BasePagination):** add debounce to component resizeObservers
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** 'select none' visibility incorrect
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** add missing background in selection mode without thumbnails
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** amount of selected entries by 'select all' button incorrect
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** field type number initial field value not set correctly
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** input field slots not working for group fields
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** use nested `dropDownLists` to allow for identical field names in field groups
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** form group field drop downs shifted to the left
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** margin of BaseToggle is not fitting all use cases
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** `showLabel` set via `fieldProps` is not working (if false)
+* **styleguide:** link base-ui-icons.svg instead of copy
+
+
+## 2.1.3 (2023-07-31)
+
+
+### Added
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/#basedateinput):** improvements for BaseDateInput format switch
+
+## 2.1.2 (2023-07-24)
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** do not switch filter on subset option select
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** OpenAPI data type `number`: initial field value not set correctly
+
+## 2.1.1 (2023-07-13)
+
+
+### Added
+
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/components/BaseMenuEntry), [BaseMenuList](https://base-angewandte.github.io/base-ui-components/components/BaseMenuList), [BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** new slots `text-content` / `entry-text-content` and `right-side-elements` / `entry-right-side-elements`
+
+
+## 2.1.0 (2023-07-12)
+
+
+### Added
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch), [BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearchRow):** new filter config option `subsets` to indicate filter relations
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** adding a month switch option to BaseDateInput, new prop `format` value `date_month_year`
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** make search field element optional with new prop `useSearch`
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** add new icon 'institution'
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** loader set true on option select, causing it to never disappear
+* **[BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearchRow):** filter columns overflowing filter container
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** correct label and switch button overlap
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** use nested objects for prop `dropDownLists` to allow for identical field names in field groups
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** form group field dropdowns shifted to the left
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** date format switch label missing for new option month
+
+
+
+## 3.0.2 (2023-06-12)
+
+### Fixed
+
+* **styleguide:** add base-ui-icons path for github pages
+
+
+## 3.0.1 (2023-05-23)
+
+
+### Fixed
+
+* update README for css files front end project integration
+
+## 3.0.0 (2023-05-17)
+
+### ⚠ BREAKING CHANGE
+* switch from [rollup.js](https://rollupjs.org/) and [Vue CLI](https://cli.vuejs.org/) to [Vite](https://vitejs.dev/) as build and development tool.
+  In course of that, the build configuration was changed in a way that components don't need to be added as plugins via `Vue.use` anymore but can just be registered as regular components again. See [Readme](README.md) for further details on how to add components to a project.
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/components/BaseImageBox):** Renaming of slots 'footerLeft' and 'footer' to 'footer-left', 'footer-right'.
+* **[BaseMediaPreview](https://base-angewandte.github.io/base-ui-components/components/BaseMediaPreview):** removing the deprecated component - use [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel) instead.
+
+
+### Added
+
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** add new icon 'people-filled'.
+
+
+### Changed
+* switch from [rollup.js](https://rollupjs.org/) and [Vue CLI](https://cli.vuejs.org/) to [Vite](https://vitejs.dev/) as build and development tool.
+* **styleguide:** implement new styleguide with [VuePress](https://vuepress.vuejs.org/) instead of [Vue Styleguidist](https://vue-styleguidist.github.io/).
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/components/BaseImageBox):** rename footer slots
+* update and rename `npm publish` pipeline
+* add "exports" field to package.json.
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** update swiper from v6 to v9
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** load swiper api only when component is mounted
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** fix swiper init and use the native browser lazy loading feature for images
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/components/BaseMap):** import leaflet and related plugins async
+* **[BaseChip](https://base-angewandte.github.io/base-ui-components/components/BaseChip):** use BaseIcon component for remove icon
+
+
+### Removed
+
+* **[BaseMediaPreview](https://base-angewandte.github.io/base-ui-components/components/BaseMediaPreview):** remove deprecated component, use [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel) instead.
+* remove obsolete update-package-exports build script.
+* remove obsolete test setup and jest.config.
+
+
+### Fixed
+
+* **[BaseTextList](https://base-angewandte.github.io/base-ui-components/components/BaseTextList):** avoid separators for chip rendered links
+* **[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/components/BaseBoxButton):** built in plus icon not centered
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** no activeIndex on swiper hide
+* **styleguide:** replace placeimg with picsum example images, since placeimg API not available anymore from June 2023.
+* **[BaseEditControl](https://base-angewandte.github.io/base-ui-components/components/BaseEditControl):** styleguide error with `editMode` `done`
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** demo not working
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel), [BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel):** clarify property descriptions
+* **[BaseExpandList](https://base-angewandte.github.io/base-ui-components/components/BaseExpandList):** avoid text glitches with class 'supportive-text'
+* **[BaseToolTip](https://base-angewandte.github.io/base-ui-components/components/BaseToolTip):** fix property type
+
+
+
+## 2.0.11 (2023-05-08)
+
+
+### Fixed
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/#basebutton):** fix active state style in a base-button-row
+
+
+## 2.0.10 (2023-05-08)
+
+
+### Fixed
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/#basebutton):** fix active state style
+
+
+## 2.0.9 (2023-04-03)
+
+
+### Added
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/#basechipsinput):** add additional prop `displayChipsRemove`
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/#basesearch), [BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearchrow):** add new search type `chipssingle`
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearch):** fix autocomplete malfunctioning (options not displayed, select in styleguide not working).
+* **[BaseAdvancedSearchRow](https://base-angewandte.github.io/base-ui-components/#baseadvancedsearchrow):** open drop down on element click event.
+
+
 ## 2.0.8 (2023-03-27)
 
 ### Fixed

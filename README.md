@@ -22,11 +22,8 @@ main.js
 import Vue from 'vue';
 // import the components you would like
 import { BaseAutcompleteInput, BaseCarousel } from 'base-ui-components';
-// also import the component css
-import 'base-ui-components/dist/components/BaseAutocompleteInput/BaseAutocompleteInput.css';
-import 'base-ui-components/dist/components/BaseCarousel/BaseCarousel.css';
-// additionally a common css file is needed
-import 'base-ui-components/dist/base-ui-components-common.css';
+// import the component css
+import 'base-ui-components/dist/base-ui-components.css';
 import App from './App';
 
 const components = {
@@ -72,7 +69,7 @@ new Vue({
 
 ```
 
-After adding the components as plugins, they can be used in your app globally, like so:
+After adding the components, they can be used in your app globally, like so:
 
 ```vue
 Component.vue
@@ -125,7 +122,7 @@ Then in your `main.js` file import your styles before the base-ui-components fil
 ```js
 import './styles/app.scss';
 
-import 'base-ui-components/dist/lib/base-ui-components.min.css';
+import 'base-ui-components/dist/lib/base-ui-components.css';
 ```
 
 

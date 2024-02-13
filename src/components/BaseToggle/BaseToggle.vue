@@ -20,7 +20,8 @@
         :aria-disabled="disabled"
         :type="'checkbox'"
         value=""
-        class="base-toggle__input">
+        class="base-toggle__input"
+        @click.stop="">
 
       <div class="base-switch">
         <span
@@ -161,6 +162,8 @@ export default {
   @import "../../styles/variables";
 
   .base-toggle {
+    position: relative;
+    margin-top: calc((#{$input-field-line-height} - #{$line-height}) * 2);
 
     .base-toggle__container {
       position: relative;
@@ -195,6 +198,7 @@ export default {
       border-radius: calc((#{$spacing} + 2px) / 2);
       border: 1px solid $switch-container-color;
       transition: border-color 250ms ease-in-out;
+      flex: 0 0 auto;
 
       .base-switch__control {
         position: absolute;

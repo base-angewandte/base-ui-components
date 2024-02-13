@@ -3,25 +3,36 @@
     ref="baseDateInput"
     class="base-date-input">
     <div
+      v-if="showLabelRow"
       :class="['base-date-input__label-row',
-               { 'base-date-input__label-row_visible': showLabel }]">
+               { 'base-date-input__label-row--visible': showLabel }]">
       <legend
         v-if="showLabel"
+        ref="label"
         class="base-date-input__label"
         @click.prevent="">
         {{ label }}
       </legend>
       <div
-        v-if="showFormatOptions"
-        class="base-date-input__format-tabs">
-        <BaseSwitchButton
-          v-model="dateFormatInt"
-          :options="[
-            { label: dateFormatLabels.date, value: 'DD.MM.YYYY' },
-            { label: dateFormatLabels.year, value: 'YYYY' },
-          ]"
-          :label="formatTabsLegend"
-          :active-tab="dateFormatInt" />
+        :class="['base-date-input__label-additions',
+                 {'base-date-input__label-additions--switch-height': isSwitchableFormat },
+                 {'base-date-input__label-additions--wrap': wrapLabelRow }]">
+        <div
+          ref="labelAdditions"
+          :class="['base-date-input__label-additions-inner',
+                   {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
+                   {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
+                     && !showLabel }]">
+          <!-- @slot to add additional elements to the label row -->
+          <slot name="label-addition" />
+          <BaseSwitchButton
+            v-if="isSwitchableFormat"
+            v-model="dateFormatInt"
+            :options="tabSwitchOptions"
+            :label="formatTabsLegend"
+            :active-tab="dateFormatInt"
+            class="base-date-input__switch-buttons" />
+        </div>
       </div>
     </div>
 
@@ -42,7 +53,7 @@
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            :id="label + '-' + id"
+            :id="`input-${id}-from`"
             v-model="inputFrom"
             :label="label"
             :show-label="false"
@@ -59,14 +70,13 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('fromOpen', $event)"
+            @update:is-active="isActiveHandler('from', $event)"
             v-on="inputListeners">
             <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
                   v-model="inputFrom"
-                  :input-attr="{ id: label + '-' + id }"
                   :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
@@ -77,17 +87,18 @@
                   :value-type="isFromTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('from')"
-                  @click.native.prevent.stop=""
+                  @click.native.prevent="onInputClick"
                   @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="label + '-' + id"
+                      :id="`input-${id}-from`"
                       ref="inputFrom"
                       v-model="inputFrom"
-                      :placeholder="placeholder.date || placeholder"
+                      :placeholder="isFromTimeField ? placeholder.time || placeholder
+                        : placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-' + id"
                       :aria-required="required.toString()"
@@ -97,7 +108,6 @@
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
                       autocomplete="off"
-                      @blur="checkDateValidity('From')"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
                       v-on="dateInputListeners">
@@ -127,7 +137,7 @@
           <!-- INPUT TO -->
           <BaseInput
             v-if="type !== 'single'"
-            :id="label + '-to-' + id"
+            :id="`input-${id}-to`"
             v-model="inputTo"
             :label="label"
             :show-label="false"
@@ -143,14 +153,13 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('toOpen', $event)"
+            @update:is-active="isActiveHandler('to', $event)"
             v-on="inputListeners">
             <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
                   v-model="inputTo"
-                  :input-attr="{ id: label + '-' + id }"
                   :placeholder="isToTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
@@ -158,20 +167,21 @@
                   :open="toOpen"
                   :type="isToTimeField ? 'time' : minDateView"
                   :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
-                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
+                  :value-type="isToTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
-                  @click.native.prevent.stop=""
+                  @click.native.prevent="onInputClick"
                   @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="label + '-to-' + id"
+                      :id="`input-${id}-to`"
                       ref="inputTo"
                       v-model="inputTo"
-                      :placeholder="placeholder.date || placeholder"
+                      :placeholder="isToTimeField ? placeholder.time || placeholder
+                        : placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-to-' + id"
                       :aria-required="required.toString()"
@@ -181,7 +191,6 @@
                       :aria-disabled="disabled"
                       autocomplete="off"
                       :class="['base-date-input__input', inputClass]"
-                      @blur="checkDateValidity('To')"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
                       v-on="dateInputListeners">
@@ -209,7 +218,7 @@
     </div>
 
     <div class="base-date-input__below">
-      <!-- @slot Slot to add elements below input fields e.g. add drop down -->
+      <!-- @slot to add elements below input fields e.g. add drop down -->
       <slot name="below-input" />
     </div>
   </div>
@@ -218,6 +227,7 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
+import { capitalizeString, debounce } from '@/utils/utils';
 
 import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
@@ -302,21 +312,23 @@ export default {
      *
      *  **date_year**: display tabs that allow for toggle between only choosing year
      *   or complete date
+     *  **date_month_year**: display tabs that allow for toggle between choosing only year,
+     *   year and month or complete date
      */
     format: {
       type: String,
       default: 'day',
       validator(val) {
-        return ['day', 'month', 'year', 'date_year'].includes(val);
+        return ['day', 'month', 'year', 'date_year', 'date_month_year'].includes(val);
       },
     },
     /**
      * specify labels displayed instead of 'DD.MM.YYYY' and 'YYYY'
-     *   should have the form `{ date: 'xxx', year: 'yyy' }`
+     *   should have the form `{ date: 'xxx', month: 'zzz', year: 'yyy' }`
      */
     dateFormatLabels: {
       type: Object,
-      default: () => ({ date: 'DD.MM.YYYY', year: 'YYYY' }),
+      default: () => ({ date: 'DD.MM.YYYY', month: 'MM.YYYY', year: 'YYYY' }),
       validator(val) {
         const labelKeys = Object.keys(val);
         return labelKeys.includes('date') && labelKeys.includes('year');
@@ -516,6 +528,11 @@ export default {
        */
       resizeObserver: null,
       /**
+       * function needs to be triggered when date switch is populated
+       * @type {?ResizeObserver}
+       */
+      labelAdditionsObserver: null,
+      /**
        * datepicker localisations
        *   using object fixes problem of missing localisation files in rollup-esm-build
        */
@@ -524,6 +541,11 @@ export default {
         en,
         fr,
       },
+      /**
+       * variable to set css class according to label elements wrapping or not
+       * @type {boolean}
+       */
+      wrapLabelRow: false,
     };
   },
   computed: {
@@ -537,7 +559,7 @@ export default {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
         return 'YYYY';
       }
-      if (this.format === 'month') {
+      if (this.format === 'month' || this.dateFormatInt === 'MM.YYYY') {
         return 'YYYY-MM';
       }
       return 'YYYY-MM-DD';
@@ -556,10 +578,13 @@ export default {
      * @returns {string}
      */
     minDateView() {
-      if (this.format === 'date_year' && this.dateFormatInt === 'YYYY') {
+      if (this.isSwitchableFormat && this.dateFormatInt === 'YYYY') {
         return 'year';
       }
-      if (this.format === 'date_year' && this.dateFormatInt === 'DD.MM.YYYY') {
+      if (this.isSwitchableFormat && this.dateFormatInt === 'MM.YYYY') {
+        return 'month';
+      }
+      if (this.isSwitchableFormat && this.dateFormatInt === 'DD.MM.YYYY') {
         return 'day';
       }
       return this.format;
@@ -570,13 +595,6 @@ export default {
      */
     inputProperties() {
       return Object.keys(this.input);
-    },
-    /**
-     * check if format switch tabs should be shown
-     * @returns {boolean}
-     */
-    showFormatOptions() {
-      return this.format === 'date_year';
     },
     /**
      * check if input is just a single date or an object
@@ -613,6 +631,12 @@ export default {
           this.inputInt.date_from = this.dateStorage(val);
         } else {
           this.inputInt.date = this.dateStorage(val);
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          this.emitData();
         }
       },
     },
@@ -651,6 +675,12 @@ export default {
         } else {
           this.inputInt.time = val;
         }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+          this.emitData();
+        }
       },
     },
     /**
@@ -662,6 +692,39 @@ export default {
       return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && this.inputInt[key].length <= 4));
+    },
+    isDateFormatMonth() {
+      return ((this.isSingleDate && this.inputInt.date
+          && this.inputInt.date.length > 4 && this.inputInt.date.length <= 7)
+        || this.inputProperties.some(key => !!key.includes('date')
+          && this.inputInt[key]
+          && this.inputInt[key].length > 4 && this.inputInt[key].length <= 7));
+    },
+    /**
+     * check if format switch tabs should be shown
+     * @returns {boolean}
+     */
+    isSwitchableFormat() {
+      return this.format === 'date_month_year' || this.format === 'date_year';
+    },
+    /**
+     * return the format options for date, month, year switches
+     * @returns {[{label: string, value: string}]}
+     */
+    tabSwitchOptions() {
+      // minimal options
+      const options = [
+        { label: this.dateFormatLabels.date, value: 'DD.MM.YYYY' },
+        { label: this.dateFormatLabels.year, value: 'YYYY' },
+      ];
+      // if format can be month as well, add month option
+      if (this.format === 'date_month_year') {
+        options.splice(1, 0, {
+          label: this.dateFormatLabels.month,
+          value: 'MM.YYYY',
+        });
+      }
+      return options;
     },
     /**
      * determine if the from field is a time field
@@ -693,18 +756,9 @@ export default {
           'clicked-outside': (event) => {
             event.stopPropagation();
           },
-          // need to stop the event triggered in original BaseInput as well
-          // and replace it with the internal active state variable
-          'update:is-active': () => {
-            /**
-             * replace BaseInput state with BaseDateInput field active state and
-             * propagate this one
-             *
-             * @event update:is-active
-             * @param {boolean} - is input field active
-             */
-            this.$emit('update:is-active', this.isActiveInt);
-          },
+          // need to stop the event triggered in original BaseInput and only trigger
+          // when component isActiveInt has changed
+          'update:is-active': () => {},
         },
       };
     },
@@ -730,6 +784,25 @@ export default {
           this.$emit('input', this.getInputData());
         },
       };
+    },
+    /**
+     * check if label-addition slot exists is filled
+     */
+    labelRowSlotsHaveData() {
+      // get label-addition slot
+      const slotElements = this.$slots['label-addition'];
+      // check if slot exists and has data and actually has content
+      // (this did not work with SSR otherwise...)
+      return !!slotElements && !!slotElements.length
+        && slotElements.some(elem => elem.tag || elem.text?.trim());
+    },
+    /**
+     * determines if label row should be shown
+     * @returns {Boolean|boolean}
+     */
+    showLabelRow() {
+      // show label when prop is set true or a label addition was added via slot
+      return this.showLabel || this.isSwitchableFormat || this.labelRowSlotsHaveData;
     },
   },
   watch: {
@@ -760,8 +833,14 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
           this.inputInt = this.isSingleDate ? { date: val } : { ...val };
           // check if external input was year format and set internal format accordingly
-          if (this.showFormatOptions) {
-            this.dateFormatInt = this.isDateFormatYear ? 'YYYY' : 'DD.MM.YYYY';
+          if (this.isSwitchableFormat) {
+            if (this.isDateFormatYear) {
+              this.dateFormatInt = 'YYYY';
+            } else if (this.isDateFormatMonth) {
+              this.dateFormatInt = 'MM.YYYY';
+            } else {
+              this.dateFormatInt = 'DD.MM.YYYY';
+            }
           }
         }
       },
@@ -769,28 +848,40 @@ export default {
       immediate: true,
     },
     /**
-     * if inputInt changes inform parent about it
-     */
-    inputInt: {
-      handler() {
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
-          this.emitData();
-        }
-      },
-      deep: true,
-    },
-    /**
      * in order to allow user to restore previous date after switching
      * from date to year and back store in temp variable (but only if previous date was full date
      * (check necessary for starting with year where format is switched to 'YYYY'
      * but no previous full date avaliable))
      * @param {string} val - the changed dateFormatInt value
+     * @param {string} old - the previous value
      */
-    dateFormatInt(val) {
-      if (val === 'YYYY' && !this.isDateFormatYear) {
+    dateFormatInt(val, old) {
+      // in order to allow user to restore previous date after switching
+      // from date to year and back store in temp variable if
+      // a) date is not just format 'YYYY' & switch was made from full date
+      if (!this.isDateFormatYear && old === 'DD.MM.YYYY') {
         this.tempDateStore = { ...this.inputInt };
+        // b) tab switch was made from month to year
+      } else if (!this.isDateFormatYear
+        && (val === 'YYYY' && old === 'MM.YYYY')) {
+        // if there is no previous stored date just store everything
+        if (!this.tempDateStore) {
+          this.tempDateStore = { ...this.inputInt };
+          // if there was a previous stored date check for every date prop in inputInt
+          // if stored date should be overwritten
+        } else {
+          Object.keys(this.inputInt).filter(key => !!key.includes('date'))
+            .forEach((dateKey) => {
+              // date should be overwritten if month or year are different from
+              // the already stored date
+              if (!this.monthAndYearIdent(
+                this.inputInt[dateKey],
+                this.tempDateStore[dateKey],
+              )) {
+                this.$set(this.tempDateStore, dateKey, this.inputInt[dateKey]);
+              }
+            });
+        }
       }
       this.convertDate();
     },
@@ -821,9 +912,14 @@ export default {
      * @param {boolean} val - the changed internal is active variable
      */
     isActiveInt(val) {
-      if (val !== this.isActive) {
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * replace BaseInput state with BaseDateInput field active state and
+       * propagate this one
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * also adjust internal variable when active state changes from outside
@@ -847,9 +943,8 @@ export default {
     if (this.$refs.baseIcon) {
       this.iconWidth = this.$refs.baseIcon.$el.clientWidth;
     }
-
-    // initialize the resize observer to calculate fade out when component is resized
-    this.initObserver();
+    // initialize the resize observer to calculate fade out and label row when component is resized
+    this.initObservers();
   },
   updated() {
     // this hack is necessary because otherwise keyboard navigation was impaired by the datepicker
@@ -873,16 +968,49 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDateInput);
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },
   methods: {
-    initObserver() {
+    /**
+     * since the complete datepicker lies within the BaseInput, the BaseInput click event
+     *  is triggered also when a date is picked from the date picker - this leads to the undesired
+     *  side effect that the date picker pop up is reopened when a date was selected there
+     *  therefore we only allow the click event to pass on when the user clicks on the input field
+     *  DIRECTLY
+     * @param {PointerEvent} event - the native click event
+     */
+    onInputClick(event) {
+      if (event.target.tagName !== 'INPUT') {
+        event.stopPropagation();
+      }
+    },
+    initObservers() {
       // create an observer with the fade out calc function
-      const tempResizeObserver = new ResizeObserver(() => this.calcFadeOut(['From', 'To']));
+      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
+        if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
+          this.calcLabelAdditionsWidth();
+        }
+        this.calcFadeOut(['From', 'To']);
+      }));
       // put it on the relevant element
       tempResizeObserver.observe(this.$refs.baseDateInput);
       // store it in variable
       this.resizeObserver = tempResizeObserver;
+
+      if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
+        // second observer to trigger label additions width calc as soon as element is rendered
+        const tempLabelAdditionsObserver = new ResizeObserver(debounce(50, (entries, observer) => {
+          // only do calc when element is filled
+          if (entries[0].contentRect.width > 0) {
+            this.calcLabelAdditionsWidth(this.$refs.baseDateInput.clientWidth);
+            // only do this once as soon as elements are rendered - then disconnect!
+            observer.disconnect();
+          }
+        }));
+        tempLabelAdditionsObserver.observe(this.$refs.labelAdditions);
+        this.labelAdditionsObserver = tempLabelAdditionsObserver;
+      }
     },
     /**
      * transform the date to the correct display format
@@ -930,16 +1058,18 @@ export default {
       // * if type is date and key was period and date format is year or last char in string was
       //    already a period
       // * if type is time and key was colon and last char was already a colon
-      if (!allowedKeysRegex.test(key)
+      // * and also make sure copy & paste is allowed!
+      if ((!allowedKeysRegex.test(key)
         || (disallowedKeysOnLengthRegex.test(key) && this[`input${origin}`].length >= formatLength
           && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
         || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
           || currentInputString.charAt(currentInputString.length - 1) === '.'))
-        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':')) {
+        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
+        && !(['c', 'v', 'x'].includes(key) && event.ctrlKey)) {
         event.preventDefault();
       }
       // when the user tries to leave the field check if input string is valid
-      if (key === 'Enter' && currentInputString) {
+      if (key === 'Enter') {
         this.checkDateValidity(origin);
         currentInputString = this[`input${origin}`];
       }
@@ -1137,7 +1267,7 @@ export default {
             }
           }
           // since technically invalid dates (like 30.02.2000) will also be considered a
-          // vaild date by Date.parse() just convert to Date and back one more time
+          // valid date by Date.parse() just convert to Date and back one more time
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
           const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
@@ -1169,23 +1299,26 @@ export default {
      */
     closeTimePicker(origin, time, type) {
       if (type === 'minute') {
+        // get capitalized origin here since needed 2x
+        const uppercaseOrigin = capitalizeString(origin);
+        // check date validity
+        this.checkDateValidity(uppercaseOrigin);
+        // close the drop down
         this[`${origin}Open`] = false;
         // check if the new date/time string needs a fade out
-        this.calcFadeOut([`${origin.charAt(0).toUpperCase()}${origin.slice(1)}`]);
+        this.calcFadeOut([uppercaseOrigin]);
       }
     },
     /**
      * function triggered on datepicker 'pick' event, handling date picker closing
      * and date validation
+     *  caveat: this event is just triggered for DATE picker - not time!
      * @param origin
-     * @param isTimeField
      */
-    datePicked(origin, isTimeField) {
-      if (!isTimeField) {
-        this[`${origin}Open`] = false;
-      }
+    datePicked(origin) {
+      this[`${origin}Open`] = false;
       // need this here because on blur() date is not updated
-      this.checkDateValidity(origin);
+      this.checkDateValidity(capitalizeString(origin));
     },
     /**
      * handle click outside event and adjust input active variable accordingly
@@ -1237,23 +1370,44 @@ export default {
     convertDate() {
       Object.keys(this.inputInt).filter(key => !!key.includes('date'))
         .forEach((dateKey) => {
-          if (this.inputInt[dateKey]) {
+          const dateToConvert = this.inputInt[dateKey];
+          if (dateToConvert) {
             if (this.minDateView === 'year') {
               // convert date string to real date in order to get year and convert back to string
-              this.$set(this.inputInt, dateKey, this.convertToDate(this.inputInt[dateKey])
+              this.$set(this.inputInt, dateKey, this.convertToDate(dateToConvert)
                 .getFullYear().toString());
-            } else {
-              // check if year was changed or is still the same
-              const yearIdent = new Date(this.tempDateStore[dateKey])
-                .getFullYear().toString() === this.inputInt[dateKey];
-              // if there is a stored value set this, otherwise convert year string to date
-              // and then to date string in correct format
+            } else if (this.minDateView === 'month') {
+              const newDate = !!this.tempDateStore
+                // get stored date if
+                // a) previous date was full date and month and year
+                // are identical with stored year and month
+                && ((!this.isDateFormatYear
+                && this.monthAndYearIdent(this.tempDateStore[dateKey], dateToConvert))
+                // b) previous date was year and it is identical with stored year
+                || (new Date(this.tempDateStore[dateKey])
+                  .getFullYear().toString() === dateToConvert))
+                // else use current input date
+                ? this.tempDateStore[dateKey] : dateToConvert;
               this.$set(
                 this.inputInt,
                 dateKey,
-                (yearIdent && this.tempDateStore[dateKey]
-                  ? this.tempDateStore[dateKey]
-                  : this.getDateString(this.convertToDate(this.inputInt[dateKey]))),
+                this.getDateString(this.convertToDate(newDate), true),
+              );
+            } else {
+              // check if a previous date was stored and year (coming from year)
+              const useStoredDate = !!this.tempDateStore && ((this.isDateFormatYear
+                && new Date(this.tempDateStore[dateKey]).getFullYear().toString() === dateToConvert)
+                // or month and year (coming from month) was changed or is still the same
+                || (this.isDateFormatMonth
+                && this.monthAndYearIdent(this.tempDateStore[dateKey], dateToConvert)));
+              // if a previous date was stored use this one else use the input date
+              const newDate = useStoredDate ? this.tempDateStore[dateKey] : dateToConvert;
+              // set the new date (converted to date and formatted
+              // in the correct format YYYY-MM-DD)
+              this.$set(
+                this.inputInt,
+                dateKey,
+                this.getDateString(this.convertToDate(newDate)),
               );
             }
           }
@@ -1276,7 +1430,7 @@ export default {
     /**
      * convert a value to a date in local time at zero hours
      *
-     * @param value: the date string stored in db (format YYYY-MM-DD)
+     * @param {string} value - the date string stored in db (format YYYY-MM-DD)
      * @returns {Date} - (e.g. Fri Jul 30 2021 00:00:00 GMT+0200 (Central European Summer Time))
      */
     convertToDate(value) {
@@ -1289,8 +1443,8 @@ export default {
      * @returns {string} - returns a string in format YYYY-MM-DD
      */
     getDateString(date) {
-      // there is always a year
-      let dateString = `${date.getFullYear().toString()}`;
+      // there is always a year // add padStart to always have 4 digits
+      let dateString = `${date.getFullYear().toString().padStart(4, '0')}`;
       // if date format is not 'year' only - add month
       if (this.dateFormatInt !== 'YYYY') {
         const month = (date.getMonth() + 1).toString();
@@ -1302,6 +1456,15 @@ export default {
         dateString = `${dateString}-${day.length < 2 ? '0' : ''}${day}`;
       }
       return dateString;
+    },
+    monthAndYearIdent(date1, date2) {
+      const convertedDate1 = this.convertToDate(date1);
+      const convertedDate2 = this.convertToDate(date2);
+      const monthDate1 = convertedDate1.getMonth();
+      const monthDate2 = convertedDate2.getMonth();
+      const yearDate1 = convertedDate1.getFullYear();
+      const yearDate2 = convertedDate2.getFullYear();
+      return monthDate1 === monthDate2 && yearDate1 === yearDate2;
     },
     /**
      * function to calculate if fade out in the input fields should be shown, needs to be
@@ -1361,21 +1524,45 @@ export default {
       });
     },
     /**
+     * function to correctly style the date format switch buttons and prevent
+     * overlay with label
+     */
+    calcLabelAdditionsWidth() {
+      // get the complete element width
+      const observableWidth = this.$refs.baseDateInput.clientWidth;
+      // get the label margin
+      const labelMargin = this.showLabel
+        ? Number(getComputedStyle(this.$refs.label)['margin-right'].replace('px', '')) : 0;
+      const labelWidth = this.showLabel ? this.$refs.label.clientWidth : 0;
+      // calculate the remaining container space after label, label margin and date switch width
+      const spacingLeft = observableWidth
+        - labelWidth
+        - labelMargin
+        - this.$refs.labelAdditions.clientWidth;
+      // if no space is left set a class that sets label additions width to 100% so element has to wrap
+      this.wrapLabelRow = spacingLeft < 0;
+    },
+    /**
      * add delay before value is set
      *
-     * @param {String} key
+     * @param {String} origin - is event originating from 'from' or 'to' field
      * @param {boolean} value
      */
-    isActiveHandler(key, value) {
+    isActiveHandler(origin, value) {
       // if false set value immediately
       if (!value) {
-        this[key] = value;
+        this[`${origin}Open`] = value;
+        this.isActiveInt = this.fromOpen || this.toOpen;
+        // check for date validity here instead of blur event (necessary for time input
+        // which is not triggered otherwise)
+        this.checkDateValidity(capitalizeString(origin));
         return;
       }
 
       // otherwise add a delay
       setTimeout(() => {
-        this[key] = value;
+        this[`${origin}Open`] = value;
+        this.isActiveInt = this.fromOpen || this.toOpen;
       }, this.isActiveDelay);
     },
   },
@@ -1393,11 +1580,13 @@ export default {
 
     .base-date-input__label-row {
       display: flex;
+      flex-wrap: wrap;
       width: 100%;
       height: 100%;
       justify-content: space-between;
+      align-items: center;
 
-      &.base-date-input__label-row_visible {
+      &.base-date-input__label-row--visible {
         margin-bottom: $spacing-small-half;
       }
 
@@ -1406,19 +1595,58 @@ export default {
         margin-bottom: $spacing-small-half;
         text-align: left;
         align-self: flex-end;
+        margin-right: 50px;
       }
 
-      .base-date-input__format-tabs {
-        align-self: center;
-        flex-shrink: 0;
+      .base-date-input__label-additions {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        flex: 1 1 auto;
+        height: $line-height;
+
+        &.base-date-input__label-additions--switch-height {
+          height: calc(#{$line-height} + #{$spacing-small-half});
+
+          &.base-date-input__label-additions--wrap {
+            margin-top: 2px;
+          }
+        }
+
+        &.base-date-input__label-additions--wrap {
+          width: 100%;
+        }
+      }
+
+      .base-date-input__label-additions-inner {
         position: absolute;
         right: 0;
-        top: -$spacing-small;
+        display: flex;
+        align-items: center;
+        margin-bottom: $spacing-small-half;
 
-        @media screen and (max-width: $mobile) {
-          position: inherit;
-          right: inherit;
-          top: inherit;
+        &.base-date-input__label-additions-inner--switch {
+          bottom: 0;
+          margin-bottom: calc(-#{$spacing-small-half} / 2);
+
+          @media screen and (max-width: $mobile) {
+            margin-bottom: calc(-#{$spacing-small} - 2px);
+          }
+        }
+        &.base-date-input__label-additions-inner--no-label-switch {
+          margin-bottom:  2px;
+
+          @media screen and (max-width: $mobile) {
+            margin-bottom: calc(-#{$spacing-small} + 1px);
+          }
+        }
+
+        .base-date-input__switch-buttons {
+          bottom: 0;
+          display: flex;
+          line-height: $line-height;
         }
       }
     }
@@ -1484,6 +1712,12 @@ export default {
 
     .base-date-input__below {
       position: relative;
+    }
+  }
+
+  @media screen and (max-width: $mobile) {
+    .base-date-input .base-date-input__label-row .base-date-input__label-additions {
+      align-items: center;
     }
   }
 </style>

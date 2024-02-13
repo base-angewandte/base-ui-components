@@ -79,7 +79,7 @@
         <slot name="error-icon" />
       </template>
       <template #remove-icon>
-        <!-- @slot for adding elements after input (e.g. used to add loader. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="remove-icon" />
       </template>
     </BaseInput>
@@ -253,7 +253,7 @@ export default {
      */
     identifierPropertyName: {
       type: String,
-      default: 'id',
+      default: 'source',
     },
     /**
      * specify the object property that should be used as value to be displayed
@@ -309,6 +309,8 @@ export default {
           // (handled this way because this input event is only triggered on
           // keyboard input not when I select from the drop down)
           input: () => {},
+          // keep this BaseInput event from propagating and use component's own event
+          'update:is-active': () => {},
         },
       };
     },
@@ -429,16 +431,13 @@ export default {
       if (!val) {
         this.activeOptionIndex = -1;
       }
-      // also inform parent of the state changes
-      if (JSON.stringify(val) !== JSON.stringify(this.isActive)) {
-        /**
-         * update when active state of input field changes
-         * the `.sync` modifier can be used on this event
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * update when active state of input field changes
+       * the `.sync` modifier can be used on this event
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
   },
   methods: {

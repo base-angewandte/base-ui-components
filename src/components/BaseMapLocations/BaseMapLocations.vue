@@ -280,18 +280,18 @@ export default {
           margin-bottom: $spacing-small;
         }
 
-        .base-text-list-content {
+        .base-text-list__content {
           transition: color 250ms ease-in-out;
         }
 
-        &--highlight :deep(.base-text-list-content) {
+        &--highlight :deep(.base-text-list__content) {
           color: $app-color !important;
         }
 
         &:hover ::v-deep {
           cursor: pointer;
 
-          .base-text-list-content {
+          .base-text-list__content {
             color: $app-color !important;
           }
         }

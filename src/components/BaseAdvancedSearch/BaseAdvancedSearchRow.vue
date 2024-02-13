@@ -5,6 +5,8 @@
     class="base-advanced-search-row"
     @click="openDropDown">
     <!-- SEARCH FIELD -->
+    <!-- note: the id is used in the javascript part as well as the parent component
+      BaseAdvancedSearch.vue - consider that when changing it! -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
       ref="baseSearch"
@@ -32,8 +34,8 @@
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       v-bind="$listeners"
-      @clicked-outside="isActive = false"
-      @click="isActive = true"
+      @clicked-outside="onClickedOutsideSearch"
+      @click.native="onSearchClick"
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
@@ -43,7 +45,8 @@
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
-          :id="'filter-select-' + internalRowId"
+          v-if="mode === 'list'"
+          :id="'search-filter-select-' + internalRowId"
           :selected-list.sync="selectedFilter"
           :allow-multiple-entries="false"
           :allow-unknown-entries="false"
@@ -103,6 +106,8 @@
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
+        <!-- @slot add an element at the end of the search row (e.g. additional button) -->
+        <slot name="after" />
       </template>
 
       <!-- DROP DOWN BODY -->
@@ -127,7 +132,9 @@
           class="base-advanced-search-row__drop-down-body"
           @touchstart.native.stop=""
           @click.native.stop="">
-          <template #before-list>
+          <template
+            v-if="mode === 'list'"
+            #before-list>
             <div
               :class="['base-advanced-search-row__above-list-area',
                        'base-advanced-search-row__area-padding',
@@ -207,23 +214,23 @@
 
           <!-- AUTOCOMPLETE OPTIONS LIST -->
           <template
-            #option="slotProps">
+            #option="{ option }">
             <div
               v-if="!filter || useAutocompleteFunctionality"
               class="base-advanced-search-row__autocomplete-body">
               <div
-                v-if="slotProps.option[autocompletePropertyNames.data].length"
+                v-if="option[autocompletePropertyNames.data].length"
                 :class="['base-advanced-search-row__first-column',
                          'base-advanced-search-row__autocomplete-collection',
                 ]">
                 <div class="base-advanced-search-row__autocomplete-collection-text">
-                  {{ slotProps.option[autocompletePropertyNames.label] }}
+                  {{ option[autocompletePropertyNames.label] }}
                 </div>
               </div>
 
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
-                :drop-down-options="slotProps.option[autocompletePropertyNames.data]"
+                :drop-down-options="option[autocompletePropertyNames.data]"
                 :active-option.sync="activeEntry"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
@@ -231,10 +238,11 @@
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
                 :label-property-name="labelPropertyName.autocompleteOption"
                 class="base-advanced-search-row__autocomplete-options"
-                @update:active-option="setCollection(slotProps
-                  .option[autocompletePropertyNames.id])"
-                @update:selected-option="addOption($event, slotProps
-                  .option[autocompletePropertyNames.id])" />
+                @update:active-option="setCollection(option[autocompletePropertyNames.id])"
+                @update:selected-option="addOption(
+                  $event,
+                  option[autocompletePropertyNames.id],
+                )" />
             </div>
           </template>
 
@@ -346,10 +354,12 @@
             </div>
           </template>
         </BaseDropDownList>
+        <!-- @slot add an element below the primary row (same styling (box-shadow) as primary row element) -->
+        <slot name="below" />
       </template>
     </BaseSearch>
     <BaseButton
-      v-if="isMainSearch"
+      v-if="mode === 'list' && isMainSearch"
       icon="plus"
       button-style="row"
       icon-position="right"
@@ -357,8 +367,9 @@
                { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
       @clicked="addFilterRow"
       @click.native.stop="">
-      <template #text>
+      <template #text="{ labelId }">
         <span
+          :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
           {{ getI18nTerm(getLangLabel(advancedSearchText.addFilter)) }}
         </span>
@@ -398,13 +409,21 @@ export default {
       default: '',
     },
     /**
+     *
+     */
+    mode: {
+      type: String,
+      default: 'list',
+      validator: val => ['list', 'form'].includes(val),
+    },
+    /**
      * property to distinguish between one of multiple filter rows
      * and the main search field (where new filters are added) that has
      * a slightly different design and functionality
      */
     isMainSearch: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     /**
      * list of available filters, needs to be an array of objects with the following properties:<br>
@@ -420,12 +439,16 @@ export default {
      *      property are used or autocomplete is used
      *    <b>options</b> {Object[]} - for filter type 'chips' and 'chipssingle' the controlled
      *      vocabulary options
+     *    <b>subsets</b> {string[]} - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add these filter ids here
      */
     filterList: {
       type: Array,
       default: () => ([]),
       validator: val => !val.length
-        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * specify a default value for a filter that is set when none of the
@@ -443,7 +466,10 @@ export default {
      *    <b>options</b> {Object[]} - for filter type 'chips' and 'chipssingle' the controlled
      *      vocabulary options<br>
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
-     *    or array of objects or strings for type 'text', type 'chips' and 'chipssingle'
+     *      or array of objects or strings for type 'text', type 'chips' and 'chipssingle'
+     *
+     *    defaultFilter does not need the property subsets since results for all filters are
+     *    shown per default
      */
     defaultFilter: {
       type: Object,
@@ -453,7 +479,9 @@ export default {
         type: 'text',
         options: [],
       }),
-      validator: val => val.type && (val.type !== 'chips' || val.freetext_allowed || val.options),
+      validator: val => !val.length
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>
@@ -469,6 +497,9 @@ export default {
      *      property are used or autocomplete is used
      *    <b>filter_values</b> {Object[]|string[]|Object} - the values selected - object for date
      *      or array of objects or strings for type 'text',  type 'chips' and 'chipssingle'
+     *    <b>subsets</b> {string[]} - if a filter of `type` 'text' or 'chips' with
+     *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
+     *      the autosuggest results should also be shown - add these filter ids here
      */
     appliedFilter: {
       type: [Object, null],
@@ -537,7 +568,7 @@ export default {
       }),
     },
     /**
-     * autocomplete results need a label and a data property that contains all the actual
+     * autocomplete results need a label, an id and a data property that contains all the actual
      * autocomplete results for that specific category
      * TODO: make category optional
      */
@@ -552,7 +583,7 @@ export default {
       validator: val => ['label', 'id', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
-     * add a place holder for the search input; either just a string or an object with
+     * add a placeholder for the search input; either just a string or an object with
      * different text for each search type (text, chips, date)
      */
     placeholder: {
@@ -561,7 +592,7 @@ export default {
     },
     /**
      * specify informational texts for the component - this needs to be an object with the following
-     * properties (if you dont want to display any text leave an empty string:  <br>
+     * properties (if you dont want to display any text leave an empty string):  <br>
      *   <br>
      *     <b>title</b>: text shown as first line on the drop down in filters area<br>
      *     <b>subtext</b>: text shown as second line on the drop down in filters area<br>
@@ -658,16 +689,11 @@ export default {
        * @type {?string|?Object}
        */
       currentInput: '',
-      // current filter
-      // TODO: a) adjust to actual filter structure
       /**
        * the currently selected filter
        * @type {Filter}
        */
-      filter: {
-        ...this.defaultFilter,
-        filter_values: this.setFilterValues(this.defaultFilter),
-      },
+      filter: null,
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Filter}
@@ -738,6 +764,11 @@ export default {
        * @type {string}
        */
       filterSlotName: 'pre-input-field',
+      /**
+       * variable for touch devices to stop the click event from opening the drop down
+       *  when click event was coming from elements within the search (e.g. BaseForm)
+       */
+      stopSearchClick: false,
     };
   },
   computed: {
@@ -771,9 +802,15 @@ export default {
         return [this.filter];
       },
     },
+    /**
+     * for main filter do not display the default filter in the drop down list with
+     *  available filters (mode 'list')
+     * @returns {Filter[]}
+     */
     displayFilterList() {
       if (!this.isMainSearch) return this.filterList;
-      return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
+      return this.filterList.filter(filter => filter[this.identifierPropertyName.filter]
+        !== this.defaultFilter[[this.identifierPropertyName.filter]]);
     },
     /**
      * variable to return if autocomplete functionality should be shown (= results fetched
@@ -868,9 +905,13 @@ export default {
         // have same category as selected text filter
         if (this.filter[this.identifierPropertyName.filter]
           !== this.defaultFilter[this.identifierPropertyName.filter]) {
+          // filter for identical autocomplete section id OR if a filter has the
+          // prop `subsets` specified also filter for the ids specified in that array
           resultsToDisplay = resultsToDisplay
             .filter(section => section[this.autocompletePropertyNames.id]
-              === this.filter[this.identifierPropertyName.filter]);
+              === this.filter[this.identifierPropertyName.filter]
+              || (this.filter.subsets && this.filter.subsets.length
+                && this.filter.subsets.includes(section[this.autocompletePropertyNames.id])));
         }
         // filter empty collections
         resultsToDisplay = resultsToDisplay
@@ -950,6 +991,20 @@ export default {
       },
       deep: true,
     },
+    defaultFilter: {
+      handler(val) {
+        // check if the props default defaultFilter is still applied
+        if (!this.filter || this.filter.id === 'default') {
+          this.filter = {
+            ...val,
+            // if filter is changed from outside this often means resetting a filter so previous
+            // values should not be taken over (=leave second argument of function empty here)
+            filter_values: this.setFilterValues(val),
+          };
+        }
+      },
+      immediate: true,
+    },
     /**
      * watch if applied filter changes from outside
      */
@@ -973,7 +1028,7 @@ export default {
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
             } else if (val.type === 'text') {
-              [this.currentInput] = val.filter_values;
+              this.currentInput = val.filter_values[0] || '';
             } else {
               this.currentInput = '';
             }
@@ -1017,7 +1072,7 @@ export default {
       }
       // if isActive becomes false and the drop down closes check for remaining input strings
       // if the filter is chips
-      if (!val && this.filter.type === 'chips' && this.currentInput && this.currentInput.trim()) {
+      if (!val && this.filter.type === 'chips' && !!this.currentInput && this.currentInput.trim()) {
         // check if the string can actually be added (freetext options allowed) and that the option
         // was not added previously
         if (this.filter.freetext_allowed && (!this.selectedOptions || !this.selectedOptions
@@ -1195,21 +1250,40 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
-      // if option is coming from autocomplete drop down list (=has an id)
-      // and currently active filter is not identical
-      // with the category of the selected item (if everything is going right this should
-      // be 'default') then set the category of the selected item as current filter
-      if (this.useAutocompleteFunctionality
+      // get the result category of the selected option (on key navigation this.activeCollection
+      // should be set, if selected from drop down by click the collectionId is passed to the
+      // function else the default filter category is assumed
+      const selectedOptionCollection = this.activeCollection || collectionId
+        || this.defaultFilter[this.identifierPropertyName.filter];
+      // check if filters were specified - if not assume the input is handled in parent component
+      if (!this.filterList || !this.filterList.length) {
+        this.$emit('option-selected', ({ entry, collectionId: selectedOptionCollection }));
+        // check if filter is not default filter
+        if (selectedOptionCollection !== this.defaultFilter[this.identifierPropertyName.filter]) {
+          // only then reset all input
+          this.resetAllInput();
+        }
+        // if option is coming from autocomplete drop down list (=has an id)
+        // and currently active filter is not identical
+        // with the category of the selected item (if everything is going right this should
+        // be 'default') then set the category of the selected item as current filter
+      } else if (this.useAutocompleteFunctionality
         && entry[this.identifierPropertyName.autocompleteOption]
+        // and currently active filter is not identical
+        // with the category of the selected item
         && this.filter[this.identifierPropertyName.filter]
-          !== (this.activeCollection || collectionId
-            || this.defaultFilter[this.identifierPropertyName.filter])) {
+          !== selectedOptionCollection
+        // and selected item is not from a subset (so
+        // if everything goes right category should be 'default')
+        && !(this.filter.subsets && this.filter.subsets.length
+          && this.filter.subsets.includes(selectedOptionCollection))) {
+        // then set the category of the selected item as current filter
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
           === (this.activeCollection || collectionId)) || this.defaultFilter;
         // since default filter could be other than chips at least safeguard against type 'text'
-        // TODO: this assumes filter type is 'text'! needs further handling if other filter
+        // TODO: this assumes default filter type is 'text'! needs further handling if other filter
         // types could be default
         const newValue = newFilter[this.identifierPropertyName.filter]
         === this.defaultFilter[this.identifierPropertyName.filter]
@@ -1301,10 +1375,15 @@ export default {
      * event triggered on row click to open drop down and focus main input
      */
     openDropDown() {
-      this.isActive = true;
-      if (this.searchInputElement) {
+      // set focus to input field when drop down opens only if
+      // a) drop down is not already open (e.g. otherwise this would always cause the first input field of a date
+      //    range to get focused on element click
+      // b) mode is 'list'
+      // c) search input element exists
+      if (!this.isActive && this.mode === 'list' && this.searchInputElement) {
         this.searchInputElement.focus();
       }
+      this.isActive = true;
     },
     /**
      * primary drop down navigation deciding what arrow keys are used for
@@ -1426,15 +1505,18 @@ export default {
     handleDropDownOnTabKey(event) {
       // get all input elements
       const inputElements = this.$el.getElementsByTagName('input');
+      // create an array out of input elements found
+      const searchInputArray = Array.from(inputElements)
+        // and filter only for elements that are connected to search (necessary for mode
+        // 'form' which has additional input fields)
+        .filter(element => element.id.includes('search'));
       // check if some where found
       if (inputElements) {
-        // create an array out of input elements found
-        const inputArray = Array.from(inputElements);
         // get the index of the element the event came from
-        const eventInputIndex = inputArray.indexOf(event.target);
+        const eventInputIndex = searchInputArray.indexOf(event.target);
         // check if element is either the last input element and no shift key was used or
         // it is the first element and shift key was used --> if true --> close drop down
-        if ((!event.shiftKey && eventInputIndex >= inputArray.length - 1)
+        if ((!event.shiftKey && eventInputIndex >= searchInputArray.length - 1)
           || (event.shiftKey && eventInputIndex <= 0)) {
           this.isActive = false;
         }
@@ -1494,6 +1576,12 @@ export default {
       }
       // check if both are autocomplete chips filters
       if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
+        // check if new filter is a superset filter of the previous filter (=previous
+        // filter id is included in current filter 'subsets' property
+        if (newFilter.subsets
+          && newFilter.subsets.includes(previousFilter[this.identifierPropertyName.filter])) {
+          return previousFilterValues;
+        }
         // if both are chips with freetext keep options without id (=not specific entries)
         return previousFilterValues && previousFilterValues.length ? previousFilterValues
           .filter(value => !value[this.identifierPropertyName.autocompleteOption]) : [];
@@ -1545,6 +1633,54 @@ export default {
       if (!event.shiftKey) {
         // if no - set row active to false
         this.isActive = false;
+      }
+    },
+    /**
+     * on touch devices click-outside is not only triggered by 'touchstart' instead of 'click'.
+     *  this means the 'click-outside' event gets propagated before the 'click' event on touch devices (on
+     *  desktop browsers it is the other way round). This leads to search drop down getting
+     *  triggered when an element INSIDE search was clicked (in case of desktop when click-outside
+     *  is propagated AFTER this leads to isActive = false again immediately after so no drop
+     *  down showing). Therefore, we need to check for mobile event and set variable stopSearchClick
+     *  to true so in event onSearchClick the click can be stopped from opening the drop-down.
+     *
+     * @param {MouseEvent|TouchEvent} event - the event provided by click-outside plugin
+     */
+    onClickedOutsideSearch(event) {
+      // do the regular action to set is active false (and close drop down)
+      this.isActive = false;
+      // get the event type
+      const { type } = event;
+      // if event type is 'touchstart' we assume mobile that was propagated before click event
+      if (type === 'touchstart') {
+        // therefore we set the click stop variable true
+        this.stopSearchClick = true;
+        // since this should only affect click events triggered directly after set
+        // the variable false again after a time out
+        setTimeout(() => {
+          this.stopSearchClick = false;
+        }, 500);
+      }
+    },
+    /**
+     * need to special handle search click event due to the reasons described above in function
+     *  onClickedOutsideSearch().
+     *
+     * @param {MouseEvent} event - the native click event
+     */
+    onSearchClick(event) {
+      // check if mobile variable to stop click being propagated after click-outside
+      // was set
+      if (!this.stopSearchClick) {
+        // if no - show drop down
+        this.isActive = true;
+      } else {
+        // if click-outside was propagated before click event stop the event here
+        // and don't open drop down
+        event.stopPropagation();
+        this.isActive = false;
+        // set variable false again after
+        this.stopSearchClick = false;
       }
     },
     initObservers() {
@@ -1600,7 +1736,7 @@ export default {
      */
     getSearchInputElement() {
       // get input elements
-      const inputElements = document.getElementsByTagName('input');
+      const inputElements = this.$el.getElementsByTagName('input');
       // check if input elements were found
       if (inputElements && inputElements.length) {
         // if yes - transform HTMLElement list to Array and find the search input element
@@ -1714,6 +1850,8 @@ export default {
       .base-advanced-search-row__columns {
         column-gap: $spacing;
         column-count: var(--col-number, 4);
+        // this is used in the script part to calculate columns! (~line 1589)
+        column-width: 180px;
         display: block;
         width: 100%;
 
@@ -1954,6 +2092,7 @@ export default {
           .base-advanced-search-row__filter-list {
             column-count: unset;
             column-gap: unset;
+            column-width: unset;
             display: flex;
             align-items: center;
             flex-direction: row;
@@ -1994,7 +2133,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@import '../../styles/variables';
 
 .base-advanced-search-row__input-field {
   height: calc(#{$row-height-large} - 4px);

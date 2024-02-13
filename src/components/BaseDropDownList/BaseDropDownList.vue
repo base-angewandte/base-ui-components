@@ -8,6 +8,7 @@
     <slot name="before-list" />
     <ul
       :id="listId"
+      ref="dropDownList"
       :style="listBodyStyle"
       :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : false"
       role="listbox"
@@ -39,7 +40,7 @@
           role="option"
           tabindex="0"
           @keydown.enter="selected(option)"
-          @click="selected(option)">
+          @click.stop="selected(option)">
           <!-- @slot a slot to customize every single option (e.g. display of information other than `[valuePropertyName]`)
             @binding {Object} option - the current option in the options list-->
           <slot
@@ -315,49 +316,54 @@ export default {
           // get the option height
           const activeOptionHeightTemp = activeOptionHeight || activeOptionTemp.clientHeight;
           // get the option top position
-          const activeOptionTopTemp = activeOptionTop || activeOptionTemp.offsetTop;
+          const activeOptionTopTemp = activeOptionTemp.offsetTop + activeOptionTop;
           if (this.$parent.$refs.dropDownContainer) {
             this.$parent.navigateOptions(event, {
               activeOptionHeight: activeOptionHeightTemp,
               activeOptionTop: activeOptionTopTemp,
             });
           } else {
-            // save the container element in a variable
-            const dropDownContainerTemp = this.$refs.dropDownContainer;
+            // find the correct container to scroll
+            // assume its the outer element
+            let scrollContainerTemp = this.$refs.dropDownContainer;
+            const dropDownListTemp = this.$refs.dropDownList;
+            // check if its the inner element (this could be the case if the `before-list` slot is used)
+            if (dropDownListTemp.scrollHeight > dropDownListTemp.clientHeight) {
+              scrollContainerTemp = dropDownListTemp;
+            }
             // get the current scroll position of the container
-            const dropDownContainerScrollTop = dropDownContainerTemp.scrollTop;
+            const scrollContainerScrollTop = scrollContainerTemp.scrollTop;
             // get the container height
-            const dropDownContainerHeight = dropDownContainerTemp.clientHeight;
+            const scrollContainerHeight = scrollContainerTemp.clientHeight;
             // check if current active option is out of view
             const optionOutOfView = activeOptionTopTemp + activeOptionHeightTemp
-              < dropDownContainerScrollTop || activeOptionTopTemp
-              > dropDownContainerScrollTop + dropDownContainerHeight;
+              < scrollContainerScrollTop || activeOptionTopTemp
+              > scrollContainerScrollTop + scrollContainerHeight;
             // if active option index is 0 - return to top
             if (!this.hasSubOptions && !this.activeOptionIndex) {
-              dropDownContainerTemp.scrollTop = 0;
+              scrollContainerTemp.scrollTo({
+                top: 0,
+              });
               // else if index is last entry of options list - bring last item into view
             } else if (!this.hasSubOptions
               && this.activeOptionIndex === this.dropDownOptions.length - 1) {
-              dropDownContainerTemp.scrollTo({
+              scrollContainerTemp.scrollTo({
                 top: activeOptionTopTemp + activeOptionHeightTemp,
               });
-              // dropDownContainerTemp.scrollTop = activeOptionTopTemp
-              //   + activeOptionHeightTemp;
               // else check if key was arrow down
             } else if (event.key === 'ArrowDown') {
               // if option is out of sight set container scrollTop to option position
               if (optionOutOfView) {
-                dropDownContainerTemp.scrollTo({
+                scrollContainerTemp.scrollTo({
                   top: activeOptionTopTemp,
                 });
-                // dropDownContainerTemp.scrollTop = activeOptionTopTemp;
                 // else if the option position is larger then container height
                 // add the height of one option row to scroll top
               } else if (activeOptionTopTemp + activeOptionHeightTemp
-                > dropDownContainerHeight + dropDownContainerScrollTop) {
+                > scrollContainerHeight + scrollContainerScrollTop) {
                 // dropDownContainerTemp.scrollTop += activeOptionHeightTemp;
-                dropDownContainerTemp.scrollTo({
-                  top: dropDownContainerScrollTop + activeOptionHeightTemp,
+                scrollContainerTemp.scrollTo({
+                  top: scrollContainerScrollTop + activeOptionHeightTemp,
                 });
               }
               // else check if key was arrow up
@@ -365,13 +371,17 @@ export default {
               // if option is out of sight set scrollTop to option position so it shows
               // up as last option in container
               if (optionOutOfView) {
-                dropDownContainerTemp.scrollTop = activeOptionTopTemp
-                  + activeOptionHeightTemp - dropDownContainerHeight;
+                scrollContainerTemp.scrollTo({
+                  top: activeOptionTopTemp
+                    + activeOptionHeightTemp - scrollContainerHeight,
+                });
                 // else if index is smaller than previous index (navigating up) and the container
                 // top position is larger than the option top position subtract one option row
                 // height
-              } else if (dropDownContainerScrollTop > activeOptionTopTemp) {
-                dropDownContainerTemp.scrollTop -= activeOptionHeightTemp;
+              } else if (scrollContainerScrollTop > activeOptionTopTemp) {
+                scrollContainerTemp.scrollTo({
+                  top: scrollContainerScrollTop - activeOptionHeightTemp,
+                });
               }
             }
           }
@@ -397,6 +407,7 @@ export default {
     }
 
     .base-drop-down-list {
+      position: relative;
       overflow-y: auto;
 
       .base-drop-down-list__option {
