@@ -12,32 +12,40 @@
         v-for="element in primaryItems"
         :key="`p-${element.id}`"
         class="base-navigation__nav-item">
-        <component
-          :is="renderLinkElementsAs"
-          v-bind="linkAttributes(element)"
-          :aria-current="element.id === activeElementId ? 'page' : null"
+        <BaseLink
+          :render-link-as="renderAs"
+          :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+          :aria-current="element.id === activeElementIdInt ? 'page' : null"
+          :identifier-property-value="element.route || undefined"
+          :url="element.url || undefined"
           :class="['base-navigation__nav-item-link',
-                   { 'base-navigation__nav-item-link--active': activeElementId === element.id }]">
-          <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-            {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-          </span>
-        </component>
+                   { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
+          <template #label="{ label }">
+            <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+              {{ label }}
+            </span>
+          </template>
+        </BaseLink>
       </li>
       <!-- SECONDARY ELEMENTS -->
       <li
         v-for="element in secondaryItems"
         :key="`s-${element.id}`"
         class="base-navigation__nav-item base-navigation__nav-item--secondary">
-        <component
-          :is="renderLinkElementsAs"
-          v-bind="linkAttributes(element)"
-          :aria-current="element.id === activeElementId ? 'page' : null"
+        <BaseLink
+          :render-link-as="renderAs"
+          :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+          :aria-current="element.id === activeElementIdInt ? 'page' : null"
+          :identifier-property-value="element.route || undefined"
+          :url="element.url || undefined"
           :class="['base-navigation__nav-item-link',
-                   { 'base-navigation__nav-item-link--active': activeElementId === element.id }]">
-          <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-            {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-          </span>
-        </component>
+                   { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
+          <template #label="{ label }">
+            <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+              {{ label }}
+            </span>
+          </template>
+        </BaseLink>
       </li>
     </ul>
 
@@ -50,17 +58,20 @@
         <!-- ACTIVE NAV ITEM -->
         <div
           class="base-navigation__nav-item">
-          <component
-            :is="renderLinkElementsAs"
-            v-bind="linkAttributes(activeElement)"
+          <BaseLink
+            :render-link-as="renderAs"
+            :value="showShortLabel && activeElement.shortLabel ?
+              activeElement.shortLabel : activeElement.label"
+            aria-current="page"
+            :identifier-property-value="activeElement.route"
             class="base-navigation__nav-item-link
-                   base-navigation__nav-item-link--active"
-            aria-current="page">
-            <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-              {{ showShortLabel && activeElement.shortLabel ?
-                activeElement.shortLabel : activeElement.label }}
-            </span>
-          </component>
+                   base-navigation__nav-item-link--active">
+            <template #label="{ label }">
+              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                {{ label }}
+              </span>
+            </template>
+          </BaseLink>
         </div>
         <!-- HAMBURGER MENU -->
         <BaseButton
@@ -84,17 +95,23 @@
             v-for="element in mobileLeftElements"
             :key="`pm-${element.id}`"
             class="base-navigation__nav-item">
-            <component
-              :is="renderLinkElementsAs"
-              v-bind="linkAttributes(element)"
+            <BaseLink
+              :render-link-as="renderAs"
+              :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+              :identifier-property-value="element.route || undefined"
+              :url="element.url || undefined"
               :class="['base-navigation__nav-item-link',
                        { 'base-navigation__nav-item-link--separator': mobileLeftElements.length
                          + mobileRightElements.length > 2 },
-                       { 'base-navigation__nav-item-link--active': activeElementId === element.id }]">
-              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-              </span>
-            </component>
+                       { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
+              @click.native="navOpen = false"
+              @keydown.native="navOpen = false">
+              <template #label="{ label }">
+                <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                  {{ label }}
+                </span>
+              </template>
+            </BaseLink>
           </li>
           <!-- SECONDARY ELEMENTS -->
           <li
@@ -102,15 +119,20 @@
             :key="`sm-${element.id}`"
             :class="['base-navigation__nav-item', 'base-navigation__nav-item--secondary',
                      { 'base-navigation__nav-item--separator': showSeparator }]">
-            <component
-              :is="renderLinkElementsAs"
-              v-bind="linkAttributes(element)"
+            <BaseLink
+              :render-link-as="renderAs"
+              :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+              :identifier-property-value="element.route || undefined"
+              :url="element.url || undefined"
               :class="['base-navigation__nav-item-link',
-                       { 'base-navigation__nav-item-link--active': activeElementId === element.id }]">
-              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                {{ showShortLabel && element.shortLabel ? element.shortLabel : element.label }}
-              </span>
-            </component>
+                       { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
+              @click.native="navOpen = false">
+              <template #label="{ label }">
+                <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                  {{ label }}
+                </span>
+              </template>
+            </BaseLink>
           </li>
         </ul>
       </transition>
@@ -120,11 +142,13 @@
 
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton';
+import BaseLink from '@/components/BaseLink/BaseLink';
 
 export default {
   name: 'BaseNavigation',
   components: {
     BaseButton,
+    BaseLink,
   },
   props: {
     /**
@@ -132,9 +156,14 @@ export default {
      *
      *    **id** `string` - a unique id
      *    **label** `string` - a label for the route to be displayed
-     *    **shortLabel** `?string` - a shorter version of the label to be shown if the regular label does not
+     *    **shortLabel** `string?` - a shorter version of the label to be shown if the regular label does not
      *      fit the element anymore
-     *    **route** `string` - the route of the element should navigate to
+     *    **route** `string?` - the route of the element should navigate to
+     *    **url** `string?` - the external url to navigate to on element click
+     *    **routeMatch** `RegEx?` - provide a regular expression that will be used to determine
+     *      the currently active element
+     *
+     *  caveat: the object requires either the `route` or the `url` property!
      *
      * on a desktop screen, these elements will be rendered on the left-hand side of the navigation
      * on a mobile screen, these elements will be rendered in the upper half of the dropdown list
@@ -149,8 +178,8 @@ export default {
           route: '/',
         },
       ],
-      validator: arr => arr.every(entry => !['id', 'label', 'route']
-        .some(property => !Object.keys(entry).includes(property))),
+      validator: arr => arr.every(entry => !['id', 'label']
+        .some(property => !Object.keys(entry).includes(property)) && (entry.route || entry.url)),
     },
     /**
      * list of secondary navigation items, with the following properties:
@@ -159,7 +188,12 @@ export default {
      *    **label** `string` - a label for the route to be displayed
      *    **shortLabel** `?string` - a shorter version of the label to be shown if the regular label does not
      *      fit the element anymore
-     *    **route** `string` - the route of the element should navigate to
+     *   **route** `string?` - the route of the element should navigate to
+     *    **url** `string?` - the external url to navigate to on element click
+     *    **routeMatch** `RegEx?` - provide a regular expression that will be used to determine
+     *      the currently active element
+     *
+     *  caveat: the object requires either the `route` or the `url` property!
      *
      * on a desktop screen, these elements will be rendered on the right-hand side of the navigation
      * on a mobile screen, these elements will be rendered in the lower half of the dropdown list
@@ -174,8 +208,8 @@ export default {
           route: '/',
         },
       ],
-      validator: arr => arr.every(entry => !['id', 'label', 'route']
-        .some(property => !Object.keys(entry).includes(property))),
+      validator: arr => arr.every(entry => !['id', 'label']
+        .some(property => !Object.keys(entry).includes(property)) && (entry.route || entry.url)),
     },
     /**
      * specify how link element should be rendered - this needs to be a
@@ -200,6 +234,18 @@ export default {
     menuButtonLabel: {
       type: String,
       default: 'Toggle Navigation',
+    },
+    /**
+     * active Element can be set two ways:
+     * 1) provide a regex in property `routeMatch` for each element in
+     *  `primaryItems` and `secondaryItems`
+     * 2) handle the active element in the front end and set the active
+     *  element id with this property - this property will have priority over
+     *  `routeMatch`
+     */
+    activeElementId: {
+      type: [String, Number],
+      default: null,
     },
   },
   data() {
@@ -234,13 +280,6 @@ export default {
       return !!this.$router;
     },
     /**
-     * get the tag element should be rendered as - determined by router availability
-     * @returns {string}
-     */
-    renderLinkElementsAs() {
-      return this.routerAvailable ? this.renderAs : 'a';
-    },
-    /**
      * provide a list of all nav elements on the page (=primary and secondary items
      *  combined)
      * @returns {Object[]}
@@ -254,17 +293,34 @@ export default {
      * @returns {{}|Object}
      */
     activeElement() {
-      if (this.$route) {
-        return this.navElements.find(e => e.route === this.$route.path)
-          || this.navElements[0];
+      // if no other match is found the first list item will be used.
+      let element = null;
+      // prioritize active element set via props
+      if (this.activeElementId) {
+        element = this.navElements.find(e => e.id === this.activeElementId);
+        // if prop is not set check for the current active element via route match
+      } else if (this.$route) {
+        const { path } = this.$route;
+        element = this.navElements.find(e => e.routeMatch && path.search(e.routeMatch) >= 0);
+        // if no element was found with routeMatch property take a last attempt to
+        // match the route
+        if (!element) {
+          element = this.navElements.find(e => path === e.route);
+        }
       }
-      return this.navElements[0];
+      // use the found element or if nothing was found use the first element in
+      // list
+      if (!element) {
+        console.warn('Attention - no active element could be identified and the first list item will be used!'
+          + 'Please set an active element via prop `activeElementId` or `routeMatch` property.');
+      }
+      return element || this.navElements[0];
     },
     /**
      * the id of the currently active element
      * @returns {?string}
      */
-    activeElementId() {
+    activeElementIdInt() {
       return this.activeElement?.id ?? '';
     },
     /**
@@ -272,7 +328,7 @@ export default {
      * @returns {Object[]}
      */
     mobileDropDownElements() {
-      return this.navElements.filter(e => e.id !== this.activeElementId);
+      return this.navElements.filter(e => e.id !== this.activeElementIdInt);
     },
     /**
      * return all elements that should appear in the mobile drop down below the separation line
@@ -280,7 +336,7 @@ export default {
      * @returns {Object[]}
      */
     mobileRightElements() {
-      return this.secondaryItems.filter(e => e.id !== this.activeElementId);
+      return this.secondaryItems.filter(e => e.id !== this.activeElementIdInt);
     },
     /**
      * return all elements that should appear in the mobile drop down above the separation line
@@ -288,7 +344,7 @@ export default {
      * @returns {Object[]}
      */
     mobileLeftElements() {
-      return this.primaryItems.filter(e => e.id !== this.activeElementId);
+      return this.primaryItems.filter(e => e.id !== this.activeElementIdInt);
     },
     /**
      * drop down primary and secondary separator should only be shown if in total min 3 items
@@ -395,19 +451,6 @@ export default {
       }, 300);
     },
     /**
-     * dynamically determine the attributes of the link tag
-     *  (due to href disappearing if set null with RouterLink or NuxtLink and elements not
-     *  accessible anymore)
-     * @param {Object} element - the navigation element in the list
-     * @returns {Object}
-     */
-    linkAttributes(element) {
-      return {
-        [this.routerAvailable
-          && this.renderAs.toLowerCase().includes('link') ? 'to' : 'href']: element.route,
-      };
-    },
-    /**
      * set isMobile variable (function called on window resize)
      */
     calcIsMobile() {
@@ -422,6 +465,7 @@ export default {
 
 .base-navigation {
   box-shadow: $box-shadow-reg;
+  position: relative;
   display: flex;
   width: 100%;
   height: $row-height-large;
@@ -446,6 +490,7 @@ export default {
       background-color: white;
       text-align: center;
       white-space: nowrap;
+      text-decoration: none;
 
       &:hover, &:focus, &:active, &:focus-within {
         text-decoration: none;
@@ -454,7 +499,6 @@ export default {
 
       &.base-navigation__nav-item-link--active {
         box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
-        z-index: map-get($zindex, button-active);
       }
 
       .base-navigation__nav-item-link__text--truncation {
@@ -468,10 +512,46 @@ export default {
   .base-navigation__nav-items {
     display: flex;
     width: 100%;
+    justify-content: center;
+    align-items: center;
 
     .base-navigation__nav-item {
       &:nth-child(1 of .base-navigation__nav-item--secondary) {
         margin-left: auto;
+      }
+    }
+  }
+
+  // mobile element styling
+  .base-navigation__mobile-nav-bar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    background: $box-color;
+
+    .base-navigation__mobile-menu-button {
+      margin-left: auto;
+
+      &.base-navigation__mobile-menu-button--hidden {
+        visibility: hidden;
+      }
+    }
+  }
+
+  // mobile drop down styling
+  .base-navigation__drop-down {
+    position: absolute;
+    display: inline-block;
+    width: 100%;
+    background: $box-color;
+    box-shadow: $drop-shadow;
+    border-top: $separation-line;
+    margin-top: $row-height-large;
+    z-index: map-get($zindex, dropdown);
+
+    .base-navigation__nav-item {
+      &:nth-child(1 of .base-navigation__nav-item--secondary) {
+        border-top: $separation-line;
       }
     }
   }
@@ -491,38 +571,5 @@ export default {
 .translateY-leave-to{
   transform: translateY(-10px);
   opacity: 0;
-}
-
-@media screen and (max-width: $mobile) {
-  .base-navigation {
-    position: relative;
-
-    .base-navigation__mobile-nav-bar {
-      display: flex;
-      width: 100%;
-      background: $box-color;
-
-      .base-navigation__mobile-menu-button {
-        margin-left: auto;
-      }
-    }
-
-    .base-navigation__drop-down {
-      position: absolute;
-      display: inline-block;
-      width: 100%;
-      background: $box-color;
-      box-shadow: $drop-shadow;
-      border-top: $separation-line;
-      margin-top: $row-height-large;
-      z-index: map-get($zindex, dropdown);
-
-      .base-navigation__nav-item {
-        &:nth-child(1 of .base-navigation__nav-item--secondary) {
-          border-top: $separation-line;
-        }
-      }
-    }
-  }
 }
 </style>

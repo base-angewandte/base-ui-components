@@ -4,7 +4,8 @@
       :style="{ marginBottom: 50 }"
       :render-as="renderAs"
       :primary-items="primaryItems"
-      :secondary-items="secondaryItems" />
+      :secondary-items="secondaryItems"
+      :active-element-id="'0'" />
   </div>
 </template>
 
@@ -22,13 +23,15 @@ export default {
           id: '0',
           label: 'BaseNavigation',
           shortLabel: 'BNavigation',
-          route: '/components/BaseNavigation.html',
+          routeMatch: /\//,
+          route: '/',
         },
         {
           id: '3',
           label: 'BaseLink 2(this is a vershould cause a switch to shortLabel)',
           shortLabel: 'BLink 2',
-          route: '/components/BaseLink.html',
+          routeMatch: '',
+          route: '/',
         },
       ],
       secondaryItems: [
@@ -36,13 +39,15 @@ export default {
           id: '1',
           label: 'BaseButton',
           shortLabel: 'BButton',
-          route: '/components/BaseButton.html',
+          routeMatch: '',
+          route: '/',
         },
         {
           id: '2',
           label: 'BaseLink',
           shortLabel: 'BLink',
-          route: '/components/BaseLink.html',
+          routeMatch: '',
+          route: '/',
         },
       ],
       renderAs: 'RouterLink',
