@@ -859,10 +859,10 @@ export default {
         searchFilterList = this.appliedFiltersInt
           // and only keep the properties relevant for search
           // eslint-disable-next-line camelcase
-          .map(({ id, type, filter_values }) => ({
+          .map(({ id, type, filter_values: filterValues }) => ({
             id,
             type,
-            filter_values,
+            filter_values: filterValues,
           }));
       }
       // if there are changes in filters or main filter trigger search (=if alwaysTrigger was
