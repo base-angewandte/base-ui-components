@@ -24,7 +24,11 @@
     <!-- chip, internal, external, text -->
     <template
       v-if="!isTooltip">
-      {{ value }}
+      <slot
+        name="label"
+        :label="value">
+        {{ value }}
+      </slot>
     </template>
 
     <!-- (i) tooltip -->
@@ -32,7 +36,11 @@
       v-if="isTooltip">
       <span
         class="base-link__label">
-        {{ value }}
+        <slot
+          name="label"
+          :label="value">
+          {{ value }}
+        </slot>
       </span>
 
       <span
