@@ -143,6 +143,7 @@
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton';
 import BaseLink from '@/components/BaseLink/BaseLink';
+import { debounce } from '@/utils/utils';
 
 export default {
   name: 'BaseNavigation',
@@ -436,19 +437,13 @@ export default {
      * resize function with timeout to minimize number of label display recalculations
      */
     resizeTriggered() {
-      // check if there is a timeout already set and clear it if yes
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = null;
-      }
-      // give the browser a few milliseconds for transitions etc. before computing the new text width
-      this.resizeTimeout = setTimeout(() => {
+      debounce(300, () => {
         this.calcIsMobile();
         // give mobile elements time to render
         this.$nextTick(() => {
           this.calcTextWidth();
         });
-      }, 300);
+      })();
     },
     /**
      * set isMobile variable (function called on window resize)
