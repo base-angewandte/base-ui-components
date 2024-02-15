@@ -126,7 +126,8 @@
               :url="element.url || undefined"
               :class="['base-navigation__nav-item-link',
                        { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
-              @click.native="navOpen = false">
+              @click.native="navOpen = false"
+              @keydown.enter.native="navOpen = false">
               <template #label="{ label }">
                 <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
                   {{ label }}
