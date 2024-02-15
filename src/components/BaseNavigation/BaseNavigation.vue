@@ -248,6 +248,14 @@ export default {
       type: [String, Number],
       default: null,
     },
+    /**
+     * define a custom size (in px) when the component should switch to mobile view
+     *  (with hamburger menu icon)
+     */
+    mobileSize: {
+      type: Number,
+      default: 640,
+    },
   },
   data() {
     return {
@@ -267,7 +275,7 @@ export default {
        */
       resizeTimeout: null,
       /**
-       * store if window size is mobile <640px to render correct elements
+       * store if window size is mobile <640px (or custom `mobileSize`) to render correct elements
        */
       isMobile: false,
     };
@@ -386,7 +394,7 @@ export default {
       clonedNavigation.style.maxWidth = `${navigationWidth}px`;
       // add the cloned element to the DOM
       this.$refs[cloneRefName].parentElement.append(clonedNavigation);
-      // different elements need to be checked if it is mobile (<640px) or desktop
+      // different elements need to be checked if it is mobile (<640px or custom mobileSize) or desktop
       if (this.isMobile) {
         // get the menu button width
         const menuButtonWidth = this.$refs.menuButton.$el.clientWidth;
@@ -449,7 +457,7 @@ export default {
      * set isMobile variable (function called on window resize)
      */
     calcIsMobile() {
-      this.isMobile = window?.innerWidth < 640 ?? false;
+      this.isMobile = window?.innerWidth < this.mobileSize ?? false;
     },
   },
 };
