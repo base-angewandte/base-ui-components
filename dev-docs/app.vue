@@ -54,11 +54,13 @@
 
 <script>
 import BaseForm from '@/components/BaseForm/BaseForm';
+import BaseInfoPanel from '@/components/BaseInfoPanel/BaseInfoPanel';
 
 export default {
   name: 'App',
   components: {
     BaseForm,
+    BaseInfoPanel,
   },
   data() {
     return {
