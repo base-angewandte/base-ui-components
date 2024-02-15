@@ -235,7 +235,8 @@
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           type="timerange"
-          class="base-form-field-creator__date-field"
+          :class="['base-form-field-creator__date-field',
+                   { 'base-form-field-creator__date-field--spacing': dateType.includes('date') }]"
           @value-validated="emitCompletedInputValues">
           <!-- only add slot here if it there is no first (date) field row -->
           <template
@@ -1203,11 +1204,24 @@ export default {
     }
   }
 
+  // this class is used in BaseForm.vue!
   .base-form-field-creator__date-field-wrapper {
     display: flex;
+    flex-direction: row;
+    gap: $spacing;
 
-    .base-form-field-creator__date-field + .base-form-field-creator__date-field {
-      margin-left: $spacing;
+    @media screen and (max-width: 1260px) {
+      flex-direction: column;
+    }
+
+    @media screen and (max-width: $mobile) {
+      gap: $spacing-small;
+    }
+
+    .base-form-field-creator__date-field--spacing {
+      @media screen and (min-width: 1261px) {
+        margin-top: calc(#{$line-height} + #{$spacing-small});
+      }
     }
   }
 
@@ -1237,15 +1251,5 @@ export default {
   .base-form-field-creator__toggle {
     display: flex;
     flex-direction: column;
-  }
-
-  @media screen and (max-width: 1260px) {
-    .base-form-field-creator__date-field-wrapper {
-      display: block;
-      .base-form-field-creator__date-field + .base-form-field-creator__date-field {
-        margin-top: $spacing;
-        margin-left: 0;
-      }
-    }
   }
 </style>

@@ -8,7 +8,7 @@ Following options are available:
 | field_format             | all                              | `full`                                                                   | `full`, `half`                                                                                                                    | specify if the field should fill full width or half in a form<br> (in case it is a `half` field make sure it has a second 'half' field as well, otherwise the space will be empty)<br>**Caveat**: if field is multiply-able this value needs to be `full`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | field_type               | all                              | `text`                                                                   | `text`, `autocomplete`, `chips`, `chips-below`, `date`, `multiline`, `group`, `boolean`                                           | which kind of field should be shown front-end:<br>**text**: simple text field<br> **autocomplete**: text field with autocomplete functionality (`source` property needed!)<br> **chips**: input field with options (optional: dynamic autocomplete) that creates chips out of selected options<br>(if single or multi-select chips will be determined automatically from field type being an array or object (see below))<br> **chips-below**: same as chips, however chips are not added inline but below the input field<br> **date**: a date field (different formats - decided from the OpenAPI definition (see below))<br> **multiline**: a multiline text field<br> **group**: indicates that the fields specified within should be grouped<br> **boolean** will create a toggle element<br>**integer** creates a number field with integer numbers allowed<br>**float** will create a number field with float values allowed. |
 | placeholder              | all                              | -                                                                        | `{string, Object}`                                                                                                                | Add a placeholder displayed in the input field<br>  A `{string}` for all fields except date fields - there it should be an `{object}` with `date` and (if necessary) `time` attributes that contain the relevant string                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| order                    | all                              | this should be specified for all fields otherwise sorting will be random | `{number}`                                                                                                                        | this will specify the order in which the fields are displayed in the form                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| order                    | all                              | this should be specified for all fields otherwise sorting will be random | `{number}`                                                                                                                        | this will specify the order in which the fields are displayed in the form. If `field_format` is `half` or `third` a number can be skipped in order to not completely fill the row.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | source                   | chips, chips-below, autocomplete | -                                                                        | an API endpoint                                                                                                                   | if the field has a autocomplete functionality (autocomplete field or dynamic chips inputs (`dynamic_autosuggest = true`) or options (`dynamic_autosuggest = false`) this route is **required** to fetch these options (the base url for the API is specified in the front end configuration)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | source_*                 | chips, chips-below               | -                                                                        | an API endpoint                                                                                                                   | as above, to specify additional sources (URLs) for prefetching (e.g. used for text field property `type` --> `source_type` or field property `roles` --> `source_roles`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | prefetch                 | chips, chips-below               | `[]`                                                                     | e.g. `source`                                                                                                                     | specify the attributes that contain an URL where options should be prefetched (=for chips inputs that are not dynamic!)<br> (for the example above e.g. `source`, `source_types`, `source_roles`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -122,8 +122,8 @@ This is a basic (autocomplete functionality not working here) example how a form
         <template v-if="fieldName === 'isan'">
           test
         </template>
-        <template v-if="fieldName === 'published_in'">
-          only for published in
+        <template v-if="fieldName === 'url4'">
+          only for url
         </template>
         <template v-if="groupNames && groupNames.includes('date_location') && fieldName === 'location'">
           using groupNames
@@ -288,7 +288,7 @@ export default {
               'x-attrs': {
                 placeholder: 'erschienen in eintragen',
                 field_type: 'text',
-                field_format: 'half',
+                field_format: 'third',
                 order: 5,
               },
             },
@@ -298,7 +298,7 @@ export default {
               'x-attrs': {
                 placeholder: 'URL eintragen',
                 order: 6,
-                field_format: 'half',
+                field_format: 'third',
               },
             },
             display_in_showroom: {
@@ -307,17 +307,8 @@ export default {
               'x-attrs': {
                 placeholder: 'Display in Showroom',
                 order: 7,
-                field_format: 'half',
+                field_format: 'third',
                 field_type: 'boolean',
-              },
-            },
-            url2: {
-              type: 'string',
-              title: 'URL',
-              'x-attrs': {
-                placeholder: 'URL eintragen',
-                order: 7,
-                field_format: 'half',
               },
             },
             isan: {
