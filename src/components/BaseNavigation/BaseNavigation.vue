@@ -318,12 +318,16 @@ export default {
           element = this.navElements.find(e => path === e.route);
         }
       }
-      // use the found element or if nothing was found use the first element in
-      // list
-      if (!element) {
+      // restrict warning to when element was searched for but no element was found and no option was set
+      // to define one
+      if (!element && !this.navElements.some(e => e.routeMatch) && !this.activeElementId) {
+        // provide a warnign to the user
         console.warn('Attention - no active element could be identified and the first list item will be used!'
           + 'Please set an active element via prop `activeElementId` or `routeMatch` property.');
       }
+
+      // use the found element or if nothing was found use the first element in
+      // list
       return element || this.navElements[0];
     },
     /**
