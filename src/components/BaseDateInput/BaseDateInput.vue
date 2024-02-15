@@ -929,6 +929,8 @@ export default {
       handler(val) {
         if (val !== this.isActiveInt) {
           this.isActiveInt = val;
+          // if is active is set from outside also open the first date field
+          this.fromOpen = val;
         }
         // if isActive is set false from outside also close date picker
         if (!val) {

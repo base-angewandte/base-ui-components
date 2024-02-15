@@ -596,11 +596,14 @@ export default {
      * watch for outside changes in the input field active state
      * @param {boolean} val - the prop value set from outside
      */
-    isActive(val) {
-      // check is in sync already
-      if (val !== this.isActiveInt) {
-        this.isActiveInt = val;
-      }
+    isActive: {
+      handler(val) {
+        // check is in sync already
+        if (val !== this.isActiveInt) {
+          this.isActiveInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * also input needs to be synchronized between component and parent (if necessary)
