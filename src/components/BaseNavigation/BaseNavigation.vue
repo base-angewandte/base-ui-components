@@ -531,6 +531,8 @@ export default {
     flex-direction: row;
     width: 100%;
     background: $box-color;
+    // add z-index here so drop down is behind nav bar
+    z-index: calc(#{map-get($zindex, dropdown)} + 1);
 
     .base-navigation__mobile-menu-button {
       margin-left: auto;
