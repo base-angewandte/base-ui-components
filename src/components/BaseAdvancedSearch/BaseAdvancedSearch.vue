@@ -856,7 +856,7 @@ export default {
           // also only keep the filters that have filter values
           .filter(([, filterValues]) => hasData(filterValues))
           .map(([filterKey, filterValues]) => ({
-            id: filterKey,
+            [this.identifierPropertyName.filter]: filterKey,
             type: modeFilterList[filterKey]?.['x-attrs']?.field_type ?? 'text',
             // only keep filter values that actually have values (relevant for groups!)
             filter_values: typeof filterValues === 'object' && filterValues.length
@@ -867,10 +867,10 @@ export default {
         searchFilterList = this.appliedFiltersInt
           // and only keep the properties relevant for search
           // eslint-disable-next-line camelcase
-          .map(({ id, type, filter_values: filterValues }) => ({
-            id,
-            type,
-            filter_values: filterValues,
+          .map(filter => ({
+            [this.identifierPropertyName.filter]: filter[this.identifierPropertyName.filter],
+            type: filter.type,
+            filter_values: filter.filter_values,
           }));
       }
       // if there are changes in filters or main filter trigger search (=if alwaysTrigger was
@@ -881,7 +881,7 @@ export default {
         this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
         // also minimize main filter
         const minMainFilter = {
-          id: this.mainFilter.id,
+          [this.identifierPropertyName.filter]: this.mainFilter[this.identifierPropertyName.filter],
           type: this.mainFilter.type,
           filter_values: this.mainFilter.filter_values,
         };
