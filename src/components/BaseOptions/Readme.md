@@ -13,9 +13,10 @@ Resize to see the 'mobile' effect!
             value: 'show',
           },
           {
-            text: 'and a second action button',
+            text: 'and a disabled button',
             icon: 'waste-bin',
             value: 'delete',
+            disabled: true,
           }]"
          :use-options-button-on="useOptionsButtonOn" >
         </BaseOptions>

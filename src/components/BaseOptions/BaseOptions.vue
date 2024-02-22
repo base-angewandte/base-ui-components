@@ -31,14 +31,15 @@
         <slot name="options">
           <template v-if="optionsConfig.length">
             <BaseButton
-              v-for="(config, index) of optionsConfig"
-              :key="config.text + '_' + index"
-              :text="config.text"
-              :icon="config.icon"
+              v-for="({ text, icon, disabled, value }, index) of optionsConfig"
+              :key="text + '_' + index"
+              :text="text"
+              :icon="icon"
+              :disabled="disabled || disableOptions.includes(value)"
               :has-background-color="false"
               icon-size="large"
               button-style="single"
-              @clicked="optionTriggered(config.value)" />
+              @clicked="optionTriggered(value)" />
           </template>
         </slot>
       </div>
@@ -188,6 +189,7 @@ export default {
      *   **icon** `string` - the icon name to display
      *    (for available icons see [BaseIcon](BaseIcon) )
      *   **value** `string` - the value emitted on button click
+     *   **disabled** `boolean?` - should button be shown as disabled
      */
     optionsConfig: {
       type: Array,
@@ -195,12 +197,23 @@ export default {
         text: 'delete',
         icon: 'waste-bin',
         value: 'delete',
+        disabled: false,
       }],
       validator: val => val.every((action) => {
         const requiredProps = ['text', 'icon', 'value'];
         const actionProps = Object.keys(action);
         return requiredProps.every(prop => actionProps.includes(prop));
       }),
+    },
+    /**
+     * specify an array of values set in `optionsConfig` property `value`
+     *  for options that should appear disabled.
+     *  This is equivalent to and just a more convenient way than to
+     *  set the `optionsConfig` property `disabled`
+     */
+    disableOptions: {
+      type: Array,
+      default: () => ([]),
     },
   },
   data() {
