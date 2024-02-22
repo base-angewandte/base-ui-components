@@ -995,6 +995,7 @@ export default {
         && !this.formFilterValuesInt[collectionId]
           ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
           .includes(entry[this.identifierPropertyName.autocompleteOption])) {
+        // get the filter field information if there is any
         const fieldInformation = this.formFilterList[collectionId];
         // check if there is actual field information --> default filter is not part of
         // swagger list! so all but default filter will go here!
@@ -1031,6 +1032,8 @@ export default {
           }
           // main filter filter values should remain empty
           this.mainFilter.filter_values = [];
+          // this does not trigger an update event from BaseForm so search needs to be triggered manually here
+          this.search();
         } else {
           // if it is main filter set the value to main filter instead
           this.$set(
@@ -1038,9 +1041,10 @@ export default {
             'filter_values',
             [entry],
           );
+          // this does not trigger an update event from BaseForm so search needs to be triggered manually here
+          // since main filter is not evaluated in filter comparison set alwaysTrigger true
+          this.search(true);
         }
-        // this does not trigger an update event from BaseForm so search needs to be triggered manually here
-        this.search();
       }
     },
     /**
