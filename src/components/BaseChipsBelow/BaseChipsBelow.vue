@@ -488,7 +488,9 @@ export default {
         this.createInternalList(val);
         // reset error
         if (val.length) {
-          this.invalidInt = false;
+          // reset the invalid state but still respect any invalid state set from outside
+          this.invalidInt = this.invalid;
+          this.errorMessageInt = this.errorMessage;
         }
         // check if allowUnknownEntries are allowed and reset errors,
         // due new entries do not have an id set initially and
@@ -527,7 +529,9 @@ export default {
     required: {
       handler(val) {
         if (!val) {
-          this.invalidInt = false;
+          // reset but still consider state set from outside
+          this.invalidInt = this.invalid;
+          this.errorMessageInt = this.errorMessage;
         }
       },
     },
@@ -733,9 +737,10 @@ export default {
      * @returns {boolean} - components error state
      */
     validate() {
-      // clear errors
-      this.invalidInt = false;
-      this.errorMessageInt = '';
+      // clear errors but still consider if invalid state and error message were set from
+      // out side - in this case use these values instead of a complete reset
+      this.invalidInt = this.invalid;
+      this.errorMessageInt = this.errorMessage;
       this.additionalPropErrors = [];
       // validate
       const isValidChipsInput = this.isValidChipsInput();
