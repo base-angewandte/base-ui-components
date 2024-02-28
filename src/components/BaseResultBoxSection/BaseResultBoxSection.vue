@@ -248,7 +248,7 @@
           * edit mode is not active and rows are expanded (always true if
             useExpandMode is set false) -->
           <BasePagination
-            v-if="usePagination && pages > 1
+            v-if="usePagination && showPagination && pages > 1
               && ((editModeActive && !draggable)
                 || (!editModeActive && expandedInt))"
             :key="'pagination-' + elementId"
@@ -691,6 +691,12 @@ export default {
        * @type {string}
        */
       currentSupportiveText: '',
+      /**
+       * control pagination display with this variable and only render after
+       *  entryListInt was initialized from outside
+       *  @type {boolean}
+       */
+      showPagination: false,
     };
   },
   computed: {
@@ -782,6 +788,14 @@ export default {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.entryListInt)) {
           this.entryListInt = [...val];
+          // check if showPagination was already set true otherwise do it after
+          // entryListInt was set for the first time
+          if (!this.showPagination) {
+            // make sure this is one last (and boxes are already rendered)
+            setTimeout(() => {
+              this.showPagination = true;
+            }, 0);
+          }
         }
       },
       immediate: true,
