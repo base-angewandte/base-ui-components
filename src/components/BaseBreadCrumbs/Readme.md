@@ -10,7 +10,7 @@ export default {
   data() {
     return {
       routes: [
-        { label: 'Übersicht', route: '/' },
+        { label: 'Übersicht', route: '/', icon: 'home' },
         { label: 'Moderne Plastik', route: '/moderne-plastik' },
       ]
     };
