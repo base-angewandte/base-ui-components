@@ -728,8 +728,11 @@ export default {
         this.chipsInputActive = false;
         this.inputElem.blur();
       }
-      // optional close dropdown after selection
-      this.closeDropDown();
+      // make sure drop down is closed at the end of all variable updates
+      setTimeout(() => {
+        // optional close dropdown after selection
+        this.closeDropDown();
+      }, 0);
     },
     /**
      * method for emitting selected list changes to parent
@@ -838,7 +841,7 @@ export default {
     closeDropDown() {
       // optional close dropdown after selection
       if (this.closeDropdownOnOptionSelect && this.isActive) {
-        this.isActive = false;
+        this.chipsInputActive = false;
       }
     },
   },
