@@ -1,27 +1,38 @@
 <template>
-  <div :class="className">
+  <div
+    class="base-bread-crumbs">
     <template
-      v-for="(entry, index) in routes">
+      v-for="({ route, label, showLabel, icon }, index) in routes">
       <BaseLink
-        :key="entry.route"
+        :key="route"
         external-link-target="_self"
-        :identifier-property-value="entry.route"
-        :value="entry.label"
+        :identifier-property-value="route"
+        :value="label"
         :render-link-as="renderLinkAs"
         class="base-bread-crumbs__link">
         <template
-          v-if="entry.icon"
+          v-if="icon"
           #label>
-          <BaseIcon
-            :name="entry.icon"
-            :title="entry.label"
-            :key="entry.label"
-            class="base-bread-crumbs__icon" />
+          <span class="base-bread-crumbs__label">
+            <BaseIcon
+              :key="label"
+              :name="icon"
+              :title="showLabel === false ? label : undefined"
+              :class="['base-bread-crumbs__icon',
+                       { 'base-bread-crumbs__icon--with-label': showLabel !== false }]" />
+            <span
+              v-if="showLabel !== false"
+              class="base-bread-crumbs__label-text">
+              {{ label }}
+            </span>
+          </span>
         </template>
-      </BaseLink><span
+      </BaseLink>
+      <BaseIcon
         v-if="index < routes.length - 1"
-        :key="`${entry.route}-separator`"
-        class="base-bread-crumbs__separator">></span>
+        :key="`${route}-separator`"
+        name="next"
+        class="base-bread-crumbs__separator" />
     </template>
   </div>
 </template>
@@ -40,27 +51,23 @@ export default {
   },
   props: {
     /**
-     * specify an array with the properties `route`, `label` and (optional) `icon` that
+     * specify an array with the properties `route`, `label` and (optional) `icon` and `showLabel` that
      *  should be used for navigation - these have to be internal
      *  links, i.e. without a protocol like `http:` or `mailto:` in the url
-     * if `icon` property is specified link will be displayed as icon only!
+     * `showLabel` set to false is only considered if the `icon` property is set!
      */
     routes: {
       type: Array,
       default: () => [{ route: '', label: '' }],
       validator: arr => !arr.some(
-        val => val.route
-            && (val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
+        val => (val.route
+            // check that link is specified without protocol
+            && !!(val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
               || val.route.match(/^mailto:/)
-              || val.route.match(/^tel:/)),
+              || val.route.match(/^tel:/)))
+          // and check that icon is specified when `showLabel` is
+          || (val.showLabel === false && !val.icon),
       ),
-    },
-    /**
-     * class name of the breadcrumb component, can be used for customization
-     */
-    className: {
-      type: String,
-      default: 'base-bread-crumbs',
     },
     /**
      * specify how link element should be rendered - this needs to be a
@@ -86,27 +93,47 @@ export default {
   flex-direction: row;
   align-items: center;
 
-  .base-link {
+  .base-bread-crumbs__link {
+    padding-right: $spacing-small-half;
+    display: flex;
+    align-items: center;
     color: $font-color-second;
+
+    &:nth-child(n+2) {
+      padding-left: $spacing-small-half;
+    }
+
+    &:last-child {
+      text-decoration: underline;
+    }
+
+    .base-bread-crumbs__label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .base-bread-crumbs__icon {
+        width: $icon-medium;
+        height: $icon-medium;
+        margin: $spacing-small-half 0;
+
+        &.base-bread-crumbs__icon--with-label {
+          margin: $spacing-small-half $spacing-small-half $spacing-small-half 0;
+        }
+      }
+
+      .base-bread-crumbs__label-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
   }
-}
 
-.base-bread-crumbs__link {
-  padding-right: $spacing-small-half;
-  display: flex;
-  align-items: center;
-
-  &:nth-child(n+2) {
-    padding-left: $spacing-small-half;
-  }
-
-  &:last-child {
-    text-decoration: underline;
-  }
-
-  .base-bread-crumbs__icon {
-    height: $icon-medium;
-    width: $icon-medium;
+  .base-bread-crumbs__separator {
+    height: $icon-min;
+    width: $icon-min;
+    color: $font-color-second;
   }
 }
 </style>
