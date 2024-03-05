@@ -12,7 +12,7 @@ export default {
       routes: [
         { label: 'Overview', route: '/', icon: 'home', showLabel: false },
         { label: 'Collection Folder', route: '/folders/12', icon: 'collection' },
-        { label: 'Modern Plastic', route: '/modern-plastic' },
+        { label: 'BaseBreadCrumbs', route: '/components/BaseBreadCrumbs.html' },
       ]
     };
   }
