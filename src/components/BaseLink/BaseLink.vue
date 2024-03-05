@@ -270,6 +270,17 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * set additional attributes directly on the link element,
+     *  this can be HTML link element native attributes or framework
+     *  specific props (e.g. `aria-current-value` to set the aria-current
+     *  attribute, for more possibilities check out the
+     *  [Vue-Router documentation](https://v3.router.vuejs.org/api/)
+     */
+    additionalAttributes: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -376,7 +387,11 @@ export default {
         obj[router] = `${this.path}?${this.chipQueryName}=${JSON.stringify(this.chipObj)}`;
       }
 
-      return obj;
+      return {
+        // add attributes set from outside
+        ...this.additionalAttributes,
+        ...obj,
+      };
     },
     /**
      * build the title attribute depending on the current link type
