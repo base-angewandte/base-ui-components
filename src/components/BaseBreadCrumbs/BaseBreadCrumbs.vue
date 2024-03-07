@@ -100,6 +100,14 @@ export default {
     align-items: center;
     color: $font-color-second;
 
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus, &:hover {
+      color: $app-color;
+    }
+
     &:nth-child(n+2) {
       padding-left: $spacing-small-half;
     }
