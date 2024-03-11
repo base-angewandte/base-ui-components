@@ -21,7 +21,7 @@
         ? fieldProps.tabsLegend || getI18nTerm('form.textTabsLegend') : false"
       :active-tab="fieldType === 'multiline' ? activeTab : false"
       :list="fieldType === 'autocomplete'
-        ? dropDownList.length ? dropDownList : fieldProps.list || [] : false"
+        ? dropDownList?.length ? dropDownList : fieldProps.list || [] : false"
       :is-loading="autocompleteLoading"
       :input="fieldValueInt"
       :field-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
