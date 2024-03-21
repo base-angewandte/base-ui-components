@@ -10,7 +10,7 @@
         :value="label"
         :render-link-as="renderLinkAs"
         :additional-attributes="{ ariaCurrentValue: 'location' }"
-        class="base-bread-crumbs__link">
+        :class="['base-bread-crumbs__link', { 'base-bread-crumbs__link--icon-only': showLabel === false }]">
         <template
           v-if="icon"
           #label>
@@ -100,6 +100,10 @@ export default {
     align-items: center;
     color: $font-color-second;
 
+    &.base-bread-crumbs__link--icon-only {
+      flex-shrink: 0;
+    }
+
     &:hover {
       text-decoration: none;
     }
@@ -125,6 +129,7 @@ export default {
         width: $icon-medium;
         height: $icon-medium;
         margin: $spacing-small-half 0;
+        flex-shrink: 0;
 
         &.base-bread-crumbs__icon--with-label {
           margin: $spacing-small-half $spacing-small-half $spacing-small-half 0;
@@ -142,6 +147,7 @@ export default {
   .base-bread-crumbs__separator {
     height: $icon-min;
     width: $icon-min;
+    flex-shrink: 0;
     color: $font-color-second;
   }
 }
