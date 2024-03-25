@@ -31,7 +31,7 @@ export default {
       default: null,
       validator(val) {
         return ['add-existing-collection', 'add-existing-object', 'add-new-collection', 'add-new-object', 'archive-arrow',
-          'archive-empty', 'archive-sheets', 'arrow-left', 'attachment', 'attention', 'audio-object', 'calendar-many',
+          'archive-empty', 'archive-sheets', 'arrow-left', 'arrow-right', 'attachment', 'attention', 'audio-object', 'calendar-many',
           'calendar-number', 'camera', 'check-mark', 'clock', 'collection', 'download', 'drag-lines', 'drag-n-drop',
           'drop-down', 'duplicate', 'edit', 'eye-hide', 'eye', 'file-object', 'forbidden', 'fullscreen', 'fullscreen-exit',
           'grid', 'home', 'image-object', 'information', 'institution', 'information-solo', 'licence', 'logo', 'magnifier',
