@@ -149,9 +149,7 @@ export default {
      */
     activeTab: {
       type: String,
-      default() {
-        return this.tabs[0] || 'default';
-      },
+      default: 'default',
     },
     /**
      * set a legend for the tabs to be read (for accessibility only, hidden)

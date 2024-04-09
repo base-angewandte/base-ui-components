@@ -142,6 +142,7 @@ export default {
       validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
     },
   },
+  emits: ['update:modelValue'],
   data() {
     return {
       /**

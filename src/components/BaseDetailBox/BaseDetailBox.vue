@@ -6,11 +6,12 @@
     class="base-detail-box">
     <dl class="base-detail-box-dl">
       <template
-        v-for="(item, index) in data">
-        <dt :key="'dt' + index">
+        v-for="(item, index) in data"
+        :key="'dt' + index">
+        <dt>
           {{ getLangLabel(item[labelPropertyName], true) }}
         </dt>
-        <dd :key="'dd' + index">
+        <dd>
           <!-- TODO: if necessary also add language specific function here! -->
           {{ item[valuePropertyName] }}
         </dd>

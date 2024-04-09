@@ -9,9 +9,9 @@
     </span>
 
     <template
-      v-for="(option, index) in options">
+      v-for="(option, index) in options"
+      :key="option.value">
       <label
-        :key="option.value + 'label'"
         :for="optionIds[index]"
         :class="['base-switch-buttons__button',
                  `base-switch-buttons__button--${type}`,

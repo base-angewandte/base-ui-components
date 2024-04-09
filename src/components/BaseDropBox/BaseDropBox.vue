@@ -9,7 +9,7 @@
       { 'base-box-button-disabled': disabled },
       { 'is-drag-over': isDragOver }]"
     @clicked="onClicked"
-    @onTooltip="onTooltip">
+    @on-tooltip="onTooltip">
     <div
       class="base-drop-box-inner">
       <draggable
