@@ -71,9 +71,9 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import popUpLock from '@/mixins/popUpLock';
+import { usePopUpLock } from '@/composables/popUpLock';
 
 /**
  * A component as overlay to display messages
@@ -87,7 +87,6 @@ export default {
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
     BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
-  mixins: [popUpLock],
   props: {
     /**
      * could be used to control visibility
@@ -168,19 +167,25 @@ export default {
     },
   },
   emits: ['button-left', 'button-right', 'close'],
-  data() {
+  setup() {
+    const popUpBody = ref(null);
+    const { toggleScrollLock, showElement: showInt } = usePopUpLock(popUpBody);
+
     return {
-      showInt: this.show,
-      // this is needed for popUpLock mixin!
-      targetName: 'popUpBody',
+      popUpBody,
+      showInt,
+      toggleScrollLock,
     };
   },
   watch: {
-    show(val) {
-      if (!this.showInt && !this.prevActiveElement) {
-        this.prevActiveElement = document.activeElement;
-      }
-      this.showInt = val;
+    show: {
+      handler(val) {
+        if (document && !this.showInt && !this.prevActiveElement) {
+          this.prevActiveElement = document.activeElement;
+        }
+        this.toggleScrollLock(val);
+      },
+      immediate: true,
     },
   },
   updated() {
@@ -197,9 +202,9 @@ export default {
   },
   mounted() {
     document.onkeyup = (e) => {
-      const event = e || window.event;
+      const { key } = e;
       if (document.querySelector('.popup-box')) {
-        if (event.keyCode === 27 || event.key === 'Escape') { // 27 === ESC
+        if (key === 'Escape') {
           const btn = document.querySelector('.popup-box .base-popup__close-button');
           btn.dispatchEvent(new Event('click'));
         }
@@ -214,7 +219,7 @@ export default {
        * @event close
        */
       this.$emit('close');
-      this.showInt = false;
+      this.toggleScrollLock(false);
     },
     buttonRight() {
       /**

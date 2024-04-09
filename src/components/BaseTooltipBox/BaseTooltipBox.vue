@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="popUpBody"
+    ref="tooltipBody"
     v-click-outside="() => clickedOutside()"
     role="dialog"
     :style="{ ...styles, ...css }"
@@ -46,9 +46,11 @@
 </template>
 
 <script>
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import popUpLock from '@/mixins/popUpLock';
+import { usePopUpLock } from '@/composables/popUpLock';
+import { ref } from 'vue';
 
 /**
  * Component to display a tooltip
@@ -62,7 +64,6 @@ export default {
   directives: {
     ClickOutside: vOnClickOutside,
   },
-  mixins: [popUpLock],
   props: {
     /**
      * HTMLElement to attach the tooltip
@@ -109,6 +110,15 @@ export default {
     },
   },
   emits: ['close'],
+  setup() {
+    const tooltipBody = ref(null);
+    const { toggleScrollLock } = usePopUpLock(tooltipBody);
+
+    return {
+      tooltipBody,
+      toggleScrollLock,
+    };
+  },
   data() {
     return {
       isActive: false,
@@ -128,9 +138,6 @@ export default {
       resizeObserver: null,
       // guard for click-outside-event
       isClickOutsideActive: false,
-      // this is needed for popUpLock mixin
-      targetName: 'popUpBody',
-      showInt: false,
     };
   },
   computed: {
@@ -157,8 +164,9 @@ export default {
     this.calcPosition();
     this.isActive = true;
 
+    console.log('mounted', this.isPopUpLockEnabled());
     // block body scrolling
-    this.showInt = this.isPopUpLockEnabled();
+    this.toggleScrollLock(this.isPopUpLockEnabled());
 
     // initialize the resize observer to calculate fade outs when content is resized
     this.initObserver();
@@ -170,7 +178,7 @@ export default {
   },
   beforeUnmount() {
     this.isActive = false;
-    this.showInt = false;
+    this.toggleScrollLock(false);
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
     this.$refs.body.removeEventListener('scroll', this.scrollHandler);
     window.removeEventListener('resize', this.resizeHandler);
@@ -182,6 +190,7 @@ export default {
      * @returns {boolean}
      */
     isPopUpLockEnabled() {
+      console.log(this.typeOnMobile, window.innerWidth);
       return (this.typeOnMobile === 'modal' || this.typeOnMobile === 'fullscreen')
         && window.innerWidth <= 640;
     },

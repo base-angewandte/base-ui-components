@@ -60,7 +60,8 @@
 <script>
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import popUpLock from '@/mixins/popUpLock';
+import { ref } from 'vue';
+import { usePopUpLock } from '@/composables/popUpLock';
 
 /**
  * Component allowing sliding through images,
@@ -73,7 +74,6 @@ export default {
     BaseMediaCarouselItem,
     BaseIcon,
   },
-  mixins: [popUpLock],
   props: {
     /**
      * items to display in a swiper carousel
@@ -146,11 +146,18 @@ export default {
     },
   },
   emits: ['download', 'hide'],
+  setup() {
+    const mediaCarousel = ref(null);
+    const { toggleScrollLock, showElement: showInt } = usePopUpLock(mediaCarousel);
+
+    return {
+      toggleScrollLock,
+      showInt,
+      mediaCarousel,
+    };
+  },
   data() {
     return {
-      showInt: this.showPreview,
-      // needed for popUpLock mixin
-      targetName: 'mediaCarousel',
       swiper: null,
       // eslint-disable-next-line
       swiperId: `base-media-carousel__swiper${this._uid}`,
@@ -159,7 +166,7 @@ export default {
   },
   watch: {
     showPreview(val) {
-      this.showInt = val;
+      this.toggleScrollLock(val);
     },
   },
   mounted() {
@@ -432,24 +439,6 @@ export default {
       fill: white;
       transform: translateY(-50%);
       transition: fill 250ms ease-in-out;
-
-        &:focus,
-        &:hover {
-          fill: $app-color;
-        }
-
-        &-prev {
-          left: $spacing;
-        }
-
-        &-next {
-          right: $spacing;
-        }
-
-        @media screen and (max-width: $mobile) {
-          display: none;
-        }
-      }
     }
   }
 

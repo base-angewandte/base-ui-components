@@ -37,7 +37,7 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.21.0",
-    "@vueuse/components": "^10.5.0",
+    "@vueuse/components": "^10.9.0",
     "body-scroll-lock": "^3.1.5",
     "hls.js": "^1.2.9",
     "lazysizes": "^5.3.2",
