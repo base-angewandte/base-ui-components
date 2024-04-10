@@ -1,11 +1,14 @@
 <template>
-  <div class="base-advanced-search">
+  <div
+    ref="searchContainer"
+    class="base-advanced-search">
+    <!-- FILTER ROW LIST (MODE 'LIST') -->
     <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
       <BaseAdvancedSearchRow
         v-for="(filter, index) in appliedFiltersInt"
         :key="'filter-' + index"
         :mode="mode"
-        :search-row-id="getRowId()"
+        :search-row-id="`${rowId}-${filter[identifierPropertyName.filter]}-${index}`"
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index]"
         :filter-list="displayedFilters"
@@ -27,9 +30,11 @@
         @fetch-autocomplete-results="fetchAutocomplete($event, index)" />
     </template>
 
+    <!-- MAIN FILTER -->
     <BaseAdvancedSearchRow
+      ref="mainSearch"
       v-model:applied-filter="mainFilter"
-      :search-row-id="'main'"
+      :search-row-id="`main-${rowId}`"
       :is-main-search="true"
       :mode="mode"
       :filter-list="displayedFilters"
@@ -49,11 +54,12 @@
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
       @option-selected="fillOptionToForm">
+      <!-- SHOW ADVANCED SEARCH FORM BUTTON (MODE 'FORM') -->
       <template #after>
         <BaseButton
           v-if="mode === 'form'"
+          :text="showAdvancedSearchButtonText ? advancedSearchText.advancedButtonLabel : ''"
           button-style="row"
-          text="Advanced Search"
           icon="drop-down"
           icon-size="small"
           icon-position="right"
@@ -61,19 +67,25 @@
                    { 'base-button-icon-rotate-180': formOpen }]"
           @click.stop="openAdvancedSearch" />
       </template>
+      <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>
         <BaseForm
           v-if="mode === 'form' && formOpen"
           v-bind="formProps"
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
-          class="base-advanced-search__search-form"
+          :label-property-name="labelPropertyName.formInputs"
+          :identifier-property-name="identifierPropertyName.formInputs"
+          :class="['base-advanced-search__search-form',
+                   { 'base-advanced-search__search-form--hidden': !formMounted}]"
           @input-complete="updateFormFilters"
-          @fetch-autocomplete="fetchFormAutocomplete" />
+          @fetch-autocomplete="fetchFormAutocomplete"
+          @form-mounted="formIsMounted" />
         <div
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
           <BaseCollapsedFilterRow
             v-model:filters="collapsedFiltersArray"
+            :date-time-text="advancedSearchText.collapsedDateTime"
             @remove-all="removeAllFilters" />
         </div>
       </template>
@@ -84,8 +96,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
-import BaseCollapsedFilterRow from '@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue';
-import { createId, hasData, sort } from '@/utils/utils';
+import { createId, debounce, hasData, sort } from '@/utils/utils';
 
 /**
  * @typedef Filter
@@ -94,7 +105,7 @@ import { createId, hasData, sort } from '@/utils/utils';
  * @property {string} id|* - property 'id' used as unique identifier or an equivalent
  *  custom property defined in prop identifierPropertyName.filter
  * @property {string} type - a filter type defining the type of search element shown
- *  @values text, chips, date, daterange
+ *  @values text, chips, chipssingle, date, daterange
  * @property {boolean?} [hidden] - exclude filters that have this attribute true from display
  * @property {boolean?} [freetext_allowed] - property specifc for type: chips determining
  *  if options are autocompleted (true) or used from the options property (false)
@@ -110,10 +121,10 @@ import { createId, hasData, sort } from '@/utils/utils';
 export default {
   name: 'BaseAdvancedSearch',
   components: {
-    BaseCollapsedFilterRow,
     BaseAdvancedSearchRow,
-    BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue')),
-    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseCollapsedFilterRow: defineAsyncComponent(() => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue').then(m => m.default || m)),
+    BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m)),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m)),
   },
   props: {
     /**
@@ -139,12 +150,12 @@ export default {
      *    **id** `string` - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      `identifierPropertyName.filter`.
-     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `date`, `daterange`.
+     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `chipssingle`, `date`, `daterange`.
      *    **hidden** `boolean` - filters with this attribute true will be filtered from
      *      displayed filter list.
      *    **freetext_allowed** `boolean` - determines if predetermined options from `options`
      *      property are used or autocomplete is used.
-     *    **options** `Object[]` - for filter type `chips` the controlled
+     *    **options** `Object[]` - for filter type `chips` and `chipssingle` the controlled
      *      vocabulary options.
      *     **subsets** `string[]` - if a filter of `type` 'text' or 'chips' with
      *      `freetext_allowed` (thus triggering autocomplete) has subordinate filters for which
@@ -156,7 +167,8 @@ export default {
       validator: val => !val.length
         // make sure a filter type is present and type is other than chips or freetext is
         // allowed - otherwise it needs to have an options property
-        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
+        || (val.every(v => !!v.type
+          && (!['chips', 'chipssingle'].includes(v.type) || v.freetext_allowed || !!v.options))),
     },
     /**
      * this variable is just used in mode `list`, for mode `form` leave it empty and use property `formFilterValues`
@@ -180,11 +192,11 @@ export default {
      *    **id** `string` - the identifier of the filter (displayed
      *      if not main search) - this prop can be customized by specifying
      *      `identifierPropertyName.filter`.
-     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `date`, `daterange`.
-     *    **options** `Object[]` - for filter type 'chips' the controlled
+     *    **type** `string` - the filter type. Possible values: `text`, `chips`, `chipssingle`, `date`, `daterange`.
+     *    **options** `Object[]` - for filter type `chips` and `chipssingle` the controlled
      *      vocabulary options.
      *    **filter_values** `Object[], string[], Object` - the values selected - object for date
-     *    or array of objects or strings for type `text` and type `chips`,
+     *    or array of objects or strings for type `text`, type `chips` and `chipssingle`,
      *
      *    defaultFilter does not need the property `subsets` since results for all filters are
      *    shown per default
@@ -200,7 +212,8 @@ export default {
         options: [],
         filter_values: [],
       }),
-      validator: val => val === null || (val.type && (val.type !== 'chips' || val.options)),
+      validator: val => val === null || (val.type
+        && (!['chips', 'chipssingle'].includes(val.type) || val.options)),
     },
     /**
      * this variable is just used in mode `form`, for mode `list` leave it empty and use property `filterList`
@@ -208,8 +221,8 @@ export default {
      * for mode 'form' provide a specification for the form fields in the form of [OpenAPi
      *  schema object](https://swagger.io/specification/#schema-object).
      *  see also [BaseForm](BaseForm) `form-field-json` prop - currently all field types except
-     *    `multiline` and `chips-below` are supported. Also field groups are supported but maximum
-     *    nesting level is 1.
+     *    `multiline` and `chips-below` and for date/time fields only single date, date range and date time fields
+     *    are supported. Also field groups are supported but maximum nesting level is 1.
      */
     formFilterList: {
       type: Object,
@@ -218,7 +231,7 @@ export default {
     /**
      * this variable is just used in mode `form`, for mode `list` leave it empty and use property `appliedFilters`
      *  to provide values per filter instead.
-     * provide values for the fields specified in `formFilterList`.
+     * provide values for the fields specified in `formFilterList`. Main filter can be filled by adding a `default` property.
      */
     formFilterValues: {
       type: Object,
@@ -262,14 +275,17 @@ export default {
      * specify informational texts for the component - this needs to be an object with the following
      * properties (if you don't want to display any text leave an empty string):
      *
-     *     **title**: text shown as first line on the drop-down in filters area.
-     *     **subtext**: text shown as second line on the drop-down in filters area.
+     *     **title**: text shown as first line on the drop-down in filters area for mode `list`.
+     *     **subtext**: text shown as second line on the drop-down in filters area for mode `list`.
      *     **availableOptions**: text shown with chips options for controlled vocabulary
-     *     search.
-     *     **addFilter**: text/label used for add filter icon.
-     *     **removeFilter**: text/label used for remove filter icon.
-     *     **selectFilterLabel**: label (not visible) used for filter chips input field.
+     *     search` for mode `list`.
+     *     **addFilter**: text/label used for add filter icon for mode `list`.
+     *     **removeFilter**: text/label used for remove filter icon for mode `list`.
+     *     **selectFilterLabel**: label (not visible) used for filter chips input field for mode `list`.
      *     **searchLabel**: label (not visible) used for search input field.
+     *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
+     *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
+     *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
      *
      *  The values of this object might be plain text or a key for an i18n file.
      * This prop can be ignored when the `no-options` slot is used.
@@ -284,11 +300,13 @@ export default {
         removeFilter: 'Remove filter',
         selectFilterLabel: 'Select filter',
         searchLabel: 'Search for Entries',
+        collapsedDateTime: {
+          from: 'from',
+          until: 'until',
+          range: 'to',
+        },
+        advancedButtonLabel: 'Advanced Search',
       }),
-      // checking if all necessary properties are part of the provided object
-      validator: val => ['title', 'subtext', 'availableOptions',
-        'addFilter', 'removeFilter', 'selectFilterLabel', 'searchLabel']
-        .every(prop => Object.keys(val).includes(prop)),
     },
     /**
      * specify informational texts for the drop-down - this needs to be an object with the following
@@ -357,7 +375,8 @@ export default {
      *     vocabulary option objects.
      *     **formInputs**: for mode 'form' in case the form contains chips or autocomplete input fields,
      *      the object properties for label and identifier need to be set here (in case they are different
-     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `identifierPropertyName`)
+     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `identifierPropertyName`))
+     *      if `identifierPropertyName` is also set via `fieldProps` the latter is the preferred value.
      */
     identifierPropertyName: {
       type: [Object, String],
@@ -379,7 +398,8 @@ export default {
      *     vocabulary option objects.
      *     **formInputs**: for mode 'form' in case the form contains chips or autocomplete input fields,
      *      the object properties for label and identifier need to be set here (in case they are different
-     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `labelPropertyName`)
+     *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `labelPropertyName`))
+     *      if `labelPropertyName` is also set via `fieldProps` the latter is the preferred value.
      */
     labelPropertyName: {
       type: [Object, String],
@@ -429,8 +449,17 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * prop only relevant for mode `form`
+     * set advanced search (form) visibility from outside
+     * this can also be used to not show the advanced search after initial loading
+     */
+    advancedFormOpen: {
+      type: Boolean,
+      default: true,
+    },
   },
-  emits: ['update:applied-filters', 'update:form-filter-values', 'fetch-form-autocomplete', 'fetch-autocomplete', 'search'],
+  emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
   data() {
     return {
       /**
@@ -471,6 +500,21 @@ export default {
        * @type {Object}
        */
       originalFilterValues: null,
+      /**
+       * render BaseForm with delay to reduce flickering and flinching
+       * @type {boolean}
+       */
+      formMounted: false,
+      /**
+       * resize observer for specific element (instead of window)
+       * (only mode `form`)
+       */
+      resizeObserver: null,
+      /**
+       * button text should only be shown if enough space is available
+       * (only mode `form`)
+       */
+      showAdvancedSearchButtonText: true,
     };
   },
   computed: {
@@ -488,7 +532,7 @@ export default {
       ];
     },
     /**
-     * the actually displayed filters
+     * the actually displayed filter categories (visible in the filter drop down for mode 'list')
      * @returns {Filter[]}
      */
     displayedFilters() {
@@ -497,6 +541,11 @@ export default {
       // sort them
       return sort(displayed, this.labelPropertyName.filter);
     },
+    /**
+     * main filter is always added to the emitted filter array last to maintain same order
+     *  to what is rendered (main filter lowest) so we need to get the last filter index
+     * @returns {number}
+     */
     mainFilterIndex() {
       const lastFilterIndex = this.appliedFilters.length - 1;
       return lastFilterIndex > 0 ? lastFilterIndex : 0;
@@ -519,7 +568,8 @@ export default {
           .filter(([, value]) => hasData(value))
           // sort the values in the order of the form so the collapsed display has the same order
           .sort(([key1], [key2]) => {
-            if (this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
+            if (this.formFilterList[key1] && this.formFilterList[key2]
+                && this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
               return 1;
             }
             return -1;
@@ -573,6 +623,14 @@ export default {
         this.search();
       },
     },
+    /**
+     * create an internal row id for unique identification of added filter rows
+     *
+     * @returns {string}
+     */
+    rowId() {
+      return createId();
+    },
   },
   watch: {
     /**
@@ -585,12 +643,6 @@ export default {
         this.$set(this.filtersAutocompleteResults, this.autocompleteIndex, [...val]);
         this.autocompleteIndex = -1;
       }
-    },
-    /**
-     * set autocomplete loading from outside
-     */
-    isLoadingIndex() {
-      // this.autocompleteIndex = val;
     },
     /**
      * have appliedFilters in sync with parent to be able to set them from outside
@@ -616,7 +668,6 @@ export default {
           // if yes - update internal value
           [, ...this.appliedFiltersInt] = JSON.parse(JSON
             .stringify([val, ...val.slice(0, -1)]));
-          this.originalFilterValues = JSON.parse(JSON.stringify(this.appliedFiltersInt));
         }
         // also check if main filter is different separately!
         if (val && val.length >= 1
@@ -661,28 +712,34 @@ export default {
         }
       }
       /**
-       * inform parent of changes in applied filters
+       * inform parent of changes in applied filters - event emitted for mode `list`
        *
        * @event update:applied-filters
        * @param {Filter[]} - the list of updated applied filters
        */
       this.$emit('update:applied-filters', [...this.appliedFiltersInt, val]);
+      // also emit updated form filter values at this point
+      this.$emit('update:form-filter-values', { ...this.formFilterValuesInt, default: this.mainFilter.filter_values });
     },
     /**
      * have formFilterValues in sync with parent to be able to set them from outside
      */
     formFilterValuesInt: {
       handler(val) {
+        // get filters without default first to ensure comparability
+        const filtersWithoutDefault = { ...this.formFilterValues };
+        this.$delete(filtersWithoutDefault, 'default');
         // check if val is actually different from prop value
-        if (JSON.stringify(val) !== JSON.stringify(this.formFilterValues)) {
+        if (JSON.stringify(val) !== JSON.stringify(filtersWithoutDefault)) {
           // if yes - inform parent
           /**
-           * inform parent of form filter value changes
+           * inform parent of form filter value changes - event emitted for mode `form`
            * @event update:form-filter-values
-           * @param {Object} - a form filter values object with a property for each filter field
+           * @param {Object} - a form filter values object with a property for each filter field - main filter values
+           *  are available under the default property
            *
            */
-          this.$emit('update:form-filter-values', { ...val });
+          this.$emit('update:form-filter-values', { ...val, default: this.mainFilter.filter_values });
         }
       },
       deep: true,
@@ -692,15 +749,34 @@ export default {
      */
     formFilterValues: {
       handler(val) {
-        // check if value is different from internal value
-        if (val
-          && JSON.stringify(val) !== JSON.stringify(this.formFilterValuesInt)) {
-          // if yes - update internal value
-          this.formFilterValuesInt = JSON.parse(JSON.stringify(val));
-          this.search();
+        if (this.mode === 'form') {
+          // check if value is different from internal value
+          if (val
+            && JSON.stringify(val) !== JSON.stringify({
+              ...this.formFilterValuesInt,
+              default: this.mainFilter.filter_values,
+            })) {
+            // remove the default key from the form filter values that should fill form
+            const { default: _, ...filterValuesNoMain } = val;
+            // update internal values
+            this.formFilterValuesInt = JSON.parse(JSON.stringify(filterValuesNoMain));
+            // set default property to mainFilter.filter_values
+            this.$set(this.mainFilter, 'filter_values', val.default || ['']);
+            // trigger search with updated values
+            this.search();
+          }
         }
       },
       immediate: true,
+    },
+    advancedFormOpen: {
+      handler(val) {
+        this.formOpen = val;
+      },
+      immediate: true,
+    },
+    formOpen(val) {
+      this.$emit('update:advanced-form-open', val);
     },
   },
   created() {
@@ -709,66 +785,120 @@ export default {
       // if not set default filter
       this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
     }
+    // copy these filter values to later be able to determine if filters changed before
+    // triggering search
     this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
-    this.originalFilterValues = JSON.parse(JSON.stringify(this.mode === 'form'
-      ? this.formFilterValuesInt : this.appliedFiltersInt));
+  },
+  mounted() {
+    // only add observer for mode `form`
+    if (this.mode === 'form') {
+      // to listen to element with instead of window width create an observer!
+      this.initObserver();
+    }
+  },
+  beforeUnmount() {
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.searchContainer);
   },
   methods: {
-    fillOptionToForm({ entry, collectionId }) {
-      // check if mode is form and if collection id is present
-      // (otherwise value is default filter string input)
-      if (this.mode === 'form' && collectionId
-        // and if option is already included in the selected options to prevent double key problems
-        && !this.formFilterValuesInt[collectionId]
-          ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
-          .includes(entry[this.identifierPropertyName.autocompleteOption])) {
-        const fieldInformation = this.formFilterList[collectionId];
-        const fieldXAttrs = fieldInformation['x-attrs'];
-        // check the type of field that the value should be added to (we assume the only possibilities
-        // are chips or text - other types are currently NOT implemented and would need to be added here!)
-        if (fieldXAttrs.field_type === 'chips') {
-          // map the information from the search autocomplete to the chips form field
-          // required values
-          const chipsFormFieldValue = {
-            // map search autocomplete result to chips form field required values
-            [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
-            [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
-          };
-          // for multi chips - add value to array
-          if (fieldInformation.type === 'array') {
-            // check if property exists already in formFilterValuesInt
-            if (this.formFilterValuesInt[collectionId]) {
-              this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
-            } else {
-              this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
-            }
-            // for single chips - replace value
-          } else if (fieldInformation.type === 'object') {
-            this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
-          }
-        } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
-          this.$set(
-            this.formFilterValuesInt,
-            collectionId,
-            entry[this.labelPropertyName.autocompleteOption] || entry,
-          );
-        }
-        this.mainFilter.filter_values = [];
-        // this does not trigger an update event from BaseForm so search needs to be triggered manually here
-        this.search();
+    /**
+     * GENERAL FUNCTIONALITIES
+     */
+
+    /**
+     * initialize resize observer to steer advanced search button appearance
+     */
+    initObserver() {
+      const resizeObserver = new ResizeObserver(debounce(50, ([container]) => {
+        this.showAdvancedSearchButtonText = container.contentRect.width >= 460;
+      }));
+      resizeObserver.observe(this.$refs.searchContainer);
+      this.resizeObserver = resizeObserver;
+    },
+    /**
+     * @param {string} input - the search string to autocomplete
+     * @param {Filter} filter - the filter the autocomplete was triggered for
+     * @param {number} index - the index of the filter
+     */
+    fetchAutocomplete({ input, filter }, index) {
+      if (input) {
+        // if input string present set autocomplete variable to correct filter row
+        this.autocompleteIndex = index;
+      } else {
+        // else reset the autocomplete results
+        this.$set(this.filtersAutocompleteResults, index, []);
+      }
+      // stil emit fetch-autocomplete no matter if input string present or not to give
+      // parent opportunity to also update
+      /**
+       * inform parent to fetch autocomplete data for the provided filter
+       *
+       * @event fetch-autocomplete
+       * @type {Object} - object with the following properties:
+       * @property {string} searchString - the string to autocomplete
+       * @property {Filter} filter - the filter object
+       * @property {number} index - the filter index of all filters (main and applied)
+       */
+      this.$emit('fetch-autocomplete', { searchString: input, filter, index });
+    },
+    /**
+     * search function
+     * @param {boolean} alwaysTrigger - set true if search should be triggered irrespective of
+     *  appliedFiltersInt changes (needed for changes in mainFilter which is checked in the
+     *  mainFilter watcher already)
+     */
+    search(alwaysTrigger = false) {
+      // get the correct filter values list according to component mode
+      const modeFilterList = this.mode === 'form' ? this.formFilterList : this.filterList;
+      // define variable to store modified filters list to be emitted
+      let searchFilterList = [];
+      if (this.mode === 'form') {
+        searchFilterList = Object.entries(this.formFilterValuesInt)
+          // also only keep the filters that have filter values
+          .filter(([, filterValues]) => hasData(filterValues))
+          .map(([filterKey, filterValues]) => ({
+            [this.identifierPropertyName.filter]: filterKey,
+            type: modeFilterList[filterKey]?.['x-attrs']?.field_type ?? 'text',
+            // only keep filter values that actually have values (relevant for groups!)
+            filter_values: typeof filterValues === 'object' && filterValues.length
+            && !modeFilterList[filterKey]?.type.includes('chips')
+              ? filterValues.filter(filterValue => hasData(filterValue)) : filterValues,
+          }));
+      } else {
+        searchFilterList = this.appliedFiltersInt
+          // and only keep the properties relevant for search
+          // eslint-disable-next-line camelcase
+          .map(filter => ({
+            [this.identifierPropertyName.filter]: filter[this.identifierPropertyName.filter],
+            type: filter.type,
+            filter_values: filter.filter_values,
+          }));
+      }
+      // if there are changes in filters or main filter trigger search (=if alwaysTrigger was
+      // set true in mainFilter watcher)
+      if (alwaysTrigger || JSON.stringify(this.originalFilterValues) !== JSON
+        .stringify(searchFilterList)) {
+        // update the original value
+        this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
+        // also minimize main filter
+        const minMainFilter = {
+          [this.identifierPropertyName.filter]: this.mainFilter[this.identifierPropertyName.filter],
+          type: this.mainFilter.type,
+          filter_values: this.mainFilter.filter_values,
+        };
+        /**
+         * inform parent that search should be triggered
+         *
+         * @event search
+         * @param {Filter[]} - the updated list of applied filters - last filter in the list is always the main
+         *  filter (relevant especially for mode `form`)
+         */
+        this.$emit('search', [...searchFilterList, minMainFilter]);
       }
     },
-    fetchFormAutocomplete(params) {
-      /**
-       * @event fetch-form-autocomplete
-       *
-       * @property {string} value - the string to autocomplete
-       * @property {string} name - the name of the field
-       * @property {string} source - the url to request the data from
-       * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
-       */
-      this.$emit('fetch-form-autocomplete', params);
-    },
+    /**
+     * MODE 'LIST' FUNCTIONALITIES
+     */
+
     /**
      * function to add a filter row after '+' icon was triggered
      */
@@ -806,6 +936,7 @@ export default {
       // and reset the main filter
       this.mainFilter = {
         ...this.defaultFilter,
+        filter_values: null,
       };
       // and store the main filter to compare to later
       this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
@@ -813,6 +944,14 @@ export default {
       if (triggerSearch) {
         this.search();
       }
+      // now focus new added row search input but wait until it is rendered
+      this.$nextTick(() => {
+        // get the correct field from all input fields of that element
+        const newSearchInputField = Array.from(this.$refs.mainSearch.$el
+          .getElementsByTagName('input'))
+          .find(element => element.id.includes('search-input'));
+        newSearchInputField.focus();
+      });
     },
     /**
      * remove filter after 'x' was triggered
@@ -835,6 +974,98 @@ export default {
       // trigger search to update search results
       this.search();
     },
+
+    /**
+     * MODE 'FORM' FUNCTIONALITIES
+     */
+
+    /**
+     * function called when an option was selected from main search autocomplete OR on
+     *  search input TAB keydown
+     *
+     * @param {Object} entry - the selected option
+     * @param {string} collectionId - the option category selected - this needs to match a
+     *  formFilter id
+     */
+    fillOptionToForm({ entry, collectionId }) {
+      // check if mode is form and if collection id is present
+      // (otherwise value is default filter string input)
+      if (this.mode === 'form' && collectionId
+        // and if option is already included in the selected options to prevent double key problems
+        && !this.formFilterValuesInt[collectionId]
+          ?.map(selectedOption => selectedOption[this.identifierPropertyName.formInputs])
+          .includes(entry[this.identifierPropertyName.autocompleteOption])) {
+        // get the filter field information if there is any
+        const fieldInformation = this.formFilterList[collectionId];
+        // check if there is actual field information --> default filter is not part of
+        // swagger list! so all but default filter will go here!
+        if (fieldInformation) {
+          const fieldXAttrs = fieldInformation['x-attrs'];
+          // check the type of field that the value should be added to (we assume the only possibilities
+          // are chips or text - other types are currently NOT implemented and would need to be added here!)
+          if (fieldXAttrs.field_type === 'chips') {
+            // map the information from the search autocomplete to the chips form field
+            // required values
+            const chipsFormFieldValue = {
+              // map search autocomplete result to chips form field required values
+              [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
+              [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
+            };
+            // for multi chips - add value to array
+            if (fieldInformation.type === 'array') {
+              // check if property exists already in formFilterValuesInt
+              if (this.formFilterValuesInt[collectionId]) {
+                this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
+              } else {
+                this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
+              }
+              // for single chips - replace value
+            } else if (fieldInformation.type === 'object') {
+              this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
+            }
+          } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
+            this.$set(
+              this.formFilterValuesInt,
+              collectionId,
+              entry[this.labelPropertyName.autocompleteOption] || entry,
+            );
+          }
+          // main filter filter values should remain empty
+          this.mainFilter.filter_values = [];
+          // this does not trigger an update event from BaseForm so search needs to be triggered manually here
+          this.search();
+        } else {
+          // if it is main filter set the value to main filter instead
+          this.$set(
+            this.mainFilter,
+            'filter_values',
+            [entry],
+          );
+          // this does not trigger an update event from BaseForm so search needs to be triggered manually here
+          // since main filter is not evaluated in filter comparison set alwaysTrigger true
+          this.search(true);
+        }
+      }
+    },
+    /**
+     * function called from form if one of the form fields needs autocomplete
+     *
+     * @param {Object} params - see event for object properties sent to parent
+     */
+    fetchFormAutocomplete(params) {
+      /**
+       * event emitted when a form drop down (e.g. chips input field) needs autocomplete
+       *
+       * @event fetch-form-autocomplete
+       *
+       * @property {string} value - the string to autocomplete
+       * @property {string} name - the name of the field
+       * @property {string} source - the url to request the data from
+       * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
+       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specified in this array (most nested property last)
+       */
+      this.$emit('fetch-form-autocomplete', params);
+    },
     /**
      * for mode 'form'
      * update the form filters when an event is received from form that values have changed
@@ -844,9 +1075,24 @@ export default {
       this.formFilterValuesInt = JSON.parse(JSON.stringify(newFilterValueList));
       this.search();
     },
+    /**
+     * function called by BaseCollapsedFilter row if 'x' was clicked to remove all filters
+     */
     removeAllFilters() {
+      // reset form filter values
       this.formFilterValuesInt = {};
+      // trigger search without filters
       this.search();
+    },
+    /**
+     * reduce the flickering and flinching from base form fields rendering by
+     *  only making the element visible after component mount and additionally
+     *  apply a timeout
+     */
+    formIsMounted() {
+      setTimeout(() => {
+        this.formMounted = true;
+      }, 200);
     },
     /**
      * function triggered when 'advanced search' button is clicked in 'form' mode
@@ -854,100 +1100,6 @@ export default {
     openAdvancedSearch() {
       // toggle form
       this.formOpen = !this.formOpen;
-      // if form is opened - close the drop down
-      // TODO?
-    },
-    /**
-     * @param {string} input - the search string to autocomplete
-     * @param {Filter} filter - the filter the autocomplete was triggered for
-     * @param {number} index - the index of the filter
-     */
-    fetchAutocomplete({ input, filter }, index) {
-      if (input) {
-        // if input string present set autocomplete variable to correct filter row
-        this.autocompleteIndex = index;
-      } else {
-        // else reset the autocomplete results
-        this.$set(this.filtersAutocompleteResults, index, []);
-      }
-      // stil emit fetch-autocomplete no matter if input string present or not to give
-      // parent opportunity to also update
-      /**
-       * inform parent to fetch autocomplete data for the provided filter
-       *
-       * @event fetch-autocomplete
-       * @type {Object} - object with the following properties:
-       * @property {string} searchString - the string to autocomplete
-       * @property {Filter} filter - the filter object
-       * @property {number} index - the filter index of all filters (main and applied)
-       */
-      this.$emit('fetch-autocomplete', { searchString: input, filter, index });
-    },
-    /**
-     * search function
-     * @param {boolean} alwaysTrigger - set true if search should be triggered irrespective of
-     *  appliedFiltersInt changes (needed for changes in mainFilter which is checked in the
-     *  mainFilter watcher already)
-     */
-    search(alwaysTrigger = false) {
-      // get the correct field information list
-      const modeFilterList = this.mode === 'form' ? this.formFilterList : this.filterList;
-      // get the correct filter values list according to component mode
-      let searchFilterList = [];
-      if (this.mode === 'form') {
-        searchFilterList = Object.entries(this.formFilterValuesInt)
-          // also only keep the filters that have filter values
-          .filter(([, filterValues]) => hasData(filterValues))
-          .map(([filterKey, filterValues]) => ({
-            id: filterKey,
-            type: modeFilterList[filterKey].type,
-            // only keep filter values that actually have values (relevant for groups!)
-            filter_values: typeof filterValues === 'object' && filterValues.length
-            && !modeFilterList[filterKey].type.includes('chips')
-              ? filterValues.filter(filterValue => hasData(filterValue)) : filterValues,
-          }));
-      } else {
-        searchFilterList = this.appliedFiltersInt
-          // also only keep the filters that have filter values
-          .filter(filterValues => hasData(filterValues.filter_values))
-          // and only keep the properties relevant for search
-          // eslint-disable-next-line camelcase
-          .map(({ id, type, filter_values }) => ({
-            id,
-            type,
-            filter_values,
-          }));
-      }
-      // if there are changes in filters or main filter trigger search (=if alwaysTrigger was
-      // set true in mainFilter watcher)
-      if (alwaysTrigger || JSON.stringify(this.originalFilterValues) !== JSON
-        .stringify(searchFilterList)) {
-        // update the original value
-        this.originalFilterValues = JSON.parse(JSON.stringify(searchFilterList));
-        // also minimize main filter
-        // TODO: think about also only emitting main filter when there are actually values
-        const minMainFilter = {
-          id: this.mainFilter.id,
-          type: this.mainFilter.type,
-          filter_values: this.mainFilter.filter_values,
-        };
-        /**
-         * inform parent that search should be triggered
-         *
-         * @event search
-         * @param {Filter[]} - the updated list of applied filters
-         */
-        this.$emit('search', [...searchFilterList, minMainFilter]);
-      }
-    },
-    /**
-     * create an internal row id for unique identification of added filter rows
-     *
-     * @returns {string}
-     */
-    getRowId() {
-      // call utils function to return a "random" string
-      return createId();
     },
     /**
      * function to retrieve the filter values in reduced form the way CollapsedFilterRow needs them
@@ -1023,7 +1175,13 @@ export default {
               label: chipValue ? chipValue.split('-').reverse().join('.') : '',
             })),
           fieldId,
-          fieldType,
+          // BaseCollapsedRow needs information if date is type daterange, timerange or datetime
+          // so alter to 'date' and 'time' for daterange and timerange respectively and 'datetime'
+          // for datetime.
+          fieldType: Object.keys(values).reduce((prev, key) => {
+            const currentType = key.split('_')[0];
+            return currentType !== prev ? prev + currentType : prev;
+          }, ''),
         };
       }
       // NOT COVERED: multiline and chips below
@@ -1054,7 +1212,7 @@ export default {
         // date could be string if it is just a single date or an object in all other cases
       }
       // case date field
-      if (fieldType === 'date' && filterData.type === 'object') {
+      if ((fieldType.includes('date') || fieldType.includes('time')) && filterData.type === 'object') {
         const objectProperties = Object.keys(filterData.properties);
         return values.reduce((valueObject, value, index) => ({
           ...valueObject,
@@ -1105,9 +1263,14 @@ export default {
 .base-advanced-search__expand-button {
   border-left: $separation-line;
   margin-left: $spacing-small;
+  padding-right: $spacing-small;
 }
 
 .base-advanced-search__search-form {
   border-top: $separation-line;
+
+  &.base-advanced-search__search-form--hidden {
+    display: none;
+  }
 }
 </style>

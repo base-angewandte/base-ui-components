@@ -6,6 +6,7 @@ With the FormFieldCreator component you can create any of the following form inp
 * [Chips Input](BaseChipsInput)
 * [Chips Input with selected Items below](BaseChipsBelow)
 * [Date Input](BaseDateInput)
+* [BaseToggle](BaseToggle) - a boolean value field
 * Nested Field Groups (a subform)
 
 For description of the `x-attrs` the field creation relies on, please see [BaseForm](BaseForm)

@@ -306,6 +306,8 @@ export default {
           // (handled this way because this input event is only triggered on
           // keyboard input not when I select from the drop down)
           onInput: () => {},
+          // keep this BaseInput event from propagating and use component's own event
+          'update:is-active': () => {},
         },
       };
     },
@@ -426,16 +428,13 @@ export default {
       if (!val) {
         this.activeOptionIndex = -1;
       }
-      // also inform parent of the state changes
-      if (JSON.stringify(val) !== JSON.stringify(this.isActive)) {
-        /**
-         * update when active state of input field changes
-         * the v-model directive can be used on this event
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * update when active state of input field changes
+       * the v-model directive can be used on this event
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
   },
   methods: {

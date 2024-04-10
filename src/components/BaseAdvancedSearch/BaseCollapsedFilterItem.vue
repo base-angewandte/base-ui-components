@@ -1,13 +1,19 @@
 <template>
   <div
     class="base-collapsed-filter-item">
+    <!-- if value is single value of date or time range add an 'from' or 'until' character -->
+    <span
+      v-if="isDateOrTimeRange"
+      class="base-collapsed-filter-item__until">
+      {{ rangeIndicator }}
+    </span>
     <!-- per default use BaseChip component except for type `boolean` -->
     <BaseChip
       v-if="!isBoolean && hasValue"
       :model-value="value.label"
       :is-linked="true"
+      :text-styling="chipStyling"
       role="listitem"
-      @mousedown.stop=""
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
@@ -21,14 +27,6 @@
         class="base-collapsed-filter-item__icon-remove"
         @click.stop="removeChip" />
     </div>
-    <!-- if value is date or time range it might need an 'until' character -->
-    <span
-      v-if="['date', 'time'].includes(type) && appendUntil"
-      :class="[
-        'base-collapsed-filter-item__until',
-        {'base-collapsed-filter-item__until__spacing-left': applySpacingLeft }]">
-      &#x2012;
-    </span>
   </div>
 </template>
 
@@ -64,15 +62,21 @@ export default {
      * for date and time ranges it needs to be determined if a 'until' character should
      *  be displayed
      */
-    appendUntil: {
+    rangeIndicator: {
+      type: String,
+      default: 'from',
+    },
+    /**
+     * needed for cursor styling if over chips if list is scrollable
+     */
+    isScrolling: {
       type: Boolean,
       default: false,
     },
     /**
-     * spacing left needs to be applied for date and time ranges where the `date_from`
-     *  is populated
+     * needed for cursor styling if over chips
      */
-    applySpacingLeft: {
+    scrollable: {
       type: Boolean,
       default: false,
     },
@@ -86,12 +90,26 @@ export default {
     isBoolean() {
       return this.type === 'boolean';
     },
+    isDateOrTimeRange() {
+      return ['date', 'time'].includes(this.type) && this.rangeIndicator;
+    },
     /**
      * does the provided value exist and have a label
      * @returns {boolean}
      */
     hasValue() {
       return !!this.value && !!this.value.label;
+    },
+    /**
+     * need to overwrite chips styling cursor and user-select in case
+     *  row is scrollable - if not return empty object
+     * @returns {{cursor: (string), userSelect: (string)}|{}}
+     */
+    chipStyling() {
+      return this.scrollable ? ({
+        cursor: this.isScrolling ? 'grabbing' : 'grab',
+        userSelect: this.isScrolling ? 'none' : 'unset',
+      }) : {};
     },
   },
   methods: {
@@ -136,10 +154,6 @@ export default {
 
   .base-collapsed-filter-item__until {
     margin: 0 #{$spacing-small-half} 0 0;
-
-    &.base-collapsed-filter-item__until__spacing-left {
-      margin-left: -#{$spacing-small};
-    }
   }
 }
 </style>

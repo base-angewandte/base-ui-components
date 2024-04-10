@@ -86,6 +86,7 @@ const executeFire = function(){
     button-style="row"
     icon="plus"
     icon-size="large"
+    icon-title="Add"
     @clicked="executeFire" />
 </div>
 

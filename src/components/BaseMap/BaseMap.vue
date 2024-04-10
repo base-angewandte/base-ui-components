@@ -28,7 +28,7 @@ export default {
     attributionPosition: {
       type: String,
       default: 'bottomright',
-      validate: val => ['topright', 'bottomleft', 'bottomright'].includes(val),
+      validator: val => ['topright', 'bottomleft', 'bottomright'].includes(val),
     },
     /**
      * set array index of marker to center map from outside

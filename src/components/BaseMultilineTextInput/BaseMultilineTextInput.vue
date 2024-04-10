@@ -26,7 +26,7 @@
           :label="tabsLegend"
           class="base-multiline-text-input__tabs">
           <template
-            #right-of-text="tab">
+            #right-of-content="tab">
             <BaseIcon
               v-if="hasText(tab.value)"
               class="base-multiline-text-input__text-icon"

@@ -1,21 +1,35 @@
 ## Demo
 
+The different link types are selected by the properties passed.
+
+| types         | properties                       |
+|---------------|----------------------------------|
+| chip          | identifierPropertyValue && type  | 
+| external      | url                              | 
+| internal      | identifierPropertyValue && !type | 
+| text          |                                  |
+| tooltip       | tooltip                          | 
+| tooltip async | tooltipAsync                     | 
+
 ```vue live
 <template>
   <div>
-    <h2>types</h2>
+    <h2>examples of different link types:</h2>
     <template
       v-for="(link, index) in links">
       <BaseLink
         :key="index"
-        :source="link.source"
+        :identifier-property-name="'id'"
+        :identifier-property-value="link.id"
+        :chip-query-name="'chip-link'"
+        :path="link.path"
         :tooltip="link.tooltip"
-        :tooltip-async="link.additional"
+        :tooltip-async="link.external"
         :tooltip-styles="{ 'min-width': '300px', top: '500px' }"
         :type="link.type"
         :url="link.url"
         :value="link.value"
-        @tooltipClicked="asyncTooltip($event, index)" /><!-- eslint-disable --><template v-if="index !== links.length - 1">, </template><!-- eslint-enable -->
+        @tooltip-clicked="asyncTooltip($event, index)" /><!-- eslint-disable --><template v-if="index !== links.length - 1">, </template><!-- eslint-enable -->
     </template>
   </div>
 </template>
@@ -37,7 +51,7 @@ export default {
         },
         {
           value: 'internal link',
-          source: 'internal.link',
+          id: '/components/BaseSearch',
         },
         {
           value: 'tooltip',
@@ -54,26 +68,35 @@ export default {
           ],
         },
         {
-          value: 'aync tooltip',
-          additional: [
+          value: 'async tooltip',
+          external: [
             {
-              label: 'label',
-              value: 'value',
+              // some id
+              id: '0000-0003-2731-3077',
+              // url to fetch data from
+              source: 'https://orcid.org/',
             },
           ],
         },
         {
-          value: 'internal link (chips)',
-          source: 'internal.link',
-          type: 'activity'
+          path: '/some-path',
+          id: 'some-id',
+          type: 'keywords',
+          value: 'chip'
         },
       ],
     };
   },
   methods: {
-    asyncTooltip(value, index) {
+    /**
+     * fetch the toolTip content
+     * @param {Object} value - data from the tooltipAsync prop
+     * @param {Number} id - internal id of the BaseLink which triggered the event
+     */
+    asyncTooltip(value, id) {
+      // fetch data with the data from value
       setTimeout(() => {
-        this.$set(this.links[index], 'tooltip', [
+        this.$set(this.links[id], 'tooltip', [
           {
             label: 'label',
             value: 'value',
@@ -89,4 +112,18 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+  /* reset chip hover style due the styleguide css would overwrite the component ones */
+  .base-link.base-link--chip:hover {
+    text-decoration: none !important;
+  }
+
+  /* set z-index equal or higher than styleguides sidebar */
+  @media screen and (min-width: $mobile) {
+    >>> .base-tooltip-box {
+      z-index: 1002 !important;
+    }
+  }
+</style>
 ```

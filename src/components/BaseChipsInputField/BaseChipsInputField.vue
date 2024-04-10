@@ -7,7 +7,8 @@
       ref="baseInput"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
-      v-bind="$attrs"
+      v-bind="inputListeners"
+      :field-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"
@@ -211,6 +212,15 @@ export default {
       default: '',
     },
     /**
+     * specify input field type
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
+    },
+    /**
      * input field label
      */
     label: {
@@ -340,7 +350,7 @@ export default {
      *   (will be used in `aria-activedescendant` attribute)
      */
     linkedListOption: {
-      type: String,
+      type: [Number, String],
       default: null,
     },
     /**
@@ -528,6 +538,19 @@ export default {
       inputInt: '',
     };
   },
+  computed: {
+    inputListeners() {
+      return {
+        // add all the listeners from the parent
+        ...this.$attrs,
+        // and add custom listeners
+        ...{
+          // keep this BaseInput event from propagating and use component's own event
+          'update:is-active': () => {},
+        },
+      };
+    },
+  },
   watch: {
     /**
      * selectedList is watched to also change selectedListInt if necessary
@@ -563,26 +586,26 @@ export default {
      * @param {boolean} val - internal input field active value
      */
     isActiveInt(val) {
-      // check if values are in sync already
-      if (val !== this.isActive) {
-        /**
-         * event updating the is-active prop in case of internal changes
-         *
-         * @event update:is-active
-         * @param {boolean} - is input field active
-         */
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * event updating the is-active prop in case of internal changes
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * watch for outside changes in the input field active state
      * @param {boolean} val - the prop value set from outside
      */
-    isActive(val) {
-      // check is in sync already
-      if (val !== this.isActiveInt) {
-        this.isActiveInt = val;
-      }
+    isActive: {
+      handler(val) {
+        // check is in sync already
+        if (val !== this.isActiveInt) {
+          this.isActiveInt = val;
+        }
+      },
+      immediate: true,
     },
     /**
      * also input needs to be synchronized between component and parent (if necessary)

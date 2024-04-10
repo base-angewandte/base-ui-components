@@ -40,7 +40,7 @@ Component to render list data
         <BaseLink
           :url="data.url"
           :value="data.value"
-          :source="data.source"
+          :identifier-property-value="data.source"
           :space-after="!!data.additional"
           :tooltip="data.additional"
           :type="data.type"/>

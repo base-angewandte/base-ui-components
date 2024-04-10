@@ -5,6 +5,8 @@
     class="base-advanced-search-row"
     @click="openDropDown">
     <!-- SEARCH FIELD -->
+    <!-- note: the id is used in the javascript part as well as the parent component
+      BaseAdvancedSearch.vue - consider that when changing it! -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
       ref="baseSearch"
@@ -31,8 +33,8 @@
       :date-field-delay="dateFieldDelay"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
-      @clicked-outside="isActive = false"
-      @click="isActive = true"
+      @clicked-outside="onClickedOutsideSearch"
+      @click="onSearchClick"
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
@@ -42,6 +44,7 @@
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
+          v-if="mode === 'list'"
           :id="'search-filter-select-' + internalRowId"
           v-model:selected-list="selectedFilter"
           :allow-multiple-entries="false"
@@ -363,8 +366,9 @@
                { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
       @clicked="addFilterRow"
       @click.stop="">
-      <template #text>
+      <template #text="{ labelId }">
         <span
+          :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
           {{ getI18nTerm(getLangLabel(advancedSearchText.addFilter)) }}
         </span>
@@ -442,7 +446,8 @@ export default {
       type: Array,
       default: () => ([]),
       validator: val => !val.length
-        || (val.every(v => !!v.type && (v.type !== 'chips' || v.freetext_allowed || !!v.options))),
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * specify a default value for a filter that is set when none of the
@@ -473,7 +478,9 @@ export default {
         type: 'text',
         options: [],
       }),
-      validator: val => val.type && (val.type !== 'chips' || val.freetext_allowed || val.options),
+      validator: val => !val.length
+        || (val.every(v => !!v.type && (!['chips', 'chipssingle'].includes(v.type)
+          || v.freetext_allowed || !!v.options))),
     },
     /**
      * the filter currently applied, needs to be an object with the following properties:<br>
@@ -682,16 +689,11 @@ export default {
        * @type {?string|?Object}
        */
       currentInput: '',
-      // current filter
-      // TODO: a) adjust to actual filter structure
       /**
        * the currently selected filter
        * @type {Filter}
        */
-      filter: {
-        ...this.defaultFilter,
-        filter_values: this.setFilterValues(this.defaultFilter),
-      },
+      filter: null,
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Filter}
@@ -762,6 +764,11 @@ export default {
        * @type {string}
        */
       filterSlotName: 'pre-input-field',
+      /**
+       * variable for touch devices to stop the click event from opening the drop down
+       *  when click event was coming from elements within the search (e.g. BaseForm)
+       */
+      stopSearchClick: false,
     };
   },
   computed: {
@@ -795,9 +802,15 @@ export default {
         return [this.filter];
       },
     },
+    /**
+     * for main filter do not display the default filter in the drop down list with
+     *  available filters (mode 'list')
+     * @returns {Filter[]}
+     */
     displayFilterList() {
       if (!this.isMainSearch) return this.filterList;
-      return this.filterList.filter(filter => filter.id !== this.defaultFilter.id);
+      return this.filterList.filter(filter => filter[this.identifierPropertyName.filter]
+        !== this.defaultFilter[[this.identifierPropertyName.filter]]);
     },
     /**
      * variable to return if autocomplete functionality should be shown (= results fetched
@@ -977,6 +990,20 @@ export default {
       },
       deep: true,
     },
+    defaultFilter: {
+      handler(val) {
+        // check if the props default defaultFilter is still applied
+        if (!this.filter || this.filter.id === 'default') {
+          this.filter = {
+            ...val,
+            // if filter is changed from outside this often means resetting a filter so previous
+            // values should not be taken over (=leave second argument of function empty here)
+            filter_values: this.setFilterValues(val),
+          };
+        }
+      },
+      immediate: true,
+    },
     /**
      * watch if applied filter changes from outside
      */
@@ -1000,7 +1027,7 @@ export default {
             if (val.type.includes('date')) {
               this.currentInput = val.filter_values;
             } else if (val.type === 'text') {
-              [this.currentInput] = val.filter_values;
+              this.currentInput = val.filter_values[0] || '';
             } else {
               this.currentInput = '';
             }
@@ -1044,7 +1071,7 @@ export default {
       }
       // if isActive becomes false and the drop down closes check for remaining input strings
       // if the filter is chips
-      if (!val && this.filter.type === 'chips' && this.currentInput && this.currentInput.trim()) {
+      if (!val && this.filter.type === 'chips' && !!this.currentInput && this.currentInput.trim()) {
         // check if the string can actually be added (freetext options allowed) and that the option
         // was not added previously
         if (this.filter.freetext_allowed && (!this.selectedOptions || !this.selectedOptions
@@ -1230,7 +1257,11 @@ export default {
       // check if filters were specified - if not assume the input is handled in parent component
       if (!this.filterList || !this.filterList.length) {
         this.$emit('option-selected', ({ entry, collectionId: selectedOptionCollection }));
-        this.resetAllInput();
+        // check if filter is not default filter
+        if (selectedOptionCollection !== this.defaultFilter[this.identifierPropertyName.filter]) {
+          // only then reset all input
+          this.resetAllInput();
+        }
         // if option is coming from autocomplete drop down list (=has an id)
         // and currently active filter is not identical
         // with the category of the selected item (if everything is going right this should
@@ -1343,10 +1374,15 @@ export default {
      * event triggered on row click to open drop down and focus main input
      */
     openDropDown() {
-      this.isActive = true;
-      if (this.mode === 'list' && this.searchInputElement) {
+      // set focus to input field when drop down opens only if
+      // a) drop down is not already open (e.g. otherwise this would always cause the first input field of a date
+      //    range to get focused on element click
+      // b) mode is 'list'
+      // c) search input element exists
+      if (!this.isActive && this.mode === 'list' && this.searchInputElement) {
         this.searchInputElement.focus();
       }
+      this.isActive = true;
     },
     /**
      * primary drop down navigation deciding what arrow keys are used for
@@ -1598,6 +1634,54 @@ export default {
         this.isActive = false;
       }
     },
+    /**
+     * on touch devices click-outside is not only triggered by 'touchstart' instead of 'click'.
+     *  this means the 'click-outside' event gets propagated before the 'click' event on touch devices (on
+     *  desktop browsers it is the other way round). This leads to search drop down getting
+     *  triggered when an element INSIDE search was clicked (in case of desktop when click-outside
+     *  is propagated AFTER this leads to isActive = false again immediately after so no drop
+     *  down showing). Therefore, we need to check for mobile event and set variable stopSearchClick
+     *  to true so in event onSearchClick the click can be stopped from opening the drop-down.
+     *
+     * @param {MouseEvent|TouchEvent} event - the event provided by click-outside plugin
+     */
+    onClickedOutsideSearch(event) {
+      // do the regular action to set is active false (and close drop down)
+      this.isActive = false;
+      // get the event type
+      const { type } = event;
+      // if event type is 'touchstart' we assume mobile that was propagated before click event
+      if (type === 'touchstart') {
+        // therefore we set the click stop variable true
+        this.stopSearchClick = true;
+        // since this should only affect click events triggered directly after set
+        // the variable false again after a time out
+        setTimeout(() => {
+          this.stopSearchClick = false;
+        }, 500);
+      }
+    },
+    /**
+     * need to special handle search click event due to the reasons described above in function
+     *  onClickedOutsideSearch().
+     *
+     * @param {MouseEvent} event - the native click event
+     */
+    onSearchClick(event) {
+      // check if mobile variable to stop click being propagated after click-outside
+      // was set
+      if (!this.stopSearchClick) {
+        // if no - show drop down
+        this.isActive = true;
+      } else {
+        // if click-outside was propagated before click event stop the event here
+        // and don't open drop down
+        event.stopPropagation();
+        this.isActive = false;
+        // set variable false again after
+        this.stopSearchClick = false;
+      }
+    },
     initObservers() {
       const tempObserver = new MutationObserver(this.filterChangeObserverAction);
       tempObserver.observe(this.$refs.advancedSearchRow, {
@@ -1651,7 +1735,7 @@ export default {
      */
     getSearchInputElement() {
       // get input elements
-      const inputElements = document.getElementsByTagName('input');
+      const inputElements = this.$el.getElementsByTagName('input');
       // check if input elements were found
       if (inputElements && inputElements.length) {
         // if yes - transform HTMLElement list to Array and find the search input element

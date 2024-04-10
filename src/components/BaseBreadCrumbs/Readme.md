@@ -10,8 +10,9 @@ export default {
   data() {
     return {
       routes: [
-        { label: 'Übersicht', route: '/' },
-        { label: 'Moderne Plastik', route: '/moderne-plastik' },
+        { label: 'Overview', route: '/', icon: 'home', showLabel: false },
+        { label: 'Collection Folder', route: '/folders/12', icon: 'collection' },
+        { label: 'BaseBreadCrumbs', route: '/components/BaseBreadCrumbs.html' },
       ]
     };
   }

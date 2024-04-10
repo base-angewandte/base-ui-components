@@ -33,6 +33,7 @@ import BaseIcon from './BaseIcon/BaseIcon.vue';
 import BaseImage from './BaseImage/BaseImage.vue';
 import BaseImageBox from './BaseImageBox/BaseImageBox.vue';
 import BaseImageGrid from './BaseImageGrid/BaseImageGrid.vue';
+import BaseInfoPanel from './BaseInfoPanel/BaseInfoPanel.vue';
 import BaseInput from './BaseInput/BaseInput.vue';
 import BaseLink from './BaseLink/BaseLink.vue';
 import BaseLoader from './BaseLoader/BaseLoader.vue';
@@ -42,6 +43,7 @@ import BaseMediaCarousel from './BaseMediaCarousel/BaseMediaCarousel.vue';
 import BaseMenuEntry from './BaseMenuEntry/BaseMenuEntry.vue';
 import BaseMenuList from './BaseMenuList/BaseMenuList.vue';
 import BaseMultilineTextInput from './BaseMultilineTextInput/BaseMultilineTextInput.vue';
+import BaseNavigation from './BaseNavigation/BaseNavigation.vue';
 import BaseOptions from './BaseOptions/BaseOptions.vue';
 import BasePagination from './BasePagination/BasePagination.vue';
 import BasePopUp from './BasePopUp/BasePopUp.vue';
@@ -92,6 +94,7 @@ export {
   BaseImage,
   BaseImageBox,
   BaseImageGrid,
+  BaseInfoPanel,
   BaseInput,
   BaseLink,
   BaseLoader,
@@ -101,6 +104,7 @@ export {
   BaseMenuEntry,
   BaseMenuList,
   BaseMultilineTextInput,
+  BaseNavigation,
   BaseOptions,
   BasePagination,
   BasePopUp,

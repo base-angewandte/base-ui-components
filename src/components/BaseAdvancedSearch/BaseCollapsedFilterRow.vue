@@ -19,8 +19,10 @@
         :class="[
           'base-collapsed-filter-row__filter-list',
           { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
+          { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
         ]"
-        @mousedown="mouseDownHandler">
+        @mousedown="mouseDownHandler"
+        @touchstart="mouseDownHandler">
         <li
           v-for="(filter, filterIndex) in filtersInt"
           :key="filter.id"
@@ -38,29 +40,34 @@
               <!-- iterate through the filter values list -->
               <template
                 v-for="(value, valueIndex) in filter.filter_values?.values">
-                <!-- check if filter.type is an array to determine if it belongs to a field group -->
+                <!-- check if filter.fieldType is an array to determine if it belongs to a field group -->
                 <template v-if="filter.filter_values.fieldType === 'group'">
                   <!-- if yes - also iterate through those values -->
-                  <BaseCollapsedFilterItem
+                  <template
                     v-for="(groupValue, groupIndex) in value.values"
                     :key="groupValue.id
-                      || `${groupValue.label}-${valueIndex}-${groupIndex}`"
-                    :value="groupValue"
-                    :type="value.fieldType"
-                    :append-until="value.values.length === 2
-                      && filterValuesHaveData(value.values)
-                      && groupIndex === 0"
-                    :apply-spacing-left="!!value.values[0].label"
-                    @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
+                      || `${groupValue.label}-${valueIndex}-${groupIndex}`">
+                    <BaseCollapsedFilterItem
+                      v-if="groupValue.label"
+                      :value="groupValue"
+                      :type="value.fieldType"
+                      :range-indicator="getRangeIndicator(value, groupIndex)"
+                      :scrollable="filterListScrollable"
+                      :is-scrolling="isScrolling"
+                      :date-time-text="dateTimeText"
+                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
+                  </template>
                 </template>
                 <template v-else>
                   <BaseCollapsedFilterItem
+                    v-if="value.label"
                     :key="value.id || `${value.label}-${valueIndex}`"
                     :value="value"
                     :type="filter.filter_values.fieldType"
-                    :append-until="filter.filter_values?.values.length === 2
-                      && valueIndex === 0"
-                    :apply-spacing-left="!!filter.filter_values?.values[0].label"
+                    :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
+                    :scrollable="filterListScrollable"
+                    :is-scrolling="isScrolling"
+                    :date-time-text="dateTimeText"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -71,15 +78,15 @@
     </div>
 
     <!-- remove all filters button -->
-    <div
+    <!-- TODO: add accessibility features -->
+    <button
       class="base-collapsed-filter-row__remove"
       @click="removeFilters">
       <BaseIcon
         name="remove"
         text=""
-        button-style="row"
         class="base-collapsed-filter-row__remove-icon" />
-    </div>
+    </button>
   </div>
 </template>
 
@@ -156,6 +163,19 @@ export default {
         });
       },
     },
+    /**
+     * set the text displayed for date or time values of ranges where only one field is
+     * filled.
+     */
+    dateTimeText: {
+      type: Object,
+      default: () => ({
+        from: 'from',
+        until: 'until',
+        range: 'to',
+      }),
+      validator: val => !['from', 'until', 'range'].some(property => !Object.keys(val).includes(property)),
+    },
   },
   emits: ['update:filters', 'remove-all'],
   data() {
@@ -193,6 +213,12 @@ export default {
        */
       scrollContainer: null,
       /**
+       * set cursor styling according to current scroll state
+       * use variable instead of setting css class directly so child component
+       *  BaseCollapsedFilter item can also be steered easily
+       */
+      isScrolling: false,
+      /**
        * Resize Observer to trigger fade out calculations
        * @type {?ResizeObserver}
        */
@@ -228,6 +254,7 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.filters)) {
           this.$emit('update:filters', [...val]);
         }
+        this.$nextTick(() => this.calcFadeOut());
       },
       deep: true,
     },
@@ -238,9 +265,6 @@ export default {
     if (this.$refs.filterList) {
       // store the filter list element (which is the scroll container)
       this.scrollContainer = this.$refs.filterList;
-      // calculate if fade out should be shown (filter list element is larger
-      // than available space)
-      this.calcFadeOut();
     }
     // add a resize observer for the fade out and scroll functionalities
     this.initResizeObserver();
@@ -268,40 +292,50 @@ export default {
      *  within the group
      */
     removeChip(filterIndex, valueIndex, groupIndex) {
-      // check if this is the last (or only) filter value currently selected
-      if (this.filtersInt.length === 1 && this.filtersInt[filterIndex].filter_values.values.length === 1) {
+      const { fieldType, values } = this.filtersInt[filterIndex].filter_values;
+      // first check special case group
+      if (fieldType === 'group') {
+        // get all the concatenated values within the group
+        const concatValuesArray = values.reduce((prev, { values: groupFilterValues }) => prev
+          .concat(groupFilterValues.filter(val => hasData(val))), []);
+        // check if more than 1 value is left in the whole row
+        if (concatValuesArray.length < 2 && this.filtersInt.length < 2) {
+          this.removeFilters();
+          // now check if more than one value is left for the group
+        } else if (concatValuesArray.length > 1) {
+          // check for special case date and time fields
+          if (values[valueIndex].fieldType.includes('date') || values[valueIndex].fieldType.includes('time')) {
+            // for date arrays just remove the label so the order of the date_from and date_to does not
+            // get mixed up by removing the complete value
+            this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
+          } else {
+            // if its not a date just splice the value out of the array
+            this.filtersInt[filterIndex].filter_values.values[valueIndex].values.splice(groupIndex, 1);
+          }
+          // else this means there is only 1 value in the group left and the whole filter group can be
+          // spliced away
+        } else {
+          // if no - just splice the complete filter group away
+          this.filtersInt.splice(filterIndex, 1);
+        }
+        // check if this is the last (or only) filter value currently selected
+      } else if (this.filtersInt.length === 1 && values.length === 1) {
         // if yes - remove the complete row
         this.removeFilters();
         // else check if this is the only value for a specific filter
-      } else if (this.filtersInt[filterIndex].filter_values.values.length === 1) {
+      } else if (values.length === 1) {
         // if yes - remove the complete filter
         this.filtersInt.splice(filterIndex, 1);
         // special case date object
-      } else if (this.filtersInt[filterIndex].type === 'date'
-        && this.filtersInt[filterIndex].filter_values.values.filter(value => hasData(value)).length < 2) {
-        // if yes - remove the complete filter
-        this.filtersInt.splice(filterIndex, 1);
-        // case field group - check if type is an array of several types which indicates a field group
-      } else if (typeof this.filtersInt[filterIndex].type === 'object'
-        // now check how many values are left in the group and if it is more than one
-        && this.filtersInt[filterIndex].filter_values.values.reduce((prev, curr) => {
-          if (curr.length) {
-            return prev.concat(curr.filter(val => hasData(val)));
-          }
-          return hasData(curr) ? prev.push(curr) : prev;
-        }, []).length < 2) {
-        this.filtersInt.splice(filterIndex, 1);
-        // else just set the filter label to an empty string
-        // this is done instead of slicing the whole value so the remaining values can
-        // be reassigned to the correct property in case values are part of an object!
-      } else if (groupIndex >= 0) {
-        this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
+      } else if (fieldType.includes('date') || fieldType.includes('time')) {
+        if (values.filter(value => hasData(value)).length < 2) {
+          // if yes - remove the complete filter
+          this.filtersInt.splice(filterIndex, 1);
+        } else {
+          this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
+        }
       } else {
-        this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
-      }
-      if (this.filterListScrollable) {
-        // wait until element was removed, then recalc fade out
-        this.$nextTick(() => this.calcFadeOut());
+        this.filtersInt[filterIndex].filter_values.values.splice(valueIndex, 1);
       }
     },
 
@@ -329,14 +363,21 @@ export default {
           left: this.scrollContainer.scrollLeft,
           top: this.scrollContainer.scrollTop,
           // Get the current mouse position
-          x: event.clientX,
-          y: event.clientY,
+          x: event.clientX || event.touches[0]?.clientX,
+          y: event.clientY || event.touches[0]?.clientY,
         };
         // add event listeners for mousemove and mouseup to be able to trigger scroll
-        document.addEventListener('mousemove', this.mouseMoveHandler);
-        document.addEventListener('mouseup', this.mouseUpHandler);
+        // for touch devices add touch event listeners
+        if (event.type === 'touchstart') {
+          document.addEventListener('touchmove', this.mouseMoveHandler);
+          document.addEventListener('touchend', this.mouseUpHandler);
+        } else {
+          // else add mouse events
+          document.addEventListener('mousemove', this.mouseMoveHandler);
+          document.addEventListener('mouseup', this.mouseUpHandler);
+        }
         // Change the cursor and prevent user from selecting the text
-        this.scrollContainer.classList.add('base-collapsed-filter-row__filter-list__scrolling');
+        this.isScrolling = true;
       }
     },
     /**
@@ -345,9 +386,13 @@ export default {
      * @param {MouseEvent} e
      */
     mouseMoveHandler(e) {
+      // get event position - touch event does not have clientX/clientY - fallback
+      // to touches position
+      const eventXPosition = e.clientX || e.touches[0]?.clientX || 0;
+      const eventYPosition = e.clientY || e.touches[0]?.clientY || 0;
       // How far the mouse has been moved
-      const dx = e.clientX - this.pos.x;
-      const dy = e.clientY - this.pos.y;
+      const dx = eventXPosition - this.pos.x;
+      const dy = eventYPosition - this.pos.y;
 
       // Scroll the element
       this.scrollContainer.scrollTop = this.pos.top - dy;
@@ -363,16 +408,18 @@ export default {
       // remove all the event listeners again
       document.removeEventListener('mousemove', this.mouseMoveHandler);
       document.removeEventListener('mouseup', this.mouseUpHandler);
+      document.removeEventListener('touchmove', this.mouseMoveHandler);
+      document.removeEventListener('touchend', this.mouseUpHandler);
 
       // change the styling of the element back to normal
-      this.scrollContainer.classList.remove('base-collapsed-filter-row__filter-list__scrolling');
+      this.isScrolling = false;
     },
     /**
-     * function to caclulate if filterList fade out should be shown on element left and/or right border
+     * function to calculate if filterList fade out should be shown on element left and/or right border
      */
     calcFadeOut() {
       // get current element scroll position
-      const scrollPosition = this.scrollContainer.scrollLeft;
+      const scrollPosition = Math.floor(this.scrollContainer.scrollLeft);
       // get element max scroll position
       const scrollMax = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
       // set filter fade variables
@@ -396,6 +443,23 @@ export default {
      */
     filterValuesHaveData(filterValues) {
       return hasData(filterValues);
+    },
+    getRangeIndicator(filterValues, index) {
+      // check if it is a filter with an array of exactly two values
+      if (filterValues.values.length === 2
+        && ['date', 'time'].includes(filterValues.fieldType)) {
+        if (!!filterValues.values[0].label
+          && !!filterValues.values[1].label && index === 1) {
+          return this.dateTimeText.range;
+        }
+        if (!filterValues.values[1].label && filterValues.values[0].label) {
+          return this.dateTimeText.from;
+        }
+        if (!filterValues.values[0].label && filterValues.values[1].label) {
+          return this.dateTimeText.until;
+        }
+      }
+      return '';
     },
   },
 };

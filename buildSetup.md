@@ -1,5 +1,11 @@
 ## Build Setup
 
+### System Requirements
+
+This project is currently compatible with node versions >= 18.0.0 <21.0.0.
+
+### Available Npm Scripts
+
 ``` bash
 # install dependencies
 npm install
@@ -27,6 +33,12 @@ npm run lint:fix
 
 # publish a new version
 npm run version-publish
+
+# run the styleguide in dev mode
+npm run styleguide
+
+# build a new styleguide version
+npm run styleguide:build
 
 # create svg spriteSheet
 npm run svg

@@ -30,6 +30,7 @@
             v-model="dateFormatInt"
             :options="tabSwitchOptions"
             :label="formatTabsLegend"
+            :active-tab="dateFormatInt"
             class="base-date-input__switch-buttons" />
         </div>
       </div>
@@ -52,7 +53,7 @@
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            :id="label + '-' + id"
+            :id="`input-${id}-from`"
             v-model="inputFrom"
             v-bind="inputListeners"
             :label="label"
@@ -70,13 +71,12 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('fromOpen', $event)">
+            @update:is-active="isActiveHandler('from', $event)">
             <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
                   v-model="inputFrom"
-                  :input-attr="{ id: label + '-' + id }"
                   :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
@@ -87,18 +87,19 @@
                   :value-type="isFromTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('from')"
-                  @click.prevent.stop=""
+                  @click.prevent="onInputClick"
                   @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="label + '-' + id"
+                      :id="`input-${id}-from`"
                       ref="inputFrom"
                       v-model="inputFrom"
                       v-bind="dateInputListeners"
-                      :placeholder="placeholder.date || placeholder"
+                      :placeholder="isFromTimeField ? placeholder.time || placeholder
+                        : placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-' + id"
                       :aria-required="required.toString()"
@@ -108,7 +109,6 @@
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
                       autocomplete="off"
-                      @blur="onInputBlur($event, 'From')"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')">
                   </template>
@@ -137,7 +137,7 @@
           <!-- INPUT TO -->
           <BaseInput
             v-if="type !== 'single'"
-            :id="label + '-to-' + id"
+            :id="`input-${id}-to`"
             v-model="inputTo"
             v-bind="inputListeners"
             :label="label"
@@ -154,13 +154,12 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('toOpen', $event)">
+            @update:is-active="isActiveHandler('to', $event)">
             <template #input>
               <div
                 class="base-date-input__datepicker">
                 <DatePicker
                   v-model="inputTo"
-                  :input-attr="{ id: label + '-' + id }"
                   :placeholder="isToTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
@@ -168,21 +167,22 @@
                   :open="toOpen"
                   :type="isToTimeField ? 'time' : minDateView"
                   :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
-                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
+                  :value-type="isToTimeField ? 'format' : dateFormatInt"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
-                  @click.prevent.stop=""
+                  @click.prevent="onInputClick"
                   @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="label + '-to-' + id"
+                      :id="`input-${id}-to`"
                       ref="inputTo"
                       v-model="inputTo"
+                      :placeholder="isToTimeField ? placeholder.time || placeholder
+                        : placeholder.date || placeholder"
                       v-bind="dateInputListeners"
-                      :placeholder="placeholder.date || placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-to-' + id"
                       :aria-required="required.toString()"
@@ -192,7 +192,6 @@
                       :aria-disabled="disabled"
                       autocomplete="off"
                       :class="['base-date-input__input', inputClass]"
-                      @blur="checkDateValidity('To')"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')">
                   </template>
@@ -759,18 +758,9 @@ export default {
           'clicked-outside': (event) => {
             event.stopPropagation();
           },
-          // need to stop the event triggered in original BaseInput as well
-          // and replace it with the internal active state variable
-          'update:is-active': () => {
-            /**
-             * replace BaseInput state with BaseDateInput field active state and
-             * propagate this one
-             *
-             * @event update:is-active
-             * @param {boolean} - is input field active
-             */
-            this.$emit('update:is-active', this.isActiveInt);
-          },
+          // need to stop the event triggered in original BaseInput and only trigger
+          // when component isActiveInt has changed
+          'update:is-active': () => {},
         },
       };
     },
@@ -806,7 +796,7 @@ export default {
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       return !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag || elem.text);
+        && slotElements.some(elem => elem.tag || elem.text?.trim());
     },
     /**
      * determines if label row should be shown
@@ -924,9 +914,14 @@ export default {
      * @param {boolean} val - the changed internal is active variable
      */
     isActiveInt(val) {
-      if (val !== this.isActive) {
-        this.$emit('update:is-active', val);
-      }
+      /**
+       * replace BaseInput state with BaseDateInput field active state and
+       * propagate this one
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      this.$emit('update:is-active', val);
     },
     /**
      * also adjust internal variable when active state changes from outside
@@ -936,6 +931,8 @@ export default {
       handler(val) {
         if (val !== this.isActiveInt) {
           this.isActiveInt = val;
+          // if is active is set from outside also open the first date field
+          this.fromOpen = val;
         }
         // if isActive is set false from outside also close date picker
         if (!val) {
@@ -979,11 +976,18 @@ export default {
     if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
   },
   methods: {
-    onInputBlur(event, origin) {
-      // only check date validity when blur is coming from user input event not from
-      // date picker blur - they are distinguishable by relatedTarget!
-      if (event.relatedTarget?.className === 'mx-calendar-content') return;
-      this.checkDateValidity(origin);
+    /**
+     * since the complete datepicker lies within the BaseInput, the BaseInput click event
+     *  is triggered also when a date is picked from the date picker - this leads to the undesired
+     *  side effect that the date picker pop up is reopened when a date was selected there
+     *  therefore we only allow the click event to pass on when the user clicks on the input field
+     *  DIRECTLY
+     * @param {PointerEvent} event - the native click event
+     */
+    onInputClick(event) {
+      if (event.target.tagName !== 'INPUT') {
+        event.stopPropagation();
+      }
     },
     initObservers() {
       // create an observer with the fade out calc function
@@ -1058,16 +1062,18 @@ export default {
       // * if type is date and key was period and date format is year or last char in string was
       //    already a period
       // * if type is time and key was colon and last char was already a colon
-      if (!allowedKeysRegex.test(key)
+      // * and also make sure copy & paste is allowed!
+      if ((!allowedKeysRegex.test(key)
         || (disallowedKeysOnLengthRegex.test(key) && this[`input${origin}`].length >= formatLength
           && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
         || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
           || currentInputString.charAt(currentInputString.length - 1) === '.'))
-        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':')) {
+        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
+        && !(['c', 'v', 'x'].includes(key) && event.ctrlKey)) {
         event.preventDefault();
       }
       // when the user tries to leave the field check if input string is valid
-      if (key === 'Enter' && currentInputString) {
+      if (key === 'Enter') {
         this.checkDateValidity(origin);
         currentInputString = this[`input${origin}`];
       }
@@ -1265,7 +1271,7 @@ export default {
             }
           }
           // since technically invalid dates (like 30.02.2000) will also be considered a
-          // vaild date by Date.parse() just convert to Date and back one more time
+          // valid date by Date.parse() just convert to Date and back one more time
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
           const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
@@ -1297,21 +1303,24 @@ export default {
      */
     closeTimePicker(origin, time, type) {
       if (type === 'minute') {
+        // get capitalized origin here since needed 2x
+        const uppercaseOrigin = capitalizeString(origin);
+        // check date validity
+        this.checkDateValidity(uppercaseOrigin);
+        // close the drop down
         this[`${origin}Open`] = false;
         // check if the new date/time string needs a fade out
-        this.calcFadeOut([`${origin.charAt(0).toUpperCase()}${origin.slice(1)}`]);
+        this.calcFadeOut([uppercaseOrigin]);
       }
     },
     /**
      * function triggered on datepicker 'pick' event, handling date picker closing
      * and date validation
+     *  caveat: this event is just triggered for DATE picker - not time!
      * @param origin
-     * @param isTimeField
      */
-    datePicked(origin, isTimeField) {
-      if (!isTimeField) {
-        this[`${origin}Open`] = false;
-      }
+    datePicked(origin) {
+      this[`${origin}Open`] = false;
       // need this here because on blur() date is not updated
       this.checkDateValidity(capitalizeString(origin));
     },
@@ -1425,7 +1434,7 @@ export default {
     /**
      * convert a value to a date in local time at zero hours
      *
-     * @param value: the date string stored in db (format YYYY-MM-DD)
+     * @param {string} value - the date string stored in db (format YYYY-MM-DD)
      * @returns {Date} - (e.g. Fri Jul 30 2021 00:00:00 GMT+0200 (Central European Summer Time))
      */
     convertToDate(value) {
@@ -1438,8 +1447,8 @@ export default {
      * @returns {string} - returns a string in format YYYY-MM-DD
      */
     getDateString(date) {
-      // there is always a year
-      let dateString = `${date.getFullYear().toString()}`;
+      // there is always a year // add padStart to always have 4 digits
+      let dateString = `${date.getFullYear().toString().padStart(4, '0')}`;
       // if date format is not 'year' only - add month
       if (this.dateFormatInt !== 'YYYY') {
         const month = (date.getMonth() + 1).toString();
@@ -1540,19 +1549,24 @@ export default {
     /**
      * add delay before value is set
      *
-     * @param {String} key
+     * @param {String} origin - is event originating from 'from' or 'to' field
      * @param {boolean} value
      */
-    isActiveHandler(key, value) {
+    isActiveHandler(origin, value) {
       // if false set value immediately
       if (!value) {
-        this[key] = value;
+        this[`${origin}Open`] = value;
+        this.isActiveInt = this.fromOpen || this.toOpen;
+        // check for date validity here instead of blur event (necessary for time input
+        // which is not triggered otherwise)
+        this.checkDateValidity(capitalizeString(origin));
         return;
       }
 
       // otherwise add a delay
       setTimeout(() => {
-        this[key] = value;
+        this[`${origin}Open`] = value;
+        this.isActiveInt = this.fromOpen || this.toOpen;
       }, this.isActiveDelay);
     },
   },

@@ -1,17 +1,39 @@
 <template>
-  <div :class="className">
+  <div
+    class="base-bread-crumbs">
     <template
-      v-for="(entry, index) in routes"
-      :key="index">
+      v-for="({ route, label, showLabel, icon }, index) in routes"
+      :key="route">
       <BaseLink
         external-link-target="_self"
-        :source="entry.route"
-        :value="entry.label"
+        :identifier-property-value="route"
+        :value="label"
         :render-link-as="renderLinkAs"
-        class="base-bread-crumbs__link" /><span
-          v-if="index < routes.length - 1"
-          :key="`${index}-separator`"
-          class="base-bread-crumbs__separator">></span>
+        :additional-attributes="{ ariaCurrentValue: 'location' }"
+        :class="['base-bread-crumbs__link', { 'base-bread-crumbs__link--icon-only': showLabel === false }]">
+        <template
+          v-if="icon"
+          #label>
+          <span class="base-bread-crumbs__label">
+            <BaseIcon
+              :key="label"
+              :name="icon"
+              :title="showLabel === false ? label : undefined"
+              :class="['base-bread-crumbs__icon',
+                       { 'base-bread-crumbs__icon--with-label': showLabel !== false }]" />
+            <span
+              v-if="showLabel !== false"
+              class="base-bread-crumbs__label-text">
+              {{ label }}
+            </span>
+          </span>
+        </template>
+      </BaseLink>
+      <BaseIcon
+        v-if="index < routes.length - 1"
+        :key="`${route}-separator`"
+        name="next"
+        class="base-bread-crumbs__separator" />
     </template>
   </div>
 </template>
@@ -20,33 +42,34 @@
 /**
  * component to display breadcrumb-style navigation
  */
+import { defineAsyncComponent } from 'vue';
 import BaseLink from '@/components/BaseLink/BaseLink.vue';
 
 export default {
   name: 'BaseBreadCrumbs',
-  components: { BaseLink },
+  components: {
+    BaseLink,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m)),
+  },
   props: {
     /**
-     * specify an array with the properties `route` and `label` that should be used for
-     * navigation - these have to be internal
-     * links, i.e. without a protocol like `http:` or `mailto:` in the url
+     * specify an array with the properties `route`, `label` and (optional) `icon` and `showLabel` that
+     *  should be used for navigation - these have to be internal
+     *  links, i.e. without a protocol like `http:` or `mailto:` in the url
+     * `showLabel` set to false is only considered if the `icon` property is set!
      */
     routes: {
       type: Array,
       default: () => [{ route: '', label: '' }],
       validator: arr => !arr.some(
-        val => val.route
-            && (val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
+        val => (val.route
+            // check that link is specified without protocol
+            && !!(val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
               || val.route.match(/^mailto:/)
-              || val.route.match(/^tel:/)),
+              || val.route.match(/^tel:/)))
+          // and check that icon is specified when `showLabel` is
+          || (val.showLabel === false && !val.icon),
       ),
-    },
-    /**
-     * class name of the breadcrumb component, can be used for customization
-     */
-    className: {
-      type: String,
-      default: 'base-bread-crumbs',
     },
     /**
      * specify how link element should be rendered - this needs to be a
@@ -65,22 +88,68 @@ export default {
 @import "../../styles/variables";
 
 .base-bread-crumbs {
+  position: relative;
   color: $font-color-second;
   font-size: $font-size-small;
-  .base-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .base-bread-crumbs__link {
+    padding-right: $spacing-small-half;
+    display: flex;
+    align-items: center;
     color: $font-color-second;
+
+    &.base-bread-crumbs__link--icon-only {
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus, &:hover {
+      color: $app-color;
+    }
+
+    &:nth-child(n+2) {
+      padding-left: $spacing-small-half;
+    }
+
+    &:last-child {
+      text-decoration: underline;
+    }
+
+    .base-bread-crumbs__label {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .base-bread-crumbs__icon {
+        width: $icon-medium;
+        height: $icon-medium;
+        margin: $spacing-small-half 0;
+        flex-shrink: 0;
+
+        &.base-bread-crumbs__icon--with-label {
+          margin: $spacing-small-half $spacing-small-half $spacing-small-half 0;
+        }
+      }
+
+      .base-bread-crumbs__label-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
   }
-}
 
-.base-bread-crumbs__link {
-  padding-right: $spacing-small-half;
-
-  &:nth-child(n+2) {
-    padding-left: $spacing-small-half;
-  }
-
-  &:last-child {
-    text-decoration: underline;
+  .base-bread-crumbs__separator {
+    height: $icon-min;
+    width: $icon-min;
+    flex-shrink: 0;
+    color: $font-color-second;
   }
 }
 </style>

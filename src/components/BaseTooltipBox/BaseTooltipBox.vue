@@ -3,6 +3,7 @@
     ref="tooltipBody"
     v-click-outside="() => clickedOutside()"
     role="dialog"
+    :aria-labelledby="`baseTooltipBox-title-${_uid}`"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
@@ -14,6 +15,7 @@
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
         <div
+          :id="`baseTooltipBox-title-${_uid}`"
           class="base-tooltip-box__header__title">
           {{ modalTitle }}
         </div>
@@ -99,14 +101,25 @@ export default {
     /**
      * specify how the component is rendered on mobile resolutions
      *
-     * *box*: component is rendered at the `attachTo` HTMLElement
-     * *modal*: component is rendered as a modal popup
-     * *fullscreen*: component is rendered as ap popup with max height and width
+     * **box**: component is rendered at the `attachTo` HTMLElement
+     * **modal**: component is rendered as a modal popup
+     * **fullscreen**: component is rendered as ap popup with max height and width
      */
     typeOnMobile: {
       type: String,
       default: 'modal',
       validator: val => ['box', 'fullscreen', 'modal'].includes(val),
+    },
+    /**
+     * specify a threshold value in px for the box top position calculation
+     * Useful to prevent top alignment of the TooltipBox, for example, when there is a fixed-positioned header (BaseHeader).
+     *
+     * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
+     *       The property will be overwritten by the CSS variable.
+     */
+    thresholdTop: {
+      type: Number,
+      default: 0,
     },
   },
   emits: ['close'],
@@ -129,13 +142,15 @@ export default {
       },
       thresholdX: 2, // px, distance between tooltip and attachTo element
       thresholdY: 2, // px, distance between tooltip and attachTo element
-      spacing: 8, // px, distance from window left or right side
+      spacing: 8, // px, distance from window's left or right boundary
       bodyHeight: null,
       bodyInnerHeight: null,
       fadeOutTop: false,
       fadeOutBottom: false,
       // resize observer for specific element
       resizeObserver: null,
+      // mutation observer for specific element
+      mutationObserver: null,
       // guard for click-outside-event
       isClickOutsideActive: false,
     };
@@ -148,6 +163,52 @@ export default {
     isScrollable() {
       return this.bodyInnerHeight > this.bodyHeight;
     },
+    /**
+     * get the thresholdTop value from the CSS variables if defined,
+     * create a temporary ghost element and evaluate the computed style value,
+     * otherwise use the component prop
+     * @returns {number}
+     */
+    getThresholdTop() {
+      // get optional global css variable
+      const style = getComputedStyle(document.body);
+      const thresholdTopCssVar = style.getPropertyValue('--base-tooltip-box-threshold-top');
+
+      // do nothing if the css variable is not defined
+      if (!thresholdTopCssVar) return this.thresholdTop;
+
+      // check if the css variable contains only digits and return it
+      if (/^\d+$/.test(thresholdTopCssVar)) return Number(thresholdTopCssVar);
+
+      // create a ghost node element to evaluate top value in px
+      const elem = document.createElement('div');
+      elem.style.position = 'absolute';
+      elem.style.top = thresholdTopCssVar;
+      elem.style.visibility = 'hidden';
+      // append the ghost element to body
+      document.body.appendChild(elem);
+      // get computed style value
+      const computedTop = window.getComputedStyle(elem).top;
+      // remove non digits (px unit)
+      const thresholdTopAsNumber = Number(computedTop.replace(/\D/g, ''));
+      // remove ghost element
+      elem.remove();
+
+      // return value
+      return thresholdTopAsNumber;
+    },
+  },
+  watch: {
+    /**
+     * watch if attachTo has changed and calculate the component position again
+     */
+    attachTo() {
+      this.$nextTick(() => {
+        this.calcContentHeight();
+        this.calcFadeOuts();
+        this.calcPosition();
+      });
+    },
   },
   mounted() {
     // move the component to the body node to position it absolutely in the document
@@ -155,31 +216,36 @@ export default {
       .appendChild(this.$el);
 
     // Note: the click-outside event is executed immediately when the component is initialized.
-    //       to prevent this timing problem, the guard variable is set with a delay.
+    //       To prevent this timing problem, the guard variable is set with a delay.
     setTimeout(() => {
       this.isClickOutsideActive = true;
     }, 0);
 
-    // calc components position and activate it
-    this.calcPosition();
-    this.isActive = true;
+    // In SSR environment, the first position calculation is wrong.
+    // To prevent this timing problem, the calc and further functions are executed with a delay.
+    // Using nextTick() has no effect for whatever reason.
+    setTimeout(() => {
+      // calc components position and activate it
+      this.calcPosition();
+      this.isActive = true;
 
-    console.log('mounted', this.isPopUpLockEnabled());
-    // block body scrolling
-    this.toggleScrollLock(this.isPopUpLockEnabled());
+      // block body scrolling
+      this.toggleScrollLock(this.isPopUpLockEnabled());
 
-    // initialize the resize observer to calculate fade outs when content is resized
-    this.initObserver();
+      // initialize the resize observer to calculate fade outs when content is resized
+      this.initObserver();
 
-    // add additional event listeners
-    this.$refs.body.addEventListener('scroll', this.scrollHandler);
-    window.addEventListener('resize', this.resizeHandler);
-    window.addEventListener('keyup', this.escEventHandler);
+      // add additional event listeners
+      this.$refs.body.addEventListener('scroll', this.scrollHandler);
+      window.addEventListener('resize', this.resizeHandler);
+      window.addEventListener('keyup', this.escEventHandler);
+    }, 0);
   },
   beforeUnmount() {
     this.isActive = false;
     this.toggleScrollLock(false);
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
+    if (this.mutationObserver) this.mutationObserver.disconnect();
     this.$refs.body.removeEventListener('scroll', this.scrollHandler);
     window.removeEventListener('resize', this.resizeHandler);
     window.removeEventListener('keyup', this.escEventHandler);
@@ -190,9 +256,8 @@ export default {
      * @returns {boolean}
      */
     isPopUpLockEnabled() {
-      console.log(this.typeOnMobile, window.innerWidth);
       return (this.typeOnMobile === 'modal' || this.typeOnMobile === 'fullscreen')
-        && window.innerWidth <= 640;
+        && window.innerWidth < 640;
     },
     /**
      * calc content related heights
@@ -228,9 +293,9 @@ export default {
           // check if fits to the left
           && attachToRect.left > boxWidth + triangleWidth
           // check if box overlaps the window top
-          && !(attachToRect.y < boxHeight / 2)
+          && !(attachToRect.top + (attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
           // check if box overlaps the window bottom
-          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
+          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
           this.direction = 'left';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.left - boxWidth - triangleWidth - this.thresholdX}px`;
@@ -241,9 +306,9 @@ export default {
           // check if fits to the right
           && window.innerWidth - attachToRect.right > boxWidth + triangleWidth
           // check if box overlaps the window top
-          && !(attachToRect.y < boxHeight / 2)
+          && !((attachToRect.top + attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
           // check if box overlaps the window bottom
-          && !(attachToRect.y + boxHeight / 2 >= window.innerHeight)) {
+          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
           this.direction = 'right';
           this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
           this.css.left = `${attachToRect.right + triangleWidth + this.thresholdX}px`;
@@ -252,7 +317,7 @@ export default {
 
         if (direction === 'top'
           // check if fits to the top
-          && attachToRect.top > boxHeight + triangleHeight) {
+          && attachToRect.top - this.getThresholdTop > boxHeight + triangleHeight + this.thresholdY) {
           this.direction = 'top';
           this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -261,7 +326,8 @@ export default {
 
         if (direction === 'bottom'
           // check if fits to the bottom
-          && window.innerHeight - attachToRect.bottom > boxHeight + triangleHeight) {
+          && window.innerHeight - attachToRect.bottom
+          > boxHeight + triangleHeight + this.thresholdY + this.spacing) {
           this.direction = 'bottom';
           this.css.top = `${attachToRect.bottom + triangleHeight + this.thresholdY + scrollY}px`;
           this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
@@ -273,21 +339,21 @@ export default {
       // center the triangle by default
       this.css['--triangle-left'] = '50%';
 
-      // direction 'top' or 'bottom':
+      // Direction 'top' or 'bottom':
       // Check again if the box overlaps the window on the left or right side.
       // If so, reposition the box and adjust the triangle's position relative to the anchor point.
       if (!['top', 'bottom'].includes(this.direction)) {
         return;
       }
 
-      // box overlaps the window left side
+      // the box overlaps the window left side
       if (attachToRect.x < boxWidth / 2) {
         this.css.left = `${this.spacing}px`;
         this.css['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - this.spacing}px`;
         return;
       }
 
-      // box overlaps the window right side
+      // the box overlaps the window right side
       if (attachToRect.left + attachToRect.width / 2 + boxWidth / 2 > window.innerWidth) {
         this.css.left = '';
         this.css.right = `${this.spacing}px`;
@@ -328,24 +394,35 @@ export default {
       }
     },
     /**
-     * create resize observer for the content container
+     * create resize/mutation observer for the content container
      */
     initObserver() {
-      // create an observer with the calc heights and calc fadeout functions
+      // create a resize observer with calculation functions
       const resizeObserver = new ResizeObserver(() => {
         this.calcContentHeight();
         this.calcFadeOuts();
       });
-      // attach to relevant element
+
+      // create a mutation observer with calculation functions
+      const mutationObserver = new MutationObserver(() => {
+        this.calcContentHeight();
+        this.calcFadeOuts();
+        this.calcPosition();
+      });
+
+      // attach the observers to a specific element
       resizeObserver.observe(this.$refs.bodyInner);
-      // store it in variable
+      mutationObserver.observe(this.$refs.bodyInner, { childList: true, subtree: true });
+
+      // store them in variables
       this.resizeObserver = resizeObserver;
+      this.mutationObserver = mutationObserver;
     },
     /**
      * intercept resize event and close the component
      */
     resizeHandler() {
-      this.close();
+      this.calcPosition();
     },
     /**
      * intercept scroll event and set fade-outs
@@ -370,15 +447,19 @@ export default {
 
   .base-tooltip-box {
     position: absolute;
-    z-index: 1;
+    z-index: map-get($zindex, modal);
     min-width: 200px;
     max-height: 50vh;
+    max-width: calc(100% - $spacing);
     color: $font-color;
     background-color: #fff;
     visibility: hidden;
     opacity: 0;
     transition: opacity 150ms ease-in;
     filter: drop-shadow($tooltip-drop-shadow);
+    // Use the GPU to render the element. Otherwise, the drop-shadow
+    // will disappear after the opacity transition finishes on MacOS Safari
+    transform: translateZ(0);
 
     &__inner {
       position: relative;
@@ -389,6 +470,13 @@ export default {
 
     &__header {
       display: none;
+
+      &__title {
+        margin-right: $spacing-small;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     &__body {
@@ -436,6 +524,7 @@ export default {
 
     &__button {
       display: flex;
+      flex-shrink: 0;
       transition: $link-transition;
 
       &__icon {
@@ -467,6 +556,7 @@ export default {
         width: 100vw;
         height: 100vh;
         max-height: 100vh;
+        max-width: inherit;
         background-color: transparent;
         z-index: map-get($zindex, modal);
 
@@ -504,6 +594,8 @@ export default {
 
     &.base-tooltip-box--fullscreen-on-mobile {
       @media screen and (max-width: $mobile) {
+        max-width: inherit;
+
         .base-tooltip-box__inner {
           margin: 0;
           width: 100%;
