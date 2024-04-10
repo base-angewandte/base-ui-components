@@ -506,6 +506,10 @@ export default {
           }
         }
       }
+
+      .base-tooltip-box__body__inner {
+        overflow: hidden;
+      }
     }
 
     &__label {
