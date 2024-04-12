@@ -475,6 +475,7 @@ export default {
       margin: $spacing;
       flex: 1;
       overflow: auto;
+      max-height: calc(50vh - #{$spacing-large});
 
       @media screen and (max-width: $mobile) {
         max-height: 90vh;
