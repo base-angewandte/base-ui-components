@@ -483,6 +483,7 @@ export default {
       margin: $spacing;
       flex: 1;
       overflow: auto;
+      max-height: calc(50vh - #{$spacing-large});
 
       @media screen and (max-width: $mobile) {
         max-height: 90vh;
@@ -513,6 +514,10 @@ export default {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0), white);
           }
         }
+      }
+
+      .base-tooltip-box__body__inner {
+        overflow: hidden;
       }
     }
 

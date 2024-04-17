@@ -776,6 +776,11 @@ export default {
       immediate: true,
     },
     formOpen(val) {
+      /**
+       * in mode `form` when 'advanced search' button was clicked
+       * @event update:advanced-form-open
+       * @type {boolean}
+       */
       this.$emit('update:advanced-form-open', val);
     },
   },
