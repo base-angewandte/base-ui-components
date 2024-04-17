@@ -265,9 +265,9 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { extractNestedPropertyValue } from '@/utils/utils';
-import navigateList from '@/mixins/navigateList';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import i18n from '@/mixins/i18n';
+import { useListNavigation } from '@/composables/listNavigation';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -283,7 +283,7 @@ export default {
     BaseBoxButton: defineAsyncComponent(() => import('@/components/BaseBoxButton/BaseBoxButton.vue')),
     BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
   },
-  mixins: [i18n, navigateList],
+  mixins: [i18n],
   model: {
     prop: 'entryList',
     event: 'entries-changed',
@@ -659,6 +659,10 @@ export default {
     },
   },
   emits: ['entry-clicked', 'items-per-row-changed', 'submit-action', 'update:edit-mode', 'update:expanded', 'update:current-page-number', 'update:selected-list', 'entries-changed'],
+  setup() {
+    const { navigate } = useListNavigation();
+    return { navigate };
+  },
   data() {
     return {
       // internal representation of entry list to be able to

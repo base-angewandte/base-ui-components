@@ -385,8 +385,8 @@ import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInput
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import { createId, hasData, sort } from '@/utils/utils';
-import navigateMixin from '@/mixins/navigateList';
 import i18n from '@/mixins/i18n';
+import { useListNavigation } from '@/composables/listNavigation';
 
 export default {
   name: 'BaseAdvancedSearchRow',
@@ -398,7 +398,7 @@ export default {
     BaseSearch,
     BaseIcon,
   },
-  mixins: [navigateMixin, i18n],
+  mixins: [i18n],
   props: {
     /**
      * provide an id for each search row
@@ -682,6 +682,10 @@ export default {
     },
   },
   emits: ['update:applied-filter', 'fetch-autocomplete-results', 'is-active', 'option-selected', 'remove-filter', 'add-filter-row'],
+  setup() {
+    const { navigate } = useListNavigation();
+    return { navigate };
+  },
   data() {
     return {
       /**

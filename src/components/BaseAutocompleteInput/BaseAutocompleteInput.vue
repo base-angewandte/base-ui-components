@@ -90,7 +90,7 @@
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import { createId } from '@/utils/utils';
-import navigateMixin from '@/mixins/navigateList';
+import { useListNavigation } from '@/composables/listNavigation';
 
 /**
  * Input component allowing to select single values from a drop down that are filled into
@@ -103,9 +103,6 @@ export default {
     BaseInput,
     BaseDropDownList,
   },
-  mixins: [
-    navigateMixin,
-  ],
   props: {
     /**
      * input field settable from outside
@@ -275,6 +272,10 @@ export default {
     },
   },
   emits: ['update:modelValue', 'fetch-dropdown-entries', 'update:is-active', 'selected'],
+  setup() {
+    const { navigate } = useListNavigation();
+    return { navigate };
+  },
   data() {
     return {
       /**

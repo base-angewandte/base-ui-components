@@ -168,7 +168,7 @@ import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import i18n from '@/mixins/i18n';
-import navigateMixin from '@/mixins/navigateList';
+import { useListNavigation } from '@/composables/listNavigation';
 
 /** input field with chips functionalities */
 
@@ -181,7 +181,6 @@ export default {
   },
   mixins: [
     i18n,
-    navigateMixin,
   ],
   model: {
     prop: 'input',
@@ -497,6 +496,10 @@ export default {
     },
   },
   emits: ['hoverbox-active', 'update:selected-list', 'duplicate', 'removed', 'input', 'update:is-active'],
+  setup() {
+    const { navigate } = useListNavigation();
+    return { navigate };
+  },
   data() {
     return {
       /**

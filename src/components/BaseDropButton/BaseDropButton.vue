@@ -81,7 +81,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import navigateList from '@/mixins/navigateList';
+import { useListNavigation } from '@/composables/listNavigation';
 
 /**
  * An Element to have the functionality of several buttons in one element
@@ -96,7 +96,6 @@ export default {
   directives: {
     ClickOutside: vOnClickOutside,
   },
-  mixins: [navigateList],
   props: {
     /**
      * array of button options
@@ -144,6 +143,10 @@ export default {
     },
   },
   emits: ['clicked'],
+  setup() {
+    const { navigate } = useListNavigation();
+    return { navigate };
+  },
   data() {
     return {
       /**
@@ -206,12 +209,15 @@ export default {
     },
   },
   watch: {
-    buttonsInt() {
-      // if buttons changed the drop-down size might have as well - recalculate
-      // the position of the drop-down
-      // this might be obsolete now due to the v-click-outside but still leaving it here in case
-      // there might be any other scenario where drop-down size changes
-      this.calculateDropDownPosition();
+    buttonsInt: {
+      handler() {
+        // if buttons changed the drop-down size might have as well - recalculate
+        // the position of the drop-down
+        // this might be obsolete now due to the v-click-outside but still leaving it here in case
+        // there might be any other scenario where drop-down size changes
+        this.calculateDropDownPosition();
+      },
+      deep: true,
     },
     showOptions(val) {
       if (val) {

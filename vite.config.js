@@ -110,6 +110,9 @@ export default defineConfig({
   },
   define: {
     'process.env': {},
+    // enable hydration mismatch details in production build
+    // TODO: this should probably be set false in future
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true',
   },
   server: {
     port: 8080,
