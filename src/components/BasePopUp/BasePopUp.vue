@@ -40,7 +40,9 @@
       <div class="popup-content">
         <!-- @slot slot to fill the body of the box with custom content -->
         <slot />
-        <div class="popup-button-row">
+        <div
+          v-if="showButtonRow"
+          class="popup-button-row">
           <!-- @slot custom button row -->
           <slot name="button-row">
             <BaseButton
@@ -178,6 +180,13 @@ export default {
     fullscreenOnMobile: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * button row visibility
+     */
+    showButtonRow: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
