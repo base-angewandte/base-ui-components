@@ -231,14 +231,13 @@
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
                 :drop-down-options="option[autocompletePropertyNames.data]"
-                :active-option.sync="activeEntry"
+                :active-option="activeEntry"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
                 :label-property-name="labelPropertyName.autocompleteOption"
                 class="base-advanced-search-row__autocomplete-options"
-                @update:active-option="setCollection(option[autocompletePropertyNames.id])"
                 @update:selected-option="addOption(
                   $event,
                   option[autocompletePropertyNames.id],
@@ -1232,15 +1231,6 @@ export default {
 
     /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
 
-    /**
-     * function for setting the currently active collection
-     *
-     * @param {string} collection - the collection string to set
-     * as active collection (triggered when active entry changes)
-     */
-    setCollection(collection) {
-      this.activeCollection = this.activeEntry ? collection : '';
-    },
     /**
      * function to add any entry to the BaseSearch selectedChips list (since basically all
      * base search input is handled as chips)
