@@ -231,7 +231,7 @@
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
                 :drop-down-options="option[autocompletePropertyNames.data]"
-                :active-option="activeEntry"
+                :active-option="activeCollection === option[autocompletePropertyNames.id] ? activeEntry : {}"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
