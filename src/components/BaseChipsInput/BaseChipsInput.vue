@@ -842,6 +842,9 @@ export default {
       // optional close dropdown after selection
       if (this.closeDropdownOnOptionSelect && this.isActive) {
         this.chipsInputActive = false;
+        if (this.inputElem) {
+          this.inputElem.blur();
+        }
       }
     },
   },
