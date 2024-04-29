@@ -62,7 +62,7 @@
             :render-link-as="renderAs"
             :value="showShortLabel && activeElement.shortLabel ?
               activeElement.shortLabel : activeElement.label"
-            aria-current="page"
+            :additional-attributes="{ ariaCurrentValue: 'page', exactPath: true }"
             :identifier-property-value="activeElement.route"
             class="base-navigation__nav-item-link
                    base-navigation__nav-item-link--active">
