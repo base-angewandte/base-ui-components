@@ -9,7 +9,7 @@
         :identifier-property-value="route"
         :value="label"
         :render-link-as="renderLinkAs"
-        :additional-attributes="{ ariaCurrentValue: 'location' }"
+        :additional-attributes="{ ariaCurrentValue: 'page' }"
         :class="['base-bread-crumbs__link', { 'base-bread-crumbs__link--icon-only': showLabel === false }]">
         <template
           v-if="icon"
