@@ -1086,7 +1086,7 @@ export default {
         }
         // if filter type is text and the value was not added in that form yet also add it
         // (which will trigger search)
-      } else if (!val && this.filter.type === 'text' && this.currentInput
+      } else if (!val && this.filter.type === 'text'
         && this.filter.filter_values.join() !== this.currentInput) {
         this.addOption(this.currentInput);
       }
