@@ -1037,6 +1037,7 @@ export default {
         }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * when current input changes emit this to parent component which should
