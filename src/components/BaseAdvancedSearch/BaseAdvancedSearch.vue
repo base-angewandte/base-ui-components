@@ -1261,21 +1261,24 @@ export default {
 <style lang="scss" scoped>
 @import "../../styles/variables";
 
-.base-advanced-search__filter-row {
-  margin-bottom: $spacing;
-}
+.base-advanced-search {
+  .base-advanced-search__filter-row {
+    margin-bottom: $spacing;
+  }
 
-.base-advanced-search__expand-button {
-  border-left: $separation-line;
-  margin-left: $spacing-small;
-  padding-right: $spacing-small;
-}
+  .base-advanced-search__expand-button {
+    border-left: $separation-line;
+    margin-left: $spacing-small;
+    padding-right: $spacing-small;
+  }
 
-.base-advanced-search__search-form {
-  border-top: $separation-line;
+  .base-advanced-search__search-form {
+    border-top: $separation-line;
 
-  &.base-advanced-search__search-form--hidden {
-    display: none;
+    &.base-advanced-search__search-form--hidden {
+      display: none;
+    }
   }
 }
+
 </style>
