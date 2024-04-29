@@ -507,7 +507,9 @@ export default {
       }
 
       &.base-navigation__nav-item-link--active {
-        box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
+        // add one pixel to active border and make smaller again by reducing the spread-radius
+        // otherwise there is an artefact line left or right of the element sometimes
+        box-shadow: $box-shadow-reg, inset 0 (-#{$border-active-width + 1}) 0 -1px $app-color;
       }
 
       .base-navigation__nav-item-link__text--truncation {
