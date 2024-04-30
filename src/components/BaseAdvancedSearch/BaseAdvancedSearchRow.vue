@@ -237,6 +237,9 @@
                 :language="language"
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
                 :label-property-name="labelPropertyName.autocompleteOption"
+                :use-highlight-string-match="highlightAutocompleteMatch"
+                :highlight-string-tags="highlightAutocompleteTags"
+                :highlight-string-match="currentInput"
                 class="base-advanced-search-row__autocomplete-options"
                 @update:selected-option="addOption(
                   $event,
@@ -679,6 +682,23 @@ export default {
     dateFieldDelay: {
       type: Number,
       default: 0,
+    },
+    /**
+     * set this flag to `true` to highlight autocomplete option characters that match
+     *  the current search input string
+     */
+    highlightAutocompleteMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `highlightAutocompleteMatch` is set `true`
+     *  provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightAutocompleteTags: {
+      type: Array,
+      default: () => ([]),
     },
   },
   data() {

@@ -24,6 +24,8 @@
         :assistive-text="assistiveText"
         :date-field-delay="dateFieldDelay"
         :language="language"
+        :highlight-autocomplete-match="highlightAutocompleteMatch"
+        :highlight-autocomplete-tags="highlightAutocompleteTags"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
@@ -50,6 +52,8 @@
       :assistive-text="assistiveText"
       :date-field-delay="dateFieldDelay"
       :language="language"
+      :highlight-autocomplete-match="highlightAutocompleteMatch"
+      :highlight-autocomplete-tags="highlightAutocompleteTags"
       v-bind="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
@@ -457,6 +461,23 @@ export default {
     advancedFormOpen: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * set this flag to `true` to highlight autocomplete option characters that match
+     *  the current search input string
+     */
+    highlightAutocompleteMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `highlightAutocompleteMatch` is set `true`
+     *  provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightAutocompleteTags: {
+      type: Array,
+      default: () => ([]),
     },
   },
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],

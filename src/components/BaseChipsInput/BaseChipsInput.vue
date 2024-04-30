@@ -54,7 +54,12 @@
                 :item="entry.option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                {{ getLangLabel(entry.option[labelPropertyName], true) }}
+                <template v-if="highlightStringMatch">
+                  <span v-html="highlight(getLangLabel(entry.option[labelPropertyName], true))" />
+                </template>
+                <template v-else>
+                  {{ getLangLabel(entry.option[labelPropertyName], true) }}
+                </template>
               </slot>
             </template>
           </template>
@@ -120,7 +125,7 @@
 </template>
 
 <script>
-import { createId } from '@/utils/utils';
+import { createId, highlightText } from '@/utils/utils';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
@@ -441,6 +446,23 @@ export default {
       type: [Object, null],
       default: null,
     },
+    /**
+     * set this flag to `true` to highlight autocomplete option characters that match
+     *  the current search input string
+     */
+    highlightStringMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `highlightAutocompleteMatch` is set `true`
+     *  provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightStringTags: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   data() {
     return {
@@ -570,6 +592,15 @@ export default {
     },
     internalId() {
       return this.id || createId();
+    },
+    /**
+     * create an object out of prop `highlightStringTags` so it can be
+     *  spread into the options of the `highlightText` function
+     * @returns {{highlightTags: []}|{}}
+     */
+    highlightTags() {
+      return this.highlightStringTags?.length
+        ? { highlightTags: this.highlightStringTags } : {};
     },
   },
   watch: {
@@ -846,6 +877,19 @@ export default {
           this.inputElem.blur();
         }
       }
+    },
+    /**
+     * function to highlight characters of a string
+     * @param {string} word - the option that should be matched with query string
+     * @returns {string} - the string to fill into v-html
+     */
+    highlight(word) {
+      return highlightText({
+        word,
+        queryString: this.input,
+        // this is an empty object if prop `highlightStringTags` was not used
+        ...this.highlightTags,
+      });
     },
   },
 };

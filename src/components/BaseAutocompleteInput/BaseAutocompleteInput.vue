@@ -35,6 +35,9 @@
           :list-id="`${id}-list-identifier`"
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
+          :use-highlight-string-match="highlightStringMatch"
+          :highlight-string-tags="highlightStringTags"
+          :highlight-string-match="inputInt"
           class="base-autocomplete-input__drop-down"
           @click.native.stop=""
           @touchstart.native.stop=""
@@ -276,6 +279,23 @@ export default {
     dynamicFetch: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * set this flag to `true` to highlight autocomplete option characters that match
+     *  the current search input string
+     */
+    highlightStringMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `highlightAutocompleteMatch` is set `true`
+     *  provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightStringTags: {
+      type: Array,
+      default: () => ([]),
     },
   },
   data() {
