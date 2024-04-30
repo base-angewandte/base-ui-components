@@ -523,7 +523,6 @@ export default {
   .base-navigation__nav-items {
     display: flex;
     width: 100%;
-    justify-content: center;
     align-items: center;
 
     .base-navigation__nav-item {
