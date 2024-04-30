@@ -29,7 +29,14 @@
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
-        @fetch-autocomplete-results="fetchAutocomplete($event, index)" />
+        @fetch-autocomplete-results="fetchAutocomplete($event, index)">
+        <template #autocomplete-option="{ option: autocompleteOption }">
+          <!-- @slot to allow for modification of the autocomplete option -->
+          <slot
+            name="autocomplete-option"
+            :option="autocompleteOption" />
+        </template>
+      </BaseAdvancedSearchRow>
     </template>
 
     <!-- MAIN FILTER -->
@@ -92,6 +99,12 @@
             :date-time-text="advancedSearchText.collapsedDateTime"
             @remove-all="removeAllFilters" />
         </div>
+      </template>
+      <template #autocomplete-option="{ option: autocompleteOption }">
+        <!-- @slot to allow for modification of the autocomplete option -->
+        <slot
+          name="autocomplete-option"
+          :option="autocompleteOption" />
       </template>
     </BaseAdvancedSearchRow>
   </div>

@@ -244,7 +244,14 @@
                 @update:selected-option="addOption(
                   $event,
                   option[autocompletePropertyNames.id],
-                )" />
+                )">
+                <template #option="{ option: autocompleteOption }">
+                  <!-- @slot to allow for modification of the autocomplete option -->
+                  <slot
+                    name="autocomplete-option"
+                    :option="autocompleteOption" />
+                </template>
+              </BaseDropDownList>
             </div>
           </template>
 
