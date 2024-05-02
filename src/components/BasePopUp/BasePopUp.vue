@@ -303,6 +303,7 @@ export default {
 
           .popup-remove {
             width: $icon-medium;
+            min-width: $icon-medium;
             cursor: pointer;
           }
         }
