@@ -439,6 +439,7 @@ export default {
     /**
      * set this flag to `true` to highlight autocomplete option characters that match
      *  the current search input string
+     *  this will only have effect when the slot `drop-down-entry` is not used
      */
     highlightStringMatch: {
       type: Boolean,
@@ -448,6 +449,7 @@ export default {
      * if `highlightAutocompleteMatch` is set `true`
      *  provide tag names to style the matched characters
      *  (without '<' and '>', e.g. ['b'] for <b>)
+     *  this will only have effect when the slot `drop-down-entry` is not used
      */
     highlightStringTags: {
       type: Array,
