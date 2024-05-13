@@ -17,7 +17,9 @@
         <div
           :id="`baseTooltipBox-title-${_uid}`"
           class="base-tooltip-box__header__title">
-          {{ modalTitle }}
+          <span class="base-tooltip-box__header__title__inner">
+            {{ modalTitle }}
+          </span>
         </div>
         <button
           title="close"
@@ -469,6 +471,10 @@ export default {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+
+        &__inner {
+          display: inline;
+        }
       }
     }
 
