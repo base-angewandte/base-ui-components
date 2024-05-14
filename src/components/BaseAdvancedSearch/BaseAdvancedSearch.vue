@@ -1137,6 +1137,9 @@ export default {
      * function triggered when 'advanced search' button is clicked in 'form' mode
      */
     openAdvancedSearch() {
+      // close the main search autocomplete drop down since this is not in user focus
+      // anymore
+      this.$refs.mainSearch.isActive = false;
       // toggle form
       this.formOpen = !this.formOpen;
     },
