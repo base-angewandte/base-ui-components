@@ -295,6 +295,14 @@ export default {
         align-items: center;
         flex-shrink: 0;
 
+        .popup-title {
+          margin-right: $spacing-small;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
         .base-popup__close-button {
           &:active, &:focus {
             color: $app-color;
