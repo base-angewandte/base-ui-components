@@ -1072,18 +1072,21 @@ export default {
      * the values to filter.filter_values if type is 'date' or 'daterange'
      * @param {string} val - the search string
      */
-    currentInput(val) {
-      // if filter type is text - just emit for fetching autocomplete results
-      if (this.useAutocompleteFunctionality) {
-        /**
-         * event emitted when input string for text or chips filter changes
-         *
-         * @event fetch-autocomplete-results
-         * @property {string} input - the input string
-         * @property {Filter} filter - the filter currently applied
-         */
-        this.$emit('fetch-autocomplete-results', { input: val, filter: this.filter });
-      }
+    currentInput: {
+      handler(val) {
+        // if filter type is text - just emit for fetching autocomplete results
+        if (this.useAutocompleteFunctionality) {
+          /**
+           * event emitted when input string for text or chips filter changes
+           *
+           * @event fetch-autocomplete-results
+           * @property {string} input - the input string
+           * @property {Filter} filter - the filter currently applied
+           */
+          this.$emit('fetch-autocomplete-results', { input: val, filter: this.filter });
+        }
+      },
+      immediate: true,
     },
     /**
      * if 'isActive' is set true reset the filterFade (for mobile filter view) to
