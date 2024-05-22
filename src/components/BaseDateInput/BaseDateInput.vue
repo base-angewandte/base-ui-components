@@ -71,6 +71,7 @@
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('from', $event)"
+            @input.stop=""
             v-on="inputListeners">
             <template #input>
               <div
@@ -83,8 +84,8 @@
                   :lang="lang[language]"
                   :open="fromOpen"
                   :type="isFromTimeField ? 'time' : minDateView"
-                  :format="isFromTimeField ? 'HH:mm' : dateFormatDisplay"
-                  :value-type="isFromTimeField ? 'format' : dateFormatInt"
+                  :format="isFromTimeField ? 'HH:mm' : datePickerValueFormat"
+                  :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('from')"
                   @click.native.prevent="onInputClick"
@@ -96,7 +97,7 @@
                     <input
                       :id="`input-${id}-from`"
                       ref="inputFrom"
-                      v-model="inputFrom"
+                      :value="inputFrom"
                       :placeholder="isFromTimeField ? placeholder.time || placeholder
                         : placeholder.date || placeholder"
                       :type="'text'"
@@ -154,6 +155,7 @@
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('to', $event)"
+            @input.stop=""
             v-on="inputListeners">
             <template #input>
               <div
@@ -166,8 +168,8 @@
                   :lang="lang[language]"
                   :open="toOpen"
                   :type="isToTimeField ? 'time' : minDateView"
-                  :format="isToTimeField ? 'HH:mm' : dateFormatDisplay"
-                  :value-type="isToTimeField ? 'format' : dateFormatInt"
+                  :format="isToTimeField ? 'HH:mm' : datePickerValueFormat"
+                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
                   @click.native.prevent="onInputClick"
@@ -179,7 +181,7 @@
                     <input
                       :id="`input-${id}-to`"
                       ref="inputTo"
-                      v-model="inputTo"
+                      :value="inputTo"
                       :placeholder="isToTimeField ? placeholder.time || placeholder
                         : placeholder.date || placeholder"
                       :type="'text'"
@@ -557,20 +559,15 @@ export default {
      */
     datePickerValueFormat() {
       if (this.format === 'year' || this.dateFormatInt === 'YYYY') {
-        return 'YYYY';
+        // use single letter for year here to allow negative dates
+        return 'Y';
       }
       if (this.format === 'month' || this.dateFormatInt === 'MM.YYYY') {
-        return 'YYYY-MM';
+        // use single letter for year here to allow negative dates
+        return 'MM.Y';
       }
-      return 'YYYY-MM-DD';
-    },
-    /**
-     * compute the date format needed for the date picker (display!)
-     * TODO: check if this is still needed with custom input
-     * @returns {string}
-     */
-    dateFormatDisplay() {
-      return this.datePickerValueFormat.split('-').reverse().join('.');
+      // use single letter for year here to allow negative dates
+      return 'DD.MM.Y';
     },
     /**
      * if the format is settable this.format is date_year and can not be
@@ -609,7 +606,7 @@ export default {
     inputFrom: {
       /**
        * get back the appropriate inputInt attribute value
-       * @returns {string}
+       * @returns {string} - a date in the format DD.MM.YYYY
        */
       get() {
         // if it is a time field just return the time_from value
@@ -618,24 +615,29 @@ export default {
         }
         // else it is a date (either single or date_from) --> convert it into the
         // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
-        return this.dateDisplay(this.inputInt.date || this.inputInt.date_from);
+        return this.parseToDateDisplay(this.inputInt.date || this.inputInt.date_from);
       },
       /**
        * also assign them again accordingly
        * @param {string} val - the value provided by the input element
+       * @param {string} oldValue - the previous value of inputFrom
        */
-      set(val) {
+      set(val, oldValue) {
+        let newDate = val;
         if (this.isFromTimeField) {
-          this.inputInt.time_from = val;
-        } else if (this.inputProperties.includes('date_from')) {
-          this.inputInt.date_from = this.dateStorage(val);
+          this.inputInt.time_from = newDate;
         } else {
-          this.inputInt.date = this.dateStorage(val);
+          newDate = this.parseToDateStorage(val);
+          if (this.inputProperties.includes('date_from')) {
+            this.inputInt.date_from = newDate;
+          } else {
+            this.inputInt.date = newDate;
+          }
         }
         // watching of computed values does not work so emit event for altered inputInt right here
         // the actual value is not needed here since data were transformed and
         // original object structure with correct data is retrieved with function getInputData
-        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+        if (newDate !== oldValue) {
           this.emitData();
         }
       },
@@ -656,29 +658,32 @@ export default {
           return this.inputInt.time || this.inputInt.time_to;
         }
         // else return the date_to attribute value
-        return this.dateDisplay(this.inputInt.date_to);
+        return this.parseToDateDisplay(this.inputInt.date_to);
       },
       /**
        * also assign them again accordingly
        * @param {string} val - the value provided by the input element
+       * @param {string} oldValue - the previous value of inputTo
        */
-      set(val) {
+      set(val, oldValue) {
+        let newValue = val;
         // check if field is date field
         if (!this.isToTimeField) {
+          newValue = this.parseToDateStorage(newValue);
           // if so, set date_to attribute value and transform value appropriately
           // TODO: this could be insufficient since currently no validity checks on input string
-          this.inputInt.date_to = this.dateStorage(val);
+          this.inputInt.date_to = newValue;
           // else check if type is timerange
         } else if (this.inputProperties.includes('time_from')) {
-          this.inputInt.time_to = val;
+          this.inputInt.time_to = newValue;
           // else assume the type is datetime
         } else {
-          this.inputInt.time = val;
+          this.inputInt.time = newValue;
         }
         // watching of computed values does not work so emit event for altered inputInt right here
         // the actual value is not needed here since data were transformed and
         // original object structure with correct data is retrieved with function getInputData
-        if (JSON.stringify(this.input) !== JSON.stringify(this.getInputData())) {
+        if (newValue !== oldValue) {
           this.emitData();
         }
       },
@@ -689,16 +694,17 @@ export default {
      * @returns {boolean}
      */
     isDateFormatYear() {
-      return ((this.isSingleDate && this.inputInt.date && this.inputInt.date.length <= 4)
-        || this.inputProperties.some(key => !!key.includes('date')
-          && this.inputInt[key] && this.inputInt[key].length <= 4));
+      return (this.isSingleDate && this.inputInt.date
+          && /^(-?[0-9]{1,4}|-[0-9]{0,4})$/.test(this.inputInt.date))
+        || (this.inputProperties.some(key => !!key.includes('date')
+          && this.inputInt[key] && /^(-?[0-9]{1,4}|-[0-9]{0,4})$/.test(this.inputInt[key])));
     },
     isDateFormatMonth() {
       return ((this.isSingleDate && this.inputInt.date
-          && this.inputInt.date.length > 4 && this.inputInt.date.length <= 7)
+          && /^(-?[0-9]{1,4}|-[0-9]{0,4})-[0-1]?[0-9]$/.test(this.inputInt.date))
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key]
-          && this.inputInt[key].length > 4 && this.inputInt[key].length <= 7));
+          && /^(-?[0-9]{1,4}|-[0-9]{0,4})-[0-1]?[0-9]$/.test(this.inputInt[key])));
     },
     /**
      * check if format switch tabs should be shown
@@ -831,7 +837,10 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          this.inputInt = this.isSingleDate ? { date: val } : { ...val };
+          const isDateTimeField = this.type === 'datetime';
+          this.inputFrom = isDateTimeField
+            ? val.date : val.date || val.date_from || val.time || val.time_from;
+          this.inputTo = isDateTimeField ? val.time : val.date_to || val.time_to;
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
@@ -875,15 +884,21 @@ export default {
               // date should be overwritten if month or year are different from
               // the already stored date
               if (!this.monthAndYearIdent(
-                this.inputInt[dateKey],
-                this.tempDateStore[dateKey],
-              )) {
+                // check if the positive dates are identical
+                this.removeYearMinusFromStorageDate(this.inputInt[dateKey], old),
+                (/^-/.test(this.tempDateStore[dateKey]) ? this.tempDateStore[dateKey].replace('-', '') : this.tempDateStore[dateKey]),
+                // and also check if the operator in front of year is identical
+              ) && this.isNegativeStorageDate(this.inputInt[dateKey], old)
+                === /^-/.test(this.tempDateStore[dateKey])) {
                 this.$set(this.tempDateStore, dateKey, this.inputInt[dateKey]);
               }
             });
         }
       }
-      this.convertDate();
+      this.convertDate(old);
+      // since inputInt is manipulated directly in this case (easier with Date conversions)
+      // inputFrom and inputTo setters are not triggered and we need to emit the new data manually
+      this.emitData();
     },
     /**
      * when input becomes inactive always also blur input field just in case
@@ -1018,14 +1033,25 @@ export default {
      * transform the date to the correct display format
      * @param {string} dateString - the date string in YYYY-MM-DD format
      */
-    dateDisplay(dateString) {
-      return dateString ? dateString.split('-').reverse().join('.') : '';
+    parseToDateDisplay(dateString) {
+      // if no date string was provided just return an empty string
+      if (!dateString) return '';
+      // now check if year is negative
+      const isNegativeYear = this.isNegativeStorageDate(dateString);
+      // if so, create a positive date string
+      const positiveDateString = isNegativeYear
+        ? this.removeYearMinusFromStorageDate(dateString) : dateString;
+      // now do the transformation and add the minus to the year again if necessary
+      return this.addYearMinusToDateDisplay(
+        positiveDateString.split('-').reverse().join('.'),
+        isNegativeYear,
+      );
     },
     /**
      * transform the date to the correct storage format
      * @param {string} dateString - the date string in DD.MM.YYYY format
      */
-    dateStorage(dateString) {
+    parseToDateStorage(dateString) {
       return dateString ? dateString.split('.').reverse().join('-') : '';
     },
     /**
@@ -1038,21 +1064,33 @@ export default {
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     handleInputKeydown(event, origin) {
-      let currentInputString = this[`input${origin}`];
+      let currentInputString = event.target.value;
       // get the key triggering the event
       const { key } = event;
       // now check for the specific input key to preventDefault and prevent unwanted
       // characters
       // create boolean to determine if it is a time field (otherwise date is assumed)
-      const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin === 'to');
+      const isTimeField = this.isTimeInputField(origin);
       // if time ':' is allowed in input regex - otherwise '.'
       const allowedFieldKey = isTimeField ? ':' : '\\.';
+      // check if '-' should be an allowed key
+      let allowMinus = false;
+      if ((this.dateFormatInt === 'DD.MM.YYYY' && /^\d{2}\.\d{2}\.\d{0,4}$/.test(currentInputString))
+        || (this.dateFormatInt === 'MM.YYYY' && /^\d{2}\.\d{0,4}$/.test(currentInputString))
+        || (this.dateFormatInt === 'YYYY' && /^\d{0,4}$/.test(currentInputString))) {
+        allowMinus = true;
+      }
       // create regex for allowed keys
-      const allowedKeysRegex = new RegExp(`([0-9]|${allowedFieldKey}|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)`);
+      const allowedKeysRegex = new RegExp(`([0-9${allowMinus ? '-' : ''}]|${allowedFieldKey}|Backspace|Delete|Tab|Enter|ArrowRight|ArrowLeft)`);
       // create regex that should not be allowed if max length is reached
       const disallowedKeysOnLengthRegex = new RegExp(`([0-9]|${allowedFieldKey})`);
       // get the max length for the respective format (for time: 'HH:mm' = 5)
-      const formatLength = isTimeField ? 5 : this.dateFormatInt.length;
+      // also check for a minus
+      let formatLength = isTimeField ? 5 : this.dateFormatInt.length;
+      if (!isTimeField && this.isNegativeDisplayDate(currentInputString)) {
+        // add one extra to formatLength for the '-' if date is negative
+        formatLength += 1;
+      }
       // check if
       // * key was not any of the allowed keys
       // * or was an allowed key but the length is to long for the format in
@@ -1062,7 +1100,7 @@ export default {
       // * if type is time and key was colon and last char was already a colon
       // * and also make sure copy & paste is allowed!
       if ((!allowedKeysRegex.test(key)
-        || (disallowedKeysOnLengthRegex.test(key) && this[`input${origin}`].length >= formatLength
+        || (disallowedKeysOnLengthRegex.test(key) && currentInputString.length >= formatLength
           && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
         || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
           || currentInputString.charAt(currentInputString.length - 1) === '.'))
@@ -1084,33 +1122,46 @@ export default {
     },
     /**
      * this function is triggered with the input event - it checks the length of the value and
-     * adds the '.' (date) or (':') or '0' in the correct places if necessary
+     * adds the '.' (date) or (':') or '0' in the correct places or removes '-' that was added at
+     * a wrong position if necessary
      * @param {InputEvent} event - the input event
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     checkDate(event, origin) {
       // get the value in question
-      const value = this[`input${origin}`];
-      const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
+      let modifiedValue = event.target.value;
+      // this is a workaround necessary because of the manual input event triggered in BaseInput
+      // (~line 610) but since input has not changed with this event we can easily filter it out
+      // by only applying the operations if input has changed
+      if (modifiedValue === this[`input${origin}`]) return;
+      // otherwise continue to check the input
+      // determine if input is coming from a time or date field
+      const isTimeField = this.isTimeInputField(origin);
+      // depending on that different characters need to be added
       const charToAdd = isTimeField ? ':' : '.';
       // check if value is present and if input type is other than 'deleteContentBackward' because
       // otherwise the dots can not be deleted anymore
-      if (value && event.inputType !== 'deleteContentBackward') {
+      if (modifiedValue && event.inputType !== 'deleteContentBackward') {
+        // remove a non-matching '-' character
+        if (modifiedValue !== '-' && !this.isNegativeDisplayDate(modifiedValue)) {
+          modifiedValue = modifiedValue.replace('-', '');
+        }
         // now check the date format and if input so far matches the appropriate regex
-        if ((!isTimeField && this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}$|\d{2}\.\d{2})$/.test(value))
-            || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(value))) {
+        if ((!isTimeField && this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}$|\d{2}\.\d{2})$/.test(modifiedValue))
+            || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(modifiedValue))) {
           // if so - add a period character
-          this[`input${origin}`] = `${value}${charToAdd}`;
+          modifiedValue = `${modifiedValue}${charToAdd}`;
         }
         const firstTwoDigitsRegex = new RegExp(`^[1-9]${isTimeField ? ':' : '\\.'}$`);
         // check if input was a period - if yes - check date validity and add zeros if necessary
-        if (firstTwoDigitsRegex.test(value)) {
-          this[`input${origin}`] = `0${this[`input${origin}`]}`;
-        } else if (/^\d{2}\.\d\.$/.test(value)) {
-          const [day, month, year] = value.split('.');
-          this[`input${origin}`] = `${day}.0${month}.${year}`;
+        if (firstTwoDigitsRegex.test(modifiedValue)) {
+          modifiedValue = `0${modifiedValue}`;
+        } else if (/^\d{2}\.\d\.$/.test(modifiedValue)) {
+          const [day, month, year] = modifiedValue.split('.');
+          modifiedValue = `${day}.0${month}.${year}`;
         }
       }
+      this[`input${origin}`] = modifiedValue;
     },
     /**
      * this function is triggered with the blur event on the input and does a last check on the
@@ -1118,13 +1169,13 @@ export default {
      * @param {string} origin - is event coming from 'from' or 'to' field in title case
      */
     checkDateValidity(origin) {
-      // get the value in question
-      let value = this[`input${origin}`];
+      // important and mostly different checks to make depending if value is date or time
+      // so save that in variable
+      const isTimeField = this.isTimeInputField(origin);
+      // since Date() has problems with negative dates just remove the '-' and add it again after!
+      let positiveDate = this.removeYearMinusFromDisplayDate(this[`input${origin}`]);
       // check if there is a value present
-      if (value) {
-        // important and mostly different checks to make depending if value is date or time
-        // so save that in variable
-        const isTimeField = this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
+      if (positiveDate) {
         // also save the current format length
         const formatLength = isTimeField ? 5 : this.dateFormatInt.length;
         // get the separator depending on time or date field
@@ -1133,107 +1184,103 @@ export default {
         // format and value string)
         const numberFormatParts = isTimeField ? 2 : this.dateFormatInt.split('.').length;
         // first check if periods (date) or colons (time) are too many
-        if (value.split(separator).length > numberFormatParts) {
+        if (positiveDate.split(separator).length > numberFormatParts) {
           // just remove all the periods or colons - there the next check will add some again
-          this[`input${origin}`] = value.replaceAll('.', '');
-          value = this[`input${origin}`];
+          positiveDate = positiveDate.replaceAll('.', '');
         }
         // check if there are too little separators
-        if (numberFormatParts > value.split(separator).length) {
+        if (numberFormatParts > positiveDate.split(separator).length) {
           // check if day and month (for DDMMYYYY) or month and year (for MMYYYY) or time
           // are without period or colon respectively
-          if (formatLength !== 4 && /^\d{3}/.test(value)) {
+          if (formatLength !== 4 && /^\d{3}/.test(positiveDate)) {
             // this assumes the first two digits are for day or month respectively!
             // TODO: not ideal that 2 digits are assumed - see if this can be improved
-            this[`input${origin}`] = `${value.slice(0, 2)}${separator}${value.slice(2, value.length)}`;
-            value = this[`input${origin}`];
+            positiveDate = `${positiveDate.slice(0, 2)}${separator}${positiveDate.slice(2, positiveDate.length)}`;
           }
           // check if there is a second period between month and year (for DDMMYYYY)
-          if (this.dateFormatInt === 'DD.MM.YYYY' && formatLength !== 4 && /^\d{2}\.\d{3}/.test(value)) {
+          if (this.dateFormatInt === 'DD.MM.YYYY' && formatLength !== 4 && /^\d{2}\.\d{3}/.test(positiveDate)) {
             // this assumes there are two digits for day and month respectively!
             // TODO: not ideal that 2 digits are assumed - see if this can be improved
-            this[`input${origin}`] = `${value.slice(0, 5)}.${value.slice(5, value.length)}`;
-            value = this[`input${origin}`];
+            positiveDate = `${positiveDate.slice(0, 5)}.${positiveDate.slice(5, positiveDate.length)}`;
           }
         }
         // second check if the length of the value is correct
-        if (value.length !== formatLength) {
+        if (positiveDate.length !== formatLength) {
           // distinguish between date and time string
           if (isTimeField) {
             // check if minutes are missing
-            if (/^\d{1,2}:?$/.test(value)) {
-              const [hours] = value.split(':');
-              this[`input${origin}`] = `${hours}:00`;
-              value = this[`input${origin}`];
+            if (/^\d{1,2}:?$/.test(positiveDate)) {
+              const [hours] = positiveDate.split(':');
+              positiveDate = `${hours}:00`;
             }
             // check if zeros out front are missing from hour
-            if (/^\d:\d{1,2}$/.test(value)) {
-              const [hours, minutes] = value.split(':');
-              this[`input${origin}`] = `0${hours}:${minutes}`;
-              value = this[`input${origin}`];
+            if (/^\d:\d{1,2}$/.test(positiveDate)) {
+              const [hours, minutes] = positiveDate.split(':');
+              positiveDate = `0${hours}:${minutes}`;
             }
             // check if zeros out front are missing from minute
-            if (/^\d{2}:\d$/.test(value)) {
-              const [hours, minutes] = value.split(':');
-              this[`input${origin}`] = `${hours}:0${minutes}`;
-              value = this[`input${origin}`];
+            if (/^\d{2}:\d$/.test(positiveDate)) {
+              const [hours, minutes] = positiveDate.split(':');
+              positiveDate = `${hours}:0${minutes}`;
             }
           } else {
-            // first check reason for length mismatch is year having only two digits or is
+            // first check reason for length mismatch is year is
             // completely missing for date format
-            if (this.dateFormatInt === 'DD.MM.YYYY' && /^\d{1,2}\.\d{1,2}\.?(\d{0}|\d{2})$/.test(value)) {
+            if (this.dateFormatInt === 'DD.MM.YYYY' && /^\d{1,2}\.\d{1,2}\.?(\d{0,3})$/.test(positiveDate)) {
               // determine current year
               const currentYear = new Date().getFullYear();
-              const [day, month, year] = value.split('.');
-              // repair date and add first two year digits - if date more than 10 years to the
-              // future - make it 20. century
-              const century = (currentYear).toString().slice(0, 2);
-              this[`input${origin}`] = `${day}.${month}.${year > (currentYear + 10).toString().slice(2, 4)
-                ? Number(century - 1) : century}${year || currentYear.toString().slice(2, 4)}`;
-              value = this[`input${origin}`];
+              const [day, month, year] = positiveDate.split('.');
+              if (!year) {
+                // repair date and add the year if it is missing
+                positiveDate = `${day}.${month}.${currentYear}`;
+                // else assume there are digits missing from the year and add 0
+              } else {
+                positiveDate = `${day}.${month}.${year.padStart(4, '0')}`;
+              }
             }
             // for month format
-            if (this.dateFormatInt === 'MM.YYYY' && /^\d{1,2}\.?(\d{0}|\d{2})$/.test(value)) {
+            if (this.dateFormatInt === 'MM.YYYY' && /^\d{1,2}\.?(\d{0}|\d{2})$/.test(positiveDate)) {
               // determine current year
               const currentYear = new Date().getFullYear();
-              const [month, year] = value.split('.');
+              const [month, year] = positiveDate.split('.');
               // repair date and add first two year digits - if date more than 10 years to the
               // future - make it current century - otherwise last century
               const century = (currentYear).toString().slice(0, 2);
-              this[`input${origin}`] = `${month}.${year > (currentYear + 10).toString().slice(2, 4)
+              positiveDate = `${month}.${year > (currentYear + 10).toString().slice(2, 4)
                 ? Number(century - 1) : century}${year || currentYear.toString().slice(2, 4)}`;
-              value = this[`input${origin}`];
             }
             // second check if the reason for the length not matching is that the day is
             // missing a zero
-            if (this.dateFormatInt === 'DD.MM.YYYY' && /^[1-9]\.\d{1,2}\.\d{4}$/.test(value)) {
+            if (this.dateFormatInt === 'DD.MM.YYYY' && /^[1-9]\.\d{1,2}\.\d{4}$/.test(positiveDate)) {
               // get the values
-              const [day, month, year] = value.split('.');
+              const [day, month, year] = positiveDate.split('.');
               // repair date and add a zero to day
-              this[`input${origin}`] = `0${day}.${month}.${year}`;
-              value = this[`input${origin}`];
+              positiveDate = `0${day}.${month}.${year}`;
             }
             // second check if the reason for mismatching length is that the zero in month
             // is missing
-            if (['DD.MM.YYYY', 'MM.YYYY'].includes(this.dateFormatInt) && /^\d{2}?\.?[1-9]\.\d{4}$/.test(value)) {
+            if (['DD.MM.YYYY', 'MM.YYYY'].includes(this.dateFormatInt) && /^\d{2}?\.?[1-9]\.\d{4}$/.test(positiveDate)) {
               // get values, reverse in order to be able to get also correct values for format
               // 'month'
-              const [year, month, day] = value.split('.').reverse();
+              const [year, month, day] = positiveDate.split('.').reverse();
               // repair date and add missing zero to month
-              this[`input${origin}`] = `${day}.0${month}.${year}`;
-              value = this[`input${origin}`];
+              positiveDate = `${day}.0${month}.${year}`;
+            }
+            // if format is year assume there are zeros in the year missing
+            if (this.dateFormatInt === 'YYYY') {
+              positiveDate = `${positiveDate.padStart(4, '0')}`;
             }
           }
           // now check if time/date has now the correct length - if not still remove the value
-          if (value.length !== formatLength) {
-            this[`input${origin}`] = '';
+          if (positiveDate.length !== formatLength) {
+            positiveDate = '';
           }
         }
         // now check for general validity
         if (isTimeField) {
           // just add random date to see if time is valid
-          if (Number.isNaN(Date.parse(`12.12.1212T${value}`))) {
-            let [hours, minutes] = value.split(':');
+          if (Number.isNaN(Date.parse(`12.12.1212T${positiveDate}`))) {
+            let [hours, minutes] = positiveDate.split(':');
             // check if valid hours
             if (!/^([0-1][0-9]|2[0-4])$/.test(hours)) {
               hours = '00';
@@ -1245,26 +1292,25 @@ export default {
             // construct a new time
             const newTime = `${hours}:${minutes}`;
             // now check again if time is valid now if yes assign, if no delete the string
-            this[`input${origin}`] = Number.isNaN(Date.parse(`12.12.1212T${newTime}`)) ? newTime : '';
-            value = this[`input${origin}`];
+            positiveDate = Number.isNaN(Date.parse(`12.12.1212T${newTime}`)) ? newTime : '';
           }
         } else {
           // now truly check if date is a valid date
-          if (Number.isNaN(Date.parse(this.dateStorage(value)))) {
+          if (Number.isNaN(Date.parse(this.parseToDateStorage(positiveDate)))) {
             // TODO: check if date has appropriate number of periods
-            const [year, month, day] = value.split('.').reverse();
+            const [year, month, day] = positiveDate.split('.').reverse();
             if (this.dateFormatInt === 'DD.MM.YYYY') {
               // TODO: could this check already be done on input???
               // check if something is wrong with the day
               if (!/^(0[1-9]|[1-2][0-9]|3[0-1])/.test(day)) {
                 // replace day with appropriate value
-                this[`input${origin}`] = `01.${month}.${year}`;
+                positiveDate = `01.${month}.${year}`;
               }
             } if (this.dateFormatInt !== 'YYYY') {
               // check if something is wrong with the month
               if (!/^(0[1-9]|1[0-2])/.test(month)) {
                 // replace month with appropriate value
-                this[`input${origin}`] = `${day ? `${day}.` : ''}01.${year}`;
+                positiveDate = `${day ? `${day}.` : ''}01.${year}`;
               }
             }
           }
@@ -1272,13 +1318,18 @@ export default {
           // valid date by Date.parse() just convert to Date and back one more time
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
-          const tempDate = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
-          if (!Number.isNaN(Date.parse(this.dateStorage(tempDate)))) {
-            this[`input${origin}`] = this.getDateString(this.convertToDate(this.dateStorage(this[`input${origin}`])));
+          const tempDate = this.getDateString(this.convertToDate(this.parseToDateStorage(positiveDate)));
+          if (!Number.isNaN(Date.parse(this.parseToDateStorage(positiveDate)))) {
+            positiveDate = tempDate;
           } else {
-            this[`input${origin}`] = '';
+            positiveDate = '';
           }
         }
+        // now add the minus again if necessary
+        this[`input${origin}`] = this.addYearMinusToDateDisplay(
+          positiveDate,
+          this.isNegativeDisplayDate(this[`input${origin}`]),
+        );
         // after everything also still check if the new date/time string needs a fade out
         this.calcFadeOut([origin]);
       }
@@ -1369,49 +1420,62 @@ export default {
     /**
      * convert function triggered on format tab switch
      */
-    convertDate() {
-      Object.keys(this.inputInt).filter(key => !!key.includes('date'))
-        .forEach((dateKey) => {
-          const dateToConvert = this.inputInt[dateKey];
+    convertDate(oldFormat) {
+      // go over each property of inputInt (that includes date - since not applicable to time
+      // values)
+      Object.entries(this.inputInt).filter(([key]) => !!key.includes('date'))
+        .forEach(([dateKey, dateValue]) => {
+          // get the date to convert and remove the minus if there is one
+          const dateToConvert = this.removeYearMinusFromStorageDate(dateValue, oldFormat);
           if (dateToConvert) {
             if (this.minDateView === 'year') {
               // convert date string to real date in order to get year and convert back to string
-              this.$set(this.inputInt, dateKey, this.convertToDate(dateToConvert)
-                .getFullYear().toString());
-            } else if (this.minDateView === 'month') {
-              const newDate = !!this.tempDateStore
+              this.$set(this.inputInt, dateKey, this.addYearMinusToDateStorage(
+                this.convertToDate(dateToConvert).getFullYear().toString(),
+                this.isNegativeStorageDate(dateValue, oldFormat),
+              ));
+              return;
+            }
+            let useStorageDate;
+            const storageDate = this.tempDateStore ? this.tempDateStore[dateKey] : null;
+            const isNegativeTempStorageDate = !!storageDate && /^-/.test(storageDate);
+            const isNegativeNewDateValue = this.isNegativeStorageDate(dateValue, oldFormat);
+            const positiveTempStorageDate = isNegativeTempStorageDate ? storageDate.replace('-', '') : storageDate;
+            if (this.minDateView === 'month') {
+              useStorageDate = !!positiveTempStorageDate
                 // get stored date if
                 // a) previous date was full date and month and year
                 // are identical with stored year and month
                 && ((!this.isDateFormatYear
-                && this.monthAndYearIdent(this.tempDateStore[dateKey], dateToConvert))
-                // b) previous date was year and it is identical with stored year
-                || (new Date(this.tempDateStore[dateKey])
-                  .getFullYear().toString() === dateToConvert))
-                // else use current input date
-                ? this.tempDateStore[dateKey] : dateToConvert;
-              this.$set(
-                this.inputInt,
-                dateKey,
-                this.getDateString(this.convertToDate(newDate), true),
-              );
+                    && this.monthAndYearIdent(positiveTempStorageDate, dateToConvert))
+                  // b) previous date was year and it is identical with stored year
+                  || (new Date(positiveTempStorageDate)
+                    .getFullYear().toString() === dateToConvert))
+                // also check that they have the identical sign
+                && (isNegativeTempStorageDate === isNegativeNewDateValue);
+              // assume the format is 'date'
             } else {
               // check if a previous date was stored and year (coming from year)
-              const useStoredDate = !!this.tempDateStore && ((this.isDateFormatYear
-                && new Date(this.tempDateStore[dateKey]).getFullYear().toString() === dateToConvert)
+              useStorageDate = !!positiveTempStorageDate && ((this.isDateFormatYear
+                && new Date(positiveTempStorageDate).getFullYear().toString() === dateToConvert
+                  && isNegativeTempStorageDate === this.isNegativeStorageDate(dateValue, oldFormat))
                 // or month and year (coming from month) was changed or is still the same
                 || (this.isDateFormatMonth
-                && this.monthAndYearIdent(this.tempDateStore[dateKey], dateToConvert)));
+                && this.monthAndYearIdent(positiveTempStorageDate, dateToConvert)
+                  && (isNegativeTempStorageDate === isNegativeNewDateValue)));
               // if a previous date was stored use this one else use the input date
-              const newDate = useStoredDate ? this.tempDateStore[dateKey] : dateToConvert;
-              // set the new date (converted to date and formatted
-              // in the correct format YYYY-MM-DD)
-              this.$set(
-                this.inputInt,
-                dateKey,
-                this.getDateString(this.convertToDate(newDate)),
-              );
             }
+            const newDate = useStorageDate ? positiveTempStorageDate : dateToConvert;
+            // now assign the new date to the input variable
+            this.$set(
+              this.inputInt,
+              dateKey,
+              this.addYearMinusToDateStorage(
+                this.getDateString(this.convertToDate(newDate)),
+                // use the original dates here before minus was removed, depending on which date was used
+                (useStorageDate ? isNegativeTempStorageDate : isNegativeNewDateValue),
+              ),
+            );
           }
         });
     },
@@ -1432,7 +1496,8 @@ export default {
     /**
      * convert a value to a date in local time at zero hours
      *
-     * @param {string} value - the date string stored in db (format YYYY-MM-DD)
+     * @param {string} value - the date string stored in db (format YYYY-MM-DD) - this needs to
+     *  be a positive date value!! (remove minus from negative years before applying this function)
      * @returns {Date} - (e.g. Fri Jul 30 2021 00:00:00 GMT+0200 (Central European Summer Time))
      */
     convertToDate(value) {
@@ -1459,6 +1524,14 @@ export default {
       }
       return dateString;
     },
+    /**
+     * compare 2 dates for identical month and year values respectively
+     *  these dates need to be positive values (remove the minus from the date
+     *  before applying this function)
+     * @param {string} date1 - a string in YYYY-MM-DD format
+     * @param {string} date2 - a string in YYYY-MM-DD format
+     * @returns {boolean}
+     */
     monthAndYearIdent(date1, date2) {
       const convertedDate1 = this.convertToDate(date1);
       const convertedDate2 = this.convertToDate(date2);
@@ -1467,6 +1540,95 @@ export default {
       const yearDate1 = convertedDate1.getFullYear();
       const yearDate2 = convertedDate2.getFullYear();
       return monthDate1 === monthDate2 && yearDate1 === yearDate2;
+    },
+    /**
+     * check for a negative year in the date that is displayed
+     * @param {string} date - date string in the format DD.MM.YYYY
+     * @returns {boolean}
+     */
+    isNegativeDisplayDate(date) {
+      if (!date) return false;
+      if (this.dateFormatInt === 'MM.YYYY') {
+        return /^\d{0,2}\.-\d{0,4}$/.test(date);
+      }
+      if (this.dateFormatInt === 'YYYY') {
+        return /^-\d{0,4}$/.test(date);
+      }
+      return /^\d{0,2}\.\d{0,2}\.-\d{0,4}$/.test(date);
+    },
+    /**
+     * check if year is negative in the stored date
+     * @param {string} date - a date string in the format YYYY-MM-DD
+     * @param {string} [format=undefined] - in case not the current format (this.dateFormatInt) should
+     *  be used for evaluation provide it with this param
+     * @returns {boolean}
+     */
+    isNegativeStorageDate(date, format = undefined) {
+      // if there is no date to evaluate just return false
+      if (!date) return false;
+      // either use the format provided as param or the currently set format in dateFormatInt
+      const formatToCheck = format || this.dateFormatInt;
+      if (formatToCheck === 'MM.YYYY') {
+        return /^-\d{0,4}-\d{0,2}$/.test(date);
+      }
+      if (formatToCheck === 'YYYY') {
+        return /^-\d{0,4}$/.test(date);
+      }
+      return /^-\d{0,4}-\d{0,2}-\d{0,2}$/.test(date);
+    },
+    /**
+     * since minus has to be temporarily removed for some actions add it again
+     *  after with this function (for displayed date)
+     * @param {string} date - date in the format DD.MM.YYYY
+     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
+     *  function
+     * @returns {string}
+     */
+    addYearMinusToDateDisplay(date, isNegative = true) {
+      if (isNegative) {
+        const [year, month, day] = date.split('.').reverse();
+        return `${day !== undefined ? `${day}.` : ''}${month !== undefined ? `${month}.` : ''}-${year}`;
+      }
+      return date;
+    },
+    /**
+     * since minus has to be temporarily removed for some actions add it again
+     *  after with this function (for stored date)
+     * @param {string} date - date in the format YYYY-MM-DD
+     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
+     *  function
+     * @returns {string}
+     */
+    addYearMinusToDateStorage(date, isNegative = true) {
+      if (isNegative) {
+        return `-${date}`;
+      }
+      return date;
+    },
+    /**
+     * remove the minus from the date since some functions (especially Date() ) can
+     *  not cope with negative dates (for displayed date)
+     * @param {string} date - the date string in format DD.MM.YYYY
+     * @returns {string}
+     */
+    removeYearMinusFromDisplayDate(date) {
+      return this.isNegativeDisplayDate(date)
+        ? date.replace('-', '') : date;
+    },
+    /**
+     * remove the minus from the date since some functions (especially Date()) can
+     *  not cope with negative dates (for stored date)
+     * @param {string} date - the date string in format YYYY-MM-DD
+     * @param {string} [format=undefined] - in case not the currently selected format should be used
+     *  for date evaluation provide the format with this param
+     * @returns {string}
+     */
+    removeYearMinusFromStorageDate(date, format = undefined) {
+      return this.isNegativeStorageDate(date, format)
+        ? date.replace('-', '') : date;
+    },
+    isTimeInputField(origin) {
+      return this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
     },
     /**
      * function to calculate if fade out in the input fields should be shown, needs to be
