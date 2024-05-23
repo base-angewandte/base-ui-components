@@ -1319,7 +1319,7 @@ export default {
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
           const tempDate = this.getDateString(this.convertToDate(this.parseToDateStorage(positiveDate)));
-          if (!Number.isNaN(Date.parse(this.parseToDateStorage(positiveDate)))) {
+          if (!Number.isNaN(Date.parse(this.parseToDateStorage(tempDate)))) {
             positiveDate = tempDate;
           } else {
             positiveDate = '';
