@@ -1279,7 +1279,7 @@ export default {
         // now check for general validity
         if (isTimeField) {
           // just add random date to see if time is valid
-          if (Number.isNaN(Date.parse(`12.12.1212T${positiveDate}`))) {
+          if (Number.isNaN(Date.parse(`1212-12-12T${positiveDate}`))) {
             let [hours, minutes] = positiveDate.split(':');
             // check if valid hours
             if (!/^([0-1][0-9]|2[0-4])$/.test(hours)) {
@@ -1292,7 +1292,7 @@ export default {
             // construct a new time
             const newTime = `${hours}:${minutes}`;
             // now check again if time is valid now if yes assign, if no delete the string
-            positiveDate = Number.isNaN(Date.parse(`12.12.1212T${newTime}`)) ? newTime : '';
+            positiveDate = Number.isNaN(Date.parse(`1212-12-12T${newTime}`)) ? '' : newTime;
           }
         } else {
           // now truly check if date is a valid date
