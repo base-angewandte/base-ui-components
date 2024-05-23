@@ -26,6 +26,7 @@
         </slot>
         <!-- @event close -->
         <button
+          v-if="!closeButtonDisabled"
           type="button"
           aria-label="close pop up"
           class="base-popup__close-button"
@@ -161,6 +162,13 @@ export default {
       default: false,
     },
     /**
+     * disable close button
+     */
+    closeButtonDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * if true button loader will be shown
      */
     isLoading: {
@@ -218,9 +226,8 @@ export default {
   },
   mounted() {
     document.onkeyup = (e) => {
-      const event = e || window.event;
       if (document.querySelector('.popup-box')) {
-        if (event.keyCode === 27 || event.key === 'Escape') { // 27 === ESC
+        if (!this.closeButtonDisabled && e.key === 'Escape') {
           const btn = document.querySelector('.popup-box .base-popup__close-button');
           btn.dispatchEvent(new Event('click'));
         }
