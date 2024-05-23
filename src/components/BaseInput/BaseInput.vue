@@ -1010,6 +1010,7 @@ export default {
         display: flex;
         justify-content: center;
         align-self: center;
+        flex-shrink: 0;
 
         .base-input__error-icon {
           height: $icon-large;
