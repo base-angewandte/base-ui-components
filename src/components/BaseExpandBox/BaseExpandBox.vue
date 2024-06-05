@@ -136,6 +136,8 @@ export default {
       contentWidth: null,
       initialized: false,
       showButton: false,
+      mutationObserver: null,
+      resizeObserver: null,
     };
   },
   computed: {
@@ -151,6 +153,10 @@ export default {
   mounted() {
     this.init();
   },
+  beforeDestroy() {
+    if (this.mutationObserver) this.mutationObserver.disconnect();
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+  },
   methods: {
     /**
      * init
@@ -161,45 +167,62 @@ export default {
         this.showButton = this.contentInnerHeight() > this.contentHeight();
         this.expandInt = true;
       }
-
       this.initialized = true;
-
-      // observe resize of container and set visibility of button
-      this.boxResize().observe(this.$el);
+      this.initObserver();
     },
     /**
-     * check if box width changes and set visibility of button
+     * create resize/mutation observer for the content container
+     * to trigger the calculation for the visibility of the show more button
      */
-    boxResize() {
-      return new ResizeObserver((entries) => {
-        const currentWidth = entries[0].contentRect.width;
-
-        if (this.contentWidth !== currentWidth) {
-          // compare content to parent container -> set button visibility
-          if (!this.expandInt) {
-            this.showButton = this.contentInnerHeight() > this.contentHeight();
-          }
-
-          // close expanded box
-          if (this.expand
-            && this.expandInt
-            && this.contentWidth !== null) {
-            this.expandInt = false;
-          }
-        }
-
-        // save currentWidth for next comparison
-        this.contentWidth = currentWidth;
-
-        // emit box-size
-        if (!this.expandInt) {
-          /**
-           * emitting box-height on resize
-           * @param {number} - the element offset height
-           */
-          this.$emit('box-height', this.$el.offsetHeight);
-        }
+    initObserver() {
+      // create a resize observer with calculation functions
+      const resizeObserver = new ResizeObserver(() => {
+        this.calcButtonVisibility();
       });
+
+      // create a mutation observer with calculation functions
+      const mutationObserver = new MutationObserver(() => {
+        this.calcButtonVisibility();
+      });
+
+      // attach the observers to the component
+      resizeObserver.observe(this.$el);
+      mutationObserver.observe(this.$el, { childList: true, subtree: true });
+
+      // store them in variables
+      this.resizeObserver = resizeObserver;
+      this.mutationObserver = mutationObserver;
+    },
+    /**
+     * calculate visibility of 'show more' button
+     */
+    calcButtonVisibility() {
+      // get the current container width
+      const currentWidth = this.$el.offsetWidth;
+
+      // compare content to parent container -> set button visibility
+      if (!this.expandInt) {
+        this.showButton = this.contentInnerHeight() > this.contentHeight();
+      }
+
+      // close expanded box
+      if (this.expand
+        && this.expandInt
+        && this.contentWidth !== null) {
+        this.expandInt = false;
+      }
+
+      // save currentWidth for next comparison
+      this.contentWidth = currentWidth;
+
+      // emit box-size
+      if (!this.expandInt) {
+        /**
+         * emitting box-height on resize
+         * @param {number} - the element offset height
+         */
+        this.$emit('box-height', this.$el.offsetHeight);
+      }
     },
     /**
      * calculate the content height
