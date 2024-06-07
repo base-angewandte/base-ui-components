@@ -17,13 +17,14 @@
       <slot name="header" />
     </div>
     <div
+      ref="content"
       :class="[
         'base-expand-box-content',
         { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">
       <div
         class="base-expand-box-content-inner">
         <!-- div is needed for calculation of content height -->
-        <div>
+        <div ref="contentInner">
           <!--
             @slot add expand box content here
           -->
@@ -56,6 +57,7 @@
 </template>
 
 <script>
+import { debounce } from '@/utils/utils';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseButton from '../BaseButton/BaseButton';
 
@@ -132,8 +134,8 @@ export default {
   },
   data() {
     return {
+      elementId: null,
       expandInt: false,
-      contentWidth: null,
       initialized: false,
       showButton: false,
       mutationObserver: null,
@@ -162,13 +164,17 @@ export default {
      * init
      */
     init() {
-      if (this.expand) {
-        // check if button is needed
-        this.showButton = this.contentInnerHeight() > this.contentHeight();
-        this.expandInt = true;
-      }
-      this.initialized = true;
+      // create an element id to generate unique dom selectors
+      // eslint-disable-next-line no-underscore-dangle
+      this.elementId = this._uid;
+      // set internal expand variable
+      if (this.expand) this.expandInt = true;
+      // calculate the show-more button visibility
+      this.calcButtonVisibility({});
+      // init observers (currently for resize and mutation)
       this.initObserver();
+      // set initialization state
+      this.initialized = true;
     },
     /**
      * create resize/mutation observer for the content container
@@ -176,18 +182,14 @@ export default {
      */
     initObserver() {
       // create a resize observer with calculation functions
-      const resizeObserver = new ResizeObserver(() => {
-        this.calcButtonVisibility();
-      });
+      const resizeObserver = new ResizeObserver(debounce(50, () => this.calcButtonVisibility({})));
 
       // create a mutation observer with calculation functions
-      const mutationObserver = new MutationObserver(() => {
-        this.calcButtonVisibility();
-      });
+      const mutationObserver = new MutationObserver(() => this.calcButtonVisibility({ collapse: true }));
 
       // attach the observers to the component
-      resizeObserver.observe(this.$el);
-      mutationObserver.observe(this.$el, { childList: true, subtree: true });
+      resizeObserver.observe(this.$refs.content);
+      mutationObserver.observe(this.$refs.content, { childList: true, subtree: true });
 
       // store them in variables
       this.resizeObserver = resizeObserver;
@@ -195,25 +197,23 @@ export default {
     },
     /**
      * calculate visibility of 'show more' button
+     * @param {boolean} collapse - defines if the content is collapsed
      */
-    calcButtonVisibility() {
-      // get the current container width
-      const currentWidth = this.$el.offsetWidth;
-
-      // compare content to parent container -> set button visibility
-      if (!this.expandInt) {
-        this.showButton = this.contentInnerHeight() > this.contentHeight();
-      }
-
-      // close expanded box
-      if (this.expand
-        && this.expandInt
-        && this.contentWidth !== null) {
-        this.expandInt = false;
-      }
-
-      // save currentWidth for next comparison
-      this.contentWidth = currentWidth;
+    calcButtonVisibility({ collapse = false }) {
+      // check if content should be collapsed
+      if (collapse) this.expandInt = false;
+      // clone inner content
+      const contentInnerTemp = this.$refs.contentInner.cloneNode(true);
+      // add unique id for later use
+      contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.elementId}`);
+      // append the temporary element to the component
+      this.$el.appendChild(contentInnerTemp);
+      // get the height of the temporary element
+      const contentInnerTempHeight = contentInnerTemp.offsetHeight;
+      // remove  element
+      this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.elementId}`));
+      // set button visibility
+      this.showButton = contentInnerTempHeight - this.contentHeightOffset() > this.maxCollapsedHeight;
 
       // emit box-size
       if (!this.expandInt) {
@@ -223,20 +223,6 @@ export default {
          */
         this.$emit('box-height', this.$el.offsetHeight);
       }
-    },
-    /**
-     * calculate the content height
-     * @returns {number}
-     */
-    contentHeight() {
-      return this.$el.querySelector('.base-expand-box-content').offsetHeight;
-    },
-    /**
-     * calculate the content inner height
-     * @returns {number}
-     */
-    contentInnerHeight() {
-      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight - this.contentHeightOffset();
     },
     /**
      * calculate an optional offset for the content inner height
