@@ -60,11 +60,10 @@
         <!-- render as comma separated list -->
         <template
           v-if="!containKeys([].concat(item.data), 'label')">
-          <div class="base-text-list__content">
+          <div class="base-text-list__content base-text-list__content--list">
             <template
               v-for="(objectItem, objectIndex) in [].concat(item.data)">
               <!-- BaseLink: text, external, internal, text -->
-              <!-- eslint-disable max-len -->
               <BaseLink
                 v-if="!isTooltip(objectItem)"
                 :key="objectIndex"
@@ -75,8 +74,12 @@
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
-                :class="[{ 'base-link--chip-text-list': item.id }]" />{{ !isTooltip(objectItem) && item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ', ' : '' }}
-              <!-- eslint-enable -->
+                :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]" />
+              <span
+                :key="`${objectIndex}-space`">
+                {{ !isTooltip(objectItem) && item.data.length
+                  && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}
+              </span>
               <!-- BaseLink: tooltip -->
               <span
                 v-if="isTooltip(objectItem)"
@@ -92,7 +95,7 @@
                   :type="item.id"
                   :url="objectItem.url"
                   :value="objectItem.value"
-                  :class="[{ 'base-link--chip-text-list': item.id }]">
+                  :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]">
                   <template #tooltip>
                     <!-- @slot slot for tooltip content
                          @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
@@ -101,8 +104,11 @@
                       name="tooltip" />
                   </template>
                   <!-- add directly after to avoid additional spaces -->
-                  <!-- eslint-disable-next-line max-len -->
-                </BaseLink>{{ isTooltip(objectItem) && item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}
+                </BaseLink>
+                <span>
+                  {{ isTooltip(objectItem) && item.data.length
+                    && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}
+                </span>
               </span>
             </template>
           </div>
@@ -122,7 +128,7 @@
                 class="base-text-list__content__label">
                 <template
                   v-if="objectItem.label">
-                  {{ getLangLabel(objectItem.label) }}:
+                  {{ getLangLabel(objectItem.label) }}:&nbsp;
                 </template>
               </dt>
               <dd
@@ -359,9 +365,32 @@ export default {
 
       // class gets modified in component baseMapLocations
       .base-text-list__content {
+        position: relative;
         color: $font-color-second;
         height: 100%;
         overflow-wrap: break-word;
+
+        &.base-text-list__content--list {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+
+          .base-link--wrapper {
+            display: inline-flex;
+            max-width: 100%;
+          }
+
+          .base-text-list__link {
+            min-width: 0;
+            max-width: 100%;
+
+            &.base-link--chip-text-list {
+              display: inline-block;
+              margin-right: $spacing-small;
+              margin-bottom: $spacing-small-half;
+            }
+          }
+        }
       }
 
       .base-text-list__content--pre-line {
@@ -400,17 +429,6 @@ export default {
           word-break: break-word;
         }
       }
-
-      .base-link--chip-text-list {
-        display: inline-block;
-        margin-right: $spacing-small-half;
-        margin-bottom: $spacing-small-half;
-      }
-    }
-
-    .base-link--wrapper {
-      display: inline-flex;
-      max-width: 100%;
     }
 
     // spacing below elements
