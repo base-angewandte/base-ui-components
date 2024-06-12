@@ -202,26 +202,28 @@ export default {
     calcButtonVisibility({ collapse = false }) {
       // check if content should be collapsed
       if (collapse) this.expandInt = false;
-      // clone inner content
-      const contentInnerTemp = this.$refs.contentInner.cloneNode(true);
-      // add unique id for later use
-      contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.elementId}`);
-      // append the temporary element to the component
-      this.$el.appendChild(contentInnerTemp);
-      // get the height of the temporary element
-      const contentInnerTempHeight = contentInnerTemp.offsetHeight;
-      // remove  element
-      this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.elementId}`));
-      // set button visibility
-      this.showButton = contentInnerTempHeight - this.contentHeightOffset() > this.maxCollapsedHeight;
+      if (this.$refs.contentInner) {
+        // clone inner content
+        const contentInnerTemp = this.$refs.contentInner.cloneNode(true);
+        // add unique id for later use
+        contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.elementId}`);
+        // append the temporary element to the component
+        this.$el.appendChild(contentInnerTemp);
+        // get the height of the temporary element
+        const contentInnerTempHeight = contentInnerTemp.offsetHeight;
+        // remove  element
+        this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.elementId}`));
+        // set button visibility
+        this.showButton = contentInnerTempHeight - this.contentHeightOffset() > this.maxCollapsedHeight;
 
-      // emit box-size
-      if (!this.expandInt) {
-        /**
-         * emitting box-height on resize
-         * @param {number} - the element offset height
-         */
-        this.$emit('box-height', this.$el.offsetHeight);
+        // emit box-size
+        if (!this.expandInt) {
+          /**
+           * emitting box-height on resize
+           * @param {number} - the element offset height
+           */
+          this.$emit('box-height', this.$el.offsetHeight);
+        }
       }
     },
     /**
