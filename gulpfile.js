@@ -3,7 +3,7 @@ const fs = require('fs');
 const { argv } = require('yargs');
 const conventionalChangelog = require('gulp-conventional-changelog');
 
-const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/components/';
+const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/';
 
 gulp.task('changelog', (cb) => {
   // check if the file exists and create it if necessary

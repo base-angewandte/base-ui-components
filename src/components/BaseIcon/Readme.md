@@ -16,12 +16,12 @@ Available icons:
   <div style="display: flex; flex-wrap: wrap">
     <div
       v-for="icon in icons"
-      class="symbol">
+      class="icon-symbol">
       <BaseIcon
         :name="icon"
         :title="icon"
         class="icon" />
-      <span class="title">{{ icon }}</span>
+      <span class="icon-title">{{ icon }}</span>
     </div>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style>
-  .symbol {
+  .icon-symbol {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -61,7 +61,7 @@ export default {
     margin-bottom: 8px;
   }
 
-  .title {
+  .icon-title {
     font-size: 12px;
   }
 </style>

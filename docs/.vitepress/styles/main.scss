@@ -1,0 +1,123 @@
+@import 'fonts';
+@import "src/styles/variables";
+
+/**
+ * Custom Styles here.
+ *
+ * ref：https://v1.vuepress.vuejs.org/config/#index-styl
+ */
+
+
+:root {
+  // variables for base-components
+  --app-color: #3f51b5;
+  --app-color-secondary: #8e99f3;
+  --map-cluster-bg: rgba(63, 81, 181, .4);
+  --map-cluster-bg-inner :rgba(63, 81, 181, .85);
+  --map-cluster-bg-hover: rgba(142, 153, 243, .4);
+  --map-cluster-bg-inner-hover: rgba(142, 153, 243, .85);
+
+  // variables for the theme
+  --vp-font-family-base: "Source Sans Pro", serif;
+  // make title fit
+  --vp-sidebar-width: 350px;
+}
+
+.title {
+  font-size: $font-size-large !important;
+
+  @media screen and (max-width: $mobile) {
+    font-size: $font-size-regular !important;
+  }
+}
+
+.text, .vp-doc th, .vp-doc td, .vp-doc blockquote > p, .menu,
+.VPNavScreenMenuLink,
+.VPNavBarMenuLink, .pager-link .title {
+  font-size: $font-size-regular !important;
+
+  @media screen and (max-width: $mobile) {
+    font-size: $font-size-small !important;
+  }
+}
+
+.desc, .menu-text, .DocSearch-Button .DocSearch-Button-Placeholder,
+.outline-link, .outline-title, .details {
+  font-size: $font-size-small !important;
+}
+
+
+
+body {
+  font-size: $font-size-regular;
+
+  @media screen and (max-width: $mobile) {
+    font-size: $font-size-small;
+  }
+}
+
+button {
+  font-size: $font-size-regular;
+
+  @media screen and (max-width: $mobile) {
+    font-size: $font-size-small;
+  }
+}
+
+table {
+  overflow-x: auto;
+}
+
+
+.go-to-top {
+  bottom: 4.5rem !important;
+  right: 1rem !important;
+}
+
+// leaflet is setting a tile z-index of 1000 so in order to prevent map overlaying sidebar
+.sidebar {
+  z-index: 1001;
+}
+
+.navbar {
+  z-index: 1002;
+}
+
+.home .hero img {
+  max-width: 450px!important;
+}
+
+html {
+  font-size: $font-size-regular !important;
+  color: $font-color;
+  background-color: $background-color;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+
+  &:root {
+    font-size: 19px !important;
+  }
+
+  .rotate-180 {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+
+  .hide {
+    position: absolute !important;
+    top: auto !important;
+    left: -9999px !important;
+  }
+}
+
+@media screen and (max-width: $mobile) {
+  html:root {
+    font-size: 16px;
+  }
+}
