@@ -160,7 +160,7 @@ export default {
     return {
       swiper: null,
       // eslint-disable-next-line
-      swiperId: `base-media-carousel__swiper${this._uid}`,
+      swiperId: `base-media-carousel__swiper${this.$.uid}`,
       isMounted: false,
     };
   },

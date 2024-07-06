@@ -67,7 +67,7 @@ export default {
     },
     id() {
       // eslint-disable-next-line no-underscore-dangle
-      return this._uid;
+      return this.$.uid;
     },
     ariaAttribute() {
       const aria = [];
