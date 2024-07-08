@@ -5,7 +5,7 @@ A simple example without label
 ```vue live
 <template>
   <BaseInput
-    id="simpleexample"
+    input-id="simpleexample"
     label="This label says Specify any text below"
     placeholder="A custom placeholder"/>
 </template>
@@ -25,7 +25,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
 <template>
   <div>
     <BaseInput
-      id="withslot"
+      input-id="withslot"
       :key="'input_' + key"
       v-model="input"
       :invalid="invalid"

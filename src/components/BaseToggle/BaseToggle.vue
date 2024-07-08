@@ -113,7 +113,7 @@ export default {
     /**
      * if field is occurring more than once - set an id
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },
@@ -131,7 +131,7 @@ export default {
      * @returns {String|string}
      */
     idInt() {
-      return this.id || createId();
+      return this.inputId || createId();
     },
   },
   watch: {

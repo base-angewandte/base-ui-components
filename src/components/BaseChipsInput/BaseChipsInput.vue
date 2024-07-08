@@ -307,7 +307,7 @@ export default {
     /**
      if field is occuring more then once - set an id
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },
@@ -572,7 +572,7 @@ export default {
       },
     },
     internalId() {
-      return this.id || createId();
+      return this.inputId || createId();
     },
   },
   watch: {

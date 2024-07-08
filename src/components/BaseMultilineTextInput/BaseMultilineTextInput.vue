@@ -1,9 +1,9 @@
 <template>
   <BaseInput
-    :id="idInt"
     v-model="fieldContent[activeTabInt]"
-    v-bind="$attrs"
     v-model:is-active="isActive"
+    v-bind="$attrs"
+    :input-id="idInt"
     :label="label"
     :show-label="showLabel"
     :placeholder="placeholder"
@@ -161,7 +161,7 @@ export default {
     /**
      * set id which is used for label + id
      */
-    id: {
+    inputId: {
       type: [String, Number],
       default: '',
     },
@@ -236,7 +236,7 @@ export default {
      * @returns {String|string}
      */
     idInt() {
-      return this.id || createId();
+      return this.inputId || createId();
     },
     // TODO: refactor component props to already match object necessary for switch component
     switchTabs() {

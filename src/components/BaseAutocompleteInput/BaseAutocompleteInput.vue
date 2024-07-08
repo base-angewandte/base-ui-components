@@ -1,10 +1,10 @@
 <template>
   <div class="base-autocomplete-input">
     <BaseInput
-      :id="id"
       v-model="inputInt"
-      v-bind="inputListeners"
       v-model:is-active="isActiveInt"
+      v-bind="inputListeners"
+      :input-id="inputId"
       :label="label"
       :show-label="showLabel"
       :placeholder="placeholder"
@@ -19,7 +19,7 @@
       :is-loading="isLoading"
       :language="language"
       :disabled="disabled"
-      :drop-down-list-id="`${id}-list-identifier`"
+      :drop-down-list-id="`${inputId}-list-identifier`"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"
@@ -32,7 +32,7 @@
           :drop-down-options="filteredListInt"
           :identifier-property-name="identifierPropertyName"
           :label-property-name="labelPropertyName"
-          :list-id="`${id}-list-identifier`"
+          :list-id="`${inputId}-list-identifier`"
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-autocomplete-input__drop-down"
@@ -140,7 +140,7 @@ export default {
      * in case a custom input is used with the input slot it is important to
      * assign the same id to the input element
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },

@@ -98,9 +98,9 @@
               @remove-entry="removeEntry($event, index)" />
           </div>
           <BaseChipsInput
-            :id="`${id}_${additionalPropertyName}_${entry[identifierPropertyName] || entry.idInt}`"
             :key="'input_' + entry.idInt"
             v-model="entry[additionalPropertyName]"
+            :input-id="`${inputId}_${additionalPropertyName}_${entry[identifierPropertyName] || entry.idInt}`"
             :show-label="false"
             :label="label + '-' + additionalPropertyName"
             :list="additionalPropOptions"
@@ -171,7 +171,7 @@ export default {
     /**
      if field is occurring more than once - set an id
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },

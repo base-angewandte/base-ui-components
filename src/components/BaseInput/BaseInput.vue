@@ -185,7 +185,7 @@ export default {
      * **caveat**: in case a custom input is used with the `input` slot it is important to
      * assign the same id to the input element
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },
@@ -417,7 +417,7 @@ export default {
      * @returns {String|string}
      */
     idInt() {
-      return this.id || createId();
+      return this.inputId || createId();
     },
     /**
      * determines if label row should be shown

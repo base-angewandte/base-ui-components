@@ -53,8 +53,8 @@
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            :id="`input-${id}-from`"
             v-model="inputFrom"
+            :input-id="`input-${inputId}-from`"
             v-bind="inputListeners"
             :label="label"
             :show-label="false"
@@ -94,14 +94,14 @@
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-from`"
+                      :id="`input-${inputId}-from`"
                       ref="inputFrom"
                       v-model="inputFrom"
                       v-bind="dateInputListeners"
                       :placeholder="isFromTimeField ? placeholder.time || placeholder
                         : placeholder.date || placeholder"
                       :type="'text'"
-                      :aria-describedby="label + '-' + id"
+                      :aria-describedby="label + '-' + inputId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
@@ -137,8 +137,8 @@
           <!-- INPUT TO -->
           <BaseInput
             v-if="type !== 'single'"
-            :id="`input-${id}-to`"
             v-model="inputTo"
+            :input-id="`input-${inputId}-to`"
             v-bind="inputListeners"
             :label="label"
             :show-label="false"
@@ -177,14 +177,14 @@
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-to`"
+                      :id="`input-${inputId}-to`"
                       ref="inputTo"
                       v-model="inputTo"
                       :placeholder="isToTimeField ? placeholder.time || placeholder
                         : placeholder.date || placeholder"
                       v-bind="dateInputListeners"
                       :type="'text'"
-                      :aria-describedby="label + '-to-' + id"
+                      :aria-describedby="label + '-to-' + inputId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
@@ -355,7 +355,7 @@ export default {
     /**
      * set id
      */
-    id: {
+    inputId: {
       type: [Number, String],
       default: 1,
     },

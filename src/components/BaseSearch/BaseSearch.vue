@@ -2,9 +2,9 @@
   <div class="base-search">
     <component
       :is="inputComponent"
-      :id="idInt"
       v-model="searchValues"
       v-model:is-active="isActiveInt"
+      :input-id="idInt"
       v-bind="$attrs"
       :type="dateFieldType"
       :show-label="false"
@@ -146,7 +146,7 @@ export default {
      * specify a field id for identification of the input field
      * if none is specified an internal id will be assigned
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },
@@ -418,7 +418,7 @@ export default {
      * @returns {string}
      */
     idInt() {
-      return this.id || createId();
+      return this.inputId || createId();
     },
     placeholderInt() {
       if (typeof this.placeholder === 'string') {

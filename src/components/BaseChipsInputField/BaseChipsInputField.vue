@@ -3,10 +3,10 @@
     class="base-chips-input-field">
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
-      :id="id"
       ref="baseInput"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
+      :input-id="inputId"
       v-bind="inputListeners"
       :field-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
@@ -190,7 +190,7 @@ export default {
     /**
      if field is occurring more then once - set an id
      */
-    id: {
+    inputId: {
       type: String,
       default: '',
     },
@@ -723,7 +723,7 @@ export default {
       this.$emit('removed', option);
       // lay the focus on the input field
       const inputElements = this.$refs.baseInput.$el.getElementsByTagName('input');
-      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.id);
+      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.inputId);
       if (mainInputElement) {
         mainInputElement.focus();
       }

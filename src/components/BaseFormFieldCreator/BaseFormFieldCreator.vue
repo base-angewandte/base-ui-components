@@ -8,8 +8,8 @@
       v-if="fieldType !== 'date' && fieldType !== 'chips'
         && fieldType !== 'chips-below' && fieldType !== 'group'
         && fieldType !== 'boolean'"
-      :id="fieldKey"
       :key="fieldKey"
+      :input-id="fieldKey"
       v-bind="fieldPropsInt"
       :label="labelInt"
       :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
@@ -132,9 +132,9 @@
           rendered -->
         <BaseDateInput
           v-if="dateType === 'single' || dateType.includes('date')"
-          :id="fieldKey"
           :key="fieldKey + '_date'"
           v-model="fieldValueInt"
+          :input-id="fieldKey"
           v-bind="fieldPropsInt"
           :label="labelInt"
           :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
@@ -222,9 +222,9 @@
           rendered -->
         <BaseDateInput
           v-if="dateType.includes('timerange')"
-          :id="fieldKey"
           :key="fieldKey + '_time'"
           v-model="fieldValueInt"
+          :input-id="fieldKey"
           v-bind="fieldPropsInt"
           :label="dateType !== 'timerange' && field.properties.time_from.title
             ? field.properties.time_from.title : labelInt"
@@ -310,10 +310,10 @@
     <component
       :is="fieldElement"
       v-else-if="fieldType === 'chips' || fieldType === 'chips-below'"
-      :id="fieldKey"
       :ref="fieldType + fieldKey"
       :key="fieldKey"
       v-model="fieldValueInt"
+      :input-id="fieldKey"
       v-bind="fieldPropsInt"
       :placeholder="placeholderInt"
       :label="labelInt"
@@ -550,6 +550,7 @@
       <BaseToggle
         v-model="fieldValueInt"
         v-bind="fieldPropsInt"
+        :input-id="fieldKey"
         :name="fieldKey"
         :label="labelInt"
         :bind-slot-to-state="fieldProps.bindSlotToState || true"

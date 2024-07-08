@@ -6,7 +6,7 @@ Date range input fields
 <template>
   <div>
       <BaseDateInput
-        id="dayformatdemo"
+        input-id="dayformatdemo"
         :label="'Enter A Date'"
         :format="'day'"
         :show-label="true"
@@ -38,7 +38,7 @@ Single date input with format 'date_month_year', enabling switching the format
 ```vue live
 <template>
   <BaseDateInput
-    id="yearformatdemo"
+    input-id="yearformatdemo"
     :label="'Enter A Year'"
     :format="'date_month_year'"
     :show-label="true"
@@ -68,7 +68,7 @@ Date Time Input
 <template>
   <div>
     <BaseDateInput
-      id="datetimeformatdemo"
+      input-id="datetimeformatdemo"
       :label="'Enter A Date'"
       :format="'day'"
       :show-label="true"

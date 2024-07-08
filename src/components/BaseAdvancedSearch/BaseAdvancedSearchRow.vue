@@ -8,10 +8,10 @@
     <!-- note: the id is used in the javascript part as well as the parent component
       BaseAdvancedSearch.vue - consider that when changing it! -->
     <BaseSearch
-      :id="'search-input-' + internalRowId"
       ref="baseSearch"
       v-model="currentInput"
       v-model:selected-chips="selectedOptions"
+      :input-id="'search-input-' + internalRowId"
       :show-pre-input-icon="isMainSearch
         && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
       :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
@@ -45,8 +45,8 @@
       <template #[filterSlotName]>
         <BaseChipsInputField
           v-if="mode === 'list'"
-          :id="'search-filter-select-' + internalRowId"
           v-model:selected-list="selectedFilter"
+          :input-id="'search-filter-select-' + internalRowId"
           :allow-multiple-entries="false"
           :allow-unknown-entries="false"
           :allow-dynamic-drop-down-entries="false"
