@@ -64,7 +64,7 @@
             <span
               v-for="(objectItem, objectIndex) in [].concat(item.data)"
               :key="objectIndex"
-              v-clean-dom-nodes
+              v-clean-dom-nodes="{ recursive: false }"
               :class="['base-link__wrapper', { 'base-link__wrapper--tooltip': isTooltip(objectItem)}]">
               <!-- BaseLink: text, external, internal, text and tooltip -->
               <BaseLink
