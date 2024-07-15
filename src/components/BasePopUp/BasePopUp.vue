@@ -6,7 +6,7 @@
     <div class="base-pop-up-background" />
     <div
       ref="popUpBody"
-      :aria-labelledby="id"
+      :aria-labelledby="headerId"
       :aria-describedby="descriptionElementId"
       role="alertdialog"
       aria-modal="true"
@@ -16,7 +16,7 @@
         <!-- @slot add a custom header title instead of the text defined with the prop `title`.
           @binding {string, number} id - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
         <slot
-          :id="id"
+          :id="headerId"
           name="header-title">
           <div
             id="popup-title"
@@ -112,10 +112,10 @@ export default {
       default: 'Pop Up',
     },
     /**
-     * customize the popup id.
+     * customize the popup header id.
      *  if you are using the `header-title` slot this should also be set as id on your custom title element
      */
-    id: {
+    headerId: {
       type: [String, Number],
       default: 'popup-title',
     },
