@@ -91,7 +91,91 @@
                    { 'base-advanced-search__search-form--hidden': !formMounted}]"
           @input-complete="updateFormFilters"
           @fetch-autocomplete="fetchFormAutocomplete"
-          @form-mounted="formIsMounted" />
+          @form-mounted="formIsMounted">
+          <template #label-addition="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-label-addition"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #pre-input-field="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-pre-input-field"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template
+            #input-field-addition-before="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-addition-before"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #input-field-inline-before="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-inline-before"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #input-field-addition-after="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-addition-after"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #post-input-field="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-post-input-field"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #error-icon>
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
+            <slot name="form-error-icon" />
+          </template>
+          <template #remove-icon>
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
+            <slot name="form-remove-icon" />
+          </template>
+          <template #below-input="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-below-input"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #drop-down-entry="{ option, fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+              @binding {object} option - the option object
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              :field-name="fieldName"
+              :group-names="groupNames"
+              :option="option"
+              name="form-drop-down-entry" />
+          </template>
+        </BaseForm>
         <div
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
           <BaseCollapsedFilterRow
