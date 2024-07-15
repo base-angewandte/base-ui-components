@@ -463,6 +463,17 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * if necessary selected chip text can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    `v-html` on trusted content and never on user-provided content.
+     */
+    interpretChipsLabelAsHtml: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
