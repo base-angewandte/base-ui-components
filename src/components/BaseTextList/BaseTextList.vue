@@ -29,16 +29,18 @@
           :label-margin-bottom="labelMarginBottom"
           :list-type="listType"
           :render-label-as="renderLabelAs"
-          :style="{ '--columns': cols }" />
+          :style="{ '--columns': cols }"
+          :interpret-text-as-html="interpretTextAsHtml" />
       </template>
 
       <!-- String as text -->
       <!-- get rid of prepending white-space -->
       <p
         v-else-if="item.data && typeof item.data === 'string'"
+        v-insert-text-as-html="{ value: item.data, interpretTextAsHtml }"
         :class="[
           'base-text-list__content',
-          'base-text-list__content--pre-line',
+          { 'base-text-list__content--pre-line': !interpretTextAsHtml },
           // render single content in columns
           // eslint-disable-next-line vue/multiline-html-element-content-newline
           { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
@@ -49,9 +51,8 @@
         class="base-text-list__content">
         <li
           v-for="(arrayItem, listIndex) in item.data"
-          :key="listIndex">
-          {{ arrayItem }}
-        </li>
+          :key="listIndex"
+          v-insert-text-as-html="{ value: arrayItem, interpretTextAsHtml }" />
       </ul>
 
       <!-- Array/Objects -->
@@ -76,6 +77,7 @@
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
+                :interpret-text-as-html="interpretTextAsHtml"
                 :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]">
                 <template #tooltip>
                   <template v-if="isTooltip(objectItem)">
@@ -124,7 +126,8 @@
                   :tooltip-threshold-top="tooltipThresholdTop"
                   :type="item.id"
                   :url="objectItem.url"
-                  :value="objectItem.value">
+                  :value="objectItem.value"
+                  :interpret-text-as-html="interpretTextAsHtml">
                   <!-- @slot slot for tooltip content
                        @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
                   <slot
@@ -141,6 +144,7 @@
 </template>
 
 <script>
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import cleanDomNodes from '@/directives/cleanDomNodes';
 import i18n from '../../mixins/i18n';
 
@@ -156,6 +160,7 @@ export default {
     BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
   },
   directives: {
+    insertTextAsHtml: InsertTextAsHtml,
     cleanDomNodes,
   },
   mixins: [i18n],
@@ -276,6 +281,17 @@ export default {
     tooltipThresholdTop: {
       type: Number,
       default: 0,
+    },
+    /**
+     * if necessary box text (title, subtext, boxText) can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    `v-html` on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

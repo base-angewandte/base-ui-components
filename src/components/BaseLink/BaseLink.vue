@@ -30,7 +30,9 @@
       <slot
         name="label"
         :label="value">
-        {{ value }}
+        <span
+          v-insert-text-as-html="{ value, interpretTextAsHtml }"
+          :class="{ 'no-clean': interpretTextAsHtml }" />
       </slot>
     </template>
 
@@ -42,7 +44,9 @@
         <slot
           name="label"
           :label="value">
-          {{ value }}
+          <span
+            v-insert-text-as-html="{ value, interpretTextAsHtml }"
+            :class="{ 'no-clean': interpretTextAsHtml }" />
         </slot>
       </span>
 
@@ -89,15 +93,15 @@
             {{ item.label }}:
             <template v-if="item.url">
               <a
+                v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }"
                 :href="item.url"
                 :title="item.value"
                 class="base-link--external">
                 {{ item.value }}
               </a>
             </template>
-            <!-- eslint-disable -->
-            <template v-else>{{ item.value }}</template>
-            <!-- eslint-enable -->
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len -->
+            <template v-else><span v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }" /></template>
           </div>
         </slot>
       </BaseTooltipBox>
@@ -112,6 +116,7 @@
  */
 
 import cleanDomNodes from '@/directives/cleanDomNodes';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 
 export default {
   name: 'BaseLink',
@@ -122,6 +127,7 @@ export default {
   },
   directives: {
     cleanDomNodes,
+    InsertTextAsHtml,
   },
   props: {
     /**
@@ -283,6 +289,17 @@ export default {
     additionalAttributes: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * if necessary box text (title, subtext, boxText) can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    `v-html` on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

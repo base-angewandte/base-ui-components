@@ -25,12 +25,11 @@
         <div
           class="base-image-box__header__row">
           <div
+            v-insert-text-as-html="{ value: title, interpretTextAsHtml }"
             :title="title"
             :class="['base-image-box__header__text',
                      'base-image-box__header__text--bold',
-                     { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]">
-            {{ title }}
-          </div>
+                     { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]" />
           <div
             v-if="$slots['title-right']"
             class="base-image-box__header__row__additional">
@@ -42,10 +41,9 @@
           v-if="subtext"
           class="base-image-box__header__row">
           <div
+            v-insert-text-as-html="{ value: subtext, interpretTextAsHtml }"
             :title="subtext"
-            class="base-image-box__header__text">
-            {{ subtext }}
-          </div>
+            class="base-image-box__header__text" />
         </div>
       </div>
 
@@ -122,9 +120,8 @@
               class="base-image-box__body__text__inner">
               <div
                 v-for="(entry, index) in boxText"
-                :key="index">
-                {{ entry }}
-              </div>
+                :key="index"
+                v-insert-text-as-html="{ value: entry, interpretTextAsHtml }" />
             </div>
           </slot>
         </div>
@@ -199,6 +196,7 @@
   </BaseBox>
 </template>
 <script>
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseBox from '../BaseBox/BaseBox';
 import BaseIcon from '../BaseIcon/BaseIcon';
 
@@ -215,6 +213,9 @@ export default {
     BaseCheckmark: () => import('../BaseCheckmark/BaseCheckmark').then(m => m.default || m),
     BaseImage: () => import('../BaseImage/BaseImage').then(m => m.default || m),
     BaseImageGrid: () => import('../BaseImageGrid/BaseImageGrid').then(m => m.default || m),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   props: {
     /**
@@ -409,6 +410,17 @@ export default {
       default: '',
       validator: val => typeof val === 'string'
         || (val instanceof Object && Object.keys(val).includes('path')),
+    },
+    /**
+     * if necessary box text (title, subtext, boxText) can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    `v-html` on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -614,6 +626,7 @@ export default {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        width: 100%;
 
         &--2-lines {
           white-space: normal;
