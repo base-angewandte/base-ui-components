@@ -3,7 +3,7 @@
     ref="popUpBody"
     v-click-outside="() => clickedOutside()"
     role="dialog"
-    :aria-labelledby="`baseTooltipBox-title-${_uid}`"
+    :aria-labelledby="headerId"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
@@ -14,11 +14,14 @@
     <div
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
-        <div
-          :id="`baseTooltipBox-title-${_uid}`"
-          class="base-tooltip-box__header__title">
-          {{ modalTitle }}
-        </div>
+        <!-- @slot customize the header displayed on mobile for `typeOnMobile` `modal` and `fullscreen` -->
+        <slot name="header-title">
+          <div
+            :id="headerId"
+            class="base-tooltip-box__header__title">
+            {{ modalTitle }}
+          </div>
+        </slot>
         <button
           title="close"
           class="base-tooltip-box__button"
@@ -92,6 +95,7 @@ export default {
     },
     /**
      * title of the modal popup on mobile
+     * if more customization is needed, use the slot `header-title` instead
      */
     modalTitle: {
       type: String,
@@ -119,6 +123,14 @@ export default {
     thresholdTop: {
       type: Number,
       default: 0,
+    },
+    /**
+     * customize the tooltipbox id.
+     *  if you are using the `header-title` slot this should also be set as id on your custom title element
+     */
+    headerId: {
+      type: [String, Number],
+      default: 'popup-title',
     },
   },
   data() {
