@@ -116,6 +116,17 @@
                 :field-name="fieldName"
                 :group-names="groupNames" />
             </template>
+            <template #drop-down-entry="{ option, fieldName, groupNames }">
+              <!-- @slot customize the form field drop down options
+                @binding {object} option - the option object
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                :field-name="fieldName"
+                :group-names="groupNames"
+                :option="option"
+                name="drop-down-entry" />
+            </template>
           </BaseFormFieldCreator>
 
           <!-- FOR REPEATABLE FIELDS - ALLOW FOR MULTIPLE VALUES PER FIELD -->
@@ -242,6 +253,17 @@
                     :field-name="fieldName"
                     :group-names="groupNames"
                     :index="valueIndex" />
+                </template>
+                <template #drop-down-entry="{ option, fieldName, groupNames }">
+                  <!-- @slot customize the form field drop down options
+                    @binding {object} option - the option object
+                    @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                    @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :option="option"
+                    name="drop-down-entry" />
                 </template>
               </BaseFormFieldCreator>
 

@@ -121,6 +121,16 @@
           :field-name="field.name"
           name="below-input" />
       </template>
+      <template #drop-down-entry="{ item }">
+        <template v-if="fieldType === 'autocomplete'" >
+          <!-- @slot customize the form field drop down options
+            @binding {object} option - the option object -->
+          <slot
+            :field-name="field.name"
+            :option="item"
+            name="drop-down-entry" />
+        </template>
+      </template>
     </component>
 
     <!-- DATE FIELD -->
@@ -351,16 +361,23 @@
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
       <template
-        #drop-down-entry="props">
-        <span>
-          {{ getLabel(props.item[labelPropertyName]) }}
-        </span>
-        <span class="base-form-field-creator__chips-dropdown-second">
-          {{ props.item.additional }}
-        </span>
-        <span class="base-form-field-creator__chips-dropdown-third">
-          {{ props.item.source_name }}
-        </span>
+        #drop-down-entry="{ item }">
+        <!-- @slot customize the form field drop down options
+          @binding {object} option - the option object -->
+        <slot
+          :field-name="field.name"
+          :option="item"
+          name="drop-down-entry">
+          <span>
+            {{ getLabel(item[labelPropertyName]) }}
+          </span>
+          <span class="base-form-field-creator__chips-dropdown-second">
+            {{ item.additional }}
+          </span>
+          <span class="base-form-field-creator__chips-dropdown-third">
+            {{ item.source_name }}
+          </span>
+        </slot>
       </template>
       <template #no-options>
         <span v-if="formFieldXAttrs.dynamic_autosuggest && !fieldInput">
@@ -537,6 +554,17 @@
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
               name="below-input" />
+          </template>
+          <template #drop-down-entry="{ option, fieldName, groupNames }">
+            <!-- @slot customize the form field drop down options
+              @binding {object} option - the option object
+              @binding {string} field-name - the name of the current field for identification purposes
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              :field-name="fieldName"
+              :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :option="option"
+              name="drop-down-entry" />
           </template>
         </BaseForm>
       </div>
