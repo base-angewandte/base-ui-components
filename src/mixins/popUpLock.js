@@ -21,7 +21,7 @@ export default {
     this.targetElement = this.$refs[this.targetName];
     if (this.targetElement) {
       if (this.showInt) {
-        disableBodyScroll(this.targetElement);
+        disableBodyScroll(this.targetElement, { allowTouchMove: () => true });
       } else {
         enableBodyScroll(this.targetElement);
       }
