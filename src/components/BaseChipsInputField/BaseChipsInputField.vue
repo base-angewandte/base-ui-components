@@ -91,7 +91,7 @@
                         || !!entry[identifierPropertyName]"
                       :chip-active="chipActiveForRemove === index"
                       :is-removable="chipsRemovable"
-                      :interpret-text-as-html="interpretChipsLabelAsHtml"
+                      :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                       @remove-entry="removeEntry(entry, index)"
                       @hoverbox-active="hoverBoxActive($event, entry)" />
                   </slot>
@@ -127,7 +127,7 @@
                   :chip-active="chipActiveForRemove === index"
                   :assistive-text="assistiveText.selectedOption"
                   :is-removable="chipsRemovable"
-                  :interpret-text-as-html="interpretChipsLabelAsHtml"
+                  :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                   @remove-entry="removeEntry(entry, index)"
                   @value-changed="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
