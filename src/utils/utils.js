@@ -16,7 +16,12 @@ export const createId = () => Math.random().toString(36).substr(2, 9);
  * @returns {*} - the value contained in the nested object
  */
 export const extractNestedPropertyValue = (string, object) => string
-  .split('.').reduce((a, b) => a[b], object);
+  .split('.').reduce((a, b) => {
+    if (a) {
+      return a[b];
+    }
+    return a;
+  }, object);
 
 /**
  * function taking a string and returning any name format in an array
