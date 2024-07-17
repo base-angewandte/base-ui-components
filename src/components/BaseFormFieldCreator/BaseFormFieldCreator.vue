@@ -122,7 +122,7 @@
           name="below-input" />
       </template>
       <template #drop-down-entry="{ item }">
-        <template v-if="fieldType === 'autocomplete'" >
+        <template v-if="fieldType === 'autocomplete'">
           <!-- @slot customize the form field drop down options
             @binding {object} option - the option object -->
           <slot

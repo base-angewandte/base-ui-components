@@ -295,7 +295,7 @@ export default {
      *  be rendered as v-html directive
      *
      *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
-     *    `v-html` on trusted content and never on user-provided content.
+     *    this prop on trusted content and never on user-provided content.
      */
     interpretTextAsHtml: {
       type: Boolean,

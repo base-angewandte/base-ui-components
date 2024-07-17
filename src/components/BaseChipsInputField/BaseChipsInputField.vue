@@ -501,7 +501,9 @@ export default {
      *  be rendered as v-html directive
      *
      *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
-     *    `v-html` on trusted content and never on user-provided content.
+     *    this prop on trusted content and never on user-provided content. This is
+     *    also why this will only take effect on selected chips with identifier (=selected
+     *    from the options not a direct user input)
      */
     interpretChipsLabelAsHtml: {
       type: Boolean,

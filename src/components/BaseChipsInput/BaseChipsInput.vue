@@ -55,6 +55,7 @@
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
                 <template v-if="highlightStringMatch">
+                  <!-- eslint-disable-next-line vue/no-v-html -->
                   <span v-html="highlight(getLangLabel(entry.option[labelPropertyName], true))" />
                 </template>
                 <template v-else>
@@ -468,7 +469,7 @@ export default {
      *  be rendered as v-html directive
      *
      *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
-     *    `v-html` on trusted content and never on user-provided content.
+     *    this prop on trusted content and never on user-provided content.
      */
     interpretChipsLabelAsHtml: {
       type: Boolean,
