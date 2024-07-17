@@ -82,7 +82,7 @@
       <template #below>
         <BaseForm
           v-if="mode === 'form' && formOpen"
-          v-bind="formProps"
+          v-bind="amendedFormProps"
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
           :label-property-name="labelPropertyName.formInputs"
@@ -181,6 +181,7 @@
           <BaseCollapsedFilterRow
             :filters.sync="collapsedFiltersArray"
             :date-time-text="advancedSearchText.collapsedDateTime"
+            :interpret-label-as-html="renderFormChipsLabelAsHtml"
             @remove-all="removeAllFilters" />
         </div>
       </template>
@@ -196,7 +197,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { createId, debounce, hasData, sort } from '@/utils/utils';
+import { createId, debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
 
 /**
@@ -576,6 +577,20 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * mode `form`: if necessary selected chip text can  be rendered as v-html directive
+     *  either set this prop `true` or `false` or provide a string array with
+     * this will only be applied to chips with an identifier property and of course
+     *   can only apply to form field field_type `chips`
+     * if only chips of certain form fields should be rendered as html use prop
+     *  `formProps.fieldProps.interpretChipsLabelAsHtml` or if certain fields should
+     *  be excluded set this prop to `true` and set `formProps.fieldProps.interpretChipsLabelAsHtml`
+     *  for that field `false`
+     */
+    interpretFormChipsLabelAsHtml: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
   data() {
@@ -636,6 +651,48 @@ export default {
     };
   },
   computed: {
+    amendedFormProps() {
+      // if the prop is false - don't bother any further and just return
+      // the formProps as is
+      if (!this.interpretFormChipsLabelAsHtml) {
+        return this.formProps;
+      }
+      // else get the fieldProps out of formProps
+      const fieldProps = this.formProps.fieldProps || {};
+      // check which fields should be altered - if array was provided use these fields
+      // otherwise use all fields - and filter in the end for just chips type fields
+      const fieldsToAlter = (typeof this.interpretFormChipsLabelAsHtml === 'object'
+        ? this.interpretFormChipsLabelAsHtml : Object.keys(this.formFilterList))
+        // TODO: this automatically excludes nested form fields - also allow for
+        // these fields in type `group`!
+        .filter(fieldKey => ['chips', 'chips-below']
+          .includes(this.formFilterList[fieldKey]['x-attrs']?.field_type));
+      // now iterate over the fields and add (or overwrite) the `interpretChipsLabelAsHtml`
+      // prop
+      const updatedFormFieldProps = fieldsToAlter.reduce((prev, key) => {
+        const previousValues = fieldProps[key] || {};
+        return {
+          ...prev,
+          [key]: {
+            ...previousValues,
+            interpretChipsLabelAsHtml: true,
+          },
+        };
+      }, {});
+
+      return {
+        // add all other specified form props
+        ...this.formProps,
+        // and the modified fieldprops
+        fieldProps: {
+          // also don't lose the field props of non-chips fields or not
+          // modified ones
+          ...fieldProps,
+          // and add the modified ones
+          ...updatedFormFieldProps,
+        },
+      };
+    },
     /**
      * store the loading state of every filter
      *
@@ -740,6 +797,19 @@ export default {
         // trigger search after filters changed
         this.search();
       },
+    },
+    renderFormChipsLabelAsHtml() {
+      // first get all form field props
+      const { fieldProps } = this.formProps;
+      // if no fieldProps were specified just use the prop value
+      if (!fieldProps) return this.interpretFormChipsLabelAsHtml;
+      // else we need to check if prop `renderChipsLabelAsHtml` was specified for
+      // a chips input field - done via recursive (because of subforms) function
+      const fieldsToSetTrue = this.filterHtmlRenderFields(this.formFilterList);
+
+      // check if values were set for individual fields, otherwise fall back
+      // to the prop value
+      return fieldsToSetTrue.length ? fieldsToSetTrue : this.interpretFormChipsLabelAsHtml;
     },
     /**
      * create an internal row id for unique identification of added filter rows
@@ -1127,12 +1197,30 @@ export default {
           // check the type of field that the value should be added to (we assume the only possibilities
           // are chips or text - other types are currently NOT implemented and would need to be added here!)
           if (fieldXAttrs.field_type === 'chips') {
+            // in order to be able to set the correct properties for the chip display in the input field
+            // we might need to map the label and id properties of the autocomplete option to the label and
+            // id properties of the input field - since an individual option for a field might have been
+            // set via fieldProps - we need to check for that first
+            const fieldProps = this.formProps.fieldProps?.[collectionId] || {};
+            // check if label prop was set otherwise use the default form input one
+            const labelProp = fieldProps.labelPropertyName
+              || this.labelPropertyName.formInputs;
+            // check if id prop was set otherwise use the default form input one
+            const idProp = fieldProps.identifierPropertyName
+              || this.identifierPropertyName.formInputs;
             // map the information from the search autocomplete to the chips form field
             // required values
             const chipsFormFieldValue = {
               // map search autocomplete result to chips form field required values
-              [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
-              [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
+              [labelProp]: entry[this.labelPropertyName.autocompleteOption],
+              [idProp]: entry[this.identifierPropertyName.autocompleteOption],
+              // HOWEVER - in order to enable customization of the properties used in the front
+              // end - e.g. to add discriminatory terms html we also leave the rest of the
+              // object properties and actually give them PRIORITY over the newly created ones!
+              // (so e.g. if the property `displayLabel` was already added to the autocomplete option
+              // with the appropriate tags and styling then this will not be overwritten by
+              // entry[this.labelPropertyName.autocompleteOption] but be retained
+              ...entry,
             };
             // for multi chips - add value to array
             if (fieldInformation.type === 'array') {
@@ -1232,9 +1320,11 @@ export default {
      * @param {any} values - the form field values
      * @param {Object} fieldData - the OpenAPI json field information
      * @param {string} fieldId - the id of the field to transform
+     * @param {string[]} parentFields - if field is a field group we also need the parent field name(s)
+     *  (in theory there could be many but BaseAdvancedSearch is currently only supporting one nesting level)
      * @returns {[string, unknown]|[{label: string}]|string|{label: *}[]|boolean[]|[{label: (string|string)}]|*}
      */
-    getCollapsedFilterValue(values, fieldData, fieldId) {
+    getCollapsedFilterValue(values, fieldData, fieldId, parentFields = []) {
       const fieldType = fieldData['x-attrs'].field_type;
       if (fieldType === 'integer' || fieldType === 'float' || typeof values === 'number') {
         return {
@@ -1265,11 +1355,19 @@ export default {
         };
       }
       if (fieldType === 'chips') {
+        // check if general property names were overwritten for the specific field
+        const fieldProps = extractNestedPropertyValue(
+          parentFields.length ? [fieldId].concat(parentFields).join('.') : fieldId,
+          this.formProps.fieldProps,
+        );
+        const labelProp = fieldProps?.labelPropertyName
+          || this.labelPropertyName.formInputs;
+        const idProp = fieldProps?.labelPropertyName
+          || this.labelPropertyName.formInputs;
         return {
           values: values.map(chipValue => ({
-            // TODO: check if label property needs to be customized
-            label: chipValue[this.labelPropertyName.formInputs] || chipValue,
-            id: chipValue[this.identifierPropertyName.formInputs] || '',
+            label: chipValue[labelProp] || chipValue,
+            id: chipValue[idProp] || '',
           })),
           fieldId,
           fieldType,
@@ -1285,6 +1383,7 @@ export default {
                 // depending if group is repeatable or not get to properties attribute
                 fieldData.items ? fieldData.items.properties[fieldKey] : fieldData.properties[fieldKey],
                 fieldKey,
+                [fieldKey].concat(parentFields),
               ));
               return prev;
             }, []),
@@ -1319,11 +1418,13 @@ export default {
      * @param {{ values: Object[], fieldId: string, fieldType: string }} collapsedValues - the updated collapsed
      *  values coming from collapsed filter row
      * @param {Object} filterData - the relevant OpenAPI form field information
+     * @param {string[]} parentFields - if field is a field group we also need the parent field name(s)
+     *  (in theory there could be many but BaseAdvancedSearch is currently only supporting one nesting level)
      * @returns {any} - value returned depending on the filter type
      */
-    setFormFilterValues(collapsedValues, filterData) {
+    setFormFilterValues(collapsedValues, filterData, parentFields = []) {
       // get the relevant information out of collapsed values
-      const { values, fieldType } = collapsedValues;
+      const { values, fieldType, fieldId } = collapsedValues;
       // case string
       if (filterData.type === 'string') {
         return values[0].label;
@@ -1347,10 +1448,22 @@ export default {
       }
       // case chips input field
       if (fieldType.includes('chips')) {
+        // we need to take into consideration that custom label and identifier property names
+        // might have been set for a specific form field - so we need to check `formProps.fieldProps`
+        // (or the corresponding nested field for type 'group') for that field first and use these
+        // values if present
+        const fieldProps = extractNestedPropertyValue(
+          parentFields.length ? [fieldId].concat(parentFields).join('.') : fieldId,
+          this.formProps.fieldProps,
+        );
+        const labelProp = fieldProps?.labelPropertyName
+          || this.labelPropertyName.formInputs;
+        const idProp = fieldProps?.labelPropertyName
+          || this.labelPropertyName.formInputs;
         return values.filter(filterValue => !!filterValue.label)
           .map(filterValue => ({
-            [this.labelPropertyName.formInputs]: filterValue.label,
-            [this.identifierPropertyName.formInputs]: filterValue.id,
+            [labelProp]: filterValue.label,
+            [idProp]: filterValue.id,
           }));
       }
       // case repeatable fields where every repeated field or field group is a separate filter entry
@@ -1370,10 +1483,53 @@ export default {
             [k.fieldId]: this.setFormFilterValues(
               k,
               filterData.properties[k.fieldId],
+              [k.fieldId].concat(parentFields),
             ),
           }), {});
       }
       return null;
+    },
+    filterHtmlRenderFields(formFieldInfo, parentFields = []) {
+      // get the field props needed later
+      const { fieldProps } = this.formProps;
+      // iterate over all form fields given in formFieldInfo
+      return Object.entries(formFieldInfo)
+        .reduce((prev, [key, values]) => {
+          // get the field type from the x attributes
+          const { field_type: fieldType } = values['x-attrs'] ? values['x-attrs'] : {};
+          // check if form fields are nested (subform)
+          if (fieldType === 'group') {
+            // and recursively iterate over these fields as well
+            const subFields = this.filterHtmlRenderFields(
+              values.properties || values.items.properties,
+              [key].concat(parentFields),
+            );
+            // if fields with `interpretChipsLabelAsHtml` `true` are found
+            // add them in the form { [key]: ['subField1', 'SubField2'] }
+            return subFields.length ? prev.concat({
+              [key]: subFields,
+            }) : prev;
+          }
+          // only add fields that are type chips
+          if (fieldType === 'chips') {
+            // get the fieldProps set for that specific field - if it is a nested field we
+            // need to extract them with the function below - else we can use fieldProps directly
+            const keyProps = ((parentFields.length
+              ? extractNestedPropertyValue(parentFields.join('.'), fieldProps) : fieldProps) || {})[key];
+            // now check if field key should be added to the list - 2 possibilities to add:
+            // a) prop `interpretFormChipsLabelAsHtml` is `false` - and the fieldProp for that specific
+            //  field is set
+            // b) prop `interpretFormChipsLabelAsHtml` was set `true` to cover all fields and
+            //  specifically exclude this one
+            if ((!this.interpretFormChipsLabelAsHtml && keyProps.interpretChipsLabelAsHtml)
+              || (this.interpretFormChipsLabelAsHtml && (!keyProps
+                || !Object.keys(keyProps).includes('interpretChipsLabelAsHtml') || keyProps.interpretChipsLabelAsHtml))) {
+              return prev.concat(key);
+            }
+          }
+          // if any of the conditions fail just return the list unaltered
+          return prev;
+        }, []);
     },
   },
 };
