@@ -26,7 +26,7 @@
           class="base-image-box__header__row">
           <div
             v-insert-text-as-html="{ value: title, interpretTextAsHtml }"
-            :title="title"
+            :title="altTitleInt"
             :class="['base-image-box__header__text',
                      'base-image-box__header__text--bold',
                      { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]" />
@@ -42,7 +42,7 @@
           class="base-image-box__header__row">
           <div
             v-insert-text-as-html="{ value: subtext, interpretTextAsHtml }"
-            :title="subtext"
+            :title="altSubtextInt"
             class="base-image-box__header__text" />
         </div>
       </div>
@@ -61,7 +61,7 @@
           <BaseImage
             v-if="imageUrl || (images && images.length === 1)"
             ref="image"
-            :alt="title"
+            :alt="altTitleInt"
             :lazyload="lazyload"
             :src="images && images.length === 1 ? src(images[0]) : src(imageUrl)"
             :srcset="images && images.length === 1 ? srcset(images[0]) : srcset(imageUrl)"
@@ -71,7 +71,7 @@
           <!-- image grid -->
           <BaseImageGrid
             v-if="images && images.length > 1"
-            :alt="title"
+            :alt="altTitleInt"
             :images="images"
             :lazyload="lazyload" />
         </template>
@@ -141,10 +141,9 @@
           <div class="base-image-box__body__footer__center">
             <div
               v-if="showTitleOnHover"
-              :title="title"
-              class="base-image-box__body__footer__title base-image-box__body__footer--bold">
-              {{ title }}
-            </div>
+              v-insert-text-as-html="{ interpretTextAsHtml, value: title }"
+              :title="altTitleInt"
+              class="base-image-box__body__footer__title base-image-box__body__footer--bold" />
             <div
               v-if="description"
               :title="description"
@@ -185,7 +184,7 @@
           <BaseCheckmark
             v-if="selectable"
             :checked="selectedInt"
-            :label="title"
+            :label="altTitleInt"
             mark-style="checkbox"
             check-box-size="large"
             class="base-image-box__checkbox"
@@ -226,9 +225,26 @@ export default {
       default: 'No title',
     },
     /**
+     * specify a separate title to display on title hover and for the
+     *  image alt text. Useful for example if `interpretTextAsHtml` is
+     *  set `true` and the `title` contains HTML
+     */
+    altTitle: {
+      type: String,
+      default: '',
+    },
+    /**
      * Text displayed directly below title (max two lines; max 3 lines with title)
      */
     subtext: {
+      type: String,
+      default: '',
+    },
+    /**
+     * specify a separate subtext to display on subtext hover. Useful for example
+     *  if `interpretTextAsHtml` is set `true` and the `subtext` contains HTML
+     */
+    altSubtext: {
       type: String,
       default: '',
     },
@@ -415,6 +431,10 @@ export default {
      * if necessary box text (title, subtext, boxText) can
      *  be rendered as v-html directive
      *
+     *  *tip*: do not forget to set prop `altTitle` and/or `altSubtext` if the
+     *    title text or subtext contains html - otherwise the complete html will
+     *    be displayed on text hover and for image alt text
+     *
      *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
      *    this prop on trusted content and never on user-provided content.
      */
@@ -444,6 +464,22 @@ export default {
     };
   },
   computed: {
+    /**
+     * compute the alt title used for title hover and image alt description
+     *  from specific prop `altTitle` or use the regular title
+     * @returns {string}
+     */
+    altTitleInt() {
+      return this.altTitle || this.title;
+    },
+    /**
+     * compute the alt subtext used for subtext hover
+     *  from specific prop `altSubtext` or use the regular subtext
+     * @returns {string}
+     */
+    altSubtextInt() {
+      return this.altSubtext || this.subtext;
+    },
     // determine if a shadow at the top of the image should be visible
     imageShadowTop() {
       return (this.selectable && this.hasImages && !this.showTitle)
