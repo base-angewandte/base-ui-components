@@ -30,11 +30,14 @@
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
         @fetch-autocomplete-results="fetchAutocomplete($event, index)">
-        <template #autocomplete-option="{ option: autocompleteOption }">
-          <!-- @slot to allow for modification of the autocomplete option -->
+        <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
+          <!-- @slot to allow for modification of the autocomplete option
+            @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+            @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
           <slot
             name="autocomplete-option"
-            :option="autocompleteOption" />
+            :option="autocompleteOption"
+            :collection-id="collectionId" />
         </template>
       </BaseAdvancedSearchRow>
     </template>
@@ -185,11 +188,14 @@
             @remove-all="removeAllFilters" />
         </div>
       </template>
-      <template #autocomplete-option="{ option: autocompleteOption }">
-        <!-- @slot to allow for modification of the autocomplete option -->
+      <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
+        <!-- @slot to allow for modification of the autocomplete option
+          @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+          @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
         <slot
           name="autocomplete-option"
-          :option="autocompleteOption" />
+          :option="autocompleteOption"
+          :collection-id="collectionId" />
       </template>
     </BaseAdvancedSearchRow>
   </div>

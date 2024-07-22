@@ -246,10 +246,13 @@
                   option[autocompletePropertyNames.id],
                 )">
                 <template #option="{ option: autocompleteOption }">
-                  <!-- @slot to allow for modification of the autocomplete option -->
+                  <!-- @slot to allow for modification of the autocomplete option
+                    @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+                    @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
                   <slot
                     name="autocomplete-option"
-                    :option="autocompleteOption" />
+                    :option="autocompleteOption"
+                    :collection-id="option[autocompletePropertyNames.id]" />
                 </template>
               </BaseDropDownList>
             </div>
