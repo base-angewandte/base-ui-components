@@ -10,6 +10,9 @@ export const capitalizeString = (string) => {
 export const createId = () => Math.random().toString(36).substr(2, 9);
 
 /**
+ * function to extract the value from a nested object property
+ * e.g. to get 'prop3' value from { prop1: { prop2: { prop3: [value] }}} provide
+ * the object and string `prop1.prop2.prop3`
  *
  * @param {string} string - the nested object property path in dot notation
  * @param {Object} object - the object from which the property value should be extracted
@@ -20,7 +23,9 @@ export const extractNestedPropertyValue = (string, object) => string
     if (a) {
       return a[b];
     }
-    return a;
+    // if the previous `a[b]` did not exist `a` is now 'undefined' - return this
+    // directly instead of `a` to make code easier to read
+    return undefined;
   }, object);
 
 /**
