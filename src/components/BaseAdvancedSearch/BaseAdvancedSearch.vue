@@ -588,7 +588,7 @@ export default {
      *  for that field `false`
      */
     interpretFormChipsLabelAsHtml: {
-      type: Boolean,
+      type: [Boolean, Array],
       default: false,
     },
   },
