@@ -77,6 +77,7 @@
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
+                :alt-title="objectItem.altTitle"
                 :interpret-text-as-html="interpretTextAsHtml"
                 :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]">
                 <template #tooltip>
@@ -127,6 +128,7 @@
                   :type="item.id"
                   :url="objectItem.url"
                   :value="objectItem.value"
+                  :alt-title="objectItem.altTitle"
                   :interpret-text-as-html="interpretTextAsHtml">
                   <!-- @slot slot for tooltip content
                        @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
@@ -179,14 +181,15 @@ export default {
      *  Possible object properties for `{ data : {Object, Object[]} }`:
      *  - **value** `string` - the displayed text for all types
      *  - **label** `string?` - an optional pretext in style of 'label:'
+     *  - **altTitle** `string?` - if `interpretTextAsHtml` is set `true`, add a html-free version of the label
+     *    here that can be used for hover title and assistive technologies (needed for type 'chip')
      * - **[identifierPropertyName]** `string?` - specify the id of a chip or the path for internal link - specify the object property name with prop `identifierPropertyName`
      * - **id** `string?` - for type chip - an identifier for the chip type (used in link generation)
      * - **path** `string?` - for type chip (used in link generation)
      * - **url** `string?` - for external link - the url to link to
      * - **additional** `Object?` - used for tooltip content generation - an array of objects with properties:
-     *    `label`, `value` and (in case the item should render as link) `url`
-     *    **caveat**: even if tooltip content is created via slot this property needs to be present and filled in order for the tooltip to show
-     * - **data** `Object[]?` - for type chip - specify the list of chips to be displayed here - needs to be an object with `value` and `[identifierPropertyName]`
+     *    `label`, `value` optionally `altTitle` (if `interpretTextAsHtml` is set true) and `url` (in case the item should render as link)
+     *    **caveat**: even if tooltip content is created via slot this property (`tooltip`) needs to be present and filled in order for the tooltip to show
      *
      * Note: objects wrapped in an extra array are rendered as columns respecting the `cols` property.
      */
