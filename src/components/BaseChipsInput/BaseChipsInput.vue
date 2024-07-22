@@ -54,12 +54,14 @@
                 :item="entry.option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                <template v-if="highlightStringMatch">
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <span v-html="highlight(getLangLabel(entry.option[labelPropertyName], true))" />
-                </template>
-                <template v-else>
-                  {{ getLangLabel(entry.option[labelPropertyName], true) }}
+                <template>
+                  <span
+                    v-insert-text-as-html="{
+                      value: highlightStringMatch
+                        ? highlight(getLangLabel(entry.option[labelPropertyName], true))
+                        : getLangLabel(entry.option[labelPropertyName], true),
+                      interpretTextAsHtml: interpretChipsLabelAsHtml,
+                    }" />
                 </template>
               </slot>
             </template>
@@ -127,6 +129,7 @@
 
 <script>
 import { createId, highlightText } from '@/utils/utils';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
@@ -143,6 +146,9 @@ export default {
     BaseIcon,
     BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList').then(m => m.default || m),
     BaseChipsInputField,
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   mixins: [
     i18n,
@@ -450,6 +456,9 @@ export default {
     /**
      * set this flag to `true` to highlight autocomplete option characters that match
      *  the current search input string
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
      */
     highlightStringMatch: {
       type: Boolean,

@@ -368,9 +368,11 @@
           :field-name="field.name"
           :option="item"
           name="drop-down-entry">
-          <span>
-            {{ getLabel(item[labelPropertyName]) }}
-          </span>
+          <span
+            v-insert-text-as-html="{
+              value: getLabel(item[labelPropertyName]),
+              interpretTextAsHtml: fieldProps.interpretChipsLabelAsHtml,
+            }" />
           <span class="base-form-field-creator__chips-dropdown-second">
             {{ item.additional }}
           </span>
@@ -592,6 +594,7 @@
 </template>
 
 <script>
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import i18n from '../../mixins/i18n';
 
 /**
@@ -606,6 +609,9 @@ export default {
     BaseForm: () => import('../BaseForm/BaseForm').then(m => m.default || m),
     BaseToggle: () => import('../BaseToggle/BaseToggle').then(m => m.default || m),
     BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   mixins: [i18n],
   props: {
