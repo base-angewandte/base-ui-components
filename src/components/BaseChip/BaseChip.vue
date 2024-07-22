@@ -117,8 +117,7 @@ export default {
       default: '',
     },
     /**
-     * if necessary chip text can
-     *  be rendered as v-html directive
+     * if necessary chip text can be rendered as html
      *  this feature is currently only available if the chip is not editable
      *
      *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use

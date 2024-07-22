@@ -428,8 +428,8 @@ export default {
         || (val instanceof Object && Object.keys(val).includes('path')),
     },
     /**
-     * if necessary box text (title, subtext, boxText) can
-     *  be rendered as v-html directive
+     * if necessary box text (`title`, `subtext`, `boxText`) can
+     *  be rendered as html
      *
      *  *tip*: do not forget to set prop `altTitle` and/or `altSubtext` if the
      *    title text or subtext contains html - otherwise the complete html will

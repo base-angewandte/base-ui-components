@@ -283,8 +283,7 @@ export default {
       default: 0,
     },
     /**
-     * if necessary box text (title, subtext, boxText) can
-     *  be rendered as v-html directive
+     * set true to render `data` or `value` content as html
      *
      *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
      *    this prop on trusted content and never on user-provided content.
