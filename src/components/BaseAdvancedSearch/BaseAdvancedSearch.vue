@@ -674,8 +674,10 @@ export default {
         return {
           ...prev,
           [key]: {
-            ...previousValues,
+            // put the updated property first so individually set fields
+            // always have priority over `interpretFormChipsLabelAsHtml`
             interpretChipsLabelAsHtml: true,
+            ...previousValues,
           },
         };
       }, {});
