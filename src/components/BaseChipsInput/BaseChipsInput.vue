@@ -35,31 +35,33 @@
           @within-drop-down="dropDownActive = $event"
           @click.native.stop="closeDropDown"
           @touchstart.native.stop="closeDropDown">
-          <template #option="entry">
+          <template #option="{ option }">
             <span
-              v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
+              v-if="allowUnknownEntries && !option[identifierPropertyName]"
               ref="option"
-              :key="entry.option[identifierPropertyName]">
+              :key="option[labelPropertyName]">
               {{ addNewChipText
-                ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
+                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
                 : `${getI18nTerm('form.Add', -1, {
-                  value: getLangLabel(entry.option[labelPropertyName], true),
+                  value: getLangLabel(option[labelPropertyName], true),
                 })} ...` }}
             </span>
             <template
-              v-else-if="entry">
+              v-else-if="option">
               <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
                 @binding {Object} item - the option passed to options list -->
               <slot
-                :item="entry.option"
+                :item="option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
                 <template>
                   <span
+                    v-if="option[identifierPropertyName]"
+                    :key="option[identifierPropertyName]"
                     v-insert-text-as-html="{
                       value: highlightStringMatch
-                        ? highlight(getLangLabel(entry.option[labelPropertyName], true))
-                        : getLangLabel(entry.option[labelPropertyName], true),
+                        ? highlight(getLangLabel(option[labelPropertyName], true))
+                        : getLangLabel(option[labelPropertyName], true),
                       interpretTextAsHtml: interpretChipsLabelAsHtml,
                     }" />
                 </template>
