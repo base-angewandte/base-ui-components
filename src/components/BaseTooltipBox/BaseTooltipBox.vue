@@ -14,8 +14,11 @@
     <div
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
-        <!-- @slot customize the header displayed on mobile for `typeOnMobile` `modal` and `fullscreen` -->
-        <slot name="header-title">
+        <!-- @slot customize the header displayed on mobile for `typeOnMobile` `modal` and `fullscreen`
+        @binding header-id {string, number} bind this id to your slot element containing the title text for assistive technology to work properly-->
+        <slot
+          name="header-title"
+          :header-id="headerId">
           <div
             :id="headerId"
             class="base-tooltip-box__header__title">
@@ -127,6 +130,7 @@ export default {
     /**
      * customize the tooltipbox id.
      *  if you are using the `header-title` slot this should also be set as id on your custom title element
+     *  (it is also available via slot binding)
      */
     headerId: {
       type: [String, Number],
