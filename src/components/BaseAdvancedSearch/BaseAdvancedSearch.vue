@@ -176,7 +176,19 @@
               :field-name="fieldName"
               :group-names="groupNames"
               :option="option"
-              name="form-drop-down-entry" />
+              name="form-drop-down-entry">
+              <template
+                v-if="mode === 'form'
+                  && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                    || (typeof renderFormChipsLabelAsHtml === 'object'
+                      && renderFormChipsLabelAsHtml.includes(fieldName)))">
+                <span
+                  v-insert-text-as-html="{
+                    value: option[labelPropertyName.formInputs],
+                    interpretTextAsHtml: true,
+                  }" />
+              </template>
+            </slot>
           </template>
         </BaseForm>
         <div
@@ -195,7 +207,20 @@
         <slot
           name="autocomplete-option"
           :option="autocompleteOption"
-          :collection-id="collectionId" />
+          :collection-id="collectionId">
+          <!-- also automate the display of html for all fields specified directly in the component -->
+          <template
+            v-if="mode === 'form'
+              && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                || (typeof renderFormChipsLabelAsHtml === 'object'
+                  && renderFormChipsLabelAsHtml.includes(collectionId)))">
+            <span
+              v-insert-text-as-html="{
+                value: autocompleteOption[labelPropertyName.autocompleteOption],
+                interpretTextAsHtml: true,
+              }" />
+          </template>
+        </slot>
       </template>
     </BaseAdvancedSearchRow>
   </div>
@@ -204,6 +229,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { createId, debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
 
 /**
@@ -233,6 +259,9 @@ export default {
     BaseCollapsedFilterRow: defineAsyncComponent(() => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow').then(m => m.default || m)),
     BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm').then(m => m.default || m)),
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton').then(m => m.default || m)),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   props: {
     /**
@@ -1529,7 +1558,7 @@ export default {
             //  field is set
             // b) prop `interpretFormChipsLabelAsHtml` was set `true` to cover all fields and
             //  specifically exclude this one
-            if ((!this.interpretFormChipsLabelAsHtml && keyProps.interpretChipsLabelAsHtml)
+            if ((!this.interpretFormChipsLabelAsHtml && keyProps?.interpretChipsLabelAsHtml)
               || (this.interpretFormChipsLabelAsHtml && (!keyProps
                 || !Object.keys(keyProps).includes('interpretChipsLabelAsHtml') || keyProps.interpretChipsLabelAsHtml))) {
               return prev.concat(key);
