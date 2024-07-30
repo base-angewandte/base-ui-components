@@ -3,7 +3,11 @@
     v-if="showInt"
     :class="['base-pop-up',
              { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
-    <div class="base-pop-up-background" />
+    <div
+      :class="[
+        'base-pop-up__background',
+        { 'base-pop-up__background--visible': overlayBackgroundVisible },
+      ]" />
     <div
       ref="popUpBody"
       :aria-labelledby="id"
@@ -196,6 +200,14 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * define if the overlay background should be visible
+     * (semitransparent black)
+     */
+    overlayBackgroundVisible: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -268,7 +280,7 @@ export default {
   @import '../../styles/variables.scss';
 
   .base-pop-up {
-    .base-pop-up-background {
+    .base-pop-up__background {
       position: fixed;
       top: 0;
       left: 0;
@@ -277,6 +289,10 @@ export default {
       /* specific to be higher than base header */
       z-index: map-get($zindex, modal_bg);
       overflow: hidden;
+
+      &.base-pop-up__background--visible {
+        background: $overlay-background-light;
+      }
     }
 
     .popup-box {

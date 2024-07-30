@@ -68,6 +68,8 @@ $map-cluster-bg-hover: var(--map-cluster-bg-hover, rgba(255, 217, 91, .4));
 $map-cluster-bg-inner-hover: var(--map-cluster-bg-inner-hover, rgba(255, 217, 91, .85));
 $pagination-bullet-color: var(--pagination-bullet-color, #444444);
 $warning-color: var(--warning-color, #ff4444);
+$overlay-background-light: rgba(0, 0, 0, 0.5);
+$overlay-background-dark: rgba(0, 0, 0, 0.8);
 
 /* shadows and borders */
 $border-width: 2px;

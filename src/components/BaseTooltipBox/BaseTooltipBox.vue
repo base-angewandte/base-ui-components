@@ -6,6 +6,7 @@
     :aria-labelledby="`baseTooltipBox-title-${_uid}`"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
+             { 'base-tooltip-box--background-visible': overlayBackgroundVisible },
              'base-tooltip-box--' + direction,
              { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
                || typeOnMobile === 'fullscreen' },
@@ -119,6 +120,14 @@ export default {
     thresholdTop: {
       type: Number,
       default: 0,
+    },
+    /**
+     * define if the overlay background should be visible
+     * (semitransparent black) - this only applies to `typeOnMobile` 'modal'
+     */
+    overlayBackgroundVisible: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -560,6 +569,10 @@ export default {
         max-width: inherit;
         background-color: transparent;
         z-index: map-get($zindex, modal);
+
+        &.base-tooltip-box--background-visible {
+          background-color: $overlay-background-light;
+        }
 
         .base-tooltip-box__inner {
           position: relative;
