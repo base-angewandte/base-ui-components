@@ -1171,10 +1171,16 @@ export default {
         };
       }
       if (fieldType === 'text' || fieldType === 'autocomplete' || typeof values === 'string') {
+        let formattedLabel = values;
+        if (fieldType === 'date' && values) {
+          // if type is date we need to parse the storage date to display values also considering
+          // possible minus
+          formattedLabel = this.formatToDisplayDate(values);
+        }
         return {
           values: [{
             // if fieldType is date convert to de date locale for display
-            label: fieldType === 'date' && values ? values.split('-').reverse().join('.') : values,
+            label: formattedLabel,
           }],
           fieldId,
           fieldType,
@@ -1214,7 +1220,7 @@ export default {
           values: Object.values(values)
             .map(chipValue => ({
               // convert to de date locale for display
-              label: chipValue ? chipValue.split('-').reverse().join('.') : '',
+              label: chipValue ? this.formatToDisplayDate(chipValue) : '',
             })),
           fieldId,
           // BaseCollapsedRow needs information if date is type daterange, timerange or datetime
@@ -1229,6 +1235,16 @@ export default {
       // NOT COVERED: multiline and chips below
       return values;
     },
+    formatToDisplayDate(storageDate) {
+      const { groups: { minus, year, month, day } = {} } = storageDate
+        .match(/((?<minus>-)?(?<year>\d{4})-?(?<month>\d{2})?-?(?<day>\d{2})?)/) || {};
+      return year ? `${day ? `${day}.` : ''}${month ? `${month}.` : ''}${minus || ''}${year}` : '';
+    },
+    formatToStorageDate(storageDate) {
+      const { groups: { minus, year, month, day } = {} } = storageDate
+        .match(/(?<day>\d{2})?\.?(?<month>\d{2})?\.?(?<minus>-)?(?<year>\d{4})/) || {};
+      return year ? `${minus || ''}${year}${month ? `-${month}` : ''}${day ? `-${day}` : ''}` : '';
+    },
     /**
      * function to transform collapsed values to form field values (necessary if something changed
      * in collapsed values, e.g. a filter value was removed)
@@ -1242,6 +1258,10 @@ export default {
       const { values, fieldType } = collapsedValues;
       // case string
       if (filterData.type === 'string') {
+        // special case date that needs to transform display to storage date format again
+        if (fieldType === 'date') {
+          return this.formatToStorageDate(values[0].label);
+        }
         return values[0].label;
       }
       // case boolean value
@@ -1253,12 +1273,12 @@ export default {
         return Number(values[0].label);
         // date could be string if it is just a single date or an object in all other cases
       }
-      // case date field
+      // case date field (not string)
       if ((fieldType.includes('date') || fieldType.includes('time')) && filterData.type === 'object') {
         const objectProperties = Object.keys(filterData.properties);
         return values.reduce((valueObject, value, index) => ({
           ...valueObject,
-          [objectProperties[index]]: value.label,
+          [objectProperties[index]]: this.formatToStorageDate(value.label),
         }), {});
       }
       // case chips input field
