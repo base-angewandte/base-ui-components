@@ -114,3 +114,19 @@ export const debounce = (delay, f) => {
     timer = setTimeout(() => f.apply(this, args), delay);
   };
 };
+
+/**
+ * highlight characters in a word matching a given string with chosen html tags
+ * @param {string} word - the word that should be highlighted
+ * @param {string} queryString - the query string that should be highlighted in `word`
+ * @param {string[]} highlightTags - the names of one or more html tags to apply
+ *  (only names without '<' and '>'! e.g. ['u', 'b'])
+ * @returns {string} - the string to fill into v-html
+ */
+export const highlightText = ({ word, queryString, highlightTags = ['u', 'strong'] }) => {
+  const check = new RegExp(queryString, 'ig');
+  const highlightTagsStart = `<${highlightTags.join('><')}>`;
+  const highlightTagsEnd = `</${highlightTags.join('></')}>`;
+  return word.toString()
+    .replace(check, matchedText => (`${highlightTagsStart}${matchedText}${highlightTagsEnd}`));
+};

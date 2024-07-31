@@ -22,7 +22,7 @@ export function usePopUpLock(target) {
   onUpdated(() => {
     if (target?.value) {
       if (showElement.value) {
-        disableBodyScroll(target.value);
+        disableBodyScroll(target.value, { allowTouchMove: () => true });
       } else {
         enableBodyScroll(target.value);
       }

@@ -24,10 +24,19 @@
         :assistive-text="assistiveText"
         :date-field-delay="dateFieldDelay"
         :language="language"
+        :highlight-autocomplete-match="highlightAutocompleteMatch"
+        :highlight-autocomplete-tags="highlightAutocompleteTags"
         class="base-advanced-search__filter-row"
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
-        @fetch-autocomplete-results="fetchAutocomplete($event, index)" />
+        @fetch-autocomplete-results="fetchAutocomplete($event, index)">
+        <template #autocomplete-option="{ option: autocompleteOption }">
+          <!-- @slot to allow for modification of the autocomplete option -->
+          <slot
+            name="autocomplete-option"
+            :option="autocompleteOption" />
+        </template>
+      </BaseAdvancedSearchRow>
     </template>
 
     <!-- MAIN FILTER -->
@@ -51,6 +60,8 @@
       :assistive-text="assistiveText"
       :date-field-delay="dateFieldDelay"
       :language="language"
+      :highlight-autocomplete-match="highlightAutocompleteMatch"
+      :highlight-autocomplete-tags="highlightAutocompleteTags"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
       @option-selected="fillOptionToForm">
@@ -88,6 +99,12 @@
             :date-time-text="advancedSearchText.collapsedDateTime"
             @remove-all="removeAllFilters" />
         </div>
+      </template>
+      <template #autocomplete-option="{ option: autocompleteOption }">
+        <!-- @slot to allow for modification of the autocomplete option -->
+        <slot
+          name="autocomplete-option"
+          :option="autocompleteOption" />
       </template>
     </BaseAdvancedSearchRow>
   </div>
@@ -457,6 +474,23 @@ export default {
     advancedFormOpen: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * set this flag to `true` to highlight autocomplete option characters that match
+     *  the current search input string
+     */
+    highlightAutocompleteMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `highlightAutocompleteMatch` is set `true`
+     *  provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightAutocompleteTags: {
+      type: Array,
+      default: () => ([]),
     },
   },
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
@@ -1103,6 +1137,9 @@ export default {
      * function triggered when 'advanced search' button is clicked in 'form' mode
      */
     openAdvancedSearch() {
+      // close the main search autocomplete drop down since this is not in user focus
+      // anymore
+      this.$refs.mainSearch.isActive = false;
       // toggle form
       this.formOpen = !this.formOpen;
     },
@@ -1261,21 +1298,24 @@ export default {
 <style lang="scss" scoped>
 @import "../../styles/variables";
 
-.base-advanced-search__filter-row {
-  margin-bottom: $spacing;
-}
+.base-advanced-search {
+  .base-advanced-search__filter-row {
+    margin-bottom: $spacing;
+  }
 
-.base-advanced-search__expand-button {
-  border-left: $separation-line;
-  margin-left: $spacing-small;
-  padding-right: $spacing-small;
-}
+  .base-advanced-search__expand-button {
+    border-left: $separation-line;
+    margin-left: $spacing-small;
+    padding-right: $spacing-small;
+  }
 
-.base-advanced-search__search-form {
-  border-top: $separation-line;
+  .base-advanced-search__search-form {
+    border-top: $separation-line;
 
-  &.base-advanced-search__search-form--hidden {
-    display: none;
+    &.base-advanced-search__search-form--hidden {
+      display: none;
+    }
   }
 }
+
 </style>

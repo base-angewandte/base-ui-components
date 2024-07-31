@@ -1,4 +1,7 @@
 <template>
+  <!-- v-clean-dom-nodes is here because space was added before and after the link which
+    was not the desired effect when link was followed by a comma in BaseTextList - also
+    see ticket #2283#note-11 -->
   <component
     :is="renderAs"
     v-bind="linkAttributes"

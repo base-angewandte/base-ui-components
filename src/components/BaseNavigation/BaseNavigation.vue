@@ -62,7 +62,7 @@
             :render-link-as="renderAs"
             :value="showShortLabel && activeElement.shortLabel ?
               activeElement.shortLabel : activeElement.label"
-            aria-current="page"
+            :additional-attributes="{ ariaCurrentValue: 'page', exactPath: true }"
             :identifier-property-value="activeElement.route"
             class="base-navigation__nav-item-link
                    base-navigation__nav-item-link--active">
@@ -507,7 +507,9 @@ export default {
       }
 
       &.base-navigation__nav-item-link--active {
-        box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
+        // add one pixel to active border and make smaller again by reducing the spread-radius
+        // otherwise there is an artefact line left or right of the element sometimes
+        box-shadow: $box-shadow-reg, inset 0 (-#{$border-active-width + 1}) 0 -1px $app-color;
       }
 
       .base-navigation__nav-item-link__text--truncation {
@@ -521,7 +523,6 @@ export default {
   .base-navigation__nav-items {
     display: flex;
     width: 100%;
-    justify-content: center;
     align-items: center;
 
     .base-navigation__nav-item {

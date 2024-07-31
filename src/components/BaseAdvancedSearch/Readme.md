@@ -231,6 +231,7 @@ export default {
           ],
         },
       ],
+      timeout: null,
     };
   },
   methods: {
@@ -240,7 +241,11 @@ export default {
     fetchAutocomplete({ searchString, filter }) {
        if (searchString && (filter.type === 'text'
          || (filter.type === 'chips' && filter.freetext_allowed)) ) {
-         setTimeout(() => {
+         if (this.timeout) {
+           clearTimeout(this.timeout);
+           this.timeout = null;
+         }
+         this.timeout = setTimeout(() => {
            this.autocompleteResults = this.potentialResults.map(({ collection, id, data }) => {
              const filteredResults = data
                .filter(entry => entry.header.toLowerCase()
@@ -507,13 +512,18 @@ export default {
         { filter_id: 'title', label: 'Titel', data: [{ id: 'GEsHuzeVJSQovwaGLDZdSQ', title: 'Afterthought: Fashion, Feminism and Radical Protest', subtext: [] }, { id: 'LgCvdxfdNVZgjjobhbnYUv', title: 'Les Testaments Trahis', subtext: [] }, { id: 'gGt7TJFvPxYY6VxRzEexw3', title: 'Kreativität lohnt sich – Beweis und Praxistest', subtext: [] }, { id: '9E84PwCZrDSPPyJBw5mtgb', title: 'praxistest blog', subtext: [] }, { id: 'Geq3woWMK85o5z9nz3tLiM', title: 'USING SOLAR SINTERING TO BUILD INFRASTRUCTURE ON THE MOON LATEST ADVANCEMENTS IN', subtext: [] }, { id: 'TSu72rc256YMWp3YLmVJrG', title: 'Rechtstipp: Werbetestimonial wider Willen?', subtext: [] }, { id: 'Lgpw3NFGuhNUAczYMpp7xL', title: 'Test Blink of an Eye', subtext: [] }, { id: '5k3RNU6ATARzb3u8rJSkmX', title: 'Vordiplom: Konsolidierung von degradiertem Holz, Testreihe', subtext: ['Interdisziplinäre / projektorientierte Lehrtätigkeit'] }, { id: 'N2v5F95j9TKpTqwQPexHzZ', title: 'Greatest Hits', subtext: [] }, { id: '7aYwxD672TT4LFSXD3iVKh', title: "Protest 2.0 - Don't believe the Hype: Soziale Computernetzwerke als Gelegenheit und Herausforderung für politischen Aktivismus", subtext: [] }, { id: 'DE2XmDpUv89YbB2VoatDop', title: 'Scores #5. intact bodies / under protest  (Co-ed.)', subtext: [] }, { id: 'XHy9NiuCJgC8Hh6HUiXPR3', title: 'Songs of Social Protest,', subtext: [] }, { id: 'XUVMdRrW5SeSMQGiWrJsnP', title: 'Die lauteste Zeit des Jahres', subtext: [] }, { id: 'cwHw3Tk5icpEDucMmEx8ge', title: 'Fashion, Feminism and Radical Protest: Paths towards a Praxis of Joyful Militancy', subtext: [] }, { id: 'DbVxxo8NLgT8EKehHT2bsr', title: 'LeFo - 1. Testmodul zur Archivierung digitaler Kunst im virtuellen Raum', subtext: ['LeFo'] }, { id: 'NL7cFgRBupqphh5MBVmwsQ', title: 'Symposium “Teststrecke Kunst. Wiener Avantgarden nach 1945”', subtext: [] }, { id: 'LDRW6wJwvR38NMvxi4d9tt', title: 'UNSETTLED – Urban routines, temporalities and contestations', subtext: [] }, { id: 'AiHq8bMT7iqfj6N6BBDUyJ', title: 'I volti dell’amore. Pluralità e intertestualità nel De amore di Andrea Cappellano', subtext: [] }, { id: 'af9wvTkzN8d8ndD4bqeUGt', title: 'Im Zentrum der Aufmerksamkeit – Gesten des Widerstands, Polizei und die Warenförmigkeit von Protest', subtext: [] }, { id: 'ig9puxcKrGY64mtMR2aHZc', title: 'Kunst und Protest', subtext: ['Clevere Strategie oder Störung der Ordnung?'] }] },
       ],
       fieldLoading: '',
+      timeout: null,
     };
   },
   methods: {
     fetchAutocomplete({ searchString, filter }) {
       if (searchString && (filter.type === 'text'
         || (filter.type === 'chips' && filter.freetext_allowed))) {
-        setTimeout(() => {
+        if (this.timeout) {
+          clearTimeout(this.timeout);
+          this.timeout = null;
+        }
+        this.timeout = setTimeout(() => {
           // eslint-disable-next-line camelcase
           this.autocompleteResults = this.potentialResults.map(({ label, filter_id, data }) => {
             const filteredResults = data

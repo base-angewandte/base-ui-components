@@ -229,19 +229,28 @@
 
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
-                v-model:active-option="activeEntry"
+                :active-option="activeCollection === option[autocompletePropertyNames.id] ? activeEntry : {}"
                 :drop-down-options="option[autocompletePropertyNames.data]"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
                 :label-property-name="labelPropertyName.autocompleteOption"
+                :use-highlight-string-match="highlightAutocompleteMatch"
+                :highlight-string-tags="highlightAutocompleteTags"
+                :highlight-string-match="currentInput"
                 class="base-advanced-search-row__autocomplete-options"
-                @update:active-option="setCollection(option[autocompletePropertyNames.id])"
                 @update:selected-option="addOption(
                   $event,
                   option[autocompletePropertyNames.id],
-                )" />
+                )">
+                <template #option="{ option: autocompleteOption }">
+                  <!-- @slot to allow for modification of the autocomplete option -->
+                  <slot
+                    name="autocomplete-option"
+                    :option="autocompleteOption" />
+                </template>
+              </BaseDropDownList>
             </div>
           </template>
 
@@ -680,6 +689,23 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * set this flag to `true` to highlight autocomplete option characters that match
+     *  the current search input string
+     */
+    highlightAutocompleteMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `highlightAutocompleteMatch` is set `true`
+     *  provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightAutocompleteTags: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   emits: ['update:applied-filter', 'fetch-autocomplete-results', 'is-active', 'option-selected', 'remove-filter', 'add-filter-row'],
   setup() {
@@ -1041,6 +1067,7 @@ export default {
         }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * when current input changes emit this to parent component which should
@@ -1048,18 +1075,21 @@ export default {
      * the values to filter.filter_values if type is 'date' or 'daterange'
      * @param {string} val - the search string
      */
-    currentInput(val) {
-      // if filter type is text - just emit for fetching autocomplete results
-      if (this.useAutocompleteFunctionality) {
-        /**
-         * event emitted when input string for text or chips filter changes
-         *
-         * @event fetch-autocomplete-results
-         * @property {string} input - the input string
-         * @property {Filter} filter - the filter currently applied
-         */
-        this.$emit('fetch-autocomplete-results', { input: val, filter: this.filter });
-      }
+    currentInput: {
+      handler(val) {
+        // if filter type is text - just emit for fetching autocomplete results
+        if (this.useAutocompleteFunctionality) {
+          /**
+           * event emitted when input string for text or chips filter changes
+           *
+           * @event fetch-autocomplete-results
+           * @property {string} input - the input string
+           * @property {Filter} filter - the filter currently applied
+           */
+          this.$emit('fetch-autocomplete-results', { input: val, filter: this.filter });
+        }
+      },
+      immediate: true,
     },
     /**
      * if 'isActive' is set true reset the filterFade (for mobile filter view) to
@@ -1089,7 +1119,7 @@ export default {
         }
         // if filter type is text and the value was not added in that form yet also add it
         // (which will trigger search)
-      } else if (!val && this.filter.type === 'text' && this.currentInput
+      } else if (!val && this.filter.type === 'text'
         && this.filter.filter_values.join() !== this.currentInput) {
         this.addOption(this.currentInput);
       }
@@ -1235,15 +1265,6 @@ export default {
 
     /** CONTROLLED VOCABULARY AND AUTOCOMPLETE SELECT RELATED METHODS */
 
-    /**
-     * function for setting the currently active collection
-     *
-     * @param {string} collection - the collection string to set
-     * as active collection (triggered when active entry changes)
-     */
-    setCollection(collection) {
-      this.activeCollection = this.activeEntry ? collection : '';
-    },
     /**
      * function to add any entry to the BaseSearch selectedChips list (since basically all
      * base search input is handled as chips)

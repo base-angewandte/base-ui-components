@@ -41,13 +41,20 @@
           role="option"
           tabindex="0"
           @keydown.enter="selected(option)"
-          @click.stop="selected(option)">
+          @click.stop="selected(option)"
+          @touchstart.stop="">
           <!-- @slot a slot to customize every single option (e.g. display of information other than `[valuePropertyName]`)
             @binding {Object} option - the current option in the options list-->
           <slot
             name="option"
             :option="option">
-            {{ getLangLabel(option[labelPropertyName], true) }}
+            <template v-if="useHighlightStringMatch">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <span v-html="highlight(getLangLabel(option[labelPropertyName], true))" />
+            </template>
+            <template v-else>
+              {{ getLangLabel(option[labelPropertyName], true) }}
+            </template>
           </slot>
         </li>
       </template>
@@ -73,6 +80,7 @@
 </template>
 
 <script>
+import { highlightText } from '@/utils/utils';
 import i18n from '@/mixins/i18n';
 
 /** a multipurpose drop down list */
@@ -198,6 +206,30 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * set true if option characters matching a string provided in `highlightStringMatch`
+     *  should be highlighted
+     */
+    useHighlightStringMatch: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `useHighlightStringMatch` is set to `true`, provide a string to match with the
+     *  option label here
+     */
+    highlightStringMatch: {
+      type: String,
+      default: '',
+    },
+    /**
+     * provide tag names to style the matched characters
+     *  (without '<' and '>', e.g. ['b'] for <b>)
+     */
+    highlightStringTags: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   emits: ['update:selected-option'],
   data() {
@@ -243,6 +275,15 @@ export default {
     noOptionsSlotHasData() {
       return !!this.$slots['no-options'];
     },
+    /**
+     * create an object out of prop `highlightStringTags` so it can be
+     *  spread into the options of the `highlightText` function
+     * @returns {{highlightTags: []}|{}}
+     */
+    highlightTags() {
+      return this.highlightStringTags?.length
+        ? { highlightTags: this.highlightStringTags } : {};
+    },
   },
   mounted() {
     // check if this element is associated with an input element
@@ -268,6 +309,19 @@ export default {
     }
   },
   methods: {
+    /**
+     * function to highlight characters of a string
+     * @param {string} word - the option that should be matched with query string
+     * @returns {string} - the string to fill into v-html
+     */
+    highlight(word) {
+      return highlightText({
+        word,
+        queryString: this.highlightStringMatch,
+        // this is an empty object if prop `highlightStringTags` was not used
+        ...this.highlightTags,
+      });
+    },
     /**
      * triggered if option was selected by click
      *

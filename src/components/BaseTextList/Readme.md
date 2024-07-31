@@ -66,7 +66,7 @@ export default {
               {
                 label: 'internal',
                 value: 'internal link',
-                id: '/some-path',
+                source: '/some-path',
               },
               {
                 label: 'Labore',

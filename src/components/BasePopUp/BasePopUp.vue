@@ -26,6 +26,7 @@
         </slot>
         <!-- @event close -->
         <button
+          v-if="!closeButtonDisabled"
           type="button"
           aria-label="close pop up"
           class="base-popup__close-button"
@@ -40,7 +41,9 @@
       <div class="popup-content">
         <!-- @slot slot to fill the body of the box with custom content -->
         <slot />
-        <div class="popup-button-row">
+        <div
+          v-if="showButtonRow"
+          class="popup-button-row">
           <!-- @slot custom button row -->
           <slot name="button-row">
             <BaseButton
@@ -159,6 +162,13 @@ export default {
       default: false,
     },
     /**
+     * disable close button
+     */
+    closeButtonDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * if true button loader will be shown
      */
     isLoading: {
@@ -178,6 +188,13 @@ export default {
     fullscreenOnMobile: {
       type: Boolean,
       default: false,
+    },
+    /**
+     * button row visibility
+     */
+    showButtonRow: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: ['button-left', 'button-right', 'close'],
@@ -218,7 +235,7 @@ export default {
     document.onkeyup = (e) => {
       const { key } = e;
       if (document.querySelector('.popup-box')) {
-        if (key === 'Escape') {
+        if (!this.closeButtonDisabled && key === 'Escape') {
           const btn = document.querySelector('.popup-box .base-popup__close-button');
           btn.dispatchEvent(new Event('click'));
         }
@@ -293,6 +310,14 @@ export default {
         align-items: center;
         flex-shrink: 0;
 
+        .popup-title {
+          margin-right: $spacing-small;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
         .base-popup__close-button {
           &:active, &:focus {
             color: $app-color;
@@ -301,6 +326,7 @@ export default {
 
           .popup-remove {
             width: $icon-medium;
+            min-width: $icon-medium;
             cursor: pointer;
           }
         }

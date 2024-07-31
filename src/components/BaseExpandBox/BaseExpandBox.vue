@@ -17,13 +17,14 @@
       <slot name="header" />
     </div>
     <div
+      ref="content"
       :class="[
         'base-expand-box-content',
         { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">
       <div
         class="base-expand-box-content-inner">
         <!-- div is needed for calculation of content height -->
-        <div>
+        <div ref="contentInner">
           <!--
             @slot add expand box content here
           -->
@@ -56,6 +57,7 @@
 </template>
 
 <script>
+import { debounce } from '@/utils/utils';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 
@@ -133,10 +135,12 @@ export default {
   emits: ['update:expand', 'box-height'],
   data() {
     return {
+      elementId: null,
       expandInt: false,
-      contentWidth: null,
       initialized: false,
       showButton: false,
+      mutationObserver: null,
+      resizeObserver: null,
     };
   },
   computed: {
@@ -152,45 +156,66 @@ export default {
   mounted() {
     this.init();
   },
+  beforeUnmount() {
+    if (this.mutationObserver) this.mutationObserver.disconnect();
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+  },
   methods: {
     /**
      * init
      */
     init() {
-      if (this.expand) {
-        // check if button is needed
-        this.showButton = this.contentInnerHeight() > this.contentHeight();
-        this.expandInt = true;
-      }
-
+      // create an element id to generate unique dom selectors
+      // eslint-disable-next-line no-underscore-dangle
+      this.elementId = this._uid;
+      // set internal expand variable
+      if (this.expand) this.expandInt = true;
+      // calculate the show-more button visibility
+      this.calcButtonVisibility({});
+      // init observers (currently for resize and mutation)
+      this.initObserver();
+      // set initialization state
       this.initialized = true;
-
-      // observe resize of container and set visibility of button
-      this.boxResize().observe(this.$el);
     },
     /**
-     * check if box width changes and set visibility of button
+     * create resize/mutation observer for the content container
+     * to trigger the calculation for the visibility of the show more button
      */
-    boxResize() {
-      return new ResizeObserver((entries) => {
-        const currentWidth = entries[0].contentRect.width;
+    initObserver() {
+      // create a resize observer with calculation functions
+      const resizeObserver = new ResizeObserver(debounce(50, () => this.calcButtonVisibility({})));
 
-        if (this.contentWidth !== currentWidth) {
-          // compare content to parent container -> set button visibility
-          if (!this.expandInt) {
-            this.showButton = this.contentInnerHeight() > this.contentHeight();
-          }
+      // create a mutation observer with calculation functions
+      const mutationObserver = new MutationObserver(() => this.calcButtonVisibility({ collapse: true }));
 
-          // close expanded box
-          if (this.expand
-            && this.expandInt
-            && this.contentWidth !== null) {
-            this.expandInt = false;
-          }
-        }
+      // attach the observers to the component
+      resizeObserver.observe(this.$refs.content);
+      mutationObserver.observe(this.$refs.content, { childList: true, subtree: true });
 
-        // save currentWidth for next comparison
-        this.contentWidth = currentWidth;
+      // store them in variables
+      this.resizeObserver = resizeObserver;
+      this.mutationObserver = mutationObserver;
+    },
+    /**
+     * calculate visibility of 'show more' button
+     * @param {boolean} collapse - defines if the content is collapsed
+     */
+    calcButtonVisibility({ collapse = false }) {
+      // check if content should be collapsed
+      if (collapse) this.expandInt = false;
+      if (this.$refs.contentInner) {
+        // clone inner content
+        const contentInnerTemp = this.$refs.contentInner.cloneNode(true);
+        // add unique id for later use
+        contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.elementId}`);
+        // append the temporary element to the component
+        this.$el.appendChild(contentInnerTemp);
+        // get the height of the temporary element
+        const contentInnerTempHeight = contentInnerTemp.offsetHeight;
+        // remove  element
+        this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.elementId}`));
+        // set button visibility
+        this.showButton = contentInnerTempHeight > this.maxCollapsedHeight;
 
         // emit box-size
         if (!this.expandInt) {
@@ -200,51 +225,7 @@ export default {
            */
           this.$emit('box-height', this.$el.offsetHeight);
         }
-      });
-    },
-    /**
-     * calculate the content height
-     * @returns {number}
-     */
-    contentHeight() {
-      return this.$el.querySelector('.base-expand-box-content').offsetHeight;
-    },
-    /**
-     * calculate the content inner height
-     * @returns {number}
-     */
-    contentInnerHeight() {
-      return this.$el.querySelector('.base-expand-box-content-inner > div').offsetHeight - this.contentHeightOffset();
-    },
-    /**
-     * calculate an optional offset for the content inner height
-     *
-     * In some base-components, e.g. BaseTextList,
-     * a negative margin-bottom is defined to handle exact element boundaries.
-     * Therefore, an offset is needed to calculate the contentInnerHeight.
-     *
-     * @returns {number}
-     */
-    contentHeightOffset() {
-      // default offset
-      let offset = 0;
-      // get content slot elements
-      const elements = this.$el.querySelectorAll('.base-expand-box-content-inner > div > *');
-
-      // iterate through elements, evaluate whether an offset is required
-      elements.forEach((elem) => {
-        // break if offset is already set
-        if (offset) return;
-        // get elements margin-bottom as a number
-        const marginBottom = parseFloat(window.getComputedStyle(elem, null).getPropertyValue('margin-bottom'));
-        // check if the number is negative, if so, set the offset as a positive number
-        if (marginBottom < 0) {
-          offset = Math.abs(marginBottom);
-        }
-      });
-
-      // return number
-      return offset;
+      }
     },
     /**
      * click event for the show-more button
