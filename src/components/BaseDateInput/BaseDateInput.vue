@@ -591,13 +591,15 @@ export default {
      * @returns {string[]}
      */
     inputProperties() {
-      return Object.keys(this.input);
+      // if input is object return those keys // else for a single date it
+      // could also be a string - then just return an empty array
+      return typeof this.input === 'object' ? Object.keys(this.input) : [];
     },
     /**
      * check if input is just a single date or an object
      * @returns {boolean}
      */
-    isSingleDate() {
+    isInputTypeString() {
       return typeof this.input === 'string' || !this.inputProperties.length;
     },
     /**
@@ -694,13 +696,13 @@ export default {
      * @returns {boolean}
      */
     isDateFormatYear() {
-      return (this.isSingleDate && this.inputInt.date
+      return (this.isInputTypeString && this.inputInt.date
           && /^(-?[0-9]{1,4}|-[0-9]{0,4})$/.test(this.inputInt.date))
         || (this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && /^(-?[0-9]{1,4}|-[0-9]{0,4})$/.test(this.inputInt[key])));
     },
     isDateFormatMonth() {
-      return ((this.isSingleDate && this.inputInt.date
+      return ((this.isInputTypeString && this.inputInt.date
           && /^(-?[0-9]{1,4}|-[0-9]{0,4})-[0-1]?[0-9]$/.test(this.inputInt.date))
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key]
@@ -839,8 +841,8 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
           const isDateTimeField = this.type === 'datetime';
           this.inputFrom = isDateTimeField
-            ? val.date : val.date || val.date_from || val.time || val.time_from;
-          this.inputTo = isDateTimeField ? val.time : val.date_to || val.time_to;
+            ? val.date : val.date || val.date_from || val.time || val.time_from || val || '';
+          this.inputTo = isDateTimeField ? val.time : val.date_to || val.time_to || '';
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
@@ -1486,7 +1488,7 @@ export default {
      * @returns {string | Object}
      */
     getInputData() {
-      if (this.isSingleDate) {
+      if (this.isInputTypeString) {
         return this.inputInt.date !== null ? this.inputInt.date : '';
       }
       const data = {};
