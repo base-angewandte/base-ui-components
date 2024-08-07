@@ -179,9 +179,18 @@
               name="form-drop-down-entry">
               <template
                 v-if="mode === 'form'
+                  // check if value is boolean and was set true
                   && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                    // or if it is an array and
                     || (typeof renderFormChipsLabelAsHtml === 'object'
-                      && renderFormChipsLabelAsHtml.includes(fieldName)))">
+                      // a) includes the field name
+                      && (renderFormChipsLabelAsHtml.includes(fieldName)
+                        // or b) this is nested field in a form group and the array
+                        // contains a (nested) object with the group names and an array with the field name
+                        || (groupNames.length && renderFormChipsLabelAsHtml
+                          .some((arrayEntry) => typeof arrayEntry === 'object'
+                            && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
+                              .includes(fieldName))))))">
                 <span
                   v-insert-text-as-html="{
                     value: option[labelPropertyName.formInputs],
@@ -694,28 +703,20 @@ export default {
       }
       // else get the fieldProps out of formProps
       const fieldProps = this.formProps.fieldProps || {};
-      // check which fields should be altered - if array was provided use these fields
-      // otherwise use all fields - and filter in the end for just chips type fields
-      const fieldsToAlter = (typeof this.interpretFormChipsLabelAsHtml === 'object'
-        ? this.interpretFormChipsLabelAsHtml : Object.keys(this.formFilterList))
-        // TODO: this automatically excludes nested form fields - also allow for
-        // these fields in type `group`!
-        .filter(fieldKey => ['chips', 'chips-below']
-          .includes(this.formFilterList[fieldKey]['x-attrs']?.field_type));
       // now iterate over the fields and add (or overwrite) the `interpretChipsLabelAsHtml`
       // prop
-      const updatedFormFieldProps = fieldsToAlter.reduce((prev, key) => {
-        const previousValues = fieldProps[key] || {};
-        return {
-          ...prev,
-          [key]: {
-            // put the updated property first so individually set fields
-            // always have priority over `interpretFormChipsLabelAsHtml`
-            interpretChipsLabelAsHtml: true,
-            ...previousValues,
-          },
-        };
-      }, {});
+      const updatedFormFieldProps = this.renderFormChipsLabelAsHtml.reduce((prev, renderProp) => ({
+        ...prev,
+        ...this.addNewPropertyValueToNestedObject(
+          renderProp,
+          fieldProps || {},
+          'interpretChipsLabelAsHtml',
+          true,
+          // individually set fields should always have priority
+          // over `interpretFormChipsLabelAsHtml`
+          false,
+        ),
+      }), {});
 
       return {
         // add all other specified form props
@@ -1030,6 +1031,7 @@ export default {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.searchContainer);
   },
   methods: {
+    extractNestedPropertyValue,
     /**
      * GENERAL FUNCTIONALITIES
      */
@@ -1567,6 +1569,70 @@ export default {
           // if any of the conditions fail just return the list unaltered
           return prev;
         }, []);
+    },
+    /**
+     * a function to add a new property to a nested object
+     *
+     * @param {string|Object} renderProp - this is either a string - then an object
+     *  with `previousFieldProps` and this property will be created, or an object in
+     *  the style of { [parentProperty]: ['childProp1', 'childProp2'] } - this object
+     *  can also be nested deeper - 'childProp2' could instead also be an object in the
+     *  style above again
+     * @param {Object} fieldProps - an object for all fields including `renderProp` that contains
+     *  other properties `renderProp` or [renderProp.key] should receive
+     *  so: { [renderProp]: { renderPropProperties } }
+     * @param {string} propertyName - the name of the property to be added or overwritten
+     * @param {*} propertyValue - the value of the property to be added or overwritten
+     * @param {boolean} [overwritePreviousValues=true] - define if a preexisting value for
+     *  `propertyName` should be overwritten
+     * @returns {{[p: string]: *}|{}} - returns an object in the style
+     *  { [renderProp|renderProp.key]: { ...previousFieldProps, [propertyName]: propertyValue }}
+     *  or a deeper nested version thereof
+     */
+    addNewPropertyValueToNestedObject(
+      renderProp,
+      fieldProps,
+      propertyName,
+      propertyValue,
+      overwritePreviousValues = false,
+    ) {
+      // check if renderProp is a string
+      if (typeof renderProp === 'string') {
+        const previousFieldProps = fieldProps[renderProp] || {};
+        return {
+          [renderProp]: {
+            // if previous values should be overwritten - place the add the previous
+            // object properties first
+            ...(overwritePreviousValues ? previousFieldProps : {}),
+            [propertyName]: propertyValue,
+            // otherwise add them after the new property
+            ...(!overwritePreviousValues ? previousFieldProps : {}),
+          },
+        };
+      }
+      if (typeof renderProp === 'object') {
+        return Object.entries(renderProp).reduce((prev, [renderPropKey, renderPropValues]) => ({
+          ...prev,
+          // add an object in the form of [formGroupPropertyName]: {},
+          [renderPropKey]: {
+            // add all the field props that have been defined for that form group fields
+            // previously
+            ...fieldProps[renderPropKey],
+            // then overwrite form group fields that are defined in the renderProp array
+            ...renderPropValues.reduce((prevObject, field) => ({
+              ...prevObject,
+              // add property to fieldProps of this field
+              ...this.addNewPropertyValueToNestedObject(
+                field,
+                fieldProps[renderPropKey] || {},
+                propertyName,
+                propertyValue,
+              ),
+            }), {}),
+          },
+        }), {});
+      }
+      return {};
     },
   },
 };
