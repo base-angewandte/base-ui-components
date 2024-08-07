@@ -95,7 +95,7 @@
               <a
                 v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }"
                 :href="item.url"
-                :title="item.altTitle || item.value"
+                :title="item.altTitle || undefined"
                 class="base-link--external">
                 {{ item.value }}
               </a>
@@ -280,9 +280,12 @@ export default {
       default: '',
     },
     /**
-     * if `interpretTextAsHtml` is set `true` add a html-free version of
-     *  `value` here to be used for the `title` attribute and with
-     *  assistive technologies (only needed for type `chip`)
+     *  use this property to set the title attribute
+     *  also for link types other than `chip` and `tooltip`
+     *
+     * if `interpretTextAsHtml` is set `true` for type `chip` and `tootlip`
+     *  add a html-free version of `value` here to be used for the `title`
+     *  attribute and with assistive technologies
      */
     altTitle: {
       type: String,
@@ -431,7 +434,7 @@ export default {
      */
     title() {
       if (this.isTooltip) {
-        return this.titleText.tooltip;
+        return this.altTitle || this.titleText.tooltip;
       }
       if (this.isChip) {
         return this.titleText.chip
@@ -441,6 +444,10 @@ export default {
           .replace('{value}', this.altTitleInt)
           // remove multiple spaces with a single space
           .replace(/\s+/g, ' ');
+      }
+      // for all other types set the altTitle as title attribute if it was defined
+      if (this.altTitle) {
+        return this.altTitle;
       }
       // default
       return null;
