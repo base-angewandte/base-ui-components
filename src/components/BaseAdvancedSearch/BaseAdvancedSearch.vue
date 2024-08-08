@@ -187,7 +187,7 @@
                       && (renderFormChipsLabelAsHtml.includes(fieldName)
                         // or b) this is nested field in a form group and the array
                         // contains a (nested) object with the group names and an array with the field name
-                        || (groupNames.length && renderFormChipsLabelAsHtml
+                        || (groupNames?.length && renderFormChipsLabelAsHtml
                           .some((arrayEntry) => typeof arrayEntry === 'object'
                             && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
                               .includes(fieldName))))))">
@@ -623,16 +623,18 @@ export default {
     },
     /**
      * mode `form`: if necessary selected chip text can  be rendered as v-html directive
-     *  either set this prop `true` or `false` or provide a string array with
+     *  either set this prop `true` or `false`
+     *
      * this will only be applied to chips with an identifier property and of course
      *   can only apply to form field field_type `chips`
+     *
      * if only chips of certain form fields should be rendered as html use prop
      *  `formProps.fieldProps.interpretChipsLabelAsHtml` or if certain fields should
      *  be excluded set this prop to `true` and set `formProps.fieldProps.interpretChipsLabelAsHtml`
      *  for that field `false`
      */
     interpretFormChipsLabelAsHtml: {
-      type: [Boolean, Array],
+      type: Boolean,
       default: false,
     },
   },
