@@ -29,16 +29,18 @@
           :label-margin-bottom="labelMarginBottom"
           :list-type="listType"
           :render-label-as="renderLabelAs"
-          :style="{ '--columns': cols }" />
+          :style="{ '--columns': cols }"
+          :interpret-text-as-html="interpretTextAsHtml" />
       </template>
 
       <!-- String as text -->
       <!-- get rid of prepending white-space -->
       <p
         v-else-if="item.data && typeof item.data === 'string'"
+        v-insert-text-as-html="{ value: item.data, interpretTextAsHtml }"
         :class="[
           'base-text-list__content',
-          'base-text-list__content--pre-line',
+          { 'base-text-list__content--pre-line': !interpretTextAsHtml },
           // render single content in columns
           // eslint-disable-next-line vue/multiline-html-element-content-newline
           { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
@@ -49,9 +51,8 @@
         class="base-text-list__content">
         <li
           v-for="(arrayItem, listIndex) in item.data"
-          :key="listIndex">
-          {{ arrayItem }}
-        </li>
+          :key="listIndex"
+          v-insert-text-as-html="{ value: arrayItem, interpretTextAsHtml }" />
       </ul>
 
       <!-- Array/Objects -->
@@ -76,6 +77,8 @@
                 :type="item.id"
                 :url="objectItem.url"
                 :value="objectItem.value"
+                :alt-title="objectItem.altTitle"
+                :interpret-text-as-html="interpretTextAsHtml"
                 :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]">
                 <template #tooltip>
                   <template v-if="isTooltip(objectItem)">
@@ -124,7 +127,9 @@
                   :tooltip-threshold-top="tooltipThresholdTop"
                   :type="item.id"
                   :url="objectItem.url"
-                  :value="objectItem.value">
+                  :value="objectItem.value"
+                  :alt-title="objectItem.altTitle"
+                  :interpret-text-as-html="interpretTextAsHtml">
                   <!-- @slot slot for tooltip content
                        @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
                   <slot
@@ -141,6 +146,7 @@
 </template>
 
 <script>
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import cleanDomNodes from '@/directives/cleanDomNodes';
 import i18n from '../../mixins/i18n';
 
@@ -156,6 +162,7 @@ export default {
     BaseLink: () => import('../BaseLink/BaseLink').then(m => m.default || m),
   },
   directives: {
+    insertTextAsHtml: InsertTextAsHtml,
     cleanDomNodes,
   },
   mixins: [i18n],
@@ -174,14 +181,15 @@ export default {
      *  Possible object properties for `{ data : {Object, Object[]} }`:
      *  - **value** `string` - the displayed text for all types
      *  - **label** `string?` - an optional pretext in style of 'label:'
+     *  - **altTitle** `string?` - if `interpretTextAsHtml` is set `true`, add a html-free version of the label
+     *    here that can be used for hover title and assistive technologies (needed for type 'chip')
      * - **[identifierPropertyName]** `string?` - specify the id of a chip or the path for internal link - specify the object property name with prop `identifierPropertyName`
      * - **id** `string?` - for type chip - an identifier for the chip type (used in link generation)
      * - **path** `string?` - for type chip (used in link generation)
      * - **url** `string?` - for external link - the url to link to
      * - **additional** `Object?` - used for tooltip content generation - an array of objects with properties:
-     *    `label`, `value` and (in case the item should render as link) `url`
-     *    **caveat**: even if tooltip content is created via slot this property needs to be present and filled in order for the tooltip to show
-     * - **data** `Object[]?` - for type chip - specify the list of chips to be displayed here - needs to be an object with `value` and `[identifierPropertyName]`
+     *    `label`, `value` optionally `altTitle` (if `interpretTextAsHtml` is set true) and `url` (in case the item should render as link)
+     *    **caveat**: even if tooltip content is created via slot this property (`tooltip`) needs to be present and filled in order for the tooltip to show
      *
      * Note: objects wrapped in an extra array are rendered as columns respecting the `cols` property.
      */
@@ -276,6 +284,16 @@ export default {
     tooltipThresholdTop: {
       type: Number,
       default: 0,
+    },
+    /**
+     * set true to render `data` or `value` content as html
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

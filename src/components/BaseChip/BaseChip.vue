@@ -6,6 +6,7 @@
              { 'base-chip__active': chipActive }]">
     <div
       ref="chipText"
+      v-insert-text-as-html="{ value: entryInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
       :style="textStyling"
       :contenteditable="editable ? 'true' : false"
       :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
@@ -16,9 +17,7 @@
       @click.stop="clickAction"
       @mousedown="onMouseDown"
       @mousemove="moveBox"
-      @mouseleave="hideBox">
-      {{ entryInt }}
-    </div>
+      @mouseleave="hideBox" />
     <span
       v-if="assistiveText"
       :id="`${internalId}_aria-label`"
@@ -39,6 +38,7 @@
 
 <script>
 import { createId } from '@/utils/utils';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 
 /**
  * Basic Chip component
@@ -49,6 +49,9 @@ export default {
   components: {
     BaseHoverBox: () => import('../BaseHoverBox/BaseHoverBox'),
     BaseIcon: () => import('../BaseIcon/BaseIcon'),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   model: {
     prop: 'entry',
@@ -112,6 +115,17 @@ export default {
     assistiveText: {
       type: String,
       default: '',
+    },
+    /**
+     * if necessary chip text can be rendered as html
+     *  this feature is currently only available if the chip is not editable
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

@@ -7,13 +7,15 @@
       class="base-collapsed-filter-item__until">
       {{ rangeIndicator }}
     </span>
-    <!-- per default use BaseChip component except for type `boolean` -->
+    <!-- per default use BaseChip component except for type `boolean`
+      enable interpret-text-as-html for chips input fields and chips WITH ids -->
     <BaseChip
       v-if="!isBoolean && hasValue"
       :entry="value.label"
       :is-linked="true"
       :text-styling="chipStyling"
       role="listitem"
+      :interpret-text-as-html="interpretLabelAsHtml && !!value.id"
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
@@ -77,6 +79,14 @@ export default {
      * needed for cursor styling if over chips
      */
     scrollable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if necessary selected chip text can be rendered as v-html directive
+     * will only be applied to values with `id`
+     */
+    interpretLabelAsHtml: {
       type: Boolean,
       default: false,
     },

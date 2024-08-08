@@ -202,7 +202,12 @@ $base-expand-list-transition-duration: 250ms;
 
 * If a component needs to have a `z-index`, it should be set in reference to and added to `$zindex` in `variables.scss` (line 91).
 
-* Additional helper classes are available in `src/styles/lib.scss` (e.g. a `.hide` class keep content available for screenreaders).
+#### Helper Classes
+
+`no-clean`: can be used to not have the directive `v-clean-dom-nodes` applied to a child element
+
+
+Additional helper classes are available in `src/styles/lib.scss` (e.g. a `.hide` class keep content available for screenreaders).
 
 ### Commit Guidelines
 

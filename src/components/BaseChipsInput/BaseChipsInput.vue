@@ -35,30 +35,35 @@
           @within-drop-down="dropDownActive = $event"
           @click.native.stop="closeDropDown"
           @touchstart.native.stop="closeDropDown">
-          <template #option="entry">
+          <template #option="{ option }">
             <span
-              v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
+              v-if="allowUnknownEntries && !option[identifierPropertyName]"
               ref="option"
-              :key="entry.option[identifierPropertyName]">
+              :key="option[labelPropertyName]">
               {{ addNewChipText
-                ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
+                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
                 : `${getI18nTerm('form.Add', -1, {
-                  value: getLangLabel(entry.option[labelPropertyName], true),
+                  value: getLangLabel(option[labelPropertyName], true),
                 })} ...` }}
             </span>
             <template
-              v-else-if="entry">
+              v-else-if="option">
               <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
                 @binding {Object} item - the option passed to options list -->
               <slot
-                :item="entry.option"
+                :item="option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                <template v-if="highlightStringMatch">
-                  <span v-html="highlight(getLangLabel(entry.option[labelPropertyName], true))" />
-                </template>
-                <template v-else>
-                  {{ getLangLabel(entry.option[labelPropertyName], true) }}
+                <template>
+                  <span
+                    v-if="option[identifierPropertyName]"
+                    :key="option[identifierPropertyName]"
+                    v-insert-text-as-html="{
+                      value: highlightStringMatch
+                        ? highlight(getLangLabel(option[labelPropertyName], true))
+                        : getLangLabel(option[labelPropertyName], true),
+                      interpretTextAsHtml: interpretChipsLabelAsHtml,
+                    }" />
                 </template>
               </slot>
             </template>
@@ -126,6 +131,7 @@
 
 <script>
 import { createId, highlightText } from '@/utils/utils';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
@@ -142,6 +148,9 @@ export default {
     BaseIcon,
     BaseDropDownList: () => import('@/components/BaseDropDownList/BaseDropDownList').then(m => m.default || m),
     BaseChipsInputField,
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   mixins: [
     i18n,
@@ -449,6 +458,9 @@ export default {
     /**
      * set this flag to `true` to highlight autocomplete option characters that match
      *  the current search input string
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
      */
     highlightStringMatch: {
       type: Boolean,
@@ -462,6 +474,17 @@ export default {
     highlightStringTags: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * if necessary selected chip text can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
+     */
+    interpretChipsLabelAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

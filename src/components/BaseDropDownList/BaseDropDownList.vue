@@ -48,6 +48,7 @@
             name="option"
             :option="option">
             <template v-if="useHighlightStringMatch">
+              <!-- eslint-disable-next-line vue/no-v-html -->
               <span v-html="highlight(getLangLabel(option[labelPropertyName], true))" />
             </template>
             <template v-else>

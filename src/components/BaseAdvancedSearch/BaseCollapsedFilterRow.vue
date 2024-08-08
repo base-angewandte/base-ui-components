@@ -54,6 +54,9 @@
                       :scrollable="filterListScrollable"
                       :is-scrolling="isScrolling"
                       :date-time-text="dateTimeText"
+                      :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                        && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                        && calcSubFormChipHtmlRender(filter.id, value.fieldId))"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
@@ -67,6 +70,9 @@
                     :scrollable="filterListScrollable"
                     :is-scrolling="isScrolling"
                     :date-time-text="dateTimeText"
+                    :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                      && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                      && interpretLabelAsHtml.includes(filter.id))"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -174,6 +180,17 @@ export default {
         range: 'to',
       }),
       validator: val => !['from', 'until', 'range'].some(property => !Object.keys(val).includes(property)),
+    },
+    /**
+     * if necessary selected chip text can be rendered as v-html directive
+     * can be `true` (all fields will have html rendering enabled) `false` or a list
+     *  of field names for which rendering should be enabled, for nested fields
+     *  specify an object with a list of child field names.
+     *  e.g. :interpretLabelAsHtml="['field1', { [field2]: ['childField1'] }]"
+     */
+    interpretLabelAsHtml: {
+      type: [Boolean, Array],
+      default: false,
     },
   },
   data() {
@@ -458,6 +475,24 @@ export default {
         }
       }
       return '';
+    },
+    /**
+     * we need to check if `interpretLabelAsHtml` was set true for a subform field when
+     *  the prop was provided as [{ [parentField]: ['subfield1'] }]
+     * @param {string} filterId - the filter id as provided to this component (in the form
+     *  [fieldname]-group-[index])
+     * @param {string} valueId - the property name of the actual subformfield
+     * @returns {boolean}
+     */
+    calcSubFormChipHtmlRender(filterId, valueId) {
+      // get the correct filter property name from the id
+      // e.g. 'weekday-date-group-0' -> 'weekday-date'
+      const filterPropertyName = filterId.split('-').slice(0, 1).join('-');
+      // find the correct object in the `interpretLabelAsHtml` array
+      const subFormList = this.interpretLabelAsHtml
+        .find(id => typeof id === 'object' && Object.keys(id).includes(filterPropertyName));
+      // check if a value was found and if the field name is included in the list of that value
+      return !!subFormList && subFormList[filterPropertyName].includes(valueId);
     },
   },
 };

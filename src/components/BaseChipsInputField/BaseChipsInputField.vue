@@ -91,6 +91,7 @@
                         || !!entry[identifierPropertyName]"
                       :chip-active="chipActiveForRemove === index"
                       :is-removable="chipsRemovable"
+                      :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                       @remove-entry="removeEntry(entry, index)"
                       @hoverbox-active="hoverBoxActive($event, entry)" />
                   </slot>
@@ -126,6 +127,7 @@
                   :chip-active="chipActiveForRemove === index"
                   :assistive-text="assistiveText.selectedOption"
                   :is-removable="chipsRemovable"
+                  :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                   @remove-entry="removeEntry(entry, index)"
                   @value-changed="modifyListEntry($event, index)"
                   @hoverbox-active="hoverBoxActive($event, entry)" />
@@ -493,6 +495,19 @@ export default {
     chipsRemovable: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * if necessary chip text can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content. This is
+     *    also why this will only take effect on selected chips with identifier (=selected
+     *    from the options not a direct user input)
+     */
+    interpretChipsLabelAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
