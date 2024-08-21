@@ -237,6 +237,8 @@ export default {
     }, 250);
   },
   mounted() {
+    // update internal variable with prop value
+    this.showInt = this.show;
     document.onkeyup = (e) => {
       if (document.querySelector('.popup-box')) {
         if (!this.closeButtonDisabled && e.key === 'Escape') {
@@ -245,6 +247,11 @@ export default {
         }
       }
     };
+    // if show is true on initial render also set the active element (could not be
+    // set in watcher)
+    if (this.showInt) {
+      this.prevActiveElement = document.activeElement;
+    }
   },
   methods: {
     close() {
