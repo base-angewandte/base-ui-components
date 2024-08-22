@@ -5,7 +5,7 @@
     :box-size="boxSize"
     :box-ratio="boxRatio"
     :disabled="disabled"
-    class="base-box-button"
+    :class="['base-box-button', { 'base-box-button-disabled': disabled }]"
     @clicked="clicked">
     <div
       v-if="boxStyle === 'large'"
@@ -166,6 +166,8 @@ export default {
   },
   methods: {
     clicked(event) {
+      // prevent click event if disabled
+      if (this.disabled) return;
       /**
        * event emitted on box click
        *
