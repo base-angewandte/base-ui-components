@@ -278,27 +278,31 @@ export default {
      * how many page numbers can be displayed
      */
     setStartEnd() {
-      // get parent width
-      const elementWidth = this.$refs.pagination.clientWidth;
-      // set the subset and the max number accordingly
-      if (elementWidth < 400) {
-        this.subsetNumber = 1;
-        this.maxNumbers = 5;
-      } else if (elementWidth < 550) {
-        this.subsetNumber = 3;
-        this.maxNumbers = 8;
-      } else if (elementWidth < 700) {
-        this.subsetNumber = 5;
-        this.maxNumbers = 8;
-      } else {
-        this.subsetNumber = 7;
-        this.maxNumbers = 10;
+      // since observer is carried out one last time before component is destroyed
+      // we need to check if element still exists or was unmounted already
+      if (this.$refs.pagination) {
+        // get parent width
+        const elementWidth = this.$refs.pagination.clientWidth;
+        // set the subset and the max number accordingly
+        if (elementWidth < 400) {
+          this.subsetNumber = 1;
+          this.maxNumbers = 5;
+        } else if (elementWidth < 550) {
+          this.subsetNumber = 3;
+          this.maxNumbers = 8;
+        } else if (elementWidth < 700) {
+          this.subsetNumber = 5;
+          this.maxNumbers = 8;
+        } else {
+          this.subsetNumber = 7;
+          this.maxNumbers = 10;
+        }
+        // calc start and end number from the subset number
+        this.start = this.active - this.subsetNumber / 2 > 0
+          ? this.active - Math.floor(this.subsetNumber / 2) : 1;
+        this.end = this.active + this.subsetNumber / 2 < this.total
+          ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
       }
-      // calc start and end number from the subset number
-      this.start = this.active - this.subsetNumber / 2 > 0
-        ? this.active - Math.floor(this.subsetNumber / 2) : 1;
-      this.end = this.active + this.subsetNumber / 2 < this.total
-        ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
     },
     /**
      * function to set a new page number active
