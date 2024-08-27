@@ -98,8 +98,8 @@
                       :id="`input-${id}-from`"
                       ref="inputFrom"
                       :value="inputFrom"
-                      :placeholder="isFromTimeField ? placeholder.time || placeholder
-                        : placeholder.date || placeholder"
+                      :placeholder="isFromTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-' + id"
                       :aria-required="required.toString()"
@@ -182,8 +182,8 @@
                       :id="`input-${id}-to`"
                       ref="inputTo"
                       :value="inputTo"
-                      :placeholder="isToTimeField ? placeholder.time || placeholder
-                        : placeholder.date || placeholder"
+                      :placeholder="isToTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
                       :type="'text'"
                       :aria-describedby="label + '-to-' + id"
                       :aria-required="required.toString()"
@@ -841,8 +841,8 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
           const isDateTimeField = this.type === 'datetime';
           this.inputFrom = isDateTimeField
-            ? val.date : val.date || val.date_from || val.time || val.time_from || val || '';
-          this.inputTo = isDateTimeField ? val.time : val.date_to || val.time_to || '';
+            ? val.date : val.date ?? val.date_from ?? val.time ?? val.time_from ?? val ?? '';
+          this.inputTo = isDateTimeField ? val.time : val.date_to ?? val.time_to ?? '';
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
