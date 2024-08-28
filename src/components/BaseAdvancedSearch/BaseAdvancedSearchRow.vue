@@ -96,7 +96,7 @@
       <template #post-input-field>
         <button
           v-if="!isMainSearch
-            || filterHasValues"
+            || filterHasValues || (filter.type === 'text' && currentInput)"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
