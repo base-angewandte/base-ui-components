@@ -54,7 +54,6 @@ import BaseSelectOptions from './BaseSelectOptions/BaseSelectOptions.vue';
 import BaseSwitchButton from './BaseSwitchButton/BaseSwitchButton.vue';
 import BaseTextList from './BaseTextList/BaseTextList.vue';
 import BaseToggle from './BaseToggle/BaseToggle.vue';
-import BaseTooltip from './BaseTooltip/BaseTooltip.vue';
 import BaseTooltipBox from './BaseTooltipBox/BaseTooltipBox.vue';
 import BaseUploadPopUp from './BaseUploadPopUp/BaseUploadPopUp.vue';
 
@@ -115,7 +114,6 @@ export {
   BaseSwitchButton,
   BaseTextList,
   BaseToggle,
-  BaseTooltip,
   BaseTooltipBox,
   BaseUploadPopUp,
 };
