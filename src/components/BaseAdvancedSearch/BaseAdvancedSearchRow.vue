@@ -1178,6 +1178,7 @@ export default {
           filter_values: this.setFilterValues(this.defaultFilter),
         };
         this.resetAllInput();
+        this.isActive = false;
       } else {
         /**
          * event emitted when user triggered remove icon on filter row
