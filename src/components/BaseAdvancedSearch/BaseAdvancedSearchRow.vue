@@ -33,7 +33,7 @@
       :date-field-delay="dateFieldDelay"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
-      v-bind="$listeners"
+      v-on="$listeners"
       @clicked-outside="onClickedOutsideSearch"
       @click.native="onSearchClick"
       @keydown="handleKeyDownEvent"

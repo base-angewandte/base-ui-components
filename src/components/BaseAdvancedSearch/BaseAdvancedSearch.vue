@@ -64,7 +64,7 @@
       :language="language"
       :highlight-autocomplete-match="highlightAutocompleteMatch"
       :highlight-autocomplete-tags="highlightAutocompleteTags"
-      v-bind="$listeners"
+      v-on="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
       @option-selected="fillOptionToForm">
