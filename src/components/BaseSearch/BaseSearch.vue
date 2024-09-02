@@ -488,6 +488,16 @@ export default {
       },
       immediate: true,
     },
+    isActiveInt(val) {
+      if (val !== this.isActive) {
+        /**
+         * inform parent if is active has changed internally
+         * @event update:is-active
+         * @type {boolean}
+         */
+        this.$emit('update:is-active', val);
+      }
+    },
   },
   methods: {
     onEnter(event) {

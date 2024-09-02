@@ -28,7 +28,7 @@
         : identifierPropertyName.controlledVocabularyOption"
       :label-property-name="useAutocompleteFunctionality ? labelPropertyName.autocompleteOption
         : labelPropertyName.controlledVocabularyOption"
-      :is-active="isActive"
+      :is-active.sync="isActive"
       :set-focus-on-active="false"
       :clearable="false"
       :assistive-text="assistiveText"
