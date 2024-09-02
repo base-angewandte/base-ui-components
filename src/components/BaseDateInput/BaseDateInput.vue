@@ -53,7 +53,7 @@
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            :id="`input-${id}-from`"
+            :id="`input-${internalId}-from`"
             v-model="inputFrom"
             :label="label"
             :show-label="false"
@@ -95,13 +95,13 @@
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-from`"
+                      :id="`input-${internalId}-from`"
                       ref="inputFrom"
                       :value="inputFrom"
                       :placeholder="isFromTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       :type="'text'"
-                      :aria-describedby="label + '-' + id"
+                      :aria-describedby="label + '-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
@@ -138,7 +138,7 @@
           <!-- INPUT TO -->
           <BaseInput
             v-if="type !== 'single'"
-            :id="`input-${id}-to`"
+            :id="`input-${internalId}-to`"
             v-model="inputTo"
             :label="label"
             :show-label="false"
@@ -179,13 +179,13 @@
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-to`"
+                      :id="`input-${internalId}-to`"
                       ref="inputTo"
                       :value="inputTo"
                       :placeholder="isToTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       :type="'text'"
-                      :aria-describedby="label + '-to-' + id"
+                      :aria-describedby="label + '-to-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
@@ -229,14 +229,14 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
-import { capitalizeString, debounce } from '@/utils/utils';
+import { capitalizeString, createId, debounce } from '@/utils/utils';
 
 import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
 import fr from 'vue2-datepicker/locale/fr';
 
 import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -358,7 +358,7 @@ export default {
      */
     id: {
       type: [Number, String],
-      default: 1,
+      default: '',
     },
     /**
      * define if standard form field styling should be
@@ -551,6 +551,9 @@ export default {
     };
   },
   computed: {
+    internalId() {
+      return this.id || createId();
+    },
     /**
      * this is the format we want to store computed based on what
      * was specified in format and what date toggle tabs (via dateFormatInt) might say
