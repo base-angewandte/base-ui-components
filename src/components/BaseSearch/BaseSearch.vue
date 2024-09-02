@@ -1,5 +1,11 @@
 <template>
-  <div class="base-search">
+  <!-- make this a form so that iOS recognizes it as 'search'
+  (also the action="." is needed for that -->
+  <form
+    class="base-search"
+    action="."
+    @submit.prevent
+    @keydown.enter.prevent>
     <component
       :is="inputComponent"
       :id="idInt"
@@ -32,6 +38,7 @@
       :chips-removable="type !== 'chipssingle'"
       input-class="base-search__input-field"
       field-type="search"
+      enterkeyhint="search"
       class="base-search__input"
       v-on="$listeners"
       @keydown.enter="onEnter">
@@ -79,7 +86,7 @@
         <slot name="below-input" />
       </template>
     </component>
-  </div>
+  </form>
 </template>
 
 <script>
