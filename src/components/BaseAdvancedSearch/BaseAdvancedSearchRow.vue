@@ -7,6 +7,8 @@
     <!-- SEARCH FIELD -->
     <!-- note: the id is used in the javascript part as well as the parent component
       BaseAdvancedSearch.vue - consider that when changing it! -->
+    <!-- note for @keydown.enter.capture: need to capture here so option select is handled
+      before input is blurred in search -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
       ref="baseSearch"
@@ -39,7 +41,7 @@
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
-      @keydown.enter="selectOptionOnKeyEnter"
+      @keydown.enter.capture="selectOptionOnKeyEnter"
       @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->

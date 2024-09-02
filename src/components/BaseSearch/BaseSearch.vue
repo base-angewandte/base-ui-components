@@ -33,7 +33,8 @@
       input-class="base-search__input-field"
       field-type="search"
       class="base-search__input"
-      v-on="$listeners">
+      v-on="$listeners"
+      @keydown.enter="onEnter">
       <template #pre-input-field>
         <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
         <slot name="pre-input-field" />
@@ -486,6 +487,16 @@ export default {
         }
       },
       immediate: true,
+    },
+  },
+  methods: {
+    onEnter(event) {
+      // if device has a virtual keyboard open we want to close it on search enter
+      // just to be safe also check if the target element (where the keydown came from) is the
+      // search input - compare ids
+      if (window.visualViewport.height < window.innerHeight && event.target.id === this.idInt) {
+        event.target.blur();
+      }
     },
   },
 };
