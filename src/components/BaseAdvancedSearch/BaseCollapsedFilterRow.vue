@@ -378,8 +378,8 @@ export default {
           left: this.scrollContainer.scrollLeft,
           top: this.scrollContainer.scrollTop,
           // Get the current mouse position
-          x: event.clientX || event.touches[0]?.clientX,
-          y: event.clientY || event.touches[0]?.clientY,
+          x: event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0),
+          y: event.clientY ?? (event.touches ? event.touches[0]?.clientY : 0),
         };
         // add event listeners for mousemove and mouseup to be able to trigger scroll
         // for touch devices add touch event listeners
@@ -403,8 +403,8 @@ export default {
     mouseMoveHandler(e) {
       // get event position - touch event does not have clientX/clientY - fallback
       // to touches position
-      const eventXPosition = e.clientX || e.touches[0]?.clientX || 0;
-      const eventYPosition = e.clientY || e.touches[0]?.clientY || 0;
+      const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
+      const eventYPosition = e.clientY ?? (e.touches ? e.touches[0]?.clientY : 0);
       // How far the mouse has been moved
       const dx = eventXPosition - this.pos.x;
       const dy = eventYPosition - this.pos.y;
