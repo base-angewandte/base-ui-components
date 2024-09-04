@@ -1293,6 +1293,8 @@ export default {
             'filter_values',
             [entry],
           );
+          // and also update original filter with newly set data
+          this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // this does not trigger an update event from BaseForm so search needs to be triggered manually here
           // since main filter is not evaluated in filter comparison set alwaysTrigger true
           this.search(true);
