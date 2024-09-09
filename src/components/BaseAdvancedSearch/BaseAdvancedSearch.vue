@@ -79,8 +79,7 @@
           icon-position="right"
           :class="['base-advanced-search__expand-button',
                    { 'base-button-icon-rotate-180': formOpen }]"
-          @click.native.stop="openAdvancedSearch"
-          @focusin.native.stop />
+          @click.native.stop="openAdvancedSearch" />
       </template>
       <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>

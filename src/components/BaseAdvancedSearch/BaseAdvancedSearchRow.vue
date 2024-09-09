@@ -100,7 +100,6 @@
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
-          @focusin.stop
           @click.stop.prevent="removeFilter">
           <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
