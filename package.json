@@ -17,8 +17,8 @@
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore --ignore-path .eslintignore src",
     "version-publish": "sh ./version-publish.sh",
     "prepublishOnly": "npm run build",
-    "styleguide": "env NODE_OPTIONS=--openssl-legacy-provider concurrently \"vue-docgen --watch\" \"vuepress dev docs\"",
-    "styleguide:build": "vue-docgen && env NODE_OPTIONS=--openssl-legacy-provider vuepress build docs",
+    "styleguide": "env concurrently \"vue-docgen --watch\" \"vuepress dev docs\"",
+    "styleguide:build": "vue-docgen && vuepress build docs",
     "svg": "node ./build/generate-svg-sprite-sheet.js",
     "prepare": "husky",
     "changelog": "gulp changelog"
