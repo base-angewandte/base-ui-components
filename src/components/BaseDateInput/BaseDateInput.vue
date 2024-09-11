@@ -111,6 +111,7 @@
                       autocomplete="off"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
+                      @blur="onInputBlur($event, 'from')"
                       v-on="dateInputListeners">
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
@@ -195,6 +196,7 @@
                       :class="['base-date-input__input', inputClass]"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
+                      @blur="onInputBlur($event, 'to')"
                       v-on="dateInputListeners">
                   </template>
                   <!-- this empty element is here so that the default icon of
@@ -1005,6 +1007,24 @@ export default {
     onInputClick(event) {
       if (event.target.tagName !== 'INPUT') {
         event.stopPropagation();
+      }
+    },
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     * @param {string} origin - did event emit from 'from' or 'to' date field
+     */
+    onInputBlur(event, origin) {
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget && event.relatedTarget.tagName === 'INPUT'
+        && (!event.relatedTarget.id || event.relatedTarget.id !== event.target.id)) {
+        // set input active state false
+        this[`${origin}Open`] = false;
       }
     },
     initObservers() {
