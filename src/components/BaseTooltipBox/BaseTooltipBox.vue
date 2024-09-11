@@ -366,13 +366,14 @@ export default {
       // the box overlaps the window left side
       if (attachToRect.x < boxWidth / 2) {
         this.css.left = `${this.spacing}px`;
+        this.css.right = ''; // clear right position
         this.css['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - this.spacing}px`;
         return;
       }
 
       // the box overlaps the window right side
       if (attachToRect.left + attachToRect.width / 2 + boxWidth / 2 > window.innerWidth) {
-        this.css.left = '';
+        this.css.left = ''; // clear left position
         this.css.right = `${this.spacing}px`;
         this.css['--triangle-left'] = `${boxWidth + this.spacing
           - (document.body.clientWidth - (attachToRect.right - attachToRect.width / 2))}px`;
