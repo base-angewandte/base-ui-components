@@ -290,6 +290,9 @@ export default {
      * calc absolute tooltip and inner triangle position
      */
     calcPosition() {
+      // clear already applied CSS style properties
+      this.css = {};
+
       // anchor elements current position
       const attachToRect = this.attachTo.getBoundingClientRect();
 
