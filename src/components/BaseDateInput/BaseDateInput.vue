@@ -71,7 +71,6 @@
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('from', $event)"
-            @input.stop=""
             v-on="inputListeners">
             <template #input>
               <div
@@ -156,7 +155,6 @@
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('to', $event)"
-            @input.stop=""
             v-on="inputListeners">
             <template #input>
               <div
@@ -772,6 +770,8 @@ export default {
           // need to stop the event triggered in original BaseInput and only trigger
           // when component isActiveInt has changed
           'update:is-active': () => {},
+          // stop BaseInput input event since BaseDateInput will propagate their own
+          input: () => {},
         },
       };
     },
