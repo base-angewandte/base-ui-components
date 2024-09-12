@@ -784,18 +784,9 @@ export default {
       return {
         // add all the listeners from the parent
         ...this.$listeners,
-        // and add custom listeners
-        input: () => {
-          /**
-           * Event emitted on input, passing input string
-           *
-           * @event input
-           * @param {string} - the input event value however
-           * passing only the event.target.value
-           *
-           */
-          this.$emit('input', this.getInputData());
-        },
+        // stop native input event here and emit own event (in inputInt watcher)
+        // with just the values
+        input: () => {},
       };
     },
     /**
@@ -819,6 +810,20 @@ export default {
     },
   },
   watch: {
+    inputInt: {
+      handler() {
+        /**
+         * Event emitted on input, passing input string
+         *
+         * @event input
+         * @param {string} - the input event value however
+         * passing only the event.target.value
+         *
+         */
+        this.$emit('input', this.getInputData());
+      },
+      deep: true,
+    },
     /**
      * watch format and set correct dateFormat
      */
