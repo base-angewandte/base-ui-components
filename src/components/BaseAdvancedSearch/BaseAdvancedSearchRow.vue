@@ -7,6 +7,8 @@
     <!-- SEARCH FIELD -->
     <!-- note: the id is used in the javascript part as well as the parent component
       BaseAdvancedSearch.vue - consider that when changing it! -->
+    <!-- note for @keydown.enter.capture: need to capture here so option select is handled
+      before input is blurred in search -->
     <BaseSearch
       :id="'search-input-' + internalRowId"
       ref="baseSearch"
@@ -26,20 +28,20 @@
         : identifierPropertyName.controlledVocabularyOption"
       :label-property-name="useAutocompleteFunctionality ? labelPropertyName.autocompleteOption
         : labelPropertyName.controlledVocabularyOption"
-      :is-active="isActive"
+      :is-active.sync="isActive"
       :set-focus-on-active="false"
       :clearable="false"
       :assistive-text="assistiveText"
       :date-field-delay="dateFieldDelay"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
-      v-bind="$listeners"
+      v-on="$listeners"
       @clicked-outside="onClickedOutsideSearch"
       @click.native="onSearchClick"
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
-      @keydown.enter="selectOptionOnKeyEnter"
+      @keydown.enter.capture="selectOptionOnKeyEnter"
       @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
@@ -96,10 +98,11 @@
       <template #post-input-field>
         <button
           v-if="!isMainSearch
-            || filterHasValues"
+            || filterHasValues || (filter.type === 'text' && currentInput)"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
+          @focusin.stop.prevent
           @click.stop.prevent="removeFilter">
           <BaseIcon
             :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
@@ -161,7 +164,7 @@
                   <span
                     class="base-advanced-search-row__filter-area-close"
                     @keydown.enter="isActive = false"
-                    @click="isActive = false">
+                    @click.stop="isActive = false">
                     <BaseIcon
                       class="rotate-180 base-advanced-search-row__filter-area-close-icon"
                       name="drop-down" />
@@ -1176,6 +1179,7 @@ export default {
           filter_values: this.setFilterValues(this.defaultFilter),
         };
         this.resetAllInput();
+        this.isActive = false;
       } else {
         /**
          * event emitted when user triggered remove icon on filter row

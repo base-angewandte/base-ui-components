@@ -1,5 +1,11 @@
 <template>
-  <div class="base-search">
+  <!-- make this a form so that iOS recognizes it as 'search'
+  (also the action="." is needed for that -->
+  <form
+    class="base-search"
+    action="."
+    @submit.prevent
+    @keydown.enter.prevent>
     <component
       :is="inputComponent"
       :id="idInt"
@@ -32,8 +38,10 @@
       :chips-removable="type !== 'chipssingle'"
       input-class="base-search__input-field"
       field-type="search"
+      enterkeyhint="search"
       class="base-search__input"
-      v-on="$listeners">
+      v-on="$listeners"
+      @keydown.enter="onEnter">
       <template #pre-input-field>
         <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
         <slot name="pre-input-field" />
@@ -78,7 +86,7 @@
         <slot name="below-input" />
       </template>
     </component>
-  </div>
+  </form>
 </template>
 
 <script>
@@ -486,6 +494,26 @@ export default {
         }
       },
       immediate: true,
+    },
+    isActiveInt(val) {
+      if (val !== this.isActive) {
+        /**
+         * inform parent if is active has changed internally
+         * @event update:is-active
+         * @type {boolean}
+         */
+        this.$emit('update:is-active', val);
+      }
+    },
+  },
+  methods: {
+    onEnter(event) {
+      // if device has a virtual keyboard open we want to close it on search enter
+      // just to be safe also check if the target element (where the keydown came from) is the
+      // search input - compare ids
+      if (window.visualViewport.height < window.innerHeight && event.target.id === this.idInt) {
+        event.target.blur();
+      }
     },
   },
 };

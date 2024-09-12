@@ -83,6 +83,7 @@
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
                   @keydown.tab="handleInputTab"
+                  @blur="onInputBlur"
                   v-on="inputListeners">
               </slot>
             </div>
@@ -712,6 +713,23 @@ export default {
     }
   },
   methods: {
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     */
+    onInputBlur(event) {
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget && event.relatedTarget.tagName === 'INPUT'
+        && (!event.relatedTarget.id || event.relatedTarget.id !== event.target.id)) {
+        // set input active state false
+        this.setFieldState(false);
+      }
+    },
     /**
      * special event triggered when tab was used on clear input button
      * @param {KeyboardEvent} event

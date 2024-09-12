@@ -64,7 +64,7 @@
       :language="language"
       :highlight-autocomplete-match="highlightAutocompleteMatch"
       :highlight-autocomplete-tags="highlightAutocompleteTags"
-      v-bind="$listeners"
+      v-on="$listeners"
       @add-filter-row="addFilterRow"
       @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
       @option-selected="fillOptionToForm">
@@ -79,7 +79,8 @@
           icon-position="right"
           :class="['base-advanced-search__expand-button',
                    { 'base-button-icon-rotate-180': formOpen }]"
-          @click.native.stop="openAdvancedSearch" />
+          @click.native.stop="openAdvancedSearch"
+          @focusin.native.stop />
       </template>
       <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>
@@ -1293,6 +1294,8 @@ export default {
             'filter_values',
             [entry],
           );
+          // and also update original filter with newly set data
+          this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // this does not trigger an update event from BaseForm so search needs to be triggered manually here
           // since main filter is not evaluated in filter comparison set alwaysTrigger true
           this.search(true);

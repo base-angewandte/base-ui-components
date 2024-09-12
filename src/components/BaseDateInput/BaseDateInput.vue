@@ -53,7 +53,7 @@
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            :id="`input-${id}-from`"
+            :id="`input-${internalId}-from`"
             v-model="inputFrom"
             :label="label"
             :show-label="false"
@@ -95,13 +95,13 @@
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-from`"
+                      :id="`input-${internalId}-from`"
                       ref="inputFrom"
                       :value="inputFrom"
                       :placeholder="isFromTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       :type="'text'"
-                      :aria-describedby="label + '-' + id"
+                      :aria-describedby="label + '-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
@@ -111,6 +111,7 @@
                       autocomplete="off"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
+                      @blur="onInputBlur($event, 'from')"
                       v-on="dateInputListeners">
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
@@ -138,7 +139,7 @@
           <!-- INPUT TO -->
           <BaseInput
             v-if="type !== 'single'"
-            :id="`input-${id}-to`"
+            :id="`input-${internalId}-to`"
             v-model="inputTo"
             :label="label"
             :show-label="false"
@@ -179,13 +180,13 @@
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${id}-to`"
+                      :id="`input-${internalId}-to`"
                       ref="inputTo"
                       :value="inputTo"
                       :placeholder="isToTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       :type="'text'"
-                      :aria-describedby="label + '-to-' + id"
+                      :aria-describedby="label + '-to-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
@@ -195,6 +196,7 @@
                       :class="['base-date-input__input', inputClass]"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
+                      @blur="onInputBlur($event, 'to')"
                       v-on="dateInputListeners">
                   </template>
                   <!-- this empty element is here so that the default icon of
@@ -229,14 +231,14 @@
 <script>
 import ClickOutside from 'vue-click-outside';
 import DatePicker from 'vue2-datepicker';
-import { capitalizeString, debounce } from '@/utils/utils';
+import { capitalizeString, createId, debounce } from '@/utils/utils';
 
 import en from 'vue2-datepicker/locale/en';
 import de from 'vue2-datepicker/locale/de';
 import fr from 'vue2-datepicker/locale/fr';
 
 import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -358,7 +360,7 @@ export default {
      */
     id: {
       type: [Number, String],
-      default: 1,
+      default: '',
     },
     /**
      * define if standard form field styling should be
@@ -551,6 +553,9 @@ export default {
     };
   },
   computed: {
+    internalId() {
+      return this.id || createId();
+    },
     /**
      * this is the format we want to store computed based on what
      * was specified in format and what date toggle tabs (via dateFormatInt) might say
@@ -1002,6 +1007,24 @@ export default {
     onInputClick(event) {
       if (event.target.tagName !== 'INPUT') {
         event.stopPropagation();
+      }
+    },
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     * @param {string} origin - did event emit from 'from' or 'to' date field
+     */
+    onInputBlur(event, origin) {
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget && event.relatedTarget.tagName === 'INPUT'
+        && (!event.relatedTarget.id || event.relatedTarget.id !== event.target.id)) {
+        // set input active state false
+        this[`${origin}Open`] = false;
       }
     },
     initObservers() {
