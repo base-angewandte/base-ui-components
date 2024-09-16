@@ -71,7 +71,6 @@
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('from', $event)"
-            @input.stop=""
             v-on="inputListeners">
             <template #input>
               <div
@@ -156,7 +155,6 @@
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
             @update:is-active="isActiveHandler('to', $event)"
-            @input.stop=""
             v-on="inputListeners">
             <template #input>
               <div
@@ -772,6 +770,8 @@ export default {
           // need to stop the event triggered in original BaseInput and only trigger
           // when component isActiveInt has changed
           'update:is-active': () => {},
+          // stop BaseInput input event since BaseDateInput will propagate their own
+          input: () => {},
         },
       };
     },
@@ -784,18 +784,9 @@ export default {
       return {
         // add all the listeners from the parent
         ...this.$listeners,
-        // and add custom listeners
-        input: () => {
-          /**
-           * Event emitted on input, passing input string
-           *
-           * @event input
-           * @param {string} - the input event value however
-           * passing only the event.target.value
-           *
-           */
-          this.$emit('input', this.getInputData());
-        },
+        // stop native input event here and emit own event (in inputInt watcher)
+        // with just the values
+        input: () => {},
       };
     },
     /**
@@ -819,6 +810,20 @@ export default {
     },
   },
   watch: {
+    inputInt: {
+      handler() {
+        /**
+         * Event emitted on input, passing input string
+         *
+         * @event input
+         * @param {string} - the input event value however
+         * passing only the event.target.value
+         *
+         */
+        this.$emit('input', this.getInputData());
+      },
+      deep: true,
+    },
     /**
      * watch format and set correct dateFormat
      */
@@ -906,28 +911,6 @@ export default {
       // since inputInt is manipulated directly in this case (easier with Date conversions)
       // inputFrom and inputTo setters are not triggered and we need to emit the new data manually
       this.emitData();
-    },
-    /**
-     * when input becomes inactive always also blur input field just in case
-     * @param {boolean} val - the changed fromOpen value
-     */
-    fromOpen(val) {
-      if (!val) {
-        this.$refs.inputFrom.blur();
-      } else {
-        this.toOpen = false;
-      }
-    },
-    /**
-     * when input becomes inactive always also blur input field just in case
-     * @param {boolean} val - the changed toOpen value
-     */
-    toOpen(val) {
-      if (!val && this.$refs.inputTo) {
-        this.$refs.inputTo.blur();
-      } else if (val) {
-        this.fromOpen = false;
-      }
     },
     /**
      * watch for changes in input field active variable to keep in sync with parent
@@ -1018,11 +1001,18 @@ export default {
      * @param {string} origin - did event emit from 'from' or 'to' date field
      */
     onInputBlur(event, origin) {
+      const relatedTargetInput = event.relatedTarget?.parentElement ? event.relatedTarget.parentElement
+        .getElementsByTagName('input') : null;
       // so since these arrows only navigate between input fields we check if there is a
       // related target and if this related target is an input field and if yes we make sure
       // the id is different from the input id of this component (the one the event originated from)
-      if (event.relatedTarget && event.relatedTarget.tagName === 'INPUT'
-        && (!event.relatedTarget.id || event.relatedTarget.id !== event.target.id)) {
+      if (event.relatedTarget
+        && ((event.relatedTarget.tagName === 'INPUT'
+            && (!event.relatedTarget?.id || event.relatedTarget.id !== event.target.id))
+          // additionally also set input active false when the BaseInput 'remove' button
+          // (displayed if `clearable` is true) is triggered in the other date field of the range
+          || (event.relatedTarget?.className === 'base-input__remove-icon-wrapper'
+            && relatedTargetInput && relatedTargetInput[0]?.id !== event.target.id))) {
         // set input active state false
         this[`${origin}Open`] = false;
       }
