@@ -1522,8 +1522,8 @@ export default {
         );
         const labelProp = fieldProps?.labelPropertyName
           || this.labelPropertyName.formInputs;
-        const idProp = fieldProps?.labelPropertyName
-          || this.labelPropertyName.formInputs;
+        const idProp = fieldProps?.identifierPropertyName
+          || this.identifierPropertyName.formInputs;
         return values.filter(filterValue => !!filterValue.label)
           .map(filterValue => ({
             [labelProp]: filterValue.label,
