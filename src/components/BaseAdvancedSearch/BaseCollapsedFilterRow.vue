@@ -25,14 +25,14 @@
         @touchstart="mouseDownHandler">
         <li
           v-for="(filter, filterIndex) in filtersInt"
-          :key="filter.id"
+          :key="filter.idInternal"
           :class="['base-collapsed-filter-row__filter',
                    { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
                      .fieldType === 'boolean' }]">
           <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
             <div
               class="base-collapsed-filter-row__filter-label">
-              {{ filter.label }}
+              {{ filter.labelInternal }}
             </div>
             <!-- the chips for each filter -->
             <ul
@@ -45,9 +45,9 @@
                   <!-- if yes - also iterate through those values -->
                   <template v-for="(groupValue, groupIndex) in value.values">
                     <BaseCollapsedFilterItem
-                      v-if="groupValue.label"
-                      :key="groupValue.id
-                        || `${groupValue.label}-${valueIndex}-${groupIndex}`"
+                      v-if="groupValue.labelInternal"
+                      :key="groupValue.idInternal
+                        || `${groupValue.labelInternal}-${valueIndex}-${groupIndex}`"
                       :value="groupValue"
                       :type="value.fieldType"
                       :range-indicator="getRangeIndicator(value, groupIndex)"
@@ -56,14 +56,14 @@
                       :date-time-text="dateTimeText"
                       :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                         && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
-                        && calcSubFormChipHtmlRender(filter.id, value.fieldId))"
+                        && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
                 <template v-else>
                   <BaseCollapsedFilterItem
-                    v-if="value.label"
-                    :key="value.id || `${value.label}-${valueIndex}`"
+                    v-if="value.labelInternal"
+                    :key="value.idInternal || `${value.labelInternal}-${valueIndex}`"
                     :value="value"
                     :type="filter.filter_values.fieldType"
                     :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
@@ -72,7 +72,7 @@
                     :date-time-text="dateTimeText"
                     :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                       && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
-                      && interpretLabelAsHtml.includes(filter.id))"
+                      && interpretLabelAsHtml.includes(filter.idInternal))"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -112,15 +112,15 @@ export default {
   props: {
     /**
      * provide a list of filters in array form, every array object that needs the following properties:
-     *  **id** `string` - a filter identifier
-     *  **label** `string` - a label shown for the filter
+     *  **idInternal** `string` - a filter identifier
+     *  **labelInternal** `string` - a label shown for the filter
      *  **filter_values** `{
-     *    values: { label: string|boolean, id: string? }[]|{ values: {}, fieldId: string, fieldType: string }[]
+     *    values: { labelInternal: string|boolean, idInternal: string? }[]|{ values: {}, fieldId: string, fieldType: string }[]
      *    fieldId: string,
      *    fieldType: string,
      *   }[]` - the values that were selected for the filter (set by BaseAdvancedSearch internally), this is again
      *    an array of objects with the properties
-     *      `values` - either containing the actual values to display (with `label` and `id` (optional) properties)
+     *      `values` - either containing the actual values to display (with `labelInternal` and `idInternal` (optional) properties)
      *      OR in case of field groups to have nested another object array with `fieldType`, `fieldId` and `values` properties
      *      again (see below for description)
      *    `fieldId`: the property of the form field in question
@@ -131,7 +131,7 @@ export default {
       default: () => ([]),
       validator: (val) => {
         // define all required props here
-        const requiredProps = ['id', 'label', 'filter_values'];
+        const requiredProps = ['idInternal', 'labelInternal', 'filter_values'];
         const requiredFilterValueProps = ['values', 'fieldType', 'fieldId'];
         // iterate through the filter array - return true if NO prop is missing
         return !val.some((filter) => {
@@ -151,15 +151,15 @@ export default {
                 // if filterValue has a length it is a nested array
                 if (filterValue?.values?.length >= 0) {
                   const groupFilterValueProps = Object.keys(filterValue);
-                  // if yes check for each array if it has content and if yes, if it has the label property
+                  // if yes check for each array if it has content and if yes, if it has the labelInternal property
                   return filterValue.values.length !== 0
                     && requiredFilterValueProps.some(prop => !groupFilterValueProps.includes(prop))
                     && filterValue.values
-                      // also account here for special case boolean which does not need a label
-                      .some(nestedFilterValue => !Object.keys(nestedFilterValue).includes('label'));
+                      // also account here for special case boolean which does not need a labelInternal
+                      .some(nestedFilterValue => !Object.keys(nestedFilterValue).includes('labelInternal'));
                 }
-                // else check for each filterValue if label property is there
-                return !Object.keys(filterValue).includes('label');
+                // else check for each filterValue if labelInternal property is there
+                return !Object.keys(filterValue).includes('labelInternal');
               });
             }
           }
@@ -320,9 +320,9 @@ export default {
         } else if (concatValuesArray.length > 1) {
           // check for special case date and time fields
           if (values[valueIndex].fieldType.includes('date') || values[valueIndex].fieldType.includes('time')) {
-            // for date arrays just remove the label so the order of the date_from and date_to does not
+            // for date arrays just remove the labelInternal so the order of the date_from and date_to does not
             // get mixed up by removing the complete value
-            this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
+            this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].labelInternal = '';
           } else {
             // if its not a date just splice the value out of the array
             this.filtersInt[filterIndex].filter_values.values[valueIndex].values.splice(groupIndex, 1);
@@ -347,7 +347,7 @@ export default {
           // if yes - remove the complete filter
           this.filtersInt.splice(filterIndex, 1);
         } else {
-          this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
+          this.filtersInt[filterIndex].filter_values.values[valueIndex].labelInternal = '';
         }
       } else {
         this.filtersInt[filterIndex].filter_values.values.splice(valueIndex, 1);
@@ -463,14 +463,14 @@ export default {
       // check if it is a filter with an array of exactly two values
       if (filterValues.values.length === 2
         && ['date', 'time'].includes(filterValues.fieldType)) {
-        if (!!filterValues.values[0].label
-          && !!filterValues.values[1].label && index === 1) {
+        if (!!filterValues.values[0].labelInternal
+          && !!filterValues.values[1].labelInternal && index === 1) {
           return this.dateTimeText.range;
         }
-        if (!filterValues.values[1].label && filterValues.values[0].label) {
+        if (!filterValues.values[1].labelInternal && filterValues.values[0].labelInternal) {
           return this.dateTimeText.from;
         }
-        if (!filterValues.values[0].label && filterValues.values[1].label) {
+        if (!filterValues.values[0].labelInternal && filterValues.values[1].labelInternal) {
           return this.dateTimeText.until;
         }
       }
