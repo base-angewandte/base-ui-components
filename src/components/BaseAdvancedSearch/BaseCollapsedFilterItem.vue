@@ -11,11 +11,11 @@
       enable interpret-text-as-html for chips input fields and chips WITH ids -->
     <BaseChip
       v-if="!isBoolean && hasValue"
-      :entry="value.label"
+      :entry="value.labelInternal"
       :is-linked="true"
       :text-styling="chipStyling"
       role="listitem"
-      :interpret-text-as-html="interpretLabelAsHtml && !!value.id"
+      :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
@@ -45,13 +45,13 @@ export default {
   },
   props: {
     /**
-     * the chip object to be displayed. Needs to be an object with id (optional) and label
+     * the chip object to be displayed. Needs to be an object with idInternal (optional) and labelInternal
      */
     value: {
       type: [Object],
       required: true,
       validator: val => Object.keys(val)
-        .includes('label'),
+        .includes('labelInternal'),
     },
     /**
      * the `field_type` of the form field for which the chip should be displayed
@@ -84,7 +84,7 @@ export default {
     },
     /**
      * if necessary selected chip text can be rendered as v-html directive
-     * will only be applied to values with `id`
+     * will only be applied to values with `idInternal`
      */
     interpretLabelAsHtml: {
       type: Boolean,
@@ -103,11 +103,11 @@ export default {
       return ['date', 'time'].includes(this.type) && this.rangeIndicator;
     },
     /**
-     * does the provided value exist and have a label
+     * does the provided value exist and have a labelInternal
      * @returns {boolean}
      */
     hasValue() {
-      return !!this.value && !!this.value.label;
+      return !!this.value && !!this.value.labelInternal;
     },
     /**
      * need to overwrite chips styling cursor and user-select in case

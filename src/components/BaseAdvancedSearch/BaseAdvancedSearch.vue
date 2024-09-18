@@ -524,6 +524,8 @@ export default {
      *      the object properties for label and identifier need to be set here (in case they are different
      *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `identifierPropertyName`))
      *      if `identifierPropertyName` is also set via `fieldProps` the latter is the preferred value.
+     *  Caveat: Please note that the property `idInternal` is used for internal handlings and the property
+     *    might be overwritten
      */
     identifierPropertyName: {
       type: [Object, String],
@@ -547,6 +549,8 @@ export default {
      *      the object properties for label and identifier need to be set here (in case they are different
      *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `labelPropertyName`))
      *      if `labelPropertyName` is also set via `fieldProps` the latter is the preferred value.
+     *    Caveat: Please note that the property `labelInternal` is used for internal handlings and the property
+     *    might be overwritten
      */
     labelPropertyName: {
       type: [Object, String],
@@ -800,10 +804,10 @@ export default {
             const valueList = isRepeatableField ? value : [value];
             return valueList.map((repeatableEntry, index) => ({
               // label that will be displayed on top of each collapsed filter
-              label: formFilterData.title,
+              labelInternal: formFilterData.title,
               // add a special id that allows to identify repeatable fields (applied in reverse mapping
               // ~line 555)
-              id: `${key}${isRepeatableField ? `-group-${index}` : ''}`,
+              idInternal: `${key}${isRepeatableField ? `-group-${index}` : ''}`,
               // the actual filter values and filter information for each field (important for field groups)
               filter_values: this.getCollapsedFilterValue(repeatableEntry, formFilterData, key),
             }));
@@ -820,7 +824,7 @@ export default {
         this.formFilterValuesInt = val.reduce((prev, filter) => {
           // necessary because of field groups to remove index (added in line 538) from id
           // get actual field id and indicator if field was repeatable field
-          const [, filterId, groupMatch] = filter.id.match(/(.*?)(-group-\d*)?$/);
+          const [, filterId, groupMatch] = filter.idInternal.match(/(.*?)(-group-\d*)?$/);
           // get the form field data for the id
           const filterData = this.formFilterList[filterId];
           // get the correctly mapped filter values
@@ -1280,7 +1284,7 @@ export default {
             this.$set(
               this.formFilterValuesInt,
               collectionId,
-              entry[this.labelPropertyName.autocompleteOption] || entry,
+              entry[this.labelPropertyName.autocompleteOption] ?? entry,
             );
           }
           // main filter filter values should remain empty
@@ -1373,7 +1377,7 @@ export default {
       if (fieldType === 'integer' || fieldType === 'float' || typeof values === 'number') {
         return {
           values: [{
-            label: values.toString(),
+            labelInternal: values.toString(),
           }],
           fieldId,
           fieldType,
@@ -1382,7 +1386,7 @@ export default {
       if (fieldType === 'boolean' || typeof values === 'boolean') {
         return {
           values: [{
-            label: values,
+            labelInternal: values,
           }],
           fieldId,
           fieldType,
@@ -1398,7 +1402,7 @@ export default {
         return {
           values: [{
             // if fieldType is date convert to de date locale for display
-            label: formattedLabel,
+            labelInternal: formattedLabel,
           }],
           fieldId,
           fieldType,
@@ -1415,10 +1419,15 @@ export default {
         const idProp = fieldProps?.identifierPropertyName
           || this.identifierPropertyName.formInputs;
         return {
-          values: values.map(chipValue => ({
-            label: chipValue[labelProp] || chipValue,
-            id: chipValue[idProp] || '',
-          })),
+          values: values.map((chipValue) => {
+            // do not delete additional properties the chip might have
+            const additionalProperties = typeof chipValue === 'object' ? chipValue : {};
+            return ({
+              labelInternal: chipValue[labelProp] ?? chipValue,
+              idInternal: chipValue[idProp] || '',
+              ...additionalProperties,
+            });
+          }),
           fieldId,
           fieldType,
         };
@@ -1447,7 +1456,7 @@ export default {
           values: Object.values(values)
             .map(chipValue => ({
               // convert to de date locale for display
-              label: chipValue ? this.formatToDisplayDate(chipValue) : '',
+              labelInternal: chipValue ? this.formatToDisplayDate(chipValue) : '',
             })),
           fieldId,
           // BaseCollapsedRow needs information if date is type daterange, timerange or datetime
@@ -1489,17 +1498,17 @@ export default {
       if (filterData.type === 'string') {
         // special case date that needs to transform display to storage date format again
         if (fieldType === 'date') {
-          return this.formatToStorageDate(values[0].label);
+          return this.formatToStorageDate(values[0].labelInternal);
         }
-        return values[0].label;
+        return values[0].labelInternal;
       }
       // case boolean value
       if (filterData.type === 'boolean') {
-        return values[0].label;
+        return values[0].labelInternal;
       }
       // case number value
       if (filterData.type === 'integer' || filterData.type === 'float') {
-        return Number(values[0].label);
+        return Number(values[0].labelInternal);
         // date could be string if it is just a single date or an object in all other cases
       }
       // case date field (not string)
@@ -1507,7 +1516,7 @@ export default {
         const objectProperties = Object.keys(filterData.properties);
         return values.reduce((valueObject, value, index) => ({
           ...valueObject,
-          [objectProperties[index]]: this.formatToStorageDate(value.label),
+          [objectProperties[index]]: this.formatToStorageDate(value.labelInternal),
         }), {});
       }
       // case chips input field
@@ -1524,11 +1533,21 @@ export default {
           || this.labelPropertyName.formInputs;
         const idProp = fieldProps?.identifierPropertyName
           || this.identifierPropertyName.formInputs;
-        return values.filter(filterValue => !!filterValue.label)
-          .map(filterValue => ({
-            [labelProp]: filterValue.label,
-            [idProp]: filterValue.id,
-          }));
+        return values.filter(filterValue => !!filterValue.labelInternal)
+          .map((filterValue) => {
+            // in order to keep any additional properties the chips entry might have, clone
+            // the object and remove internally added variables again
+            const additionalProperties = JSON.parse(JSON.stringify(filterValue));
+            this.$delete(additionalProperties, 'labelInternal');
+            this.$delete(additionalProperties, 'idInternal');
+            return ({
+              // and add it to the values that are returned
+              ...additionalProperties,
+              // apart from the labelProperty and the identifierProperty
+              [labelProp]: filterValue.labelInternal,
+              [idProp]: filterValue.idInternal,
+            });
+          });
       }
       // case repeatable fields where every repeated field or field group is a separate filter entry
       if (!fieldType.includes('chips') && filterData.type === 'array') {
