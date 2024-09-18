@@ -150,6 +150,9 @@ export default {
     }
 
     .base-select-options__select-button {
+      // to keep button aligned right when parent wraps
+      margin-left: auto;
+
       &:hover,
       &:focus {
         color: $app-color;
