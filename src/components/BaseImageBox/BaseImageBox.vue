@@ -662,7 +662,6 @@ export default {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        width: 100%;
 
         &--2-lines {
           white-space: normal;
