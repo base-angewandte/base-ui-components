@@ -79,6 +79,7 @@
                   :minlength="minLength"
                   :maxlength="maxLength"
                   :inputmode="fieldType === 'number' && allowNegativeNumber ? 'decimal': null"
+                  enterkeyhint="done"
                   autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
