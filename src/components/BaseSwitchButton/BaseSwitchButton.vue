@@ -179,6 +179,7 @@ export default {
     display: flex;
     position: relative;
     align-items: center;
+    background-color: inherit;
 
     &.base-switch-buttons--gap {
       gap: $spacing;

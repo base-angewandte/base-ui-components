@@ -507,14 +507,16 @@ export default {
 
 .base-options {
   width: 100%;
-  background-color: inherit;
 
   .base-options__row {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
     min-height: $row-height-small;
     width: 100%;
+    background-color: inherit;
+    z-index: map-get($zindex, slidein);
 
     &-left {
       justify-content: flex-start;
@@ -566,6 +568,7 @@ export default {
       order: 5;
       display: flex;
       justify-content: flex-end;
+      background-color: inherit;
     }
   }
 
