@@ -464,7 +464,9 @@ export default {
       }
       // check if it is defined - if yes - calculate the width remaining for the action buttons
       this.remainingActionsWidth = optionsRow ? this.rowWidth
-        - this.beforeOptionsWidth - this.afterOptionsWidth - this.optionsButtonWidth
+        - this.beforeOptionsWidth - this.afterOptionsWidth
+        // only subtract options button if it is shown
+        - (this.useOptionsButton ? this.optionsButtonWidth : 0)
         : 0;
       // get the action button elements
       const actionsElement = this.$refs.actions;
