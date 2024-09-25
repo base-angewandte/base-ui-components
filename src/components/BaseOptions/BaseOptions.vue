@@ -137,11 +137,13 @@ export default {
      *   **always**: always show the options button
      *   **mobile**: only show options button when window size < 640px
      *   **never**: never show the options button - just show the available options directly
+     *   **fitted**: use options button whenever the actions (incl. before and after slot) do
+     *    not fit the row anymore
      */
     useOptionsButtonOn: {
       type: String,
       default: 'always',
-      validator: val => ['always', 'mobile', 'never'].includes(val),
+      validator: val => ['always', 'mobile', 'never', 'fitted'].includes(val),
     },
     /**
      * define the options button text as an object with `show` (=text that should be
@@ -287,7 +289,8 @@ export default {
      */
     useOptionsButton() {
       return this.useOptionsButtonOn === 'always'
-        || (this.useOptionsButtonOn === 'mobile' && this.isMobile);
+        || (this.useOptionsButtonOn === 'mobile' && this.isMobile)
+        || (this.useOptionsButtonOn === 'fitted' && !this.optionsFittingRowWidth);
     },
     /**
      * determine if options should be shown inline or below options row
@@ -310,6 +313,9 @@ export default {
         // showAfterOptionsBelow is false
         || (this.useOptionsButton && (!this.showAfterOptionsBelow
             || this.remainingActionsWidth > 0)));
+    },
+    optionsFittingRowWidth() {
+      return this.rowWidth - this.actionButtonsWidth - this.beforeOptionsWidth - this.afterOptionsWidth > 0;
     },
     /**
      * determine if action buttons need to be flex-wrapped
@@ -366,10 +372,9 @@ export default {
      */
     useOptionsButton: {
       handler(val) {
-        // make sure options are shown when options button is disabled
-        if (!val) {
-          this.showOptionsInt = true;
-        }
+        // make sure options are shown when options button is disabled and
+        // hidden behind the options button as soon as it is used
+        this.showOptionsInt = !val;
       },
       immediate: true,
     },

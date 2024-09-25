@@ -40,6 +40,12 @@ Resize to see the 'mobile' effect!
             text="mobile"
             class="button-switch"
             @clicked="useOptionsButtonOn = 'mobile'" />
+          <BaseButton
+            :active="useOptionsButtonOn === 'fitted'"
+            button-style="row"
+            text="fitted"
+            class="button-switch"
+            @clicked="useOptionsButtonOn = 'fitted'" />
         </div>
     </div>
 </template>
