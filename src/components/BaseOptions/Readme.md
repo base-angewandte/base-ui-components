@@ -81,6 +81,7 @@ Advanced example with all slots filled. Choose different settings for available 
         :options-hidden="optionsHidden"
         :show-options.sync="optionsToggle"
         :show-after-options-below="showAfterOptionsBelow"
+        :options-button-disabled="optionsButtonDisabled"
         :align-options="alignOptions">
         <template #beforeOptions>
           <div>beforeOptions slot</div>
@@ -130,6 +131,12 @@ Advanced example with all slots filled. Choose different settings for available 
             text="Hide Options"
             class="button-switch"
             @clicked="optionsHidden = !optionsHidden" />
+          <BaseButton
+            :active="optionsButtonDisabled"
+            button-style="row"
+            text="Disable Options Button"
+            class="button-switch"
+            @clicked="optionsButtonDisabled = !optionsButtonDisabled" />
         </div>
         <p class="options-settings">Choose setting for 'useOptionsButtonOn' prop:</p>
         <div class="button-switches">
@@ -165,6 +172,7 @@ export default {
       showAfterOptionsBelow: true,
       alignOptions: 'right',
       useOptionsButtonOn: 'always',
+      optionsButtonDisabled: false,
     };
   },
 };
