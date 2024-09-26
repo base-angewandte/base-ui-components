@@ -49,6 +49,7 @@
         :text="showOptionsInt ? getI18nTerm(optionsButtonText.hide)
           : getI18nTerm(optionsButtonText.show)"
         :icon="showOptionsInt ? optionsButtonIcon.hide : optionsButtonIcon.show"
+        :disabled="optionsButtonDisabled"
         :class="[{ 'base-options__options-button-left': alignOptions === 'left' }]"
         @clicked="showOptionsInt = !showOptionsInt" />
       <div
@@ -216,6 +217,14 @@ export default {
     disableOptions: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * set true if options button should be disabled
+     *  not relevant for `useOptionsButtonOn` with value `never`
+     */
+    optionsButtonDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -386,6 +395,11 @@ export default {
      */
     isMobile(val) {
       if (this.useOptionsButtonOn === 'mobile' && val) {
+        this.showOptionsInt = false;
+      }
+    },
+    optionsButtonDisabled(val) {
+      if (val) {
         this.showOptionsInt = false;
       }
     },
