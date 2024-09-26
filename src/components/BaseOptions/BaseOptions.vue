@@ -393,6 +393,11 @@ export default {
         this.showOptionsInt = false;
       }
     },
+    optionsButtonDisabled(val) {
+      if (val) {
+        this.showOptionsInt = false;
+      }
+    },
   },
   mounted() {
     // to listen to element with instead of window width create an observer!
