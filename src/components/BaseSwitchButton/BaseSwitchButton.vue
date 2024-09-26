@@ -2,7 +2,8 @@
   <fieldset
     :class="['base-switch-buttons', { 'base-switch-buttons--gap': type === 'prominent' }]">
     <span
-      :class="['base-switch-buttons__legend', { 'hide': !showLabel }]">
+      :class="['base-switch-buttons__legend', { 'hide': !showLabel },
+               { 'base-switch-buttons__legend--disabled': disabled }]">
       <legend>
         {{ label }}
       </legend>
@@ -15,7 +16,8 @@
         :for="optionIds[index]"
         :class="['base-switch-buttons__button',
                  `base-switch-buttons__button--${type}`,
-                 { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption }]">
+                 { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption },
+                 { 'base-switch-buttons__button--disabled': disabled }]">
         <input
           :id="optionIds[index]"
           :key="option.value + 'input'"
@@ -25,6 +27,7 @@
           :aria-checked="option.value === selectedOption"
           :value="option.value"
           :name="label"
+          :disabled="disabled"
           class="hide"
           type="radio"
           @keydown.enter.prevent="">
@@ -129,6 +132,14 @@ export default {
       default: 'right',
       validator: val => ['right', 'left'].includes(val),
     },
+    /**
+     * set true if the buttons should be visible but disabled, so they
+     * will appear greyed out and not be clickable
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -187,6 +198,10 @@ export default {
 
     .base-switch-buttons__legend {
       display: flex;
+
+      &.base-switch-buttons__legend--disabled {
+        color: $font-color-second;
+      }
     }
 
     .base-switch-buttons__button {
@@ -219,6 +234,10 @@ export default {
 
         &.base-switch-buttons__button--prominent-active {
           box-shadow: inset 0 -#{$border-width} 0 0 #{$app-color};
+
+          &.base-switch-buttons__button--disabled {
+            box-shadow: inset 0 -#{$border-width} 0 0 #{$graytext-color};
+          }
         }
 
         &:focus-within {
@@ -235,6 +254,16 @@ export default {
       &:hover .base-switch-buttons__icon,
       &:active .base-switch-buttons__icon {
         color: $app-color;
+      }
+
+      &.base-switch-buttons__button--disabled {
+        cursor: default;
+        color: $graytext-color;
+
+        &:hover .base-switch-buttons__icon,
+        &:active .base-switch-buttons__icon {
+          color: $graytext-color;
+        }
       }
     }
   }
