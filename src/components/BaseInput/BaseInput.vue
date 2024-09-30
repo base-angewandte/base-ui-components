@@ -796,7 +796,6 @@ export default {
       if (!this.showRemoveIcon || event.shiftKey) {
         this.setFieldState(false);
       }
-      this.$emit('keydown', event);
     },
     /**
      * replace dot with decimalSeparator
