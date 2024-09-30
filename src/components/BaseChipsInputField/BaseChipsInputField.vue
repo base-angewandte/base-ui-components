@@ -742,7 +742,9 @@ export default {
       const inputElements = this.$refs.baseInput.$el.getElementsByTagName('input');
       const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.internalId);
       if (mainInputElement) {
-        mainInputElement.focus();
+        // trigger an input click here instead of focus so that clicked-outside is triggered for all
+        // other input fields (and potential drop downs / pop ups are closed)
+        mainInputElement.click();
       }
     },
     /**
