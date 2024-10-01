@@ -812,7 +812,7 @@ export default {
     onInputBlur() {
       this.chipsInputActive = false;
       // if the focus goes to somewhere else on the page - remove input string
-      if (!this.dropDownActive && document.activeElement.tagName === 'BODY') {
+      if (this.input && document.activeElement.id !== this.internalId) {
         this.input = '';
       }
     },
@@ -832,6 +832,21 @@ export default {
       // again - this is currently just hypothetical)
       if (!['Tab', 'Enter', 'Shift'].includes(key)) {
         this.chipsInputActive = true;
+      }
+      // if user pressed tab and thus input field leaves focus we would want to remove the input string
+      // so no confusion is created as to wether this string is part of a search or saved in form
+      // so we check for type of key and if input is present
+      if (key === 'Tab' && this.input
+        // and remove input if
+        // there is no other focusable element in the input (like the clear input button)
+        && (!this.clearable
+          // user is moving focus backwards from input to outside of input field (not from any
+          // other element in the input field)
+          || (event.shiftKey && event.target.tagName === 'INPUT')
+          // user is moving focus from clear input button to outside of the input
+          || (this.clearable && !event.shiftKey && event.target.tagName !== 'INPUT'))) {
+        // this.chipsInputActive = false;
+        this.input = '';
       }
     },
     /**
