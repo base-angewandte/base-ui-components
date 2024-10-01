@@ -11,7 +11,7 @@
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="internalId"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :is-active.sync="isActive"
+      :is-active.sync="chipsInputActive"
       :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -21,7 +21,7 @@
       v-on="$listeners">
       <template #below-input>
         <BaseDropDownList
-          v-if="isActive"
+          v-if="chipsInputActive"
           ref="dropDownList"
           :drop-down-options="listInt"
           :active-option.sync="activeOption"
@@ -33,7 +33,6 @@
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
-          @within-drop-down="dropDownActive = $event"
           @click.native.stop="closeDropDown"
           @touchstart.native.stop="closeDropDown">
           <template #option="{ option }">
@@ -105,14 +104,14 @@
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
-          @keydown.enter.stop="isActive = !isActive"
-          @click.stop="isActive = !isActive">
+          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
+          @click.stop="chipsInputActive = !chipsInputActive">
           <BaseIcon
             :class="[
               'base-chips-input__single-dropdown-icon',
               {
                 'base-chips-input__single-dropdown-icon-rotated':
-                  isActive,
+                  chipsInputActive,
               },
             ]"
             name="drop-down" />
@@ -517,12 +516,7 @@ export default {
        * variable to store state of input field (for drop down handling)
        * @type {boolean}
        */
-      isActive: false,
-      /**
-       * variable for checking if cursor is withing drop down
-       * @type {boolean}
-       */
-      dropDownActive: false,
+      chipsInputActive: false,
       /**
        * the minimal width of the drop down element (calculated in js because ? )
        * TODO: above...
@@ -580,20 +574,6 @@ export default {
           .toLowerCase().includes(this.input.toLowerCase()));
       }
       return tempList;
-    },
-    /**
-     * determine from state of input field and drop down state (is cursor within)
-     * if drop down should be active
-     * @returns {boolean}
-     */
-    chipsInputActive: {
-      set(val) {
-        this.dropDownActive = val;
-        this.isActive = val;
-      },
-      get() {
-        return this.isActive || this.dropDownActive;
-      },
     },
     /**
      * the currently active option object
@@ -767,7 +747,7 @@ export default {
         this.$set(this.selectedListInt, 0, selected);
         // for single select the drop down should close again automatically
         // after choosing the option
-        this.dropDownActive = false;
+        this.chipsInputActive = false;
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
@@ -855,7 +835,7 @@ export default {
      */
     onEnter() {
       // do nothing if dropdown should be closed on option select, and dropdown is not active
-      if (this.closeDropdownOnOptionSelect && !this.isActive) return;
+      if (this.closeDropdownOnOptionSelect && !this.chipsInputActive) return;
 
       // check if there is a currently active option
       if (this.activeOption) {
@@ -908,7 +888,7 @@ export default {
      */
     closeDropDown() {
       // optional close dropdown after selection
-      if (this.closeDropdownOnOptionSelect && this.isActive) {
+      if (this.closeDropdownOnOptionSelect && this.chipsInputActive) {
         this.chipsInputActive = false;
         if (this.inputElem) {
           this.inputElem.blur();
