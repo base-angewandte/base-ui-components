@@ -15,6 +15,7 @@
       :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
+      @keydown="checkKeyEvent"
       @click-input-field="onInputFocus"
       @clicked-outside="onInputBlur"
       v-on="$listeners">
@@ -695,9 +696,6 @@ export default {
      * @param {string} val
      */
     input(val) {
-      // open dropdown
-      this.isActive = true;
-
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
         /**
@@ -826,10 +824,14 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     checkKeyEvent(event) {
-      // if tab this will trigger moving forward to next input field
-      // --> this one should be inactive
-      if (event.key === 'Tab') {
-        this.chipsInputActive = false;
+      const { key } = event;
+      // this should (currently) never be the case (but it was in the past - on closeDropDownOnOptionSelect
+      // focus remained but drop down was closed) but just to be safe - set the input active as soon
+      // as user enters input
+      // TODO: what would happen if user selects an option, focus stays and user copy pastes? (but
+      // again - this is currently just hypothetical)
+      if (!['Tab', 'Enter', 'Shift'].includes(key)) {
+        this.chipsInputActive = true;
       }
     },
     /**
@@ -851,9 +853,6 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     onArrowKey(event) {
-      // open dropdown
-      this.isActive = true;
-
       // check if the list has any options
       if (this.listInt.length) {
         // if yes trigger the navigate function
