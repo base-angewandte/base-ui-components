@@ -54,17 +54,15 @@
                 :item="option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                <template>
-                  <span
-                    v-if="option[identifierPropertyName]"
-                    :key="option[identifierPropertyName]"
-                    v-insert-text-as-html="{
-                      value: highlightStringMatch
-                        ? highlight(getLangLabel(option[labelPropertyName], true))
-                        : getLangLabel(option[labelPropertyName], true),
-                      interpretTextAsHtml: interpretChipsLabelAsHtml,
-                    }" />
-                </template>
+                <span
+                  v-if="option[identifierPropertyName]"
+                  :key="option[identifierPropertyName]"
+                  v-insert-text-as-html="{
+                    value: highlightStringMatch
+                      ? highlight(getLangLabel(option[labelPropertyName], true))
+                      : getLangLabel(option[labelPropertyName], true),
+                    interpretTextAsHtml: interpretChipsLabelAsHtml,
+                  }" />
               </slot>
             </template>
           </template>
@@ -786,9 +784,15 @@ export default {
 
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
 
+    /**
+     * function triggered when input field was clicked
+     */
     onInputFocus() {
       this.chipsInputActive = true;
     },
+    /**
+     * function triggered when click-outside happened
+     */
     onInputBlur() {
       this.chipsInputActive = false;
       // if the focus goes to somewhere else on the page - remove input string
