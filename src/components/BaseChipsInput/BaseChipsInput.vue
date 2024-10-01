@@ -541,7 +541,7 @@ export default {
      * (e.g. because they are only needed for drop down component)
      */
     chipsFieldInputProps() {
-      const newProps = { ...this.$props };
+      const newProps = { ...this.$props, id: this.internalId };
       delete newProps.dropDownNoOptionsInfo;
       delete newProps.allowDynamicDropDownEntries;
       delete newProps.addNewChipText;
