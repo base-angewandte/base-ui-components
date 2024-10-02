@@ -14,7 +14,8 @@
       :aria-describedby="descriptionElementId"
       role="alertdialog"
       aria-modal="true"
-      class="popup-box">
+      class="popup-box"
+      @keydown="tabKeyHandler($event, disableTabKeyHandler)">
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <!-- @slot add a custom header title instead of the text defined with the prop `title`.
@@ -24,6 +25,7 @@
           name="header-title">
           <div
             id="popup-title"
+            tabindex="-1"
             class="popup-title">
             {{ title }}
           </div>
@@ -84,9 +86,10 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useTabKeyHandler } from '@/composables/useTabKeyHandler';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
-
 /**
  * A component as overlay to display messages
  *
@@ -198,6 +201,20 @@ export default {
       default: false,
     },
     /**
+     * list of focusable HTML elements using tab key navigation
+     */
+    focusableElements: {
+      type: Array,
+      default: () => ['a[href]', 'button', 'input'],
+    },
+    /**
+     * specify to disable the tab key handler within the component
+     */
+    disableTabKeyHandler: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * button row visibility
      */
     showButtonRow: {
@@ -212,6 +229,17 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  setup(props) {
+    // get reference to element
+    const popUpBody = ref(null);
+    // init tab key handler
+    const { tabKeyHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '));
+
+    return {
+      popUpBody,
+      tabKeyHandler,
+    };
   },
   data() {
     return {
@@ -229,16 +257,24 @@ export default {
     },
   },
   updated() {
-    setTimeout(() => {
-      if (this.showInt) {
-        if (this.initialFocusElement !== '' && this.$el.querySelector(this.initialFocusElement)) {
-          this.$el.querySelector(this.initialFocusElement).focus();
-        }
-      } else if (this.prevActiveElement) {
-        this.prevActiveElement.focus();
-        this.prevActiveElement = false;
+    // when the popup is opened
+    if (this.showInt) {
+      // try to focus the element defined with the initialFocusElement property
+      if (!!this.initialFocusElement && this.$el.querySelector(this.initialFocusElement)) {
+        this.$el.querySelector(this.initialFocusElement).focus();
+        return;
       }
-    }, 250);
+      // or the popup title
+      if (document?.getElementById('popup-title')) {
+        this.$el.querySelector('#popup-title').focus();
+        return;
+      }
+    }
+    // when the popup is closed, try to focus the previous triggering element
+    if (this.prevActiveElement) {
+      this.prevActiveElement.focus();
+      this.prevActiveElement = false;
+    }
   },
   mounted() {
     // update internal variable with prop value
