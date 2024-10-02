@@ -180,9 +180,13 @@ export default {
       default: false,
     },
     /**
-     * selector to focus if popup is open
+     * HTMLElement to focus after opening the popup
+     * Note: If empty, the header title will be focused by default.
+     *       If using the slot for a custom header, be sure to
+     *       define an id attribute with the value `popup-title`
+     *       The value should be a valid CSS selector.
      */
-    isOpenFocus: {
+    initialFocusElement: {
       type: String,
       default: '',
     },
@@ -227,8 +231,8 @@ export default {
   updated() {
     setTimeout(() => {
       if (this.showInt) {
-        if (this.isOpenFocus !== '' && this.$el.querySelector(this.isOpenFocus)) {
-          this.$el.querySelector(this.isOpenFocus).focus();
+        if (this.initialFocusElement !== '' && this.$el.querySelector(this.initialFocusElement)) {
+          this.$el.querySelector(this.initialFocusElement).focus();
         }
       } else if (this.prevActiveElement) {
         this.prevActiveElement.focus();
