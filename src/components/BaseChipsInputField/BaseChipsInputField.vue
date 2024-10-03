@@ -3,7 +3,7 @@
     class="base-chips-input-field">
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
-      :id="id"
+      :id="internalId"
       ref="baseInput"
       v-model="inputInt"
       :field-type="inputType"
@@ -552,6 +552,13 @@ export default {
     };
   },
   computed: {
+    /**
+     * if an id was not provided in props we create an internal id
+     * @returns {string}
+     */
+    internalId() {
+      return this.id || createId();
+    },
     inputListeners() {
       return {
         // add all the listeners from the parent
@@ -733,9 +740,11 @@ export default {
       this.$emit('removed', option);
       // lay the focus on the input field
       const inputElements = this.$refs.baseInput.$el.getElementsByTagName('input');
-      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.id);
+      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.internalId);
       if (mainInputElement) {
-        mainInputElement.focus();
+        // trigger an input click here instead of focus so that clicked-outside is triggered for all
+        // other input fields (and potential drop downs / pop ups are closed)
+        mainInputElement.click();
       }
     },
     /**
