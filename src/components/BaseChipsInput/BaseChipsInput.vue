@@ -11,16 +11,17 @@
       :selected-list.sync="selectedListInt"
       :drop-down-list-id="internalId"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :is-active.sync="isActive"
+      :is-active.sync="chipsInputActive"
       :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
+      @keydown="checkKeyEvent"
       @click-input-field="onInputFocus"
       @clicked-outside="onInputBlur"
       v-on="$listeners">
       <template #below-input>
         <BaseDropDownList
-          v-if="isActive"
+          v-if="chipsInputActive"
           ref="dropDownList"
           :drop-down-options="listInt"
           :active-option.sync="activeOption"
@@ -32,7 +33,6 @@
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
-          @within-drop-down="dropDownActive = $event"
           @click.native.stop="closeDropDown"
           @touchstart.native.stop="closeDropDown">
           <template #option="{ option }">
@@ -54,17 +54,15 @@
                 :item="option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                <template>
-                  <span
-                    v-if="option[identifierPropertyName]"
-                    :key="option[identifierPropertyName]"
-                    v-insert-text-as-html="{
-                      value: highlightStringMatch
-                        ? highlight(getLangLabel(option[labelPropertyName], true))
-                        : getLangLabel(option[labelPropertyName], true),
-                      interpretTextAsHtml: interpretChipsLabelAsHtml,
-                    }" />
-                </template>
+                <span
+                  v-if="option[identifierPropertyName]"
+                  :key="option[identifierPropertyName]"
+                  v-insert-text-as-html="{
+                    value: highlightStringMatch
+                      ? highlight(getLangLabel(option[labelPropertyName], true))
+                      : getLangLabel(option[labelPropertyName], true),
+                    interpretTextAsHtml: interpretChipsLabelAsHtml,
+                  }" />
               </slot>
             </template>
           </template>
@@ -104,14 +102,14 @@
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
-          @keydown.enter.stop="isActive = !isActive"
-          @click.stop="isActive = !isActive">
+          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
+          @click.stop="chipsInputActive = !chipsInputActive">
           <BaseIcon
             :class="[
               'base-chips-input__single-dropdown-icon',
               {
                 'base-chips-input__single-dropdown-icon-rotated':
-                  isActive,
+                  chipsInputActive,
               },
             ]"
             name="drop-down" />
@@ -516,12 +514,7 @@ export default {
        * variable to store state of input field (for drop down handling)
        * @type {boolean}
        */
-      isActive: false,
-      /**
-       * variable for checking if cursor is withing drop down
-       * @type {boolean}
-       */
-      dropDownActive: false,
+      chipsInputActive: false,
       /**
        * the minimal width of the drop down element (calculated in js because ? )
        * TODO: above...
@@ -541,7 +534,7 @@ export default {
      * (e.g. because they are only needed for drop down component)
      */
     chipsFieldInputProps() {
-      const newProps = { ...this.$props };
+      const newProps = { ...this.$props, id: this.internalId };
       delete newProps.dropDownNoOptionsInfo;
       delete newProps.allowDynamicDropDownEntries;
       delete newProps.addNewChipText;
@@ -579,20 +572,6 @@ export default {
           .toLowerCase().includes(this.input.toLowerCase()));
       }
       return tempList;
-    },
-    /**
-     * determine from state of input field and drop down state (is cursor within)
-     * if drop down should be active
-     * @returns {boolean}
-     */
-    chipsInputActive: {
-      set(val) {
-        this.dropDownActive = val;
-        this.isActive = val;
-      },
-      get() {
-        return this.isActive || this.dropDownActive;
-      },
     },
     /**
      * the currently active option object
@@ -695,9 +674,6 @@ export default {
      * @param {string} val
      */
     input(val) {
-      // open dropdown
-      this.isActive = true;
-
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
         /**
@@ -769,7 +745,7 @@ export default {
         this.$set(this.selectedListInt, 0, selected);
         // for single select the drop down should close again automatically
         // after choosing the option
-        this.dropDownActive = false;
+        this.chipsInputActive = false;
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
@@ -808,13 +784,19 @@ export default {
 
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
 
+    /**
+     * function triggered when input field was clicked
+     */
     onInputFocus() {
       this.chipsInputActive = true;
     },
+    /**
+     * function triggered when click-outside happened
+     */
     onInputBlur() {
       this.chipsInputActive = false;
       // if the focus goes to somewhere else on the page - remove input string
-      if (!this.dropDownActive && document.activeElement.tagName === 'BODY') {
+      if (this.input && document.activeElement.id !== this.internalId) {
         this.input = '';
       }
     },
@@ -826,10 +808,29 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     checkKeyEvent(event) {
-      // if tab this will trigger moving forward to next input field
-      // --> this one should be inactive
-      if (event.key === 'Tab') {
-        this.chipsInputActive = false;
+      const { key } = event;
+      // this should (currently) never be the case (but it was in the past - on closeDropDownOnOptionSelect
+      // focus remained but drop down was closed) but just to be safe - set the input active as soon
+      // as user enters input
+      // TODO: what would happen if user selects an option, focus stays and user copy pastes? (but
+      // again - this is currently just hypothetical)
+      if (!['Tab', 'Enter', 'Shift'].includes(key)) {
+        this.chipsInputActive = true;
+      }
+      // if user pressed tab and thus input field leaves focus we would want to remove the input string
+      // so no confusion is created as to wether this string is part of a search or saved in form
+      // so we check for type of key and if input is present
+      if (key === 'Tab' && this.input
+        // and remove input if
+        // there is no other focusable element in the input (like the clear input button)
+        && (!this.clearable
+          // user is moving focus backwards from input to outside of input field (not from any
+          // other element in the input field)
+          || (event.shiftKey && event.target.tagName === 'INPUT')
+          // user is moving focus from clear input button to outside of the input
+          || (this.clearable && !event.shiftKey && event.target.tagName !== 'INPUT'))) {
+        // this.chipsInputActive = false;
+        this.input = '';
       }
     },
     /**
@@ -838,7 +839,7 @@ export default {
      */
     onEnter() {
       // do nothing if dropdown should be closed on option select, and dropdown is not active
-      if (this.closeDropdownOnOptionSelect && !this.isActive) return;
+      if (this.closeDropdownOnOptionSelect && !this.chipsInputActive) return;
 
       // check if there is a currently active option
       if (this.activeOption) {
@@ -851,9 +852,6 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     onArrowKey(event) {
-      // open dropdown
-      this.isActive = true;
-
       // check if the list has any options
       if (this.listInt.length) {
         // if yes trigger the navigate function
@@ -894,7 +892,7 @@ export default {
      */
     closeDropDown() {
       // optional close dropdown after selection
-      if (this.closeDropdownOnOptionSelect && this.isActive) {
+      if (this.closeDropdownOnOptionSelect && this.chipsInputActive) {
         this.chipsInputActive = false;
         if (this.inputElem) {
           this.inputElem.blur();
