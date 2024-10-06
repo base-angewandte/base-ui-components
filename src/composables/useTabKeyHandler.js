@@ -1,3 +1,5 @@
+import { computed, ref, watchEffect } from 'vue';
+
 /**
  * Handle tab key events to focus a list of focusable HTML elements
  *
@@ -5,25 +7,38 @@
  *                                  * can be either a Vue reference object or
  *                                  * a string representing a CSS selector
  * @param {string} focusableElements - comma separated list of HTML elements to focus
- * @returns {{tabKeyHandler: tabKeyHandler}}
+ * @param {boolean} disable - disable method and do nothing
+ * @returns {{focusableHTMLTags: *, disableHandler: *}}
  */
 // eslint-disable-next-line import/prefer-default-export
-export function useTabKeyHandler(target, focusableElements) {
+export function useTabKeyHandler(target, focusableElements, disable = false) {
+  const focusableHTMLTags = ref(focusableElements);
+  const disableHandler = ref(disable);
+
+  /**
+   * determine the target HTML element
+   * @return {HTMLElement}
+   */
+  const targetElement = computed(() => {
+    if (typeof target === 'object' && target?.value) {
+      return target.value;
+    }
+    // if target is a string representing a CSS selector
+    if (typeof target === 'string' && document?.querySelector(target)) {
+      return document?.querySelector(target);
+    }
+    return undefined;
+  });
+
   /**
    * get focusable dom elements within a target container element
    * @return array - list of focusable DOM elements
    */
   function getFocusableElements() {
+    // if targetElement is not defined, return an empty array
+    if (!targetElement.value) return [];
     // define an empty list
-    let elements = [];
-    // if target is a Vue reference object
-    if (typeof target === 'object' && target?.value) {
-      elements = Array.from(target.value.querySelectorAll(focusableElements));
-    }
-    // if target is a string representing a CSS selector
-    if (typeof target === 'string') {
-      elements = Array.from(document?.querySelector(target).querySelectorAll(focusableElements));
-    }
+    const elements = Array.from(targetElement.value.querySelectorAll(focusableHTMLTags.value));
     // return DOM visible focusable elements
     return elements.filter(element => element.checkVisibility());
   }
@@ -34,7 +49,7 @@ export function useTabKeyHandler(target, focusableElements) {
    */
   function setFocus(direction = 'next') {
     const elements = getFocusableElements();
-    if (!Array.isArray(elements)) return;
+    if (!elements.length) return;
 
     let currentFocus = null;
     let nextFocus = null;
@@ -64,10 +79,9 @@ export function useTabKeyHandler(target, focusableElements) {
   /**
    * intercept tab key event
    * @param {Object} e - event
-   * @param {boolean} [disable=false] - disable method and do nothing
    */
-  function tabKeyHandler(e, disable) {
-    if (disable) return;
+  function tabKeyHandler(e) {
+    if (disableHandler.value) return;
 
     if (e.shiftKey && e.key === 'Tab') {
       e.preventDefault();
@@ -81,5 +95,14 @@ export function useTabKeyHandler(target, focusableElements) {
     }
   }
 
-  return { tabKeyHandler };
+  watchEffect(() => {
+    if (targetElement.value) {
+      targetElement.value.addEventListener('keydown', tabKeyHandler);
+    }
+  });
+
+  return {
+    focusableHTMLTags,
+    disableHandler,
+  };
 }

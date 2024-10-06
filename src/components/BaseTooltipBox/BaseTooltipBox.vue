@@ -13,8 +13,7 @@
              { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
                || typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
-             { 'base-tooltip-box--active': isActive }]"
-    @keydown="tabKeyHandler($event, disableTabKeyHandler)">
+             { 'base-tooltip-box--active': isActive }]">
     <div
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
@@ -60,7 +59,7 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { createId } from '@/utils/utils';
 import { useTabKeyHandler } from '@/composables/useTabKeyHandler';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
@@ -191,12 +190,16 @@ export default {
     // get reference to element
     const popUpBody = ref(null);
     // init tab key handler
-    const { tabKeyHandler } = useTabKeyHandler(`#${internalId}`, props.focusableElements.join(', '));
+    const { focusableHTMLTags, disableHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '), props.disableTabKeyHandler);
+    // watcher to set specific properties
+    watchEffect(() => {
+      focusableHTMLTags.value = props.focusableElements;
+      disableHandler.value = props.disableTabKeyHandler;
+    });
 
     return {
       internalId,
       popUpBody,
-      tabKeyHandler,
     };
   },
   data() {

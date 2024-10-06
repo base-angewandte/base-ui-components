@@ -14,8 +14,7 @@
       :aria-describedby="descriptionElementId"
       role="alertdialog"
       aria-modal="true"
-      class="popup-box"
-      @keydown="tabKeyHandler($event, disableTabKeyHandler)">
+      class="popup-box">
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <!-- @slot add a custom header title instead of the text defined with the prop `title`.
@@ -86,7 +85,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useTabKeyHandler } from '@/composables/useTabKeyHandler';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
@@ -234,11 +233,15 @@ export default {
     // get reference to element
     const popUpBody = ref(null);
     // init tab key handler
-    const { tabKeyHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '));
+    const { focusableHTMLTags, disableHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '), props.disableTabKeyHandler);
+    // watcher to set specific properties
+    watchEffect(() => {
+      focusableHTMLTags.value = props.focusableElements;
+      disableHandler.value = props.disableTabKeyHandler;
+    });
 
     return {
       popUpBody,
-      tabKeyHandler,
     };
   },
   data() {
