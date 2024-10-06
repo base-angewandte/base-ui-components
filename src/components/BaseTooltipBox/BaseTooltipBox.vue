@@ -174,7 +174,7 @@ export default {
      */
     focusableElements: {
       type: Array,
-      default: () => ['a[href]', 'button', 'input'],
+      default: () => ['a[href]', 'button:enabled', 'input:enabled'],
     },
     /**
      * specify to disable the tab key handler within the component
