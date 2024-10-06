@@ -18,12 +18,12 @@
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <!-- @slot add a custom header title instead of the text defined with the prop `title`.
-          @binding {string, number} id - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
+          @binding header-id {string, number} - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
         <slot
-          :id="headerId"
-          name="header-title">
+          name="header-title"
+          :header-id="headerId">
           <div
-            id="popup-title"
+            :id="headerId"
             tabindex="-1"
             class="popup-title">
             {{ title }}
