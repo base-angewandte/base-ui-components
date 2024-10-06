@@ -55,7 +55,7 @@ export default defineConfig({
     minify: true, // set to false in linked dev mode and using nuxt-bride
     sourcemap: true,
     lib: {
-      entry: path.resolve(__dirname, 'src/components/index.js'),
+      entry: path.resolve(__dirname, 'src/index.js'),
       name: 'BaseUiComponents',
       formats: ['es', 'cjs'],
       fileName: format => `[name].${format}.js`,
