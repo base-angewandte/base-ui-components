@@ -503,8 +503,10 @@ export default {
      */
     focusInitialElement() {
       setTimeout(() => {
+        // get the current components id, since it could have been changed/overwritten in FE
+        const internalId = this.$el.id;
         // by default for box mode, focus the component container
-        let focusElement = this.internalId ? document?.getElementById(this.internalId) : undefined;
+        let focusElement = internalId ? document?.getElementById(internalId) : undefined;
         // if the component is in popup mode and within mobile resolution, focus the popup title
         if (this.typeOnMobile !== 'box' && this.isMobile()) {
           focusElement = this.headerId ? this.$el.querySelector(`#${this.headerId}`) : undefined;
