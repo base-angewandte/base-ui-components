@@ -2,6 +2,8 @@ import { computed, ref, watchEffect } from 'vue';
 
 /**
  * Handle tab key events to focus a list of focusable HTML elements
+ * Note: Currently the composable makes troubles when imported from the base-ui-components library.
+ * TODO: Find another way to initialize the EventListener than within the watchEffect method.
  *
  * @param {Object, String} target - container element where the focusableElements are located
  *                                  * can be either a Vue reference object or
@@ -17,7 +19,7 @@ export function useTabKeyHandler(target, focusableElements, disable = false) {
 
   /**
    * determine the target HTML element
-   * @return {HTMLElement}
+   * @return {HTMLElement, undefined}
    */
   const targetElement = computed(() => {
     if (typeof target === 'object' && target?.value) {
@@ -96,6 +98,11 @@ export function useTabKeyHandler(target, focusableElements, disable = false) {
   }
 
   watchEffect(() => {
+    /**
+     * Currently the composable makes troubles when imported from the base-ui-components library.
+     * Somehow the watchEffect method is called before the DOM is updated.
+     * TODO: find another way to initialize the eventListener
+     */
     if (targetElement.value) {
       targetElement.value.addEventListener('keydown', tabKeyHandler);
     }

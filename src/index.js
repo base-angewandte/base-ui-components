@@ -119,5 +119,3 @@ export {
   BaseTooltipBox,
   BaseUploadPopUp,
 };
-
-export { useTabKeyHandler } from './composables/useTabKeyHandler';
