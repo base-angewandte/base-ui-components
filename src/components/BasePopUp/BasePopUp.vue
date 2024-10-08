@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="showInt"
     :class="['base-pop-up',
              { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
     <div
@@ -103,13 +102,6 @@ export default {
   },
   mixins: [popUpLock],
   props: {
-    /**
-     * could be used to control visibility
-     */
-    show: {
-      type: Boolean,
-      default: false,
-    },
     /**
      * pop up header text
      */
@@ -246,50 +238,11 @@ export default {
   },
   data() {
     return {
-      showInt: this.show,
       // this is needed for popUpLock mixin!
       targetName: 'popUpBody',
     };
   },
-  watch: {
-    show(val) {
-      if (!this.showInt && !this.prevActiveElement) {
-        this.prevActiveElement = document.activeElement;
-      }
-      this.showInt = val;
-    },
-    /**
-     * focus a specific element when the component changes visibility
-     *   open: focus initial focus element of the title element
-     *   closed: focus the previous triggering element
-     * @param {boolean} val
-     */
-    showInt(val) {
-      this.$nextTick(() => {
-        // when the popup is opened
-        if (val) {
-          // try to focus the element defined with the initialFocusElement property
-          if (!!this.initialFocusElement && this.$el.querySelector(this.initialFocusElement)) {
-            this.$el.querySelector(this.initialFocusElement).focus();
-            return;
-          }
-          // or the popup title
-          if (this.$el.querySelector(`#${this.headerId}`)) {
-            this.$el.querySelector(`#${this.headerId}`).focus();
-            return;
-          }
-        }
-        // when the popup is closed, try to focus the previous triggering element
-        if (!val && this.prevActiveElement) {
-          this.prevActiveElement.focus();
-          this.prevActiveElement = false;
-        }
-      });
-    },
-  },
   mounted() {
-    // update internal variable with prop value
-    this.showInt = this.show;
     document.onkeyup = (e) => {
       if (document.querySelector('.popup-box')) {
         if (!this.closeButtonDisabled && e.key === 'Escape') {
@@ -298,10 +251,18 @@ export default {
         }
       }
     };
-    // if show is true on initial render also set the active element (could not be
-    // set in watcher)
-    if (this.showInt) {
-      this.prevActiveElement = document.activeElement;
+    // also set the previously active element so it can be used to return to
+    // if pop up is closed
+    this.prevActiveElement = document.activeElement;
+    this.$nextTick(() => {
+      this.determineFocus();
+    });
+  },
+  beforeDestroy() {
+    // when the popup is closed, try to focus the previous triggering element
+    if (this.prevActiveElement) {
+      this.prevActiveElement.focus();
+      this.prevActiveElement = false;
     }
   },
   methods: {
@@ -312,7 +273,6 @@ export default {
        * @event close
        */
       this.$emit('close');
-      this.showInt = false;
     },
     buttonRight() {
       /**
@@ -329,6 +289,17 @@ export default {
        * @event button-left
        */
       this.$emit('button-left');
+    },
+
+    /** INITIAL FOCUS */
+    determineFocus() {
+      // try to focus the element defined with the initialFocusElement property
+      if (!!this.initialFocusElement && this.$el?.querySelector(this.initialFocusElement)) {
+        this.$el.querySelector(this.initialFocusElement).focus();
+        // or the popup title
+      } else if (this.$el?.querySelector(`#${this.headerId}`)) {
+        this.$el.querySelector(`#${this.headerId}`).focus();
+      }
     },
   },
 };
