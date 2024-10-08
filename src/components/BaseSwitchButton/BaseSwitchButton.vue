@@ -10,10 +10,9 @@
     </legend>
     <span
       :class="['base-switch-buttons__legend', { 'hide': !showLabel },
-               { 'base-switch-buttons__legend--disabled': disabled }]">
-      <legend>
-        {{ label }}
-      </legend>
+               { 'base-switch-buttons__legend--disabled': disabled },
+               { 'base-switch-buttons__legend--gap': type === 'normal' }]">
+      {{ label }}
     </span>
 
     <template
