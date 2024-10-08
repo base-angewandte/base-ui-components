@@ -1,6 +1,13 @@
 <template>
   <fieldset
     :class="['base-switch-buttons', { 'base-switch-buttons--gap': type === 'prominent' }]">
+    <!-- we need to separate legend here from the actually displayed label because
+      legend is not accessible if wrapped in a span but i can not style the legend the way
+      i want without the span -->
+    <legend
+      class="hide">
+      {{ label }}
+    </legend>
     <span
       :class="['base-switch-buttons__legend', { 'hide': !showLabel },
                { 'base-switch-buttons__legend--disabled': disabled }]">
@@ -35,17 +42,17 @@
           v-if="option?.icon?.length > 0 && iconPosition === 'left'"
           :name="option.icon"
           size="small"
-          :title="label"
+          :title="option.label"
           class="base-switch-buttons__icon" />
         <span
-          :class="{ hide: !showButtonsLabelInt }">
+          v-if="showButtonsLabelInt">
           {{ option.label }}
         </span>
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'right'"
           :name="option.icon"
           size="small"
-          :title="label"
+          :title="option.label"
           class="base-switch-buttons__icon" />
         <!-- @slot slot to display something right of text (e.g. icon), or if `showButtonsLabel` false - generally right of the button content
         @binding {string} value - the value of the option object
@@ -201,6 +208,10 @@ export default {
 
       &.base-switch-buttons__legend--disabled {
         color: $font-color-second;
+      }
+
+      &.base-switch-buttons__legend--gap {
+        padding-right: $spacing-small;
       }
     }
 
