@@ -6,6 +6,7 @@
     role="dialog"
     tabindex="-1"
     :aria-labelledby="headerId"
+    :aria-describedby="descriptionElementId"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              { 'base-tooltip-box--background-visible': overlayBackgroundVisible },
@@ -15,6 +16,7 @@
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
+      :id="descriptionElementId"
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
         <!-- @slot customize the header displayed on mobile for `typeOnMobile` `modal` and `fullscreen`
@@ -142,6 +144,13 @@ export default {
     headerId: {
       type: [String, Number],
       default: 'popup-title',
+    },
+    /**
+     * specify the id of the element containing a description - for accessibility only
+     */
+    descriptionElementId: {
+      type: String,
+      default: 'popup-body',
     },
     /**
      * define if the overlay background should be visible
