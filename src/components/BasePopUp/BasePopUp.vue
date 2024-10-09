@@ -87,6 +87,7 @@
 import { ref, watchEffect } from 'vue';
 import { useTabKeyHandler } from '@/composables/useTabKeyHandler';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseButton from '@/components/BaseButton/BaseButton';
 import popUpLock from '../../mixins/popUpLock';
 /**
  * A component as overlay to display messages
@@ -97,7 +98,7 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseButton,
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   mixins: [popUpLock],
