@@ -16,6 +16,7 @@
       <!-- the actual list of filters -->
       <ul
         ref="filterList"
+        :aria-description="assistiveText.appliedFiltersLabel"
         :class="[
           'base-collapsed-filter-row__filter-list',
           { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
@@ -26,11 +27,15 @@
         <li
           v-for="(filter, filterIndex) in filtersInt"
           :key="filter.idInternal"
+          :aria-describedby="`${filter.idInternal}-label`"
+          role="listitem"
+          tabindex="0"
           :class="['base-collapsed-filter-row__filter',
                    { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
                      .fieldType === 'boolean' }]">
           <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
             <div
+              :id="`${filter.idInternal}-label`"
               class="base-collapsed-filter-row__filter-label">
               {{ filter.labelInternal }}
             </div>
@@ -57,6 +62,8 @@
                       :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                         && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
                         && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
+                      :boolean-filter-label="assistiveText.booleanFilterValue
+                        .replace('{label}', filter.labelInternal)"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
@@ -73,6 +80,8 @@
                     :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                       && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
                       && interpretLabelAsHtml.includes(filter.idInternal))"
+                    :boolean-filter-label="assistiveText.booleanFilterValue ? assistiveText.booleanFilterValue
+                      .replace('{label}', filter.labelInternal) : ''"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -81,15 +90,20 @@
         </li>
       </ul>
     </div>
+    <span
+      v-if="chipRemovedAssistiveText"
+      aria-live="assertive"
+      class="supportive-text">
+      {{ chipRemovedAssistiveText }}
+    </span>
 
     <!-- remove all filters button -->
-    <!-- TODO: add accessibility features -->
     <button
+      :title="assistiveText.removeFiltersLabel"
       class="base-collapsed-filter-row__remove"
       @click="removeFilters">
       <BaseIcon
         name="remove"
-        text=""
         class="base-collapsed-filter-row__remove-icon" />
     </button>
   </div>
@@ -192,6 +206,25 @@ export default {
       type: [Boolean, Array],
       default: false,
     },
+    /**
+     * **removeFiltersLabel**: add a descriptive label used for the remove all
+     *  filters icon in collapsed row
+     * **filterRemovedNotification**: notification that is read by screenreaders when a filter
+     *  value was removed. Add the string {value} to read the filter value that was removed and
+     *  {label} to read the label of the filter from which the value was removed.
+     * **appliedFiltersLabel**: description for the filters in the collapsed filter row.
+     * **booleanFilterValue**: Set text that should be read for a boolan filter value. You may add
+     *      the string {label} which will be replaced by the filter label.
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        removeFiltersLabel: 'Remove all filters.',
+        filterRemovedNotification: 'Filter value {value} was removed from filter {label}.',
+        appliedFiltersLabel: 'Currently applied Filters',
+        booleanFilterValue: 'Filter {label} was set',
+      }),
+    },
   },
   data() {
     return {
@@ -238,6 +271,12 @@ export default {
        * @type {?ResizeObserver}
        */
       resizeObserver: null,
+      /**
+       * assistive text set when a chip was removed to be read
+       * by screenreader
+       * @type {string}
+       */
+      chipRemovedAssistiveText: '',
     };
   },
   computed: {
@@ -308,6 +347,10 @@ export default {
      */
     removeChip(filterIndex, valueIndex, groupIndex) {
       const { fieldType, values } = this.filtersInt[filterIndex].filter_values;
+      const filterLabel = this.filtersInt[filterIndex].labelInternal;
+      // get the filter value label and assume it is not a group
+      const filterValue = fieldType === 'group' ? values[valueIndex].values[groupIndex].labelInternal
+        : values[valueIndex].labelInternal;
       // first check special case group
       if (fieldType === 'group') {
         // get all the concatenated values within the group
@@ -352,6 +395,14 @@ export default {
       } else {
         this.filtersInt[filterIndex].filter_values.values.splice(valueIndex, 1);
       }
+      // set the assistive text so it is read by screenreader
+      this.chipRemovedAssistiveText = this.assistiveText.filterRemovedNotification
+        .replace('{label}', filterLabel)
+        .replace('{value}', filterValue);
+      // and remove it again afterward
+      setTimeout(() => {
+        this.chipRemovedAssistiveText = '';
+      }, 300);
     },
 
     /** SCROLL RELATED FUNCTIONALITIES */
@@ -609,6 +660,10 @@ export default {
     padding: 0 $spacing;
     height: 100%;
     align-items: center;
+
+    &:hover, &:active, &:focus {
+      color: $app-color;
+    }
 
     .base-collapsed-filter-row__remove-icon {
       height: $icon-medium;

@@ -1,6 +1,10 @@
 <template>
   <div
-    class="base-collapsed-filter-item">
+    ref="filterChip"
+    role="listitem"
+    tabindex="0"
+    class="base-collapsed-filter-item"
+    @keydown="removeChip">
     <!-- if value is single value of date or time range add an 'from' or 'until' character -->
     <span
       v-if="isDateOrTimeRange"
@@ -14,14 +18,15 @@
       :entry="value.labelInternal"
       :is-linked="true"
       :text-styling="chipStyling"
-      role="listitem"
       :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
+      class="base-collapsed-filter-item__chip"
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
       v-else-if="isBoolean && hasValue"
-      class="base-collapsed-filter-item__boolean-value">
+      class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
       <BaseIcon
+        :title="booleanFilterLabel"
         name="check-mark"
         class="base-collapsed-filter-item__icon" />
       <BaseIcon
@@ -90,6 +95,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * define text to be read by assistive technologies when a
+     * boolean filter value is in focus
+     * string may include '{label}' which will be replaced by the boolean
+     * filter label
+     */
+    booleanFilterLabel: {
+      type: String,
+      default: 'Filter was set.',
+    },
   },
   computed: {
     /**
@@ -125,12 +140,15 @@ export default {
     /**
      * propagate to parent when the remove icon was clicked
      */
-    removeChip() {
-      /**
-       * inform parent about chip removeal
-       * @event remove-chip
-       */
-      this.$emit('remove-chip');
+    removeChip(event) {
+      const { type, key } = event;
+      if (type === 'click' || (type === 'keydown' && ['Backspace', 'Delete'].includes(key))) {
+        /**
+         * inform parent about chip removal
+         * @event remove-chip
+         */
+        this.$emit('remove-chip');
+      }
     },
   },
 };
@@ -141,6 +159,12 @@ export default {
 
 .base-collapsed-filter-item {
   flex-shrink: 0;
+
+  &:focus {
+    .base-collapsed-filter-item__chip {
+      background-color: $app-color-secondary;
+    }
+  }
 
   .base-collapsed-filter-item__boolean-value {
     display: flex;
