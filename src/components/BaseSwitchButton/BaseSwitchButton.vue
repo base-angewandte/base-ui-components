@@ -20,6 +20,7 @@
       <label
         :key="option.value + 'label'"
         :for="optionIds[index]"
+        :title="!showButtonsLabelInt ? option.label : undefined"
         :class="['base-switch-buttons__button',
                  `base-switch-buttons__button--${type}`,
                  { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption },
@@ -41,7 +42,6 @@
           v-if="option?.icon?.length > 0 && iconPosition === 'left'"
           :name="option.icon"
           size="small"
-          :title="option.label"
           class="base-switch-buttons__icon" />
         <span
           v-if="showButtonsLabelInt">
@@ -51,7 +51,6 @@
           v-if="option?.icon?.length > 0 && iconPosition === 'right'"
           :name="option.icon"
           size="small"
-          :title="option.label"
           class="base-switch-buttons__icon" />
         <!-- @slot slot to display something right of text (e.g. icon), or if `showButtonsLabel` false - generally right of the button content
         @binding {string} value - the value of the option object
