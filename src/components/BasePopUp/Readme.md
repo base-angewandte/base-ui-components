@@ -6,18 +6,18 @@ A basic example
 <template>
   <div
   class="container">
-    <base-button
+    <BaseButton
       text="Click me"
       @clicked="showPopUp = true" />
-    <base-pop-up
-      :show="showPopUp"
+    <BasePopUp
+      v-if="showPopUp"
       title="An Example Pop Up"
       button-right-text="Custom Submit"
       @close="showPopUp = false"
       @button-left="showPopUp = false"
       @button-right="action">
       <div class="body">Specify Content here</div>
-    </base-pop-up>
+    </BasePopUp>
 </div>
 </template>
 

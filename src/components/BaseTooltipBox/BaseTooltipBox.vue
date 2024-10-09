@@ -1,9 +1,12 @@
 <template>
   <div
+    :id="internalId"
     ref="popUpBody"
     v-click-outside="() => clickedOutside()"
     role="dialog"
+    tabindex="-1"
     :aria-labelledby="headerId"
+    :aria-describedby="descriptionElementId"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
              { 'base-tooltip-box--background-visible': overlayBackgroundVisible },
@@ -13,15 +16,17 @@
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
+      :id="descriptionElementId"
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
         <!-- @slot customize the header displayed on mobile for `typeOnMobile` `modal` and `fullscreen`
-        @binding header-id {string, number} bind this id to your slot element containing the title text for assistive technology to work properly-->
+        @binding header-id {string, number} bind this id to your slot element containing the title text for assistive technology to work properly -->
         <slot
           name="header-title"
           :header-id="headerId">
           <div
             :id="headerId"
+            tabindex="-1"
             class="base-tooltip-box__header__title">
             {{ modalTitle }}
           </div>
@@ -56,6 +61,9 @@
 
 <script>
 import ClickOutside from 'vue-click-outside';
+import { ref, watchEffect } from 'vue';
+import { createId } from '@/utils/utils';
+import { useTabKeyHandler } from '@/composables/useTabKeyHandler';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
 import popUpLock from '../../mixins/popUpLock';
 
@@ -138,6 +146,13 @@ export default {
       default: 'popup-title',
     },
     /**
+     * specify the id of the element containing a description - for accessibility only
+     */
+    descriptionElementId: {
+      type: String,
+      default: 'popup-body',
+    },
+    /**
      * define if the overlay background should be visible
      * (semitransparent black) - this only applies to `typeOnMobile` 'modal'
      */
@@ -145,6 +160,56 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * define a custom size (in px) when the component should switch to mobile view
+     */
+    mobileSize: {
+      type: Number,
+      default: 640,
+    },
+    /**
+     * HTMLElement to focus after opening the tooltip
+     * Note: If empty, the header title will be focused by default.
+     *       If using the slot for a custom header, be sure to
+     *       define an id attribute with the value `headerId`
+     *       The value should be a valid CSS selector.
+     */
+    initialFocusElement: {
+      type: String,
+      default: '',
+    },
+    /**
+     * list of focusable HTML elements using tab key navigation
+     */
+    focusableElements: {
+      type: Array,
+      default: () => ['a[href]', 'button:enabled', 'input:enabled'],
+    },
+    /**
+     * specify to disable the tab key handler within the component
+     */
+    disableTabKeyHandler: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
+    // create internal id
+    const internalId = `base-tooltip-box-${createId()}`;
+    // get reference to element
+    const popUpBody = ref(null);
+    // init tab key handler
+    const { focusableHTMLTags, disableHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '), props.disableTabKeyHandler);
+    // watcher to set specific properties
+    watchEffect(() => {
+      focusableHTMLTags.value = props.focusableElements;
+      disableHandler.value = props.disableTabKeyHandler;
+    });
+
+    return {
+      internalId,
+      popUpBody,
+    };
   },
   data() {
     return {
@@ -251,6 +316,9 @@ export default {
 
       // initialize the resize observer to calculate fade outs when content is resized
       this.initObserver();
+
+      // focus a specific element when the component is opened
+      this.focusInitialElement();
 
       // add additional event listeners
       this.$refs.body.addEventListener('scroll', this.scrollHandler);
@@ -440,6 +508,27 @@ export default {
       this.mutationObserver = mutationObserver;
     },
     /**
+     * determine which element should be focused when opening the component
+     */
+    focusInitialElement() {
+      setTimeout(() => {
+        // get the current components id, since it could have been changed/overwritten in FE
+        const internalId = this.$el.id;
+        // by default for box mode, focus the component container
+        let focusElement = internalId ? document?.getElementById(internalId) : undefined;
+        // if the component is in popup mode and within mobile resolution, focus the popup title
+        if (this.typeOnMobile !== 'box' && this.isMobile()) {
+          focusElement = this.headerId ? this.$el.querySelector(`#${this.headerId}`) : undefined;
+        }
+        // if a specific element within the component is defined, try that one
+        if (this.initialFocusElement && this.$el.querySelector(this.initialFocusElement)) {
+          focusElement = this.$el.querySelector(this.initialFocusElement);
+        }
+        // finally, focus the element
+        if (focusElement) focusElement.focus();
+      }, 0);
+    },
+    /**
      * intercept resize event and close the component
      */
     resizeHandler() {
@@ -458,6 +547,13 @@ export default {
       if (e.key === 'Escape') {
         this.close();
       }
+    },
+    /**
+     * check if the window has a mobile resolution
+     * @returns {boolean}
+     */
+    isMobile() {
+      return window?.innerWidth <= this.mobileSize;
     },
   },
 };

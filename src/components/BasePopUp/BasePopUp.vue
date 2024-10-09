@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="showInt"
     :class="['base-pop-up',
              { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
     <div
@@ -18,12 +17,13 @@
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <!-- @slot add a custom header title instead of the text defined with the prop `title`.
-          @binding {string, number} id - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
+          @binding header-id {string, number} - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
         <slot
-          :id="headerId"
-          name="header-title">
+          name="header-title"
+          :header-id="headerId">
           <div
-            id="popup-title"
+            :id="headerId"
+            tabindex="-1"
             class="popup-title">
             {{ title }}
           </div>
@@ -84,9 +84,11 @@
 </template>
 
 <script>
+import { ref, watchEffect } from 'vue';
+import { useTabKeyHandler } from '@/composables/useTabKeyHandler';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseButton from '@/components/BaseButton/BaseButton';
 import popUpLock from '../../mixins/popUpLock';
-
 /**
  * A component as overlay to display messages
  *
@@ -96,18 +98,11 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
+    BaseButton,
     BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
   },
   mixins: [popUpLock],
   props: {
-    /**
-     * could be used to control visibility
-     */
-    show: {
-      type: Boolean,
-      default: false,
-    },
     /**
      * pop up header text
      */
@@ -180,9 +175,16 @@ export default {
       default: false,
     },
     /**
-     * selector to focus if popup is open
+     * HTMLElement to focus after opening the popup
+     * **Note:** If empty, the header title will be focused by default.
+     *           If using the slot for a custom header, be sure to
+     *           define an id attribute with the value `popup-title`
+     *           The value should be a valid CSS selector.
+     * **useful IDs:**
+     * - left-button: `popup-left-button`
+     * - right-button: `popup-right-button`
      */
-    isOpenFocus: {
+    initialFocusElement: {
       type: String,
       default: '',
     },
@@ -190,6 +192,20 @@ export default {
      * specify to render component with max height and width
      */
     fullscreenOnMobile: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * list of focusable HTML elements using tab key navigation
+     */
+    focusableElements: {
+      type: Array,
+      default: () => ['a[href]', 'button:enabled', 'input:enabled'],
+    },
+    /**
+     * specify to disable the tab key handler within the component
+     */
+    disableTabKeyHandler: {
       type: Boolean,
       default: false,
     },
@@ -209,36 +225,28 @@ export default {
       default: false,
     },
   },
+  setup(props) {
+    // get reference to element
+    const popUpBody = ref(null);
+    // init tab key handler
+    const { focusableHTMLTags, disableHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '), props.disableTabKeyHandler);
+    // watcher to set specific properties
+    watchEffect(() => {
+      focusableHTMLTags.value = props.focusableElements;
+      disableHandler.value = props.disableTabKeyHandler;
+    });
+
+    return {
+      popUpBody,
+    };
+  },
   data() {
     return {
-      showInt: this.show,
       // this is needed for popUpLock mixin!
       targetName: 'popUpBody',
     };
   },
-  watch: {
-    show(val) {
-      if (!this.showInt && !this.prevActiveElement) {
-        this.prevActiveElement = document.activeElement;
-      }
-      this.showInt = val;
-    },
-  },
-  updated() {
-    setTimeout(() => {
-      if (this.showInt) {
-        if (this.isOpenFocus !== '' && this.$el.querySelector(this.isOpenFocus)) {
-          this.$el.querySelector(this.isOpenFocus).focus();
-        }
-      } else if (this.prevActiveElement) {
-        this.prevActiveElement.focus();
-        this.prevActiveElement = false;
-      }
-    }, 250);
-  },
   mounted() {
-    // update internal variable with prop value
-    this.showInt = this.show;
     document.onkeyup = (e) => {
       if (document.querySelector('.popup-box')) {
         if (!this.closeButtonDisabled && e.key === 'Escape') {
@@ -247,10 +255,18 @@ export default {
         }
       }
     };
-    // if show is true on initial render also set the active element (could not be
-    // set in watcher)
-    if (this.showInt) {
-      this.prevActiveElement = document.activeElement;
+    // also set the previously active element so it can be used to return to
+    // if pop up is closed
+    this.prevActiveElement = document.activeElement;
+    this.$nextTick(() => {
+      this.determineFocus();
+    });
+  },
+  beforeDestroy() {
+    // when the popup is closed, try to focus the previous triggering element
+    if (this.prevActiveElement) {
+      this.prevActiveElement.focus();
+      this.prevActiveElement = false;
     }
   },
   methods: {
@@ -261,7 +277,6 @@ export default {
        * @event close
        */
       this.$emit('close');
-      this.showInt = false;
     },
     buttonRight() {
       /**
@@ -278,6 +293,17 @@ export default {
        * @event button-left
        */
       this.$emit('button-left');
+    },
+
+    /** INITIAL FOCUS */
+    determineFocus() {
+      // try to focus the element defined with the initialFocusElement property
+      if (!!this.initialFocusElement && this.$el?.querySelector(this.initialFocusElement)) {
+        this.$el.querySelector(this.initialFocusElement).focus();
+        // or the popup title
+      } else if (this.$el?.querySelector(`#${this.headerId}`)) {
+        this.$el.querySelector(`#${this.headerId}`).focus();
+      }
     },
   },
 };

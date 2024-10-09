@@ -23,12 +23,12 @@
     "prepare": "husky",
     "changelog": "gulp changelog"
   },
-  "main": "./dist/components/index.cjs.js",
-  "module": "./dist/components/index.es.js",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
   "exports": {
     ".": {
-      "import": "./dist/components/index.es.js",
-      "require": "./dist/components/index.cjs.js"
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js"
     },
     "./dist/base-ui-components.css": "./dist/base-ui-components.css"
   },
