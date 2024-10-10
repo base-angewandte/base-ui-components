@@ -77,6 +77,7 @@
             v-if="isSelectable && selectActive && !isDisabled"
             :key="entryId + 'checkmark'"
             :checked="isSelected"
+            :label="title"
             title="checkbox"
             mark-style="checkbox"
             class="base-menu-entry-checkbox"
@@ -113,6 +114,8 @@ export default {
     },
     /**
      * item main title
+     * if prop `isSelectable` is true please always set this so
+     * the checkbox has a label
      */
     title: {
       type: String,
@@ -282,8 +285,10 @@ export default {
     background: white;
     overflow: hidden;
 
-    &:focus {
+    &:focus, &:focus-within {
       outline: 0;
+      fill: $app-color;
+      color: $app-color;
 
       .base-menu-entry-icon,
       .base-menu-entry-title,
@@ -397,6 +402,9 @@ export default {
       }
 
       &:hover, &:focus-within {
+        fill: $app-color;
+        color: $app-color;
+
         .base-menu-entry-icon,
         .base-menu-entry-icon path,
         .base-menu-entry-icon use svg,
