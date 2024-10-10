@@ -142,7 +142,9 @@ export default {
      */
     removeChip(event) {
       const { type, key } = event;
-      if (type === 'click' || (type === 'keydown' && ['Backspace', 'Delete'].includes(key))) {
+      // if event is not coming from 'keydown' it should go through - if it is
+      // a keydown event we need to check if correct keys were triggered
+      if (type !== 'keydown' || (type === 'keydown' && ['Backspace', 'Delete'].includes(key))) {
         /**
          * inform parent about chip removal
          * @event remove-chip
