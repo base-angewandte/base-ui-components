@@ -73,19 +73,24 @@
         <BaseButton
           v-if="mode === 'form'"
           :text="showAdvancedSearchButtonText ? advancedSearchText.advancedButtonLabel : ''"
+          :aria-expanded="`${formOpen}`"
+          :aria-controls="`${rowId}-form`"
+          :description="advancedButtonDescription"
           button-style="row"
           icon="drop-down"
           icon-size="small"
           icon-position="right"
           :class="['base-advanced-search__expand-button',
                    { 'base-button-icon-rotate-180': formOpen }]"
-          @click.native.stop="openAdvancedSearch"
+          @click.native.prevent.stop="openAdvancedSearch"
+          @keydown.native.enter.space.prevent.stop="openAdvancedSearch"
           @focusin.native.stop />
       </template>
       <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>
         <BaseForm
           v-if="mode === 'form' && formOpen"
+          :id="`${rowId}-form`"
           v-bind="amendedFormProps"
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
@@ -207,6 +212,13 @@
             :filters.sync="collapsedFiltersArray"
             :date-time-text="advancedSearchText.collapsedDateTime"
             :interpret-label-as-html="renderFormChipsLabelAsHtml"
+            :remove-filters-label="advancedSearchText.removeAllFiltersLabel"
+            :assistive-text="{
+              removeFiltersLabel: advancedSearchText.removeAllFiltersLabel,
+              filterRemovedNotification: advancedSearchText.removeFilterValueNotification,
+              appliedFiltersLabel: advancedSearchText.collapsedAppliedFiltersLabel,
+              booleanFilterValue: advancedSearchText.collapsedBooleanFilterValue,
+            }"
             @remove-all="removeAllFilters" />
         </div>
       </template>
@@ -233,6 +245,12 @@
         </slot>
       </template>
     </BaseAdvancedSearchRow>
+    <span
+      v-if="assistiveTextNotification"
+      aria-live="assertive"
+      class="supportive-text">
+      {{ assistiveTextNotification }}
+    </span>
   </div>
 </template>
 
@@ -433,6 +451,24 @@ export default {
      *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
      *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
      *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
+     *     **advancedButtonDescription**: button description for Advanced Search Toggle button for mode `form`.
+     *      For accessibility purposes. You may add the string {state} which will be replaced with the respective
+     *      'open' and 'close' value specified in `formState` (see below). Only relevant for mode `form`.
+     *    **formState**: an object with properties `open` (text that is read when form is closed and button
+     *      functionality is to open the form) and `close` (text that is read when form is open and button
+     *      functionality is to close the form). Only relevant for mode `form`.
+    *     **removeAllFiltersLabel**: label for the remove icon in the collapsed filter row.
+     *     Only relevant for mode `form`. For accessibility purposes
+     *    **removeFilterValueNotification**: notification that is read by screenreaders when a filter
+     *      value was removed. Add the string {value} to read the filter value that was removed and
+     *      {label} to read the label of the filter from which the value was removed. Only relevant for mode `form`.
+     *    **collapsedFilterRowRemovedNotification**: notification read when the last filter was removed from
+     *      the collapsed filter row. Or remove row was clicked. Only relevant for mode `form`.
+     *    **collapsedAppliedFiltersLabel**: description for the filters in the collapsed filter row.
+     *      Only relevant for mode `form`. For accessibility purposes.
+     *    **collapsedBooleanFilterValue**: Set text that should be read for a boolan filter value. You may add
+     *      the string {label} which will be replaced by the filter label.
+     *      Only relevant for mode `form`. For accessibility purposes.
      *
      *  The values of this object might be plain text or a key for an i18n file.
      * This prop can be ignored when the `no-options` slot is used.
@@ -453,6 +489,16 @@ export default {
           range: 'to',
         },
         advancedButtonLabel: 'Advanced Search',
+        advancedButtonDescription: 'Click to {state} advanced search form.',
+        formState: {
+          open: 'open',
+          close: 'close',
+        },
+        removeAllFiltersLabel: 'Remove all filters.',
+        removeFilterValueNotification: 'Filter value {value} was removed from filter {label}.',
+        collapsedFilterRowRemovedNotification: 'All search filters were reset.',
+        collapsedAppliedFiltersLabel: 'Currently applied Filters',
+        collapsedBooleanFilterValue: 'Filter {label} was set',
       }),
     },
     /**
@@ -699,6 +745,11 @@ export default {
        * (only mode `form`)
        */
       showAdvancedSearchButtonText: true,
+      /**
+       * variable to contain assistive text to inform user of actions
+       * @type {string}
+       */
+      assistiveTextNotification: '',
     };
   },
   computed: {
@@ -864,6 +915,16 @@ export default {
     rowId() {
       return createId();
     },
+    /**
+     * advanced button description for mode `form`
+     * @returns {string}
+     */
+    advancedButtonDescription() {
+      // if value was not set for any reason just return an empty string
+      if (!this.advancedSearchText.advancedButtonDescription) return '';
+      return this.advancedSearchText.advancedButtonDescription
+        .replace('{state}', this.advancedSearchText.formState[this.formOpen ? 'close' : 'open']);
+    },
   },
   watch: {
     /**
@@ -1015,6 +1076,20 @@ export default {
        * @type {boolean}
        */
       this.$emit('update:advanced-form-open', val);
+    },
+    /**
+     * function to automatically reset the assistiveTextNotification
+     * after using it
+     * @param {string} val
+     */
+    assistiveTextNotification(val) {
+      // setting the value will trigger the screenreader
+      if (val) {
+        setTimeout(() => {
+          // after that text can be removed again
+          this.assistiveTextNotification = '';
+        }, 300);
+      }
     },
   },
   created() {
@@ -1340,6 +1415,7 @@ export default {
     removeAllFilters() {
       // reset form filter values
       this.formFilterValuesInt = {};
+      this.assistiveTextNotification = this.advancedSearchText.collapsedFilterRowRemovedNotification || '';
       // trigger search without filters
       this.search();
     },
