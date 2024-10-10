@@ -235,6 +235,8 @@ export default {
       // this is needed for popUpLock mixin
       targetName: 'popUpBody',
       showInt: false,
+      // HTML element that should be focused when the component is closed
+      prevActiveElement: undefined,
     };
   },
   computed: {
@@ -293,6 +295,9 @@ export default {
     },
   },
   mounted() {
+    // save the previously active element
+    this.prevActiveElement = document?.activeElement;
+
     // move the component to the body node to position it absolutely in the document
     document.querySelector('body')
       .appendChild(this.$el);
@@ -327,8 +332,12 @@ export default {
     }, 0);
   },
   beforeDestroy() {
+    // reset states
     this.isActive = false;
     this.showInt = false;
+    // when the tooltipBox is closed, try to focus the previous active element
+    if (this.prevActiveElement) this.prevActiveElement.focus();
+    // remove event listeners
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
     if (this.mutationObserver) this.mutationObserver.disconnect();
     this.$refs.body.removeEventListener('scroll', this.scrollHandler);

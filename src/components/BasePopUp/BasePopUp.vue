@@ -244,6 +244,8 @@ export default {
     return {
       // this is needed for popUpLock mixin!
       targetName: 'popUpBody',
+      // HTML element that should be focused when the component is closed
+      prevActiveElement: undefined,
     };
   },
   mounted() {
