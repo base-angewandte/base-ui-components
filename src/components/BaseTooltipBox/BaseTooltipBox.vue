@@ -183,7 +183,8 @@ export default {
      */
     focusableElements: {
       type: Array,
-      default: () => ['a[href]', 'button:enabled', 'input:enabled'],
+      // also add all elements in general that have a tabindex, except the ones with value -1
+      default: () => ['a[href]', 'button:enabled', 'input:enabled', '*[tabindex]:not([tabindex="-1"])'],
     },
     /**
      * specify to disable the tab key handler within the component
