@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="loader"
     :style="{ ...position, ...{ '--loader-color': loaderColor } }"
     class="base-loader">
     <svg
@@ -17,10 +18,11 @@
   </div>
 </template>
 
-<script>
-/**
+<script>/**
  * Minimal loader component to be reused in other components
  */
+import { ref, watch } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 
 export default {
   name: 'BaseLoader',
@@ -47,6 +49,38 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * define a text that should be read as soon as loader appears
+     */
+    textOnLoaderShow: {
+      type: String,
+      default: 'loading',
+    },
+  },
+  setup(props) {
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const loader = ref(null);
+    /**
+     * variable to control the text to be read
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const announcement = ref('');
+    // insert an HTML element with aria-live assertive that will announce the
+    // loading process
+    useAnnouncer(loader, announcement);
+
+    // watch the element to add the text as soon as it is rendered
+    watch(loader, (val) => {
+      if (val) {
+        announcement.value = props.textOnLoaderShow;
+      }
+    });
+    return {
+      loader,
+    };
   },
 };
 </script>
