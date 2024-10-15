@@ -73,6 +73,8 @@
               name="no-options" />
           </template>
         </BaseDropDownList>
+        <!-- @slot to add elements below input fields e.g. add drop down -->
+        <slot name="below-input" />
       </template>
       <template
         #label-addition>

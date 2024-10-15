@@ -53,6 +53,11 @@
         <slot
           name="no-options" />
       </template>
+      <!-- @slot to add elements below input fields e.g. add drop down; will appear before the
+        chosen chips list -->
+      <template #below-input>
+        <slot name="below-input" />
+      </template>
     </BaseChipsInput>
     <draggable
       v-model="selectedBelowListInt"
