@@ -535,7 +535,7 @@ export default {
               data: filteredResults,
             };
           });
-        }, 1000);
+        }, 1001);
       } else {
         this.autocompleteResults = [];
       }

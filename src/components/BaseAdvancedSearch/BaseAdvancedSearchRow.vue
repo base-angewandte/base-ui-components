@@ -677,10 +677,15 @@ export default {
      * properties:<br>
      * <b>selectedOption</b>: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+      }),
     },
     /**
      * if desired the box shadow around the search rows can be deactivated here

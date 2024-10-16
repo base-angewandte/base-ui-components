@@ -21,7 +21,10 @@
         :identifier-property-name="identifierPropertyName"
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
-        :assistive-text="assistiveText"
+        :assistive-text="{
+          selectedOption: assistiveText.selectedOption,
+          loaderActive: assistiveText.autocompleteLoaderActive,
+        }"
         :date-field-delay="dateFieldDelay"
         :language="language"
         :highlight-autocomplete-match="highlightAutocompleteMatch"
@@ -59,7 +62,10 @@
       :identifier-property-name="identifierPropertyName"
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
-      :assistive-text="assistiveText"
+      :assistive-text="{
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.autocompleteLoaderActive,
+      }"
       :date-field-delay="dateFieldDelay"
       :language="language"
       :highlight-autocomplete-match="highlightAutocompleteMatch"
@@ -627,10 +633,15 @@ export default {
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **loaderActive**: text that is announced when autocomplete results are being fetched (prop
+     *  `isLoading` is set `true`)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        autocompleteLoaderActive: 'loading options.',
+      }),
     },
     /**
      * if desired the box shadow around the search rows can be deactivated here

@@ -32,7 +32,7 @@
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
-      :assistive-text="isFieldTypeChips ? assistiveText : false"
+      :assistive-text="!type.includes('date') ? assistiveText : undefined"
       :is-active-delay="dateFieldDelay"
       :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : false"
       :chips-removable="type !== 'chipssingle'"
@@ -265,10 +265,15 @@ export default {
      *
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+      }),
     },
     /**
      * use this prop to set a delay in ms before date input calender is displayed
