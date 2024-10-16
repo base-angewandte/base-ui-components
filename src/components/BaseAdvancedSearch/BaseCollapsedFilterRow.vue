@@ -563,6 +563,7 @@ export default {
   overflow: hidden;
 
   .base-collapsed-filter-row__filter-list-container {
+    position: relative;
     flex: 1 1 auto;
     overflow: hidden;
 
@@ -572,7 +573,6 @@ export default {
       height: 100%;
       position: absolute;
       top: 0;
-      left: $spacing;
       background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
       z-index: map-get($zindex, chips-fadeout);
       pointer-events: none;
@@ -584,8 +584,7 @@ export default {
       height: 100%;
       position: absolute;
       top: 0;
-      right: $spacing;
-      transform: translateX(-100%);
+      right: 0;
       background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
       z-index: map-get($zindex, chips-fadeout);
       pointer-events: none;
