@@ -64,23 +64,64 @@ export default {
      */
     const loader = ref(null);
     /**
-     * variable to control the text to be read
-     * @type {Ref<UnwrapRef<string>>}
+     * timeout variable to only set announcement after a certain time passed
+     * @type {Ref<UnwrapRef<null|number>>}
      */
-    const announcement = ref('');
-    // insert an HTML element with aria-live assertive that will announce the
-    // loading process
-    useAnnouncer(loader, announcement);
+    const timeout = ref(null);
+    /**
+     * insert an HTML element with aria-live assertive that will announce the
+     * loading process
+     */
+    const { announcement } = useAnnouncer(loader);
+
+    /**
+     * function called on changes to the loader element or prop `hide`
+     * announcing the text set in prop `textOnLoaderShow`
+     */
+    function setLoaderAnnouncement() {
+      // first check if loader is now present and not hidden
+      if (loader.value && !props.hide) {
+        // if so need to be working with a timeout here so the announcement
+        // is not overwritten by later actions
+        if (timeout.value) {
+          clearTimeout(timeout.value);
+          timeout.value = null;
+        }
+        timeout.value = setTimeout(() => {
+          // now check again if element is still visible
+          if (loader.value && !props.hide) {
+            // if yes - make loading announcement
+            announcement.value = props.textOnLoaderShow;
+          }
+        }, 1000);
+      }
+    }
 
     // watch the element to add the text as soon as it is rendered
-    watch(loader, (val) => {
-      if (val) {
-        announcement.value = props.textOnLoaderShow;
-      }
+    // (other option: prop `hide` is set true - this needed to be handled
+    // in options API since watcher not triggering here)
+    watch(loader, () => {
+      setLoaderAnnouncement();
     });
     return {
       loader,
+      announcement,
+      setLoaderAnnouncement,
     };
+  },
+  data() {
+    return {
+      timeout: null,
+    };
+  },
+  watch: {
+    /**
+     * for some reason in frontend setup watcher did not trigger for prop `hide`
+     * so added it here
+     */
+    hide() {
+      this.setLoaderAnnouncement();
+    },
   },
 };
 </script>
