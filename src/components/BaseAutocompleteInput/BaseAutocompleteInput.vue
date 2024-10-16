@@ -20,6 +20,9 @@
       :disabled="disabled"
       :drop-down-list-id="`${id}-list-identifier`"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -296,6 +299,18 @@ export default {
     highlightStringTags: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * add text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`) and when results were retrieved (drop down
+     *  list changed)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'Drop down options are loading.',
+        resultsRetrieved: '{number} options found with your input.',
+      }),
     },
   },
   data() {

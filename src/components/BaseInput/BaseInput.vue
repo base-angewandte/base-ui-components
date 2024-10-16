@@ -106,7 +106,8 @@
               v-if="loadable"
               class="base-input__loader">
               <BaseLoader
-                :hide="!isLoading" />
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.resultsLoading" />
             </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
@@ -406,6 +407,17 @@ export default {
       // checking if all necessary properties are part of the provided object
       validator: val => ['min', 'max', 'minLength', 'maxLength']
         .every(prop => Object.keys(val).includes(prop)),
+    },
+    /**
+     * provide assistive text for screen readers
+     * **loaderActive**: if `loadable` is set `true` this text is read
+     *  as soon as the loader is appearing (`isLoading` is set true)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+      }),
     },
   },
   data() {

@@ -430,10 +430,16 @@ export default {
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+      }),
     },
     /**
      * define if selected options chips should come with a remove icon

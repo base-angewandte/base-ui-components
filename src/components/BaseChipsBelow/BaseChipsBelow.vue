@@ -455,6 +455,21 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+      }),
+    },
   },
   data() {
     return {

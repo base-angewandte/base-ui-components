@@ -26,6 +26,9 @@
       :is-loading="isLoading"
       :input-class="inputClass"
       :set-focus-on-active="setFocusOnActive"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
       v-on="inputListeners">
@@ -481,10 +484,15 @@ export default {
      *
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+      }),
     },
     /**
      * define if selected options chips should come with a remove icon
