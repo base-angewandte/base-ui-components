@@ -40,6 +40,7 @@
       :max="typeof formFieldXAttrs.max !== 'undefined' ? formFieldXAttrs.max : fieldProps.max"
       :decimals="allowedDecimals"
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
+      :assistive-text="assistiveTextInt"
       @keydown.enter="onEnter"
       @blur="emitCompletedInputValues"
       @input="setInputValue($event)"
@@ -356,6 +357,7 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
+      :assistive-text="assistiveTextInt"
       @selected-changed="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
@@ -827,6 +829,37 @@ export default {
       type: String,
       default: 'label',
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     * Options for inputs type `autocomplete`, `chips`, `chips-below`:
+     * **loaderActive**: text that is announced when options are being fetched (prop
+     *  `isLoading` is set `true`)
+     *
+     * Options for inputs type `chips`:
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     *
+     * Options for inputs type `chips`, `chips-below`:
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
+    },
   },
   data() {
     return {
@@ -1038,6 +1071,27 @@ export default {
         return 0;
       }
       return null;
+    },
+    /**
+     * create the assistiveText object as required by the input component
+     * depending on field type
+     * @returns {{loaderActive: (string|*)}|Object|undefined|{}}
+     */
+    assistiveTextInt() {
+      if (this.fieldType === 'chips') {
+        return this.assistiveText;
+      }
+      if (this.fieldType === 'autocomplete') {
+        return {
+          loaderActive: this.assistiveText.loaderActive || '',
+        };
+      }
+      if (this.fieldType === 'chips-below') {
+        const textObject = { ...this.assistiveText };
+        delete textObject.optionToRemoveSelected;
+        return textObject;
+      }
+      return undefined;
     },
   },
   watch: {

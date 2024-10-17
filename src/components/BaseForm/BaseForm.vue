@@ -526,6 +526,37 @@ export default {
       type: String,
       default: 'label',
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     * Options for inputs type `autocomplete`, `chips`, `chips-below`:
+     * **loaderActive**: text that is announced when options are being fetched (prop
+     *  `isLoading` is set `true`)
+     *
+     * Options for inputs type `chips`:
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     *
+     * Options for inputs type `chips`, `chips-below`:
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
+    },
   },
   data() {
     return {
@@ -973,6 +1004,7 @@ export default {
         validationTexts: singleFieldProps.validationTexts || this.validationTexts,
         identifierPropertyName: this.identifierPropertyName,
         labelPropertyName: this.labelPropertyName,
+        assistiveText: singleFieldProps.assistiveText || this.assistiveText,
       };
     },
     /**
