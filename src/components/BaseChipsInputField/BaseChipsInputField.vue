@@ -74,7 +74,7 @@
                   <!-- @slot a slot to provide customized chips
                     @binding { object } entry - one selected option displayed as chip
                     @binding { number } index - the index of the entry in the selectedList array
-                    @binding { number } chipActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                    @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
                     @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
                   -->
                   <slot
@@ -82,7 +82,7 @@
                     v-bind="{
                       entry,
                       index,
-                      chipActiveForRemove,
+                      indexActiveForRemove,
                       removeEntry,
                     }">
                     <BaseChip
@@ -92,7 +92,7 @@
                       :hover-box-content="hoverboxContent"
                       :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                         || !!entry[identifierPropertyName]"
-                      :chip-active="chipActiveForRemove === index"
+                      :chip-active="indexActiveForRemove === index"
                       :is-removable="chipsRemovable"
                       :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                       @remove-entry="removeEntry(entry, index)"
@@ -108,7 +108,7 @@
               <!-- @slot a slot to provide customized chips
                 @binding { object } entry - one selected option displayed as chip
                 @binding { number } index - the index of the entry in the selectedList array
-                @binding { number } chipActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
                 @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
               -->
               <slot
@@ -116,7 +116,7 @@
                 v-bind="{
                   entry,
                   index,
-                  chipActiveForRemove,
+                  indexActiveForRemove,
                   removeEntry,
                 }">
                 <BaseChip
@@ -127,7 +127,7 @@
                   :editable="chipsEditable"
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                     || !!entry[identifierPropertyName]"
-                  :chip-active="chipActiveForRemove === index"
+                  :chip-active="indexActiveForRemove === index"
                   :assistive-text="assistiveText.selectedOption"
                   :is-removable="chipsRemovable"
                   :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
@@ -551,7 +551,7 @@ export default {
        * variable for the currently active chip (for arrow key use)
        * @type {number}
        */
-      chipActiveForRemove: -1,
+      indexActiveForRemove: -1,
       /**
        * variable for internal input handling
        * @type {string}
@@ -681,16 +681,16 @@ export default {
       if (this.chipsRemovable && (key === 'Backspace' || key === 'Delete')) {
         // if backspace (once) is used make last chip active
         if (key === 'Backspace' && !this.fired
-          && !this.inputInt && this.chipActiveForRemove < 0) {
-          this.chipActiveForRemove = this.selectedListInt.length - 1;
+          && !this.inputInt && this.indexActiveForRemove < 0) {
+          this.indexActiveForRemove = this.selectedListInt.length - 1;
           // on second backspace set timeout for delete
-        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.inputInt) {
+        } else if (this.indexActiveForRemove >= 0 && !this.fired && !this.inputInt) {
           // check if there is actually anything left to remove
           this.removeEntry(
-            this.selectedListInt[this.chipActiveForRemove],
-            this.chipActiveForRemove,
+            this.selectedListInt[this.indexActiveForRemove],
+            this.indexActiveForRemove,
           );
-          this.chipActiveForRemove = -1;
+          this.indexActiveForRemove = -1;
         }
         // necessary to prevent accidential delete of chips when user keeps backspace pressed
         this.fired = true;
@@ -711,14 +711,14 @@ export default {
         const activeChip = this.navigate(
           this.selectedListInt,
           isIndexUp,
-          this.chipActiveForRemove,
+          this.indexActiveForRemove,
           true,
         );
         // set the chip active for removal (currently active one)
-        this.chipActiveForRemove = this.selectedListInt.indexOf(activeChip);
+        this.indexActiveForRemove = this.selectedListInt.indexOf(activeChip);
         // in any other key event reset the chip active for remove
       } else {
-        this.chipActiveForRemove = -1;
+        this.indexActiveForRemove = -1;
       }
     },
 
