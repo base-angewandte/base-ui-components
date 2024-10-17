@@ -38,7 +38,7 @@
           @touchstart.native.stop="closeDropDown">
           <template #option="{ option }">
             <span
-              v-if="allowUnknownEntries && !option[identifierPropertyName]"
+              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
               ref="option"
               :key="option[labelPropertyName]">
               {{ addNewChipText
@@ -587,6 +587,9 @@ export default {
       if (this.allowUnknownEntries && this.input) {
         tempList.unshift({
           [this.labelPropertyName]: this.language ? { [this.language]: this.input } : this.input,
+          // add an identifier here as well so this option can be recognized by the inputs
+          // `aria-activedescendant` attribute
+          [this.identifierPropertyName]: 'createNew',
         });
       }
       // filter entries that were already selected, if no identifier
@@ -770,12 +773,18 @@ export default {
      * @param {Object} selected
      */
     addSelectedOption(selected) {
+      // if unknown entries are allowed we need to remove the added
+      // id again before pushing it to selectedListInt
+      const newSelected = { ...selected };
+      if (this.allowUnknownEntries && newSelected[this.identifierPropertyName] === 'createNew') {
+        delete newSelected[this.identifierPropertyName];
+      }
       if (this.allowMultipleEntries) {
-        this.selectedListInt.push(selected);
+        this.selectedListInt.push(newSelected);
       } else {
         // set the option on first array index (either setting new if empty
         // array or replacing old option)
-        this.$set(this.selectedListInt, 0, selected);
+        this.$set(this.selectedListInt, 0, newSelected);
         // for single select the drop down should close again automatically
         // after choosing the option
         this.chipsInputActive = false;
@@ -784,7 +793,7 @@ export default {
       this.updateParentSelectedList(this.selectedListInt);
       // announce the added option to the screen reader
       this.announcement = this.assistiveText.optionAdded
-        .replace('{label}', selected[this.labelPropertyName]);
+        .replace('{label}', newSelected[this.labelPropertyName]);
       // clear input
       this.input = '';
       // reset selected option
