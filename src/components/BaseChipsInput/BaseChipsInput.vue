@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="chipsInput"
     class="base-chips-input">
     <!-- TODO: check if really ALL props should be forwarded -->
     <BaseChipsInputField
@@ -131,6 +132,8 @@
 import { createId, highlightText } from '@/utils/utils';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import { ref } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
@@ -432,6 +435,13 @@ export default {
      *  working for editable chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
      */
     assistiveText: {
       type: Object,
@@ -439,6 +449,9 @@ export default {
         selectedOption: '',
         loaderActive: 'loading.',
         resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
       }),
     },
     /**
@@ -490,6 +503,20 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsInput = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsInput);
+    return {
+      chipsInput,
+      announcement,
+    };
   },
   data() {
     return {
@@ -755,6 +782,9 @@ export default {
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
+      // announce the added option to the screen reader
+      this.announcement = this.assistiveText.optionAdded
+        .replace('{label}', selected[this.labelPropertyName]);
       // clear input
       this.input = '';
       // reset selected option

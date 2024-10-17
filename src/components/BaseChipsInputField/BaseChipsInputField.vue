@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="chipsInputField"
     class="base-chips-input-field">
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
@@ -171,6 +172,8 @@
 import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput';
+import { ref } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
 
@@ -486,12 +489,22 @@ export default {
      *  working for editable chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
      */
     assistiveText: {
       type: Object,
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
       }),
     },
     /**
@@ -517,6 +530,20 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsInputField = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsInputField);
+    return {
+      chipsInputField,
+      announcement,
+    };
   },
   data() {
     return {
@@ -683,6 +710,9 @@ export default {
         if (key === 'Backspace' && !this.fired
           && !this.inputInt && this.indexActiveForRemove < 0) {
           this.indexActiveForRemove = this.selectedListInt.length - 1;
+          // inform screen reader user
+          this.announcement = this.assistiveText.optionToRemoveSelected
+            .replace('{label}', this.selectedListInt[this.indexActiveForRemove][this.labelPropertyName]);
           // on second backspace set timeout for delete
         } else if (this.indexActiveForRemove >= 0 && !this.fired && !this.inputInt) {
           // check if there is actually anything left to remove
@@ -732,6 +762,8 @@ export default {
      * @param {number} index - the index of the item in the list
      */
     removeEntry(option, index) {
+      // save the label for screen reader information
+      const optionLabel = this.selectedListInt[index][this.labelPropertyName];
       // remove the item from the internal list
       this.selectedListInt.splice(index, 1);
       // emit an event to inform parent of altered list
@@ -754,6 +786,12 @@ export default {
         // other input fields (and potential drop downs / pop ups are closed)
         mainInputElement.click();
       }
+      // add a timeout so announcement is not interfered with by default drop down list announcement
+      setTimeout(() => {
+        // inform screen reader user
+        this.announcement = this.assistiveText.optionRemoved
+          .replace('{label}', optionLabel);
+      }, 1000);
     },
     /**
      * adding an selected option to the array of selected options
@@ -779,6 +817,9 @@ export default {
           this.$set(this.selectedListInt, setIndex, newEntry);
           // emit an event to inform parent of altered list
           this.updateParentList(this.selectedListInt);
+          // inform screen reader user
+          this.announcement = this.assistiveText.optionAdded
+            .replace('{label}', this.inputInt);
           // otherwise just emit event to parent (for informing user)
         } else {
           /**
