@@ -1,5 +1,7 @@
 <template>
-  <div class="base-autocomplete-input">
+  <div
+    ref="autocompleteInput"
+    class="base-autocomplete-input">
     <BaseInput
       :id="id"
       v-model="inputInt"
@@ -96,6 +98,8 @@
 import BaseInput from '@/components/BaseInput/BaseInput';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
 import { createId } from '@/utils/utils';
+import { useAnnouncer } from '@/composables/useAnnouncer';
+import { ref } from 'vue';
 import navigateMixin from '../../mixins/navigateList';
 
 /**
@@ -313,6 +317,21 @@ export default {
       }),
     },
   },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const autocompleteInput = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(autocompleteInput);
+
+    return {
+      autocompleteInput,
+      announcement,
+    };
+  },
   data() {
     return {
       /**
@@ -331,6 +350,12 @@ export default {
        * @type {boolean}
        */
       isActiveInt: false,
+      /**
+       * timeout for drop down options found announcer because otherwise
+       * text not read if more than one character entered into input
+       * @type {?number}
+       */
+      timeout: null,
     };
   },
   computed: {
@@ -473,6 +498,25 @@ export default {
        * @param {boolean} - is input field active
        */
       this.$emit('update:is-active', val);
+    },
+    filteredListInt(val) {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+      }
+      // adding this timeout because with dynamicFetch false the list
+      // changes immediately and announcement text is not always read
+      this.timeout = setTimeout(() => {
+        // only read announcement if drop down is open
+        if (this.isActiveInt) {
+          if (val.length) {
+            this.announcement = this.assistiveText.resultsRetrieved
+              .replace('{number}', val.length);
+          } else {
+            this.announcement = this.dropDownNoOptionsInfo;
+          }
+        }
+      }, 1000);
     },
   },
   methods: {

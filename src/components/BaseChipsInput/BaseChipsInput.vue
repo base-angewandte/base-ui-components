@@ -435,6 +435,8 @@ export default {
      *  working for editable chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
      * **optionAdded**: text read when option was added to the selected list. string {label}
      *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
      * **optionToRemoveSelected**: text read when option is marked active for removal (by using
@@ -559,6 +561,12 @@ export default {
        * @type {HTMLElement}
        */
       inputElem: null,
+      /**
+       * timeout for drop down options found announcer because otherwise
+       * text not read if more than one character entered into input
+       * @type {?number}
+       */
+      timeout: null,
     };
   },
   computed: {
@@ -668,6 +676,31 @@ export default {
           this.activeOptionIndex = 0;
         } else if (!val.length && (!this.allowUnknownEntries || !this.input)) {
           this.activeOptionIndex = -1;
+        }
+        // only set the text when the drop down is actually visible
+        // and do not announce the "create {custom entry}..." because it overwrites
+        // the loader message and is announced again with the rest of the search results
+        // later anyway
+        if (this.chipsInputActive
+          && !this.isLoading && !this.announcement) {
+          if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+          }
+          // adding this timeout because with dynamicFetch false the list
+          // changes immediately and announcement text is not always read
+          this.timeout = setTimeout(() => {
+            // check if drop down is still open agin to prevent announcement
+            // after option was added (if drop down was closed)
+            if (this.chipsInputActive) {
+              if (val.length) {
+                this.announcement = this.assistiveText.resultsRetrieved
+                  .replace('{number}', val.length);
+              } else {
+                this.announcement = this.dropDownNoOptionsInfo;
+              }
+            }
+          }, 300);
         }
       },
       immediate: true,
