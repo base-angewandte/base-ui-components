@@ -12,10 +12,10 @@
         :additional-attributes="{ ariaCurrentValue: 'page' }"
         :class="['base-bread-crumbs__link', { 'base-bread-crumbs__link--icon-only': showLabel === false }]">
         <template
-          v-if="icon"
           #label>
           <span class="base-bread-crumbs__label">
             <BaseIcon
+              v-if="icon"
               :key="label"
               :name="icon"
               :title="showLabel === false ? label : undefined"
@@ -93,15 +93,20 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-wrap: wrap;
 
   .base-bread-crumbs__link {
     padding-right: $spacing-small-half;
     display: flex;
     align-items: center;
     color: $font-color-second;
+    // get child to respect parent width
+    // (needed because of white-space: nowrap; further down the line)
+    min-width: 100px;
 
     &.base-bread-crumbs__link--icon-only {
       flex-shrink: 0;
+      min-width: $icon-medium;
     }
 
     &:hover {
@@ -124,6 +129,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
 
       .base-bread-crumbs__icon {
         width: $icon-medium;
@@ -137,9 +143,11 @@ export default {
       }
 
       .base-bread-crumbs__label-text {
-        display: flex;
-        justify-content: center;
+        display: inline;
+        justify-content: flex-start;
         align-items: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
   }
