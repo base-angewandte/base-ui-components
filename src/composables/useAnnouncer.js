@@ -36,6 +36,11 @@ export function useAnnouncer(target, timeout = 300) {
   // watch the provided announcement value for changes and update
   // the element inner text if necessary
   watch(announcement, (val) => {
+    // first check if the target element exists, so assertive element could be set
+    if (!target.value) {
+      console.warn('Announcement element could not be set because the target reference is undefined!');
+      return;
+    }
     // if a string was set assign it to the HTML element created earlier
     if (val) {
       assertiveElement.value.innerText = val;
@@ -52,7 +57,6 @@ export function useAnnouncer(target, timeout = 300) {
    */
   watch(target, () => {
     if (target.value) {
-      console.log('MOUNTED!!', target.value.children[1]);
       // create a HTML element
       assertiveElement.value = document.createElement('div');
       // use the 'hide' class to hide it from the screen

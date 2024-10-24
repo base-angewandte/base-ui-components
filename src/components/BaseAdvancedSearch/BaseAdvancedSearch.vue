@@ -65,6 +65,7 @@
       :assistive-text="{
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.autocompleteLoaderActive,
+        results: assistiveText.results,
       }"
       :date-field-delay="dateFieldDelay"
       :language="language"
@@ -635,12 +636,19 @@ export default {
      *  working for type chips with autocomplete (=freetext_allowed))
      * **loaderActive**: text that is announced when autocomplete results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **results**: provide text that should be announced when the search has
+     *  yielded results (or not).
+     *
+     * Caveat: `results` has a watcher attached to trigger the
+     *    announcement so make sure the property values are reset after filling them
+     *    by using update:assistive-text or resetting it manually (after a timeout)
      */
     assistiveText: {
       type: Object,
       default: () => ({
         selectedOption: '',
         autocompleteLoaderActive: 'loading options.',
+        results: 'Results found.',
       }),
     },
     /**

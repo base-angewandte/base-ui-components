@@ -1,9 +1,11 @@
 <template>
   <!-- make this a form so that iOS recognizes it as 'search'
-  (also the action="." is needed for that -->
+  (also the action="." is needed for that) -->
   <form
-    class="base-search"
+    ref="search"
     action="."
+    role="search"
+    class="base-search"
     @submit.prevent
     @keydown.enter.prevent>
     <component
@@ -91,6 +93,9 @@
 
 <script>
 import { createId } from '@/utils/utils';
+import { useAnnouncer } from '@/composables/useAnnouncer';
+import { ref, watch } from 'vue';
+
 /**
  * A basic text search to filter entries or files
  */
@@ -267,12 +272,19 @@ export default {
      *  working for type chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **results**: provide text that should be announced when the search has
+     *  yielded results (or not).
+     *
+     *  Caveat: `results` has a watcher attached to trigger the
+     *    announcement so make sure the property values are reset after filling them
+     *    by using update:assistive-text or resetting it manually (after a timeout)
      */
     assistiveText: {
       type: Object,
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
+        results: 'Results found.',
       }),
     },
     /**
@@ -282,6 +294,46 @@ export default {
       type: Number,
       default: 0,
     },
+  },
+  emits: ['input', 'update:selected-chips', 'update:is-active', 'update:assistive-text'],
+  setup(props, { emit }) {
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const search = ref(null);
+    /**
+     * insert an HTML element with aria-live assertive that will announce the
+     * search result
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const { announcement } = useAnnouncer(search);
+
+    // also add a watcher to the announcement variable so user can easily have assistiveText.results
+    // reset after announcement (the watcher for this variable again is only working in setup!)
+    watch(announcement, (val) => {
+      // check if values are already in sync
+      if (val !== props.assistiveText.results) {
+        // if not - emit update
+        /**
+         * event to keep assistiveText.results in sync after
+         * announcement
+         * @event update:assistive-text
+         * @type {Object}
+         */
+        emit('update:assistive-text', {
+          ...props.assistiveText,
+          results: val,
+        });
+      }
+    });
+
+    return {
+      search,
+      // need to just export the announcement text because setting it in setup function
+      // did not work in nuxt (respectively the watcher on assistiveText did not work)
+      announcement,
+    };
   },
   data() {
     return {
@@ -509,6 +561,16 @@ export default {
          */
         this.$emit('update:is-active', val);
       }
+    },
+    /**
+     * inserting this component in Nuxt only options API watcher on prop
+     * is working (in setup this is not working)
+     */
+    assistiveText: {
+      handler(val) {
+        this.announcement = val.results;
+      },
+      deep: true,
     },
   },
   methods: {
