@@ -4,7 +4,9 @@
     <div
       v-if="isLoading"
       class="base-result-box-section__loading">
-      <BaseLoader class="base-result-box-section__loader" />
+      <BaseLoader
+        :text-on-loader-show="supportiveText.loaderActive"
+        class="base-result-box-section__loader" />
     </div>
 
     <!-- RESULT BOX SECTION AREA -->
@@ -644,6 +646,7 @@ export default {
           + 'key to select an item for reordering. Use Tab key to navigate between items.',
         activated: 'Item at position {pos} selected for reordering. Use arrow keys to order item.',
         moved: 'Item moved to position {pos} of {total}',
+        loaderActive: 'loading.',
       }),
     },
     /**
