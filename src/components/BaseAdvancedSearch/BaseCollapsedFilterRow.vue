@@ -93,7 +93,7 @@
     <span
       v-if="chipRemovedAssistiveText"
       aria-live="assertive"
-      class="supportive-text">
+      class="assistive-text">
       {{ chipRemovedAssistiveText }}
     </span>
 

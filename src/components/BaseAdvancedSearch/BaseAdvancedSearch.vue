@@ -255,7 +255,7 @@
     <span
       v-if="assistiveTextNotification"
       aria-live="assertive"
-      class="supportive-text">
+      class="assistive-text">
       {{ assistiveTextNotification }}
     </span>
   </div>
