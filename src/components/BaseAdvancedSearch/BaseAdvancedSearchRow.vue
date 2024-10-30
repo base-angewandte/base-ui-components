@@ -1293,7 +1293,7 @@ export default {
       // get the result category of the selected option (on key navigation this.activeCollection
       // should be set, if selected from drop down by click the collectionId is passed to the
       // function else the default filter category is assumed
-      const selectedOptionCollection = this.activeCollection || collectionId
+      const selectedOptionCollection = collectionId
         || this.defaultFilter[this.identifierPropertyName.filter];
       // check if filters were specified - if not assume the input is handled in parent component
       if (!this.filterList || !this.filterList.length) {
@@ -1369,7 +1369,7 @@ export default {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
       } else if (this.useAutocompleteFunctionality && this.activeEntry) {
-        this.addOption(this.activeEntry);
+        this.addOption(this.activeEntry, this.activeCollection);
         // check if filter type is text
       } else if (this.filter.type === 'text') {
         const newTextArray = [].concat(this.currentInput);
