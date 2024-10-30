@@ -112,6 +112,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * text read when a chip is focused - currently only available with prop
+     *  `editable` true
+     */
     assistiveText: {
       type: String,
       default: '',

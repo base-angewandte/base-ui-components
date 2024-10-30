@@ -476,14 +476,14 @@ export default {
      *      functionality is to close the form). Only relevant for mode `form`.
     *     **removeAllFiltersLabel**: label for the remove icon in the collapsed filter row.
      *     Only relevant for mode `form`. For accessibility purposes
-     *    **removeFilterValueNotification**: notification that is read by screenreaders when a filter
+     *    **removeFilterValueNotification**: notification that is read by screen readers when a filter
      *      value was removed. Add the string {value} to read the filter value that was removed and
      *      {label} to read the label of the filter from which the value was removed. Only relevant for mode `form`.
      *    **collapsedFilterRowRemovedNotification**: notification read when the last filter was removed from
      *      the collapsed filter row. Or remove row was clicked. Only relevant for mode `form`.
      *    **collapsedAppliedFiltersLabel**: description for the filters in the collapsed filter row.
      *      Only relevant for mode `form`. For accessibility purposes.
-     *    **collapsedBooleanFilterValue**: Set text that should be read for a boolan filter value. You may add
+     *    **collapsedBooleanFilterValue**: Set text that should be read for a boolean filter value. You may add
      *      the string {label} which will be replaced by the filter label.
      *      Only relevant for mode `form`. For accessibility purposes.
      *
