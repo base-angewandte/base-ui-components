@@ -28,6 +28,12 @@ To see autocomplete results try typing 'zentrum'.
         id: 'id',
         data: 'data',
       }"
+      :assistive-text="{
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        categoryAnnouncement: 'Category {label}.',
+        controlledVocabularyRetrieved: '{number} of options available.',
+        optionsAnnouncement: '{number} options.',
+      }"
       @add-filter="addFilter"
       @fetch-autocomplete="fetchAutocomplete" />
   </div>
@@ -313,6 +319,13 @@ adds the filters in the form of a form below the primary search row that can be 
             }
           }
         },
+      }"
+      :search-assistive-text="{
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        categoryAnnouncement: 'Category {label}.',
+        autocompleteNoResults: 'No results found.',
+        optionsAnnouncement: '{number} options.',
+        autocompleteInitial: 'Please start typing to see suggestions.',
       }"
       @fetch-autocomplete="fetchAutocomplete"
       @fetch-form-autocomplete="fetchFormAutcomplete" />

@@ -22,8 +22,13 @@
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
         :assistive-text="{
-          selectedOption: assistiveText.selectedOption,
-          loaderActive: assistiveText.autocompleteLoaderActive,
+          selectedOption: searchAssistiveText.selectedOption,
+          loaderActive: searchAssistiveText.autocompleteLoaderActive,
+          autocompleteResultsRetrieved: searchAssistiveText.autocompleteResultsRetrieved,
+          autocompleteNoResults: searchAssistiveText.autocompleteNoResults,
+          autocompleteInitial: searchAssistiveText.autocompleteInitial,
+          categoryAnnouncement: searchAssistiveText.categoryAnnouncement,
+          optionsAnnouncement: searchAssistiveText.optionsAnnouncement,
         }"
         :date-field-delay="dateFieldDelay"
         :language="language"
@@ -63,9 +68,14 @@
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
       :assistive-text="{
-        selectedOption: assistiveText.selectedOption,
-        loaderActive: assistiveText.autocompleteLoaderActive,
-        results: assistiveText.results,
+        selectedOption: searchAssistiveText.selectedOption,
+        loaderActive: searchAssistiveText.autocompleteLoaderActive,
+        autocompleteResultsRetrieved: searchAssistiveText.autocompleteResultsRetrieved,
+        autocompleteNoResults: searchAssistiveText.autocompleteNoResults,
+        autocompleteInitial: searchAssistiveText.autocompleteInitial,
+        categoryAnnouncement: searchAssistiveText.categoryAnnouncement,
+        optionsAnnouncement: searchAssistiveText.optionsAnnouncement,
+        results: searchAssistiveText.results,
       }"
       :date-field-delay="dateFieldDelay"
       :language="language"
@@ -630,12 +640,27 @@ export default {
       validator: val => ['id', 'label', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
-     * this prop gives the option to add assistive text for screen readers.
+     * this prop gives the option to add assistive text for screen readers for
+     *  the BaseSearch component.
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
      * **loaderActive**: text that is announced when autocomplete results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **autocompleteResultsRetrieved**: text announced when autocomplete results are returned.
+     *  use {optionsNumber} and {collectionsNumber} in the string to announce the number of
+     *  total options and collections found respectively.
+     * **autocompleteNoResults**: Text announced when no results were found with a given
+     *  search string.
+     * **autocompleteInitial**: Text announced when no search string was provided for
+     *  autocomplete.
+     * **categoryAnnouncement**: Text announced when a new category is entered in the
+     *  autocomplete drop down options list with keyboard navigation. string '{label}' will
+     *  be replaced by the actual specified category label
+     * **optionsAnnouncement**: announced together with category when in category selection
+     *  mode (after using arrowLeft key on autocomplete input) - to give the user a feeling
+     *  how many options were found for the announced category. string '{number}' will be
+     *  replaced by the number of entries in that category.
      * **results**: provide text that should be announced when the search has
      *  yielded results (or not).
      *
@@ -643,11 +668,16 @@ export default {
      *    announcement so make sure the property values are reset after filling them
      *    by using update:assistive-text or resetting it manually (after a timeout)
      */
-    assistiveText: {
+    searchAssistiveText: {
       type: Object,
       default: () => ({
         selectedOption: '',
         autocompleteLoaderActive: 'loading options.',
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        autocompleteNoResults: 'No results found.',
+        autocompleteInitial: 'Please start typing to see suggestions.',
+        categoryAnnouncement: 'category {label}.',
+        optionsAnnouncement: '{number} options.',
         results: '',
       }),
     },
