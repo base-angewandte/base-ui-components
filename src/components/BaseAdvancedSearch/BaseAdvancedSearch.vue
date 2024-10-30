@@ -648,7 +648,7 @@ export default {
       default: () => ({
         selectedOption: '',
         autocompleteLoaderActive: 'loading options.',
-        results: 'Results found.',
+        results: '',
       }),
     },
     /**

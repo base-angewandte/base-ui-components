@@ -691,7 +691,7 @@ export default {
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
-        results: 'Results found.',
+        results: '',
       }),
     },
     /**
