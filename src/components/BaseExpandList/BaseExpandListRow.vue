@@ -94,7 +94,7 @@
           @keydown.down.prevent.stop="moveItem('down')"
           @keydown.up.prevent.stop="moveItem('up')"
           @keydown.enter.prevent.stop="movable = !movable"
-          @focus="supportiveText('activate')"
+          @focus="assistiveText('activate')"
           @keyup.esc="cancelMovable"
           @blur="cancelMovable">
           <base-icon
@@ -239,7 +239,7 @@ export default {
       // referenced in BaseExpandList
       movable: false,
       // referenced in BaseExpandList
-      useSupportiveText: true,
+      useAssistiveText: true,
       // internal representation of data
       dataInt: null,
       // fade out overlays
@@ -272,12 +272,12 @@ export default {
 
       // check if dragHandle has focus
       if (document.activeElement === dragHandle) {
-        // emit supportive text for aria-live
-        this.supportiveText(this.movable ? 'activated' : 'activate');
+        // emit assistive text for aria-live
+        this.assistiveText(this.movable ? 'activated' : 'activate');
       }
 
-      // enable supportive text (disabled by moveItem())
-      this.useSupportiveText = true;
+      // enable assistive text (disabled by moveItem())
+      this.useAssistiveText = true;
     },
     dataInt: {
       handler(val) {
@@ -342,8 +342,8 @@ export default {
      */
     moveItem(direction = 'up ') {
       if (this.movable) {
-        // disable supportive text to avoid message cue
-        this.useSupportiveText = false;
+        // disable assistive text to avoid message cue
+        this.useAssistiveText = false;
         this.movable = false;
         this.$emit('sorted', {
           direction,
@@ -455,19 +455,19 @@ export default {
       }
     },
     /**
-     * supportive text for screen readers
+     * assistive text for screen readers
      */
-    supportiveText(type = 'activate') {
-      if (!this.useSupportiveText) {
+    assistiveText(type = 'activate') {
+      if (!this.useAssistiveText) {
         return;
       }
       /**
        * event emitted on dragHandle toggle
        *
-       * @event supportive
+       * @event assistive
        * @property {string} type
        */
-      this.$emit('supportive', type);
+      this.$emit('assistive', type);
     },
     /**
      * set fadeOut elements depending on scroll position
