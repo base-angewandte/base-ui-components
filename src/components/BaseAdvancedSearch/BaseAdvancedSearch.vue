@@ -237,7 +237,6 @@
             :filters.sync="collapsedFiltersArray"
             :date-time-text="advancedSearchText.collapsedDateTime"
             :interpret-label-as-html="renderFormChipsLabelAsHtml"
-            :remove-filters-label="advancedSearchText.removeAllFiltersLabel"
             :assistive-text="{
               removeFiltersLabel: assistiveText.removeAllFiltersLabel,
               filterRemovedNotification: assistiveText.removeFilterValueNotification,
@@ -475,7 +474,6 @@ export default {
      *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
      *
      *  The values of this object might be plain text or a key for an i18n file.
-     * This prop can be ignored when the `no-options` slot is used.
      */
     advancedSearchText: {
       type: Object,
