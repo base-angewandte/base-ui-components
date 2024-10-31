@@ -710,9 +710,6 @@ export default {
         if (key === 'Backspace' && !this.fired
           && !this.inputInt && this.indexActiveForRemove < 0) {
           this.indexActiveForRemove = this.selectedListInt.length - 1;
-          // inform screen reader user
-          this.announcement = this.assistiveText.optionToRemoveSelected
-            .replace('{label}', this.selectedListInt[this.indexActiveForRemove][this.labelPropertyName]);
           // on second backspace set timeout for delete
         } else if (this.indexActiveForRemove >= 0 && !this.fired && !this.inputInt) {
           // check if there is actually anything left to remove
@@ -722,7 +719,7 @@ export default {
           );
           this.indexActiveForRemove = -1;
         }
-        // necessary to prevent accidential delete of chips when user keeps backspace pressed
+        // necessary to prevent accidental delete of chips when user keeps backspace pressed
         this.fired = true;
         if (this.timeout) {
           clearTimeout(this.timeout);
@@ -749,6 +746,13 @@ export default {
         // in any other key event reset the chip active for remove
       } else {
         this.indexActiveForRemove = -1;
+      }
+      // if an entry was set active for removal by any key action - announce it
+      // to the screen reader user
+      if (this.indexActiveForRemove >= 0) {
+        // inform screen reader user
+        this.announcement = this.assistiveText.optionToRemoveSelected
+          .replace('{label}', this.selectedListInt[this.indexActiveForRemove][this.labelPropertyName]);
       }
     },
 
