@@ -22,6 +22,10 @@
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
         :assistive-text="{
+          addFilter: assistiveText.addFilter,
+          removeFilter: assistiveText.removeFilter,
+          selectFilterLabel: assistiveText.selectFilterLabel,
+          searchLabel: assistiveText.searchLabel,
           selectedOption: assistiveText.selectedOption,
           loaderActive: assistiveText.autocompleteLoaderActive,
           autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
@@ -68,6 +72,10 @@
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
       :assistive-text="{
+        addFilter: assistiveText.addFilter,
+        removeFilter: assistiveText.removeFilter,
+        selectFilterLabel: assistiveText.selectFilterLabel,
+        searchLabel: assistiveText.searchLabel,
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.autocompleteLoaderActive,
         autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
@@ -462,10 +470,6 @@ export default {
      *     **subtext**: text shown as second line on the drop-down in filters area for mode `list`.
      *     **availableOptions**: text shown with chips options for controlled vocabulary
      *     search` for mode `list`.
-     *     **addFilter**: text/label used for add filter icon for mode `list`.
-     *     **removeFilter**: text/label used for remove filter icon for mode `list`.
-     *     **selectFilterLabel**: label (not visible) used for filter chips input field for mode `list`.
-     *     **searchLabel**: label (not visible) used for search input field.
      *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
      *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
      *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
@@ -479,10 +483,6 @@ export default {
         title: 'Advanced Search',
         subtext: 'Select a filter',
         availableOptions: 'Available options',
-        addFilter: 'Add filter',
-        removeFilter: 'Remove filter',
-        selectFilterLabel: 'Select filter',
-        searchLabel: 'Search for Entries',
         collapsedDateTime: {
           from: 'from',
           until: 'until',
@@ -616,6 +616,10 @@ export default {
      * this prop gives the option to add assistive text for screen readers for
      *  the BaseSearch component.
      * properties:
+     * **addFilter**: text/label used for add filter icon for mode `list`.
+     * **removeFilter**: text/label used for remove filter icon for mode `list`.
+     * **selectFilterLabel**: label (not visible) used for filter chips input field for mode `list`.
+     * **searchLabel**: label (not visible) used for search input field.
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
      * **loaderActive**: text that is announced when autocomplete results are being fetched (prop
@@ -664,6 +668,10 @@ export default {
     assistiveText: {
       type: Object,
       default: () => ({
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
         selectedOption: '',
         autocompleteLoaderActive: 'loading options.',
         autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',

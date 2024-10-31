@@ -15,7 +15,7 @@
       v-model="currentInput"
       :show-pre-input-icon="isMainSearch
         && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
-      :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
+      :label="assistiveText.searchLabel"
       :type="searchType"
       :selected-chips.sync="selectedOptions"
       :loadable="filter.type === 'text' || filter.type === 'chips'"
@@ -73,7 +73,7 @@
           :use-form-field-styling="false"
           :show-input-border="false"
           :show-label="false"
-          :label="getI18nTerm(getLangLabel(advancedSearchText.selectFilterLabel))"
+          :label="assistiveText.selectFilterLabel"
           :language="language"
           :drop-down-list-id="'filter-options-' + internalRowId"
           :identifier-property-name="identifierPropertyName.filter"
@@ -120,7 +120,7 @@
           @focusin.stop.prevent
           @click.stop.prevent="removeFilter">
           <BaseIcon
-            :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
+            :title="assistiveText.removeFilter"
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
@@ -406,7 +406,7 @@
         <span
           :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
-          {{ getI18nTerm(getLangLabel(advancedSearchText.addFilter)) }}
+          {{ assistiveText.addFilter }}
         </span>
       </template>
     </BaseButton>
@@ -635,10 +635,6 @@ export default {
      *     <b>subtext</b>: text shown as second line on the drop down in filters area<br>
      *     <b>availableOptions</b>: text shown with chips options for controlled vocabulary
      *     search<br>
-     *     <b>addFilter</b>: text/label used for add filter icon<br>
-     *     <b>removeFilter</b>: text/label used for remove filter icon<br>
-     *     <b>selectFilterLabel</b>: label (not visible) used for filter chips input field<br>
-     *     <b>searchLabel</b>: label (not visible) used for search input field<br>
      *  <br>
      *  The values of this object might be plain text or a key for an i18n file<br>
      * This prop can be ignored when the 'no-options' slot is used.
@@ -649,10 +645,6 @@ export default {
         title: 'Advanced Search',
         subtext: 'Select a filter',
         availableOptions: 'Available options',
-        addFilter: 'Add filter',
-        removeFilter: 'Remove filter',
-        selectFilterLabel: 'Select filter',
-        searchLabel: 'Search for Entries',
       }),
     },
     /**
@@ -697,6 +689,10 @@ export default {
     /**
      * this prop gives the option to add assistive text for screen readers<br>
      * properties:<br>
+     * <b>addFilter</b>: text/label used for add filter icon<br>
+     * <b>removeFilter</b>: text/label used for remove filter icon<br>
+     * <b>selectFilterLabel</b>: label (not visible) used for filter chips input field<br>
+     * <b>searchLabel</b>: label (not visible) used for search input field<br>
      * <b>selectedOption</b>: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
      * **loaderActive**: text that is announced when results are being fetched (prop
@@ -725,6 +721,10 @@ export default {
     assistiveText: {
       type: Object,
       default: () => ({
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
         selectedOption: '',
         loaderActive: 'loading.',
         autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
