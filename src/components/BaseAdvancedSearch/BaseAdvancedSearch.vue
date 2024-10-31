@@ -272,10 +272,11 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import { createId, debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 
 /**
  * @typedef Filter
@@ -661,6 +662,8 @@ export default {
      *  mode (after using arrowLeft key on autocomplete input) - to give the user a feeling
      *  how many options were found for the announced category. string '{number}' will be
      *  replaced by the number of entries in that category.
+     * **autocompleteOptionFilledToForm**: text announced when an option was selected from the autocomplete
+     *  dropdown, and it is filled into the respective form field. (only for mode `form`)
      * **results**: provide text that should be announced when the search has
      *  yielded results (or not).
      *
@@ -678,6 +681,7 @@ export default {
         autocompleteInitial: 'Please start typing to see suggestions.',
         categoryAnnouncement: 'category {label}.',
         optionsAnnouncement: '{number} options.',
+        autocompleteOptionFilledToForm: 'option {optionLabel} filled to field {fieldLabel}.',
         results: '',
       }),
     },
@@ -739,6 +743,23 @@ export default {
     },
   },
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
+  setup() {
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const searchContainer = ref(null);
+    /**
+     * insert an HTML element with aria-live assertive that will announce the
+     * search result
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const { announcement } = useAnnouncer(searchContainer);
+    return {
+      searchContainer,
+      announcement,
+    };
+  },
   data() {
     return {
       /**
@@ -1413,6 +1434,19 @@ export default {
           }
           // main filter filter values should remain empty
           this.mainFilter.filter_values = [];
+          // announce to screen reader user that field was added to advanced search form
+          // if the appropriate text was set
+          if (this.searchAssistiveText.autocompleteOptionFilledToForm) {
+            // get option label from entry param
+            const optionLabel = entry[this.labelPropertyName.autocompleteOption];
+            // and field label from fieldInformation
+            const fieldLabel = fieldInformation.title;
+            // assemble announcement
+            this.announcement = this.searchAssistiveText.autocompleteOptionFilledToForm
+              .replace('{optionLabel}', optionLabel)
+              .replace('{fieldLabel}', fieldLabel);
+          }
+
           // this does not trigger an update event from BaseForm so search needs to be triggered manually here
           this.search();
         } else {

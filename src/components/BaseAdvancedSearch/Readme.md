@@ -326,6 +326,7 @@ adds the filters in the form of a form below the primary search row that can be 
         autocompleteNoResults: 'No results found.',
         optionsAnnouncement: '{number} options.',
         autocompleteInitial: 'Please start typing to see suggestions.',
+        autocompleteOptionFilledToForm: 'option {optionLabel} filled to field {fieldLabel}.',
       }"
       @fetch-autocomplete="fetchAutocomplete"
       @fetch-form-autocomplete="fetchFormAutcomplete" />
