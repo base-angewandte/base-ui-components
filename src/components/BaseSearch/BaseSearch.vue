@@ -34,7 +34,10 @@
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : false"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
-      :assistive-text="!type.includes('date') ? assistiveText : undefined"
+      :assistive-text="!type.includes('date') ? {
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.loaderActive,
+      } : undefined"
       :is-active-delay="dateFieldDelay"
       :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : false"
       :chips-removable="type !== 'chipssingle'"
