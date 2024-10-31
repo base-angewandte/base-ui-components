@@ -22,13 +22,13 @@
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
         :assistive-text="{
-          selectedOption: searchAssistiveText.selectedOption,
-          loaderActive: searchAssistiveText.autocompleteLoaderActive,
-          autocompleteResultsRetrieved: searchAssistiveText.autocompleteResultsRetrieved,
-          autocompleteNoResults: searchAssistiveText.autocompleteNoResults,
-          autocompleteInitial: searchAssistiveText.autocompleteInitial,
-          categoryAnnouncement: searchAssistiveText.categoryAnnouncement,
-          optionsAnnouncement: searchAssistiveText.optionsAnnouncement,
+          selectedOption: assistiveText.selectedOption,
+          loaderActive: assistiveText.autocompleteLoaderActive,
+          autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
+          autocompleteNoResults: assistiveText.autocompleteNoResults,
+          autocompleteInitial: assistiveText.autocompleteInitial,
+          categoryAnnouncement: assistiveText.categoryAnnouncement,
+          optionsAnnouncement: assistiveText.optionsAnnouncement,
         }"
         :date-field-delay="dateFieldDelay"
         :language="language"
@@ -68,14 +68,14 @@
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
       :assistive-text="{
-        selectedOption: searchAssistiveText.selectedOption,
-        loaderActive: searchAssistiveText.autocompleteLoaderActive,
-        autocompleteResultsRetrieved: searchAssistiveText.autocompleteResultsRetrieved,
-        autocompleteNoResults: searchAssistiveText.autocompleteNoResults,
-        autocompleteInitial: searchAssistiveText.autocompleteInitial,
-        categoryAnnouncement: searchAssistiveText.categoryAnnouncement,
-        optionsAnnouncement: searchAssistiveText.optionsAnnouncement,
-        results: searchAssistiveText.results,
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.autocompleteLoaderActive,
+        autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
+        autocompleteNoResults: assistiveText.autocompleteNoResults,
+        autocompleteInitial: assistiveText.autocompleteInitial,
+        categoryAnnouncement: assistiveText.categoryAnnouncement,
+        optionsAnnouncement: assistiveText.optionsAnnouncement,
+        results: assistiveText.results,
       }"
       :date-field-delay="dateFieldDelay"
       :language="language"
@@ -231,10 +231,10 @@
             :interpret-label-as-html="renderFormChipsLabelAsHtml"
             :remove-filters-label="advancedSearchText.removeAllFiltersLabel"
             :assistive-text="{
-              removeFiltersLabel: advancedSearchText.removeAllFiltersLabel,
-              filterRemovedNotification: advancedSearchText.removeFilterValueNotification,
-              appliedFiltersLabel: advancedSearchText.collapsedAppliedFiltersLabel,
-              booleanFilterValue: advancedSearchText.collapsedBooleanFilterValue,
+              removeFiltersLabel: assistiveText.removeAllFiltersLabel,
+              filterRemovedNotification: assistiveText.removeFilterValueNotification,
+              appliedFiltersLabel: assistiveText.collapsedAppliedFiltersLabel,
+              booleanFilterValue: assistiveText.collapsedBooleanFilterValue,
             }"
             @remove-all="removeAllFilters" />
         </div>
@@ -469,24 +469,6 @@ export default {
      *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
      *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
      *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
-     *     **advancedButtonDescription**: button description for Advanced Search Toggle button for mode `form`.
-     *      For accessibility purposes. You may add the string {state} which will be replaced with the respective
-     *      'open' and 'close' value specified in `formState` (see below). Only relevant for mode `form`.
-     *    **formState**: an object with properties `open` (text that is read when form is closed and button
-     *      functionality is to open the form) and `close` (text that is read when form is open and button
-     *      functionality is to close the form). Only relevant for mode `form`.
-    *     **removeAllFiltersLabel**: label for the remove icon in the collapsed filter row.
-     *     Only relevant for mode `form`. For accessibility purposes
-     *    **removeFilterValueNotification**: notification that is read by screen readers when a filter
-     *      value was removed. Add the string {value} to read the filter value that was removed and
-     *      {label} to read the label of the filter from which the value was removed. Only relevant for mode `form`.
-     *    **collapsedFilterRowRemovedNotification**: notification read when the last filter was removed from
-     *      the collapsed filter row. Or remove row was clicked. Only relevant for mode `form`.
-     *    **collapsedAppliedFiltersLabel**: description for the filters in the collapsed filter row.
-     *      Only relevant for mode `form`. For accessibility purposes.
-     *    **collapsedBooleanFilterValue**: Set text that should be read for a boolean filter value. You may add
-     *      the string {label} which will be replaced by the filter label.
-     *      Only relevant for mode `form`. For accessibility purposes.
      *
      *  The values of this object might be plain text or a key for an i18n file.
      * This prop can be ignored when the `no-options` slot is used.
@@ -507,16 +489,6 @@ export default {
           range: 'to',
         },
         advancedButtonLabel: 'Advanced Search',
-        advancedButtonDescription: 'Click to {state} advanced search form.',
-        formState: {
-          open: 'open',
-          close: 'close',
-        },
-        removeAllFiltersLabel: 'Remove all filters.',
-        removeFilterValueNotification: 'Filter value {value} was removed from filter {label}.',
-        collapsedFilterRowRemovedNotification: 'All search filters were reset.',
-        collapsedAppliedFiltersLabel: 'Currently applied Filters',
-        collapsedBooleanFilterValue: 'Filter {label} was set',
       }),
     },
     /**
@@ -664,6 +636,24 @@ export default {
      *  replaced by the number of entries in that category.
      * **autocompleteOptionFilledToForm**: text announced when an option was selected from the autocomplete
      *  dropdown, and it is filled into the respective form field. (only for mode `form`)
+     * **advancedButtonDescription**: button description for Advanced Search Toggle button for mode `form`.
+     *      For accessibility purposes. You may add the string {state} which will be replaced with the respective
+     *      'open' and 'close' value specified in `formState` (see below). Only relevant for mode `form`.
+     * **formState**: an object with properties `open` (text that is read when form is closed and button
+     *      functionality is to open the form) and `close` (text that is read when form is open and button
+     *      functionality is to close the form). Only relevant for mode `form`.
+     * **removeAllFiltersLabel**: label for the remove icon in the collapsed filter row.
+     *     Only relevant for mode `form`. For accessibility purposes
+     * **removeFilterValueNotification**: notification that is read by screen readers when a filter
+     *      value was removed. Add the string {value} to read the filter value that was removed and
+     *      {label} to read the label of the filter from which the value was removed. Only relevant for mode `form`.
+     * **collapsedFilterRowRemovedNotification**: notification read when the last filter was removed from
+     *      the collapsed filter row. Or remove row was clicked. Only relevant for mode `form`.
+     * **collapsedAppliedFiltersLabel**: description for the filters in the collapsed filter row.
+     *      Only relevant for mode `form`. For accessibility purposes.
+     * **collapsedBooleanFilterValue**: Set text that should be read for a boolean filter value. You may add
+     *      the string {label} which will be replaced by the filter label.
+     *      Only relevant for mode `form`. For accessibility purposes.
      * **results**: provide text that should be announced when the search has
      *  yielded results (or not).
      *
@@ -671,7 +661,7 @@ export default {
      *    announcement so make sure the property values are reset after filling them
      *    by using update:assistive-text or resetting it manually (after a timeout)
      */
-    searchAssistiveText: {
+    assistiveText: {
       type: Object,
       default: () => ({
         selectedOption: '',
@@ -682,6 +672,16 @@ export default {
         categoryAnnouncement: 'category {label}.',
         optionsAnnouncement: '{number} options.',
         autocompleteOptionFilledToForm: 'option {optionLabel} filled to field {fieldLabel}.',
+        advancedButtonDescription: 'Click to {state} advanced search form.',
+        formState: {
+          open: 'open',
+          close: 'close',
+        },
+        removeAllFiltersLabel: 'Remove all filters.',
+        removeFilterValueNotification: 'Filter value {value} was removed from filter {label}.',
+        collapsedFilterRowRemovedNotification: 'All search filters were reset.',
+        collapsedAppliedFiltersLabel: 'Currently applied Filters',
+        collapsedBooleanFilterValue: 'Filter {label} was set',
         results: '',
       }),
     },
@@ -991,9 +991,9 @@ export default {
      */
     advancedButtonDescription() {
       // if value was not set for any reason just return an empty string
-      if (!this.advancedSearchText.advancedButtonDescription) return '';
-      return this.advancedSearchText.advancedButtonDescription
-        .replace('{state}', this.advancedSearchText.formState[this.formOpen ? 'close' : 'open']);
+      if (!this.assistiveText.advancedButtonDescription) return '';
+      return this.assistiveText.advancedButtonDescription
+        .replace('{state}', this.assistiveText.formState[this.formOpen ? 'close' : 'open']);
     },
   },
   watch: {
@@ -1436,13 +1436,13 @@ export default {
           this.mainFilter.filter_values = [];
           // announce to screen reader user that field was added to advanced search form
           // if the appropriate text was set
-          if (this.searchAssistiveText.autocompleteOptionFilledToForm) {
+          if (this.assistiveText.autocompleteOptionFilledToForm) {
             // get option label from entry param
             const optionLabel = entry[this.labelPropertyName.autocompleteOption];
             // and field label from fieldInformation
             const fieldLabel = fieldInformation.title;
             // assemble announcement
-            this.announcement = this.searchAssistiveText.autocompleteOptionFilledToForm
+            this.announcement = this.assistiveText.autocompleteOptionFilledToForm
               .replace('{optionLabel}', optionLabel)
               .replace('{fieldLabel}', fieldLabel);
           }
@@ -1498,7 +1498,7 @@ export default {
     removeAllFilters() {
       // reset form filter values
       this.formFilterValuesInt = {};
-      this.assistiveTextNotification = this.advancedSearchText.collapsedFilterRowRemovedNotification || '';
+      this.assistiveTextNotification = this.assistiveText.collapsedFilterRowRemovedNotification || '';
       // trigger search without filters
       this.search();
     },
