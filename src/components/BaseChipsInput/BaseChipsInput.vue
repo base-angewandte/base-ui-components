@@ -692,7 +692,7 @@ export default {
           this.timeout = setTimeout(() => {
             // check if drop down is still open agin to prevent announcement
             // after option was added (if drop down was closed)
-            if (this.chipsInputActive) {
+            if (this.chipsInputActive && this.assistiveText.resultsRetrieved) {
               if (val.length) {
                 this.announcement = this.assistiveText.resultsRetrieved
                   .replace('{number}', val.length);
