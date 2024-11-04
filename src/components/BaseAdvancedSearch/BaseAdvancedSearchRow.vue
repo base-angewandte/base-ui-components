@@ -15,7 +15,7 @@
       v-model="currentInput"
       :show-pre-input-icon="isMainSearch
         && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
-      :label="assistiveText.searchLabel"
+      :label="assistiveText.searchLabel || 'Search for Entries'"
       :type="searchType"
       :selected-chips.sync="selectedOptions"
       :loadable="filter.type === 'text' || filter.type === 'chips'"
@@ -73,7 +73,7 @@
           :use-form-field-styling="false"
           :show-input-border="false"
           :show-label="false"
-          :label="assistiveText.selectFilterLabel"
+          :label="assistiveText.selectFilterLabel || 'Select filter'"
           :language="language"
           :drop-down-list-id="'filter-options-' + internalRowId"
           :identifier-property-name="identifierPropertyName.filter"
@@ -120,7 +120,7 @@
           @focusin.stop.prevent
           @click.stop.prevent="removeFilter">
           <BaseIcon
-            :title="assistiveText.removeFilter"
+            :title="assistiveText.removeFilter || 'Remove filter'"
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
@@ -406,7 +406,7 @@
         <span
           :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
-          {{ assistiveText.addFilter }}
+          {{ assistiveText.addFilter || 'Add filter'}}
         </span>
       </template>
     </BaseButton>
