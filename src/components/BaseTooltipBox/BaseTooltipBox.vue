@@ -337,7 +337,15 @@ export default {
     this.isActive = false;
     this.showInt = false;
     // when the tooltipBox is closed, try to focus the previous active element
-    if (this.prevActiveElement) this.prevActiveElement.focus();
+    if (this.prevActiveElement
+      // but not if an element of the same class is now focused (case where tooltip box
+      // is closed and another one is immediately opened)
+      // this is good enough for our current use case, but we might need to think of a more
+      // thoroughly solution in future (prop for exempt classes?)
+      && JSON.stringify(this.prevActiveElement.classList) !== JSON
+        .stringify(document.activeElement.classList)) {
+      this.prevActiveElement.focus();
+    }
     // remove event listeners
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
     if (this.mutationObserver) this.mutationObserver.disconnect();
