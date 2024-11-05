@@ -41,7 +41,6 @@
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'left'"
           :name="option.icon"
-          size="small"
           :class="['base-switch-buttons__icon',
                    `base-switch-buttons__icon--${iconSize}`]" />
         <span
@@ -51,7 +50,6 @@
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'right'"
           :name="option.icon"
-          size="small"
           :class="['base-switch-buttons__icon',
                    `base-switch-buttons__icon--${iconSize}`]" />
         <!-- @slot slot to display something right of text (e.g. icon), or if `showButtonsLabel` false - generally right of the button content
