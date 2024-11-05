@@ -38,6 +38,7 @@ export function useAnnouncer(target, timeout = 300) {
   watch(announcement, (val) => {
     // first check if the target element exists, so assertive element could be set
     if (!target.value) {
+      // eslint-disable-next-line no-console
       console.warn('Announcement element could not be set because the target reference is undefined!');
       return;
     }

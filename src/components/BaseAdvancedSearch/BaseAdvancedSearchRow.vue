@@ -40,7 +40,7 @@
       :date-field-delay="dateFieldDelay"
       :linked-list-option="activeEntry
         // set option for autocomplete - check if collection select mode is active and set id of that if yes
-        ? (collectionSelect ? activeCollection
+        ? (collectionSelect ? activeCollectionId
           // or set the active entry id
           : activeEntry[identifierPropertyName.autocompleteOption])
         // else check if there is an active controlled vocabulary entry and set that if yes
@@ -134,7 +134,7 @@
           v-if="isActive"
           ref="dropDown"
           :drop-down-options="resultListInt"
-          :active-option="{ [autocompletePropertyNames.id]: activeCollection }"
+          :active-option="{ [autocompletePropertyNames.id]: activeCollectionId }"
           :list-id="'autocomplete-options-' + internalRowId"
           :active-styled="false"
           :has-sub-options="true"
@@ -253,7 +253,8 @@
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
                 :drop-down-options="option[autocompletePropertyNames.data]"
-                :active-option="activeCollection === option[autocompletePropertyNames.id] ? activeEntry : {}"
+                :active-option="activeCollectionId === option[autocompletePropertyNames.id]
+                  ? activeEntry : {}"
                 :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
@@ -406,7 +407,7 @@
         <span
           :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
-          {{ assistiveText.addFilter || 'Add filter'}}
+          {{ assistiveText.addFilter || 'Add filter' }}
         </span>
       </template>
     </BaseButton>
@@ -815,7 +816,7 @@ export default {
        * for autocomplete drop down navigation - collection level
        * @type {?string}
        */
-      activeCollection: '',
+      activeCollectionId: '',
       /**
        * switch between arrow use on collection or entry level
        * (true for collection level)
@@ -1220,7 +1221,7 @@ export default {
     autocompleteResults() {
       // reset the active entry / collection set with the previous results
       this.activeEntry = null;
-      this.activeCollection = '';
+      this.activeCollectionId = '';
       // on results change announce what was found, but only if the dropdown is active
       if (this.isActive) {
         this.assembleAutocompleteResultsAnnouncement();
@@ -1378,7 +1379,7 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
-      // get the result category of the selected option (on key navigation this.activeCollection
+      // get the result category of the selected option (on key navigation this.activeCollectionId
       // should be set, if selected from drop down by click the collectionId is passed to the
       // function else the default filter category is assumed
       const selectedOptionCollection = collectionId
@@ -1409,7 +1410,7 @@ export default {
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
-          === (this.activeCollection || collectionId)) || this.defaultFilter;
+          === (this.activeCollectionId || collectionId)) || this.defaultFilter;
         // since default filter could be other than chips at least safeguard against type 'text'
         // TODO: this assumes default filter type is 'text'! needs further handling if other filter
         // types could be default
@@ -1457,7 +1458,7 @@ export default {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
       } else if (this.useAutocompleteFunctionality && this.activeEntry) {
-        this.addOption(this.activeEntry, this.activeCollection);
+        this.addOption(this.activeEntry, this.activeCollectionId);
         // check if filter type is text
       } else if (this.filter.type === 'text') {
         const newTextArray = [].concat(this.currentInput);
@@ -1578,22 +1579,22 @@ export default {
       if (this.resultListInt.length) {
         // remember the previous collection so it can be decided if
         // announcement should be read in the end
-        const previousActiveCollection = this.activeCollection;
+        const previousActiveCollection = this.activeCollectionId;
         // store key stroked in variable
         const { key } = event;
         // actions for arrow up or down
         if (key === 'ArrowDown' || key === 'ArrowUp') {
           // if there is no active Collection (could happen due to hover)
           // set the first item in array
-          if (!this.activeCollection) {
-            this.activeCollection = this
+          if (!this.activeCollectionId) {
+            this.activeCollectionId = this
               .resultListInt[0][this.autocompletePropertyNames.id];
           }
           // get the index of the currently active collection
           const currentCollectionIndex = this.resultListInt
             .map(section => section[this.autocompletePropertyNames.id])
-            .indexOf(this.activeCollection);
-          let currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            .indexOf(this.activeCollectionId);
+          let currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
           // depending if arrow was up or down set +/- one to add or subtract
           // generically
           const numberToAdd = isArrowDown ? 1 : -1;
@@ -1624,14 +1625,14 @@ export default {
           } else if (!this.collectionSelect
             && (!isArrowDown && currentCollectionIndex === 0 && currentEntryIndex === 0)) {
             this.activeEntry = null;
-            this.activeCollection = '';
+            this.activeCollectionId = '';
             // if collection select is active or first/last element of the current collection
             // is reached - switch to next/previous collection
           } else if (isWithinListLimit) {
             // set the new active collection
-            this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd][this
+            this.activeCollectionId = this.resultListInt[currentCollectionIndex + numberToAdd][this
               .autocompletePropertyNames.id];
-            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
             // define which element in the newly active collection should appear active
             // if collection select or arrow up - first one otherwise last
             const newItemIndex = isArrowDown || this.collectionSelect ? 0
@@ -1641,16 +1642,16 @@ export default {
             // if it is the last entry of the complete list - start from the top
           } else if (!isWithinListLimit && currentCollectionIndex === this.resultListInt.length - 1
             && currentEntryIndex === currentCollectionArray.length - 1) {
-            this.activeCollection = this
+            this.activeCollectionId = this
               .resultListInt[0][this.autocompletePropertyNames.id];
-            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
             [this.activeEntry] = currentCollectionArray;
             // else if current index is at -1 go to the last entry in the list
           } else if (!isWithinListLimit && currentCollectionIndex === 0
             && currentEntryIndex === -1) {
-            this.activeCollection = this.resultListInt[this.resultListInt.length - 1][this
+            this.activeCollectionId = this.resultListInt[this.resultListInt.length - 1][this
               .autocompletePropertyNames.id];
-            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
             [this.activeEntry] = currentCollectionArray.slice(-1);
           }
         } else if (key === 'ArrowLeft') {
@@ -1661,11 +1662,12 @@ export default {
         // if the assistive text was set, announce if a new category was entered via
         // key navigation! (not if in collection select mode because then category is announced
         // anyway)
-        if (!this.collectionSelect && previousActiveCollection !== this.activeCollection
-            && this.assistiveText.categoryAnnouncement) {
-          // since this.activeCollection is just the id we need to get the collection label
+        if (this.activeCollectionId && !this.collectionSelect
+          && previousActiveCollection !== this.activeCollectionId
+          && this.assistiveText.categoryAnnouncement) {
+          // since this.activeCollectionId is just the id we need to get the collection label
           const collectionLabel = this.autocompleteResults
-            .find(({ [this.autocompletePropertyNames.id]: id }) => id === this.activeCollection)[this
+            .find(({ [this.autocompletePropertyNames.id]: id }) => id === this.activeCollectionId)[this
               .autocompletePropertyNames.label];
           // set the announcement and the collection label
           this.announcement = this.assistiveText.categoryAnnouncement
@@ -1772,7 +1774,7 @@ export default {
     resetAllInput() {
       this.currentInput = '';
       this.activeEntry = null;
-      this.activeCollection = '';
+      this.activeCollectionId = '';
       this.activeControlledVocabularyEntry = null;
     },
     /**
