@@ -19,6 +19,7 @@
       :is-linked="true"
       :text-styling="chipStyling"
       :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
+      :assistive-text="filterItemLabel"
       class="base-collapsed-filter-item__chip"
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
@@ -26,7 +27,7 @@
       v-else-if="isBoolean && hasValue"
       class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
       <BaseIcon
-        :title="booleanFilterLabel"
+        :title="filterItemLabel"
         name="check-mark"
         class="base-collapsed-filter-item__icon" />
       <BaseIcon
@@ -96,14 +97,21 @@ export default {
       default: false,
     },
     /**
-     * define text to be read by assistive technologies when a
-     * boolean filter value is in focus
-     * string may include '{label}' which will be replaced by the boolean
-     * filter label
+     * provide assistive text for boolean values and to inform user of chip
+     * removal options
+     *
+     * **booleanFilterLabel**: Set text that should be read for a boolean filter value. You may add
+     *  the string {label} which will be replaced by the filter label.
+     * **optionToRemoveSelected**: text read when an option is focused (and thus selected), should
+     *  announce to the screen reader user that option can now be removed via Backspace or Delete.
+     *  You may add the string {label} which will be replaced by the filter label.
      */
-    booleanFilterLabel: {
-      type: String,
-      default: 'Filter was set.',
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        booleanFilterLabel: 'Filter was set.',
+        optionToRemoveSelected: 'Press delete or backspace to remove.',
+      }),
     },
   },
   computed: {
@@ -134,6 +142,19 @@ export default {
         cursor: this.isScrolling ? 'grabbing' : 'grab',
         userSelect: this.isScrolling ? 'none' : 'unset',
       }) : {};
+    },
+    filterItemLabel() {
+      if (this.isBoolean && this.assistiveText.booleanFilterLabel
+        && this.assistiveText.optionToRemoveSelected) {
+        return `${this.assistiveText.booleanFilterLabel}. ${this.assistiveText.optionToRemoveSelected}`;
+      }
+      if (this.isBoolean && this.assistiveText.booleanFilterLabel) {
+        return this.assistiveText.booleanFilterLabel;
+      }
+      if (!this.isBoolean && this.assistiveText.optionToRemoveSelected) {
+        return `${this.value.labelInternal}. ${this.assistiveText.optionToRemoveSelected}`;
+      }
+      return this.value.labelInternal.toString();
     },
   },
   methods: {

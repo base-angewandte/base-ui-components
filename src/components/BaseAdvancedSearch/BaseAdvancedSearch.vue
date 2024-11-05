@@ -241,7 +241,8 @@
               removeFiltersLabel: assistiveText.removeAllFiltersLabel,
               filterRemovedNotification: assistiveText.removeFilterValueNotification,
               appliedFiltersLabel: assistiveText.collapsedAppliedFiltersLabel,
-              booleanFilterValue: assistiveText.collapsedBooleanFilterValue,
+              booleanFilterLabel: assistiveText.collapsedBooleanFilterValue,
+              optionToRemoveSelected: assistiveText.collapsedOptionToRemoveSelected,
             }"
             @remove-all="removeAllFilters" />
         </div>
@@ -656,6 +657,8 @@ export default {
      * **collapsedBooleanFilterValue**: Set text that should be read for a boolean filter value. You may add
      *      the string {label} which will be replaced by the filter label.
      *      Only relevant for mode `form`. For accessibility purposes.
+     * **collapsedOptionToRemoveSelected**: text read when an option is focused (and thus selected), should
+     *  announce to the screen reader user that option can now be removed via Backspace or Delete.
      * **results**: provide text that should be announced when the search has
      *  yielded results (or not).
      *
@@ -688,6 +691,7 @@ export default {
         collapsedFilterRowRemovedNotification: 'All search filters were reset.',
         collapsedAppliedFiltersLabel: 'Currently applied Filters',
         collapsedBooleanFilterValue: 'Filter {label} was set',
+        collapsedOptionToRemoveSelected: 'Press delete or backspace to remove.',
         results: '',
       }),
     },

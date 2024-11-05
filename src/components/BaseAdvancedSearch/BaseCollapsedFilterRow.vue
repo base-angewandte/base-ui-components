@@ -62,8 +62,12 @@
                       :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                         && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
                         && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
-                      :boolean-filter-label="assistiveText.booleanFilterValue
-                        .replace('{label}', filter.labelInternal)"
+                      :assistive-text="{
+                        booleanFilterLabel: assistiveText.booleanFilterLabel
+                          ? assistiveText.booleanFilterLabel
+                            .replace('{label}', filter.labelInternal) : groupValue.labelInternal.toString(),
+                        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                      }"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
@@ -80,8 +84,12 @@
                     :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                       && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
                       && interpretLabelAsHtml.includes(filter.idInternal))"
-                    :boolean-filter-label="assistiveText.booleanFilterValue ? assistiveText.booleanFilterValue
-                      .replace('{label}', filter.labelInternal) : ''"
+                    :assistive-text="{
+                      booleanFilterLabel: assistiveText.booleanFilterLabel
+                        ? assistiveText.booleanFilterLabel
+                          .replace('{label}', filter.labelInternal) : value.labelInternal.toString(),
+                      optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                    }"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -213,8 +221,10 @@ export default {
      *  value was removed. Add the string {value} to read the filter value that was removed and
      *  {label} to read the label of the filter from which the value was removed.
      * **appliedFiltersLabel**: description for the filters in the collapsed filter row.
-     * **booleanFilterValue**: Set text that should be read for a boolan filter value. You may add
+     * **booleanFilterLabel**: Set text that should be read for a boolan filter value. You may add
      *      the string {label} which will be replaced by the filter label.
+     * **optionToRemoveSelected**: text read when an option is focused (and thus selected), should
+     *  announce to the screen reader user that option can now be removed via Backspace or Delete.
      */
     assistiveText: {
       type: Object,
@@ -222,7 +232,8 @@ export default {
         removeFiltersLabel: 'Remove all filters.',
         filterRemovedNotification: 'Filter value {value} was removed from filter {label}.',
         appliedFiltersLabel: 'Currently applied Filters',
-        booleanFilterValue: 'Filter {label} was set',
+        booleanFilterLabel: 'Filter {label} was set',
+        optionToRemoveSelected: 'Press delete or backspace to remove.',
       }),
     },
   },
