@@ -24,6 +24,7 @@
         :class="['base-switch-buttons__button',
                  `base-switch-buttons__button--${type}`,
                  { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption },
+                 { 'base-switch-buttons__button--icon-only': !showButtonsLabel },
                  { 'base-switch-buttons__button--disabled': disabled }]">
         <input
           :id="optionIds[index]"
@@ -41,8 +42,8 @@
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'left'"
           :name="option.icon"
-          size="small"
-          class="base-switch-buttons__icon" />
+          :class="['base-switch-buttons__icon',
+                   `base-switch-buttons__icon--${iconSize}`]" />
         <span
           v-if="showButtonsLabelInt">
           {{ option.label }}
@@ -50,8 +51,8 @@
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'right'"
           :name="option.icon"
-          size="small"
-          class="base-switch-buttons__icon" />
+          :class="['base-switch-buttons__icon',
+                   `base-switch-buttons__icon--${iconSize}`]" />
         <!-- @slot slot to display something right of text (e.g. icon), or if `showButtonsLabel` false - generally right of the button content
         @binding {string} value - the value of the option object
         --->
@@ -136,6 +137,17 @@ export default {
       type: String,
       default: 'right',
       validator: val => ['right', 'left'].includes(val),
+    },
+    /**
+     * specify icon size
+     * this prop currently only applies to `type` 'prominent'
+     */
+    iconSize: {
+      type: String,
+      default: 'medium',
+      validator(val) {
+        return ['small', 'medium', 'large'].includes(val);
+      },
     },
     /**
      * set true if the buttons should be visible but disabled, so they
@@ -238,6 +250,7 @@ export default {
       }
 
       &.base-switch-buttons__button--prominent {
+        justify-content: center;
         border: $input-field-border;
         height: $row-height-small;
 
@@ -249,15 +262,33 @@ export default {
           }
         }
 
+        &.base-switch-buttons__button--icon-only {
+          width: 50px;
+          padding: 0;
+        }
+
         &:focus-within {
           border-color: $app-color;
         }
       }
 
       .base-switch-buttons__icon {
-        height: $icon-medium;
-        width: $icon-medium;
         flex: 0 0 auto;
+
+        &.base-switch-buttons__icon--small {
+          height: $icon-small;
+          width: $icon-small;
+        }
+
+        &.base-switch-buttons__icon--medium {
+          height: $icon-medium;
+          width: $icon-medium;
+        }
+
+        &.base-switch-buttons__icon--large {
+          height: $icon-large;
+          width: $icon-large;
+        }
       }
 
       &:hover .base-switch-buttons__icon,
