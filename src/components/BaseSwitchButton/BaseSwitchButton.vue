@@ -140,6 +140,7 @@ export default {
     },
     /**
      * specify icon size
+     * this prop currently only applies to `type` 'prominent'
      */
     iconSize: {
       type: String,
