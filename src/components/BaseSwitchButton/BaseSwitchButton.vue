@@ -24,6 +24,7 @@
         :class="['base-switch-buttons__button',
                  `base-switch-buttons__button--${type}`,
                  { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption },
+                 { 'base-switch-buttons__button--icon-only': !showButtonsLabel },
                  { 'base-switch-buttons__button--disabled': disabled }]">
         <input
           :id="optionIds[index]"
@@ -249,10 +250,8 @@ export default {
 
       &.base-switch-buttons__button--prominent {
         justify-content: center;
-        padding: 0;
         border: $input-field-border;
         height: $row-height-small;
-        width: 50px;
 
         &.base-switch-buttons__button--prominent-active {
           box-shadow: inset 0 -#{$border-width} 0 0 #{$app-color};
@@ -260,6 +259,11 @@ export default {
           &.base-switch-buttons__button--disabled {
             box-shadow: inset 0 -#{$border-width} 0 0 #{$graytext-color};
           }
+        }
+
+        &.base-switch-buttons__button--icon-only {
+          width: 50px;
+          padding: 0;
         }
 
         &:focus-within {
