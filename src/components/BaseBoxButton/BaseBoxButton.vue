@@ -18,7 +18,7 @@
               v-if="showPlus"
               name="plus"
               alt="add"
-              class="button-box-plus" />
+              class="button-box-icon button-box-plus" />
           </div>
           <div class="button-box-icon-container">
             <base-icon
@@ -47,7 +47,7 @@
       <base-icon
         v-if="icon"
         :name="icon"
-        class="button-box-icon-small" />
+        class="button-box-icon button-box-icon-small" />
       <div class="button-box-text-small">
         {{ text }}
       </div>
@@ -289,6 +289,11 @@ export default {
           visibility: hidden;
         }
       }
+    }
+
+    .button-box-icon {
+      pointer-events: none;
+      touch-action: none;
     }
   }
 
