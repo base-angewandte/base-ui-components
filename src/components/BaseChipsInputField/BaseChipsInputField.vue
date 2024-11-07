@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="chipsInputField"
     class="base-chips-input-field">
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
@@ -26,6 +27,9 @@
       :is-loading="isLoading"
       :input-class="inputClass"
       :set-focus-on-active="setFocusOnActive"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
       @keydown.enter.prevent="addOption"
       @keydown="checkKeyEvent"
       v-on="inputListeners">
@@ -71,7 +75,7 @@
                   <!-- @slot a slot to provide customized chips
                     @binding { object } entry - one selected option displayed as chip
                     @binding { number } index - the index of the entry in the selectedList array
-                    @binding { number } chipActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                    @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
                     @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
                   -->
                   <slot
@@ -79,7 +83,7 @@
                     v-bind="{
                       entry,
                       index,
-                      chipActiveForRemove,
+                      indexActiveForRemove,
                       removeEntry,
                     }">
                     <BaseChip
@@ -89,7 +93,7 @@
                       :hover-box-content="hoverboxContent"
                       :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                         || !!entry[identifierPropertyName]"
-                      :chip-active="chipActiveForRemove === index"
+                      :chip-active="indexActiveForRemove === index"
                       :is-removable="chipsRemovable"
                       :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                       @remove-entry="removeEntry(entry, index)"
@@ -105,7 +109,7 @@
               <!-- @slot a slot to provide customized chips
                 @binding { object } entry - one selected option displayed as chip
                 @binding { number } index - the index of the entry in the selectedList array
-                @binding { number } chipActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
                 @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
               -->
               <slot
@@ -113,7 +117,7 @@
                 v-bind="{
                   entry,
                   index,
-                  chipActiveForRemove,
+                  indexActiveForRemove,
                   removeEntry,
                 }">
                 <BaseChip
@@ -124,7 +128,7 @@
                   :editable="chipsEditable"
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                     || !!entry[identifierPropertyName]"
-                  :chip-active="chipActiveForRemove === index"
+                  :chip-active="indexActiveForRemove === index"
                   :assistive-text="assistiveText.selectedOption"
                   :is-removable="chipsRemovable"
                   :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
@@ -168,6 +172,8 @@
 import Draggable from 'vuedraggable';
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput';
+import { ref } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
 
@@ -481,10 +487,25 @@ export default {
      *
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
     },
     /**
      * define if selected options chips should come with a remove icon
@@ -509,6 +530,20 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsInputField = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsInputField);
+    return {
+      chipsInputField,
+      announcement,
+    };
   },
   data() {
     return {
@@ -543,7 +578,7 @@ export default {
        * variable for the currently active chip (for arrow key use)
        * @type {number}
        */
-      chipActiveForRemove: -1,
+      indexActiveForRemove: -1,
       /**
        * variable for internal input handling
        * @type {string}
@@ -673,18 +708,18 @@ export default {
       if (this.chipsRemovable && (key === 'Backspace' || key === 'Delete')) {
         // if backspace (once) is used make last chip active
         if (key === 'Backspace' && !this.fired
-          && !this.inputInt && this.chipActiveForRemove < 0) {
-          this.chipActiveForRemove = this.selectedListInt.length - 1;
+          && !this.inputInt && this.indexActiveForRemove < 0) {
+          this.indexActiveForRemove = this.selectedListInt.length - 1;
           // on second backspace set timeout for delete
-        } else if (this.chipActiveForRemove >= 0 && !this.fired && !this.inputInt) {
+        } else if (this.indexActiveForRemove >= 0 && !this.fired && !this.inputInt) {
           // check if there is actually anything left to remove
           this.removeEntry(
-            this.selectedListInt[this.chipActiveForRemove],
-            this.chipActiveForRemove,
+            this.selectedListInt[this.indexActiveForRemove],
+            this.indexActiveForRemove,
           );
-          this.chipActiveForRemove = -1;
+          this.indexActiveForRemove = -1;
         }
-        // necessary to prevent accidential delete of chips when user keeps backspace pressed
+        // necessary to prevent accidental delete of chips when user keeps backspace pressed
         this.fired = true;
         if (this.timeout) {
           clearTimeout(this.timeout);
@@ -703,14 +738,21 @@ export default {
         const activeChip = this.navigate(
           this.selectedListInt,
           isIndexUp,
-          this.chipActiveForRemove,
+          this.indexActiveForRemove,
           true,
         );
         // set the chip active for removal (currently active one)
-        this.chipActiveForRemove = this.selectedListInt.indexOf(activeChip);
+        this.indexActiveForRemove = this.selectedListInt.indexOf(activeChip);
         // in any other key event reset the chip active for remove
       } else {
-        this.chipActiveForRemove = -1;
+        this.indexActiveForRemove = -1;
+      }
+      // if an entry was set active for removal by any key action - announce it
+      // to the screen reader user
+      if (this.indexActiveForRemove >= 0) {
+        // inform screen reader user
+        this.announcement = this.assistiveText.optionToRemoveSelected
+          .replace('{label}', this.selectedListInt[this.indexActiveForRemove][this.labelPropertyName]);
       }
     },
 
@@ -724,6 +766,8 @@ export default {
      * @param {number} index - the index of the item in the list
      */
     removeEntry(option, index) {
+      // save the label for screen reader information
+      const optionLabel = this.selectedListInt[index][this.labelPropertyName];
       // remove the item from the internal list
       this.selectedListInt.splice(index, 1);
       // emit an event to inform parent of altered list
@@ -746,6 +790,12 @@ export default {
         // other input fields (and potential drop downs / pop ups are closed)
         mainInputElement.click();
       }
+      // add a timeout so announcement is not interfered with by default drop down list announcement
+      setTimeout(() => {
+        // inform screen reader user
+        this.announcement = this.assistiveText.optionRemoved
+          .replace('{label}', optionLabel);
+      }, 1000);
     },
     /**
      * adding an selected option to the array of selected options
@@ -771,6 +821,9 @@ export default {
           this.$set(this.selectedListInt, setIndex, newEntry);
           // emit an event to inform parent of altered list
           this.updateParentList(this.selectedListInt);
+          // inform screen reader user
+          this.announcement = this.assistiveText.optionAdded
+            .replace('{label}', this.inputInt);
           // otherwise just emit event to parent (for informing user)
         } else {
           /**
