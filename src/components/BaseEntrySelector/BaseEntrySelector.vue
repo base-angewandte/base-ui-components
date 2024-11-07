@@ -16,6 +16,10 @@
           v-model="filterString"
           :show-image="true"
           :placeholder="getI18nTerm(entrySelectorText.search)"
+          :assistive-text="{
+            loaderActive: assistiveText.loaderActive,
+            results: resultsAnnouncement,
+          }"
           :class="['base-entry-selector__head__search-bar',
                    { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
           @input="filterEntries($event, 'title')" />
@@ -113,6 +117,7 @@
         v-if="isLoading"
         class="loading-area">
         <BaseLoader
+          :text-on-loader-show="assistiveText.loaderActive"
           :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
       </div>
 
@@ -404,6 +409,25 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers.
+     * properties:
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsFound**: provide text that should be announced when the search has
+     *  yielded results. Adding the string '{number}' will announce the total number
+     *  of results found
+     * **noResultsFound**: provide text that should be announced when no search results
+     *  were round
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        resultsFound: '{number} Results found.',
+        noResultsFound: 'No results found.',
+        loaderActive: 'Loading.',
+      }),
+    },
   },
   data() {
     return {
@@ -439,6 +463,11 @@ export default {
        * to first entry after page change)
        */
       pageChanged: false,
+      /**
+       * manage the announcement of found results
+       * @type {string}
+       */
+      resultsAnnouncement: '',
     };
   },
   computed: {
@@ -511,6 +540,13 @@ export default {
       }
       // reset pageChanged flag
       this.pageChanged = false;
+      // announce that entries have changed
+      this.resultsAnnouncement = this.assistiveText[this.entriesTotal ? 'resultsFound' : 'noResultsFound']
+        .replace('{number}', this.entriesTotal);
+      // and reset afterward so the same text would trigger the watcher again
+      setTimeout(() => {
+        this.resultsAnnouncement = '';
+      }, 300);
     },
     /**
      * watch outside variable to have it in sync with internal 'showOptions'

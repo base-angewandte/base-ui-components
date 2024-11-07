@@ -1,5 +1,7 @@
 <template>
-  <div class="base-chips-below">
+  <div
+    ref="chipsBelow"
+    class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
       v-model="selectedBelowListInt"
@@ -135,6 +137,8 @@
 
 <script>
 import Draggable from 'vuedraggable';
+import { ref } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 import BaseIcon from '../BaseIcon/BaseIcon';
 import BaseChipsInput from '../BaseChipsInput/BaseChipsInput';
 import BaseChip from '../BaseChip/BaseChip';
@@ -460,6 +464,41 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionRemoved: 'option {label} removed.',
+      }),
+    },
+  },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsBelow = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsBelow);
+    return {
+      chipsBelow,
+      announcement,
+    };
   },
   data() {
     return {
@@ -592,6 +631,9 @@ export default {
       const item = this.selectedBelowListInt.splice(index, 1);
       this.$set(item, this.additionalPropertyName, {});
       this.emitInternalList(this.selectedBelowListInt);
+      // inform screen reader user
+      this.announcement = this.assistiveText.optionRemoved
+        .replace('{label}', item[0][this.labelPropertyName]);
     },
     updateList(evt, list) {
       this.emitInternalList(list);

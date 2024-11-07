@@ -28,6 +28,12 @@ To see autocomplete results try typing 'zentrum'.
         id: 'id',
         data: 'data',
       }"
+      :assistive-text="{
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        categoryAnnouncement: 'Category {label}.',
+        controlledVocabularyRetrieved: '{number} of options available.',
+        optionsAnnouncement: '{number} options.',
+      }"
       @add-filter="addFilter"
       @fetch-autocomplete="fetchAutocomplete" />
   </div>
@@ -314,6 +320,20 @@ adds the filters in the form of a form below the primary search row that can be 
           }
         },
       }"
+      :search-assistive-text="{
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        categoryAnnouncement: 'Category {label}.',
+        autocompleteNoResults: 'No results found.',
+        optionsAnnouncement: '{number} options.',
+        autocompleteInitial: 'Please start typing to see suggestions.',
+        autocompleteOptionFilledToForm: 'option {optionLabel} filled to field {fieldLabel}.',
+        removeAllFiltersLabel: 'Remove all filters.',
+        removeFilterValueNotification: 'Filter value {value} was removed from filter {label}.',
+        collapsedFilterRowRemovedNotification: 'All search filters were reset.',
+        collapsedAppliedFiltersLabel: 'Currently applied Filters',
+        collapsedBooleanFilterValue: 'Filter {label} was set',
+        collapsedOptionToRemoveSelected: 'Press delete or backspace to remove.',
+      }"
       @fetch-autocomplete="fetchAutocomplete"
       @fetch-form-autocomplete="fetchFormAutcomplete" />
     <div class="applied-filters-area">
@@ -535,7 +555,7 @@ export default {
               data: filteredResults,
             };
           });
-        }, 1000);
+        }, 1001);
       } else {
         this.autocompleteResults = [];
       }

@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="chipsInput"
     class="base-chips-input">
     <!-- TODO: check if really ALL props should be forwarded -->
     <BaseChipsInputField
@@ -37,7 +38,7 @@
           @touchstart.native.stop="closeDropDown">
           <template #option="{ option }">
             <span
-              v-if="allowUnknownEntries && !option[identifierPropertyName]"
+              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
               ref="option"
               :key="option[labelPropertyName]">
               {{ addNewChipText
@@ -133,6 +134,8 @@
 import { createId, highlightText } from '@/utils/utils';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import { ref } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer';
 import BaseChipsInputField from '../BaseChipsInputField/BaseChipsInputField';
 import i18n from '../../mixins/i18n';
 import navigateMixin from '../../mixins/navigateList';
@@ -432,10 +435,28 @@ export default {
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
     },
     /**
      * define if selected options chips should come with a remove icon
@@ -487,6 +508,20 @@ export default {
       default: false,
     },
   },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsInput = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsInput);
+    return {
+      chipsInput,
+      announcement,
+    };
+  },
   data() {
     return {
       /**
@@ -528,6 +563,12 @@ export default {
        * @type {HTMLElement}
        */
       inputElem: null,
+      /**
+       * timeout for drop down options found announcer because otherwise
+       * text not read if more than one character entered into input
+       * @type {?number}
+       */
+      timeout: null,
     };
   },
   computed: {
@@ -556,6 +597,9 @@ export default {
       if (this.allowUnknownEntries && this.input) {
         tempList.unshift({
           [this.labelPropertyName]: this.language ? { [this.language]: this.input } : this.input,
+          // add an identifier here as well so this option can be recognized by the inputs
+          // `aria-activedescendant` attribute
+          [this.identifierPropertyName]: 'createNew',
         });
       }
       // filter entries that were already selected, if no identifier
@@ -634,6 +678,31 @@ export default {
           this.activeOptionIndex = 0;
         } else if (!val.length && (!this.allowUnknownEntries || !this.input)) {
           this.activeOptionIndex = -1;
+        }
+        // only set the text when the drop down is actually visible
+        // and do not announce the "create {custom entry}..." because it overwrites
+        // the loader message and is announced again with the rest of the search results
+        // later anyway
+        if (this.chipsInputActive
+          && !this.isLoading && !this.announcement) {
+          if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+          }
+          // adding this timeout because with dynamicFetch false the list
+          // changes immediately and announcement text is not always read
+          this.timeout = setTimeout(() => {
+            // check if drop down is still open agin to prevent announcement
+            // after option was added (if drop down was closed)
+            if (this.chipsInputActive && this.assistiveText.resultsRetrieved) {
+              if (val.length) {
+                this.announcement = this.assistiveText.resultsRetrieved
+                  .replace('{number}', val.length);
+              } else {
+                this.announcement = this.dropDownNoOptionsInfo;
+              }
+            }
+          }, 300);
         }
       },
       immediate: true,
@@ -739,18 +808,27 @@ export default {
      * @param {Object} selected
      */
     addSelectedOption(selected) {
+      // if unknown entries are allowed we need to remove the added
+      // id again before pushing it to selectedListInt
+      const newSelected = { ...selected };
+      if (this.allowUnknownEntries && newSelected[this.identifierPropertyName] === 'createNew') {
+        delete newSelected[this.identifierPropertyName];
+      }
       if (this.allowMultipleEntries) {
-        this.selectedListInt.push(selected);
+        this.selectedListInt.push(newSelected);
       } else {
         // set the option on first array index (either setting new if empty
         // array or replacing old option)
-        this.$set(this.selectedListInt, 0, selected);
+        this.$set(this.selectedListInt, 0, newSelected);
         // for single select the drop down should close again automatically
         // after choosing the option
         this.chipsInputActive = false;
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
+      // announce the added option to the screen reader
+      this.announcement = this.assistiveText.optionAdded
+        .replace('{label}', newSelected[this.labelPropertyName]);
       // clear input
       this.input = '';
       // reset selected option

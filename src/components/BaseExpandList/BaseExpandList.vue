@@ -31,14 +31,14 @@
         v-if="edit">
         <div
           aria-live="assertive"
-          class="supportive-text">
+          class="assistive-text">
           {{ assertiveText }}
         </div>
 
         <p
           :id="`draggable-${_uid}`"
-          class="supportive-text">
-          {{ supportiveText['description'] }}
+          class="assistive-text">
+          {{ assistiveText['description'] }}
         </p>
 
         <div
@@ -64,7 +64,7 @@
               :control-type="controlType"
               :disabled="disabled"
               class="base-expand-list__draggable__item"
-              @supportive="supportive($event, index)"
+              @assistive="assistive($event, index)"
               @sorted="sort($event, index)"
               @update:data="updateData($event, index)" />
           </draggable>
@@ -178,7 +178,7 @@ export default {
      *   **hidden**: string substituted to 'activate' text for state variable if item is hidden
      *
      */
-    supportiveText: {
+    assistiveText: {
       type: Object,
       default: () => ({
         activate: 'Use the Enter key to select item. Item is currently {state}',
@@ -358,7 +358,7 @@ export default {
       if ((direction === 'up' && index - 1 < 0)
         || (direction === 'down' && index + 1 >= this.dataInt.length)) {
         // current movable item (focus) needs to stay the same
-        this.$refs.baseExpandListRow[index].useSupportiveText = false;
+        this.$refs.baseExpandListRow[index].useAssistiveText = false;
         this.$refs.baseExpandListRow[index].movable = true;
         return;
       }
@@ -371,12 +371,12 @@ export default {
       this.dataInt = data;
 
       // set assertive text
-      this.assertiveText = this.supportiveText.moved
+      this.assertiveText = this.assistiveText.moved
         .replace('{pos}', to + 1)
         .replace('{total}', this.dataInt.length);
 
       // set current item movable (focus)
-      this.$refs.baseExpandListRow[to].useSupportiveText = false;
+      this.$refs.baseExpandListRow[to].useAssistiveText = false;
       this.$refs.baseExpandListRow[to].movable = true;
     },
     /**
@@ -405,15 +405,15 @@ export default {
       this.originalData = JSON.parse(JSON.stringify(this.dataInt));
     },
     /**
-     * set supportiveText for screen readers
+     * set assistiveText for screen readers
      *
      * @param {string} type
      * @param {number} index
      */
-    supportive(type, index) {
+    assistive(type, index) {
       const visibilityText = this.dataInt[index].hidden
-        ? this.supportiveText.hidden : this.supportiveText.visible;
-      const currentSupportString = this.supportiveText[type].replace('{state}', visibilityText);
+        ? this.assistiveText.hidden : this.assistiveText.visible;
+      const currentSupportString = this.assistiveText[type].replace('{state}', visibilityText);
       if (this.assertiveText === currentSupportString) {
         // clear temporary to trigger screen reader
         this.assertiveText = '';

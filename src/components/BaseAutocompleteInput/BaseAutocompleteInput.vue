@@ -1,5 +1,7 @@
 <template>
-  <div class="base-autocomplete-input">
+  <div
+    ref="autocompleteInput"
+    class="base-autocomplete-input">
     <BaseInput
       :id="id"
       v-model="inputInt"
@@ -20,6 +22,9 @@
       :disabled="disabled"
       :drop-down-list-id="`${id}-list-identifier`"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -93,6 +98,8 @@
 import BaseInput from '@/components/BaseInput/BaseInput';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList';
 import { createId } from '@/utils/utils';
+import { useAnnouncer } from '@/composables/useAnnouncer';
+import { ref } from 'vue';
 import navigateMixin from '../../mixins/navigateList';
 
 /**
@@ -297,6 +304,33 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * add text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`) and when results were retrieved (drop down
+     *  list changed)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'Drop down options are loading.',
+        resultsRetrieved: '{number} options found with your input.',
+      }),
+    },
+  },
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const autocompleteInput = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(autocompleteInput);
+
+    return {
+      autocompleteInput,
+      announcement,
+    };
   },
   data() {
     return {
@@ -316,6 +350,12 @@ export default {
        * @type {boolean}
        */
       isActiveInt: false,
+      /**
+       * timeout for drop down options found announcer because otherwise
+       * text not read if more than one character entered into input
+       * @type {?number}
+       */
+      timeout: null,
     };
   },
   computed: {
@@ -458,6 +498,25 @@ export default {
        * @param {boolean} - is input field active
        */
       this.$emit('update:is-active', val);
+    },
+    filteredListInt(val) {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+      }
+      // adding this timeout because with dynamicFetch false the list
+      // changes immediately and announcement text is not always read
+      this.timeout = setTimeout(() => {
+        // only read announcement if drop down is open
+        if (this.isActiveInt) {
+          if (val.length) {
+            this.announcement = this.assistiveText.resultsRetrieved
+              .replace('{number}', val.length);
+          } else {
+            this.announcement = this.dropDownNoOptionsInfo;
+          }
+        }
+      }, 1000);
     },
   },
   methods: {
