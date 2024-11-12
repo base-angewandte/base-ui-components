@@ -826,9 +826,12 @@ export default {
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
-      // announce the added option to the screen reader
-      this.announcement = this.assistiveText.optionAdded
-        .replace('{label}', newSelected[this.labelPropertyName]);
+      // make sure the assistive text exists
+      if (this.assistiveText.optionAdded) {
+        // announce the added option to the screen reader
+        this.announcement = this.assistiveText.optionAdded
+          .replace('{label}', newSelected[this.labelPropertyName]);
+      }
       // clear input
       this.input = '';
       // reset selected option
