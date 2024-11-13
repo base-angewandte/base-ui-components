@@ -1,6 +1,6 @@
 ## Demo
 
-This component acts as a wrapper around [BaseForm](BaseForm), so the form fields can be grouped into visually distinct forms without this being reflected in the field information of the [OpenAPI]((https://www.openapis.org/)) definition by simply adding an `x-attrs` field `form_group` with an order number as value.
+This component acts as a wrapper around [BaseForm](BaseForm), so the form fields can be grouped into visually distinct forms without this being reflected in the field information of the [OpenAPI](https://www.openapis.org/) definition by simply adding an `x-attrs` field `form_group` with an order number as value.
 
 The events and slots (and mostly also props) of this component are identical to [BaseForm](BaseForm).
 

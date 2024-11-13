@@ -1,26 +1,12 @@
-import path from 'path';
+import { fileURLToPath, URL } from 'node:url';
+
 import { defineConfig } from 'vite';
-import { execSync } from 'child_process';
-import babel from '@rollup/plugin-babel';
+import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
-import eslint from 'vite-plugin-eslint';
-import pkg from './package.json';
-
-// generate external pattern
-// taken from: https://github.com/rollup/rollup-plugin-babel/issues/148#issuecomment-399696316
-const external = [
-  ...Object.keys(pkg.peerDependencies || {}),
-  ...Object.keys(pkg.dependencies || {}),
-  '@babel',
-];
-
-const externalPattern = (arr) => {
-  if (arr.length === 0) {
-    return () => false;
-  }
-  const pattern = new RegExp(`^(${arr.join('|')})($|/)`);
-  return id => pattern.test(id);
-};
+import vueDevTools from 'vite-plugin-vue-devtools';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import babel from '@rollup/plugin-babel';
+import { execSync } from 'child_process';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -34,15 +20,10 @@ export default defineConfig({
         console.log('build:post-commands completed');
       },
     },
-    vue({
-      template: {
-        compilerOptions: {
-          compatConfig: {
-            MODE: 3,
-          },
-        },
-      },
-    }),
+    vue(),
+    vueDevTools(),
+    // needed because otherwise we get "SyntaxError: Identifier 'h' has already been declared"
+    // in Nuxt
     babel({
       // https://github.com/rollup/plugins/tree/master/packages/babel#babelhelpers
       // user 'runtime' for libraries for improved code deduplication
@@ -50,45 +31,55 @@ export default defineConfig({
       // avoid missing source files
       exclude: ['node_modules/**'],
     }),
-    eslint(),
   ],
   resolve: {
     extensions: ['*', '.js', '.json'],
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '~': path.resolve(__dirname, ''),
-      vue: '@vue/compat',
-    },
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '~': fileURLToPath(new URL('', import.meta.url))
+    }
   },
   build: {
-    minify: true, // set to false in linked dev mode and using nuxt-bride
     sourcemap: true,
     lib: {
-      entry: path.resolve(__dirname, 'src/components/index.js'),
+      entry: resolve(__dirname, './src/components/index.js'),
       name: 'BaseUiComponents',
-      formats: ['es', 'cjs'],
-      fileName: format => `[name].${format}.js`,
+      fileName: 'base-ui-components',
     },
     rollupOptions: {
-      external: externalPattern(external),
+      // silence source map errors that are there because of some mismatch
+      // in rollup? (see https://github.com/vitejs/vite/issues/15012#issuecomment-1858010382)
+      onwarn(warning, defaultHandler) {
+        if (warning.code === 'SOURCEMAP_ERROR') {
+          return
+        }
+        defaultHandler(warning)
+      },
+      external: [
+        'vue',
+        '@vueuse/components',
+        '@vueuse/core',
+        'vue-i18n',
+        'swiper',
+        'hls.light.js',
+        'hls.js/dist/hls.light.js',
+      ],
       output: {
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'base-ui-components.css';
           return assetInfo.name;
         },
-        exports: 'named',
         globals: {
           vue: 'Vue',
-          'vue-datepicker-next': 'Datepicker',
-          lazysizes: 'lazysizes',
-          swiper: 'Swiper',
-          leaflet: 'leaflet',
-          'leaflet-responsive-popup': 'leaflet-responsive-popup',
-          'leaflet.markercluster': 'leaflet.markercluster',
+          'swiper': 'Swiper',
+          'vue-i18n': 'VueI18n',
+          '@vueuse/components': 'VueUse',
+          '@vueuse/core': 'VueUse',
+          'hls.light.js': 'Hls',
+          'hls.js/dist/hls.light.js': 'Hls',
         },
-        preserveModules: true,
-        preserveModulesRoot: 'src',
       },
+      plugins: [nodeResolve()],
     },
   },
   css: {

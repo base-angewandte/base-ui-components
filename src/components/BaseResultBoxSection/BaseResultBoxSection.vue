@@ -171,7 +171,7 @@
                   :draggable="editModeActive && draggable"
                   :selected="isEntrySelected(entry)"
                   :box-size="{ width: 'auto' }"
-                  :box-ratio="100"
+                  :box-ratio="'100'"
                   :title="getPropValue(titlePropertyName, entry)"
                   :subtext="entry.subtext"
                   :description="entry.description"
@@ -228,7 +228,7 @@
                   <span
                     v-if="!expandedInt"
                     class="base-result-box-section__expand-button__content-number">
-                    {{ `+${(total || entryList.length) - visibleBoxes.length}` }}
+                    {{ `+${(total || modelValue.length) - visibleBoxes.length}` }}
                   </span>
                   <span
                     :class="[expandedInt
@@ -266,8 +266,9 @@
 import { defineAsyncComponent } from 'vue';
 import { extractNestedPropertyValue } from '@/utils/utils';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
-import i18n from '@/mixins/i18n';
-import { useListNavigation } from '@/composables/listNavigation';
+import { useI18n } from '@/composables/useI18n.js';
+import { useListNavigation } from '@/composables/useListNavigation';
+const { VueDraggable } = defineAsyncComponent(() => import('vue-draggable-plus'));
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -282,11 +283,6 @@ export default {
     BasePagination: defineAsyncComponent(() => import('@/components/BasePagination/BasePagination.vue')),
     BaseBoxButton: defineAsyncComponent(() => import('@/components/BaseBoxButton/BaseBoxButton.vue')),
     BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
-  },
-  mixins: [i18n],
-  model: {
-    prop: 'entryList',
-    event: 'entries-changed',
   },
   props: {
     /**
@@ -306,7 +302,7 @@ export default {
      *    elements - only id and title should still be provided but can also
      *    be customized via `identifierPropertyName` and `titlePropertyName`
      */
-    entryList: {
+    modelValue: {
       type: Array,
       default: () => [],
     },
@@ -570,7 +566,7 @@ export default {
     },
     /**
      * define a custom identifier property name for objects in your
-     * `entryList` array.
+     * `modelValue` array.
      *   if relevant property is contained in a nested object the string can
      *   be in dot notation. e.g. `nestedObject.id`
      */
@@ -580,7 +576,7 @@ export default {
     },
     /**
      * define a custom title property name for objects in your
-     * `entryList` array.
+     * `modelValue` array.
      *   if relevant property is contained in a nested object the string can
      *   be in dot notation. e.g. `nestedObject.title`
      */
@@ -658,10 +654,19 @@ export default {
       default: false,
     },
   },
-  emits: ['entry-clicked', 'items-per-row-changed', 'submit-action', 'update:edit-mode', 'update:expanded', 'update:current-page-number', 'update:selected-list', 'entries-changed'],
+  emits: ['entry-clicked', 'items-per-row-changed', 'submit-action', 'update:edit-mode', 'update:expanded', 'update:current-page-number', 'update:selected-list', 'update:model-value'],
   setup() {
+    /** BOX NAVIGATION */
+    // TODO: this does not seem to be used??
     const { navigate } = useListNavigation();
-    return { navigate };
+
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
+    return {
+      navigate,
+      getI18nTerm,
+    };
   },
   data() {
     return {
@@ -713,7 +718,7 @@ export default {
      */
     draggableComponent() {
       if (this.draggable) {
-        return () => import('vuedraggable').then(m => (m.default || m));
+        return defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable));
       }
       return 'ul';
     },
@@ -747,7 +752,7 @@ export default {
             );
         }
         if (this.fetchDataExternally) {
-          return this.entryList.slice(0, this.visibleNumberOfItems);
+          return this.modelValue.slice(0, this.visibleNumberOfItems);
         }
         // else return complete list
         return this.entryListInt;
@@ -786,11 +791,11 @@ export default {
      * can be displayed and thus if an expand button is needed
      */
     expandNeeded() {
-      return (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length;
+      return (this.itemsPerRow * this.maxShowMoreRows) < this.modelValue.length;
     },
   },
   watch: {
-    entryList: {
+    modelValue: {
       handler(val) {
         if (JSON.stringify(val) !== JSON.stringify(this.entryListInt)) {
           this.entryListInt = [...val];
@@ -809,15 +814,15 @@ export default {
     },
     entryListInt: {
       handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.entryList)) {
+        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
           /**
            * event emitted when the list of entries changed internally
            * (relevant if `draggable` is set `true`)
            *
-           * @event entries-changed
+           * @event update:model-value
            * @param {Object[]} - the updated list of entries
            */
-          this.$emit('entries-changed', val);
+          this.$emit('update:model-value', val);
         }
       },
       deep: true,

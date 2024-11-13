@@ -143,7 +143,6 @@
 import { defineAsyncComponent } from 'vue';
 // eslint-disable-next-line
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseExpandListRow',
@@ -154,7 +153,6 @@ export default {
     BaseExpandListRow: defineAsyncComponent(() => import('@/components/BaseExpandList/BaseExpandListRow.vue')),
     BaseIcon,
   },
-  mixins: [i18n],
   props: {
     /**
      * data object: { label: 'String', data: [{ value: 'String', }],

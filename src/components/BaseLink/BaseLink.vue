@@ -6,7 +6,7 @@
     :is="renderAs"
     v-bind="linkAttributes"
     v-clean-dom-nodes
-    :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
+    :aria-controls="isTooltip ? `tooltipBox-${internalId}`: null"
     :aria-expanded="isTooltip ? showTooltip.toString() : null"
     :aria-label="isChip || isTooltip ? title : null"
     :tabindex="isTooltip ? 0 : null"
@@ -63,7 +63,7 @@
 
       <BaseTooltipBox
         v-if="showTooltip"
-        :id="`tooltipBox-${_uid}`"
+        :id="`tooltipBox-${internalId}`"
         :attach-to="$refs.icon"
         :modal-on-mobile="false"
         :role="'tooltip'"
@@ -111,8 +111,12 @@
  * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
  */
 
-import { defineAsyncComponent } from 'vue';
+import {defineAsyncComponent, ref, getCurrentInstance, computed, onMounted} from 'vue';
 import cleanDomNodes from '@/directives/cleanDomNodes';
+import { useWindowResize } from '@/composables/useWindowResize.js';
+import { useEventListener } from '@/composables/useEventListener.js';
+import { useDebounce } from '@/composables/useDebounce.js';
+import {useId} from '@/composables/useId.js';
 
 export default {
   name: 'BaseLink',
@@ -287,11 +291,71 @@ export default {
     },
   },
   emits: ['tooltip-clicked', 'chip-clicked'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+
+    /** TOOLTIP VISIBILITY HANDLING */
+    /**
+     * variable to store if tooltip should be shown
+     * @type {Ref<UnwrapRef<boolean>>}
+     */
+    const showTooltip = ref(false);
+
+    // get the debounce function to put a timeout
+    // on scroll and resize event listeners
+    const { debounce } = useDebounce();
+
+    /**
+     * close an open tooltip
+     */
+    function closeTooltip() {
+      if (!showTooltip.value) return;
+      showTooltip.value = false;
+    }
+    /**
+     * intercept scroll/resize event and close the tooltip
+     */
+    function scrollResizeHandler() {
+      debounce(() => {
+        if (showTooltip.value) {
+          closeTooltip();
+        }
+      }, 100);
+    }
+
+    // use the window resize event listener
+    useWindowResize({
+      callback: scrollResizeHandler,
+    });
+    // and additionally create a scroll event listener to also
+    // close the tooltip when scrolling is happening on the page
+    useEventListener({
+      target: window,
+      event: 'scroll',
+      callback: scrollResizeHandler,
+    });
+
+    /** DETERMINE ELEMENT TYPE */
+    // we need to access the current component instance
+    // to check for router
+    const { app } = getCurrentInstance().appContext;
+
+    /**
+     * check if vue router is available
+     * @type {ComputedRef<boolean>}
+     */
+    const isRouterAvailable = computed(() => !!app.config.globalProperties?.$router);
+
+    return {
+      internalId,
+      showTooltip,
+      isRouterAvailable,
+    }
+  },
   data() {
     return {
       isLoading: false,
-      scrollResizeTimeout: null,
-      showTooltip: false,
     };
   },
   computed: {
@@ -339,13 +403,6 @@ export default {
      */
     isInternal() {
       return !!(this.identifierPropertyValue && !this.type);
-    },
-    /**
-     * check if vue router is available
-     * @returns {boolean}
-     */
-    isRouterAvailable() {
-      return !!this.$router;
     },
     /**
      * check if the link is type `tooltip`
@@ -427,14 +484,6 @@ export default {
       }
     },
   },
-  mounted() {
-    window.addEventListener('scroll', this.scrollResizeHandler);
-    window.addEventListener('resize', this.scrollResizeHandler);
-  },
-  unmounted() {
-    window.removeEventListener('scroll', this.scrollResizeHandler);
-    window.removeEventListener('resize', this.scrollResizeHandler);
-  },
   methods: {
     /**
      * handle click events for different link types
@@ -443,15 +492,6 @@ export default {
       if (this.isTooltip) {
         this.tooltipClicked();
       }
-    },
-    /**
-     * close an open tooltip
-     */
-    closeTooltip() {
-      if (!this.showTooltip) {
-        return;
-      }
-      this.showTooltip = false;
     },
     /**
      * handle tooltip click event
@@ -472,21 +512,6 @@ export default {
          */
         this.$emit('tooltip-clicked', this.tooltipAsync);
       }
-    },
-    /**
-     * intercept scroll/resize event and close the tooltip
-     */
-    scrollResizeHandler() {
-      // check if there is a timeout already set and clear it if yes
-      if (this.scrollResizeTimeout) {
-        clearTimeout(this.scrollResizeTimeout);
-        this.scrollResizeTimeout = null;
-      }
-      this.scrollResizeTimeout = setTimeout(() => {
-        if (this.showTooltip) {
-          this.closeTooltip();
-        }
-      }, 100);
     },
   },
 };

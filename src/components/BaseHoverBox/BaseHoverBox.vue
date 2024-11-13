@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * A box for information display after mouse hover or click
@@ -16,7 +16,7 @@ import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 export default {
   name: 'BaseHoverBox',
   components: {
-    BaseImageBox,
+    BaseImageBox: defineAsyncComponent(() => import('@/components/BaseImageBox/BaseImageBox.vue')),
   },
   props: {
     /**

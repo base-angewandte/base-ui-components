@@ -58,9 +58,9 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
-import BaseBoxTooltip from '@/components/BaseBoxTooltip/BaseBoxTooltip.vue';
+import {ref, defineAsyncComponent} from 'vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
  * A Base Box Shaped Button
@@ -69,9 +69,10 @@ import BaseBoxTooltip from '@/components/BaseBoxTooltip/BaseBoxTooltip.vue';
 export default {
   name: 'BaseBoxButton',
   components: {
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseBox,
-    BaseBoxTooltip,
+    BaseBoxTooltip: defineAsyncComponent(() => import('@/components/BaseBoxTooltip/BaseBoxTooltip.vue')),
+
   },
   props: {
     /**
@@ -153,17 +154,32 @@ export default {
     },
   },
   emits: ['clicked', 'on-tooltip'],
-  data() {
+  setup() {
+    const baseBox = ref(null);
+    const baseBoxSubtext = ref(null);
+    // to hide subtext if box is to small
+    const showSubtext = ref(false);
+
+    function calcShowSubtext() {
+      if (baseBoxSubtext.value && baseBox.value) {
+        const subtextBottomPosition = baseBoxSubtext.value.offsetTop
+            + baseBoxSubtext.value.offsetHeight;
+        const boxHeight = baseBox.value.$el.offsetHeight;
+        showSubtext.value = boxHeight >= subtextBottomPosition;
+      }
+    }
+
+    useElementObserver({
+      type: 'resize',
+      target: baseBox,
+      callback: calcShowSubtext,
+    })
+
     return {
-      // to hide subtext if box is to small
-      showSubtext: true,
+      baseBox,
+      baseBoxSubtext,
+      showSubtext,
     };
-  },
-  mounted() {
-    this.setShowSubtext();
-    window.addEventListener('resize', () => {
-      this.setShowSubtext();
-    });
   },
   methods: {
     clicked(event) {
@@ -183,15 +199,6 @@ export default {
        * @param {Event} - the native event from tooltip triggered
        */
       this.$emit('on-tooltip', event);
-    },
-    setShowSubtext() {
-      const subtextRef = this.$refs.baseBoxSubtext;
-      if (subtextRef) {
-        const subtextBottomPosition = subtextRef.offsetTop
-          + subtextRef.offsetHeight;
-        const boxHeight = this.$refs.baseBox.$el.offsetHeight;
-        this.showSubtext = boxHeight >= subtextBottomPosition;
-      }
     },
   },
 };

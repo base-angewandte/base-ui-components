@@ -1,67 +1,70 @@
 <template>
-  <transition name="grow">
-    <div
-      v-if="showInt"
-      ref="mediaCarousel"
-      class="base-media-carousel">
-      <div class="base-media-carousel__background" />
-
-      <button
-        class="base-media-carousel__close"
-        @click="hide">
-        <BaseIcon
-          name="remove" />
-      </button>
-
+  <div>
+    <transition name="grow">
       <div
-        :id="swiperId"
-        class="swiper-container">
-        <template
-          v-if="items.length > 1">
-          <BaseIcon
-            name="prev"
-            class="swiper-button swiper-button-prev" />
+          v-if="showInt"
+          ref="mediaCarousel"
+          class="base-media-carousel">
+        <div class="base-media-carousel__background" />
 
+        <button
+            class="base-media-carousel__close"
+            @click="hide">
           <BaseIcon
-            name="next"
-            class="swiper-button swiper-button-next" />
-        </template>
+              name="remove" />
+        </button>
 
-        <div class="swiper-wrapper">
-          <div
-            v-for="(media, index) in items"
-            :key="index"
-            class="swiper-slide">
-            <BaseMediaCarouselItem
-              ref="baseMedia"
-              :autoplay="index === initialSlide"
-              :additional-info="media.additionalInfo"
-              :allow-download="allowDownload"
-              :current-slide-info="items.length > 1 ? `${index + 1} / ${items.length}` : ''"
-              :display-name="media.title"
-              :display-size="media.displaySize"
-              :download-url="media.downloadUrl"
-              :info-texts="infoTexts"
-              :media-url="media.mediaUrl"
-              :media-poster-url="media.mediaPosterUrl"
-              :media-type="media.mediaType"
-              :orientation="media.orientation"
-              :previews="media.previews"
-              :hls-start-level="media.hlsStartLevel"
-              tabindex="0"
-              @download="download" />
+        <div
+            :id="swiperId"
+            class="swiper-container">
+          <template
+              v-if="items.length > 1">
+            <BaseIcon
+                name="prev"
+                class="swiper-button swiper-button-prev" />
+
+            <BaseIcon
+                name="next"
+                class="swiper-button swiper-button-next" />
+          </template>
+
+          <div class="swiper-wrapper">
+            <div
+                v-for="(media, index) in items"
+                :key="index"
+                class="swiper-slide">
+              <BaseMediaCarouselItem
+                  ref="baseMedia"
+                  :autoplay="index === initialSlide"
+                  :additional-info="media.additionalInfo"
+                  :allow-download="allowDownload"
+                  :current-slide-info="items.length > 1 ? `${index + 1} / ${items.length}` : ''"
+                  :display-name="media.title"
+                  :display-size="media.displaySize"
+                  :download-url="media.downloadUrl"
+                  :info-texts="infoTexts"
+                  :media-url="media.mediaUrl"
+                  :media-poster-url="media.mediaPosterUrl"
+                  :media-type="media.mediaType"
+                  :orientation="media.orientation"
+                  :previews="media.previews"
+                  :hls-start-level="media.hlsStartLevel"
+                  tabindex="0"
+                  @download="download" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </transition>
+    </transition>
+  </div>
 </template>
 
 <script>
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { ref } from 'vue';
-import { usePopUpLock } from '@/composables/popUpLock';
+import { usePopUpLock } from '@/composables/usePopUpLock.js';
+import {useId} from '@/composables/useId.js';
 
 /**
  * Component allowing sliding through images,
@@ -147,20 +150,23 @@ export default {
   },
   emits: ['download', 'hide'],
   setup() {
+    /** POP UP LOCK */
     const mediaCarousel = ref(null);
     const { toggleScrollLock, showElement: showInt } = usePopUpLock(mediaCarousel);
+
+    /** PROVIDE A SWIPER ID */
+    const swiperId = `base-media-carousel__swiper${useId()}`;
 
     return {
       toggleScrollLock,
       showInt,
       mediaCarousel,
+      swiperId,
     };
   },
   data() {
     return {
-      swiper: null,
-      // eslint-disable-next-line
-      swiperId: `base-media-carousel__swiper${this.$.uid}`,
+      swiper: undefined,
       isMounted: false,
     };
   },
@@ -208,9 +214,9 @@ export default {
       // import swiper and plugins
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
-      const { Swiper } = await import('swiper');
-      const { Keyboard } = await import('swiper');
-      const { Navigation } = await import('swiper');
+      const { Swiper } = await import('swiper/modules');
+      const { Keyboard } = await import('swiper/modules');
+      const { Navigation } = await import('swiper/modules');
 
       const additionalOptions = {
         init: false,
@@ -376,10 +382,10 @@ export default {
 
   // import swiper styles
   @import '../../../node_modules/swiper/swiper.scss';
-  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
-  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
-  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
-  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
+  @import '../../../node_modules/swiper/modules/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay.scss';
 
   .base-media-carousel {
     position: fixed;

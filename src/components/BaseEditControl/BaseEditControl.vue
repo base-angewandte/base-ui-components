@@ -67,7 +67,7 @@
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 export default {
   name: 'BaseEditControl',
@@ -75,9 +75,6 @@ export default {
     BaseButton,
     BaseLoader,
   },
-  mixins: [
-    i18n,
-  ],
   props: {
     /**
      * toggle control buttons
@@ -165,6 +162,12 @@ export default {
     },
   },
   emits: ['saved', 'canceled', 'activated'],
+  setup() {
+    const { getI18nTerm } = useI18n();
+    return {
+      getI18nTerm,
+    };
+  },
   computed: {
     /**
      * set icon depending on editMode

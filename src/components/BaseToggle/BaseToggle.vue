@@ -55,8 +55,9 @@
 </template>
 
 <script>
-import { createId } from '@/utils/utils';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
+import { computed } from 'vue';
 
 /**
  * Toggle Component
@@ -119,20 +120,25 @@ export default {
     },
   },
   emits: ['update:modelValue'],
+  setup(props) {
+    // create id outside of computed to make sure we just have one fixed id
+    const internalId = useId();
+    /**
+     * check if an id was provided (to handle label input connection), if not
+     *  use the created one
+     * @returns {String|string}
+     */
+    const idInt = computed(() => props.inputId || internalId);
+    return {
+      idInt,
+    }
+
+  },
   data() {
     return {
       checkedInt: false,
       animate: false,
     };
-  },
-  computed: {
-    /**
-     * check if an id was provided (to handle label input connection), if not create one
-     * @returns {String|string}
-     */
-    idInt() {
-      return this.inputId || createId();
-    },
   },
   watch: {
     modelValue: {

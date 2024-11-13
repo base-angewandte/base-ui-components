@@ -1,9 +1,13 @@
-const path = require('path');
-const glob = require('globby');
+import { defineConfig } from 'vue-docgen-cli';
+import * as path from 'path';
+import { globbySync } from 'globby';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const cwd = path.join(__dirname, './src');
 
-// add files that should be ignored here
 const ignore = [
   'components/BaseTooltip/*',
   'components/BaseExpandList/BaseExpandListRow.vue',
@@ -15,28 +19,27 @@ const ignore = [
   'components/BaseDatePanel/*',
 ];
 
-// get all files that should be converted to .md files
-const components = glob
-  .sync('components/**/Base*.{vue,js,jsx,ts,tsx}', {
+const components = globbySync('components/**/Base*.{vue,js,jsx,ts,tsx}', {
     cwd,
     ignore,
   })
   // modify path to match the docgen requirements (relative to componentsRoot)
   .map(f => f.replace('components/', ''));
 
-module.exports = {
-  docsFolder: 'docs',
+export default defineConfig({
   componentsRoot: 'src/components',
   components,
-  outDir: './docs/components',
-  defaultExamples: true,
+	outDir: './docs/components',
+	defaultExamples: true,
   apiOptions: {
     jsx: false,
     alias: {
-      styles: path.resolve(__dirname, './docs/.vuepress/styles'),
+      styles: path.resolve(__dirname, './docs/.vitepress/styles'),
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // create a file with .md ending instead of .vue
-  getDestFile: (file, config) => path.join(config.outDir, file.split('/')[1]).replace(/\.vue$/, '.md'),
-};
+  getDestFile: (file, config) => path.join(config.outDir, file.split('/')[1] || file).replace(/\.vue$/, '.md'),
+  docsRepo: false,
+  editLinkLabel: false,
+  getRepoEditUrl: false,
+})

@@ -142,7 +142,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import cleanDomNodes from '@/directives/cleanDomNodes';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 /**
  * Component to render different types of text content depending on the data type of prop `data`
@@ -158,7 +158,6 @@ export default {
   directives: {
     cleanDomNodes,
   },
-  mixins: [i18n],
   props: {
     /**
      * specify a list of array objects to render different types of text content
@@ -277,6 +276,14 @@ export default {
       type: Number,
       default: 0,
     },
+  },
+  setup() {
+    /** INTERNATIONALIZATION */
+    const { getLangLabel } = useI18n();
+
+    return {
+      getLangLabel,
+    }
   },
   data() {
     return {

@@ -81,7 +81,7 @@
 
 <script>
 import { highlightText } from '@/utils/utils';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 /** a multipurpose drop down list */
 
@@ -89,9 +89,6 @@ import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseDropDownList',
-  mixins: [
-    i18n,
-  ],
   props: {
     /**
      * list of options to select from
@@ -232,6 +229,13 @@ export default {
     },
   },
   emits: ['update:selected-option'],
+  setup(props) {
+    const { getLangLabel } = useI18n(props.language);
+
+    return {
+      getLangLabel,
+    };
+  },
   data() {
     return {
       /**

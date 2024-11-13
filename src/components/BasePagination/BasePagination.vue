@@ -103,8 +103,10 @@
 </template>
 
 <script>
-import { debounce } from '@/utils/utils';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import {onMounted, ref} from 'vue';
+import {useElementObserver} from '@/composables/useElementObserver.js';
+import {useDebounce} from '@/composables/useDebounce.js';
 
 /**
  * Pagination component
@@ -143,36 +145,103 @@ export default {
     },
   },
   emits: ['update:modelValue'],
+  setup(props) {
+    /** ACTIVE PAGE NUMBER */
+    /**
+     * currently active page number
+     * @type {Ref<UnwrapRef<number>>}
+     */
+    const active = ref(props.modelValue);
+
+
+    /** PAGE NUMBER DISPLAY CALCULATIONS */
+    const pagination = ref(null);
+    /**
+     * total numbers to be displayed before the '...' depending on the width of the
+     * pagination element (only relevant if not all numbers can be displayed)
+     * @type {Ref<UnwrapRef<number>>}
+     */
+    const subsetNumber = ref(7);
+    /**
+     * max numbers to be displayed
+     * @type {Ref<UnwrapRef<number>>}
+     */
+    const maxNumbers = ref(10);
+    /**
+     * number the displayed pages between '...' should start with
+     * (only relevant if not all numbers can be displayed)
+     * @type {Ref<UnwrapRef<?number>>}
+     */
+    const start = ref(null);
+    /**
+     * number the displayed pages between the '...' should end with
+     * (only relevant if not all numbers can be displayed)
+     * @type {Ref<UnwrapRef<?number>>}
+     */
+    const end = ref(null);
+
+    /**
+     * depending on with of the parent element of the pagination calculate
+     * how many page numbers can be displayed
+     */
+    function setStartEnd() {
+      // get parent width
+      const elementWidth = pagination.value.clientWidth;
+      // set the subset and the max number accordingly
+      if (elementWidth < 400) {
+        subsetNumber.value = 1;
+        maxNumbers.value = 5;
+      } else if (elementWidth < 550) {
+        subsetNumber.value = 3;
+        maxNumbers.value = 8;
+      } else if (elementWidth < 700) {
+        subsetNumber.value = 5;
+        maxNumbers.value = 8;
+      } else {
+        subsetNumber.value = 7;
+        maxNumbers.value = 10;
+      }
+      // calc start and end number from the subset number
+      start.value = active.value - subsetNumber.value / 2 > 0
+          ? active.value - Math.floor(subsetNumber.value / 2) : 1;
+      end.value = active.value + subsetNumber.value / 2 < props.total
+          ? active.value + Math.floor(subsetNumber.value / 2) : props.total;
+    }
+
+    // add a delay to start / end calculations
+    const { debounce } = useDebounce();
+    function debounceCalculations() {
+      debounce(setStartEnd, 50);
+    }
+
+    /**
+     * add an observer to adjust displayed numbers according to component
+     * width
+     */
+    useElementObserver({
+      type: 'resize',
+      target: pagination,
+      callback: debounceCalculations,
+    });
+
+    onMounted(() => {
+      // calc the correct numbers for the first time as soon as component
+      // is mounted
+      setStartEnd();
+    });
+
+    return {
+      pagination,
+      subsetNumber,
+      maxNumbers,
+      start,
+      end,
+      active,
+      setStartEnd,
+    };
+  },
   data() {
     return {
-      /**
-       * currently active page number
-       * @type {number}
-       */
-      active: this.modelValue,
-      /**
-       * number the displayed pages between '...' should start with
-       * (only relevant if not all numbers can be displayed)
-       * @type {?number}
-       */
-      start: null,
-      /**
-       * number the displayed pages between the '...' should end with
-       * (only relevant if not all numbers can be displayed)
-       * @type {?number}
-       */
-      end: null,
-      /**
-       * total numbers to be displayed before the '...' depending on the width of the
-       * pagination element (only relevant if not all numbers can be displayed)
-       * @type {number}
-       */
-      subsetNumber: 7,
-      /**
-       * max numbers to be displayed
-       * @type {number}
-       */
-      maxNumbers: 10,
       /**
        * an observer to adjust displayed numbers according to component
        * width
@@ -239,58 +308,7 @@ export default {
       this.active = val;
     },
   },
-  mounted() {
-    // initialize the start and end variable in case not all numbers can be displayed
-    this.setStartEnd();
-    // add an resize observer to adapt visible page numbers to component width
-    this.initObserver();
-  },
-  beforeUnmount() {
-    // remove observer again
-    if (this.resizeObserver) this.resizeObserver.disconnect();
-  },
   methods: {
-    /**
-     * function to initialize the resize observer necessary to adapt
-     * pagination to component width at all times
-     */
-    initObserver() {
-      // create an observer with the set overflow calc function
-      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
-        this.setStartEnd();
-      }));
-      // put it on the relevant element
-      tempResizeObserver.observe(this.$refs.pagination);
-      // store it
-      this.resizeObserver = tempResizeObserver;
-    },
-    /**
-     * depending on with of the parent element of the pagination calculate
-     * how many page numbers can be displayed
-     */
-    setStartEnd() {
-      // get parent width
-      const elementWidth = this.$refs.pagination.clientWidth;
-      // set the subset and the max number accordingly
-      if (elementWidth < 400) {
-        this.subsetNumber = 1;
-        this.maxNumbers = 5;
-      } else if (elementWidth < 550) {
-        this.subsetNumber = 3;
-        this.maxNumbers = 8;
-      } else if (elementWidth < 700) {
-        this.subsetNumber = 5;
-        this.maxNumbers = 8;
-      } else {
-        this.subsetNumber = 7;
-        this.maxNumbers = 10;
-      }
-      // calc start and end number from the subset number
-      this.start = this.active - this.subsetNumber / 2 > 0
-        ? this.active - Math.floor(this.subsetNumber / 2) : 1;
-      this.end = this.active + this.subsetNumber / 2 < this.total
-        ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
-    },
     /**
      * function to set a new page number active
      * @param {number} page - the new page number

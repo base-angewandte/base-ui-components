@@ -1,12 +1,7 @@
-/* eslint-disable */
-import Vue from 'vue';
-import { createApp } from 'vue';
+import './assets/main.css'
 
-import App from './app.vue';
+import { createApp } from 'vue'
+import App from './App.vue'
 
-import './styles/app.scss';
+createApp(App).mount('#app')
 
-Vue.config.productionTip = false;
-
-const app = createApp(App);
-app.mount('#app');

@@ -229,12 +229,11 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
-import DatePicker from 'vue-datepicker-next';
 import { capitalizeString, debounce } from '@/utils/utils';
 
-import en from 'vue-datepicker-next/locale/en';
-import de from 'vue-datepicker-next/locale/de';
-import fr from 'vue-datepicker-next/locale/fr';
+import en from 'vue-datepicker-next/locale/en.es.js';
+import de from 'vue-datepicker-next/locale/de.es.js';
+import fr from 'vue-datepicker-next/locale/fr.es.js';
 
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
@@ -252,14 +251,11 @@ export default {
     BaseInput,
     BaseIcon,
     BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
-    DatePicker,
+    // we need to import date picker async to avoid SSR problems
+    DatePicker: defineAsyncComponent(() => import('vue-datepicker-next')),
   },
   directives: {
     ClickOutside: vOnClickOutside,
-  },
-  model: {
-    prop: 'input',
-    event: 'selected',
   },
   props: {
   /**
@@ -278,7 +274,7 @@ export default {
      *   properties (e.g. date_from, time_to) already otherwise only
      *   a string will be returned
      */
-    input: {
+    modelValue: {
       type: [Object, String, Date],
       required: true,
     },
@@ -455,7 +451,7 @@ export default {
       default: 0,
     },
   },
-  emits: ['click-input-field', 'selected', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
+  emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
   data() {
     return {
       /**
@@ -593,14 +589,14 @@ export default {
      * @returns {string[]}
      */
     inputProperties() {
-      return Object.keys(this.input);
+      return Object.keys(this.modelValue);
     },
     /**
      * check if input is just a single date or an object
      * @returns {boolean}
      */
     isSingleDate() {
-      return typeof this.input === 'string' || !this.inputProperties.length;
+      return typeof this.modelValue === 'string' || !this.inputProperties.length;
     },
     /**
      * handle input for the 'from' input field
@@ -798,7 +794,7 @@ export default {
      */
     labelRowSlotsHaveData() {
       // get label-addition slot
-      const slotElements = this.$slots['label-addition']() ?? null;
+      const slotElements = this.$slots['label-addition'] ? this.$slots['label-addition'](): null;
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       return !!slotElements && !!slotElements.length
@@ -835,7 +831,7 @@ export default {
      * watch input set from outside and set internal inputInt accordingly as well as
      * set the correct display format
      */
-    input: {
+    modelValue: {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
@@ -892,7 +888,7 @@ export default {
                 // and also check if the operator in front of year is identical
               ) && this.isNegativeStorageDate(this.inputInt[dateKey], old)
                 === /^-/.test(this.tempDateStore[dateKey])) {
-                this.$set(this.tempDateStore, dateKey, this.inputInt[dateKey]);
+                this.tempDateStore[dateKey] = this.inputInt[dateKey];
               }
             });
         }
@@ -1417,7 +1413,7 @@ export default {
        * @event selected
        * @param {string, Object} - the input string or object
        */
-      this.$emit('selected', data);
+      this.$emit('update:model-value', data);
     },
     /**
      * convert function triggered on format tab switch
@@ -1432,10 +1428,10 @@ export default {
           if (dateToConvert) {
             if (this.minDateView === 'year') {
               // convert date string to real date in order to get year and convert back to string
-              this.$set(this.inputInt, dateKey, this.addYearMinusToDateStorage(
+              this.inputInt[dateKey] = this.addYearMinusToDateStorage(
                 this.convertToDate(dateToConvert).getFullYear().toString(),
                 this.isNegativeStorageDate(dateValue, oldFormat),
-              ));
+              );
               return;
             }
             let useStorageDate;
@@ -1469,15 +1465,11 @@ export default {
             }
             const newDate = useStorageDate ? positiveTempStorageDate : dateToConvert;
             // now assign the new date to the input variable
-            this.$set(
-              this.inputInt,
-              dateKey,
-              this.addYearMinusToDateStorage(
+            this.inputInt[dateKey] = this.addYearMinusToDateStorage(
                 this.getDateString(this.convertToDate(newDate)),
                 // use the original dates here before minus was removed, depending on which date was used
                 (useStorageDate ? isNegativeTempStorageDate : isNegativeNewDateValue),
-              ),
-            );
+              );
           }
         });
     },
@@ -1492,7 +1484,7 @@ export default {
         return this.inputInt.date !== null ? this.inputInt.date : '';
       }
       const data = {};
-      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key] !== null ? this.inputInt[key] : ''));
+      this.inputProperties.forEach(key => data[key] =  this.inputInt[key] !== null ? this.inputInt[key] : '');
       return data;
     },
     /**

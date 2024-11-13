@@ -186,8 +186,9 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
-import i18n from '@/mixins/i18n';
+import { defineAsyncComponent, ref } from 'vue';
+import { useI18n } from '@/composables/useI18n.js';
+import { useEventListener } from '@/composables/useEventListener.js';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -204,7 +205,6 @@ export default {
     BaseSearch: defineAsyncComponent(() => import('@/components/BaseSearch/BaseSearch.vue')),
     BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
   },
-  mixins: [i18n],
   props: {
     /**
      * list of entries to display. Unless the slot `entries` is used this should be an object with
@@ -407,6 +407,33 @@ export default {
     },
   },
   emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
+  setup(props) {
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n(props.language);
+
+    /** LIST FADE OUT */
+    const body = ref(null);
+    const headHasShadow = ref(false);
+    function scroll() {
+      if (body.value.scrollTop) {
+        headHasShadow.value = true;
+        return;
+      }
+      headHasShadow.value = false;
+    }
+
+    useEventListener({
+      target: body,
+      event: 'scroll',
+      callback: scroll,
+    })
+
+    return {
+      getI18nTerm,
+      body,
+      headHasShadow,
+    };
+  },
   data() {
     return {
       /**
@@ -424,7 +451,6 @@ export default {
        * @type {Object}
        */
       sortParam: {},
-      headHasShadow: false,
       pageNumber: 1,
       showOptions: false,
       // TODO: eventually it would make sense to have selected entries settable from outside
@@ -531,13 +557,6 @@ export default {
   mounted() {
     // fetch initial entries
     this.fetchEntries();
-    // add scroll listener to determine if head shadow should be displayed
-    this.$refs.body
-      .addEventListener('scroll', this.scroll);
-  },
-  beforeUnmount() {
-    this.$refs.body
-      .removeEventListener('scroll', this.scroll);
   },
   methods: {
     /**
@@ -595,13 +614,6 @@ export default {
         }, 600);
       }
       this.pageNumber = 1;
-    },
-    scroll() {
-      if (this.$refs.body.scrollTop) {
-        this.headHasShadow = true;
-        return;
-      }
-      this.headHasShadow = false;
     },
     /**
      * function to trigger from slot `entries` when an entry was selected

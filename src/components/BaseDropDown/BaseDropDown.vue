@@ -82,8 +82,8 @@
 <script>
 import { debounce } from '@/utils/utils';
 import { vOnClickOutside } from '@vueuse/components';
-import i18n from '@/mixins/i18n';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useI18n } from '@/composables/useI18n.js';
 
 /**
  * Accessible drop down component
@@ -96,9 +96,6 @@ export default {
   directives: {
     ClickOutside: vOnClickOutside,
   },
-  mixins: [
-    i18n,
-  ],
   props: {
     /**
      * specify options to choose from
@@ -193,6 +190,12 @@ export default {
     },
   },
   emits: ['update:modelValue'],
+  setup(props) {
+    const { getLangLabel } = useI18n(props.language);
+    return {
+      getLangLabel,
+    };
+  },
   data() {
     return {
       showDropDown: false,

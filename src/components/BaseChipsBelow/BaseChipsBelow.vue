@@ -54,7 +54,7 @@
           name="no-options" />
       </template>
     </BaseChipsInput>
-    <draggable
+    <VueDraggable
       v-model="selectedBelowListInt"
       :animation="200"
       :force-fallback="!isDragDropCapable"
@@ -124,15 +124,14 @@
             @update:model-value="updateAdditionalProperty($event, index)" />
         </div>
       </div>
-    </draggable>
+    </VueDraggable>
   </div>
 </template>
 
 <script>
-import Draggable from 'vuedraggable';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { VueDraggable } from 'vue-draggable-plus';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
-import BaseChip from '@/components/BaseChip/BaseChip.vue';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)
@@ -144,9 +143,9 @@ export default {
   name: 'BaseChipsBelow',
   components: {
     BaseChipsInput,
-    Draggable,
-    BaseChip,
-    BaseIcon,
+    VueDraggable,
+    BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
   props: {
     /**
@@ -475,6 +474,9 @@ export default {
       delete newProps.additionalPropOptions;
       delete newProps.additionalPropPlaceholder;
       delete newProps.additionalPropertyName;
+      // since BaseInput also has a prop `validationTexts` (and also
+      // BaseChipsInput does not have that prop) we dont want that passed down
+      delete newProps.validationTexts;
       return newProps;
     },
     isDragDropCapable() {
@@ -582,14 +584,14 @@ export default {
     },
     removeEntry(evt, index) {
       const item = this.selectedBelowListInt.splice(index, 1);
-      this.$set(item, this.additionalPropertyName, {});
+      item[this.additionalPropertyName] = {};
       this.emitInternalList(this.selectedBelowListInt);
     },
     updateList(evt, list) {
       this.emitInternalList(list);
     },
     updateAdditionalProperty(evt, index) {
-      this.$set(this.selectedBelowListInt[index], this.additionalPropertyName, evt);
+      this.selectedBelowListInt[index][this.additionalPropertyName] = evt;
       this.emitInternalList(this.selectedBelowListInt);
       this.isValidAdditionalOptions(this.selectedBelowListInt[index]);
       /**
@@ -625,8 +627,8 @@ export default {
     },
     emitInternalList(val) {
       const sendArr = [];
-      val.forEach((sel, index) => this.$set(sendArr, index, { ...sel }));
-      sendArr.forEach(sel => this.$delete(sel, 'idInt'));
+      val.forEach((sel, index) => sendArr[index] = { ...sel });
+      sendArr.forEach(sel => delete sel.idInt);
       /**
        * propagate list change from dragging event to parent
        *
@@ -642,10 +644,10 @@ export default {
       } else {
         const modifiedEntry = { ...this.selectedBelowListInt[index] };
         if (this.identifierPropertyName) {
-          this.$set(modifiedEntry, this.identifierPropertyName, '');
+          modifiedEntry[this.identifierPropertyName] = '';
         }
-        this.$set(modifiedEntry, this.labelPropertyName, event);
-        this.$set(this.selectedBelowListInt, index, modifiedEntry);
+        modifiedEntry[this.labelPropertyName] = event;
+        this.selectedBelowListInt[index] = modifiedEntry;
       }
       this.emitInternalList(this.selectedBelowListInt);
     },

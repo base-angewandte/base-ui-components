@@ -22,16 +22,13 @@
 
 <script>
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
-import setLanguage from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 export default {
   name: 'BaseDetailBox',
   components: {
     BaseBox,
   },
-  mixins: [
-    setLanguage,
-  ],
   props: {
     /**
      * an array with objects to pass the data to be displayed, expecting an object with
@@ -64,6 +61,12 @@ export default {
       type: String,
       default: 'en',
     },
+  },
+  setup(props) {
+    const { getLangLabel } = useI18n(props.language);
+    return {
+      getLangLabel,
+    };
   },
 };
 </script>

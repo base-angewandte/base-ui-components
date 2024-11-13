@@ -12,7 +12,7 @@
     @on-tooltip="onTooltip">
     <div
       class="base-drop-box-inner">
-      <draggable
+      <VueDraggable
         v-if="dropType === 'elements'"
         v-model="dragList"
         :sort="false"
@@ -33,7 +33,7 @@
             {{ item }}
           </div>
         </div>
-      </draggable>
+      </VueDraggable>
       <form
         v-else
         ref="fileform" />
@@ -42,7 +42,8 @@
 </template>
 
 <script>
-import Draggable from 'vuedraggable';
+import { ref } from 'vue';
+import { VueDraggable } from 'vue-draggable-plus';
 import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
 
 /**
@@ -53,7 +54,7 @@ export default {
   name: 'BaseDropBox',
   components: {
     BaseBoxButton,
-    Draggable,
+    VueDraggable,
   },
   props: {
     /**

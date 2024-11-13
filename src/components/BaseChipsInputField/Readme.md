@@ -155,4 +155,4 @@ export default {
 </style>
 ```
 
-Also see one more example in combination with a BaseDropDownList [there](there).
+Also see one more example in combination with a [BaseDropDownList](components/BaseDropDownList).

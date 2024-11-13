@@ -1,72 +1,20 @@
-<template>
-  <div
-    ref="tooltipBody"
-    v-click-outside="() => clickedOutside()"
-    role="dialog"
-    :aria-labelledby="`baseTooltipBox-title-${_uid}`"
-    :style="{ ...styles, ...css }"
-    :class="['base-tooltip-box',
-             'base-tooltip-box--' + direction,
-             { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
-               || typeOnMobile === 'fullscreen' },
-             { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
-             { 'base-tooltip-box--active': isActive }]">
-    <div
-      class="base-tooltip-box__inner">
-      <div class="base-tooltip-box__header">
-        <div
-          :id="`baseTooltipBox-title-${_uid}`"
-          class="base-tooltip-box__header__title">
-          {{ modalTitle }}
-        </div>
-        <button
-          title="close"
-          class="base-tooltip-box__button"
-          @click="close">
-          <BaseIcon
-            name="remove"
-            class="base-tooltip-box__button__icon" />
-        </button>
-      </div>
-      <div
-        ref="body"
-        :class="['base-tooltip-box__body',
-                 {'base-tooltip-box__body--fade-out': fadeOutTop || fadeOutBottom},
-                 { 'base-tooltip-box__body--fade-out--top': fadeOutTop },
-                 { 'base-tooltip-box__body--fade-out--bottom': fadeOutBottom }]">
-        <div
-          ref="bodyInner"
-          class="base-tooltip-box__body__inner">
-          <!-- @slot slot to inject box content -->
-          <slot>
-            <i>use default slot</i>
-          </slot>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script>
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { vOnClickOutside } from '@vueuse/components';
+<script setup>
+import { onClickOutside } from '@vueuse/core'
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { usePopUpLock } from '@/composables/popUpLock';
-import { ref } from 'vue';
+import { usePopUpLock } from '@/composables/usePopUpLock.js';
+import {computed, onMounted, ref, watch, nextTick, onUnmounted} from 'vue';
+import { useId } from '@/composables/useId.js';
+import { useWindowResize } from '@/composables/useWindowResize.js';
+import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
+import { useEventListener } from '@/composables/useEventListener.js';
 
 /**
  * Component to display a tooltip
  *   for additional content e.g: quick actions
  */
-export default {
-  name: 'BaseTooltipBox',
-  components: {
-    BaseIcon,
-  },
-  directives: {
-    ClickOutside: vOnClickOutside,
-  },
-  props: {
+
+const props = defineProps({
     /**
      * HTMLElement to attach the tooltip
      * e.g.: vue ref element
@@ -121,326 +69,318 @@ export default {
       type: Number,
       default: 0,
     },
-  },
-  emits: ['close'],
-  setup() {
-    const tooltipBody = ref(null);
-    const { toggleScrollLock } = usePopUpLock(tooltipBody);
+});
 
-    return {
-      tooltipBody,
-      toggleScrollLock,
-    };
-  },
-  data() {
-    return {
-      isActive: false,
-      direction: null,
-      css: {
-        top: '0',
-        left: '-10000px',
-      },
-      thresholdX: 2, // px, distance between tooltip and attachTo element
-      thresholdY: 2, // px, distance between tooltip and attachTo element
-      spacing: 8, // px, distance from window's left or right boundary
-      bodyHeight: null,
-      bodyInnerHeight: null,
-      fadeOutTop: false,
-      fadeOutBottom: false,
-      // resize observer for specific element
-      resizeObserver: null,
-      // mutation observer for specific element
-      mutationObserver: null,
-      // guard for click-outside-event
-      isClickOutsideActive: false,
-    };
-  },
-  computed: {
-    /**
-     * compare body and inner height and evaluate if body is scrollable
-     * @returns {boolean}
-     */
-    isScrollable() {
-      return this.bodyInnerHeight > this.bodyHeight;
-    },
-    /**
-     * get the thresholdTop value from the CSS variables if defined,
-     * create a temporary ghost element and evaluate the computed style value,
-     * otherwise use the component prop
-     * @returns {number}
-     */
-    getThresholdTop() {
-      // get optional global css variable
-      const style = getComputedStyle(document.body);
-      const thresholdTopCssVar = style.getPropertyValue('--base-tooltip-box-threshold-top');
+const emit = defineEmits(['close']);
 
-      // do nothing if the css variable is not defined
-      if (!thresholdTopCssVar) return this.thresholdTop;
+// define an internal id, needed for aria purposes
+const internalId = useId();
 
-      // check if the css variable contains only digits and return it
-      if (/^\d+$/.test(thresholdTopCssVar)) return Number(thresholdTopCssVar);
+// make the root element available
+const tooltip = ref(null);
+// the html element reference for the actual tooltip container
+const tooltipInner = ref(null);
+// ref variable for the container body (handling fade out)
+const body = ref(null);
+// ref variable for tooltip body inner element (within fade out)
+const bodyInner = ref(null);
 
-      // create a ghost node element to evaluate top value in px
-      const elem = document.createElement('div');
-      elem.style.position = 'absolute';
-      elem.style.top = thresholdTopCssVar;
-      elem.style.visibility = 'hidden';
-      // append the ghost element to body
-      document.body.appendChild(elem);
-      // get computed style value
-      const computedTop = window.getComputedStyle(elem).top;
-      // remove non digits (px unit)
-      const thresholdTopAsNumber = Number(computedTop.replace(/\D/g, ''));
-      // remove ghost element
-      elem.remove();
+// variable to steer visibility of tooltip box when active
+const isActive = ref(false);
 
-      // return value
-      return thresholdTopAsNumber;
-    },
-  },
-  watch: {
-    /**
-     * watch if attachTo has changed and calculate the component position again
-     */
-    attachTo() {
-      this.$nextTick(() => {
-        this.calcContentHeight();
-        this.calcFadeOuts();
-        this.calcPosition();
-      });
-    },
-  },
-  mounted() {
-    // move the component to the body node to position it absolutely in the document
-    document.querySelector('body')
-      .appendChild(this.$el);
+/** CLICK OUTSIDE HANDLING */
+// guard for click-outside-event
+const isClickOutsideActive = ref(false);
 
-    // Note: the click-outside event is executed immediately when the component is initialized.
-    //       To prevent this timing problem, the guard variable is set with a delay.
-    setTimeout(() => {
-      this.isClickOutsideActive = true;
-    }, 0);
+/**
+ * trigger event to remove/close the component
+ */
+function close() {
+  /**
+   * Event emitted when close button is clicked or clicked-outside is triggered
+   * @event close
+   * @type {boolean}
+   */
+  emit('close');
+}
 
-    // In SSR environment, the first position calculation is wrong.
-    // To prevent this timing problem, the calc and further functions are executed with a delay.
-    // Using nextTick() has no effect for whatever reason.
-    setTimeout(() => {
-      // calc components position and activate it
-      this.calcPosition();
-      this.isActive = true;
+/**
+ * intercept escape key event and reset edit mode
+ */
+function escEventHandler(e) {
+  if (e.key === 'Escape') {
+    close();
+  }
+}
 
-      // block body scrolling
-      this.toggleScrollLock(this.isPopUpLockEnabled());
+useEventListener({
+  target: window,
+  event: 'keydown',
+  callback: escEventHandler,
+})
 
-      // initialize the resize observer to calculate fade outs when content is resized
-      this.initObserver();
 
-      // add additional event listeners
-      this.$refs.body.addEventListener('scroll', this.scrollHandler);
-      window.addEventListener('resize', this.resizeHandler);
-      window.addEventListener('keyup', this.escEventHandler);
-    }, 0);
-  },
-  beforeUnmount() {
-    this.isActive = false;
-    this.toggleScrollLock(false);
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.bodyInner);
-    if (this.mutationObserver) this.mutationObserver.disconnect();
-    this.$refs.body.removeEventListener('scroll', this.scrollHandler);
-    window.removeEventListener('resize', this.resizeHandler);
-    window.removeEventListener('keyup', this.escEventHandler);
-  },
-  methods: {
-    /**
-     * check if popup scroll lock handler is enabled
-     * @returns {boolean}
-     */
-    isPopUpLockEnabled() {
-      return (this.typeOnMobile === 'modal' || this.typeOnMobile === 'fullscreen')
-        && window.innerWidth < 640;
-    },
-    /**
-     * calc content related heights
-     */
-    calcContentHeight() {
-      if (!this.$refs.body || !this.$refs.bodyInner) return;
-      // use getBoundingClientRect() to get the precise height and
-      // round up to avoid up to 1 pixel inaccuracy
-      this.bodyHeight = Math.ceil(this.$refs.body.getBoundingClientRect().height);
-      this.bodyInnerHeight = Math.ceil(this.$refs.bodyInner.getBoundingClientRect().height);
-    },
-    /**
-     * calc absolute tooltip and inner triangle position
-     */
-    calcPosition() {
-      // anchor elements current position
-      const attachToRect = this.attachTo.getBoundingClientRect();
+/**
+ * intercept click-outside event and close the component
+ */
+onClickOutside(tooltipInner, () => {
+  if (isClickOutsideActive.value) {
+    close();
+  }
+});
 
-      // sizes
-      const box = this.$el;
-      const boxWidth = box.offsetWidth;
-      const boxHeight = box.offsetHeight;
-      const triangleHeight = parseFloat(window.getComputedStyle(box, ':after').height) / 2;
-      const triangleWidth = parseFloat(window.getComputedStyle(box, ':after').width) / 2;
+/** FADE OUT RELATED FUNCTIONALITY */
+const { boxFadeOut: { top: fadeOutTop, bottom: fadeOutBottom }, calcFadeOut } = useElementFadeOut({
+  target: body,
+})
 
-      // current scroll position
-      const { scrollY } = window;
+/** TOOLTIP POSITION HANDLING */
+const direction = ref(null);
+const css = ref({
+  top: '0',
+  left: '-10000px',
+});
+const thresholdX = ref(2); // px, distance between tooltip and attachTo element
+const thresholdY = ref(2); // px, distance between tooltip and attachTo element
+const spacing = ref(8); // px, distance from window's left or right boundary
 
-      // loop through the preferred direction order
-      // and choose the first direction which fits and leave the loop
-      this.directionOrder.every((direction) => {
-        if (direction === 'left'
-          // check if fits to the left
-          && attachToRect.left > boxWidth + triangleWidth
-          // check if box overlaps the window top
-          && !(attachToRect.top + (attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
-          // check if box overlaps the window bottom
-          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
-          this.direction = 'left';
-          this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
-          this.css.left = `${attachToRect.left - boxWidth - triangleWidth - this.thresholdX}px`;
-          return false;
-        }
+/**
+ * get the thresholdTop value from the CSS variables if defined,
+ * create a temporary ghost element and evaluate the computed style value,
+ * otherwise use the component prop
+ * @returns {number}
+ */
+const thresholdTopInt = computed(() => {
+  // get optional global css variable
+  const style = getComputedStyle(document.body);
+  const thresholdTopCssVar = style.getPropertyValue('--base-tooltip-box-threshold-top');
 
-        if (direction === 'right'
-          // check if fits to the right
-          && window.innerWidth - attachToRect.right > boxWidth + triangleWidth
-          // check if box overlaps the window top
-          && !((attachToRect.top + attachToRect.height / 2) - this.getThresholdTop < boxHeight / 2)
-          // check if box overlaps the window bottom
-          && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
-          this.direction = 'right';
-          this.css.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
-          this.css.left = `${attachToRect.right + triangleWidth + this.thresholdX}px`;
-          return false;
-        }
+  // do nothing if the css variable is not defined
+  if (!thresholdTopCssVar) return props.thresholdTop;
 
-        if (direction === 'top'
-          // check if fits to the top
-          && attachToRect.top - this.getThresholdTop > boxHeight + triangleHeight + this.thresholdY) {
-          this.direction = 'top';
-          this.css.top = `${attachToRect.top - boxHeight - triangleHeight - this.thresholdY + scrollY}px`;
-          this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
-          return false;
-        }
+  // check if the css variable contains only digits and return it
+  if (/^\d+$/.test(thresholdTopCssVar)) return Number(thresholdTopCssVar);
 
-        if (direction === 'bottom'
-          // check if fits to the bottom
-          && window.innerHeight - attachToRect.bottom
-          > boxHeight + triangleHeight + this.thresholdY + this.spacing) {
-          this.direction = 'bottom';
-          this.css.top = `${attachToRect.bottom + triangleHeight + this.thresholdY + scrollY}px`;
-          this.css.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
-          return false;
-        }
-        return true;
-      });
+  // create a ghost node element to evaluate top value in px
+  const elem = document.createElement('div');
+  elem.style.position = 'absolute';
+  elem.style.top = thresholdTopCssVar;
+  elem.style.visibility = 'hidden';
+  // append the ghost element to body
+  document.body.appendChild(elem);
+  // get computed style value
+  const computedTop = window.getComputedStyle(elem).top;
+  // remove non digits (px unit)
+  const thresholdTopAsNumber = Number(computedTop.replace(/\D/g, ''));
+  // remove ghost element
+  elem.remove();
 
-      // center the triangle by default
-      this.css['--triangle-left'] = '50%';
+  // return value
+  return thresholdTopAsNumber;
+});
 
-      // Direction 'top' or 'bottom':
-      // Check again if the box overlaps the window on the left or right side.
-      // If so, reposition the box and adjust the triangle's position relative to the anchor point.
-      if (!['top', 'bottom'].includes(this.direction)) {
-        return;
-      }
 
-      // the box overlaps the window left side
-      if (attachToRect.x < boxWidth / 2) {
-        this.css.left = `${this.spacing}px`;
-        this.css['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - this.spacing}px`;
-        return;
-      }
+/**
+ * calc absolute tooltip and inner triangle position
+ */
+function calcPosition() {
+  // anchor elements current position
+  const attachToRect = props.attachTo.getBoundingClientRect();
 
-      // the box overlaps the window right side
-      if (attachToRect.left + attachToRect.width / 2 + boxWidth / 2 > window.innerWidth) {
-        this.css.left = '';
-        this.css.right = `${this.spacing}px`;
-        this.css['--triangle-left'] = `${boxWidth + this.spacing
-          - (document.body.clientWidth - (attachToRect.right - attachToRect.width / 2))}px`;
-      }
-    },
-    /**
-     * evaluate if fade-outs (top, bottom) are displayed based on current scroll position
-     */
-    calcFadeOuts() {
-      if (!this.isScrollable || !this.$refs.body) return;
+  // sizes
+  const boxWidth = tooltip.value.offsetWidth;
+  const boxHeight = tooltip.value.offsetHeight;
+  const triangleHeight = parseFloat(window.getComputedStyle(tooltip.value, ':after').height) / 2;
+  const triangleWidth = parseFloat(window.getComputedStyle(tooltip.value, ':after').width) / 2;
 
-      // get current scroll position
-      const { scrollTop } = this.$refs.body;
+  // current scroll position
+  const { scrollY } = window;
 
-      // set fade-outs
-      this.fadeOutTop = scrollTop >= 1;
-      this.fadeOutBottom = !(scrollTop + this.bodyHeight >= this.bodyInnerHeight);
-    },
-    /**
-     * trigger event to remove/close the component
-     */
-    close() {
-      /**
-       * Event emitted when close button is clicked or clicked-outside is triggered
-       * @event close
-       * @type {boolean}
-       */
-      this.$emit('close');
-    },
-    /**
-     * intercept click-outside event and close the component
-     */
-    clickedOutside() {
-      if (this.isClickOutsideActive) {
-        this.close();
-      }
-    },
-    /**
-     * create resize/mutation observer for the content container
-     */
-    initObserver() {
-      // create a resize observer with calculation functions
-      const resizeObserver = new ResizeObserver(() => {
-        this.calcContentHeight();
-        this.calcFadeOuts();
-      });
+  // loop through the preferred direction order
+  // and choose the first direction which fits and leave the loop
+  props.directionOrder.every((directionOption) => {
+    if (directionOption === 'left'
+        // check if fits to the left
+        && attachToRect.left > boxWidth + triangleWidth
+        // check if box overlaps the window top
+        && !(attachToRect.top + (attachToRect.height / 2) - thresholdTopInt.value < boxHeight / 2)
+        // check if box overlaps the window bottom
+        && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
+      direction.value = 'left';
+      css.value.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
+      css.value.left = `${attachToRect.left - boxWidth - triangleWidth - thresholdX.value}px`;
+      return false;
+    }
 
-      // create a mutation observer with calculation functions
-      const mutationObserver = new MutationObserver(() => {
-        this.calcContentHeight();
-        this.calcFadeOuts();
-        this.calcPosition();
-      });
+    if (directionOption === 'right'
+        // check if fits to the right
+        && window.innerWidth - attachToRect.right > boxWidth + triangleWidth
+        // check if box overlaps the window top
+        && !((attachToRect.top + attachToRect.height / 2) - thresholdTopInt.value < boxHeight / 2)
+        // check if box overlaps the window bottom
+        && !(window.innerHeight - (attachToRect.top + (attachToRect.height / 2)) < boxHeight / 2)) {
+      direction.value = 'right';
+      css.value.top = `${attachToRect.top + attachToRect.height / 2 - boxHeight / 2 + scrollY}px`;
+      css.value.left = `${attachToRect.right + triangleWidth + thresholdX.value}px`;
+      return false;
+    }
 
-      // attach the observers to a specific element
-      resizeObserver.observe(this.$refs.bodyInner);
-      mutationObserver.observe(this.$refs.bodyInner, { childList: true, subtree: true });
+    if (directionOption === 'top'
+        // check if fits to the top
+        && attachToRect.top - thresholdTopInt.value > boxHeight + triangleHeight + thresholdY.value) {
+      direction.value = 'top';
+      css.value.top = `${attachToRect.top - boxHeight - triangleHeight - thresholdY.value + scrollY}px`;
+      css.value.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
+      return false;
+    }
 
-      // store them in variables
-      this.resizeObserver = resizeObserver;
-      this.mutationObserver = mutationObserver;
-    },
-    /**
-     * intercept resize event and close the component
-     */
-    resizeHandler() {
-      this.calcPosition();
-    },
-    /**
-     * intercept scroll event and set fade-outs
-     */
-    scrollHandler() {
-      this.calcFadeOuts();
-    },
-    /**
-     * intercept escape key event and reset edit mode
-     */
-    escEventHandler(e) {
-      if (e.key === 'Escape') {
-        this.close();
-      }
-    },
-  },
-};
+    if (directionOption === 'bottom'
+        // check if fits to the bottom
+        && window.innerHeight - attachToRect.bottom
+        > boxHeight + triangleHeight + thresholdY.value + spacing.value) {
+      direction.value = 'bottom';
+      css.value.top = `${attachToRect.bottom + triangleHeight + thresholdY.value + scrollY}px`;
+      css.value.left = `${attachToRect.left + (attachToRect.width / 2) - (boxWidth / 2)}px`;
+      return false;
+    }
+    return true;
+  });
+
+  // center the triangle by default
+  css.value['--triangle-left'] = '50%';
+
+  // Direction 'top' or 'bottom':
+  // Check again if the box overlaps the window on the left or right side.
+  // If so, reposition the box and adjust the triangle's position relative to the anchor point.
+  if (!['top', 'bottom'].includes(direction.value)) {
+    return;
+  }
+
+  // the box overlaps the window left side
+  if (attachToRect.x < boxWidth / 2) {
+    css.value.left = `${spacing.value}px`;
+    css.value['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - spacing.value}px`;
+    return;
+  }
+
+  // the box overlaps the window right side
+  if (attachToRect.left + attachToRect.width / 2 + boxWidth / 2 > window.innerWidth) {
+    css.value.left = '';
+    css.value.right = `${spacing.value}px`;
+    css.value['--triangle-left'] = `${boxWidth + spacing.value
+    - (document.body.clientWidth - (attachToRect.right - attachToRect.width / 2))}px`;
+  }
+}
+
+/** BODY SCROLL LOCK HANDLING */
+const { toggleScrollLock } = usePopUpLock(tooltip);
+
+const { isMobile } = useWindowResize({
+  callback: calcPosition,
+});
+
+const isPopUpLockEnabled = computed(() => {
+  return (props.typeOnMobile === 'modal' || props.typeOnMobile === 'fullscreen')
+      && isMobile;
+});
+
+/** ADDING OBSERVERS FOR FADEOUT AND TOOLTIP POSITIONING */
+/**
+ * watch if attachTo has changed and calculate the component position again
+ */
+watch(() => props.attachTo, () => {
+  nextTick(() => {
+    calcFadeOut();
+    calcPosition();
+  });
+});
+
+useElementObserver({
+  type: 'mutation',
+  target: bodyInner,
+  callback: onMutation,
+  options: { childList: true, subtree: true },
+})
+
+function onMutation() {
+  calcPosition();
+}
+
+onMounted(() => {
+  // move the component to the body node to position it absolutely in the document
+  document.querySelector('body')
+      .appendChild(tooltip.value);
+
+  // Note: the click-outside event is executed immediately when the component is initialized.
+  //       To prevent this timing problem, the guard variable is set with a delay.
+  setTimeout(() => {
+    isClickOutsideActive.value = true;
+  }, 0);
+  // In SSR environment, the first position calculation is wrong.
+  // To prevent this timing problem, the calc and further functions are executed with a delay.
+  // Using nextTick() has no effect for whatever reason.
+  setTimeout(() => {
+    // calc components position and activate it
+    calcPosition();
+    isActive.value = true;
+    // block body scrolling
+    toggleScrollLock(isPopUpLockEnabled.value);
+  }, 0);
+});
+
+onUnmounted(() => {
+  isActive.value = false;
+});
 </script>
+
+<template>
+  <div
+      ref="tooltip"
+      role="dialog"
+      :aria-labelledby="`baseTooltipBox-title-${internalId}`"
+      :style="{ ...styles, ...css }"
+      :class="['base-tooltip-box',
+             'base-tooltip-box--' + direction,
+             { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
+               || typeOnMobile === 'fullscreen' },
+             { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
+             { 'base-tooltip-box--active': isActive }]">
+    <div
+        ref="tooltipInner"
+        class="base-tooltip-box__inner">
+      <div class="base-tooltip-box__header">
+        <div
+            :id="`baseTooltipBox-title-${internalId}`"
+            class="base-tooltip-box__header__title">
+          {{ modalTitle }}
+        </div>
+        <button
+            title="close"
+            class="base-tooltip-box__button"
+            @click="close">
+          <BaseIcon
+              name="remove"
+              class="base-tooltip-box__button__icon" />
+        </button>
+      </div>
+      <div
+          ref="body"
+          :class="['base-tooltip-box__body',
+                 {'base-tooltip-box__body--fade-out': fadeOutTop || fadeOutBottom},
+                 { 'base-tooltip-box__body--fade-out--top': fadeOutTop },
+                 { 'base-tooltip-box__body--fade-out--bottom': fadeOutBottom }]">
+        <div
+            ref="bodyInner"
+            class="base-tooltip-box__body__inner">
+          <!-- @slot slot to inject box content -->
+          <slot>
+            <i>use default slot</i>
+          </slot>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @import "../../styles/variables";

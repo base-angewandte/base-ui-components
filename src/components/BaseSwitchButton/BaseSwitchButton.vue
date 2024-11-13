@@ -57,6 +57,7 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
 /**
  * accessible tab switch buttons
  */
@@ -126,7 +127,13 @@ export default {
       validator: val => ['right', 'left'].includes(val),
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
+  setup() {
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       selectedOption: this.modelValue,
@@ -135,7 +142,7 @@ export default {
   computed: {
     // to ensure a unique id (made problems on field duplication)
     optionIds() {
-      return this.options.map(option => this.generateId(option.value));
+      return this.options.map(option => `${this.internalId}-${option.value}`);
     },
     defaultShowButtonsLabel() {
       return this.type === 'normal';
@@ -152,17 +159,12 @@ export default {
        * @event switch
        * @param { string } - the `value` of the selected option object
        */
-      this.$emit('update:modelValue', val);
+      this.$emit('update:model-value', val);
     },
     modelValue(val) {
       if (val !== this.selectedOption) {
         this.selectedOption = val;
       }
-    },
-  },
-  methods: {
-    generateId(value) {
-      return `${value}${(Math.floor(Math.random() * 1000000)).toString()}`;
     },
   },
 };

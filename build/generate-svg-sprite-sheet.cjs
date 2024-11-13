@@ -20,7 +20,7 @@ const config = {
   // directory to store spriteSheet
   dest: [
     '../public',
-    '../docs/.vuepress/public',
+    '../docs/.vitepress/public',
   ],
   // temporally directory to store optimized icons (will be removed afterwards)
   tmp: '../_optimizedIcons',

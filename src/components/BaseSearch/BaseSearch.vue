@@ -2,8 +2,9 @@
   <div class="base-search">
     <component
       :is="inputComponent"
-      v-model="searchValues"
+      v-model="inputInt"
       v-model:is-active="isActiveInt"
+      v-model:seledted-list="selectedChipsInt"
       :input-id="idInt"
       v-bind="$attrs"
       :type="dateFieldType"
@@ -81,8 +82,8 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
-import { createId } from '@/utils/utils';
+import { defineAsyncComponent, computed } from 'vue';
+import { useId } from '@/composables/useId.js';
 /**
  * A basic text search to filter entries or files
  */
@@ -267,6 +268,14 @@ export default {
     },
   },
   emits: ['update:is-active', 'update:selected-chips', 'update:modelValue'],
+  setup(props) {
+    /**
+     * internally used id - eiter provided by props or use internally created one
+     * @returns {string}
+     */
+    const idInt = computed(() => props.inputId || useId());
+    return { idInt };
+  },
   data() {
     return {
       /**
@@ -412,13 +421,6 @@ export default {
      */
     isFieldTypeChips() {
       return this.type.includes('chips') || this.type === 'controlled';
-    },
-    /**
-     * internally used id - eiter provided by props or created internally with utils function
-     * @returns {string}
-     */
-    idInt() {
-      return this.inputId || createId();
     },
     placeholderInt() {
       if (typeof this.placeholder === 'string') {

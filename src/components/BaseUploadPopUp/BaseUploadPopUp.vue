@@ -3,7 +3,7 @@
     :show="!!fileList.length"
     :title="getI18nTerm(getLangLabel(uploadText.title))"
     @close="cancelUpload">
-    <transition-group name="list-complete">
+    <TransitionGroup name="list-complete">
       <div
         v-if="userQuotaExceeded"
         key="user-warning"
@@ -21,9 +21,8 @@
       <div
         key="upload-area"
         class="popup-upload-area">
-        <transition-group
-          name="bar-move"
-          class="transition">
+        <TransitionGroup
+          name="bar-move">
           <BaseProgressBar
             v-for="(file, index) of fileList"
             :key="file.name"
@@ -35,9 +34,9 @@
             :show-remove="currentStatus === 'initial' && fileList.length > 1"
             class="upload-bar"
             @remove-item="removeFile(index)" />
-        </transition-group>
+        </TransitionGroup>
       </div>
-    </transition-group>
+    </TransitionGroup>
 
     <!-- @slot slot for additional content after upload bars but before buttons -->
     <slot />
@@ -79,7 +78,7 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import BasePopUp from '@/components/BasePopUp/BasePopUp.vue';
 import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar.vue';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 /**
  * A component taking care of uploads within a pop up
@@ -94,7 +93,6 @@ export default {
     BasePopUp,
     BaseProgressBar,
   },
-  mixins: [i18n],
   props: {
     /**
      * register files to upload
@@ -198,6 +196,13 @@ export default {
     },
   },
   emits: ['remove-file', 'start-upload', 'cancel-upload'],
+  setup() {
+    const { getI18nTerm, getLangLabel } = useI18n();
+    return {
+      getLangLabel,
+      getI18nTerm,
+    }
+  },
   computed: {
     buttonText() {
       if (this.currentStatus === 'initial' || this.currentStatus === 'saving') {
@@ -344,11 +349,6 @@ export default {
 
   .list-complete-move {
     transition: all 200ms;
-  }
-
-  .transition {
-    display: flex;
-    flex-direction: column;
   }
 
   .bar-move-leave-active {

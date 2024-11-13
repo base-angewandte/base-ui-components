@@ -1,5 +1,5 @@
 <template>
-  <draggable
+  <VueDraggable
     ref="draggable"
     :value="list"
     :sort="false"
@@ -37,7 +37,7 @@
           <slot
             name="entry-text-content"
             :item="item" />
-        </template>
+        </template>isDraggable
         <template #right-side-elements="{ isSelected }">
           <!-- @slot use this slot to add elements to the right side of an entry. This slot content
             will be rendered in place of thumbnails and select checkbox so it will effectively
@@ -59,11 +59,11 @@
         </template>
       </BaseMenuEntry>
     </li>
-  </draggable>
+  </VueDraggable>
 </template>
 
 <script>
-import Draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
 
 /**
@@ -75,7 +75,7 @@ export default {
   name: 'BaseMenuList',
   components: {
     BaseMenuEntry,
-    Draggable,
+    VueDraggable,
   },
   props: {
     /**
@@ -155,14 +155,14 @@ export default {
       this.setInternalVar();
     },
     activeEntry(val) {
-      this.entryProps.map(item => this.$set(item, 'active', false));
+      this.entryProps.map(item => item.active = false);
       if (val >= 0 && this.entryProps[val]) {
-        this.$set(this.entryProps[val], 'active', true);
+        this.entryProps[val].active = true;
       }
     },
     selectActive(val) {
       if (!val) {
-        this.entryProps.forEach(entry => this.$set(entry, 'selected', false));
+        this.entryProps.forEach(entry => entry.selected = false);
       } else {
         this.setInternalVar();
       }
@@ -184,18 +184,6 @@ export default {
         this.isDraggable = !this.isMobile();
       }, 250);
     });
-
-    // Set _sortable.nativeDraggable directly due
-    // prop force-fallback in vue-draggable is not propagated to sortablejs if updated
-    // eslint-disable-next-line
-    if (typeof this.$refs.draggable._sortable.nativeDraggable !== 'undefined') {
-      // eslint-disable-next-line
-      this.$refs.draggable._sortable.nativeDraggable = this.dragAndDropCapable;
-    } else {
-      // eslint-disable-next-line
-      console.warn('The option "nativeDraggable" in sortableJS is missing. '
-        + 'Please check for changes https://github.com/SortableJS/sortablejs.');
-    }
   },
   methods: {
     // this function is called when a menu entry is clicked (when checkboxes not active)
@@ -209,7 +197,7 @@ export default {
       this.$emit('clicked', index);
     },
     selectItem(index, selected) {
-      this.$set(this.entryProps[index], 'selected', selected);
+      this.entryProps[index].selected = selected;
       /**
        * event emitted when entry is clicked and select is active
        *
@@ -229,7 +217,7 @@ export default {
         },
       }));
       if (this.entryProps.length && this.activeEntry >= 0) {
-        this.$set(this.entryProps[this.activeEntry], 'active', true);
+        this.entryProps[this.activeEntry].active = true;
       }
     },
     /**

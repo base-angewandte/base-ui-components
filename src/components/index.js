@@ -1,119 +1,97 @@
-import BaseAdvancedSearch from './BaseAdvancedSearch/BaseAdvancedSearch.vue';
-import BaseAdvancedSearchRow from './BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
-import BaseAutocompleteInput from './BaseAutocompleteInput/BaseAutocompleteInput.vue';
-import BaseBox from './BaseBox/BaseBox.vue';
-import BaseBoxButton from './BaseBoxButton/BaseBoxButton.vue';
-import BaseBoxTooltip from './BaseBoxTooltip/BaseBoxTooltip.vue';
-import BaseBreadCrumbs from './BaseBreadCrumbs/BaseBreadCrumbs.vue';
-import BaseButton from './BaseButton/BaseButton.vue';
-import BaseCarousel from './BaseCarousel/BaseCarousel.vue';
-import BaseCheckmark from './BaseCheckmark/BaseCheckmark.vue';
-import BaseChip from './BaseChip/BaseChip.vue';
-import BaseChipsBelow from './BaseChipsBelow/BaseChipsBelow.vue';
-import BaseChipsInput from './BaseChipsInput/BaseChipsInput.vue';
-import BaseChipsInputField from './BaseChipsInputField/BaseChipsInputField.vue';
-import BaseDateInput from './BaseDateInput/BaseDateInput.vue';
-import BaseDatePanel from './BaseDatePanel/BaseDatePanel.vue';
-import BaseDetailBox from './BaseDetailBox/BaseDetailBox.vue';
-import BaseDropBox from './BaseDropBox/BaseDropBox.vue';
-import BaseDropButton from './BaseDropButton/BaseDropButton.vue';
-import BaseDropDown from './BaseDropDown/BaseDropDown.vue';
-import BaseDropDownList from './BaseDropDownList/BaseDropDownList.vue';
-import BaseEditControl from './BaseEditControl/BaseEditControl.vue';
-import BaseEntrySelector from './BaseEntrySelector/BaseEntrySelector.vue';
-import BaseExpandBox from './BaseExpandBox/BaseExpandBox.vue';
-import BaseExpandList from './BaseExpandList/BaseExpandList.vue';
-import BaseExpandRow from './BaseExpandRow/BaseExpandRow.vue';
-import BaseForm from './BaseForm/BaseForm.vue';
-import BaseFormFieldCreator from './BaseFormFieldCreator/BaseFormFieldCreator.vue';
-import BaseFormGroups from './BaseFormGroups/BaseFormGroups.vue';
-import BaseHlsVideo from './BaseHlsVideo/BaseHlsVideo.vue';
-import BaseHoverBox from './BaseHoverBox/BaseHoverBox.vue';
+import { defineAsyncComponent } from 'vue';
+
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
+import BaseTooltipBox from '@/components/BaseTooltipBox/BaseTooltipBox.vue';
+import BaseImage from '@/components/BaseImage/BaseImage.vue';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
+import BaseAutocompleteInput from '@/components/BaseAutocompleteInput/BaseAutocompleteInput.vue';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import BaseSwitchButton from '@/components/BaseSwitchButton/BaseSwitchButton.vue';
+import BasePopUp from '@/components/BasePopUp/BasePopUp.vue';
+import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar.vue';
+import BaseDropDown from '@/components/BaseDropDown/BaseDropDown.vue';
+import BaseUploadPopUp from '@/components/BaseUploadPopUp/BaseUploadPopUp.vue';
+import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
+import BaseSelectOptions from '@/components/BaseSelectOptions/BaseSelectOptions.vue';
+import BaseImageGrid from '@/components/BaseImageGrid/BaseImageGrid.vue';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+import BaseHoverBox from '@/components/BaseHoverBox/BaseHoverBox.vue';
+import BaseChip from '@/components/BaseChip/BaseChip.vue';
+import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
+import BaseSearch from '@/components/BaseSearch/BaseSearch.vue';
+import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
+import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
+import BaseLink from '@/components/BaseLink/BaseLink.vue';
+import BaseBreadCrumbs from '@/components/BaseBreadCrumbs/BaseBreadCrumbs.vue';
+import BaseNavigation from '@/components/BaseNavigation/BaseNavigation.vue';
+import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
+import BaseCarousel from '@/components/BaseCarousel/BaseCarousel.vue';
+import BaseChipsBelow from '@/components/BaseChipsBelow/BaseChipsBelow.vue';
+import BaseDetailBox from '@/components/BaseDetailBox/BaseDetailBox.vue';
+import BaseDropBox from '@/components/BaseDropBox/BaseDropBox.vue';
+import BaseDropButton from '@/components/BaseDropButton/BaseDropButton.vue';
+import BaseEditControl from '@/components/BaseEditControl/BaseEditControl.vue';
+import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput.vue';
+import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
+import BaseMenuList from '@/components/BaseMenuList/BaseMenuList.vue';
+import BaseEntrySelector from '@/components/BaseEntrySelector/BaseEntrySelector.vue';
+import BasePagination from '@/components/BasePagination/BasePagination.vue';
+import BaseOptions from '@/components/BaseOptions/BaseOptions.vue';
+import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
+import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection.vue';
+import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel.vue';
 import BaseIcon from './BaseIcon/BaseIcon.vue';
-import BaseImage from './BaseImage/BaseImage.vue';
-import BaseImageBox from './BaseImageBox/BaseImageBox.vue';
-import BaseImageGrid from './BaseImageGrid/BaseImageGrid.vue';
-import BaseInfoPanel from './BaseInfoPanel/BaseInfoPanel.vue';
-import BaseInput from './BaseInput/BaseInput.vue';
-import BaseLink from './BaseLink/BaseLink.vue';
-import BaseLoader from './BaseLoader/BaseLoader.vue';
-import BaseMap from './BaseMap/BaseMap.vue';
-import BaseMapLocations from './BaseMapLocations/BaseMapLocations.vue';
-import BaseMediaCarousel from './BaseMediaCarousel/BaseMediaCarousel.vue';
-import BaseMenuEntry from './BaseMenuEntry/BaseMenuEntry.vue';
-import BaseMenuList from './BaseMenuList/BaseMenuList.vue';
-import BaseMultilineTextInput from './BaseMultilineTextInput/BaseMultilineTextInput.vue';
-import BaseNavigation from './BaseNavigation/BaseNavigation.vue';
-import BaseOptions from './BaseOptions/BaseOptions.vue';
-import BasePagination from './BasePagination/BasePagination.vue';
-import BasePopUp from './BasePopUp/BasePopUp.vue';
-import BaseProgressBar from './BaseProgressBar/BaseProgressBar.vue';
-import BaseResultBoxSection from './BaseResultBoxSection/BaseResultBoxSection.vue';
-import BaseSearch from './BaseSearch/BaseSearch.vue';
-import BaseSelectOptions from './BaseSelectOptions/BaseSelectOptions.vue';
-import BaseSwitchButton from './BaseSwitchButton/BaseSwitchButton.vue';
-import BaseTextList from './BaseTextList/BaseTextList.vue';
-import BaseToggle from './BaseToggle/BaseToggle.vue';
-import BaseTooltipBox from './BaseTooltipBox/BaseTooltipBox.vue';
-import BaseUploadPopUp from './BaseUploadPopUp/BaseUploadPopUp.vue';
+import BaseButton from './BaseButton/BaseButton.vue';
+// importing BaseDateInput async to avoid SSR problems!
+const BaseDateInput = defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue'));
+// import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
+const BaseHlsVideo = defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue'));
 
 export {
-  BaseAdvancedSearch,
-  BaseAdvancedSearchRow,
+  BaseButton,
+  BaseIcon,
+  BaseLoader,
+  BaseTooltipBox,
+  BaseImage,
+  BaseInput,
+  BaseDropDownList,
   BaseAutocompleteInput,
   BaseBox,
-  BaseBoxButton,
-  BaseBoxTooltip,
-  BaseBreadCrumbs,
-  BaseButton,
-  BaseCarousel,
-  BaseCheckmark,
-  BaseChip,
-  BaseChipsBelow,
-  BaseChipsInput,
-  BaseChipsInputField,
+  BaseSwitchButton,
   BaseDateInput,
-  BaseDatePanel,
+  BasePopUp,
+  BaseProgressBar,
+  BaseDropDown,
+  BaseUploadPopUp,
+  BaseToggle,
+  BaseSelectOptions,
+  BaseImageGrid,
+  BaseImageBox,
+  BaseHoverBox,
+  BaseChip,
+  BaseChipsInputField,
+  BaseSearch,
+  BaseChipsInput,
+  BaseBoxButton,
+  BaseLink,
+  BaseBreadCrumbs,
+  BaseNavigation,
+  BaseCheckmark,
+  BaseCarousel,
+  BaseChipsBelow,
   BaseDetailBox,
   BaseDropBox,
   BaseDropButton,
-  BaseDropDown,
-  BaseDropDownList,
   BaseEditControl,
-  BaseEntrySelector,
-  BaseExpandBox,
-  BaseExpandList,
-  BaseExpandRow,
-  BaseForm,
-  BaseFormFieldCreator,
-  BaseFormGroups,
   BaseHlsVideo,
-  BaseHoverBox,
-  BaseIcon,
-  BaseImage,
-  BaseImageBox,
-  BaseImageGrid,
-  BaseInfoPanel,
-  BaseInput,
-  BaseLink,
-  BaseLoader,
-  BaseMap,
-  BaseMapLocations,
-  BaseMediaCarousel,
+  BaseMultilineTextInput,
   BaseMenuEntry,
   BaseMenuList,
-  BaseMultilineTextInput,
-  BaseNavigation,
-  BaseOptions,
+  BaseEntrySelector,
   BasePagination,
-  BasePopUp,
-  BaseProgressBar,
-  BaseResultBoxSection,
-  BaseSearch,
-  BaseSelectOptions,
-  BaseSwitchButton,
+  BaseOptions,
   BaseTextList,
-  BaseToggle,
-  BaseTooltipBox,
-  BaseUploadPopUp,
+  BaseResultBoxSection,
+  BaseMediaCarousel,
 };

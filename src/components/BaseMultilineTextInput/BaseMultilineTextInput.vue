@@ -83,10 +83,9 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import {computed, defineAsyncComponent, ref} from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { createId } from '@/utils/utils';
+import { useId } from '@/composables/useId.js';
 
 /**
  * A multiline textfield base component
@@ -96,7 +95,7 @@ export default {
   name: 'BaseMultilineTextInput',
   components: {
     BaseInput,
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
   },
   props: {
@@ -149,7 +148,7 @@ export default {
      */
     activeTab: {
       type: String,
-      default: 'default',
+      default: '',
     },
     /**
      * set a legend for the tabs to be read (for accessibility only, hidden)
@@ -223,21 +222,30 @@ export default {
     },
   },
   emits: ['update:modelValue'],
+  setup(props) {
+    /** INTERNAL ID */
+    /**
+     * create a permanent id (also suitable for ssr)
+     * @type {Ref<UnwrapRef<string|number>>}
+     */
+    const idInt = ref(props.inputId);
+    // check if one was provided by prop or create one
+    if (!idInt.value) {
+      idInt.value = useId();
+    }
+
+    return {
+      idInt,
+    };
+  },
   data() {
     return {
-      activeTabInt: this.activeTab || 'default',
+      activeTabInt: this.tabs[0],
       fieldContent: {},
       isActive: false,
     };
   },
   computed: {
-    /**
-     * check if an id was provided (to handle label input connection), if not create one
-     * @returns {String|string}
-     */
-    idInt() {
-      return this.inputId || createId();
-    },
     // TODO: refactor component props to already match object necessary for switch component
     switchTabs() {
       return this.tabs.map((tab, index) => ({ value: tab, label: this.tabLabels[index] || tab }));
@@ -282,21 +290,20 @@ export default {
       deep: true,
     },
     // get updates for active tab from outside
-    activeTab(val) {
-      this.activeTabInt = val;
+    activeTab: {
+      handler(val) {
+        this.activeTabInt = val || this.tabs[0] || 'default';
+      },
+      immediate: true,
     },
   },
   methods: {
     setFieldContent(val) {
       if (this.tabs.length < 2) {
         const propName = this.activeTabInt || 'default';
-        this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
+        this.fieldContent[propName] = typeof val === 'string' ? val : val[propName];
       } else {
-        this.tabs.forEach(tab => this.$set(
-          this.fieldContent,
-          tab,
-          val[tab],
-        ));
+        this.tabs.forEach(tab => this.fieldContent[tab] = val[tab]);
       }
     },
     emitFieldContent() {

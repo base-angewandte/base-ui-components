@@ -94,7 +94,7 @@
 <script>
 import { debounce } from '@/utils/utils';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 /**
  * a row that can display options responsively either hidden behind an options button
@@ -106,7 +106,6 @@ export default {
   components: {
     BaseButton,
   },
-  mixins: [i18n],
   props: {
     /**
      * set showing of option buttons from outside.
@@ -217,6 +216,12 @@ export default {
     },
   },
   emits: ['option-triggered', 'update:show-options'],
+  setup() {
+    const { getI18nTerm } = useI18n();
+    return {
+      getI18nTerm,
+    }
+  },
   data() {
     return {
       /**

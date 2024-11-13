@@ -11,7 +11,7 @@ The Toggle lets you choose if the options are provided as array of strings or ob
       v-model="listIsObjects"
       label="Options is Array of Objects" />
     <BaseAutocompleteInput
-      v-model="autocompleteInput"
+      v-model:model-value="autocompleteInput"
       :list="autocompleteResults"
       :placeholder="'Select Your Favourite Subject'"
       :dynamic-fetch="true"

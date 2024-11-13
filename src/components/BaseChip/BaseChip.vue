@@ -38,7 +38,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { createId } from '@/utils/utils';
+import { useId } from '@/composables/useId.js';
 
 /**
  * Basic Chip component
@@ -111,6 +111,12 @@ export default {
     },
   },
   emits: ['clicked', 'update:modelValue', 'hoverbox-active', 'remove-entry'],
+  setup() {
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       /**
@@ -128,9 +134,6 @@ export default {
   computed: {
     hoverBoxEnabled() {
       return this.isLinked && !!Object.keys(this.hoverBoxContent).length;
-    },
-    internalId() {
-      return createId();
     },
   },
   watch: {

@@ -10,7 +10,7 @@
       <label
         :for="idInt"
         :class="['base-input__label', { hide: !showLabel }]">
-        {{ getLangLabel(label) }}
+        {{ labelLocalized }}
       </label>
       <div class="base-input__label-spacer" />
       <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
@@ -22,7 +22,7 @@
       accessibility -->
     <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
-      v-click-outside="clickedOutsideInput"
+      ref="inputFrame"
       :class="['base-input__input-frame',
                { 'base-input__input-frame__border': showInputBorder },
                { 'base-input__input-frame__disabled': disabled },
@@ -132,17 +132,17 @@
     <div
       v-if="invalidInt && errorMessageInt"
       class="base-input__invalid-message">
-      {{ getLangLabel(errorMessageInt) }}
+      {{ errorMessageLocalized }}
     </div>
   </div>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
-import { vOnClickOutside } from '@vueuse/components';
+import { defineAsyncComponent, ref, computed } from 'vue';
+import { onClickOutside } from '@vueuse/core'
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { createId } from '@/utils/utils';
-import i18n from '@/mixins/i18n';
+import { useId } from '@/composables/useId.js';
+import { useI18n } from '@/composables/useI18n.js';
 
 /**
  * Form Input Field Component
@@ -150,14 +150,10 @@ import i18n from '@/mixins/i18n';
 
 export default {
   name: 'BaseInput',
-  directives: {
-    ClickOutside: vOnClickOutside,
-  },
   components: {
     BaseIcon,
     BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
-  mixins: [i18n],
   props: {
     /**
      * input field settable from outside
@@ -402,9 +398,65 @@ export default {
     },
   },
   emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'blur', 'keydown', 'update:model-value'],
+  setup(props, { emit }) {
+
+    /** LABEL and ERROR MESSAGE LOCALIZATION */
+    const errorMessageInt = ref('');
+    const { getLangLabel } = useI18n(props.language);
+    const labelLocalized = computed(() => getLangLabel(props.label));
+    const errorMessageLocalized = computed(() => getLangLabel(errorMessageInt));
+
+    /** INTERNAL ID */
+    /**
+     * create a permanent id (also suitable for ssr)
+     * @type {Ref<UnwrapRef<string|number>>}
+     */
+    const idInt = ref(props.inputId);
+    if (!idInt.value) {
+      // define an internal id, needed for aria and reference purposes
+      idInt.value = useId();
+    }
+
+    /** CLICK OUTSIDE HANDLING */
+    // get the ref element for click outside
+    const inputFrame = ref(null);
+    const isActiveInt = ref(false);
+
+    /**
+     * set the active input field state (used for visual active indication)
+     * @param {boolean} val - the value to be set
+     */
+    function setFieldState(val) {
+      isActiveInt.value = val;
+    }
+    /**
+     * intercept click-outside event and close the component
+     * triggered when click happened outside of 'input-frame' element
+     * @param {Event} event
+     */
+    onClickOutside(inputFrame, (event) => {
+      setFieldState(false);
+      /**
+       * Event emitted when click outside input field <div> is registered
+       *
+       * @event clicked-outside
+       * @param {MouseEvent} - the native mouse event
+       *
+       */
+      emit('clicked-outside', event);
+    });
+    return {
+      labelLocalized,
+      errorMessageInt,
+      errorMessageLocalized,
+      isActiveInt,
+      setFieldState,
+      idInt,
+      inputFrame,
+    }
+  },
   data() {
     return {
-      isActiveInt: false,
       inputInt: '',
       previousInput: '',
       errorMessageInt: '',
@@ -412,13 +464,6 @@ export default {
     };
   },
   computed: {
-    /**
-     * check if an id was provided (to handle label input connection), if not create one
-     * @returns {String|string}
-     */
-    idInt() {
-      return this.inputId || createId();
-    },
     /**
      * determines if label row should be shown
      * @returns {Boolean|boolean}
@@ -741,21 +786,6 @@ export default {
       }
     },
     /**
-     * triggered when click happened outside of 'input-frame' element
-     * @param {Event} event
-     */
-    clickedOutsideInput(event) {
-      this.setFieldState(false);
-      /**
-       * Event emitted when click outside input field <div> is registered
-       *
-       * @event clicked-outside
-       * @param {MouseEvent} - the native mouse event
-       *
-       */
-      this.$emit('clicked-outside', event);
-    },
-    /**
      * triggered on clear input button click and removes input and returns focus
      * to input field
      */
@@ -764,13 +794,6 @@ export default {
       if (this.inputElement) {
         this.inputElement.focus();
       }
-    },
-    /**
-     * set the active input field state (used for visual active indication)
-     * @param {boolean} val - the value to be set
-     */
-    setFieldState(val) {
-      this.isActiveInt = val;
     },
     handleInputTab(event) {
       if (!this.showRemoveIcon || event.shiftKey) {

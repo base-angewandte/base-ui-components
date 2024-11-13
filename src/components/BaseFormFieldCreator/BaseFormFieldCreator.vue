@@ -568,7 +568,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
 
 /**
  * A component for form field creation via [openAPI](https://spec.openapis.org/oas/v3.1.0/) standard
@@ -583,7 +583,6 @@ export default {
     BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
   },
-  mixins: [i18n],
   props: {
     /**
      * a key to uniquely identify the field
@@ -799,6 +798,16 @@ export default {
     },
   },
   emits: ['fetch-info-data', 'input-complete', 'fetch-autocomplete', 'field-value-changed', 'keydown', 'blur'],
+  setup(props) {
+    const { getLangLabel, hasI18n, getI18nTerm, setLangLabels } = useI18n(props.language);
+
+    return {
+      getLangLabel,
+      hasI18n,
+      getI18nTerm,
+      setLangLabels,
+    };
+  },
   data() {
     return {
       /**

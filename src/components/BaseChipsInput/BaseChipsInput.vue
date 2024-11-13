@@ -125,12 +125,12 @@
 </template>
 
 <script>
-import { createId, highlightText } from '@/utils/utils';
-import { defineAsyncComponent } from 'vue';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { highlightText } from '@/utils/utils';
+import { computed, ref, defineAsyncComponent } from 'vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
-import i18n from '@/mixins/i18n';
-import { useListNavigation } from '@/composables/listNavigation';
+import { useI18n } from '@/composables/useI18n.js';
+import { useListNavigation } from '@/composables/useListNavigation';
+import {useId} from '@/composables/useId.js';
 
 /**
  * Base Chips Input component with drop down and autocomplete functionality
@@ -140,13 +140,10 @@ import { useListNavigation } from '@/composables/listNavigation';
 export default {
   name: 'BaseChipsInput',
   components: {
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseDropDownList: defineAsyncComponent(() => import('@/components/BaseDropDownList/BaseDropDownList.vue')),
     BaseChipsInputField,
   },
-  mixins: [
-    i18n,
-  ],
   props: {
     /**
      * list of selectable options. needs to be a list with at least an identifier and a label
@@ -461,9 +458,37 @@ export default {
     },
   },
   emits: ['hoverbox-active', 'update:modelValue', 'fetch-dropdown-entries'],
-  setup() {
+  setup(props) {
+    /** DROP DOWN NAVIGATION */
     const { navigate } = useListNavigation();
-    return { navigate };
+    /** LOCALIZATION */
+    const { getLangLabel, getI18nTerm } = useI18n(props.language);
+    /** COMPONENT ID */
+    const internalId = computed(() => props.inputId || useId());
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * the BaseChipsInputField component
+     * @type {Ref<UnwrapRef<null>>}
+     */
+    const baseInput = ref(null);
+
+    /**
+     * get the HTML input element (in BaseInput)
+     * @type {ComputedRef<null|HTMLElement>}
+     */
+    const inputElem = computed(() => {
+      if (!baseInput.value || !baseInput.value.$el) return null;
+      return baseInput.value.$el.getElementsByTagName('input')[0];
+    })
+
+    return {
+      navigate,
+      internalId,
+      getLangLabel,
+      getI18nTerm,
+      baseInput,
+      inputElem,
+    };
   },
   data() {
     return {
@@ -506,11 +531,6 @@ export default {
        * @type {string}
        */
       dropDownMinWidth: '100%',
-      /**
-       * the input element
-       * @type {HTMLElement}
-       */
-      inputElem: null,
     };
   },
   computed: {
@@ -523,6 +543,10 @@ export default {
         ...this.$attrs,
         ...this.$props,
       };
+      // delete the chipsInput `modelValue` prop because for component
+      // ChipsInputField the input string is `modelValue`
+      delete newProps.modelValue;
+      // and delete all drop down related props
       delete newProps.dropDownNoOptionsInfo;
       delete newProps.allowDynamicDropDownEntries;
       delete newProps.addNewChipText;
@@ -593,9 +617,6 @@ export default {
       get() {
         return this.listInt[this.activeOptionIndex];
       },
-    },
-    internalId() {
-      return this.inputId || createId();
     },
     /**
      * create an object out of prop `highlightStringTags` so it can be
@@ -676,6 +697,7 @@ export default {
      * @param {string} val
      */
     input(val) {
+      console.log('chips input changed', val);
       // open dropdown
       this.isActive = true;
 
@@ -721,12 +743,6 @@ export default {
     },
   },
   mounted() {
-    // get the input element(s) and store them for later
-    const elems = this.$el.getElementsByTagName('input');
-    if (elems && elems.length) {
-      [this.inputElem] = elems;
-    }
-
     // add optional default entry to empty modelValue selected list only
     if (this.defaultEntry && !this.modelValue.length) {
       this.selectedListInt.push(this.defaultEntry);
@@ -747,7 +763,7 @@ export default {
       } else {
         // set the option on first array index (either setting new if empty
         // array or replacing old option)
-        this.$set(this.selectedListInt, 0, selected);
+        this.selectedListInt[0] = selected;
         // for single select the drop down should close again automatically
         // after choosing the option
         this.dropDownActive = false;

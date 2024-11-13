@@ -94,7 +94,7 @@ export default {
   components: {
     BaseButton,
     BaseExpandListRow,
-    Draggable: () => import('vuedraggable').then(m => (m.default || m)),
+    Draggable: () => import('vue-draggable-plus').then(m => (m.default || m)),
   },
   props: {
     /**

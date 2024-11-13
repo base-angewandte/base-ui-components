@@ -19,8 +19,8 @@
             :lazyload="true"
             :image-first="true"
             :center-header="true"
-            :render-element-as="vueRouterAvailable && item.href ? renderLinkElementAs : 'div'"
-            :link-to="vueRouterAvailable && item.href ? item.href : ''"
+            :render-element-as="isRouterAvailable && item.href ? renderLinkElementAs : 'div'"
+            :link-to="isRouterAvailable && item.href ? item.href : ''"
             style="margin-right: 0"
             @clicked="boxClicked(item)" />
         </div>
@@ -46,13 +46,13 @@
 
 <script>
 import 'lazysizes';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+import {computed, defineAsyncComponent, getCurrentInstance} from 'vue';
 
 export default {
   name: 'BaseCarousel',
   components: {
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseImageBox,
   },
   props: {
@@ -90,6 +90,21 @@ export default {
     },
   },
   emits: ['initialized', 'clicked'],
+  setup() {
+    /** CHECK ROUTER AVAILABILITY */
+    // we need to access the current component instance
+    // to check for router
+    const { app } = getCurrentInstance().appContext;
+
+    /**
+     * check if vue router is available
+     * @type {ComputedRef<boolean>}
+     */
+    const isRouterAvailable = computed(() => !!app.config.globalProperties?.$router);
+    return {
+      isRouterAvailable,
+    }
+  },
   data() {
     return {
       swiper: undefined,
@@ -100,9 +115,6 @@ export default {
   computed: {
     boxSize() {
       return this.swiperIsActive ? { height: '400px' } : { 'min-height': '250px', 'max-height': '350px' };
-    },
-    vueRouterAvailable() {
-      return !!this.$router;
     },
   },
   watch: {
@@ -145,10 +157,10 @@ export default {
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
       const { Swiper } = await import('swiper');
-      const { Autoplay } = await import('swiper');
-      const { Keyboard } = await import('swiper');
-      const { Navigation } = await import('swiper');
-      const { Pagination } = await import('swiper');
+      const { Autoplay } = await import('swiper/modules');
+      const { Keyboard } = await import('swiper/modules');
+      const { Navigation } = await import('swiper/modules');
+      const { Pagination } = await import('swiper/modules');
 
       this.swiperIsActive = true;
       this.swiperOptionsInt.init = false;
@@ -249,10 +261,10 @@ export default {
 
   // import swiper styles
   @import '../../../node_modules/swiper/swiper.scss';
-  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
-  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
-  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
-  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
+  @import '../../../node_modules/swiper/modules/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay.scss';
 
   .base-carousel {
     .base-image-box-image {

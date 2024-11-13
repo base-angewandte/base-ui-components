@@ -318,7 +318,8 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
+
 
 /**
  * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard
@@ -342,7 +343,6 @@ export default {
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m)),
     BaseFormFieldCreator,
   },
-  mixins: [i18n],
   props: {
     /**
      * the json object containing all the field information incl. `x-attrs` custom field
@@ -507,6 +507,13 @@ export default {
     },
   },
   emits: ['values-changed', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
+  setup(props) {
+    const { getLangLabel } = useI18n(props.language);
+
+    return {
+      getLangLabel,
+    };
+  },
   data() {
     return {
       /**

@@ -28,7 +28,7 @@
       <template #below-input>
         <BaseDropDownList
           v-if="isActiveInt"
-          v-model:active-option="activeOption"
+          :active-option="activeOption"
           :drop-down-options="filteredListInt"
           :identifier-property-name="identifierPropertyName"
           :label-property-name="labelPropertyName"
@@ -93,7 +93,7 @@
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import { createId } from '@/utils/utils';
-import { useListNavigation } from '@/composables/listNavigation';
+import { useListNavigation } from '@/composables/useListNavigation';
 
 /**
  * Input component allowing to select single values from a drop down that are filled into
@@ -291,7 +291,7 @@ export default {
       default: () => ([]),
     },
   },
-  emits: ['update:modelValue', 'fetch-dropdown-entries', 'update:is-active', 'selected'],
+  emits: ['update:model-value', 'fetch-dropdown-entries', 'update:is-active', 'selected'],
   setup() {
     const { navigate } = useListNavigation();
     return { navigate };
@@ -410,10 +410,10 @@ export default {
       if (val !== this.modelValue) {
         /**
          * event triggered when input changes - part of v-model
-         * @event update:modelValue
+         * @event update:model-value
          * @param {string} - the altered input string
          */
-        this.$emit('update:modelValue', val);
+        this.$emit('update:model-value', val);
       }
       // if options should be fetched dynamically trigger event when inputInt changes
       if (this.dynamicFetch) {

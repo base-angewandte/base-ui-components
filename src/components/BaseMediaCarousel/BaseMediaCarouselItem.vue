@@ -123,10 +123,10 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import {defineAsyncComponent, ref} from 'vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
-import { debounce } from '@/utils/utils';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
+import { useWindowResize } from '@/composables/useWindowResize.js';
 
 /**
  * Component allowing for the display of images or streaming of
@@ -140,7 +140,6 @@ export default {
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
     BaseHlsVideo: defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue')),
   },
-  mixins: [i18n],
   props: {
     /**
      * url of the medium to be displayed
@@ -253,13 +252,49 @@ export default {
     },
   },
   emits: ['download'],
+  setup() {
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
+    /** RESIZE / FOOTER HEIGHT CALCULATIONS */
+    /**
+     * element reference
+     * @type {Ref<UnwrapRef<HTMLElement|null>>}
+     */
+    const footer = ref(null);
+    /**
+     * variable to store calculated footer height
+     * @type {Ref<UnwrapRef<number|null>>}
+     */
+    const footerHeight = ref(null);
+
+    /**
+     * function calculating the footer height
+     */
+    function setFooterHeight() {
+      if (!footer.value) return;
+      footerHeight.value = footer.value.offsetHeight;
+    }
+
+    /**
+     * set up a resize event listener calling the footer height function
+     */
+    const { isMobile } = useWindowResize({
+      callback: setFooterHeight,
+      setDebounce: 500,
+      callOnMounted: true,
+    });
+
+    return {
+      getI18nTerm,
+      isMobile,
+      footerHeight,
+    }
+  },
   data() {
     return {
       // variable for display image error handling
       displayImage: true,
-      isMobile: false,
-      // variable to store calculated footer height
-      footerHeight: null,
     };
   },
   computed: {
@@ -292,6 +327,7 @@ export default {
       const match = this.sourceUrl.match(/\w+\.(\w{2,4})$/);
       return match ? match[1] : '';
     },
+    // TODO: this property is not used?
     formatNotSupported() {
       return !this.fileType;
     },
@@ -304,14 +340,6 @@ export default {
       return this.previews && this.previews[last]
         ? Object.values(this.previews[last])[0] : this.mediaUrl;
     },
-  },
-  mounted() {
-    this.isMobile = window.innerWidth <= 640;
-    this.setFooterHeight();
-    this.resizeObserver().observe(document.body);
-  },
-  beforeUnmount() {
-    this.resizeObserver().unobserve(document.body);
   },
   methods: {
     /**
@@ -336,21 +364,6 @@ export default {
      */
     openPdf() {
       window.open(this.mediaUrl);
-    },
-    /**
-     * set footer height
-     */
-    setFooterHeight() {
-      if (!this.$refs.footer) {
-        return;
-      }
-      this.footerHeight = this.$refs.footer.offsetHeight;
-    },
-    /**
-     * check if document width changes and calc/set footer height
-     */
-    resizeObserver() {
-      return new ResizeObserver(debounce(500, () => this.setFooterHeight()));
     },
   },
 };

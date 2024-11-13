@@ -61,26 +61,29 @@
         <TransitionGroup
           ref="slideFade"
           name="slide-fade"
-          class="slide-fade-group"
           @leave="slideFadeLeave"
           @after-leave="slideFadeAfterLeave">
           <div
-            v-if="showThumbnails"
-            :key="entryId + 'thumbnail'"
-            ref="thumbnailContainer"
-            class="base-menu-entry-thumbnail-container"
-            :style="{ '--cols': columns }">
-            <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
-            <slot name="thumbnails" />
+            :key="entryId"
+            class="slide-fade-group">
+            <div
+              v-if="showThumbnails"
+              :key="entryId + 'thumbnail'"
+              ref="thumbnailContainer"
+              class="base-menu-entry-thumbnail-container"
+              :style="{ '--cols': columns }">
+              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
+              <slot name="thumbnails" />
+            </div>
+            <BaseCheckmark
+              v-if="isSelectable && selectActive && !isDisabled"
+              :key="entryId + 'checkmark'"
+              :model-value="isSelected"
+              title="checkbox"
+              mark-style="checkbox"
+              class="base-menu-entry-checkbox"
+              @update:model-value="clicked" />
           </div>
-          <BaseCheckmark
-            v-if="isSelectable && selectActive && !isDisabled"
-            :key="entryId + 'checkmark'"
-            :model-value="isSelected"
-            title="checkbox"
-            mark-style="checkbox"
-            class="base-menu-entry-checkbox"
-            @update:model-value="clicked" />
         </TransitionGroup>
       </div>
     </slot>
@@ -88,8 +91,7 @@
 </template>
 
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * Component to be used in Menu Entry List or as a sort of header element
@@ -99,8 +101,9 @@ import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
 export default {
   name: 'BaseMenuEntry',
   components: {
-    BaseIcon,
-    BaseCheckmark,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseCheckmark: defineAsyncComponent(() => import('@/components/BaseCheckmark/BaseCheckmark.vue')),
+
   },
   props: {
     /**

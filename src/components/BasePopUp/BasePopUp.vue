@@ -80,9 +80,9 @@
 </template>
 
 <script>
-import { defineAsyncComponent, ref } from 'vue';
+import { defineAsyncComponent, ref, watchEffect } from 'vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { usePopUpLock } from '@/composables/popUpLock';
+import { usePopUpLock } from '@/composables/usePopUpLock.js';
 
 /**
  * A component as overlay to display messages
@@ -198,26 +198,24 @@ export default {
     },
   },
   emits: ['button-left', 'button-right', 'close'],
-  setup() {
+  setup(props) {
+    /** SCROLL LOCK HANDLING */
+    // get the pop up body ref for scroll lock
     const popUpBody = ref(null);
-    const { toggleScrollLock, showElement: showInt } = usePopUpLock(popUpBody);
+    // set scroll lock
+    const { showElement: showInt } = usePopUpLock(popUpBody);
+
+    /**
+     * watch prop `show` to update internal variable `showInt`
+     */
+    watchEffect(() => {
+      showInt.value = props.show;
+    })
 
     return {
       popUpBody,
       showInt,
-      toggleScrollLock,
     };
-  },
-  watch: {
-    show: {
-      handler(val) {
-        if (document && !this.showInt && !this.prevActiveElement) {
-          this.prevActiveElement = document.activeElement;
-        }
-        this.toggleScrollLock(val);
-      },
-      immediate: true,
-    },
   },
   updated() {
     setTimeout(() => {
@@ -244,13 +242,13 @@ export default {
   },
   methods: {
     close() {
+      this.showInt = false;
       /**
        * Event triggered on right top corner close action
        *
        * @event close
        */
       this.$emit('close');
-      this.toggleScrollLock(false);
     },
     buttonRight() {
       /**

@@ -310,6 +310,7 @@ export default {
             selectAll: 'Custom Select All',
             selectNone: 'Custom Select None',
             entriesSelected: 'Custom Items Selected',
+            maxEntriesReached: 'Custom Max Number of items selected',
           },
         };
       }

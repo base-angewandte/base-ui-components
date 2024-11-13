@@ -54,20 +54,20 @@
           v-if="displayChipsInline"
           class="base-chips-input-field__chips">
           <template v-if="draggable && !chipsEditable">
-            <draggable
+            <VueDraggable
               v-model="selectedListInt"
               :set-data="setDragElement"
               :force-fallback="true"
               :animation="200"
               handle=".base-chip__text"
+              class="base-chips-input-field__chips-transition"
               @start="drag = true"
               @end="onDragEnd">
-              <transition-group
+              <TransitionGroup
                 :name="!drag ? 'flip-list' : null"
-                type="transition"
-                class="base-chips-input-field__chips-transition">
+                type="transition">
                 <template
-                  v-for="(entry, index) in selectedListInt">
+                    v-for="(entry, index) in selectedListInt">
                   <!-- @slot a slot to provide customized chips
                     @binding { object } entry - one selected option displayed as chip
                     @binding { number } index - the index of the entry in the selectedList array
@@ -75,28 +75,28 @@
                     @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
                   -->
                   <slot
-                    name="chip"
-                    v-bind="{
-                      entry,
-                      index,
-                      chipActiveForRemove,
-                      removeEntry,
-                    }">
+                      name="chip"
+                      v-bind="{
+                    entry,
+                    index,
+                    chipActiveForRemove,
+                    removeEntry,
+                  }">
                     <BaseChip
-                      :id="entry.idInt"
-                      :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                      :model-value="getLangLabel(entry[labelPropertyName], true)"
-                      :hover-box-content="hoverboxContent"
-                      :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
-                        || !!entry[identifierPropertyName]"
-                      :chip-active="chipActiveForRemove === index"
-                      :is-removable="chipsRemovable"
-                      @remove-entry="removeEntry(entry, index)"
-                      @hoverbox-active="hoverBoxActive($event, entry)" />
+                        :id="entry.idInt"
+                        :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                        :model-value="getLangLabel(entry[labelPropertyName], true)"
+                        :hover-box-content="hoverboxContent"
+                        :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                      || !!entry[identifierPropertyName]"
+                        :chip-active="chipActiveForRemove === index"
+                        :is-removable="chipsRemovable"
+                        @remove-entry="removeEntry(entry, index)"
+                        @hoverbox-active="hoverBoxActive($event, entry)" />
                   </slot>
                 </template>
-              </transition-group>
-            </draggable>
+              </TransitionGroup>
+            </VueDraggable>
           </template>
           <template v-else>
             <template
@@ -164,11 +164,11 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import Draggable from 'vuedraggable';
+import { VueDraggable } from 'vue-draggable-plus';
 import { sort, createId } from '@/utils/utils';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
-import i18n from '@/mixins/i18n';
-import { useListNavigation } from '@/composables/listNavigation';
+import { useI18n } from '@/composables/useI18n.js';
+import { useListNavigation } from '@/composables/useListNavigation';
 
 /** input field with chips functionalities */
 
@@ -177,14 +177,7 @@ export default {
   components: {
     BaseInput,
     BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
-    Draggable,
-  },
-  mixins: [
-    i18n,
-  ],
-  model: {
-    prop: 'input',
-    event: 'input',
+    VueDraggable,
   },
   props: {
     /**
@@ -206,7 +199,7 @@ export default {
     /**
      * input string
      */
-    input: {
+    modelValue: {
       type: String,
       default: '',
     },
@@ -495,10 +488,18 @@ export default {
       default: true,
     },
   },
-  emits: ['hoverbox-active', 'update:selected-list', 'duplicate', 'removed', 'input', 'update:is-active'],
-  setup() {
+  emits: ['hoverbox-active', 'update:selected-list', 'duplicate', 'removed', 'update:model-value', 'update:is-active'],
+  setup(props) {
+    /** LIST NAVIGATION */
     const { navigate } = useListNavigation();
-    return { navigate };
+
+    /** INTERNATIONALIZATION */
+    const { getLangLabel }  = useI18n(props.language);
+
+    return {
+      navigate,
+      getLangLabel,
+    };
   },
   data() {
     return {
@@ -613,7 +614,7 @@ export default {
     /**
      * also input needs to be synchronized between component and parent (if necessary)
      */
-    input: {
+    modelValue: {
       handler(val) {
         // check if sync already
         if (val !== this.inputInt) {
@@ -627,13 +628,13 @@ export default {
      */
     inputInt: {
       handler(val) {
-        if (val !== this.input) {
+        if (val !== this.modelValue) {
           /**
            * emitting the input string if changed internally
-           * @event input
+           * @event update:model-value
            * @param {string} - the new input string
            */
-          this.$emit('input', val);
+          this.$emit('update:model-value', val);
         }
       },
       immediate: true,
@@ -749,7 +750,7 @@ export default {
             [this.labelPropertyName]: this.inputInt,
           };
           // set entry in selectedList
-          this.$set(this.selectedListInt, setIndex, newEntry);
+          this.selectedListInt[setIndex] = newEntry;
           // emit an event to inform parent of altered list
           this.updateParentList(this.selectedListInt);
           // otherwise just emit event to parent (for informing user)
@@ -806,7 +807,7 @@ export default {
       } else if (newSelectedListInt.length) {
         // remove internal ids again
         tempList = tempList.map((selected) => {
-          this.$delete(selected, 'idInt');
+          delete selected.idInt;
           return selected;
         });
       }

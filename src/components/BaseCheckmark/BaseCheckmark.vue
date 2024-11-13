@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import { createId } from '@/utils/utils';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * Checkbox and Radio Button Component
@@ -40,7 +40,7 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 export default {
   name: 'BaseCheckmark',
   components: {
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
   props: {
     /**
@@ -100,15 +100,18 @@ export default {
     },
   },
   emits: ['update:modelValue'],
+  setup() {
+    const internalId = useId();
+    return {
+      internalId,
+    }
+  },
   data() {
     return {
       checkedInt: false,
     };
   },
   computed: {
-    internalId() {
-      return createId();
-    },
     radioValueInt() {
       return this.radioValue || this.label;
     },

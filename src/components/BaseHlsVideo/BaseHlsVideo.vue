@@ -28,17 +28,14 @@
 <script>
 // eslint-disable-next-line import/extensions
 import Hls from 'hls.js/dist/hls.light.js';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import i18n from '@/mixins/i18n';
+import { useI18n } from '@/composables/useI18n.js';
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'BaseHlsVideo',
   components: {
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
-  mixins: [
-    i18n,
-  ],
   props: {
     /**
      * url of the medium to be displayed
@@ -83,6 +80,12 @@ export default {
       type: Number,
       default: undefined,
     },
+  },
+  setup() {
+    const { getI18nTerm } = useI18n();
+    return {
+      getI18nTerm,
+    };
   },
   data() {
     return {
