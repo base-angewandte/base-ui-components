@@ -30,7 +30,9 @@
       <slot
         name="label"
         :label="value">
-        {{ value }}
+        <span
+          v-insert-text-as-html="{ value, interpretTextAsHtml }"
+          :class="{ 'no-clean': interpretTextAsHtml }" />
       </slot>
     </template>
 
@@ -42,7 +44,9 @@
         <slot
           name="label"
           :label="value">
-          {{ value }}
+          <span
+            v-insert-text-as-html="{ value, interpretTextAsHtml }"
+            :class="{ 'no-clean': interpretTextAsHtml }" />
         </slot>
       </span>
 
@@ -89,15 +93,15 @@
             {{ item.label }}:
             <template v-if="item.url">
               <a
+                v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }"
                 :href="item.url"
-                :title="item.value"
+                :title="item.altTitle || undefined"
                 class="base-link--external">
                 {{ item.value }}
               </a>
             </template>
-            <!-- eslint-disable -->
-            <template v-else>{{ item.value }}</template>
-            <!-- eslint-enable -->
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len -->
+            <template v-else><span v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }" /></template>
           </div>
         </slot>
       </BaseTooltipBox>
@@ -112,11 +116,12 @@
  */
 
 import { defineAsyncComponent, ref, getCurrentInstance, computed } from 'vue';
-import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useEventListener } from '@/composables/useEventListener.js';
 import { useDebounce } from '@/composables/useDebounce.js';
 import { useId } from '@/composables/useId.js';
+import cleanDomNodes from '@/directives/cleanDomNodes.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
 export default {
   name: 'BaseLink',
@@ -127,6 +132,7 @@ export default {
   },
   directives: {
     cleanDomNodes,
+    InsertTextAsHtml,
   },
   props: {
     /**
@@ -209,7 +215,7 @@ export default {
      * specify tooltip content
      * Prop must be either set true or an Object[] to render a type tooltip link.
      * **Object[]**:
-     *   - `[{ label: 'label', value: 'value', url: '#' }]` to render a content list
+     *   - `[{ label: 'label', value: 'value', altTitle?: 'altTitle',  url: '#' }]` to render a content list
      *   - any other structure in combination with the slot `#tooltip`
      * **Boolean**: use the slot `#tooltip` to customize the content
      */
@@ -279,6 +285,18 @@ export default {
       default: '',
     },
     /**
+     *  use this property to set the title attribute
+     *  also for link types other than `chip` and `tooltip`
+     *
+     * if `interpretTextAsHtml` is set `true` for type `chip` and `tootlip`
+     *  add a html-free version of `value` here to be used for the `title`
+     *  attribute and with assistive technologies
+     */
+    altTitle: {
+      type: String,
+      default: '',
+    },
+    /**
      * set additional attributes directly on the link element,
      *  this can be HTML link element native attributes or framework
      *  specific props (e.g. `aria-current-value` to set the aria-current
@@ -288,6 +306,16 @@ export default {
     additionalAttributes: {
       type: Object,
       default: () => ({}),
+    },
+    /**
+     * set true to render link `value` as html
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['tooltip-clicked', 'chip-clicked'],
@@ -359,6 +387,9 @@ export default {
     };
   },
   computed: {
+    altTitleInt() {
+      return this.altTitle || this.value;
+    },
     /**
      * object added as value to `[chipQueryName]` query param when a chip is clicked
      * @returns {Object}
@@ -367,7 +398,8 @@ export default {
       const obj = {};
       obj[this.identifierPropertyName] = this.identifierPropertyValue;
       obj.type = this.type;
-      obj.value = this.value;
+      // this should not have html in it so we use altTitle if provided
+      obj.value = this.altTitleInt;
       return obj;
     },
     /**
@@ -461,16 +493,20 @@ export default {
      */
     title() {
       if (this.isTooltip) {
-        return this.titleText.tooltip;
+        return this.altTitle || this.titleText.tooltip;
       }
       if (this.isChip) {
         return this.titleText.chip
           // replace the placeholder with a matching translated type, otherwise with an empty string
           .replace('{type}', this.titleText.type[this.type] ? this.titleText.type[this.type] : '')
           // replace the placeholder with the value (no translation needed)
-          .replace('{value}', this.value)
+          .replace('{value}', this.altTitleInt)
           // remove multiple spaces with a single space
           .replace(/\s+/g, ' ');
+      }
+      // for all other types set the altTitle as title attribute if it was defined
+      if (this.altTitle) {
+        return this.altTitle;
       }
       // default
       return null;

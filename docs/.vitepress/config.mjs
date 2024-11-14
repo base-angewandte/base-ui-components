@@ -59,10 +59,19 @@ export default defineConfig({
         '@': path.resolve(__dirname, '../../src'),
       },
     },
-    scss: {
-      additionalData: `
-            @use "src/styles/variables" as *;
-        `
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `
+            @use "@/styles/variables" as *;
+        `,
+          api: 'modern-compiler', // or "modern"
+          // currently deprecation warnings from sass concerning legacy js API and from
+          // datepicker - added the two settings below to not pollute console
+          silenceDeprecations: ['legacy-js-api', 'import'],
+          quietDeps: true,
+        },
+      },
     },
   },
   rewrites: {

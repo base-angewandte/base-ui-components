@@ -71,8 +71,8 @@
 </template>
 
 <script>
+import { useId } from '@/composables/useId.js';
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
-import { createId } from '@/utils/utils.js';
 
 export default {
   name: 'BaseFormGroups',
@@ -186,6 +186,17 @@ export default {
         .every(fieldProps => Object.keys(fieldProps)),
     },
   },
+  setup() {
+    /** INTERNAL ID */
+    /**
+     * create an internal id for looping purposes
+     * @returns {string}
+     */
+    const { internalId: groupsId } = useId();
+    return {
+      groupsId,
+    };
+  },
   computed: {
     /**
      * modify the component $props, so they can be forwarded to BaseForm directly via
@@ -236,13 +247,6 @@ export default {
         groupedFormFields.push(noGroupFields);
       }
       return groupedFormFields;
-    },
-    /**
-     * create an internal id for looping purposes
-     * @returns {string}
-     */
-    groupsId() {
-      return createId();
     },
   },
 };

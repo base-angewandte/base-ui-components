@@ -54,7 +54,7 @@
           <!-- INPUT FROM -->
           <BaseInput
             v-model="inputFrom"
-            :input-id="`input-${inputId}-from`"
+            :input-id="`input-${internalId}-from`"
             v-bind="inputListeners"
             :label="label"
             :show-label="false"
@@ -71,8 +71,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('from', $event)"
-            @input.stop="">
+            @update:is-active="isActiveHandler('from', $event)">
             <template #input>
               <div
                 class="base-date-input__datepicker">
@@ -95,23 +94,25 @@
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${inputId}-from`"
+                      :id="`input-${internalId}-from`"
                       ref="inputFrom"
                       :value="inputFrom"
                       v-bind="dateInputListeners"
-                      :placeholder="isFromTimeField ? placeholder.time || placeholder
-                        : placeholder.date || placeholder"
+                      :placeholder="isFromTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
                       :type="'text'"
-                      :aria-describedby="label + '-' + inputId"
+                      :aria-describedby="label + '-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
                       :disabled="disabled"
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
+                      enterkeyhint="done"
                       autocomplete="off"
                       @input="checkDate($event, 'From')"
-                      @keydown="handleInputKeydown($event, 'From')">
+                      @keydown="handleInputKeydown($event, 'From')"
+                      @blur="onInputBlur($event, 'from')">
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
                   is not used -->
@@ -139,7 +140,7 @@
           <BaseInput
             v-if="type !== 'single'"
             v-model="inputTo"
-            :input-id="`input-${inputId}-to`"
+            :input-id="`input-${internalId}-to`"
             v-bind="inputListeners"
             :label="label"
             :show-label="false"
@@ -155,8 +156,7 @@
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('to', $event)"
-            @input.stop="">
+            @update:is-active="isActiveHandler('to', $event)">
             <template #input>
               <div
                 class="base-date-input__datepicker">
@@ -179,23 +179,25 @@
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
-                      :id="`input-${inputId}-to`"
+                      :id="`input-${internalId}-to`"
                       ref="inputTo"
                       :value="inputTo"
-                      :placeholder="isToTimeField ? placeholder.time || placeholder
-                        : placeholder.date || placeholder"
+                      :placeholder="isToTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
                       v-bind="dateInputListeners"
                       :type="'text'"
-                      :aria-describedby="label + '-to-' + inputId"
+                      :aria-describedby="label + '-to-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
                       :required="required"
                       :disabled="disabled"
                       :aria-disabled="disabled"
+                      enterkeyhint="done"
                       autocomplete="off"
                       :class="['base-date-input__input', inputClass]"
                       @input="checkDate($event, 'To')"
-                      @keydown="handleInputKeydown($event, 'To')">
+                      @keydown="handleInputKeydown($event, 'To')"
+                      @blur="onInputBlur($event, 'to')">
                   </template>
                   <!-- this empty element is here so that the default icon of
                   datepicker is not used -->
@@ -227,7 +229,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import { capitalizeString, debounce } from '@/utils/utils.js';
 
@@ -237,6 +239,7 @@ import fr from 'vue-datepicker-next/locale/fr.es.js';
 
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -355,7 +358,7 @@ export default {
      */
     inputId: {
       type: [Number, String],
-      default: 1,
+      default: '',
     },
     /**
      * define if standard form field styling should be
@@ -452,6 +455,14 @@ export default {
     },
   },
   emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
+  setup(props) {
+    /** INTERNAL ID */
+    const { internalId: generatedId } = useId();
+    const internalId = computed(() => props.inputId || generatedId);
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       /**
@@ -589,13 +600,15 @@ export default {
      * @returns {string[]}
      */
     inputProperties() {
-      return Object.keys(this.modelValue);
+      // if input is object return those keys // else for a single date it
+      // could also be a string - then just return an empty array
+      return typeof this.modelValue === 'object' ? Object.keys(this.modelValue) : [];
     },
     /**
      * check if input is just a single date or an object
      * @returns {boolean}
      */
-    isSingleDate() {
+    isInputTypeString() {
       return typeof this.modelValue === 'string' || !this.inputProperties.length;
     },
     /**
@@ -692,13 +705,13 @@ export default {
      * @returns {boolean}
      */
     isDateFormatYear() {
-      return (this.isSingleDate && this.inputInt.date
+      return (this.isInputTypeString && this.inputInt.date
           && /^(-?[0-9]{1,4}|-[0-9]{0,4})$/.test(this.inputInt.date))
         || (this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key] && /^(-?[0-9]{1,4}|-[0-9]{0,4})$/.test(this.inputInt[key])));
     },
     isDateFormatMonth() {
-      return ((this.isSingleDate && this.inputInt.date
+      return ((this.isInputTypeString && this.inputInt.date
           && /^(-?[0-9]{1,4}|-[0-9]{0,4})-[0-1]?[0-9]$/.test(this.inputInt.date))
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key]
@@ -763,6 +776,8 @@ export default {
           // need to stop the event triggered in original BaseInput and only trigger
           // when component isActiveInt has changed
           'update:is-active': () => {},
+          // stop BaseInput input event since BaseDateInput will propagate their own
+          onInput: () => {},
         },
       };
     },
@@ -775,18 +790,9 @@ export default {
       return {
         // add all the listeners from the parent
         ...this.$attrs,
-        // and add custom listeners
-        onInput: () => {
-          /**
-           * Event emitted on input, passing input string
-           *
-           * @event input
-           * @param {string} - the input event value however
-           * passing only the event.target.value
-           *
-           */
-          this.$emit('input', this.getInputData());
-        },
+        // stop native input event here and emit own event (in inputInt watcher)
+        // with just the values
+        onInput: () => {},
       };
     },
     /**
@@ -810,6 +816,20 @@ export default {
     },
   },
   watch: {
+    inputInt: {
+      handler() {
+        /**
+         * Event emitted on input, passing input string
+         *
+         * @event input
+         * @param {string} - the input event value however
+         * passing only the event.target.value
+         *
+         */
+        this.$emit('input', this.getInputData());
+      },
+      deep: true,
+    },
     /**
      * watch format and set correct dateFormat
      */
@@ -837,8 +857,8 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
           const isDateTimeField = this.type === 'datetime';
           this.inputFrom = isDateTimeField
-            ? val.date : val.date || val.date_from || val.time || val.time_from;
-          this.inputTo = isDateTimeField ? val.time : val.date_to || val.time_to;
+            ? val.date : val.date ?? val.date_from ?? val.time ?? val.time_from ?? val ?? '';
+          this.inputTo = isDateTimeField ? val.time : val.date_to ?? val.time_to ?? '';
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
@@ -897,28 +917,6 @@ export default {
       // since inputInt is manipulated directly in this case (easier with Date conversions)
       // inputFrom and inputTo setters are not triggered and we need to emit the new data manually
       this.emitData();
-    },
-    /**
-     * when input becomes inactive always also blur input field just in case
-     * @param {boolean} val - the changed fromOpen value
-     */
-    fromOpen(val) {
-      if (!val) {
-        this.$refs.inputFrom.blur();
-      } else {
-        this.toOpen = false;
-      }
-    },
-    /**
-     * when input becomes inactive always also blur input field just in case
-     * @param {boolean} val - the changed toOpen value
-     */
-    toOpen(val) {
-      if (!val && this.$refs.inputTo) {
-        this.$refs.inputTo.blur();
-      } else if (val) {
-        this.fromOpen = false;
-      }
     },
     /**
      * watch for changes in input field active variable to keep in sync with parent
@@ -998,6 +996,31 @@ export default {
     onInputClick(event) {
       if (event.target.tagName !== 'INPUT') {
         event.stopPropagation();
+      }
+    },
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     * @param {string} origin - did event emit from 'from' or 'to' date field
+     */
+    onInputBlur(event, origin) {
+      const relatedTargetInput = event.relatedTarget?.parentElement ? event.relatedTarget.parentElement
+        .getElementsByTagName('input') : null;
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget
+        && ((event.relatedTarget.tagName === 'INPUT'
+            && (!event.relatedTarget?.id || event.relatedTarget.id !== event.target.id))
+          // additionally also set input active false when the BaseInput 'remove' button
+          // (displayed if `clearable` is true) is triggered in the other date field of the range
+          || (event.relatedTarget?.className === 'base-input__remove-icon-wrapper'
+            && relatedTargetInput && relatedTargetInput[0]?.id !== event.target.id))) {
+        // set input active state false
+        this[`${origin}Open`] = false;
       }
     },
     initObservers() {
@@ -1480,7 +1503,7 @@ export default {
      * @returns {string | Object}
      */
     getInputData() {
-      if (this.isSingleDate) {
+      if (this.isInputTypeString) {
         return this.inputInt.date !== null ? this.inputInt.date : '';
       }
       const data = {};
@@ -1883,5 +1906,5 @@ export default {
 </style>
 
 <style lang="scss">
-  @use 'src/styles/datepicker';
+  @use '@/styles/datepicker';
 </style>

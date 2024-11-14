@@ -5,7 +5,7 @@
     :box-size="boxSize"
     :box-ratio="boxRatio"
     :disabled="disabled"
-    class="base-box-button"
+    :class="['base-box-button', { 'base-box-button-disabled': disabled }]"
     @clicked="clicked">
     <div
       v-if="boxStyle === 'large'"
@@ -18,7 +18,7 @@
               v-if="showPlus"
               name="plus"
               alt="add"
-              class="button-box-plus" />
+              class="button-box-icon button-box-plus" />
           </div>
           <div class="button-box-icon-container">
             <BaseIcon
@@ -47,7 +47,7 @@
       <BaseIcon
         v-if="icon"
         :name="icon"
-        class="button-box-icon-small" />
+        class="button-box-icon button-box-icon-small" />
       <div class="button-box-text-small">
         {{ text }}
       </div>
@@ -183,6 +183,8 @@ export default {
   },
   methods: {
     clicked(event) {
+      // prevent click event if disabled
+      if (this.disabled) return;
       /**
        * event emitted on box click
        *
@@ -295,6 +297,11 @@ export default {
           visibility: hidden;
         }
       }
+    }
+
+    .button-box-icon {
+      pointer-events: none;
+      touch-action: none;
     }
   }
 

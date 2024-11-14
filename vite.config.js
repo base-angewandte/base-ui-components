@@ -4,6 +4,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
+import eslint from 'vite-plugin-eslint';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
 import { execSync } from 'child_process';
@@ -31,6 +32,7 @@ export default defineConfig({
       // avoid missing source files
       exclude: ['node_modules/**'],
     }),
+    eslint(),
   ],
   resolve: {
     extensions: ['*', '.js', '.json'],
@@ -86,6 +88,10 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: 'modern-compiler', // or "modern"
+        // currently deprecation warnings from sass concerning legacy js API and from
+        // datepicker - added the two settings below to not pollute console
+        silenceDeprecations: ['legacy-js-api', 'import'],
+        quietDeps: true,
       },
     },
     postcss: {

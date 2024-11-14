@@ -78,10 +78,12 @@
                   :minlength="minLength"
                   :maxlength="maxLength"
                   :inputmode="fieldType === 'number' && allowNegativeNumber ? 'decimal': null"
+                  enterkeyhint="done"
                   autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
-                  @keydown.tab="handleInputTab">
+                  @keydown.tab="handleInputTab"
+                  @blur="onInputBlur">
               </slot>
             </div>
             <!-- wrapped in a button for accessibility -->
@@ -102,7 +104,8 @@
               v-if="loadable"
               class="base-input__loader">
               <BaseLoader
-                :hide="!isLoading" />
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.loaderActive" />
             </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
@@ -395,6 +398,17 @@ export default {
       // checking if all necessary properties are part of the provided object
       validator: val => ['min', 'max', 'minLength', 'maxLength']
         .every(prop => Object.keys(val).includes(prop)),
+    },
+    /**
+     * provide assistive text for screen readers
+     * **loaderActive**: if `loadable` is set `true` this text is read
+     *  as soon as the loader is appearing (`isLoading` is set true)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+      }),
     },
   },
   emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'blur', 'keydown', 'update:model-value'],
@@ -754,6 +768,23 @@ export default {
     }
   },
   methods: {
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     */
+    onInputBlur(event) {
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget && event.relatedTarget.tagName === 'INPUT'
+        && (!event.relatedTarget.id || event.relatedTarget.id !== event.target.id)) {
+        // set input active state false
+        this.setFieldState(false);
+      }
+    },
     /**
      * special event triggered when tab was used on clear input button
      * @param {KeyboardEvent} event

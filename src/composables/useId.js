@@ -1,4 +1,5 @@
 import { getCurrentInstance } from 'vue';
+import { createId } from '@/utils/utils.js';
 
 const ATTR_KEY = 'data-base-id';
 
@@ -19,7 +20,7 @@ export function useId() {
     return id;
   }
   // if not - create a new id
-  id = Math.random().toString(36).slice(2, 9);
+  id = createId();
   // and set it on the element attributes
   instance.attrs[ATTR_KEY] = id;
   // and return the newly created id

@@ -10,7 +10,7 @@ A basic example
       text="Click me"
       @clicked="showPopUp = true" />
     <BasePopUp
-      :show="showPopUp"
+      v-if="showPopUp"
       title="An Example Pop Up"
       button-right-text="Custom Submit"
       @close="showPopUp = false"

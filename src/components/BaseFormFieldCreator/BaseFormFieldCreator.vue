@@ -40,6 +40,7 @@
       :max="typeof formFieldXAttrs.max !== 'undefined' ? formFieldXAttrs.max : fieldProps.max"
       :decimals="allowedDecimals"
       :decimal-separator="fieldProps.decimalSeparator || language === 'de' ? ',' : '.'"
+      :assistive-text="assistiveTextInt"
       @keydown.enter="onEnter"
       @blur="emitCompletedInputValues"
       @update:model-value="setInputValue($event)"
@@ -120,6 +121,16 @@
         <slot
           :field-name="field.name"
           name="below-input" />
+      </template>
+      <template #drop-down-entry="{ item }">
+        <template v-if="fieldType === 'autocomplete'">
+          <!-- @slot customize the form field drop down options
+            @binding {object} option - the option object -->
+          <slot
+            :field-name="field.name"
+            :option="item"
+            name="drop-down-entry" />
+        </template>
       </template>
     </component>
 
@@ -348,21 +359,31 @@
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
       :label-property-name="fieldProps.labelPropertyName || labelPropertyName"
+      :assistive-text="assistiveTextInt"
       @update:model-value="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
       @input="textInput = $event"
       @hoverbox-active="fetchBoxData">
       <template
-        #drop-down-entry="props">
-        <span>
-          {{ getLabel(props.item[labelPropertyName]) }}
-        </span>
-        <span class="base-form-field-creator__chips-dropdown-second">
-          {{ props.item.additional }}
-        </span>
-        <span class="base-form-field-creator__chips-dropdown-third">
-          {{ props.item.source_name }}
-        </span>
+        #drop-down-entry="{ item }">
+        <!-- @slot customize the form field drop down options
+          @binding {object} option - the option object -->
+        <slot
+          :field-name="field.name"
+          :option="item"
+          name="drop-down-entry">
+          <span
+            v-insert-text-as-html="{
+              value: getLabel(item[labelPropertyName]),
+              interpretTextAsHtml: fieldProps.interpretChipsLabelAsHtml,
+            }" />
+          <span class="base-form-field-creator__chips-dropdown-second">
+            {{ item.additional }}
+          </span>
+          <span class="base-form-field-creator__chips-dropdown-third">
+            {{ item.source_name }}
+          </span>
+        </slot>
       </template>
       <template #no-options>
         <span v-if="formFieldXAttrs.dynamic_autosuggest && !fieldInput">
@@ -540,6 +561,17 @@
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
               name="below-input" />
           </template>
+          <template #drop-down-entry="{ option, fieldName, groupNames }">
+            <!-- @slot customize the form field drop down options
+              @binding {object} option - the option object
+              @binding {string} field-name - the name of the current field for identification purposes
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              :field-name="fieldName"
+              :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :option="option"
+              name="drop-down-entry" />
+          </template>
         </BaseForm>
       </div>
     </div>
@@ -569,6 +601,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
 /**
  * A component for form field creation via [openAPI](https://spec.openapis.org/oas/v3.1.0/) standard
@@ -582,6 +615,9 @@ export default {
     BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue')),
     BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   props: {
     /**
@@ -795,6 +831,37 @@ export default {
     labelPropertyName: {
       type: String,
       default: 'label',
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     * Options for inputs type `autocomplete`, `chips`, `chips-below`:
+     * **loaderActive**: text that is announced when options are being fetched (prop
+     *  `isLoading` is set `true`)
+     *
+     * Options for inputs type `chips`:
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     *
+     * Options for inputs type `chips`, `chips-below`:
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
     },
   },
   emits: ['fetch-info-data', 'input-complete', 'fetch-autocomplete', 'field-value-changed', 'keydown', 'blur'],
@@ -1070,6 +1137,27 @@ export default {
         return 0;
       }
       return null;
+    },
+    /**
+     * create the assistiveText object as required by the input component
+     * depending on field type
+     * @returns {{loaderActive: (string|*)}|Object|undefined|{}}
+     */
+    assistiveTextInt() {
+      if (this.fieldType === 'chips') {
+        return this.assistiveText;
+      }
+      if (this.fieldType === 'autocomplete') {
+        return {
+          loaderActive: this.assistiveText.loaderActive || '',
+        };
+      }
+      if (this.fieldType === 'chips-below') {
+        const textObject = { ...this.assistiveText };
+        delete textObject.optionToRemoveSelected;
+        return textObject;
+      }
+      return undefined;
     },
   },
   watch: {

@@ -1,6 +1,6 @@
 <template>
   <BasePopUp
-    :show="!!fileList.length"
+    v-if="!!fileList.length"
     :title="getI18nTerm(getLangLabel(uploadText.title))"
     @close="cancelUpload">
     <TransitionGroup name="list-complete">

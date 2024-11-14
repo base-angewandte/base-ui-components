@@ -116,6 +116,17 @@
                 :field-name="fieldName"
                 :group-names="groupNames" />
             </template>
+            <template #drop-down-entry="{ option, fieldName, groupNames }">
+              <!-- @slot customize the form field drop down options
+                @binding {object} option - the option object
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                :field-name="fieldName"
+                :group-names="groupNames"
+                :option="option"
+                name="drop-down-entry" />
+            </template>
           </BaseFormFieldCreator>
 
           <!-- FOR REPEATABLE FIELDS - ALLOW FOR MULTIPLE VALUES PER FIELD -->
@@ -242,6 +253,17 @@
                     :field-name="fieldName"
                     :group-names="groupNames"
                     :index="valueIndex" />
+                </template>
+                <template #drop-down-entry="{ option, fieldName, groupNames }">
+                  <!-- @slot customize the form field drop down options
+                    @binding {object} option - the option object
+                    @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                    @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :option="option"
+                    name="drop-down-entry" />
                 </template>
               </BaseFormFieldCreator>
 
@@ -503,6 +525,37 @@ export default {
     labelPropertyName: {
       type: String,
       default: 'label',
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     * Options for inputs type `autocomplete`, `chips`, `chips-below`:
+     * **loaderActive**: text that is announced when options are being fetched (prop
+     *  `isLoading` is set `true`)
+     *
+     * Options for inputs type `chips`:
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     *
+     * Options for inputs type `chips`, `chips-below`:
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
     },
   },
   emits: ['values-changed', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
@@ -959,6 +1012,7 @@ export default {
         validationTexts: singleFieldProps.validationTexts || this.validationTexts,
         identifierPropertyName: this.identifierPropertyName,
         labelPropertyName: this.labelPropertyName,
+        assistiveText: singleFieldProps.assistiveText || this.assistiveText,
       };
     },
     /**

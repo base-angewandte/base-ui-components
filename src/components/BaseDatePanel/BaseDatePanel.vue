@@ -265,7 +265,7 @@ export default {
 
 <style lang="scss">
 @use "@/styles/variables" as *;
-@use 'src/styles/datepicker';
+@use '@/styles/datepicker';
 
   .base-date-panel {
     position: relative;

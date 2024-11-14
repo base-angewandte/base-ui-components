@@ -334,7 +334,7 @@ export default {
     selected(option) {
       /**
        * inform parent if option was selected by mouse click
-       * (the .sync modifier on prop selectedOption can be used)
+       * (v-model on prop selectedOption can be used)
        *
        * @event update:selected-option
        * @param {Object} - the selected option

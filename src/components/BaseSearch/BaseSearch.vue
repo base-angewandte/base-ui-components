@@ -1,5 +1,13 @@
 <template>
-  <div class="base-search">
+  <!-- make this a form so that iOS recognizes it as 'search'
+  (also the action="." is needed for that) -->
+  <form
+    ref="search"
+    action="."
+    role="search"
+    class="base-search"
+    @submit.prevent
+    @keydown.enter.prevent>
     <component
       :is="inputComponent"
       v-model="inputInt"
@@ -27,13 +35,18 @@
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="true"
-      :assistive-text="isFieldTypeChips ? assistiveText : null"
+      :assistive-text="!type.includes('date') ? {
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.loaderActive,
+      } : null"
       :is-active-delay="dateFieldDelay"
       :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : null"
       :chips-removable="type !== 'chipssingle'"
       input-class="base-search__input-field"
       field-type="search"
-      class="base-search__input">
+      enterkeyhint="search"
+      class="base-search__input"
+      @keydown.enter="onEnter">
       <template #pre-input-field>
         <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
         <slot name="pre-input-field" />
@@ -78,12 +91,14 @@
         <slot name="below-input" />
       </template>
     </component>
-  </div>
+  </form>
 </template>
 
 <script>
-import { defineAsyncComponent, computed } from 'vue';
+import { defineAsyncComponent, computed, ref, watch } from 'vue';
 import { useId } from '@/composables/useId.js';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
+
 /**
  * A basic text search to filter entries or files
  */
@@ -254,10 +269,22 @@ export default {
      *
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **results**: provide text that should be announced when the search has
+     *  yielded results (or not).
+     *
+     *  Caveat: `results` has a watcher attached to trigger the
+     *    announcement so make sure the property values are reset after filling them
+     *    by using update:assistive-text or resetting it manually (after a timeout)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+        results: '',
+      }),
     },
     /**
      * use this prop to set a delay in ms before date input calendar is displayed
@@ -267,14 +294,54 @@ export default {
       default: 0,
     },
   },
-  emits: ['update:is-active', 'update:selected-chips', 'update:modelValue'],
-  setup(props) {
+  emits: ['update:modelValue', 'update:selected-chips', 'update:is-active', 'update:assistive-text'],
+  setup(props, { emit }) {
+    /** INTERNAL ID */
     /**
      * internally used id - eiter provided by props or use internally created one
      * @returns {string}
      */
     const idInt = computed(() => props.inputId || useId());
-    return { idInt };
+
+    /** TAB KEY HANDLER */
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const search = ref(null);
+    /**
+     * insert an HTML element with aria-live assertive that will announce the
+     * search result
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const { announcement } = useAnnouncer(search);
+
+    // also add a watcher to the announcement variable so user can easily have assistiveText.results
+    // reset after announcement (the watcher for this variable again is only working in setup!)
+    watch(announcement, (val) => {
+      // check if values are already in sync
+      if (val !== props.assistiveText.results) {
+        // if not - emit update
+        /**
+         * event to keep assistiveText.results in sync after
+         * announcement
+         * @event update:assistive-text
+         * @type {Object}
+         */
+        emit('update:assistive-text', {
+          ...props.assistiveText,
+          results: val,
+        });
+      }
+    });
+
+    return {
+      idInt,
+      search,
+      // need to just export the announcement text because setting it in setup function
+      // did not work in nuxt (respectively the watcher on assistiveText did not work)
+      announcement,
+    };
   },
   data() {
     return {
@@ -502,6 +569,36 @@ export default {
         }
       },
       immediate: true,
+    },
+    isActiveInt(val) {
+      if (val !== this.isActive) {
+        /**
+         * inform parent if is active has changed internally
+         * @event update:is-active
+         * @type {boolean}
+         */
+        this.$emit('update:is-active', val);
+      }
+    },
+    /**
+     * inserting this component in Nuxt only options API watcher on prop
+     * is working (in setup this is not working)
+     */
+    assistiveText: {
+      handler(val) {
+        this.announcement = val.results;
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    onEnter(event) {
+      // if device has a virtual keyboard open we want to close it on search enter
+      // just to be safe also check if the target element (where the keydown came from) is the
+      // search input - compare ids
+      if (window.visualViewport.height < window.innerHeight && event.target.id === this.idInt) {
+        event.target.blur();
+      }
     },
   },
 };

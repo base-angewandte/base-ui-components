@@ -49,6 +49,7 @@
         :text="showOptionsInt ? getI18nTerm(optionsButtonText.hide)
           : getI18nTerm(optionsButtonText.show)"
         :icon="showOptionsInt ? optionsButtonIcon.hide : optionsButtonIcon.show"
+        :disabled="optionsButtonDisabled"
         :class="[{ 'base-options__options-button-left': alignOptions === 'left' }]"
         @clicked="showOptionsInt = !showOptionsInt" />
       <div
@@ -136,11 +137,13 @@ export default {
      *   **always**: always show the options button
      *   **mobile**: only show options button when window size < 640px
      *   **never**: never show the options button - just show the available options directly
+     *   **fitted**: use options button whenever the actions (incl. before and after slot) do
+     *    not fit the row anymore
      */
     useOptionsButtonOn: {
       type: String,
       default: 'always',
-      validator: val => ['always', 'mobile', 'never'].includes(val),
+      validator: val => ['always', 'mobile', 'never', 'fitted'].includes(val),
     },
     /**
      * define the options button text as an object with `show` (=text that should be
@@ -213,6 +216,14 @@ export default {
     disableOptions: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * set true if options button should be disabled
+     *  not relevant for `useOptionsButtonOn` with value `never`
+     */
+    optionsButtonDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['option-triggered', 'update:show-options'],
@@ -293,7 +304,8 @@ export default {
      */
     useOptionsButton() {
       return this.useOptionsButtonOn === 'always'
-        || (this.useOptionsButtonOn === 'mobile' && this.isMobile);
+        || (this.useOptionsButtonOn === 'mobile' && this.isMobile)
+        || (this.useOptionsButtonOn === 'fitted' && !this.optionsFittingRowWidth);
     },
     /**
      * determine if options should be shown inline or below options row
@@ -316,6 +328,9 @@ export default {
         // showAfterOptionsBelow is false
         || (this.useOptionsButton && (!this.showAfterOptionsBelow
             || this.remainingActionsWidth > 0)));
+    },
+    optionsFittingRowWidth() {
+      return this.rowWidth - this.actionButtonsWidth - this.beforeOptionsWidth - this.afterOptionsWidth > 0;
     },
     /**
      * determine if action buttons need to be flex-wrapped
@@ -372,10 +387,9 @@ export default {
      */
     useOptionsButton: {
       handler(val) {
-        // make sure options are shown when options button is disabled
-        if (!val) {
-          this.showOptionsInt = true;
-        }
+        // make sure options are shown when options button is disabled and
+        // hidden behind the options button as soon as it is used
+        this.showOptionsInt = !val;
       },
       immediate: true,
     },
@@ -387,6 +401,11 @@ export default {
      */
     isMobile(val) {
       if (this.useOptionsButtonOn === 'mobile' && val) {
+        this.showOptionsInt = false;
+      }
+    },
+    optionsButtonDisabled(val) {
+      if (val) {
         this.showOptionsInt = false;
       }
     },
@@ -470,7 +489,9 @@ export default {
       }
       // check if it is defined - if yes - calculate the width remaining for the action buttons
       this.remainingActionsWidth = optionsRow ? this.rowWidth
-        - this.beforeOptionsWidth - this.afterOptionsWidth - this.optionsButtonWidth
+        - this.beforeOptionsWidth - this.afterOptionsWidth
+        // only subtract options button if it is shown
+        - (this.useOptionsButton ? this.optionsButtonWidth : 0)
         : 0;
       // get the action button elements
       const actionsElement = this.$refs.actions;
@@ -508,17 +529,20 @@ export default {
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
+@use "sass:map";
 
 .base-options {
   width: 100%;
-  background-color: inherit;
 
   .base-options__row {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
     min-height: $row-height-small;
     width: 100%;
+    background-color: inherit;
+    z-index: map.get($zindex, slidein);
 
     &-left {
       justify-content: flex-start;
@@ -570,6 +594,7 @@ export default {
       order: 5;
       display: flex;
       justify-content: flex-end;
+      background-color: inherit;
     }
   }
 

@@ -7,30 +7,48 @@
     <!-- SEARCH FIELD -->
     <!-- note: the id is used in the javascript part as well as the parent component
       BaseAdvancedSearch.vue - consider that when changing it! -->
+    <!-- note for @keydown.enter.capture: need to capture here so option select is handled
+      before input is blurred in search -->
     <BaseSearch
       ref="baseSearch"
       v-model="currentInput"
       v-model:selected-chips="selectedOptions"
+      v-model:is-active="isActive"
+      v-bind="$attrs"
       :input-id="'search-input-' + internalRowId"
       :show-pre-input-icon="isMainSearch
         && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
-      :label="getI18nTerm(getLangLabel(advancedSearchText.searchLabel))"
+      :label="assistiveText.searchLabel || 'Search for Entries'"
       :type="searchType"
       :loadable="filter.type === 'text' || filter.type === 'chips'"
       :is-loading="isLoading"
       :placeholder="placeholder"
-      :drop-down-list-id="'autocomplete-options-' + internalRowId"
+      :drop-down-list-id="searchType === 'controlled' ? `controlled-options-${internalRowId}`
+        : 'autocomplete-options-' + internalRowId"
       :language="language"
       :identifier-property-name="useAutocompleteFunctionality
         ? identifierPropertyName.autocompleteOption
         : identifierPropertyName.controlledVocabularyOption"
       :label-property-name="useAutocompleteFunctionality ? labelPropertyName.autocompleteOption
         : labelPropertyName.controlledVocabularyOption"
-      :is-active="isActive"
       :set-focus-on-active="false"
       :clearable="false"
-      :assistive-text="assistiveText"
+      :assistive-text="{
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.loaderActive,
+        results: assistiveText.results,
+      }"
       :date-field-delay="dateFieldDelay"
+      :linked-list-option="activeEntry
+        // set option for autocomplete - check if collection select mode is active and set id of that if yes
+        ? (collectionSelect ? activeCollectionId
+          // or set the active entry id
+          : activeEntry[identifierPropertyName.autocompleteOption])
+        // else check if there is an active controlled vocabulary entry and set that if yes
+        : (activeControlledVocabularyEntry
+          ? activeControlledVocabularyEntry[identifierPropertyName.controlledVocabularyOption]
+          // if everything else fails set undefined
+          : undefined)"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       @clicked-outside="onClickedOutsideSearch"
@@ -38,7 +56,7 @@
       @keydown="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
-      @keydown.enter="selectOptionOnKeyEnter"
+      @keydown.enter.capture="selectOptionOnKeyEnter"
       @keydown.esc="isActive = false"
       @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
@@ -55,7 +73,7 @@
           :use-form-field-styling="false"
           :show-input-border="false"
           :show-label="false"
-          :label="getI18nTerm(getLangLabel(advancedSearchText.selectFilterLabel))"
+          :label="assistiveText.selectFilterLabel || 'Select filter'"
           :language="language"
           :drop-down-list-id="'filter-options-' + internalRowId"
           :identifier-property-name="identifierPropertyName.filter"
@@ -95,13 +113,14 @@
       <template #post-input-field>
         <button
           v-if="!isMainSearch
-            || filterHasValues"
+            || filterHasValues || (filter.type === 'text' && currentInput)"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @keydown.tab="onTab"
+          @focusin.stop.prevent
           @click.stop.prevent="removeFilter">
           <BaseIcon
-            :title="getI18nTerm(getLangLabel(advancedSearchText.removeFilter))"
+            :title="assistiveText.removeFilter || 'Remove filter'"
             name="remove"
             class="base-advanced-search-row__search-row-icon" />
         </button>
@@ -115,7 +134,7 @@
           v-if="isActive"
           ref="dropDown"
           :drop-down-options="resultListInt"
-          :active-option="{ [autocompletePropertyNames.id]: activeCollection }"
+          :active-option="{ [autocompletePropertyNames.id]: activeCollectionId }"
           :list-id="'autocomplete-options-' + internalRowId"
           :active-styled="false"
           :has-sub-options="true"
@@ -160,7 +179,7 @@
                   <span
                     class="base-advanced-search-row__filter-area-close"
                     @keydown.enter="isActive = false"
-                    @click="isActive = false">
+                    @click.stop="isActive = false">
                     <BaseIcon
                       class="rotate-180 base-advanced-search-row__filter-area-close-icon"
                       name="drop-down" />
@@ -224,14 +243,18 @@
                 ]">
                 <div class="base-advanced-search-row__autocomplete-collection-text">
                   {{ option[autocompletePropertyNames.label] }}
+                  <span
+                    v-if="assistiveText.optionsAnnouncement"
+                    class="hide">{{ assistiveText.optionsAnnouncement
+                      .replace('{number}', option[autocompletePropertyNames.data].length) }}</span>
                 </div>
               </div>
 
               <!-- AUTOCOMPLETE OPTIONS -->
               <BaseDropDownList
-                :active-option="activeCollection === option[autocompletePropertyNames.id] ? activeEntry : {}"
                 :drop-down-options="option[autocompletePropertyNames.data]"
-                :display-as-drop-down="false"
+                :active-option="activeCollectionId === option[autocompletePropertyNames.id]
+                  ? activeEntry : {}"                :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
@@ -245,10 +268,13 @@
                   option[autocompletePropertyNames.id],
                 )">
                 <template #option="{ option: autocompleteOption }">
-                  <!-- @slot to allow for modification of the autocomplete option -->
+                  <!-- @slot to allow for modification of the autocomplete option
+                    @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+                    @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
                   <slot
                     name="autocomplete-option"
-                    :option="autocompleteOption" />
+                    :option="autocompleteOption"
+                    :collection-id="option[autocompletePropertyNames.id]" />
                 </template>
               </BaseDropDownList>
             </div>
@@ -273,15 +299,16 @@
                          base-advanced-search-row__first-column">
                   {{ getI18nTerm(getLangLabel(advancedSearchText.availableOptions)) }}
                 </div>
-                <!-- TODO: not linked to input!!! -->
                 <ul
                   v-if="controlledVocabularyOptions && displayedOptions.length
                     && (displayedOptions.length <= maxNumberControlledOptions
                       || (currentInput && currentInput.length >= 4))"
+                  :id="`controlled-options-${internalRowId}`"
                   role="listbox"
                   class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
                   <li
                     v-for="chip in displayedOptions"
+                    :id="chip[identifierPropertyName.controlledVocabularyOption]"
                     :key="chip[identifierPropertyName.controlledVocabularyOption]"
                     :value="chip[labelPropertyName.controlledVocabularyOption]"
                     :aria-selected="(activeControlledVocabularyEntry
@@ -379,7 +406,7 @@
         <span
           :id="labelId"
           class="base-advanced-search-row__add-filter-button__text">
-          {{ getI18nTerm(getLangLabel(advancedSearchText.addFilter)) }}
+          {{ assistiveText.addFilter || 'Add filter' }}
         </span>
       </template>
     </BaseButton>
@@ -387,15 +414,18 @@
 </template>
 
 <script>
+import {computed, ref} from 'vue';
+import { hasData, sort } from '@/utils/utils.js';
+import { useI18n } from '@/composables/useI18n.js';
+import { useId } from '@/composables/useId.js';
+import { useListNavigation } from '@/composables/useListNavigation.js';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseSearch from '@/components/BaseSearch/BaseSearch.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
-import { createId, hasData, sort } from '@/utils/utils.js';
-import { useI18n } from '@/composables/useI18n.js';
-import { useListNavigation } from '@/composables/useListNavigation.js';
 
 export default {
   name: 'BaseAdvancedSearchRow',
@@ -605,10 +635,6 @@ export default {
      *     <b>subtext</b>: text shown as second line on the drop down in filters area<br>
      *     <b>availableOptions</b>: text shown with chips options for controlled vocabulary
      *     search<br>
-     *     <b>addFilter</b>: text/label used for add filter icon<br>
-     *     <b>removeFilter</b>: text/label used for remove filter icon<br>
-     *     <b>selectFilterLabel</b>: label (not visible) used for filter chips input field<br>
-     *     <b>searchLabel</b>: label (not visible) used for search input field<br>
      *  <br>
      *  The values of this object might be plain text or a key for an i18n file<br>
      * This prop can be ignored when the 'no-options' slot is used.
@@ -619,10 +645,6 @@ export default {
         title: 'Advanced Search',
         subtext: 'Select a filter',
         availableOptions: 'Available options',
-        addFilter: 'Add filter',
-        removeFilter: 'Remove filter',
-        selectFilterLabel: 'Select filter',
-        searchLabel: 'Search for Entries',
       }),
     },
     /**
@@ -667,12 +689,51 @@ export default {
     /**
      * this prop gives the option to add assistive text for screen readers<br>
      * properties:<br>
+     * <b>addFilter</b>: text/label used for add filter icon<br>
+     * <b>removeFilter</b>: text/label used for remove filter icon<br>
+     * <b>selectFilterLabel</b>: label (not visible) used for filter chips input field<br>
+     * <b>searchLabel</b>: label (not visible) used for search input field<br>
      * <b>selectedOption</b>: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **autocompleteResultsRetrieved**: text announced when autocomplete results are returned.
+     *  use {optionsNumber} and {collectionsNumber} in the string to announce the number of
+     *  total options and collections found respectively.
+     * **autocompleteNoResults**: Text announced when no results were found with a given
+     *  search string.
+     * **autocompleteInitial**: Text announced when no search string was provided for
+     *  autocomplete.
+     * **categoryAnnouncement**: Text announced when a new category is entered in the
+     *  autocomplete drop down options list with keyboard navigation. string '{label}' will
+     *  be replaced by the actual specified category label
+     * **optionsAnnouncement**: announced together with category when in category selection
+     *  mode (after using arrowLeft key on autocomplete input) - to give the user a feeling
+     *  how many options were found for the announced category. string '{number}' will be
+     *  replaced by the number of entries in that category.
+     * **results**: provide text that should be announced when the search has
+     *  yielded results (or not).
+     *
+     * Caveat: `results` has a watcher attached to trigger the
+     *    announcement so make sure the property values are reset after filling them
+     *    by using update:assistive-text or resetting it manually (after a timeout)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
+        selectedOption: '',
+        loaderActive: 'loading.',
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        autocompleteNoResults: 'No results found.',
+        autocompleteInitial: 'Please start typing to see suggestions.',
+        categoryAnnouncement: 'category {label}.',
+        optionsAnnouncement: '{number} options.',
+        results: '',
+      }),
     },
     /**
      * if desired the box shadow around the search rows can be deactivated here
@@ -708,12 +769,44 @@ export default {
   },
   emits: ['update:applied-filter', 'fetch-autocomplete-results', 'is-active', 'option-selected', 'remove-filter', 'add-filter-row'],
   setup(props) {
+    /** INTERNAL ID */
+    const { internalId } = useId();
+    /**
+     * create a row id either taken from externally specified id or
+     * from internally created id
+     */
+    const internalRowId = computed(() => props.searchRowId || internalId);
+    /**
+     * DROP DOWN NAVIGATION
+     */
     const { navigate } = useListNavigation();
+
+    /**
+     * LOCALIZATION
+     */
     const { getLangLabel, getI18nTerm } = useI18n(props.language);
+
+    /**
+     * ACCESSIBILITY ANNOUNCEMENTS
+     */
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const advancedSearchRow = ref(null);
+    /**
+     * insert an HTML element with aria-live assertive that will announce the
+     * search result
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const { announcement } = useAnnouncer(advancedSearchRow);
     return {
+      internalRowId,
       navigate,
       getLangLabel,
       getI18nTerm,
+      advancedSearchRow,
+      announcement,
     };
   },
   data() {
@@ -747,7 +840,7 @@ export default {
        * for autocomplete drop down navigation - collection level
        * @type {?string}
        */
-      activeCollection: '',
+      activeCollectionId: '',
       /**
        * switch between arrow use on collection or entry level
        * (true for collection level)
@@ -806,13 +899,6 @@ export default {
     };
   },
   computed: {
-    /**
-     * create a row id either taken from externally specified id or
-     * via createId function
-     */
-    internalRowId() {
-      return this.searchRowId || createId();
-    },
     /**
      * v-model of BaseChipsInputField provides an array of selected options - do
      * conversion to object and array respectively with this computed variable
@@ -1106,6 +1192,17 @@ export default {
           left: false,
           right: true,
         };
+        // if drop down was opened and there is no currently active entry (if there is, the options
+        // are announced anyway) we announce the dropdown content
+        if (!this.activeEntry) {
+          // timeout and secondary isActive check is needed because on click in the form the isActive value
+          // also changes to true for a second before it switches back to false
+          setTimeout(() => {
+            if (this.isActive) {
+              this.assembleAutocompleteResultsAnnouncement();
+            }
+          }, 300);
+        }
       }
       // if isActive becomes false and the drop down closes check for remaining input strings
       // if the filter is chips
@@ -1133,6 +1230,25 @@ export default {
        * @type {boolean}
        */
       this.$emit('is-active', val);
+    },
+    /**
+     * reset the currently active drop down autocomplete option when the list changes
+     */
+    autocompleteResults() {
+      // reset the active entry / collection set with the previous results
+      this.activeEntry = null;
+      this.activeCollectionId = '';
+      // on results change announce what was found, but only if the dropdown is active
+      if (this.isActive) {
+        this.assembleAutocompleteResultsAnnouncement();
+      }
+    },
+    /**
+     * reset the currently active controlled vocabulary option when the list changes
+     */
+    displayedOptions() {
+      // reset currently active vc entry if list changed
+      this.activeControlledVocabularyEntry = null;
     },
   },
   mounted() {
@@ -1180,6 +1296,7 @@ export default {
           filter_values: this.setFilterValues(this.defaultFilter),
         };
         this.resetAllInput();
+        this.isActive = false;
       } else {
         /**
          * event emitted when user triggered remove icon on filter row
@@ -1278,10 +1395,10 @@ export default {
      *  is needed when option was selected by click
      */
     addOption(entry, collectionId = '') {
-      // get the result category of the selected option (on key navigation this.activeCollection
+      // get the result category of the selected option (on key navigation this.activeCollectionId
       // should be set, if selected from drop down by click the collectionId is passed to the
       // function else the default filter category is assumed
-      const selectedOptionCollection = this.activeCollection || collectionId
+      const selectedOptionCollection = collectionId
         || this.defaultFilter[this.identifierPropertyName.filter];
       // check if filters were specified - if not assume the input is handled in parent component
       if (!this.filterList || !this.filterList.length) {
@@ -1309,7 +1426,7 @@ export default {
         const newFilter = this.filterList.find(filter => filter[this.identifierPropertyName.filter]
           // the filterList SHOULD have the filter included that is displayed as autocomplete option
           // category but if everything fails - use default filter again
-          === (this.activeCollection || collectionId)) || this.defaultFilter;
+          === (this.activeCollectionId || collectionId)) || this.defaultFilter;
         // since default filter could be other than chips at least safeguard against type 'text'
         // TODO: this assumes default filter type is 'text'! needs further handling if other filter
         // types could be default
@@ -1357,7 +1474,7 @@ export default {
         this.addOption(this.activeControlledVocabularyEntry);
         // if an active entry is present (=selected by key naviagation) add the entry
       } else if (this.useAutocompleteFunctionality && this.activeEntry) {
-        this.addOption(this.activeEntry);
+        this.addOption(this.activeEntry, this.activeCollectionId);
         // check if filter type is text
       } else if (this.filter.type === 'text') {
         const newTextArray = [].concat(this.currentInput);
@@ -1394,6 +1511,32 @@ export default {
       } else if (key === ' ' && !this.currentInput) {
         this.isActive = !this.isActive;
         event.preventDefault();
+      }
+    },
+    /**
+     * create an announcement to inform about the information shown in the autocomplete
+     * dropdown
+     */
+    assembleAutocompleteResultsAnnouncement() {
+      // check if there are results to display and if the needed assistive text was defined in
+      // the prop
+      if (this.resultListInt.length && this.assistiveText.autocompleteResultsRetrieved) {
+        // calculate the complete number of results provided
+        const resultsNumber = this.resultListInt.reduce((prev, curr) => prev + curr.data.length, 0);
+        // set the announcement text with the appropriate number of collections and total results
+        // displayed
+        this.announcement = this.assistiveText.autocompleteResultsRetrieved
+          .replace('{optionsNumber}', resultsNumber.toString())
+          .replace('{collectionsNumber}', this.resultListInt.length.toString());
+        // else handle an empty drop down list if
+        // a) no results were found or
+      } else if (!this.resultListInt.length && this.currentInput
+        && this.assistiveText.autocompleteNoResults) {
+        this.announcement = this.assistiveText.autocompleteNoResults;
+        // b) no search input string is given
+      } else if (!this.resultListInt.length && !this.currentInput
+        && this.assistiveText.autocompleteInitial) {
+        this.announcement = this.assistiveText.autocompleteInitial;
       }
     },
 
@@ -1450,21 +1593,24 @@ export default {
       // prevent moving of cursor on input line
       event.preventDefault();
       if (this.resultListInt.length) {
+        // remember the previous collection so it can be decided if
+        // announcement should be read in the end
+        const previousActiveCollection = this.activeCollectionId;
         // store key stroked in variable
         const { key } = event;
         // actions for arrow up or down
         if (key === 'ArrowDown' || key === 'ArrowUp') {
           // if there is no active Collection (could happen due to hover)
           // set the first item in array
-          if (!this.activeCollection) {
-            this.activeCollection = this
+          if (!this.activeCollectionId) {
+            this.activeCollectionId = this
               .resultListInt[0][this.autocompletePropertyNames.id];
           }
           // get the index of the currently active collection
           const currentCollectionIndex = this.resultListInt
             .map(section => section[this.autocompletePropertyNames.id])
-            .indexOf(this.activeCollection);
-          let currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            .indexOf(this.activeCollectionId);
+          let currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
           // depending if arrow was up or down set +/- one to add or subtract
           // generically
           const numberToAdd = isArrowDown ? 1 : -1;
@@ -1495,13 +1641,14 @@ export default {
           } else if (!this.collectionSelect
             && (!isArrowDown && currentCollectionIndex === 0 && currentEntryIndex === 0)) {
             this.activeEntry = null;
+            this.activeCollectionId = '';
             // if collection select is active or first/last element of the current collection
             // is reached - switch to next/previous collection
           } else if (isWithinListLimit) {
             // set the new active collection
-            this.activeCollection = this.resultListInt[currentCollectionIndex + numberToAdd][this
+            this.activeCollectionId = this.resultListInt[currentCollectionIndex + numberToAdd][this
               .autocompletePropertyNames.id];
-            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
             // define which element in the newly active collection should appear active
             // if collection select or arrow up - first one otherwise last
             const newItemIndex = isArrowDown || this.collectionSelect ? 0
@@ -1511,22 +1658,36 @@ export default {
             // if it is the last entry of the complete list - start from the top
           } else if (!isWithinListLimit && currentCollectionIndex === this.resultListInt.length - 1
             && currentEntryIndex === currentCollectionArray.length - 1) {
-            this.activeCollection = this
+            this.activeCollectionId = this
               .resultListInt[0][this.autocompletePropertyNames.id];
-            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
             [this.activeEntry] = currentCollectionArray;
             // else if current index is at -1 go to the last entry in the list
           } else if (!isWithinListLimit && currentCollectionIndex === 0
             && currentEntryIndex === -1) {
-            this.activeCollection = this.resultListInt[this.resultListInt.length - 1][this
+            this.activeCollectionId = this.resultListInt[this.resultListInt.length - 1][this
               .autocompletePropertyNames.id];
-            currentCollectionArray = this.consolidatedResultList[this.activeCollection];
+            currentCollectionArray = this.consolidatedResultList[this.activeCollectionId];
             [this.activeEntry] = currentCollectionArray.slice(-1);
           }
         } else if (key === 'ArrowLeft') {
           this.collectionSelect = true;
         } else if (key === 'ArrowRight') {
           this.collectionSelect = false;
+        }
+        // if the assistive text was set, announce if a new category was entered via
+        // key navigation! (not if in collection select mode because then category is announced
+        // anyway)
+        if (this.activeCollectionId && !this.collectionSelect
+          && previousActiveCollection !== this.activeCollectionId
+          && this.assistiveText.categoryAnnouncement) {
+          // since this.activeCollectionId is just the id we need to get the collection label
+          const collectionLabel = this.autocompleteResults
+            .find(({ [this.autocompletePropertyNames.id]: id }) => id === this.activeCollectionId)[this
+              .autocompletePropertyNames.label];
+          // set the announcement and the collection label
+          this.announcement = this.assistiveText.categoryAnnouncement
+            .replace('{label}', collectionLabel);
         }
       }
     },
@@ -1629,7 +1790,7 @@ export default {
     resetAllInput() {
       this.currentInput = '';
       this.activeEntry = null;
-      this.activeCollection = '';
+      this.activeCollectionId = '';
       this.activeControlledVocabularyEntry = null;
     },
     /**

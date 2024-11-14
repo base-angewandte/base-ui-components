@@ -2,12 +2,13 @@
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
-import { computed, onMounted, ref, watch, nextTick, onUnmounted } from 'vue';
+import { onBeforeUnmount, computed, onMounted, ref, watch, watchEffect, nextTick, onUnmounted } from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
 import { useEventListener } from '@/composables/useEventListener.js';
+import { useTabKeyHandler } from '@/composables/useTabKeyHandler.js';
 
 /**
  * Component to display a tooltip
@@ -41,6 +42,7 @@ const props = defineProps({
   },
   /**
      * title of the modal popup on mobile
+     * if more customization is needed, use the slot `header-title` instead
      */
   modalTitle: {
     type: String,
@@ -69,15 +71,72 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  /**
+   * customize the tooltipbox id.
+   *  if you are using the `header-title` slot this should also be set as id on your custom title element
+   *  (it is also available via slot binding)
+   */
+  headerId: {
+    type: [String, Number],
+    default: 'popup-title',
+  },
+  /**
+   * specify the id of the element containing a description - for accessibility only
+   */
+  descriptionElementId: {
+    type: String,
+    default: 'popup-body',
+  },
+  /**
+   * define if the overlay background should be visible
+   * (semitransparent black) - this only applies to `typeOnMobile` 'modal'
+   */
+  overlayBackgroundVisible: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * define a custom size (in px) when the component should switch to mobile view
+   */
+  mobileSize: {
+    type: Number,
+    default: 640,
+  },
+  /**
+   * HTMLElement to focus after opening the tooltip
+   * Note: If empty, the header title will be focused by default.
+   *       If using the slot for a custom header, be sure to
+   *       define an id attribute with the value `headerId`
+   *       The value should be a valid CSS selector.
+   */
+  initialFocusElement: {
+    type: String,
+    default: '',
+  },
+  /**
+   * list of focusable HTML elements using tab key navigation
+   */
+  focusableElements: {
+    type: Array,
+    // also add all elements in general that have a tabindex, except the ones with value -1
+    default: () => ['a[href]', 'button:enabled', 'input:enabled', '*[tabindex]:not([tabindex="-1"])'],
+  },
+  /**
+   * specify to disable the tab key handler within the component
+   */
+  disableTabKeyHandler: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['close']);
 
+/** GENERAL VARIABLES */
 // define an internal id, needed for aria purposes
 const internalId = useId();
-
-// make the root element available
-const tooltip = ref(null);
+// get reference to element
+const tooltipBox = ref(null);
 // the html element reference for the actual tooltip container
 const tooltipInner = ref(null);
 // ref variable for the container body (handling fade out)
@@ -87,6 +146,11 @@ const bodyInner = ref(null);
 
 // variable to steer visibility of tooltip box when active
 const isActive = ref(false);
+
+const { isMobile } = useWindowResize({
+  callback: calcPosition,
+  mobileMaxSize: props.mobileSize,
+});
 
 /** CLICK OUTSIDE HANDLING */
 // guard for click-outside-event
@@ -182,14 +246,15 @@ const thresholdTopInt = computed(() => {
  * calc absolute tooltip and inner triangle position
  */
 function calcPosition() {
+  css.value = {};
   // anchor elements current position
   const attachToRect = props.attachTo.getBoundingClientRect();
 
   // sizes
-  const boxWidth = tooltip.value.offsetWidth;
-  const boxHeight = tooltip.value.offsetHeight;
-  const triangleHeight = parseFloat(window.getComputedStyle(tooltip.value, ':after').height) / 2;
-  const triangleWidth = parseFloat(window.getComputedStyle(tooltip.value, ':after').width) / 2;
+  const boxWidth = tooltipBox.value.offsetWidth;
+  const boxHeight = tooltipBox.value.offsetHeight;
+  const triangleHeight = parseFloat(window.getComputedStyle(tooltipBox.value, ':after').height) / 2;
+  const triangleWidth = parseFloat(window.getComputedStyle(tooltipBox.value, ':after').width) / 2;
 
   // current scroll position
   const { scrollY } = window;
@@ -257,13 +322,14 @@ function calcPosition() {
   // the box overlaps the window left side
   if (attachToRect.x < boxWidth / 2) {
     css.value.left = `${spacing.value}px`;
+    css.value.right = ''; // clear right position
     css.value['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - spacing.value}px`;
     return;
   }
 
   // the box overlaps the window right side
   if (attachToRect.left + attachToRect.width / 2 + boxWidth / 2 > window.innerWidth) {
-    css.value.left = '';
+    css.value.left = ''; // clear left position
     css.value.right = `${spacing.value}px`;
     css.value['--triangle-left'] = `${boxWidth + spacing.value
     - (document.body.clientWidth - (attachToRect.right - attachToRect.width / 2))}px`;
@@ -271,11 +337,7 @@ function calcPosition() {
 }
 
 /** BODY SCROLL LOCK HANDLING */
-const { toggleScrollLock } = usePopUpLock(tooltip);
-
-const { isMobile } = useWindowResize({
-  callback: calcPosition,
-});
+const { toggleScrollLock } = usePopUpLock(tooltipBox);
 
 const isPopUpLockEnabled = computed(() => (props.typeOnMobile === 'modal' || props.typeOnMobile === 'fullscreen')
       && isMobile);
@@ -302,10 +364,49 @@ useElementObserver({
   options: { childList: true, subtree: true },
 });
 
+/**
+ * FOCUS / TABKEY HANDLING HANDLING
+ */
+/**
+ * variable to store the element active before the tooltip box was opened
+ * @type {[null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>}
+ */
+const prevActiveElement = ref(null);
+// init tab key handler
+const { focusableHTMLTags, disableHandler } = useTabKeyHandler(tooltipBox, props.focusableElements.join(', '), props.disableTabKeyHandler);
+// watcher to set specific properties
+watchEffect(() => {
+  focusableHTMLTags.value = props.focusableElements;
+  disableHandler.value = props.disableTabKeyHandler;
+});
+/**
+ * determine which element should be focused when opening the component
+ */
+function focusInitialElement() {
+  setTimeout(() => {
+    // by default for box mode, focus the component container
+    let focusElement = tooltipBox.value;
+    // if the component is in popup mode and within mobile resolution, focus the popup title
+    if (props.typeOnMobile !== 'box' && isMobile) {
+      focusElement = props.headerId ? document.querySelector(`#${props.headerId}`) : undefined;
+    }
+    // if a specific element within the component is defined, try that one
+    if (props.initialFocusElement && document.querySelector(props.initialFocusElement)) {
+      focusElement = document.querySelector(props.initialFocusElement);
+    }
+    // finally, focus the element
+    if (focusElement) focusElement.focus();
+  }, 0);
+}
+
 onMounted(() => {
+  // save the previously active element
+  prevActiveElement.value = document?.activeElement;
+  // focus a specific element when the component is opened
+  focusInitialElement();
   // move the component to the body node to position it absolutely in the document
   document.querySelector('body')
-    .appendChild(tooltip.value);
+    .appendChild(tooltipBox.value);
 
   // Note: the click-outside event is executed immediately when the component is initialized.
   //       To prevent this timing problem, the guard variable is set with a delay.
@@ -324,6 +425,19 @@ onMounted(() => {
   }, 0);
 });
 
+onBeforeUnmount(() => {
+  // when the tooltipBox is closed, try to focus the previous active element
+  if (prevActiveElement.value
+    // but not if an element of the same class is now focused (case where tooltip box
+    // is closed and another one is immediately opened)
+    // this is good enough for our current use case, but we might need to think of a more
+    // thoroughly solution in future (prop for exempt classes?)
+    && JSON.stringify(prevActiveElement.value.classList) !== JSON
+      .stringify(document.activeElement.classList)) {
+    prevActiveElement.value.focus();
+  }
+});
+
 onUnmounted(() => {
   isActive.value = false;
 });
@@ -331,25 +445,37 @@ onUnmounted(() => {
 
 <template>
   <div
-    ref="tooltip"
+    :id="internalId"
+    ref="tooltipBox"
     role="dialog"
-    :aria-labelledby="`baseTooltipBox-title-${internalId}`"
+    tabindex="-1"
+    :aria-labelledby="headerId"
+    :aria-describedby="descriptionElementId"
     :style="{ ...styles, ...css }"
     :class="['base-tooltip-box',
+             { 'base-tooltip-box--background-visible': overlayBackgroundVisible },
              'base-tooltip-box--' + direction,
              { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
                || typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
+      :id="descriptionElementId"
       ref="tooltipInner"
       class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
-        <div
-          :id="`baseTooltipBox-title-${internalId}`"
-          class="base-tooltip-box__header__title">
-          {{ modalTitle }}
-        </div>
+        <!-- @slot customize the header displayed on mobile for `typeOnMobile` `modal` and `fullscreen`
+        @binding header-id {string, number} bind this id to your slot element containing the title text for assistive technology to work properly -->
+        <slot
+          name="header-title"
+          :header-id="headerId">
+          <div
+            :id="headerId"
+            tabindex="-1"
+            class="base-tooltip-box__header__title">
+            {{ modalTitle }}
+          </div>
+        </slot>
         <button
           title="close"
           class="base-tooltip-box__button"
@@ -505,6 +631,10 @@ onUnmounted(() => {
         max-width: inherit;
         background-color: transparent;
         z-index: map.get($zindex, modal);
+
+        &.base-tooltip-box--background-visible {
+          background-color: $overlay-background-light;
+        }
 
         .base-tooltip-box__inner {
           position: relative;

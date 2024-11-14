@@ -16,6 +16,10 @@
           v-model="filterString"
           :show-image="true"
           :placeholder="getI18nTerm(entrySelectorText.search)"
+          :assistive-text="{
+            loaderActive: assistiveText.loaderActive,
+            results: resultsAnnouncement,
+          }"
           :class="['base-entry-selector__head__search-bar',
                    { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
           @update:model-value="filterEntries($event, 'title')" />
@@ -113,6 +117,7 @@
         v-if="isLoading"
         class="loading-area">
         <BaseLoader
+          :text-on-loader-show="assistiveText.loaderActive"
           :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
       </div>
 
@@ -405,6 +410,25 @@ export default {
       type: Boolean,
       default: true,
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers.
+     * properties:
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsFound**: provide text that should be announced when the search has
+     *  yielded results. Adding the string '{number}' will announce the total number
+     *  of results found
+     * **noResultsFound**: provide text that should be announced when no search results
+     *  were round
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        resultsFound: '{number} Results found.',
+        noResultsFound: 'No results found.',
+        loaderActive: 'Loading.',
+      }),
+    },
   },
   emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
   setup(props) {
@@ -462,6 +486,16 @@ export default {
        * component users
        */
       timeout: null,
+      /**
+       * variable to remember if page changed when entries are updated (to set the focus
+       * to first entry after page change)
+       */
+      pageChanged: false,
+      /**
+       * manage the announcement of found results
+       * @type {string}
+       */
+      resultsAnnouncement: '',
     };
   },
   computed: {
@@ -509,6 +543,39 @@ export default {
     },
   },
   watch: {
+    /**
+     * watch if entries are updated to set the focus on the first list
+     * element
+     */
+    entries() {
+      // check if the menu list exist already (which it should on page
+      // change) and if change was triggered by changing the page
+      if (this.$refs.menuList && this.pageChanged) {
+        // wait until the elements are rendered
+        this.$nextTick(() => {
+          // then depending on if select input is shown or not
+          const firstFocusableListElement = this.showOptions
+            // get the first select input element
+            ? this.$refs.menuList.$el.querySelector('input:enabled')
+            // or the first menu entry element (that has tabindex 0 set)
+            : this.$refs.menuList.$el.querySelector('*[tabindex]:not([tabindex="-1"])');
+          // check if an element was found
+          if (firstFocusableListElement) {
+            // if yes - focus
+            firstFocusableListElement.focus();
+          }
+        });
+      }
+      // reset pageChanged flag
+      this.pageChanged = false;
+      // announce that entries have changed
+      this.resultsAnnouncement = this.assistiveText[this.entriesTotal ? 'resultsFound' : 'noResultsFound']
+        .replace('{number}', this.entriesTotal);
+      // and reset afterward so the same text would trigger the watcher again
+      setTimeout(() => {
+        this.resultsAnnouncement = '';
+      }, 300);
+    },
     /**
      * watch outside variable to have it in sync with internal 'showOptions'
      */
@@ -631,6 +698,7 @@ export default {
       }
     },
     setPage(number) {
+      this.pageChanged = true;
       this.pageNumber = number;
       this.fetchEntries();
     },

@@ -1,25 +1,33 @@
 <template>
   <div
-    class="base-collapsed-filter-item">
+    ref="filterChip"
+    role="listitem"
+    tabindex="0"
+    class="base-collapsed-filter-item"
+    @keydown="removeChip">
     <!-- if value is single value of date or time range add an 'from' or 'until' character -->
     <span
       v-if="isDateOrTimeRange"
       class="base-collapsed-filter-item__until">
       {{ rangeIndicator }}
     </span>
-    <!-- per default use BaseChip component except for type `boolean` -->
+    <!-- per default use BaseChip component except for type `boolean`
+      enable interpret-text-as-html for chips input fields and chips WITH ids -->
     <BaseChip
       v-if="!isBoolean && hasValue"
-      :model-value="value.label"
+      :model-value="value.labelInternal"
       :is-linked="true"
       :text-styling="chipStyling"
-      role="listitem"
+      :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
+      :assistive-text="filterItemLabel"
+      class="base-collapsed-filter-item__chip"
       @remove-entry="removeChip" />
     <!-- for boolean we use a checkmark icon instead of text -->
     <div
       v-else-if="isBoolean && hasValue"
-      class="base-collapsed-filter-item__boolean-value">
+      class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
       <BaseIcon
+        :title="filterItemLabel"
         name="check-mark"
         class="base-collapsed-filter-item__icon" />
       <BaseIcon
@@ -43,13 +51,13 @@ export default {
   },
   props: {
     /**
-     * the chip object to be displayed. Needs to be an object with id (optional) and label
+     * the chip object to be displayed. Needs to be an object with idInternal (optional) and labelInternal
      */
     value: {
       type: [Object],
       required: true,
       validator: val => Object.keys(val)
-        .includes('label'),
+        .includes('labelInternal'),
     },
     /**
      * the `field_type` of the form field for which the chip should be displayed
@@ -80,6 +88,31 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * if necessary selected chip text can be rendered as v-html directive
+     * will only be applied to values with `idInternal`
+     */
+    interpretLabelAsHtml: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * provide assistive text for boolean values and to inform user of chip
+     * removal options
+     *
+     * **booleanFilterLabel**: Set text that should be read for a boolean filter value. You may add
+     *  the string {label} which will be replaced by the filter label.
+     * **optionToRemoveSelected**: text read when an option is focused (and thus selected), should
+     *  announce to the screen reader user that option can now be removed via Backspace or Delete.
+     *  You may add the string {label} which will be replaced by the filter label.
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        booleanFilterLabel: 'Filter was set.',
+        optionToRemoveSelected: 'Press delete or backspace to remove.',
+      }),
+    },
   },
   emits: ['remove-chip'],
   computed: {
@@ -94,11 +127,11 @@ export default {
       return ['date', 'time'].includes(this.type) && this.rangeIndicator;
     },
     /**
-     * does the provided value exist and have a label
+     * does the provided value exist and have a labelInternal
      * @returns {boolean}
      */
     hasValue() {
-      return !!this.value && !!this.value.label;
+      return !!this.value && !!this.value.labelInternal;
     },
     /**
      * need to overwrite chips styling cursor and user-select in case
@@ -111,17 +144,35 @@ export default {
         userSelect: this.isScrolling ? 'none' : 'unset',
       }) : {};
     },
+    filterItemLabel() {
+      if (this.isBoolean && this.assistiveText.booleanFilterLabel
+        && this.assistiveText.optionToRemoveSelected) {
+        return `${this.assistiveText.booleanFilterLabel}. ${this.assistiveText.optionToRemoveSelected}`;
+      }
+      if (this.isBoolean && this.assistiveText.booleanFilterLabel) {
+        return this.assistiveText.booleanFilterLabel;
+      }
+      if (!this.isBoolean && this.assistiveText.optionToRemoveSelected) {
+        return `${this.value.labelInternal}. ${this.assistiveText.optionToRemoveSelected}`;
+      }
+      return this.value.labelInternal.toString();
+    },
   },
   methods: {
     /**
      * propagate to parent when the remove icon was clicked
      */
-    removeChip() {
-      /**
-       * inform parent about chip removeal
-       * @event remove-chip
-       */
-      this.$emit('remove-chip');
+    removeChip(event) {
+      const { type, key } = event;
+      // if event is not coming from 'keydown' it should go through - if it is
+      // a keydown event we need to check if correct keys were triggered
+      if (type !== 'keydown' || (type === 'keydown' && ['Backspace', 'Delete'].includes(key))) {
+        /**
+         * inform parent about chip removal
+         * @event remove-chip
+         */
+        this.$emit('remove-chip');
+      }
     },
   },
 };
@@ -132,6 +183,12 @@ export default {
 
 .base-collapsed-filter-item {
   flex-shrink: 0;
+
+  &:focus {
+    .base-collapsed-filter-item__chip {
+      background-color: $app-color-secondary;
+    }
+  }
 
   .base-collapsed-filter-item__boolean-value {
     display: flex;

@@ -4,7 +4,9 @@
     <div
       v-if="isLoading"
       class="base-result-box-section__loading">
-      <BaseLoader class="base-result-box-section__loader" />
+      <BaseLoader
+        :text-on-loader-show="assistiveText.loaderActive"
+        class="base-result-box-section__loader" />
     </div>
 
     <!-- RESULT BOX SECTION AREA -->
@@ -106,8 +108,8 @@
           @selected="selectAllTriggered" />
         <span
           aria-live="assertive"
-          class="supportive-text">
-          {{ currentSupportiveText }}
+          class="assistive-text">
+          {{ currentAssistiveText }}
         </span>
         <!-- BOXES AREA -->
         <template v-if="entryListInt.length">
@@ -633,13 +635,14 @@ export default {
      *    property moved can contain variables `{pos}` (new position) and `{total}` (total number
      *    of list items)
      */
-    supportiveText: {
+    assistiveText: {
       type: Object,
       default: () => ({
         description: 'Select items via space bar to carry out actions or use enter '
           + 'key to select an item for reordering. Use Tab key to navigate between items.',
         activated: 'Item at position {pos} selected for reordering. Use arrow keys to order item.',
         moved: 'Item moved to position {pos} of {total}',
+        loaderActive: 'loading.',
       }),
     },
     /**
@@ -697,10 +700,10 @@ export default {
        */
       movableElementId: null,
       /**
-       * add supportive text especially to ease use of drag mode accessibly
+       * add assistive text especially to ease use of drag mode accessibly
        * @type {string}
        */
-      currentSupportiveText: '',
+      currentAssistiveText: '',
       /**
        * control pagination display with this variable and only render after
        *  entryListInt was initialized from outside
@@ -942,10 +945,10 @@ export default {
         }
       }, 500);
       if (val) {
-        this.currentSupportiveText = this.supportiveText.description;
+        this.currentAssistiveText = this.assistiveText.description;
       } else {
         this.movableElementId = null;
-        this.currentSupportiveText = '';
+        this.currentAssistiveText = '';
       }
       if (val !== this.editMode) {
         /**
@@ -1101,7 +1104,7 @@ export default {
           // else use it to leave edit mode
         } else {
           this.editModeActive = false;
-          this.currentSupportiveText = '';
+          this.currentAssistiveText = '';
         }
       }
     },
@@ -1118,8 +1121,8 @@ export default {
         if (!this.movableElementId) {
           // if yes activate drag mode by assigning the entry id as movableElementId
           this.movableElementId = entry.id;
-          // add supportive text for the screen reader
-          this.currentSupportiveText = this.supportiveText.activated
+          // add assistive text for the screen reader
+          this.currentAssistiveText = this.assistiveText.activated
             .replace('{pos}', (index + 1).toString());
         } else {
           // if drag mode was active before - cancel it
@@ -1136,8 +1139,8 @@ export default {
      *  in the visibleBoxes array
      */
     moveEntry(event, index) {
-      // reset supportive text
-      this.currentSupportiveText = '';
+      // reset assistive text
+      this.currentAssistiveText = '';
       // get key that was pressed
       const { key } = event;
       // determine if element should be moved up or down in the list
@@ -1163,18 +1166,18 @@ export default {
           // element is loosing focus in the process of swapping so refocus here
           movedElement.focus();
         });
-        // add matching supportive text informing the user of the move and the new position
-        this.currentSupportiveText = this.supportiveText.moved
+        // add matching assistive text informing the user of the move and the new position
+        this.currentAssistiveText = this.assistiveText.moved
           .replace('{pos}', newIndex + 1)
           .replace('{total}', this.visibleBoxes.length);
       }
     },
     /**
-     * reset drag related variable and supportive text
+     * reset drag related variable and assistive text
      */
     cancelDragMode() {
       this.movableElementId = null;
-      this.currentSupportiveText = '';
+      this.currentAssistiveText = '';
     },
 
     /** BOX DISPLAY FUNCTIONALITIES */

@@ -1,9 +1,12 @@
 <template>
   <div
-    v-if="showInt"
     :class="['base-pop-up',
              { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
-    <div class="base-pop-up-background" />
+    <div
+      :class="[
+        'base-pop-up__background',
+        { 'base-pop-up__background--visible': overlayBackgroundVisible },
+      ]" />
     <div
       ref="popUpBody"
       :aria-labelledby="headerId"
@@ -14,12 +17,13 @@
       <!-- POP UP HEADER -->
       <div class="popup-header">
         <!-- @slot add a custom header title instead of the text defined with the prop `title`.
-          @binding {string, number} id - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
+          @binding header-id {string, number} - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
         <slot
-          :id="headerId"
-          name="header-title">
+          name="header-title"
+          :header-id="headerId">
           <div
-            id="popup-title"
+            :id="headerId"
+            tabindex="-1"
             class="popup-title">
             {{ title }}
           </div>
@@ -81,8 +85,10 @@
 
 <script>
 import { defineAsyncComponent, ref, watchEffect } from 'vue';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useTabKeyHandler } from '@/composables/useTabKeyHandler.js';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 /**
  * A component as overlay to display messages
@@ -93,17 +99,10 @@ export default {
   name: 'BasePopUp',
   components: {
     BaseIcon,
-    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseButton,
     BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
   props: {
-    /**
-     * could be used to control visibility
-     */
-    show: {
-      type: Boolean,
-      default: false,
-    },
     /**
      * pop up header text
      */
@@ -176,9 +175,16 @@ export default {
       default: false,
     },
     /**
-     * selector to focus if popup is open
+     * HTMLElement to focus after opening the popup
+     * **Note:** If empty, the header title will be focused by default.
+     *           If using the slot for a custom header, be sure to
+     *           define an id attribute with the value `popup-title`
+     *           The value should be a valid CSS selector.
+     * **useful IDs:**
+     * - left-button: `popup-left-button`
+     * - right-button: `popup-right-button`
      */
-    isOpenFocus: {
+    initialFocusElement: {
       type: String,
       default: '',
     },
@@ -190,46 +196,67 @@ export default {
       default: false,
     },
     /**
+     * list of focusable HTML elements using tab key navigation
+     */
+    focusableElements: {
+      type: Array,
+      // also add all elements in general that have a tabindex, except the ones with value -1
+      default: () => ['a[href]', 'button:enabled', 'input:enabled', '*[tabindex]:not([tabindex="-1"])'],
+    },
+    /**
+     * specify to disable the tab key handler within the component
+     */
+    disableTabKeyHandler: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * button row visibility
      */
     showButtonRow: {
       type: Boolean,
       default: true,
     },
+    /**
+     * define if the overlay background should be visible
+     * (semitransparent black)
+     */
+    overlayBackgroundVisible: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['button-left', 'button-right', 'close'],
   setup(props) {
-    /** SCROLL LOCK HANDLING */
     // get the pop up body ref for scroll lock
     const popUpBody = ref(null);
-    // set scroll lock
-    const { showElement: showInt } = usePopUpLock(popUpBody);
 
-    /**
-     * watch prop `show` to update internal variable `showInt`
-     */
+    /** SCROLL LOCK HANDLING */
+    // set scroll lock
+    const { toggleScrollLock } = usePopUpLock(popUpBody);
+
+    /** TAB KEY HANDLING */
+    // init tab key handler
+    const { focusableHTMLTags, disableHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '), props.disableTabKeyHandler);
+    // watcher to set specific properties
     watchEffect(() => {
-      showInt.value = props.show;
+      focusableHTMLTags.value = props.focusableElements;
+      disableHandler.value = props.disableTabKeyHandler;
     });
 
     return {
       popUpBody,
-      showInt,
+      toggleScrollLock,
     };
   },
-  updated() {
-    setTimeout(() => {
-      if (this.showInt) {
-        if (this.isOpenFocus !== '' && this.$el.querySelector(this.isOpenFocus)) {
-          this.$el.querySelector(this.isOpenFocus).focus();
-        }
-      } else if (this.prevActiveElement) {
-        this.prevActiveElement.focus();
-        this.prevActiveElement = false;
-      }
-    }, 250);
+  data() {
+    return {
+      // HTML element that should be focused when the component is closed
+      prevActiveElement: undefined,
+    };
   },
   mounted() {
+    this.toggleScrollLock(true);
     document.onkeyup = (e) => {
       const { key } = e;
       if (document.querySelector('.popup-box')) {
@@ -239,10 +266,22 @@ export default {
         }
       }
     };
+    // also set the previously active element so it can be used to return to
+    // if pop up is closed
+    this.prevActiveElement = document.activeElement;
+    this.$nextTick(() => {
+      this.determineFocus();
+    });
+  },
+  beforeUnmount() {
+    // when the popup is closed, try to focus the previous triggering element
+    if (this.prevActiveElement) {
+      this.prevActiveElement.focus();
+      this.prevActiveElement = false;
+    }
   },
   methods: {
     close() {
-      this.showInt = false;
       /**
        * Event triggered on right top corner close action
        *
@@ -266,6 +305,17 @@ export default {
        */
       this.$emit('button-left');
     },
+
+    /** INITIAL FOCUS */
+    determineFocus() {
+      // try to focus the element defined with the initialFocusElement property
+      if (!!this.initialFocusElement && this.$el?.querySelector(this.initialFocusElement)) {
+        this.$el.querySelector(this.initialFocusElement).focus();
+        // or the popup title
+      } else if (this.$el?.querySelector(`#${this.headerId}`)) {
+        this.$el.querySelector(`#${this.headerId}`).focus();
+      }
+    },
   },
 };
 </script>
@@ -275,7 +325,7 @@ export default {
   @use "@/styles/variables" as *;
 
   .base-pop-up {
-    .base-pop-up-background {
+    .base-pop-up__background {
       position: fixed;
       top: 0;
       left: 0;
@@ -284,6 +334,10 @@ export default {
       /* specific to be higher than base header */
       z-index: map.get($zindex, modal_bg);
       overflow: hidden;
+
+      &.base-pop-up__background--visible {
+        background: $overlay-background-light;
+      }
     }
 
     .popup-box {

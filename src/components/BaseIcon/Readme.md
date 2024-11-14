@@ -34,9 +34,10 @@ export default {
         'archive-empty', 'archive-sheets', 'arrow-left', 'arrow-right', 'attachment', 'attention', 'audio-object', 'calendar-many',
         'calendar-number', 'camera', 'check-mark', 'clock', 'collection', 'download', 'drag-lines', 'drag-n-drop',
         'drop-down', 'duplicate', 'edit', 'eye-hide', 'eye', 'file-object', 'forbidden', 'fullscreen', 'fullscreen-exit',
-        'grid', 'home', 'image-object', 'information', 'institution', 'information-solo', 'licence', 'magnifier', 'minus',
-        'next', 'options-menu', 'people', 'people-filled', 'play', 'plus', 'prev', 'print', 'refresh', 'remove', 'save-file',
-        'separator-vertical', 'share', 'sort', 'subscribe', 'success', 'text', 'unsubscribe', 'video-object', 'waste-bin'],
+        'grid', 'home', 'image-object', 'image-cropped', 'image-resized', 'information', 'institution', 'information-solo',
+        'licence', 'magnifier', 'minus', 'next', 'options-menu', 'people', 'people-filled', 'play', 'plus', 'prev', 'print', 
+        'refresh', 'remove', 'save-file', 'separator-vertical', 'share', 'sort', 'subscribe', 'success', 'text', 'unsubscribe',
+        'video-object', 'waste-bin'],
     };
   },
 };

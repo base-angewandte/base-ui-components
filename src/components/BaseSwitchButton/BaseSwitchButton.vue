@@ -1,11 +1,18 @@
 <template>
   <fieldset
     :class="['base-switch-buttons', { 'base-switch-buttons--gap': type === 'prominent' }]">
+    <!-- we need to separate legend here from the actually displayed label because
+      legend is not accessible if wrapped in a span but i can not style the legend the way
+      i want without the span -->
+    <legend
+      class="hide">
+      {{ label }}
+    </legend>
     <span
-      :class="['base-switch-buttons__legend', { 'hide': !showLabel }]">
-      <legend>
-        {{ label }}
-      </legend>
+      :class="['base-switch-buttons__legend', { 'hide': !showLabel },
+               { 'base-switch-buttons__legend--disabled': disabled },
+               { 'base-switch-buttons__legend--gap': type === 'normal' }]">
+      {{ label }}
     </span>
 
     <template
@@ -13,9 +20,12 @@
       :key="option.value">
       <label
         :for="optionIds[index]"
+        :title="!showButtonsLabelInt ? option.label : undefined"
         :class="['base-switch-buttons__button',
                  `base-switch-buttons__button--${type}`,
-                 { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption }]">
+                 { [`base-switch-buttons__button--${type}-active`]: option.value === selectedOption },
+                 { 'base-switch-buttons__button--icon-only': !showButtonsLabel },
+                 { 'base-switch-buttons__button--disabled': disabled }]">
         <input
           :id="optionIds[index]"
           :key="option.value + 'input'"
@@ -25,25 +35,24 @@
           :aria-checked="option.value === selectedOption"
           :value="option.value"
           :name="label"
+          :disabled="disabled"
           class="hide"
           type="radio"
           @keydown.enter.prevent="">
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'left'"
           :name="option.icon"
-          size="small"
-          :title="label"
-          class="base-switch-buttons__icon" />
+          :class="['base-switch-buttons__icon',
+                   `base-switch-buttons__icon--${iconSize}`]" />
         <span
-          :class="{ hide: !showButtonsLabelInt }">
+          v-if="showButtonsLabelInt">
           {{ option.label }}
         </span>
         <BaseIcon
           v-if="option?.icon?.length > 0 && iconPosition === 'right'"
           :name="option.icon"
-          size="small"
-          :title="label"
-          class="base-switch-buttons__icon" />
+          :class="['base-switch-buttons__icon',
+                   `base-switch-buttons__icon--${iconSize}`]" />
         <!-- @slot slot to display something right of text (e.g. icon), or if `showButtonsLabel` false - generally right of the button content
         @binding {string} value - the value of the option object
         --->
@@ -126,6 +135,25 @@ export default {
       default: 'right',
       validator: val => ['right', 'left'].includes(val),
     },
+    /**
+     * specify icon size
+     * this prop currently only applies to `type` 'prominent'
+     */
+    iconSize: {
+      type: String,
+      default: 'medium',
+      validator(val) {
+        return ['small', 'medium', 'large'].includes(val);
+      },
+    },
+    /**
+     * set true if the buttons should be visible but disabled, so they
+     * will appear greyed out and not be clickable
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['update:model-value'],
   setup() {
@@ -178,6 +206,7 @@ export default {
     display: flex;
     position: relative;
     align-items: center;
+    background-color: inherit;
 
     &.base-switch-buttons--gap {
       gap: $spacing;
@@ -185,6 +214,14 @@ export default {
 
     .base-switch-buttons__legend {
       display: flex;
+
+      &.base-switch-buttons__legend--disabled {
+        color: $font-color-second;
+      }
+
+      &.base-switch-buttons__legend--gap {
+        padding-right: $spacing-small;
+      }
     }
 
     .base-switch-buttons__button {
@@ -212,11 +249,21 @@ export default {
       }
 
       &.base-switch-buttons__button--prominent {
+        justify-content: center;
         border: $input-field-border;
         height: $row-height-small;
 
         &.base-switch-buttons__button--prominent-active {
           box-shadow: inset 0 -#{$border-width} 0 0 #{$app-color};
+
+          &.base-switch-buttons__button--disabled {
+            box-shadow: inset 0 -#{$border-width} 0 0 #{$graytext-color};
+          }
+        }
+
+        &.base-switch-buttons__button--icon-only {
+          width: 50px;
+          padding: 0;
         }
 
         &:focus-within {
@@ -225,14 +272,37 @@ export default {
       }
 
       .base-switch-buttons__icon {
-        height: $icon-medium;
-        width: $icon-medium;
         flex: 0 0 auto;
+
+        &.base-switch-buttons__icon--small {
+          height: $icon-small;
+          width: $icon-small;
+        }
+
+        &.base-switch-buttons__icon--medium {
+          height: $icon-medium;
+          width: $icon-medium;
+        }
+
+        &.base-switch-buttons__icon--large {
+          height: $icon-large;
+          width: $icon-large;
+        }
       }
 
       &:hover .base-switch-buttons__icon,
       &:active .base-switch-buttons__icon {
         color: $app-color;
+      }
+
+      &.base-switch-buttons__button--disabled {
+        cursor: default;
+        color: $graytext-color;
+
+        &:hover .base-switch-buttons__icon,
+        &:active .base-switch-buttons__icon {
+          color: $graytext-color;
+        }
       }
     }
   }

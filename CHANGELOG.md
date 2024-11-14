@@ -1,3 +1,376 @@
+## 4.0.0 (2024-11-11)
+
+### ⚠ BREAKING CHANGE
+
+* min required node version is now v18.
+<br><br>
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** move properties `addFilter`, `removeFilter`, `selectFilterLabel` and `searchLabel` from prop `advancedSearchText` to `assistiveText`. Also the option to use an key to a localization json file instead of a pure text string was removed.
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/components/BaseButton):** set default value of prop `text` to an empty string instead of `'Submit'`.
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):**
+  * `list` and `selectedList` need to be an array of objects with at least an identifier and a label, no strings allowed anymore (property names for this object can be set via `identifierPropertyName` and `labelPropertyName` as before)
+  * `identifierPropertyName` and `labelPropertyName` default values were changed from empty string to `id` and `label` respectively
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/components/BaseChipsBelow):** The dropdown list now closes after an option is selected.   To prevent this new default behaviour, the new prop `closeDropdownOnOptionSelect` must be set to `false`.
+
+* **[BaseExpandList](https://base-angewandte.github.io/base-ui-components/components/BaseExpandList), [BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):** prop `supportiveText` is renamed to `assistiveText`.
+
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator), [BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** if field name was `keywords` the [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput) had the prop `sortable` set true per default up to now. This was removed and `sortable` needs to be set via `x-attrs` or `fieldProps` for EVERY field.
+
+* **[BaseLink](https://base-angewandte.github.io/base-ui-components/components/BaseLink):**
+  * The `chip-clicked` event has been removed for type chip links.
+    Chips are now rendered as an `a` tag and a query param with the chip-object is added to the link.
+    The URL params can be set with the new props `chipQueryName`, `identifierPropertyName` and `path`.
+  * Use `identifierPropertyValue` property instead of `source` property.
+
+* **[BasePopUp](https://base-angewandte.github.io/base-ui-components/components/BasePopUp):**
+  * prop `show` was removed, control component rendering with v-if instead.
+  * Prop `isOpenFocus` was renamed to `initialFocusElement`.
+
+* **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton):** slot `right-of-text` was renamed to `right-of-content`.
+
+* **[BaseTextList](https://base-angewandte.github.io/base-ui-components/components/BaseTextList):**
+  * Boolean prop `cols2` was removed and replaced with prop `cols` which can now take a number defining the number of columns to be rendered.
+  * Use prop `colsSingleTextObject` prop `data` is an array of objects with `label` and `data` properties, where the data type of `data` is `string` (see example 2 in the styleguide).
+
+
+### Added
+
+#### New Components:
+
+* **[BaseInfoPanel](https://base-angewandte.github.io/base-ui-components/components/BaseInfoPanel):** new component BaseInfoPanel to display information.
+* **[BaseImageGrid](https://base-angewandte.github.io/base-ui-components/components/BaseImageGrid)**: new component to render 1 to 4 images in a static grid.
+* **[BaseNavigation](https://base-angewandte.github.io/base-ui-components/components/BaseNavigation)**:
+* **[BaseTooltipBox](https://base-angewandte.github.io/base-ui-components/components/BaseTooltipBox)**: component to render tooltip boxes. Complete refactor of [BaseTooltip](https://base-angewandte.github.io/base-ui-components/components/BaseTooltip) with extended functionality:
+  * improved position calculation based on preferred direction.
+  * optional modal or fullscreen mode on mobile.
+  * scrollable content with top and bottom fade outs.
+  * new slot `header-title` for easier header customization and allow for customization of header id with new prop `headerId`.
+
+
+#### Other
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):**
+  * new component mode `form` using a form instead of filter rows.
+  * enable drop down option string match highlighting with new props `highlightAutocompleteMatch` and `highlightAutocompleteTags`.
+  * improve usability for assistive technologies, expand functionality of prop `assistiveText`, e.g. to announce search results or autocomplete loading.
+  * add slot `autocomplete-option` for easier customization of the options.
+
+* **[BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/components/BaseAutocompleteInput):**
+  * enable drop down option string match highlighting with new props `highlightStringMatch` and `highlightStringTags`.
+  * add new prop `assistiveText` to announce autocomplete loading and results retrieved.
+
+* **[BaseBox](https://base-angewandte.github.io/base-ui-components/components/BaseBox):** add option `'none'` to prop `boxShadowSize` to enable boxes without box-shadow.
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/components/BaseButton):** add new style to prop `buttonStyle` named `'circle'`.
+
+* **[BaseChip](https://base-angewandte.github.io/base-ui-components/components/BaseChip):**  new prop `interpretTextAsHtml` applying the new directive `v-insert-text-as-html`.
+
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/components/BaseChipsBelow):**
+  * add new prop `closeDropdownOnOptionSelect` (default `true`!) to close dropdown after selection.
+  * add new props `sortable` and `draggable` to make these component features optional.
+  * add props `additionalPropAllowMultipleEntries`, `additionalPropRequired` to allow more control over the additional property input field. The latter can also be set via OpenAPI definition x-attrs `additional_prop_required`.
+  * add validation for required fields.
+  * add new prop `additionalPropDefaultOption` that will be added if selected list is empty as soon as component is rendered.
+  * enable drop down option string match highlighting with new props `highlightStringMatch` and `highlightStringTags`.
+  * add new prop `assistiveText` to announce autocomplete loading, results retrieved or adding and removal of chips.
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):**
+  * add new prop `chipsRemovable` to make the display of the chip remove icon optional.
+  * add new prop `defaultEntry` that will be added if the selected list is empty as soon as component is rendered.
+  * add new prop `closeDropdownOnOptionSelect` to close dropdown after selection.
+  * add prop `inputType` (possible values `'text', 'search'`) to be provided to the native HTML input field.
+  * enable drop down option string match highlighting with new props `highlightStringMatch` and `highlightStringTags`.
+  * new prop `interpretChipsLabelAsHtml` applying the directive `v-insert-text-as-html` to the selected chips.
+  * extend prop `assistiveText` to also announce autocomplete loading, results retrieved or adding and removal of chips.
+
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInputField):**
+  * also allow data type `number` for prop `linkedListOption`.
+  * add prop `inputType` (possible values `'text', 'search'`) to be provided to the native HTML input field.
+  * new prop `interpretChipsLabelAsHtml` applying the directive `v-insert-text-as-html` to the selected chips.
+  * extend prop `assistiveText` to also announce autocomplete loading or adding and removal of chips
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** allow negative dates and years with less than 4 digits.
+
+* **[BaseDropDownList](https://base-angewandte.github.io/base-ui-components/components/BaseDropDownList):** add new props `useHighlightStringMatch`, `highlightStringMatch` and `highlightStringTags` to enable drop down option string match highlighting.
+
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** add screen reader announcements for results loading and results found.
+
+* **[BaseExpandBox](https://base-angewandte.github.io/base-ui-components/components/BaseExpandBox):**
+  * add additional slot `header`.
+  * add option `'none'` for prop `padding` to allow the padding to be 0.
+  * calculate 'show more' button visibility on content change.
+  * introduce prop `boxShadow` to enable boxes without box-shadow.
+
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):**
+  * support `timerange` only fields.
+  * new event `input-complete` to only trigger when valid input was provided.
+  * make drop down slot `drop-down-entry` available in form components for easier customization of drop down options.
+  * add new prop `assistiveText` to enable adding assistive text for all form fields.
+  * add new x-attrs field `additional_prop_required` to set the additional property of [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/components/BaseChipsBelow) as required.
+
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):**
+  * add basic form validation.
+  * add event `form-mounted` to be emitted after element was mounted and rendered
+  * add new props `labelPropertyName` and `identifierPropertyName` (used for chips inputs and drop downs)
+  * refactoring of BaseForm allowing 3 columns per row (can be set via `x-attrs` `field_format` with new value `'third'`).
+
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** new icons: `'minus'`, `'fullscreen'`, `'fullscreen-exit'`, `'grid'`, `'separator-vertical'`, `'information-solo'`, `'image-cropped'`, `'image-resized'` and `'arrow-right'`.
+
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput):**
+  * also allow data type `number` for prop `linkedListOption`.
+  * add new assistive text feature for loader visibility via prop `assistiveText`.
+
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/components/BaseImageBox):**
+  * add additional slot `icon` that can be displayed and add a separator line between header and body if no image.
+  * add additional title slot `title-right`.
+  * add prop `titleRows` to specify number of title rows.
+  * add prop `imageFooterMargin` to make the spacing of the footer to the box edge more flexible.
+  * add prop `imageShadow` to set the shadow overlay visibility.
+  * To enable showing of up to 4 images in the box new props `images` and `gridGap` added. `images` takes an array of image urls or srcsets to display up to 4 images instead of just one. (Prop `imageUrl` was still kept
+    for backwards compatibility)`gridGap` specifies the spacing between the images.
+  * new prop `interpretTextAsHtml` applying the new directive `v-insert-text-as-html` and also adding props `altTitle` and `altSubtext` to not display html tags on hover and for image alt text if `interpretTextAsHtml` is set `true`.
+
+* **[BaseLink](https://base-angewandte.github.io/base-ui-components/components/BaseLink):**
+  * add prop `tooltipTypeOnMobile` to specify how the [TooltipBox](https://base-angewandte.github.io/base-ui-components/components/TooltipBox) should be rendered on mobile devices.
+  * add better support for screen readers.
+  * enable setting of additional attributes on the link element with prop `additionalAttributes`.
+  * add new slot `label` to improve styling options.
+  * also allow data type `number` for prop `identifierPropertyValue`.
+  * add prop `titleText` to allow configuration of the text shown on hover and `spaceAfter` to improve styling options for tooltip entries.
+  * new prop `interpretTextAsHtml` applying the new directive `v-insert-text-as-html`. Also adding new prop `altTitle` to be used in case `value` contains HTML.
+  * new prop `tooltipThresholdTop` to consider a threshold in tooltip position calculations.
+
+* **[BaseLoader](https://base-angewandte.github.io/base-ui-components/components/BaseLoader):** accessibility improvement - read text on loader appearance.
+
+* **[BaseOptions](https://base-angewandte.github.io/base-ui-components/components/BaseOptions):**
+  * add new prop `optionsButtonDisabled`.
+  * new option `'fitted'` for prop `useOptionsButtonOn` to switch to using options button as soon as the row does not fit the screen size anymore.
+  * add new prop `disabled` to completely disable the options.
+  * add possibility to disable single options buttons via prop `optionsConfig`.
+
+
+* **[BasePopUp](https://base-angewandte.github.io/base-ui-components/components/BasePopUp):**
+  * add slot `header-title` for header customization.
+  * add new prop `headerId` to allow for customization of the popup body id.
+  * add prop `showButtonRow` to enable showing the popup without the bottom buttons.
+  * add handler to focus specific HTML elements within the component using the tab keys. To specify elements that should be focused use new prop `focusableElements`.
+  * new prop `overlayBackgroundVisible` to have a visible background overlay.
+  * add prop `closeButtonDisabled` to disable the close button.
+
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):** to announce results loading via screen reader, add property `loaderActive` to prop `supportiveText`.
+
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/components/BaseSearch):**
+  * also allow data type `number` for prop `linkedListOption`.
+  * add prop `assistiveText` option to announce search results or autocomplete loading.
+
+* **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton):**
+  * add [BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon) component to display icons natively not only via slot (configurable via property `icon` to `options` prop).
+  * new prop `mode` with possible values [`'normal'`](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton.html#type-normal) (the previous appearance, now default) and [`'prominent'`](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton.html#type-prominent).
+  * also added new props `showLabel` to be able to display the label of the fieldset and `showButtonsLabel` (default `false` for type prominent) to show or hide the button label.
+  * add prop `iconSize` (only for `type 'prominent'`).
+
+* **[BaseTextList](https://base-angewandte.github.io/base-ui-components/components/BaseTextList):**
+  * add property `identifierPropertyName` to be used as identifier instead of hardcoded `'source'`.
+  * decide column render based on data structure (so either the number of columns specified in `cols` is used or just a single text block is rendered).
+  * add the aria-labelledby attribute to the dialog box using the title.
+  * new prop `interpretTextAsHtml` applying the new directive `v-insert-text-as-html` and prop `altTitle` for screen reader in case the title contains HTML.
+  * new prop `tooltipThresholdTop` to consider a threshold in tooltip position calculations.
+
+
+### Changed
+
+* **build:**
+  * update dependencies hls.js, commitlint, autoprefixer, concurrently, eslint, globby, gulp-conventional-changelog, husky, postcss, sass-loader, svgo, vite.
+  * upgrade project to be compatible with >= node v18
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):** move properties solely purposed for assistive technologies from prop `advancedSearchText` to `assistiveText`.
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/components/BaseButton):** set text properties default value to an empty string.
+
+* **[BaseChip](https://base-angewandte.github.io/base-ui-components/components/BaseChip):** add BaseChip to components available in styleguide.
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):** remove `dropDownActive` because the BaseDropDownList event does not exist anymore and unify all state handling with `chipsInputActive`.
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** rework input event emit and get rid of double emit.
+
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):**
+  * focus first new menu list element after page change.
+  * other accessibility improvements.
+
+* **[BaseExpandBox](https://base-angewandte.github.io/base-ui-components/components/BaseExpandBox):** adaptions to better handle the visibility of the 'show more' button.
+
+* **[BaseExpandList](https://base-angewandte.github.io/base-ui-components/components/BaseExpandList):** rename prop `supportiveText` to `assistiveText` for consistency.
+
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput):** `update:is-active` event should always be emitted from BaseInput.
+
+* **[BaseLink](https://base-angewandte.github.io/base-ui-components/components/BaseLink):**
+  * render chips as links instead of buttons.
+  * replace [BaseTooltip](https://base-angewandte.github.io/base-ui-components/components/BaseTooltip) with [BaseTooltipBox](https://base-angewandte.github.io/base-ui-components/components/BaseTooltipBox).
+
+* **[BasePopUp](https://base-angewandte.github.io/base-ui-components/components/BasePopUp):**
+  * rename prop `id` to `headerId` to clarify purpose and unify with [BaseTooltipBox](https://base-angewandte.github.io/base-ui-components/components/BaseTooltipBox).
+  * rename prop `isOpenFocus` that defines the HTML element which should be focused after the popup opens to a more fitting name.
+
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):** rename prop `supportiveText` to `assistiveText` for consistency.
+
+* **[BaseTextList](https://base-angewandte.github.io/base-ui-components/components/BaseTextList):** refactor props for more flexibility in the object structure (e.g. define the identifier property name).
+
+
+### Deprecated
+
+* **[BaseTooltip](https://base-angewandte.github.io/base-ui-components/components/BaseTooltip):** this component is deprecated and replaced by [BaseTooltipBox](https://base-angewandte.github.io/base-ui-components/components/BaseTooltipBox).
+
+
+### Removed
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):** remove option to specify an array of strings for selected options. Only array of objects allowed.
+* **[BasePopUp](https://base-angewandte.github.io/base-ui-components/components/BasePopUp):** remove unnecessary variables `show` and `showInt`.
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/components/BaseAdvancedSearch):**
+  * 'Add filter' button has `aria-describedby` attribute but no element with same id.
+  * event `search` emitted params not using `identifierPropertyName` of filter but always `id`.
+  * focus not on input on first drop down open.
+  * search not triggered on main search blur.
+  * if two options in different collections are the same both are highlighted.
+  * main filter not updated if values change from outside.
+  * search not triggered if string is removed from main search field.
+  * reduce recalculation of `rowId`.
+  * also fetch autocomplete results immediately on component render.
+  * autocomplete results sometimes displayed incorrectly in styleguide demo.
+  * also close drop down when all filter data are deleted.
+  * propagate input listeners with correct directive (v-on not v-bind).
+  * remove icon should be shown immediately on text enter.
+  * search mode `list` mobile drop down close button not working.
+  * search not triggered on mobile after blur + remove icon.
+  * accessibility improvements.
+  * drop-downs not closing on chips remove.
+
+* **[BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/components/BaseAutocompleteInput):** avoid doubled events from update:is-active (BaseInput).
+
+* **[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/components/BaseBoxButton):**
+  * trigger event even when the icon is touched directly.
+  * fix disabled state.
+
+* **[BaseBreadCrumbs](https://base-angewandte.github.io/base-ui-components/components/BaseBreadCrumbs):**
+  * deal with long labels.
+  * add app-color on focus and hover to improve visual user experience.
+  * enable aria-current attribute on currently active link.
+  * icon shrinking if label is very long.
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/components/BaseButton):**
+  * `aria-describedby` id sometimes has no reference and button no label if only icon.
+  * add animation for drop down icon.
+  * remove button title attribute.
+
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/components/BaseChipsBelow):** add missing slot `below-input`.
+
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput):**
+  * add id also to 'create entry' option of `allowUnknownEntries` so it is recognized by screen reader.
+  * add missing slot `below-input`.
+  * input string not cleared if focus to other input field.
+  * propagate `internalId` of BaseChipsInput to BaseChipsInputField so they have the same id even if prop `id` has not been set.
+
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInputField):**
+  * update:is-active event emitted twice.
+  * rename variable `chipActiveForRemove` to `indexActiveForRemove` to reflect more accurately what it contains.
+  * focus setting not always triggered on chips remove.
+
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):**
+  * copy & paste not possible.
+  * if year starts with '0' it will be removed by Date.getFullYear().
+  * `inputInt` computed variable changed event not working.
+  * `labelRowSlotHasData()` not always calculated correctly because of whitespace issues.
+  * time picker validation not working.
+  * validity check on date picked not working.
+  * validity check on input blur triggered twice for date picker.
+  * keep `isActiveInt` variable up to date to emit correct state in event.
+  * date/time from should set open if `isActive` prop is set `true`.
+  * error on triggering clear input button.
+  * keyboard tab navigation not possible on firefox.
+  * make sure component always has a proper id assigned.
+  * ios virtual keyboard arrow keys leave picker open.
+  * picker not closed using virtual keyboard on mobile.
+
+* **[BaseExpandBox](https://base-angewandte.github.io/base-ui-components/components/BaseExpandBox):** calculate an optional offset for the content inner height.
+
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):**
+  * `label-additions` slot only shown for first field if field is repeatable.
+  * `field_type 'boolean'` styling wrong if full field.
+  * remove icon not always displayed correctly.
+  * slot bindings not shown in styleguide.
+
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):**
+  * base date input time field event naming wrong.
+  * chips drop down options not displayed with custom `labelPropertyName`.
+  * `fieldValueInt`  variable not updated.
+  * `fieldValueInt` variable not updated with `value-changed` event from subform.
+  * sortable always true if field name is 'keywords'.
+  * time fields do not use correct placeholder.
+  * safeguard against dropDownList being null or undefined.
+
+* **[BaseHlsVideo](https://base-angewandte.github.io/base-ui-components/components/BaseHlsVideo):** add demo to styleguide.
+
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput):**
+  * \<input\> value not updated on event dispatch on some devices.
+  * blur event not triggered when value empty.
+  * make blur event available to outside again.
+  * remove magnifier icon from input type=search in safari (since we have our own icon).
+  * props `errorMessage` and `invalid` should trigger immediately.
+  * `showLabelRow()` not always calculated correctly.
+  * prevent error icon from shrinking.
+  * set focus on input if `isActive` on mounted.
+  * stop tab keydown event from being emitted twice.
+  * ios virtual keyboard arrow keys leave dropdowns open.
+  * chip not added on Android using virtual keyboard.
+
+* **[BaseLink](https://base-angewandte.github.io/base-ui-components/components/BaseLink):**
+  * fix word-breaks for comma separated links
+  * clarify prop `tooltip` usage and improve slot `tooltip` documentation
+  * render aria-label for type chip links
+  * set link attributes depending on link type and router availability
+
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/components/BaseMap):** props validator functions not working because of wrongful property name.
+
+* **[BaseOptions](https://base-angewandte.github.io/base-ui-components/components/BaseOptions):**
+  * wrong calculation of remaining space before row wrap.
+  * improve options transition.
+
+* **[BasePagination](https://base-angewandte.github.io/base-ui-components/components/BasePagination):** error if pagination is removed.
+
+* **[BasePopUp](https://base-angewandte.github.io/base-ui-components/components/BasePopUp):**
+  * fixed `descriptionElementId` not being interpreted as variable on the `aria-describedby` attribute.
+  * prevent scaling of the close icon on long titles.
+  * limit the popup title to two lines and optional ellipsis.
+  * enable scroll functionality on iOS.
+  * refactor how initial focus element is set once when the component is opened.
+
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):** pagination visible before boxes are rendered.
+
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/components/BaseSearch):**
+  * avoid doubled events from update:is-active (BaseInput).
+  * have iOS enter key on virtual keyboard displayed as 'search'.
+  * on mobile blur input on keyboard enter so virtual keyboard is removed.
+  * keep is-active prop in sync between BaseSearch and BaseAdvancedSearch.
+
+* **[BaseSelectOptions](https://base-angewandte.github.io/base-ui-components/components/BaseSelectOptions):** styling broken on element wrap (small screen size).
+
+* **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton):** improve options transition.
+
+* **[BaseTextList](https://base-angewandte.github.io/base-ui-components/components/BaseTextList):**
+  * fix the `listType` prop if the component is used recursively.
+  * remove unused event and non-existent method `chip-clicked` and `emitChipData`.
+  * fix word-breaks for comma separated links.
+  * comma moving to next line separately for link list (internal, external).
+  * props validator functions not working because of wrongful property name.
+  * refactor styling to BEM syntax.
+  * fix chips margin-bottom.
+
+* **docs:** fix README css import statements to structure determined in v3.
+* **utils:**
+  * improve `extractNestedPropertyValue()` code readability and documentation.
+  * safeguard `extractNestedPropertyValue()` against property not existing in the object.
+  * safeguard i18n term function against key not being provided.
+
 ## 3.1.2 (2024-01-03)
 
 

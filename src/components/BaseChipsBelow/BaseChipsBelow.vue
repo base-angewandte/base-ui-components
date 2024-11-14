@@ -1,5 +1,7 @@
 <template>
-  <div class="base-chips-below">
+  <div
+    ref="chipsBelow"
+    class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
       v-model="selectedBelowListInt"
@@ -52,6 +54,11 @@
         <!-- @slot a slot to customize messages in case of no options present in drop down -->
         <slot
           name="no-options" />
+      </template>
+      <!-- @slot to add elements below input fields e.g. add drop down; will appear before the
+        chosen chips list -->
+      <template #below-input>
+        <slot name="below-input" />
       </template>
     </BaseChipsInput>
     <VueDraggable
@@ -130,9 +137,11 @@
 
 <script>
 import { VueDraggable } from 'vue-draggable-plus';
+import { defineAsyncComponent, ref } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
-import { defineAsyncComponent } from 'vue';
-
+import BaseChip from '@/components/BaseChip/BaseChip.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)
  * in order to assign additional values (e.g. roles) to selected entries)]
@@ -450,8 +459,43 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionRemoved: 'option {label} removed.',
+      }),
+    },
   },
   emits: ['additional-property-changed', 'hoverbox-active', 'fetch-dropdown-entries', 'update:modelValue'],
+  setup() {
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsBelow = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsBelow);
+    return {
+      chipsBelow,
+      announcement,
+    };
+  },
   data() {
     return {
       chipsArray: [],
@@ -586,6 +630,9 @@ export default {
       const item = this.selectedBelowListInt.splice(index, 1);
       item[this.additionalPropertyName] = {};
       this.emitInternalList(this.selectedBelowListInt);
+      // inform screen reader user
+      this.announcement = this.assistiveText.optionRemoved
+        .replace('{label}', item[0][this.labelPropertyName]);
     },
     updateList(evt, list) {
       this.emitInternalList(list);

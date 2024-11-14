@@ -1,12 +1,13 @@
 <template>
   <div
+    ref="chipsInput"
     class="base-chips-input">
     <!-- TODO: check if really ALL props should be forwarded -->
     <BaseChipsInputField
       ref="baseInput"
       v-model="input"
       v-model:selected-list="selectedListInt"
-      v-model:is-active="isActive"
+      v-model:is-active="chipsInputActive"
       v-bind="chipsFieldInputProps"
       :input-type="inputType"
       :add-selected-entry-directly="false"
@@ -15,11 +16,12 @@
       :loadable="allowDynamicDropDownEntries"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
+      @keydown="checkKeyEvent"
       @click-input-field="onInputFocus"
       @clicked-outside="onInputBlur">
       <template #below-input>
         <BaseDropDownList
-          v-if="isActive"
+          v-if="chipsInputActive"
           ref="dropDownList"
           v-model:active-option="activeOption"
           v-model:selected-option="selectedOption"
@@ -31,35 +33,36 @@
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
-          @within-drop-down="dropDownActive = $event"
           @click.stop="closeDropDown"
           @touchstart.stop="closeDropDown">
-          <template #option="entry">
+          <template #option="{ option }">
             <span
-              v-if="allowUnknownEntries && !entry.option[identifierPropertyName]"
+              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
               ref="option"
-              :key="entry.option[identifierPropertyName]">
+              :key="option[labelPropertyName]">
               {{ addNewChipText
-                ? `${addNewChipText} ${getLangLabel(entry.option[labelPropertyName], true)} ...`
+                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
                 : `${getI18nTerm('form.Add', -1, {
-                  value: getLangLabel(entry.option[labelPropertyName], true),
+                  value: getLangLabel(option[labelPropertyName], true),
                 })} ...` }}
             </span>
             <template
-              v-else-if="entry">
+              v-else-if="option">
               <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
                 @binding {Object} item - the option passed to options list -->
               <slot
-                :item="entry.option"
+                :item="option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                <template v-if="highlightStringMatch">
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <span v-html="highlight(getLangLabel(entry.option[labelPropertyName], true))" />
-                </template>
-                <template v-else>
-                  {{ getLangLabel(entry.option[labelPropertyName], true) }}
-                </template>
+                <span
+                  v-if="option[identifierPropertyName]"
+                  :key="option[identifierPropertyName]"
+                  v-insert-text-as-html="{
+                    value: highlightStringMatch
+                      ? highlight(getLangLabel(option[labelPropertyName], true))
+                      : getLangLabel(option[labelPropertyName], true),
+                    interpretTextAsHtml: interpretChipsLabelAsHtml,
+                  }" />
               </slot>
             </template>
           </template>
@@ -70,6 +73,8 @@
               name="no-options" />
           </template>
         </BaseDropDownList>
+        <!-- @slot to add elements below input fields e.g. add drop down -->
+        <slot name="below-input" />
       </template>
       <template
         #label-addition>
@@ -99,14 +104,14 @@
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"
-          @keydown.enter.stop="isActive = !isActive"
-          @click.stop="isActive = !isActive">
+          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
+          @click.stop="chipsInputActive = !chipsInputActive">
           <BaseIcon
             :class="[
               'base-chips-input__single-dropdown-icon',
               {
                 'base-chips-input__single-dropdown-icon-rotated':
-                  isActive,
+                  chipsInputActive,
               },
             ]"
             name="drop-down" />
@@ -125,12 +130,14 @@
 </template>
 
 <script>
-import { highlightText } from '@/utils/utils.js';
 import { computed, ref, defineAsyncComponent } from 'vue';
-import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
+import { highlightText } from '@/utils/utils.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useId } from '@/composables/useId.js';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 
 /**
  * Base Chips Input component with drop down and autocomplete functionality
@@ -143,6 +150,13 @@ export default {
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseDropDownList: defineAsyncComponent(() => import('@/components/BaseDropDownList/BaseDropDownList.vue')),
     BaseChipsInputField,
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
+  },
+  model: {
+    prop: 'selectedList',
+    event: 'selected-changed',
   },
   props: {
     /**
@@ -416,10 +430,28 @@ export default {
      * properties:
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for editable chips)
+     * **loaderActive**: text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop down
+     *  list changed)
+     * **optionAdded**: text read when option was added to the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
+     * **optionToRemoveSelected**: text read when option is marked active for removal (by using
+     *  backspace in empty input field). string {label} could be added to be replaced
+     *  by the actual chip label (value in [`labelPropertyName`])
+     * **optionRemoved**: text read when option was removed from the selected list. string {label}
+     *  could be added to be replaced by the actual chip label (value in [`labelPropertyName`])
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        selectedOption: '',
+        loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
+      }),
     },
     /**
      * define if selected options chips should come with a remove icon
@@ -442,6 +474,9 @@ export default {
     /**
      * set this flag to `true` to highlight autocomplete option characters that match
      *  the current search input string
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
      */
     highlightStringMatch: {
       type: Boolean,
@@ -455,6 +490,17 @@ export default {
     highlightStringTags: {
       type: Array,
       default: () => ([]),
+    },
+    /**
+     * if necessary selected chip text can
+     *  be rendered as v-html directive
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
+     */
+    interpretChipsLabelAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['hoverbox-active', 'update:modelValue', 'fetch-dropdown-entries'],
@@ -480,8 +526,20 @@ export default {
       if (!baseInput.value || !baseInput.value.$el) return null;
       return baseInput.value.$el.getElementsByTagName('input')[0];
     });
-
+    /**
+     * ACCESSIBILITY ANNOUNCEMENT
+     */
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const chipsInput = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(chipsInput);
     return {
+      chipsInput,
+      announcement,
       navigate,
       internalId,
       getLangLabel,
@@ -519,18 +577,19 @@ export default {
        * variable to store state of input field (for drop down handling)
        * @type {boolean}
        */
-      isActive: false,
-      /**
-       * variable for checking if cursor is withing drop down
-       * @type {boolean}
-       */
-      dropDownActive: false,
+      chipsInputActive: false,
       /**
        * the minimal width of the drop down element (calculated in js because ? )
        * TODO: above...
        * @type {string}
        */
       dropDownMinWidth: '100%',
+      /**
+       * timeout for drop down options found announcer because otherwise
+       * text not read if more than one character entered into input
+       * @type {?number}
+       */
+      timeout: null,
     };
   },
   computed: {
@@ -542,6 +601,7 @@ export default {
       const newProps = {
         ...this.$attrs,
         ...this.$props,
+        id: this.internalId,
       };
       // delete the chipsInput `modelValue` prop because for component
       // ChipsInputField the input string is `modelValue`
@@ -566,6 +626,9 @@ export default {
       if (this.allowUnknownEntries && this.input) {
         tempList.unshift({
           [this.labelPropertyName]: this.language ? { [this.language]: this.input } : this.input,
+          // add an identifier here as well so this option can be recognized by the inputs
+          // `aria-activedescendant` attribute
+          [this.identifierPropertyName]: 'createNew',
         });
       }
       // filter entries that were already selected, if no identifier
@@ -584,20 +647,6 @@ export default {
           .toLowerCase().includes(this.input.toLowerCase()));
       }
       return tempList;
-    },
-    /**
-     * determine from state of input field and drop down state (is cursor within)
-     * if drop down should be active
-     * @returns {boolean}
-     */
-    chipsInputActive: {
-      set(val) {
-        this.dropDownActive = val;
-        this.isActive = val;
-      },
-      get() {
-        return this.isActive || this.dropDownActive;
-      },
     },
     /**
      * the currently active option object
@@ -656,6 +705,31 @@ export default {
         } else if (!val.length && (!this.allowUnknownEntries || !this.input)) {
           this.activeOptionIndex = -1;
         }
+        // only set the text when the drop down is actually visible
+        // and do not announce the "create {custom entry}..." because it overwrites
+        // the loader message and is announced again with the rest of the search results
+        // later anyway
+        if (this.chipsInputActive
+          && !this.isLoading && !this.announcement) {
+          if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+          }
+          // adding this timeout because with dynamicFetch false the list
+          // changes immediately and announcement text is not always read
+          this.timeout = setTimeout(() => {
+            // check if drop down is still open agin to prevent announcement
+            // after option was added (if drop down was closed)
+            if (this.chipsInputActive && this.assistiveText.resultsRetrieved) {
+              if (val.length) {
+                this.announcement = this.assistiveText.resultsRetrieved
+                  .replace('{number}', val.length);
+              } else {
+                this.announcement = this.dropDownNoOptionsInfo;
+              }
+            }
+          }, 300);
+        }
       },
       immediate: true,
     },
@@ -697,10 +771,6 @@ export default {
      * @param {string} val
      */
     input(val) {
-      console.log('chips input changed', val);
-      // open dropdown
-      this.isActive = true;
-
       // if dropdown content is dynamic alert parent to fetch new relevant entries (if desired)
       if (this.allowDynamicDropDownEntries) {
         /**
@@ -758,18 +828,30 @@ export default {
      * @param {Object} selected
      */
     addSelectedOption(selected) {
+      // if unknown entries are allowed we need to remove the added
+      // id again before pushing it to selectedListInt
+      const newSelected = { ...selected };
+      if (this.allowUnknownEntries && newSelected[this.identifierPropertyName] === 'createNew') {
+        delete newSelected[this.identifierPropertyName];
+      }
       if (this.allowMultipleEntries) {
-        this.selectedListInt.push(selected);
+        this.selectedListInt.push(newSelected);
       } else {
         // set the option on first array index (either setting new if empty
         // array or replacing old option)
-        this.selectedListInt[0] = selected;
+        this.selectedListInt[0] = newSelected;
         // for single select the drop down should close again automatically
         // after choosing the option
-        this.dropDownActive = false;
+        this.chipsInputActive = false;
       }
       // inform parent of the changes
       this.updateParentSelectedList(this.selectedListInt);
+      // make sure the assistive text exists
+      if (this.assistiveText.optionAdded) {
+        // announce the added option to the screen reader
+        this.announcement = this.assistiveText.optionAdded
+          .replace('{label}', newSelected[this.labelPropertyName]);
+      }
       // clear input
       this.input = '';
       // reset selected option
@@ -805,13 +887,19 @@ export default {
 
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
 
+    /**
+     * function triggered when input field was clicked
+     */
     onInputFocus() {
       this.chipsInputActive = true;
     },
+    /**
+     * function triggered when click-outside happened
+     */
     onInputBlur() {
       this.chipsInputActive = false;
       // if the focus goes to somewhere else on the page - remove input string
-      if (!this.dropDownActive && document.activeElement.tagName === 'BODY') {
+      if (this.input && document.activeElement.id !== this.internalId) {
         this.input = '';
       }
     },
@@ -823,10 +911,29 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     checkKeyEvent(event) {
-      // if tab this will trigger moving forward to next input field
-      // --> this one should be inactive
-      if (event.key === 'Tab') {
-        this.chipsInputActive = false;
+      const { key } = event;
+      // this should (currently) never be the case (but it was in the past - on closeDropDownOnOptionSelect
+      // focus remained but drop down was closed) but just to be safe - set the input active as soon
+      // as user enters input
+      // TODO: what would happen if user selects an option, focus stays and user copy pastes? (but
+      // again - this is currently just hypothetical)
+      if (!['Tab', 'Enter', 'Shift'].includes(key)) {
+        this.chipsInputActive = true;
+      }
+      // if user pressed tab and thus input field leaves focus we would want to remove the input string
+      // so no confusion is created as to wether this string is part of a search or saved in form
+      // so we check for type of key and if input is present
+      if (key === 'Tab' && this.input
+        // and remove input if
+        // there is no other focusable element in the input (like the clear input button)
+        && (!this.clearable
+          // user is moving focus backwards from input to outside of input field (not from any
+          // other element in the input field)
+          || (event.shiftKey && event.target.tagName === 'INPUT')
+          // user is moving focus from clear input button to outside of the input
+          || (this.clearable && !event.shiftKey && event.target.tagName !== 'INPUT'))) {
+        // this.chipsInputActive = false;
+        this.input = '';
       }
     },
     /**
@@ -835,7 +942,7 @@ export default {
      */
     onEnter() {
       // do nothing if dropdown should be closed on option select, and dropdown is not active
-      if (this.closeDropdownOnOptionSelect && !this.isActive) return;
+      if (this.closeDropdownOnOptionSelect && !this.chipsInputActive) return;
 
       // check if there is a currently active option
       if (this.activeOption) {
@@ -848,9 +955,6 @@ export default {
      * @param {KeyboardEvent} event - the keydown event
      */
     onArrowKey(event) {
-      // open dropdown
-      this.isActive = true;
-
       // check if the list has any options
       if (this.listInt.length) {
         // if yes trigger the navigate function
@@ -891,7 +995,7 @@ export default {
      */
     closeDropDown() {
       // optional close dropdown after selection
-      if (this.closeDropdownOnOptionSelect && this.isActive) {
+      if (this.closeDropdownOnOptionSelect && this.chipsInputActive) {
         this.chipsInputActive = false;
         if (this.inputElem) {
           this.inputElem.blur();

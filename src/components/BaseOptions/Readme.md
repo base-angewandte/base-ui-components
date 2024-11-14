@@ -40,6 +40,12 @@ Resize to see the 'mobile' effect!
             text="mobile"
             class="button-switch"
             @clicked="useOptionsButtonOn = 'mobile'" />
+          <BaseButton
+            :active="useOptionsButtonOn === 'fitted'"
+            button-style="row"
+            text="fitted"
+            class="button-switch"
+            @clicked="useOptionsButtonOn = 'fitted'" />
         </div>
     </div>
 </template>
@@ -81,6 +87,7 @@ Advanced example with all slots filled. Choose different settings for available 
         :use-options-button-on="useOptionsButtonOn"
         :options-hidden="optionsHidden"
         :show-after-options-below="showAfterOptionsBelow"
+        :options-button-disabled="optionsButtonDisabled"
         :align-options="alignOptions">
         <template #beforeOptions>
           <div>beforeOptions slot</div>
@@ -130,6 +137,12 @@ Advanced example with all slots filled. Choose different settings for available 
             text="Hide Options"
             class="button-switch"
             @clicked="optionsHidden = !optionsHidden" />
+          <BaseButton
+            :active="optionsButtonDisabled"
+            button-style="row"
+            text="Disable Options Button"
+            class="button-switch"
+            @clicked="optionsButtonDisabled = !optionsButtonDisabled" />
         </div>
         <p class="options-settings">Choose setting for 'useOptionsButtonOn' prop:</p>
         <div class="button-switches">
@@ -165,6 +178,7 @@ export default {
       showAfterOptionsBelow: true,
       alignOptions: 'right',
       useOptionsButtonOn: 'always',
+      optionsButtonDisabled: false,
     };
   },
 };

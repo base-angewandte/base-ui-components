@@ -1,5 +1,7 @@
 <template>
-  <div class="base-autocomplete-input">
+  <div
+    ref="autocompleteInput"
+    class="base-autocomplete-input">
     <BaseInput
       v-model="inputInt"
       v-model:is-active="isActiveInt"
@@ -21,6 +23,9 @@
       :disabled="disabled"
       :drop-down-list-id="`${inputId}-list-identifier`"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"
@@ -90,10 +95,12 @@
 </template>
 
 <script>
-import BaseInput from '@/components/BaseInput/BaseInput.vue';
-import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
+import { ref } from 'vue';
 import { createId } from '@/utils/utils.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 
 /**
  * Input component allowing to select single values from a drop down that are filled into
@@ -249,7 +256,7 @@ export default {
      */
     identifierPropertyName: {
       type: String,
-      default: 'source',
+      default: 'id',
     },
     /**
      * specify the object property that should be used as value to be displayed
@@ -290,11 +297,43 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * add text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`) and when results were retrieved (drop down
+     *  list changed)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        loaderActive: 'Drop down options are loading.',
+        resultsRetrieved: '{number} options found with your input.',
+      }),
+    },
   },
   emits: ['update:model-value', 'fetch-dropdown-entries', 'update:is-active', 'selected'],
   setup() {
+    /**
+     * DROP DOWN NAVIGATION
+     */
     const { navigate } = useListNavigation();
-    return { navigate };
+
+    /**
+     * ACCESSIBILITY ANNOUNCEMENTS
+     */
+    /**
+     * set up component reference
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const autocompleteInput = ref(null);
+    // use composable to announce screen reader text on actions taken (e.g.
+    // add chip to selected list or remove chip
+    const { announcement } = useAnnouncer(autocompleteInput);
+
+    return {
+      navigate,
+      autocompleteInput,
+      announcement,
+    };
   },
   data() {
     return {
@@ -314,6 +353,12 @@ export default {
        * @type {boolean}
        */
       isActiveInt: false,
+      /**
+       * timeout for drop down options found announcer because otherwise
+       * text not read if more than one character entered into input
+       * @type {?number}
+       */
+      timeout: null,
     };
   },
   computed: {
@@ -456,6 +501,25 @@ export default {
        * @param {boolean} - is input field active
        */
       this.$emit('update:is-active', val);
+    },
+    filteredListInt(val) {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+      }
+      // adding this timeout because with dynamicFetch false the list
+      // changes immediately and announcement text is not always read
+      this.timeout = setTimeout(() => {
+        // only read announcement if drop down is open
+        if (this.isActiveInt) {
+          if (val.length) {
+            this.announcement = this.assistiveText.resultsRetrieved
+              .replace('{number}', val.length);
+          } else {
+            this.announcement = this.dropDownNoOptionsInfo;
+          }
+        }
+      }, 1000);
     },
   },
   methods: {

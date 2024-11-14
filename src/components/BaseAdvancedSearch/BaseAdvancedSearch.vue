@@ -8,7 +8,7 @@
         v-for="(filter, index) in appliedFiltersInt"
         :key="'filter-' + index"
         :mode="mode"
-        :search-row-id="`${rowId}-${filter[identifierPropertyName.filter]}-${index}`"
+        :search-row-id="`${internalId}-${filter[identifierPropertyName.filter]}-${index}`"
         :is-main-search="false"
         :autocomplete-results="filtersAutocompleteResults[index]"
         :filter-list="displayedFilters"
@@ -21,7 +21,19 @@
         :identifier-property-name="identifierPropertyName"
         :drop-down-info-texts="dropDownInfoTexts"
         :advanced-search-text="advancedSearchText"
-        :assistive-text="assistiveText"
+        :assistive-text="{
+          addFilter: assistiveText.addFilter,
+          removeFilter: assistiveText.removeFilter,
+          selectFilterLabel: assistiveText.selectFilterLabel,
+          searchLabel: assistiveText.searchLabel,
+          selectedOption: assistiveText.selectedOption,
+          loaderActive: assistiveText.autocompleteLoaderActive,
+          autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
+          autocompleteNoResults: assistiveText.autocompleteNoResults,
+          autocompleteInitial: assistiveText.autocompleteInitial,
+          categoryAnnouncement: assistiveText.categoryAnnouncement,
+          optionsAnnouncement: assistiveText.optionsAnnouncement,
+        }"
         :date-field-delay="dateFieldDelay"
         :language="language"
         :highlight-autocomplete-match="highlightAutocompleteMatch"
@@ -30,11 +42,14 @@
         @remove-filter="removeFilter($event, index)"
         @update:applied-filter="updateFilter($event, index)"
         @fetch-autocomplete-results="fetchAutocomplete($event, index)">
-        <template #autocomplete-option="{ option: autocompleteOption }">
-          <!-- @slot to allow for modification of the autocomplete option -->
+        <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
+          <!-- @slot to allow for modification of the autocomplete option
+            @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+            @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
           <slot
             name="autocomplete-option"
-            :option="autocompleteOption" />
+            :option="autocompleteOption"
+            :collection-id="collectionId" />
         </template>
       </BaseAdvancedSearchRow>
     </template>
@@ -43,8 +58,8 @@
     <BaseAdvancedSearchRow
       ref="mainSearch"
       v-model:applied-filter="mainFilter"
-      :search-row-id="`main-${rowId}`"
-      :is-main-search="true"
+      v-bind="$attrs"
+      :search-row-id="`main-${internalId}`"
       :mode="mode"
       :filter-list="displayedFilters"
       :form-filter-list="formFilterList"
@@ -57,7 +72,20 @@
       :identifier-property-name="identifierPropertyName"
       :drop-down-info-texts="dropDownInfoTexts"
       :advanced-search-text="advancedSearchText"
-      :assistive-text="assistiveText"
+      :assistive-text="{
+        addFilter: assistiveText.addFilter,
+        removeFilter: assistiveText.removeFilter,
+        selectFilterLabel: assistiveText.selectFilterLabel,
+        searchLabel: assistiveText.searchLabel,
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.autocompleteLoaderActive,
+        autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
+        autocompleteNoResults: assistiveText.autocompleteNoResults,
+        autocompleteInitial: assistiveText.autocompleteInitial,
+        categoryAnnouncement: assistiveText.categoryAnnouncement,
+        optionsAnnouncement: assistiveText.optionsAnnouncement,
+        results: assistiveText.results,
+      }"
       :date-field-delay="dateFieldDelay"
       :language="language"
       :highlight-autocomplete-match="highlightAutocompleteMatch"
@@ -70,19 +98,25 @@
         <BaseButton
           v-if="mode === 'form'"
           :text="showAdvancedSearchButtonText ? advancedSearchText.advancedButtonLabel : ''"
+          :aria-expanded="`${formOpen}`"
+          :aria-controls="`${internalId}-form`"
+          :description="advancedButtonDescription"
           button-style="row"
           icon="drop-down"
           icon-size="small"
           icon-position="right"
           :class="['base-advanced-search__expand-button',
                    { 'base-button-icon-rotate-180': formOpen }]"
-          @click.stop="openAdvancedSearch" />
+          @click.prevent.stop="openAdvancedSearch"
+          @keydown.enter.space.prevent.stop="openAdvancedSearch"
+          @focusin.stop />
       </template>
       <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>
         <BaseForm
           v-if="mode === 'form' && formOpen"
-          v-bind="formProps"
+          :id="`${internalId}-form`"
+          v-bind="amendedFormProps"
           :form-field-json="formFilterList"
           :value-list="formFilterValuesInt"
           :label-property-name="labelPropertyName.formInputs"
@@ -91,29 +125,167 @@
                    { 'base-advanced-search__search-form--hidden': !formMounted}]"
           @input-complete="updateFormFilters"
           @fetch-autocomplete="fetchFormAutocomplete"
-          @form-mounted="formIsMounted" />
+          @form-mounted="formIsMounted">
+          <template #label-addition="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-label-addition"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #pre-input-field="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-pre-input-field"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template
+            #input-field-addition-before="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-addition-before"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #input-field-inline-before="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-inline-before"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #input-field-addition-after="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-addition-after"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #post-input-field="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-post-input-field"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #error-icon>
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
+            <slot name="form-error-icon" />
+          </template>
+          <template #remove-icon>
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
+            <slot name="form-remove-icon" />
+          </template>
+          <template #below-input="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-below-input"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #drop-down-entry="{ option, fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+              @binding {object} option - the option object
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              :field-name="fieldName"
+              :group-names="groupNames"
+              :option="option"
+              name="form-drop-down-entry">
+              <template
+                v-if="mode === 'form'
+                  // check if value is boolean and was set true
+                  && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                    // or if it is an array and
+                    || (typeof renderFormChipsLabelAsHtml === 'object'
+                      // a) includes the field name
+                      && (renderFormChipsLabelAsHtml.includes(fieldName)
+                        // or b) this is nested field in a form group and the array
+                        // contains a (nested) object with the group names and an array with the field name
+                        || (groupNames?.length && renderFormChipsLabelAsHtml
+                          .some((arrayEntry) => typeof arrayEntry === 'object'
+                            && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
+                              .includes(fieldName))))))">
+                <span
+                  v-insert-text-as-html="{
+                    value: option[labelPropertyName.formInputs],
+                    interpretTextAsHtml: true,
+                  }" />
+              </template>
+            </slot>
+          </template>
+        </BaseForm>
         <div
           v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
           <BaseCollapsedFilterRow
             v-model:filters="collapsedFiltersArray"
             :date-time-text="advancedSearchText.collapsedDateTime"
+            :interpret-label-as-html="renderFormChipsLabelAsHtml"
+            :assistive-text="{
+              removeFiltersLabel: assistiveText.removeAllFiltersLabel,
+              filterRemovedNotification: assistiveText.removeFilterValueNotification,
+              appliedFiltersLabel: assistiveText.collapsedAppliedFiltersLabel,
+              booleanFilterLabel: assistiveText.collapsedBooleanFilterValue,
+              optionToRemoveSelected: assistiveText.collapsedOptionToRemoveSelected,
+            }"
             @remove-all="removeAllFilters" />
         </div>
       </template>
-      <template #autocomplete-option="{ option: autocompleteOption }">
-        <!-- @slot to allow for modification of the autocomplete option -->
+      <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
+        <!-- @slot to allow for modification of the autocomplete option
+          @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+          @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
         <slot
           name="autocomplete-option"
-          :option="autocompleteOption" />
+          :option="autocompleteOption"
+          :collection-id="collectionId">
+          <!-- also automate the display of html for all fields specified directly in the component -->
+          <template
+            v-if="mode === 'form'
+              && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                || (typeof renderFormChipsLabelAsHtml === 'object'
+                  && renderFormChipsLabelAsHtml.includes(collectionId)))">
+            <span
+              v-insert-text-as-html="{
+                value: autocompleteOption[labelPropertyName.autocompleteOption],
+                interpretTextAsHtml: true,
+              }" />
+          </template>
+        </slot>
       </template>
     </BaseAdvancedSearchRow>
+    <span
+      v-if="assistiveTextNotification"
+      aria-live="assertive"
+      class="assistive-text">
+      {{ assistiveTextNotification }}
+    </span>
   </div>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
+import { debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import { useId } from '@/composables/useId.js';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
-import { createId, debounce, hasData, sort } from '@/utils/utils.js';
 
 /**
  * @typedef Filter
@@ -142,6 +314,9 @@ export default {
     BaseCollapsedFilterRow: defineAsyncComponent(() => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue').then(m => m.default || m)),
     BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m)),
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m)),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   props: {
     /**
@@ -296,16 +471,11 @@ export default {
      *     **subtext**: text shown as second line on the drop-down in filters area for mode `list`.
      *     **availableOptions**: text shown with chips options for controlled vocabulary
      *     search` for mode `list`.
-     *     **addFilter**: text/label used for add filter icon for mode `list`.
-     *     **removeFilter**: text/label used for remove filter icon for mode `list`.
-     *     **selectFilterLabel**: label (not visible) used for filter chips input field for mode `list`.
-     *     **searchLabel**: label (not visible) used for search input field.
      *     **collapsedDateTime**: for mode `form`: set the text for the collapsed filter row which is
      *      displayed for date or time values of ranges when only one field is filled. (e.g. `until 12.12.2023`)
      *     **advancedButtonLabel**: button text displayed for Advanced Search Toggle button for mode `form`.
      *
      *  The values of this object might be plain text or a key for an i18n file.
-     * This prop can be ignored when the `no-options` slot is used.
      */
     advancedSearchText: {
       type: Object,
@@ -313,10 +483,6 @@ export default {
         title: 'Advanced Search',
         subtext: 'Select a filter',
         availableOptions: 'Available options',
-        addFilter: 'Add filter',
-        removeFilter: 'Remove filter',
-        selectFilterLabel: 'Select filter',
-        searchLabel: 'Search for Entries',
         collapsedDateTime: {
           from: 'from',
           until: 'until',
@@ -394,6 +560,8 @@ export default {
      *      the object properties for label and identifier need to be set here (in case they are different
      *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `identifierPropertyName`))
      *      if `identifierPropertyName` is also set via `fieldProps` the latter is the preferred value.
+     *  Caveat: Please note that the property `idInternal` is used for internal handlings and the property
+     *    might be overwritten
      */
     identifierPropertyName: {
       type: [Object, String],
@@ -417,6 +585,8 @@ export default {
      *      the object properties for label and identifier need to be set here (in case they are different
      *      from the input components default (e.g. see [BaseChipsInput](BaseChipsInput) `labelPropertyName`))
      *      if `labelPropertyName` is also set via `fieldProps` the latter is the preferred value.
+     *    Caveat: Please note that the property `labelInternal` is used for internal handlings and the property
+     *    might be overwritten
      */
     labelPropertyName: {
       type: [Object, String],
@@ -443,14 +613,88 @@ export default {
       validator: val => ['id', 'label', 'data'].every(key => Object.keys(val).includes(key)),
     },
     /**
-     * this prop gives the option to add assistive text for screen readers.
+     * this prop gives the option to add assistive text for screen readers for
+     *  the BaseSearch component.
      * properties:
+     * **addFilter**: text/label used for add filter icon for mode `list`.
+     * **removeFilter**: text/label used for remove filter icon for mode `list`.
+     * **selectFilterLabel**: label (not visible) used for filter chips input field for mode `list`.
+     * **searchLabel**: label (not visible) used for search input field.
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **loaderActive**: text that is announced when autocomplete results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **autocompleteResultsRetrieved**: text announced when autocomplete results are returned.
+     *  use {optionsNumber} and {collectionsNumber} in the string to announce the number of
+     *  total options and collections found respectively.
+     * **autocompleteNoResults**: Text announced when no results were found with a given
+     *  search string.
+     * **autocompleteInitial**: Text announced when no search string was provided for
+     *  autocomplete.
+     * **categoryAnnouncement**: Text announced when a new category is entered in the
+     *  autocomplete drop down options list with keyboard navigation. string '{label}' will
+     *  be replaced by the actual specified category label
+     * **optionsAnnouncement**: announced together with category when in category selection
+     *  mode (after using arrowLeft key on autocomplete input) - to give the user a feeling
+     *  how many options were found for the announced category. string '{number}' will be
+     *  replaced by the number of entries in that category.
+     * **autocompleteOptionFilledToForm**: text announced when an option was selected from the autocomplete
+     *  dropdown, and it is filled into the respective form field. (only for mode `form`)
+     * **advancedButtonDescription**: button description for Advanced Search Toggle button for mode `form`.
+     *      For accessibility purposes. You may add the string {state} which will be replaced with the respective
+     *      'open' and 'close' value specified in `formState` (see below). Only relevant for mode `form`.
+     * **formState**: an object with properties `open` (text that is read when form is closed and button
+     *      functionality is to open the form) and `close` (text that is read when form is open and button
+     *      functionality is to close the form). Only relevant for mode `form`.
+     * **removeAllFiltersLabel**: label for the remove icon in the collapsed filter row.
+     *     Only relevant for mode `form`. For accessibility purposes
+     * **removeFilterValueNotification**: notification that is read by screen readers when a filter
+     *      value was removed. Add the string {value} to read the filter value that was removed and
+     *      {label} to read the label of the filter from which the value was removed. Only relevant for mode `form`.
+     * **collapsedFilterRowRemovedNotification**: notification read when the last filter was removed from
+     *      the collapsed filter row. Or remove row was clicked. Only relevant for mode `form`.
+     * **collapsedAppliedFiltersLabel**: description for the filters in the collapsed filter row.
+     *      Only relevant for mode `form`. For accessibility purposes.
+     * **collapsedBooleanFilterValue**: Set text that should be read for a boolean filter value. You may add
+     *      the string {label} which will be replaced by the filter label.
+     *      Only relevant for mode `form`. For accessibility purposes.
+     * **collapsedOptionToRemoveSelected**: text read when an option is focused (and thus selected), should
+     *  announce to the screen reader user that option can now be removed via Backspace or Delete.
+     * **results**: provide text that should be announced when the search has
+     *  yielded results (or not).
+     *
+     * Caveat: `results` has a watcher attached to trigger the
+     *    announcement so make sure the property values are reset after filling them
+     *    by using update:assistive-text or resetting it manually (after a timeout)
      */
     assistiveText: {
       type: Object,
-      default: () => ({}),
+      default: () => ({
+        addFilter: 'Add filter',
+        removeFilter: 'Remove filter',
+        selectFilterLabel: 'Select filter',
+        searchLabel: 'Search for Entries',
+        selectedOption: '',
+        autocompleteLoaderActive: 'loading options.',
+        autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
+        autocompleteNoResults: 'No results found.',
+        autocompleteInitial: 'Please start typing to see suggestions.',
+        categoryAnnouncement: 'category {label}.',
+        optionsAnnouncement: '{number} options.',
+        autocompleteOptionFilledToForm: 'option {optionLabel} filled to field {fieldLabel}.',
+        advancedButtonDescription: 'Click to {state} advanced search form.',
+        formState: {
+          open: 'open',
+          close: 'close',
+        },
+        removeAllFiltersLabel: 'Remove all filters.',
+        removeFilterValueNotification: 'Filter value {value} was removed from filter {label}.',
+        collapsedFilterRowRemovedNotification: 'All search filters were reset.',
+        collapsedAppliedFiltersLabel: 'Currently applied Filters',
+        collapsedBooleanFilterValue: 'Filter {label} was set',
+        collapsedOptionToRemoveSelected: 'Press delete or backspace to remove.',
+        results: '',
+      }),
     },
     /**
      * if desired the box shadow around the search rows can be deactivated here
@@ -492,8 +736,45 @@ export default {
       type: Array,
       default: () => ([]),
     },
+    /**
+     * mode `form`: if necessary selected chip text can  be rendered as v-html directive
+     *  either set this prop `true` or `false`
+     *
+     * this will only be applied to chips with an identifier property and of course
+     *   can only apply to form field field_type `chips`
+     *
+     * if only chips of certain form fields should be rendered as html use prop
+     *  `formProps.fieldProps.interpretChipsLabelAsHtml` or if certain fields should
+     *  be excluded set this prop to `true` and set `formProps.fieldProps.interpretChipsLabelAsHtml`
+     *  for that field `false`
+     */
+    interpretFormChipsLabelAsHtml: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
+  setup() {
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const searchContainer = ref(null);
+    /** INTERNAL ID */
+    const { internalId } = useId();
+    /** ACCESSIBILITY ANNOUNCEMENTS */
+    /**
+     * insert an HTML element with aria-live assertive that will announce the
+     * search result
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const { announcement } = useAnnouncer(searchContainer);
+    return {
+      searchContainer,
+      internalId,
+      announcement,
+    };
+  },
   data() {
     return {
       /**
@@ -549,9 +830,50 @@ export default {
        * (only mode `form`)
        */
       showAdvancedSearchButtonText: true,
+      /**
+       * variable to contain assistive text to inform user of actions
+       * @type {string}
+       */
+      assistiveTextNotification: '',
     };
   },
   computed: {
+    amendedFormProps() {
+      // if the prop is false - don't bother any further and just return
+      // the formProps as is
+      if (!this.interpretFormChipsLabelAsHtml) {
+        return this.formProps;
+      }
+      // else get the fieldProps out of formProps
+      const fieldProps = this.formProps.fieldProps || {};
+      // now iterate over the fields and add (or overwrite) the `interpretChipsLabelAsHtml`
+      // prop
+      const updatedFormFieldProps = this.renderFormChipsLabelAsHtml.reduce((prev, renderProp) => ({
+        ...prev,
+        ...this.addNewPropertyValueToNestedObject(
+          renderProp,
+          fieldProps || {},
+          'interpretChipsLabelAsHtml',
+          true,
+          // individually set fields should always have priority
+          // over `interpretFormChipsLabelAsHtml`
+          false,
+        ),
+      }), {});
+
+      return {
+        // add all other specified form props
+        ...this.formProps,
+        // and the modified fieldprops
+        fieldProps: {
+          // also don't lose the field props of non-chips fields or not
+          // modified ones
+          ...fieldProps,
+          // and add the modified ones
+          ...updatedFormFieldProps,
+        },
+      };
+    },
     /**
      * store the loading state of every filter
      *
@@ -618,10 +940,10 @@ export default {
             const valueList = isRepeatableField ? value : [value];
             return valueList.map((repeatableEntry, index) => ({
               // label that will be displayed on top of each collapsed filter
-              label: formFilterData.title,
+              labelInternal: formFilterData.title,
               // add a special id that allows to identify repeatable fields (applied in reverse mapping
               // ~line 555)
-              id: `${key}${isRepeatableField ? `-group-${index}` : ''}`,
+              idInternal: `${key}${isRepeatableField ? `-group-${index}` : ''}`,
               // the actual filter values and filter information for each field (important for field groups)
               filter_values: this.getCollapsedFilterValue(repeatableEntry, formFilterData, key),
             }));
@@ -638,7 +960,7 @@ export default {
         this.formFilterValuesInt = val.reduce((prev, filter) => {
           // necessary because of field groups to remove index (added in line 538) from id
           // get actual field id and indicator if field was repeatable field
-          const [, filterId, groupMatch] = filter.id.match(/(.*?)(-group-\d*)?$/);
+          const [, filterId, groupMatch] = filter.idInternal.match(/(.*?)(-group-\d*)?$/);
           // get the form field data for the id
           const filterData = this.formFilterList[filterId];
           // get the correctly mapped filter values
@@ -657,13 +979,28 @@ export default {
         this.search();
       },
     },
+    renderFormChipsLabelAsHtml() {
+      // first get all form field props
+      const { fieldProps } = this.formProps;
+      // if no fieldProps were specified just use the prop value
+      if (!fieldProps) return this.interpretFormChipsLabelAsHtml;
+      // else we need to check if prop `renderChipsLabelAsHtml` was specified for
+      // a chips input field - done via recursive (because of subforms) function
+      const fieldsToSetTrue = this.filterHtmlRenderFields(this.formFilterList);
+
+      // check if values were set for individual fields, otherwise fall back
+      // to the prop value
+      return fieldsToSetTrue.length ? fieldsToSetTrue : this.interpretFormChipsLabelAsHtml;
+    },
     /**
-     * create an internal row id for unique identification of added filter rows
-     *
+     * advanced button description for mode `form`
      * @returns {string}
      */
-    rowId() {
-      return createId();
+    advancedButtonDescription() {
+      // if value was not set for any reason just return an empty string
+      if (!this.assistiveText.advancedButtonDescription) return '';
+      return this.assistiveText.advancedButtonDescription
+        .replace('{state}', this.assistiveText.formState[this.formOpen ? 'close' : 'open']);
     },
   },
   watch: {
@@ -817,6 +1154,20 @@ export default {
        */
       this.$emit('update:advanced-form-open', val);
     },
+    /**
+     * function to automatically reset the assistiveTextNotification
+     * after using it
+     * @param {string} val
+     */
+    assistiveTextNotification(val) {
+      // setting the value will trigger the screenreader
+      if (val) {
+        setTimeout(() => {
+          // after that text can be removed again
+          this.assistiveTextNotification = '';
+        }, 300);
+      }
+    },
   },
   created() {
     // check if mainFilter was already set (e.g. from outside)
@@ -839,6 +1190,7 @@ export default {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.searchContainer);
   },
   methods: {
+    extractNestedPropertyValue,
     /**
      * GENERAL FUNCTIONALITIES
      */
@@ -1043,12 +1395,30 @@ export default {
           // check the type of field that the value should be added to (we assume the only possibilities
           // are chips or text - other types are currently NOT implemented and would need to be added here!)
           if (fieldXAttrs.field_type === 'chips') {
+            // in order to be able to set the correct properties for the chip display in the input field
+            // we might need to map the label and id properties of the autocomplete option to the label and
+            // id properties of the input field - since an individual option for a field might have been
+            // set via fieldProps - we need to check for that first
+            const fieldProps = this.formProps.fieldProps?.[collectionId] || {};
+            // check if label prop was set otherwise use the default form input one
+            const labelProp = fieldProps.labelPropertyName
+              || this.labelPropertyName.formInputs;
+            // check if id prop was set otherwise use the default form input one
+            const idProp = fieldProps.identifierPropertyName
+              || this.identifierPropertyName.formInputs;
             // map the information from the search autocomplete to the chips form field
             // required values
             const chipsFormFieldValue = {
               // map search autocomplete result to chips form field required values
-              [this.labelPropertyName.formInputs]: entry[this.labelPropertyName.autocompleteOption],
-              [this.identifierPropertyName.formInputs]: entry[this.identifierPropertyName.autocompleteOption],
+              [labelProp]: entry[this.labelPropertyName.autocompleteOption],
+              [idProp]: entry[this.identifierPropertyName.autocompleteOption],
+              // HOWEVER - in order to enable customization of the properties used in the front
+              // end - e.g. to add discriminatory terms html we also leave the rest of the
+              // object properties and actually give them PRIORITY over the newly created ones!
+              // (so e.g. if the property `displayLabel` was already added to the autocomplete option
+              // with the appropriate tags and styling then this will not be overwritten by
+              // entry[this.labelPropertyName.autocompleteOption] but be retained
+              ...entry,
             };
             // for multi chips - add value to array
             if (fieldInformation.type === 'array') {
@@ -1066,11 +1436,24 @@ export default {
             this.$set(
               this.formFilterValuesInt,
               collectionId,
-              entry[this.labelPropertyName.autocompleteOption] || entry,
+              entry[this.labelPropertyName.autocompleteOption] ?? entry,
             );
           }
           // main filter filter values should remain empty
           this.mainFilter.filter_values = [];
+          // announce to screen reader user that field was added to advanced search form
+          // if the appropriate text was set
+          if (this.assistiveText.autocompleteOptionFilledToForm) {
+            // get option label from entry param
+            const optionLabel = entry[this.labelPropertyName.autocompleteOption];
+            // and field label from fieldInformation
+            const fieldLabel = fieldInformation.title;
+            // assemble announcement
+            this.announcement = this.assistiveText.autocompleteOptionFilledToForm
+              .replace('{optionLabel}', optionLabel)
+              .replace('{fieldLabel}', fieldLabel);
+          }
+
           // this does not trigger an update event from BaseForm so search needs to be triggered manually here
           this.search();
         } else {
@@ -1080,6 +1463,8 @@ export default {
             'filter_values',
             [entry],
           );
+          // and also update original filter with newly set data
+          this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // this does not trigger an update event from BaseForm so search needs to be triggered manually here
           // since main filter is not evaluated in filter comparison set alwaysTrigger true
           this.search(true);
@@ -1120,6 +1505,7 @@ export default {
     removeAllFilters() {
       // reset form filter values
       this.formFilterValuesInt = {};
+      this.assistiveTextNotification = this.assistiveText.collapsedFilterRowRemovedNotification || '';
       // trigger search without filters
       this.search();
     },
@@ -1148,14 +1534,16 @@ export default {
      * @param {any} values - the form field values
      * @param {Object} fieldData - the OpenAPI json field information
      * @param {string} fieldId - the id of the field to transform
+     * @param {string[]} parentFields - if field is a field group we also need the parent field name(s)
+     *  (in theory there could be many but BaseAdvancedSearch is currently only supporting one nesting level)
      * @returns {[string, unknown]|[{label: string}]|string|{label: *}[]|boolean[]|[{label: (string|string)}]|*}
      */
-    getCollapsedFilterValue(values, fieldData, fieldId) {
+    getCollapsedFilterValue(values, fieldData, fieldId, parentFields = []) {
       const fieldType = fieldData['x-attrs'].field_type;
       if (fieldType === 'integer' || fieldType === 'float' || typeof values === 'number') {
         return {
           values: [{
-            label: values.toString(),
+            labelInternal: values.toString(),
           }],
           fieldId,
           fieldType,
@@ -1164,29 +1552,48 @@ export default {
       if (fieldType === 'boolean' || typeof values === 'boolean') {
         return {
           values: [{
-            label: values,
+            labelInternal: values,
           }],
           fieldId,
           fieldType,
         };
       }
       if (fieldType === 'text' || fieldType === 'autocomplete' || typeof values === 'string') {
+        let formattedLabel = values;
+        if (fieldType === 'date' && values) {
+          // if type is date we need to parse the storage date to display values also considering
+          // possible minus
+          formattedLabel = this.formatToDisplayDate(values);
+        }
         return {
           values: [{
             // if fieldType is date convert to de date locale for display
-            label: fieldType === 'date' && values ? values.split('-').reverse().join('.') : values,
+            labelInternal: formattedLabel,
           }],
           fieldId,
           fieldType,
         };
       }
       if (fieldType === 'chips') {
+        // check if general property names were overwritten for the specific field
+        const fieldProps = extractNestedPropertyValue(
+          parentFields.length ? [fieldId].concat(parentFields).join('.') : fieldId,
+          this.formProps.fieldProps,
+        );
+        const labelProp = fieldProps?.labelPropertyName
+          || this.labelPropertyName.formInputs;
+        const idProp = fieldProps?.identifierPropertyName
+          || this.identifierPropertyName.formInputs;
         return {
-          values: values.map(chipValue => ({
-            // TODO: check if label property needs to be customized
-            label: chipValue[this.labelPropertyName.formInputs] || chipValue,
-            id: chipValue[this.identifierPropertyName.formInputs] || '',
-          })),
+          values: values.map((chipValue) => {
+            // do not delete additional properties the chip might have
+            const additionalProperties = typeof chipValue === 'object' ? chipValue : {};
+            return ({
+              labelInternal: chipValue[labelProp] ?? chipValue,
+              idInternal: chipValue[idProp] || '',
+              ...additionalProperties,
+            });
+          }),
           fieldId,
           fieldType,
         };
@@ -1201,6 +1608,7 @@ export default {
                 // depending if group is repeatable or not get to properties attribute
                 fieldData.items ? fieldData.items.properties[fieldKey] : fieldData.properties[fieldKey],
                 fieldKey,
+                [fieldKey].concat(parentFields),
               ));
               return prev;
             }, []),
@@ -1214,7 +1622,7 @@ export default {
           values: Object.values(values)
             .map(chipValue => ({
               // convert to de date locale for display
-              label: chipValue ? chipValue.split('-').reverse().join('.') : '',
+              labelInternal: chipValue ? this.formatToDisplayDate(chipValue) : '',
             })),
           fieldId,
           // BaseCollapsedRow needs information if date is type daterange, timerange or datetime
@@ -1229,45 +1637,83 @@ export default {
       // NOT COVERED: multiline and chips below
       return values;
     },
+    formatToDisplayDate(storageDate) {
+      const { groups: { minus, year, month, day } = {} } = storageDate
+        .match(/((?<minus>-)?(?<year>\d{4})-?(?<month>\d{2})?-?(?<day>\d{2})?)/) || {};
+      return year ? `${day ? `${day}.` : ''}${month ? `${month}.` : ''}${minus || ''}${year}` : '';
+    },
+    formatToStorageDate(storageDate) {
+      const { groups: { minus, year, month, day } = {} } = storageDate
+        .match(/(?<day>\d{2})?\.?(?<month>\d{2})?\.?(?<minus>-)?(?<year>\d{4})/) || {};
+      return year ? `${minus || ''}${year}${month ? `-${month}` : ''}${day ? `-${day}` : ''}` : '';
+    },
     /**
      * function to transform collapsed values to form field values (necessary if something changed
      * in collapsed values, e.g. a filter value was removed)
      * @param {{ values: Object[], fieldId: string, fieldType: string }} collapsedValues - the updated collapsed
      *  values coming from collapsed filter row
      * @param {Object} filterData - the relevant OpenAPI form field information
+     * @param {string[]} parentFields - if field is a field group we also need the parent field name(s)
+     *  (in theory there could be many but BaseAdvancedSearch is currently only supporting one nesting level)
      * @returns {any} - value returned depending on the filter type
      */
-    setFormFilterValues(collapsedValues, filterData) {
+    setFormFilterValues(collapsedValues, filterData, parentFields = []) {
       // get the relevant information out of collapsed values
-      const { values, fieldType } = collapsedValues;
+      const { values, fieldType, fieldId } = collapsedValues;
       // case string
       if (filterData.type === 'string') {
-        return values[0].label;
+        // special case date that needs to transform display to storage date format again
+        if (fieldType === 'date') {
+          return this.formatToStorageDate(values[0].labelInternal);
+        }
+        return values[0].labelInternal;
       }
       // case boolean value
       if (filterData.type === 'boolean') {
-        return values[0].label;
+        return values[0].labelInternal;
       }
       // case number value
       if (filterData.type === 'integer' || filterData.type === 'float') {
-        return Number(values[0].label);
+        return Number(values[0].labelInternal);
         // date could be string if it is just a single date or an object in all other cases
       }
-      // case date field
+      // case date field (not string)
       if ((fieldType.includes('date') || fieldType.includes('time')) && filterData.type === 'object') {
         const objectProperties = Object.keys(filterData.properties);
         return values.reduce((valueObject, value, index) => ({
           ...valueObject,
-          [objectProperties[index]]: value.label,
+          [objectProperties[index]]: this.formatToStorageDate(value.labelInternal),
         }), {});
       }
       // case chips input field
       if (fieldType.includes('chips')) {
-        return values.filter(filterValue => !!filterValue.label)
-          .map(filterValue => ({
-            [this.labelPropertyName.formInputs]: filterValue.label,
-            [this.identifierPropertyName.formInputs]: filterValue.id,
-          }));
+        // we need to take into consideration that custom label and identifier property names
+        // might have been set for a specific form field - so we need to check `formProps.fieldProps`
+        // (or the corresponding nested field for type 'group') for that field first and use these
+        // values if present
+        const fieldProps = extractNestedPropertyValue(
+          parentFields.length ? [fieldId].concat(parentFields).join('.') : fieldId,
+          this.formProps.fieldProps,
+        );
+        const labelProp = fieldProps?.labelPropertyName
+          || this.labelPropertyName.formInputs;
+        const idProp = fieldProps?.identifierPropertyName
+          || this.identifierPropertyName.formInputs;
+        return values.filter(filterValue => !!filterValue.labelInternal)
+          .map((filterValue) => {
+            // in order to keep any additional properties the chips entry might have, clone
+            // the object and remove internally added variables again
+            const additionalProperties = JSON.parse(JSON.stringify(filterValue));
+            this.$delete(additionalProperties, 'labelInternal');
+            this.$delete(additionalProperties, 'idInternal');
+            return ({
+              // and add it to the values that are returned
+              ...additionalProperties,
+              // apart from the labelProperty and the identifierProperty
+              [labelProp]: filterValue.labelInternal,
+              [idProp]: filterValue.idInternal,
+            });
+          });
       }
       // case repeatable fields where every repeated field or field group is a separate filter entry
       if (!fieldType.includes('chips') && filterData.type === 'array') {
@@ -1286,10 +1732,117 @@ export default {
             [k.fieldId]: this.setFormFilterValues(
               k,
               filterData.properties[k.fieldId],
+              [k.fieldId].concat(parentFields),
             ),
           }), {});
       }
       return null;
+    },
+    filterHtmlRenderFields(formFieldInfo, parentFields = []) {
+      // get the field props needed later
+      const { fieldProps } = this.formProps;
+      // iterate over all form fields given in formFieldInfo
+      return Object.entries(formFieldInfo)
+        .reduce((prev, [key, values]) => {
+          // get the field type from the x attributes
+          const { field_type: fieldType } = values['x-attrs'] ? values['x-attrs'] : {};
+          // check if form fields are nested (subform)
+          if (fieldType === 'group') {
+            // and recursively iterate over these fields as well
+            const subFields = this.filterHtmlRenderFields(
+              values.properties || values.items.properties,
+              [key].concat(parentFields),
+            );
+            // if fields with `interpretChipsLabelAsHtml` `true` are found
+            // add them in the form { [key]: ['subField1', 'SubField2'] }
+            return subFields.length ? prev.concat({
+              [key]: subFields,
+            }) : prev;
+          }
+          // only add fields that are type chips
+          if (fieldType === 'chips') {
+            // get the fieldProps set for that specific field - if it is a nested field we
+            // need to extract them with the function below - else we can use fieldProps directly
+            const keyProps = ((parentFields.length
+              ? extractNestedPropertyValue(parentFields.join('.'), fieldProps) : fieldProps) || {})[key];
+            // now check if field key should be added to the list - 2 possibilities to add:
+            // a) prop `interpretFormChipsLabelAsHtml` is `false` - and the fieldProp for that specific
+            //  field is set
+            // b) prop `interpretFormChipsLabelAsHtml` was set `true` to cover all fields and
+            //  specifically exclude this one
+            if ((!this.interpretFormChipsLabelAsHtml && keyProps?.interpretChipsLabelAsHtml)
+              || (this.interpretFormChipsLabelAsHtml && (!keyProps
+                || !Object.keys(keyProps).includes('interpretChipsLabelAsHtml') || keyProps.interpretChipsLabelAsHtml))) {
+              return prev.concat(key);
+            }
+          }
+          // if any of the conditions fail just return the list unaltered
+          return prev;
+        }, []);
+    },
+    /**
+     * a function to add a new property to a nested object
+     *
+     * @param {string|Object} renderProp - this is either a string - then an object
+     *  with `previousFieldProps` and this property will be created, or an object in
+     *  the style of { [parentProperty]: ['childProp1', 'childProp2'] } - this object
+     *  can also be nested deeper - 'childProp2' could instead also be an object in the
+     *  style above again
+     * @param {Object} fieldProps - an object for all fields including `renderProp` that contains
+     *  other properties `renderProp` or [renderProp.key] should receive
+     *  so: { [renderProp]: { renderPropProperties } }
+     * @param {string} propertyName - the name of the property to be added or overwritten
+     * @param {*} propertyValue - the value of the property to be added or overwritten
+     * @param {boolean} [overwritePreviousValues=true] - define if a preexisting value for
+     *  `propertyName` should be overwritten
+     * @returns {{[p: string]: *}|{}} - returns an object in the style
+     *  { [renderProp|renderProp.key]: { ...previousFieldProps, [propertyName]: propertyValue }}
+     *  or a deeper nested version thereof
+     */
+    addNewPropertyValueToNestedObject(
+      renderProp,
+      fieldProps,
+      propertyName,
+      propertyValue,
+      overwritePreviousValues = false,
+    ) {
+      // check if renderProp is a string
+      if (typeof renderProp === 'string') {
+        const previousFieldProps = fieldProps[renderProp] || {};
+        return {
+          [renderProp]: {
+            // if previous values should be overwritten - place the add the previous
+            // object properties first
+            ...(overwritePreviousValues ? previousFieldProps : {}),
+            [propertyName]: propertyValue,
+            // otherwise add them after the new property
+            ...(!overwritePreviousValues ? previousFieldProps : {}),
+          },
+        };
+      }
+      if (typeof renderProp === 'object') {
+        return Object.entries(renderProp).reduce((prev, [renderPropKey, renderPropValues]) => ({
+          ...prev,
+          // add an object in the form of [formGroupPropertyName]: {},
+          [renderPropKey]: {
+            // add all the field props that have been defined for that form group fields
+            // previously
+            ...fieldProps[renderPropKey],
+            // then overwrite form group fields that are defined in the renderProp array
+            ...renderPropValues.reduce((prevObject, field) => ({
+              ...prevObject,
+              // add property to fieldProps of this field
+              ...this.addNewPropertyValueToNestedObject(
+                field,
+                fieldProps[renderPropKey] || {},
+                propertyName,
+                propertyValue,
+              ),
+            }), {}),
+          },
+        }), {});
+      }
+      return {};
     },
   },
 };

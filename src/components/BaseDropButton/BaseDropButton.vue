@@ -354,7 +354,7 @@ export default {
         || (event.key === 'Tab' && !event.shiftKey);
       // get the current index needed for navigate function
       const currentIndex = this.buttonsInt.indexOf(this.activeOption);
-      // call mixin navigate function that returns the new active option
+      // call composable navigate function that returns the new active option
       this.activeOption = this.navigate(
         this.buttonsInt,
         isArrowDown,

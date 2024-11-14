@@ -16,6 +16,7 @@
       <!-- the actual list of filters -->
       <ul
         ref="filterList"
+        :aria-description="assistiveText.appliedFiltersLabel"
         :class="[
           'base-collapsed-filter-row__filter-list',
           { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
@@ -25,14 +26,18 @@
         @touchstart="mouseDownHandler">
         <li
           v-for="(filter, filterIndex) in filtersInt"
-          :key="filter.id"
+          :key="filter.idInternal"
+          :aria-describedby="`${filter.idInternal}-label`"
+          role="listitem"
+          tabindex="0"
           :class="['base-collapsed-filter-row__filter',
                    { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
                      .fieldType === 'boolean' }]">
           <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
             <div
+              :id="`${filter.idInternal}-label`"
               class="base-collapsed-filter-row__filter-label">
-              {{ filter.label }}
+              {{ filter.labelInternal }}
             </div>
             <!-- the chips for each filter -->
             <ul
@@ -45,29 +50,47 @@
                   <!-- if yes - also iterate through those values -->
                   <template
                     v-for="(groupValue, groupIndex) in value.values"
-                    :key="groupValue.id
-                      || `${groupValue.label}-${valueIndex}-${groupIndex}`">
+                    :key="groupValue.idInternal
+                      || `${groupValue.labelInternal}-${valueIndex}-${groupIndex}`">
                     <BaseCollapsedFilterItem
-                      v-if="groupValue.label"
+                      v-if="groupValue.labelInternal"
                       :value="groupValue"
                       :type="value.fieldType"
                       :range-indicator="getRangeIndicator(value, groupIndex)"
                       :scrollable="filterListScrollable"
                       :is-scrolling="isScrolling"
                       :date-time-text="dateTimeText"
+                      :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                        && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                        && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
+                      :assistive-text="{
+                        booleanFilterLabel: assistiveText.booleanFilterLabel
+                          ? assistiveText.booleanFilterLabel
+                            .replace('{label}', filter.labelInternal) : groupValue.labelInternal.toString(),
+                        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                      }"
                       @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
                   </template>
                 </template>
                 <template v-else>
                   <BaseCollapsedFilterItem
-                    v-if="value.label"
-                    :key="value.id || `${value.label}-${valueIndex}`"
+                    v-if="value.labelInternal"
+                    :key="value.idInternal || `${value.labelInternal}-${valueIndex}`"
                     :value="value"
                     :type="filter.filter_values.fieldType"
                     :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
                     :scrollable="filterListScrollable"
                     :is-scrolling="isScrolling"
                     :date-time-text="dateTimeText"
+                    :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                      && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                      && interpretLabelAsHtml.includes(filter.idInternal))"
+                    :assistive-text="{
+                      booleanFilterLabel: assistiveText.booleanFilterLabel
+                        ? assistiveText.booleanFilterLabel
+                          .replace('{label}', filter.labelInternal) : value.labelInternal.toString(),
+                      optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                    }"
                     @remove-chip="removeChip(filterIndex, valueIndex)" />
                 </template>
               </template>
@@ -76,15 +99,20 @@
         </li>
       </ul>
     </div>
+    <span
+      v-if="chipRemovedAssistiveText"
+      aria-live="assertive"
+      class="assistive-text">
+      {{ chipRemovedAssistiveText }}
+    </span>
 
     <!-- remove all filters button -->
-    <!-- TODO: add accessibility features -->
     <button
+      :title="assistiveText.removeFiltersLabel"
       class="base-collapsed-filter-row__remove"
       @click="removeFilters">
       <BaseIcon
         name="remove"
-        text=""
         class="base-collapsed-filter-row__remove-icon" />
     </button>
   </div>
@@ -107,15 +135,15 @@ export default {
   props: {
     /**
      * provide a list of filters in array form, every array object that needs the following properties:
-     *  **id** `string` - a filter identifier
-     *  **label** `string` - a label shown for the filter
+     *  **idInternal** `string` - a filter identifier
+     *  **labelInternal** `string` - a label shown for the filter
      *  **filter_values** `{
-     *    values: { label: string|boolean, id: string? }[]|{ values: {}, fieldId: string, fieldType: string }[]
+     *    values: { labelInternal: string|boolean, idInternal: string? }[]|{ values: {}, fieldId: string, fieldType: string }[]
      *    fieldId: string,
      *    fieldType: string,
      *   }[]` - the values that were selected for the filter (set by BaseAdvancedSearch internally), this is again
      *    an array of objects with the properties
-     *      `values` - either containing the actual values to display (with `label` and `id` (optional) properties)
+     *      `values` - either containing the actual values to display (with `labelInternal` and `idInternal` (optional) properties)
      *      OR in case of field groups to have nested another object array with `fieldType`, `fieldId` and `values` properties
      *      again (see below for description)
      *    `fieldId`: the property of the form field in question
@@ -126,7 +154,7 @@ export default {
       default: () => ([]),
       validator: (val) => {
         // define all required props here
-        const requiredProps = ['id', 'label', 'filter_values'];
+        const requiredProps = ['idInternal', 'labelInternal', 'filter_values'];
         const requiredFilterValueProps = ['values', 'fieldType', 'fieldId'];
         // iterate through the filter array - return true if NO prop is missing
         return !val.some((filter) => {
@@ -146,15 +174,15 @@ export default {
                 // if filterValue has a length it is a nested array
                 if (filterValue?.values?.length >= 0) {
                   const groupFilterValueProps = Object.keys(filterValue);
-                  // if yes check for each array if it has content and if yes, if it has the label property
+                  // if yes check for each array if it has content and if yes, if it has the labelInternal property
                   return filterValue.values.length !== 0
                     && requiredFilterValueProps.some(prop => !groupFilterValueProps.includes(prop))
                     && filterValue.values
-                      // also account here for special case boolean which does not need a label
-                      .some(nestedFilterValue => !Object.keys(nestedFilterValue).includes('label'));
+                      // also account here for special case boolean which does not need a labelInternal
+                      .some(nestedFilterValue => !Object.keys(nestedFilterValue).includes('labelInternal'));
                 }
-                // else check for each filterValue if label property is there
-                return !Object.keys(filterValue).includes('label');
+                // else check for each filterValue if labelInternal property is there
+                return !Object.keys(filterValue).includes('labelInternal');
               });
             }
           }
@@ -175,6 +203,39 @@ export default {
         range: 'to',
       }),
       validator: val => !['from', 'until', 'range'].some(property => !Object.keys(val).includes(property)),
+    },
+    /**
+     * if necessary selected chip text can be rendered as v-html directive
+     * can be `true` (all fields will have html rendering enabled) `false` or a list
+     *  of field names for which rendering should be enabled, for nested fields
+     *  specify an object with a list of child field names.
+     *  e.g. :interpretLabelAsHtml="['field1', { [field2]: ['childField1'] }]"
+     */
+    interpretLabelAsHtml: {
+      type: [Boolean, Array],
+      default: false,
+    },
+    /**
+     * **removeFiltersLabel**: add a descriptive label used for the remove all
+     *  filters icon in collapsed row
+     * **filterRemovedNotification**: notification that is read by screenreaders when a filter
+     *  value was removed. Add the string {value} to read the filter value that was removed and
+     *  {label} to read the label of the filter from which the value was removed.
+     * **appliedFiltersLabel**: description for the filters in the collapsed filter row.
+     * **booleanFilterLabel**: Set text that should be read for a boolan filter value. You may add
+     *      the string {label} which will be replaced by the filter label.
+     * **optionToRemoveSelected**: text read when an option is focused (and thus selected), should
+     *  announce to the screen reader user that option can now be removed via Backspace or Delete.
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        removeFiltersLabel: 'Remove all filters.',
+        filterRemovedNotification: 'Filter value {value} was removed from filter {label}.',
+        appliedFiltersLabel: 'Currently applied Filters',
+        booleanFilterLabel: 'Filter {label} was set',
+        optionToRemoveSelected: 'Press delete or backspace to remove.',
+      }),
     },
   },
   emits: ['update:filters', 'remove-all'],
@@ -223,6 +284,12 @@ export default {
        * @type {?ResizeObserver}
        */
       resizeObserver: null,
+      /**
+       * assistive text set when a chip was removed to be read
+       * by screenreader
+       * @type {string}
+       */
+      chipRemovedAssistiveText: '',
     };
   },
   computed: {
@@ -293,6 +360,10 @@ export default {
      */
     removeChip(filterIndex, valueIndex, groupIndex) {
       const { fieldType, values } = this.filtersInt[filterIndex].filter_values;
+      const filterLabel = this.filtersInt[filterIndex].labelInternal;
+      // get the filter value label and assume it is not a group
+      const filterValue = fieldType === 'group' ? values[valueIndex].values[groupIndex].labelInternal
+        : values[valueIndex].labelInternal;
       // first check special case group
       if (fieldType === 'group') {
         // get all the concatenated values within the group
@@ -305,9 +376,9 @@ export default {
         } else if (concatValuesArray.length > 1) {
           // check for special case date and time fields
           if (values[valueIndex].fieldType.includes('date') || values[valueIndex].fieldType.includes('time')) {
-            // for date arrays just remove the label so the order of the date_from and date_to does not
+            // for date arrays just remove the labelInternal so the order of the date_from and date_to does not
             // get mixed up by removing the complete value
-            this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].label = '';
+            this.filtersInt[filterIndex].filter_values.values[valueIndex].values[groupIndex].labelInternal = '';
           } else {
             // if its not a date just splice the value out of the array
             this.filtersInt[filterIndex].filter_values.values[valueIndex].values.splice(groupIndex, 1);
@@ -332,11 +403,19 @@ export default {
           // if yes - remove the complete filter
           this.filtersInt.splice(filterIndex, 1);
         } else {
-          this.filtersInt[filterIndex].filter_values.values[valueIndex].label = '';
+          this.filtersInt[filterIndex].filter_values.values[valueIndex].labelInternal = '';
         }
       } else {
         this.filtersInt[filterIndex].filter_values.values.splice(valueIndex, 1);
       }
+      // set the assistive text so it is read by screenreader
+      this.chipRemovedAssistiveText = this.assistiveText.filterRemovedNotification
+        .replace('{label}', filterLabel)
+        .replace('{value}', filterValue);
+      // and remove it again afterward
+      setTimeout(() => {
+        this.chipRemovedAssistiveText = '';
+      }, 300);
     },
 
     /** SCROLL RELATED FUNCTIONALITIES */
@@ -363,8 +442,8 @@ export default {
           left: this.scrollContainer.scrollLeft,
           top: this.scrollContainer.scrollTop,
           // Get the current mouse position
-          x: event.clientX || event.touches[0]?.clientX,
-          y: event.clientY || event.touches[0]?.clientY,
+          x: event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0),
+          y: event.clientY ?? (event.touches ? event.touches[0]?.clientY : 0),
         };
         // add event listeners for mousemove and mouseup to be able to trigger scroll
         // for touch devices add touch event listeners
@@ -388,8 +467,8 @@ export default {
     mouseMoveHandler(e) {
       // get event position - touch event does not have clientX/clientY - fallback
       // to touches position
-      const eventXPosition = e.clientX || e.touches[0]?.clientX || 0;
-      const eventYPosition = e.clientY || e.touches[0]?.clientY || 0;
+      const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
+      const eventYPosition = e.clientY ?? (e.touches ? e.touches[0]?.clientY : 0);
       // How far the mouse has been moved
       const dx = eventXPosition - this.pos.x;
       const dy = eventYPosition - this.pos.y;
@@ -448,18 +527,36 @@ export default {
       // check if it is a filter with an array of exactly two values
       if (filterValues.values.length === 2
         && ['date', 'time'].includes(filterValues.fieldType)) {
-        if (!!filterValues.values[0].label
-          && !!filterValues.values[1].label && index === 1) {
+        if (!!filterValues.values[0].labelInternal
+          && !!filterValues.values[1].labelInternal && index === 1) {
           return this.dateTimeText.range;
         }
-        if (!filterValues.values[1].label && filterValues.values[0].label) {
+        if (!filterValues.values[1].labelInternal && filterValues.values[0].labelInternal) {
           return this.dateTimeText.from;
         }
-        if (!filterValues.values[0].label && filterValues.values[1].label) {
+        if (!filterValues.values[0].labelInternal && filterValues.values[1].labelInternal) {
           return this.dateTimeText.until;
         }
       }
       return '';
+    },
+    /**
+     * we need to check if `interpretLabelAsHtml` was set true for a subform field when
+     *  the prop was provided as [{ [parentField]: ['subfield1'] }]
+     * @param {string} filterId - the filter id as provided to this component (in the form
+     *  [fieldname]-group-[index])
+     * @param {string} valueId - the property name of the actual subformfield
+     * @returns {boolean}
+     */
+    calcSubFormChipHtmlRender(filterId, valueId) {
+      // get the correct filter property name from the id
+      // e.g. 'weekday-date-group-0' -> 'weekday-date'
+      const filterPropertyName = filterId.split('-').slice(0, 1).join('-');
+      // find the correct object in the `interpretLabelAsHtml` array
+      const subFormList = this.interpretLabelAsHtml
+        .find(id => typeof id === 'object' && Object.keys(id).includes(filterPropertyName));
+      // check if a value was found and if the field name is included in the list of that value
+      return !!subFormList && subFormList[filterPropertyName].includes(valueId);
     },
   },
 };
@@ -480,6 +577,7 @@ export default {
   overflow: hidden;
 
   .base-collapsed-filter-row__filter-list-container {
+    position: relative;
     flex: 1 1 auto;
     overflow: hidden;
 
@@ -489,7 +587,6 @@ export default {
       height: 100%;
       position: absolute;
       top: 0;
-      left: $spacing;
       background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
       z-index: map.get($zindex, chips-fadeout);
       pointer-events: none;
@@ -501,8 +598,7 @@ export default {
       height: 100%;
       position: absolute;
       top: 0;
-      right: $spacing;
-      transform: translateX(-100%);
+      right: 0;
       background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
       z-index: map.get($zindex, chips-fadeout);
       pointer-events: none;
@@ -577,6 +673,10 @@ export default {
     padding: 0 $spacing;
     height: 100%;
     align-items: center;
+
+    &:hover, &:active, &:focus {
+      color: $app-color;
+    }
 
     .base-collapsed-filter-row__remove-icon {
       height: $icon-medium;

@@ -6,6 +6,7 @@
              { 'base-chip__active': chipActive }]">
     <div
       ref="chipText"
+      v-insert-text-as-html="{ value: modelValueInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
       :style="textStyling"
       :contenteditable="editable ? 'true' : null"
       :aria-labelledby="assistiveText ? `${internalId}_aria-label` : null"
@@ -15,9 +16,7 @@
       @keydown.enter.prevent="updateText"
       @click.stop="clickAction"
       @mousemove="moveBox"
-      @mouseleave="hideBox">
-      {{ modelValueInt }}
-    </div>
+      @mouseleave="hideBox" />
     <span
       v-if="assistiveText"
       :id="`${internalId}_aria-label`"
@@ -39,6 +38,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { useId } from '@/composables/useId.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
 /**
  * Basic Chip component
@@ -49,6 +49,9 @@ export default {
   components: {
     BaseHoverBox: defineAsyncComponent(() => import('@/components/BaseHoverBox/BaseHoverBox.vue')),
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+  },
+  directives: {
+    insertTextAsHtml: InsertTextAsHtml,
   },
   props: {
     /**
@@ -105,9 +108,24 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * text read when a chip is focused - currently only available with prop
+     *  `editable` true
+     */
     assistiveText: {
       type: String,
       default: '',
+    },
+    /**
+     * if necessary chip text can be rendered as html
+     *  this feature is currently only available if the chip is not editable
+     *
+     *  **caveat**: setting this variable `true` can lead to XSS attacks. Only use
+     *    this prop on trusted content and never on user-provided content.
+     */
+    interpretTextAsHtml: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['clicked', 'update:modelValue', 'hoverbox-active', 'remove-entry'],
