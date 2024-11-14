@@ -508,7 +508,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 
 .base-search {
   background: white;
@@ -550,7 +550,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 .base-search__input-field {
   min-height: $row-height-large !important;
 }

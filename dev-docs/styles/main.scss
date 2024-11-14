@@ -1,5 +1,5 @@
-@import 'dev-docs/styles/fonts';
-@import "src/styles/variables";
+@use 'dev-docs/styles/fonts';
+@use "src/styles/variables" as *;
 
 $font: "Source Sans Pro", serif;
 

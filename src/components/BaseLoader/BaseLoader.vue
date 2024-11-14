@@ -52,7 +52,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 
   .base-loader{
     position: absolute;

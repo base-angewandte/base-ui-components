@@ -1,10 +1,7 @@
 <script setup>
-import {computed, ref} from 'vue';
+import { ref } from 'vue';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel.vue';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
-
 
 import '@/styles/lib.scss';
 
@@ -21,7 +18,7 @@ const media = ref([
     title: 'Image',
     additionalInfo: [
       'Taken from: https://picsum.photos',
-      'Archive Id: 6548976543156498'
+      'Archive Id: 6548976543156498',
     ],
     mediaUrl: 'https://picsum.photos/seed/anotherimage/1260/800.jpg',
     mediaUrlSmall: 'https://picsum.photos/seed/anotherimage/400/300.jpg',
@@ -35,7 +32,7 @@ const media = ref([
     mediaUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
     mediaPosterUrl: 'https://picsum.photos/seed/video/1200/650.jpg',
     mediaUrlSmall: 'https://picsum.photos/seed/video/400/300.jpg',
-    displaySize: { 'width': '100%', 'max-width': '1000px' },
+    displaySize: { width: '100%', 'max-width': '1000px' },
   },
   {
     title: 'Audio',
@@ -63,7 +60,12 @@ function preview(index) {
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+    <img
+      alt="Vue logo"
+      class="logo"
+      src="./assets/logo.svg"
+      width="125"
+      height="125">
 
     <div class="wrapper">
       WORKING!!
@@ -77,24 +79,23 @@ function preview(index) {
     <div class="container">
       <div style="display: flex; flex-wrap: wrap;">
         <BaseImageBox
-            v-for="(item, index) in media"
-            :key="index"
-            :box-size="{ width: 'calc(25% - 10px)' }"
-            :title="item.title"
-            :image-url="item.mediaUrlSmall"
-            style="margin-right: 10px"
-            @clicked="preview(index)" />
+          v-for="(item, index) in media"
+          :key="index"
+          :box-size="{ width: 'calc(25% - 10px)' }"
+          :title="item.title"
+          :image-url="item.mediaUrlSmall"
+          style="margin-right: 10px"
+          @clicked="preview(index)" />
       </div>
       <BaseMediaCarousel
-          :show-preview="showPreview"
-          :initial-slide="initialSlide"
-          :items="media"
-          :allow-download="false"
-          @hide="showPreview = false" />
+        :show-preview="showPreview"
+        :initial-slide="initialSlide"
+        :items="media"
+        :allow-download="false"
+        @hide="showPreview = false" />
     </div>
   </main>
 </template>
-
 
 <style scoped>
 header {

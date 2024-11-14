@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import {defineAsyncComponent, ref} from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import { useI18n } from '@/composables/useI18n.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
@@ -289,7 +289,7 @@ export default {
       getI18nTerm,
       isMobile,
       footerHeight,
-    }
+    };
   },
   data() {
     return {
@@ -370,7 +370,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables';
+@use "@/styles/variables" as *;
 
   .base-media-preview-image-stage {
     margin: auto;

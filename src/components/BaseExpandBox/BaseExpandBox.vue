@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { debounce } from '@/utils/utils';
+import { debounce } from '@/utils/utils.js';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 
@@ -244,7 +244,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-expand-box {
     flex-direction: column;

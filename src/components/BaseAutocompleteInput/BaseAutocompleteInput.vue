@@ -92,8 +92,8 @@
 <script>
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
-import { createId } from '@/utils/utils';
-import { useListNavigation } from '@/composables/useListNavigation';
+import { createId } from '@/utils/utils.js';
+import { useListNavigation } from '@/composables/useListNavigation.js';
 
 /**
  * Input component allowing to select single values from a drop down that are filled into

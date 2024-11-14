@@ -215,7 +215,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-chip {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
@@ -258,7 +259,7 @@ export default {
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
       word-break: break-word;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
 
       &:active, &:focus {
         outline: none;

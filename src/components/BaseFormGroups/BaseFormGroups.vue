@@ -72,7 +72,7 @@
 
 <script>
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
-import { createId } from '@/utils/utils';
+import { createId } from '@/utils/utils.js';
 
 export default {
   name: 'BaseFormGroups',
@@ -249,7 +249,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables.scss";
+@use "@/styles/variables" as *;
 
 .base-form-groups {
   .base-form-groups__group:nth-of-type(n+2) {

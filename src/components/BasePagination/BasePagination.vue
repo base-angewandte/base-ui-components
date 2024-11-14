@@ -104,9 +104,9 @@
 
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import {onMounted, ref} from 'vue';
-import {useElementObserver} from '@/composables/useElementObserver.js';
-import {useDebounce} from '@/composables/useDebounce.js';
+import { onMounted, ref } from 'vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
  * Pagination component
@@ -152,7 +152,6 @@ export default {
      * @type {Ref<UnwrapRef<number>>}
      */
     const active = ref(props.modelValue);
-
 
     /** PAGE NUMBER DISPLAY CALCULATIONS */
     const pagination = ref(null);
@@ -203,9 +202,9 @@ export default {
       }
       // calc start and end number from the subset number
       start.value = active.value - subsetNumber.value / 2 > 0
-          ? active.value - Math.floor(subsetNumber.value / 2) : 1;
+        ? active.value - Math.floor(subsetNumber.value / 2) : 1;
       end.value = active.value + subsetNumber.value / 2 < props.total
-          ? active.value + Math.floor(subsetNumber.value / 2) : props.total;
+        ? active.value + Math.floor(subsetNumber.value / 2) : props.total;
     }
 
     // add a delay to start / end calculations
@@ -337,7 +336,7 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-pagination {
     text-align: center;

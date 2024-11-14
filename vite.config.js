@@ -36,8 +36,8 @@ export default defineConfig({
     extensions: ['*', '.js', '.json'],
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '~': fileURLToPath(new URL('', import.meta.url))
-    }
+      '~': fileURLToPath(new URL('', import.meta.url)),
+    },
   },
   build: {
     sourcemap: true,
@@ -51,9 +51,9 @@ export default defineConfig({
       // in rollup? (see https://github.com/vitejs/vite/issues/15012#issuecomment-1858010382)
       onwarn(warning, defaultHandler) {
         if (warning.code === 'SOURCEMAP_ERROR') {
-          return
+          return;
         }
-        defaultHandler(warning)
+        defaultHandler(warning);
       },
       external: [
         'vue',
@@ -71,7 +71,7 @@ export default defineConfig({
         },
         globals: {
           vue: 'Vue',
-          'swiper': 'Swiper',
+          swiper: 'Swiper',
           'vue-i18n': 'VueI18n',
           '@vueuse/components': 'VueUse',
           '@vueuse/core': 'VueUse',
@@ -83,6 +83,11 @@ export default defineConfig({
     },
   },
   css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler', // or "modern"
+      },
+    },
     postcss: {
       // the configuration was defined here (and not in an external file)
       // to prevent in a npm-link-setup the plugins from being requested in the parent module

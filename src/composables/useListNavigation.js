@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/prefer-default-export
 export function useListNavigation() {
   function isWithinArrayLimit(list, isArrowDown, newIndex) {
     // set variable for limit to check against

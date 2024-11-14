@@ -627,8 +627,13 @@ export default {
     },
     emitInternalList(val) {
       const sendArr = [];
-      val.forEach((sel, index) => sendArr[index] = { ...sel });
-      sendArr.forEach(sel => delete sel.idInt);
+      val.forEach((sel, index) => {
+        sendArr[index] = { ...sel };
+      });
+      sendArr.forEach((sel) => {
+        // eslint-disable-next-line no-param-reassign
+        delete sel.idInt;
+      });
       /**
        * propagate list change from dragging event to parent
        *
@@ -777,7 +782,7 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-chips-below {
     .base-chips-below-list-item {

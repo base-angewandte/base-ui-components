@@ -144,11 +144,10 @@
 <script setup>
 import BaseLink from '@/components/BaseLink/BaseLink.vue';
 import { useDebounce } from '@/composables/useDebounce.js';
-import {computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, watch} from 'vue';
+import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 
-const BaseButton = defineAsyncComponent(() =>
-    import('@/components/BaseButton/BaseButton.vue'));
+const BaseButton = defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue'));
 
 const props = defineProps({
   /**
@@ -179,7 +178,7 @@ const props = defineProps({
       },
     ],
     validator: arr => arr.every(entry => !['id', 'label']
-        .some(property => !Object.keys(entry).includes(property)) && (entry.route || entry.url)),
+      .some(property => !Object.keys(entry).includes(property)) && (entry.route || entry.url)),
   },
   /**
    * list of secondary navigation items, with the following properties:
@@ -209,7 +208,7 @@ const props = defineProps({
       },
     ],
     validator: arr => arr.every(entry => !['id', 'label']
-        .some(property => !Object.keys(entry).includes(property)) && (entry.route || entry.url)),
+      .some(property => !Object.keys(entry).includes(property)) && (entry.route || entry.url)),
   },
   /**
    * specify how link element should be rendered - this needs to be a
@@ -255,7 +254,7 @@ const props = defineProps({
     type: Number,
     default: 640,
   },
-})
+});
 
 // use the debounce function for window resize
 const { debounce } = useDebounce();
@@ -273,20 +272,18 @@ const menuButton = ref(null);
 const navOpen = ref(false);
 
 /** ACTIVE ELEMENT HANDLING */
-    // we need to access the current component instance
-    // to check for router
+// we need to access the current component instance
+// to check for router
 const { app } = getCurrentInstance().appContext;
 
-const currentRoute = computed(() => {
-  return app.config.globalProperties.$route?.path;
-});
+const currentRoute = computed(() => app.config.globalProperties.$route?.path);
 
 /**
  * provide a list of all nav elements on the page (=primary and secondary items
  *  combined)
  * @returns {Object[]}
  */
-const navElements = computed( () => [].concat(props.primaryItems, props.secondaryItems));
+const navElements = computed(() => [].concat(props.primaryItems, props.secondaryItems));
 
 /**
  * return the active list element or an empty object if $route not initialized yet
@@ -302,7 +299,7 @@ const activeElement = computed(() => {
     // if prop is not set check for the current active element via route match
   } else if (currentRoute.value) {
     element = navElements.value.find(e => e.routeMatch && currentRoute.value
-        .search(e.routeMatch) >= 0);
+      .search(e.routeMatch) >= 0);
     // if no element was found with routeMatch property take a last attempt to
     // match the route
     if (!element) {
@@ -326,16 +323,14 @@ const activeElement = computed(() => {
  * the id of the currently active element
  * @returns {?string}
  */
-const activeElementIdInt = computed(() => {
-  return activeElement.value?.id ?? '';
-});
+const activeElementIdInt = computed(() => activeElement.value?.id ?? '');
 
 /** MOBILE OR DESKTOP DISPLAY */
-    // get isMobile variable from window resize event listener
+// get isMobile variable from window resize event listener
 const { isMobile } = useWindowResize({
-      callback: resizeTriggered,
-      mobileMaxSize: props.mobileSize,
-    });
+  callback: resizeTriggered,
+  mobileMaxSize: props.mobileSize,
+});
 /**
  * after calculating all the element widths - should short label be shown?
  * @type {Ref<UnwrapRef<boolean>>}
@@ -346,23 +341,22 @@ const showShortLabel = ref(false);
  * list of navigation elements minus the currently active element
  * @returns {Object[]}
  */
-const mobileDropDownElements = computed(() => {
-  return navElements.value.filter(e => e.id !== activeElementIdInt.value);
-});
+const mobileDropDownElements = computed(() => navElements.value
+  .filter(e => e.id !== activeElementIdInt.value));
 /**
  * return all elements that should appear in the mobile drop down below the separation line
  * (filtering out the active item)
  * @returns {Object[]}
  */
 const mobileRightElements = computed(() => props.secondaryItems
-    .filter(e => e.id !== activeElementIdInt.value));
+  .filter(e => e.id !== activeElementIdInt.value));
 /**
  * return all elements that should appear in the mobile drop down above the separation line
  * (filtering out the active item)
  * @returns {Object[]}
  */
 const mobileLeftElements = computed(() => props.primaryItems
-    .filter(e => e.id !== activeElementIdInt.value));
+  .filter(e => e.id !== activeElementIdInt.value));
 /**
  * drop down primary and secondary separator should only be shown if in total min 3 items
  * @returns {boolean}
@@ -403,7 +397,7 @@ function calcTextWidth() {
     // const activeTextElement = activeLinkElement.firstChild;
     // get the padding of the link element
     const activeLinkPadding = Number(window.getComputedStyle(activeLinkElement).paddingLeft
-        .replace('px', ''));
+      .replace('px', ''));
     // now set the regular label of the currently active element as innerText
     activeTextElement.innerText = activeElement.value.label;
     // check if short label should be shown by
@@ -421,21 +415,21 @@ function calcTextWidth() {
   } else {
     // get grandchildren of navigation element -> <li> elements
     showShortLabel.value = [...clonedNavigation.childNodes].flat()
-        // filter out separation lines and other potential items that do not contain a link element
-        .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-navigation__nav-item-link')[0])
-        // check if one of the elements has text that does not fit the link element
-        .some((li, index) => {
-          // get the link (<a>) element
-          const linkElement = li.getElementsByTagName('a')[0] || li.firstChild;
-          // get the text (<span>) element
-          const textElement = li.getElementsByTagName('span')[0];
-          // set the innerText of the span to the full label of the element with the same index in the navElements array
-          textElement.innerText = navElements.value[index]?.label;
-          // get the link element padding to subtract from available width
-          const linkPadding = Number(window.getComputedStyle(linkElement).paddingLeft.replace('px', ''));
-          // check if text fits link element width of if scrollWidth exceeds it
-          return (Math.ceil(linkElement.clientWidth - (2 * linkPadding)) < textElement.scrollWidth);
-        });
+    // filter out separation lines and other potential items that do not contain a link element
+      .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-navigation__nav-item-link')[0])
+    // check if one of the elements has text that does not fit the link element
+      .some((li, index) => {
+        // get the link (<a>) element
+        const linkElement = li.getElementsByTagName('a')[0] || li.firstChild;
+        // get the text (<span>) element
+        const textElement = li.getElementsByTagName('span')[0];
+        // set the innerText of the span to the full label of the element with the same index in the navElements array
+        textElement.innerText = navElements.value[index]?.label;
+        // get the link element padding to subtract from available width
+        const linkPadding = Number(window.getComputedStyle(linkElement).paddingLeft.replace('px', ''));
+        // check if text fits link element width of if scrollWidth exceeds it
+        return (Math.ceil(linkElement.clientWidth - (2 * linkPadding)) < textElement.scrollWidth);
+      });
   }
   // remove the cloned elements
   clonedNavigation.remove();
@@ -469,7 +463,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables.scss";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-navigation {
   box-shadow: $box-shadow-reg;
@@ -538,7 +533,7 @@ onMounted(() => {
     width: 100%;
     background: $box-color;
     // add z-index here so drop down is behind nav bar
-    z-index: calc(#{map-get($zindex, dropdown)} + 1);
+    z-index: calc(#{map.get($zindex, dropdown)} + 1);
 
     .base-navigation__mobile-menu-button {
       margin-left: auto;
@@ -558,7 +553,7 @@ onMounted(() => {
     box-shadow: $drop-shadow;
     border-top: $separation-line;
     margin-top: $row-height-large;
-    z-index: map-get($zindex, dropdown);
+    z-index: map.get($zindex, dropdown);
 
     .base-navigation__nav-item {
       &:nth-child(1 of .base-navigation__nav-item--secondary) {

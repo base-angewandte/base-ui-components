@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { debounce } from '@/utils/utils';
+import { debounce } from '@/utils/utils.js';
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useI18n } from '@/composables/useI18n.js';
@@ -289,7 +289,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-drop-down {
     display: inline-block;
@@ -379,7 +380,7 @@ export default {
     .base-drop-down-body {
       position: absolute;
       background-color: white;
-      z-index: map-get($zindex, dropdown);
+      z-index: map.get($zindex, dropdown);
       box-shadow: $drop-shadow;
       max-height: 300px;
       max-width: calc(100vw - 3 * #{$spacing});

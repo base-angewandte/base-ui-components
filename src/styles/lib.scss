@@ -1,4 +1,6 @@
-@import 'variables';
+@use "sass:map";
+@use "variables" as *;
+
 
 /* for accessibility */
 .hide {
@@ -188,7 +190,7 @@ h1, h2, h3 {
     top: 0;
     right: 0;
     background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-    z-index: map-get($zindex, fadeout);
+    z-index: map.get($zindex, fadeout);
   }
 }
 
@@ -203,7 +205,7 @@ h1, h2, h3 {
     top: 0;
     left: 0;
     background: linear-gradient(to left, rgba(255, 255, 255, 0) , white);
-    z-index: map-get($zindex, fadeout);
+    z-index: map.get($zindex, fadeout);
   }
 }
 
@@ -218,7 +220,7 @@ h1, h2, h3 {
     top: 0;
     right: 0;
     background: linear-gradient(to right, rgba(255, 255, 255, 0) , $background-color);
-    z-index: map-get($zindex, fadeout);
+    z-index: map.get($zindex, fadeout);
   }
 }
 

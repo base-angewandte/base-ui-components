@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import { highlightText } from '@/utils/utils';
+import { highlightText } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 
 /** a multipurpose drop down list */
@@ -453,14 +453,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-drop-down-list__container {
     background: inherit;
 
     &.base-drop-down-list__container-drop-down-style {
       box-shadow: $drop-shadow;
-      z-index: map-get($zindex, dropdown);
+      z-index: map.get($zindex, dropdown);
       max-height: 10 * $row-height-small;
       overflow-y: auto;
       position: absolute;

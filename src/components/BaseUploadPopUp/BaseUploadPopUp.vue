@@ -201,7 +201,7 @@ export default {
     return {
       getLangLabel,
       getI18nTerm,
-    }
+    };
   },
   computed: {
     buttonText() {
@@ -281,7 +281,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-uploader-user-warning {
     color: $warning-color;
@@ -390,7 +390,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-upload-bar-loader {
   position: relative;

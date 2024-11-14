@@ -35,11 +35,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-box-tooltip {
     position: relative;
-    z-index: map-get($zindex, boxcontent);
+    z-index: map.get($zindex, boxcontent);
     margin-left: auto;
     color: $font-color;
     transition: color 250ms ease-in-out;

@@ -1,5 +1,5 @@
-@import 'fonts';
-@import "src/styles/variables";
+@use 'fonts';
+@use "src/styles/variables" as *;
 
 /**
  * Custom Styles here.

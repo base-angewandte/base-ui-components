@@ -1,8 +1,8 @@
 import {
   ref, onMounted, computed,
 } from 'vue';
-import { useElementObserver } from '@/composables/useElementObserver';
-import { useEventListener } from '@/composables/useEventListener';
+import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useEventListener } from '@/composables/useEventListener.js';
 
 /**
  *
@@ -10,7 +10,8 @@ import { useEventListener } from '@/composables/useEventListener';
  * @param direction
  * @returns {{boxFadeOut: Ref<UnwrapRef<{}>>, elementIsScrollable: ComputedRef<unknown>, calcFadeOut: function }}
  */
-export function useElementFadeOut({ target, direction = 'vertical'}) {
+// eslint-disable-next-line import/prefer-default-export
+export function useElementFadeOut({ target, direction = 'vertical' }) {
   const scrollContainer = computed(() => target.value.$el || target.value);
 
   const directionIsVertical = computed(() => direction === 'vertical');

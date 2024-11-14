@@ -1,7 +1,11 @@
-const gulp = require('gulp');
-const fs = require('fs');
-const { argv } = require('yargs');
-const conventionalChangelog = require('gulp-conventional-changelog');
+import gulp from 'gulp';
+import fs from 'fs';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import yargs from 'yargs';
+import conventionalChangelog from 'gulp-conventional-changelog';
+
+// eslint-disable-next-line no-undef
+const argv = yargs(process.argv.slice(2)).parse();
 
 const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/';
 

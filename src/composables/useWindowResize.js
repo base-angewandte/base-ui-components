@@ -1,5 +1,5 @@
-import {computed, ref} from 'vue';
-import {useEventListener} from '@/composables/useEventListener.js';
+import { computed, ref } from 'vue';
+import { useEventListener } from '@/composables/useEventListener.js';
 
 /**
  * composable that manages an event listener on the window resize event
@@ -14,7 +14,14 @@ import {useEventListener} from '@/composables/useEventListener.js';
  * @param {boolean} [callOnMounted=false] - specify if function should be called the first time on mounted
  * @returns {{windowInnerWidth: number, isTablet: boolean, isMobile: boolean}}
  */
-export function useWindowResize({ callback, mobileMaxSize = 639, tabletMaxSize = 1023, setDebounce = false, callOnMounted = false}) {
+// eslint-disable-next-line import/prefer-default-export
+export function useWindowResize({
+  callback,
+  mobileMaxSize = 639,
+  tabletMaxSize = 1023,
+  setDebounce = false,
+  callOnMounted = false,
+}) {
   /**
    * variable to store window inner width
    * @type {Ref<UnwrapRef<number>>}
@@ -24,16 +31,12 @@ export function useWindowResize({ callback, mobileMaxSize = 639, tabletMaxSize =
    * is window width within mobile size
    * @type {ComputedRef<boolean>}
    */
-  const isMobile = computed(() => {
-    return windowInnerWidth.value <= mobileMaxSize;
-  });
+  const isMobile = computed(() => windowInnerWidth.value <= mobileMaxSize);
   /**
    * is window width within tablet size
    * @type {ComputedRef<boolean>}
    */
-  const isTablet = computed(() => {
-    return windowInnerWidth.value <= tabletMaxSize;
-  });
+  const isTablet = computed(() => windowInnerWidth.value <= tabletMaxSize);
 
   /**
    * on resize update the windowInnerWidth variable and
@@ -56,5 +59,5 @@ export function useWindowResize({ callback, mobileMaxSize = 639, tabletMaxSize =
     windowInnerWidth,
     isMobile,
     isTablet,
-  }
+  };
 }

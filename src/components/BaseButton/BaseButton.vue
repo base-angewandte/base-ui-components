@@ -1,5 +1,5 @@
 <script>
-import {computed, defineAsyncComponent, useSlots} from 'vue';
+import { computed, defineAsyncComponent, useSlots } from 'vue';
 import { useId } from '@/composables/useId.js';
 
 /**
@@ -155,14 +155,12 @@ export default {
 
     // compute if internal id should be set for aria-attribute
     // (no need if no text or slot is not used)
-    const setLabelIdReference = computed(() => {
-      return !!props.text || !!slots.text;
-    })
+    const setLabelIdReference = computed(() => !!props.text || !!slots.text);
 
     return {
       internalId,
       setLabelIdReference,
-    }
+    };
   },
   methods: {
     clicked(event) {
@@ -179,24 +177,24 @@ export default {
 
 <template>
   <button
-      ref="baseButton"
-      :disabled="disabled || null"
-      :aria-disabled="disabled || null"
-      :aria-labelledby="setLabelIdReference ? internalId : null"
-      :aria-describedby="description ? `${internalId}-description` : null"
-      :type="buttonType"
-      :class="['base-button',
+    ref="baseButton"
+    :disabled="disabled || null"
+    :aria-disabled="disabled || null"
+    :aria-labelledby="setLabelIdReference ? internalId : null"
+    :aria-describedby="description ? `${internalId}-description` : null"
+    :type="buttonType"
+    :class="['base-button',
              `base-button-${buttonStyle}`,
              `base-button-icon-${iconPosition}`,
              `base-button-align-${alignText}`,
              { 'base-button-background': hasBackgroundColor },
              { 'base-button-active': active }]"
-      @click.prevent="clicked">
+    @click.prevent="clicked">
     <BaseIcon
-        v-if="icon"
-        :name="icon"
-        :title="iconTitle"
-        :class="['base-button-icon',
+      v-if="icon"
+      :name="icon"
+      :title="iconTitle"
+      :class="['base-button-icon',
                'base-button-icon-' + iconSize,
                { 'base-button-icon-colored': iconColored },
                { 'base-button-icon-hide': hideIcon }]" />
@@ -207,12 +205,12 @@ export default {
     <!-- @slot have your own text element which also allows for easier custom styling.
       @binding {string|number} label-id If you are using this slot please also set the id of your custom element to `label-id` since this id is used for the <button> `aria-labelledby` attribute -->
     <slot
-        name="text"
-        :label-id="internalId">
+      name="text"
+      :label-id="internalId">
       <span
-          v-if="text && buttonStyle !== 'circle'"
-          :id="internalId"
-          :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
+        v-if="text && buttonStyle !== 'circle'"
+        :id="internalId"
+        :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
         {{ text }}
       </span>
     </slot>
@@ -221,21 +219,22 @@ export default {
     <slot name="right-of-text" />
 
     <BaseBoxTooltip
-        v-if="showTooltip"
-        @clicked="clicked">
+      v-if="showTooltip"
+      @clicked="clicked">
       test
     </BaseBoxTooltip>
     <span
-        v-if="description"
-        :id="`${internalId}-description`"
-        class="hide">
+      v-if="description"
+      :id="`${internalId}-description`"
+      class="hide">
       {{ description }}
     </span>
   </button>
 </template>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-button {
     position: relative;
@@ -294,7 +293,7 @@ export default {
       &.base-button-active {
         /* TODO: adjust this to style guide if necessary */
         box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
-        z-index: map-get($zindex, button-active);
+        z-index: map.get($zindex, button-active);
       }
     }
 
@@ -377,7 +376,7 @@ export default {
     &.base-button-active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
-      z-index: map-get($zindex, button-active);
+      z-index: map.get($zindex, button-active);
     }
 
     &.base-button-align-left:not(&.base-button-icon-top) {

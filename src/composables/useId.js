@@ -1,7 +1,8 @@
 import { getCurrentInstance } from 'vue';
 
-const ATTR_KEY = 'data-base-id'
+const ATTR_KEY = 'data-base-id';
 
+// eslint-disable-next-line import/prefer-default-export
 export function useId() {
   // get the current component instance
   const instance = getCurrentInstance();

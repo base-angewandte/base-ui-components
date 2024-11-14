@@ -1,5 +1,5 @@
-import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
-import {useDebounce} from '@/composables/useDebounce.js';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
  * put an even listener on a HTML element
@@ -12,17 +12,25 @@ import {useDebounce} from '@/composables/useDebounce.js';
  *  calling the function
  * @param {boolean} [callOnMounted=false] - specify if function should be called the first time on mounted
  */
-export function useEventListener({ target, event, callback, options = {}, setDebounce = false, callOnMounted = false }) {
+// eslint-disable-next-line import/prefer-default-export
+export function useEventListener({
+  target,
+  event,
+  callback,
+  options = {},
+  setDebounce = false,
+  callOnMounted = false,
+}) {
   // in order to be able to use all kind of element we create a separate variable here
-  const listenerContainer = computed(() => target.value === undefined
-    ? target : target.value.$el || target.value);
+  const listenerContainer = computed(() => (target.value === undefined
+    ? target : target.value.$el || target.value));
 
   /**
    * define a variable that can hold the debounce function in case debounce
    * should be applied
    * @type {Ref<UnwrapRef<Function>>}
    */
-  let listenerCallback = ref(callback);
+  const listenerCallback = ref(callback);
 
   // check if debounce was set
   if (typeof setDebounce === 'number' && setDebounce >= 0) {

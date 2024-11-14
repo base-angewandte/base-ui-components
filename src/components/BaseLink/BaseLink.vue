@@ -111,12 +111,12 @@
  * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
  */
 
-import {defineAsyncComponent, ref, getCurrentInstance, computed, onMounted} from 'vue';
-import cleanDomNodes from '@/directives/cleanDomNodes';
+import { defineAsyncComponent, ref, getCurrentInstance, computed } from 'vue';
+import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useEventListener } from '@/composables/useEventListener.js';
 import { useDebounce } from '@/composables/useDebounce.js';
-import {useId} from '@/composables/useId.js';
+import { useId } from '@/composables/useId.js';
 
 export default {
   name: 'BaseLink',
@@ -351,7 +351,7 @@ export default {
       internalId,
       showTooltip,
       isRouterAvailable,
-    }
+    };
   },
   data() {
     return {
@@ -518,7 +518,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-link {
     transition-property: color, text-decoration-color, background-color;

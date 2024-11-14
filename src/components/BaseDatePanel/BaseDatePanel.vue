@@ -47,9 +47,9 @@
 import { vOnClickOutside } from '@vueuse/components';
 import DatePicker from 'vue-datepicker-next';
 
-import en from 'vue-datepicker-next/locale/en';
-import de from 'vue-datepicker-next/locale/de';
-import fr from 'vue-datepicker-next/locale/fr';
+import en from 'vue-datepicker-next/locale/en.js';
+import de from 'vue-datepicker-next/locale/de.js';
+import fr from 'vue-datepicker-next/locale/fr.js';
 
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
@@ -216,7 +216,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "@/styles/variables" as *;
 
   .base-date-panel {
     display: inline-block;
@@ -264,7 +264,8 @@ export default {
 </style>
 
 <style lang="scss">
-  @import '../../styles/_datepicker.scss';
+@use "@/styles/variables" as *;
+@use 'src/styles/datepicker';
 
   .base-date-panel {
     position: relative;

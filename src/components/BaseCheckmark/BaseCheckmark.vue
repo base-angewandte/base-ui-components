@@ -104,7 +104,7 @@ export default {
     const internalId = useId();
     return {
       internalId,
-    }
+    };
   },
   data() {
     return {
@@ -143,7 +143,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-checkbox-container {
     position: relative;
@@ -185,7 +186,7 @@ export default {
       cursor: pointer;
       width: 100%;
       height: 100%;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
 
       &:focus ~ .base-checkmark-container {
         border-color: $app-color;

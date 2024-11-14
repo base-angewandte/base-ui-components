@@ -72,7 +72,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   $width-dl: 20%;
   $width-dd: 80%;

@@ -210,7 +210,7 @@ export default {
      */
     watchEffect(() => {
       showInt.value = props.show;
-    })
+    });
 
     return {
       popUpBody,
@@ -271,7 +271,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-pop-up {
     .base-pop-up-background {
@@ -281,7 +282,7 @@ export default {
       height: 100%;
       width: 100%;
       /* specific to be higher than base header */
-      z-index: map-get($zindex, modal_bg);
+      z-index: map.get($zindex, modal_bg);
       overflow: hidden;
     }
 
@@ -290,7 +291,7 @@ export default {
       position: fixed;
       top: 20vh;
       left: 50%;
-      z-index: map-get($zindex, modal);
+      z-index: map.get($zindex, modal);
       min-width: 288px;
       width: 50%;
       max-width: 700px;

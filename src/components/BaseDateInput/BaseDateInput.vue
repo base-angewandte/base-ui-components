@@ -229,7 +229,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
-import { capitalizeString, debounce } from '@/utils/utils';
+import { capitalizeString, debounce } from '@/utils/utils.js';
 
 import en from 'vue-datepicker-next/locale/en.es.js';
 import de from 'vue-datepicker-next/locale/de.es.js';
@@ -794,7 +794,7 @@ export default {
      */
     labelRowSlotsHaveData() {
       // get label-addition slot
-      const slotElements = this.$slots['label-addition'] ? this.$slots['label-addition'](): null;
+      const slotElements = this.$slots['label-addition'] ? this.$slots['label-addition']() : null;
       // check if slot exists and has data and actually has content
       // (this did not work with SSR otherwise...)
       return !!slotElements && !!slotElements.length
@@ -1466,10 +1466,10 @@ export default {
             const newDate = useStorageDate ? positiveTempStorageDate : dateToConvert;
             // now assign the new date to the input variable
             this.inputInt[dateKey] = this.addYearMinusToDateStorage(
-                this.getDateString(this.convertToDate(newDate)),
-                // use the original dates here before minus was removed, depending on which date was used
-                (useStorageDate ? isNegativeTempStorageDate : isNegativeNewDateValue),
-              );
+              this.getDateString(this.convertToDate(newDate)),
+              // use the original dates here before minus was removed, depending on which date was used
+              (useStorageDate ? isNegativeTempStorageDate : isNegativeNewDateValue),
+            );
           }
         });
     },
@@ -1484,7 +1484,9 @@ export default {
         return this.inputInt.date !== null ? this.inputInt.date : '';
       }
       const data = {};
-      this.inputProperties.forEach(key => data[key] =  this.inputInt[key] !== null ? this.inputInt[key] : '');
+      this.inputProperties.forEach((key) => {
+        data[key] = this.inputInt[key] !== null ? this.inputInt[key] : '';
+      });
       return data;
     },
     /**
@@ -1728,7 +1730,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-date-input {
     display: flex;
@@ -1881,5 +1883,5 @@ export default {
 </style>
 
 <style lang="scss">
-  @import '../../styles/_datepicker.scss';
+  @use 'src/styles/datepicker';
 </style>

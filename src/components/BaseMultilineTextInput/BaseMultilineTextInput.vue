@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import {computed, defineAsyncComponent, ref} from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import { useId } from '@/composables/useId.js';
 
@@ -303,7 +303,9 @@ export default {
         const propName = this.activeTabInt || 'default';
         this.fieldContent[propName] = typeof val === 'string' ? val : val[propName];
       } else {
-        this.tabs.forEach(tab => this.fieldContent[tab] = val[tab]);
+        this.tabs.forEach((tab) => {
+          this.fieldContent[tab] = val[tab];
+        });
       }
     },
     emitFieldContent() {
@@ -320,7 +322,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 
 .base-multiline-text-input {
   font-family: inherit;

@@ -110,12 +110,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-hover-box {
     box-shadow: $preview-box-shadow;
     position: absolute;
-    z-index: map-get($zindex, hoverbox);
+    z-index: map.get($zindex, hoverbox);
     margin: $spacing;
   }
 </style>

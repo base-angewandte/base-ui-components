@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { debounce } from '@/utils/utils';
+import { debounce } from '@/utils/utils.js';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import { useI18n } from '@/composables/useI18n.js';
 
@@ -220,7 +220,7 @@ export default {
     const { getI18nTerm } = useI18n();
     return {
       getI18nTerm,
-    }
+    };
   },
   data() {
     return {
@@ -507,7 +507,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-options {
   width: 100%;

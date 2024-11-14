@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import { ref } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
 import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
 
@@ -275,7 +274,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-drop-box {
     background-color: $background-color !important;

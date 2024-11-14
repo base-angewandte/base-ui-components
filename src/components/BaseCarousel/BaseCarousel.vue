@@ -47,7 +47,7 @@
 <script>
 import 'lazysizes';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
-import {computed, defineAsyncComponent, getCurrentInstance} from 'vue';
+import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
 
 export default {
   name: 'BaseCarousel',
@@ -103,7 +103,7 @@ export default {
     const isRouterAvailable = computed(() => !!app.config.globalProperties?.$router);
     return {
       isRouterAvailable,
-    }
+    };
   },
   data() {
     return {
@@ -157,9 +157,13 @@ export default {
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
       const { Swiper } = await import('swiper');
+      // eslint-disable-next-line import/extensions
       const { Autoplay } = await import('swiper/modules');
+      // eslint-disable-next-line import/extensions
       const { Keyboard } = await import('swiper/modules');
+      // eslint-disable-next-line import/extensions
       const { Navigation } = await import('swiper/modules');
+      // eslint-disable-next-line import/extensions
       const { Pagination } = await import('swiper/modules');
 
       this.swiperIsActive = true;
@@ -205,7 +209,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-carousel {
     max-width: 1400px;
@@ -257,7 +261,7 @@ export default {
 </style>
 
 <style lang="scss">
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   // import swiper styles
   @import '../../../node_modules/swiper/swiper.scss';

@@ -141,7 +141,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import cleanDomNodes from '@/directives/cleanDomNodes';
+import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import { useI18n } from '@/composables/useI18n.js';
 
 /**
@@ -283,7 +283,7 @@ export default {
 
     return {
       getLangLabel,
-    }
+    };
   },
   data() {
     return {
@@ -336,7 +336,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-text-list {
 

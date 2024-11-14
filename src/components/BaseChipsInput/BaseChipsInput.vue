@@ -125,12 +125,12 @@
 </template>
 
 <script>
-import { highlightText } from '@/utils/utils';
+import { highlightText } from '@/utils/utils.js';
 import { computed, ref, defineAsyncComponent } from 'vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useListNavigation } from '@/composables/useListNavigation';
-import {useId} from '@/composables/useId.js';
+import { useListNavigation } from '@/composables/useListNavigation.js';
+import { useId } from '@/composables/useId.js';
 
 /**
  * Base Chips Input component with drop down and autocomplete functionality
@@ -479,7 +479,7 @@ export default {
     const inputElem = computed(() => {
       if (!baseInput.value || !baseInput.value.$el) return null;
       return baseInput.value.$el.getElementsByTagName('input')[0];
-    })
+    });
 
     return {
       navigate,
@@ -916,7 +916,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
   .base-chips-input {
     position: relative;

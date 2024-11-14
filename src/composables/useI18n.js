@@ -6,6 +6,7 @@ import { computed, ref, getCurrentInstance } from 'vue';
  * @param {?string} [language] - provide the currently set locale here
  * @returns {{setLangLabels: (function(string, string[]): {}), getLangLabel: ((function((string|Object), boolean=): (Object|string))|*), getI18nTerm: ((function(string, number=, Object=): string)|*)}}
  */
+// eslint-disable-next-line import/prefer-default-export
 export function useI18n(language) {
   // in order to check for i18n we need to access the app instance app context
   const { app } = getCurrentInstance().appContext;
@@ -17,6 +18,7 @@ export function useI18n(language) {
    * @type {ComputedRef<any|boolean>}
    */
   const hasI18n = computed(() => {
+    // eslint-disable-next-line no-underscore-dangle
     const i18nEnabled = Boolean(app?.__VUE_I18N__);
     // if the __VUE_I18N__ variable is set - return the global $i18n variable
     if (i18nEnabled) {
@@ -64,6 +66,7 @@ export function useI18n(language) {
   function setLangLabels(key, locales) {
     return locales
       .reduce((prev, curr) => {
+        // eslint-disable-next-line no-param-reassign
         prev[curr] = hasI18n.value
           ? t.value(key, curr) : key.split('.').pop();
         return prev;
@@ -99,5 +102,5 @@ export function useI18n(language) {
     getI18nTerm,
     setLangLabels,
     getLangLabel,
-  }
+  };
 }

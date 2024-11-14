@@ -190,7 +190,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-progress-bar {
     .base-progress-bar__container {
@@ -234,7 +235,7 @@ export default {
           top: 0;
           right: 0;
           background: linear-gradient(to right, rgba(240, 240, 240, 0) , rgba(240, 240, 240, 1));
-          z-index: map-get($zindex, uploadbar);
+          z-index: map.get($zindex, uploadbar);
           opacity: 1;
           transition: opacity 0.3s;
 

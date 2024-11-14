@@ -131,8 +131,7 @@ export default {
     const idInt = computed(() => props.inputId || internalId);
     return {
       idInt,
-    }
-
+    };
   },
   data() {
     return {
@@ -162,7 +161,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
   .base-toggle {
     position: relative;
@@ -179,7 +179,7 @@ export default {
       position: absolute;
       left: -1000px;
       opacity: 0;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
 
       &:focus-visible ~ .base-switch {
         border: 1px solid $app-color;

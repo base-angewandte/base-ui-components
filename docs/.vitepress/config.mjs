@@ -61,7 +61,7 @@ export default defineConfig({
     },
     scss: {
       additionalData: `
-            @import "@/styles/variables.scss";
+            @use "src/styles/variables" as *;
         `
     },
   },

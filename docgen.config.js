@@ -3,7 +3,9 @@ import * as path from 'path';
 import { globbySync } from 'globby';
 import { fileURLToPath } from 'url';
 
+// eslint-disable-next-line no-underscore-dangle
 const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line no-underscore-dangle
 const __dirname = path.dirname(__filename);
 
 const cwd = path.join(__dirname, './src');
@@ -20,17 +22,17 @@ const ignore = [
 ];
 
 const components = globbySync('components/**/Base*.{vue,js,jsx,ts,tsx}', {
-    cwd,
-    ignore,
-  })
+  cwd,
+  ignore,
+})
   // modify path to match the docgen requirements (relative to componentsRoot)
   .map(f => f.replace('components/', ''));
 
 export default defineConfig({
   componentsRoot: 'src/components',
   components,
-	outDir: './docs/components',
-	defaultExamples: true,
+  outDir: './docs/components',
+  defaultExamples: true,
   apiOptions: {
     jsx: false,
     alias: {
@@ -42,4 +44,4 @@ export default defineConfig({
   docsRepo: false,
   editLinkLabel: false,
   getRepoEditUrl: false,
-})
+});

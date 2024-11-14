@@ -426,7 +426,7 @@ export default {
       target: body,
       event: 'scroll',
       callback: scroll,
-    })
+    });
 
     return {
       getI18nTerm,
@@ -648,7 +648,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables.scss";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-entry-selector {
     display: flex;
@@ -657,7 +658,7 @@ export default {
 
     &__head {
       position: sticky;
-      z-index: map-get($zindex, entry-selector-head);
+      z-index: map.get($zindex, entry-selector-head);
       background-color: $background-color;
       flex: 0 0 auto;
 
@@ -697,7 +698,7 @@ export default {
         position: absolute;
         height: 100%;
         width: 100%;
-        z-index: map-get($zindex, loader);
+        z-index: map.get($zindex, loader);
         background-color: $loading-background;
         overflow: hidden;
 

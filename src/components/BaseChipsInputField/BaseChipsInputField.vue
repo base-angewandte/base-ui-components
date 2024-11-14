@@ -67,7 +67,7 @@
                 :name="!drag ? 'flip-list' : null"
                 type="transition">
                 <template
-                    v-for="(entry, index) in selectedListInt">
+                  v-for="(entry, index) in selectedListInt">
                   <!-- @slot a slot to provide customized chips
                     @binding { object } entry - one selected option displayed as chip
                     @binding { number } index - the index of the entry in the selectedList array
@@ -75,24 +75,24 @@
                     @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
                   -->
                   <slot
-                      name="chip"
-                      v-bind="{
-                    entry,
-                    index,
-                    chipActiveForRemove,
-                    removeEntry,
-                  }">
+                    name="chip"
+                    v-bind="{
+                      entry,
+                      index,
+                      chipActiveForRemove,
+                      removeEntry,
+                    }">
                     <BaseChip
-                        :id="entry.idInt"
-                        :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                        :model-value="getLangLabel(entry[labelPropertyName], true)"
-                        :hover-box-content="hoverboxContent"
-                        :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
-                      || !!entry[identifierPropertyName]"
-                        :chip-active="chipActiveForRemove === index"
-                        :is-removable="chipsRemovable"
-                        @remove-entry="removeEntry(entry, index)"
-                        @hoverbox-active="hoverBoxActive($event, entry)" />
+                      :id="entry.idInt"
+                      :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                      :model-value="getLangLabel(entry[labelPropertyName], true)"
+                      :hover-box-content="hoverboxContent"
+                      :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                        || !!entry[identifierPropertyName]"
+                      :chip-active="chipActiveForRemove === index"
+                      :is-removable="chipsRemovable"
+                      @remove-entry="removeEntry(entry, index)"
+                      @hoverbox-active="hoverBoxActive($event, entry)" />
                   </slot>
                 </template>
               </TransitionGroup>
@@ -165,10 +165,10 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
-import { sort, createId } from '@/utils/utils';
+import { sort, createId } from '@/utils/utils.js';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useListNavigation } from '@/composables/useListNavigation';
+import { useListNavigation } from '@/composables/useListNavigation.js';
 
 /** input field with chips functionalities */
 
@@ -494,7 +494,7 @@ export default {
     const { navigate } = useListNavigation();
 
     /** INTERNATIONALIZATION */
-    const { getLangLabel }  = useI18n(props.language);
+    const { getLangLabel } = useI18n(props.language);
 
     return {
       navigate,
@@ -807,6 +807,7 @@ export default {
       } else if (newSelectedListInt.length) {
         // remove internal ids again
         tempList = tempList.map((selected) => {
+          // eslint-disable-next-line no-param-reassign
           delete selected.idInt;
           return selected;
         });
@@ -911,7 +912,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-chips-input-field {
     width: 100%;

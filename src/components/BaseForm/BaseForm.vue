@@ -320,7 +320,6 @@ import { defineAsyncComponent } from 'vue';
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
 import { useI18n } from '@/composables/useI18n.js';
 
-
 /**
  * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard
  */
@@ -1039,7 +1038,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-form {
     position: relative;
@@ -1214,7 +1213,7 @@ export default {
 </style>
 
 <style lang="scss">
-  @import "../../styles/variables.scss";
+  @use "@/styles/variables" as *;
 
   .base-form__input-field--third {
     .base-form-field-creator__date-field-wrapper {

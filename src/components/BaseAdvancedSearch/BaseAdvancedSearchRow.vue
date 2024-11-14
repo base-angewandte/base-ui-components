@@ -393,9 +393,9 @@ import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
-import { createId, hasData, sort } from '@/utils/utils';
-import { useListNavigation } from '@/composables/listNavigation';
+import { createId, hasData, sort } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
+import { useListNavigation } from '@/composables/useListNavigation.js';
 
 export default {
   name: 'BaseAdvancedSearchRow',
@@ -1777,7 +1777,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-advanced-search-row {
   position: relative;
@@ -1868,7 +1869,7 @@ export default {
       width: 100%;
       position: absolute;
       box-shadow: $drop-shadow;
-      z-index: map-get($zindex, dropdown);
+      z-index: map.get($zindex, dropdown);
 
       &.base-advanced-search-row__drop-down-body__date {
         width: calc(100% + #{$spacing});
@@ -2161,7 +2162,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import '../../styles/variables';
+@use "@/styles/variables" as *;
 
 .base-advanced-search-row__input-field {
   height: calc(#{$row-height-large} - 4px);

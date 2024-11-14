@@ -258,7 +258,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-info-panel {
   position: relative;

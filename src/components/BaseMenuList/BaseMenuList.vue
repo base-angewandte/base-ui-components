@@ -155,14 +155,20 @@ export default {
       this.setInternalVar();
     },
     activeEntry(val) {
-      this.entryProps.map(item => item.active = false);
+      this.entryProps.forEach((item) => {
+        // eslint-disable-next-line no-param-reassign
+        item.active = false;
+      });
       if (val >= 0 && this.entryProps[val]) {
         this.entryProps[val].active = true;
       }
     },
     selectActive(val) {
       if (!val) {
-        this.entryProps.forEach(entry => entry.selected = false);
+        this.entryProps.forEach((entry) => {
+          // eslint-disable-next-line no-param-reassign
+          entry.selected = false;
+        });
       } else {
         this.setInternalVar();
       }
@@ -281,7 +287,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-menu-list {
     position: relative;

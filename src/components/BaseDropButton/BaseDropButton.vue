@@ -80,10 +80,10 @@
 import { vOnClickOutside } from '@vueuse/components';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { useListNavigation } from '@/composables/useListNavigation';
-import {defineAsyncComponent, ref, watch} from 'vue';
+import { useListNavigation } from '@/composables/useListNavigation.js';
+import { defineAsyncComponent, ref, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
-import {useDebounce} from '@/composables/useDebounce.js';
+import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
  * An Element to have the functionality of several buttons in one element
@@ -382,7 +382,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-drop-button {
   position: relative;

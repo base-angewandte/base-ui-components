@@ -139,7 +139,7 @@
 
 <script>
 import { defineAsyncComponent, ref, computed } from 'vue';
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
 import { useI18n } from '@/composables/useI18n.js';
@@ -399,7 +399,6 @@ export default {
   },
   emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'blur', 'keydown', 'update:model-value'],
   setup(props, { emit }) {
-
     /** LABEL and ERROR MESSAGE LOCALIZATION */
     const errorMessageInt = ref('');
     const { getLangLabel } = useI18n(props.language);
@@ -453,13 +452,12 @@ export default {
       setFieldState,
       idInt,
       inputFrame,
-    }
+    };
   },
   data() {
     return {
       inputInt: '',
       previousInput: '',
-      errorMessageInt: '',
       invalidInt: '',
     };
   },
@@ -879,7 +877,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 
 .base-input {
   position: relative;

@@ -264,11 +264,10 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import { extractNestedPropertyValue } from '@/utils/utils';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useListNavigation } from '@/composables/useListNavigation';
-const { VueDraggable } = defineAsyncComponent(() => import('vue-draggable-plus'));
+import { useListNavigation } from '@/composables/useListNavigation.js';
+import { extractNestedPropertyValue } from '@/utils/utils.js';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -1319,7 +1318,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-result-box-section {
   position: relative;
@@ -1330,7 +1330,7 @@ export default {
     position: absolute;
     height: 100%;
     width: 100%;
-    z-index: map-get($zindex, loader);
+    z-index: map.get($zindex, loader);
     background-color: $loading-background;
 
     .base-result-box-section__loader {
@@ -1429,7 +1429,7 @@ export default {
       text-align: center;
       color: $font-color-second;
       backface-visibility: hidden;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
       position: relative;
 
       .base-result-box-section__message-area-text {

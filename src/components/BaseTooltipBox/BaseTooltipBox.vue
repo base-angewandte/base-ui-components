@@ -1,8 +1,8 @@
 <script setup>
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
-import {computed, onMounted, ref, watch, nextTick, onUnmounted} from 'vue';
+import { computed, onMounted, ref, watch, nextTick, onUnmounted } from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useElementObserver } from '@/composables/useElementObserver.js';
@@ -15,60 +15,60 @@ import { useEventListener } from '@/composables/useEventListener.js';
  */
 
 const props = defineProps({
-    /**
+  /**
      * HTMLElement to attach the tooltip
      * e.g.: vue ref element
      */
-    attachTo: {
-      type: null, // HTMLElement makes troubles with nuxt/nuxt-bridge
-      required: true,
-    },
-    /**
+  attachTo: {
+    type: null, // HTMLElement makes troubles with nuxt/nuxt-bridge
+    required: true,
+  },
+  /**
      * define the default direction order
      */
-    directionOrder: {
-      type: Array,
-      default: () => ['top', 'bottom', 'right', 'left'],
-      validator: val => [...val].sort().toString() === ['top', 'bottom', 'right', 'left'].sort().toString(),
-    },
-    /**
+  directionOrder: {
+    type: Array,
+    default: () => ['top', 'bottom', 'right', 'left'],
+    validator: val => [...val].sort().toString() === ['top', 'bottom', 'right', 'left'].sort().toString(),
+  },
+  /**
      * add additional styling
      * **caveat**: properties `top`, `left` and `right` will be overwritten due position calculation
      */
-    styles: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
+  styles: {
+    type: Object,
+    default: () => ({}),
+  },
+  /**
      * title of the modal popup on mobile
      */
-    modalTitle: {
-      type: String,
-      default: '',
-    },
-    /**
+  modalTitle: {
+    type: String,
+    default: '',
+  },
+  /**
      * specify how the component is rendered on mobile resolutions
      *
      * **box**: component is rendered at the `attachTo` HTMLElement
      * **modal**: component is rendered as a modal popup
      * **fullscreen**: component is rendered as ap popup with max height and width
      */
-    typeOnMobile: {
-      type: String,
-      default: 'modal',
-      validator: val => ['box', 'fullscreen', 'modal'].includes(val),
-    },
-    /**
+  typeOnMobile: {
+    type: String,
+    default: 'modal',
+    validator: val => ['box', 'fullscreen', 'modal'].includes(val),
+  },
+  /**
      * specify a threshold value in px for the box top position calculation
      * Useful to prevent top alignment of the TooltipBox, for example, when there is a fixed-positioned header (BaseHeader).
      *
      * Note: The value can also be set globally with the CSS variable `--base-tooltip-box-threshold-top`.
      *       The property will be overwritten by the CSS variable.
      */
-    thresholdTop: {
-      type: Number,
-      default: 0,
-    },
+  thresholdTop: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const emit = defineEmits(['close']);
@@ -117,8 +117,7 @@ useEventListener({
   target: window,
   event: 'keydown',
   callback: escEventHandler,
-})
-
+});
 
 /**
  * intercept click-outside event and close the component
@@ -132,7 +131,7 @@ onClickOutside(tooltipInner, () => {
 /** FADE OUT RELATED FUNCTIONALITY */
 const { boxFadeOut: { top: fadeOutTop, bottom: fadeOutBottom }, calcFadeOut } = useElementFadeOut({
   target: body,
-})
+});
 
 /** TOOLTIP POSITION HANDLING */
 const direction = ref(null);
@@ -178,7 +177,6 @@ const thresholdTopInt = computed(() => {
   // return value
   return thresholdTopAsNumber;
 });
-
 
 /**
  * calc absolute tooltip and inner triangle position
@@ -279,10 +277,8 @@ const { isMobile } = useWindowResize({
   callback: calcPosition,
 });
 
-const isPopUpLockEnabled = computed(() => {
-  return (props.typeOnMobile === 'modal' || props.typeOnMobile === 'fullscreen')
-      && isMobile;
-});
+const isPopUpLockEnabled = computed(() => (props.typeOnMobile === 'modal' || props.typeOnMobile === 'fullscreen')
+      && isMobile);
 
 /** ADDING OBSERVERS FOR FADEOUT AND TOOLTIP POSITIONING */
 /**
@@ -295,21 +291,21 @@ watch(() => props.attachTo, () => {
   });
 });
 
+function onMutation() {
+  calcPosition();
+}
+
 useElementObserver({
   type: 'mutation',
   target: bodyInner,
   callback: onMutation,
   options: { childList: true, subtree: true },
-})
-
-function onMutation() {
-  calcPosition();
-}
+});
 
 onMounted(() => {
   // move the component to the body node to position it absolutely in the document
   document.querySelector('body')
-      .appendChild(tooltip.value);
+    .appendChild(tooltip.value);
 
   // Note: the click-outside event is executed immediately when the component is initialized.
   //       To prevent this timing problem, the guard variable is set with a delay.
@@ -335,43 +331,43 @@ onUnmounted(() => {
 
 <template>
   <div
-      ref="tooltip"
-      role="dialog"
-      :aria-labelledby="`baseTooltipBox-title-${internalId}`"
-      :style="{ ...styles, ...css }"
-      :class="['base-tooltip-box',
+    ref="tooltip"
+    role="dialog"
+    :aria-labelledby="`baseTooltipBox-title-${internalId}`"
+    :style="{ ...styles, ...css }"
+    :class="['base-tooltip-box',
              'base-tooltip-box--' + direction,
              { 'base-tooltip-box--modal-on-mobile': typeOnMobile === 'modal'
                || typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--fullscreen-on-mobile': typeOnMobile === 'fullscreen' },
              { 'base-tooltip-box--active': isActive }]">
     <div
-        ref="tooltipInner"
-        class="base-tooltip-box__inner">
+      ref="tooltipInner"
+      class="base-tooltip-box__inner">
       <div class="base-tooltip-box__header">
         <div
-            :id="`baseTooltipBox-title-${internalId}`"
-            class="base-tooltip-box__header__title">
+          :id="`baseTooltipBox-title-${internalId}`"
+          class="base-tooltip-box__header__title">
           {{ modalTitle }}
         </div>
         <button
-            title="close"
-            class="base-tooltip-box__button"
-            @click="close">
+          title="close"
+          class="base-tooltip-box__button"
+          @click="close">
           <BaseIcon
-              name="remove"
-              class="base-tooltip-box__button__icon" />
+            name="remove"
+            class="base-tooltip-box__button__icon" />
         </button>
       </div>
       <div
-          ref="body"
-          :class="['base-tooltip-box__body',
+        ref="body"
+        :class="['base-tooltip-box__body',
                  {'base-tooltip-box__body--fade-out': fadeOutTop || fadeOutBottom},
                  { 'base-tooltip-box__body--fade-out--top': fadeOutTop },
                  { 'base-tooltip-box__body--fade-out--bottom': fadeOutBottom }]">
         <div
-            ref="bodyInner"
-            class="base-tooltip-box__body__inner">
+          ref="bodyInner"
+          class="base-tooltip-box__body__inner">
           <!-- @slot slot to inject box content -->
           <slot>
             <i>use default slot</i>
@@ -383,11 +379,12 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-tooltip-box {
     position: absolute;
-    z-index: map-get($zindex, modal);
+    z-index: map.get($zindex, modal);
     min-width: 200px;
     max-height: 50vh;
     max-width: calc(100% - $spacing);
@@ -442,7 +439,7 @@ onUnmounted(() => {
           position: absolute;
           left: $spacing;
           right: $spacing;
-          z-index: map-get($zindex, fadeout);
+          z-index: map.get($zindex, fadeout);
         }
 
         &--top {
@@ -507,7 +504,7 @@ onUnmounted(() => {
         max-height: 100vh;
         max-width: inherit;
         background-color: transparent;
-        z-index: map-get($zindex, modal);
+        z-index: map.get($zindex, modal);
 
         .base-tooltip-box__inner {
           position: relative;

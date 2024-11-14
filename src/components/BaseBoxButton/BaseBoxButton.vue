@@ -59,7 +59,7 @@
 
 <script>
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
-import {ref, defineAsyncComponent} from 'vue';
+import { ref, defineAsyncComponent } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
@@ -173,7 +173,7 @@ export default {
       type: 'resize',
       target: baseBox,
       callback: calcShowSubtext,
-    })
+    });
 
     return {
       baseBox,
@@ -205,7 +205,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-box-button {
     display: flex;

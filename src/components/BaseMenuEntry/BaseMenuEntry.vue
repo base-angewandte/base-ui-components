@@ -275,7 +275,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-menu-entry {
     display: flex;
@@ -488,7 +489,7 @@ export default {
       top: 0;
       left: calc(-#{$fade-out-width} - #{$spacing});
       background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-      z-index: map-get($zindex, fadeout);
+      z-index: map.get($zindex, fadeout);
     }
   }
 </style>

@@ -128,7 +128,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-collapsed-filter-item {
   flex-shrink: 0;

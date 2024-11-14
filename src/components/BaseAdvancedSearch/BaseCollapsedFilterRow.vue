@@ -93,7 +93,7 @@
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue';
-import { hasData } from '@/utils/utils';
+import { hasData } from '@/utils/utils.js';
 
 /**
  * component for BaseAdvancedSearch 'form' mode to display form filter values efficiently
@@ -466,7 +466,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-collapsed-filter-row {
   position: relative;
@@ -490,7 +491,7 @@ export default {
       top: 0;
       left: $spacing;
       background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-      z-index: map-get($zindex, chips-fadeout);
+      z-index: map.get($zindex, chips-fadeout);
       pointer-events: none;
     }
 
@@ -503,7 +504,7 @@ export default {
       right: $spacing;
       transform: translateX(-100%);
       background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
-      z-index: map-get($zindex, chips-fadeout);
+      z-index: map.get($zindex, chips-fadeout);
       pointer-events: none;
     }
 

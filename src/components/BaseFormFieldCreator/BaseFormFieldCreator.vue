@@ -1241,7 +1241,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-form-field-creator__field-array {
     margin-top: $spacing-small;
@@ -1251,7 +1252,7 @@ export default {
     .base-form-field-creator__field-array-label {
       color: $font-color-second;
       margin-bottom: $spacing-small;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
     }
 
     .base-form-field-creator__subform-wrapper {

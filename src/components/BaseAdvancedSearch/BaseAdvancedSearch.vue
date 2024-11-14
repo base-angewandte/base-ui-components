@@ -113,7 +113,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
-import { createId, debounce, hasData, sort } from '@/utils/utils';
+import { createId, debounce, hasData, sort } from '@/utils/utils.js';
 
 /**
  * @typedef Filter
@@ -1296,7 +1296,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-advanced-search {
   .base-advanced-search__filter-row {

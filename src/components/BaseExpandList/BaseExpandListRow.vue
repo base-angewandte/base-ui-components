@@ -483,7 +483,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-expand-item {
   display: flex;
@@ -601,7 +601,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .expand-enter-active,
 .expand-leave-active {
@@ -634,5 +634,5 @@ export default {
 </style>
 
 <style lang="scss">
-@import "../../styles/baseExpand";
+@use "@/styles/baseExpand";
 </style>

@@ -461,13 +461,13 @@ export default {
 </style>
 
 <style lang="scss">
+@use "@/styles/variables" as *;
   /* for some reason this is not working as "leaflet/dist/leaflet.css" (webpack)
   or "~leaflet/dist/leaflet.css" (rollup)
   (compare BaseCarousel where exactly the same (first version) IS working */
   @import '../../../node_modules/leaflet/dist/leaflet.css';
   @import '../../../node_modules/leaflet.markercluster/dist/MarkerCluster.css';
   @import '../../../node_modules/leaflet-responsive-popup/leaflet.responsive.popup.css';
-  @import "../../styles/variables";
 
   /* Cluster */
   $clusterClass: '.base-map-marker-cluster';
