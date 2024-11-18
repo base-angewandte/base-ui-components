@@ -28,6 +28,7 @@
       :is-loading="isLoading"
       :input-class="inputClass"
       :set-focus-on-active="setFocusOnActive"
+      :validation-texts="{}"
       :assistive-text="{
         loaderActive: assistiveText.loaderActive,
       }"

@@ -797,9 +797,9 @@ export default {
         },
       }),
       // checking if all necessary properties are part of the provided object
-      validator: val => ['text'].every(prop => Object.keys(val).includes(prop))
+      validator: val => !Object.keys(val).length || (['text'].every(prop => Object.keys(val).includes(prop))
         && ['min', 'max', 'minLength', 'maxLength']
-          .every(prop => Object.keys(val.text).includes(prop)),
+          .every(prop => Object.keys(val.text).includes(prop))),
     },
     /**
      * define if error icon should be shown.

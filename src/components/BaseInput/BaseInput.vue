@@ -396,7 +396,7 @@ export default {
         maxLength: 'Text cannot be longer than {value} characters.',
       }),
       // checking if all necessary properties are part of the provided object
-      validator: val => ['min', 'max', 'minLength', 'maxLength']
+      validator: val => !Object.keys(val).length || ['min', 'max', 'minLength', 'maxLength']
         .every(prop => Object.keys(val).includes(prop)),
     },
     /**
