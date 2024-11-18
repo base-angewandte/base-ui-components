@@ -1,5 +1,12 @@
 // eslint-disable-next-line import/prefer-default-export
 export function useListNavigation() {
+  /**
+   * function to check if arrow key navigation was within the array
+   * @param {Array} list - the list that is navigated with arrow keys
+   * @param {boolean} isArrowDown - was arrow up or down used
+   * @param {number} newIndex - the new index that would be navigated to
+   * @returns {boolean}
+   */
   function isWithinArrayLimit(list, isArrowDown, newIndex) {
     // set variable for limit to check against
     // 0 for arrow up and array length for arrow down
@@ -52,5 +59,8 @@ export function useListNavigation() {
     }
     return list[currentIndex];
   }
-  return { navigate };
+  return {
+    navigate,
+    isWithinArrayLimit,
+  };
 }

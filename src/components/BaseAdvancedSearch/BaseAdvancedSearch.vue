@@ -1011,7 +1011,7 @@ export default {
       // check if autocomplete is active for any field ( > -1 )
       if (this.autocompleteIndex >= 0) {
         // if yes set the results on the filter row active
-        this.$set(this.filtersAutocompleteResults, this.autocompleteIndex, [...val]);
+        this.filtersAutocompleteResults[this.autocompleteIndex] = [...val];
         this.autocompleteIndex = -1;
       }
     },
@@ -1099,7 +1099,7 @@ export default {
       handler(val) {
         // get filters without default first to ensure comparability
         const filtersWithoutDefault = { ...this.formFilterValues };
-        this.$delete(filtersWithoutDefault, 'default');
+        delete filtersWithoutDefault.default;
         // check if val is actually different from prop value
         if (JSON.stringify(val) !== JSON.stringify(filtersWithoutDefault)) {
           // if yes - inform parent
@@ -1132,7 +1132,7 @@ export default {
             // update internal values
             this.formFilterValuesInt = JSON.parse(JSON.stringify(filterValuesNoMain));
             // set default property to mainFilter.filter_values
-            this.$set(this.mainFilter, 'filter_values', val.default || ['']);
+            this.mainFilter.filter_values = val.default || [''];
             // trigger search with updated values
             this.search();
           }
@@ -1216,7 +1216,7 @@ export default {
         this.autocompleteIndex = index;
       } else {
         // else reset the autocomplete results
-        this.$set(this.filtersAutocompleteResults, index, []);
+        this.filtersAutocompleteResults[index] = [];
       }
       // stil emit fetch-autocomplete no matter if input string present or not to give
       // parent opportunity to also update
@@ -1361,7 +1361,7 @@ export default {
      * @param {number} index - the index of the filter
      */
     updateFilter(filter, index) {
-      this.$set(this.appliedFiltersInt, index, JSON.parse(JSON.stringify(filter)));
+      this.appliedFiltersInt[index] = JSON.parse(JSON.stringify(filter));
       // trigger search to update search results
       this.search();
     },
@@ -1426,18 +1426,15 @@ export default {
               if (this.formFilterValuesInt[collectionId]) {
                 this.formFilterValuesInt[collectionId].push(chipsFormFieldValue);
               } else {
-                this.$set(this.formFilterValuesInt, collectionId, [chipsFormFieldValue]);
+                this.formFilterValuesInt[collectionId] = [chipsFormFieldValue];
               }
               // for single chips - replace value
             } else if (fieldInformation.type === 'object') {
-              this.$set(this.formFilterValuesInt, collectionId, chipsFormFieldValue);
+              this.formFilterValuesInt[collectionId] = chipsFormFieldValue;
             }
           } else if (!fieldXAttrs || fieldXAttrs.field_type === 'text') {
-            this.$set(
-              this.formFilterValuesInt,
-              collectionId,
-              entry[this.labelPropertyName.autocompleteOption] ?? entry,
-            );
+            this.formFilterValuesInt[collectionId] = entry[this.labelPropertyName.autocompleteOption]
+              ?? entry;
           }
           // main filter filter values should remain empty
           this.mainFilter.filter_values = [];
@@ -1458,11 +1455,7 @@ export default {
           this.search();
         } else {
           // if it is main filter set the value to main filter instead
-          this.$set(
-            this.mainFilter,
-            'filter_values',
-            [entry],
-          );
+          this.mainFilter.filter_values = [entry];
           // and also update original filter with newly set data
           this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // this does not trigger an update event from BaseForm so search needs to be triggered manually here
@@ -1704,8 +1697,8 @@ export default {
             // in order to keep any additional properties the chips entry might have, clone
             // the object and remove internally added variables again
             const additionalProperties = JSON.parse(JSON.stringify(filterValue));
-            this.$delete(additionalProperties, 'labelInternal');
-            this.$delete(additionalProperties, 'idInternal');
+            delete additionalProperties.labelInternal;
+            delete additionalProperties.idInternal;
             return ({
               // and add it to the values that are returned
               ...additionalProperties,

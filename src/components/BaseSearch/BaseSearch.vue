@@ -1,6 +1,7 @@
 <template>
   <!-- make this a form so that iOS recognizes it as 'search'
   (also the action="." is needed for that) -->
+  <!-- ref is used in BaseAdvancedSearchRow! -->
   <form
     ref="search"
     action="."

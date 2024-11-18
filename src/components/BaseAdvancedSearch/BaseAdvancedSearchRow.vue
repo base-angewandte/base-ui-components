@@ -254,7 +254,8 @@
               <BaseDropDownList
                 :drop-down-options="option[autocompletePropertyNames.data]"
                 :active-option="activeCollectionId === option[autocompletePropertyNames.id]
-                  ? activeEntry : {}"                :display-as-drop-down="false"
+                  ? activeEntry : {}"
+                :display-as-drop-down="false"
                 :list-id="'autocomplete-options-' + internalRowId"
                 :language="language"
                 :identifier-property-name="identifierPropertyName.autocompleteOption"
@@ -414,7 +415,7 @@
 </template>
 
 <script>
-import {computed, ref} from 'vue';
+import { computed, ref } from 'vue';
 import { hasData, sort } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useId } from '@/composables/useId.js';
@@ -426,6 +427,7 @@ import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
 
 export default {
   name: 'BaseAdvancedSearchRow',
@@ -769,6 +771,25 @@ export default {
   },
   emits: ['update:applied-filter', 'fetch-autocomplete-results', 'is-active', 'option-selected', 'remove-filter', 'add-filter-row'],
   setup(props) {
+    /** GENERAL */
+    /**
+     * set up a reference to the root element (e.g. for announcer element)
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const advancedSearchRow = ref(null);
+    /**
+     * reference to the search element, needed for resizing actions
+     * @type {[null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>}
+     */
+    const baseSearch = ref(null);
+
+    /** FILTER DATA */
+    /**
+     * the currently selected filter
+     * @type {Filter}
+     */
+    const filter = ref(null);
+
     /** INTERNAL ID */
     const { internalId } = useId();
     /**
@@ -776,36 +797,167 @@ export default {
      * from internally created id
      */
     const internalRowId = computed(() => props.searchRowId || internalId);
+
+    /** DROP DOWN NAVIGATION */
+    const { navigate, isWithinArrayLimit } = useListNavigation();
+
+    /** COMPONENT RESIZING */
     /**
-     * DROP DOWN NAVIGATION
+     * depending on element size a different slot of BaseInput is used and needs
+     * to be passed on to v-slot directive of template element
+     * @type {Ref<UnwrapRef<string>, UnwrapRef<string> | string>}
      */
-    const { navigate } = useListNavigation();
+    const filterSlotName = ref('pre-input-field');
 
     /**
-     * LOCALIZATION
+     * Resize Observer to trigger actions (e.g. drop down columns calculations) when
+     * component is resized
      */
+    useElementObserver({
+      type: 'resize',
+      target: advancedSearchRow,
+      callback: resizeActions,
+    });
+    /**
+     * calculate the number of columns for filters and chips dynamically and
+     * use correct slot for selected filter depending on element size
+     */
+    function resizeActions() {
+      // get the actual search HTML element by reference
+      const searchElement = baseSearch.value?.search;
+      // check if it was found
+      if (searchElement) {
+        // SET COLUMN STYLE
+        // get the width of the element
+        const searchElementWidth = searchElement.clientWidth;
+        // set a css variable that is responsible for the number of items
+        // (subtract 1/4 of elementWidth because of first column): 180px is assumed for each column
+        advancedSearchRow.value.style.setProperty(
+          '--col-number',
+          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1,
+        );
+      }
+      // check if it was found
+      if (advancedSearchRow.value) {
+        // SET CORRECT SLOT FOR SELECTED FILTER DISPLAY
+        // get the width of the element
+        const searchRowElementWidth = advancedSearchRow.value.clientWidth;
+        filterSlotName.value = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
+      }
+    }
+
+    /** FOCUS HANDLING */
+    /**
+     * the search input element stored in a variable so it can easily be focused again after
+     * option selection
+     * @type {?HTMLElement}
+     */
+    const searchInputElement = ref(null);
+    /**
+     * to control if search field is active (and drop down shown)
+     * @type {Ref<UnwrapRef<boolean>>}
+     */
+    const isActive = ref(false);
+    /**
+     * store the current filter type to recognize when it changes and only take
+     * action e.g. on focusing input field, after it was rendered
+     * @type {string}
+     */
+    const currentFilterType = ref(props.appliedFilter ? props.appliedFilter.type : props.defaultFilter.type);
+
+    /**
+     * Mutation observer for handling the focusing of input field after changes
+     */
+    useElementObserver({
+      type: 'mutation',
+      target: advancedSearchRow,
+      callback: filterChangeObserverAction,
+      options: {
+        subtree: true,
+        childList: true,
+      },
+    });
+
+    function filterChangeObserverAction() {
+      getSearchInputElement();
+      if (filter.value.type !== currentFilterType.value && isActive.value) {
+        if (searchInputElement.value) {
+          searchInputElement.value.focus();
+          currentFilterType.value = filter.value?.type || props.defaultFilter.type;
+        }
+      }
+    }
+    /**
+     * function to get the current search input element
+     */
+    function getSearchInputElement() {
+      // get input elements
+      const inputElements = advancedSearchRow.value.getElementsByTagName('input');
+      // check if input elements were found
+      if (inputElements && inputElements.length) {
+        // if yes - transform HTMLElement list to Array and find the search input element
+        searchInputElement.value = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
+          && inputElem.id.includes(internalRowId.value));
+      }
+    }
+
+    /**
+     * if tab key was used we want to check if drop down should be closed
+     * @param event
+     */
+    function handleDropDownOnTabKey(event) {
+      // get all input elements
+      const inputElements = advancedSearchRow.value.getElementsByTagName('input');
+      // create an array out of input elements found
+      const searchInputArray = Array.from(inputElements)
+        // and filter only for elements that are connected to search (necessary for mode
+        // 'form' which has additional input fields)
+        .filter(element => element.id.includes('search'));
+      // check if some were found
+      if (inputElements) {
+        // get the index of the element the event came from
+        const eventInputIndex = searchInputArray.indexOf(event.target);
+        // check if element is either the last input element and no shift key was used or
+        // it is the first element and shift key was used --> if true --> close drop down
+        if ((!event.shiftKey && eventInputIndex >= searchInputArray.length - 1)
+          || (event.shiftKey && eventInputIndex <= 0)) {
+          isActive.value = false;
+        }
+      }
+    }
+
+    /** LOCALIZATION */
     const { getLangLabel, getI18nTerm } = useI18n(props.language);
 
-    /**
-     * ACCESSIBILITY ANNOUNCEMENTS
-     */
-    /**
-     * set up a reference to the element to be able to attach the announcements element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
-     */
-    const advancedSearchRow = ref(null);
+    /** ACCESSIBILITY */
     /**
      * insert an HTML element with aria-live assertive that will announce the
      * search result
      * @type {Ref<UnwrapRef<string>>}
      */
     const { announcement } = useAnnouncer(advancedSearchRow);
+
     return {
+      // ref elements
+      advancedSearchRow,
+      baseSearch,
+      // filter data
+      filter,
+      // internal id
       internalRowId,
+      // drop down navigation
       navigate,
+      isWithinArrayLimit,
+      // internationalization
       getLangLabel,
       getI18nTerm,
-      advancedSearchRow,
+      // resize handling
+      filterSlotName,
+      // focus handling
+      searchInputElement,
+      isActive,
+      handleDropDownOnTabKey,
+      // accessibility
       announcement,
     };
   },
@@ -816,11 +968,6 @@ export default {
        * @type {?string|?Object}
        */
       currentInput: '',
-      /**
-       * the currently selected filter
-       * @type {Filter}
-       */
-      filter: null,
       /**
        * the currently active (selected by key navigation) filter
        * @type {?Filter}
@@ -857,40 +1004,6 @@ export default {
        * @type {?Object}
        */
       activeEntry: null,
-      /**
-       * to control if search field is active (and drop down shown)
-       * @type {boolean}
-       */
-      isActive: false,
-      /**
-       * store the current filter type to recognize when it changes and only take
-       * action e.g. on focusing input field, after it was rendered
-       * @type {string}
-       */
-      currentFilterType: this.appliedFilter ? this.appliedFilter.type : this.defaultFilter.type,
-      /**
-       * the search input element stored in a variable so it can easily be focused again after
-       * option selection
-       * @type {?HTMLElement}
-       */
-      searchInputElement: null,
-      /**
-       * Mutation observer for handling the focusing of input field after changes
-       * @type {?MutationObserver}
-       */
-      observer: null,
-      /**
-       * Resize Observer to trigger actions (e.g. drop down columns calculations) when
-       * component is resized
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
-      /**
-       * depending on element size a different slot of BaseInput is used and needs
-       * to be passed on to v-slot directive of template element
-       * @type {string}
-       */
-      filterSlotName: 'pre-input-field',
       /**
        * variable for touch devices to stop the click event from opening the drop down
        *  when click event was coming from elements within the search (e.g. BaseForm)
@@ -952,7 +1065,7 @@ export default {
        *  current filter
        */
       set(val) {
-        this.$set(this.filter, 'filter_values', [...val]);
+        this.filter.filter_values = [...val];
       },
       get() {
         /**
@@ -1061,11 +1174,10 @@ export default {
      * @returns {Object}
      */
     consolidatedResultList() {
-      return this.resultListInt.reduce((prev, curr) => {
-        this.$set(prev, curr[this
-          .autocompletePropertyNames.id], curr[this.autocompletePropertyNames.data]);
-        return prev;
-      }, {});
+      return this.resultListInt.reduce((prev, curr) => ({
+        ...prev,
+        [curr[this.autocompletePropertyNames.id]]: curr[this.autocompletePropertyNames.data],
+      }), {});
     },
     /**
      * function to determine if filter has filter values
@@ -1251,23 +1363,12 @@ export default {
       this.activeControlledVocabularyEntry = null;
     },
   },
-  mounted() {
-    // get the search input element for later use
-    this.getSearchInputElement();
-    // initialize observers that calculate the number of columns shown for filters
-    // and chips options on render and recalculate on resize of element and that handle
-    // focusing of the search input on changes
-    this.initObservers();
-  },
   updated() {
     // if the filterBox element exists add
     // the listener
     if (this.$refs.filterBox) {
       this.$refs.filterBox.addEventListener('scroll', this.calcFadeOut);
     }
-  },
-  beforeUnmount() {
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.advancedSearchRow);
   },
   unmounted() {
     // remove event listener again if element exists
@@ -1479,7 +1580,7 @@ export default {
       } else if (this.filter.type === 'text') {
         const newTextArray = [].concat(this.currentInput);
         if (JSON.stringify(this.filter.filter_values) !== JSON.stringify(newTextArray)) {
-          this.$set(this.filter, 'filter_values', [].concat(this.currentInput));
+          this.filter.filter_values = [].concat(this.currentInput);
           this.isActive = false;
         } else {
           this.isActive = !this.isActive;
@@ -1691,26 +1792,6 @@ export default {
         }
       }
     },
-    handleDropDownOnTabKey(event) {
-      // get all input elements
-      const inputElements = this.$el.getElementsByTagName('input');
-      // create an array out of input elements found
-      const searchInputArray = Array.from(inputElements)
-        // and filter only for elements that are connected to search (necessary for mode
-        // 'form' which has additional input fields)
-        .filter(element => element.id.includes('search'));
-      // check if some where found
-      if (inputElements) {
-        // get the index of the element the event came from
-        const eventInputIndex = searchInputArray.indexOf(event.target);
-        // check if element is either the last input element and no shift key was used or
-        // it is the first element and shift key was used --> if true --> close drop down
-        if ((!event.shiftKey && eventInputIndex >= searchInputArray.length - 1)
-          || (event.shiftKey && eventInputIndex <= 0)) {
-          this.isActive = false;
-        }
-      }
-    },
     /**
      * handle the date input after it was validated (necessary to only assign valid date input
      * to filter_values)
@@ -1725,7 +1806,7 @@ export default {
         && JSON.stringify(data) !== JSON.stringify(this.filter.filter_values)) {
         this.currentInput = data;
         // set the filter_values with date values - this will trigger search
-        this.$set(this.filter, 'filter_values', this.currentInput);
+        this.filter.filter_values = this.currentInput;
         this.isActive = false;
       }
     },
@@ -1879,59 +1960,6 @@ export default {
         childList: true,
       });
       this.observer = tempObserver;
-      const tempResizeObserver = new ResizeObserver(this.resizeActions);
-      tempResizeObserver.observe(this.$refs.advancedSearchRow);
-      this.resizeObserver = tempResizeObserver;
-    },
-    filterChangeObserverAction() {
-      this.getSearchInputElement();
-      if (this.filter.type !== this.currentFilterType && this.isActive) {
-        if (this.searchInputElement) {
-          this.searchInputElement.focus();
-          this.currentFilterType = this.filter.type;
-        }
-      }
-    },
-    /**
-     * calculate the number of columns for filters and chips dynamically and
-     * use correct slot for selected filter depending on element size
-     */
-    resizeActions() {
-      // get the components base element
-      const searchRowElement = this.$refs.advancedSearchRow;
-      const searchElement = this.$refs.baseSearch;
-      // check if it was found
-      if (searchElement) {
-        // SET COLUMN STYLE
-        // get the width of the element
-        const searchElementWidth = searchElement.$el.clientWidth;
-        // set a css variable that is responsible for the number of items
-        // (subtract 1/4 of elementWidth because of first column): 180px is assumed for each column
-        this.$el.style.setProperty(
-          '--col-number',
-          Math.floor((searchElementWidth - searchElementWidth / 4) / 180) || 1,
-        );
-      }
-      // check if it was found
-      if (searchRowElement) {
-        // SET CORRECT SLOT FOR SELECTED FILTER DISPLAY
-        // get the width of the element
-        const searchRowElementWidth = searchRowElement.clientWidth;
-        this.filterSlotName = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
-      }
-    },
-    /**
-     * function to get the current search input element
-     */
-    getSearchInputElement() {
-      // get input elements
-      const inputElements = this.$el.getElementsByTagName('input');
-      // check if input elements were found
-      if (inputElements && inputElements.length) {
-        // if yes - transform HTMLElement list to Array and find the search input element
-        this.searchInputElement = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
-          && inputElem.id.includes(this.searchRowId));
-      }
     },
   },
 };
