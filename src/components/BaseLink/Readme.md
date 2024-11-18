@@ -4,12 +4,12 @@ The different link types are selected by the properties passed.
 
 | types         | properties                       |
 |---------------|----------------------------------|
-| chip          | identifierPropertyValue && type  | 
-| external      | url                              | 
-| internal      | identifierPropertyValue && !type | 
+| chip          | identifierPropertyValue && type  |
+| external      | url                              |
+| internal      | identifierPropertyValue && !type |
 | text          |                                  |
-| tooltip       | tooltip                          | 
-| tooltip async | tooltipAsync                     | 
+| tooltip       | tooltip                          |
+| tooltip async | tooltipAsync                     |
 
 ```vue live
 <template>
@@ -96,7 +96,7 @@ export default {
     asyncTooltip(value, id) {
       // fetch data with the data from value
       setTimeout(() => {
-        this.$set(this.links[id], 'tooltip', [
+        this.links[id].tooltip = [
           {
             label: 'label',
             value: 'value',
@@ -106,7 +106,7 @@ export default {
             value: 'external link',
             url: 'https://base.uni-ak.ac.at',
           },
-        ]);
+        ];
       }, 500);
     },
   },
