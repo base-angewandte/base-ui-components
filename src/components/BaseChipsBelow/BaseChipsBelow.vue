@@ -140,8 +140,6 @@ import { VueDraggable } from 'vue-draggable-plus';
 import { defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
-import BaseChip from '@/components/BaseChip/BaseChip.vue';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)
  * in order to assign additional values (e.g. roles) to selected entries)]
