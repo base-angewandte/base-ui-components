@@ -125,7 +125,8 @@
                    { 'base-advanced-search__search-form--hidden': !formMounted}]"
           @input-complete="updateFormFilters"
           @fetch-autocomplete="fetchFormAutocomplete"
-          @form-mounted="formIsMounted">
+          @form-mounted="formIsMounted"
+          @click.stop>
           <template #label-addition="{ fieldName, groupNames }">
             <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
             @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
