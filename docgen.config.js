@@ -17,8 +17,6 @@ const ignore = [
   'components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue',
   'components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue',
   'components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue',
-  // currently hidden for accessibility reasons
-  'components/BaseDatePanel/*',
 ];
 
 const components = globbySync('components/**/Base*.{vue,js,jsx,ts,tsx}', {

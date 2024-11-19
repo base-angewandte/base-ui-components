@@ -13,7 +13,6 @@ import BaseChipsBelow from './components/BaseChipsBelow/BaseChipsBelow';
 import BaseChipsInput from './components/BaseChipsInput/BaseChipsInput';
 import BaseChipsInputField from './components/BaseChipsInputField/BaseChipsInputField';
 import BaseDateInput from './components/BaseDateInput/BaseDateInput';
-import BaseDatePanel from './components/BaseDatePanel/BaseDatePanel';
 import BaseDetailBox from './components/BaseDetailBox/BaseDetailBox';
 import BaseDropBox from './components/BaseDropBox/BaseDropBox';
 import BaseDropButton from './components/BaseDropButton/BaseDropButton';
@@ -74,7 +73,6 @@ export {
   BaseChipsInput,
   BaseChipsInputField,
   BaseDateInput,
-  BaseDatePanel,
   BaseDetailBox,
   BaseDropBox,
   BaseDropButton,
