@@ -560,10 +560,12 @@ export default {
   },
   emits: ['values-changed', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
   setup(props) {
-    const { getLangLabel } = useI18n(props.language);
+    /** INTERNATIONALIZATION */
+    const { getLangLabel, getI18nTerm } = useI18n(props.language);
 
     return {
       getLangLabel,
+      getI18nTerm,
     };
   },
   data() {
@@ -760,9 +762,9 @@ export default {
      */
     setFieldValue(value, fieldName, index = -1) {
       if (index >= 0) {
-        this.$set(this.valueListInt[fieldName], index, JSON.parse(JSON.stringify(value)));
+        this.valueListInt[fieldName][index] = JSON.parse(JSON.stringify(value));
       } else {
-        this.$set(this.valueListInt, fieldName, value ? JSON.parse(JSON.stringify(value)) : value);
+        this.valueListInt[fieldName] = value ? JSON.parse(JSON.stringify(value)) : value;
       }
       this.propagateValueListChanges();
     },
@@ -788,11 +790,7 @@ export default {
      */
     initializeValueObject() {
       this.cleanedAndSortedFormFieldList.forEach((field) => {
-        this.$set(
-          this.valueListInt,
-          field.name,
-          this.getInitialFieldValue(field),
-        );
+        this.valueListInt[field.name] = this.getInitialFieldValue(field);
       });
     },
     /**
@@ -835,7 +833,7 @@ export default {
         const initObj = {};
         // for each property in the object also get initial values
         Object.keys(properties).forEach((key) => {
-          this.$set(initObj, key, this.getInitialFieldValue(properties[key]));
+          initObj[key] = this.getInitialFieldValue(properties[key]);
         });
         return ({ ...initObj, ...value });
       }
@@ -888,7 +886,7 @@ export default {
         fieldGroupValues.splice(index, 1);
         // else just clear the fields
       } else {
-        this.$set(fieldGroupValues, index, this.getInitialFieldValue(field.items));
+        fieldGroupValues[index] = this.getInitialFieldValue(field.items);
       }
       // inform parent of changes
       this.propagateValueListChanges();

@@ -8,7 +8,7 @@
       v-if="fieldType !== 'date' && fieldType !== 'chips'
         && fieldType !== 'chips-below' && fieldType !== 'group'
         && fieldType !== 'boolean'"
-      :key="fieldKey"
+      :key="`${fieldKey}-text`"
       :input-id="fieldKey"
       v-bind="fieldPropsInt"
       :label="labelInt"
@@ -322,7 +322,7 @@
       :is="fieldElement"
       v-else-if="fieldType === 'chips' || fieldType === 'chips-below'"
       :ref="fieldType + fieldKey"
-      :key="fieldKey"
+      :key="`${fieldKey}-chips`"
       v-model="fieldValueInt"
       :input-id="fieldKey"
       v-bind="fieldPropsInt"
@@ -465,7 +465,7 @@
     <!-- FIELD GROUPS -->
     <div
       v-else-if="fieldType === 'group'"
-      :key="fieldKey"
+      :key="`${fieldKey}-group`"
       class="base-form-field-creator__field-array">
       <div
         v-if="formFieldXAttrs.show_label"
@@ -475,12 +475,8 @@
       <div
         :key="fieldKey"
         class="base-form-field-creator__subform-wrapper">
-        <BaseForm
-          :form-field-json="groupFormFields"
-          :value-list="fieldValueInt"
-          :form-id="fieldKey + '_' + field.name"
-          :field-props="fieldProps"
-          :drop-down-lists="fieldGroupDropDownLists"
+        <component
+          :is="fieldElement"
           v-bind="fieldGroupParamsInt"
           class="base-form-field-creator__subform"
           @values-changed="setInputValue"
@@ -572,29 +568,28 @@
               :option="option"
               name="drop-down-entry" />
           </template>
-        </BaseForm>
+        </component>
       </div>
     </div>
 
     <!-- FIELD BOOLEAN -->
-    <template
-      v-else-if="fieldType === 'boolean'">
-      <BaseToggle
-        v-model="fieldValueInt"
-        v-bind="fieldPropsInt"
-        :input-id="fieldKey"
-        :name="fieldKey"
-        :label="labelInt"
-        :bind-slot-to-state="fieldProps.bindSlotToState || true"
-        class="base-form-field-creator__toggle"
-        @update:model-value="emitCompletedInputValues">
-        <BaseLink
-          v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
-          :identifier-property-value="formFieldXAttrs.subtext.source || ''"
-          :url="formFieldXAttrs.subtext.url || ''"
-          :value="formFieldXAttrs.subtext.value" />
-      </BaseToggle>
-    </template>
+    <BaseToggle
+      v-else-if="fieldType === 'boolean'"
+      :key="`${fieldKey}-toggle`"
+      v-model="fieldValueInt"
+      v-bind="fieldPropsInt"
+      :input-id="fieldKey"
+      :name="fieldKey"
+      :label="labelInt"
+      :bind-slot-to-state="fieldProps.bindSlotToState || true"
+      class="base-form-field-creator__toggle"
+      @update:model-value="emitCompletedInputValues">
+      <BaseLink
+        v-if="formFieldXAttrs.subtext && formFieldXAttrs.subtext.value"
+        :identifier-property-value="formFieldXAttrs.subtext.source || ''"
+        :url="formFieldXAttrs.subtext.url || ''"
+        :value="formFieldXAttrs.subtext.value" />
+    </BaseToggle>
   </div>
 </template>
 
@@ -612,7 +607,6 @@ export default {
   components: {
     BaseDropDown: defineAsyncComponent(() => import('@/components/BaseDropDown/BaseDropDown.vue')),
     BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
-    BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue')),
     BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
   },
@@ -921,9 +915,15 @@ export default {
      * @returns {Object}
      */
     fieldGroupParamsInt() {
+      console.log(this.fieldGroupParams);
       return {
         ...this.inputListeners,
         ...this.fieldGroupParams,
+        formFieldJson: this.groupFormFields,
+        valueList: this.fieldValueInt,
+        formId: `${this.fieldKey}_${this.field.name}`,
+        fieldProps: this.fieldProps,
+        dropDownLists: this.fieldGroupDropDownLists,
       };
     },
     inputListeners() {
@@ -960,19 +960,21 @@ export default {
     },
     /**
      * import the relevant component
-     * @returns {(function(): Promise)|null}
+     * @returns {{readonly default?: {components: {BaseIcon: {data(): {baseIcons: null}, computed: {icon(): string, ariaAttribute(): *}, name: string, setup(): {internalId: *|string}, mounted(): void, props: {name: {default: null, validator(*): *, type: String | StringConstructor}, title: {default: string, type: String | StringConstructor}, desc: {default: string, type: String | StringConstructor}}}, BaseLoader: {readonly default?: {data(): {timeout: null}, watch: {hide(): void}, name: string, setup(*): {loader: RefObject<HTMLElement extends ShallowRef<infer V, unknown> ? V : (HTMLElement extends Ref<infer V, unknown> ? UnwrapRefSimple<V> : UnwrapRefSimple<HTMLElement>) | null extends ShallowRef<infer V, unknown> ? V : (null extends Ref<infer V, unknown> ? UnwrapRefSimple<V> : UnwrapRefSimple<null>)> | RefCallback<HTMLElement extends ShallowRef<infer V, unknown> ? V : (HTMLElement extends Ref<infer V, unknown> ? UnwrapRefSimple<V> : UnwrapRefSimple<HTMLElement>) | null extends ShallowRef<infer V, unknown> ? V : (null extends Ref<infer V, unknown> ? UnwrapRefSimple<V> : UnwrapRefSimple<null>)>, setLoaderAnnouncement: function(): void, announcement: RefObject<UnwrapRef<string>> | RefCallback<UnwrapRef<string>>}, props: {hide: {default: boolean, type: Boolean | BooleanConstructor}, loaderColor: {default: string, type: String | StringConstructor}, position: {default: function(): {}, type: Object | ObjectConstructor}, textOnLoaderShow: {default: string, type: String | StringConstructor}}}}}, emits, data(): {previousInput: string, invalidInt: string, inputInt: string}, computed: {inputListeners(): {onKeydown: function(*): void, onBlur: function(*): void, onInput: function(*): void}, showRemoveIcon(): boolean, allowNegativeNumber(): boolean, showLabelRow(): (Boolean|boolean), inputElement(): (*|null)}, watch: {isActiveInt(boolean): void, invalidInt(boolean): void, errorMessage: {handler(*): void, immediate: boolean}, invalid: {handler(*): void, immediate: boolean}, modelValue: {handler(*): void, immediate: boolean}, inputInt(string): void, isActive: {handler(*): void, immediate: boolean}}, methods: {triggerInputEvent(): void, onInputBlur(FocusEvent): void, clickedInside((FocusEvent|MouseEvent)): void, stringToFloat(string): number, inputIsNaN(string): boolean, blurInput(KeyboardEvent): void, removeMultipleChars(String, String): string, translateFloat(number): string, handleInputTab(*): void, removeInput(): void, roundDecimals(*): string}, name: string, setup(*, {emit: *}): {isActiveInt: Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>, idInt: RefObject<string extends (Builtin | Ref | RefUnwrapBailTypes[keyof RefUnwrapBailTypes] | {[RawSymbol]?: true}) ? string : (string extends Map<infer K, infer V> ? (Map<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof Map<any, any>>>) : (string extends WeakMap<infer K, infer V> ? (WeakMap<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof WeakMap<any, any>>>) : (string extends Set<infer V> ? (Set<UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof Set<any>>>) : (string extends WeakSet<infer V> ? (WeakSet<UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof WeakSet<any>>>) : (string extends ReadonlyArray<any> ? {[K in keyof string]: UnwrapRefSimple<string[K]>} : (string extends (object & {[ShallowReactiveMarker]?: never}) ? {[P in keyof string]: P extends symbol ? string[P] : UnwrapRef<string[P]>} : string)))))) | number extends (Builtin | Ref | RefUnwrapBailTypes[keyof RefUnwrapBailTypes] | {[RawSymbol]?: true}) ? number : (number extends Map<infer K, infer V> ? (Map<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof Map<any, any>>>) : (number extends WeakMap<infer K, infer V> ? (WeakMap<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof WeakMap<any, any>>>) : (number extends Set<infer V> ? (Set<UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof Set<any>>>) : (number extends WeakSet<infer V> ? (WeakSet<UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof WeakSet<any>>>) : (number extends ReadonlyArray<any> ? {[K in keyof number]: UnwrapRefSimple<number[K]>} : (number extends (object & {[ShallowReactiveMarker]?: never}) ? {[P in keyof number]: P extends symbol ? number[P] : UnwrapRef<number[P]>} : number))))))> | RefCallback<string extends (Builtin | Ref | RefUnwrapBailTypes[keyof RefUnwrapBailTypes] | {[RawSymbol]?: true}) ? string : (string extends Map<infer K, infer V> ? (Map<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof Map<any, any>>>) : (string extends WeakMap<infer K, infer V> ? (WeakMap<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof WeakMap<any, any>>>) : (string extends Set<infer V> ? (Set<UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof Set<any>>>) : (string extends WeakSet<infer V> ? (WeakSet<UnwrapRefSimple<V>> & UnwrapRef<Omit<string, keyof WeakSet<any>>>) : (string extends ReadonlyArray<any> ? {[K in keyof string]: UnwrapRefSimple<string[K]>} : (string extends (object & {[ShallowReactiveMarker]?: never}) ? {[P in keyof string]: P extends symbol ? string[P] : UnwrapRef<string[P]>} : string)))))) | number extends (Builtin | Ref | RefUnwrapBailTypes[keyof RefUnwrapBailTypes] | {[RawSymbol]?: true}) ? number : (number extends Map<infer K, infer V> ? (Map<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof Map<any, any>>>) : (number extends WeakMap<infer K, infer V> ? (WeakMap<K, UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof WeakMap<any, any>>>) : (number extends Set<infer V> ? (Set<UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof Set<any>>>) : (number extends WeakSet<infer V> ? (WeakSet<UnwrapRefSimple<V>> & UnwrapRef<Omit<number, keyof WeakSet<any>>>) : (number extends ReadonlyArray<any> ? {[K in keyof number]: UnwrapRefSimple<number[K]>} : (number extends (object & {[ShallowReactiveMarker]?: never}) ? {[P in keyof number]: P extends symbol ? number[P] : UnwrapRef<number[P]>} : number))))))>, labelLocalized: ComputedRef<Object|string>, setFieldState: function(boolean): void, inputFrame: [null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>, errorMessageInt: Ref<UnwrapRef<string>, UnwrapRef<string> | string>, errorMessageLocalized: ComputedRef<Object|string>}, mounted(): void, props: {inputId: {default: string, type: String | StringConstructor}, showErrorIcon: {default: boolean, type: Boolean | BooleanConstructor}, validationTexts: {default: function(): {min: string, max: string, minLength: string, maxLength: string}, validator: function(*): boolean, type: Object | ObjectConstructor}, decimalSeparator: {default: string, type: String | StringConstructor}, loadable: {default: boolean, type: Boolean | BooleanConstructor}, minLength: {default: null, type: Number | NumberConstructor}, assistiveText: {default: function(): {loaderActive: string}, type: Object | ObjectConstructor}, language: {default: string, validator: function(*): *, type: String | StringConstructor}, isActive: {default: null, type: Boolean | BooleanConstructor}, showLabel: {default: boolean, type: Boolean | BooleanConstructor}, required: {default: boolean, type: Boolean | BooleanConstructor}, min: {default: null, type: Number | NumberConstructor}, setFocusOnActive: {default: boolean, type: Boolean | BooleanConstructor}, inputClass: {default: string, type: String | StringConstructor}, disabled: {default: boolean, type: Boolean | BooleanConstructor}, placeholder: {default: string, type: String | StringConstructor}, linkedListOption: {default: null, type: [Number | NumberConstructor,String | StringConstructor]}, clearable: {default: boolean, type: Boolean | BooleanConstructor}, useFadeOut: {default: boolean, type: Boolean | BooleanConstructor}, max: {default: null, type: Number | NumberConstructor}, errorMessage: {default: string, type: String | StringConstructor}, label: {type: String | StringConstructor, required: boolean}, showInputBorder: {default: boolean, type: Boolean | BooleanConstructor}, dropDownListId: {default: string, type: String | StringConstructor}, isLoading: {default: boolean, type: Boolean | BooleanConstructor}, decimals: {default: null, type: Number | NumberConstructor}, invalid: {default: boolean, type: Boolean | BooleanConstructor}, hideInputField: {default: boolean, type: Boolean | BooleanConstructor}, modelValue: {default: string, type: [String | StringConstructor,Number | NumberConstructor]}, fieldType: {default: string, validator: function(*): *, type: String | StringConstructor}, maxLength: {default: null, type: Number | NumberConstructor}, useFormFieldStyling: {default: boolean, type: Boolean | BooleanConstructor}}}}|null}
      */
     fieldElement() {
       if (this.fieldType === 'text' || this.fieldType === 'integer' || this.fieldType === 'float') {
-        return () => import('@/components/BaseInput/BaseInput.vue');
+        return defineAsyncComponent(() => import('@/components/BaseInput/BaseInput.vue'));
       } if (this.fieldType === 'multiline') {
-        return () => import('@/components/BaseMultilineTextInput/BaseMultilineTextInput.vue');
+        return defineAsyncComponent(() => import('@/components/BaseMultilineTextInput/BaseMultilineTextInput.vue'));
       } if (this.fieldType === 'autocomplete') {
-        return () => import('@/components/BaseAutocompleteInput/BaseAutocompleteInput.vue');
+        return defineAsyncComponent(() => import('@/components/BaseAutocompleteInput/BaseAutocompleteInput.vue'));
       } if (this.fieldType === 'chips') {
-        return () => import('@/components/BaseChipsInput/BaseChipsInput.vue');
+        return defineAsyncComponent(() => import('@/components/BaseChipsInput/BaseChipsInput.vue'));
       } if (this.fieldType === 'chips-below') {
-        return () => import('@/components/BaseChipsBelow/BaseChipsBelow.vue');
+        return defineAsyncComponent(() => import('@/components/BaseChipsBelow/BaseChipsBelow.vue'));
+      } if (this.fieldType === 'group') {
+        return defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue'));
       }
       return null;
     },
@@ -1289,7 +1291,8 @@ export default {
     // function for mulitline text input to set drop down field correctly
     setMultilineDropDown(val) {
       // set texts type value if present - otherwise set empty
-      this.$set(this.fieldValueInt, 'type', val.source ? val : null);
+      // TODO: source is still hardcoded here??
+      this.fieldValueInt.type = val.source ? val : null;
       this.emitCompletedInputValues();
     },
     // prevent default action for everything except multiline

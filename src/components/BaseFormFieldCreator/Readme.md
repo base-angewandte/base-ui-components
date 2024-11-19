@@ -342,7 +342,7 @@ export default {
                   field_format: 'half',
                   placeholder: 'Ortsbeschreibung eintragen',
                   field_type: 'text',
-                  order: 3,
+                  order: 1,
                 },
               },
               date: {
@@ -357,7 +357,7 @@ export default {
                   placeholder: {
                     date: 'Datum eintragen',
                   },
-                  order: 1,
+                  order: 2,
                 },
               },
             },
@@ -367,7 +367,7 @@ export default {
           'x-attrs': {
             field_type: 'group',
             show_label: false,
-            order: 6,
+            order: 1,
           },
         },
         value: {},

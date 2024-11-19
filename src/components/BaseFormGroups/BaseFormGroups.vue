@@ -239,7 +239,6 @@ export default {
           }
         } else {
           // if not - save the field to a separate object that will be added last
-          // this.$set(noGroupFields, key, value);
           noGroupFields[key] = value;
         }
       });
