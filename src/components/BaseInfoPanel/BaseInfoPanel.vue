@@ -73,11 +73,13 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
+
 export default {
   name: 'BaseInfoPanel',
   components: {
-    BaseIcon: () => import('@/components/BaseIcon/BaseIcon.vue'),
-    BaseButton: () => import('@/components/BaseButton/BaseButton.vue'),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
   },
   props: {
     /**
