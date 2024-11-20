@@ -66,7 +66,6 @@ export default {
      */
     icon: {
       type: String,
-      // eslint-disable-next-line max-len
       default: '<svg viewBox="0 0 70.866 70.866" xmlns="http://www.w3.org/2000/svg"><path d="m35.433 0a22.731 22.731 0 0 0-22.731 22.82 24.125 24.125 0 0 0 1.872 9.1814l19.611 38.063a1.3718 1.3718 0 0 0 2.496 0l19.611-38.063a22.249 22.249 0 0 0 1.872-9.1814 22.731 22.731 0 0 0-22.731-22.82zm0 32.858a10.216 10.216 0 1 1 10.216-10.216 10.241 10.241 0 0 1-10.216 10.216z" fill="#010101"/></svg>',
     },
     /**
@@ -212,7 +211,6 @@ export default {
 
         // get all marker and filter by id
         this.map.eachLayer((layer) => {
-          /* eslint-disable no-underscore-dangle */
           // highlight markerCluster
           if (layer._bounds && layer._icon) {
             const marker = this.getLatLng(this.markerFiltered[value]);
@@ -223,11 +221,9 @@ export default {
               return;
             }
           }
-          /* eslint-enable no-underscore-dangle */
 
           // highlight marker
           if (layer.options.id != null && layer.options.id === value) {
-            // eslint-disable-next-line no-underscore-dangle
             this.highlightedMarker = layer._icon;
             this.highlightedMarker.classList.add(`${this.markerClass}--active`);
           }
@@ -384,10 +380,8 @@ export default {
       });
     },
     activateMarker(e) {
-      /* eslint-disable no-underscore-dangle */
       const { id } = e.target.options;
       const marker = e.target._icon;
-      /* eslint-enable no-underscore-dangle */
 
       // reset all marker
       this.resetAllMarker();
@@ -398,24 +392,20 @@ export default {
         this.markerState(id);
         marker.classList.add(`${this.markerClass}--active`);
 
-        // eslint-disable-next-line no-param-reassign
         e.target.options.active = true;
       }
     },
     resetMarker(e) {
-      // eslint-disable-next-line no-underscore-dangle
       const marker = e.target._icon;
 
       marker.classList.remove(`${this.markerClass}--active`);
       this.activePopUp = null;
       this.markerState(null);
 
-      // eslint-disable-next-line no-param-reassign
       delete e.target.options.active;
     },
     resetAllMarker() {
       this.map.eachLayer((layer) => {
-        // eslint-disable-next-line no-underscore-dangle
         const marker = layer._icon;
 
         if (marker) {

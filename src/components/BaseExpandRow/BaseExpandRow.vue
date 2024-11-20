@@ -160,7 +160,6 @@ export default {
     },
   },
   created() {
-    // eslint-disable-next-line
     this.id = this.$.uid;
     this.isSelectedInternal = this.isSelected;
     this.isExpandedInternal = this.isExpanded;

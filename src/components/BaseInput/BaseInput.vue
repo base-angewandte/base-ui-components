@@ -637,7 +637,6 @@ export default {
           return tempElement;
         }
         // otherwise warn that the id was not assigned to the input element
-        // eslint-disable-next-line
         console.warn('BaseInput: you did not assign the same id to the BaseInputComponent and the input element!');
       }
       return null;
@@ -900,7 +899,6 @@ export default {
      */
     removeMultipleChars(value, char) {
       const pattern = new RegExp(`\\${char}`, 'g');
-      // eslint-disable-next-line
       return value.replace(pattern, (c, i, text) => text.indexOf(c) === i ? c : '');
     },
   },

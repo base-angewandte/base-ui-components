@@ -8,7 +8,6 @@ import { ref, watch } from 'vue';
  *  be appended to
  * @param {number} timeout - time (in ms) to wait until announcement text is deleted again
  */
-// eslint-disable-next-line import/prefer-default-export
 export function useAnnouncer(target, timeout = 300) {
   /**
    * variable to save the assertive element to be able to update / delete the
@@ -38,7 +37,6 @@ export function useAnnouncer(target, timeout = 300) {
   watch(announcement, (val) => {
     // first check if the target element exists, so assertive element could be set
     if (!target.value) {
-      // eslint-disable-next-line no-console
       console.warn('Announcement element could not be set because the target reference is undefined!');
       return;
     }

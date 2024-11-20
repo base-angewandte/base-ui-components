@@ -14,7 +14,6 @@ import { useEventListener } from '@/composables/useEventListener.js';
  * @param {boolean} [callOnMounted=false] - specify if function should be called the first time on mounted
  * @returns {{windowInnerWidth: number, isTablet: boolean, isMobile: boolean}}
  */
-// eslint-disable-next-line import/prefer-default-export
 export function useWindowResize({
   callback,
   mobileMaxSize = 639,

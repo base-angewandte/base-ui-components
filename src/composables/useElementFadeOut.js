@@ -10,7 +10,6 @@ import { useEventListener } from '@/composables/useEventListener.js';
  * @param direction
  * @returns {{boxFadeOut: Ref<UnwrapRef<{}>>, elementIsScrollable: ComputedRef<unknown>, calcFadeOut: function }}
  */
-// eslint-disable-next-line import/prefer-default-export
 export function useElementFadeOut({ target, direction = 'vertical' }) {
   const scrollContainer = computed(() => target.value.$el || target.value);
 

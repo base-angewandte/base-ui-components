@@ -8,7 +8,7 @@
 
 import { getImports } from './get-imports.mjs'
 
-function addVueLive(md, opts) {
+function addVueLive(md) {
 	const fence = md.renderer.rules.fence
 	md.renderer.rules.fence = (...args) => {
 		const [tokens, idx] = args
@@ -29,16 +29,15 @@ function addVueLive(md, opts) {
 		const requires = Object.values(imports).map(mod => `'${mod.source}': require('${mod.source}')`)
 		const langArray = lang.split(' ')
 		const langClean = langArray[0]
-		const codeClean = md.utils.escapeHtml(code).replace(/\`/g, '\\`').replace(/\$/g, '\\$')
+		const codeClean = md.utils.escapeHtml(code).replace(/`/g, '\\`').replace(/\$/g, '\\$')
 		const editorProps = langArray.find(l => /^\{.+\}$/.test(l))
 		const jsx = langArray.length > 2 && langArray[1] === 'jsx' ? 'jsx ' : '' // to enable jsx, we want ```vue jsx live or ```jsx jsx live
-		const markdownGenerated = `<vue-live ${jsx}
+    return `<vue-live ${jsx}
       :layoutProps="{lang:'${langClean}'}"
       :code="\`${codeClean}\`"
       :requires="{${requires.join(',')}}"
       ${editorProps ? ` :editorProps="${editorProps}"` : ''}
        />`
-		return markdownGenerated
 	}
 }
 

@@ -26,7 +26,6 @@
 </template>
 
 <script>
-// eslint-disable-next-line import/extensions
 import Hls from 'hls.js/dist/hls.light.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { defineAsyncComponent } from 'vue';

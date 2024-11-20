@@ -33,7 +33,7 @@ export default defineConfig({
   ],
   // to preload the font file
   transformHead({ assets }) {
-    const myFontFile = assets.find(file => /source-sans-pro-v13-latin_latin-ext\.\w+\.woff2/)
+    const myFontFile = assets.find(() => /source-sans-pro-v13-latin_latin-ext\.\w+\.woff2/)
     console.log('test', myFontFile);
     if (myFontFile) {
       return [

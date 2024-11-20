@@ -98,14 +98,11 @@ export default defineConfig({
       // the configuration was defined here (and not in an external file)
       // to prevent in a npm-link-setup the plugins from being requested in the parent module
       plugins: [
-        // eslint-disable-next-line global-require
         () => import('autoprefixer'),
         // needed for import of external css (e.g. leaflet)
         // needs to be before postcss-url to have leaflet background-images included
-        // eslint-disable-next-line global-require
         () => import('postcss-import'),
         // remove comments
-        // eslint-disable-next-line global-require
         () => import('postcss-discard-comments'),
       ],
     },

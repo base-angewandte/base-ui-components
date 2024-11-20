@@ -1,17 +1,17 @@
 <template>
   <div class="preview-code">
     <div class="preview block">
-      <slot name="preview"></slot>
+      <slot name="preview" />
     </div>
     <div class="editor block">
       <BaseButton
-          :text="`${showCode ? 'Hide' : 'Show' } code`"
-          icon="drop-down"
-          icon-position="right"
-          class="editor__button"
-          @clicked="clicked" />
+        :text="`${showCode ? 'Hide' : 'Show' } code`"
+        icon="drop-down"
+        icon-position="right"
+        class="editor__button"
+        @clicked="clicked" />
       <template v-if="showCode">
-        <slot name="editor"></slot>
+        <slot name="editor" />
       </template>
     </div>
   </div>

@@ -1129,6 +1129,7 @@ export default {
               default: this.mainFilter.filter_values,
             })) {
             // remove the default key from the form filter values that should fill form
+            // eslint-disable-next-line no-unused-vars
             const { default: _, ...filterValuesNoMain } = val;
             // update internal values
             this.formFilterValuesInt = JSON.parse(JSON.stringify(filterValuesNoMain));
@@ -1258,7 +1259,6 @@ export default {
       } else {
         searchFilterList = this.appliedFiltersInt
           // and only keep the properties relevant for search
-          // eslint-disable-next-line camelcase
           .map(filter => ({
             [this.identifierPropertyName.filter]: filter[this.identifierPropertyName.filter],
             type: filter.type,

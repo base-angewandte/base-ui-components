@@ -66,8 +66,7 @@
     "clean-css-cli": "^5.6.3",
     "concurrently": "^9.1.0",
     "es-module-lexer": "^1.5.4",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint": "^9.15.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-vue": "^9.31.0",
     "globby": "^14.0.2",
@@ -89,6 +88,7 @@
     "vitepress": "^1.2.3",
     "vue-docgen-api": "^4.78.0",
     "vue-docgen-cli": "^4.79.0",
+    "vue-eslint-parser": "^9.4.3",
     "vue-live": "^2.5.4"
   },
   "peerDependencies": {

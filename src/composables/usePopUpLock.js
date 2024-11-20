@@ -13,7 +13,6 @@ import { computed, onBeforeUnmount, onUpdated, ref, watch } from 'vue';
  *  and should trigger the scroll lock
  * @returns {{toggleScrollLock: function, showElement: Ref<UnwrapRef<boolean>>}}
  */
-// eslint-disable-next-line import/prefer-default-export
 export function usePopUpLock(target) {
   const showElement = ref(false);
   // create a separate variable here so we can use regular HTML elements OR vue components

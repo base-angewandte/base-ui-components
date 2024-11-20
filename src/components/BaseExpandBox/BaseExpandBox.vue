@@ -166,8 +166,7 @@ export default {
      */
     init() {
       // create an element id to generate unique dom selectors
-      // eslint-disable-next-line no-underscore-dangle
-      this.elementId = this._uid;
+      this.elementId = this.$.uid;
       // set internal expand variable
       if (this.expand) this.expandInt = true;
       // calculate the show-more button visibility
