@@ -53,7 +53,6 @@ import BaseSelectOptions from './components/BaseSelectOptions/BaseSelectOptions'
 import BaseSwitchButton from './components/BaseSwitchButton/BaseSwitchButton';
 import BaseTextList from './components/BaseTextList/BaseTextList';
 import BaseToggle from './components/BaseToggle/BaseToggle';
-import BaseTooltip from './components/BaseTooltip/BaseTooltip';
 import BaseTooltipBox from './components/BaseTooltipBox/BaseTooltipBox';
 import BaseUploadPopUp from './components/BaseUploadPopUp/BaseUploadPopUp';
 
@@ -113,7 +112,6 @@ export {
   BaseSwitchButton,
   BaseTextList,
   BaseToggle,
-  BaseTooltip,
   BaseTooltipBox,
   BaseUploadPopUp,
 };
