@@ -1,59 +1,3 @@
-<template>
-  <div
-    :class="['base-toggle',
-             { 'base-toggle--checked': checkedInt },
-             { 'base-toggle--disabled': disabled }]"
-    @focusin="animate = true"
-    @mouseover="animate = true"
-    @focusout="animate = false"
-    @mouseleave="animate = false">
-    <label
-      :for="`toggle-input-${idInt}`"
-      class="base-toggle__container">
-      <input
-        :id="`toggle-input-${idInt}`"
-        v-model="checkedInt"
-        :name="name"
-        :checked="checkedInt"
-        :disabled="disabled"
-        :aria-checked="checkedInt"
-        :aria-disabled="disabled"
-        :type="'checkbox'"
-        value=""
-        class="base-toggle__input"
-        @click.stop="">
-
-      <div class="base-switch">
-        <span
-          :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
-          <BaseIcon
-            v-if="checkedInt"
-            :title="hideLabel ? label : ''"
-            name="check-mark" />
-          <BaseIcon
-            v-if="!checkedInt"
-            :title="hideLabel ? label : ''"
-            name="remove" />
-        </span>
-      </div>
-
-      <span
-        v-if="!hideLabel"
-        class="base-toggle__label">
-        {{ label }}
-      </span>
-    </label>
-
-    <span
-      v-if="(!!$slots.default && checkedInt && bindSlotToState)
-        || (!!$slots.default && !bindSlotToState)"
-      class="base-toggle__subtext">
-      <!-- @slot slot after the label -->
-      <slot />
-    </span>
-  </div>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
@@ -159,6 +103,62 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-toggle',
+             { 'base-toggle--checked': checkedInt },
+             { 'base-toggle--disabled': disabled }]"
+    @focusin="animate = true"
+    @mouseover="animate = true"
+    @focusout="animate = false"
+    @mouseleave="animate = false">
+    <label
+      :for="`toggle-input-${idInt}`"
+      class="base-toggle__container">
+      <input
+        :id="`toggle-input-${idInt}`"
+        v-model="checkedInt"
+        :name="name"
+        :checked="checkedInt"
+        :disabled="disabled"
+        :aria-checked="checkedInt"
+        :aria-disabled="disabled"
+        :type="'checkbox'"
+        value=""
+        class="base-toggle__input"
+        @click.stop="">
+
+      <div class="base-switch">
+        <span
+          :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
+          <BaseIcon
+            v-if="checkedInt"
+            :title="hideLabel ? label : ''"
+            name="check-mark" />
+          <BaseIcon
+            v-if="!checkedInt"
+            :title="hideLabel ? label : ''"
+            name="remove" />
+        </span>
+      </div>
+
+      <span
+        v-if="!hideLabel"
+        class="base-toggle__label">
+        {{ label }}
+      </span>
+    </label>
+
+    <span
+      v-if="(!!$slots.default && checkedInt && bindSlotToState)
+        || (!!$slots.default && !bindSlotToState)"
+      class="base-toggle__subtext">
+      <!-- @slot slot after the label -->
+      <slot />
+    </span>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
