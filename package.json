@@ -69,6 +69,7 @@
     "eslint": "^9.15.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-vue": "^9.31.0",
+    "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globby": "^14.0.2",
     "gulp": "^5.0.0",
     "gulp-conventional-changelog": "^5.0.0",
@@ -112,5 +113,13 @@
   ],
   "lint-staged": {
     "src/**/.{js,vue}": "npm run lint:js"
+  },
+  "overrides": {
+    "@babel/traverse": {
+      "globals": "^13.24.0"
+    },
+    "@babel/preset-env": {
+      "globals": "^13.24.0"
+    }
   }
 }

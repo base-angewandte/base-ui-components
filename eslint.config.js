@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import pluginVue from 'eslint-plugin-vue';
+import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 import babelParser from "@babel/eslint-parser";
 import vueParser from "vue-eslint-parser";
 import process from 'node:process';
@@ -7,6 +8,7 @@ import process from 'node:process';
 export default [
   js.configs.recommended,
   ...pluginVue.configs['flat/recommended'],
+  ...pluginVueA11y.configs["flat/recommended"],
   {
     files: ["**/*.{js,vue}"],
     languageOptions: {
