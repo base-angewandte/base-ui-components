@@ -80,7 +80,7 @@ export default {
      * define custom options for map data
      *   e.g. {
      *          style: 'normal',
-     *          subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+     *          subdomains: ['mapsneu'],
      *          tileMatrixSet: 'google3857',
      *          type: 'geolandbasemap'
      *   }
