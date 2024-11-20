@@ -192,7 +192,7 @@ export default {
      * create an internal id for looping purposes
      * @returns {string}
      */
-    const { internalId: groupsId } = useId();
+    const groupsId = useId();
     return {
       groupsId,
     };

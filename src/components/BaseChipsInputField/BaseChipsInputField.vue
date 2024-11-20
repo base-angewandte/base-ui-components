@@ -528,7 +528,7 @@ export default {
   emits: ['hoverbox-active', 'update:selected-list', 'duplicate', 'removed', 'update:model-value', 'update:is-active'],
   setup(props) {
     /** INTERNAL ID */
-    const { internalId: generatedId } = useId();
+    const generatedId = useId();
     const internalId = computed(() => props.inputId || generatedId);
 
     /** LIST NAVIGATION */

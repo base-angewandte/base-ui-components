@@ -791,7 +791,7 @@ export default {
     const filter = ref(null);
 
     /** INTERNAL ID */
-    const { internalId } = useId();
+    const internalId = useId();
     /**
      * create a row id either taken from externally specified id or
      * from internally created id

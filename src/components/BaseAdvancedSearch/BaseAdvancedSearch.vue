@@ -762,7 +762,7 @@ export default {
      */
     const searchContainer = ref(null);
     /** INTERNAL ID */
-    const { internalId } = useId();
+    const internalId = useId();
     /** ACCESSIBILITY ANNOUNCEMENTS */
     /**
      * insert an HTML element with aria-live assertive that will announce the
