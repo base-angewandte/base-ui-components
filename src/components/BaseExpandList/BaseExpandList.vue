@@ -36,7 +36,7 @@
         </div>
 
         <p
-          :id="`draggable-${_uid}`"
+          :id="`draggable-${internalId}`"
           class="assistive-text">
           {{ assistiveText['description'] }}
         </p>
@@ -44,7 +44,7 @@
         <div
           ref="baseExpandListDraggable"
           tabindex="0"
-          :aria-labelledby="`draggable-${_uid}`"
+          :aria-labelledby="`draggable-${internalId}`"
           class="base-expand-list__draggable">
           <draggable
             v-model="dataInt"
@@ -74,7 +74,7 @@
 
     <BaseButton
       v-if="!edit && data.length > minItems"
-      :id="`base-expand-list-${_uid}`"
+      :id="`base-expand-list-${internalId}`"
       :aria-expanded="showAll ? 'true' : 'false'"
       :has-background-color="false"
       icon="drop-down"
@@ -87,14 +87,16 @@
 
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
-import BaseExpandListRow from './BaseExpandListRow.vue';
+import BaseExpandListRow from '@/components/BaseExpandList/BaseExpandListRow.vue';
+import { useId } from '@/composables/useId.js';
+import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'BaseExpandList',
   components: {
     BaseButton,
     BaseExpandListRow,
-    Draggable: () => import('vue-draggable-plus').then(m => (m.default || m)),
+    Draggable: defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable)),
   },
   props: {
     /**
@@ -203,6 +205,7 @@ export default {
     },
     /**
      * define which items are expanded
+     * v-model might be used on this property
      */
     expanded: {
       type: Array,
@@ -216,7 +219,14 @@ export default {
       default: false,
     },
   },
-  emits: ['saved', 'expanded-state', 'update:data'],
+  emits: ['saved', 'update:expanded', 'update:data'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       assertiveText: '',
@@ -333,10 +343,10 @@ export default {
       /**
        * event triggered when expanded state changes
        *
-       * @event expanded-state
+       * @event update:expanded
        * @param {Array} - array with indices of the expanded item per level; eg: [0, 1]: level1 first item, level2 second item is expanded
        */
-      this.$emit('expanded-state', value);
+      this.$emit('update:expanded', value);
     },
     /**
      * function called from BaseExpandListRow in case a prop of the data variable
@@ -345,7 +355,7 @@ export default {
      * @param {number} index - the index in the dataInt array
      */
     updateData(rowData, index) {
-      this.$set(this.dataSorted, index, rowData);
+      this.dataSorted[index] = rowData;
     },
     /**
      * sort list

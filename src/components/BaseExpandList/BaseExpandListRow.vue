@@ -8,9 +8,9 @@
     <template
       v-if="!edit && dataInt.label">
       <button
-        :id="'base-expand-control-' + _uid"
+        :id="'base-expand-control-' + internalId"
         :aria-expanded="expanded ? 'true' : 'false'"
-        :aria-controls="'base-expand-region-' + _uid"
+        :aria-controls="'base-expand-region-' + internalId"
         type="button"
         class="base-expand__head base-expand-item"
         @click="expand">
@@ -35,8 +35,8 @@
         @before-leave="beforeLeave">
         <ul
           v-show="expanded"
-          :id="'base-expand-region-' + _uid"
-          :aria-labelledby="'base-expand-control-' + _uid"
+          :id="'base-expand-region-' + internalId"
+          :aria-labelledby="'base-expand-control-' + internalId"
           :aria-hidden="!expanded ? 'true' : 'false'"
           class="base-expand__body">
           <!-- Todo: limit levels (counter) -->
@@ -143,6 +143,7 @@
 import { defineAsyncComponent } from 'vue';
 // eslint-disable-next-line
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
 
 export default {
   name: 'BaseExpandListRow',
@@ -231,7 +232,14 @@ export default {
       default: false,
     },
   },
-  emits: ['expanded-state', 'update:data', 'sorted', 'supportive'],
+  emits: ['expanded-state', 'update:data', 'sorted', 'assistive'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       // toggle item
@@ -250,7 +258,7 @@ export default {
   computed: {
     itemVisible: {
       set(val) {
-        this.$set(this.dataInt, 'hidden', !val);
+        this.dataInt.hidden = !val;
       },
       get() {
         return !this.dataInt.hidden;
@@ -325,7 +333,6 @@ export default {
         e.stopPropagation();
         e.stopImmediatePropagation();
         e.preventDefault();
-        e.cancelBubble = false;
         this.movable = false;
       }
     },
@@ -356,7 +363,7 @@ export default {
     expand() {
       // which element(s) are currently expanded
       // eg: level1, first item = 0; level2, second item: 0-1
-      const currentState = this.$vnode.key.toString().split('-');
+      const currentState = this.$.vnode.key.toString().split('-');
 
       if (this.expanded) {
         this.expanded = false;
