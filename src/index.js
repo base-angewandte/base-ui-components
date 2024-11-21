@@ -27,7 +27,6 @@ import BaseForm from './components/BaseForm/BaseForm';
 import BaseFormFieldCreator from './components/BaseFormFieldCreator/BaseFormFieldCreator';
 import BaseFormGroups from './components/BaseFormGroups/BaseFormGroups';
 import BaseHlsVideo from './components/BaseHlsVideo/BaseHlsVideo';
-import BaseHoverBox from './components/BaseHoverBox/BaseHoverBox';
 import BaseIcon from './components/BaseIcon/BaseIcon';
 import BaseImage from './components/BaseImage/BaseImage';
 import BaseImageBox from './components/BaseImageBox/BaseImageBox';
@@ -86,7 +85,6 @@ export {
   BaseFormFieldCreator,
   BaseFormGroups,
   BaseHlsVideo,
-  BaseHoverBox,
   BaseIcon,
   BaseImage,
   BaseImageBox,

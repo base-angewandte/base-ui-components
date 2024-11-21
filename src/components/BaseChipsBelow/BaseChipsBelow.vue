@@ -98,10 +98,8 @@
               v-model="entry[labelPropertyName]"
               :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
                 || !!entry[identifierPropertyName])"
-              :hover-box-content="hoverboxContent"
               class="base-chips-input-chip"
               @update:model-value="modifyChipValue($event, index)"
-              @hoverbox-active="hoverBoxActive($event, entry)"
               @remove-entry="removeEntry($event, index)" />
           </div>
           <BaseChipsInput
@@ -292,14 +290,6 @@ export default {
       validator: val => ['required'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
-     * set content for the info box activatable by click
-     * see [BaseHoverBox](BaseHoverBox) for more details
-     */
-    hoverboxContent: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
      * show spinner to indicate that something is loading.
      *  This is meant for dynamically fetching entries from a backend and will only
      *  have an effect if prop `allowDynamicDropDownEntries` is set true!
@@ -479,7 +469,7 @@ export default {
       }),
     },
   },
-  emits: ['additional-property-changed', 'hoverbox-active', 'fetch-dropdown-entries', 'update:modelValue'],
+  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue'],
   setup() {
     /**
      * set up component reference
@@ -711,15 +701,6 @@ export default {
        *
        */
       this.$emit('fetch-dropdown-entries', params);
-    },
-    hoverBoxActive(value, entry) {
-      /**
-       * event emitted on show / hide hoverbox
-       * @event hoverbox-active
-       * @property {boolean} value - value describing if hoverbox active is `true` or `false`
-       * @property {Object} option - the option for which the hoverbox was activated
-       */
-      this.$emit('hoverbox-active', { value, entry });
     },
     /**
      * get additional options error message

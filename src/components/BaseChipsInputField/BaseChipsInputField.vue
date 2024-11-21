@@ -91,14 +91,12 @@
                       :id="entry.idInt"
                       :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                       :model-value="getLangLabel(entry[labelPropertyName], true)"
-                      :hover-box-content="hoverboxContent"
                       :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                         || !!entry[identifierPropertyName]"
                       :chip-active="indexActiveForRemove === index"
                       :is-removable="chipsRemovable"
                       :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
-                      @remove-entry="removeEntry(entry, index)"
-                      @hoverbox-active="hoverBoxActive($event, entry)" />
+                      @remove-entry="removeEntry(entry, index)" />
                   </slot>
                 </template>
               </TransitionGroup>
@@ -125,7 +123,6 @@
                   :id="entry.idInt"
                   :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                   :model-value="getLangLabel(entry[labelPropertyName], true)"
-                  :hover-box-content="hoverboxContent"
                   :editable="chipsEditable"
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                     || !!entry[identifierPropertyName]"
@@ -134,8 +131,7 @@
                   :is-removable="chipsRemovable"
                   :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
                   @remove-entry="removeEntry(entry, index)"
-                  @update:model-value="modifyListEntry($event, index)"
-                  @hoverbox-active="hoverBoxActive($event, entry)" />
+                  @update:model-value="modifyListEntry($event, index)" />
               </slot>
             </template>
           </template>
@@ -285,14 +281,6 @@ export default {
     alwaysLinked: {
       type: Boolean,
       default: false,
-    },
-    /**
-     * set content for the info box activatable by click.
-     * see [BaseHoverBox](BaseHoverBox) for more details
-     */
-    hoverboxContent: {
-      type: Object,
-      default: () => ({}),
     },
     /**
      * show spinner to indicate that something is loading
@@ -465,11 +453,6 @@ export default {
     },
     /**
      * define true if chip should be editable on click
-     *
-     * **Caveat**: chips can not be both draggable AND editable and it can not show
-     *  `hoverBoxContent` as soon as it is editable respectively - if both are set `true` edit
-     *  functionality takes precedent - chip will not be draggable, `hoverBoxContent` will not
-     *  be shown!
      */
     chipsEditable: {
       type: Boolean,
@@ -525,7 +508,7 @@ export default {
       default: false,
     },
   },
-  emits: ['hoverbox-active', 'update:selected-list', 'duplicate', 'removed', 'update:model-value', 'update:is-active'],
+  emits: ['update:selected-list', 'duplicate', 'removed', 'update:model-value', 'update:is-active'],
   setup(props) {
     /** INTERNAL ID */
     const generatedId = useId();
@@ -961,24 +944,6 @@ export default {
       if (JSON.stringify(this.selectedList) !== JSON.stringify(this.selectedListInt)) {
         this.updateParentList(this.selectedListInt);
       }
-    },
-
-    /** HOVER BOX FUNCTIONALITY */
-
-    /**
-     * function triggered when a chip is clicked and hover box functionality is
-     * available
-     * @param {boolean} value - should hover box be showing or not
-     * @param {Object} option - the option on which click was made
-     */
-    hoverBoxActive(value, option) {
-      /**
-       * event emitted on show / hide hoverbox
-       *
-       * @property {boolean} value - value describing if hoverbox active is true or false
-       * @property {Object} option - the option for which the hoverbox was activated
-       */
-      this.$emit('hoverbox-active', { value, option });
     },
   },
 };

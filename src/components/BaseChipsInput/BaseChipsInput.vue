@@ -275,14 +275,6 @@ export default {
       default: false,
     },
     /**
-     * set content for the info box activatable by click.
-     * see [BaseHoverBox](BaseHoverBox) for more details
-     */
-    hoverboxContent: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
      * show spinner to indicate that something is loading
      * (for dynamically fetched entries that need to do backend requests)
      */
@@ -408,11 +400,6 @@ export default {
     },
     /**
      * set `true` if chip should be editable on click
-     *
-     * **Caveat**: chips can not be both `draggable` AND `editable` and it can not show
-     *  `hoverBoxContent` as soon as it is editable respectively - if both are set `true` edit
-     *  functionality takes precedent - chip will not be draggable, `hoverBoxContent` will not
-     *  be shown!
      */
     chipsEditable: {
       type: Boolean,
@@ -503,7 +490,7 @@ export default {
       default: false,
     },
   },
-  emits: ['hoverbox-active', 'update:modelValue', 'fetch-dropdown-entries'],
+  emits: ['update:modelValue', 'fetch-dropdown-entries'],
   setup(props) {
     /** DROP DOWN NAVIGATION */
     const { navigate } = useListNavigation();
@@ -969,15 +956,6 @@ export default {
 
     /** OTHER FUNCTIONALITIES */
 
-    hoverBoxActive(value, entry) {
-      /**
-       * event emitted on show / hide hoverbox
-       *
-       * @property {boolean} value - value describing if hoverbox active is true or false
-       * @property {Object} option - the option for which the hoverbox was activated
-       */
-      this.$emit('hoverbox-active', { value, entry });
-    },
     /**
      * calculate the minimum width of the drop down element by getting the
      * width of this element

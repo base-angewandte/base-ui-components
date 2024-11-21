@@ -16,7 +16,6 @@ import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
 import BaseSelectOptions from '@/components/BaseSelectOptions/BaseSelectOptions.vue';
 import BaseImageGrid from '@/components/BaseImageGrid/BaseImageGrid.vue';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
-import BaseHoverBox from '@/components/BaseHoverBox/BaseHoverBox.vue';
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 import BaseSearch from '@/components/BaseSearch/BaseSearch.vue';
@@ -68,7 +67,6 @@ export {
   BaseSelectOptions,
   BaseImageGrid,
   BaseImageBox,
-  BaseHoverBox,
   BaseChip,
   BaseChipsInputField,
   BaseSearch,

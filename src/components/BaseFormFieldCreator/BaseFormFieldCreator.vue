@@ -336,7 +336,6 @@
       :allow-unknown-entries="formFieldXAttrs.allow_unknown_entries
         || !!fieldProps.allowUnknownEntries"
       :draggable="!!fieldProps.draggable || !isChipsSingleSelect"
-      :hoverbox-content="hoverBoxData || fieldProps.hoverBoxData"
       :sortable="formFieldXAttrs.sortable
         || !!fieldProps.sortable"
       :is-loading="autocompleteLoading"
@@ -362,8 +361,7 @@
       :assistive-text="assistiveTextInt"
       @update:model-value="emitCompletedInputValues"
       @fetch-dropdown-entries="fetchAutocomplete"
-      @input="textInput = $event"
-      @hoverbox-active="fetchBoxData">
+      @input="textInput = $event">
       <template
         #drop-down-entry="{ item }">
         <!-- @slot customize the form field drop down options
@@ -703,13 +701,6 @@ export default {
       default: () => [],
     },
     /**
-     * provide data for elements that have a hover box (chips)
-     */
-    hoverBoxData: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
      * possibility to steer field loading (`chips`, `autocomplete`) from outside
      */
     autocompleteLoading: {
@@ -858,7 +849,7 @@ export default {
       }),
     },
   },
-  emits: ['fetch-info-data', 'input-complete', 'fetch-autocomplete', 'field-value-changed', 'keydown', 'blur'],
+  emits: ['input-complete', 'fetch-autocomplete', 'field-value-changed', 'keydown', 'blur'],
   setup(props) {
     const { getLangLabel, hasI18n, getI18nTerm, setLangLabels } = useI18n(props.language);
 
@@ -1319,13 +1310,6 @@ export default {
          */
         this.$emit('input-complete', this.fieldValueInt);
       }
-    },
-    fetchBoxData() {
-      /**
-       * event triggered when hover box data should be fetched
-       * @event fetch-info-data
-       */
-      this.$emit('fetch-info-data');
     },
   },
 };

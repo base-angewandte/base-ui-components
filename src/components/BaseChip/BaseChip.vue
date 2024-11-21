@@ -4,6 +4,7 @@
              { 'base-chip__removable': isRemovable },
              { 'base-chip__linked': isLinked },
              { 'base-chip__active': chipActive }]">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       ref="chipText"
       v-insert-text-as-html="{ value: modelValueInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
@@ -13,10 +14,7 @@
       enterkeyhint="search"
       class="base-chip__text"
       @blur="updateText"
-      @keydown.enter.prevent="updateText"
-      @click.stop="clickAction"
-      @mousemove="moveBox"
-      @mouseleave="hideBox" />
+      @keydown.enter.prevent="updateText" />
     <span
       v-if="assistiveText"
       :id="`${internalId}_aria-label`"
@@ -28,10 +26,6 @@
       name="remove"
       class="base-chip__icon"
       @click.stop="removeClicked" />
-    <BaseHoverBox
-      ref="hoverBox"
-      v-bind="hoverBoxContent"
-      :class="{ 'base-chip__hover-box__hidden': !hoverBoxEnabled || !showInfoBox }" />
   </div>
 </template>
 
@@ -47,7 +41,6 @@ import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 export default {
   name: 'BaseChip',
   components: {
-    BaseHoverBox: defineAsyncComponent(() => import('@/components/BaseHoverBox/BaseHoverBox.vue')),
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
   directives: {
@@ -67,14 +60,6 @@ export default {
     isLinked: {
       type: Boolean,
       default: true,
-    },
-    /**
-     * if a hover box is associated with the chip add all relevant properties here
-     * (see [BaseHoverBox](BaseHoverBox) for details)
-     */
-    hoverBoxContent: {
-      type: Object,
-      default: () => ({}),
     },
     /**
      * set chip active (set color)
@@ -99,10 +84,6 @@ export default {
     },
     /**
      * define true if chip should be editable on click
-     *
-     * **Caveat**: chips can not show `hoverBoxContent` as soon as it is editable
-     * respectively - if both are set `true` edit functionality takes precedent - chip will
-     *  not be draggable, `hoverBoxContent` will not be shown!
      */
     editable: {
       type: Boolean,
@@ -128,7 +109,7 @@ export default {
       default: false,
     },
   },
-  emits: ['clicked', 'update:modelValue', 'hoverbox-active', 'remove-entry'],
+  emits: ['clicked', 'update:modelValue', 'remove-entry'],
   setup() {
     const internalId = useId();
     return {
@@ -138,21 +119,11 @@ export default {
   data() {
     return {
       /**
-       * internal represenation of string provided by parent
+       * internal representation of string provided by parent
        * @type {string}
        */
       modelValueInt: '',
-      /**
-       * handle showing of HoverBox
-       * @type {boolean}
-       */
-      showInfoBox: false,
     };
-  },
-  computed: {
-    hoverBoxEnabled() {
-      return this.isLinked && !!Object.keys(this.hoverBoxContent).length;
-    },
   },
   watch: {
     modelValue: {
@@ -181,41 +152,6 @@ export default {
          * @param {string} - the displayed text string after edit
          */
         this.$emit('update:modelValue', this.modelValueInt);
-      }
-    },
-    clickAction(e) {
-      if (!this.editable) {
-        e.stopPropagation();
-        /**
-         * event emitted when chip is clicked
-         *
-         * @event clicked
-         *
-         */
-        this.$emit('clicked');
-        if (this.isLinked) {
-          this.$emit('hoverbox-active', true);
-          this.$refs.hoverBox.setPosition(e);
-          this.showInfoBox = !this.showInfoBox;
-        }
-      }
-    },
-    moveBox(e) {
-      if (this.hoverBoxEnabled && this.showInfoBox) {
-        this.$refs.hoverBox.setPosition(e);
-      }
-    },
-    hideBox() {
-      if (this.hoverBoxEnabled) {
-        /**
-         * event indicating if hover box was set to show / hide
-         *
-         * @event hoverbox-active
-         * @param {boolean} - is hoverbox active
-         *
-         */
-        this.$emit('hoverbox-active', false);
-        this.showInfoBox = false;
       }
     },
     removeClicked() {
@@ -295,9 +231,5 @@ export default {
       justify-content: center;
       align-items: center;
     }
-  }
-
-  .base-chip__hover-box__hidden {
-    display: none;
   }
 </style>
