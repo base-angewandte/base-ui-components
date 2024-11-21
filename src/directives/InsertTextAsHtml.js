@@ -8,11 +8,15 @@
  */
 // just use function - that will guarantee calling on bind and update hooks
 export default function InsertTextAsHtml(el, { value: { value, interpretTextAsHtml } }) {
-  if (interpretTextAsHtml && value) {
-    // eslint-disable-next-line no-param-reassign
-    el.innerHTML = value;
-  } else {
-    // eslint-disable-next-line no-param-reassign
-    el.innerText = value;
+  // ONLY reassign the value when the content really changed otherwise the HTML elements
+  // are permanently repainted on every udpate!
+  if ((interpretTextAsHtml && value !== el.innerHTML) || el.innerText !== value) {
+    if (interpretTextAsHtml && value) {
+      // eslint-disable-next-line no-param-reassign
+      el.innerHTML = value;
+    } else {
+      // eslint-disable-next-line no-param-reassign
+      el.innerText = value;
+    }
   }
 }
