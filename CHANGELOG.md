@@ -1,3 +1,16 @@
+## 4.0.1 (2024-11-21)
+
+
+### Deprecated
+
+* **[BaseHoverBox](https://base-angewandte.github.io/base-ui-components/components/BaseHoverBox):** add deprecation notice to BaseHoverBox and BaseChip prop `hoverBoxContent`.
+
+
+### Fixed
+
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/components/BaseMap), [BaseMapLocations](https://base-angewandte.github.io/base-ui-components/components/BaseMapLocations):** update demo map subdomains of basemap.at for styleguide.
+* **[BaseMapLocations](https://base-angewandte.github.io/base-ui-components/components/BaseMapLocations):** component BaseExpandBox collapsing if a text list element is hovered.
+
 ## 4.0.0 (2024-11-11)
 
 ### ⚠ BREAKING CHANGE
