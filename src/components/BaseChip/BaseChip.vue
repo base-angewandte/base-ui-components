@@ -75,6 +75,10 @@ export default {
     /**
      * if a hover box is associated with the chip add all relevant properties here
      * (see [BaseHoverBox](BaseHoverBox) for details)
+     *
+     * **CAVEAT**: this prop is deprecated and will be removed in the next major version!
+     * Usage not recommended!
+     * Have a look into [BaseTooltipBox](BaseTooltipBox) for implementing a similar functionality
      */
     hoverBoxContent: {
       type: Object,

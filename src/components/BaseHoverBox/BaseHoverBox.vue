@@ -10,7 +10,10 @@
 import BaseImageBox from '../BaseImageBox/BaseImageBox';
 
 /**
- * A box for information display after mouse hover or click
+ * A box for information display after mouse hover or click<br><br>
+ * <b>CAVEAT</b>: this component is deprecated!<br>
+ * Usage not recommended!<br>
+ * Have a look into [BaseTooltipBox](BaseTooltipBox) for a component with similar functionality
  */
 
 export default {
