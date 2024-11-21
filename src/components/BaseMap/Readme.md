@@ -55,7 +55,7 @@ export default {
       ],
       options: {
         style: 'normal',
-        subdomains: ['maps', 'maps1', 'maps2', 'maps3', 'maps4'],
+        subdomains: ['mapsneu'],
         tileMatrixSet: 'google3857',
         type: 'geolandbasemap',
       },
