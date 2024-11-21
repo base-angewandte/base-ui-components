@@ -10,7 +10,6 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
  * @param {object} [options={}] - options specific for that type of observer
  * @returns {{observer: Ref<UnwrapRef<null|MutationObserver|ResizeObserver>>}}
  */
-// eslint-disable-next-line import/prefer-default-export
 export function useElementObserver({ type, target, callback, options = {} }) {
   // create a reference to the provided target element, also check if value can
   // be used directly or if it is a vue component (then $el must be used)
@@ -34,7 +33,6 @@ export function useElementObserver({ type, target, callback, options = {} }) {
         callback();
       });
     } else {
-      // eslint-disable-next-line no-console
       console.warn(`type '${type}' can currently not be handled in useElementObserver.`);
     }
     observer.value.observe(targetElement.value, options);

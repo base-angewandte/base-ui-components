@@ -157,7 +157,6 @@ import { useI18n } from '@/composables/useI18n.js';
 export default {
   name: 'BaseTextList',
   components: {
-    // eslint-disable-next-line import/no-self-import
     BaseTextList: defineAsyncComponent(() => import('./BaseTextList.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
   },

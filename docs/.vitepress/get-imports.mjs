@@ -83,6 +83,7 @@ function parseNamedImports(importClauseString) {
 	const namedImports = importClauseString
 		.slice(firstCurly, lastCurly)
 		.matchAll(/([a-zA-Z0-9_]+)(?:\s+as\s+([a-zA-Z0-9_]+))?/g)
+  // eslint-disable-next-line no-unused-vars
 	return Array.from(namedImports).map(([_, imported, alias]) => ({
 		imported,
 		alias: alias || imported
@@ -103,6 +104,7 @@ export const getImports = code => {
 
 		if (descriptor?.script || descriptor?.scriptSetup) {
 			return parseImports(
+        // eslint-disable-next-line no-constant-binary-expression
 				descriptor?.script?.content ?? '' + '\n' + descriptor?.scriptSetup?.content ?? ''
 			)
 		}

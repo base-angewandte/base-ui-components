@@ -214,11 +214,8 @@ export default {
       // import swiper and plugins
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
-      // eslint-disable-next-line import/extensions
       const { Swiper } = await import('swiper/modules');
-      // eslint-disable-next-line import/extensions
       const { Keyboard } = await import('swiper/modules');
-      // eslint-disable-next-line import/extensions
       const { Navigation } = await import('swiper/modules');
 
       const additionalOptions = {

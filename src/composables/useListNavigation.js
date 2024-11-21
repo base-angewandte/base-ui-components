@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export function useListNavigation() {
   /**
    * function to check if arrow key navigation was within the array

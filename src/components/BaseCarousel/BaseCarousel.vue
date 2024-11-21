@@ -146,7 +146,6 @@ export default {
 
         // otherwise take first one
         if (!imageSrc.length) {
-          // eslint-disable-next-line
           imageSrc = Object.values(object[0])[0];
         }
       }
@@ -157,13 +156,9 @@ export default {
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
       const { Swiper } = await import('swiper');
-      // eslint-disable-next-line import/extensions
       const { Autoplay } = await import('swiper/modules');
-      // eslint-disable-next-line import/extensions
       const { Keyboard } = await import('swiper/modules');
-      // eslint-disable-next-line import/extensions
       const { Navigation } = await import('swiper/modules');
-      // eslint-disable-next-line import/extensions
       const { Pagination } = await import('swiper/modules');
 
       this.swiperIsActive = true;

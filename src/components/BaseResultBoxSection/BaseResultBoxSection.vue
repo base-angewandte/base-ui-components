@@ -997,7 +997,6 @@ export default {
   mounted() {
     // create an element id to have an unique id to assign javascript calculated styles to
     // note: done here, cause of mismatching ids (entries, class definition) in ssr-mode
-    // eslint-disable-next-line no-underscore-dangle
     this.elementId = this.$.uid;
 
     if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {

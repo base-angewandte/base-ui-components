@@ -3,7 +3,6 @@ import { createId } from '@/utils/utils.js';
 
 const ATTR_KEY = 'data-base-id';
 
-// eslint-disable-next-line import/prefer-default-export
 export function useId() {
   // get the current component instance
   const instance = getCurrentInstance();

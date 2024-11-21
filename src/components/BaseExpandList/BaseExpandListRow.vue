@@ -141,7 +141,6 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-// eslint-disable-next-line
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
 
@@ -150,7 +149,6 @@ export default {
   components: {
     BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
-    // eslint-disable-next-line import/no-self-import
     BaseExpandListRow: defineAsyncComponent(() => import('@/components/BaseExpandList/BaseExpandListRow.vue')),
     BaseIcon,
   },

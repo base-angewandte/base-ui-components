@@ -279,7 +279,6 @@ export default {
       }
     },
     setOverflow() {
-      // eslint-disable-next-line max-len
       const headerWidth = this.$refs.dropDownButton ? this.$refs.dropDownButton.getBoundingClientRect().width : 0;
       const textWidth = this.$refs.headText ? this.$refs.headText.getBoundingClientRect().width : 0;
       this.showFadeOut = textWidth > headerWidth;

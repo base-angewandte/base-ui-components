@@ -12,7 +12,6 @@ import { useDebounce } from '@/composables/useDebounce.js';
  *  calling the function
  * @param {boolean} [callOnMounted=false] - specify if function should be called the first time on mounted
  */
-// eslint-disable-next-line import/prefer-default-export
 export function useEventListener({
   target,
   event,
@@ -40,7 +39,6 @@ export function useEventListener({
     // if setDebounce evaluates to true but did not hit the condition above
     // give a warning to the user
   } else if (setDebounce) {
-    // eslint-disable-next-line no-console
     console.warn('Attention: useEventListener: `setDebounce` needs to be a number (in ms).');
   }
 

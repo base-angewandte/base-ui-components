@@ -1,7 +1,6 @@
 import DefaultTheme from 'vitepress/theme-without-fonts';
 import VueLiveWithLayout from './components/vue-live-with-layout';
-const modules = import.meta.glob
-(['../../../src/**/*.vue'], { eager: true })
+const modules = import.meta.glob(['../../../src/**/*.vue'], { eager: true });
 import '../styles/app.scss';
 
 export default {
