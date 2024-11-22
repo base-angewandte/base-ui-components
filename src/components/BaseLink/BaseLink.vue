@@ -1,114 +1,3 @@
-<template>
-  <!-- v-clean-dom-nodes is here because space was added before and after the link which
-    was not the desired effect when link was followed by a comma in BaseTextList - also
-    see ticket #2283#note-11 -->
-  <component
-    :is="renderAs"
-    v-bind="linkAttributes"
-    v-clean-dom-nodes
-    :aria-controls="isTooltip ? `tooltipBox-${internalId}`: null"
-    :aria-expanded="isTooltip ? showTooltip.toString() : null"
-    :aria-label="isChip || isTooltip ? title : null"
-    :tabindex="isTooltip ? 0 : null"
-    :title="title"
-    :class="[
-      'base-link',
-      {
-        'base-link--chip': isChip,
-        'base-link--internal': isInternal,
-        'base-link--external': isExternal,
-        'base-link--tooltip': isTooltip,
-        'base-link--active': showTooltip,
-        'base-link--space-after': spaceAfter,
-      },
-    ]"
-    @keyup.enter="clickHandler"
-    @click="clickHandler">
-    <!-- chip, internal, external, text -->
-    <template
-      v-if="!isTooltip">
-      <slot
-        name="label"
-        :label="value">
-        <span
-          v-insert-text-as-html="{ value, interpretTextAsHtml }"
-          :class="{ 'no-clean': interpretTextAsHtml }" />
-      </slot>
-    </template>
-
-    <!-- (i) tooltip -->
-    <template
-      v-if="isTooltip">
-      <span
-        class="base-link__label">
-        <slot
-          name="label"
-          :label="value">
-          <span
-            v-insert-text-as-html="{ value, interpretTextAsHtml }"
-            :class="{ 'no-clean': interpretTextAsHtml }" />
-        </slot>
-      </span>
-
-      <span
-        ref="icon"
-        class="base-link__icon">
-        <BaseIcon
-          v-show="!isLoading"
-          name="information" />
-      </span>
-
-      <span
-        v-if="isLoading"
-        class="base-link__loader">
-        <BaseLoader
-          v-if="isLoading" />
-      </span>
-
-      <BaseTooltipBox
-        v-if="showTooltip"
-        :id="`tooltipBox-${internalId}`"
-        :attach-to="$refs.icon"
-        :modal-on-mobile="false"
-        :role="'tooltip'"
-        :styles="tooltipStyles"
-        :threshold-top="tooltipThresholdTop"
-        :type-on-mobile="tooltipTypeOnMobile"
-        @close="showTooltip = !showTooltip">
-        <!-- @slot slot to inject content
-          @binding {Object} item - a tooltip object -->
-        <slot
-          name="tooltip"
-          :item="tooltip">
-          <span
-            v-if="tooltip.label"
-            class="base-tooltip__label">
-            {{ tooltip.label }}
-          </span>
-
-          <div
-            v-for="(item, index) in tooltip"
-            :key="index"
-            class="base-tooltip__row">
-            {{ item.label }}:
-            <template v-if="item.url">
-              <a
-                v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }"
-                :href="item.url"
-                :title="item.altTitle || undefined"
-                class="base-link--external">
-                {{ item.value }}
-              </a>
-            </template>
-            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len -->
-            <template v-else><span v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }" /></template>
-          </div>
-        </slot>
-      </BaseTooltipBox>
-    </template>
-  </component>
-</template>
-
 <script>
 /**
  * component to display different types of links
@@ -552,6 +441,118 @@ export default {
   },
 };
 </script>
+
+<template>
+  <!-- v-clean-dom-nodes is here because space was added before and after the link which
+    was not the desired effect when link was followed by a comma in BaseTextList - also
+    see ticket #2283#note-11 -->
+  <component
+    :is="renderAs"
+    v-bind="linkAttributes"
+    v-clean-dom-nodes
+    :aria-controls="isTooltip ? `tooltipBox-${internalId}`: null"
+    :aria-expanded="isTooltip ? showTooltip.toString() : null"
+    :aria-label="isChip || isTooltip ? title : null"
+    :tabindex="isTooltip ? 0 : null"
+    :title="title"
+    :class="[
+      'base-link',
+      {
+        'base-link--chip': isChip,
+        'base-link--internal': isInternal,
+        'base-link--external': isExternal,
+        'base-link--tooltip': isTooltip,
+        'base-link--active': showTooltip,
+        'base-link--space-after': spaceAfter,
+      },
+    ]"
+    @keyup.enter="clickHandler"
+    @click="clickHandler">
+    <!-- chip, internal, external, text -->
+    <template
+      v-if="!isTooltip">
+      <slot
+        name="label"
+        :label="value">
+        <span
+          v-insert-text-as-html="{ value, interpretTextAsHtml }"
+          :class="{ 'no-clean': interpretTextAsHtml }" />
+      </slot>
+    </template>
+
+    <!-- (i) tooltip -->
+    <template
+      v-if="isTooltip">
+      <span
+        class="base-link__label">
+        <slot
+          name="label"
+          :label="value">
+          <span
+            v-insert-text-as-html="{ value, interpretTextAsHtml }"
+            :class="{ 'no-clean': interpretTextAsHtml }" />
+        </slot>
+      </span>
+
+      <span
+        ref="icon"
+        class="base-link__icon">
+        <BaseIcon
+          v-show="!isLoading"
+          name="information" />
+      </span>
+
+      <span
+        v-if="isLoading"
+        class="base-link__loader">
+        <BaseLoader
+          v-if="isLoading" />
+      </span>
+
+      <BaseTooltipBox
+        v-if="showTooltip"
+        :id="`tooltipBox-${internalId}`"
+        :attach-to="$refs.icon"
+        :modal-on-mobile="false"
+        :role="'tooltip'"
+        :styles="tooltipStyles"
+        :threshold-top="tooltipThresholdTop"
+        :type-on-mobile="tooltipTypeOnMobile"
+        @close="showTooltip = !showTooltip">
+        <!-- @slot slot to inject content
+          @binding {Object} item - a tooltip object -->
+        <slot
+          name="tooltip"
+          :item="tooltip">
+          <span
+            v-if="tooltip.label"
+            class="base-tooltip__label">
+            {{ tooltip.label }}
+          </span>
+
+          <!-- TODO: somehow the directive `v-insert-text-as-html` is not working here.
+                     for now we remove it and use that hacky workaround -->
+          <div
+            v-for="(item, index) in tooltip"
+            :key="index"
+            class="base-tooltip__row">
+            {{ item.label }}:
+            <template v-if="item.url">
+              <a
+                v-text="!interpretTextAsHtml ? item.value : null"
+                v-html="interpretTextAsHtml ? item.value : null"
+                :href="item.url"
+                :title="item.altTitle || undefined"
+                class="base-link--external" />
+            </template>
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len -->
+            <template v-else><span v-text="!interpretTextAsHtml ? item.value : null" v-html="interpretTextAsHtml ? item.value : null" /></template>
+          </div>
+        </slot>
+      </BaseTooltipBox>
+    </template>
+  </component>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
