@@ -906,7 +906,6 @@ export default {
      * @returns {Object}
      */
     fieldGroupParamsInt() {
-      console.log(this.fieldGroupParams);
       return {
         ...this.inputListeners,
         ...this.fieldGroupParams,

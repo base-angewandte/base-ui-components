@@ -39,6 +39,7 @@ export function useEventListener({
     // if setDebounce evaluates to true but did not hit the condition above
     // give a warning to the user
   } else if (setDebounce) {
+    // eslint-disable-next-line no-console
     console.warn('Attention: useEventListener: `setDebounce` needs to be a number (in ms).');
   }
 

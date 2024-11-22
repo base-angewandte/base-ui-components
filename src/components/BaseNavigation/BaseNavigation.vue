@@ -310,6 +310,7 @@ const activeElement = computed(() => {
   // to define one
   if (!element && !navElements.value.some(e => e.routeMatch) && !props.activeElementId) {
     // provide a warning to the user
+    // eslint-disable-next-line no-console
     console.warn('Attention - no active element could be identified and the first list item will be used!'
         + 'Please set an active element via prop `activeElementId` or `routeMatch` property.');
   }
