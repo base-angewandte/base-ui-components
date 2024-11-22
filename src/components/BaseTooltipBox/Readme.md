@@ -6,10 +6,10 @@
     <BaseTooltipBox
       v-if="tooltip"
       :attach-to="$refs.button.$el"
+      :threshold-top="70"
       :type-on-mobile="'box'"
       class="base-tooltip-box"
-      :threshold-top="70"
-      @close="tooltip = !tooltip">
+      @close="close">
       <p>{{ data }}</p>
     </BaseTooltipBox>
     <BaseButton
@@ -17,8 +17,8 @@
       tabindex="0"
       icon="information"
       text="info"
-      @blur="blur()"
-      @clicked="tooltip = !tooltip" />
+      @blur="close"
+      @clicked="toggle" />
   </div>
 </template>
 
@@ -27,13 +27,21 @@ export default {
   data() {
     return {
       data: 'additional information',
+      toggleButtonDisabled: false,
       tooltip: false,
     };
   },
   methods: {
-    blur() {
+    close() {
       this.tooltip = false;
+      // prevent reopening of the tooltip
+      this.toggleDisabled = true;
+      setTimeout(() => this.toggleDisabled = false, 0);
     },
+    toggle() {
+      if (this.toggleDisabled) return;
+      this.tooltip = !this.tooltip;
+    }
   },
 };
 </script>
@@ -59,10 +67,10 @@ export default {
     <BaseImageBox
       v-for="box in boxes"
       :key="box.id"
+      :box-size="boxSize"
       :image-first="true"
       :image-shadow="false"
       :image-url="box.imageUrl"
-      :box-size="boxSize"
       :title="box.title"
       class="box">
       <template #footer-right>
@@ -83,7 +91,7 @@ export default {
             :direction-order="directionOrder"
             :modal-title="box.title"
             :threshold-top="70"
-            @close="toggleBox(box.id)">
+            @close="closeBox(box.id)">
             <BaseTextList
               :data="box.action.info.data"
               class="base-tooltip-box-body" />
@@ -95,12 +103,7 @@ export default {
 </template>
 
 <script>
-import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
-
 export default {
-  components: {
-    BaseTextList,
-  },
   data() {
     return {
       directionOrder: ['right', 'left', 'top', 'bottom'],
@@ -278,6 +281,7 @@ export default {
           },
         },
       ],
+      toggleBoxButtonDisabled: false,
     };
   },
   mounted() {
@@ -297,8 +301,14 @@ export default {
       });
     },
     toggleBox(id) {
+      if (this.toggleBoxButtonDisabled) return;
       this.activeTooltipBoxId = this.activeTooltipBoxId !== id ? id : null;
     },
+    closeBox() {
+      this.activeTooltipBoxId = null;
+      this.toggleBoxButtonDisabled = true;
+      setTimeout(() => this.toggleBoxButtonDisabled = false, 0);
+    }
   },
 };
 </script>

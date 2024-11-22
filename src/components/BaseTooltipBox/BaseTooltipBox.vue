@@ -1,8 +1,16 @@
 <script setup>
 import { onClickOutside } from '@vueuse/core';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
-import { onBeforeUnmount, computed, onMounted, ref, watch, watchEffect, nextTick, onUnmounted } from 'vue';
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+  watchEffect,
+} from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useElementObserver } from '@/composables/useElementObserver.js';
@@ -10,9 +18,11 @@ import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
 import { useEventListener } from '@/composables/useEventListener.js';
 import { useTabKeyHandler } from '@/composables/useTabKeyHandler.js';
 
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+
 /**
  * Component to display a tooltip
- *   for additional content e.g: quick actions
+ *   for additional content e.g.: quick actions
  */
 
 const props = defineProps({
@@ -42,7 +52,7 @@ const props = defineProps({
   },
   /**
      * title of the modal popup on mobile
-     * if more customization is needed, use the slot `header-title` instead
+     * if more customisation is needed, use the slot `header-title` instead
      */
   modalTitle: {
     type: String,
@@ -72,7 +82,7 @@ const props = defineProps({
     default: 0,
   },
   /**
-   * customize the tooltipbox id.
+   * customise the tooltipBox id
    *  if you are using the `header-title` slot this should also be set as id on your custom title element
    *  (it is also available via slot binding)
    */
@@ -89,7 +99,7 @@ const props = defineProps({
   },
   /**
    * define if the overlay background should be visible
-   * (semitransparent black) - this only applies to `typeOnMobile` 'modal'
+   *   (semitransparent black) - this only applies to `typeOnMobile` 'modal'
    */
   overlayBackgroundVisible: {
     type: Boolean,
@@ -137,11 +147,11 @@ const emit = defineEmits(['close']);
 const internalId = useId();
 // get reference to element
 const tooltipBox = ref(null);
-// the html element reference for the actual tooltip container
+// the HTML element reference for the actual tooltip container
 const tooltipInner = ref(null);
-// ref variable for the container body (handling fade out)
+// ref variable for the container body (handling fade-out)
 const body = ref(null);
-// ref variable for tooltip body inner element (within fade out)
+// ref variable for the tooltip body inner element (within fade out)
 const bodyInner = ref(null);
 
 // variable to steer visibility of tooltip box when active
@@ -426,6 +436,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  // TODO: remove event listener
+
   // when the tooltipBox is closed, try to focus the previous active element
   if (prevActiveElement.value
     // but not if an element of the same class is now focused (case where tooltip box
@@ -506,7 +518,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @use "sass:map";
-  @use "@/styles/variables" as *;
+@use "@/styles/variables" as *;
 
   .base-tooltip-box {
     position: absolute;
