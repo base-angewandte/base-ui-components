@@ -11,7 +11,7 @@ Note: The column elements are defined via the data structure wrapped by an array
       :cols="2"
       :data="data"
       :identifier-property-name="'source'"
-      :render-label-as="'h2'" />
+      :render-label-as="'strong'" />
   </div>
 </template>
 
@@ -146,7 +146,7 @@ Note: The number of columns can be defined with the `colsSingleTextContent` prop
     <BaseTextList
       :data="data"
       :cols-single-text-object="2"
-      :render-label-as="'h2'" />
+      :render-label-as="'strong'" />
   </div>
 </template>
 
@@ -179,7 +179,7 @@ and processed internally to prepare the structure for a single chip from [BaseLi
     <BaseTextList
       :data="data"
       :identifier-property-name="'id'"
-      :render-label-as="'h2'" />
+      :render-label-as="'strong'" />
   </div>
 </template>
 
@@ -200,6 +200,9 @@ export default {
             {
               value: 'aliquyam erat',
               id: 'keyword-2',
+            },
+            {
+              value: 'Eos et accusam aliquyam erat.',
             },
           ],
         },
