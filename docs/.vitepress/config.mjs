@@ -3,6 +3,7 @@ import { globbySync } from "globby";
 import * as path from "path";
 import { fileURLToPath } from 'url'
 import vueLiveMd from './vue-live-md-it.mjs';
+import eslint from 'vite-plugin-eslint';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +35,6 @@ export default defineConfig({
   // to preload the font file
   transformHead({ assets }) {
     const myFontFile = assets.find(() => /source-sans-pro-v13-latin_latin-ext\.\w+\.woff2/)
-    console.log('test', myFontFile);
     if (myFontFile) {
       return [
         [
@@ -53,6 +53,9 @@ export default defineConfig({
   cleanUrls: true,
   outDir: path.resolve(__dirname, '../../styleguide'),
   vite: {
+    plugins: [
+      eslint(),
+    ],
     resolve: {
       alias: {
         'styles': path.resolve(__dirname, './styles'),

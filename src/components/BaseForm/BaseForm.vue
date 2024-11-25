@@ -1049,7 +1049,7 @@ export default {
      */
     getFieldName(el) {
       // use the openAPI definition title or see if there is a i18n translation key with the field key
-      return el.title || this.getI18nTerm(`form.${el.name}` || el.name);
+      return el.title || this.getI18nTerm(el.name ? `form.${el.name}` : el.name);
     },
     /**
      * determine if field has content to see if multiply buttons should be shown
