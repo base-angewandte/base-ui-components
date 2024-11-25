@@ -33,7 +33,6 @@ export function useElementObserver({ type, target, callback, options = {} }) {
         callback();
       });
     } else {
-      // eslint-disable-next-line no-console
       console.warn(`type '${type}' can currently not be handled in useElementObserver.`);
     }
     observer.value.observe(targetElement.value, options);
