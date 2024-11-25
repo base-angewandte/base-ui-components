@@ -14,7 +14,8 @@
       enterkeyhint="search"
       class="base-chip__text"
       @blur="updateText"
-      @keydown.enter.prevent="updateText" />
+      @keydown.enter.prevent="updateText"
+      @click.stop="clickAction" />
     <span
       v-if="assistiveText"
       :id="`${internalId}_aria-label`"
@@ -152,6 +153,18 @@ export default {
          * @param {string} - the displayed text string after edit
          */
         this.$emit('update:modelValue', this.modelValueInt);
+      }
+    },
+    clickAction(e) {
+      if (!this.editable) {
+        e.stopPropagation();
+        /**
+         * event emitted when chip is clicked
+         *
+         * @event clicked
+         *
+         */
+        this.$emit('clicked');
       }
     },
     removeClicked() {
