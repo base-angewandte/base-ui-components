@@ -350,7 +350,7 @@ function calcPosition() {
 const { toggleScrollLock } = usePopUpLock(tooltipBox);
 
 const isPopUpLockEnabled = computed(() => (props.typeOnMobile === 'modal' || props.typeOnMobile === 'fullscreen')
-      && isMobile);
+      && isMobile.value);
 
 /** ADDING OBSERVERS FOR FADEOUT AND TOOLTIP POSITIONING */
 /**
