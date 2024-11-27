@@ -1,77 +1,3 @@
-<template>
-  <BasePopUp
-    v-if="!!fileList.length"
-    :title="getI18nTerm(getLangLabel(uploadText.title))"
-    @close="cancelUpload">
-    <TransitionGroup name="list-complete">
-      <div
-        v-if="userQuotaExceeded"
-        key="user-warning"
-        class="base-uploader-user-warning">
-        <BaseIcon
-          name="attention"
-          class="icon base-uploader-user-warning-icon" />
-        {{ getI18nTerm(
-          getLangLabel(uploadText.quotaExceeded),
-          1,
-          { space: convertSpace(userSpace) }
-        ) }}
-      </div>
-
-      <div
-        key="upload-area"
-        class="popup-upload-area">
-        <TransitionGroup
-          name="bar-move">
-          <BaseProgressBar
-            v-for="(file, index) of fileList"
-            :key="file.name"
-            :progress="uploadPercentage[index]"
-            :file-name="file.name"
-            :file-size="userQuotaExceeded ? convertSpace(file.size) : ''"
-            :status="getStatus(file.name)"
-            :error-message="getErrorMessage(file.name)"
-            :show-remove="currentStatus === 'initial' && fileList.length > 1"
-            class="upload-bar"
-            @remove-item="removeFile(index)" />
-        </TransitionGroup>
-      </div>
-    </TransitionGroup>
-
-    <!-- @slot slot for additional content after upload bars but before buttons -->
-    <slot />
-
-    <template #button-row>
-      <BaseButton
-        v-if="currentStatus === 'initial' || currentStatus === 'failed'"
-        :text="getI18nTerm(cancelButtonText)"
-        :icon="'remove'"
-        :icon-position="'right'"
-        :icon-size="'small'"
-        class="base-upload-bar-button"
-        @clicked="cancelUpload" />
-
-      <BaseButton
-        ref="uploadButton"
-        :text="buttonText"
-        :icon="currentStatus !== 'saving' && currentStatus !== 'failed' ? 'check-mark' : ''"
-        :icon-position="'right'"
-        :icon-size="'small'"
-        :disabled="currentStatus === 'saving' || userQuotaExceeded"
-        class="base-upload-bar-button"
-        @clicked="startUpload">
-        <template
-          v-if="currentStatus === 'saving'"
-          #right-of-text>
-          <span class="base-upload-bar-loader">
-            <BaseLoader />
-          </span>
-        </template>
-      </BaseButton>
-    </template>
-  </BasePopUp>
-</template>
-
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
@@ -280,6 +206,80 @@ export default {
 };
 </script>
 
+<template>
+  <BasePopUp
+    v-if="!!fileList.length"
+    :title="getI18nTerm(getLangLabel(uploadText.title))"
+    @close="cancelUpload">
+    <TransitionGroup name="list-complete">
+      <div
+        v-if="userQuotaExceeded"
+        key="user-warning"
+        class="base-uploader-user-warning">
+        <BaseIcon
+          name="attention"
+          class="icon base-uploader-user-warning-icon" />
+        {{ getI18nTerm(
+          getLangLabel(uploadText.quotaExceeded),
+          1,
+          { space: convertSpace(userSpace) }
+        ) }}
+      </div>
+
+      <div
+        key="upload-area"
+        class="popup-upload-area">
+        <TransitionGroup
+          name="bar-move">
+          <BaseProgressBar
+            v-for="(file, index) of fileList"
+            :key="file.name"
+            :progress="uploadPercentage[index]"
+            :file-name="file.name"
+            :file-size="userQuotaExceeded ? convertSpace(file.size) : ''"
+            :status="getStatus(file.name)"
+            :error-message="getErrorMessage(file.name)"
+            :show-remove="currentStatus === 'initial' && fileList.length > 1"
+            class="upload-bar"
+            @remove-item="removeFile(index)" />
+        </TransitionGroup>
+      </div>
+    </TransitionGroup>
+
+    <!-- @slot slot for additional content after upload bars but before buttons -->
+    <slot />
+
+    <template #button-row>
+      <BaseButton
+        v-if="currentStatus === 'initial' || currentStatus === 'failed'"
+        :text="getI18nTerm(cancelButtonText)"
+        :icon="'remove'"
+        :icon-position="'right'"
+        :icon-size="'small'"
+        class="base-upload-bar-button"
+        @clicked="cancelUpload" />
+
+      <BaseButton
+        ref="uploadButton"
+        :text="buttonText"
+        :icon="currentStatus !== 'saving' && currentStatus !== 'failed' ? 'check-mark' : ''"
+        :icon-position="'right'"
+        :icon-size="'small'"
+        :disabled="currentStatus === 'saving' || userQuotaExceeded"
+        class="base-upload-bar-button"
+        @clicked="startUpload">
+        <template
+          v-if="currentStatus === 'saving'"
+          #right-of-text>
+          <span class="base-upload-bar-loader">
+            <BaseLoader />
+          </span>
+        </template>
+      </BaseButton>
+    </template>
+  </BasePopUp>
+</template>
+
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
 
@@ -332,6 +332,7 @@ export default {
 
   .base-upload-bar-button {
     flex-basis: 100%;
+    transition: color 250ms ease-in-out;
   }
 
   .base-upload-bar-button + .base-upload-bar-button {
