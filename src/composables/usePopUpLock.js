@@ -30,8 +30,8 @@ export function usePopUpLock(target) {
   }
 
   watch(showElement, (val) => {
-    if (!val && targetElement.value) {
-      enableBodyScroll(targetElement.value);
+    if (val && targetElement.value) {
+      disableBodyScroll(targetElement.value);
     }
   });
 
