@@ -203,7 +203,9 @@ onClickOutside(tooltipInner, () => {
 });
 
 /** FADE OUT RELATED FUNCTIONALITY */
-const { boxFadeOut: { top: fadeOutTop, bottom: fadeOutBottom }, calcFadeOut } = useElementFadeOut({
+// use the whole boxFadeOut object instead of destructuring it because otherwise
+// reactivity is destroyed
+const { boxFadeOut, calcFadeOut } = useElementFadeOut({
   target: body,
 });
 
@@ -256,6 +258,7 @@ const thresholdTopInt = computed(() => {
  * calc absolute tooltip and inner triangle position
  */
 function calcPosition() {
+  if (!tooltipBox.value) return;
   css.value = {};
   // anchor elements current position
   const attachToRect = props.attachTo.getBoundingClientRect();
@@ -436,8 +439,6 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  // TODO: remove event listener
-
   // when the tooltipBox is closed, try to focus the previous active element
   if (prevActiveElement.value
     // but not if an element of the same class is now focused (case where tooltip box
@@ -500,9 +501,9 @@ onUnmounted(() => {
       <div
         ref="body"
         :class="['base-tooltip-box__body',
-                 {'base-tooltip-box__body--fade-out': fadeOutTop || fadeOutBottom},
-                 { 'base-tooltip-box__body--fade-out--top': fadeOutTop },
-                 { 'base-tooltip-box__body--fade-out--bottom': fadeOutBottom }]">
+                 {'base-tooltip-box__body--fade-out': boxFadeOut.top || boxFadeOut.bottom},
+                 { 'base-tooltip-box__body--fade-out--top': boxFadeOut.top },
+                 { 'base-tooltip-box__body--fade-out--bottom': boxFadeOut.bottom }]">
         <div
           ref="bodyInner"
           class="base-tooltip-box__body__inner">

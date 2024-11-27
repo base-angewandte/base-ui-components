@@ -1,5 +1,5 @@
 import {
-  ref, onMounted, computed,
+  ref, computed,
 } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 import { useEventListener } from '@/composables/useEventListener.js';
@@ -8,16 +8,35 @@ import { useEventListener } from '@/composables/useEventListener.js';
  *
  * @param {Ref<HTMLElement>} target - this must be a reference(!) to an HTML element
  * @param direction
- * @returns {{boxFadeOut: Ref<UnwrapRef<{}>>, elementIsScrollable: ComputedRef<unknown>, calcFadeOut: function }}
+ * @returns {{boxFadeOut: Ref<{ ['top'|'left']: boolean, ['bottom'|'right']: boolean }>, elementIsScrollable: ComputedRef<boolean>, calcFadeOut: function }}
  */
 export function useElementFadeOut({ target, direction = 'vertical' }) {
+  /**
+   * get either the element itself or if it is a Vue component the child
+   * (TODO: this probably will face problems if there is more than one root component?)
+   * @type {ComputedRef<HTMLElement>}
+   */
   const scrollContainer = computed(() => target.value.$el || target.value);
 
-  const directionIsVertical = computed(() => direction === 'vertical');
+  /**
+   * store the direction of the fade out (vertical or horizontal)
+   * @type {boolean}
+   */
+  const directionIsVertical = direction === 'vertical';
 
-  const priorElementName = directionIsVertical.value ? 'top' : 'left';
-  const postElementName = directionIsVertical.value ? 'bottom' : 'right';
+  /**
+   * and get how the properties should be named
+   * vertical: 'top' and 'bottom'
+   * horizontal: 'left' and 'right'
+   * @type {string}
+   */
+  const priorElementName = directionIsVertical ? 'top' : 'left';
+  const postElementName = directionIsVertical ? 'bottom' : 'right';
 
+  /**
+   * variable storing if fadeout top/left bottom/right should be shown
+   * @type {Ref<{ ['top'|'left']: boolean, ['bottom'|'right']: boolean }>}
+   */
   const boxFadeOut = ref({
     [priorElementName]: false,
     [postElementName]: false,
@@ -46,21 +65,24 @@ export function useElementFadeOut({ target, direction = 'vertical' }) {
     };
   }
 
-  onMounted(() => {
-    useElementObserver({
-      type: 'resize',
-      target,
-      callback: calcFadeOut,
-    });
-    useEventListener({ target, event: 'scroll', callback: calcFadeOut });
+  // use composable here not inside mounted since it has an onMounted itself!
+  useEventListener({
+    target,
+    event: 'scroll',
+    callback: calcFadeOut,
+  });
+  useElementObserver({
+    type: 'resize',
+    target,
+    callback: calcFadeOut,
   });
 
   /**
    * determine from fade out calculations if element is scrollable
-   * @returns {boolean}
+   * @type {ComputedRef<boolean>}
    */
-  const elementIsScrollable = computed(() => boxFadeOut.value[priorElementName]
-    || boxFadeOut.value[postElementName]);
+  const elementIsScrollable = computed(() => !!boxFadeOut.value[priorElementName]
+    || !!boxFadeOut.value[postElementName]);
 
   return { boxFadeOut, elementIsScrollable, calcFadeOut };
 }
