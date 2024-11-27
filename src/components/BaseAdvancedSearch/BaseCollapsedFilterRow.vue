@@ -28,7 +28,6 @@
           v-for="(filter, filterIndex) in filtersInt"
           :key="filter.idInternal"
           :aria-describedby="`${filter.idInternal}-label`"
-          role="listitem"
           tabindex="0"
           :class="['base-collapsed-filter-row__filter',
                    { 'base-collapsed-filter-row__filter__boolean': filter.filter_values

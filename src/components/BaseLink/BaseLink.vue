@@ -538,14 +538,16 @@ export default {
             class="base-tooltip__row">
             {{ item.label }}:
             <template v-if="item.url">
+              <!-- eslint-disable vue/no-v-html - just using next-line did not work -->
               <a
-                v-text="!interpretTextAsHtml ? item.value : null"
-                v-html="interpretTextAsHtml ? item.value : null"
                 :href="item.url"
                 :title="item.altTitle || undefined"
-                class="base-link--external" />
+                class="base-link--external"
+                v-text="!interpretTextAsHtml ? item.value : null"
+                v-html="interpretTextAsHtml ? item.value : null" />
+              <!-- eslint-enable vue/no-v-html -->
             </template>
-            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len -->
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len vue/no-v-html vue/max-attributes-per-line -->
             <template v-else><span v-text="!interpretTextAsHtml ? item.value : null" v-html="interpretTextAsHtml ? item.value : null" /></template>
           </div>
         </slot>

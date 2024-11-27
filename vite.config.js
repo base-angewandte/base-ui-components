@@ -59,8 +59,6 @@ export default defineConfig({
       },
       external: [
         'vue',
-        '@vueuse/components',
-        '@vueuse/core',
         'vue-i18n',
         'swiper',
         'hls.light.js',
@@ -68,15 +66,15 @@ export default defineConfig({
       ],
       output: {
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'style.css') return 'base-ui-components.css';
-          return assetInfo.name;
+          // rename style file to base-ui-components.css
+          if (assetInfo.names?.includes('style.css')) return 'base-ui-components.css';
+          // for everything else return default (but without assets folder)
+          return "[name]-[hash][extname]";
         },
         globals: {
           vue: 'Vue',
           swiper: 'Swiper',
           'vue-i18n': 'VueI18n',
-          '@vueuse/components': 'VueUse',
-          '@vueuse/core': 'VueUse',
           'hls.light.js': 'Hls',
           'hls.js/dist/hls.light.js': 'Hls',
         },

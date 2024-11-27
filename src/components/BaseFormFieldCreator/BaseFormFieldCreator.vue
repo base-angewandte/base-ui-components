@@ -1062,7 +1062,7 @@ export default {
       if (this.label || this.fieldProps.label) {
         return this.label || this.fieldProps.label;
       }
-      return this.field.title || this.getI18nTerm(`form.${this.field.name}` || this.field.name);
+      return this.field.title || this.getI18nTerm(this.field.name ? `form.${this.field.name}` : this.field.name);
     },
     // check if placeholder was specified - if not defer from
     // title or check if there is a localized term

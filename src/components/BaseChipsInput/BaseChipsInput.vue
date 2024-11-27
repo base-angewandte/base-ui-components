@@ -588,15 +588,20 @@ export default {
       const newProps = {
         ...this.$attrs,
         ...this.$props,
-        id: this.internalId,
+        // make sure the input id is always set
+        inputId: this.$props.inputId || this.internalId,
       };
       // delete the chipsInput `modelValue` prop because for component
       // ChipsInputField the input string is `modelValue`
       delete newProps.modelValue;
+      delete newProps.defaultEntry;
       // and delete all drop down related props
       delete newProps.dropDownNoOptionsInfo;
       delete newProps.allowDynamicDropDownEntries;
       delete newProps.addNewChipText;
+      delete newProps.closeDropdownOnOptionSelect;
+      delete newProps.highlightStringMatch;
+      delete newProps.highlightStringTags;
       // drop down options
       delete newProps.list;
       return newProps;
