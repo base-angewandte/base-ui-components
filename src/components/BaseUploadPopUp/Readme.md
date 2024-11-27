@@ -62,7 +62,6 @@ export default {
       uploadPercentage: [],
       rejectedFiles: [],
       uploadedFiles: [],
-      errorFiles: [],
       license: {},
       licenses: [
         { label: 'Copyright', value: 'Copyright' },
