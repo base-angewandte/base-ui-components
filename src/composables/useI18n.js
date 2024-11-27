@@ -3,7 +3,7 @@ import {computed, getCurrentInstance, ref} from 'vue';
 /**
  * component internal i18n functionality, will check if plugin exists
  *  and utilize its functions if present
- * @param {?string} [language] - provide the currently set locale here
+ * @param {Ref<String>} [language] - provide the currently set locale here
  * @returns {{setLangLabels: (function(string, string[]): {}), getLangLabel: ((function((string|Object), boolean=): (Object|string))|*), getI18nTerm: ((function(string, number=, Object=): string)|*)}}
  */
 export function useI18n(language) {
@@ -12,6 +12,7 @@ export function useI18n(language) {
   const i18n = ref(null);
   const t = ref(null);
   const te = ref(null);
+  const langInt = ref(language);
   /**
    * now we can use it to determine if i18n functionality is available
    * @type {ComputedRef<any|boolean>}
@@ -84,7 +85,7 @@ export function useI18n(language) {
    */
   function getLangLabel(value, useAny = false) {
     const langToUse = hasI18n.value
-      ? language || i18n.value.locale : language;
+      ? langInt.value || i18n.value.locale : langInt.value;
     if (typeof value === 'string') return value;
     if (value && langToUse && value[langToUse]) {
       return value[langToUse];
