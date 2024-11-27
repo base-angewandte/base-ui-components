@@ -4,13 +4,22 @@
 <template>
   <div
   class="container">
-    <BaseLoader 
-      v-if="showLoader"
-      loader-color="red"
-      class="loader"/>
-  <BaseButton 
-    text="Toggle Loader!"
-    @clicked="showLoader = !showLoader" />
+    <div class="loader-frame">
+      <BaseLoader
+        v-if="showLoader"
+        :hide="hideLoader"
+        loader-color="red"
+        class="loader" />
+    </div>
+    <div class="button-row">
+      <BaseButton
+        text="Toggle Loader!"
+        @clicked="showLoader = !showLoader" />
+      <BaseButton
+        :disabled="!showLoader"
+        text="Toggle Hide Property"
+        @clicked="hideLoader = !hideLoader" />
+    </div>
 </div>
 </template>
 
@@ -18,7 +27,8 @@
 export default {
   data() {
     return {
-      showLoader: false,
+      showLoader: true,
+      hideLoader: false,
     };
   },
 };
@@ -28,10 +38,24 @@ export default {
   .container {
     position: relative;
     height: 100px;
-  }
-  .loader {
-    top: 50%;
-    transform: translateY(-50%);
+
+    .loader-frame {
+      position: absolute;
+      top: 50%;
+      right: 50%;
+      border: 1px solid red;
+
+      .loader {
+        position: relative;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    .button-row {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+    }
   }
 </style>
 
