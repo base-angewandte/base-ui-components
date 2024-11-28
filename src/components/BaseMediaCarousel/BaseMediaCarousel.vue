@@ -180,7 +180,7 @@ export default {
   },
   updated() {
     this.$nextTick(() => {
-      if (this.isMounted && this.showInt && this.swiper === null) {
+      if (this.isMounted && this.showInt && !this.swiper) {
         this.initSwiper();
         this.$el.addEventListener('keyup', e => this.escapeEvent(e));
         this.$el.addEventListener('keydown', e => this.tabEvents(e));
@@ -214,7 +214,7 @@ export default {
       // import swiper and plugins
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
-      const { Swiper } = await import('swiper/modules');
+      const { Swiper } = await import('swiper');
       const { Keyboard } = await import('swiper/modules');
       const { Navigation } = await import('swiper/modules');
 
