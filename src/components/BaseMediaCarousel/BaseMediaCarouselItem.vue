@@ -522,12 +522,12 @@ export default {
 
         .base-media-preview-info-text {
           padding-bottom: $spacing-small-half;
-          margin-bottom: 0;
+          margin: 0;
         }
 
         .base-media-preview__info-text-additional {
           font-size: $font-size-small;
-          margin-bottom: 0;
+          margin: 0;
         }
       }
     }
