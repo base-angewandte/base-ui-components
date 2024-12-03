@@ -606,9 +606,17 @@ export default {
               if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
                 this.inputInt = '';
                 this.previousInput = '';
-              } else {
-                // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
-                this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
+              } else if (this.decimals) {
+                let updatedString;
+                if (this.decimals === -1) {
+                  // if an unlimited number of decimals is allowed, parse the value again as
+                  // number to remove obsolete chars, e.g. 0.0 > 0
+                  updatedString = this.translateFloat(Number(this.stringToFloat(value)));
+                } else {
+                  updatedString = this.translateFloat(Number(this.stringToFloat(value)).toFixed(this.decimals));
+                }
+
+                this.inputInt = updatedString;
                 // also update previous input so there are no funny effects if a type an
                 // invalid character after blur
                 this.previousInput = this.inputInt;
@@ -654,10 +662,17 @@ export default {
      */
     modelValue: {
       handler(val) {
-        const data = this.fieldType === 'number'
-          ? this.translateFloat(val) : val;
+        let data = this.translateFloat(val);
 
         if (data !== this.inputInt) {
+          if (this.fieldType === 'number') {
+            // in case prop `decimals` is set (to not -1) add the appropriate number
+            // of decimal places to the number
+            // if data is null leave the field empty
+            if (data && this.decimals && this.decimals > 0) {
+              data = Number(data).toFixed(this.decimals);
+            }
+          }
           this.inputInt = data;
           this.previousInput = data;
           // trigger input event to validate changes from parent (also initial value)
@@ -824,9 +839,10 @@ export default {
       }
     },
     /**
-     * replace dot with decimalSeparator
+     * create a string out of number values for internal handling (if it is not already)
+     * and replace dot with the display decimalSeparator chosen with prop `decimalSeparator`
      *
-     * @param {number} value
+     * @param {number|string} value
      * @returns {string}
      */
     translateFloat(value) {
