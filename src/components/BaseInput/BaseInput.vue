@@ -545,13 +545,13 @@ export default {
                 return;
               }
               // handle min values
-              if (this.min && value && Number(this.stringToFloat(value)) < this.min) {
+              if (this.min !== null && value && Number(this.stringToFloat(value)) < this.min) {
                 this.errorMessageInt = this.validationTexts.min.replace('{value}', this.min.toString());
                 this.invalidInt = true;
                 return;
               }
               // handle max values
-              if (this.max && Number(this.stringToFloat(value)) > this.max) {
+              if (this.max !== null && Number(this.stringToFloat(value)) > this.max) {
                 this.errorMessageInt = this.validationTexts.max.replace('{value}', this.max.toString());
                 this.invalidInt = true;
                 return;
