@@ -212,7 +212,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           label="Decimals"
           fieldType="number"
           placeholder="Number of decimals"
-          :min="0"
+          :min="-1"
           class="row__element"
           @update:model-value="updateComponent($event, 'decimals', true)" />
         <BaseDropDown
