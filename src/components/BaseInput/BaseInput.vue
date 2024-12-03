@@ -518,11 +518,10 @@ export default {
               const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
               const bannedChars = new RegExp(`[^e0-9${decimalSeparator}\\+-]`, 'g');
               const decimals = this.decimals && this.decimals !== Number('-1') ? `{0,${this.decimals}}` : '*';
-              const negativeNumber = this.allowNegativeNumber ? '-?' : '';
               const eMinus = this.decimals && this.decimals !== Number('-1') ? '-' : '';
               // pattern to match number: ^((-?[0-9]+(,|\.)?[0-9]{0,2}(e(-|\+)?[0-9]*)?)|-)$
               // allow: optional -, numbers, optional decimal separator, e, optional +|-, numbers
-              const pattern = new RegExp(`^((${negativeNumber}[0-9]*${decimalSeparator}?([0-9]${decimals})(e(${eMinus}|\\+)?[0-9]*)?)|-)$`, 'g');
+              const pattern = new RegExp(`^((-?[0-9]*${decimalSeparator}?([0-9]${decimals})(e(${eMinus}|\\+)?[0-9]*)?)|-)$`, 'g');
               // dot or comma are allowed as decimal separators
               // translate them beforehand
               value = value.replace(',', this.decimalSeparator);
@@ -757,10 +756,6 @@ export default {
     },
   },
   mounted() {
-    // handle max value of initial input
-    if (this.max && Number(this.stringToFloat(this.modelValue)) > this.max) {
-      this.inputInt = this.max;
-    }
     // on first render set the focus here manually
     if (this.isActiveInt && this.inputElement) {
       this.inputElement.focus();
