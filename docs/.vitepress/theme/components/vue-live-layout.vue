@@ -133,6 +133,7 @@ function clicked() {
   padding-left: unset;
   color: inherit;
   list-style-type: none;
+  margin: 0;
 }
 
 .preview li, .suggestion, .sidebar li {
