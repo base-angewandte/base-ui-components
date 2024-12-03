@@ -182,14 +182,14 @@ export default {
     this.$nextTick(() => {
       if (this.isMounted && this.showInt && !this.swiper) {
         this.initSwiper();
-        this.$el.addEventListener('keyup', e => this.escapeEvent(e));
-        this.$el.addEventListener('keydown', e => this.tabEvents(e));
+        this.$el.addEventListener('keyup', this.escapeEvent);
+        this.$el.addEventListener('keydown', this.tabEvents);
       }
 
       if (!this.showInt) {
         this.swiper = null;
-        this.$el.removeEventListener('keyup', e => this.escapeEvent(e));
-        this.$el.removeEventListener('keydown', e => this.tabEvents(e));
+        this.$el.removeEventListener('keyup', this.escapeEvent);
+        this.$el.removeEventListener('keydown', this.tabEvents);
       }
     });
   },
