@@ -513,8 +513,8 @@ export default {
         // only read announcement if drop down is open
         if (this.isActiveInt) {
           if (val.length) {
-            this.announcement = this.assistiveText.resultsRetrieved
-              .replace('{number}', val.length);
+            this.announcement = this.assistiveText.resultsRetrieved ? this.assistiveText.resultsRetrieved
+              .replace('{number}', val.length) : '';
           } else {
             this.announcement = this.dropDownNoOptionsInfo;
           }
