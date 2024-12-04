@@ -22,5 +22,5 @@ dist/
 .env.*.local
 
 # ignore styleguide build folder and generated component files
-/docs/components
+/docs/components/
 styleguide/
