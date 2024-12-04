@@ -1,127 +1,3 @@
-<template>
-  <div
-    :style="{ '--footer-height': footerHeight + 'px' }"
-    class="base-media-preview-image-stage">
-    <!-- container 'base-media-preview-preloader' is removed by swiper after image is loaded -->
-    <!-- class is also defined in swiper setup -->
-    <div
-      v-if="displayImage && fileType === 'image'"
-      class="base-media-preview-preloader">
-      <BaseLoader
-        class="base-media-preview-preloader-loader" />
-    </div>
-    <img
-      v-if="displayImage && fileType === 'image'"
-      :src="sourceUrl"
-      :srcset="imageSourceSet"
-      :style="displaySize"
-      :alt="fileName"
-      :class="[
-        'base-media-preview-image',
-        'base-media-preview-rotation-' + orientation.toString(),
-      ]"
-      loading="lazy"
-      @error="displayImage = false">
-    <div
-      v-else-if="fileType === 'image' && !displayImage"
-      class="base-media-preview-not-supported base-media-preview-error">
-      <p class="base-media-preview-not-supported-file-name">
-        An error occurred displaying this image.
-      </p>
-    </div>
-    <base-hls-video
-      v-else-if="fileType === 'video'"
-      ref="baseMediaVideo"
-      :display-size="displaySize"
-      :media-url="mediaUrl"
-      :media-poster-url="mediaPosterUrl"
-      :autoplay="autoplay"
-      :hls-start-level="hlsStartLevel"
-      class="base-media-preview-image base-media-preview-video" />
-    <audio
-      v-else-if="fileType === 'audio'"
-      ref="baseMediaAudio"
-      controls
-      class="base-media-preview__audio">
-      Your browser does not support the audio tag.
-      <source
-        :src="mediaUrl"
-        type="audio/mpeg">
-    </audio>
-    <div
-      v-else
-      class="base-media-preview-not-supported base-media-preview-error">
-      <p class="base-media-preview-not-supported-file-name">
-        {{ fileName }}
-      </p>
-      <div class="base-media-preview-not-supported-buttons">
-        <BaseButton
-          v-if="allowDownload || (!allowDownload && fileType === '')"
-          :text="getI18nTerm(infoTexts.download)"
-          icon="download"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button base-media-preview-not-supported-button"
-          @clicked="download" />
-        <BaseButton
-          v-if="(!isMobile && fileEnding === 'pdf')
-            || (!allowDownload && fileEnding === 'pdf')"
-          :text="getI18nTerm(infoTexts.view)"
-          icon="eye"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button base-media-preview-not-supported-button"
-          @clicked="openPdf()" />
-      </div>
-      <p
-        v-for="textline in additionalInfo"
-        :key="textline"
-        class="base-media-preview__not-supported-additional">
-        {{ textline }}
-      </p>
-    </div>
-    <div
-      ref="footer"
-      class="base-media-preview-info">
-      <div
-        class="base-media-preview__info__col
-               base-media-preview__info__col1
-               base-media-preview__info-text-wrapper">
-        <p class="base-media-preview-info-text">
-          {{ displayName }}
-        </p>
-        <template v-if="additionalInfo.length">
-          <p
-            v-for="textline in additionalInfo"
-            :key="textline"
-            class="base-media-preview__info-text-additional">
-            {{ textline }}
-          </p>
-        </template>
-      </div>
-      <div
-        v-if="currentSlideInfo"
-        aria-hidden="true"
-        class="base-media-preview__info__col base-media-preview__info__col2">
-        <p>
-          {{ currentSlideInfo }}
-        </p>
-      </div>
-      <div
-        v-if="allowDownload"
-        class="base-media-preview__info__col base-media-preview__info__col3">
-        <BaseButton
-          :text="infoTexts.download"
-          icon="download"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button"
-          @clicked="download" />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, ref } from 'vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
@@ -134,7 +10,7 @@ import { useWindowResize } from '@/composables/useWindowResize.js';
  */
 
 export default {
-  name: 'BaseMedia',
+  name: 'BaseMediaItem',
   components: {
     BaseLoader,
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
@@ -368,6 +244,130 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :style="{ '--footer-height': footerHeight + 'px' }"
+    class="base-media-preview-image-stage">
+    <!-- container 'base-media-preview-preloader' is removed by swiper after image is loaded -->
+    <!-- class is also defined in swiper setup -->
+    <div
+      v-if="displayImage && fileType === 'image'"
+      class="base-media-preview-preloader">
+      <BaseLoader
+        class="base-media-preview-preloader-loader" />
+    </div>
+    <img
+      v-if="displayImage && fileType === 'image'"
+      :src="sourceUrl"
+      :srcset="imageSourceSet"
+      :style="displaySize"
+      :alt="fileName"
+      :class="[
+        'base-media-preview-image',
+        'base-media-preview-rotation-' + orientation.toString(),
+      ]"
+      loading="lazy"
+      @error="displayImage = false">
+    <div
+      v-else-if="fileType === 'image' && !displayImage"
+      class="base-media-preview-not-supported base-media-preview-error">
+      <p class="base-media-preview-not-supported-file-name">
+        An error occurred displaying this image.
+      </p>
+    </div>
+    <BaseHlsVideo
+      v-else-if="fileType === 'video'"
+      ref="baseMediaVideo"
+      :display-size="displaySize"
+      :media-url="mediaUrl"
+      :media-poster-url="mediaPosterUrl"
+      :autoplay="autoplay"
+      :hls-start-level="hlsStartLevel"
+      class="base-media-preview-image base-media-preview-video" />
+    <audio
+      v-else-if="fileType === 'audio'"
+      ref="baseMediaAudio"
+      controls
+      class="base-media-preview__audio">
+      Your browser does not support the audio tag.
+      <source
+        :src="mediaUrl"
+        type="audio/mpeg">
+    </audio>
+    <div
+      v-else
+      class="base-media-preview-not-supported base-media-preview-error">
+      <p class="base-media-preview-not-supported-file-name">
+        {{ fileName }}
+      </p>
+      <div class="base-media-preview-not-supported-buttons">
+        <BaseButton
+          v-if="allowDownload || (!allowDownload && fileType === '')"
+          :text="getI18nTerm(infoTexts.download)"
+          icon="download"
+          icon-position="right"
+          icon-size="large"
+          class="base-media-preview__button base-media-preview-not-supported-button"
+          @clicked="download" />
+        <BaseButton
+          v-if="(!isMobile && fileEnding === 'pdf')
+            || (!allowDownload && fileEnding === 'pdf')"
+          :text="getI18nTerm(infoTexts.view)"
+          icon="eye"
+          icon-position="right"
+          icon-size="large"
+          class="base-media-preview__button base-media-preview-not-supported-button"
+          @clicked="openPdf()" />
+      </div>
+      <p
+        v-for="textline in additionalInfo"
+        :key="textline"
+        class="base-media-preview__not-supported-additional">
+        {{ textline }}
+      </p>
+    </div>
+    <div
+      ref="footer"
+      class="base-media-preview-info">
+      <div
+        class="base-media-preview__info__col
+               base-media-preview__info__col1
+               base-media-preview__info-text-wrapper">
+        <p class="base-media-preview-info-text">
+          {{ displayName }}
+        </p>
+        <template v-if="additionalInfo.length">
+          <p
+            v-for="textline in additionalInfo"
+            :key="textline"
+            class="base-media-preview__info-text-additional">
+            {{ textline }}
+          </p>
+        </template>
+      </div>
+      <div
+        v-if="currentSlideInfo"
+        aria-hidden="true"
+        class="base-media-preview__info__col base-media-preview__info__col2">
+        <p>
+          {{ currentSlideInfo }}
+        </p>
+      </div>
+      <div
+        v-if="allowDownload"
+        class="base-media-preview__info__col base-media-preview__info__col3">
+        <BaseButton
+          :text="infoTexts.download"
+          icon="download"
+          icon-position="right"
+          icon-size="large"
+          class="base-media-preview__button"
+          @clicked="download" />
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;

@@ -1,64 +1,3 @@
-<template>
-  <div>
-    <transition name="grow">
-      <div
-        v-if="showInt"
-        ref="mediaCarousel"
-        class="base-media-carousel">
-        <div class="base-media-carousel__background" />
-
-        <button
-          class="base-media-carousel__close"
-          @click="hide">
-          <BaseIcon
-            name="remove" />
-        </button>
-
-        <div
-          :id="swiperId"
-          class="swiper-container">
-          <template
-            v-if="items.length > 1">
-            <BaseIcon
-              name="prev"
-              class="swiper-button swiper-button-prev" />
-
-            <BaseIcon
-              name="next"
-              class="swiper-button swiper-button-next" />
-          </template>
-
-          <div class="swiper-wrapper">
-            <div
-              v-for="(media, index) in items"
-              :key="index"
-              class="swiper-slide">
-              <BaseMediaCarouselItem
-                ref="baseMedia"
-                :autoplay="index === initialSlide"
-                :additional-info="media.additionalInfo"
-                :allow-download="allowDownload"
-                :current-slide-info="items.length > 1 ? `${index + 1} / ${items.length}` : ''"
-                :display-name="media.title"
-                :display-size="media.displaySize"
-                :download-url="media.downloadUrl"
-                :info-texts="infoTexts"
-                :media-url="media.mediaUrl"
-                :media-poster-url="media.mediaPosterUrl"
-                :media-type="media.mediaType"
-                :orientation="media.orientation"
-                :previews="media.previews"
-                :hls-start-level="media.hlsStartLevel"
-                tabindex="0"
-                @download="download" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </transition>
-  </div>
-</template>
-
 <script>
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
@@ -155,7 +94,7 @@ export default {
     const { toggleScrollLock, showElement: showInt } = usePopUpLock(mediaCarousel);
 
     /** PROVIDE A SWIPER ID */
-    const swiperId = `base-media-carousel__swiper${useId()}`;
+    const swiperId = `base-media-carousel__swiper-${useId()}`;
 
     return {
       toggleScrollLock,
@@ -200,9 +139,7 @@ export default {
     hide() {
       /**
        * triggered by clicking on close button
-       *
        * @event hide
-       *
        */
       this.$emit('hide');
     },
@@ -376,6 +313,67 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div id="mediaCarousel">
+    <transition name="grow">
+      <div
+        v-if="showInt"
+        ref="mediaCarousel"
+        class="base-media-carousel">
+        <div class="base-media-carousel__background" />
+
+        <button
+          class="base-media-carousel__close"
+          @click="hide">
+          <BaseIcon
+            name="remove" />
+        </button>
+
+        <div
+          :id="swiperId"
+          class="swiper-container">
+          <template
+            v-if="items.length > 1">
+            <BaseIcon
+              name="prev"
+              class="swiper-button swiper-button-prev" />
+
+            <BaseIcon
+              name="next"
+              class="swiper-button swiper-button-next" />
+          </template>
+
+          <div class="swiper-wrapper">
+            <div
+              v-for="(media, index) in items"
+              :key="index"
+              class="swiper-slide">
+              <BaseMediaCarouselItem
+                ref="baseMedia"
+                :autoplay="index === initialSlide"
+                :additional-info="media.additionalInfo"
+                :allow-download="allowDownload"
+                :current-slide-info="items.length > 1 ? `${index + 1} / ${items.length}` : ''"
+                :display-name="media.title"
+                :display-size="media.displaySize"
+                :download-url="media.downloadUrl"
+                :info-texts="infoTexts"
+                :media-url="media.mediaUrl"
+                :media-poster-url="media.mediaPosterUrl"
+                :media-type="media.mediaType"
+                :orientation="media.orientation"
+                :previews="media.previews"
+                :hls-start-level="media.hlsStartLevel"
+                tabindex="0"
+                @download="download" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
