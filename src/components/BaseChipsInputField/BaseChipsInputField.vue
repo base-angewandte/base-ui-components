@@ -96,6 +96,7 @@
                       :chip-active="indexActiveForRemove === index"
                       :is-removable="chipsRemovable"
                       :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
+                      :class="['base-chips-input-field__chip--draggable', { 'base-chips-input-field__chip--dragging': drag }]"
                       @remove-entry="removeEntry(entry, index)" />
                   </slot>
                 </template>
@@ -962,6 +963,14 @@ export default {
       .base-chips-input-field__chips-transition {
         display: flex;
         flex-wrap: wrap;
+
+        .base-chips-input-field__chip--draggable {
+          cursor: grab;
+
+          &.base-chips-input-field__chip--dragging {
+            user-select: none;
+          }
+        }
       }
     }
 
