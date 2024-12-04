@@ -1,3 +1,10 @@
+## 4.1.1 (2024-12-04)
+
+
+### Chore
+
+* update .gitignore to ignore built component.md files 
+
 ## 4.1.0 (2024-12-04)
 
 
