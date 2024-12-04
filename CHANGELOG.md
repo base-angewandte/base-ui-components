@@ -1,3 +1,10 @@
+## 4.1.0 (2024-12-04)
+
+
+### Changed
+
+* **[BaseIcon](https://base-angewandte.github.io/base-ui-components/components/BaseIcon):** redesigned icons for image_cropped and image_resized
+
 ## 4.0.1 (2024-11-21)
 
 
