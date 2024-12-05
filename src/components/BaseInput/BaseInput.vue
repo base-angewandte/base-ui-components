@@ -5,7 +5,7 @@
     <!-- LABEL ROW -->
     <div
       :class="['base-input__label-row', { hide: !showLabelRow }]"
-      @click.stop="">
+      @click.stop>
       <!-- need to disable because label is there (below)? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
@@ -535,6 +535,10 @@ export default {
        *
        */
       emit('clicked-outside', event);
+    }, {
+      // do not capture the event so other elements have the chance to intercept the
+      // event
+      capture: false,
     });
     return {
       idInt,

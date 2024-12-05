@@ -1,119 +1,22 @@
-<template>
-  <div
-    ref="autocompleteInput"
-    class="base-autocomplete-input">
-    <BaseInput
-      v-model="inputInt"
-      v-model:is-active="isActiveInt"
-      v-bind="inputListeners"
-      :input-id="inputId"
-      :label="label"
-      :show-label="showLabel"
-      :placeholder="placeholder"
-      :required="required"
-      :invalid="invalid"
-      :error-message="errorMessage"
-      :show-error-icon="showErrorIcon"
-      :use-form-field-styling="useFormFieldStyling"
-      :show-input-border="showInputBorder"
-      :clearable="clearable"
-      :loadable="loadable"
-      :is-loading="isLoading"
-      :language="language"
-      :disabled="disabled"
-      :drop-down-list-id="`${inputId}-list-identifier`"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :assistive-text="{
-        loaderActive: assistiveText.loaderActive,
-      }"
-      class="base-autocomplete-input__input-field"
-      @keydown.enter.prevent="onEnter"
-      @keydown.up.down.prevent="onArrowKey"
-      @keydown="onKeydown">
-      <template #below-input>
-        <BaseDropDownList
-          v-if="isActiveInt"
-          :active-option="activeOption"
-          :drop-down-options="filteredListInt"
-          :identifier-property-name="identifierPropertyName"
-          :label-property-name="labelPropertyName"
-          :list-id="`${inputId}-list-identifier`"
-          :language="language"
-          :drop-down-no-options-info="dropDownNoOptionsInfo"
-          :use-highlight-string-match="highlightStringMatch"
-          :highlight-string-tags="highlightStringTags"
-          :highlight-string-match="inputInt"
-          class="base-autocomplete-input__drop-down"
-          @click.stop=""
-          @touchstart.stop=""
-          @update:selected-option="selectOption">
-          <template #option="{ option }">
-            <!-- @slot provide custom drop down options
-              @binding {string, Object} item - the option from provided options list -->
-            <slot
-              :item="option"
-              name="drop-down-entry" />
-          </template>
-        </BaseDropDownList>
-      </template>
-      <template
-        #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="label-addition" />
-      </template>
-      <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="pre-input-field" />
-      </template>
-      <template
-        #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)-->
-        <slot name="input-field-inline-before" />
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="remove-icon" />
-      </template>
-    </BaseInput>
-  </div>
-</template>
-
-<script>
-import { ref } from 'vue';
+<script setup>
+import { computed, ref, watch } from 'vue';
 import { createId } from '@/utils/utils.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
- * Input component allowing to select single values from a drop down that are filled into
+ * Input component allowing to select single values from a drop-down that are filled into
  * the input field as string
  */
 
-export default {
-  name: 'BaseAutocompleteInput',
-  components: {
-    BaseInput,
-    BaseDropDownList,
-  },
-  props: {
+defineOptions({
+  inheritAttrs: false,
+});
+
+const props = defineProps({
     /**
      * input field settable from outside
      */
@@ -122,7 +25,7 @@ export default {
       default: '',
     },
     /**
-     * provide a list of options for the drop down.
+     * provide a list of options for the drop-down.
      * could be a list of strings or objects - if it is objects if necessary please adapt
      * the props `labelPropertyName` (value to be displayed) and `identifierPropertyName` (used for
      * identification) for correct handling
@@ -130,6 +33,26 @@ export default {
     list: {
       type: Array,
       default: () => [],
+      validator: (val) => {
+        // if the value is undefined return false
+        if (!val) return false;
+        // if it is an empty array always return true
+        if (!val.length) return true;
+        // else make sure the options are unique
+        let isUniqueList;
+        // if options are strings compare newly created set with original
+        if (val[0] === 'string') {
+          isUniqueList = val.length === Array.from(new Set(val)).length;
+        } else {
+          // if it is an object we need to stringify the object first before comparison
+          isUniqueList = val.length === Array.from(new Set(val.map(JSON.stringify))).length;
+        }
+        // also issue a warning to the user if options are not unique
+        if (!isUniqueList) {
+          console.warn('An option is appearing in the options list more than once!');
+        }
+        return isUniqueList;
+      }
     },
     /** label for input field, required for usability purposes, handle
      * showing of label with property `showLabel`
@@ -299,308 +222,400 @@ export default {
     },
     /**
      * add text that is announced when results are being fetched (prop
-     *  `isLoading` is set `true`) and when results were retrieved (drop down
+     *  `isLoading` is set `true`) and when results were retrieved (drop-down
      *  list changed)
      */
     assistiveText: {
       type: Object,
       default: () => ({
-        loaderActive: 'Drop down options are loading.',
+        loaderActive: 'drop-down options are loading.',
         resultsRetrieved: '{number} options found with your input.',
       }),
     },
-  },
-  emits: ['update:model-value', 'fetch-dropdown-entries', 'update:is-active', 'selected'],
-  setup() {
-    /**
-     * DROP DOWN NAVIGATION
-     */
-    const { navigate } = useListNavigation();
+  });
+const emits = defineEmits(['update:model-value', 'fetch-dropdown-entries', 'update:is-active', 'selected']);
 
-    /**
-     * ACCESSIBILITY ANNOUNCEMENTS
-     */
-    /**
-     * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
-     */
-    const autocompleteInput = ref(null);
-    // use composable to announce screen reader text on actions taken (e.g.
-    // add chip to selected list or remove chip
-    const { announcement } = useAnnouncer(autocompleteInput);
+/** ATTRS HANDLING */
+const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
-    return {
-      navigate,
-      autocompleteInput,
-      announcement,
-    };
+/** INPUT HANDLING */
+/**
+ * internal input representation passed on to BaseInput
+ * @type {Ref<UnwrapRef<string|Object|null>>}
+ */
+const inputInt = ref(null);
+
+/**
+ * watch modelValue prop to update internal representation
+ */
+watch(() => props.modelValue, (val) => {
+  if (val !== inputInt.value) {
+    inputInt.value = val;
+  }
+}, {
+  immediate: true,
+});
+
+/**
+ * watch internal input variable to inform parent of changes if necessary
+ * @param {Object|string} val
+ */
+watch(inputInt, (val) => {
+  if (val !== props.modelValue) {
+    /**
+     * event triggered when input changes - part of v-model
+     * @event update:model-value
+     * @param {string} - the altered input string
+     */
+    emits('update:model-value', val);
+  }
+  // if options should be fetched dynamically trigger event when inputInt changes
+  if (props.dynamicFetch) {
+    /**
+     * an event specifically triggered when drop-down should be fetched anew
+     * when `dynamicFetch` is set `true`
+     * @event fetch-dropdown-entries
+     * @property {string} value
+     */
+    emits('fetch-dropdown-entries', { value: val });
+  }
+});
+
+
+/** LIST HANDLING */
+
+/**
+ * determine if list prop is array of strings or objects
+ * @returns {ComputedRef<boolean>}
+ */
+const optionsIsListOfStrings = computed(() => {
+  return !!props.list && !!props.list.length && typeof props.list[0] === 'string';
+});
+/**
+ * compute an internal representation for the list to always have an
+ * object with identifier provided to BaseDropDownList
+ * @returns {ComputedRef<Object[]>}
+ */
+const listInt = computed((val) => {
+  // if list is array of objects - simply return the original prop value
+  return !optionsIsListOfStrings.value
+    // else map the array of strings with internal properties and an internal id
+    ? props.list : props.list.map((option) => {
+      // to not create a new id everytime the list changes but reuse already created id's by finding the
+      // option in `listInt`
+      const previousOptionValue = val ? val.find(({ [props.labelPropertyName]: label }) => option === label)
+        : undefined;
+      // if an option with the identical label string was found in listInt use the id of that one
+      const optionId = previousOptionValue ? previousOptionValue[props.identifierPropertyName]
+        // otherwise create a new id
+        : `${option}-${createId()}`
+      return ({
+        [props.labelPropertyName]: option,
+        [props.identifierPropertyName]: optionId,
+      });
+    });
+});
+
+/**
+ * additionally if the list is not fetched dynamically filter already selected
+ * options from the  list
+ * (since inputInt is always only string now this can only be done by comparing
+ * the label!)
+ * @returns {ComputedRef<Object[]>}
+ */
+const filteredListInt = computed(() => {
+  // check if list content is fetched dynamically
+  if (!props.dynamicFetch) {
+    // if not filter input string by label property
+    return listInt.value
+      .filter(option => option[props.labelPropertyName].toLowerCase()
+        .includes(inputInt.value.toLowerCase()));
+  }
+  // else just return the unmodified list
+  return listInt.value;
+});
+
+/**
+ * drop-down NAVIGATION // ACTIVE OPTION HANDLING
+ */
+const { navigate } = useListNavigation();
+/**
+ * needed for navigation via keyboard in drop-down list
+ * the index of the current active option in the list array
+ * @type {Ref<UnwrapRef<number>>}
+ */
+const activeOptionIndex = ref(-1);
+/**
+ * the currently active option object
+ */
+const activeOption = computed({
+  /**
+   * setter function of activeOption - will set active option index
+   * @param {?Object} val - the active option (by hover or arrow key use)
+   */
+  set(val) {
+    activeOptionIndex.value = filteredListInt.value.indexOf(val);
   },
-  data() {
-    return {
-      /**
-       * internal input representation passed on to BaseInput
-       * @type {?string|Object}
-       */
-      inputInt: null,
-      /**
-       * needed for navigation via keyboard in drop down list
-       * the index of the current active option in the list array
-       * @type {number}
-       */
-      activeOptionIndex: -1,
-      /**
-       * internal representation for active state of input and drop down
-       * @type {boolean}
-       */
-      isActiveInt: false,
-      /**
-       * timeout for drop down options found announcer because otherwise
-       * text not read if more than one character entered into input
-       * @type {?number}
-       */
-      timeout: null,
-    };
+  /**
+   * getter function for activeOption - determined by active option index
+   * @returns {ComputedRef<Object>}
+   */
+  get() {
+    return filteredListInt.value[activeOptionIndex.value];
   },
-  computed: {
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$attrs,
-        // and add custom listeners
-        ...{
-          // keep this input from propagating and use own event
-          // (handled this way because this input event is only triggered on
-          // keyboard input not when I select from the drop down)
-          onInput: () => {},
-          // keep this BaseInput event from propagating and use component's own event
-          'update:is-active': () => {},
-        },
-      };
-    },
+});
+
+/**
+ * event for keydown arrow (up, down) key use
+ *
+ * @param {KeyboardEvent} event - the keydown event
+ */
+function onArrowKey(event) {
+  // check if the list has any options
+  if (filteredListInt.value.length) {
+    // if yes trigger the navigate function
+    activeOption.value = navigate(
+      filteredListInt.value,
+      event.key === 'ArrowDown',
+      activeOptionIndex.value,
+      false,
+      true,
+    );
+  }
+}
+
+/** INPUT/DROP-DOWN ACTIVE HANDLING */
+
+/**
+ * internal representation for active state of input and drop-down
+ * @type {Ref<UnwrapRef<boolean>>}
+ */
+const isActiveInt = ref(false);
+
+/**
+ * watch prop isActive to sync with internal variable
+ */
+watch(() => props.isActive, (val) => {
+  // check first if internal and external variable differ
+  if (val !== isActiveInt.value) {
+    isActiveInt.value = val;
+  }
+}, {
+  immediate: true,
+});
+
+/**
+ * watch internal is active variable to be able to inform parent about
+ * changes
+ */
+watch(isActiveInt, (val) => {
+  // if input is not active anymore reset the active option index
+  if (!val) {
+    activeOptionIndex.value = -1;
+  }
+  /**
+   * update when active state of input field changes
+   * the v-model directive can be used on this event
+   * @event update:is-active
+   * @param {boolean} - is input field active
+   */
+  emits('update:is-active', val);
+});
+
+/**
+ * if user continues typing after 'enter' (which closes the drop-down)
+ * the dropdown should open again
+ */
+function onKeydown(event) {
+  const { key } = event;
+  if (!['Tab', 'Enter'].includes(key)) {
+    isActiveInt.value = true;
+  }
+}
+
+/** SELECT OPTION */
+
+/**
+ * triggered on keydown enter event and will add
+ * a selected option
+ */
+function onEnter() {
+  // check if there is a currently active option
+  if (activeOption.value) {
+    selectOption(activeOption.value);
+    // if enter was not pressed to add an option from the drop-down
+    // still close the drop-down
+  } else {
+    isActiveInt.value = false;
+  }
+}
+
+/**
+ * @param {Object} selectedOption - the option selected from drop-down or by keyboard
+ * enter - always an object due to internal identifier prop added in case it was a string
+ */
+function selectOption(selectedOption) {
+  // assign the newly selected value to the input field (only the string from label prop!)
+  inputInt.value = selectedOption[props.labelPropertyName];
+  // if options list was objects also inform parent which option was selected separately
+  if (!optionsIsListOfStrings.value) {
+    // therefore identify the selected option from the list
+    const originalOption = props.list
+      .find(option => option[props.identifierPropertyName]
+        === selectedOption[props.identifierPropertyName]);
+    emits('selected', originalOption);
+  } else {
     /**
-     * compute an internal representation for the list to always have an
-     * object with identifier provided to BaseDropDownList
-     * @returns {Object[]}
+     * inform parent when an option was selected with all information provided in options list
+     * (mainly useful when options list was array of objects - if strings this information
+     * is provided with input event anyways)
+     * @event selected
+     * @param {string, Object} - selected option (if list of objects was provided the whole object)
      */
-    listInt() {
-      // if list is array of objects - simply return the original prop value
-      return !this.optionsIsListOfStrings
-        // else map the array of strings with internal properties and an internal id
-        ? this.list : this.list.map(option => ({
-          [this.labelPropertyName]: option,
-          [this.identifierPropertyName]: `${option}-${createId()}`,
-        }));
-    },
-    /**
-     * additionally if the list is not fetched dynamically filter already selected
-     * options from the  list
-     * (since inputInt is always only string now this can only be done by comparing
-     * the label!)
-     */
-    filteredListInt() {
-      // check if list content is fetched dynamically
-      if (!this.dynamicFetch) {
-        // if not filter input string by label property
-        return this.listInt
-          .filter(option => option[this.labelPropertyName].toLowerCase()
-            .includes(this.inputInt.toLowerCase()));
-      }
-      // else just return the unmodified list
-      return this.listInt;
-    },
-    /**
-     * determine if list prop is array of strings or objects
-     * @returns {boolean}
-     */
-    optionsIsListOfStrings() {
-      return !!this.list && !!this.list.length && typeof this.list[0] === 'string';
-    },
-    /**
-     * the currently active option object
-     */
-    activeOption: {
-      /**
-       * setter function of activeOption - will set active option index
-       * @param {?Object} val - the active option (by hover or arrow key use)
-       */
-      set(val) {
-        this.activeOptionIndex = this.filteredListInt.indexOf(val);
-      },
-      /**
-       * getter function for activeOption - determined by active option index
-       * @returns {?Object}
-       */
-      get() {
-        return this.filteredListInt[this.activeOptionIndex];
-      },
-    },
-  },
-  watch: {
-    /**
-     * watch modelValue prop to update internal representation
-     */
-    modelValue: {
-      handler(val) {
-        if (val !== this.inputInt) {
-          this.inputInt = val;
-        }
-      },
-      immediate: true,
-    },
-    /**
-     * watch internal input variable to inform parent of changes if necessary
-     * @param {Object|string} val
-     */
-    inputInt(val) {
-      if (val !== this.modelValue) {
-        /**
-         * event triggered when input changes - part of v-model
-         * @event update:model-value
-         * @param {string} - the altered input string
-         */
-        this.$emit('update:model-value', val);
-      }
-      // if options should be fetched dynamically trigger event when inputInt changes
-      if (this.dynamicFetch) {
-        /**
-         * an event specifically triggered when drop down should be fetched anew
-         * when `dynamicFetch` is set `true`
-         * @event fetch-dropdown-entries
-         * @property {string} value
-         */
-        this.$emit('fetch-dropdown-entries', { value: val });
-      }
-    },
-    isActive: {
-      /**
-       * watch prop isActive to sync with internal variable
-       * @param {boolean} val - is input active
-       */
-      handler(val) {
-        // check first if internal and external variable differ
-        if (val !== this.isActiveInt) {
-          this.isActiveInt = val;
-        }
-      },
-      immediate: true,
-    },
-    /**
-     * watch internal is active variable to be able to inform parent about
-     * changes
-     * @param {boolean} val
-     */
-    isActiveInt(val) {
-      // if input is not active anymore reset the active option index
-      if (!val) {
-        this.activeOptionIndex = -1;
-      }
-      /**
-       * update when active state of input field changes
-       * the v-model directive can be used on this event
-       * @event update:is-active
-       * @param {boolean} - is input field active
-       */
-      this.$emit('update:is-active', val);
-    },
-    filteredListInt(val) {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout = null;
-      }
-      // adding this timeout because with dynamicFetch false the list
-      // changes immediately and announcement text is not always read
-      this.timeout = setTimeout(() => {
-        // only read announcement if drop down is open
-        if (this.isActiveInt) {
-          if (val.length) {
-            this.announcement = this.assistiveText.resultsRetrieved ? this.assistiveText.resultsRetrieved
-              .replace('{number}', val.length) : '';
-          } else {
-            this.announcement = this.dropDownNoOptionsInfo;
-          }
-        }
-      }, 1000);
-    },
-  },
-  methods: {
-    /**
-     * event for keydown arrow (up, down) key use
-     *
-     * @param {KeyboardEvent} event - the keydown event
-     */
-    onArrowKey(event) {
-      // check if the list has any options
-      if (this.filteredListInt.length) {
-        // if yes trigger the navigate function
-        this.activeOption = this.navigate(
-          this.filteredListInt,
-          event.key === 'ArrowDown',
-          this.activeOptionIndex,
-          false,
-          true,
-        );
-      }
-    },
-    /**
-     * triggered on keydown enter event and will add
-     * a selected option
-     */
-    onEnter() {
-      // check if there is a currently active option
-      if (this.activeOption) {
-        this.selectOption(this.activeOption);
-        // if enter was not pressed to add an option from the drop down
-        // use it to toggle the drop down
+    emits('selected', inputInt.value);
+  }
+  // close the drop-down and blur input
+  isActiveInt.value = false;
+}
+
+/** ACCESSIBILITY ANNOUNCEMENTS */
+/**
+ * set up component reference
+ * @type {Ref<UnwrapRef<null|HTMLElement>>}
+ */
+const autocompleteInput = ref(null);
+// use composable to announce screen reader text on actions taken (e.g.
+// add chip to selected list or remove chip
+const { announcement } = useAnnouncer(autocompleteInput);
+/**
+ * timeout for drop-down options found announcer because otherwise
+ * text not read if more than one character entered into input
+ * @type {Ref<UnwrapRef<null|number>>}
+ */
+const timeout = ref(null);
+
+watch(filteredListInt, (val) => {
+  if (timeout.value) {
+    clearTimeout(timeout.value);
+    timeout.value = null;
+  }
+  // adding this timeout because with dynamicFetch false the list
+  // changes immediately and announcement text is not always read
+  timeout.value = setTimeout(() => {
+    // only read announcement if drop-down is open
+    if (isActiveInt.value) {
+      if (val.length) {
+        announcement.value = props.assistiveText.resultsRetrieved ? props.assistiveText.resultsRetrieved
+          .replace('{number}', val.length) : '';
       } else {
-        this.isActiveInt = false;
+        announcement.value = props.dropDownNoOptionsInfo;
       }
-    },
-    /**
-     * if user continues typing after 'enter' (which closes the drop down)
-     * the dropdown should open again
-     */
-    onKeydown(event) {
-      const { key } = event;
-      if (!['Tab', 'Enter'].includes(key)) {
-        this.isActiveInt = true;
-      }
-    },
-    /**
-     * function to toggle the drop down e.g. on space or enter key
-     */
-    toggleDropDown() {
-      this.isActiveInt = !this.isActiveInt;
-    },
-    /**
-     * @param {Object} selectedOption - the option selected from drop down or by keyboard
-     * enter - always an object due to internal identifier prop added in case it was a string
-     */
-    selectOption(selectedOption) {
-      // assign the newly selected value to the input field (only the string from label prop!)
-      this.inputInt = selectedOption[this.labelPropertyName];
-      // if options list was objects also inform parent which option was selected separately
-      if (!this.optionsIsListOfStrings) {
-        // therefore identify the selected option from the list
-        const originalOption = this.list
-          .find(option => option[this.identifierPropertyName]
-            === selectedOption[this.identifierPropertyName]);
-        this.$emit('selected', originalOption);
-      } else {
-        /**
-         * inform parent when an option was selected with all information provided in options list
-         * (mainly useful when options list was array of objects - if strings this information
-         * is provided with input event anyways)
-         * @event selected
-         * @param {string, Object} - selected option (if list of objects was provided the whole object)
-         */
-        this.$emit('selected', this.inputInt);
-      }
-      // close the drop down and blur input
-      this.isActiveInt = false;
-    },
-  },
-};
+    }
+  }, 1000);
+});
 </script>
+
+<template>
+  <div
+    ref="autocompleteInput"
+    v-bind="rootAttrs"
+    class="base-autocomplete-input">
+    <BaseInput
+      v-model="inputInt"
+      v-model:is-active="isActiveInt"
+      v-bind="forwardAttrs"
+      :aria-autocomplete="'list'"
+      :aria-controls="`${inputId}-list-identifier`"
+      :aria-expanded="isActiveInt"
+      :aria-haspopup="'listbox'"
+      :input-id="inputId"
+      :label="label"
+      :show-label="showLabel"
+      :placeholder="placeholder"
+      :required="required"
+      :invalid="invalid"
+      :error-message="errorMessage"
+      :show-error-icon="showErrorIcon"
+      :use-form-field-styling="useFormFieldStyling"
+      :show-input-border="showInputBorder"
+      :clearable="clearable"
+      :loadable="loadable"
+      :is-loading="isLoading"
+      :language="language"
+      :disabled="disabled"
+      :drop-down-list-id="`${inputId}-list-identifier`"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
+      role="combobox"
+      class="base-autocomplete-input__input-field"
+      @keydown.enter.prevent="onEnter"
+      @keydown.up.down.prevent="onArrowKey"
+      @keydown="onKeydown">
+      <template #below-input>
+        <BaseDropDownList
+          v-if="isActiveInt"
+          :active-option="activeOption"
+          :drop-down-options="filteredListInt"
+          :identifier-property-name="identifierPropertyName"
+          :label-property-name="labelPropertyName"
+          :list-id="`${inputId}-list-identifier`"
+          :language="language"
+          :drop-down-no-options-info="dropDownNoOptionsInfo"
+          :use-highlight-string-match="highlightStringMatch"
+          :highlight-string-tags="highlightStringTags"
+          :highlight-string-match="inputInt"
+          class="base-autocomplete-input__drop-down"
+          @click.stop
+          @touchstart.stop
+          @update:selected-option="selectOption">
+          <template #option="{ option }">
+            <!-- @slot provide custom drop-down options
+              @binding {string, Object} item - the option from provided options list -->
+            <slot
+              :item="option"
+              name="drop-down-entry" />
+          </template>
+        </BaseDropDownList>
+      </template>
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="label-addition" />
+      </template>
+      <template #pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="pre-input-field" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)-->
+        <slot name="input-field-inline-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="remove-icon" />
+      </template>
+    </BaseInput>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .base-autocomplete-input {
