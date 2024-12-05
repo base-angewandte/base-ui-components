@@ -92,6 +92,7 @@
             <!-- wrapped in a button for accessibility -->
             <button
               v-if="showRemoveIcon"
+              :id="`${idInt}-remove-icon`"
               class="base-input__remove-icon-wrapper"
               @keydown.tab="blurInput"
               @click.stop="removeInput">
@@ -634,7 +635,9 @@ export default {
      */
     isActiveInt(val) {
       // if active was set true focus the input field
-      if (this.inputElement && val && this.setFocusOnActive) {
+      if (this.inputElement && val && this.setFocusOnActive
+        // however do not take away the focus from the remove button
+        && document.activeElement?.id !== `${this.idInt}-remove-icon`) {
         this.inputElement.focus();
       }
       /**
