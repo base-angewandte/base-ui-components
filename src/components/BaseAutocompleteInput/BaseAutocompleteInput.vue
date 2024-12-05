@@ -424,14 +424,14 @@ export default {
        * @param {?Object} val - the active option (by hover or arrow key use)
        */
       set(val) {
-        this.activeOptionIndex = this.listInt.indexOf(val);
+        this.activeOptionIndex = this.filteredListInt.indexOf(val);
       },
       /**
        * getter function for activeOption - determined by active option index
        * @returns {?Object}
        */
       get() {
-        return this.listInt[this.activeOptionIndex];
+        return this.filteredListInt[this.activeOptionIndex];
       },
     },
   },
@@ -530,10 +530,10 @@ export default {
      */
     onArrowKey(event) {
       // check if the list has any options
-      if (this.listInt.length) {
+      if (this.filteredListInt.length) {
         // if yes trigger the navigate function
         this.activeOption = this.navigate(
-          this.listInt,
+          this.filteredListInt,
           event.key === 'ArrowDown',
           this.activeOptionIndex,
           false,
