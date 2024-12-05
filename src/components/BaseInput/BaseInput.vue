@@ -59,15 +59,17 @@
               <slot
                 :id="idInt"
                 name="input">
+                <!-- instead of v-model we need to use :value because on android chrome value is not updated properly otherwise
+                also see https://stackoverflow.com/questions/75477442/vue-3-v-model-not-properly-updating-on-in-andoids-chrome -->
                 <!-- need to disable because label is there (below)? -->
                 <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                 <input
                   :id="idInt"
                   ref="input"
-                  v-model="inputInt"
                   v-bind="forwardAttrs"
+                  :value="inputInt"
                   :placeholder="placeholder"
-                  :type="fieldType === 'number' ? 'text' : fieldType"
+                  :type="isFieldTypeNumber ? 'text' : fieldType"
                   :list="dropDownListId || null"
                   :disabled="disabled"
                   :aria-disabled="disabled.toString()"
@@ -457,7 +459,7 @@ export default {
      * store the input v-model value
      * @type {Ref<UnwrapRef<string>>}
      */
-    const inputInt = ref(null);
+    const inputInt = ref('');
     /**
      * get the appropriate value for <input> attribute `inputmode` in case
      * input is of type number
@@ -491,9 +493,9 @@ export default {
       if (window) {
         // if input element exists in ref use this one
         if (input.value) {
-          return input;
+          return input.value;
         }
-        // otherwise check for an custom element by id
+        // otherwise check for a custom element by id
         const tempElement = document.getElementById(idInt.value);
         // check if element exists
         if (tempElement) {
@@ -541,6 +543,7 @@ export default {
       showRemoveIcon,
       inputInt,
       inputMode,
+      input,
       inputElement,
       inputFrame,
       isActiveInt,
@@ -568,6 +571,9 @@ export default {
     };
   },
   computed: {
+    isFieldTypeNumber() {
+      return this.fieldType === 'number';
+    },
     /**
      * compute actual invalid state considering value provided by parent
      * and internal validation state
@@ -586,13 +592,13 @@ export default {
         // since internally all values are handled as strings we need to parse input
         // with fieldType 'number' and also place the correct decimal separator
         // since type float comes with '.'
-        let parsedValue = this.fieldType === 'number'
+        let parsedValue = this.isFieldTypeNumber
           ? this.translateFloat(val) : val;
 
         // now check if the value provided by parent is actually different from current
         // internal value
         if (parsedValue !== this.inputInt) {
-          if (this.fieldType === 'number') {
+          if (this.isFieldTypeNumber) {
             // in case prop `decimals` is set (to not -1) add the appropriate number
             // of decimal places to the number
             // if data is null leave the field empty
@@ -675,7 +681,7 @@ export default {
      * @param event
      */
     onKeydown(event) {
-      if (this.fieldType === 'number') {
+      if (this.isFieldTypeNumber) {
         const { key, ctrlKey } = event;
         const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Shift', 'Control', '[0-9]', '\\.', ',', 'e', '-', '\\+'];
         const allowedKeysRegex = new RegExp(`(${allowedKeys.join('|')})`);
@@ -695,6 +701,9 @@ export default {
       const validatedValue = this.validate(event.target.value);
       // only emit if a value was returned from the validateFunction
       if (validatedValue !== undefined) {
+        // we need to update the value manually here since it is not updated
+        // through v-model on time for the event emit on some mobile devices
+        this.inputInt = validatedValue;
         // store input to use/reset if validation fails
         this.previousInput = validatedValue;
         // and inform parent of the input update
@@ -706,7 +715,7 @@ export default {
      */
     updateModelValue() {
       let parsedValue = this.inputInt;
-      if (this.fieldType === 'number') {
+      if (this.isFieldTypeNumber) {
         // since internally value is always handled as string we need to transform
         // it back to a number in case field type is 'number' and also add the correct
         // decimal separator for type number ('.') again
@@ -742,7 +751,7 @@ export default {
         this.setFieldState(false);
       }
       // 2) check for fieldType number
-      if (this.fieldType === 'number') {
+      if (this.isFieldTypeNumber) {
         // clear value and return if value is NaN
         if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
           this.inputInt = '';
@@ -836,7 +845,7 @@ export default {
       // Handle number inputs with input field type text.
       // Use a regular expression to validate the number format.
       // Invalid entries are restored with the previous valid value.
-      if (this.fieldType === 'number') {
+      if (this.isFieldTypeNumber) {
         const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
         // if field type is number disallow every character except 0-9, e, +, - and the correct
         // decimal separator
