@@ -1,5 +1,6 @@
 <template>
   <div
+    v-bind="rootAttrs"
     class="base-input">
     <!-- LABEL ROW -->
     <div
@@ -64,7 +65,7 @@
                   :id="idInt"
                   ref="input"
                   v-model="inputInt"
-                  v-bind="$attrs"
+                  v-bind="forwardAttrs"
                   :placeholder="placeholder"
                   :type="fieldType === 'number' ? 'text' : fieldType"
                   :list="dropDownListId || null"
@@ -148,6 +149,7 @@ import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
 import { useI18n } from '@/composables/useI18n.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
  * Form Input Field Component
@@ -437,6 +439,9 @@ export default {
       idInt.value = useId();
     }
 
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
     /** LABEL ROW DISPLAY */
     /**
      * variable to define if label low (with margin) should be displayed or not
@@ -530,6 +535,8 @@ export default {
     });
     return {
       idInt,
+      rootAttrs,
+      forwardAttrs,
       showLabelRow,
       showRemoveIcon,
       inputInt,
