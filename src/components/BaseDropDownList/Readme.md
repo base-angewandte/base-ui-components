@@ -74,9 +74,10 @@ An example connected with an input field (displayAsDropDown: false) using all ki
     <BaseChipsInputField
       v-model="input"
       v-model:selected-list="selectedList"
-      :show-label="false"
-      :linked-list-option="active?.id ? active.id : null"
       :allow-unknown-entries="false"
+      :language="language"
+      :linked-list-option="active?.id ? active.id : null"
+      :show-label="false"
       drop-down-list-id="aSimpleTestList"
       identifier-property-name="id"
       label-property-name="value"
