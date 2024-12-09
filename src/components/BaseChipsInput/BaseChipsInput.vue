@@ -49,7 +49,8 @@
                 ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
                 : `${getI18nTerm('form.Add', -1, {
                   value: getLangLabel(option[labelPropertyName], true),
-                })} ...` }}
+                // if there is no i18n getI18nTerm will not return the value - so add it here manually
+                })} ${hasI18n ? '' : getLangLabel(option[labelPropertyName], true) }...` }}
             </span>
             <template
               v-else-if="option">
@@ -498,7 +499,7 @@ export default {
     /** DROP DOWN NAVIGATION */
     const { navigate } = useListNavigation();
     /** LOCALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
+    const { getLangLabel, getI18nTerm, hasI18n } = useI18n(toRef(props, 'language'));
     /** COMPONENT ID */
     // create an internal id in case there is none provided via props
     const createdId = useId();
