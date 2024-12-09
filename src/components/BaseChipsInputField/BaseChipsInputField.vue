@@ -1,6 +1,7 @@
 <template>
   <div
     ref="chipsInputField"
+    v-bind="rootAttrs"
     class="base-chips-input-field">
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
@@ -8,7 +9,7 @@
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       :input-id="internalId"
-      v-bind="inputListeners"
+      v-bind="forwardAttrs"
       :field-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
@@ -168,13 +169,13 @@
 
 <script>
 import { computed, defineAsyncComponent, ref } from 'vue';
-import { VueDraggable } from 'vue-draggable-plus';
 import { sort, createId } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import { useId } from '@/composables/useId.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /** input field with chips functionalities */
 
@@ -183,11 +184,12 @@ export default {
   components: {
     BaseInput,
     BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
-    VueDraggable,
+    VueDraggable: defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable)),
   },
+  inheritAttrs: false,
   props: {
     /**
-     if field is occurring more then once - set an id
+     if field is occurring more than once - set an id
      */
     inputId: {
       type: String,
@@ -329,7 +331,7 @@ export default {
       default: true,
     },
     /**
-     * specify the id of a linked drop down list
+     * specify the id of a linked drop-down list
      */
     dropDownListId: {
       type: String,
@@ -513,6 +515,13 @@ export default {
   setup(props) {
     /** INTERNAL ID */
     const generatedId = useId();
+
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+    /**
+     * use the value provided by the composable
+     * @type {ComputedRef<string>}
+     */
     const internalId = computed(() => props.inputId || generatedId);
 
     /** LIST NAVIGATION */
@@ -532,6 +541,8 @@ export default {
     const { announcement } = useAnnouncer(chipsInputField);
     return {
       internalId,
+      rootAttrs,
+      forwardAttrs,
       navigate,
       getLangLabel,
       chipsInputField,
@@ -578,19 +589,6 @@ export default {
        */
       inputInt: '',
     };
-  },
-  computed: {
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$attrs,
-        // and add custom listeners
-        ...{
-          // keep this BaseInput event from propagating and use component's own event
-          'update:is-active': () => {},
-        },
-      };
-    },
   },
   watch: {
     /**
