@@ -1,4 +1,4 @@
-import {computed, getCurrentInstance, ref} from 'vue';
+import { computed, getCurrentInstance, ref } from 'vue';
 
 /**
  * component internal i18n functionality, will check if plugin exists

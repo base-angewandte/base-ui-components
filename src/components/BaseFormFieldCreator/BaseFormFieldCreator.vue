@@ -592,7 +592,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, toRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
@@ -851,7 +851,7 @@ export default {
   },
   emits: ['input-complete', 'fetch-autocomplete', 'field-value-changed', 'keydown', 'blur'],
   setup(props) {
-    const { getLangLabel, hasI18n, getI18nTerm, setLangLabels } = useI18n(props.language);
+    const { getLangLabel, hasI18n, getI18nTerm, setLangLabels } = useI18n(toRef(props, 'language'));
 
     return {
       getLangLabel,

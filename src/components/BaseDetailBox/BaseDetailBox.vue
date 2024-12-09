@@ -23,6 +23,7 @@
 <script>
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import { useI18n } from '@/composables/useI18n.js';
+import { toRef } from 'vue';
 
 export default {
   name: 'BaseDetailBox',
@@ -63,7 +64,7 @@ export default {
     },
   },
   setup(props) {
-    const { getLangLabel } = useI18n(props.language);
+    const { getLangLabel } = useI18n(toRef(props, 'language'));
     return {
       getLangLabel,
     };
