@@ -1,10 +1,10 @@
 <template>
   <div
     ref="chipsInput"
+    v-bind="rootAttrs"
     class="base-chips-input">
-    <!-- TODO: check if really ALL props should be forwarded -->
     <BaseChipsInputField
-      ref="baseInput"
+      ref="chipsInputField"
       v-model="input"
       v-model:selected-list="selectedListInt"
       v-model:is-active="chipsInputActive"
@@ -137,6 +137,7 @@ import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useId } from '@/composables/useId.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 
 /**
@@ -154,10 +155,7 @@ export default {
   directives: {
     insertTextAsHtml: InsertTextAsHtml,
   },
-  model: {
-    prop: 'selectedList',
-    event: 'selected-changed',
-  },
+  inheritAttrs: false,
   props: {
     /**
      * list of selectable options. needs to be a list with at least an identifier and a label
@@ -497,21 +495,31 @@ export default {
     /** LOCALIZATION */
     const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
     /** COMPONENT ID */
-    const internalId = computed(() => props.inputId || useId());
+    // create an internal id in case there is none provided via props
+    const createdId = useId();
+    /**
+     * provide an internal id
+     * @type {ComputedRef<string|number>}
+     */
+    const internalId = computed(() => props.inputId || createdId);
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
     /** INPUT ELEMENT HANDLING */
     /**
      * the BaseChipsInputField component
      * @type {Ref<UnwrapRef<null>>}
      */
-    const baseInput = ref(null);
+    const chipsInputField = ref(null);
 
     /**
      * get the HTML input element (in BaseInput)
      * @type {ComputedRef<null|HTMLElement>}
      */
     const inputElem = computed(() => {
-      if (!baseInput.value || !baseInput.value.$el) return null;
-      return baseInput.value.$el.getElementsByTagName('input')[0];
+      if (!chipsInputField.value || !chipsInputField.value.$el) return null;
+      const inputElements = chipsInputField.value.$el.getElementsByTagName('input');
+      return inputElements?.length ? inputElements[0] : null;
     });
     /**
      * ACCESSIBILITY ANNOUNCEMENT
@@ -529,9 +537,12 @@ export default {
       announcement,
       navigate,
       internalId,
+      rootAttrs,
+      forwardAttrs,
+      hasI18n,
       getLangLabel,
       getI18nTerm,
-      baseInput,
+      chipsInputField,
       inputElem,
     };
   },
@@ -586,7 +597,9 @@ export default {
      */
     chipsFieldInputProps() {
       const newProps = {
-        ...this.$attrs,
+        // all attributes not in props except for (class, style and data-base-id) and events will
+        // be forwarded to the native HTML input element
+        ...this.forwardAttrs,
         ...this.$props,
         // make sure the input id is always set
         inputId: this.$props.inputId || this.internalId,
@@ -758,8 +771,6 @@ export default {
     /**
      * input is watched for follow up actions needed after input
      * --> fetch autocomplete entries
-     * --> inform parent of input (this however is not needed anymore since
-     * events of $attrs (former $listeners) from input are now propagated to parent anyways!)
      * @param {string} val
      */
     input(val) {
@@ -967,7 +978,7 @@ export default {
      */
     calcDropDownMinWidth() {
       // get the base input element
-      const inputElement = this.$refs.baseInput;
+      const inputElement = this.$refs.chipsInputField;
       // see if it exists and has a width - if yes set drop down min width to the same
       if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
         this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
