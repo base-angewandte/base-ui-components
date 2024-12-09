@@ -338,7 +338,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, toRef } from 'vue';
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
 import { useI18n } from '@/composables/useI18n.js';
 
@@ -561,7 +561,7 @@ export default {
   emits: ['values-changed', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
   setup(props) {
     /** INTERNATIONALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(props.language);
+    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
 
     return {
       getLangLabel,

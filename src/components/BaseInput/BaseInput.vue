@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent, ref, computed } from 'vue';
+import { defineAsyncComponent, ref, computed, toRef } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
@@ -427,7 +427,7 @@ export default {
   setup(props, { emit, slots }) {
     /** LABEL and ERROR MESSAGE LOCALIZATION */
     const internalValidationMessage = ref('');
-    const { getLangLabel } = useI18n(props.language);
+    const { getLangLabel } = useI18n(toRef(props, 'language'));
     const labelLocalized = computed(() => getLangLabel(props.label));
     const errorMessageInt = computed(() => getLangLabel(internalValidationMessage.value || props.errorMessage));
 

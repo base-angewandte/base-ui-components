@@ -84,6 +84,7 @@ import { debounce } from '@/utils/utils.js';
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useI18n } from '@/composables/useI18n.js';
+import { toRef } from 'vue';
 
 /**
  * Accessible drop down component
@@ -191,7 +192,7 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props) {
-    const { getLangLabel } = useI18n(props.language);
+    const { getLangLabel } = useI18n(toRef(props, 'language'));
     return {
       getLangLabel,
     };

@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import { computed, ref, defineAsyncComponent } from 'vue';
+import { computed, ref, defineAsyncComponent, toRef } from 'vue';
 import { highlightText } from '@/utils/utils.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useI18n } from '@/composables/useI18n.js';
@@ -495,7 +495,7 @@ export default {
     /** DROP DOWN NAVIGATION */
     const { navigate } = useListNavigation();
     /** LOCALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(props.language);
+    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
     /** COMPONENT ID */
     const internalId = computed(() => props.inputId || useId());
     /** INPUT ELEMENT HANDLING */

@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, ref, toRef } from 'vue';
 import { sort, createId } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
@@ -528,7 +528,7 @@ export default {
     const { navigate } = useListNavigation();
 
     /** INTERNATIONALIZATION */
-    const { getLangLabel } = useI18n(props.language);
+    const { getLangLabel } = useI18n(toRef(props, 'language'));
 
     /** ACCESSIBILITY ANNOUNCEMENTS */
     /**
