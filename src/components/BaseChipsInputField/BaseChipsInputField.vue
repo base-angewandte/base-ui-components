@@ -1,173 +1,3 @@
-<template>
-  <div
-    ref="chipsInputField"
-    v-bind="rootAttrs"
-    class="base-chips-input-field">
-    <!-- INPUT LABEL AND FIELD -->
-    <BaseInput
-      ref="baseInput"
-      v-model="inputInt"
-      v-model:is-active="isActiveInt"
-      :input-id="internalId"
-      v-bind="forwardAttrs"
-      :field-type="inputType"
-      :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
-      :label="label"
-      :show-label="showLabel"
-      :show-input-border="showInputBorder"
-      :use-form-field-styling="useFormFieldStyling"
-      :drop-down-list-id="dropDownListId"
-      :linked-list-option="linkedListOption"
-      :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
-      :invalid="invalid"
-      :required="required"
-      :disabled="disabled"
-      :clearable="clearable"
-      :loadable="loadable"
-      :error-message="errorMessage"
-      :show-error-icon="showErrorIcon"
-      :is-loading="isLoading"
-      :input-class="inputClass"
-      :set-focus-on-active="setFocusOnActive"
-      :validation-texts="{}"
-      :assistive-text="{
-        loaderActive: assistiveText.loaderActive,
-      }"
-      @keydown.enter.prevent="addOption"
-      @keydown="checkKeyEvent">
-      <template
-        #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
-        <slot name="label-addition" />
-        <button
-          v-if="sortable"
-          :aria-label="`${label}. ${sortText.replace(/[—–-]/, 'to')}`"
-          type="button"
-          class="base-chips-input-field__sort"
-          @click="sortSelectedList(selectedListInt)">
-          {{ sortText }}
-        </button>
-      </template>
-      <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)-->
-        <slot name="pre-input-field" />
-      </template>
-      <template
-        #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
-        <slot name="input-field-addition-before" />
-        <div
-          v-if="displayChipsInline"
-          class="base-chips-input-field__chips">
-          <template v-if="draggable && !chipsEditable">
-            <VueDraggable
-              v-model="selectedListInt"
-              :set-data="setDragElement"
-              :animation="200"
-              handle=".base-chip__text"
-              drag-class="base-chips-input-field__chip--dragged"
-              class="base-chips-input-field__chips-transition"
-              @mousedown="onMouseDown"
-              @mouseup="onMouseUp"
-              @end="onDragEnd">
-              <TransitionGroup
-                :name="!drag ? 'flip-list' : null"
-                type="transition">
-                <template
-                  v-for="(entry, index) in selectedListInt">
-                  <!-- @slot a slot to provide customized chips
-                    @binding { object } entry - one selected option displayed as chip
-                    @binding { number } index - the index of the entry in the selectedList array
-                    @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
-                    @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
-                  -->
-                  <slot
-                    name="chip"
-                    v-bind="{
-                      entry,
-                      index,
-                      indexActiveForRemove,
-                      removeEntry,
-                    }">
-                    <BaseChip
-                      :id="entry.idInt"
-                      :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                      :model-value="getLangLabel(entry[labelPropertyName], true)"
-                      :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
-                        || !!entry[identifierPropertyName]"
-                      :chip-active="indexActiveForRemove === index"
-                      :is-removable="chipsRemovable"
-                      :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
-                      :class="['base-chips-input-field__chip--draggable', { 'base-chips-input-field__chip--dragging': drag }]"
-                      @remove-entry="removeEntry(entry, index)" />
-                  </slot>
-                </template>
-              </TransitionGroup>
-            </VueDraggable>
-          </template>
-          <template v-else>
-            <template
-              v-for="(entry, index) in selectedListInt">
-              <!-- @slot a slot to provide customized chips
-                @binding { object } entry - one selected option displayed as chip
-                @binding { number } index - the index of the entry in the selectedList array
-                @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
-                @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
-              -->
-              <slot
-                name="chip"
-                v-bind="{
-                  entry,
-                  index,
-                  indexActiveForRemove,
-                  removeEntry,
-                }">
-                <BaseChip
-                  :id="entry.idInt"
-                  :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
-                  :model-value="getLangLabel(entry[labelPropertyName], true)"
-                  :editable="chipsEditable"
-                  :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
-                    || !!entry[identifierPropertyName]"
-                  :chip-active="indexActiveForRemove === index"
-                  :assistive-text="assistiveText.selectedOption"
-                  :is-removable="chipsRemovable"
-                  :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
-                  @remove-entry="removeEntry(entry, index)"
-                  @update:model-value="modifyListEntry($event, index)" />
-              </slot>
-            </template>
-          </template>
-        </div>
-      </template>
-      <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap). for an example see [BaseInput](BaseInput)-->
-        <slot name="input-field-inline-before" />
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height -->
-        <slot name="post-input-field" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon -->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon -->
-        <slot name="remove-icon" />
-      </template>
-      <template #below-input>
-        <!-- @slot below-input slot added to e.g. add drop down -->
-        <slot name="below-input" />
-      </template>
-    </BaseInput>
-  </div>
-</template>
-
 <script>
 import { computed, defineAsyncComponent, ref, toRef } from 'vue';
 import { sort, createId } from '@/utils/utils.js';
@@ -965,6 +795,176 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="chipsInputField"
+    v-bind="rootAttrs"
+    class="base-chips-input-field">
+    <!-- INPUT LABEL AND FIELD -->
+    <BaseInput
+      ref="baseInput"
+      v-model="inputInt"
+      v-model:is-active="isActiveInt"
+      :input-id="internalId"
+      v-bind="forwardAttrs"
+      :field-type="inputType"
+      :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
+      :label="label"
+      :show-label="showLabel"
+      :show-input-border="showInputBorder"
+      :use-form-field-styling="useFormFieldStyling"
+      :drop-down-list-id="dropDownListId"
+      :linked-list-option="linkedListOption"
+      :hide-input-field="!allowMultipleEntries && !!selectedListInt.length"
+      :invalid="invalid"
+      :required="required"
+      :disabled="disabled"
+      :clearable="clearable"
+      :loadable="loadable"
+      :error-message="errorMessage"
+      :show-error-icon="showErrorIcon"
+      :is-loading="isLoading"
+      :input-class="inputClass"
+      :set-focus-on-active="setFocusOnActive"
+      :validation-texts="{}"
+      :assistive-text="{
+        loaderActive: assistiveText.loaderActive,
+      }"
+      @keydown.enter.prevent="addOption"
+      @keydown="checkKeyEvent">
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
+        <slot name="label-addition" />
+        <button
+          v-if="sortable"
+          :aria-label="`${label}. ${sortText.replace(/[—–-]/, 'to')}`"
+          type="button"
+          class="base-chips-input-field__sort"
+          @click="sortSelectedList(selectedListInt)">
+          {{ sortText }}
+        </button>
+      </template>
+      <template #pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)-->
+        <slot name="pre-input-field" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
+        <slot name="input-field-addition-before" />
+        <div
+          v-if="displayChipsInline"
+          class="base-chips-input-field__chips">
+          <template v-if="draggable && !chipsEditable">
+            <VueDraggable
+              v-model="selectedListInt"
+              :set-data="setDragElement"
+              :animation="200"
+              handle=".base-chip__text"
+              drag-class="base-chips-input-field__chip--dragged"
+              class="base-chips-input-field__chips-transition"
+              @mousedown="onMouseDown"
+              @mouseup="onMouseUp"
+              @end="onDragEnd">
+              <TransitionGroup
+                :name="!drag ? 'flip-list' : null"
+                type="transition">
+                <template
+                  v-for="(entry, index) in selectedListInt">
+                  <!-- @slot a slot to provide customized chips
+                    @binding { object } entry - one selected option displayed as chip
+                    @binding { number } index - the index of the entry in the selectedList array
+                    @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                    @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
+                  -->
+                  <slot
+                    name="chip"
+                    v-bind="{
+                      entry,
+                      index,
+                      indexActiveForRemove,
+                      removeEntry,
+                    }">
+                    <BaseChip
+                      :id="entry.idInt"
+                      :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                      :model-value="getLangLabel(entry[labelPropertyName], true)"
+                      :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                        || !!entry[identifierPropertyName]"
+                      :chip-active="indexActiveForRemove === index"
+                      :is-removable="chipsRemovable"
+                      :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
+                      :class="['base-chips-input-field__chip--draggable', { 'base-chips-input-field__chip--dragging': drag }]"
+                      @remove-entry="removeEntry(entry, index)" />
+                  </slot>
+                </template>
+              </TransitionGroup>
+            </VueDraggable>
+          </template>
+          <template v-else>
+            <template
+              v-for="(entry, index) in selectedListInt">
+              <!-- @slot a slot to provide customized chips
+                @binding { object } entry - one selected option displayed as chip
+                @binding { number } index - the index of the entry in the selectedList array
+                @binding { number } indexActiveForRemove - the index of the chip that is currently active to be removed (for keyboard handling)
+                @binding { function } removeEntry - function to remove the entry from selectedList, needs `entry` and `index` as arguments
+              -->
+              <slot
+                name="chip"
+                v-bind="{
+                  entry,
+                  index,
+                  indexActiveForRemove,
+                  removeEntry,
+                }">
+                <BaseChip
+                  :id="entry.idInt"
+                  :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
+                  :model-value="getLangLabel(entry[labelPropertyName], true)"
+                  :editable="chipsEditable"
+                  :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
+                    || !!entry[identifierPropertyName]"
+                  :chip-active="indexActiveForRemove === index"
+                  :assistive-text="assistiveText.selectedOption"
+                  :is-removable="chipsRemovable"
+                  :interpret-text-as-html="interpretChipsLabelAsHtml && !!entry[identifierPropertyName]"
+                  @remove-entry="removeEntry(entry, index)"
+                  @update:model-value="modifyListEntry($event, index)" />
+              </slot>
+            </template>
+          </template>
+        </div>
+      </template>
+      <template #input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap). for an example see [BaseInput](BaseInput)-->
+        <slot name="input-field-inline-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height -->
+        <slot name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon -->
+        <slot name="remove-icon" />
+      </template>
+      <template #below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
+        <slot name="below-input" />
+      </template>
+    </BaseInput>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;

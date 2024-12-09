@@ -1,140 +1,3 @@
-<template>
-  <div
-    ref="chipsInput"
-    v-bind="rootAttrs"
-    class="base-chips-input">
-    <BaseChipsInputField
-      ref="chipsInputField"
-      v-model="input"
-      v-model:selected-list="selectedListInt"
-      v-model:is-active="chipsInputActive"
-      v-bind="chipsFieldInputProps"
-      :aria-autocomplete="'list'"
-      :aria-controls="`${internalId}-list-identifier`"
-      :aria-expanded="chipsInputActive"
-      :aria-haspopup="'listbox'"
-      :input-type="inputType"
-      :add-selected-entry-directly="false"
-      :drop-down-list-id="internalId"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :loadable="allowDynamicDropDownEntries"
-      role="combobox"
-      @keydown.enter.prevent="onEnter"
-      @keydown.up.down.prevent="onArrowKey"
-      @keydown="checkKeyEvent"
-      @click-input-field="onInputFocus"
-      @clicked-outside="onInputBlur">
-      <template #below-input>
-        <BaseDropDownList
-          v-if="chipsInputActive"
-          ref="dropDownList"
-          v-model:active-option="activeOption"
-          v-model:selected-option="selectedOption"
-          :drop-down-options="listInt"
-          :identifier-property-name="identifierPropertyName"
-          :label-property-name="labelPropertyName"
-          :list-id="internalId"
-          :style="{ 'min-width': dropDownMinWidth }"
-          :language="language"
-          :drop-down-no-options-info="dropDownNoOptionsInfo"
-          class="base-chips-input__drop-down"
-          @click.stop="closeDropDown"
-          @touchstart.stop="closeDropDown">
-          <template #option="{ option }">
-            <span
-              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
-              ref="option"
-              :key="option[labelPropertyName]">
-              {{ addNewChipText
-                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
-                : `${getI18nTerm('form.Add', -1, {
-                  value: getLangLabel(option[labelPropertyName], true),
-                // if there is no i18n getI18nTerm will not return the value - so add it here manually
-                })} ${hasI18n ? '' : getLangLabel(option[labelPropertyName], true) }...` }}
-            </span>
-            <template
-              v-else-if="option">
-              <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
-                @binding {Object} item - the option passed to options list -->
-              <slot
-                :item="option"
-                name="drop-down-entry">
-                <!-- SLOT DEFAULT -->
-                <span
-                  v-if="option[identifierPropertyName]"
-                  :key="option[identifierPropertyName]"
-                  v-insert-text-as-html="{
-                    value: highlightStringMatch
-                      ? highlight(getLangLabel(option[labelPropertyName], true))
-                      : getLangLabel(option[labelPropertyName], true),
-                    interpretTextAsHtml: interpretChipsLabelAsHtml,
-                  }" />
-              </slot>
-            </template>
-          </template>
-          <template
-            #no-options>
-            <!-- @slot a slot to customize messages in case of no options present in drop down -->
-            <slot
-              name="no-options" />
-          </template>
-        </BaseDropDownList>
-        <!-- @slot to add elements below input fields e.g. add drop down -->
-        <slot name="below-input" />
-      </template>
-      <template
-        #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="label-addition" />
-      </template>
-      <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="pre-input-field" />
-      </template>
-      <template
-        #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-inline-before" />
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-        <div
-          v-if="!allowMultipleEntries"
-          class="base-chips-input__single-dropdown"
-          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
-          @click.stop="chipsInputActive = !chipsInputActive">
-          <BaseIcon
-            :class="[
-              'base-chips-input__single-dropdown-icon',
-              {
-                'base-chips-input__single-dropdown-icon-rotated':
-                  chipsInputActive,
-              },
-            ]"
-            name="drop-down" />
-        </div>
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField).-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField). -->
-        <slot name="remove-icon" />
-      </template>
-    </BaseChipsInputField>
-  </div>
-</template>
-
 <script>
 import { computed, ref, defineAsyncComponent, toRef } from 'vue';
 import { highlightText } from '@/utils/utils.js';
@@ -1018,6 +881,143 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="chipsInput"
+    v-bind="rootAttrs"
+    class="base-chips-input">
+    <BaseChipsInputField
+      ref="chipsInputField"
+      v-model="input"
+      v-model:selected-list="selectedListInt"
+      v-model:is-active="chipsInputActive"
+      v-bind="chipsFieldInputProps"
+      :aria-autocomplete="'list'"
+      :aria-controls="`${internalId}-list-identifier`"
+      :aria-expanded="chipsInputActive"
+      :aria-haspopup="'listbox'"
+      :input-type="inputType"
+      :add-selected-entry-directly="false"
+      :drop-down-list-id="internalId"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :loadable="allowDynamicDropDownEntries"
+      role="combobox"
+      @keydown.enter.prevent="onEnter"
+      @keydown.up.down.prevent="onArrowKey"
+      @keydown="checkKeyEvent"
+      @click-input-field="onInputFocus"
+      @clicked-outside="onInputBlur">
+      <template #below-input>
+        <BaseDropDownList
+          v-if="chipsInputActive"
+          ref="dropDownList"
+          v-model:active-option="activeOption"
+          v-model:selected-option="selectedOption"
+          :drop-down-options="listInt"
+          :identifier-property-name="identifierPropertyName"
+          :label-property-name="labelPropertyName"
+          :list-id="internalId"
+          :style="{ 'min-width': dropDownMinWidth }"
+          :language="language"
+          :drop-down-no-options-info="dropDownNoOptionsInfo"
+          class="base-chips-input__drop-down"
+          @click.stop="closeDropDown"
+          @touchstart.stop="closeDropDown">
+          <template #option="{ option }">
+            <span
+              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
+              ref="option"
+              :key="option[labelPropertyName]">
+              {{ addNewChipText
+                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
+                : `${getI18nTerm('form.Add', -1, {
+                  value: getLangLabel(option[labelPropertyName], true),
+                  // if there is no i18n getI18nTerm will not return the value - so add it here manually
+                })} ${hasI18n ? '' : getLangLabel(option[labelPropertyName], true) }...` }}
+            </span>
+            <template
+              v-else-if="option">
+              <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
+                @binding {Object} item - the option passed to options list -->
+              <slot
+                :item="option"
+                name="drop-down-entry">
+                <!-- SLOT DEFAULT -->
+                <span
+                  v-if="option[identifierPropertyName]"
+                  :key="option[identifierPropertyName]"
+                  v-insert-text-as-html="{
+                    value: highlightStringMatch
+                      ? highlight(getLangLabel(option[labelPropertyName], true))
+                      : getLangLabel(option[labelPropertyName], true),
+                    interpretTextAsHtml: interpretChipsLabelAsHtml,
+                  }" />
+              </slot>
+            </template>
+          </template>
+          <template
+            #no-options>
+            <!-- @slot a slot to customize messages in case of no options present in drop down -->
+            <slot
+              name="no-options" />
+          </template>
+        </BaseDropDownList>
+        <!-- @slot to add elements below input fields e.g. add drop down -->
+        <slot name="below-input" />
+      </template>
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="label-addition" />
+      </template>
+      <template #pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="pre-input-field" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field \<div\> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-inline-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+        <div
+          v-if="!allowMultipleEntries"
+          class="base-chips-input__single-dropdown"
+          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
+          @click.stop="chipsInputActive = !chipsInputActive">
+          <BaseIcon
+            :class="[
+              'base-chips-input__single-dropdown-icon',
+              {
+                'base-chips-input__single-dropdown-icon-rotated':
+                  chipsInputActive,
+              },
+            ]"
+            name="drop-down" />
+        </div>
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField).-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField). -->
+        <slot name="remove-icon" />
+      </template>
+    </BaseChipsInputField>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
