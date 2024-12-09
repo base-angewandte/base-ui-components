@@ -63,11 +63,12 @@
             <VueDraggable
               v-model="selectedListInt"
               :set-data="setDragElement"
-              :force-fallback="true"
               :animation="200"
               handle=".base-chip__text"
+              drag-class="base-chips-input-field__chip--dragged"
               class="base-chips-input-field__chips-transition"
-              @start="drag = true"
+              @mousedown="onMouseDown"
+              @mouseup="onMouseUp"
               @end="onDragEnd">
               <TransitionGroup
                 :name="!drag ? 'flip-list' : null"
@@ -922,6 +923,7 @@ export default {
      * @param {HTMLElement} dragEl - the dragged HTML Element
      */
     setDragElement(dataTransfer, dragEl) {
+      this.drag = true;
       const img = dragEl.cloneNode(true);
       img.id = 'chip-inline-drag';
       img.style.position = 'absolute';
@@ -931,6 +933,22 @@ export default {
       // add the element to the dom
       document.body.appendChild(img);
       dataTransfer.setDragImage(img, 0, 0);
+    },
+    /**
+     * set the appropriate cursor on mouse down by adding a class
+     * (if it is set on drag start there is a short period where
+     * cursor does not match action)
+     */
+    onMouseDown() {
+      if (this.draggable) {
+        this.drag = true;
+      }
+    },
+    /**
+     * remove that class again by setting drag false
+     */
+    onMouseUp() {
+      this.drag = false;
     },
     onDragEnd() {
       this.drag = false;
@@ -962,11 +980,22 @@ export default {
         display: flex;
         flex-wrap: wrap;
 
+        // needed at least for Firefox
+        .base-chips-input-field__chip--dragged {
+          cursor: grabbing;
+        }
+
         .base-chips-input-field__chip--draggable {
-          cursor: grab;
+          &:hover {
+            cursor: grab;
+          }
 
           &.base-chips-input-field__chip--dragging {
-            user-select: none;
+            &:deep(.base-chip__text) {
+              &:active, &:focus {
+                cursor: grabbing;
+              }
+            }
           }
         }
       }
