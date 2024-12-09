@@ -140,6 +140,12 @@ function clicked() {
   list-style: none;
 }
 
+.preview {
+  li + li {
+    margin: 0;
+  }
+}
+
 .preview h1, .preview h2, .preview h3 {
   font-size: 1rem;
   font-weight: bold;
