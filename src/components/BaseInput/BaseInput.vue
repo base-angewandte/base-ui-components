@@ -608,7 +608,7 @@ export default {
             // of decimal places to the number
             // if data is null leave the field empty
             if (parsedValue && this.decimals !== undefined && this.decimals !== null && this.decimals !== -1) {
-              parsedValue = this.translateFloat(Number(parsedValue).toFixed(this.decimals));
+              parsedValue = this.translateFloat(Number(this.stringToFloat(parsedValue)).toFixed(this.decimals));
             }
           }
           // if yes validate the input
@@ -1120,6 +1120,7 @@ export default {
             cursor: pointer;
             display: flex;
             justify-content: center;
+            flex-shrink: 0;
 
             &:focus, &:active {
               color: $app-color-secondary;

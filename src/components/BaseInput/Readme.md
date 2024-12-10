@@ -291,6 +291,11 @@ export default {
         this.input = null;
       }
     },
+    decimals(val, previousVal) {
+      if (!val && previousVal) {
+        this.input = null;
+      }
+    }
   },
   methods: {
     updateComponent(value, key) {
