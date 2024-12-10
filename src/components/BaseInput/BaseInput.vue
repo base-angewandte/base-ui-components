@@ -1113,6 +1113,7 @@ export default {
             cursor: pointer;
             display: flex;
             justify-content: center;
+            flex-shrink: 0;
 
             &:focus, &:active {
               color: $app-color-secondary;
