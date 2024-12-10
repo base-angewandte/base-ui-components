@@ -818,6 +818,9 @@ export default {
      */
     removeInput() {
       this.inputInt = '';
+      // in input was reset also clear internal error message
+      this.internalValidationMessage = '';
+      this.internalValidationFailed = false;
       this.updateModelValue();
       if (this.inputElement) {
         this.inputElement.focus();
