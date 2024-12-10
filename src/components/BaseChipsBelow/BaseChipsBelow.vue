@@ -1,6 +1,7 @@
 <template>
   <div
     ref="chipsBelow"
+    v-bind="rootAttrs"
     class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
@@ -471,6 +472,10 @@ export default {
   },
   emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue'],
   setup() {
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** ACCESSIBILITY HANDLING */
     /**
      * set up component reference
      * @type {Ref<UnwrapRef<null|HTMLElement>>}
@@ -480,6 +485,8 @@ export default {
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsBelow);
     return {
+      rootAttrs,
+      forwardAttrs,
       chipsBelow,
       announcement,
     };
@@ -500,7 +507,10 @@ export default {
     // additional property (roles)!
     // leads to unwanted behaviour else (creating multilang object)
     chipsInputProps() {
-      const newProps = { ...this.$props };
+      const newProps = {
+        ...this.$props,
+        ...this.forwardAttrs,
+      };
       delete newProps.language;
       // also remove additional property related props since unknown to chips input component
       delete newProps.additionalPropOptions;
