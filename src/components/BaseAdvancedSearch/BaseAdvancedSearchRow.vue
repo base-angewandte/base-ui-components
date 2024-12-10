@@ -415,7 +415,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue';
+import { computed, ref, toRef } from 'vue';
 import { hasData, sort } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useId } from '@/composables/useId.js';
@@ -927,7 +927,7 @@ export default {
     }
 
     /** LOCALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(props.language);
+    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
 
     /** ACCESSIBILITY */
     /**

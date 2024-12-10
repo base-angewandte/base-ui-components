@@ -65,7 +65,7 @@ export default {
 </style>
 ```
 
-An example connected with an input field (displayAsDropDown: false)
+An example connected with an input field (displayAsDropDown: false) using all kinds of slots and with `useHighlightStringMatch` enabled.
 
 ```vue live
 
@@ -74,6 +74,9 @@ An example connected with an input field (displayAsDropDown: false)
     <BaseChipsInputField
       v-model="input"
       v-model:selected-list="selectedList"
+      :allow-unknown-entries="false"
+      :language="language"
+      :linked-list-option="active?.id ? active.id : null"
       :show-label="false"
       drop-down-list-id="aSimpleTestList"
       identifier-property-name="id"
@@ -83,9 +86,13 @@ An example connected with an input field (displayAsDropDown: false)
       @keydown.up.down.prevent="navigate"
       @keydown.enter.prevent="addChipByKeyboard"/>
     <BaseDropDownList
-        v-model:active-option="active"
+        :active-option="active"
         :drop-down-options="optionsListInt"
         :display-as-drop-down="false"
+        :language="language"
+        :use-highlight-string-match="true"
+        :highlight-string-tags="['b']"
+        :highlight-string-match="input"
         list-id="aSimpleTestList"
         class="base-drop-down-list-example"
         @update:selected-option="addChipByClick">
@@ -109,6 +116,32 @@ An example connected with an input field (displayAsDropDown: false)
         </div>
       </template>
     </BaseDropDownList>
+    <div class="row">
+      <BaseButton
+        :active="listStyle === 'Plain'"
+        text="options as objects"
+        class="option-button"
+        @clicked="listStyle = 'Plain'" />
+      <BaseButton
+        :active="listStyle === 'Lang'"
+        text="options as objects with lang labels"
+        class="option-button"
+        @clicked="listStyle = 'Lang'" />
+    </div>
+    <div class="row">
+      <BaseButton
+        :active="listStyle === 'Lang' && language === 'de'"
+        :disabled="listStyle === 'Plain'"
+        text="'DE'"
+        class="option-button"
+        @clicked="language = 'de'" />
+      <BaseButton
+        :active="listStyle === 'Lang' && language === 'en'"
+        :disabled="listStyle === 'Plain'"
+        text="'EN'"
+        class="option-button"
+        @clicked="language = 'en'" />
+    </div>
   </div>
 </template>
 
@@ -117,9 +150,12 @@ export default {
   data() {
     return {
       input: '',
-      active: {},
+      active: null,
       selectedList: [],
-      optionsList: [
+      displayOptions: [],
+      language: 'en',
+      listStyle: 'Plain',
+      optionsListPlain: [
         {
             value: "Lion",
             id: '1',
@@ -137,21 +173,51 @@ export default {
             id: '14',
         },
       ],
+      optionsListLang: [
+        {
+          value: {
+            de: 'Elefant',
+            en: 'Elephant',
+          },
+          id: '1',
+        },
+        {
+          value: {
+            de: 'Bär',
+            en: 'Bear',
+          },
+          id: '12',
+        },
+        {
+          value: {
+            de: 'Pferd',
+            en: 'Horse',
+          },
+          id: '13',
+        },
+      ],
     };
   },
   computed: {
     optionsListInt() {
-      return this.optionsList
-        .filter(option => !this.selectedList.map(sel => sel.id).includes(option.id))
-        .filter(option => option.value.toLowerCase().includes(this.input.toLowerCase()));
+      return this[`optionsList${this.listStyle}`]
+        .filter((option) => {
+          const langLabel = option.value[this.language] || option.value;
+          return !this.selectedList.map(sel => sel.id).includes(option.id)
+            && langLabel.toLowerCase().includes(this.input.toLowerCase());
+        });
     },
   },
   watch: {
-    optionsListInt() {
-      if (this.active && Object.keys(this.active).length) {
+    optionsListInt: {
+      handler() {
         this.active = this.optionsListInt.length ? this.optionsListInt[0] : null;
-      }
-    },
+      },
+      immediate: true,
+    }
+  },
+  beforeMount() {
+    this.displayOptions = this[`optionsList${this.listStyle}`];
   },
   methods: {
     addChipByKeyboard() {
@@ -165,13 +231,14 @@ export default {
       this.input = '';
     },
     navigate(event) {
-      const currentIndex = this.optionsListInt.indexOf(this.active);
+      const { key } = event;
+      const currentIndex = this.optionsListInt.indexOf(this.active) || 0;
       const listLength = this.optionsListInt.length;
-      if (event.key === 'ArrowUp') {
+      if (key === 'ArrowUp') {
         const newIndex = currentIndex - 1;
         this.active = newIndex >= 0 ? this.optionsListInt[currentIndex - 1]
           : this.optionsListInt[listLength - 1];
-      } else if (event.key === 'ArrowDown') {
+      } else if (key === 'ArrowDown') {
         const newIndex = currentIndex + 1;
         this.active = this.optionsListInt[newIndex < listLength ? newIndex : 0];
       }
@@ -196,6 +263,14 @@ export default {
   .customized-option {
     color: red;
     margin-left: 16px;
+  }
+  .row {
+    margin: 16px;
+    display: flex;
+    flex-direction: row;
+    .option-button {
+      margin: 0 8px;
+    }
   }
 </style>
 ```

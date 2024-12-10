@@ -191,7 +191,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent, ref } from 'vue';
+import { defineAsyncComponent, ref, toRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 import { useEventListener } from '@/composables/useEventListener.js';
 
@@ -433,7 +433,7 @@ export default {
   emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
   setup(props) {
     /** INTERNATIONALIZATION */
-    const { getI18nTerm } = useI18n(props.language);
+    const { getI18nTerm } = useI18n(toRef(props, 'language'));
 
     /** LIST FADE OUT */
     const body = ref(null);
