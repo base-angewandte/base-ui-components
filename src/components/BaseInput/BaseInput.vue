@@ -607,7 +607,7 @@ export default {
             // in case prop `decimals` is set (to not -1) add the appropriate number
             // of decimal places to the number
             // if data is null leave the field empty
-            if (parsedValue && this.decimals && this.decimals > 0) {
+            if (parsedValue && this.decimals !== undefined && this.decimals !== null && this.decimals !== -1) {
               parsedValue = this.translateFloat(Number(parsedValue).toFixed(this.decimals));
             }
           }
@@ -690,8 +690,13 @@ export default {
     onKeydown(event) {
       if (this.isFieldTypeNumber) {
         const { key, ctrlKey } = event;
-        const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Shift', 'Control', '[0-9]', '\\.', ',', 'e', '-', '\\+'];
+        // only allow comma keys if decimals are allowed
+        const allowedDecimalKeys = this.decimals !== 0 ? ['\\.', ','] : [];
+        // and define and add keys that are always allowed in number fields
+        const allowedKeys = allowedDecimalKeys.concat(['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Shift', 'Control', '[0-9]', 'e', '-', '\\+']);
         const allowedKeysRegex = new RegExp(`(${allowedKeys.join('|')})`);
+        // check if control is true to allow for copy & paste etc. - otherwise stop any
+        // key that is not in allowed keys
         if (!ctrlKey && !allowedKeysRegex.test(key)) {
           event.preventDefault();
           event.stopPropagation();
@@ -820,6 +825,9 @@ export default {
      */
     removeInput() {
       this.inputInt = '';
+      // in input was reset also clear internal error message
+      this.internalValidationMessage = '';
+      this.internalValidationFailed = false;
       this.updateModelValue();
       if (this.inputElement) {
         this.inputElement.focus();
