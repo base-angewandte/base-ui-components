@@ -149,7 +149,6 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
         class="toggle" />
       <BaseToggle
         v-model="useCustomRemoveIcon"
-        :disabled="!!input"
         label="custom remove icon"
         name="use a custom remove icon"
         class="toggle" />
@@ -338,8 +337,9 @@ export default {
 }
 
 .icon {
-  height: 16px;
-  margin: 0 8px;
+  height: 32px;
+  width: 32px;
+  padding: 8px;
 }
 
 .button-row {
