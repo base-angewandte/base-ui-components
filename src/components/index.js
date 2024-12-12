@@ -42,6 +42,7 @@ import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBo
 import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel.vue';
 import BaseIcon from './BaseIcon/BaseIcon.vue';
 import BaseButton from './BaseButton/BaseButton.vue';
+import BaseMap from './BaseMap/BaseMap.vue';
 // importing BaseDateInput async to avoid SSR problems!
 const BaseDateInput = defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue'));
 // import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
@@ -92,4 +93,5 @@ export {
   BaseTextList,
   BaseResultBoxSection,
   BaseMediaCarousel,
+  BaseMap,
 };

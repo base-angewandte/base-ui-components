@@ -1,12 +1,4 @@
-<template>
-  <div
-    ref="mapElement"
-    :style="cssProps"
-    class="base-map" />
-</template>
-
 <script>
-
 /**
  * A component to display a Leaflet-map with multiple locations
  */
@@ -443,6 +435,13 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="mapElement"
+    :style="cssProps"
+    class="base-map" />
+</template>
 
 <style lang="scss" scoped>
   .base-map {
