@@ -64,10 +64,10 @@
     </BaseChipsInput>
     <VueDraggable
       v-model="selectedBelowListInt"
+      :group="{ name: `chips-below-draggable-${internalId}` }"
       :animation="200"
       :force-fallback="!isDragDropCapable"
       :fallback-on-body="!isDragDropCapable"
-      :group="{ name: 'people' }"
       handle=".base-chips-below-list-icon-wrapper"
       @end="updateList($event, selectedBelowListInt)">
       <div
@@ -130,6 +130,8 @@
             @update:model-value="updateAdditionalProperty($event, index)" />
         </div>
       </div>
+      :group="{ name: `chips-below-draggable-${internalId}` }"
+      :group="{ name: `chips-below-draggable-${internalId}` }"
     </VueDraggable>
   </div>
 </template>
@@ -139,6 +141,7 @@ import { VueDraggable } from 'vue-draggable-plus';
 import { defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
+import { useId } from '@/composables/useId.js';
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)
  * in order to assign additional values (e.g. roles) to selected entries)]
@@ -471,9 +474,18 @@ export default {
     },
   },
   emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue'],
-  setup() {
+  setup(props) {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** COMPONENT ID */
+      // create an internal id in case there is none provided via props
+    const createdId = useId();
+    /**
+     * provide an internal id
+     * @type {ComputedRef<string|number>}
+     */
+    const internalId = computed(() => props.inputId || createdId);
 
     /** ACCESSIBILITY HANDLING */
     /**
@@ -487,6 +499,7 @@ export default {
     return {
       rootAttrs,
       forwardAttrs,
+      internalId,
       chipsBelow,
       announcement,
     };
