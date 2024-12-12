@@ -153,6 +153,7 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Form Input Field Component
@@ -446,13 +447,14 @@ export default {
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
     /** LABEL ROW DISPLAY */
+
+    const { slotHasContent } = useHasSlotContent(slots['label-addition']);
     /**
      * variable to define if label low (with margin) should be displayed or not
      * @type {ComputedRef<boolean>}
      */
     const showLabelRow = computed(() => {
-      const slotElements = slots['label-addition'] ? slots['label-addition']() : [];
-      return props.showLabel || !!slotElements.length;
+      return props.showLabel || slotHasContent.value;
     });
 
     /** INPUT HANDLING */
