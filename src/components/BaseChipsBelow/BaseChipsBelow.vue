@@ -140,9 +140,10 @@
 
 <script>
 import { VueDraggable } from 'vue-draggable-plus';
-import { defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 import { createId } from '@/utils/utils.js';
 import { useId } from '@/composables/useId.js';
 /**
