@@ -66,72 +66,74 @@
       v-model="selectedBelowListInt"
       :group="{ name: `chips-below-draggable-${internalId}` }"
       :animation="200"
-      :force-fallback="!isDragDropCapable"
-      :fallback-on-body="!isDragDropCapable"
-      handle=".base-chips-below-list-icon-wrapper"
-      @end="updateList($event, selectedBelowListInt)">
-      <div
-        v-for="(entry, index) in selectedBelowListInt"
-        :key="'item' + entry.idInt"
-        :name="entry[labelPropertyName]"
-        :class="['base-chips-below-list-item',
-                 { 'base-chips-below-list-item--draggable': draggable }]"
-        @mousedown="chipActive = index">
+      :set-data="setDragElement"
+      handle=".base-chips-below__icon-handle"
+      @end="onDragEnd(selectedBelowListInt)">
+      <TransitionGroup
+        :name="'flip-list'"
+        type="transition">
         <div
-          :key="'line' + entry.idInt"
-          class="base-chips-below-list-item-line">
+          v-for="(entry, index) in selectedBelowListInt"
+          :key="'item' + entry.idInt"
+          :class="['base-chips-below-list-item',
+                   { 'base-chips-below-list-item--draggable': draggable }]">
           <div
-            v-if="draggable"
-            :key="'iconwrapper' + entry.idInt"
-            class="base-chips-below-list-icon-wrapper">
-            <BaseIcon
-              :key="'icon' + entry.idInt"
-              name="drag-lines"
-              class="svg-icon base-chips-below-list-icon" />
+            :key="'line' + entry.idInt"
+            class="base-chips-below-list-item-line">
+            <div
+              v-if="draggable"
+              :key="'iconwrapper' + entry.idInt"
+              class="base-chips-below-list-icon-wrapper">
+              <div
+                class="base-chips-below__icon-handle">
+                <BaseIcon
+                  :key="'icon' + entry.idInt"
+                  name="drag-lines"
+                  class="svg-icon base-chips-below-list-icon" />
+              </div>
+            </div>
+            <div
+              :key="'chip-wrapper' + entry.idInt"
+              class="base-chips-below-list-item-chip-wrapper">
+              <BaseChip
+                :id="'chips-below' + entry.idInt"
+                ref="selectedChip"
+                :key="'chip' + entry.idInt"
+                v-model="entry[labelPropertyName]"
+                :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
+                  || !!entry[identifierPropertyName])"
+                class="base-chips-input-chip"
+                @update:model-value="modifyChipValue($event, index)"
+                @remove-entry="removeEntry(index)" />
+            </div>
+            <BaseChipsInput
+              :key="'input_' + entry.idInt"
+              v-model="entry[additionalPropertyName]"
+              :input-id="`${inputId || entry.idInt}_${additionalPropertyName}_${entry[identifierPropertyName]}`"
+              :show-label="false"
+              :label="label + '-' + additionalPropertyName"
+              :list="additionalPropOptions"
+              :show-input-border="false"
+              :allow-dynamic-drop-down-entries="false"
+              :placeholder="additionalPropPlaceholder"
+              :always-linked="true"
+              :language="language"
+              :draggable="true"
+              :drop-down-no-options-info="dropDownNoOptionsInfo"
+              :identifier-property-name="identifierPropertyName"
+              :label-property-name="labelPropertyName"
+              :invalid="isInvalidAdditionalOption(entry[labelPropertyName], index)"
+              :error-message="additionalOptionsErrorMessage(entry[labelPropertyName], index)"
+              :allow-multiple-entries="additionalPropAllowMultipleEntries"
+              :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
+              :show-error-icon="showErrorIcon"
+              :required="additionalPropRequired"
+              :default-entry="additionalPropDefaultOption"
+              class="base-chips-below-chips-input"
+              @update:model-value="updateAdditionalProperty($event, index)" />
           </div>
-          <div
-            :key="'chip-wrapper' + entry.idInt"
-            class="base-chips-below-list-item-chip-wrapper">
-            <BaseChip
-              :id="'chips-below' + index"
-              ref="selectedChip"
-              :key="'chip' + entry.idInt"
-              v-model="entry[labelPropertyName]"
-              :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
-                || !!entry[identifierPropertyName])"
-              class="base-chips-input-chip"
-              @update:model-value="modifyChipValue($event, index)"
-              @remove-entry="removeEntry($event, index)" />
-          </div>
-          <BaseChipsInput
-            :key="'input_' + entry.idInt"
-            v-model="entry[additionalPropertyName]"
-            :input-id="`${inputId}_${additionalPropertyName}_${entry[identifierPropertyName] || entry.idInt}`"
-            :show-label="false"
-            :label="label + '-' + additionalPropertyName"
-            :list="additionalPropOptions"
-            :show-input-border="false"
-            :allow-dynamic-drop-down-entries="false"
-            :placeholder="additionalPropPlaceholder"
-            :always-linked="true"
-            :language="language"
-            :draggable="true"
-            :drop-down-no-options-info="dropDownNoOptionsInfo"
-            :identifier-property-name="identifierPropertyName"
-            :label-property-name="labelPropertyName"
-            :invalid="isInvalidAdditionalOption(entry[labelPropertyName], index)"
-            :error-message="additionalOptionsErrorMessage(entry[labelPropertyName], index)"
-            :allow-multiple-entries="additionalPropAllowMultipleEntries"
-            :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
-            :show-error-icon="showErrorIcon"
-            :required="additionalPropRequired"
-            :default-entry="additionalPropDefaultOption"
-            class="base-chips-below-chips-input"
-            @update:model-value="updateAdditionalProperty($event, index)" />
         </div>
-      </div>
-      :group="{ name: `chips-below-draggable-${internalId}` }"
-      :group="{ name: `chips-below-draggable-${internalId}` }"
+      </TransitionGroup>
     </VueDraggable>
   </div>
 </template>
@@ -141,6 +143,7 @@ import { VueDraggable } from 'vue-draggable-plus';
 import { defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
+import { createId } from '@/utils/utils.js';
 import { useId } from '@/composables/useId.js';
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)
@@ -508,7 +511,6 @@ export default {
     return {
       chipsArray: [],
       selectedBelowListInt: [],
-      chipActive: -1,
       // error handling
       invalidInt: false,
       errorMessageInt: '',
@@ -533,22 +535,6 @@ export default {
       // BaseChipsInput does not have that prop) we dont want that passed down
       delete newProps.validationTexts;
       return newProps;
-    },
-    isDragDropCapable() {
-      if (window) {
-        // TODO: due to vue draggable safari related bug
-        //  https://github.com/SortableJS/Vue.Draggable/issues/743 we need to check
-        // specifically for safari to use forceFallback true for Safari browsers
-        const isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1
-          && navigator.userAgent
-          // leaving chrome check in since it is currently working with forceFallback true
-          && navigator.userAgent.indexOf('CriOS') === -1;
-          // taking firefox out since it it is not working anymore with forceFallback true
-          // and need to check first if it is also affected by the Safari bug.
-          // && navigator.userAgent.indexOf('FxiOS') === -1;
-        return !isSafari && 'DragEvent' in window;
-      }
-      return false;
     },
   },
   watch: {
@@ -637,7 +623,7 @@ export default {
         };
       }));
     },
-    removeEntry(evt, index) {
+    removeEntry(index) {
       const item = this.selectedBelowListInt.splice(index, 1);
       item[this.additionalPropertyName] = {};
       this.emitInternalList(this.selectedBelowListInt);
@@ -645,7 +631,11 @@ export default {
       this.announcement = this.assistiveText.optionRemoved
         .replace('{label}', item[0][this.labelPropertyName]);
     },
-    updateList(evt, list) {
+    onDragEnd(list) {
+      const elem = document.getElementById('drag-element');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
+      }
       this.emitInternalList(list);
     },
     updateAdditionalProperty(evt, index) {
@@ -662,26 +652,41 @@ export default {
       this.$emit('additional-property-changed', this.modelValue[index]);
     },
     createInternalList(val) {
-      this.selectedBelowListInt = val.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return {
-            ...{
-              [this.additionalPropertyName]: [],
-              idInt: this.identifierPropertyName && (entry[this.identifierPropertyName] === 0
-              || entry[this.identifierPropertyName])
-                ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + index,
-            },
-            ...entry,
-          };
-        }
+      this.selectedBelowListInt = val.map((entry) => {
         return {
           ...{
-            [this.labelPropertyName]: entry,
-            idInt: this.list.length + index,
+            // initialize the additional property
             [this.additionalPropertyName]: [],
+            // and create an internal id if none was provided
+            idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
+              ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + createId(),
           },
+          ...entry,
         };
       });
+    },
+    /**
+     * need to set custom due to some strange effects not showing correct element in some cases
+     * (this function is only triggered on non-touch devices)
+     * @param {DataTransfer} dataTransfer
+     */
+    setDragElement(dataTransfer) {
+      const img = document.createElement('div');
+      img.id = 'drag-element';
+      img.style.position = 'absolute';
+      img.style.top = '-99999px';
+      img.style.left = '-99999px';
+      // setting height and width is important for macOS it wont work
+      // otherwise with an empty element
+      img.style.width = '100%';
+      img.style.height = '100%';
+      // setting like this makes it work in all three major browsers
+      // the 0.01 opacity is needed for firefox not to display some default
+      // document icon
+      img.style.backgroundColor = 'rgb(255, 255, 255, 0.01)';
+      // add the element to the dom
+      document.body.appendChild(img);
+      dataTransfer.setDragImage(img, 0, 0);
     },
     emitInternalList(val) {
       const sendArr = [];
@@ -853,12 +858,30 @@ export default {
           display: flex;
           flex: 0 0 auto;
           cursor: grab;
+          position: relative;
 
-          .base-chips-below-list-icon {
-            max-height: 100%;
-            width: $icon-medium;
-            color: $input-field-color;
-            margin: auto;
+          .base-chips-below__icon-handle {
+            display: flex;
+            justify-content: center;
+
+            /* for mobile create a padding around the icon so its easier to grab */
+            @media screen and (max-width: $mobile) {
+              position: absolute;
+              width: calc(#{$icon-medium} + 2 * #{$spacing-small});
+              height: calc(#{$icon-medium} + 2 * #{$spacing-small});
+              padding: $spacing-small;
+              top: 50%;
+              right: -$spacing-small;
+              transform: translateY(-50%);
+            }
+            .base-chips-below-list-icon {
+              max-height: 100%;
+              width: $icon-medium;
+              height: $icon-medium;
+              color: $input-field-color;
+              margin: auto;
+              pointer-events: none;
+            }
           }
         }
 
@@ -888,16 +911,6 @@ export default {
           flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small-half});
         }
       }
-
-      &.sortable-chosen {
-        border-bottom: 0;
-      }
-    }
-
-    .base-chips-below-list-item-chosen {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
     }
   }
 </style>
