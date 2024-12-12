@@ -1,151 +1,10 @@
-<template>
-  <div
-    class="base-input">
-    <!-- LABEL ROW -->
-    <div
-      :class="['base-input__label-row', { hide: !showLabelRow }]"
-      @click.stop="">
-      <!-- need to disable because label is there (below)? -->
-      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
-      <label
-        :for="idInt"
-        :class="['base-input__label', { hide: !showLabel }]">
-        {{ labelLocalized }}
-      </label>
-      <div class="base-input__label-spacer" />
-      <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
-      <slot name="label-addition" />
-    </div>
-
-    <!-- ACTUAL INPUT FIELD -->
-    <!-- keydown event would have unwanted side effects here and is not relevant for
-      accessibility -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
-    <div
-      ref="inputFrame"
-      :class="['base-input__input-frame',
-               { 'base-input__input-frame__border': showInputBorder },
-               { 'base-input__input-frame__disabled': disabled },
-               { 'base-input__input-frame__invalid': invalidInt }]"
-      @focusin="clickedInside"
-      @click="clickedInside">
-      <!-- one class __active for pseudo-class :focus-within, one class __is-active
-      for manually setting input active -->
-      <div
-        :class="['base-input__input-container',
-                 {
-                   'base-input__input-container__is-active':
-                     isActiveInt && useFormFieldStyling,
-                 }]">
-        <!-- @slot add elements before the actual input line but within the input field container -->
-        <slot name="pre-input-field" />
-        <div
-          :class="['base-input__input-line-container',
-                   { 'base-input__input-line-container__wrap': !hideInputField }]">
-          <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips) (before <input>) -->
-          <slot name="input-field-addition-before" />
-          <div class="base-input__input-line">
-            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap -->
-            <slot name="input-field-inline-before" />
-            <div
-              :class="['base-input__input-wrapper',
-                       {
-                         'base-input__input-wrapper__fade-out':
-                           useFadeOut && !isActiveInt && !hideInputField,
-                       }]">
-              <!-- @slot replace native HTML input element with custom input
-                   @binding { string } id - the id of the BaseInput component - if `id` is not provided in props this is an internal id that should also be set as <input> `id` -->
-              <slot
-                :id="idInt"
-                name="input">
-                <!-- need to disable because label is there (below)? -->
-                <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-                <input
-                  :id="idInt"
-                  ref="input"
-                  v-model="inputInt"
-                  v-bind="inputListeners"
-                  :placeholder="placeholder"
-                  :type="fieldType === 'number' ? 'text' : fieldType"
-                  :list="dropDownListId || null"
-                  :disabled="disabled"
-                  :aria-disabled="disabled.toString()"
-                  :aria-activedescendant="linkedListOption"
-                  :aria-describedby="idInt"
-                  :aria-required="required.toString()"
-                  :required="required"
-                  :aria-invalid="invalidInt.toString()"
-                  :minlength="minLength"
-                  :maxlength="maxLength"
-                  :inputmode="fieldType === 'number' && allowNegativeNumber ? 'decimal': null"
-                  enterkeyhint="done"
-                  autocomplete="off"
-                  :class="[inputClass, 'base-input__input',
-                           { 'base-input__input__hidden': hideInputField }]"
-                  @keydown.tab="handleInputTab"
-                  @blur="onInputBlur">
-              </slot>
-            </div>
-            <!-- wrapped in a button for accessibility -->
-            <button
-              v-if="showRemoveIcon"
-              class="base-input__remove-icon-wrapper"
-              @keydown.tab="blurInput"
-              @click.stop="removeInput">
-              <!-- @slot use a custom icon instead of standard remove icon -->
-              <slot name="remove-icon">
-                <BaseIcon
-                  name="remove"
-                  title="Clear input"
-                  class="base-input__remove-icon" />
-              </slot>
-            </button>
-            <div
-              v-if="loadable"
-              class="base-input__loader">
-              <BaseLoader
-                :hide="!isLoading"
-                :text-on-loader-show="assistiveText.loaderActive" />
-            </div>
-            <!-- @slot for adding elements after input (e.g. used to add loader) -->
-            <slot name="input-field-addition-after" />
-          </div>
-        </div>
-        <div
-          v-if="showErrorIcon && invalidInt"
-          class="base-input__error-icon-wrapper">
-          <!-- @slot use a custom icon instead of standard error/warning icon -->
-          <slot name="error-icon">
-            <BaseIcon
-              name="attention"
-              class="base-input__error-icon" />
-          </slot>
-        </div>
-        <!-- @slot after the actual input element over whole height of the input field container -->
-        <slot name="post-input-field" />
-      </div>
-    </div>
-
-    <!-- BELOW INPUT FIELD -->
-    <div>
-      <!-- @slot below-input slot added to e.g. add drop down -->
-      <!-- this way it does not interfere with error message -->
-      <slot name="below-input" />
-    </div>
-    <div
-      v-if="invalidInt && errorMessageInt"
-      class="base-input__invalid-message">
-      {{ errorMessageLocalized }}
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, ref, computed, toRef } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
 import { useI18n } from '@/composables/useI18n.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
  * Form Input Field Component
@@ -157,6 +16,7 @@ export default {
     BaseIcon,
     BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
+  inheritAttrs: false,
   props: {
     /**
      * input field settable from outside
@@ -205,6 +65,7 @@ export default {
     /**
      * mark the form field as invalid and ideally also provide an error message
      * to display below the form field
+     * the v-model directive might be used on this prop
      */
     invalid: {
       type: Boolean,
@@ -364,6 +225,9 @@ export default {
     },
     /**
      * set decimal separator character, e.g. ',' for german
+     * note that this only changes the display of decimal values, input
+     * values should always be provided with '.' as separator and will be
+     * returned as such
      */
     decimalSeparator: {
       type: String,
@@ -411,13 +275,13 @@ export default {
       }),
     },
   },
-  emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'blur', 'keydown', 'update:model-value'],
-  setup(props, { emit }) {
+  emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'update:model-value'],
+  setup(props, { emit, slots }) {
     /** LABEL and ERROR MESSAGE LOCALIZATION */
-    const errorMessageInt = ref('');
+    const internalValidationMessage = ref('');
     const { getLangLabel } = useI18n(toRef(props, 'language'));
     const labelLocalized = computed(() => getLangLabel(props.label));
-    const errorMessageLocalized = computed(() => getLangLabel(errorMessageInt));
+    const errorMessageInt = computed(() => getLangLabel(internalValidationMessage.value || props.errorMessage));
 
     /** INTERNAL ID */
     /**
@@ -429,6 +293,72 @@ export default {
       // define an internal id, needed for aria and reference purposes
       idInt.value = useId();
     }
+
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** LABEL ROW DISPLAY */
+    /**
+     * variable to define if label low (with margin) should be displayed or not
+     * @type {ComputedRef<boolean>}
+     */
+    const showLabelRow = computed(() => {
+      const slotElements = slots['label-addition'] ? slots['label-addition']() : [];
+      return props.showLabel || !!slotElements.length;
+    });
+
+    /** INPUT HANDLING */
+    /**
+     * store the input v-model value
+     * @type {Ref<UnwrapRef<string>>}
+     */
+    const inputInt = ref('');
+    /**
+     * get the appropriate value for <input> attribute `inputmode` in case
+     * input is of type number
+     * @type {ComputedRef<null|string>}
+     */
+    const inputMode = computed(() => {
+      if (props.fieldType !== 'number') return null;
+      return props.decimals ? 'decimal' : 'numeric';
+    });
+    /**
+     * determines if remove icon should be shown - added to section input handling
+     * since value is determined by input present
+     * @type {ComputedRef<boolean>}
+     */
+    const showRemoveIcon = computed(() => {
+      return props.clearable && !!inputInt.value;
+    });
+
+    /** FOCUS HANDLING */
+    /**
+     * reference to the native HTML input element (if slot was not used and it exists)
+     * @type {Ref<UnwrapRef<HTMLElement|null>>}
+     */
+    const input = ref(null);
+    /**
+     * find and store the input element associated with this component in a variable
+     * @type {ComputedRef<HTMLElement|null>}
+     */
+    const inputElement = computed(() => {
+      // check if client side
+      if (window) {
+        // if input element exists in ref use this one
+        if (input.value) {
+          return input.value;
+        }
+        // otherwise check for a custom element by id
+        const tempElement = document.getElementById(idInt.value);
+        // check if element exists
+        if (tempElement) {
+          return tempElement;
+        }
+        // otherwise warn that the id was not assigned to the input element
+        console.warn('BaseInput: you did not assign the same id to the BaseInputComponent and the input element!');
+      }
+      return null;
+    });
 
     /** CLICK OUTSIDE HANDLING */
     // get the ref element for click outside
@@ -459,194 +389,51 @@ export default {
       emit('clicked-outside', event);
     });
     return {
-      labelLocalized,
-      errorMessageInt,
-      errorMessageLocalized,
-      isActiveInt,
-      setFieldState,
       idInt,
+      rootAttrs,
+      forwardAttrs,
+      showLabelRow,
+      showRemoveIcon,
+      inputInt,
+      inputMode,
+      input,
+      inputElement,
       inputFrame,
+      isActiveInt,
+      labelLocalized,
+      internalValidationMessage,
+      errorMessageInt,
+      setFieldState,
     };
   },
   data() {
     return {
-      inputInt: '',
+      /**
+       * store previous input in case invalid input needs to be replaced
+       * @type {string|number}
+       */
       previousInput: '',
-      invalidInt: '',
+      /**
+       * variable specifically for internal validation status so
+       * it can not be overwritten by prop `invalid` and `invalidInt`
+       * will always show false if either this variable or `invalid`
+       * are true
+       * @type {boolean}
+       */
+      internalValidationFailed: false,
     };
   },
   computed: {
-    /**
-     * determines if label row should be shown
-     * @returns {Boolean|boolean}
-     */
-    showLabelRow() {
-      // get label-addition slot
-      const slotElements = this.$slots['label-addition'] ? this.$slots['label-addition']() : null;
-      // check if slot exists and has data and actually has content
-      // (this did not work with SSR otherwise...)
-      const slotsHaveData = !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag || elem.text?.trim());
-      // show label when prop is set true or a label addition was added via slot
-      return this.showLabel || slotsHaveData;
+    isFieldTypeNumber() {
+      return this.fieldType === 'number';
     },
     /**
-     * determines if remove icon should be shown
+     * compute actual invalid state considering value provided by parent
+     * and internal validation state
      * @returns {boolean}
      */
-    showRemoveIcon() {
-      return this.clearable && !!this.inputInt;
-    },
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$attrs,
-        // and add custom listeners
-        ...{
-          // for number fields: filter characters except numbers, decimals, negative values, e
-          onInput: (event) => {
-            let { value } = event.target;
-
-            // clear errorMessage
-            this.errorMessageInt = '';
-            this.invalidInt = false;
-
-            // Handle number inputs with input field type text.
-            // Use a regular expression to validate the number format.
-            // Invalid entries are restored with the previous valid value.
-            if (this.fieldType === 'number') {
-              const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
-              const bannedChars = new RegExp(`[^e0-9${decimalSeparator}\\+-]`, 'g');
-              const decimals = this.decimals && this.decimals !== Number('-1') ? `{0,${this.decimals}}` : '*';
-              const negativeNumber = this.allowNegativeNumber ? '-?' : '';
-              const eMinus = this.decimals && this.decimals !== Number('-1') ? '-' : '';
-              // pattern to match number: ^((-?[0-9]+(,|\.)?[0-9]{0,2}(e(-|\+)?[0-9]*)?)|-)$
-              // allow: optional -, numbers, optional decimal separator, e, optional +|-, numbers
-              const pattern = new RegExp(`^((${negativeNumber}[0-9]*${decimalSeparator}?([0-9]${decimals})(e(${eMinus}|\\+)?[0-9]*)?)|-)$`, 'g');
-              // dot or comma are allowed as decimal separators
-              // translate them beforehand
-              value = value.replace(',', this.decimalSeparator);
-              value = value.replace('.', this.decimalSeparator);
-              // remove banned characters
-              value = value.replace(bannedChars, '');
-              // remove multiple special characters
-              value = this.removeMultipleChars(value, this.decimalSeparator);
-              value = this.removeMultipleChars(value, 'e');
-              // update input
-              this.inputInt = value;
-              // round and crop decimals if decimals set
-              if (this.decimals && !Number.isNaN(Number(value))) {
-                value = this.roundDecimals(value);
-                this.inputInt = value;
-              }
-              // validate number format
-              if (value !== '' && !value.match(pattern)) {
-                this.inputInt = this.previousInput;
-                return;
-              }
-              // handle min values
-              if (this.min && value && Number(this.stringToFloat(value)) < this.min) {
-                this.errorMessageInt = this.validationTexts.min.replace('{value}', this.min.toString());
-                this.invalidInt = true;
-                return;
-              }
-              // handle max values
-              if (this.max && Number(this.stringToFloat(value)) > this.max) {
-                this.errorMessageInt = this.validationTexts.max.replace('{value}', this.max.toString());
-                this.invalidInt = true;
-                return;
-              }
-              // reset infinite values
-              if (Number(this.stringToFloat(value)) === Infinity) {
-                value = 0;
-                this.inputInt = value;
-              }
-              // do not emit cases which would be NaN
-              if (this.inputIsNaN(value)) {
-                return;
-              }
-              // store input to use/reset if validation fails
-              this.previousInput = value;
-              // format number
-              value = this.stringToFloat(value);
-            }
-
-            if (this.fieldType !== 'number') {
-              // handle min length
-              if (this.minLength && value && value.length < this.minLength) {
-                this.errorMessageInt = this.validationTexts.minLength.replace('{value}', this.minLength.toString());
-                this.invalidInt = true;
-                return;
-              }
-              // handle max length
-              if (this.maxLength && value.length > this.maxLength) {
-                this.errorMessageInt = this.validationTexts.maxLength.replace('{value}', this.maxLength.toString());
-                this.invalidInt = true;
-                return;
-              }
-            }
-
-            /**
-              * Event emitted on input, passing input string
-              *
-              * @event update:model-value
-              * @param {string} - the input event value however
-              *   passing only the event.target.value
-              *
-              */
-            this.$emit('update:model-value', value);
-          },
-          onKeydown: (event) => {
-            this.$emit('keydown', event);
-          },
-          onBlur: (event) => {
-            const { value } = event.target;
-
-            if (this.fieldType === 'number') {
-              // clear value and return if value is NaN
-              if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
-                this.inputInt = '';
-                this.previousInput = '';
-              } else {
-                // otherwise parse the value again as number to remove obsolete chars, e.g. 0.0 > 0
-                this.inputInt = this.translateFloat(Number(this.stringToFloat(value)));
-                // also update previous input so there are no funny effects if a type an
-                // invalid character after blur
-                this.previousInput = this.inputInt;
-              }
-            }
-            this.$emit('blur', event);
-          },
-        },
-      };
-    },
-    /**
-     * find and store the input element associated with this component in a variable
-     */
-    inputElement() {
-      // check if client side
-      if (window) {
-        // if input element exists in ref use this one
-        if (this.$refs && this.$refs.input) {
-          return this.$refs.input;
-        }
-        // otherwise check for an custom element by id
-        const tempElement = document.getElementById(this.idInt);
-        // check if element exists
-        if (tempElement) {
-          return tempElement;
-        }
-        // otherwise warn that the id was not assigned to the input element
-        console.warn('BaseInput: you did not assign the same id to the BaseInputComponent and the input element!');
-      }
-      return null;
-    },
-    /**
-     * determines if a negative number|float is allowed
-     * @returns {boolean}
-     */
-    allowNegativeNumber() {
-      return this.min === null || this.min < 0;
+    invalidInt() {
+      return this.invalid || this.internalValidationFailed;
     },
   },
   watch: {
@@ -655,39 +442,38 @@ export default {
      */
     modelValue: {
       handler(val) {
-        const data = this.fieldType === 'number'
+        // since internally all values are handled as strings we need to parse input
+        // with fieldType 'number' and also place the correct decimal separator
+        // since type float comes with '.'
+        let parsedValue = this.isFieldTypeNumber
           ? this.translateFloat(val) : val;
 
-        if (data !== this.inputInt) {
-          this.inputInt = data;
-          this.previousInput = data;
-          // trigger input event to validate changes from parent (also initial value)
-          this.triggerInputEvent();
+        // now check if the value provided by parent is actually different from current
+        // internal value
+        if (parsedValue !== this.inputInt) {
+          if (this.isFieldTypeNumber) {
+            // in case prop `decimals` is set (to not -1) add the appropriate number
+            // of decimal places to the number
+            // if data is null leave the field empty
+            if (parsedValue && this.decimals !== undefined && this.decimals !== null && this.decimals !== -1) {
+              parsedValue = this.translateFloat(Number(this.stringToFloat(parsedValue)).toFixed(this.decimals));
+            }
+          }
+          // if yes validate the input
+          const validatedValue = this.validate(parsedValue);
+          if (validatedValue !== undefined) {
+            this.inputInt = validatedValue;
+            this.previousInput = this.inputInt;
+          }
+          if (validatedValue !== parsedValue) {
+            // if something went wrong the internal value will not be udpated with the
+            // value provided but a modified value - so to have parent in sync we will
+            // inform them about the current value
+            this.updateModelValue();
+          }
         }
       },
       immediate: true,
-    },
-    /**
-     * if an external input element is used changes in inputInt need to be propagated to
-     * parent manually
-     * @param {string} val
-     */
-    inputInt(val) {
-      let data = val;
-
-      if (this.fieldType === 'number') {
-        // do not emit cases which would be NaN
-        if (this.inputIsNaN(data)) {
-          return;
-        }
-        // format value
-        data = this.stringToFloat(data);
-      }
-      // check if the internal input element exists and if values are in sync
-      if (data !== this.modelValue) {
-        // if not propagate change to parent
-        this.$emit('update:model-value', data);
-      }
     },
     /**
      * keep externally set active variable and internal active variable in sync
@@ -718,30 +504,6 @@ export default {
       this.$emit('update:is-active', val);
     },
     /**
-     * keep externally set errorMessage variable and internal errorMessage variable in sync
-     * @param {string} val
-     */
-    errorMessage: {
-      handler(val) {
-        if (val !== this.errorMessageInt) {
-          this.errorMessageInt = val;
-        }
-      },
-      immediate: true,
-    },
-    /**
-     * keep externally set invalid variable and internal invalid variable in sync
-     * @param {boolean} val
-     */
-    invalid: {
-      handler(val) {
-        if (val !== this.invalidInt) {
-          this.invalidInt = val;
-        }
-      },
-      immediate: true,
-    },
-    /**
      * keep externally set invalid variable and internal invalid variable in sync
      * @param {boolean} val
      */
@@ -757,31 +519,118 @@ export default {
     },
   },
   mounted() {
-    // handle max value of initial input
-    if (this.max && Number(this.stringToFloat(this.modelValue)) > this.max) {
-      this.inputInt = this.max;
-    }
     // on first render set the focus here manually
     if (this.isActiveInt && this.inputElement) {
       this.inputElement.focus();
     }
   },
   methods: {
+    /** INPUT EVENT HANDLING */
+    /**
+     * if input is fieldType 'number' we only want to allow certain keys
+     * (yes disallowed characters will be filtered in input validation again as
+     * well but why not stop the entering right here if possible then they don't have to
+     * be removed again later)
+     * @param event
+     */
+    onKeydown(event) {
+      if (this.isFieldTypeNumber) {
+        const { key, ctrlKey } = event;
+        // only allow comma keys if decimals are allowed
+        const allowedDecimalKeys = this.decimals !== 0 ? ['\\.', ','] : [];
+        // and define and add keys that are always allowed in number fields
+        const allowedKeys = allowedDecimalKeys.concat(['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Shift', 'Control', '[0-9]', 'e', '-', '\\+']);
+        const allowedKeysRegex = new RegExp(`(${allowedKeys.join('|')})`);
+        // check if control is true to allow for copy & paste etc. - otherwise stop any
+        // key that is not in allowed keys
+        if (!ctrlKey && !allowedKeysRegex.test(key)) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+    },
+
+    /**
+     * method triggered on native HTML input `input` event
+     * @param {InputEvent} event - the native HTML input event
+     */
+    onInput(event) {
+      // validate the provided value
+      const validatedValue = this.validate(event.target.value);
+      // only emit if a value was returned from the validateFunction
+      if (validatedValue !== undefined) {
+        // we need to update the value manually here since it is not updated
+        // through v-model on time for the event emit on some mobile devices
+        this.inputInt = validatedValue;
+        // store input to use/reset if validation fails
+        this.previousInput = validatedValue;
+        // and inform parent of the input update
+        this.updateModelValue();
+      }
+    },
+    /**
+     * function called when input changed and has been validated
+     */
+    updateModelValue() {
+      let parsedValue = this.inputInt;
+      if (this.isFieldTypeNumber) {
+        // since internally value is always handled as string we need to transform
+        // it back to a number in case field type is 'number' and also add the correct
+        // decimal separator for type number ('.') again
+        parsedValue = this.stringToFloat(this.inputInt);
+      }
+      /**
+       * Event emitted on input, passing input string
+       *
+       * @event update:model-value
+       * @param {string|number} - the validated input value
+       *
+       */
+      this.$emit('update:model-value', parsedValue);
+    },
     /**
      * in general input field active styling is handled via focusin and
-     * clicked-outside, however for special case iOS touch  devices have
-     * up and down arrows that do not trigger any event other than blur and will
-     * cause the dropdowns of input fields to remain open
+     * clicked-outside, however two cases are handled here:
+     * 1) for special case iOS touch devices have
+     *  up and down arrows that do not trigger any event other than blur and will
+     *  cause the dropdowns of input fields to remain open
+     * 2) field `fieldType 'number'` handling
      * @param {FocusEvent} event - the native blur event
      */
     onInputBlur(event) {
-      // so since these arrows only navigate between input fields we check if there is a
+      const { value, id } = event.target;
+
+      // 1) so since these arrows only navigate between input fields we check if there is a
       // related target and if this related target is an input field and if yes we make sure
       // the id is different from the input id of this component (the one the event originated from)
       if (event.relatedTarget && event.relatedTarget.tagName === 'INPUT'
-        && (!event.relatedTarget.id || event.relatedTarget.id !== event.target.id)) {
+        && (!event.relatedTarget.id || event.relatedTarget.id !== id)) {
         // set input active state false
         this.setFieldState(false);
+      }
+      // 2) check for fieldType number
+      if (this.isFieldTypeNumber) {
+        // clear value and return if value is NaN
+        if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
+          this.inputInt = '';
+          this.previousInput = '';
+        } else if (this.decimals) {
+          let updatedString;
+          if (this.decimals === -1) {
+            // if an unlimited number of decimals is allowed, parse the value again as
+            // number to remove obsolete chars, e.g. 0.0 > 0
+            updatedString = this.translateFloat(Number(this.stringToFloat(value)));
+          } else {
+            // else add the appropriate number of decimals
+            updatedString = this.translateFloat(Number(this.stringToFloat(value)).toFixed(this.decimals));
+          }
+          this.inputInt = updatedString;
+          // also update previous input so there are no funny effects if a type an
+          // invalid character after blur
+          this.previousInput = this.inputInt;
+        }
+        // and also inform parent of possible changes
+        this.updateModelValue();
       }
     },
     /**
@@ -791,9 +640,12 @@ export default {
     blurInput(event) {
       // set input active state false
       this.setFieldState(false);
-      // handle as if tab was coming from input to also allow parent to handle
+      // forward this event as if tab was coming from input to also allow parent to handle
       // active state if isActive is used
-      this.$emit('keydown', event);
+      // but first check if keydown event was set on parent
+      if (this.$attrs?.onKeyDown) {
+        this.$attrs.onKeyDown(event);
+      }
     },
     /**
      * function triggered if click event or focus event happened inside the
@@ -819,19 +671,115 @@ export default {
      */
     removeInput() {
       this.inputInt = '';
+      // in input was reset also clear internal error message
+      this.internalValidationMessage = '';
+      this.internalValidationFailed = false;
+      this.updateModelValue();
       if (this.inputElement) {
         this.inputElement.focus();
       }
     },
+    /**
+     * tab key does not always trigger the leaving of the input field but only if
+     * input remove icon is not present
+     * @param event
+     */
     handleInputTab(event) {
       if (!this.showRemoveIcon || event.shiftKey) {
         this.setFieldState(false);
       }
     },
+
+    /** INPUT VALIDATION */
     /**
-     * replace dot with decimalSeparator
+     * function validating the input on @input event changes or on values provided by parent
+     * @param {string} input - the value provided by the @input event or `modelValue`
+     * @returns {string|undefined}
+     */
+    validate(input) {
+      // clear errorMessage
+      this.internalValidationMessage = '';
+      this.internalValidationFailed = false;
+      // define a temporary variable that will be modified
+      let value = input;
+
+      // Handle number inputs with input field type text.
+      // Use a regular expression to validate the number format.
+      // Invalid entries are restored with the previous valid value.
+      if (this.isFieldTypeNumber) {
+        const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
+        // if field type is number disallow every character except 0-9, e, +, - and the correct
+        // decimal separator
+        const bannedChars = new RegExp(`[^e0-9${decimalSeparator}\\+-]`, 'g');
+        const decimals = this.decimals && this.decimals !== Number('-1') ? `{0,${this.decimals}}` : '*';
+        const eMinus = this.decimals && this.decimals !== Number('-1') ? '-' : '';
+        // pattern to match number: ^((-?[0-9]+(,|\.)?[0-9]{0,2}(e(-|\+)?[0-9]*)?)|-)$
+        // allow: optional -, numbers, optional decimal separator, e, optional +|-, numbers
+        const pattern = new RegExp(`^((-?[0-9]*${decimalSeparator}?([0-9]${decimals})(e(${eMinus}|\\+)?[0-9]*)?)|-)$`, 'g');
+        // dot or comma are allowed as decimal separators
+        // translate them beforehand
+        value = value.replace(',', this.decimalSeparator);
+        value = value.replace('.', this.decimalSeparator);
+        // remove banned characters
+        value = value.replace(bannedChars, '');
+        // remove multiple special characters
+        value = this.removeMultipleChars(value, this.decimalSeparator);
+        value = this.removeMultipleChars(value, 'e');
+        // update input
+        this.inputInt = value;
+        // round and crop decimals if decimals set
+        if (Number(this.decimals) > -1 && !Number.isNaN(Number(value))) {
+          value = this.roundDecimals(value);
+          this.inputInt = value;
+        }
+        // validate number format
+        if (value !== '' && !value.match(pattern)) {
+          this.inputInt = this.previousInput;
+          return this.inputInt;
+        }
+        // handle min values
+        if (this.min !== null && value && Number(this.stringToFloat(value)) < this.min) {
+          this.internalValidationMessage = this.validationTexts.min.replace('{value}', this.min.toString());
+          this.internalValidationFailed = true;
+        }
+        // handle max values
+        if (this.max !== null && Number(this.stringToFloat(value)) > this.max) {
+          this.internalValidationMessage = this.validationTexts.max.replace('{value}', this.max.toString());
+          this.internalValidationFailed = true;
+        }
+        // reset infinite values
+        if (Number(this.stringToFloat(value)) === Infinity) {
+          value = '0';
+          this.inputInt = value;
+          return;
+        }
+        // do not emit cases which would be NaN
+        if (this.inputIsNaN(value)) {
+          return;
+        }
+      }
+
+      if (this.fieldType !== 'number') {
+        // handle min length
+        if (this.minLength && value && value.length < this.minLength) {
+          this.internalValidationMessage = this.validationTexts.minLength.replace('{value}', this.minLength.toString());
+          this.internalValidationFailed = true;
+        }
+        // handle max length
+        if (this.maxLength && value.length > this.maxLength) {
+          this.internalValidationMessage = this.validationTexts.maxLength.replace('{value}', this.maxLength.toString());
+          this.internalValidationFailed = true;
+        }
+      }
+      return value;
+    },
+
+    /** NUMBER HANDLING */
+    /**
+     * create a string out of number values for internal handling (if it is not already)
+     * and replace dot with the display decimalSeparator chosen with prop `decimalSeparator`
      *
-     * @param {number} value
+     * @param {number|string} value
      * @returns {string}
      */
     translateFloat(value) {
@@ -846,7 +794,7 @@ export default {
      */
     stringToFloat(value) {
       // number('') would be 0, so we leave it empty if necessary
-      return value ? Number(value.toString().replace(this.decimalSeparator, '.')) : '';
+      return value ? Number(value.toString().replace(this.decimalSeparator, '.')) : null;
     },
     /**
      * check if input would not be a valid number
@@ -862,24 +810,9 @@ export default {
         && (value.toString().match(pattern) || Number.isNaN(this.stringToFloat(value)));
     },
     /**
-     * trigger input event
-     * e.g. to validate input changes from parent
-     */
-    triggerInputEvent() {
-      // Todo: find other solution to wait until inputInt has really changed
-      setTimeout(() => {
-        if (this.inputElement) {
-          // need to set element value manually here since in some devices (e.g. pixel) it was not updated
-          // yet when event is triggered (see ticket #2451)
-          this.inputElement.value = this.inputInt;
-          this.inputElement.dispatchEvent(new Event('input'));
-        }
-      }, 0);
-    },
-    /**
      * crop and round decimals if needed
      * eg allowed decimals: 2 <br>
-     *   * 12.5e-2 => 0.125 => 0.12
+     *   * 12.5e-2 => 0.125 => 0.13
      *   * 0.01e-1 => 0.001 => 0
      * @param value
      * @returns {string}
@@ -904,6 +837,153 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    v-bind="rootAttrs"
+    class="base-input">
+    <!-- LABEL ROW -->
+    <div
+      :class="['base-input__label-row', { hide: !showLabelRow }]"
+      @click.stop="">
+      <!-- need to disable because label is there (below)? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
+      <label
+        :for="idInt"
+        :class="['base-input__label', { hide: !showLabel }]">
+        {{ labelLocalized }}
+      </label>
+      <div class="base-input__label-spacer" />
+      <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
+      <slot name="label-addition" />
+    </div>
+
+    <!-- ACTUAL INPUT FIELD -->
+    <!-- keydown event would have unwanted side effects here and is not relevant for
+      accessibility -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <div
+      ref="inputFrame"
+      :class="['base-input__input-frame',
+               { 'base-input__input-frame__border': showInputBorder },
+               { 'base-input__input-frame__disabled': disabled },
+               { 'base-input__input-frame__invalid': invalidInt }]"
+      @focusin="clickedInside"
+      @click="clickedInside">
+      <!-- one class __active for pseudo-class :focus-within, one class __is-active
+      for manually setting input active -->
+      <div
+        :class="['base-input__input-container',
+                 {
+                   'base-input__input-container__is-active':
+                     isActiveInt && useFormFieldStyling,
+                 }]">
+        <!-- @slot add elements before the actual input line but within the input field container -->
+        <slot name="pre-input-field" />
+        <div
+          :class="['base-input__input-line-container',
+                   { 'base-input__input-line-container__wrap': !hideInputField }]">
+          <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips) (before <input>) -->
+          <slot name="input-field-addition-before" />
+          <div class="base-input__input-line">
+            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap -->
+            <slot name="input-field-inline-before" />
+            <div
+              :class="['base-input__input-wrapper',
+                       {
+                         'base-input__input-wrapper__fade-out':
+                           useFadeOut && !isActiveInt && !hideInputField,
+                       }]">
+              <!-- @slot replace native HTML input element with custom input
+                   @binding { string } id - the id of the BaseInput component - if `id` is not provided in props this is an internal id that should also be set as <input> `id`. Also if this slot is used the v-model value should be provided to BaseInput as well for validation. Otherwise validation can be triggered with the `validate()` method. -->
+              <slot
+                :id="idInt"
+                name="input">
+                <!-- instead of v-model we need to use :value because on android chrome value is not updated properly otherwise
+                also see https://stackoverflow.com/questions/75477442/vue-3-v-model-not-properly-updating-on-in-andoids-chrome -->
+                <!-- need to disable because label is there (below)? -->
+                <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+                <input
+                  :id="idInt"
+                  ref="input"
+                  v-bind="forwardAttrs"
+                  :value="inputInt"
+                  :placeholder="placeholder"
+                  :type="isFieldTypeNumber ? 'text' : fieldType"
+                  :list="dropDownListId || null"
+                  :disabled="disabled"
+                  :aria-disabled="disabled.toString()"
+                  :aria-activedescendant="linkedListOption"
+                  :aria-describedby="idInt"
+                  :aria-required="required.toString()"
+                  :required="required"
+                  :aria-invalid="invalidInt.toString()"
+                  :minlength="minLength"
+                  :maxlength="maxLength"
+                  :inputmode="inputMode"
+                  enterkeyhint="done"
+                  autocomplete="off"
+                  :class="[inputClass, 'base-input__input',
+                           { 'base-input__input__hidden': hideInputField }]"
+                  @input.stop="onInput"
+                  @keydown="onKeydown"
+                  @keydown.tab="handleInputTab"
+                  @blur="onInputBlur">
+              </slot>
+            </div>
+            <!-- wrapped in a button for accessibility -->
+            <button
+              v-if="showRemoveIcon"
+              class="base-input__remove-icon-wrapper"
+              @keydown.tab="blurInput"
+              @click.stop="removeInput">
+              <!-- @slot use a custom icon instead of standard remove icon -->
+              <slot name="remove-icon">
+                <BaseIcon
+                  name="remove"
+                  title="Clear input"
+                  class="base-input__remove-icon" />
+              </slot>
+            </button>
+            <div
+              v-if="loadable"
+              class="base-input__loader">
+              <BaseLoader
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.loaderActive" />
+            </div>
+            <!-- @slot for adding elements after input (e.g. used to add loader) -->
+            <slot name="input-field-addition-after" />
+          </div>
+        </div>
+        <div
+          v-if="showErrorIcon && invalidInt"
+          class="base-input__error-icon-wrapper">
+          <!-- @slot use a custom icon instead of standard error/warning icon -->
+          <slot name="error-icon">
+            <BaseIcon
+              name="attention"
+              class="base-input__error-icon" />
+          </slot>
+        </div>
+        <!-- @slot after the actual input element over whole height of the input field container -->
+        <slot name="post-input-field" />
+      </div>
+    </div>
+
+    <!-- BELOW INPUT FIELD -->
+    <div>
+      <!-- @slot below-input slot added to e.g. add drop down -->
+      <!-- this way it does not interfere with error message -->
+      <slot name="below-input" />
+    </div>
+    <div
+      v-if="invalidInt && errorMessageInt"
+      class="base-input__invalid-message">
+      {{ errorMessageInt }}
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
@@ -1033,6 +1113,7 @@ export default {
             cursor: pointer;
             display: flex;
             justify-content: center;
+            flex-shrink: 0;
 
             &:focus, &:active {
               color: $app-color-secondary;

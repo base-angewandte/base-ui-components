@@ -86,13 +86,13 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
         <BaseIcon
           v-if="useCustomRemoveIcon"
           name="clock"
-          class="icon"/>
+          class="icon" />
       </template>
       <template #error-icon>
         <BaseIcon
           v-if="useCustomErrorIcon"
           name="eye"
-          class="icon"/>
+          class="icon" />
       </template>
     </BaseInput>
     <div class="button-row">
@@ -100,59 +100,58 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
         v-model="invalid"
         label="invalid"
         name="toggle invalid"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="disabled"
         label="disabled"
         name="toggle disabled"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="dropdownActive"
         label="show drop down"
         name="toggle drop down display"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="isLoading"
         label="show loader"
         name="toggle loader"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="clearable"
         label="clearable"
         name="toggle clearable"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="showInputBorder"
         label="input border"
         name="show input border"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="useFormFieldStyling"
         label="form field styling"
         name="use standard form field styling"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="showLabel"
         label="show label"
         name="show label"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="showErrorIcon"
         label="show error icon"
         name="show error icon"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="useCustomErrorIcon"
         :disabled="invalid"
         label="custom error icon"
         name="use a custom error icon"
-        class="toggle"/>
+        class="toggle" />
       <BaseToggle
         v-model="useCustomRemoveIcon"
-        :disabled="!!input"
         label="custom remove icon"
         name="use a custom remove icon"
-        class="toggle"/>
+        class="toggle" />
     </div>
     <BaseDropDown
       v-model="type"
@@ -179,7 +178,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
             },
         ]"
       :show-label="true"
-      label="Field type"/>
+      label="Field type" />
 
     <template
       v-if="type.value !== 'number'">
@@ -212,9 +211,9 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
           label="Decimals"
           fieldType="number"
           placeholder="Number of decimals"
-          :min="0"
+          :min="-1"
           class="row__element"
-          @update:model-value="updateComponent($event, 'decimals', true)" />
+          @update:model-value="updateComponent($event, 'decimals')" />
         <BaseDropDown
           v-model="language"
           :options="[
@@ -287,21 +286,22 @@ export default {
     };
   },
   watch: {
-    type(val) {
-      if (val.value === 'number') {
-        this.input = '';
+    type(val, previousVal) {
+      if (val.value === 'number' || previousVal.value === 'number') {
+        this.input = null;
       }
     },
+    decimals(val, previousVal) {
+      if (!val && previousVal) {
+        this.input = null;
+      }
+    }
   },
   methods: {
-    updateComponent(value, key, resetInput = false) {
+    updateComponent(value, key) {
       this.key += 1;
-      if (key && !value) {
+      if (key && [null, undefined, ''].includes(value)) {
         this[key] = null;
-
-        if (resetInput) {
-          this.input = '';
-        }
       }
     }
   },
@@ -342,8 +342,9 @@ export default {
 }
 
 .icon {
-  height: 16px;
-  margin: 0 8px;
+  height: 32px;
+  width: 32px;
+  padding: 8px;
 }
 
 .button-row {
