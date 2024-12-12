@@ -18,7 +18,8 @@
       :initial-slide="initialSlide"
       :items="media"
       :allow-download="false"
-      @hide="showPreview = false" />
+      @hide="showPreview = false" 
+      @download="download"/>
   </div>
 </template>
 
@@ -57,18 +58,18 @@ export default {
         },
         {
           title: 'Audio',
-          additionalInfo: ['Audio: Taken from: http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3'],
-          mediaUrl: 'http://www.hochmuth.com/mp3/Haydn_Cello_Concerto_D-1.mp3',
+          additionalInfo: ['Audio: Taken from: https://file-examples.com'],
+          mediaUrl: '/base-ui-components/files/file_example_MP3_700KB.mp3',
         },
         {
           title: 'Document',
-          additionalInfo: ['Taken from http://www.africau.edu/images/default/sample.pdf'],
-          mediaUrl: 'http://www.africau.edu/images/default/sample.pdf',
+          additionalInfo: ['Taken from https://file-examples.com'],
+          mediaUrl: '/base-ui-components/files/file-sample_150kB.pdf',
         },
         {
           title: 'Document',
-          additionalInfo: ['Taken from: https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc'],
-          mediaUrl: 'https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc',
+          additionalInfo: ['Taken from: https://file-examples.com'],
+          mediaUrl: '/base-ui-components/files/file-sample_100kB.doc',
         },
       ],
     };
@@ -80,6 +81,9 @@ export default {
     preview(index) {
       this.initialSlide = index;
       this.showPreview = true;
+    },
+    download(obj) {
+      window.open(obj.url, '_blank');
     },
   },
 };

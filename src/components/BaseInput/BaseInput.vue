@@ -1,151 +1,3 @@
-<template>
-  <div
-    v-bind="rootAttrs"
-    class="base-input">
-    <!-- LABEL ROW -->
-    <div
-      :class="['base-input__label-row', { hide: !showLabelRow }]"
-      @click.stop>
-      <!-- need to disable because label is there (below)? -->
-      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
-      <label
-        :for="idInt"
-        :class="['base-input__label', { hide: !showLabel }]">
-        {{ labelLocalized }}
-      </label>
-      <div class="base-input__label-spacer" />
-      <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
-      <slot name="label-addition" />
-    </div>
-
-    <!-- ACTUAL INPUT FIELD -->
-    <!-- keydown event would have unwanted side effects here and is not relevant for
-      accessibility -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
-    <div
-      ref="inputFrame"
-      :class="['base-input__input-frame',
-               { 'base-input__input-frame__border': showInputBorder },
-               { 'base-input__input-frame__disabled': disabled },
-               { 'base-input__input-frame__invalid': invalidInt }]"
-      @focusin="clickedInside"
-      @click="clickedInside">
-      <!-- one class __active for pseudo-class :focus-within, one class __is-active
-      for manually setting input active -->
-      <div
-        :class="['base-input__input-container',
-                 {
-                   'base-input__input-container__is-active':
-                     isActiveInt && useFormFieldStyling,
-                 }]">
-        <!-- @slot add elements before the actual input line but within the input field container -->
-        <slot name="pre-input-field" />
-        <div
-          :class="['base-input__input-line-container',
-                   { 'base-input__input-line-container__wrap': !hideInputField }]">
-          <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips) (before <input>) -->
-          <slot name="input-field-addition-before" />
-          <div class="base-input__input-line">
-            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap -->
-            <slot name="input-field-inline-before" />
-            <div
-              :class="['base-input__input-wrapper',
-                       {
-                         'base-input__input-wrapper__fade-out':
-                           useFadeOut && !isActiveInt && !hideInputField,
-                       }]">
-              <!-- @slot replace native HTML input element with custom input
-                   @binding { string } id - the id of the BaseInput component - if `id` is not provided in props this is an internal id that should also be set as <input> `id`. Also if this slot is used the v-model value should be provided to BaseInput as well for validation. Otherwise validation can be triggered with the `validate()` method. -->
-              <slot
-                :id="idInt"
-                name="input">
-                <!-- instead of v-model we need to use :value because on android chrome value is not updated properly otherwise
-                also see https://stackoverflow.com/questions/75477442/vue-3-v-model-not-properly-updating-on-in-andoids-chrome -->
-                <!-- need to disable because label is there (below)? -->
-                <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-                <input
-                  :id="idInt"
-                  ref="input"
-                  v-bind="forwardAttrs"
-                  :value="inputInt"
-                  :placeholder="placeholder"
-                  :type="isFieldTypeNumber ? 'text' : fieldType"
-                  :list="dropDownListId || null"
-                  :disabled="disabled"
-                  :aria-disabled="disabled.toString()"
-                  :aria-activedescendant="linkedListOption"
-                  :aria-describedby="idInt"
-                  :aria-required="required.toString()"
-                  :required="required"
-                  :aria-invalid="invalidInt.toString()"
-                  :minlength="minLength"
-                  :maxlength="maxLength"
-                  :inputmode="inputMode"
-                  enterkeyhint="done"
-                  autocomplete="off"
-                  :class="[inputClass, 'base-input__input',
-                           { 'base-input__input__hidden': hideInputField }]"
-                  @input.stop="onInput"
-                  @keydown="onKeydown"
-                  @keydown.tab="handleInputTab"
-                  @blur="onInputBlur">
-              </slot>
-            </div>
-            <!-- wrapped in a button for accessibility -->
-            <button
-              v-if="showRemoveIcon"
-              :id="`${idInt}-remove-icon`"
-              class="base-input__remove-icon-wrapper"
-              @keydown.tab="blurInput"
-              @click.stop="removeInput">
-              <!-- @slot use a custom icon instead of standard remove icon -->
-              <slot name="remove-icon">
-                <BaseIcon
-                  name="remove"
-                  title="Clear input"
-                  class="base-input__remove-icon" />
-              </slot>
-            </button>
-            <div
-              v-if="loadable"
-              class="base-input__loader">
-              <BaseLoader
-                :hide="!isLoading"
-                :text-on-loader-show="assistiveText.loaderActive" />
-            </div>
-            <!-- @slot for adding elements after input (e.g. used to add loader) -->
-            <slot name="input-field-addition-after" />
-          </div>
-        </div>
-        <div
-          v-if="showErrorIcon && invalidInt"
-          class="base-input__error-icon-wrapper">
-          <!-- @slot use a custom icon instead of standard error/warning icon -->
-          <slot name="error-icon">
-            <BaseIcon
-              name="attention"
-              class="base-input__error-icon" />
-          </slot>
-        </div>
-        <!-- @slot after the actual input element over whole height of the input field container -->
-        <slot name="post-input-field" />
-      </div>
-    </div>
-
-    <!-- BELOW INPUT FIELD -->
-    <div>
-      <!-- @slot below-input slot added to e.g. add drop down -->
-      <!-- this way it does not interfere with error message -->
-      <slot name="below-input" />
-    </div>
-    <div
-      v-if="invalidInt && errorMessageInt"
-      class="base-input__invalid-message">
-      {{ errorMessageInt }}
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, ref, computed, toRef } from 'vue';
 import { onClickOutside } from '@vueuse/core';
@@ -993,6 +845,154 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    v-bind="rootAttrs"
+    class="base-input">
+    <!-- LABEL ROW -->
+    <div
+      :class="['base-input__label-row', { hide: !showLabelRow }]"
+      @click.stop="">
+      <!-- need to disable because label is there (below)? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
+      <label
+        :for="idInt"
+        :class="['base-input__label', { hide: !showLabel }]">
+        {{ labelLocalized }}
+      </label>
+      <div class="base-input__label-spacer" />
+      <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)) -->
+      <slot name="label-addition" />
+    </div>
+
+    <!-- ACTUAL INPUT FIELD -->
+    <!-- keydown event would have unwanted side effects here and is not relevant for
+      accessibility -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <div
+      ref="inputFrame"
+      :class="['base-input__input-frame',
+               { 'base-input__input-frame__border': showInputBorder },
+               { 'base-input__input-frame__disabled': disabled },
+               { 'base-input__input-frame__invalid': invalidInt }]"
+      @focusin="clickedInside"
+      @click="clickedInside">
+      <!-- one class __active for pseudo-class :focus-within, one class __is-active
+      for manually setting input active -->
+      <div
+        :class="['base-input__input-container',
+                 {
+                   'base-input__input-container__is-active':
+                     isActiveInt && useFormFieldStyling,
+                 }]">
+        <!-- @slot add elements before the actual input line but within the input field container -->
+        <slot name="pre-input-field" />
+        <div
+          :class="['base-input__input-line-container',
+                   { 'base-input__input-line-container__wrap': !hideInputField }]">
+          <!-- @slot Slot to allow for additional elements in the input field <div> (e.g. chips) (before <input>) -->
+          <slot name="input-field-addition-before" />
+          <div class="base-input__input-line">
+            <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap -->
+            <slot name="input-field-inline-before" />
+            <div
+              :class="['base-input__input-wrapper',
+                       {
+                         'base-input__input-wrapper__fade-out':
+                           useFadeOut && !isActiveInt && !hideInputField,
+                       }]">
+              <!-- @slot replace native HTML input element with custom input
+                   @binding { string } id - the id of the BaseInput component - if `id` is not provided in props this is an internal id that should also be set as <input> `id`. Also if this slot is used the v-model value should be provided to BaseInput as well for validation. Otherwise validation can be triggered with the `validate()` method. -->
+              <slot
+                :id="idInt"
+                name="input">
+                <!-- instead of v-model we need to use :value because on android chrome value is not updated properly otherwise
+                also see https://stackoverflow.com/questions/75477442/vue-3-v-model-not-properly-updating-on-in-andoids-chrome -->
+                <!-- need to disable because label is there (below)? -->
+                <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+                <input
+                  :id="idInt"
+                  ref="input"
+                  v-bind="forwardAttrs"
+                  :value="inputInt"
+                  :placeholder="placeholder"
+                  :type="isFieldTypeNumber ? 'text' : fieldType"
+                  :list="dropDownListId || null"
+                  :disabled="disabled"
+                  :aria-disabled="disabled.toString()"
+                  :aria-activedescendant="linkedListOption"
+                  :aria-describedby="idInt"
+                  :aria-required="required.toString()"
+                  :required="required"
+                  :aria-invalid="invalidInt.toString()"
+                  :minlength="minLength"
+                  :maxlength="maxLength"
+                  :inputmode="inputMode"
+                  enterkeyhint="done"
+                  autocomplete="off"
+                  :class="[inputClass, 'base-input__input',
+                           { 'base-input__input__hidden': hideInputField }]"
+                  @input.stop="onInput"
+                  @keydown="onKeydown"
+                  @keydown.tab="handleInputTab"
+                  @blur="onInputBlur">
+              </slot>
+            </div>
+            <!-- wrapped in a button for accessibility -->
+            <button
+              v-if="showRemoveIcon"
+              :id="`${idInt}-remove-icon`"
+              class="base-input__remove-icon-wrapper"
+              @keydown.tab="blurInput"
+              @click.stop="removeInput">
+              <!-- @slot use a custom icon instead of standard remove icon -->
+              <slot name="remove-icon">
+                <BaseIcon
+                  name="remove"
+                  title="Clear input"
+                  class="base-input__remove-icon" />
+              </slot>
+            </button>
+            <div
+              v-if="loadable"
+              class="base-input__loader">
+              <BaseLoader
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.loaderActive" />
+            </div>
+            <!-- @slot for adding elements after input (e.g. used to add loader) -->
+            <slot name="input-field-addition-after" />
+          </div>
+        </div>
+        <div
+          v-if="showErrorIcon && invalidInt"
+          class="base-input__error-icon-wrapper">
+          <!-- @slot use a custom icon instead of standard error/warning icon -->
+          <slot name="error-icon">
+            <BaseIcon
+              name="attention"
+              class="base-input__error-icon" />
+          </slot>
+        </div>
+        <!-- @slot after the actual input element over whole height of the input field container -->
+        <slot name="post-input-field" />
+      </div>
+    </div>
+
+    <!-- BELOW INPUT FIELD -->
+    <div>
+      <!-- @slot below-input slot added to e.g. add drop down -->
+      <!-- this way it does not interfere with error message -->
+      <slot name="below-input" />
+    </div>
+    <div
+      v-if="invalidInt && errorMessageInt"
+      class="base-input__invalid-message">
+      {{ errorMessageInt }}
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
