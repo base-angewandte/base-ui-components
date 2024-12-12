@@ -37,7 +37,7 @@
           <slot
             name="entry-text-content"
             :item="item" />
-        </template>isDraggable
+        </template>
         <template #right-side-elements="{ isSelected }">
           <!-- @slot use this slot to add elements to the right side of an entry. This slot content
             will be rendered in place of thumbnails and select checkbox so it will effectively
