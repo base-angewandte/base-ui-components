@@ -256,13 +256,13 @@ export default {
       const { MarkerClusterGroup } = await import('leaflet.markercluster');
 
       // Initialize Leaflet map
-      this.map = this.L.map(this.$refs.mapElement, {
+      const map = this.L.map(this.$refs.mapElement, {
         scrollWheelZoom: this.scrollWheelZoom,
         tap: false, // fix clickEvent for macOS Safari
       });
 
       // Set position of attribution
-      this.map.attributionControl.setPosition(this.attributionPosition);
+      map.attributionControl.setPosition(this.attributionPosition);
 
       // Draw Leaflet map
       const mapConfig = {
@@ -273,9 +273,9 @@ export default {
       };
 
       if (this.tileLayerService === 'WMS') {
-        this.L.tileLayer.wms(this.url, mapConfig).addTo(this.map);
+        this.L.tileLayer.wms(this.url, mapConfig).addTo(map);
       } else {
-        this.L.tileLayer(this.url, mapConfig).addTo(this.map);
+        this.L.tileLayer(this.url, mapConfig).addTo(map);
       }
 
       // Add marker to map
@@ -352,7 +352,7 @@ export default {
       });
 
       // Add clusterGroup to map
-      this.map.addLayer(this.markerCluster);
+      map.addLayer(this.markerCluster);
 
       // Check if marker has property latLng or coordinates again, otherwise do not render to map
       const marker = this.markerFiltered.filter(item => (item.latLng || item.coordinates));
@@ -366,10 +366,13 @@ export default {
         this.markerFiltered.map(item => this.getLatLng(item)),
       );
 
-      this.map.fitBounds(bounds, {
+      map.fitBounds(bounds, {
         padding: this.boundsPadding,
         maxZoom: this.zoom,
       });
+
+      // store map to vue context
+      this.map = map;
     },
     activateMarker(e) {
       const { id } = e.target.options;
