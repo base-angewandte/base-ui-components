@@ -62,13 +62,14 @@
         <slot name="below-input" />
       </template>
     </BaseChipsInput>
-    <VueDraggable
-      v-model="selectedBelowListInt"
-      :group="{ name: `chips-below-draggable-${internalId}` }"
-      :animation="200"
-      :set-data="setDragElement"
-      handle=".base-chips-below__icon-handle"
-      @end="onDragEnd(selectedBelowListInt)">
+    <Component
+      :is="draggableComponent"
+      v-model="draggableList"
+      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: null"
+      :animation="draggable ? 200 : null"
+      :set-data="draggable ? setDragElement : null"
+      :handle="draggable ? '.base-chips-below__icon-handle' : null"
+      @end="draggable ? onDragEnd(selectedBelowListInt) : null">
       <TransitionGroup
         :name="'flip-list'"
         type="transition">
@@ -139,7 +140,6 @@
 </template>
 
 <script>
-import { VueDraggable } from 'vue-draggable-plus';
 import { computed, defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
@@ -156,7 +156,6 @@ export default {
   name: 'BaseChipsBelow',
   components: {
     BaseChipsInput,
-    VueDraggable,
     BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
@@ -527,6 +526,12 @@ export default {
     };
   },
   computed: {
+    draggableComponent() {
+      if (this.draggable) {
+        return defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable));
+      }
+      return 'div';
+    },
     // need to filter language from $props for chips input component since only needed for
     // additional property (roles)!
     // leads to unwanted behaviour else (creating multilang object)
@@ -544,6 +549,15 @@ export default {
       // BaseChipsInput does not have that prop) we dont want that passed down
       delete newProps.validationTexts;
       return newProps;
+    },
+    draggableList: {
+      set(val) {
+        this.selectedBelowListInt = val;
+      },
+      get() {
+        if (!this.draggable) return null;
+        return this.selectedBelowListInt;
+      },
     },
   },
   watch: {
