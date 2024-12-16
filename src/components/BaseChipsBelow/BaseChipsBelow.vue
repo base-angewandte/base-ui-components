@@ -75,26 +75,26 @@
         <div
           v-for="(entry, index) in selectedBelowListInt"
           :key="'item' + entry.idInt"
-          :class="['base-chips-below-list-item',
-                   { 'base-chips-below-list-item--draggable': draggable }]">
+          :class="['base-chips-below__list-item',
+                   { 'base-chips-below__list-item--draggable': draggable }]">
           <div
             :key="'line' + entry.idInt"
-            class="base-chips-below-list-item-line">
+            class="base-chips-below__list-item-line">
             <div
               v-if="draggable"
               :key="'iconwrapper' + entry.idInt"
-              class="base-chips-below-list-icon-wrapper">
+              class="base-chips-below__list-icon-wrapper">
               <div
                 class="base-chips-below__icon-handle">
                 <BaseIcon
                   :key="'icon' + entry.idInt"
                   name="drag-lines"
-                  class="svg-icon base-chips-below-list-icon" />
+                  class="svg-icon base-chips-below__list-icon" />
               </div>
             </div>
             <div
               :key="'chip-wrapper' + entry.idInt"
-              class="base-chips-below-list-item-chip-wrapper">
+              class="base-chips-below__list-item-chip-wrapper">
               <BaseChip
                 :id="'chips-below' + entry.idInt"
                 ref="selectedChip"
@@ -103,7 +103,6 @@
                 :editable="allowUnknownEntries && chipsEditable"
                 :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
                   || !!entry[identifierPropertyName])"
-                class="base-chips-input-chip"
                 @update:model-value="modifyChipValue($event, index)"
                 @remove-entry="removeEntry(index)" />
             </div>
@@ -130,12 +129,12 @@
               :show-error-icon="showErrorIcon"
               :required="additionalPropRequired"
               :default-entry="additionalPropDefaultOption"
-              class="base-chips-below-chips-input"
+              class="base-chips-below__chips-input"
               @update:model-value="updateAdditionalProperty($event, index)" />
           </div>
         </div>
       </TransitionGroup>
-    </VueDraggable>
+    </Component>
   </div>
 </template>
 
@@ -849,7 +848,7 @@ export default {
   @use "@/styles/variables" as *;
 
   .base-chips-below {
-    .base-chips-below-list-item {
+    .base-chips-below__list-item {
       padding: $spacing-small-half 0 0 0;
 
       &:not(:last-of-type) {
@@ -858,11 +857,11 @@ export default {
         padding: $spacing-small-half 0;
       }
 
-      .base-chips-below-list-item-line {
+      .base-chips-below__list-item-line {
         display: flex;
         align-items: center;
 
-        .base-chips-below-list-icon-wrapper {
+        .base-chips-below__list-icon-wrapper {
           width: $icon-medium;
           height: $icon-medium;
           display: flex;
@@ -884,7 +883,7 @@ export default {
               right: -$spacing-small;
               transform: translateY(-50%);
             }
-            .base-chips-below-list-icon {
+            .base-chips-below__list-icon {
               max-height: 100%;
               width: $icon-medium;
               height: $icon-medium;
@@ -895,7 +894,7 @@ export default {
           }
         }
 
-        .base-chips-below-list-item-chip-wrapper {
+        .base-chips-below__list-item-chip-wrapper {
           width: 100%;
           margin-right: $spacing;
           max-width: calc(50% - #{$spacing});
@@ -903,20 +902,20 @@ export default {
           text-align: left;
         }
 
-        .base-chips-below-chips-input {
+        .base-chips-below__chips-input {
           max-width: calc(50%);
           flex: 1 0 calc(50%);
         }
       }
 
-      &.base-chips-below-list-item--draggable {
-        .base-chips-below-list-item-chip-wrapper {
+      &.base-chips-below__list-item--draggable {
+        .base-chips-below__list-item-chip-wrapper {
           margin-left: $spacing-small;
           max-width: calc(50% - (2 * #{$spacing}));
           flex: 1 0 calc(50% - (2 * #{$spacing}));
         }
 
-        .base-chips-below-chips-input {
+        .base-chips-below__chips-input {
           max-width: calc(50% - #{$spacing-small} - #{$spacing-small-half});
           flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small-half});
         }
