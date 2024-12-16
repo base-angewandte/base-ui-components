@@ -100,6 +100,7 @@
                 ref="selectedChip"
                 :key="'chip' + entry.idInt"
                 v-model="entry[labelPropertyName]"
+                :editable="allowUnknownEntries && chipsEditable"
                 :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
                   || !!entry[identifierPropertyName])"
                 class="base-chips-input-chip"
@@ -475,6 +476,14 @@ export default {
         optionAdded: 'option {label} added to selected list.',
         optionRemoved: 'option {label} removed.',
       }),
+    },
+    /**
+     * set `true` if chips (only [labelPropertyName] not additional attribute) should be editable on click
+     * caveat: this will only have an effect if `allowUnknownEntries` is true as well
+     */
+    chipsEditable: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue'],
