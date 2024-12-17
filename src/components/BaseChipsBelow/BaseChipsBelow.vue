@@ -1,144 +1,3 @@
-<template>
-  <div
-    ref="chipsBelow"
-    v-bind="rootAttrs"
-    class="base-chips-below">
-    <BaseChipsInput
-      ref="chipsInput"
-      v-bind="chipsInputProps"
-      :model-value="selectedBelowListInt"
-      :close-dropdown-on-option-select="closeDropdownOnOptionSelect"
-      :is-loading="isLoading"
-      :display-chips-inline="false"
-      :sort-text="sortText"
-      :sort-name="sortName"
-      :invalid="invalidInt"
-      :error-message="errorMessageInt"
-      @update:model-value="updateSelectedList"
-      @fetch-dropdown-entries="fetchDropDownEntries">
-      <template
-        #drop-down-entry="props">
-        <!-- @slot a slot to provide customized drop down options
-          @binding {Object} item - an option in the options list  -->
-        <slot
-          :item="props.item"
-          name="drop-down-entry" />
-      </template>
-      <template
-        #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField) -->
-        <slot name="label-addition" />
-      </template>
-      <template
-        #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField) -->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="remove-icon" />
-      </template>
-      <template
-        #no-options>
-        <!-- @slot a slot to customize messages in case of no options present in drop down -->
-        <slot
-          name="no-options" />
-      </template>
-      <!-- @slot to add elements below input fields e.g. add drop down; will appear before the
-        chosen chips list -->
-      <template #below-input>
-        <slot name="below-input" />
-      </template>
-    </BaseChipsInput>
-    <Component
-      :is="draggableComponent"
-      v-model="draggableList"
-      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: null"
-      :animation="draggable ? 200 : null"
-      :set-data="draggable ? setDragElement : null"
-      :handle="draggable ? '.base-chips-below__icon-handle' : null"
-      @end="draggable ? onDragEnd(selectedBelowListInt) : null">
-      <TransitionGroup
-        :name="'flip-list'"
-        type="transition">
-        <div
-          v-for="(entry, index) in renderList"
-          :key="'item' + entry.idInt"
-          :class="['base-chips-below__list-item',
-                   { 'base-chips-below__list-item--draggable': draggable }]">
-          <div
-            :key="'line' + entry.idInt"
-            class="base-chips-below__list-item-line">
-            <div
-              v-if="draggable"
-              :key="'iconwrapper' + entry.idInt"
-              class="base-chips-below__list-icon-wrapper">
-              <div
-                class="base-chips-below__icon-handle">
-                <BaseIcon
-                  :key="'icon' + entry.idInt"
-                  name="drag-lines"
-                  class="svg-icon base-chips-below__list-icon" />
-              </div>
-            </div>
-            <div
-              :key="'chip-wrapper' + entry.idInt"
-              class="base-chips-below__list-item-chip-wrapper">
-              <BaseChip
-                :id="'chips-below' + entry.idInt"
-                ref="selectedChip"
-                :key="'chip' + entry.idInt"
-                v-model="entry[labelPropertyName]"
-                :editable="allowUnknownEntries && chipsEditable"
-                :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
-                  || !!entry[identifierPropertyName])"
-                @update:model-value="modifyChipValue($event, index)"
-                @remove-entry="removeEntry(index)" />
-            </div>
-            <BaseChipsInput
-              :key="'input_' + entry.idInt"
-              v-model="entry[additionalPropertyName]"
-              :input-id="`${inputId || entry.idInt}_${additionalPropertyName}_${entry[identifierPropertyName]}`"
-              :show-label="false"
-              :label="label + '-' + additionalPropertyName"
-              :list="additionalPropOptions"
-              :show-input-border="false"
-              :allow-dynamic-drop-down-entries="false"
-              :placeholder="additionalPropPlaceholder"
-              :always-linked="true"
-              :language="language"
-              :draggable="true"
-              :drop-down-no-options-info="dropDownNoOptionsInfo"
-              :identifier-property-name="identifierPropertyName"
-              :label-property-name="labelPropertyName"
-              :invalid="hasAdditionalPropErrors && additionalPropErrorsList && additionalPropErrorsList[index]"
-              :error-message="validationTexts.required"
-              :allow-multiple-entries="additionalPropAllowMultipleEntries"
-              :chips-removable="chipsRemovable && chipsRemovable[index]"
-              :show-error-icon="showErrorIcon"
-              :required="additionalPropRequired"
-              :default-entry="additionalPropDefaultOption"
-              class="base-chips-below__chips-input"
-              @update:model-value="updateAdditionalProperty($event, index)" />
-          </div>
-        </div>
-      </TransitionGroup>
-    </Component>
-  </div>
-</template>
-
 <script>
 import { computed, defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
@@ -881,8 +740,148 @@ export default {
     },
   },
 };
-
 </script>
+
+<template>
+  <div
+    ref="chipsBelow"
+    v-bind="rootAttrs"
+    class="base-chips-below">
+    <BaseChipsInput
+      ref="chipsInput"
+      v-bind="chipsInputProps"
+      :model-value="selectedBelowListInt"
+      :close-dropdown-on-option-select="closeDropdownOnOptionSelect"
+      :is-loading="isLoading"
+      :display-chips-inline="false"
+      :sort-text="sortText"
+      :sort-name="sortName"
+      :invalid="invalidInt"
+      :error-message="errorMessageInt"
+      @update:model-value="updateSelectedList"
+      @fetch-dropdown-entries="fetchDropDownEntries">
+      <template
+        #drop-down-entry="props">
+        <!-- @slot a slot to provide customized drop down options
+          @binding {Object} item - an option in the options list  -->
+        <slot
+          :item="props.item"
+          name="drop-down-entry" />
+      </template>
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField) -->
+        <slot name="label-addition" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField) -->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="remove-icon" />
+      </template>
+      <template
+        #no-options>
+        <!-- @slot a slot to customize messages in case of no options present in drop down -->
+        <slot
+          name="no-options" />
+      </template>
+      <!-- @slot to add elements below input fields e.g. add drop down; will appear before the
+        chosen chips list -->
+      <template #below-input>
+        <slot name="below-input" />
+      </template>
+    </BaseChipsInput>
+    <Component
+      :is="draggableComponent"
+      v-model="draggableList"
+      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: null"
+      :animation="draggable ? 200 : null"
+      :set-data="draggable ? setDragElement : null"
+      :handle="draggable ? '.base-chips-below__icon-handle' : null"
+      @end="draggable ? onDragEnd(selectedBelowListInt) : null">
+      <TransitionGroup
+        :name="'flip-list'"
+        type="transition">
+        <div
+          v-for="(entry, index) in renderList"
+          :key="'item' + entry.idInt"
+          :class="['base-chips-below__list-item',
+                   { 'base-chips-below__list-item--draggable': draggable }]">
+          <div
+            :key="'line' + entry.idInt"
+            class="base-chips-below__list-item-line">
+            <div
+              v-if="draggable"
+              :key="'iconwrapper' + entry.idInt"
+              class="base-chips-below__list-icon-wrapper">
+              <div
+                class="base-chips-below__icon-handle">
+                <BaseIcon
+                  :key="'icon' + entry.idInt"
+                  name="drag-lines"
+                  class="svg-icon base-chips-below__list-icon" />
+              </div>
+            </div>
+            <div
+              :key="'chip-wrapper' + entry.idInt"
+              class="base-chips-below__list-item-chip-wrapper">
+              <BaseChip
+                :id="'chips-below' + entry.idInt"
+                ref="selectedChip"
+                :key="'chip' + entry.idInt"
+                v-model="entry[labelPropertyName]"
+                :editable="allowUnknownEntries && chipsEditable"
+                :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
+                  || !!entry[identifierPropertyName])"
+                @update:model-value="modifyChipValue($event, index)"
+                @remove-entry="removeEntry(index)" />
+            </div>
+            <BaseChipsInput
+              :key="'input_' + entry.idInt"
+              v-model="entry[additionalPropertyName]"
+              :input-id="`${inputId || entry.idInt}_${additionalPropertyName}_${entry[identifierPropertyName]}`"
+              :show-label="false"
+              :label="label + '-' + additionalPropertyName"
+              :list="additionalPropOptions"
+              :show-input-border="false"
+              :allow-dynamic-drop-down-entries="false"
+              :placeholder="additionalPropPlaceholder"
+              :always-linked="true"
+              :language="language"
+              :draggable="true"
+              :drop-down-no-options-info="dropDownNoOptionsInfo"
+              :identifier-property-name="identifierPropertyName"
+              :label-property-name="labelPropertyName"
+              :invalid="hasAdditionalPropErrors && additionalPropErrorsList && additionalPropErrorsList[index]"
+              :error-message="validationTexts.required"
+              :allow-multiple-entries="additionalPropAllowMultipleEntries"
+              :chips-removable="chipsRemovable && chipsRemovable[index]"
+              :show-error-icon="showErrorIcon"
+              :required="additionalPropRequired"
+              :default-entry="additionalPropDefaultOption"
+              class="base-chips-below__chips-input"
+              @update:model-value="updateAdditionalProperty($event, index)" />
+          </div>
+        </div>
+      </TransitionGroup>
+    </Component>
+  </div>
+</template>
 
 <style lang="scss">
   @use "@/styles/variables" as *;
