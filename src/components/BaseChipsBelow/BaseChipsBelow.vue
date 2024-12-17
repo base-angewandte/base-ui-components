@@ -877,7 +877,7 @@ export default {
       // e.g. { label: this.label, error: this.errorMessageInt },
       // but how to deal with the additionalOptions
       // for now a boolean is enough
-      return !(isValidChipsInput && this.hasAdditionalPropErrors);
+      return !(isValidChipsInput && !this.hasAdditionalPropErrors);
     },
   },
 };
