@@ -123,10 +123,10 @@
               :drop-down-no-options-info="dropDownNoOptionsInfo"
               :identifier-property-name="identifierPropertyName"
               :label-property-name="labelPropertyName"
-              :invalid="isInvalidAdditionalOption(entry[labelPropertyName], index)"
-              :error-message="additionalOptionsErrorMessage(entry[labelPropertyName], index)"
+              :invalid="hasAdditionalPropErrors && additionalPropErrorsList && additionalPropErrorsList[index]"
+              :error-message="validationTexts.required"
               :allow-multiple-entries="additionalPropAllowMultipleEntries"
-              :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
+              :chips-removable="chipsRemovable && chipsRemovable[index]"
               :show-error-icon="showErrorIcon"
               :required="additionalPropRequired"
               :default-entry="additionalPropDefaultOption"
@@ -513,7 +513,12 @@ export default {
       // error handling
       invalidInt: false,
       errorMessageInt: '',
-      additionalPropErrors: [],
+      /**
+       * flag to handle if additional props error should be displayed or not
+       *  -> only after manual validation (not immediately when field is added)
+       * @type {boolean}
+       */
+      hasAdditionalPropErrors: false,
     };
   },
   computed: {
@@ -550,6 +555,20 @@ export default {
         return this.selectedBelowListInt;
       },
     },
+    /**
+     * since not all entries have an identifier when `allowUnknownEntries` is set true
+     * we have an index based list that will save the error state per entry
+     * @returns {boolean[]|boolean}
+     */
+    additionalPropErrorsList() {
+      if (!this.additionalPropRequired) return false;
+      return this.selectedBelowListInt.map((selectedOption) => !selectedOption[this.additionalPropertyName]?.length);
+    },
+    chipsRemovable() {
+      if (!this.additionalPropRequired) return true;
+      return this.selectedBelowListInt.map((selectedOption) => this.additionalPropAllowMultipleEntries
+        && selectedOption[this.additionalPropertyName]?.length > 1);
+    },
   },
   watch: {
     /**
@@ -559,21 +578,18 @@ export default {
     modelValue: {
       handler(val) {
         this.createInternalList(val);
-        // reset error
-        if (val.length) {
+        // reset error if a new item was added
+        if (val.length && val.length > this.selectedBelowListInt.length) {
           // reset the invalid state but still respect any invalid state set from outside
           this.invalidInt = this.invalid;
           this.errorMessageInt = this.errorMessage;
-        }
-        // check if allowUnknownEntries are allowed and reset errors,
-        // due new entries do not have an id set initially and
-        // the error matching with index breaks
-        if (this.allowUnknownEntries
-          && this.additionalPropErrors.length) {
-          this.additionalPropErrors = [];
+          // newly added items should not immediately appear with error message so reset
+          // the error flag here
+          this.hasAdditionalPropErrors = false;
         }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * keep externally set invalid variable and internal invalid variable in sync
@@ -615,7 +631,7 @@ export default {
     additionalPropRequired: {
       handler(val) {
         if (!val) {
-          this.additionalPropErrors = [];
+          this.hasAdditionalPropErrors = false;
         }
       },
     },
@@ -636,6 +652,9 @@ export default {
           },
         };
       }));
+      // since we don't want a new entry to show an error message immediately we need
+      // to set the invalid variable false
+      this.hasAdditionalPropErrors = false;
     },
     removeEntry(index) {
       const item = this.selectedBelowListInt.splice(index, 1);
@@ -652,10 +671,11 @@ export default {
       }
       this.emitInternalList(list);
     },
-    updateAdditionalProperty(evt, index) {
-      this.selectedBelowListInt[index][this.additionalPropertyName] = evt;
       this.emitInternalList(this.selectedBelowListInt);
-      this.isValidAdditionalOptions(this.selectedBelowListInt[index]);
+    updateAdditionalProperty(updatedSelectedList, index) {
+      // update the additional property of the correct selected entry with the new list
+      this.selectedBelowListInt[index][this.additionalPropertyName] = updatedSelectedList;
+      // inform parent that the selected list changed
       /**
        * propagate additional-property-changed change event to parent
        * Note: useful when validation is done from the parent
@@ -785,44 +805,6 @@ export default {
       return true;
     },
     /**
-     * check if a single additional option is invalid
-     * @param {string} id
-     * @param {number} index
-     * @returns {boolean}
-     */
-    isInvalidAdditionalOption(id, index) {
-      return !!this.additionalPropErrors.filter(obj => obj.id === id).length
-        || typeof this.additionalPropErrors[index] !== 'undefined';
-    },
-    /**
-     * validate single or all additional option or all from the list of selected options
-     * @param {object|null} obj - single row object (optional)
-     * @returns {boolean} - valid state
-     */
-    isValidAdditionalOptions(obj) {
-      // if not set do anything
-      if (!this.additionalPropRequired) return true;
-
-      // validate single additional option
-      // if a chip is set (should always be if obj is specified)
-      if (obj && obj[this.additionalPropertyName].length) {
-        // remove the current object from the errors array
-        this.additionalPropErrors = this.additionalPropErrors
-          .filter(item => item.id !== obj.id);
-        // return validation state
-        return true;
-      }
-
-      // validate all selected entries and set errors
-      // TODO: why not use internal variable here but modelValue?
-      this.additionalPropErrors = this.modelValue
-        .filter(entry => !entry[this.additionalPropertyName] || !entry[this.additionalPropertyName].length)
-        .map(entry => ({ id: entry.id }));
-
-      // return validation state
-      return this.selectedBelowListInt.length ? !this.additionalPropErrors.length : true;
-    },
-    /**
      * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelow.validate();` from parent.<br>
      * Therefore, the component must have a reference set.
      * @public
@@ -830,19 +812,20 @@ export default {
      */
     validate() {
       // clear errors but still consider if invalid state and error message were set from
-      // out side - in this case use these values instead of a complete reset
+      // outside - in this case use these values instead of a complete reset
       this.invalidInt = this.invalid;
       this.errorMessageInt = this.errorMessage;
-      this.additionalPropErrors = [];
-      // validate
+      // validate main property field
       const isValidChipsInput = this.isValidChipsInput();
-      const isValidAdditionalOptions = this.isValidAdditionalOptions(null);
+      // and check if there are additional prop errors
+      this.hasAdditionalPropErrors = this.additionalPropErrorsList
+        && !!this.additionalPropErrorsList.some((error) => error);
       // return error state
       // nice to have would be to return an object or array with more information
       // e.g. { label: this.label, error: this.errorMessageInt },
       // but how to deal with the additionalOptions
       // for now a boolean is enough
-      return !(isValidChipsInput && isValidAdditionalOptions);
+      return !(isValidChipsInput && this.hasAdditionalPropErrors);
     },
   },
 };
