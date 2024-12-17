@@ -5,8 +5,8 @@
     class="base-chips-below">
     <BaseChipsInput
       ref="chipsInput"
-      v-model="selectedBelowListInt"
       v-bind="chipsInputProps"
+      :model-value="selectedBelowListInt"
       :close-dropdown-on-option-select="closeDropdownOnOptionSelect"
       :is-loading="isLoading"
       :display-chips-inline="false"
@@ -14,7 +14,7 @@
       :sort-name="sortName"
       :invalid="invalidInt"
       :error-message="errorMessageInt"
-      @update:model-value="addedEntry"
+      @update:model-value="updateSelectedList"
       @fetch-dropdown-entries="fetchDropDownEntries">
       <template
         #drop-down-entry="props">
@@ -475,7 +475,7 @@ export default {
       default: false,
     },
   },
-  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue'],
+  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue', 'duplicate'],
   setup(props) {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
@@ -686,12 +686,31 @@ export default {
     },
   },
   methods: {
-    addedEntry(list) {
     /** LIST HANDLING AND MANIPULATIONS */
     /**
      * function called when an entry is added to the selected list
      * @param list
      */
+    updateSelectedList(list) {
+      // first we need to make sure there are no duplicates if freetext is allowed
+      if (this.allowUnknownEntries && Array.from(new Set(list
+        // either create list of strings from identifier or if not present (=freetext entry)
+        // the label
+        .map((selectedOption) => selectedOption[this.identifierPropertyName]
+          || selectedOption[this.labelPropertyName]))).length !== list.length) {
+        // in order to also reset the BaseChipsInput modelValue we need to reassign
+        // the list to itself
+        this.selectedBelowListInt = JSON.parse(JSON.stringify(this.selectedBelowListInt));
+        /**
+         * event emitted when user is trying to add duplicate freetext which will be
+         * prevented (so that user can be informed)
+         * @event duplicate
+         * @param {Object[]} - the altered selected list (modelValue)
+         */
+        this.$emit('duplicate', list);
+        // then do not follow up with any further actions (=entry will not be added)
+        return;
+      }
       // since we don't want a new entry to show an error message immediately we need
       // to set the invalid variable false
       this.hasAdditionalPropErrors = false;
