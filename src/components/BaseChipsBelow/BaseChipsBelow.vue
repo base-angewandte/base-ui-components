@@ -74,7 +74,7 @@
         :name="'flip-list'"
         type="transition">
         <div
-          v-for="(entry, index) in selectedBelowListInt"
+          v-for="(entry, index) in renderList"
           :key="'item' + entry.idInt"
           :class="['base-chips-below__list-item',
                    { 'base-chips-below__list-item--draggable': draggable }]">
@@ -508,10 +508,23 @@ export default {
   },
   data() {
     return {
-      chipsArray: [],
+      /**
+       * internal representation of modelValue to manipulate
+       * @type {Object[]}
+       */
       selectedBelowListInt: [],
       // error handling
+      /**
+       * internal validity state - combining `invalid` prop
+       * and internal validation()
+       * @type {boolean}
+       */
       invalidInt: false,
+      /**
+       * internal error message - combining error message set by `errorMessage` prop
+       * and internal validation()
+       * @type {string}
+       */
       errorMessageInt: '',
       /**
        * flag to handle if additional props error should be displayed or not
@@ -546,11 +559,47 @@ export default {
       delete newProps.validationTexts;
       return newProps;
     },
+    /**
+     * selectedBelowListInt with an internal id added if necessary
+     * @returns {(*&{idInt: *})[]}
+     */
+    renderList() {
+      return this.selectedBelowListInt.map((entry) => {
+        // handled with ?? operator to prevent id 0 being ignored
+        let providedId = entry[this.identifierPropertyName] ?? undefined;
+        if (providedId === undefined) {
+          // try to check if the entry already received an id and the id is not it the list yet
+          // check if an id was already assigned to an item with that label which does not appear
+          // in the array more than once (this is just a safeguard - in addOption double adding
+          // of the same freetext should actually be prevented anyway)
+          const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
+            return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
+          }) : undefined;
+          providedId = createdId && createdId.length === 1
+            ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
+        }
+        return {
+          ...{
+            // initialize the additional property
+            [this.additionalPropertyName]: [],
+            // and create an internal id if none was provided
+            idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
+              ? entry[this.identifierPropertyName] : providedId,
+          },
+          ...entry,
+        };
+      });
+    },
+    /**
+     * in order to be able to dynamically import VueDraggable and only set v-model
+     * if it is used, use this variable
+     */
     draggableList: {
       set(val) {
         this.selectedBelowListInt = val;
       },
       get() {
+        // do not set v-model if draggable is false
         if (!this.draggable) return null;
         return this.selectedBelowListInt;
       },
@@ -577,7 +626,6 @@ export default {
      */
     modelValue: {
       handler(val) {
-        this.createInternalList(val);
         // reset error if a new item was added
         if (val.length && val.length > this.selectedBelowListInt.length) {
           // reset the invalid state but still respect any invalid state set from outside
@@ -587,6 +635,7 @@ export default {
           // the error flag here
           this.hasAdditionalPropErrors = false;
         }
+        this.selectedBelowListInt = JSON.parse(JSON.stringify(val));
       },
       immediate: true,
       deep: true,
@@ -638,44 +687,43 @@ export default {
   },
   methods: {
     addedEntry(list) {
-      this.emitInternalList(list.map((entry) => {
-        if (typeof entry === 'object') {
-          return {
-            ...entry,
-            [this.additionalPropertyName]: entry[this.additionalPropertyName] || [],
-          };
-        }
-        return {
-          ...{
-            [this.labelPropertyName]: entry,
-            [this.additionalPropertyName]: entry[this.additionalPropertyName] || [],
-          },
-        };
-      }));
+    /** LIST HANDLING AND MANIPULATIONS */
+    /**
+     * function called when an entry is added to the selected list
+     * @param list
+     */
       // since we don't want a new entry to show an error message immediately we need
       // to set the invalid variable false
       this.hasAdditionalPropErrors = false;
+      // update internal selected list
+      this.selectedBelowListInt = JSON.parse(JSON.stringify(list));
+      this.emitSelected(list);
     },
+    /**
+     * function called when an entry should be removed from the selected list
+     * @param {number} index
+     */
     removeEntry(index) {
+      // remove the entry from the internal list
       const item = this.selectedBelowListInt.splice(index, 1);
       item[this.additionalPropertyName] = {};
-      this.emitInternalList(this.selectedBelowListInt);
+      // inform parent about the change
+      this.emitSelected(this.selectedBelowListInt);
       // inform screen reader user
       this.announcement = this.assistiveText.optionRemoved
         .replace('{label}', item[0][this.labelPropertyName]);
     },
-    onDragEnd(list) {
-      const elem = document.getElementById('drag-element');
-      if (elem) {
-        elem.parentNode.removeChild(elem);
-      }
-      this.emitInternalList(list);
-    },
-      this.emitInternalList(this.selectedBelowListInt);
+    /**
+     * function called when an option was selected or removed from the additional property
+     * input
+     * @param {Array} updatedSelectedList
+     * @param {number} index
+     */
     updateAdditionalProperty(updatedSelectedList, index) {
       // update the additional property of the correct selected entry with the new list
       this.selectedBelowListInt[index][this.additionalPropertyName] = updatedSelectedList;
       // inform parent that the selected list changed
+      this.emitSelected(this.selectedBelowListInt);
       /**
        * propagate additional-property-changed change event to parent
        * Note: useful when validation is done from the parent
@@ -685,20 +733,59 @@ export default {
        */
       this.$emit('additional-property-changed', this.modelValue[index]);
     },
-    createInternalList(val) {
-      this.selectedBelowListInt = val.map((entry) => {
-        return {
-          ...{
-            // initialize the additional property
-            [this.additionalPropertyName]: [],
-            // and create an internal id if none was provided
-            idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
-              ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + createId(),
-          },
-          ...entry,
-        };
-      });
+    /**
+     * function called when `allowUnknownEntries` and `chipsEditable` are set true
+     * and a chip was modified
+     * @param {string} newChipText
+     * @param {number} index
+     */
+    modifyChipValue(newChipText, index) {
+      if (!newChipText) {
+        this.selectedBelowListInt.splice(index, 1);
+      } else {
+        const modifiedEntry = { ...this.selectedBelowListInt[index] };
+        if (this.identifierPropertyName) {
+          modifiedEntry[this.identifierPropertyName] = '';
+        }
+        modifiedEntry[this.labelPropertyName] = newChipText;
+        this.selectedBelowListInt[index] = modifiedEntry;
+      }
+      this.emitSelected(this.selectedBelowListInt);
     },
+    /**
+     * function to inform parent of updated selected list, sending list
+     * without internal modifications
+     * @param {Object[]} val
+     */
+    emitSelected(val) {
+      /**
+       * propagate list change from dragging event to parent
+       *
+       * @event update:modelValue
+       * @param {Object} - the altered list
+       *
+       */
+      this.$emit('update:modelValue', val);
+    },
+
+    /** DROP-DOWN / AUTOCOMPLETE */
+    /**
+     * function triggered on user input to autocomplete options
+     * @param params
+     */
+    fetchDropDownEntries(params) {
+      /**
+       * if drop down entries dynamically set - fetch new entries on input
+       *
+       * @event fetch-dropdown-entries
+       * @property {string} value - the input string
+       * @property {string} type - the `labelPropertyName` that was specified
+       *
+       */
+      this.$emit('fetch-dropdown-entries', params);
+    },
+
+    /** DRAG & DROP HANDING */
     /**
      * need to set custom due to some strange effects not showing correct element in some cases
      * (this function is only triggered on non-touch devices)
@@ -722,70 +809,16 @@ export default {
       document.body.appendChild(img);
       dataTransfer.setDragImage(img, 0, 0);
     },
-    emitInternalList(val) {
-      const sendArr = [];
-      val.forEach((sel, index) => {
-        sendArr[index] = { ...sel };
-      });
-      sendArr.forEach((sel) => {
-        // eslint-disable-next-line no-param-reassign
-        delete sel.idInt;
-      });
-      /**
-       * propagate list change from dragging event to parent
-       *
-       * @event update:modelValue
-       * @param {Object} - the altered list
-       *
-       */
-      this.$emit('update:modelValue', sendArr);
-    },
-    modifyChipValue(event, index) {
-      if (!event) {
-        this.selectedBelowListInt.splice(index, 1);
-      } else {
-        const modifiedEntry = { ...this.selectedBelowListInt[index] };
-        if (this.identifierPropertyName) {
-          modifiedEntry[this.identifierPropertyName] = '';
-        }
-        modifiedEntry[this.labelPropertyName] = event;
-        this.selectedBelowListInt[index] = modifiedEntry;
+    onDragEnd(list) {
+      const elem = document.getElementById('drag-element');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
       }
-      this.emitInternalList(this.selectedBelowListInt);
+      this.emitSelected(list);
     },
-    fetchDropDownEntries(params) {
-      /**
-       * if drop down entries dynamically set - fetch new entries on input
-       *
-       * @event fetch-dropdown-entries
-       * @property {string} value - the input string
-       * @property {string} type - the `labelPropertyName` that was specified
-       *
-       */
-      this.$emit('fetch-dropdown-entries', params);
-    },
-    /**
-     * get additional options error message
-     * @param {string} id - objects id
-     * @param {number} index - index in selectedList (needed for unknown entries)
-     * @returns {string}
-     */
-    additionalOptionsErrorMessage(id, index) {
-      if (this.additionalPropErrors.filter(obj => obj.id === id).length
-            || typeof this.additionalPropErrors[index] !== 'undefined') {
-        return this.validationTexts.required;
-      }
-      return '';
-    },
-    /**
-     * check if chips should be removable
-     * @param {Object} obj
-     * @returns {boolean}
-     */
-    isChipsRemovable(obj) {
-      return !this.additionalPropRequired
-        || (!!this.additionalPropAllowMultipleEntries && obj.length > 1);
-    },
+
+    /** VALIDATION */
+
     /**
      * validate chips input field
      * @returns {boolean} - error state
