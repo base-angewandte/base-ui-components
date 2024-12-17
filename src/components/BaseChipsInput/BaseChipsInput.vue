@@ -105,15 +105,6 @@ export default {
       default: false,
     },
     /**
-     * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to `modelValue` directly but only in parent
-     * component
-     */
-    addSelectedEntryDirectly: {
-      type: Boolean,
-      default: true,
-    },
-    /**
      * option to have the border of the input field not displayed
      */
     showInputBorder: {

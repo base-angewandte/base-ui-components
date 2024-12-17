@@ -238,15 +238,6 @@ export default {
       default: false,
     },
     /**
-     * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to selectedList directly but only in parent
-     * component
-     */
-    addSelectedEntryDirectly: {
-      type: Boolean,
-      default: true,
-    },
-    /**
      * define whether one or more options can be selected from the drop-down menu
      */
     additionalPropAllowMultipleEntries: {
