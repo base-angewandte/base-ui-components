@@ -143,6 +143,11 @@ const props = defineProps({
 });
 
 /**
+ * define emits
+ */
+const emits = defineEmits(['highlighted']);
+
+/**
  * set reference to map element
  */
 const mapElement = ref(null);
@@ -254,11 +259,6 @@ watch(() => props.highlightMarker, (value, before) => {
     markerClusterActive.classList.remove(`${markerClusterClass}--active`);
   }
 });
-
-/**
- * define emits
- */
-const emits = defineEmits(['highlighted']);
 
 /**
  * method to activate a specific marker due toggling a CSS class
