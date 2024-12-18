@@ -1,88 +1,3 @@
-<template>
-  <BaseInput
-    v-model="fieldContent[activeTabInt]"
-    v-model:is-active="isActive"
-    :input-id="idInt"
-    :label="label"
-    :show-label="showLabel"
-    :placeholder="placeholder"
-    :required="required"
-    :invalid="invalid"
-    :disabled="disabled"
-    :show-error-icon="showErrorIcon"
-    :error-message="errorMessage"
-    :clearable="clearable"
-    :use-fade-out="false"
-    class="base-multiline-text-input">
-    <template #label-addition>
-      <div class="base-multiline-text-input__additions">
-        <!-- @slot to add drop down needed for text input field (base specific) or any other element deemed necessary -->
-        <slot name="label-addition" />
-        <BaseSwitchButton
-          v-if="tabs && tabs[0] !== 'default'"
-          v-model="activeTabInt"
-          :options="switchTabs"
-          :label="tabsLegend"
-          class="base-multiline-text-input__tabs">
-          <template
-            #right-of-content="tab">
-            <BaseIcon
-              v-if="hasText(tab.value)"
-              class="base-multiline-text-input__text-icon"
-              name="text" />
-          </template>
-        </BaseSwitchButton>
-      </div>
-    </template>
-    <template #input>
-      <div
-        :class="['base-multiline-text-input__textarea-wrapper',
-                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut },
-                 { 'base-multiline-text-input__textarea-wrapper__fade-out--top': boxFadeOut.top },
-                 { 'base-multiline-text-input__textarea-wrapper__fade-out--bottom': boxFadeOut.bottom }]">
-        <!-- need to disable because label is there - it is just in BaseInput component -->
-        <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-        <textarea
-          :id="idInt"
-          ref="textarea"
-          v-model="fieldContent[activeTabInt]"
-          v-bind="forwardAttrs"
-          :required="required"
-          :aria-required="required.toString()"
-          :aria-describedby="idInt"
-          :aria-invalid="invalid.toString()"
-          :disabled="disabled"
-          :aria-disabled="disabled.toString()"
-          :placeholder="placeholder"
-          class="base-multiline-text-input__textarea"
-          @keydown.tab="isActive = false"
-          @input="onInput" />
-      </div>
-    </template>
-    <template
-      #input-field-addition-before>
-      <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
-      <slot name="input-field-addition-before" />
-    </template>
-    <template #input-field-addition-after>
-      <!-- @slot for adding elements after input -->
-      <slot name="input-field-addition-after" />
-    </template>
-    <template #post-input-field>
-      <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-      <slot name="post-input-field" />
-    </template>
-    <template #error-icon>
-      <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-      <slot name="error-icon" />
-    </template>
-    <template #remove-icon>
-      <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-      <slot name="remove-icon" />
-    </template>
-  </BaseInput>
-</template>
-
 <script>
 import { defineAsyncComponent, ref, toRef } from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
@@ -340,6 +255,91 @@ export default {
   },
 };
 </script>
+
+<template>
+  <BaseInput
+    v-model="fieldContent[activeTabInt]"
+    v-model:is-active="isActive"
+    :input-id="idInt"
+    :label="label"
+    :show-label="showLabel"
+    :placeholder="placeholder"
+    :required="required"
+    :invalid="invalid"
+    :disabled="disabled"
+    :show-error-icon="showErrorIcon"
+    :error-message="errorMessage"
+    :clearable="clearable"
+    :use-fade-out="false"
+    class="base-multiline-text-input">
+    <template #label-addition>
+      <div class="base-multiline-text-input__additions">
+        <!-- @slot to add drop down needed for text input field (base specific) or any other element deemed necessary -->
+        <slot name="label-addition" />
+        <BaseSwitchButton
+          v-if="tabs && tabs[0] !== 'default'"
+          v-model="activeTabInt"
+          :options="switchTabs"
+          :label="tabsLegend"
+          class="base-multiline-text-input__tabs">
+          <template
+            #right-of-content="tab">
+            <BaseIcon
+              v-if="hasText(tab.value)"
+              class="base-multiline-text-input__text-icon"
+              name="text" />
+          </template>
+        </BaseSwitchButton>
+      </div>
+    </template>
+    <template #input>
+      <div
+        :class="['base-multiline-text-input__textarea-wrapper',
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut },
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out--top': boxFadeOut.top },
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out--bottom': boxFadeOut.bottom }]">
+        <!-- need to disable because label is there - it is just in BaseInput component -->
+        <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+        <textarea
+          :id="idInt"
+          ref="textarea"
+          v-model="fieldContent[activeTabInt]"
+          v-bind="forwardAttrs"
+          :required="required"
+          :aria-required="required.toString()"
+          :aria-describedby="idInt"
+          :aria-invalid="invalid.toString()"
+          :disabled="disabled"
+          :aria-disabled="disabled.toString()"
+          :placeholder="placeholder"
+          class="base-multiline-text-input__textarea"
+          @keydown.tab="isActive = false"
+          @input="onInput" />
+      </div>
+    </template>
+    <template
+      #input-field-addition-before>
+      <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
+      <slot name="input-field-addition-before" />
+    </template>
+    <template #input-field-addition-after>
+      <!-- @slot for adding elements after input -->
+      <slot name="input-field-addition-after" />
+    </template>
+    <template #post-input-field>
+      <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <slot name="post-input-field" />
+    </template>
+    <template #error-icon>
+      <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <slot name="error-icon" />
+    </template>
+    <template #remove-icon>
+      <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <slot name="remove-icon" />
+    </template>
+  </BaseInput>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
