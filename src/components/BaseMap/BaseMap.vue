@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineProps, ref, shallowRef, watch } from 'vue';
+import { computed, ref, shallowRef, watch } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
