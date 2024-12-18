@@ -256,12 +256,9 @@ export default {
           margin-bottom: $spacing-small;
         }
 
-        .base-text-list__content {
-          transition: color 250ms ease-in-out;
-        }
-
         &:deep(.base-text-list__content) {
           margin-bottom: $spacing-small;
+          transition: color 250ms ease-in-out;
         }
 
         &--highlight :deep(.base-text-list__content) {
