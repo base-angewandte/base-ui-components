@@ -594,9 +594,13 @@ $clusterClass: '.base-map-marker-cluster';
 
 .leaflet-popup-content {
   margin: $spacing-small $spacing-large $spacing $spacing-small;
-  font-size: 14px !important;
-  line-height: 1.4em;
+  font-size: $font-size-small;
+  line-height: $line-height-small;
   color: $font-color;
+}
+
+.leaflet-container {
+  font-family: inherit;
 }
 
 .leaflet-container a.leaflet-popup-close-button {
