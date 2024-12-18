@@ -2,7 +2,6 @@
   <BaseInput
     v-model="fieldContent[activeTabInt]"
     v-model:is-active="isActive"
-    v-bind="$attrs"
     :input-id="idInt"
     :label="label"
     :show-label="showLabel"
@@ -37,16 +36,17 @@
     </template>
     <template #input>
       <div
-        ref="textareaWrapper"
         :class="['base-multiline-text-input__textarea-wrapper',
-                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut }]">
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut },
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out--top': boxFadeOut.top },
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out--bottom': boxFadeOut.bottom }]">
         <!-- need to disable because label is there - it is just in BaseInput component -->
         <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
         <textarea
           :id="idInt"
           ref="textarea"
           v-model="fieldContent[activeTabInt]"
-          v-bind="inputListeners"
+          v-bind="forwardAttrs"
           :required="required"
           :aria-required="required.toString()"
           :aria-describedby="idInt"
@@ -55,7 +55,8 @@
           :aria-disabled="disabled.toString()"
           :placeholder="placeholder"
           class="base-multiline-text-input__textarea"
-          @keydown.tab="isActive = false" />
+          @keydown.tab="isActive = false"
+          @input="onInput" />
       </div>
     </template>
     <template
@@ -83,9 +84,11 @@
 </template>
 
 <script>
-import { defineAsyncComponent, ref } from 'vue';
+import { defineAsyncComponent, ref, toRef } from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import { useId } from '@/composables/useId.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
 
 /**
  * A multiline textfield base component
@@ -226,16 +229,34 @@ export default {
     /** INTERNAL ID */
     /**
      * create a permanent id (also suitable for ssr)
-     * @type {Ref<UnwrapRef<string|number>>}
+     * @type {Ref<UnwrapRef<string>> | Ref<UnwrapRef<number>>}
      */
-    const idInt = ref(props.inputId);
+    const idInt = toRef(props.inputId);
     // check if one was provided by prop or create one
     if (!idInt.value) {
       idInt.value = useId();
     }
 
+    /** ATTRS HANDLING */
+    // since the root element is BaseInput directly we don't need the root attrs
+    // here - they will be extrancted and applied in BaseInput component
+    const { forwardAttrs } = useExtractAttrs();
+
+    /** FADE OUT HANDLING */
+    /**
+     * variable to store a reference the textarea element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const textarea = ref(null);
+    const { boxFadeOut } = useElementFadeOut({
+      target: textarea,
+    });
+
     return {
       idInt,
+      forwardAttrs,
+      textarea,
+      boxFadeOut,
     };
   },
   data() {
@@ -246,34 +267,21 @@ export default {
     };
   },
   computed: {
-    // TODO: refactor component props to already match object necessary for switch component
+    /**
+     * map the switch options to the format required by BaseSwitchButton (an object with label
+     * value and (optionally) icon)
+     * @returns {{value: string, label: string}[]}
+     */
     switchTabs() {
       return this.tabs.map((tab, index) => ({ value: tab, label: this.tabLabels[index] || tab }));
     },
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$attrs,
-        // and add custom listeners
-        ...{
-          onInput: () => {
-            /**
-             * Event emitted on input, passing input string or input object
-             *
-             * @event update:modelValue
-             * @param {string, Object} - the altered field input
-             */
-            this.$emit('update:modelValue', this.emitFieldContent());
-          },
-        },
-      };
-    },
+    /**
+     * calc if fade out should be visible which is if textarea height is overflown (calculated in
+     * composable) AND only if the input is not active
+     * @returns {boolean}
+     */
     showFadeOut() {
-      if (this.$refs && this.$refs.textarea) {
-        return !this.isActive
-          && this.$refs.textarea.scrollHeight > this.$refs.textareaWrapper.clientHeight;
-      }
-      return !this.isActive;
+      return !this.isActive && (this.boxFadeOut.top || this.boxFadeOut.bottom);
     },
   },
   watch: {
@@ -298,6 +306,18 @@ export default {
     },
   },
   methods: {
+    /**
+     * forward the input
+     */
+    onInput() {
+      /**
+       * Event emitted on input, passing input string or input object
+       *
+       * @event update:modelValue
+       * @param {string, Object} - the altered field input
+       */
+      this.$emit('update:modelValue', this.emitFieldContent());
+    },
     setFieldContent(val) {
       if (this.tabs.length < 2) {
         const propName = this.activeTabInt || 'default';
@@ -322,6 +342,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use "sass:map";
 @use "@/styles/variables" as *;
 
 .base-multiline-text-input {
@@ -354,15 +375,26 @@ export default {
   .base-multiline-text-input__textarea-wrapper {
     width: 100%;
 
-    &.base-multiline-text-input__textarea-wrapper__fade-out::after {
+    &.base-multiline-text-input__textarea-wrapper__fade-out::after,
+    &.base-multiline-text-input__textarea-wrapper__fade-out::before {
       content: '';
       width: 100%;
       height: $fade-out-width;
       position: absolute;
-      bottom: 0;
+      pointer-events: none;
+      z-index: map.get($zindex, fadeout);
+    }
+
+    &.base-multiline-text-input__textarea-wrapper__fade-out--bottom::after {
+      bottom: 1px;
       left: 0;
       background: linear-gradient(to bottom, rgba(255, 255, 255, 0) , white);
-      pointer-events: none;
+    }
+
+    &.base-multiline-text-input__textarea-wrapper__fade-out--top::before {
+      top: 1px;
+      left: 0;
+      background: linear-gradient(to top, rgba(255, 255, 255, 0) , white);
     }
 
     .base-multiline-text-input__textarea {
