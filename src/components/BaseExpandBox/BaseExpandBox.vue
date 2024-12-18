@@ -121,7 +121,7 @@ export default {
       // set internal expand variable
       if (this.expand) this.expandInt = true;
       // calculate the show-more button visibility
-      this.calcButtonVisibility({});
+      this.calcButtonVisibility();
       // init observers (currently for resize and mutation)
       this.initObserver();
       // set initialization state
@@ -133,10 +133,10 @@ export default {
      */
     initObserver() {
       // create a resize observer with calculation functions
-      const resizeObserver = new ResizeObserver(debounce(50, () => this.calcButtonVisibility({})));
+      const resizeObserver = new ResizeObserver(debounce(50, () => this.calcButtonVisibility));
 
       // create a mutation observer with calculation functions
-      const mutationObserver = new MutationObserver(() => this.calcButtonVisibility({}));
+      const mutationObserver = new MutationObserver(() => this.calcButtonVisibility);
 
       // attach the observers to the component
       resizeObserver.observe(this.content);
@@ -148,11 +148,8 @@ export default {
     },
     /**
      * calculate visibility of 'show more' button
-     * @param {boolean} collapse - defines if the content is collapsed
      */
-    calcButtonVisibility({ collapse = false }) {
-      // check if content should be collapsed
-      if (collapse) this.expandInt = false;
+    calcButtonVisibility() {
       if (this.contentInner) {
         // clone inner content
         const contentInnerTemp = this.contentInner.cloneNode(true);
