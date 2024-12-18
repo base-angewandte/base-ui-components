@@ -157,13 +157,13 @@ export default {
         // clone inner content
         const contentInnerTemp = this.contentInner.cloneNode(true);
         // add unique id for later use
-        contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.internalId.value}`);
+        contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.internalId}`);
         // append the temporary element to the component
         this.$el.appendChild(contentInnerTemp);
         // get the height of the temporary element
         const contentInnerTempHeight = contentInnerTemp.offsetHeight;
         // remove  element
-        this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.internalId.value}`));
+        this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.internalId}`));
         // set button visibility
         this.showButton = contentInnerTempHeight > this.maxCollapsedHeight;
 
