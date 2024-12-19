@@ -24,9 +24,7 @@ export function useElementObserver({ type, target, callback, options = {} }) {
     // if type is resize create a new resize observer
     if (type === 'resize') {
       // create a resize observer with calculation functions
-      observer.value = new ResizeObserver(() => {
-        callback();
-      });
+      observer.value = new ResizeObserver(callback);
       // or create a new mutation observer
     } else if (type === 'mutation') {
       observer.value = new MutationObserver(() => {
