@@ -1,6 +1,7 @@
 <template>
   <div
     ref="baseDateInput"
+    v-bind="rootAttrs"
     class="base-date-input">
     <div
       v-if="showLabelRow"
@@ -8,7 +9,7 @@
                { 'base-date-input__label-row--visible': showLabel }]">
       <legend
         v-if="showLabel"
-        ref="label"
+        ref="labelElement"
         class="base-date-input__label"
         @click.prevent="">
         {{ label }}
@@ -40,7 +41,7 @@
     <!-- keydown event is counter productive to workflow here -->
     <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
-      v-click-outside="clickedOutside"
+      v-click-outside="onClickOutsideHandler"
       class="base-date-input__field-wrapper"
       @click="clickedInside">
       <!-- @slot to add elements within form field but before the input element line for an example see [BaseInput](BaseInput)-->
@@ -55,7 +56,6 @@
           <BaseInput
             v-model="inputFrom"
             :input-id="`input-${internalId}-from`"
-            v-bind="inputListeners"
             :label="label"
             :show-label="false"
             :is-active="fromOpen"
@@ -75,12 +75,14 @@
             <template #input>
               <div
                 class="base-date-input__datepicker">
+                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
                 <DatePicker
-                  v-model="inputFrom"
+                  v-if="mounted"
+                  v-model:value="inputFrom"
                   :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
-                  :lang="lang[language]"
+                  :lang="lang"
                   :open="fromOpen"
                   :type="isFromTimeField ? 'time' : minDateView"
                   :format="isFromTimeField ? 'HH:mm' : datePickerValueFormat"
@@ -88,16 +90,16 @@
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('from')"
                   @click.prevent="onInputClick"
-                  @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
+                  @change="(time, timeType) => closeTimePicker({ origin: 'from', type: timeType })">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
                     component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
                       :id="`input-${internalId}-from`"
-                      ref="inputFrom"
+                      ref="inputFromElement"
                       :value="inputFrom"
-                      v-bind="dateInputListeners"
+                      v-bind="forwardAttrs"
                       :placeholder="isFromTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       :type="'text'"
@@ -141,7 +143,6 @@
             v-if="type !== 'single'"
             v-model="inputTo"
             :input-id="`input-${internalId}-to`"
-            v-bind="inputListeners"
             :label="label"
             :show-label="false"
             :is-active="toOpen"
@@ -160,12 +161,14 @@
             <template #input>
               <div
                 class="base-date-input__datepicker">
+                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
                 <DatePicker
-                  v-model="inputTo"
+                  v-if="mounted"
+                  v-model:value="inputTo"
                   :placeholder="isToTimeField ? placeholder.time : placeholder.date"
                   :clearable="false"
                   :append-to-body="false"
-                  :lang="lang[language]"
+                  :lang="lang"
                   :open="toOpen"
                   :type="isToTimeField ? 'time' : minDateView"
                   :format="isToTimeField ? 'HH:mm' : datePickerValueFormat"
@@ -173,18 +176,18 @@
                   input-class="base-date-input__datepicker-input"
                   @pick="datePicked('to')"
                   @click.prevent="onInputClick"
-                  @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
+                  @change="(time, timeType) => closeTimePicker({ origin: 'to', type: timeType })">
                   <template #input>
                     <!-- need to disable because label is there - it is just in BaseInput
                       component -->
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
                       :id="`input-${internalId}-to`"
-                      ref="inputTo"
+                      ref="inputToElement"
                       :value="inputTo"
                       :placeholder="isToTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
-                      v-bind="dateInputListeners"
+                      v-bind="forwardAttrs"
                       :type="'text'"
                       :aria-describedby="label + '-to-' + internalId"
                       :aria-required="required.toString()"
@@ -229,17 +232,16 @@
 </template>
 
 <script>
-import { computed, defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import { capitalizeString, debounce } from '@/utils/utils.js';
-
-import en from 'vue-datepicker-next/locale/en.es.js';
-import de from 'vue-datepicker-next/locale/de.es.js';
-import fr from 'vue-datepicker-next/locale/fr.es.js';
 
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
@@ -260,6 +262,7 @@ export default {
   directives: {
     ClickOutside: vOnClickOutside,
   },
+  inheritAttrs: false,
   props: {
   /**
    * select date or datetime or a range
@@ -455,12 +458,353 @@ export default {
     },
   },
   emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
-  setup(props) {
+  setup(props, { emit, slots }) {
     /** INTERNAL ID */
     const generatedId = useId();
     const internalId = computed(() => props.inputId || generatedId);
+
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** DATE FORMAT SWITCH */
+    /**
+     * check if format switch tabs should be shown
+     * @returns {boolean}
+     */
+    const isSwitchableFormat = computed(() => {
+      return props.format === 'date_month_year' || props.format === 'date_year';
+    });
+
+    /** LABEL ROW DISPLAY */
+    /**
+     * check if label-addition slot exists is filled
+     */
+    const { slotHasContent: labelRowSlotsHaveData } = useHasSlotContent(slots['label-addition']);
+    /**
+     * determines if label row should be shown
+     * @returns {Boolean|boolean}
+     */
+    const showLabelRow = computed(() => {
+      // show label when prop is set true or a label addition was added via slot
+      return props.showLabel || isSwitchableFormat.value || labelRowSlotsHaveData.value;
+    });
+
+    /** INPUT ACTIVE / PICKER OPEN / CLICK OUTSIDE HANDLING */
+    /**
+     * to steer closing of date/timepicker from and to input field once date/time is selected
+     * (packed into an object to still be able to address it dynamically like so: pickerState[`${origin}Open`]
+     * @type {{fromOpen: Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>, toOpen: Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}}
+     */
+    const pickerState = {
+      fromOpen: ref(false),
+      toOpen: ref(false),
+    }
+    /**
+     * variable to steer if input fade out of from field should be shown
+     * @type {boolean}
+     */
+    /**
+     * variable to keep active state in sync with potential parent prop
+     * (this is needed as independent variable from toOpen and fromOpen for example in
+     * BaseAdvancedSearchRow to keep dropdown open even if datepicker is closed)
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isActiveInt = ref(false);
+
+    /**
+     * watch for changes in input field active variable to keep in sync with parent
+     * @param {boolean} val - the changed internal is active variable
+     */
+    watch(isActiveInt, (val) => {
+      /**
+       * replace BaseInput state with BaseDateInput field active state and
+       * propagate this one
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      emit('update:is-active', val);
+    });
+
+    /**
+     * also adjust internal variable when active state changes from outside
+     * @param {boolean} val - the changed isActive prop
+     */
+    watch(() => props.isActive, (val) => {
+      if (val !== isActiveInt.value) {
+        isActiveInt.value = val;
+        // if is active is set from outside also open the first date field
+        pickerState.fromOpen.value = val;
+      }
+      // if isActive is set false from outside also close date picker
+      if (!val) {
+        pickerState.fromOpen.value = false;
+        pickerState.toOpen.value = false;
+      }
+    }, {
+      immediate: true,
+    });
+
+    const onClickOutsideHandler = [
+      /**
+       * handle click outside event and adjust input active variable accordingly
+       * @param {MouseEvent} event - the event provided by the click outside directive
+       */
+      (event) => {
+        isActiveInt.value = false;
+        /**
+         * emit a custom clicked-outside event instead of BaseInput event (propagation stopped)
+         *
+         * @event clicked-outside
+         * @param {MouseEvent} - the native Event
+         */
+        emit('clicked-outside', event);
+      },
+    ]
+
+    /**
+     * handle click inside the component and adjust input active variable accordingly
+     * @param {MouseEvent} event - event triggered by mouse click
+     */
+    function clickedInside(event) {
+      isActiveInt.value = true;
+      /**
+       * event additionally triggered to BaseInput default click-input-field to also
+       * set field active if component sourroundings are clicked
+       *
+       * @event click-input-field
+       * @param {MouseEvent} - the native Event
+       */
+      emit('click-input-field', event);
+    }
+
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     * @param {string} origin - did event emit from 'from' or 'to' date field
+     */
+    function onInputBlur(event, origin) {
+      const relatedTargetInput = event.relatedTarget?.parentElement ? event.relatedTarget.parentElement
+        .getElementsByTagName('input') : null;
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget
+        && ((event.relatedTarget.tagName === 'INPUT'
+            && (!event.relatedTarget?.id || event.relatedTarget.id !== event.target.id))
+          // additionally also set input active false when the BaseInput 'remove' button
+          // (displayed if `clearable` is true) is triggered in the other date field of the range
+          || (event.relatedTarget?.className === 'base-input__remove-icon-wrapper'
+            && relatedTargetInput && relatedTargetInput[0]?.id !== event.target.id))) {
+        // set input active state false
+        pickerState[`${origin}Open`].value = false;
+      }
+    }
+
+    /** STYLE AND FADE OUT CALC ON RESIZE */
+    /**
+     * reference to the root element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const baseDateInput = ref(null);
+    /**
+     * reference to the label element
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const labelElement = ref(null);
+    /**
+     * reference to the possible additions to the label row - switch buttons and `label-addition` slot
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const labelAdditions = ref(null);
+    /**
+     * reference to the native input elements
+     * @type {{ inputElementFrom: Ref<UnwrapRef<null|HTMLElement>>, inputElementTo: Ref<UnwrapRef<null|HTMLElement>> }}
+     */
+    const inputElements = {
+      inputFromElement: ref(null),
+      inputToElement: ref(null),
+    };
+    /**
+     * reference to the BaseIcon component
+     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     */
+    const baseIcon = ref(null);
+    /**
+     * store icon width in a variable
+     * @type {ComputedRef<number>}
+     */
+    const iconWidth = computed(() => {
+      if (baseIcon.value) {
+        return baseIcon.value.$el.clientWidth;
+      }
+      return 0;
+    });
+    /**
+     * variable to set css class according to label elements wrapping or not
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const wrapLabelRow = ref(false);
+    /**
+     * variable to steer if icons should be shown (becoming false if not enough
+     * space)
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const showIcons = ref(true);
+    /**
+     * variable to steer if input fade out of to field should be shown
+     * @type {boolean}
+     */
+    const fadeOut = {
+      fadeOutFrom: ref(false),
+      fadeOutTo: ref(false),
+    };
+
+    // create an observer with the fade out calc function
+    useElementObserver({
+      type: 'resize',
+      target: baseDateInput,
+      callback: debounce(50, onElementResize),
+    });
+
+    if (props.showLabel && (isSwitchableFormat.value || labelRowSlotsHaveData.value)) {
+      // second observer to trigger label additions width calc as soon as element is rendered
+      useElementObserver({
+        type: 'resize',
+        target: labelAdditions,
+        callback: debounce(50, onLabelAdditionsResize),
+      });
+    }
+    /**
+     * callback function for the resize observer calculating fade out and label
+     * additions width
+     */
+    function onElementResize() {
+      if (props.showLabel && (isSwitchableFormat.value || labelRowSlotsHaveData.value)) {
+        calcLabelAdditionsWidth();
+      }
+      calcFadeOut(['From', 'To']);
+    }
+    /**
+     * callback function for the resize observer calculating label
+     * additions width on label additions render
+     */
+    function onLabelAdditionsResize(entries, observer) {
+      // only do calc when element is filled
+      if (entries[0].contentRect.width > 0) {
+        calcLabelAdditionsWidth();
+        // only do this once as soon as elements are rendered - then disconnect!
+        observer.disconnect();
+      }
+    }
+
+    /**
+     * function to correctly style the date format switch buttons and prevent
+     * overlay with label
+     */
+    function calcLabelAdditionsWidth() {
+      // get the complete element width
+      const observableWidth = baseDateInput.value.clientWidth;
+      // get the label margin
+      const labelMargin = props.showLabel
+        ? Number(getComputedStyle(labelElement.value)['margin-right'].replace('px', '')) : 0;
+      const labelWidth = props.showLabel ? labelElement.value.clientWidth : 0;
+      // calculate the remaining container space after label, label margin and date switch width
+      const spacingLeft = observableWidth
+        - labelWidth
+        - labelMargin
+        - labelAdditions.value.clientWidth;
+      // if no space is left set a class that sets label additions width to 100% so element has to wrap
+      wrapLabelRow.value = spacingLeft < 0;
+    }
+
+    /**
+     * function to calculate if fade out in the input fields should be shown, needs to be
+     * recalculated after resize or if input changes
+     */
+    function calcFadeOut(inputFields) {
+      // now iterate through the relevant fields
+      inputFields.forEach((field) => {
+        const inputElement = inputElements[`input${field}Element`].value;
+        // check if element exists
+        if (inputElement) {
+          // now get the input field value
+          const inputValue = inputElement.value;
+          // for width (and fade out) calculation either use that or the placeholder visible
+          // in the field (this is saved in a separate variable from inputValue because for
+          // show icons only input value is relevant)
+          const text = inputValue || inputElement.getAttribute('placeholder');
+          // now check if any of the two exists
+          if (text) {
+            // create a span
+            const span = document.createElement('span');
+            // hide the span
+            span.setAttribute('class', 'hide');
+            // add the input extracted text to this span
+            span.innerHTML = text;
+            // add the element to the document body
+            document.body.appendChild(span);
+            // get the width of that element
+            const textWidth = span.offsetWidth;
+            // remove the element again
+            document.body.removeChild(span);
+            // now also get the input width
+            const inputWidth = inputElement.offsetWidth;
+            // check if the input value or placeholder width exceeds input width
+            if (textWidth > inputWidth) {
+              // if yes and there is input and icons are shown
+              if (inputValue && showIcons.value) {
+                // remove icons
+                showIcons.value = false;
+                // otherwise use fade out
+              } else {
+                fadeOut[`fadeOut${field}`].value = true;
+              }
+              // if input value or placeholder fit the input width
+            } else if (textWidth <= inputWidth) {
+              // check first if the fade out is used
+              if (fadeOut[`fadeOut${field}`].value) {
+                // if so - disable this one first
+                fadeOut[`fadeOut${field}`].value = false;
+                // else check if the icon would actually fit in the input together with the
+                // input width - if so - show icons
+              } else if (!showIcons.value && textWidth + iconWidth.value <= inputWidth) {
+                showIcons.value = true;
+              }
+            }
+          }
+        }
+      });
+    }
+
     return {
       internalId,
+      rootAttrs,
+      forwardAttrs,
+      labelRowSlotsHaveData,
+      isSwitchableFormat,
+      showLabelRow,
+      isActiveInt,
+      onClickOutsideHandler,
+      clickedInside,
+      onInputBlur,
+      fromOpen: pickerState.fromOpen,
+      toOpen: pickerState.toOpen,
+      baseDateInput,
+      labelElement,
+      labelAdditions,
+      baseIcon,
+      inputFromElement: inputElements.inputFromElement,
+      inputToElement: inputElements.inputToElement,
+      wrapLabelRow,
+      showIcons,
+      useFadeOutFrom: fadeOut.fadeOutFrom,
+      useFadeOutTo: fadeOut.fadeOutTo,
+      calcLabelAdditionsWidth,
+      calcFadeOut,
     };
   },
   data() {
@@ -496,67 +840,17 @@ export default {
        */
       tempDateStore: {},
       /**
-       * to steer closing of datepicker from input field once date is selected
+       * flag set true on mounted to indicate that its ok to render the datepicker
+       * (otherwise SSR or hydration mismatch errors)
        * @type {boolean}
        */
-      fromOpen: false,
+      mounted: false,
       /**
-       * to steer closing of datepicker to input field once date is selected
-       * @type {boolean}
+       * determine lang object needed for datepicker dynamically, will be filled in mounted
+       * (computed prop does not work reliably)
+       * @type {?Object}
        */
-      toOpen: false,
-      /**
-       * variable to keep active state in sync with potential parent prop
-       * (this is needed as independent variable from toOpen and fromOpen for example in
-       * BaseAdvancedSearchRow to keep dropdown open even if datepicker is closed)
-       */
-      isActiveInt: false,
-      /**
-       * variable to steer if input fade out of from field should be shown
-       * @type {boolean}
-       */
-      useFadeOutFrom: false,
-      /**
-       * variable to steer if input fade out of to field should be shown
-       * @type {boolean}
-       */
-      useFadeOutTo: false,
-      /**
-       * variable to steer if icons should be shown (becoming false if not enough
-       * space)
-       * @type {boolean}
-       */
-      showIcons: true,
-      /**
-       * variable to store icon size which is calculated in the beginning and might be
-       * hidden later
-       * @type {number}
-       */
-      iconSize: 24,
-      /**
-       * Resize Observer to trigger fade out calculations when component is resized
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
-      /**
-       * function needs to be triggered when date switch is populated
-       * @type {?ResizeObserver}
-       */
-      labelAdditionsObserver: null,
-      /**
-       * datepicker localisations
-       *   using object fixes problem of missing localisation files in rollup-esm-build
-       */
-      lang: {
-        de,
-        en,
-        fr,
-      },
-      /**
-       * variable to set css class according to label elements wrapping or not
-       * @type {boolean}
-       */
-      wrapLabelRow: false,
+      lang: null,
     };
   },
   computed: {
@@ -718,13 +1012,6 @@ export default {
           && /^(-?[0-9]{1,4}|-[0-9]{0,4})-[0-1]?[0-9]$/.test(this.inputInt[key])));
     },
     /**
-     * check if format switch tabs should be shown
-     * @returns {boolean}
-     */
-    isSwitchableFormat() {
-      return this.format === 'date_month_year' || this.format === 'date_year';
-    },
-    /**
      * return the format options for date, month, year switches
      * @returns {[{label: string, value: string}]}
      */
@@ -756,63 +1043,6 @@ export default {
      */
     isToTimeField() {
       return this.type === 'datetime' || this.type === 'timerange';
-    },
-    /**
-     * compute an object that takes component $attrs and manipulate some events for custom
-     * needs
-     * @returns {Object}
-     */
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$attrs,
-        // and add custom listeners
-        ...{
-          // stop these BaseInput originating events to substitute them with the
-          // correct events in search container element
-          'clicked-outside': (event) => {
-            event.stopPropagation();
-          },
-          // need to stop the event triggered in original BaseInput and only trigger
-          // when component isActiveInt has changed
-          'update:is-active': () => {},
-          // stop BaseInput input event since BaseDateInput will propagate their own
-          onInput: () => {},
-        },
-      };
-    },
-    /**
-     * compute an object that takes component $attrs and manipulate some events for custom
-     * needs
-     * @returns {Object}
-     */
-    dateInputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$attrs,
-        // stop native input event here and emit own event (in inputInt watcher)
-        // with just the values
-        onInput: () => {},
-      };
-    },
-    /**
-     * check if label-addition slot exists is filled
-     */
-    labelRowSlotsHaveData() {
-      // get label-addition slot
-      const slotElements = this.$slots['label-addition'] ? this.$slots['label-addition']() : null;
-      // check if slot exists and has data and actually has content
-      // (this did not work with SSR otherwise...)
-      return !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag || elem.text?.trim());
-    },
-    /**
-     * determines if label row should be shown
-     * @returns {Boolean|boolean}
-     */
-    showLabelRow() {
-      // show label when prop is set true or a label addition was added via slot
-      return this.showLabel || this.isSwitchableFormat || this.labelRowSlotsHaveData;
     },
   },
   watch: {
@@ -918,46 +1148,13 @@ export default {
       // inputFrom and inputTo setters are not triggered and we need to emit the new data manually
       this.emitData();
     },
-    /**
-     * watch for changes in input field active variable to keep in sync with parent
-     * @param {boolean} val - the changed internal is active variable
-     */
-    isActiveInt(val) {
-      /**
-       * replace BaseInput state with BaseDateInput field active state and
-       * propagate this one
-       *
-       * @event update:is-active
-       * @param {boolean} - is input field active
-       */
-      this.$emit('update:is-active', val);
-    },
-    /**
-     * also adjust internal variable when active state changes from outside
-     * @param {boolean} val - the changed isActive prop
-     */
-    isActive: {
-      handler(val) {
-        if (val !== this.isActiveInt) {
-          this.isActiveInt = val;
-          // if is active is set from outside also open the first date field
-          this.fromOpen = val;
-        }
-        // if isActive is set false from outside also close date picker
-        if (!val) {
-          this.fromOpen = false;
-          this.toOpen = false;
-        }
-      },
-      immediate: true,
-    },
   },
-  mounted() {
-    if (this.$refs.baseIcon) {
-      this.iconWidth = this.$refs.baseIcon.$el.clientWidth;
-    }
-    // initialize the resize observer to calculate fade out and label row when component is resized
-    this.initObservers();
+  async mounted() {
+    // import the necessary date picker language file here and provide it to the component
+    this.lang = await import(`./../../../node_modules/vue-datepicker-next/locale/${this.language}.es.js`);
+    // in order to avoid SSR and hydration problems only render the datepicker when component is
+    // mounted - this flag will serve as the notification to render
+    this.mounted = true;
   },
   updated() {
     // this hack is necessary because otherwise keyboard navigation was impaired by the datepicker
@@ -980,10 +1177,6 @@ export default {
       });
     }
   },
-  beforeUnmount() {
-    if (this.resizeObserver) this.resizeObserver.disconnect();
-    if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
-  },
   methods: {
     /**
      * since the complete datepicker lies within the BaseInput, the BaseInput click event
@@ -996,58 +1189,6 @@ export default {
     onInputClick(event) {
       if (event.target.tagName !== 'INPUT') {
         event.stopPropagation();
-      }
-    },
-    /**
-     * in general input field active styling is handled via focusin and
-     * clicked-outside, however for special case iOS touch  devices have
-     * up and down arrows that do not trigger any event other than blur and will
-     * cause the dropdowns of input fields to remain open
-     * @param {FocusEvent} event - the native blur event
-     * @param {string} origin - did event emit from 'from' or 'to' date field
-     */
-    onInputBlur(event, origin) {
-      const relatedTargetInput = event.relatedTarget?.parentElement ? event.relatedTarget.parentElement
-        .getElementsByTagName('input') : null;
-      // so since these arrows only navigate between input fields we check if there is a
-      // related target and if this related target is an input field and if yes we make sure
-      // the id is different from the input id of this component (the one the event originated from)
-      if (event.relatedTarget
-        && ((event.relatedTarget.tagName === 'INPUT'
-            && (!event.relatedTarget?.id || event.relatedTarget.id !== event.target.id))
-          // additionally also set input active false when the BaseInput 'remove' button
-          // (displayed if `clearable` is true) is triggered in the other date field of the range
-          || (event.relatedTarget?.className === 'base-input__remove-icon-wrapper'
-            && relatedTargetInput && relatedTargetInput[0]?.id !== event.target.id))) {
-        // set input active state false
-        this[`${origin}Open`] = false;
-      }
-    },
-    initObservers() {
-      // create an observer with the fade out calc function
-      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
-        if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
-          this.calcLabelAdditionsWidth();
-        }
-        this.calcFadeOut(['From', 'To']);
-      }));
-      // put it on the relevant element
-      tempResizeObserver.observe(this.$refs.baseDateInput);
-      // store it in variable
-      this.resizeObserver = tempResizeObserver;
-
-      if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
-        // second observer to trigger label additions width calc as soon as element is rendered
-        const tempLabelAdditionsObserver = new ResizeObserver(debounce(50, (entries, observer) => {
-          // only do calc when element is filled
-          if (entries[0].contentRect.width > 0) {
-            this.calcLabelAdditionsWidth(this.$refs.baseDateInput.clientWidth);
-            // only do this once as soon as elements are rendered - then disconnect!
-            observer.disconnect();
-          }
-        }));
-        tempLabelAdditionsObserver.observe(this.$refs.labelAdditions);
-        this.labelAdditionsObserver = tempLabelAdditionsObserver;
       }
     },
     /**
@@ -1368,10 +1509,11 @@ export default {
      * a function to have the time picker close automatically as soon as minutes
      * are selected
      * @param {string} origin - is it from the 'from' or 'to' part of the picker
-     * @param {any} time - the selected time (not needed here but passed by event)
      * @param {string} type - was 'hour' or 'minute' selected
      */
-    closeTimePicker(origin, time, type) {
+    closeTimePicker({ origin, type }) {
+      // else check if value selected was type 'minute' - this will automatically also
+      // exclude date fields from any action
       if (type === 'minute') {
         // get capitalized origin here since needed 2x
         const uppercaseOrigin = capitalizeString(origin);
@@ -1393,35 +1535,6 @@ export default {
       this[`${origin}Open`] = false;
       // need this here because on blur() date is not updated
       this.checkDateValidity(capitalizeString(origin));
-    },
-    /**
-     * handle click outside event and adjust input active variable accordingly
-     * @param {MouseEvent} event - the event provided by the click outside directive
-     */
-    clickedOutside(event) {
-      this.isActiveInt = false;
-      /**
-       * emit a custom clicked-outside event instead of BaseInput event (propagation stopped)
-       *
-       * @event clicked-outside
-       * @param {MouseEvent} - the native Event
-       */
-      this.$emit('clicked-outside', event);
-    },
-    /**
-     * handle click inside the component and adjust input active variable accordingly
-     * @param {MouseEvent} event - event triggered by mouse click
-     */
-    clickedInside(event) {
-      this.isActiveInt = true;
-      /**
-       * event additionally triggered to BaseInput default click-input-field to also
-       * set field active if component sourroundings are clicked
-       *
-       * @event click-input-field
-       * @param {MouseEvent} - the native Event
-       */
-      this.$emit('click-input-field', event);
     },
     /**
      * data emit function, transforming data before emit event
@@ -1650,82 +1763,6 @@ export default {
       return this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
     },
     /**
-     * function to calculate if fade out in the input fields should be shown, needs to be
-     * recalculated after resize or if input changes
-     */
-    calcFadeOut(inputFields) {
-      // now iterate through the relevant fields
-      inputFields.forEach((field) => {
-        // check if element exists
-        if (this.$refs[`input${field}`]) {
-          // now get the input field value
-          const inputValue = this.$refs[`input${field}`].value;
-          // for width (and fade out) calculation either use that or the placeholder visible
-          // in the field (this is saved in a separate variable from inputValue because for
-          // show icons only input value is relevant)
-          const text = inputValue || this.$refs[`input${field}`].getAttribute('placeholder');
-          // now check if any of the two exists
-          if (text) {
-            // create a span
-            const span = document.createElement('span');
-            // hide the span
-            span.setAttribute('class', 'hide');
-            // add the input extracted text to this span
-            span.innerHTML = text;
-            // add the element to the document body
-            document.body.appendChild(span);
-            // get the width of that element
-            const textWidth = span.offsetWidth;
-            // remove the element again
-            document.body.removeChild(span);
-            // now also get the input width
-            const inputWidth = this.$refs[`input${field}`].offsetWidth;
-            // check if the input value or placeholder width exceeds input width
-            if (textWidth > inputWidth) {
-              // if yes and there is input and icons are shown
-              if (inputValue && this.showIcons) {
-                // remove icons
-                this.showIcons = false;
-                // otherwise use fade out
-              } else {
-                this[`useFadeOut${field}`] = true;
-              }
-              // if input value or placeholder fit the input width
-            } else if (textWidth <= inputWidth) {
-              // check first if the fade out is used
-              if (this[`useFadeOut${field}`]) {
-                // if so - disable this one first
-                this[`useFadeOut${field}`] = false;
-                // else check if the icon would actually fit in the input together with the
-                // input width - if so - show icons
-              } else if (!this.showIcons && textWidth + this.iconWidth <= inputWidth) {
-                this.showIcons = true;
-              }
-            }
-          }
-        }
-      });
-    },
-    /**
-     * function to correctly style the date format switch buttons and prevent
-     * overlay with label
-     */
-    calcLabelAdditionsWidth() {
-      // get the complete element width
-      const observableWidth = this.$refs.baseDateInput.clientWidth;
-      // get the label margin
-      const labelMargin = this.showLabel
-        ? Number(getComputedStyle(this.$refs.label)['margin-right'].replace('px', '')) : 0;
-      const labelWidth = this.showLabel ? this.$refs.label.clientWidth : 0;
-      // calculate the remaining container space after label, label margin and date switch width
-      const spacingLeft = observableWidth
-        - labelWidth
-        - labelMargin
-        - this.$refs.labelAdditions.clientWidth;
-      // if no space is left set a class that sets label additions width to 100% so element has to wrap
-      this.wrapLabelRow = spacingLeft < 0;
-    },
-    /**
      * add delay before value is set
      *
      * @param {String} origin - is event originating from 'from' or 'to' field
@@ -1861,11 +1898,10 @@ export default {
               width: auto;
               font-family: inherit;
               font-size: inherit;
-              line-height: $row-height-small;
 
               .base-date-input__input {
-                padding: $spacing-small-half 0;
                 min-height: $row-height-small;
+                line-height: $row-height-small;
                 width: 100%;
               }
             }

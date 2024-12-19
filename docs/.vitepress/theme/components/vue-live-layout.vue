@@ -114,6 +114,8 @@ function clicked() {
 
 .preview td, .preview th {
   border: none;
+  padding: 0;
+  background-color: white;
 }
 
 .preview tr {
