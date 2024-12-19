@@ -893,6 +893,7 @@ export default {
       :drop-down-list-id="internalId"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :loadable="allowDynamicDropDownEntries"
+      :ignore-click-outside="['.base-chips-input__drop-down']"
       role="combobox"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"

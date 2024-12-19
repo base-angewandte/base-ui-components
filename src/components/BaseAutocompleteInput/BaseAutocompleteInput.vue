@@ -548,6 +548,7 @@ watch(filteredListInt, (val) => {
       :assistive-text="{
         loaderActive: assistiveText.loaderActive,
       }"
+      :ignore-click-outside="['.base-autocomplete-input__drop-down']"
       role="combobox"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"

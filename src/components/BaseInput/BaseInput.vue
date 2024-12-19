@@ -275,6 +275,14 @@ export default {
         loaderActive: 'loading.',
       }),
     },
+    /**
+     * add queryselector strings for elements that should not trigger a
+     * click outside event
+     */
+    ignoreClickOutside: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'update:model-value'],
   setup(props, { emit, slots }) {
@@ -390,9 +398,9 @@ export default {
        */
       emit('clicked-outside', event);
     }, {
-      // do not capture the event so other elements have the chance to intercept the
-      // event
-      capture: false,
+      // define elements that should not trigger a click outside event
+      // here (e.g. drop downs)
+      ignore: props.ignoreClickOutside,
     });
     return {
       idInt,
