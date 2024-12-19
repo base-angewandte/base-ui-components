@@ -16,6 +16,7 @@ export default {
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
   },
+  inheritAttrs: false,
   props: {
     /**
      * input displayed in the textarea.
@@ -153,9 +154,8 @@ export default {
     }
 
     /** ATTRS HANDLING */
-    // since the root element is BaseInput directly we don't need the root attrs
-    // here - they will be extrancted and applied in BaseInput component
-    const { forwardAttrs } = useExtractAttrs();
+    // split up the $attrs to leave class style and data-base-id at root level
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
     /** FADE OUT HANDLING */
     /**
@@ -169,6 +169,7 @@ export default {
 
     return {
       idInt,
+      rootAttrs,
       forwardAttrs,
       textarea,
       boxFadeOut,
@@ -260,6 +261,7 @@ export default {
   <BaseInput
     v-model="fieldContent[activeTabInt]"
     v-model:is-active="isActive"
+    v-bind="rootAttrs"
     :input-id="idInt"
     :label="label"
     :show-label="showLabel"

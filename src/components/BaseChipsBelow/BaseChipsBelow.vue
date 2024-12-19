@@ -18,6 +18,7 @@ export default {
     BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
+  inheritAttrs: false,
   props: {
     /**
      * list of selectable options objects with at least an identifier and a label property.
