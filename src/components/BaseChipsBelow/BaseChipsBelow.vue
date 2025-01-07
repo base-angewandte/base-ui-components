@@ -575,6 +575,14 @@ export default {
       this.hasAdditionalPropErrors = false;
       // update internal selected list
       this.selectedBelowListInt = JSON.parse(JSON.stringify(list));
+      // and check if input is now valid in case it was invalid before
+      // use isValidChipsInput() not validate() because we really only want to
+      // check main input field
+      if (this.invalidInt && this.isValidChipsInput()) {
+        // still honor invalid state and error message set from outside if any
+        this.invalidInt = this.invalid;
+        this.errorMessageInt = this.errorMessage;
+      }
       this.emitSelected(list);
     },
     /**
@@ -706,7 +714,7 @@ export default {
       if (!this.required) return true;
 
       // if no chips set, throw error
-      if (!this.modelValue.length) {
+      if (!this.selectedBelowListInt.length) {
         this.invalidInt = true;
         // consider also optional errorMessage
         this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`.trim();
