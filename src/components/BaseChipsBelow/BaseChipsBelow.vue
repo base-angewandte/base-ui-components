@@ -695,13 +695,61 @@ export default {
       document.body.appendChild(img);
       dataTransfer.setDragImage(img, 0, 0);
     },
-    onDragEnd(list) {
+    /**
+     * cursor is not set per default on macOS so we need to handle it here
+     * this does not influence cursor display on Windows
+     * and Ubuntu is fine anyway
+     * @param {MouseEvent} event - native event
+     */
+    onDragStart(event) {
+      // created separate method because we need to differentiate between
+      // iOS Firefox and all other browsers
+      // also tried to add the class already on mousedown however this will interfere
+      // with the dragstart / dragend cursor setting (at least on all macOS
+      // browsers, maybe others too)
+      this.toggleGrabbingCursor(true, event);
+    },
+    /**
+     * actions to handle when element is dropped again
+     * @param {Object[]} list - the re-sorted item list
+     * @param {MouseEvent} event - the native event
+     */
+    onDragEnd(list, event) {
+      // remove the drag cursor class again - for extensive comment see above
+      this.toggleGrabbingCursor(false, event);
+      // get and remove the drag element created in setDragImage() again
       const elem = document.getElementById('drag-element');
       if (elem) {
         elem.parentNode.removeChild(elem);
       }
+      // and emit the altered list
       this.emitSelected(list);
     },
+    /**
+     * added separate method to distinguish between browsers specifically because
+     * macOS did not display correct cursor and a common solution for Firefox AND Chrome
+     * could not be found
+     * this still might not be the perfect solution - more inspiration to improve can be found
+     * here https://github.com/SortableJS/Vue.Draggable/issues/815
+     * @param {boolean} state - the state that should be applied
+     * @param {MouseEvent} event - the native mouse event
+     */
+    toggleGrabbingCursor(state, event) {
+      // check if client is Firefox - because this is the only way working in Firefox!
+      // we also need to check for event, since it is needed for iOS Firefox
+      if (event && navigator.userAgent.includes('Mac') && typeof InstallTrigger !== 'undefined') {
+        if (state) {
+          event.target.classList.add('grabbing');
+        } else {
+          event.target.classList.remove('grabbing');
+        }
+        // this seems fine for every other OS (and browser therein)
+      } else {
+        const html = document.getElementsByTagName('html').item(0)
+        html.classList.toggle('grabbing', state)
+      }
+    },
+
 
     /** VALIDATION */
 
@@ -821,7 +869,8 @@ export default {
       :animation="draggable ? 200 : null"
       :set-data="draggable ? setDragElement : null"
       :handle="draggable ? '.base-chips-below__icon-handle' : null"
-      @end="draggable ? onDragEnd(selectedBelowListInt) : null">
+      @start="onDragStart"
+      @end="onDragEnd(selectedBelowListInt, $event)">
       <TransitionGroup
         :name="'flip-list'"
         type="transition">
