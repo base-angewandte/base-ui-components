@@ -1,108 +1,3 @@
-<template>
-  <nav
-    ref="pagination"
-    :aria-label="getI18nTerm(ariaLabels.pagination)"
-    class="base-pagination">
-    <component
-      :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : null"
-      :aria-disabled="active <= 1"
-      :tabindex="active <= 1 ? -1 : 0"
-      :class="[
-        'base-pagination__arrow',
-        { 'base-pagination__arrow-icon-inactive': active <= 1 },
-      ]"
-      :aria-label="getI18nTerm(ariaLabels.previousPage)"
-      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
-      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
-      <BaseIcon
-        class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
-        name="arrow-left" />
-    </component>
-    <div class="base-pagination__row">
-      <!-- ELEMENT TO DISPLAY WHEN TOTAL NUMBER OF ELEMENTS FITS INTO PARENT -->
-      <template v-if="total <= maxNumbers">
-        <component
-          :is="numberElement"
-          v-for="n in total"
-          :key="n"
-          :to="useLinkElement ? getLinkPath(n) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === n ? 'true' : null"
-          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
-          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
-          @keydown.enter="setActivePage(n)"
-          @click.prevent="setActivePage(n)">
-          {{ n }}
-        </component>
-      </template>
-      <template v-else>
-        <component
-          :is="numberElement"
-          v-if="start !== 1"
-          :to="useLinkElement ? getLinkPath(1) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === 1 ? 'true' : null"
-          :aria-label="`${active === 1 ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${1}`"
-          :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
-          @keydown.enter="setActivePage(1)"
-          @click.prevent="setActivePage(1)">
-          {{ 1 }}
-        </component>
-        <span
-          v-if="start > 2"
-          class="base-pagination__more">&#8943;</span>
-        <component
-          :is="numberElement"
-          v-for="n in subset"
-          :key="n"
-          :to="useLinkElement ? getLinkPath(n) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === n ? 'true' : null"
-          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
-          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
-          @keydown.enter="setActivePage(n)"
-          @click.prevent="setActivePage(n)">
-          {{ n }}
-        </component>
-        <span
-          v-if="(end) < (total - 1) && (end) !== (total - 1)"
-          class="base-pagination__more">&#8943;</span>
-        <component
-          :is="numberElement"
-          v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
-          :to="useLinkElement ? getLinkPath(total) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === total ? 'true' : null"
-          :aria-label="`${active === total ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${total}`"
-          :class="['base-pagination__number',
-                   { 'base-pagination__number-active': active === total }]"
-          @keydown.enter="setActivePage(total)"
-          @click.prevent="setActivePage(total)">
-          {{ total }}
-        </component>
-      </template>
-    </div>
-    <component
-      :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : null"
-      :aria-disabled="active >= total"
-      :tabindex="active >= total ? -1 : 0"
-      :class="[
-        'base-pagination__arrow',
-        { 'base-pagination__arrow-icon-inactive': active >= total },
-      ]"
-      :aria-label="getI18nTerm(ariaLabels.nextPage)"
-      @click.prevent="active + 1 <= total && !useLinkElement
-        ? setActivePage(active + 1) : false"
-      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
-      <BaseIcon
-        class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
-        name="arrow-left" />
-    </component>
-  </nav>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { onMounted, ref } from 'vue';
@@ -121,7 +16,7 @@ export default {
   },
   props: {
     /**
-     * specify total number of pages
+     * specify the total number of pages
      */
     total: {
       type: Number,
@@ -136,7 +31,7 @@ export default {
     },
     /**
      * specify if pagination elements should be links - specify a vue link element or
-     * set the variable false if element should not be a link
+     * set the variable false if the element should not be a link
      * (this needs vue-router)
      * currently only vue components (like 'RouterLink' or 'NuxtLink') are supported!
      */
@@ -367,6 +262,111 @@ export default {
   },
 };
 </script>
+
+<template>
+  <nav
+    ref="pagination"
+    :aria-label="getI18nTerm(ariaLabels.pagination)"
+    class="base-pagination">
+    <component
+      :is="numberElement"
+      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : null"
+      :aria-disabled="active <= 1"
+      :tabindex="active <= 1 ? -1 : 0"
+      :class="[
+        'base-pagination__arrow',
+        { 'base-pagination__arrow-icon-inactive': active <= 1 },
+      ]"
+      :aria-label="getI18nTerm(ariaLabels.previousPage)"
+      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
+      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
+      <BaseIcon
+        class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
+        name="arrow-left" />
+    </component>
+    <div class="base-pagination__row">
+      <!-- ELEMENT TO DISPLAY WHEN TOTAL NUMBER OF ELEMENTS FITS INTO PARENT -->
+      <template v-if="total <= maxNumbers">
+        <component
+          :is="numberElement"
+          v-for="n in total"
+          :key="n"
+          :to="useLinkElement ? getLinkPath(n) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === n ? 'true' : null"
+          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
+          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
+          @keydown.enter="setActivePage(n)"
+          @click.prevent="setActivePage(n)">
+          {{ n }}
+        </component>
+      </template>
+      <template v-else>
+        <component
+          :is="numberElement"
+          v-if="start !== 1"
+          :to="useLinkElement ? getLinkPath(1) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === 1 ? 'true' : null"
+          :aria-label="`${active === 1 ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${1}`"
+          :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
+          @keydown.enter="setActivePage(1)"
+          @click.prevent="setActivePage(1)">
+          {{ 1 }}
+        </component>
+        <span
+          v-if="start > 2"
+          class="base-pagination__more">&#8943;</span>
+        <component
+          :is="numberElement"
+          v-for="n in subset"
+          :key="n"
+          :to="useLinkElement ? getLinkPath(n) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === n ? 'true' : null"
+          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
+          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
+          @keydown.enter="setActivePage(n)"
+          @click.prevent="setActivePage(n)">
+          {{ n }}
+        </component>
+        <span
+          v-if="(end) < (total - 1) && (end) !== (total - 1)"
+          class="base-pagination__more">&#8943;</span>
+        <component
+          :is="numberElement"
+          v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
+          :to="useLinkElement ? getLinkPath(total) : null"
+          :tabindex="!useLinkElement ? 0 : null"
+          :aria-current="active === total ? 'true' : null"
+          :aria-label="`${active === total ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${total}`"
+          :class="['base-pagination__number',
+                   { 'base-pagination__number-active': active === total }]"
+          @keydown.enter="setActivePage(total)"
+          @click.prevent="setActivePage(total)">
+          {{ total }}
+        </component>
+      </template>
+    </div>
+    <component
+      :is="numberElement"
+      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : null"
+      :aria-disabled="active >= total"
+      :tabindex="active >= total ? -1 : 0"
+      :class="[
+        'base-pagination__arrow',
+        { 'base-pagination__arrow-icon-inactive': active >= total },
+      ]"
+      :aria-label="getI18nTerm(ariaLabels.nextPage)"
+      @click.prevent="active + 1 <= total && !useLinkElement
+        ? setActivePage(active + 1) : false"
+      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
+      <BaseIcon
+        class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
+        name="arrow-left" />
+    </component>
+  </nav>
+</template>
 
 <style lang="scss">
   @use "@/styles/variables" as *;
