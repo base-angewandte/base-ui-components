@@ -1,6 +1,7 @@
 <template>
   <nav
     ref="pagination"
+    :aria-label="getI18nTerm(ariaLabels.pagination)"
     class="base-pagination">
     <component
       :is="numberElement"
@@ -11,7 +12,7 @@
         'base-pagination__arrow',
         { 'base-pagination__arrow-icon-inactive': active <= 1 },
       ]"
-      aria-label="Go to previous page"
+      :aria-label="getI18nTerm(ariaLabels.previousPage)"
       @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
       @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
       <BaseIcon
@@ -28,7 +29,7 @@
           :to="useLinkElement ? getLinkPath(n) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === n ? 'true' : null"
-          :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
+          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
           @click.prevent="setActivePage(n)">
@@ -42,7 +43,7 @@
           :to="useLinkElement ? getLinkPath(1) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === 1 ? 'true' : null"
-          :aria-label="`${active === 1 ? 'Current Page, Page' : 'Go to page'} ${1}`"
+          :aria-label="`${active === 1 ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
           @keydown.enter="setActivePage(1)"
           @click.prevent="setActivePage(1)">
@@ -58,7 +59,7 @@
           :to="useLinkElement ? getLinkPath(n) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === n ? 'true' : null"
-          :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
+          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
           @click.prevent="setActivePage(n)">
@@ -73,7 +74,7 @@
           :to="useLinkElement ? getLinkPath(total) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === total ? 'true' : null"
-          :aria-label="`${active === total ? 'Current Page, Page' : 'Go to page'} ${total}`"
+          :aria-label="`${active === total ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${total}`"
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total }]"
           @keydown.enter="setActivePage(total)"
@@ -91,7 +92,7 @@
         'base-pagination__arrow',
         { 'base-pagination__arrow-icon-inactive': active >= total },
       ]"
-      aria-label="Go to next Page"
+      :aria-label="getI18nTerm(ariaLabels.nextPage)"
       @click.prevent="active + 1 <= total && !useLinkElement
         ? setActivePage(active + 1) : false"
       @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
@@ -106,6 +107,7 @@
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { onMounted, ref } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useI18n } from '@/composables/useI18n.js';
 import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
@@ -142,6 +144,32 @@ export default {
       type: [String, Boolean],
       default: false,
       validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
+    },
+    /**
+     * specify aria labels for the pagination - this needs to be an object with the following
+     * properties:
+     *
+     *     **currentPage**: aria-label for the current page
+     *     **nextPage**: aria-label for the next page
+     *     **pagination**: aria-label for the pagination element description
+     *     **previousPage**: aria-label for the previous page
+     *     **toPage**: aria-label for all page buttons except the current one
+     *
+     *  The values of this object might be plain text or a key for an i18n file
+     * This prop can be ignored when the `no-options` slot is used.
+     */
+    ariaLabels: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['currentPage', 'nextPage', 'pagination', 'previousPage', 'toPage']
+        .every(prop => Object.keys(val).includes(prop)),
     },
   },
   emits: ['update:modelValue'],
@@ -229,6 +257,9 @@ export default {
       setStartEnd();
     });
 
+    /** LOCALIZATION */
+    const { getLangLabel, getI18nTerm } = useI18n();
+
     return {
       pagination,
       subsetNumber,
@@ -237,6 +268,8 @@ export default {
       end,
       active,
       setStartEnd,
+      getLangLabel,
+      getI18nTerm,
     };
   },
   data() {
