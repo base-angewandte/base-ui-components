@@ -681,7 +681,11 @@ export default {
   mounted() {
     // add optional default entry to empty modelValue selected list only
     if (this.defaultEntry && !this.modelValue.length) {
-      this.selectedListInt.push(this.defaultEntry);
+      // create a copy of the default entry to remove the property `default`
+      const defaultValue = { ...this.defaultEntry };
+      delete defaultValue.default;
+      // and add the entry to selectedList
+      this.selectedListInt.push(defaultValue);
     }
   },
   methods: {
@@ -697,6 +701,8 @@ export default {
       // if unknown entries are allowed we need to remove the added
       // id again before pushing it to selectedListInt
       const newSelected = { ...selected };
+      // remove the default property if it is present
+      delete newSelected.default;
       if (this.allowUnknownEntries && newSelected[this.identifierPropertyName] === 'createNew') {
         delete newSelected[this.identifierPropertyName];
       }
