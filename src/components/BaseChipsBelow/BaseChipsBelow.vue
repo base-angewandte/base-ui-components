@@ -334,7 +334,7 @@ export default {
       default: false,
     },
   },
-  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue', 'duplicate'],
+  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:model-value', 'duplicate'],
   setup(props) {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
@@ -422,45 +422,56 @@ export default {
      * selectedBelowListInt with an internal id added if necessary
      * @returns {(*&{idInt: *})[]}
      */
-    renderList() {
-      return this.selectedBelowListInt.map((entry) => {
-        // handled with ?? operator to prevent id 0 being ignored
-        let providedId = entry[this.identifierPropertyName] ?? undefined;
-        if (providedId === undefined) {
-          // try to check if the entry already received an id and the id is not it the list yet
-          // check if an id was already assigned to an item with that label which does not appear
-          // in the array more than once (this is just a safeguard - in addOption double adding
-          // of the same freetext should actually be prevented anyway)
-          const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
-            return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
-          }) : undefined;
-          providedId = createdId && createdId.length === 1
-            ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
-        }
-        return {
-          ...{
-            // initialize the additional property
-            [this.additionalPropertyName]: [],
-            // and create an internal id if none was provided
-            idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
-              ? entry[this.identifierPropertyName] : providedId,
-          },
-          ...entry,
-        };
-      });
+    renderList: {
+      set(val) {
+        // update renderList but remove the internal id needed
+        // for dragging and list generation
+        this.selectedBelowListInt = val.map((entry) => {
+          // eslint-disable-next-line no-param-reassign
+          delete entry.idInt;
+          return entry;
+        });
+      },
+      get() {
+        return this.selectedBelowListInt.map((entry) => {
+          // handled with ?? operator to prevent id 0 being ignored
+          let providedId = entry[this.identifierPropertyName] ?? undefined;
+          if (providedId === undefined) {
+            // try to check if the entry already received an id and the id is not it the list yet
+            // check if an id was already assigned to an item with that label which does not appear
+            // in the array more than once (this is just a safeguard - in addOption double adding
+            // of the same freetext should actually be prevented anyway)
+            const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
+              return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
+            }) : undefined;
+            providedId = createdId && createdId.length === 1
+              ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
+          }
+          return {
+            ...{
+              // and create an internal id if none was provided
+              idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
+                ? entry[this.identifierPropertyName] : providedId,
+            },
+            ...entry,
+          };
+        });
+      },
     },
     /**
      * in order to be able to dynamically import VueDraggable and only set v-model
      * if it is used, use this variable
+     * we are using renderList here so the internalId is also available for
+     * vue draggable
      */
     draggableList: {
       set(val) {
-        this.selectedBelowListInt = val;
+        this.renderList = val;
       },
       get() {
         // do not set v-model if draggable is false
         if (!this.draggable) return null;
-        return this.selectedBelowListInt;
+        return this.renderList;
       },
     },
     /**
@@ -494,7 +505,12 @@ export default {
           // the error flag here
           this.hasAdditionalPropErrors = false;
         }
-        this.selectedBelowListInt = JSON.parse(JSON.stringify(val));
+        // now update the list but also add the additional prop already here if it does not
+        // exist yet
+        this.selectedBelowListInt = val.map((selectedOption) => ({
+          ...selectedOption,
+          [this.additionalPropertyName]: selectedOption[this.additionalPropertyName] || [],
+        }));
       },
       immediate: true,
       deep: true,
@@ -557,9 +573,6 @@ export default {
         // the label
         .map((selectedOption) => selectedOption[this.identifierPropertyName]
           || selectedOption[this.labelPropertyName]))).length !== list.length) {
-        // in order to also reset the BaseChipsInput modelValue we need to reassign
-        // the list to itself
-        this.selectedBelowListInt = JSON.parse(JSON.stringify(this.selectedBelowListInt));
         /**
          * event emitted when user is trying to add duplicate freetext which will be
          * prevented (so that user can be informed)
@@ -573,8 +586,11 @@ export default {
       // since we don't want a new entry to show an error message immediately we need
       // to set the invalid variable false
       this.hasAdditionalPropErrors = false;
-      // update internal selected list
-      this.selectedBelowListInt = JSON.parse(JSON.stringify(list));
+      // update internal selected list - also here add the additional prop immediately
+      this.selectedBelowListInt = list.map((selectedOption) => ({
+        ...selectedOption,
+        [this.additionalPropertyName]: selectedOption[this.additionalPropertyName] || [],
+      }));
       // and check if input is now valid in case it was invalid before
       // use isValidChipsInput() not validate() because we really only want to
       // check main input field
@@ -592,7 +608,6 @@ export default {
     removeEntry(index) {
       // remove the entry from the internal list
       const item = this.selectedBelowListInt.splice(index, 1);
-      item[this.additionalPropertyName] = {};
       // inform parent about the change
       this.emitSelected(this.selectedBelowListInt);
       // inform screen reader user
@@ -643,15 +658,16 @@ export default {
      * without internal modifications
      * @param {Object[]} val
      */
-    emitSelected(val) {
+    emitSelected() {
+      const updatedList = JSON.parse(JSON.stringify(this.selectedBelowListInt));
       /**
        * propagate list change from dragging event to parent
        *
-       * @event update:modelValue
+       * @event update:model-value
        * @param {Object} - the altered list
        *
        */
-      this.$emit('update:modelValue', val);
+      this.$emit('update:model-value', updatedList);
     },
 
     /** DROP-DOWN / AUTOCOMPLETE */

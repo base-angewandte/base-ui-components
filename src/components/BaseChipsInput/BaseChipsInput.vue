@@ -351,7 +351,7 @@ export default {
       default: false,
     },
   },
-  emits: ['update:modelValue', 'fetch-dropdown-entries'],
+  emits: ['update:model-value', 'fetch-dropdown-entries'],
   setup(props) {
     /** DROP DOWN NAVIGATION */
     const { navigate } = useListNavigation();
@@ -618,18 +618,30 @@ export default {
        * @param {Object[]} val
        */
       handler(val) {
-        this.selectedListInt = [...val];
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+          this.selectedListInt = JSON.parse(JSON.stringify(val));
+        }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * watch for changes to selectedListInt and propagate to parent if necessary
      * @param {Object[]} val
      */
-    selectedListInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
-        this.updateParentSelectedList(val);
-      }
+    selectedListInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
+          /**
+           * inform parent of changes to selected list
+           * @event update:model-value
+           * @property {Object[]} - the altered selectedList
+           */
+          this.$emit('update:model-value', JSON.parse(JSON.stringify(val)));
+        }
+      },
+      immediate: true,
+      deep: true,
     },
     /**
      * input is watched for follow up actions needed after input
@@ -678,7 +690,7 @@ export default {
       }
     },
   },
-  mounted() {
+  created() {
     // add optional default entry to empty modelValue selected list only
     if (this.defaultEntry && !this.modelValue.length) {
       // create a copy of the default entry to remove the property `default`
@@ -716,8 +728,6 @@ export default {
         // after choosing the option
         this.chipsInputActive = false;
       }
-      // inform parent of the changes
-      this.updateParentSelectedList(this.selectedListInt);
       // make sure the assistive text exists
       if (this.assistiveText.optionAdded) {
         // announce the added option to the screen reader
@@ -738,23 +748,6 @@ export default {
         // optional close dropdown after selection
         this.closeDropDown();
       }, 0);
-    },
-    /**
-     * method for emitting selected list changes to parent
-     * (called after adding or deleting an option to / from selected list)
-     *
-     * @param {Object[]} updatedList - the list that should be emitted in the event
-     */
-    updateParentSelectedList(updatedList) {
-      // only emit if updated list is different from parent list
-      if (JSON.stringify(this.modelValue) !== JSON.stringify(updatedList)) {
-        /**
-         * inform parent of changes to selected list
-         * @event update:modelValue
-         * @property {Object[]} - the altered selectedList
-         */
-        this.$emit('update:modelValue', [...updatedList]);
-      }
     },
 
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
