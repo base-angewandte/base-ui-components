@@ -258,6 +258,9 @@ export default {
     },
     /**
      * set `true` if chip should be editable on click
+     * **caveat**: this will only work if prop `allowUnknownEntries` is also set `true`
+     * also setting this prop `true` will disable the dragging functionality (also see prop
+     * `draggable`)
      */
     chipsEditable: {
       type: Boolean,

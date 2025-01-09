@@ -327,7 +327,7 @@ export default {
     },
     /**
      * set `true` if chips (only [labelPropertyName] not additional attribute) should be editable on click
-     * caveat: this will only have an effect if `allowUnknownEntries` is true as well
+     * **caveat**: this will only have an effect if `allowUnknownEntries` is true as well
      */
     chipsEditable: {
       type: Boolean,
