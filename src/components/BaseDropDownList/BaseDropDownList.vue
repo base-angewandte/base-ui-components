@@ -238,7 +238,7 @@ watch(activeOptionIndex, (index, previousIndex) => {
   // else determine if the current active element is still visible and scroll
   // it into view if necessary
   // get the active option element via ref
-  const activeOptionElement = options.value[index];
+  const activeOptionElement = options.value ? options.value[index] : null;
   // make sure an active option was found
   if (activeOptionElement) {
     // get the necessary container elements and their top and height variables

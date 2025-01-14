@@ -4,6 +4,9 @@ import * as path from "path";
 import { fileURLToPath } from 'url'
 import vueLiveMd from './vue-live-md-it.mjs';
 import eslint from 'vite-plugin-eslint';
+import autoprefixer from 'autoprefixer';
+import postcssImport from 'postcss-import';
+import postcssDiscardComments from 'postcss-discard-comments';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,6 +77,18 @@ export default defineConfig({
           silenceDeprecations: ['legacy-js-api', 'import'],
           quietDeps: true,
         },
+      },
+      postcss: {
+        // the configuration was defined here (and not in an external file)
+        // to prevent in a npm-link-setup the plugins from being requested in the parent module
+        plugins: [
+          autoprefixer(),
+          // needed for import of external css (e.g. leaflet)
+          // needs to be before postcss-url to have leaflet background-images included
+          postcssImport(),
+          // remove comments
+          postcssDiscardComments(),
+        ],
       },
     },
   },

@@ -1,143 +1,10 @@
-<template>
-  <div
-    ref="chipsBelow"
-    class="base-chips-below">
-    <BaseChipsInput
-      ref="chipsInput"
-      v-model="selectedBelowListInt"
-      v-bind="chipsInputProps"
-      :close-dropdown-on-option-select="closeDropdownOnOptionSelect"
-      :is-loading="isLoading"
-      :display-chips-inline="false"
-      :sort-text="sortText"
-      :sort-name="sortName"
-      :invalid="invalidInt"
-      :error-message="errorMessageInt"
-      @update:model-value="addedEntry"
-      @fetch-dropdown-entries="fetchDropDownEntries">
-      <template
-        #drop-down-entry="props">
-        <!-- @slot a slot to provide customized drop down options
-          @binding {Object} item - an option in the options list  -->
-        <slot
-          :item="props.item"
-          name="drop-down-entry" />
-      </template>
-      <template
-        #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField) -->
-        <slot name="label-addition" />
-      </template>
-      <template
-        #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField) -->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="remove-icon" />
-      </template>
-      <template
-        #no-options>
-        <!-- @slot a slot to customize messages in case of no options present in drop down -->
-        <slot
-          name="no-options" />
-      </template>
-      <!-- @slot to add elements below input fields e.g. add drop down; will appear before the
-        chosen chips list -->
-      <template #below-input>
-        <slot name="below-input" />
-      </template>
-    </BaseChipsInput>
-    <VueDraggable
-      v-model="selectedBelowListInt"
-      :animation="200"
-      :force-fallback="!isDragDropCapable"
-      :fallback-on-body="!isDragDropCapable"
-      :group="{ name: 'people' }"
-      handle=".base-chips-below-list-icon-wrapper"
-      @end="updateList($event, selectedBelowListInt)">
-      <div
-        v-for="(entry, index) in selectedBelowListInt"
-        :key="'item' + entry.idInt"
-        :name="entry[labelPropertyName]"
-        :class="['base-chips-below-list-item',
-                 { 'base-chips-below-list-item--draggable': draggable }]"
-        @mousedown="chipActive = index">
-        <div
-          :key="'line' + entry.idInt"
-          class="base-chips-below-list-item-line">
-          <div
-            v-if="draggable"
-            :key="'iconwrapper' + entry.idInt"
-            class="base-chips-below-list-icon-wrapper">
-            <BaseIcon
-              :key="'icon' + entry.idInt"
-              name="drag-lines"
-              class="svg-icon base-chips-below-list-icon" />
-          </div>
-          <div
-            :key="'chip-wrapper' + entry.idInt"
-            class="base-chips-below-list-item-chip-wrapper">
-            <BaseChip
-              :id="'chips-below' + index"
-              ref="selectedChip"
-              :key="'chip' + entry.idInt"
-              v-model="entry[labelPropertyName]"
-              :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
-                || !!entry[identifierPropertyName])"
-              class="base-chips-input-chip"
-              @update:model-value="modifyChipValue($event, index)"
-              @remove-entry="removeEntry($event, index)" />
-          </div>
-          <BaseChipsInput
-            :key="'input_' + entry.idInt"
-            v-model="entry[additionalPropertyName]"
-            :input-id="`${inputId}_${additionalPropertyName}_${entry[identifierPropertyName] || entry.idInt}`"
-            :show-label="false"
-            :label="label + '-' + additionalPropertyName"
-            :list="additionalPropOptions"
-            :show-input-border="false"
-            :allow-dynamic-drop-down-entries="false"
-            :placeholder="additionalPropPlaceholder"
-            :always-linked="true"
-            :language="language"
-            :draggable="true"
-            :drop-down-no-options-info="dropDownNoOptionsInfo"
-            :identifier-property-name="identifierPropertyName"
-            :label-property-name="labelPropertyName"
-            :invalid="isInvalidAdditionalOption(entry[labelPropertyName], index)"
-            :error-message="additionalOptionsErrorMessage(entry[labelPropertyName], index)"
-            :allow-multiple-entries="additionalPropAllowMultipleEntries"
-            :chips-removable="isChipsRemovable(entry[additionalPropertyName])"
-            :show-error-icon="showErrorIcon"
-            :required="additionalPropRequired"
-            :default-entry="additionalPropDefaultOption"
-            class="base-chips-below-chips-input"
-            @update:model-value="updateAdditionalProperty($event, index)" />
-        </div>
-      </div>
-    </VueDraggable>
-  </div>
-</template>
-
 <script>
-import { VueDraggable } from 'vue-draggable-plus';
-import { defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { createId } from '@/utils/utils.js';
+import { useId } from '@/composables/useId.js';
 /**
  * A very specialized component based on [BaseChipsInput](BaseChipsInput)
  * in order to assign additional values (e.g. roles) to selected entries)]
@@ -148,7 +15,6 @@ export default {
   name: 'BaseChipsBelow',
   components: {
     BaseChipsInput,
-    VueDraggable,
     BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
@@ -229,15 +95,6 @@ export default {
     allowDynamicDropDownEntries: {
       type: Boolean,
       default: false,
-    },
-    /**
-     * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to selectedList directly but only in parent
-     * component
-     */
-    addSelectedEntryDirectly: {
-      type: Boolean,
-      default: true,
     },
     /**
      * define whether one or more options can be selected from the drop-down menu
@@ -468,9 +325,30 @@ export default {
         optionRemoved: 'option {label} removed.',
       }),
     },
+    /**
+     * set `true` if chips (only [labelPropertyName] not additional attribute) should be editable on click
+     * **caveat**: this will only have an effect if `allowUnknownEntries` is true as well
+     */
+    chipsEditable: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue'],
-  setup() {
+  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:model-value', 'duplicate'],
+  setup(props) {
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** COMPONENT ID */
+      // create an internal id in case there is none provided via props
+    const createdId = useId();
+    /**
+     * provide an internal id
+     * @type {ComputedRef<string|number>}
+     */
+    const internalId = computed(() => props.inputId || createdId);
+
+    /** ACCESSIBILITY HANDLING */
     /**
      * set up component reference
      * @type {Ref<UnwrapRef<null|HTMLElement>>}
@@ -480,27 +358,56 @@ export default {
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsBelow);
     return {
+      rootAttrs,
+      forwardAttrs,
+      internalId,
       chipsBelow,
       announcement,
     };
   },
   data() {
     return {
-      chipsArray: [],
+      /**
+       * internal representation of modelValue to manipulate
+       * @type {Object[]}
+       */
       selectedBelowListInt: [],
-      chipActive: -1,
       // error handling
+      /**
+       * internal validity state - combining `invalid` prop
+       * and internal validation()
+       * @type {boolean}
+       */
       invalidInt: false,
+      /**
+       * internal error message - combining error message set by `errorMessage` prop
+       * and internal validation()
+       * @type {string}
+       */
       errorMessageInt: '',
-      additionalPropErrors: [],
+      /**
+       * flag to handle if additional props error should be displayed or not
+       *  -> only after manual validation (not immediately when field is added)
+       * @type {boolean}
+       */
+      hasAdditionalPropErrors: false,
     };
   },
   computed: {
+    draggableComponent() {
+      if (this.draggable) {
+        return defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable));
+      }
+      return 'div';
+    },
     // need to filter language from $props for chips input component since only needed for
     // additional property (roles)!
     // leads to unwanted behaviour else (creating multilang object)
     chipsInputProps() {
-      const newProps = { ...this.$props };
+      const newProps = {
+        ...this.$props,
+        ...this.forwardAttrs,
+      };
       delete newProps.language;
       // also remove additional property related props since unknown to chips input component
       delete newProps.additionalPropOptions;
@@ -511,21 +418,75 @@ export default {
       delete newProps.validationTexts;
       return newProps;
     },
-    isDragDropCapable() {
-      if (window) {
-        // TODO: due to vue draggable safari related bug
-        //  https://github.com/SortableJS/Vue.Draggable/issues/743 we need to check
-        // specifically for safari to use forceFallback true for Safari browsers
-        const isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1
-          && navigator.userAgent
-          // leaving chrome check in since it is currently working with forceFallback true
-          && navigator.userAgent.indexOf('CriOS') === -1;
-          // taking firefox out since it it is not working anymore with forceFallback true
-          // and need to check first if it is also affected by the Safari bug.
-          // && navigator.userAgent.indexOf('FxiOS') === -1;
-        return !isSafari && 'DragEvent' in window;
-      }
-      return false;
+    /**
+     * selectedBelowListInt with an internal id added if necessary
+     * @returns {(*&{idInt: *})[]}
+     */
+    renderList: {
+      set(val) {
+        // update renderList but remove the internal id needed
+        // for dragging and list generation
+        this.selectedBelowListInt = val.map((entry) => {
+          // eslint-disable-next-line no-param-reassign
+          delete entry.idInt;
+          return entry;
+        });
+      },
+      get() {
+        return this.selectedBelowListInt.map((entry) => {
+          // handled with ?? operator to prevent id 0 being ignored
+          let providedId = entry[this.identifierPropertyName] ?? undefined;
+          if (providedId === undefined) {
+            // try to check if the entry already received an id and the id is not it the list yet
+            // check if an id was already assigned to an item with that label which does not appear
+            // in the array more than once (this is just a safeguard - in addOption double adding
+            // of the same freetext should actually be prevented anyway)
+            const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
+              return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
+            }) : undefined;
+            providedId = createdId && createdId.length === 1
+              ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
+          }
+          return {
+            ...{
+              // and create an internal id if none was provided
+              idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
+                ? entry[this.identifierPropertyName] : providedId,
+            },
+            ...entry,
+          };
+        });
+      },
+    },
+    /**
+     * in order to be able to dynamically import VueDraggable and only set v-model
+     * if it is used, use this variable
+     * we are using renderList here so the internalId is also available for
+     * vue draggable
+     */
+    draggableList: {
+      set(val) {
+        this.renderList = val;
+      },
+      get() {
+        // do not set v-model if draggable is false
+        if (!this.draggable) return null;
+        return this.renderList;
+      },
+    },
+    /**
+     * since not all entries have an identifier when `allowUnknownEntries` is set true
+     * we have an index based list that will save the error state per entry
+     * @returns {boolean[]|boolean}
+     */
+    additionalPropErrorsList() {
+      if (!this.additionalPropRequired) return false;
+      return this.selectedBelowListInt.map((selectedOption) => !selectedOption[this.additionalPropertyName]?.length);
+    },
+    chipsRemovable() {
+      if (!this.additionalPropRequired) return true;
+      return this.selectedBelowListInt.map((selectedOption) => this.additionalPropAllowMultipleEntries
+        && selectedOption[this.additionalPropertyName]?.length > 1);
     },
   },
   watch: {
@@ -535,22 +496,24 @@ export default {
      */
     modelValue: {
       handler(val) {
-        this.createInternalList(val);
-        // reset error
-        if (val.length) {
+        // reset error if a new item was added
+        if (val.length && val.length > this.selectedBelowListInt.length) {
           // reset the invalid state but still respect any invalid state set from outside
           this.invalidInt = this.invalid;
           this.errorMessageInt = this.errorMessage;
+          // newly added items should not immediately appear with error message so reset
+          // the error flag here
+          this.hasAdditionalPropErrors = false;
         }
-        // check if allowUnknownEntries are allowed and reset errors,
-        // due new entries do not have an id set initially and
-        // the error matching with index breaks
-        if (this.allowUnknownEntries
-          && this.additionalPropErrors.length) {
-          this.additionalPropErrors = [];
-        }
+        // now update the list but also add the additional prop already here if it does not
+        // exist yet
+        this.selectedBelowListInt = val.map((selectedOption) => ({
+          ...selectedOption,
+          [this.additionalPropertyName]: selectedOption[this.additionalPropertyName] || [],
+        }));
       },
       immediate: true,
+      deep: true,
     },
     /**
      * keep externally set invalid variable and internal invalid variable in sync
@@ -592,43 +555,76 @@ export default {
     additionalPropRequired: {
       handler(val) {
         if (!val) {
-          this.additionalPropErrors = [];
+          this.hasAdditionalPropErrors = false;
         }
       },
     },
   },
   methods: {
-    addedEntry(list) {
-      this.emitInternalList(list.map((entry) => {
-        if (typeof entry === 'object') {
-          return {
-            ...entry,
-            [this.additionalPropertyName]: entry[this.additionalPropertyName] || [],
-          };
-        }
-        return {
-          ...{
-            [this.labelPropertyName]: entry,
-            [this.additionalPropertyName]: entry[this.additionalPropertyName] || [],
-          },
-        };
+    /** LIST HANDLING AND MANIPULATIONS */
+    /**
+     * function called when an entry is added to the selected list
+     * @param list
+     */
+    updateSelectedList(list) {
+      // first we need to make sure there are no duplicates if freetext is allowed
+      if (this.allowUnknownEntries && Array.from(new Set(list
+        // either create list of strings from identifier or if not present (=freetext entry)
+        // the label
+        .map((selectedOption) => selectedOption[this.identifierPropertyName]
+          || selectedOption[this.labelPropertyName]))).length !== list.length) {
+        /**
+         * event emitted when user is trying to add duplicate freetext which will be
+         * prevented (so that user can be informed)
+         * @event duplicate
+         * @param {Object[]} - the altered selected list (modelValue)
+         */
+        this.$emit('duplicate', list);
+        // then do not follow up with any further actions (=entry will not be added)
+        return;
+      }
+      // since we don't want a new entry to show an error message immediately we need
+      // to set the invalid variable false
+      this.hasAdditionalPropErrors = false;
+      // update internal selected list - also here add the additional prop immediately
+      this.selectedBelowListInt = list.map((selectedOption) => ({
+        ...selectedOption,
+        [this.additionalPropertyName]: selectedOption[this.additionalPropertyName] || [],
       }));
+      // and check if input is now valid in case it was invalid before
+      // use isValidChipsInput() not validate() because we really only want to
+      // check main input field
+      if (this.invalidInt && this.isValidChipsInput()) {
+        // still honor invalid state and error message set from outside if any
+        this.invalidInt = this.invalid;
+        this.errorMessageInt = this.errorMessage;
+      }
+      this.emitSelected(list);
     },
-    removeEntry(evt, index) {
+    /**
+     * function called when an entry should be removed from the selected list
+     * @param {number} index
+     */
+    removeEntry(index) {
+      // remove the entry from the internal list
       const item = this.selectedBelowListInt.splice(index, 1);
-      item[this.additionalPropertyName] = {};
-      this.emitInternalList(this.selectedBelowListInt);
+      // inform parent about the change
+      this.emitSelected(this.selectedBelowListInt);
       // inform screen reader user
       this.announcement = this.assistiveText.optionRemoved
         .replace('{label}', item[0][this.labelPropertyName]);
     },
-    updateList(evt, list) {
-      this.emitInternalList(list);
-    },
-    updateAdditionalProperty(evt, index) {
-      this.selectedBelowListInt[index][this.additionalPropertyName] = evt;
-      this.emitInternalList(this.selectedBelowListInt);
-      this.isValidAdditionalOptions(this.selectedBelowListInt[index]);
+    /**
+     * function called when an option was selected or removed from the additional property
+     * input
+     * @param {Array} updatedSelectedList
+     * @param {number} index
+     */
+    updateAdditionalProperty(updatedSelectedList, index) {
+      // update the additional property of the correct selected entry with the new list
+      this.selectedBelowListInt[index][this.additionalPropertyName] = updatedSelectedList;
+      // inform parent that the selected list changed
+      this.emitSelected(this.selectedBelowListInt);
       /**
        * propagate additional-property-changed change event to parent
        * Note: useful when validation is done from the parent
@@ -638,59 +634,47 @@ export default {
        */
       this.$emit('additional-property-changed', this.modelValue[index]);
     },
-    createInternalList(val) {
-      this.selectedBelowListInt = val.map((entry, index) => {
-        if (typeof entry === 'object') {
-          return {
-            ...{
-              [this.additionalPropertyName]: [],
-              idInt: this.identifierPropertyName && (entry[this.identifierPropertyName] === 0
-              || entry[this.identifierPropertyName])
-                ? entry[this.identifierPropertyName] : entry[this.labelPropertyName] + index,
-            },
-            ...entry,
-          };
-        }
-        return {
-          ...{
-            [this.labelPropertyName]: entry,
-            idInt: this.list.length + index,
-            [this.additionalPropertyName]: [],
-          },
-        };
-      });
-    },
-    emitInternalList(val) {
-      const sendArr = [];
-      val.forEach((sel, index) => {
-        sendArr[index] = { ...sel };
-      });
-      sendArr.forEach((sel) => {
-        // eslint-disable-next-line no-param-reassign
-        delete sel.idInt;
-      });
-      /**
-       * propagate list change from dragging event to parent
-       *
-       * @event update:modelValue
-       * @param {Object} - the altered list
-       *
-       */
-      this.$emit('update:modelValue', sendArr);
-    },
-    modifyChipValue(event, index) {
-      if (!event) {
+    /**
+     * function called when `allowUnknownEntries` and `chipsEditable` are set true
+     * and a chip was modified
+     * @param {string} newChipText
+     * @param {number} index
+     */
+    modifyChipValue(newChipText, index) {
+      if (!newChipText) {
         this.selectedBelowListInt.splice(index, 1);
       } else {
         const modifiedEntry = { ...this.selectedBelowListInt[index] };
         if (this.identifierPropertyName) {
           modifiedEntry[this.identifierPropertyName] = '';
         }
-        modifiedEntry[this.labelPropertyName] = event;
+        modifiedEntry[this.labelPropertyName] = newChipText;
         this.selectedBelowListInt[index] = modifiedEntry;
       }
-      this.emitInternalList(this.selectedBelowListInt);
+      this.emitSelected(this.selectedBelowListInt);
     },
+    /**
+     * function to inform parent of updated selected list, sending list
+     * without internal modifications
+     * @param {Object[]} val
+     */
+    emitSelected() {
+      const updatedList = JSON.parse(JSON.stringify(this.selectedBelowListInt));
+      /**
+       * propagate list change from dragging event to parent
+       *
+       * @event update:model-value
+       * @param {Object} - the altered list
+       *
+       */
+      this.$emit('update:model-value', updatedList);
+    },
+
+    /** DROP-DOWN / AUTOCOMPLETE */
+    /**
+     * function triggered on user input to autocomplete options
+     * @param params
+     */
     fetchDropDownEntries(params) {
       /**
        * if drop down entries dynamically set - fetch new entries on input
@@ -702,28 +686,89 @@ export default {
        */
       this.$emit('fetch-dropdown-entries', params);
     },
+
+    /** DRAG & DROP HANDING */
     /**
-     * get additional options error message
-     * @param {string} id - objects id
-     * @param {number} index - index in selectedList (needed for unknown entries)
-     * @returns {string}
+     * need to set custom due to some strange effects not showing correct element in some cases
+     * (this function is only triggered on non-touch devices)
+     * @param {DataTransfer} dataTransfer
      */
-    additionalOptionsErrorMessage(id, index) {
-      if (this.additionalPropErrors.filter(obj => obj.id === id).length
-            || typeof this.additionalPropErrors[index] !== 'undefined') {
-        return this.validationTexts.required;
+    setDragElement(dataTransfer) {
+      const img = document.createElement('div');
+      img.id = 'drag-element';
+      img.style.position = 'absolute';
+      img.style.top = '-99999px';
+      img.style.left = '-99999px';
+      // setting height and width is important for macOS it wont work
+      // otherwise with an empty element
+      img.style.width = '100%';
+      img.style.height = '100%';
+      // setting like this makes it work in all three major browsers
+      // the 0.01 opacity is needed for firefox not to display some default
+      // document icon
+      img.style.backgroundColor = 'rgb(255, 255, 255, 0.01)';
+      // add the element to the dom
+      document.body.appendChild(img);
+      dataTransfer.setDragImage(img, 0, 0);
+    },
+    /**
+     * cursor is not set per default on macOS so we need to handle it here
+     * this does not influence cursor display on Windows
+     * and Ubuntu is fine anyway
+     * @param {MouseEvent} event - native event
+     */
+    onDragStart(event) {
+      // created separate method because we need to differentiate between
+      // iOS Firefox and all other browsers
+      // also tried to add the class already on mousedown however this will interfere
+      // with the dragstart / dragend cursor setting (at least on all macOS
+      // browsers, maybe others too)
+      this.toggleGrabbingCursor(true, event);
+    },
+    /**
+     * actions to handle when element is dropped again
+     * @param {Object[]} list - the re-sorted item list
+     * @param {MouseEvent} event - the native event
+     */
+    onDragEnd(list, event) {
+      // remove the drag cursor class again - for extensive comment see above
+      this.toggleGrabbingCursor(false, event);
+      // get and remove the drag element created in setDragImage() again
+      const elem = document.getElementById('drag-element');
+      if (elem) {
+        elem.parentNode.removeChild(elem);
       }
-      return '';
+      // and emit the altered list
+      this.emitSelected(list);
     },
     /**
-     * check if chips should be removable
-     * @param {Object} obj
-     * @returns {boolean}
+     * added separate method to distinguish between browsers specifically because
+     * macOS did not display correct cursor and a common solution for Firefox AND Chrome
+     * could not be found
+     * this still might not be the perfect solution - more inspiration to improve can be found
+     * here https://github.com/SortableJS/Vue.Draggable/issues/815
+     * @param {boolean} state - the state that should be applied
+     * @param {MouseEvent} event - the native mouse event
      */
-    isChipsRemovable(obj) {
-      return !this.additionalPropRequired
-        || (!!this.additionalPropAllowMultipleEntries && obj.length > 1);
+    toggleGrabbingCursor(state, event) {
+      // check if client is Firefox - because this is the only way working in Firefox!
+      // we also need to check for event, since it is needed for iOS Firefox
+      if (event && navigator.userAgent.includes('Mac') && typeof InstallTrigger !== 'undefined') {
+        if (state) {
+          event.target.classList.add('grabbing');
+        } else {
+          event.target.classList.remove('grabbing');
+        }
+        // this seems fine for every other OS (and browser therein)
+      } else {
+        const html = document.getElementsByTagName('html').item(0)
+        html.classList.toggle('grabbing', state)
+      }
     },
+
+
+    /** VALIDATION */
+
     /**
      * validate chips input field
      * @returns {boolean} - error state
@@ -733,7 +778,7 @@ export default {
       if (!this.required) return true;
 
       // if no chips set, throw error
-      if (!this.modelValue.length) {
+      if (!this.selectedBelowListInt.length) {
         this.invalidInt = true;
         // consider also optional errorMessage
         this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`.trim();
@@ -743,44 +788,6 @@ export default {
       return true;
     },
     /**
-     * check if a single additional option is invalid
-     * @param {string} id
-     * @param {number} index
-     * @returns {boolean}
-     */
-    isInvalidAdditionalOption(id, index) {
-      return !!this.additionalPropErrors.filter(obj => obj.id === id).length
-        || typeof this.additionalPropErrors[index] !== 'undefined';
-    },
-    /**
-     * validate single or all additional option or all from the list of selected options
-     * @param {object|null} obj - single row object (optional)
-     * @returns {boolean} - valid state
-     */
-    isValidAdditionalOptions(obj) {
-      // if not set do anything
-      if (!this.additionalPropRequired) return true;
-
-      // validate single additional option
-      // if a chip is set (should always be if obj is specified)
-      if (obj && obj[this.additionalPropertyName].length) {
-        // remove the current object from the errors array
-        this.additionalPropErrors = this.additionalPropErrors
-          .filter(item => item.id !== obj.id);
-        // return validation state
-        return true;
-      }
-
-      // validate all selected entries and set errors
-      // TODO: why not use internal variable here but modelValue?
-      this.additionalPropErrors = this.modelValue
-        .filter(entry => !entry[this.additionalPropertyName] || !entry[this.additionalPropertyName].length)
-        .map(entry => ({ id: entry.id }));
-
-      // return validation state
-      return this.selectedBelowListInt.length ? !this.additionalPropErrors.length : true;
-    },
-    /**
      * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelow.validate();` from parent.<br>
      * Therefore, the component must have a reference set.
      * @public
@@ -788,30 +795,172 @@ export default {
      */
     validate() {
       // clear errors but still consider if invalid state and error message were set from
-      // out side - in this case use these values instead of a complete reset
+      // outside - in this case use these values instead of a complete reset
       this.invalidInt = this.invalid;
       this.errorMessageInt = this.errorMessage;
-      this.additionalPropErrors = [];
-      // validate
+      // validate main property field
       const isValidChipsInput = this.isValidChipsInput();
-      const isValidAdditionalOptions = this.isValidAdditionalOptions(null);
+      // and check if there are additional prop errors
+      this.hasAdditionalPropErrors = this.additionalPropErrorsList
+        && !!this.additionalPropErrorsList.some((error) => error);
       // return error state
       // nice to have would be to return an object or array with more information
       // e.g. { label: this.label, error: this.errorMessageInt },
       // but how to deal with the additionalOptions
       // for now a boolean is enough
-      return !(isValidChipsInput && isValidAdditionalOptions);
+      return !(isValidChipsInput && !this.hasAdditionalPropErrors);
     },
   },
 };
-
 </script>
+
+<template>
+  <div
+    ref="chipsBelow"
+    v-bind="rootAttrs"
+    class="base-chips-below">
+    <BaseChipsInput
+      ref="chipsInput"
+      v-bind="chipsInputProps"
+      :model-value="selectedBelowListInt"
+      :close-dropdown-on-option-select="closeDropdownOnOptionSelect"
+      :is-loading="isLoading"
+      :display-chips-inline="false"
+      :sort-text="sortText"
+      :sort-name="sortName"
+      :invalid="invalidInt"
+      :error-message="errorMessageInt"
+      @update:model-value="updateSelectedList"
+      @fetch-dropdown-entries="fetchDropDownEntries">
+      <template
+        #drop-down-entry="props">
+        <!-- @slot a slot to provide customized drop down options
+          @binding {Object} item - an option in the options list  -->
+        <slot
+          :item="props.item"
+          name="drop-down-entry" />
+      </template>
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField) -->
+        <slot name="label-addition" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField) -->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="remove-icon" />
+      </template>
+      <template
+        #no-options>
+        <!-- @slot a slot to customize messages in case of no options present in drop down -->
+        <slot
+          name="no-options" />
+      </template>
+      <!-- @slot to add elements below input fields e.g. add drop down; will appear before the
+        chosen chips list -->
+      <template #below-input>
+        <slot name="below-input" />
+      </template>
+    </BaseChipsInput>
+    <Component
+      :is="draggableComponent"
+      v-model="draggableList"
+      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: null"
+      :animation="draggable ? 200 : null"
+      :set-data="draggable ? setDragElement : null"
+      :handle="draggable ? '.base-chips-below__icon-handle' : null"
+      @start="onDragStart"
+      @end="onDragEnd(selectedBelowListInt, $event)">
+      <TransitionGroup
+        :name="'flip-list'"
+        type="transition">
+        <div
+          v-for="(entry, index) in renderList"
+          :key="'item' + entry.idInt"
+          :class="['base-chips-below__list-item',
+                   { 'base-chips-below__list-item--draggable': draggable }]">
+          <div
+            :key="'line' + entry.idInt"
+            class="base-chips-below__list-item-line">
+            <div
+              v-if="draggable"
+              :key="'iconwrapper' + entry.idInt"
+              class="base-chips-below__list-icon-wrapper">
+              <div
+                class="base-chips-below__icon-handle">
+                <BaseIcon
+                  :key="'icon' + entry.idInt"
+                  name="drag-lines"
+                  class="svg-icon base-chips-below__list-icon" />
+              </div>
+            </div>
+            <div
+              :key="'chip-wrapper' + entry.idInt"
+              class="base-chips-below__list-item-chip-wrapper">
+              <BaseChip
+                :id="'chips-below' + entry.idInt"
+                ref="selectedChip"
+                :key="'chip' + entry.idInt"
+                v-model="entry[labelPropertyName]"
+                :editable="allowUnknownEntries && chipsEditable"
+                :is-linked="!entry.edited && (entry[identifierPropertyName] === 0
+                  || !!entry[identifierPropertyName])"
+                @update:model-value="modifyChipValue($event, index)"
+                @remove-entry="removeEntry(index)" />
+            </div>
+            <BaseChipsInput
+              :key="'input_' + entry.idInt"
+              v-model="entry[additionalPropertyName]"
+              :input-id="`${inputId || entry.idInt}_${additionalPropertyName}_${entry[identifierPropertyName]}`"
+              :show-label="false"
+              :label="label + '-' + additionalPropertyName"
+              :list="additionalPropOptions"
+              :show-input-border="false"
+              :allow-dynamic-drop-down-entries="false"
+              :placeholder="additionalPropPlaceholder"
+              :always-linked="true"
+              :language="language"
+              :draggable="true"
+              :drop-down-no-options-info="dropDownNoOptionsInfo"
+              :identifier-property-name="identifierPropertyName"
+              :label-property-name="labelPropertyName"
+              :invalid="hasAdditionalPropErrors && additionalPropErrorsList && additionalPropErrorsList[index]"
+              :error-message="validationTexts.required"
+              :allow-multiple-entries="additionalPropAllowMultipleEntries"
+              :chips-removable="chipsRemovable && chipsRemovable[index]"
+              :show-error-icon="showErrorIcon"
+              :required="additionalPropRequired"
+              :default-entry="additionalPropDefaultOption"
+              class="base-chips-below__chips-input"
+              @update:model-value="updateAdditionalProperty($event, index)" />
+          </div>
+        </div>
+      </TransitionGroup>
+    </Component>
+  </div>
+</template>
 
 <style lang="scss">
   @use "@/styles/variables" as *;
 
   .base-chips-below {
-    .base-chips-below-list-item {
+    .base-chips-below__list-item {
       padding: $spacing-small-half 0 0 0;
 
       &:not(:last-of-type) {
@@ -820,26 +969,44 @@ export default {
         padding: $spacing-small-half 0;
       }
 
-      .base-chips-below-list-item-line {
+      .base-chips-below__list-item-line {
         display: flex;
         align-items: center;
 
-        .base-chips-below-list-icon-wrapper {
+        .base-chips-below__list-icon-wrapper {
           width: $icon-medium;
           height: $icon-medium;
           display: flex;
           flex: 0 0 auto;
           cursor: grab;
+          position: relative;
 
-          .base-chips-below-list-icon {
-            max-height: 100%;
-            width: $icon-medium;
-            color: $input-field-color;
-            margin: auto;
+          .base-chips-below__icon-handle {
+            display: flex;
+            justify-content: center;
+
+            /* for mobile create a padding around the icon so its easier to grab */
+            @media screen and (max-width: $mobile) {
+              position: absolute;
+              width: calc(#{$icon-medium} + 2 * #{$spacing-small});
+              height: calc(#{$icon-medium} + 2 * #{$spacing-small});
+              padding: $spacing-small;
+              top: 50%;
+              right: -$spacing-small;
+              transform: translateY(-50%);
+            }
+            .base-chips-below__list-icon {
+              max-height: 100%;
+              width: $icon-medium;
+              height: $icon-medium;
+              color: $input-field-color;
+              margin: auto;
+              pointer-events: none;
+            }
           }
         }
 
-        .base-chips-below-list-item-chip-wrapper {
+        .base-chips-below__list-item-chip-wrapper {
           width: 100%;
           margin-right: $spacing;
           max-width: calc(50% - #{$spacing});
@@ -847,34 +1014,24 @@ export default {
           text-align: left;
         }
 
-        .base-chips-below-chips-input {
+        .base-chips-below__chips-input {
           max-width: calc(50%);
           flex: 1 0 calc(50%);
         }
       }
 
-      &.base-chips-below-list-item--draggable {
-        .base-chips-below-list-item-chip-wrapper {
+      &.base-chips-below__list-item--draggable {
+        .base-chips-below__list-item-chip-wrapper {
           margin-left: $spacing-small;
           max-width: calc(50% - (2 * #{$spacing}));
           flex: 1 0 calc(50% - (2 * #{$spacing}));
         }
 
-        .base-chips-below-chips-input {
+        .base-chips-below__chips-input {
           max-width: calc(50% - #{$spacing-small} - #{$spacing-small-half});
           flex: 1 0 calc(50% - #{$spacing-small} - #{$spacing-small-half});
         }
       }
-
-      &.sortable-chosen {
-        border-bottom: 0;
-      }
-    }
-
-    .base-chips-below-list-item-chosen {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
     }
   }
 </style>

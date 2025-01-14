@@ -242,3 +242,7 @@ h1, h2, h3 {
   margin-left: -1000px;
   overflow: hidden;
 }
+
+.grabbing * {
+  cursor: grabbing;
+}

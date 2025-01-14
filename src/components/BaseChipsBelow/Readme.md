@@ -172,6 +172,17 @@ export default {
       ],
     };
   },
+  watch: {
+    additionalPropAllowMultipleEntries(val) {
+      if (!val) {
+        this.selectedList.forEach((listItem) => {
+          if (listItem.roles?.length > 1) {
+            listItem.roles.splice(1, listItem.roles.length - 1);
+          }
+        });
+      }
+    },
+  },
   mounted() {
     this.setDefaultOption(this.defaultOption);
   },
