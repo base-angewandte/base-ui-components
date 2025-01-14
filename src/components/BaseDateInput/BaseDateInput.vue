@@ -114,7 +114,8 @@
                       autocomplete="off"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
-                      @blur="onInputBlur($event, 'from')">
+                      @blur="onInputBlur($event, 'from')"
+                      @vue:mounted="calcFadeOut(['From'])">
                   </template>
                   <!-- this empty element is here so that the default icon of datepicker
                   is not used -->
@@ -126,10 +127,9 @@
             </template>
             <template #post-input-field>
               <BaseIcon
-                v-if="showIcons"
                 ref="baseIcon"
                 :name="isFromTimeField ? 'clock' : 'calendar-many'"
-                class="base-date-input__date-icon"
+                :class="['base-date-input__date-icon', { hide: !showIcons }]"
                 @click.stop="fromOpen = !fromOpen" />
             </template>
           </BaseInput>
@@ -200,7 +200,8 @@
                       :class="['base-date-input__input', inputClass]"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
-                      @blur="onInputBlur($event, 'to')">
+                      @blur="onInputBlur($event, 'to')"
+                      @vue:mounted="calcFadeOut(['To'])">
                   </template>
                   <!-- this empty element is here so that the default icon of
                   datepicker is not used -->
@@ -232,7 +233,7 @@
 </template>
 
 <script>
-import { computed, defineAsyncComponent, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, ref, watch } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import { capitalizeString, debounce } from '@/utils/utils.js';
 
@@ -466,6 +467,299 @@ export default {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
+    /** DATE FORMAT */
+    /**
+     * variable for toggling format between date and year for date_year format
+     * @type {string}
+     */
+    const dateFormatInt = ref('');
+
+    /** INPUT HANDLING */
+    /**
+     * internal input representation with all possible values for
+     * date and time
+     * @typedef {Object} inputInt
+     * @property {string} inputInt.date - attribute a single date or datetime date is stored in
+     * @property {string} inputInt.date_from - storing daterange from
+     * @property {string} inputInt.date_to - storing daterange to
+     * @property {string} inputInt.time - storing the time for datetime type
+     * @property {string} inputInt.time_from - storing timerange from
+     * @property {string} inputInt.time_to - storing timerange to
+     */
+    const inputInt = ref({
+      date: '',
+        date_from: '',
+        date_to: '',
+        time: '',
+        time_from: '',
+        time_to: '',
+    });
+
+    /**
+     * determine if the from field is a time field
+     * @returns {boolean}
+     */
+    const isFromTimeField = computed(() => {
+      return props.type === 'timerange';
+    });
+    /**
+     * determine if the to field is a time field
+     * @returns {boolean}
+     */
+    const isToTimeField = computed(() => {
+      return props.type === 'datetime' || props.type === 'timerange';
+    });
+    /**
+     * check if input is just a single date or an object
+     * @returns {boolean}
+     */
+    const isInputTypeString = computed(() => {
+      return typeof props.modelValue === 'string' || !inputProperties.value.length;
+    });
+    /**
+     * compute the properties of the object provided in input prop
+     * @returns {string[]}
+     */
+    const inputProperties = computed(() => {
+      // if input is object return those keys // else for a single date it
+      // could also be a string - then just return an empty array
+      return typeof props.modelValue === 'object' ? Object.keys(props.modelValue) : [];
+    });
+
+
+    /**
+     * handle input for the 'from' input field
+     */
+    const inputFrom = computed({
+      /**
+       * get back the appropriate inputInt attribute value
+       * @returns {string} - a date in the format DD.MM.YYYY
+       */
+      get() {
+        // if it is a time field just return the time_from value
+        if (isFromTimeField.value) {
+          return inputInt.value.time_from;
+        }
+        // else it is a date (either single or date_from) --> convert it into the
+        // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
+        return parseToDateDisplay(inputInt.value.date || inputInt.value.date_from);
+      },
+      /**
+       * also assign them again accordingly
+       * @param {string} val - the value provided by the input element
+       * @param {string} oldValue - the previous value of inputFrom
+       */
+      set(val, oldValue) {
+        let newDate = val;
+        if (isFromTimeField.value) {
+          inputInt.value.time_from = newDate;
+        } else {
+          newDate = parseToDateStorage(val);
+          if (inputProperties.value.includes('date_from')) {
+            inputInt.value.date_from = newDate;
+          } else {
+            inputInt.value.date = newDate;
+          }
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (newDate !== oldValue) {
+          emitData();
+        }
+      },
+    });
+
+    /**
+     * as above - if there is only a single time field get value from 'time' variable
+     * if it is a range use 'time_to''
+     */
+    const inputTo = computed({
+      /**
+       * get back the appropriate inputInt attribute value
+       * @returns {string}
+       */
+      get() {
+        // check if a to time field exists
+        if (isToTimeField.value) {
+          // return the appropriate attribute value
+          return inputInt.value.time || inputInt.value.time_to;
+        }
+        // else return the date_to attribute value
+        return parseToDateDisplay(inputInt.value.date_to);
+      },
+      /**
+       * also assign them again accordingly
+       * @param {string} val - the value provided by the input element
+       * @param {string} oldValue - the previous value of inputTo
+       */
+      set(val, oldValue) {
+        let newValue = val;
+        // check if field is date field
+        if (!isToTimeField.value) {
+          newValue = parseToDateStorage(newValue);
+          // if so, set date_to attribute value and transform value appropriately
+          // TODO: this could be insufficient since currently no validity checks on input string
+          inputInt.value.date_to = newValue;
+          // else check if type is timerange
+        } else if (inputProperties.value.includes('time_from')) {
+          inputInt.value.time_to = newValue;
+          // else assume the type is datetime
+        } else {
+          inputInt.value.time = newValue;
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (newValue !== oldValue) {
+          emitData();
+        }
+      },
+    });
+    /**
+     * data emit function, transforming data before emit event
+     */
+    function emitData() {
+      // get a data object that only contains fields that were also present
+      // in external input
+      const data = getInputData();
+      /**
+       * emit an event when focus leaves the input
+       *
+       * @event selected
+       * @param {string, Object} - the input string or object
+       */
+      emit('update:model-value', data);
+    }
+    /**
+     * if input was just a single string return that otherwise
+     * only return the properties provided by external input
+     * if input is empty set value to empty string instead of null (default vue2-datepicker)
+     * @returns {string | Object}
+     */
+    function getInputData() {
+      if (isInputTypeString.value) {
+        return inputInt.value.date !== null ? inputInt.value.date : '';
+      }
+      const data = {};
+      inputProperties.value.forEach((key) => {
+        data[key] = inputInt.value[key] !== null ? inputInt.value[key] : '';
+      });
+      return data;
+    }
+    // HELPER METHODS
+    /**
+     * transform the date to the correct display format
+     * @param {string} dateString - the date string in YYYY-MM-DD format
+     */
+    function parseToDateDisplay(dateString) {
+      // if no date string was provided just return an empty string
+      if (!dateString) return '';
+      // now check if year is negative
+      const isNegativeYear = isNegativeStorageDate(dateString);
+      // if so, create a positive date string
+      const positiveDateString = isNegativeYear
+        ? removeYearMinusFromStorageDate(dateString) : dateString;
+      // now do the transformation and add the minus to the year again if necessary
+      return addYearMinusToDateDisplay(
+        positiveDateString.split('-').reverse().join('.'),
+        isNegativeYear,
+      );
+    }
+    /**
+     * transform the date to the correct storage format
+     * @param {string} dateString - the date string in DD.MM.YYYY format
+     */
+    function parseToDateStorage(dateString) {
+      return dateString ? dateString.split('.').reverse().join('-') : '';
+    }
+    /**
+     * check for a negative year in the date that is displayed
+     * @param {string} date - date string in the format DD.MM.YYYY
+     * @returns {boolean}
+     */
+    function isNegativeDisplayDate(date) {
+      if (!date) return false;
+      if (dateFormatInt.value === 'MM.YYYY') {
+        return /^\d{0,2}\.-\d{0,4}$/.test(date);
+      }
+      if (dateFormatInt.value === 'YYYY') {
+        return /^-\d{0,4}$/.test(date);
+      }
+      return /^\d{0,2}\.\d{0,2}\.-\d{0,4}$/.test(date);
+    }
+    /**
+     * check if year is negative in the stored date
+     * @param {string} date - a date string in the format YYYY-MM-DD
+     * @param {string} [format=undefined] - in case not the current format (this.dateFormatInt) should
+     *  be used for evaluation provide it with this param
+     * @returns {boolean}
+     */
+    function isNegativeStorageDate(date, format = undefined) {
+      // if there is no date to evaluate just return false
+      if (!date) return false;
+      // either use the format provided as param or the currently set format in dateFormatInt
+      const formatToCheck = format || dateFormatInt.value;
+      if (formatToCheck === 'MM.YYYY') {
+        return /^-\d{0,4}-\d{0,2}$/.test(date);
+      }
+      if (formatToCheck === 'YYYY') {
+        return /^-\d{0,4}$/.test(date);
+      }
+      return /^-\d{0,4}-\d{0,2}-\d{0,2}$/.test(date);
+    }
+    /**
+     * since minus has to be temporarily removed for some actions add it again
+     *  after with this function (for displayed date)
+     * @param {string} date - date in the format DD.MM.YYYY
+     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
+     *  function
+     * @returns {string}
+     */
+    function addYearMinusToDateDisplay(date, isNegative = true) {
+      if (isNegative) {
+        const [year, month, day] = date.split('.').reverse();
+        return `${day !== undefined ? `${day}.` : ''}${month !== undefined ? `${month}.` : ''}-${year}`;
+      }
+      return date;
+    }
+    /**
+     * since minus has to be temporarily removed for some actions add it again
+     *  after with this function (for stored date)
+     * @param {string} date - date in the format YYYY-MM-DD
+     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
+     *  function
+     * @returns {string}
+     */
+    function addYearMinusToDateStorage(date, isNegative = true) {
+      if (isNegative) {
+        return `-${date}`;
+      }
+      return date;
+    }
+    /**
+     * remove the minus from the date since some functions (especially Date() ) can
+     *  not cope with negative dates (for displayed date)
+     * @param {string} date - the date string in format DD.MM.YYYY
+     * @returns {string}
+     */
+    function removeYearMinusFromDisplayDate(date) {
+      return isNegativeDisplayDate(date)
+        ? date.replace('-', '') : date;
+    }
+    /**
+     * remove the minus from the date since some functions (especially Date()) can
+     *  not cope with negative dates (for stored date)
+     * @param {string} date - the date string in format YYYY-MM-DD
+     * @param {string} [format=undefined] - in case not the currently selected format should be used
+     *  for date evaluation provide the format with this param
+     * @returns {string}
+     */
+    function removeYearMinusFromStorageDate(date, format = undefined) {
+      return isNegativeStorageDate(date, format)
+        ? date.replace('-', '') : date;
+    }
+
     /** DATE FORMAT SWITCH */
     /**
      * check if format switch tabs should be shown
@@ -637,12 +931,7 @@ export default {
      * store icon width in a variable
      * @type {ComputedRef<number>}
      */
-    const iconWidth = computed(() => {
-      if (baseIcon.value) {
-        return baseIcon.value.$el.clientWidth;
-      }
-      return 0;
-    });
+    const iconWidth = ref(0);
     /**
      * variable to set css class according to label elements wrapping or not
      * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
@@ -653,7 +942,7 @@ export default {
      * space)
      * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
      */
-    const showIcons = ref(true);
+    const showIcons = ref(false);
     /**
      * variable to steer if input fade out of to field should be shown
      * @type {boolean}
@@ -725,18 +1014,78 @@ export default {
      * function to calculate if fade out in the input fields should be shown, needs to be
      * recalculated after resize or if input changes
      */
-    function calcFadeOut(inputFields) {
-      // now iterate through the relevant fields
+    async function calcFadeOut(inputFields) {
+      // first we need to determine the iconWidth IF it is shown
+      // only get once since the icon width should not change later on
+      if (!iconWidth.value && baseIcon.value?.$el) {
+        // get the icon HTML element
+        const iconElement = baseIcon.value.$el;
+        // get the margin that is also part of the icon width in the input field
+        const iconMargin = Number(getComputedStyle(iconElement)['margin-left'].replace('px', ''));
+        // set the icon width as width + margin
+        iconWidth.value = iconElement.clientWidth + iconMargin;
+      }
+      // ICONS
+      // since we want a uniform appearance
+      // across all fields we only do this once with the longest text
+      // for input width etc. we use the 'from' field since it should always be
+      // present
+      // get the 'from' input element
+      const inputElement = inputElements.inputFromElement.value;
+      // make sure the element was found and since icon removal is only considered if there
+      // is input - check if there is actually input (or if this is the initial
+      // state were icons are still hidden per default to avoid a short flash if they dont fit)
+      if (inputElement && (!showIcons.value || inputFrom.value || inputTo.value)) {
+        // but relevant for icon calc is the longest text
+        let maxTextWidth = 0;
+        // check which element has the longer text
+        // create a span
+        const span = document.createElement('span');
+        // hide the span
+        span.setAttribute('class', 'hide');
+        // add the from value to the span
+        span.innerHTML = inputFrom.value;
+        // add the element to the document body
+        baseDateInput.value.appendChild(span);
+        maxTextWidth = span.offsetWidth;
+        // add the to value to the span
+        span.innerHTML = inputTo.value;
+        const toWidth = span.offsetWidth;
+        // update the value if 'to' field text is longer than first determined
+        // 'from'
+        if (toWidth > maxTextWidth) {
+          maxTextWidth = toWidth;
+        }
+        // remove the element again
+        baseDateInput.value.removeChild(span);
+
+        // get inputWidth
+        const inputWidth = inputElement.offsetWidth;
+        // now make the actual comparisons to set the correct showIcons value
+        // if icons are present just check the text against the remaining input width
+        if (showIcons.value && maxTextWidth > inputWidth) {
+          // if not - remove the icons
+          showIcons.value = false;
+          // wait for the DOM to update so the input width is correct in fade out calculations
+          await nextTick();
+          // if icons are not present we need to consider if text would still fit if icons
+          // WERE present - only if yes show icons again
+        } else if (!showIcons.value && maxTextWidth + iconWidth.value <= inputWidth) {
+          showIcons.value = true;
+          // wait for the DOM to update so the input width is correct in fade out calculations
+          await nextTick();
+        }
+      }
+
+
+      // FADE OUT
+      // since fade out is determined for each field individually iterate through the relevant fields
       inputFields.forEach((field) => {
         const inputElement = inputElements[`input${field}Element`].value;
         // check if element exists
         if (inputElement) {
-          // now get the input field value
-          const inputValue = inputElement.value;
-          // for width (and fade out) calculation either use that or the placeholder visible
-          // in the field (this is saved in a separate variable from inputValue because for
-          // show icons only input value is relevant)
-          const text = inputValue || inputElement.getAttribute('placeholder');
+          // now get the input field value or the placeholder text
+          const text = inputElement.value || inputElement.getAttribute('placeholder');
           // now check if any of the two exists
           if (text) {
             // create a span
@@ -746,35 +1095,15 @@ export default {
             // add the input extracted text to this span
             span.innerHTML = text;
             // add the element to the document body
-            document.body.appendChild(span);
+            baseDateInput.value.appendChild(span);
             // get the width of that element
             const textWidth = span.offsetWidth;
             // remove the element again
-            document.body.removeChild(span);
+            baseDateInput.value.removeChild(span);
             // now also get the input width
             const inputWidth = inputElement.offsetWidth;
-            // check if the input value or placeholder width exceeds input width
-            if (textWidth > inputWidth) {
-              // if yes and there is input and icons are shown
-              if (inputValue && showIcons.value) {
-                // remove icons
-                showIcons.value = false;
-                // otherwise use fade out
-              } else {
-                fadeOut[`fadeOut${field}`].value = true;
-              }
-              // if input value or placeholder fit the input width
-            } else if (textWidth <= inputWidth) {
-              // check first if the fade out is used
-              if (fadeOut[`fadeOut${field}`].value) {
-                // if so - disable this one first
-                fadeOut[`fadeOut${field}`].value = false;
-                // else check if the icon would actually fit in the input together with the
-                // input width - if so - show icons
-              } else if (!showIcons.value && textWidth + iconWidth.value <= inputWidth) {
-                showIcons.value = true;
-              }
-            }
+            // and check if the text width fits the input width
+            fadeOut[`fadeOut${field}`].value = textWidth > inputWidth;
           }
         }
       });
@@ -784,6 +1113,23 @@ export default {
       internalId,
       rootAttrs,
       forwardAttrs,
+      dateFormatInt,
+      inputInt,
+      isFromTimeField,
+      isToTimeField,
+      isInputTypeString,
+      inputProperties,
+      inputFrom,
+      inputTo,
+      emitData,
+      getInputData,
+      parseToDateStorage,
+      isNegativeDisplayDate,
+      isNegativeStorageDate,
+      addYearMinusToDateDisplay,
+      addYearMinusToDateStorage,
+      removeYearMinusFromDisplayDate,
+      removeYearMinusFromStorageDate,
       labelRowSlotsHaveData,
       isSwitchableFormat,
       showLabelRow,
@@ -803,36 +1149,11 @@ export default {
       showIcons,
       useFadeOutFrom: fadeOut.fadeOutFrom,
       useFadeOutTo: fadeOut.fadeOutTo,
-      calcLabelAdditionsWidth,
       calcFadeOut,
     };
   },
   data() {
     return {
-      /**
-       * internal input representation with all possible values for
-       * date and time
-       * @typedef {Object} inputInt
-       * @property {string} inputInt.date - attribute a single date or datetime date is stored in
-       * @property {string} inputInt.date_from - storing daterange from
-       * @property {string} inputInt.date_to - storing daterange to
-       * @property {string} inputInt.time - storing the time for datetime type
-       * @property {string} inputInt.time_from - storing timerange from
-       * @property {string} inputInt.time_to - storing timerange to
-       */
-      inputInt: {
-        date: '',
-        date_from: '',
-        date_to: '',
-        time: '',
-        time_from: '',
-        time_to: '',
-      },
-      /**
-       * variable for toggling format between date and year for date_year format
-       * @type {string}
-       */
-      dateFormatInt: '',
       /**
        * variable to store the date when switching from date to year in order to be
        * able to restore exact date when switching back
@@ -890,110 +1211,6 @@ export default {
       return this.format;
     },
     /**
-     * compute the properties of the object provided in input prop
-     * @returns {string[]}
-     */
-    inputProperties() {
-      // if input is object return those keys // else for a single date it
-      // could also be a string - then just return an empty array
-      return typeof this.modelValue === 'object' ? Object.keys(this.modelValue) : [];
-    },
-    /**
-     * check if input is just a single date or an object
-     * @returns {boolean}
-     */
-    isInputTypeString() {
-      return typeof this.modelValue === 'string' || !this.inputProperties.length;
-    },
-    /**
-     * handle input for the 'from' input field
-     */
-    inputFrom: {
-      /**
-       * get back the appropriate inputInt attribute value
-       * @returns {string} - a date in the format DD.MM.YYYY
-       */
-      get() {
-        // if it is a time field just return the time_from value
-        if (this.isFromTimeField) {
-          return this.inputInt.time_from;
-        }
-        // else it is a date (either single or date_from) --> convert it into the
-        // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
-        return this.parseToDateDisplay(this.inputInt.date || this.inputInt.date_from);
-      },
-      /**
-       * also assign them again accordingly
-       * @param {string} val - the value provided by the input element
-       * @param {string} oldValue - the previous value of inputFrom
-       */
-      set(val, oldValue) {
-        let newDate = val;
-        if (this.isFromTimeField) {
-          this.inputInt.time_from = newDate;
-        } else {
-          newDate = this.parseToDateStorage(val);
-          if (this.inputProperties.includes('date_from')) {
-            this.inputInt.date_from = newDate;
-          } else {
-            this.inputInt.date = newDate;
-          }
-        }
-        // watching of computed values does not work so emit event for altered inputInt right here
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (newDate !== oldValue) {
-          this.emitData();
-        }
-      },
-    },
-    /**
-     * as above - if there is only a single time field get value from 'time' variable
-     * if it is a range use 'time_to''
-     */
-    inputTo: {
-      /**
-       * get back the appropriate inputInt attribute value
-       * @returns {string}
-       */
-      get() {
-        // check if a to time field exists
-        if (this.isToTimeField) {
-          // return the appropriate attribute value
-          return this.inputInt.time || this.inputInt.time_to;
-        }
-        // else return the date_to attribute value
-        return this.parseToDateDisplay(this.inputInt.date_to);
-      },
-      /**
-       * also assign them again accordingly
-       * @param {string} val - the value provided by the input element
-       * @param {string} oldValue - the previous value of inputTo
-       */
-      set(val, oldValue) {
-        let newValue = val;
-        // check if field is date field
-        if (!this.isToTimeField) {
-          newValue = this.parseToDateStorage(newValue);
-          // if so, set date_to attribute value and transform value appropriately
-          // TODO: this could be insufficient since currently no validity checks on input string
-          this.inputInt.date_to = newValue;
-          // else check if type is timerange
-        } else if (this.inputProperties.includes('time_from')) {
-          this.inputInt.time_to = newValue;
-          // else assume the type is datetime
-        } else {
-          this.inputInt.time = newValue;
-        }
-        // watching of computed values does not work so emit event for altered inputInt right here
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (newValue !== oldValue) {
-          this.emitData();
-        }
-      },
-    },
-    /**
      * determine if the initially provided date is a year or a full date
      * (used to set the correct date display format and date/year switch button)
      * @returns {boolean}
@@ -1029,20 +1246,6 @@ export default {
         });
       }
       return options;
-    },
-    /**
-     * determine if the from field is a time field
-     * @returns {boolean}
-     */
-    isFromTimeField() {
-      return this.type === 'timerange';
-    },
-    /**
-     * determine if the to field is a time field
-     * @returns {boolean}
-     */
-    isToTimeField() {
-      return this.type === 'datetime' || this.type === 'timerange';
     },
   },
   watch: {
@@ -1190,31 +1393,6 @@ export default {
       if (event.target.tagName !== 'INPUT') {
         event.stopPropagation();
       }
-    },
-    /**
-     * transform the date to the correct display format
-     * @param {string} dateString - the date string in YYYY-MM-DD format
-     */
-    parseToDateDisplay(dateString) {
-      // if no date string was provided just return an empty string
-      if (!dateString) return '';
-      // now check if year is negative
-      const isNegativeYear = this.isNegativeStorageDate(dateString);
-      // if so, create a positive date string
-      const positiveDateString = isNegativeYear
-        ? this.removeYearMinusFromStorageDate(dateString) : dateString;
-      // now do the transformation and add the minus to the year again if necessary
-      return this.addYearMinusToDateDisplay(
-        positiveDateString.split('-').reverse().join('.'),
-        isNegativeYear,
-      );
-    },
-    /**
-     * transform the date to the correct storage format
-     * @param {string} dateString - the date string in DD.MM.YYYY format
-     */
-    parseToDateStorage(dateString) {
-      return dateString ? dateString.split('.').reverse().join('-') : '';
     },
     /**
      * checks done on keydown events
@@ -1537,21 +1715,6 @@ export default {
       this.checkDateValidity(capitalizeString(origin));
     },
     /**
-     * data emit function, transforming data before emit event
-     */
-    emitData() {
-      // get a data object that only contains fields that were also present
-      // in external input
-      const data = this.getInputData();
-      /**
-       * emit an event when focus leaves the input
-       *
-       * @event selected
-       * @param {string, Object} - the input string or object
-       */
-      this.$emit('update:model-value', data);
-    },
-    /**
      * convert function triggered on format tab switch
      */
     convertDate(oldFormat) {
@@ -1610,22 +1773,6 @@ export default {
         });
     },
     /**
-     * if input was just a single string return that otherwise
-     * only return the properties provided by external input
-     * if input is empty set value to empty string instead of null (default vue2-datepicker)
-     * @returns {string | Object}
-     */
-    getInputData() {
-      if (this.isInputTypeString) {
-        return this.inputInt.date !== null ? this.inputInt.date : '';
-      }
-      const data = {};
-      this.inputProperties.forEach((key) => {
-        data[key] = this.inputInt[key] !== null ? this.inputInt[key] : '';
-      });
-      return data;
-    },
-    /**
      * convert a value to a date in local time at zero hours
      *
      * @param {string} value - the date string stored in db (format YYYY-MM-DD) - this needs to
@@ -1672,92 +1819,6 @@ export default {
       const yearDate1 = convertedDate1.getFullYear();
       const yearDate2 = convertedDate2.getFullYear();
       return monthDate1 === monthDate2 && yearDate1 === yearDate2;
-    },
-    /**
-     * check for a negative year in the date that is displayed
-     * @param {string} date - date string in the format DD.MM.YYYY
-     * @returns {boolean}
-     */
-    isNegativeDisplayDate(date) {
-      if (!date) return false;
-      if (this.dateFormatInt === 'MM.YYYY') {
-        return /^\d{0,2}\.-\d{0,4}$/.test(date);
-      }
-      if (this.dateFormatInt === 'YYYY') {
-        return /^-\d{0,4}$/.test(date);
-      }
-      return /^\d{0,2}\.\d{0,2}\.-\d{0,4}$/.test(date);
-    },
-    /**
-     * check if year is negative in the stored date
-     * @param {string} date - a date string in the format YYYY-MM-DD
-     * @param {string} [format=undefined] - in case not the current format (this.dateFormatInt) should
-     *  be used for evaluation provide it with this param
-     * @returns {boolean}
-     */
-    isNegativeStorageDate(date, format = undefined) {
-      // if there is no date to evaluate just return false
-      if (!date) return false;
-      // either use the format provided as param or the currently set format in dateFormatInt
-      const formatToCheck = format || this.dateFormatInt;
-      if (formatToCheck === 'MM.YYYY') {
-        return /^-\d{0,4}-\d{0,2}$/.test(date);
-      }
-      if (formatToCheck === 'YYYY') {
-        return /^-\d{0,4}$/.test(date);
-      }
-      return /^-\d{0,4}-\d{0,2}-\d{0,2}$/.test(date);
-    },
-    /**
-     * since minus has to be temporarily removed for some actions add it again
-     *  after with this function (for displayed date)
-     * @param {string} date - date in the format DD.MM.YYYY
-     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
-     *  function
-     * @returns {string}
-     */
-    addYearMinusToDateDisplay(date, isNegative = true) {
-      if (isNegative) {
-        const [year, month, day] = date.split('.').reverse();
-        return `${day !== undefined ? `${day}.` : ''}${month !== undefined ? `${month}.` : ''}-${year}`;
-      }
-      return date;
-    },
-    /**
-     * since minus has to be temporarily removed for some actions add it again
-     *  after with this function (for stored date)
-     * @param {string} date - date in the format YYYY-MM-DD
-     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
-     *  function
-     * @returns {string}
-     */
-    addYearMinusToDateStorage(date, isNegative = true) {
-      if (isNegative) {
-        return `-${date}`;
-      }
-      return date;
-    },
-    /**
-     * remove the minus from the date since some functions (especially Date() ) can
-     *  not cope with negative dates (for displayed date)
-     * @param {string} date - the date string in format DD.MM.YYYY
-     * @returns {string}
-     */
-    removeYearMinusFromDisplayDate(date) {
-      return this.isNegativeDisplayDate(date)
-        ? date.replace('-', '') : date;
-    },
-    /**
-     * remove the minus from the date since some functions (especially Date()) can
-     *  not cope with negative dates (for stored date)
-     * @param {string} date - the date string in format YYYY-MM-DD
-     * @param {string} [format=undefined] - in case not the currently selected format should be used
-     *  for date evaluation provide the format with this param
-     * @returns {string}
-     */
-    removeYearMinusFromStorageDate(date, format = undefined) {
-      return this.isNegativeStorageDate(date, format)
-        ? date.replace('-', '') : date;
     },
     isTimeInputField(origin) {
       return this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
