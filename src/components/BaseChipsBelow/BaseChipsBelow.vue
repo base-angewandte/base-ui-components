@@ -328,14 +328,14 @@ export default {
     },
     /**
      * set `true` if chips (only [labelPropertyName] not additional attribute) should be editable on click
-     * caveat: this will only have an effect if `allowUnknownEntries` is true as well
+     * **caveat**: this will only have an effect if `allowUnknownEntries` is true as well
      */
     chipsEditable: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:modelValue', 'duplicate'],
+  emits: ['additional-property-changed', 'fetch-dropdown-entries', 'update:model-value', 'duplicate'],
   setup(props) {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
@@ -423,45 +423,56 @@ export default {
      * selectedBelowListInt with an internal id added if necessary
      * @returns {(*&{idInt: *})[]}
      */
-    renderList() {
-      return this.selectedBelowListInt.map((entry) => {
-        // handled with ?? operator to prevent id 0 being ignored
-        let providedId = entry[this.identifierPropertyName] ?? undefined;
-        if (providedId === undefined) {
-          // try to check if the entry already received an id and the id is not it the list yet
-          // check if an id was already assigned to an item with that label which does not appear
-          // in the array more than once (this is just a safeguard - in addOption double adding
-          // of the same freetext should actually be prevented anyway)
-          const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
-            return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
-          }) : undefined;
-          providedId = createdId && createdId.length === 1
-            ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
-        }
-        return {
-          ...{
-            // initialize the additional property
-            [this.additionalPropertyName]: [],
-            // and create an internal id if none was provided
-            idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
-              ? entry[this.identifierPropertyName] : providedId,
-          },
-          ...entry,
-        };
-      });
+    renderList: {
+      set(val) {
+        // update renderList but remove the internal id needed
+        // for dragging and list generation
+        this.selectedBelowListInt = val.map((entry) => {
+          // eslint-disable-next-line no-param-reassign
+          delete entry.idInt;
+          return entry;
+        });
+      },
+      get() {
+        return this.selectedBelowListInt.map((entry) => {
+          // handled with ?? operator to prevent id 0 being ignored
+          let providedId = entry[this.identifierPropertyName] ?? undefined;
+          if (providedId === undefined) {
+            // try to check if the entry already received an id and the id is not it the list yet
+            // check if an id was already assigned to an item with that label which does not appear
+            // in the array more than once (this is just a safeguard - in addOption double adding
+            // of the same freetext should actually be prevented anyway)
+            const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
+              return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
+            }) : undefined;
+            providedId = createdId && createdId.length === 1
+              ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
+          }
+          return {
+            ...{
+              // and create an internal id if none was provided
+              idInt: this.identifierPropertyName && entry[this.identifierPropertyName] !== undefined
+                ? entry[this.identifierPropertyName] : providedId,
+            },
+            ...entry,
+          };
+        });
+      },
     },
     /**
      * in order to be able to dynamically import VueDraggable and only set v-model
      * if it is used, use this variable
+     * we are using renderList here so the internalId is also available for
+     * vue draggable
      */
     draggableList: {
       set(val) {
-        this.selectedBelowListInt = val;
+        this.renderList = val;
       },
       get() {
         // do not set v-model if draggable is false
         if (!this.draggable) return null;
-        return this.selectedBelowListInt;
+        return this.renderList;
       },
     },
     /**
@@ -495,7 +506,12 @@ export default {
           // the error flag here
           this.hasAdditionalPropErrors = false;
         }
-        this.selectedBelowListInt = JSON.parse(JSON.stringify(val));
+        // now update the list but also add the additional prop already here if it does not
+        // exist yet
+        this.selectedBelowListInt = val.map((selectedOption) => ({
+          ...selectedOption,
+          [this.additionalPropertyName]: selectedOption[this.additionalPropertyName] || [],
+        }));
       },
       immediate: true,
       deep: true,
@@ -558,9 +574,6 @@ export default {
         // the label
         .map((selectedOption) => selectedOption[this.identifierPropertyName]
           || selectedOption[this.labelPropertyName]))).length !== list.length) {
-        // in order to also reset the BaseChipsInput modelValue we need to reassign
-        // the list to itself
-        this.selectedBelowListInt = JSON.parse(JSON.stringify(this.selectedBelowListInt));
         /**
          * event emitted when user is trying to add duplicate freetext which will be
          * prevented (so that user can be informed)
@@ -574,8 +587,19 @@ export default {
       // since we don't want a new entry to show an error message immediately we need
       // to set the invalid variable false
       this.hasAdditionalPropErrors = false;
-      // update internal selected list
-      this.selectedBelowListInt = JSON.parse(JSON.stringify(list));
+      // update internal selected list - also here add the additional prop immediately
+      this.selectedBelowListInt = list.map((selectedOption) => ({
+        ...selectedOption,
+        [this.additionalPropertyName]: selectedOption[this.additionalPropertyName] || [],
+      }));
+      // and check if input is now valid in case it was invalid before
+      // use isValidChipsInput() not validate() because we really only want to
+      // check main input field
+      if (this.invalidInt && this.isValidChipsInput()) {
+        // still honor invalid state and error message set from outside if any
+        this.invalidInt = this.invalid;
+        this.errorMessageInt = this.errorMessage;
+      }
       this.emitSelected(list);
     },
     /**
@@ -585,7 +609,6 @@ export default {
     removeEntry(index) {
       // remove the entry from the internal list
       const item = this.selectedBelowListInt.splice(index, 1);
-      item[this.additionalPropertyName] = {};
       // inform parent about the change
       this.emitSelected(this.selectedBelowListInt);
       // inform screen reader user
@@ -636,15 +659,16 @@ export default {
      * without internal modifications
      * @param {Object[]} val
      */
-    emitSelected(val) {
+    emitSelected() {
+      const updatedList = JSON.parse(JSON.stringify(this.selectedBelowListInt));
       /**
        * propagate list change from dragging event to parent
        *
-       * @event update:modelValue
+       * @event update:model-value
        * @param {Object} - the altered list
        *
        */
-      this.$emit('update:modelValue', val);
+      this.$emit('update:model-value', updatedList);
     },
 
     /** DROP-DOWN / AUTOCOMPLETE */
@@ -688,13 +712,61 @@ export default {
       document.body.appendChild(img);
       dataTransfer.setDragImage(img, 0, 0);
     },
-    onDragEnd(list) {
+    /**
+     * cursor is not set per default on macOS so we need to handle it here
+     * this does not influence cursor display on Windows
+     * and Ubuntu is fine anyway
+     * @param {MouseEvent} event - native event
+     */
+    onDragStart(event) {
+      // created separate method because we need to differentiate between
+      // iOS Firefox and all other browsers
+      // also tried to add the class already on mousedown however this will interfere
+      // with the dragstart / dragend cursor setting (at least on all macOS
+      // browsers, maybe others too)
+      this.toggleGrabbingCursor(true, event);
+    },
+    /**
+     * actions to handle when element is dropped again
+     * @param {Object[]} list - the re-sorted item list
+     * @param {MouseEvent} event - the native event
+     */
+    onDragEnd(list, event) {
+      // remove the drag cursor class again - for extensive comment see above
+      this.toggleGrabbingCursor(false, event);
+      // get and remove the drag element created in setDragImage() again
       const elem = document.getElementById('drag-element');
       if (elem) {
         elem.parentNode.removeChild(elem);
       }
+      // and emit the altered list
       this.emitSelected(list);
     },
+    /**
+     * added separate method to distinguish between browsers specifically because
+     * macOS did not display correct cursor and a common solution for Firefox AND Chrome
+     * could not be found
+     * this still might not be the perfect solution - more inspiration to improve can be found
+     * here https://github.com/SortableJS/Vue.Draggable/issues/815
+     * @param {boolean} state - the state that should be applied
+     * @param {MouseEvent} event - the native mouse event
+     */
+    toggleGrabbingCursor(state, event) {
+      // check if client is Firefox - because this is the only way working in Firefox!
+      // we also need to check for event, since it is needed for iOS Firefox
+      if (event && navigator.userAgent.includes('Mac') && typeof InstallTrigger !== 'undefined') {
+        if (state) {
+          event.target.classList.add('grabbing');
+        } else {
+          event.target.classList.remove('grabbing');
+        }
+        // this seems fine for every other OS (and browser therein)
+      } else {
+        const html = document.getElementsByTagName('html').item(0)
+        html.classList.toggle('grabbing', state)
+      }
+    },
+
 
     /** VALIDATION */
 
@@ -707,7 +779,7 @@ export default {
       if (!this.required) return true;
 
       // if no chips set, throw error
-      if (!this.modelValue.length) {
+      if (!this.selectedBelowListInt.length) {
         this.invalidInt = true;
         // consider also optional errorMessage
         this.errorMessageInt = `${this.errorMessage} ${this.validationTexts.required}`.trim();
@@ -814,7 +886,8 @@ export default {
       :animation="draggable ? 200 : null"
       :set-data="draggable ? setDragElement : null"
       :handle="draggable ? '.base-chips-below__icon-handle' : null"
-      @end="draggable ? onDragEnd(selectedBelowListInt) : null">
+      @start="onDragStart"
+      @end="onDragEnd(selectedBelowListInt, $event)">
       <TransitionGroup
         :name="'flip-list'"
         type="transition">

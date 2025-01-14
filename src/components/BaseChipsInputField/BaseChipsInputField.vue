@@ -287,6 +287,9 @@ export default {
     },
     /**
      * define true if chip should be editable on click
+     * **caveat**: this will only work if prop `allowUnknownEntries` is also set `true`
+     * also setting this prop `true` will disable the dragging functionality (also see prop
+     * `draggable`)
      */
     chipsEditable: {
       type: Boolean,
@@ -358,6 +361,11 @@ export default {
     /** LIST NAVIGATION */
     const { navigate } = useListNavigation();
 
+    /**
+     * MANIPULATING SELECTED LIST (EDIT OR DRAG)
+     */
+    const isChipsEditable = computed(() => props.chipsEditable && props.allowUnknownEntries);
+
     /** INTERNATIONALIZATION */
     const { getLangLabel } = useI18n(toRef(props, 'language'));
 
@@ -375,6 +383,7 @@ export default {
       rootAttrs,
       forwardAttrs,
       navigate,
+      isChipsEditable,
       getLangLabel,
       chipsInputField,
       announcement,
@@ -857,7 +866,7 @@ export default {
         <div
           v-if="displayChipsInline"
           class="base-chips-input-field__chips">
-          <template v-if="draggable && !chipsEditable">
+          <template v-if="draggable && !isChipsEditable">
             <VueDraggable
               v-model="selectedListInt"
               :set-data="setDragElement"
@@ -924,7 +933,7 @@ export default {
                   :id="entry.idInt"
                   :key="allowMultipleEntries ? 'chip-' + entry.idInt : index"
                   :model-value="getLangLabel(entry[labelPropertyName], true)"
-                  :editable="chipsEditable"
+                  :editable="isChipsEditable"
                   :is-linked="alwaysLinked || entry[identifierPropertyName] === 0
                     || !!entry[identifierPropertyName]"
                   :chip-active="indexActiveForRemove === index"

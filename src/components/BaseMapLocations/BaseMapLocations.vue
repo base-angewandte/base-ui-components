@@ -1,56 +1,3 @@
-<template>
-  <div class="base-map-locations">
-    <div
-      class="base-map-locations__map"
-      :style="additionalMapStyles">
-      <BaseMap
-        v-if="initMap"
-        :attribution="attribution"
-        :attribution-position="attributionPosition"
-        :cluster-sizes="clusterSizes"
-        :copyright="copyright"
-        :center-marker="centeredMarker"
-        :icon="icon"
-        :icon-size="iconSize"
-        :highlight-marker="highlightedMarker"
-        :marker="locationsFiltered"
-        :marker-popups="markerPopups"
-        :max-zoom="maxZoom"
-        :options="options"
-        :style="additionalMapStyles"
-        :tile-layer-service="tileLayerService"
-        :url="url"
-        :zoom="zoom"
-        @highlighted="highlightLocation" />
-    </div>
-
-    <h2
-      v-if="label"
-      class="base-map-locations__label">
-      {{ label }}
-    </h2>
-
-    <div class="base-map-locations__list">
-      <template
-        v-for="(location, index) in locationsFiltered">
-        <!-- TODO: leaving focusin and focusout events for now even though they have no effect
-          because component is not accessible at all in general -->
-        <BaseTextList
-          v-if="location.latLng || location.coordinates"
-          :key="index"
-          :data="[location]"
-          :class="['base-map-locations__list__group',
-                   { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
-          @click="centeredMarker = index"
-          @focusin="highlightedMarker = index"
-          @mouseenter="highlightedMarker = index"
-          @focusout="resetMarker"
-          @mouseleave="resetMarker" />
-      </template>
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent } from 'vue';
 import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
@@ -208,36 +155,13 @@ export default {
       highlightedMarker: null,
       highlightedLocation: null,
       centeredMarker: null,
-      initMap: false,
     };
   },
   computed: {
-    // Observer to check if component is in viewport and show baseMap
-    observer() {
-      return new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-          // If the entry is not in the viewport, do nothing
-          if (!entry.isIntersecting) return;
-
-          // Stop observing
-          observer.unobserve(entry.target);
-
-          // Init map
-          this.initMap = true;
-        });
-      });
-    },
     // compare marker objects and remove duplicates
     locationsFiltered() {
       return Array.from(new Set(this.locations.map(JSON.stringify))).map(JSON.parse);
     },
-  },
-  beforeUnmount() {
-    this.observer.disconnect();
-  },
-  mounted() {
-    // Add observer to check if component is in viewport and init baseMap
-    this.observer.observe(this.$el);
   },
   methods: {
     highlightLocation(value) {
@@ -250,6 +174,58 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="base-map-locations">
+    <div
+      class="base-map-locations__map"
+      :style="additionalMapStyles">
+      <BaseMap
+        :attribution="attribution"
+        :attribution-position="attributionPosition"
+        :cluster-sizes="clusterSizes"
+        :copyright="copyright"
+        :center-marker="centeredMarker"
+        :icon="icon"
+        :icon-size="iconSize"
+        :highlight-marker="highlightedMarker"
+        :marker="locationsFiltered"
+        :marker-popups="markerPopups"
+        :max-zoom="maxZoom"
+        :options="options"
+        :style="additionalMapStyles"
+        :tile-layer-service="tileLayerService"
+        :url="url"
+        :zoom="zoom"
+        @highlighted="highlightLocation" />
+    </div>
+
+    <h2
+      v-if="label"
+      class="base-map-locations__label">
+      {{ label }}
+    </h2>
+
+    <div class="base-map-locations__list">
+      <template
+        v-for="(location, index) in locationsFiltered">
+        <!-- TODO: leaving focusin and focusout events for now even though they have no effect
+          because component is not accessible at all in general -->
+        <BaseTextList
+          v-if="location.latLng || location.coordinates"
+          :key="index"
+          :data="[location]"
+          :class="['base-map-locations__list__group',
+                   { 'base-map-locations__list__group--highlight': index === highlightedLocation }]"
+          @click="centeredMarker = index"
+          @focusin="highlightedMarker = index"
+          @mouseenter="highlightedMarker = index"
+          @focusout="resetMarker"
+          @mouseleave="resetMarker" />
+      </template>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
@@ -280,7 +256,8 @@ export default {
           margin-bottom: $spacing-small;
         }
 
-        .base-text-list__content {
+        &:deep(.base-text-list__content) {
+          margin-bottom: $spacing-small;
           transition: color 250ms ease-in-out;
         }
 
