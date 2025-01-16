@@ -7,6 +7,9 @@
  * ref：https://v1.vuepress.vuejs.org/config/#index-styl
  */
 
+// defined here for styleguide, not in variables.scss because not needed for components
+$font-root-regular: 19px;
+$font-root-mobile: 16px;
 
 :root {
   // variables for base-components
@@ -21,47 +24,67 @@
   --vp-font-family-base: "Source Sans Pro", serif;
   // make title fit
   --vp-sidebar-width: 350px;
+  --vp-custom-block-font-size: $font-size-small;
+  --vp-custom-block-code-font-size: $font-size-small;
+  --vp-code-font-size: $font-size-small;
+}
+
+
+:root {
+  font-size: $font-root-mobile;
+
+  @media screen and (min-width: $mobile-min-width) {
+    font-size: $font-root-regular;
+  }
+}
+
+html {
+  font-size: $font-size-regular;
+  color: $font-color;
+  background-color: $background-color;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+.rotate-180 {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.hide {
+  position: absolute !important;
+  top: auto !important;
+  left: -9999px !important;
 }
 
 .title {
   font-size: $font-size-large !important;
-
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-regular !important;
-  }
 }
 
 .text, .vp-doc th, .vp-doc td, .vp-doc blockquote > p, .menu,
 .VPNavScreenMenuLink,
 .VPNavBarMenuLink, .pager-link .title {
   font-size: $font-size-regular !important;
+}
 
-  @media screen and (max-width: $mobile) {
+.desc, .menu-text, .DocSearch-Button .DocSearch-Button-Placeholder,
+.outline-link, .top-link, .outline-title, .details {
+  font-size: $font-size-regular !important;
+
+  @media screen and (min-width: $mobile-min-width) {
     font-size: $font-size-small !important;
   }
 }
 
-.desc, .menu-text, .DocSearch-Button .DocSearch-Button-Placeholder,
-.outline-link, .outline-title, .details {
-  font-size: $font-size-small !important;
-}
-
-
-
-body {
-  font-size: $font-size-regular;
-
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-small;
-  }
-}
-
 button {
-  font-size: $font-size-regular;
-
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-small;
-  }
+  font-size: $font-size-regular !important;
+  line-height: $line-height !important;
 }
 
 table {
@@ -85,39 +108,4 @@ table {
 
 .home .hero img {
   max-width: 450px!important;
-}
-
-html {
-  font-size: $font-size-regular !important;
-  color: $font-color;
-  background-color: $background-color;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-
-  &:root {
-    font-size: 19px !important;
-  }
-
-  .rotate-180 {
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
-  }
-
-  .hide {
-    position: absolute !important;
-    top: auto !important;
-    left: -9999px !important;
-  }
-}
-
-@media screen and (max-width: $mobile) {
-  html:root {
-    font-size: 16px;
-  }
 }
