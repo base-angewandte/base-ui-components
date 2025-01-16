@@ -363,11 +363,8 @@ export default {
       flex-shrink: 0;
 
       .base-multiline-text-input__text-icon {
-        margin-left: $spacing-small;
         height: 10px;
         width: 10px;
-        vertical-align: middle;
-        margin-bottom: $spacing-small-half;
         color: $font-color-second;
         fill: $font-color-second;
       }
