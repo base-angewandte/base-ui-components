@@ -1891,6 +1891,10 @@ export default {
         &.base-date-input__label-additions--switch-height {
           height: calc(#{$line-height} + #{$spacing-small-half});
 
+          @media screen and (max-width: $mobile) {
+            height: calc(#{$line-height} + #{$spacing-small});
+          }
+
           &.base-date-input__label-additions--wrap {
             margin-top: 2px;
           }
@@ -1927,7 +1931,6 @@ export default {
         .base-date-input__switch-buttons {
           bottom: 0;
           display: flex;
-          line-height: $line-height;
         }
       }
     }
@@ -1964,6 +1967,7 @@ export default {
                 min-height: $row-height-small;
                 line-height: $row-height-small;
                 width: 100%;
+                height: 100%;
               }
             }
 
