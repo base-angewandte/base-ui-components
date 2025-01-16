@@ -208,6 +208,7 @@ export default {
     position: relative;
     align-items: center;
     background-color: inherit;
+    line-height: $line-height;
 
     &.base-switch-buttons--gap {
       gap: $spacing;
