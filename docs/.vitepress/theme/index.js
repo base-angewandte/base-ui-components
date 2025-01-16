@@ -1,3 +1,4 @@
+import 'normalize.css';
 import BaseTheme from './base/base-theme.js';
 import VueLiveWithLayout from './components/vue-live-with-layout';
 const modules = import.meta.glob(['../../../src/**/*.vue'], { eager: true });

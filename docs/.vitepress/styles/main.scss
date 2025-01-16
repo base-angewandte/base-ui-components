@@ -24,9 +24,6 @@ $font-root-mobile: 16px;
   --vp-font-family-base: "Source Sans Pro", serif;
   // make title fit
   --vp-sidebar-width: 350px;
-  --vp-custom-block-font-size: $font-size-small;
-  --vp-custom-block-code-font-size: $font-size-small;
-  --vp-code-font-size: $font-size-small;
 }
 
 
@@ -38,10 +35,9 @@ $font-root-mobile: 16px;
   }
 }
 
-html {
+body {
   font-size: $font-size-regular;
   color: $font-color;
-  background-color: $background-color;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
