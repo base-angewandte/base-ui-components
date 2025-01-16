@@ -1085,7 +1085,10 @@ export default {
         // check if element exists
         if (inputElement) {
           // now get the input field value or the placeholder text
-          const text = inputElement.value || inputElement.getAttribute('placeholder');
+          // we need to take inputFrom/inputTo here because DOM value is not updated yet
+          // sometimes after validity check
+          const text = (field === 'From' ? inputFrom.value : inputTo.value)
+            || inputElement.getAttribute('placeholder');
           // now check if any of the two exists
           if (text) {
             // create a span
@@ -1670,9 +1673,9 @@ export default {
           positiveDate,
           this.isNegativeDisplayDate(this[`input${origin}`]),
         );
-        // after everything also still check if the new date/time string needs a fade out
-        this.calcFadeOut([origin]);
       }
+      // after everything also still check if the new date/time string needs a fade out
+      this.calcFadeOut([origin]);
       const data = this.getInputData();
       /**
        * this event is emitted when the value was validated in case input should just be considered
@@ -1699,8 +1702,6 @@ export default {
         this.checkDateValidity(uppercaseOrigin);
         // close the drop down
         this[`${origin}Open`] = false;
-        // check if the new date/time string needs a fade out
-        this.calcFadeOut([uppercaseOrigin]);
       }
     },
     /**
