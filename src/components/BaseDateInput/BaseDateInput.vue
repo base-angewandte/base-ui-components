@@ -226,6 +226,7 @@
     </div>
 
     <div class="base-date-input__below">
+      {{ 'lang: ' + language }}
       <!-- @slot to add elements below input fields e.g. add drop down -->
       <slot name="below-input" />
     </div>
@@ -463,6 +464,26 @@ export default {
     /** INTERNAL ID */
     const generatedId = useId();
     const internalId = computed(() => props.inputId || generatedId);
+
+    /** LOCALIZATION */
+    /**
+     * determine lang object needed for datepicker dynamically, will be filled in mounted
+     * (computed prop does not work reliably)
+     * @type {[null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>}
+     */
+    const lang = ref(null);
+    /**
+     * watch the language prop for changes so vue-datepicker can be updated with the relevant
+     * language package
+     */
+    watch(() => props.language, async (newLang) => {
+      // first import the relevant language package
+      await import(`./../../../node_modules/vue-datepicker-next/locale/${newLang}.es.js`);
+      // then update the vue-datepicker lang variable
+      lang.value = newLang;
+    }, {
+      immediate: true,
+    });
 
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
@@ -1114,6 +1135,7 @@ export default {
 
     return {
       internalId,
+      lang,
       rootAttrs,
       forwardAttrs,
       dateFormatInt,
@@ -1169,12 +1191,6 @@ export default {
        * @type {boolean}
        */
       mounted: false,
-      /**
-       * determine lang object needed for datepicker dynamically, will be filled in mounted
-       * (computed prop does not work reliably)
-       * @type {?Object}
-       */
-      lang: null,
     };
   },
   computed: {
@@ -1356,8 +1372,6 @@ export default {
     },
   },
   async mounted() {
-    // import the necessary date picker language file here and provide it to the component
-    this.lang = await import(`./../../../node_modules/vue-datepicker-next/locale/${this.language}.es.js`);
     // in order to avoid SSR and hydration problems only render the datepicker when component is
     // mounted - this flag will serve as the notification to render
     this.mounted = true;
