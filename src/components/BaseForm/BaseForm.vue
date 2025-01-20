@@ -31,7 +31,7 @@
               { 'base-form__input-field--top-margin': field.type === 'boolean' },
               { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
             ]"
-            @field-value-changed="setFieldValue($event, field.name)"
+            @update:model-value="setFieldValue($event, field.name)"
             @fetch-autocomplete="fetchAutocomplete"
             @input-complete="onInputComplete($event, field.name)">
             <template #label-addition="{ fieldName, groupNames }">
@@ -148,7 +148,7 @@
                 v-bind="formFieldComponentProps(field, index, rowIndex, valueIndex)"
                 :class="['base-form__input-component',
                          { 'base-form__input-component--margin-bottom': !multiplyButtonsInline(field) }]"
-                @field-value-changed="setFieldValue(
+                @update:model-value="setFieldValue(
                   $event,
                   field.name,
                   valueIndex)"
@@ -998,7 +998,7 @@ export default {
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
         fieldKey: `${name}_${comboIndex}_${this.formId}`,
-        fieldValue: fieldRepeatable ? this.valueListInt[name][valueIndex]
+        modelValue: fieldRepeatable ? this.valueListInt[name][valueIndex]
           : this.valueListInt[name],
         autocompleteLoading: this.fieldIsLoading === name,
         // add component props to form fields creator props if list contains a field_type 'group'

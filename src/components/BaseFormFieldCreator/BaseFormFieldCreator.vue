@@ -15,7 +15,7 @@
       :label="labelInt"
       :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
       :placeholder="placeholderInt"
-      :tabs="fieldType === 'multiline' ? fieldProps.tabs || tabs : null"
+      :tabs="fieldType === 'multiline' ? tabs : null"
       :tab-labels="fieldType === 'multiline'
         ? fieldProps.tabLabels || tabs.map(tab => getI18nTerm(tab)) : null"
       :tabs-legend="fieldType === 'multiline'
@@ -58,8 +58,7 @@
           :field-name="field.name"
           name="label-addition" />
         <BaseDropDown
-          v-if="fieldType === 'multiline' && field.items
-            && field.items.properties && field.items.properties.type"
+          v-if="fieldType === 'multiline' && multilineHasDropdownOptions"
           :id="fieldKey"
           :model-value="fieldValueInt && fieldValueInt.type && fieldValueInt.type.source
             ? fieldValueInt.type : textTypeDefault"
@@ -478,8 +477,8 @@
           :is="fieldElement"
           v-bind="fieldGroupParamsInt"
           class="base-form-field-creator__subform"
-          @values-changed="setInputValue"
-          @input-complete="$emit('input-complete', $event);"
+          @values-changed="setFieldValue"
+          @input-complete="emitCompletedInputValues"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
             #label-addition="{ fieldName, groupNames }">
@@ -632,7 +631,7 @@ export default {
     /**
      * the field value
      */
-    fieldValue: {
+    modelValue: {
       type: [Object, String, Array, Date, Number, Boolean],
       required: true,
     },
@@ -852,7 +851,7 @@ export default {
       }),
     },
   },
-  emits: ['input-complete', 'fetch-autocomplete', 'field-value-changed'],
+  emits: ['input-complete', 'fetch-autocomplete', 'update:model-value'],
   setup(props) {
     /** INTERNATIONALIZATION */
     const { getLangLabel, hasI18n, getI18nTerm, setLangLabels } = useI18n(toRef(props, 'language'));
@@ -944,6 +943,22 @@ export default {
         return defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue'));
       }
       return null;
+    },
+
+    /**
+     * determine if BaseMultilineTextInput has drop down options
+     * TODO: currently hardcoded as 'type'
+     * @returns {boolean}
+     */
+    multilineHasDropdownOptions() {
+      return !!this.field.items?.properties?.type;
+    },
+    /**
+     * determine if BaseMultilineTextInput has tabs
+     * @returns {boolean}
+     */
+    multilineHasTabs() {
+      return !!this.tabs?.length;
     },
     /**
      * check which date field type was provided and set type accordingly
@@ -1064,7 +1079,9 @@ export default {
           .language.properties
           .label.properties).filter(lang => this.availableLocales.includes(lang));
       }
-      return [];
+      // if tabs are not set via language in the openAPI JSON check the fieldProps
+      // or just set an empty array
+      return this.fieldProps.tabs || [];
     },
     /**
      * check if field is either type integer of float
@@ -1130,30 +1147,28 @@ export default {
     },
   },
   watch: {
-    fieldValue: {
+    modelValue: {
       handler(val) {
         if (JSON.stringify(this.fieldValueInt) !== JSON.stringify(val)) {
           this.setFieldValue(val);
-          const tabs = this.fieldProps.tabs || this.tabs;
-          if (tabs && tabs.length) {
+          if (this.multilineHasTabs) {
             this.activeTab = this.setActiveTab();
           }
         }
       },
-      immediate: true,
       deep: true,
     },
     fieldValueInt: {
       handler(val) {
         // prevent event being fired when change comes from outside
-        if (val !== undefined && JSON.stringify(this.fieldValue) !== JSON.stringify(val)) {
+        if (val !== undefined && JSON.stringify(this.modelValue) !== JSON.stringify(val)) {
           /**
            * Event emitted when field value changed internally
            *
-           * @event field-value-changed
+           * @event update:model-value
            * @property {Object, Array, String, Number} - the changed field value
            */
-          this.$emit('field-value-changed', val);
+          this.$emit('update:model-value', JSON.parse(JSON.stringify(val)));
         }
       },
       deep: true,
@@ -1165,11 +1180,13 @@ export default {
       deep: true,
     },
   },
-  mounted() {
+  created() {
+    // set the fieldValueInt immediately on creation so the initial value 'null'
+    // never reaches the input components
     // the first time the field is mounted set the initial field value
     // and tabs (if applicable)
-    this.setFieldValue(this.fieldValue);
-    if (this.tabs && this.tabs.length) {
+    this.setFieldValue(this.modelValue);
+    if (this.multilineHasTabs) {
       this.activeTab = this.setActiveTab();
     }
   },
@@ -1190,12 +1207,26 @@ export default {
         this.fieldValueInt = val;
       }
     },
-    // as above but specific for multiline text input field
-    setInputValue(val) {
-      if (!val || typeof val === 'string' || typeof val === 'number') {
-        this.fieldValueInt = val;
+    /**
+     * assign input to BaseInput, BaseAutocompleteInput or BaseMultilineTextInput
+     * since the BaseMultilineTextInput model value is just returning the input (if tabs are set
+     *  in the form { [tab1]: 'string', [tab2]: 'string' } or otherwise a plain string)
+     *  we also need to consider the type available here in BaseFormFieldCreator and
+     *  make sure it is not overwritten
+     * @param {Object|string} multilineText
+     */
+    setInputValue(multilineText) {
+      // check if input is type 'multiline' and if the multiline text input
+      // has drop down options or tabs - in this case the multilineText has to be
+      // an object!
+      if (this.fieldType === 'multiline' && (this.multilineHasDropdownOptions
+        || this.multilineHasTabs)) {
+        // assign this object so that potential 'type' does not get overwritten
+        this.fieldValueInt = { ...this.fieldValueInt, ...JSON.parse(JSON.stringify(multilineText)) };
       } else {
-        this.fieldValueInt = { ...this.fieldValueInt, ...JSON.parse(JSON.stringify(val)) };
+        // else we assume the returned input value is just a string or number and can be assigned
+        // directly
+        this.fieldValueInt = multilineText;
       }
     },
     /**
