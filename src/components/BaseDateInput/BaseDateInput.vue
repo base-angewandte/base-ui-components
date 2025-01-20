@@ -1485,14 +1485,11 @@ export default {
     },
     /**
      * function triggered on datepicker 'pick' event, handling date picker closing
-     * and date validation
      *  caveat: this event is just triggered for DATE picker - not time!
      * @param origin
      */
     datePicked(origin) {
       this[`${origin}Open`] = false;
-      // need this here because on blur() date is not updated
-      this.checkDateValidity(capitalizeString(origin));
     },
     /**
      * convert function triggered on format tab switch
