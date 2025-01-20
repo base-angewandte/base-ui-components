@@ -1,238 +1,3 @@
-<template>
-  <div
-    ref="baseDateInput"
-    v-bind="rootAttrs"
-    class="base-date-input">
-    <div
-      v-if="showLabelRow"
-      :class="['base-date-input__label-row',
-               { 'base-date-input__label-row--visible': showLabel }]">
-      <legend
-        v-if="showLabel"
-        ref="labelElement"
-        class="base-date-input__label"
-        @click.prevent="">
-        {{ label }}
-      </legend>
-      <div
-        :class="['base-date-input__label-additions',
-                 {'base-date-input__label-additions--switch-height': isSwitchableFormat },
-                 {'base-date-input__label-additions--wrap': wrapLabelRow }]">
-        <div
-          ref="labelAdditions"
-          :class="['base-date-input__label-additions-inner',
-                   {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
-                   {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
-                     && !showLabel }]">
-          <!-- @slot to add additional elements to the label row -->
-          <slot name="label-addition" />
-          <BaseSwitchButton
-            v-if="isSwitchableFormat"
-            v-model="dateFormatInt"
-            :options="tabSwitchOptions"
-            :label="formatTabsLegend"
-            :active-tab="dateFormatInt"
-            class="base-date-input__switch-buttons" />
-        </div>
-      </div>
-    </div>
-
-    <!-- FORM FIELDS -->
-    <!-- keydown event is counter productive to workflow here -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
-    <div
-      v-click-outside="onClickOutsideHandler"
-      class="base-date-input__field-wrapper"
-      @click="clickedInside">
-      <!-- @slot to add elements within form field but before the input element line for an example see [BaseInput](BaseInput)-->
-      <slot name="pre-input-field" />
-      <div class="base-date-input__input-fields">
-        <!-- @slot add elements within input form field but before all other elements - this field wraps if necessary for an example see [BaseInput](BaseInput) -->
-        <slot name="input-field-addition-before" />
-        <div class="base-date-input__input-line">
-          <!-- @slot add elements directly in the input line (no wrapping) for an example see [BaseInput](BaseInput)-->
-          <slot name="input-field-inline-before" />
-          <!-- INPUT FROM -->
-          <BaseInput
-            v-model="inputFrom"
-            :input-id="`input-${internalId}-from`"
-            :label="label"
-            :show-label="false"
-            :is-active="fromOpen"
-            :use-form-field-styling="useFormFieldStyling"
-            :show-input-border="showInputBorder"
-            :clearable="clearable"
-            :required="required"
-            :invalid="invalid"
-            :disabled="disabled"
-            :show-error-icon="showErrorIcon"
-            :error-message="errorMessage"
-            :input-class="inputClass"
-            :set-focus-on-active="setFocusOnActive"
-            :use-fade-out="useFadeOutFrom"
-            class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('from', $event)">
-            <template #input>
-              <div
-                class="base-date-input__datepicker">
-                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
-                <DatePicker
-                  v-if="mounted"
-                  v-model:value="inputFrom"
-                  :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
-                  :clearable="false"
-                  :append-to-body="false"
-                  :lang="lang"
-                  :open="fromOpen"
-                  :type="isFromTimeField ? 'time' : minDateView"
-                  :format="isFromTimeField ? 'HH:mm' : datePickerValueFormat"
-                  :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
-                  input-class="base-date-input__datepicker-input"
-                  @pick="datePicked('from')"
-                  @click.prevent="onInputClick"
-                  @change="(time, timeType) => closeTimePicker({ origin: 'from', type: timeType })">
-                  <template #input>
-                    <!-- need to disable because label is there - it is just in BaseInput
-                    component -->
-                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-                    <input
-                      :id="`input-${internalId}-from`"
-                      ref="inputFromElement"
-                      :value="inputFrom"
-                      v-bind="forwardAttrs"
-                      :placeholder="isFromTimeField ? placeholder.time ?? placeholder
-                        : placeholder.date ?? placeholder"
-                      :type="'text'"
-                      :aria-describedby="label + '-' + internalId"
-                      :aria-required="required.toString()"
-                      :aria-invalid="invalid.toString()"
-                      :required="required"
-                      :disabled="disabled"
-                      :aria-disabled="disabled"
-                      :class="['base-date-input__input', inputClass]"
-                      enterkeyhint="done"
-                      autocomplete="off"
-                      @input="checkDate($event, 'From')"
-                      @keydown="handleInputKeydown($event, 'From')"
-                      @blur="onInputBlur($event, 'from')"
-                      @vue:mounted="calcFadeOut(['From'])">
-                  </template>
-                  <!-- this empty element is here so that the default icon of datepicker
-                  is not used -->
-                  <template #icon-calendar>
-                    <div class="base-date-input__icon-wrapper" />
-                  </template>
-                </DatePicker>
-              </div>
-            </template>
-            <template #post-input-field>
-              <BaseIcon
-                ref="baseIcon"
-                :name="isFromTimeField ? 'clock' : 'calendar-many'"
-                :class="['base-date-input__date-icon', { hide: !showIcons }]"
-                @click.stop="fromOpen = !fromOpen" />
-            </template>
-          </BaseInput>
-
-          <span
-            v-if="type === 'daterange' || type === 'timerange'"
-            class="base-date-input__separator">{{ rangeSeparator }}</span>
-
-          <!-- INPUT TO -->
-          <BaseInput
-            v-if="type !== 'single'"
-            v-model="inputTo"
-            :input-id="`input-${internalId}-to`"
-            :label="label"
-            :show-label="false"
-            :is-active="toOpen"
-            :use-form-field-styling="useFormFieldStyling"
-            :show-input-border="showInputBorder"
-            :clearable="clearable"
-            :required="required"
-            :invalid="invalid"
-            :disabled="disabled"
-            :show-error-icon="showErrorIcon"
-            :error-message="errorMessage"
-            :set-focus-on-active="setFocusOnActive"
-            :use-fade-out="useFadeOutTo"
-            class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('to', $event)">
-            <template #input>
-              <div
-                class="base-date-input__datepicker">
-                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
-                <DatePicker
-                  v-if="mounted"
-                  v-model:value="inputTo"
-                  :placeholder="isToTimeField ? placeholder.time : placeholder.date"
-                  :clearable="false"
-                  :append-to-body="false"
-                  :lang="lang"
-                  :open="toOpen"
-                  :type="isToTimeField ? 'time' : minDateView"
-                  :format="isToTimeField ? 'HH:mm' : datePickerValueFormat"
-                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
-                  input-class="base-date-input__datepicker-input"
-                  @pick="datePicked('to')"
-                  @click.prevent="onInputClick"
-                  @change="(time, timeType) => closeTimePicker({ origin: 'to', type: timeType })">
-                  <template #input>
-                    <!-- need to disable because label is there - it is just in BaseInput
-                      component -->
-                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-                    <input
-                      :id="`input-${internalId}-to`"
-                      ref="inputToElement"
-                      :value="inputTo"
-                      :placeholder="isToTimeField ? placeholder.time ?? placeholder
-                        : placeholder.date ?? placeholder"
-                      v-bind="forwardAttrs"
-                      :type="'text'"
-                      :aria-describedby="label + '-to-' + internalId"
-                      :aria-required="required.toString()"
-                      :aria-invalid="invalid.toString()"
-                      :required="required"
-                      :disabled="disabled"
-                      :aria-disabled="disabled"
-                      enterkeyhint="done"
-                      autocomplete="off"
-                      :class="['base-date-input__input', inputClass]"
-                      @input="checkDate($event, 'To')"
-                      @keydown="handleInputKeydown($event, 'To')"
-                      @blur="onInputBlur($event, 'to')"
-                      @vue:mounted="calcFadeOut(['To'])">
-                  </template>
-                  <!-- this empty element is here so that the default icon of
-                  datepicker is not used -->
-                  <template #icon-calendar>
-                    <div class="base-date-input__icon-wrapper" />
-                  </template>
-                </DatePicker>
-              </div>
-            </template>
-            <template #post-input-field>
-              <BaseIcon
-                v-if="showIcons"
-                :name="isToTimeField ? 'clock' : 'calendar-many'"
-                class="base-date-input__date-icon"
-                @click.stop="toOpen = !toOpen" />
-            </template>
-          </BaseInput>
-        </div>
-      </div>
-      <!-- @slot for adding elements after input -->
-      <slot name="post-input-field" />
-    </div>
-
-    <div class="base-date-input__below">
-      {{ 'lang: ' + language }}
-      <!-- @slot to add elements below input fields e.g. add drop down -->
-      <slot name="below-input" />
-    </div>
-  </div>
-</template>
-
 <script>
 import { computed, defineAsyncComponent, nextTick, ref, watch } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
@@ -266,9 +31,9 @@ export default {
   },
   inheritAttrs: false,
   props: {
-  /**
-   * select date or datetime or a range
-   */
+    /**
+     * select date or datetime or a range
+     */
     type: {
       type: String,
       default: 'single',
@@ -509,11 +274,11 @@ export default {
      */
     const inputInt = ref({
       date: '',
-        date_from: '',
-        date_to: '',
-        time: '',
-        time_from: '',
-        time_to: '',
+      date_from: '',
+      date_to: '',
+      time: '',
+      time_from: '',
+      time_to: '',
     });
 
     /**
@@ -865,7 +630,7 @@ export default {
        * handle click outside event and adjust input active variable accordingly
        * @param {MouseEvent} event - the event provided by the click outside directive
        */
-      (event) => {
+        (event) => {
         isActiveInt.value = false;
         /**
          * emit a custom clicked-outside event instead of BaseInput event (propagation stopped)
@@ -1354,11 +1119,11 @@ export default {
               // date should be overwritten if month or year are different from
               // the already stored date
               if (!this.monthAndYearIdent(
-                // check if the positive dates are identical
-                this.removeYearMinusFromStorageDate(this.inputInt[dateKey], old),
-                (/^-/.test(this.tempDateStore[dateKey]) ? this.tempDateStore[dateKey].replace('-', '') : this.tempDateStore[dateKey]),
-                // and also check if the operator in front of year is identical
-              ) && this.isNegativeStorageDate(this.inputInt[dateKey], old)
+                  // check if the positive dates are identical
+                  this.removeYearMinusFromStorageDate(this.inputInt[dateKey], old),
+                  (/^-/.test(this.tempDateStore[dateKey]) ? this.tempDateStore[dateKey].replace('-', '') : this.tempDateStore[dateKey]),
+                  // and also check if the operator in front of year is identical
+                ) && this.isNegativeStorageDate(this.inputInt[dateKey], old)
                 === /^-/.test(this.tempDateStore[dateKey])) {
                 this.tempDateStore[dateKey] = this.inputInt[dateKey];
               }
@@ -1457,11 +1222,11 @@ export default {
       // * if type is time and key was colon and last char was already a colon
       // * and also make sure copy & paste is allowed!
       if ((!allowedKeysRegex.test(key)
-        || (disallowedKeysOnLengthRegex.test(key) && currentInputString.length >= formatLength
-          && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
-        || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
-          || currentInputString.charAt(currentInputString.length - 1) === '.'))
-        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
+          || (disallowedKeysOnLengthRegex.test(key) && currentInputString.length >= formatLength
+            && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
+          || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
+            || currentInputString.charAt(currentInputString.length - 1) === '.'))
+          || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
         && !(['c', 'v', 'x'].includes(key) && event.ctrlKey)) {
         event.preventDefault();
       }
@@ -1505,7 +1270,7 @@ export default {
         }
         // now check the date format and if input so far matches the appropriate regex
         if ((!isTimeField && this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}$|\d{2}\.\d{2})$/.test(modifiedValue))
-            || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(modifiedValue))) {
+          || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(modifiedValue))) {
           // if so - add a period character
           modifiedValue = `${modifiedValue}${charToAdd}`;
         }
@@ -1769,11 +1534,11 @@ export default {
             } else {
               // check if a previous date was stored and year (coming from year)
               useStorageDate = !!positiveTempStorageDate && ((this.isDateFormatYear
-                && new Date(positiveTempStorageDate).getFullYear().toString() === dateToConvert
+                  && new Date(positiveTempStorageDate).getFullYear().toString() === dateToConvert
                   && isNegativeTempStorageDate === this.isNegativeStorageDate(dateValue, oldFormat))
                 // or month and year (coming from month) was changed or is still the same
                 || (this.isDateFormatMonth
-                && this.monthAndYearIdent(positiveTempStorageDate, dateToConvert)
+                  && this.monthAndYearIdent(positiveTempStorageDate, dateToConvert)
                   && (isNegativeTempStorageDate === isNegativeNewDateValue)));
               // if a previous date was stored use this one else use the input date
             }
@@ -1864,6 +1629,241 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="baseDateInput"
+    v-bind="rootAttrs"
+    class="base-date-input">
+    <div
+      v-if="showLabelRow"
+      :class="['base-date-input__label-row',
+               { 'base-date-input__label-row--visible': showLabel }]">
+      <legend
+        v-if="showLabel"
+        ref="labelElement"
+        class="base-date-input__label"
+        @click.prevent="">
+        {{ label }}
+      </legend>
+      <div
+        :class="['base-date-input__label-additions',
+                 {'base-date-input__label-additions--switch-height': isSwitchableFormat },
+                 {'base-date-input__label-additions--wrap': wrapLabelRow }]">
+        <div
+          ref="labelAdditions"
+          :class="['base-date-input__label-additions-inner',
+                   {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
+                   {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
+                     && !showLabel }]">
+          <!-- @slot to add additional elements to the label row -->
+          <slot name="label-addition" />
+          <BaseSwitchButton
+            v-if="isSwitchableFormat"
+            v-model="dateFormatInt"
+            :options="tabSwitchOptions"
+            :label="formatTabsLegend"
+            :active-tab="dateFormatInt"
+            class="base-date-input__switch-buttons" />
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM FIELDS -->
+    <!-- keydown event is counter productive to workflow here -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <div
+      v-click-outside="onClickOutsideHandler"
+      class="base-date-input__field-wrapper"
+      @click="clickedInside">
+      <!-- @slot to add elements within form field but before the input element line for an example see [BaseInput](BaseInput)-->
+      <slot name="pre-input-field" />
+      <div class="base-date-input__input-fields">
+        <!-- @slot add elements within input form field but before all other elements - this field wraps if necessary for an example see [BaseInput](BaseInput) -->
+        <slot name="input-field-addition-before" />
+        <div class="base-date-input__input-line">
+          <!-- @slot add elements directly in the input line (no wrapping) for an example see [BaseInput](BaseInput)-->
+          <slot name="input-field-inline-before" />
+          <!-- INPUT FROM -->
+          <BaseInput
+            v-model="inputFrom"
+            :input-id="`input-${internalId}-from`"
+            :label="label"
+            :show-label="false"
+            :is-active="fromOpen"
+            :use-form-field-styling="useFormFieldStyling"
+            :show-input-border="showInputBorder"
+            :clearable="clearable"
+            :required="required"
+            :invalid="invalid"
+            :disabled="disabled"
+            :show-error-icon="showErrorIcon"
+            :error-message="errorMessage"
+            :input-class="inputClass"
+            :set-focus-on-active="setFocusOnActive"
+            :use-fade-out="useFadeOutFrom"
+            class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('from', $event)">
+            <template #input>
+              <div
+                class="base-date-input__datepicker">
+                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
+                <DatePicker
+                  v-if="mounted"
+                  v-model:value="inputFrom"
+                  :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
+                  :clearable="false"
+                  :append-to-body="false"
+                  :lang="lang"
+                  :open="fromOpen"
+                  :type="isFromTimeField ? 'time' : minDateView"
+                  :format="isFromTimeField ? 'HH:mm' : datePickerValueFormat"
+                  :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
+                  input-class="base-date-input__datepicker-input"
+                  @pick="datePicked('from')"
+                  @click.prevent="onInputClick"
+                  @change="(time, timeType) => closeTimePicker({ origin: 'from', type: timeType })">
+                  <template #input>
+                    <!-- need to disable because label is there - it is just in BaseInput
+                    component -->
+                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+                    <input
+                      :id="`input-${internalId}-from`"
+                      ref="inputFromElement"
+                      :value="inputFrom"
+                      v-bind="forwardAttrs"
+                      :placeholder="isFromTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
+                      :type="'text'"
+                      :aria-describedby="label + '-' + internalId"
+                      :aria-required="required.toString()"
+                      :aria-invalid="invalid.toString()"
+                      :required="required"
+                      :disabled="disabled"
+                      :aria-disabled="disabled"
+                      :class="['base-date-input__input', inputClass]"
+                      enterkeyhint="done"
+                      autocomplete="off"
+                      @input="checkDate($event, 'From')"
+                      @keydown="handleInputKeydown($event, 'From')"
+                      @blur="onInputBlur($event, 'from')"
+                      @vue:mounted="calcFadeOut(['From'])">
+                  </template>
+                  <!-- this empty element is here so that the default icon of datepicker
+                  is not used -->
+                  <template #icon-calendar>
+                    <div class="base-date-input__icon-wrapper" />
+                  </template>
+                </DatePicker>
+              </div>
+            </template>
+            <template #post-input-field>
+              <BaseIcon
+                ref="baseIcon"
+                :name="isFromTimeField ? 'clock' : 'calendar-many'"
+                :class="['base-date-input__date-icon', { hide: !showIcons }]"
+                @click.stop="fromOpen = !fromOpen" />
+            </template>
+          </BaseInput>
+
+          <span
+            v-if="type === 'daterange' || type === 'timerange'"
+            class="base-date-input__separator">{{ rangeSeparator }}</span>
+
+          <!-- INPUT TO -->
+          <BaseInput
+            v-if="type !== 'single'"
+            v-model="inputTo"
+            :input-id="`input-${internalId}-to`"
+            :label="label"
+            :show-label="false"
+            :is-active="toOpen"
+            :use-form-field-styling="useFormFieldStyling"
+            :show-input-border="showInputBorder"
+            :clearable="clearable"
+            :required="required"
+            :invalid="invalid"
+            :disabled="disabled"
+            :show-error-icon="showErrorIcon"
+            :error-message="errorMessage"
+            :set-focus-on-active="setFocusOnActive"
+            :use-fade-out="useFadeOutTo"
+            class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('to', $event)">
+            <template #input>
+              <div
+                class="base-date-input__datepicker">
+                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
+                <DatePicker
+                  v-if="mounted"
+                  v-model:value="inputTo"
+                  :placeholder="isToTimeField ? placeholder.time : placeholder.date"
+                  :clearable="false"
+                  :append-to-body="false"
+                  :lang="lang"
+                  :open="toOpen"
+                  :type="isToTimeField ? 'time' : minDateView"
+                  :format="isToTimeField ? 'HH:mm' : datePickerValueFormat"
+                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
+                  input-class="base-date-input__datepicker-input"
+                  @pick="datePicked('to')"
+                  @click.prevent="onInputClick"
+                  @change="(time, timeType) => closeTimePicker({ origin: 'to', type: timeType })">
+                  <template #input>
+                    <!-- need to disable because label is there - it is just in BaseInput
+                      component -->
+                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+                    <input
+                      :id="`input-${internalId}-to`"
+                      ref="inputToElement"
+                      :value="inputTo"
+                      :placeholder="isToTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
+                      v-bind="forwardAttrs"
+                      :type="'text'"
+                      :aria-describedby="label + '-to-' + internalId"
+                      :aria-required="required.toString()"
+                      :aria-invalid="invalid.toString()"
+                      :required="required"
+                      :disabled="disabled"
+                      :aria-disabled="disabled"
+                      enterkeyhint="done"
+                      autocomplete="off"
+                      :class="['base-date-input__input', inputClass]"
+                      @input="checkDate($event, 'To')"
+                      @keydown="handleInputKeydown($event, 'To')"
+                      @blur="onInputBlur($event, 'to')"
+                      @vue:mounted="calcFadeOut(['To'])">
+                  </template>
+                  <!-- this empty element is here so that the default icon of
+                  datepicker is not used -->
+                  <template #icon-calendar>
+                    <div class="base-date-input__icon-wrapper" />
+                  </template>
+                </DatePicker>
+              </div>
+            </template>
+            <template #post-input-field>
+              <BaseIcon
+                v-if="showIcons"
+                :name="isToTimeField ? 'clock' : 'calendar-many'"
+                class="base-date-input__date-icon"
+                @click.stop="toOpen = !toOpen" />
+            </template>
+          </BaseInput>
+        </div>
+      </div>
+      <!-- @slot for adding elements after input -->
+      <slot name="post-input-field" />
+    </div>
+
+    <div class="base-date-input__below">
+      {{ 'lang: ' + language }}
+      <!-- @slot to add elements below input fields e.g. add drop down -->
+      <slot name="below-input" />
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
