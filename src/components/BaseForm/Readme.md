@@ -68,7 +68,7 @@ This is a basic (autocomplete functionality not working here) example how a form
         ref="formExtension"
         form-id="formTest"
         :form-field-json="fields"
-        :value-list="valueList"
+        v-model="valueList"
         :available-locales="['de', 'en']"
         :show-error-icon="true"
         :field-props="{
@@ -116,8 +116,7 @@ This is a basic (autocomplete functionality not working here) example how a form
               },
             ],
         }"
-        class="form"
-        @values-changed="valueList = { ...$event }">
+        class="form">
       <template #label-addition="{ fieldName, groupNames }">
         <template v-if="fieldName === 'isan'">
           test

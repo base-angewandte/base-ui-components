@@ -477,7 +477,7 @@
           :is="fieldElement"
           v-bind="fieldGroupParamsInt"
           class="base-form-field-creator__subform"
-          @values-changed="setFieldValue"
+          @update:model-value="setFieldValue"
           @input-complete="emitCompletedInputValues"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
@@ -918,7 +918,7 @@ export default {
         ...this.forwardAttrs,
         ...this.fieldGroupParams,
         formFieldJson: this.groupFormFields,
-        valueList: this.fieldValueInt,
+        modelValue: this.fieldValueInt,
         formId: `${this.fieldKey}_${this.field.name}`,
         fieldProps: this.fieldProps,
         dropDownLists: this.fieldGroupDropDownLists,

@@ -377,7 +377,7 @@ export default {
     /**
      * the values for each field if any already present
      */
-    valueList: {
+    modelValue: {
       type: Object,
       default: () => ({}),
     },
@@ -558,7 +558,7 @@ export default {
       }),
     },
   },
-  emits: ['values-changed', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
+  emits: ['update:model-value', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
   setup(props) {
     /** INTERNATIONALIZATION */
     const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
@@ -583,7 +583,7 @@ export default {
        */
       fetchingAutocompleteFor: '',
       /**
-       * internal representation of valueList (containing values for all input fields)
+       * internal representation of modelValue (containing values for all input fields)
        * @type {Object}
        * @property {?string|?Array|?Object} [the name of the input field]
        */
@@ -668,7 +668,7 @@ export default {
     /**
      * watch the prop to see if it has changed from outside
      */
-    valueList: {
+    modelValue: {
       handler(val) {
         const changedValues = Object.keys(this.valueListInt)
           .some(key => JSON.stringify(this.valueListInt[key]) !== JSON.stringify(val[key]));
@@ -773,16 +773,16 @@ export default {
      */
     propagateValueListChanges() {
       // make sure there are any changes not updated yet
-      if (JSON.stringify(this.valueListInt) !== JSON.stringify(this.valueList)) {
+      if (JSON.stringify(this.valueListInt) !== JSON.stringify(this.modelValue)) {
         /**
          * event triggered when the values of a field were altered or a form
          * field was added or removed
          *
-         * @event values-changed
+         * @event update:model-value
          * @param {Object[]} - the changed value list
          * @param {Object} - the field information of the changed field
          */
-        this.$emit('values-changed', this.valueListInt);
+        this.$emit('update:model-value', JSON.parse(JSON.stringify(this.valueListInt)));
       }
     },
 
@@ -804,7 +804,7 @@ export default {
      */
     getInitialFieldValue({ name, 'x-attrs': xAttrs, type, items, properties }) {
       // get the current field value
-      const value = this.valueList[name];
+      const value = this.modelValue[name];
       // get the OpenAPI x-attrs (that we use for form config) field type
       const xAttrsFieldType = xAttrs?.field_type;
       // valid types in OpenAPI definition are 'number' and 'integer'
