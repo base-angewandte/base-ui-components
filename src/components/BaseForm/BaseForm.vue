@@ -772,15 +772,18 @@ export default {
      * emit the value list changes (only triggered by repeatable field manipulation)
      */
     propagateValueListChanges() {
-      /**
-       * event triggered when the values of a field were altered or a form
-       * field was added or removed
-       *
-       * @event values-changed
-       * @param {Object[]} - the changed value list
-       * @param {Object} - the field information of the changed field
-       */
-      this.$emit('values-changed', this.valueListInt);
+      // make sure there are any changes not updated yet
+      if (JSON.stringify(this.valueListInt) !== JSON.stringify(this.valueList)) {
+        /**
+         * event triggered when the values of a field were altered or a form
+         * field was added or removed
+         *
+         * @event values-changed
+         * @param {Object[]} - the changed value list
+         * @param {Object} - the field information of the changed field
+         */
+        this.$emit('values-changed', this.valueListInt);
+      }
     },
 
     /** FIELD VALUE INITIALIZATION */
@@ -792,6 +795,7 @@ export default {
       this.cleanedAndSortedFormFieldList.forEach((field) => {
         this.valueListInt[field.name] = this.getInitialFieldValue(field);
       });
+      this.propagateValueListChanges();
     },
     /**
      * function to determine the appropriate value for a field
