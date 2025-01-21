@@ -14,26 +14,26 @@
       class="base-form__body">
       <!-- A FORM ROW -->
       <div
-        v-for="(element, rowIndex) in formFieldListInt"
-        :key="`form-row-${formId}-${rowIndex}`"
-        :class="['base-form__form-row', `base-form__form-row--${element.type}`]">
+        v-for="({ rowId, type: rowType, data }, rowIndex) in formFieldListInt"
+        :key="`form-row-${formId}-${rowId}`"
+        :class="['base-form__form-row', `base-form__form-row--${rowType}`]">
         <!-- A SINGLE PROPERTY IN THE FORM FIELDS DEFINITION -->
-        <template v-for="(field, index) in element.data">
+        <template v-for="(field, index) in data">
           <!-- FOR A SINGLE FORM FIELD - RENDER BASEFORMFIELDCREATOR COMPONENT -->
           <BaseFormFieldCreator
-            v-if="!allowMultiply(field)"
+            v-if="!allowMultiply({ type: field.type, xAttrs: field['x-attrs'] })"
             ref="baseFormField"
-            :key="`${field.name}_${rowIndex}_${index}_${formId}`"
+            :key="`${field.name}_${rowId}_${field.fieldId}_${formId}`"
             v-bind="formFieldComponentProps(field, index, rowIndex)"
+            v-model="valueListInt[field.name]"
             :class="[
               'base-form__input-field',
-              `base-form__input-field--${element.type}`,
+              `base-form__input-field--${rowType}`,
               { 'base-form__input-field--top-margin': field.type === 'boolean' },
               { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
             ]"
-            @update:model-value="setFieldValue($event, field.name)"
             @fetch-autocomplete="fetchAutocomplete"
-            @input-complete="onInputComplete($event, field.name)">
+            @input-complete="onInputComplete">
             <template #label-addition="{ fieldName, groupNames }">
               <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
               @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
@@ -131,10 +131,10 @@
 
           <!-- FOR REPEATABLE FIELDS - ALLOW FOR MULTIPLE VALUES PER FIELD -->
           <div
-            v-else-if="allowMultiply(field)"
-            :key="`${field.name}_${index}_${formId}_wrapper`"
+            v-else-if="allowMultiply({ type: field.type, xAttrs: field['x-attrs'] })"
+            :key="`${field.name}_${field.fieldId}_${formId}_wrapper`"
             :class="['base-form__input-field',
-                     `base-form__input-field--${element.type}`,
+                     `base-form__input-field--${rowType}`,
                      { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])}]">
             <!-- wrapper around form field group and remove button -->
             <div
@@ -146,17 +146,11 @@
                 :key="`${field.name}_${index}_${valueIndex}_${formId}`"
                 ref="baseFormField"
                 v-bind="formFieldComponentProps(field, index, rowIndex, valueIndex)"
+                v-model="valueListInt[field.name][valueIndex]"
                 :class="['base-form__input-component',
                          { 'base-form__input-component--margin-bottom': !multiplyButtonsInline(field) }]"
-                @update:model-value="setFieldValue(
-                  $event,
-                  field.name,
-                  valueIndex)"
                 @fetch-autocomplete="fetchAutocomplete"
-                @input-complete="onInputComplete(
-                  $event,
-                  field.name,
-                  valueIndex)">
+                @input-complete="onInputComplete">
                 <template #label-addition="{ fieldName, groupNames }">
                   <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
                     @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
@@ -278,7 +272,7 @@
                       || checkFieldContent(field.name, 0)"
                     :icon-title="valueListInt[field.name].length === 1
                       ? getI18nTerm('form.clearField') || 'Clear'
-                      : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(element) })"
+                      : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(field) })"
                     :has-background-color="false"
                     text=""
                     button-style="single"
@@ -341,6 +335,7 @@
 import { defineAsyncComponent, toRef } from 'vue';
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
 import { useI18n } from '@/composables/useI18n.js';
+import { createId } from '@/utils/utils.js';
 
 /**
  * Component creating a form according to a provided [openAPI](https://www.openapis.org/) standard
@@ -601,7 +596,12 @@ export default {
         // filter out hidden properties and $ref property from JSON
         .filter(([, value]) => !value.$ref && !value['x-attrs']?.hidden)
         // map all fields to include the field key as property `name`
-        .map(([key, value]) => ({ name: key, ...value }))
+        // and an id for the v-for key
+        .map(([key, value]) => ({
+          fieldId: createId(),
+          name: key,
+          ...value,
+        }))
         // sort the fields according to their x-attribute (order)
         .sort((a, b) => (a['x-attrs']?.order > b['x-attrs']?.order ? 1 : -1));
     },
@@ -640,6 +640,7 @@ export default {
           // else create a new array entry with the new format for that group (or single field)
         } else {
           prev.push({
+            rowId: createId(),
             // field type group should always be full
             type: fieldFormat && curr['x-attrs']?.field_type !== 'group'
               ? fieldFormat : 'full',
@@ -677,6 +678,25 @@ export default {
         }
       },
       deep: true,
+    },
+    valueListInt: {
+      handler(val) {
+        // make sure there are any changes not updated yet
+        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
+          /**
+           * event triggered when the values of a field were altered or a form
+           * field was added or removed
+           *
+           * @event update:model-value
+           * @param {Object[]} - the changed value list
+           * @param {Object} - the field information of the changed field
+           */
+          this.$emit('update:model-value', JSON.parse(JSON.stringify(val)));
+        }
+
+      },
+      deep: true,
+      immediate: true,
     },
     /**
      * if the form fields definition was changed from outside - reinitialize the internal value list
@@ -738,14 +758,8 @@ export default {
     /**
      * function triggered when an input field input was completed (e.g. an option selected in chips input or
      *  an enter key triggered in BaseInput or after a date was validated)
-     *
-     * @param {string|number|Object|Array} value - the updated value
-     * @param {string} fieldName - the name of the field in question
-     * @param {number} index - if field is repeatable - the index in the valueList array
      */
-    onInputComplete(value, fieldName, index = -1) {
-      // update the valueListInt
-      this.setFieldValue(value, fieldName, index);
+    onInputComplete() {
       /**
        * event emitted once an input was completed (e.g. an option selected in chips input or
        *  an enter key triggered in BaseInput or after a date was validated)
@@ -753,37 +767,6 @@ export default {
        *  @property {string, number, Object, Array} - the updated value
        */
       this.$emit('input-complete', this.valueListInt);
-    },
-    /**
-     * triggered if value in form field changed
-     * @param {*} value - the altered field value
-     * @param {string} fieldName - the property name of the altered field
-     * @param {number} index - the field index if field is repeatable
-     */
-    setFieldValue(value, fieldName, index = -1) {
-      if (index >= 0) {
-        this.valueListInt[fieldName][index] = JSON.parse(JSON.stringify(value));
-      } else {
-        this.valueListInt[fieldName] = value ? JSON.parse(JSON.stringify(value)) : value;
-      }
-      this.propagateValueListChanges();
-    },
-    /**
-     * emit the value list changes (only triggered by repeatable field manipulation)
-     */
-    propagateValueListChanges() {
-      // make sure there are any changes not updated yet
-      if (JSON.stringify(this.valueListInt) !== JSON.stringify(this.modelValue)) {
-        /**
-         * event triggered when the values of a field were altered or a form
-         * field was added or removed
-         *
-         * @event update:model-value
-         * @param {Object[]} - the changed value list
-         * @param {Object} - the field information of the changed field
-         */
-        this.$emit('update:model-value', JSON.parse(JSON.stringify(this.valueListInt)));
-      }
     },
 
     /** FIELD VALUE INITIALIZATION */
@@ -795,7 +778,6 @@ export default {
       this.cleanedAndSortedFormFieldList.forEach((field) => {
         this.valueListInt[field.name] = this.getInitialFieldValue(field);
       });
-      this.propagateValueListChanges();
     },
     /**
      * function to determine the appropriate value for a field
@@ -870,13 +852,14 @@ export default {
         // insert at the correct level
         this.valueListInt[field.name].splice(index + 1, 0, newFieldValues);
       }
+
+      // set multiply params - this is needed to focus the new input element
+      // on updated() (can not do it here because elements not rendered yet)
       this.multiplyParams = {
         index: !index && index !== 0
           ? this.valueListInt[field.name].length - 1 : index + 1,
         name: field.name,
       };
-      // inform parent of changes
-      this.propagateValueListChanges();
     },
     /**
      * remove multiplied field again
@@ -893,7 +876,6 @@ export default {
         fieldGroupValues[index] = this.getInitialFieldValue(field.items);
       }
       // inform parent of changes
-      this.propagateValueListChanges();
       this.$emit('input-complete', this.valueListInt);
     },
 
@@ -994,7 +976,7 @@ export default {
         label: singleFieldProps && singleFieldProps.label
           ? singleFieldProps.label : this.getFieldName(element),
         fieldProps: singleFieldProps,
-        showLabel: !this.allowMultiply(element)
+        showLabel: !this.allowMultiply({ type: element.type, xAttrs: element['x-attrs'] })
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
         dropDownList: this.dropDownLists[name],
         secondaryDropdown: this.dropDownLists[`${name}_secondary`],
@@ -1002,8 +984,6 @@ export default {
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
         fieldKey: `${name}_${comboIndex}_${this.formId}`,
-        modelValue: fieldRepeatable ? this.valueListInt[name][valueIndex]
-          : this.valueListInt[name],
         autocompleteLoading: this.fieldIsLoading === name,
         // add component props to form fields creator props if list contains a field_type 'group'
         fieldGroupParams: this.cleanedAndSortedFormFieldList
@@ -1019,14 +999,16 @@ export default {
     },
     /**
      * check if field can be multiplied
-     * @param {Object} el - the openAPI field definition information
+     * @param {string} type - the openAPI field definition field type
+     * @param {Object} xAttrs - the openAPI field definition x-attrs with custom
+     *  information filled to configure form
      * @returns {boolean}
      */
-    allowMultiply(el) {
+    allowMultiply({ type, xAttrs }) {
       // field can be multiplied if it is an array and not a chips or chips-below
       // field
-      return el.type === 'array' && (!el['x-attrs'] || !el['x-attrs'].field_type || (el['x-attrs']
-        && !['chips', 'chips-below'].includes(el['x-attrs'].field_type)));
+      return type === 'array' && (!xAttrs || !xAttrs.field_type || (xAttrs
+        && !['chips', 'chips-below'].includes(xAttrs.field_type)));
     },
     /**
      * check if field should display multiply buttons inline (all but 'group' and 'multiline')

@@ -1316,7 +1316,7 @@ export default {
          *  @event input-complete
          *  @property {string, number, Object, Array} - the updated value
          */
-        this.$emit('input-complete', this.fieldValueInt);
+        this.$emit('input-complete', JSON.parse(JSON.stringify(this.fieldValueInt)));
       }
     },
   },
