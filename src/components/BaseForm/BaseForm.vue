@@ -71,16 +71,16 @@
                 :field-name="fieldName"
                 :group-names="groupNames" />
               <span
-                v-if="element['x-attrs'] && element['x-attrs'].text_before"
+                v-if="field['x-attrs'] && field['x-attrs'].text_before"
                 class="base-form__input-field__text-before">
-                {{ element['x-attrs'].text_before }}
+                {{ field['x-attrs'].text_before }}
               </span>
             </template>
             <template #input-field-addition-after="{ fieldName, groupNames }">
               <span
-                v-if="element['x-attrs'] && element['x-attrs'].text_after"
+                v-if="field['x-attrs'] && field['x-attrs'].text_after"
                 class="base-form__input-field__text-after">
-                {{ element['x-attrs'].text_after }}
+                {{ field['x-attrs'].text_after }}
               </span>
               <!-- @slot for adding elements after input
               @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
@@ -194,9 +194,9 @@
                 </template>
                 <template #input-field-inline-before="{ fieldName, groupNames }">
                   <span
-                    v-if="element['x-attrs'] && element['x-attrs'].text_before"
+                    v-if="field['x-attrs'] && field['x-attrs'].text_before"
                     class="base-form__input-field__text-before">
-                    {{ element['x-attrs'].text_before }}
+                    {{ field['x-attrs'].text_before }}
                   </span>
                   <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. for an example see [BaseInput](BaseInput)
                   @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
@@ -210,9 +210,9 @@
                 </template>
                 <template #input-field-addition-after="{ fieldName, groupNames }">
                   <span
-                    v-if="element['x-attrs'] && element['x-attrs'].text_after"
+                    v-if="field['x-attrs'] && field['x-attrs'].text_after"
                     class="base-form__input-field__text-after">
-                    {{ element['x-attrs'].text_after }}
+                    {{ field['x-attrs'].text_after }}
                   </span>
                   <!-- @slot for adding elements after input
                   @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
