@@ -4,8 +4,6 @@ This component acts as a wrapper around [BaseForm](BaseForm), so the form fields
 
 The events and slots (and mostly also props) of this component are identical to [BaseForm](BaseForm).
 
->Please note that this component should be rendered client side (important for SSR projects). So for example if you have a Nuxt project you will have to wrap the component in a `<client-only>` tag.
-
 Below is a basic example (the form input fields are not fully functional) to demonstrate the layout.
 
 ```vue live
