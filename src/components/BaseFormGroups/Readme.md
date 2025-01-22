@@ -13,9 +13,9 @@ Below is a basic example (the form input fields are not fully functional) to dem
     <p>Current form values:</p>
     {{ valueList }}
     <BaseFormGroups
-      :value-list="valueList"
+      :model-value="valueList"
       :form-field-json="formFieldJSON"
-      @values-changed="handleInput" />
+      @update:model-value="handleInput" />
   </div>
 </template>
 
