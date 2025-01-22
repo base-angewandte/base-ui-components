@@ -1,336 +1,3 @@
-<template>
-  <div
-    class="base-form"
-    :style="formStyle">
-    <!-- OPTIONAL HEADER -->
-    <component
-      :is="renderHeaderAs"
-      v-if="formHeader"
-      class="base-form__header">
-      {{ formHeader }}
-    </component>
-    <!-- FORM -->
-    <div
-      class="base-form__body">
-      <!-- A FORM ROW -->
-      <div
-        v-for="({ rowId, type: rowType, data }, rowIndex) in formFieldListInt"
-        :key="`form-row-${formId}-${rowId}`"
-        :class="['base-form__form-row', `base-form__form-row--${rowType}`]">
-        <!-- A SINGLE PROPERTY IN THE FORM FIELDS DEFINITION -->
-        <template v-for="(field, index) in data">
-          <!-- FOR A SINGLE FORM FIELD - RENDER BASEFORMFIELDCREATOR COMPONENT -->
-          <BaseFormFieldCreator
-            v-if="!allowMultiply({ type: field.type, xAttrs: field['x-attrs'] })"
-            ref="baseFormField"
-            :key="`${field.name}_${rowId}_${field.fieldId}_${formId}`"
-            v-bind="formFieldComponentProps(field, index, rowIndex)"
-            v-model="valueListInt[field.name]"
-            :class="[
-              'base-form__input-field',
-              `base-form__input-field--${rowType}`,
-              { 'base-form__input-field--top-margin': field.type === 'boolean' },
-              { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
-            ]"
-            @fetch-autocomplete="fetchAutocomplete"
-            @input-complete="onInputComplete">
-            <template #label-addition="{ fieldName, groupNames }">
-              <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="label-addition"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-            </template>
-            <template #pre-input-field="{ fieldName, groupNames }">
-              <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="pre-input-field"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-            </template>
-            <template
-              #input-field-addition-before="{ fieldName, groupNames }">
-              <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="input-field-addition-before"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-            </template>
-            <template #input-field-inline-before="{ fieldName, groupNames }">
-              <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="input-field-inline-before"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-              <span
-                v-if="field['x-attrs'] && field['x-attrs'].text_before"
-                class="base-form__input-field__text-before">
-                {{ field['x-attrs'].text_before }}
-              </span>
-            </template>
-            <template #input-field-addition-after="{ fieldName, groupNames }">
-              <span
-                v-if="field['x-attrs'] && field['x-attrs'].text_after"
-                class="base-form__input-field__text-after">
-                {{ field['x-attrs'].text_after }}
-              </span>
-              <!-- @slot for adding elements after input
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="input-field-addition-after"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-            </template>
-            <template #post-input-field="{ fieldName, groupNames }">
-              <!-- @slot for adding elements at the end covering the whole height
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="post-input-field"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-            </template>
-            <template #error-icon>
-              <!-- @slot use a custom icon instead of standard error/warning icon -->
-              <slot name="error-icon" />
-            </template>
-            <template #remove-icon>
-              <!-- @slot use a custom icon instead of standard remove icon -->
-              <slot name="remove-icon" />
-            </template>
-            <template #below-input="{ fieldName, groupNames }">
-              <!-- @slot below-input slot added to e.g. add drop down
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                name="below-input"
-                :field-name="fieldName"
-                :group-names="groupNames" />
-            </template>
-            <template #drop-down-entry="{ option, fieldName, groupNames }">
-              <!-- @slot customize the form field drop down options
-                @binding {object} option - the option object
-                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-              <slot
-                :field-name="fieldName"
-                :group-names="groupNames"
-                :option="option"
-                name="drop-down-entry" />
-            </template>
-          </BaseFormFieldCreator>
-
-          <!-- FOR REPEATABLE FIELDS - ALLOW FOR MULTIPLE VALUES PER FIELD -->
-          <div
-            v-else-if="allowMultiply({ type: field.type, xAttrs: field['x-attrs'] })"
-            :key="`${field.name}_${field.fieldId}_${formId}_wrapper`"
-            :class="['base-form__input-field',
-                     `base-form__input-field--${rowType}`,
-                     { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])}]">
-            <!-- wrapper around form field group and remove button -->
-            <div
-              v-for="(value, valueIndex) in valueListInt[field.name]"
-              :ref="field.name"
-              :key="`${field.name}_${index}_${valueIndex}_${formId}_wrapper`"
-              :class="[{ 'base-form__repeatable-field': multiplyButtonsInline(field) }]">
-              <BaseFormFieldCreator
-                :key="`${field.name}_${index}_${valueIndex}_${formId}`"
-                ref="baseFormField"
-                v-bind="formFieldComponentProps(field, index, rowIndex, valueIndex)"
-                v-model="valueListInt[field.name][valueIndex]"
-                :class="['base-form__input-component',
-                         { 'base-form__input-component--margin-bottom': !multiplyButtonsInline(field) }]"
-                @fetch-autocomplete="fetchAutocomplete"
-                @input-complete="onInputComplete">
-                <template #label-addition="{ fieldName, groupNames }">
-                  <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-                    @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                    @binding {number} index - the array index of field values
-                    @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="label-addition"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template #pre-input-field="{ fieldName, groupNames }">
-                  <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
-                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                  @binding {number} index - the array index of field values
-                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="pre-input-field"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template
-                  #input-field-addition-before="{ fieldName, groupNames }">
-                  <!-- @slot Slot to allow for additional elements in the input field \<div\>
-                    (before \<input\>)
-                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                  @binding {number} index - the array index of field values
-                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="input-field-addition-before"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template #input-field-inline-before="{ fieldName, groupNames }">
-                  <span
-                    v-if="field['x-attrs'] && field['x-attrs'].text_before"
-                    class="base-form__input-field__text-before">
-                    {{ field['x-attrs'].text_before }}
-                  </span>
-                  <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. for an example see [BaseInput](BaseInput)
-                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                  @binding {number} index - the array index of field values
-                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="input-field-inline-before"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template #input-field-addition-after="{ fieldName, groupNames }">
-                  <span
-                    v-if="field['x-attrs'] && field['x-attrs'].text_after"
-                    class="base-form__input-field__text-after">
-                    {{ field['x-attrs'].text_after }}
-                  </span>
-                  <!-- @slot for adding elements after input
-                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                  @binding {number} index - the array index of field values
-                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="input-field-addition-after"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template #post-input-field="{ fieldName, groupNames }">
-                  <!-- @slot for adding elements at the end covering the whole height
-                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                  @binding {number} index - the array index of field values
-                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="post-input-field"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template #error-icon>
-                  <!-- @slot use a custom icon instead of standard error/warning icon -->
-                  <slot name="error-icon" />
-                </template>
-                <template #remove-icon>
-                  <!-- @slot use a custom icon instead of standard remove icon -->
-                  <slot name="remove-icon" />
-                </template>
-                <template #below-input="{ fieldName, groupNames }">
-                  <!-- @slot below-input slot added to e.g. add drop down
-                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                  @binding {number} index - the array index of field values
-                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    name="below-input"
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :index="valueIndex" />
-                </template>
-                <template #drop-down-entry="{ option, fieldName, groupNames }">
-                  <!-- @slot customize the form field drop down options
-                    @binding {object} option - the option object
-                    @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-                    @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-                  <slot
-                    :field-name="fieldName"
-                    :group-names="groupNames"
-                    :option="option"
-                    name="drop-down-entry" />
-                </template>
-              </BaseFormFieldCreator>
-
-              <!-- INLINE MULTIPLY FOR TEXT AND DATE FIELDS -->
-              <template
-                v-if="multiplyButtonsInline(field)">
-                <div
-                  ref="multiplyButtons"
-                  class="base-form__inline-buttons">
-                  <BaseButton
-                    v-if="valueListInt[field.name].length > 1
-                      || checkFieldContent(field.name, 0)"
-                    :icon-title="valueListInt[field.name].length === 1
-                      ? getI18nTerm('form.clearField') || 'Clear'
-                      : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(field) })"
-                    :has-background-color="false"
-                    text=""
-                    button-style="single"
-                    icon="remove"
-                    icon-size="large"
-                    class="base-form__inline-button"
-                    @clicked="removeField(field, valueIndex)" />
-                  <BaseButton
-                    :icon-title="valueIndex !== (valueListInt[field.name].length - 1)
-                      ? getI18nTerm('form.addGroupBelow', -1, {
-                        fieldType: getFieldName(field),
-                      }) : getI18nTerm('form.addGroup', -1, {
-                        fieldType: getFieldName(field),
-                      })"
-                    :has-background-color="false"
-                    text=""
-                    button-style="single"
-                    icon="plus"
-                    icon-size="large"
-                    class="base-form__inline-button"
-                    @clicked="multiplyField(field, valueIndex)" />
-                </div>
-              </template>
-
-              <!-- MULTIPLY FOR MULTILINE FIELDS AND FIELD GROUPS -->
-              <div class="base-form__multiply-buttons">
-                <!-- if there is field content show a 'remove all content' button -->
-                <BaseButton
-                  v-if="!multiplyButtonsInline(field) && (valueListInt[field.name].length > 1
-                    || checkFieldContent(field.name, 0))"
-                  :text="valueListInt[field.name].length === 1
-                    ? getI18nTerm('form.clearField') || 'Clear'
-                    : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(field) })"
-                  :has-background-color="false"
-                  icon-position="right"
-                  icon="remove"
-                  :class="['base-form__multiply-button', 'base-form__multiply-button--remove']"
-                  @clicked="removeField(field, valueIndex)" />
-                <!-- multiply button -->
-                <BaseButton
-                  v-if="!multiplyButtonsInline(field)"
-                  :text="getI18nTerm('form.addGroup', -1, {
-                    fieldType: getFieldName(field),
-                  })"
-                  :has-background-color="false"
-                  icon-position="right"
-                  icon="plus"
-                  class="base-form__multiply-button"
-                  @clicked="multiplyField(field, valueIndex)" />
-              </div>
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, toRef } from 'vue';
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
@@ -1074,6 +741,339 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    class="base-form"
+    :style="formStyle">
+    <!-- OPTIONAL HEADER -->
+    <component
+      :is="renderHeaderAs"
+      v-if="formHeader"
+      class="base-form__header">
+      {{ formHeader }}
+    </component>
+    <!-- FORM -->
+    <div
+      class="base-form__body">
+      <!-- A FORM ROW -->
+      <div
+        v-for="({ rowId, type: rowType, data }, rowIndex) in formFieldListInt"
+        :key="`form-row-${formId}-${rowId}`"
+        :class="['base-form__form-row', `base-form__form-row--${rowType}`]">
+        <!-- A SINGLE PROPERTY IN THE FORM FIELDS DEFINITION -->
+        <template v-for="(field, index) in data">
+          <!-- FOR A SINGLE FORM FIELD - RENDER BASEFORMFIELDCREATOR COMPONENT -->
+          <BaseFormFieldCreator
+            v-if="!allowMultiply({ type: field.type, xAttrs: field['x-attrs'] })"
+            ref="baseFormField"
+            :key="`${field.name}_${rowId}_${field.fieldId}_${formId}`"
+            v-bind="formFieldComponentProps(field, index, rowIndex)"
+            v-model="valueListInt[field.name]"
+            :class="[
+              'base-form__input-field',
+              `base-form__input-field--${rowType}`,
+              { 'base-form__input-field--top-margin': field.type === 'boolean' },
+              { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
+            ]"
+            @fetch-autocomplete="fetchAutocomplete"
+            @input-complete="onInputComplete">
+            <template #label-addition="{ fieldName, groupNames }">
+              <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="label-addition"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+            </template>
+            <template #pre-input-field="{ fieldName, groupNames }">
+              <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="pre-input-field"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+            </template>
+            <template
+              #input-field-addition-before="{ fieldName, groupNames }">
+              <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="input-field-addition-before"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+            </template>
+            <template #input-field-inline-before="{ fieldName, groupNames }">
+              <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseInput](BaseInput)
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="input-field-inline-before"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+              <span
+                v-if="field['x-attrs'] && field['x-attrs'].text_before"
+                class="base-form__input-field__text-before">
+                {{ field['x-attrs'].text_before }}
+              </span>
+            </template>
+            <template #input-field-addition-after="{ fieldName, groupNames }">
+              <span
+                v-if="field['x-attrs'] && field['x-attrs'].text_after"
+                class="base-form__input-field__text-after">
+                {{ field['x-attrs'].text_after }}
+              </span>
+              <!-- @slot for adding elements after input
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="input-field-addition-after"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+            </template>
+            <template #post-input-field="{ fieldName, groupNames }">
+              <!-- @slot for adding elements at the end covering the whole height
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="post-input-field"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+            </template>
+            <template #error-icon>
+              <!-- @slot use a custom icon instead of standard error/warning icon -->
+              <slot name="error-icon" />
+            </template>
+            <template #remove-icon>
+              <!-- @slot use a custom icon instead of standard remove icon -->
+              <slot name="remove-icon" />
+            </template>
+            <template #below-input="{ fieldName, groupNames }">
+              <!-- @slot below-input slot added to e.g. add drop down
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                name="below-input"
+                :field-name="fieldName"
+                :group-names="groupNames" />
+            </template>
+            <template #drop-down-entry="{ option, fieldName, groupNames }">
+              <!-- @slot customize the form field drop down options
+                @binding {object} option - the option object
+                @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              <slot
+                :field-name="fieldName"
+                :group-names="groupNames"
+                :option="option"
+                name="drop-down-entry" />
+            </template>
+          </BaseFormFieldCreator>
+
+          <!-- FOR REPEATABLE FIELDS - ALLOW FOR MULTIPLE VALUES PER FIELD -->
+          <div
+            v-else-if="allowMultiply({ type: field.type, xAttrs: field['x-attrs'] })"
+            :key="`${field.name}_${field.fieldId}_${formId}_wrapper`"
+            :class="['base-form__input-field',
+                     `base-form__input-field--${rowType}`,
+                     { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])}]">
+            <!-- wrapper around form field group and remove button -->
+            <div
+              v-for="(value, valueIndex) in valueListInt[field.name]"
+              :ref="field.name"
+              :key="`${field.name}_${index}_${valueIndex}_${formId}_wrapper`"
+              :class="[{ 'base-form__repeatable-field': multiplyButtonsInline(field) }]">
+              <BaseFormFieldCreator
+                :key="`${field.name}_${index}_${valueIndex}_${formId}`"
+                ref="baseFormField"
+                v-bind="formFieldComponentProps(field, index, rowIndex, valueIndex)"
+                v-model="valueListInt[field.name][valueIndex]"
+                :class="['base-form__input-component',
+                         { 'base-form__input-component--margin-bottom': !multiplyButtonsInline(field) }]"
+                @fetch-autocomplete="fetchAutocomplete"
+                @input-complete="onInputComplete">
+                <template #label-addition="{ fieldName, groupNames }">
+                  <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+                    @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                    @binding {number} index - the array index of field values
+                    @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="label-addition"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template #pre-input-field="{ fieldName, groupNames }">
+                  <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
+                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                  @binding {number} index - the array index of field values
+                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="pre-input-field"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template
+                  #input-field-addition-before="{ fieldName, groupNames }">
+                  <!-- @slot Slot to allow for additional elements in the input field \<div\>
+                    (before \<input\>)
+                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                  @binding {number} index - the array index of field values
+                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="input-field-addition-before"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template #input-field-inline-before="{ fieldName, groupNames }">
+                  <span
+                    v-if="field['x-attrs'] && field['x-attrs'].text_before"
+                    class="base-form__input-field__text-before">
+                    {{ field['x-attrs'].text_before }}
+                  </span>
+                  <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. for an example see [BaseInput](BaseInput)
+                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                  @binding {number} index - the array index of field values
+                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="input-field-inline-before"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template #input-field-addition-after="{ fieldName, groupNames }">
+                  <span
+                    v-if="field['x-attrs'] && field['x-attrs'].text_after"
+                    class="base-form__input-field__text-after">
+                    {{ field['x-attrs'].text_after }}
+                  </span>
+                  <!-- @slot for adding elements after input
+                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                  @binding {number} index - the array index of field values
+                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="input-field-addition-after"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template #post-input-field="{ fieldName, groupNames }">
+                  <!-- @slot for adding elements at the end covering the whole height
+                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                  @binding {number} index - the array index of field values
+                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="post-input-field"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template #error-icon>
+                  <!-- @slot use a custom icon instead of standard error/warning icon -->
+                  <slot name="error-icon" />
+                </template>
+                <template #remove-icon>
+                  <!-- @slot use a custom icon instead of standard remove icon -->
+                  <slot name="remove-icon" />
+                </template>
+                <template #below-input="{ fieldName, groupNames }">
+                  <!-- @slot below-input slot added to e.g. add drop down
+                  @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                  @binding {number} index - the array index of field values
+                  @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    name="below-input"
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :index="valueIndex" />
+                </template>
+                <template #drop-down-entry="{ option, fieldName, groupNames }">
+                  <!-- @slot customize the form field drop down options
+                    @binding {object} option - the option object
+                    @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+                    @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+                  <slot
+                    :field-name="fieldName"
+                    :group-names="groupNames"
+                    :option="option"
+                    name="drop-down-entry" />
+                </template>
+              </BaseFormFieldCreator>
+
+              <!-- INLINE MULTIPLY FOR TEXT AND DATE FIELDS -->
+              <template
+                v-if="multiplyButtonsInline(field)">
+                <div
+                  ref="multiplyButtons"
+                  class="base-form__inline-buttons">
+                  <BaseButton
+                    v-if="valueListInt[field.name].length > 1
+                      || checkFieldContent(field.name, 0)"
+                    :icon-title="valueListInt[field.name].length === 1
+                      ? getI18nTerm('form.clearField') || 'Clear'
+                      : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(field) })"
+                    :has-background-color="false"
+                    text=""
+                    button-style="single"
+                    icon="remove"
+                    icon-size="large"
+                    class="base-form__inline-button"
+                    @clicked="removeField(field, valueIndex)" />
+                  <BaseButton
+                    :icon-title="valueIndex !== (valueListInt[field.name].length - 1)
+                      ? getI18nTerm('form.addGroupBelow', -1, {
+                        fieldType: getFieldName(field),
+                      }) : getI18nTerm('form.addGroup', -1, {
+                        fieldType: getFieldName(field),
+                      })"
+                    :has-background-color="false"
+                    text=""
+                    button-style="single"
+                    icon="plus"
+                    icon-size="large"
+                    class="base-form__inline-button"
+                    @clicked="multiplyField(field, valueIndex)" />
+                </div>
+              </template>
+
+              <!-- MULTIPLY FOR MULTILINE FIELDS AND FIELD GROUPS -->
+              <div class="base-form__multiply-buttons">
+                <!-- if there is field content show a 'remove all content' button -->
+                <BaseButton
+                  v-if="!multiplyButtonsInline(field) && (valueListInt[field.name].length > 1
+                    || checkFieldContent(field.name, 0))"
+                  :text="valueListInt[field.name].length === 1
+                    ? getI18nTerm('form.clearField') || 'Clear'
+                    : getI18nTerm('form.removeField', -1, { fieldType: getFieldName(field) })"
+                  :has-background-color="false"
+                  icon-position="right"
+                  icon="remove"
+                  :class="['base-form__multiply-button', 'base-form__multiply-button--remove']"
+                  @clicked="removeField(field, valueIndex)" />
+                <!-- multiply button -->
+                <BaseButton
+                  v-if="!multiplyButtonsInline(field)"
+                  :text="getI18nTerm('form.addGroup', -1, {
+                    fieldType: getFieldName(field),
+                  })"
+                  :has-background-color="false"
+                  icon-position="right"
+                  icon="plus"
+                  class="base-form__multiply-button"
+                  @clicked="multiplyField(field, valueIndex)" />
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
