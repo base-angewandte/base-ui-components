@@ -1,76 +1,3 @@
-<template>
-  <div
-    v-bind="rootAttrs"
-    class="base-form-groups">
-    <BaseForm
-      v-for="(formGroup, index) of formFieldsGrouped"
-      :key="`${groupsId}-${index}`"
-      :form-field-json="formGroup"
-      v-bind="formProps"
-      class="base-form-groups__group">
-      <template #label-addition="{ fieldName }">
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-        @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="label-addition"
-          :field-name="fieldName" />
-      </template>
-      <template #pre-input-field="{ fieldName }">
-        <!-- @slot slot to add elements within the form field but in a row before the actual input field. For an example see [BaseInput](BaseInput).
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="pre-input-field"
-          :field-name="fieldName" />
-      </template>
-      <template
-        #input-field-addition-before="{ fieldName }">
-        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>).
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="input-field-addition-before"
-          :field-name="fieldName" />
-      </template>
-      <template #input-field-inline-before="{ fieldName }">
-        <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. For an example see [BaseInput](BaseInput).
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="input-field-inline-before"
-          :field-name="fieldName" />
-      </template>
-      <template #input-field-addition-after="{ fieldName }">
-        <!-- @slot for adding elements after input
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="input-field-addition-after"
-          :field-name="fieldName" />
-      </template>
-      <template #post-input-field="{ fieldName }">
-        <!-- @slot for adding elements at the end covering the whole height
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="post-input-field"
-          :field-name="fieldName" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon -->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot name="remove-icon" />
-      </template>
-      <template #below-input="{ fieldName }">
-        <!-- @slot below-input slot added to e.g. add drop down
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
-        <slot
-          name="below-input"
-          :field-name="fieldName" />
-      </template>
-    </BaseForm>
-  </div>
-</template>
-
 <script>
 import { useId } from '@/composables/useId.js';
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
@@ -257,6 +184,79 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    v-bind="rootAttrs"
+    class="base-form-groups">
+    <BaseForm
+      v-for="(formGroup, index) of formFieldsGrouped"
+      :key="`${groupsId}-${index}`"
+      :form-field-json="formGroup"
+      v-bind="formProps"
+      class="base-form-groups__group">
+      <template #label-addition="{ fieldName }">
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
+        @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="label-addition"
+          :field-name="fieldName" />
+      </template>
+      <template #pre-input-field="{ fieldName }">
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. For an example see [BaseInput](BaseInput).
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="pre-input-field"
+          :field-name="fieldName" />
+      </template>
+      <template
+        #input-field-addition-before="{ fieldName }">
+        <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>).
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="input-field-addition-before"
+          :field-name="fieldName" />
+      </template>
+      <template #input-field-inline-before="{ fieldName }">
+        <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. For an example see [BaseInput](BaseInput).
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="input-field-inline-before"
+          :field-name="fieldName" />
+      </template>
+      <template #input-field-addition-after="{ fieldName }">
+        <!-- @slot for adding elements after input
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="input-field-addition-after"
+          :field-name="fieldName" />
+      </template>
+      <template #post-input-field="{ fieldName }">
+        <!-- @slot for adding elements at the end covering the whole height
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="post-input-field"
+          :field-name="fieldName" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon -->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot name="remove-icon" />
+      </template>
+      <template #below-input="{ fieldName }">
+        <!-- @slot below-input slot added to e.g. add drop down
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        <slot
+          name="below-input"
+          :field-name="fieldName" />
+      </template>
+    </BaseForm>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
