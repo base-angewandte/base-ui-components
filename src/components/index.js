@@ -45,10 +45,13 @@ import BaseButton from './BaseButton/BaseButton.vue';
 import BaseMap from './BaseMap/BaseMap.vue';
 import BaseMapLocations from './BaseMapLocations/BaseMapLocations.vue';
 import BaseExpandBox from './BaseExpandBox/BaseExpandBox.vue';
-// importing BaseDateInput async to avoid SSR problems!
 import BaseDateInput from '@/components/BaseDateInput/BaseDateInput.vue';
 // import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
 const BaseHlsVideo = defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue'));
+import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
+import BaseForm from '@/components/BaseForm/BaseForm.vue';
+import BaseFormGroups from '@/components/BaseFormGroups/BaseFormGroups.vue';
+
 
 export {
   BaseButton,
@@ -98,4 +101,7 @@ export {
   BaseMap,
   BaseMapLocations,
   BaseExpandBox,
+  BaseForm,
+  BaseFormFieldCreator,
+  BaseFormGroups,
 };
