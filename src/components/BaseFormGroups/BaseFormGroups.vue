@@ -1,5 +1,6 @@
 <template>
   <div
+    v-bind="rootAttrs"
     class="base-form-groups">
     <BaseForm
       v-for="(formGroup, index) of formFieldsGrouped"
@@ -73,6 +74,7 @@
 <script>
 import { useId } from '@/composables/useId.js';
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 export default {
   name: 'BaseFormGroups',
@@ -92,7 +94,6 @@ export default {
     formFieldJson: {
       type: Object,
       required: true,
-      // validator: (val) =>
     },
     /**
      * the values for each field if any already present
@@ -193,8 +194,14 @@ export default {
      * @returns {string}
      */
     const groupsId = useId();
+
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
     return {
       groupsId,
+      rootAttrs,
+      forwardAttrs,
     };
   },
   computed: {
@@ -205,7 +212,7 @@ export default {
      */
     formProps() {
       const newProps = {
-        ...this.$attrs,
+        ...this.forwardAttrs,
         ...this.$props,
       };
       // this will be added in html per group
