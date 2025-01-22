@@ -98,7 +98,7 @@ export default {
     /**
      * the values for each field if any already present
      */
-    valueList: {
+    modelValue: {
       type: Object,
       default: () => ({}),
     },
