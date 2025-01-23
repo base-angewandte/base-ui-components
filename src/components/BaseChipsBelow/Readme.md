@@ -1,5 +1,6 @@
 ## Demo
 
+### Example with draggable and editable chips
 A simple chips input form field with chips displayed below
 and default (base project specific) role selection
 
@@ -8,6 +9,7 @@ and default (base project specific) role selection
   <div class="container">
     <BaseChipsBelow
       v-model="selectedList"
+      :allow-unknown-entries="true"
       :chips-editable="true"
       :list="[
           {
@@ -57,7 +59,7 @@ export default {
 
 ```
 
-## Demo with optional validation
+### Demo with optional validation
 
 A chips input form field with chips displayed below and optional validation
 
