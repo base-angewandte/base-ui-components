@@ -425,9 +425,12 @@ export default {
      */
     renderList: {
       set(val) {
+        // create a copy of render list so the idInt is not deleted from
+        // renderList as well
+        const renderListCopy = JSON.parse(JSON.stringify(val));
         // update renderList but remove the internal id needed
         // for dragging and list generation
-        this.selectedBelowListInt = val.map((entry) => {
+        this.selectedBelowListInt = renderListCopy.map((entry) => {
           // eslint-disable-next-line no-param-reassign
           delete entry.idInt;
           return entry;
@@ -442,11 +445,11 @@ export default {
             // check if an id was already assigned to an item with that label which does not appear
             // in the array more than once (this is just a safeguard - in addOption double adding
             // of the same freetext should actually be prevented anyway)
-            const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
+            const matchingLabelsList = this.renderList ? this.renderList.filter((selectedOption) => {
               return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
             }) : undefined;
-            providedId = createdId && createdId.length === 1
-              ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
+            providedId = matchingLabelsList && matchingLabelsList.length === 1
+              ? matchingLabelsList[0].idInt : entry[this.labelPropertyName] + createId();
           }
           return {
             ...{
