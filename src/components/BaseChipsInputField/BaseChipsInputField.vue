@@ -645,9 +645,12 @@ export default {
           this.selectedListInt[setIndex] = newEntry;
           // emit an event to inform parent of altered list
           this.updateParentList(this.selectedListInt);
-          // inform screen reader user
-          this.announcement = this.assistiveText.optionAdded
-            .replace('{label}', this.inputInt);
+          // make sure the assistiveText property was set
+          if (this.assistiveText.optionAdded) {
+            // and inform screen reader user
+            this.announcement = this.assistiveText.optionAdded
+              .replace('{label}', this.inputInt);
+          }
           // otherwise just emit event to parent (for informing user)
         } else {
           /**

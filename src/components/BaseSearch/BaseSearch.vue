@@ -39,6 +39,10 @@
       :assistive-text="!type.includes('date') ? {
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
+        resultsRetrieved: assistiveText.resultsRetrieved,
+        optionAdded: assistiveText.optionAdded,
+        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+        optionRemoved: assistiveText.optionRemoved,
       } : null"
       :is-active-delay="dateFieldDelay"
       :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : null"
@@ -284,6 +288,10 @@ export default {
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
+        resultsRetrieved: '{number} options in drop down.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
         results: '',
       }),
     },
