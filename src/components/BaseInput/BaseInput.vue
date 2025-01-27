@@ -922,6 +922,8 @@ export default {
                 <input
                   :id="idInt"
                   ref="input"
+                  enterkeyhint="done"
+                  autocomplete="off"
                   v-bind="forwardAttrs"
                   :value="inputInt"
                   :placeholder="placeholder"
@@ -937,8 +939,6 @@ export default {
                   :minlength="minLength"
                   :maxlength="maxLength"
                   :inputmode="inputMode"
-                  enterkeyhint="done"
-                  autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
                   @input.stop="onInput"

@@ -1736,8 +1736,10 @@ export default {
                     <input
                       :id="`input-${internalId}-from`"
                       ref="inputFromElement"
-                      :value="inputFrom"
+                      enterkeyhint="done"
+                      autocomplete="off"
                       v-bind="forwardAttrs"
+                      :value="inputFrom"
                       :placeholder="isFromTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       :type="inputType"
@@ -1748,8 +1750,6 @@ export default {
                       :disabled="disabled"
                       :aria-disabled="disabled"
                       :class="['base-date-input__input', inputClass]"
-                      enterkeyhint="done"
-                      autocomplete="off"
                       @input="checkDate($event, 'From')"
                       @keydown="handleInputKeydown($event, 'From')"
                       @blur="onInputBlur($event, 'from')"
@@ -1822,10 +1822,12 @@ export default {
                     <input
                       :id="`input-${internalId}-to`"
                       ref="inputToElement"
+                      enterkeyhint="done"
+                      autocomplete="off"
+                      v-bind="forwardAttrs"
                       :value="inputTo"
                       :placeholder="isToTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
-                      v-bind="forwardAttrs"
                       :type="inputType"
                       :aria-describedby="label + '-to-' + internalId"
                       :aria-required="required.toString()"
@@ -1833,8 +1835,6 @@ export default {
                       :required="required"
                       :disabled="disabled"
                       :aria-disabled="disabled"
-                      enterkeyhint="done"
-                      autocomplete="off"
                       :class="['base-date-input__input', inputClass]"
                       @input="checkDate($event, 'To')"
                       @keydown="handleInputKeydown($event, 'To')"
