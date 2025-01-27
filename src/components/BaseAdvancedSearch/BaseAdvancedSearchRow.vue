@@ -19,7 +19,7 @@
       :show-pre-input-icon="isMainSearch
         && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
       :label="assistiveText.searchLabel || 'Search for Entries'"
-      :type="searchType"
+      :search-type="searchType"
       :loadable="filter.type === 'text' || filter.type === 'chips'"
       :is-loading="isLoading"
       :placeholder="placeholder"

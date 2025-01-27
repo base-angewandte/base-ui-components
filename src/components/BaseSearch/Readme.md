@@ -47,7 +47,7 @@ For slot demonstrations see [BaseChipsInput](BaseChipsInput) or [BaseInput](Base
     <BaseSearch
       v-model="searchText"
       v-model:selected-chips="selectedChips"
-      :type="searchType"
+      :search-type="searchType"
       :placeholder="placeholder"
       :show-pre-input-icon="false"
       label="Advanced Example"

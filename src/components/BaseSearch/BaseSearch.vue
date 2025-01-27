@@ -30,14 +30,14 @@
       :invalid="invalid"
       :show-error-icon="showErrorIcon"
       :language="languageInt"
-      :allow-unknown-entries="isFieldTypeChips ? type === 'chips' : null"
+      :allow-unknown-entries="isFieldTypeChips ? searchType === 'chips' : null"
       :loadable="!dateFieldType ? loadable : null"
-      :chips-editable="isFieldTypeChips ? type === 'chips' : null"
+      :chips-editable="isFieldTypeChips ? searchType === 'chips' : null"
       :label-property-name="isFieldTypeChips ? labelPropertyName : null"
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
       :set-focus-on-active="setFocusOnActive"
       :add-selected-entry-directly="isFieldTypeChips || null"
-      :assistive-text="!type.includes('date') ? {
+      :assistive-text="!searchType.includes('date') ? {
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
         resultsRetrieved: assistiveText.resultsRetrieved,
@@ -45,9 +45,9 @@
         optionToRemoveSelected: assistiveText.optionToRemoveSelected,
         optionRemoved: assistiveText.optionRemoved,
       } : null"
-      :is-active-delay="type.includes('date') ? dateFieldDelay : null"
-      :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : null"
-      :chips-removable="isFieldTypeChips ? type !== 'chipssingle' : null"
+      :is-active-delay="searchType.includes('date') ? dateFieldDelay : null"
+      :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : null"
+      :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : null"
       :input-type="'search'"
       input-class="base-search__input-field"
       enterkeyhint="search"
@@ -120,7 +120,7 @@ export default {
   props: {
     /**
      * set input value from outside
-     *   for type `daterange` this needs to be an object with
+     *   for searchType `daterange` this needs to be an object with
      *   `date_from` and `date_to` properties!
      */
     modelValue: {
@@ -128,7 +128,7 @@ export default {
       default: '',
     },
     /**
-     * if input type is `chips` this is the prop to
+     * if input searchType is `chips` this is the prop to
      * pass selected options (chips).
      *  you may use the v-model directive on this prop
      */
@@ -177,7 +177,7 @@ export default {
      * specify the type of input field
      * @values text, chips, controlled, date, daterange, chipssingle
      */
-    type: {
+    searchType: {
       type: String,
       default: 'text',
       validator: val => ['text', 'chips', 'chipssingle', 'controlled', 'date', 'daterange'].includes(val),
@@ -394,11 +394,11 @@ export default {
      * @returns {null|(function(): Promise<HTMLElement>)|string}
      */
     inputComponent() {
-      if (this.type === 'text') {
+      if (this.searchType === 'text') {
         return 'BaseInput';
       } if (this.isFieldTypeChips) {
         return 'BaseChipsInputField';
-      } if (this.type === 'date' || this.type === 'daterange') {
+      } if (this.searchType === 'date' || this.searchType === 'daterange') {
         return 'BaseDateInput';
       }
       return null;
@@ -410,15 +410,15 @@ export default {
      */
     inputInt: {
       /**
-       * set either textInputInt or dateInputInt depending on the type
-       * @param {string|{date_to: string, date_from: string}} val - depending on the type
+       * set either textInputInt or dateInputInt depending on the searchType
+       * @param {string|{date_to: string, date_from: string}} val - depending on the searchType
        * this is a date string, text string or an Object for 'daterange' with the following
        * properties:
        * @property {string} val.date_from
        * @property {string} val.date_to
        */
       set(val) {
-        if (this.type === 'date') {
+        if (this.searchType === 'date') {
           this.dateInputInt = val;
           /**
            * inform parent of changed input values (v-model)
@@ -427,7 +427,7 @@ export default {
            * @param {string, Object} - the altered input values
            */
           this.$emit('update:model-value', this.dateInputInt);
-        } else if (this.type === 'daterange') {
+        } else if (this.searchType === 'daterange') {
           this.dateInputInt = { ...val };
           this.$emit('update:model-value', this.dateInputInt);
         } else {
@@ -442,10 +442,10 @@ export default {
       get() {
         // for date or daterange use dateInputInt and use correct type
         // this preserves the date when switching between date and daterange btw
-        if (this.type === 'date') {
+        if (this.searchType === 'date') {
           return this.dateInputInt.date_from || this.dateInputInt;
         }
-        if (this.type === 'daterange') {
+        if (this.searchType === 'daterange') {
           return typeof this.dateInputInt === 'object' ? this.dateInputInt : {
             date_from: this.dateInputInt,
             date_to: '',
@@ -472,18 +472,18 @@ export default {
       },
     },
     /**
-     * to easily access the type needed for BaseDateInput in case type
+     * to easily access the type needed for BaseDateInput in case searchType
      * is 'date' or 'daterange'
      * @returns {string|boolean}
      */
     dateFieldType() {
-      if (this.type === 'date') {
+      if (this.searchType === 'date') {
         return 'single';
       }
-      if (this.type === 'daterange') {
+      if (this.searchType === 'daterange') {
         return 'daterange';
       }
-      // if type is neither 'date' or 'daterange' set the element attribute to null
+      // if searchType is neither 'date' or 'daterange' set the element attribute to null
       // so it does not show up in the rendered HTML
       return null;
     },
@@ -494,29 +494,29 @@ export default {
      */
     languageInt() {
       // adaptions for date input since only 'de', 'en', 'fr' available atm
-      if (this.type === 'date' || this.type === 'daterange') {
+      if (this.searchType === 'date' || this.searchType === 'daterange') {
         return ['de', 'en', 'fr'].includes(this.language) ? this.language : 'en';
       }
       return this.language;
     },
     /**
-     * determine if type is 'chips'
+     * determine if searchType is 'chips'
      * @returns {boolean}
      */
     isFieldTypeChips() {
-      return this.type.includes('chips') || this.type === 'controlled';
+      return this.searchType.includes('chips') || this.searchType === 'controlled';
     },
     placeholderInt() {
       if (typeof this.placeholder === 'string') {
         return this.placeholder;
       }
-      if (this.type.includes('date')) {
+      if (this.searchType.includes('date')) {
         return this.placeholder.date;
       }
-      if (this.type === 'controlled' || this.type === 'chipssingle') {
+      if (this.searchType === 'controlled' || this.searchType === 'chipssingle') {
         return this.placeholder.chips;
       }
-      return this.placeholder[this.type];
+      return this.placeholder[this.searchType];
     },
   },
   watch: {
@@ -529,7 +529,7 @@ export default {
         // if value is empty clear all input (to be able to reset the component completely)
         if (!val) {
           this.textInputInt = '';
-          this.dateInputInt = this.type === 'daterange' ? {
+          this.dateInputInt = this.searchType === 'daterange' ? {
             date_from: '',
             date_to: '',
           } : '';
