@@ -34,7 +34,7 @@ export default {
     /**
      * select date or datetime or a range
      */
-    type: {
+    dateType: {
       type: String,
       default: 'single',
       validator(val) {
@@ -295,14 +295,14 @@ export default {
      * @returns {boolean}
      */
     const isFromTimeField = computed(() => {
-      return props.type === 'timerange';
+      return props.dateType === 'timerange';
     });
     /**
      * determine if the to field is a time field
      * @returns {boolean}
      */
     const isToTimeField = computed(() => {
-      return props.type === 'datetime' || props.type === 'timerange';
+      return props.dateType === 'datetime' || props.type === 'timerange';
     });
     /**
      * check if input is just a single date or an object
@@ -1081,7 +1081,7 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          const isDateTimeField = this.type === 'datetime';
+          const isDateTimeField = this.dateType === 'datetime';
           this.inputFrom = isDateTimeField
             ? val.date : val.date ?? val.date_from ?? val.time ?? val.time_from ?? val ?? '';
           this.inputTo = isDateTimeField ? val.time : val.date_to ?? val.time_to ?? '';
@@ -1607,7 +1607,7 @@ export default {
       return monthDate1 === monthDate2 && yearDate1 === yearDate2;
     },
     isTimeInputField(origin) {
-      return this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
+      return this.dateType === 'timerange' || (this.dateType === 'datetime' && origin.toLowerCase() === 'to');
     },
     /**
      * add delay before value is set
@@ -1773,12 +1773,12 @@ export default {
           </BaseInput>
 
           <span
-            v-if="type === 'daterange' || type === 'timerange'"
+            v-if="dateType === 'daterange' || dateType === 'timerange'"
             class="base-date-input__separator">{{ rangeSeparator }}</span>
 
           <!-- INPUT TO -->
           <BaseInput
-            v-if="type !== 'single'"
+            v-if="dateType !== 'single'"
             v-model="inputTo"
             :input-id="`input-${internalId}-to`"
             :label="label"

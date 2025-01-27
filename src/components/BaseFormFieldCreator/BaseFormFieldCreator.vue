@@ -884,7 +884,7 @@ export default {
           :placeholder="placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
           :format="formFieldXAttrs.date_format || fieldProps.format"
-          :type="dateType.includes('timerange') ? dateType.includes('daterange')
+          :date-type="dateType.includes('timerange') ? dateType.includes('daterange')
             ? 'daterange' : 'single' : dateType"
           :date-format-labels="fieldProps.dateFormatLabels
             || {
@@ -977,7 +977,7 @@ export default {
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
-          type="timerange"
+          date-type="timerange"
           class="base-form-field-creator__date-field"
           @date-validated="emitCompletedInputValues">
           :class="['base-form-field-creator__date-field',

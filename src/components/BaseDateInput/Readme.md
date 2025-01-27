@@ -11,7 +11,7 @@ Date range input fields
         :format="'day'"
         :show-label="true"
         v-model="datepicked"
-        type="daterange"
+        date-type="daterange"
         placeholder="enter a date" />
       <div>{{ datepicked }}</div>
   </div>
@@ -43,7 +43,7 @@ Single date input with format 'date_month_year', enabling switching the format
     :format="'date_month_year'"
     :show-label="true"
     v-model="datepicked"
-    type="single"
+    date-type="single"
     placeholder="enter a year"
     />
 </template>
@@ -73,7 +73,7 @@ Date Time Input
       :format="'day'"
       :show-label="true"
       v-model="datepicked"
-      type="datetime"
+      date-type="datetime"
       placeholder="enter a date"
       />
     <div>{{ datepicked }}</div>
