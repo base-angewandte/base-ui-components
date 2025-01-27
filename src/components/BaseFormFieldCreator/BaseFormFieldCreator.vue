@@ -757,7 +757,7 @@ export default {
         ? dropDownList?.length ? dropDownList : fieldProps.list || [] : null"
       :is-loading="autocompleteLoading"
       :model-value="fieldValueInt"
-      :field-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
+      :input-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
       :invalid="invalid || fieldProps.invalid"
       :required="required || fieldProps.required"
       :error-message="errorMessage || fieldProps.errorMessage"

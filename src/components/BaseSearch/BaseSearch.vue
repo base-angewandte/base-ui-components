@@ -17,6 +17,7 @@
       :input-id="idInt"
       v-bind="$attrs"
       :type="dateFieldType"
+      :input-type="!dateFieldType ? 'search' : null"
       :show-label="false"
       :use-form-field-styling="false"
       :show-input-border="false"
@@ -48,7 +49,6 @@
       :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : null"
       :chips-removable="type !== 'chipssingle'"
       input-class="base-search__input-field"
-      field-type="search"
       enterkeyhint="search"
       class="base-search__input"
       @keydown.enter="onEnter">

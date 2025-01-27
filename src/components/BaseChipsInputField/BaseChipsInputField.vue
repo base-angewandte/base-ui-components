@@ -820,7 +820,7 @@ export default {
       v-model:is-active="isActiveInt"
       :input-id="internalId"
       v-bind="forwardAttrs"
-      :field-type="inputType"
+      :input-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"

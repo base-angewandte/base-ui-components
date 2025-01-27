@@ -91,7 +91,7 @@ export default {
      * @values text, number, password, email, url, search
      *
      */
-    fieldType: {
+    inputType: {
       type: String,
       default: 'text',
       validator: val => ['text', 'number', 'password', 'email', 'url', 'search'].includes(val),
@@ -217,7 +217,7 @@ export default {
       default: null,
     },
     /**
-     * set number of decimals (fieldType=number)<br>
+     * set number of decimals (inputType=number)<br>
      * Note: -1 is used for endless decimals
      */
     decimals: {
@@ -329,7 +329,7 @@ export default {
      * @type {ComputedRef<null|string>}
      */
     const inputMode = computed(() => {
-      if (props.fieldType !== 'number') return null;
+      if (props.inputType !== 'number') return null;
       return props.decimals ? 'decimal' : 'numeric';
     });
     /**
@@ -438,8 +438,8 @@ export default {
     };
   },
   computed: {
-    isFieldTypeNumber() {
-      return this.fieldType === 'number';
+    isInputTypeNumber() {
+      return this.inputType === 'number';
     },
     /**
      * compute actual invalid state considering value provided by parent
@@ -457,15 +457,15 @@ export default {
     modelValue: {
       handler(val) {
         // since internally all values are handled as strings we need to parse input
-        // with fieldType 'number' and also place the correct decimal separator
+        // with inputType 'number' and also place the correct decimal separator
         // since type float comes with '.'
-        let parsedValue = this.isFieldTypeNumber
+        let parsedValue = this.isInputTypeNumber
           ? this.translateFloat(val) : val;
 
         // now check if the value provided by parent is actually different from current
         // internal value
         if (parsedValue !== this.inputInt) {
-          if (this.isFieldTypeNumber) {
+          if (this.isInputTypeNumber) {
             // in case prop `decimals` is set (to not -1) add the appropriate number
             // of decimal places to the number
             // if data is null leave the field empty
@@ -543,14 +543,14 @@ export default {
   methods: {
     /** INPUT EVENT HANDLING */
     /**
-     * if input is fieldType 'number' we only want to allow certain keys
+     * if input is inputType 'number' we only want to allow certain keys
      * (yes disallowed characters will be filtered in input validation again as
      * well but why not stop the entering right here if possible then they don't have to
      * be removed again later)
      * @param event
      */
     onKeydown(event) {
-      if (this.isFieldTypeNumber) {
+      if (this.isInputTypeNumber) {
         const { key, ctrlKey } = event;
         // only allow comma keys if decimals are allowed
         const allowedDecimalKeys = this.decimals !== 0 ? ['\\.', ','] : [];
@@ -589,7 +589,7 @@ export default {
      */
     updateModelValue() {
       let parsedValue = this.inputInt;
-      if (this.isFieldTypeNumber) {
+      if (this.isInputTypeNumber) {
         // since internally value is always handled as string we need to transform
         // it back to a number in case field type is 'number' and also add the correct
         // decimal separator for type number ('.') again
@@ -610,7 +610,7 @@ export default {
      * 1) for special case iOS touch devices have
      *  up and down arrows that do not trigger any event other than blur and will
      *  cause the dropdowns of input fields to remain open
-     * 2) field `fieldType 'number'` handling
+     * 2) field `inputType 'number'` handling
      * @param {FocusEvent} event - the native blur event
      */
     onInputBlur(event) {
@@ -624,8 +624,8 @@ export default {
         // set input active state false
         this.setFieldState(false);
       }
-      // 2) check for fieldType number
-      if (this.isFieldTypeNumber) {
+      // 2) check for inputType number
+      if (this.isInputTypeNumber) {
         // clear value and return if value is NaN
         if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
           this.inputInt = '';
@@ -722,7 +722,7 @@ export default {
       // Handle number inputs with input field type text.
       // Use a regular expression to validate the number format.
       // Invalid entries are restored with the previous valid value.
-      if (this.isFieldTypeNumber) {
+      if (this.isInputTypeNumber) {
         const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
         // if field type is number disallow every character except 0-9, e, +, - and the correct
         // decimal separator
@@ -775,7 +775,7 @@ export default {
         }
       }
 
-      if (this.fieldType !== 'number') {
+      if (this.inputType !== 'number') {
         // handle min length
         if (this.minLength && value && value.length < this.minLength) {
           this.internalValidationMessage = this.validationTexts.minLength.replace('{value}', this.minLength.toString());
@@ -925,7 +925,7 @@ export default {
                   v-bind="forwardAttrs"
                   :value="inputInt"
                   :placeholder="placeholder"
-                  :type="isFieldTypeNumber ? 'text' : fieldType"
+                  :type="isInputTypeNumber ? 'text' : inputType"
                   :list="dropDownListId || null"
                   :disabled="disabled"
                   :aria-disabled="disabled.toString()"
