@@ -4,6 +4,7 @@
   <!-- ref is used in BaseAdvancedSearchRow! -->
   <form
     ref="search"
+    v-bind="rootAttrs"
     action="."
     role="search"
     class="base-search"
@@ -13,10 +14,9 @@
       :is="inputComponent"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
-      v-model:seledted-list="selectedChipsInt"
-      :input-id="idInt"
+      v-model:selected-list="selectedChipsModelValue"
       v-bind="$attrs"
-      :input-type="!dateFieldType ? 'search' : null"
+      :input-id="idInt"
       :date-type="dateFieldType"
       :show-label="false"
       :use-form-field-styling="false"
@@ -24,19 +24,19 @@
       :label="label"
       :placeholder="placeholderInt"
       :linked-list-option="linkedListOption"
-      :drop-down-list-id="dropDownListId || false.toString()"
-      :is-loading="isLoading"
+      :drop-down-list-id="dropDownListId || null"
+      :is-loading="!dateFieldType ? isLoading : null"
       :clearable="clearable"
       :invalid="invalid"
       :show-error-icon="showErrorIcon"
       :language="languageInt"
-      :allow-unknown-entries="type === 'chips'"
-      :loadable="loadable"
-      :chips-editable="type === 'chips'"
+      :allow-unknown-entries="isFieldTypeChips ? type === 'chips' : null"
+      :loadable="!dateFieldType ? loadable : null"
+      :chips-editable="isFieldTypeChips ? type === 'chips' : null"
       :label-property-name="isFieldTypeChips ? labelPropertyName : null"
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
       :set-focus-on-active="setFocusOnActive"
-      :add-selected-entry-directly="true"
+      :add-selected-entry-directly="isFieldTypeChips || null"
       :assistive-text="!type.includes('date') ? {
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
@@ -45,9 +45,10 @@
         optionToRemoveSelected: assistiveText.optionToRemoveSelected,
         optionRemoved: assistiveText.optionRemoved,
       } : null"
-      :is-active-delay="dateFieldDelay"
+      :is-active-delay="type.includes('date') ? dateFieldDelay : null"
       :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : null"
-      :chips-removable="type !== 'chipssingle'"
+      :chips-removable="isFieldTypeChips ? type !== 'chipssingle' : null"
+      :input-type="'search'"
       input-class="base-search__input-field"
       enterkeyhint="search"
       class="base-search__input"
@@ -103,6 +104,7 @@
 import { defineAsyncComponent, computed, ref, watch } from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
  * A basic text search to filter entries or files
@@ -303,14 +305,20 @@ export default {
       default: 0,
     },
   },
-  emits: ['update:modelValue', 'update:selected-chips', 'update:is-active', 'update:assistive-text'],
+  emits: ['update:model-value', 'update:selected-chips', 'update:is-active', 'update:assistive-text'],
   setup(props, { emit }) {
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
     /** INTERNAL ID */
+    // get an internal id in case prop inputId is not set, but do it
+    // before the compute so its only calculated once and stays the same
+    const internalId = useId();
     /**
      * internally used id - eiter provided by props or use internally created one
      * @returns {string}
      */
-    const idInt = computed(() => props.inputId || useId());
+    const idInt = computed(() => props.inputId || internalId);
 
     /** TAB KEY HANDLER */
     /**
@@ -345,6 +353,8 @@ export default {
     });
 
     return {
+      rootAttrs,
+      forwardAttrs,
       idInt,
       search,
       // need to just export the announcement text because setting it in setup function
@@ -394,23 +404,6 @@ export default {
       return null;
     },
     /**
-     * since v-model of BaseInput, BaseDateInput and BaseChipsInput deliver different values
-     *  (one the string input, one the date string or date object and one the selected chips)
-     *  we need to set and get the correct input for v-model here
-     */
-    searchValues: {
-      get() {
-        return this.type === 'chips' ? this.selectedChipsInt : this.inputInt;
-      },
-      set(val) {
-        if (this.type === 'chips') {
-          this.selectedChipsInt = [...val];
-        } else {
-          this.inputInt = val;
-        }
-      },
-    },
-    /**
      * compute the inputInt used for BaseInput v-model
      * this can either be a string or an object - also this is used to
      * convert dates between 'daterange' and 'date'
@@ -430,16 +423,16 @@ export default {
           /**
            * inform parent of changed input values (v-model)
            *
-           * @event update:modelValue
+           * @event update:model-value
            * @param {string, Object} - the altered input values
            */
-          this.$emit('update:modelValue', this.dateInputInt);
+          this.$emit('update:model-value', this.dateInputInt);
         } else if (this.type === 'daterange') {
           this.dateInputInt = { ...val };
-          this.$emit('update:modelValue', this.dateInputInt);
+          this.$emit('update:model-value', this.dateInputInt);
         } else {
           this.textInputInt = val;
-          this.$emit('update:modelValue', this.textInputInt);
+          this.$emit('update:model-value', this.textInputInt);
         }
       },
       /**
@@ -464,6 +457,21 @@ export default {
       },
     },
     /**
+     * in order to only attach the prop when it is a chips input we create a
+     * separate computed property
+     */
+    selectedChipsModelValue: {
+      set(val) {
+        this.selectedChipsInt = val;
+      },
+      get() {
+        if (this.isFieldTypeChips) {
+          return this.selectedChipsInt;
+        }
+        return null;
+      },
+    },
+    /**
      * to easily access the type needed for BaseDateInput in case type
      * is 'date' or 'daterange'
      * @returns {string|boolean}
@@ -475,9 +483,9 @@ export default {
       if (this.type === 'daterange') {
         return 'daterange';
       }
-      // if type is neither 'date' or 'daterange' set the element attribute to false
+      // if type is neither 'date' or 'daterange' set the element attribute to null
       // so it does not show up in the rendered HTML
-      return false;
+      return null;
     },
     /**
      * compute adaptions necessary for BaseDateInput since this component currently
@@ -538,7 +546,7 @@ export default {
      */
     inputInt(val) {
       if (val !== this.modelValue) {
-        this.$emit('update:modelValue', val);
+        this.$emit('update:model-value', val);
       }
     },
     /**
