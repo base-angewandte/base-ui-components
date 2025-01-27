@@ -223,6 +223,15 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * specify input field type for the native HTML <input> element
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
+    },
   },
   emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
   setup(props, { emit, slots }) {
@@ -1731,7 +1740,7 @@ export default {
                       v-bind="forwardAttrs"
                       :placeholder="isFromTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
-                      :type="'text'"
+                      :type="inputType"
                       :aria-describedby="label + '-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
@@ -1817,7 +1826,7 @@ export default {
                       :placeholder="isToTimeField ? placeholder.time ?? placeholder
                         : placeholder.date ?? placeholder"
                       v-bind="forwardAttrs"
-                      :type="'text'"
+                      :type="inputType"
                       :aria-describedby="label + '-to-' + internalId"
                       :aria-required="required.toString()"
                       :aria-invalid="invalid.toString()"
