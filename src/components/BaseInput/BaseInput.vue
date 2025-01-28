@@ -953,6 +953,7 @@ export default {
               :id="`${idInt}-remove-icon`"
               class="base-input__remove-icon-wrapper"
               @keydown.tab="blurInput"
+              @keydown.enter.stop="removeInput"
               @click.stop="removeInput">
               <!-- @slot use a custom icon instead of standard remove icon -->
               <slot name="remove-icon">
