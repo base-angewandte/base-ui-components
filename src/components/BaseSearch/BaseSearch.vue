@@ -1,105 +1,3 @@
-<template>
-  <!-- make this a form so that iOS recognizes it as 'search'
-  (also the action="." is needed for that) -->
-  <!-- ref is used in BaseAdvancedSearchRow! -->
-  <form
-    ref="search"
-    v-bind="rootAttrs"
-    action="."
-    role="search"
-    class="base-search"
-    @submit.prevent
-    @keydown.enter.prevent>
-    <component
-      :is="inputComponent"
-      v-model="inputInt"
-      v-model:is-active="isActiveInt"
-      v-model:selected-list="selectedChipsModelValue"
-      v-bind="$attrs"
-      :input-id="idInt"
-      :date-type="dateFieldType"
-      :show-label="false"
-      :use-form-field-styling="false"
-      :show-input-border="false"
-      :label="label"
-      :placeholder="placeholderInt"
-      :linked-list-option="linkedListOption"
-      :drop-down-list-id="dropDownListId || null"
-      :is-loading="!dateFieldType ? isLoading : null"
-      :clearable="clearable"
-      :invalid="invalid"
-      :show-error-icon="showErrorIcon"
-      :language="languageInt"
-      :allow-unknown-entries="isFieldTypeChips ? searchType === 'chips' : null"
-      :loadable="!dateFieldType ? loadable : null"
-      :chips-editable="isFieldTypeChips ? searchType === 'chips' : null"
-      :label-property-name="isFieldTypeChips ? labelPropertyName : null"
-      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
-      :set-focus-on-active="setFocusOnActive"
-      :add-selected-entry-directly="isFieldTypeChips || null"
-      :assistive-text="!searchType.includes('date') ? {
-        selectedOption: assistiveText.selectedOption,
-        loaderActive: assistiveText.loaderActive,
-        resultsRetrieved: assistiveText.resultsRetrieved,
-        optionAdded: assistiveText.optionAdded,
-        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
-        optionRemoved: assistiveText.optionRemoved,
-      } : null"
-      :is-active-delay="searchType.includes('date') ? dateFieldDelay : null"
-      :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : null"
-      :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : null"
-      :input-type="'search'"
-      input-class="base-search__input-field"
-      enterkeyhint="search"
-      class="base-search__input"
-      @keydown.enter="onEnter">
-      <template #pre-input-field>
-        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
-        <slot name="pre-input-field" />
-      </template>
-      <template #input-field-addition-before>
-        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-inline-before>
-        <div
-          :class="[dateFieldType && showPreInputIcon
-            ? 'base-search__spacing-date' : 'base-search__spacing']" />
-        <!-- @slot a slot to exchange the magnifier icon with other elements -->
-        <slot name="input-field-inline-before">
-          <BaseIcon
-            v-if="showPreInputIcon"
-            name="magnifier"
-            :class="['base-search__magnifier-icon',
-                     { 'base-search__magnifier-icon__date': !!dateFieldType },
-                     { 'base-search__magnifier-icon__active': isActiveInt }]" />
-        </slot>
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-        <div :class="{ 'base-search__spacing': dateFieldType }" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot for adding custom input remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="remove-icon" />
-      </template>
-      <template #below-input>
-        <!-- @slot below-input slot added to e.g. add drop down -->
-        <slot name="below-input" />
-      </template>
-    </component>
-  </form>
-</template>
-
 <script>
 import { defineAsyncComponent, computed, ref, watch } from 'vue';
 import { useId } from '@/composables/useId.js';
@@ -311,8 +209,8 @@ export default {
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
     /** INTERNAL ID */
-    // get an internal id in case prop inputId is not set, but do it
-    // before the compute so its only calculated once and stays the same
+      // get an internal id in case prop inputId is not set, but do it
+      // before the compute so its only calculated once and stays the same
     const internalId = useId();
     /**
      * internally used id - eiter provided by props or use internally created one
@@ -620,6 +518,108 @@ export default {
   },
 };
 </script>
+
+<template>
+  <!-- make this a form so that iOS recognizes it as 'search'
+  (also the action="." is needed for that) -->
+  <!-- ref is used in BaseAdvancedSearchRow! -->
+  <form
+    ref="search"
+    v-bind="rootAttrs"
+    action="."
+    role="search"
+    class="base-search"
+    @submit.prevent
+    @keydown.enter.prevent>
+    <component
+      :is="inputComponent"
+      v-model="inputInt"
+      v-model:is-active="isActiveInt"
+      v-model:selected-list="selectedChipsModelValue"
+      v-bind="$attrs"
+      :input-id="idInt"
+      :date-type="dateFieldType"
+      :show-label="false"
+      :use-form-field-styling="false"
+      :show-input-border="false"
+      :label="label"
+      :placeholder="placeholderInt"
+      :linked-list-option="linkedListOption"
+      :drop-down-list-id="dropDownListId || null"
+      :is-loading="!dateFieldType ? isLoading : null"
+      :clearable="clearable"
+      :invalid="invalid"
+      :show-error-icon="showErrorIcon"
+      :language="languageInt"
+      :allow-unknown-entries="isFieldTypeChips ? searchType === 'chips' : null"
+      :loadable="!dateFieldType ? loadable : null"
+      :chips-editable="isFieldTypeChips ? searchType === 'chips' : null"
+      :label-property-name="isFieldTypeChips ? labelPropertyName : null"
+      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
+      :set-focus-on-active="setFocusOnActive"
+      :add-selected-entry-directly="isFieldTypeChips || null"
+      :assistive-text="!searchType.includes('date') ? {
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.loaderActive,
+        resultsRetrieved: assistiveText.resultsRetrieved,
+        optionAdded: assistiveText.optionAdded,
+        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+        optionRemoved: assistiveText.optionRemoved,
+      } : null"
+      :is-active-delay="searchType.includes('date') ? dateFieldDelay : null"
+      :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : null"
+      :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : null"
+      :input-type="'search'"
+      input-class="base-search__input-field"
+      enterkeyhint="search"
+      class="base-search__input"
+      @keydown.enter="onEnter">
+      <template #pre-input-field>
+        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
+        <slot name="pre-input-field" />
+      </template>
+      <template #input-field-addition-before>
+        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <div
+          :class="[dateFieldType && showPreInputIcon
+            ? 'base-search__spacing-date' : 'base-search__spacing']" />
+        <!-- @slot a slot to exchange the magnifier icon with other elements -->
+        <slot name="input-field-inline-before">
+          <BaseIcon
+            v-if="showPreInputIcon"
+            name="magnifier"
+            :class="['base-search__magnifier-icon',
+                     { 'base-search__magnifier-icon__date': !!dateFieldType },
+                     { 'base-search__magnifier-icon__active': isActiveInt }]" />
+        </slot>
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+        <div :class="{ 'base-search__spacing': dateFieldType }" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot for adding custom input remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="remove-icon" />
+      </template>
+      <template #below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
+        <slot name="below-input" />
+      </template>
+    </component>
+  </form>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
