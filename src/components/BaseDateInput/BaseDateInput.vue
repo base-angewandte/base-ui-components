@@ -1864,7 +1864,6 @@ export default {
     </div>
 
     <div class="base-date-input__below">
-      {{ 'lang: ' + language }}
       <!-- @slot to add elements below input fields e.g. add drop down -->
       <slot name="below-input" />
     </div>
