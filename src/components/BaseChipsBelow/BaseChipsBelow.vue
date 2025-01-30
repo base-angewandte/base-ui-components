@@ -349,6 +349,19 @@ export default {
      */
     const internalId = computed(() => props.inputId || createdId);
 
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * get a reference to the ChipsInput component
+     * @type {Readonly<ShallowRef<HTMLElement| null>>}
+     */
+    const chipsInput = useTemplateRef('chipsInput');
+    /**
+     * from the ChipsInput get access to the native HTML input element (it is chained
+     * through from BaseInput)
+     * @type {ComputedRef<HTMLElement>}
+     */
+    const inputElement = computed(() => chipsInput.value?.inputElement || null);
+
     /** ACCESSIBILITY HANDLING */
     /**
      * set up component reference
@@ -362,6 +375,7 @@ export default {
       rootAttrs,
       forwardAttrs,
       internalId,
+      inputElement,
       chipsBelow,
       announcement,
     };

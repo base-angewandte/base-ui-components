@@ -262,6 +262,30 @@ export default {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * get a reference to the BaseInput component
+     * @type {{ from: Readonly<ShallowRef<null|HTMLElement>>, to: Readonly<ShallowRef<null|HTMLElement>> }}
+     */
+    const baseInput = {
+      from: useTemplateRef('baseInputFrom'),
+      to: useTemplateRef('baseInputTo'),
+    }
+    /**
+     * return the native input element found via BaseInput, in case there are two input fields
+     * this variable will always return the first one ('from' field)
+     * @type {ComputedRef<HTMLElement|null>}
+     */
+    const inputElement = computed(() => baseInput.from.value?.inputElement || null);
+
+    /**
+     * return the native input elements found via BaseInput, this variable returns both `from` and
+     * `to` input field in an array
+     * @type {ComputedRef<HTMLElement[]|null[]>}
+     */
+    const inputElements = computed(() => [baseInput.from.value?.inputElement || null, baseInput.to.value?.inputElement || null]);
+
+
     /** DATE FORMAT */
     /**
      * variable for toggling format between date and year for date_year format
@@ -713,7 +737,7 @@ export default {
      * reference to the native input elements
      * @type {{ inputElementFrom: Readonly<ShallowRef<null|HTMLElement>>, inputElementTo: Readonly<ShallowRef<null|HTMLElement>> }}
      */
-    const inputElements = {
+    const nativeInputElements = {
       inputFromElement: useTemplateRef('inputFromElement'),
       inputToElement: useTemplateRef('inputToElement'),
     };
@@ -826,7 +850,7 @@ export default {
       // for input width etc. we use the 'from' field since it should always be
       // present
       // get the 'from' input element
-      const inputElement = inputElements.inputFromElement.value;
+      const inputElement = nativeInputElements.inputFromElement.value;
       // make sure the element was found and since icon removal is only considered if there
       // is input - check if there is actually input (or if this is the initial
       // state were icons are still hidden per default to avoid a short flash if they dont fit)
@@ -876,7 +900,7 @@ export default {
       // FADE OUT
       // since fade out is determined for each field individually iterate through the relevant fields
       inputFields.forEach((field) => {
-        const inputElement = inputElements[`input${field}Element`].value;
+        const inputElement = nativeInputElements[`input${field}Element`].value;
         // check if element exists
         if (inputElement) {
           // now get the input field value or the placeholder text
@@ -912,6 +936,8 @@ export default {
       lang,
       rootAttrs,
       forwardAttrs,
+      inputElement,
+      inputElements,
       dateFormatInt,
       inputInt,
       isFromTimeField,
@@ -942,8 +968,8 @@ export default {
       labelElement,
       labelAdditions,
       baseIcon,
-      inputFromElement: inputElements.inputFromElement,
-      inputToElement: inputElements.inputToElement,
+      inputFromElement: nativeInputElements.inputFromElement,
+      inputToElement: nativeInputElements.inputToElement,
       wrapLabelRow,
       showIcons,
       useFadeOutFrom: fadeOut.fadeOutFrom,
@@ -1692,6 +1718,7 @@ export default {
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
+            ref="baseInputFrom"
             v-model="inputFrom"
             :input-id="`input-${internalId}-from`"
             :label="label"
@@ -1779,6 +1806,7 @@ export default {
           <!-- INPUT TO -->
           <BaseInput
             v-if="dateType !== 'single'"
+            ref="baseInputTo"
             v-model="inputTo"
             :input-id="`input-${internalId}-to`"
             :label="label"

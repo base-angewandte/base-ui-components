@@ -218,6 +218,30 @@ export default {
      */
     const idInt = computed(() => props.inputId || internalId);
 
+    /** INPUT REF HANDLING */
+    /**
+     * we want to keep the reference to the native input HTML element and have it
+     * accessible for the parent
+     * so we create a reference to the Vue component first - this can be a BaseInput,
+     * BaseChipsInputField or BaseDateInput (all of which have the variable `inputElement`
+     * pointing to the native input element)
+     * @type {Readonly<ShallowRef<unknown | HTMLElement>>}
+     */
+    const inputComponent = useTemplateRef('inputComponent');
+    /**
+     * and then assign the component `input` variable as soon as the component
+     * is available
+     * this variable is used in BaseAdvancedSearch!!
+     * @type {ComputedRef<HTMLElement|null>}
+     */
+    const inputElement = computed(() => inputComponent.value?.inputElement || null);
+    /**
+     * in case of BaseDateInput there could be more than one input element so also expose
+     * all fields to the parent
+     * @type {ComputedRef<HTMLElement|null[]>}
+     */
+    const inputElements = computed(() => inputComponent.value?.inputElements || null);
+
     /** TAB KEY HANDLER */
     /**
      * set up a reference to the element to be able to attach the announcements element
@@ -254,6 +278,8 @@ export default {
       rootAttrs,
       forwardAttrs,
       idInt,
+      inputElement,
+      inputElements,
       search,
       // need to just export the announcement text because setting it in setup function
       // did not work in nuxt (respectively the watcher on assistiveText did not work)
@@ -533,6 +559,7 @@ export default {
     @keydown.enter.prevent>
     <component
       :is="inputComponent"
+      ref="inputComponent"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       v-model:selected-list="selectedChipsModelValue"

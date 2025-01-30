@@ -358,6 +358,19 @@ export default {
      */
     const internalId = computed(() => props.inputId || generatedId);
 
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * get a reference to the BaseInput component
+     * @type {Readonly<ShallowRef<HTMLElement| null>>}
+     */
+    const baseInput = useTemplateRef('baseInput');
+    /**
+     * from the BaseInput get access to the native HTML input element
+     * this variable is accessed in BaseChipsInput (at least)
+     * @type {ComputedRef<HTMLElement>}
+     */
+    const inputElement = computed(() => baseInput.value?.inputElement || null);
+
     /** LIST NAVIGATION */
     const { navigate } = useListNavigation();
 
@@ -380,6 +393,8 @@ export default {
     const { announcement } = useAnnouncer(chipsInputField);
     return {
       internalId,
+      baseInput,
+      inputElement,
       rootAttrs,
       forwardAttrs,
       navigate,

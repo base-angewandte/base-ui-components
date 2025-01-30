@@ -374,16 +374,12 @@ export default {
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
     const chipsInputField = useTemplateRef('chipsInputField');
-
     /**
      * get the HTML input element (in BaseInput)
      * @type {ComputedRef<null|HTMLElement>}
      */
-    const inputElem = computed(() => {
-      if (!chipsInputField.value || !chipsInputField.value.$el) return null;
-      const inputElements = chipsInputField.value.$el.getElementsByTagName('input');
-      return inputElements?.length ? inputElements[0] : null;
-    });
+    const inputElement = computed(() => chipsInputField.value?.inputElement || null);
+
     /**
      * ACCESSIBILITY ANNOUNCEMENT
      */
@@ -406,7 +402,7 @@ export default {
       getLangLabel,
       getI18nTerm,
       chipsInputField,
-      inputElem,
+      inputElement,
     };
   },
   data() {
@@ -555,8 +551,8 @@ export default {
       if (val) {
         this.addSelectedOption(val);
         // if input element was found - focus after chips select
-        if (this.inputElem && this.allowMultipleEntries) {
-          this.inputElem.focus();
+        if (this.inputElement && this.allowMultipleEntries) {
+          this.inputElement.focus();
         }
       }
     },
@@ -741,7 +737,7 @@ export default {
       // remove focus from input if element is single select
       if (!this.allowMultipleEntries) {
         this.chipsInputActive = false;
-        this.inputElem.blur();
+        this.inputElement.blur();
       }
       // make sure drop down is closed at the end of all variable updates
       setTimeout(() => {
@@ -842,8 +838,8 @@ export default {
       // get the base input element
       const inputElement = this.$refs.chipsInputField;
       // see if it exists and has a width - if yes set drop down min width to the same
-      if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
-        this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
+      if (this.chipsInputField && this.chipsInputField.$el && this.chipsInputField.$el.clientWidth) {
+        this.dropDownMinWidth = `${this.chipsInputField.$el.clientWidth}px`;
       }
     },
     /**
@@ -853,8 +849,8 @@ export default {
       // optional close dropdown after selection
       if (this.closeDropdownOnOptionSelect && this.chipsInputActive) {
         this.chipsInputActive = false;
-        if (this.inputElem) {
-          this.inputElem.blur();
+        if (this.inputElement) {
+          this.inputElement.blur();
         }
       }
     },

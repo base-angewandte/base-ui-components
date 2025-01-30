@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, toRef, useTemplateRef } from 'vue';
+import { defineAsyncComponent, toRef, useTemplateRef, computed } from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import { useId } from '@/composables/useId.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
@@ -157,6 +157,18 @@ export default {
     // split up the $attrs to leave class style and data-base-id at root level
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
+    /** INPUT ELEMENT */
+    /**
+     * get the reference to the BaseInput component
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const baseInput = useTemplateRef('baseInput');
+    /**
+     * get the native input element from BaseInput
+     * @type {ComputedRef<HTMLElement>}
+     */
+    const inputElement = computed(() => baseInput.value?.inputElement || null);
+
     /** FADE OUT HANDLING */
     /**
      * variable to store a reference the textarea element
@@ -172,6 +184,7 @@ export default {
       rootAttrs,
       forwardAttrs,
       textarea,
+      inputElement,
       boxFadeOut,
     };
   },
@@ -259,6 +272,7 @@ export default {
 
 <template>
   <BaseInput
+    ref="baseInput"
     v-model="fieldContent[activeTabInt]"
     v-model:is-active="isActive"
     v-bind="rootAttrs"
