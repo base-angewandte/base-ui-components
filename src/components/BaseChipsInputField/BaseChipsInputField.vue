@@ -622,12 +622,10 @@ export default {
        */
       this.$emit('removed', option);
       // lay the focus on the input field
-      const inputElements = this.$refs.baseInput.$el.getElementsByTagName('input');
-      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.internalId);
-      if (mainInputElement) {
+      if (this.inputElement) {
         // trigger an input click here instead of focus so that clicked-outside is triggered for all
         // other input fields (and potential drop downs / pop ups are closed)
-        mainInputElement.click();
+        this.inputElement.click();
       }
       // add a timeout so announcement is not interfered with by default drop down list announcement
       setTimeout(() => {
