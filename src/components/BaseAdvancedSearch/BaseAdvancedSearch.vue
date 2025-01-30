@@ -281,7 +281,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
@@ -757,13 +757,16 @@ export default {
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
   setup() {
     /**
-     * set up a reference to the element to be able to attach the announcements element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
      */
     const searchContainer = ref(null);
     /** INTERNAL ID */
     const internalId = useId();
     /** ACCESSIBILITY ANNOUNCEMENTS */
+    /**
+     * set up a reference to the element to be able to attach the announcements element
+     * @type {Readonly<ShallowRef<null|HTMLElement>>}
+     */
+    const searchContainer = useTemplateRef('searchContainer');
     /**
      * insert an HTML element with aria-live assertive that will announce the
      * search result

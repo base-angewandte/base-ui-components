@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, ref, computed, toRef } from 'vue';
+import { defineAsyncComponent, ref, computed, toRef, useTemplateRef } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
@@ -344,9 +344,9 @@ export default {
     /** FOCUS HANDLING */
     /**
      * reference to the native HTML input element (if slot was not used and it exists)
-     * @type {Ref<UnwrapRef<HTMLElement|null>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const input = ref(null);
+    const input = useTemplateRef('input');
     /**
      * find and store the input element associated with this component in a variable
      * @type {ComputedRef<HTMLElement|null>}
@@ -372,7 +372,7 @@ export default {
 
     /** CLICK OUTSIDE HANDLING */
     // get the ref element for click outside
-    const inputFrame = ref(null);
+    const inputFrame = useTemplateRef('inputFrame');
     const isActiveInt = ref(false);
 
     /**

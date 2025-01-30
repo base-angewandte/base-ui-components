@@ -1,5 +1,5 @@
 <script>
-import { computed, ref, defineAsyncComponent, toRef } from 'vue';
+import { computed, defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import { highlightText } from '@/utils/utils.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useI18n } from '@/composables/useI18n.js';
@@ -371,9 +371,9 @@ export default {
     /** INPUT ELEMENT HANDLING */
     /**
      * the BaseChipsInputField component
-     * @type {Ref<UnwrapRef<null>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInputField = ref(null);
+    const chipsInputField = useTemplateRef('chipsInputField');
 
     /**
      * get the HTML input element (in BaseInput)
@@ -389,9 +389,9 @@ export default {
      */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInput = ref(null);
+    const chipsInput = useTemplateRef('chipsInput');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsInput);

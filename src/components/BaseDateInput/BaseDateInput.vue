@@ -1,5 +1,5 @@
 <script>
-import { computed, defineAsyncComponent, nextTick, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { vOnClickOutside } from '@vueuse/components';
 import { capitalizeString, debounce } from '@/utils/utils.js';
 
@@ -696,32 +696,32 @@ export default {
     /** STYLE AND FADE OUT CALC ON RESIZE */
     /**
      * reference to the root element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseDateInput = ref(null);
+    const baseDateInput = useTemplateRef('baseDateInput');
     /**
      * reference to the label element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const labelElement = ref(null);
+    const labelElement = useTemplateRef('labelElement');
     /**
      * reference to the possible additions to the label row - switch buttons and `label-addition` slot
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const labelAdditions = ref(null);
+    const labelAdditions = useTemplateRef('labelAdditions');
     /**
      * reference to the native input elements
-     * @type {{ inputElementFrom: Ref<UnwrapRef<null|HTMLElement>>, inputElementTo: Ref<UnwrapRef<null|HTMLElement>> }}
+     * @type {{ inputElementFrom: Readonly<ShallowRef<null|HTMLElement>>, inputElementTo: Readonly<ShallowRef<null|HTMLElement>> }}
      */
     const inputElements = {
-      inputFromElement: ref(null),
-      inputToElement: ref(null),
+      inputFromElement: useTemplateRef('inputFromElement'),
+      inputToElement: useTemplateRef('inputToElement'),
     };
     /**
      * reference to the BaseIcon component
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseIcon = ref(null);
+    const baseIcon = useTemplateRef('baseIcon');
     /**
      * store icon width in a variable
      * @type {ComputedRef<number>}

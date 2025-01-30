@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, ref, toRef } from 'vue';
+import { defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import BaseInput from '@/components/BaseInput/BaseInput.vue';
 import { useId } from '@/composables/useId.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
@@ -160,9 +160,9 @@ export default {
     /** FADE OUT HANDLING */
     /**
      * variable to store a reference the textarea element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const textarea = ref(null);
+    const textarea = useTemplateRef('textarea');
     const { boxFadeOut } = useElementFadeOut({
       target: textarea,
     });

@@ -1,5 +1,5 @@
 <script>
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
@@ -352,9 +352,9 @@ export default {
     /** ACCESSIBILITY HANDLING */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsBelow = ref(null);
+    const chipsBelow = useTemplateRef('chipsBelow');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsBelow);

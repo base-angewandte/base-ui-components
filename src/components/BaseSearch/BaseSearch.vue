@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, computed, ref, watch } from 'vue';
+import { defineAsyncComponent, computed, useTemplateRef, watch } from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
@@ -221,9 +221,9 @@ export default {
     /** TAB KEY HANDLER */
     /**
      * set up a reference to the element to be able to attach the announcements element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const search = ref(null);
+    const search = useTemplateRef('search');
     /**
      * insert an HTML element with aria-live assertive that will announce the
      * search result

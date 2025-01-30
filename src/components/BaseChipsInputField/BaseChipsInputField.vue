@@ -1,5 +1,5 @@
 <script>
-import { computed, defineAsyncComponent, ref, toRef } from 'vue';
+import { computed, defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import { sort, createId } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
@@ -372,9 +372,9 @@ export default {
     /** ACCESSIBILITY ANNOUNCEMENTS */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInputField = ref(null);
+    const chipsInputField = useTemplateRef('chipsInputField');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsInputField);

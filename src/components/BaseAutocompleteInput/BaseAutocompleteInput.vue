@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { createId } from '@/utils/utils.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
@@ -481,9 +481,9 @@ function selectOption(selectedOption) {
 /** ACCESSIBILITY ANNOUNCEMENTS */
 /**
  * set up component reference
- * @type {Ref<UnwrapRef<null|HTMLElement>>}
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const autocompleteInput = ref(null);
+const autocompleteInput = useTemplateRef('autocompleteInput');
 // use composable to announce screen reader text on actions taken (e.g.
 // add chip to selected list or remove chip
 const { announcement } = useAnnouncer(autocompleteInput);
