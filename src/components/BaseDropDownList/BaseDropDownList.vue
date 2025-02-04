@@ -185,7 +185,7 @@ const populatedAndLocalizedOptions = computed(() => {
       });
     }
     return prev;
-  }, [])
+  }, []);
 });
 
 /** SELECT OPTION */
@@ -237,6 +237,24 @@ const activeOptionIndex = computed(() => {
     return option[props.identifierPropertyName] === props.activeOption[props.identifierPropertyName];
   });
 });
+/**
+ * the currently active option provided by parent
+ * @returns {number}
+ */
+const activeOptionInt = computed(() => {
+  return populatedAndLocalizedOptions.value[activeOptionIndex.value] || null;
+});
+
+/**
+ * get the template element for the currently active option
+ * @type {ComputedRef<HTMLElement|null>}
+ */
+const activeOptionElement = computed(() => {
+  // this can NOT be done via activeOptionIndex since the Vue docs state that the element reference
+  // array DOES NOT necessarily have the same order!
+  // (https://vuejs.org/guide/essentials/template-refs#refs-inside-v-for)
+  return options.value.find((option) => option?.id === activeOptionInt.value?.id) || null;
+});
 
 watch(activeOptionIndex, (index, previousIndex) => {
   // TODO: needs to consider suboptions!! (ideally test with BaseAdvancedSearch)
@@ -249,25 +267,23 @@ watch(activeOptionIndex, (index, previousIndex) => {
     });
     return;
   }
-  // else determine if the current active element is still visible and scroll
-  // it into view if necessary
-  // get the active option element via ref
-  const activeOptionElement = options.value ? options.value[index] : null;
   // make sure an active option was found
-  if (activeOptionElement) {
+  if (activeOptionElement.value) {
+    // store element offsetTop in a variable since used more than once
+    const elementOffsetTop = activeOptionElement.value.offsetTop;
     // get the necessary container elements and their top and height variables
     // check if current active option is out of view
-    const optionOutOfView = activeOptionElement.offsetTop < scrollContainerElement.value.scrollTop
-      || activeOptionElement.offsetTop + activeOptionElement.clientHeight > scrollContainerHeight.value;
+    const optionOutOfView = elementOffsetTop < scrollContainerElement.value.scrollTop
+      || elementOffsetTop + activeOptionElement.value.clientHeight > scrollContainerHeight.value;
 
     if (optionOutOfView) {
       if (index > previousIndex) {
-        activeOptionElement.scrollIntoView({
+        activeOptionElement.value.scrollIntoView({
           behavior: 'auto',
           block: 'nearest',
         });
       } else if (index < previousIndex) {
-        activeOptionElement.scrollIntoView({
+        activeOptionElement.value.scrollIntoView({
           behavior: 'auto',
         });
       }
