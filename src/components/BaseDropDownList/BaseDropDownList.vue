@@ -1,7 +1,7 @@
 <script setup>
 import { highlightText } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
-import { ref, watch, computed, useSlots, toRef } from 'vue';
+import { watch, computed, useSlots, toRef, useTemplateRef } from 'vue';
 
 /** a multipurpose drop-down list */
 
@@ -153,9 +153,23 @@ const emits = defineEmits(['update:selected-option']);
 const { getLangLabel } = useI18n(toRef(props, 'language'));
 
 /** GENERAL */
-const options = ref(null);
-const dropDownContainer = ref(null);
-const dropDownList = ref(null);
+/**
+ * a reference to the single list options
+ * @type {Readonly<ShallowRef<HTMLElement[] | null>>}
+ */
+const options = useTemplateRef('options');
+/**
+ * a reference to the outermost element container - either this element or
+ * dropDownList could be scroll container
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
+ */
+const dropDownContainer = useTemplateRef('dropDownContainer');
+/**
+ * a reference to the <ul> element - either this element or
+ * dropDownContainer could be scroll container
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
+ */
+const dropDownList = useTemplateRef('dropDownList');
 
 /**
  * filter out options that don't have a value to display
