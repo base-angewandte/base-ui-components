@@ -104,12 +104,12 @@ const props = defineProps({
   },
   /**
    * this adds the possibility of nested options (thus a second list nested within the first one),
-   * if this is set `true` this will have consequences for scroll adjustment of list on keyboard use
-   * and how the active option is determined (the identifier property will be used)
+   * if an active sub-option is added, this will have consequences for scroll adjustment of list
+   * on keyboard use and how the active option is determined (the identifier property will be used)
    */
-  hasSubOptions: {
-    type: Boolean,
-    default: false,
+  activeSubOption: {
+    type: [Object, null],
+    default: () => null,
   },
   /**
    * in case a custom option background should be set to the currently active option
@@ -256,9 +256,42 @@ const activeOptionElement = computed(() => {
   return options.value.find((option) => option?.id === activeOptionInt.value?.id) || null;
 });
 
+/**
+ * watch prop `activeSubOption` to handle list intoView scrolling of the currently
+ * active element
+ */
+watch(() => props.activeSubOption, (val) => {
+  // check if a sub-option is present and active
+  if (val) {
+    // get the relevant HTML element so the position can be determined
+    const subOptionElement = document.getElementById(val.id);
+    // make sure an active sub-option was found
+    if (subOptionElement) {
+      // combine the offsetTop of the active element and the offsetTop of the
+      // sub-option (which is relative to the active element)
+      const totalOffsetTop = activeOptionElement.value.offsetTop + subOptionElement.offsetTop;
+      // check if the sub-option total offsetTop is smaller than the scroll container offsetTop
+      // if yes - trigger scroll into view (up)
+      if (totalOffsetTop < scrollContainerElement.value.scrollTop) {
+        activeOptionElement.value.scrollIntoView({
+          behavior: 'auto',
+          block: 'nearest',
+        });
+        // or check if the bottom of the active sub-option is not in view anymore - then adjust the
+        // scroll as well (down)
+      } else if (totalOffsetTop + subOptionElement.clientHeight > scrollContainerHeight.value + scrollContainerElement.value.scrollTop) {
+        activeOptionElement.value.scrollIntoView({
+          behavior: 'auto',
+        });
+      }
+    }
+  }
+});
+
 watch(activeOptionIndex, (index, previousIndex) => {
-  // TODO: needs to consider suboptions!! (ideally test with BaseAdvancedSearch)
-  // eventually prop `hasSubOptions` can be removed?
+  // if the component has sub-options the scrolling will be handled by the props.activeSubOption
+  // watcher
+  if (props.activeSubOption) return;
   // if active option was removed and drop down is still present scroll back to
   // top
   if (index === -1 && scrollContainerElement.value) {

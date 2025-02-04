@@ -140,7 +140,7 @@
           :active-option="{ [autocompletePropertyNames.id]: activeCollectionId }"
           :list-id="'autocomplete-options-' + internalRowId"
           :active-styled="false"
-          :has-sub-options="true"
+          :active-sub-option="activeEntry"
           :display-as-drop-down="false"
           :use-custom-option-active-background-color="true"
           :language="language"
