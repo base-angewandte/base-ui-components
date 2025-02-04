@@ -56,12 +56,12 @@
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       @clicked-outside="onClickedOutsideSearch"
       @click="onSearchClick"
-      @keydown="handleKeyDownEvent"
+      @keydown.stop="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
       @keydown.enter.capture="selectOptionOnKeyEnter"
       @keydown.esc="isActive = false"
-      @value-validated="handleDateInput">
+      @value-validated="searchType === 'date' ? handleDateInput : null">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
@@ -99,7 +99,7 @@
                        filter.type.includes('date'),
                    }]"
           @click="isActive = true"
-          @keydown="handleKeyDownEvent"
+          @keydown.stop="handleKeyDownEvent"
           @keydown.tab="handleDropDownOnTabKey"
           @keydown.enter="selectFilter(activeFilter)"
           @keydown.up.down="navigateFilters">
