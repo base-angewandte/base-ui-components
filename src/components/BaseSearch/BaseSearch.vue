@@ -527,7 +527,11 @@ export default {
      */
     assistiveText: {
       handler(val) {
-        this.announcement = val.results;
+        // before updating check if value is different from already set value
+        // or that a value was provided for 'results'
+        if (val.results || (Boolean(val.results) !== Boolean(this.announcement))) {
+          this.announcement = val.results;
+        }
       },
       deep: true,
     },
