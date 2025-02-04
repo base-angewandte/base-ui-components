@@ -145,7 +145,7 @@
           :use-custom-option-active-background-color="true"
           :language="language"
           :identifier-property-name="autocompletePropertyNames.id"
-          :label-property-name="autocompletePropertyNames.data"
+          :label-property-name="autocompletePropertyNames.label"
           :list-body-style="{
             'max-height': '400px',
             'overflow-y': 'auto',
