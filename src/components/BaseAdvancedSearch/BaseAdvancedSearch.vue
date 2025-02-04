@@ -768,11 +768,23 @@ export default {
   },
   emits: ['search', 'fetch-autocomplete', 'fetch-form-autocomplete', 'update:applied-filters', 'update:form-filter-values', 'update:advanced-form-open'],
   setup() {
+    /** ADD FILTER ROW */
     /**
+     * set up a reference to the main search field, which we need to be able
+     * to focus the input field after adding a filter row
+     * @type {Readonly<ShallowRef<null|HTMLElement>>}
      */
-    const searchContainer = ref(null);
+    const mainSearch = useTemplateRef('mainSearch');
+
+    /**
+     * get the native HTML input element stored in the `inputElement` variable in BaseSearch
+     * @type {ComputedRef<HTMLElement|null>}
+     */
+    const input = computed(() => mainSearch.value?.baseSearch?.inputElement || null);
+
     /** INTERNAL ID */
     const internalId = useId();
+
     /** ACCESSIBILITY ANNOUNCEMENTS */
     /**
      * set up a reference to the element to be able to attach the announcements element
@@ -786,8 +798,10 @@ export default {
      */
     const { announcement } = useAnnouncer(searchContainer);
     return {
-      searchContainer,
       internalId,
+      mainSearch,
+      input,
+      searchContainer,
       announcement,
     };
   },
@@ -1039,7 +1053,7 @@ export default {
         // check if val is actually different from prop value
         if (JSON.stringify(val) !== JSON.stringify(this.appliedFilters.slice(1))) {
           // if yes - inform parent
-          this.$emit('update:applied-filters', [...val, this.mainFilter]);
+          this.$emit('update:applied-filters', JSON.parse(JSON.stringify([...val, this.mainFilter])));
         }
       },
       deep: true,
@@ -1061,7 +1075,7 @@ export default {
           && JSON.stringify(this.mainFilter) !== JSON.stringify(val[this.mainFilterIndex])) {
           [this.mainFilter] = JSON.parse(JSON.stringify(val.slice(-1)));
         } else if (!val || val < 1) {
-          this.mainFilter = { ...this.defaultFilter };
+          this.mainFilter = JSON.parse(JSON.stringify(this.defaultFilter));
         }
       },
       immediate: true,
@@ -1104,9 +1118,9 @@ export default {
        * @event update:applied-filters
        * @param {Filter[]} - the list of updated applied filters
        */
-      this.$emit('update:applied-filters', [...this.appliedFiltersInt, val]);
+      this.$emit('update:applied-filters', JSON.parse(JSON.stringify([...this.appliedFiltersInt, val])));
       // also emit updated form filter values at this point
-      this.$emit('update:form-filter-values', { ...this.formFilterValuesInt, default: this.mainFilter.filter_values });
+      this.$emit('update:form-filter-values', JSON.parse(JSON.stringify({ ...this.formFilterValuesInt, default: this.mainFilter.filter_values })));
     },
     /**
      * have formFilterValues in sync with parent to be able to set them from outside
@@ -1126,7 +1140,7 @@ export default {
            *  are available under the default property
            *
            */
-          this.$emit('update:form-filter-values', { ...val, default: this.mainFilter.filter_values });
+          this.$emit('update:form-filter-values', JSON.parse(JSON.stringify({ ...val, default: this.mainFilter.filter_values })));
         }
       },
       deep: true,
@@ -1343,7 +1357,6 @@ export default {
       // and reset the main filter
       this.mainFilter = {
         ...this.defaultFilter,
-        filter_values: null,
       };
       // and store the main filter to compare to later
       this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
@@ -1351,14 +1364,11 @@ export default {
       if (triggerSearch) {
         this.search();
       }
-      // now focus new added row search input but wait until it is rendered
-      this.$nextTick(() => {
-        // get the correct field from all input fields of that element
-        const newSearchInputField = Array.from(this.$refs.mainSearch.$el
-          .getElementsByTagName('input'))
-          .find(element => element.id.includes('search-input'));
-        newSearchInputField.focus();
-      });
+      // make sure the main search input element was found
+      if (this.input) {
+        // and if yes focus the 'new' last row
+        this.input.focus();
+      }
     },
     /**
      * remove filter after 'x' was triggered

@@ -800,7 +800,62 @@ export default {
      * the currently selected filter
      * @type {Filter}
      */
-    const filter = ref(null);
+    const filter = ref({
+      ...props.defaultFilter,
+      filter_values: props.defaultFilter.values || setFilterValues(props.defaultFilter),
+    });
+
+    /**
+     * function to set the correct values for filter.filter_values attribute
+     *
+     * @param {Filter} newFilter - the newly selected filter
+     * @param {Filter} previousFilter - the previously set filter
+
+     * @returns {?string|Array|Object} the correct value type for the filter type
+     */
+    function setFilterValues(newFilter, previousFilter = {}) {
+      const previousFilterValues = previousFilter.filter_values;
+      const { type } = newFilter;
+      const freetextAllowed = newFilter.freetext_allowed;
+      if (type === 'date') {
+        // map the date from daterange to date if necessary
+        return previousFilter?.type.includes('date')
+        && previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
+      }
+      if (type === 'daterange') {
+        // check if it can be mapped from date to daterange
+        if (previousFilter.type.includes('date')) {
+          return {
+            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues || '' : '',
+            date_to: previousFilterValues?.to ? previousFilterValues.to : '',
+          };
+        }
+        // else just return empty object
+        return {
+          date_from: '',
+          date_to: '',
+        };
+      }
+      // check if both are autocomplete chips filters
+      if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
+        // check if new filter is a superset filter of the previous filter (=previous
+        // filter id is included in current filter 'subsets' property
+        if (newFilter.subsets?.includes(previousFilter[props.identifierPropertyName.filter])) {
+          return previousFilterValues;
+        }
+        // if both are chips with freetext keep options without id (=not specific entries)
+        return previousFilterValues?.length ? previousFilterValues
+          .filter(value => !value[props.identifierPropertyName.autocompleteOption]) : [];
+      }
+      // check if previous filter was text and new filter is autocomplete chips
+      if (previousFilter.type === 'text' && previousFilterValues?.length
+        && !!previousFilterValues[0] && type === 'chips' && freetextAllowed) {
+        return [{
+          [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
+        }];
+      }
+      return [];
+    }
 
     /** INTERNAL ID */
     const internalId = useId();
@@ -854,7 +909,12 @@ export default {
         // SET CORRECT SLOT FOR SELECTED FILTER DISPLAY
         // get the width of the element
         const searchRowElementWidth = advancedSearchRow.value.clientWidth;
-        filterSlotName.value = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
+        // need to set time out and put this assignment at the end of all observer callback executions
+        // so it is not interfering with the still unfinished observer callback (making changes to DOM
+        // while observer callback is still ongoing, causing a loop)
+        setTimeout(() => {
+          filterSlotName.value = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
+        }, 0);
       }
     }
 
@@ -873,7 +933,7 @@ export default {
     /**
      * store the current filter type to recognize when it changes and only take
      * action e.g. on focusing input field, after it was rendered
-     * @type {string}
+     * @type {Ref<UnwrapRef<string>>}
      */
     const currentFilterType = ref(props.appliedFilter ? props.appliedFilter.type : props.defaultFilter.type);
 
@@ -955,6 +1015,7 @@ export default {
       baseSearch,
       // filter data
       filter,
+      setFilterValues,
       // internal id
       internalRowId,
       // drop down navigation
@@ -1229,24 +1290,10 @@ export default {
            * @event update:applied-filter
            * @property {Filter} val - the new currently applied filter
            */
-          this.$emit('update:applied-filter', { ...val });
+          this.$emit('update:applied-filter', JSON.parse(JSON.stringify(val)));
         }
       },
       deep: true,
-    },
-    defaultFilter: {
-      handler(val) {
-        // check if the props default defaultFilter is still applied
-        if (!this.filter || this.filter.id === 'default') {
-          this.filter = {
-            ...val,
-            // if filter is changed from outside this often means resetting a filter so previous
-            // values should not be taken over (=leave second argument of function empty here)
-            filter_values: this.setFilterValues(val),
-          };
-        }
-      },
-      immediate: true,
     },
     /**
      * watch if applied filter changes from outside
@@ -1257,21 +1304,23 @@ export default {
        */
       handler(val) {
         // check if anything actually changed
-        if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
-          const newFilter = val || this.defaultFilter;
-          this.filter = {
+        if (JSON.stringify(val) !== JSON.stringify(this.filter)
+          && hasData(val.filter_values) !== hasData(this.filter.filter_values)) {
+          let newFilter = JSON.parse(JSON.stringify(val || this.defaultFilter));
+          newFilter = {
             ...newFilter,
             // if filter is changed from outside this often means resetting a filter so previous
             // values should not be taken over (=leave second argument of function empty here)
             filter_values: newFilter.filter_values || this.setFilterValues(newFilter),
           };
+          this.filter = newFilter;
           // check if the new filter has values
-          if (val && val.filter_values) {
+          if (newFilter && newFilter.filter_values) {
             // distinguish between date and others to assign to correct variable
-            if (val.type.includes('date')) {
-              this.currentInput = val.filter_values;
-            } else if (val.type === 'text') {
-              this.currentInput = val.filter_values[0] || '';
+            if (newFilter.type.includes('date')) {
+              this.currentInput = newFilter.filter_values;
+            } else if (newFilter.type === 'text') {
+              this.currentInput = newFilter.filter_values[0] || '';
             } else {
               this.currentInput = '';
             }
@@ -1825,58 +1874,6 @@ export default {
 
     /** OTHERS */
 
-    /**
-     * function to set the correct values for filter.filter_values attribute
-     *
-     * @param {Filter} newFilter - the newly selected filter
-     * @param {Filter} previousFilter - the previously set filter
-
-     * @returns {?string|Array|Object} the correct value type for the filter type
-     */
-    setFilterValues(newFilter, previousFilter = {}) {
-      const previousFilterValues = previousFilter.filter_values;
-      const { type } = newFilter;
-      const freetextAllowed = newFilter.freetext_allowed;
-      if (type === 'date') {
-        // map the date from daterange to date if necessary
-        return previousFilter.type && previousFilter.type.includes('date')
-          && previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
-      }
-      if (type === 'daterange') {
-        // check if it can be mapped from date to daterange
-        if (previousFilter.type.includes('date')) {
-          return {
-            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues || '' : '',
-            date_to: previousFilterValues && previousFilterValues.to ? previousFilterValues.to : '',
-          };
-        }
-        // else just return empty object
-        return {
-          date_from: '',
-          date_to: '',
-        };
-      }
-      // check if both are autocomplete chips filters
-      if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
-        // check if new filter is a superset filter of the previous filter (=previous
-        // filter id is included in current filter 'subsets' property
-        if (newFilter.subsets
-          && newFilter.subsets.includes(previousFilter[this.identifierPropertyName.filter])) {
-          return previousFilterValues;
-        }
-        // if both are chips with freetext keep options without id (=not specific entries)
-        return previousFilterValues && previousFilterValues.length ? previousFilterValues
-          .filter(value => !value[this.identifierPropertyName.autocompleteOption]) : [];
-      }
-      // check if previous filter was text and new filter is autocomplete chips
-      if (previousFilter.type === 'text' && previousFilterValues && previousFilterValues.length
-        && !!previousFilterValues[0] && type === 'chips' && freetextAllowed) {
-        return [{
-          [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
-        }];
-      }
-      return [];
-    },
     /**
      * reset all filter row input and navigational variables
      */
