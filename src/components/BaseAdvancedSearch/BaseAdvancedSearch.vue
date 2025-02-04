@@ -27,6 +27,9 @@
           selectFilterLabel: assistiveText.selectFilterLabel,
           searchLabel: assistiveText.searchLabel,
           selectedOption: assistiveText.selectedOption,
+          optionAdded: assistiveText.optionAdded,
+          optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+          optionRemoved: assistiveText.optionRemoved,
           loaderActive: assistiveText.autocompleteLoaderActive,
           autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
           autocompleteNoResults: assistiveText.autocompleteNoResults,
@@ -623,6 +626,12 @@ export default {
      * **searchLabel**: label (not visible) used for search input field.
      * **selectedOption**: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **optionAdded**: only for mode `list` - text read when an option was added to selected list
+     *    (if BaseSearch type is type `chips`)
+     * **optionToRemoveSelected**: only for mode `list` - text read when a selected option is in
+     *    focus to be removed (if BaseSearch type is type `chips`)
+     * **optionRemoved**: only for mode `list` - text read when an option was removed
+     *    from selected list (if BaseSearch type is type `chips`)
      * **loaderActive**: text that is announced when autocomplete results are being fetched (prop
      *  `isLoading` is set `true`)
      * **autocompleteResultsRetrieved**: text announced when autocomplete results are returned.
@@ -676,6 +685,9 @@ export default {
         selectFilterLabel: 'Select filter',
         searchLabel: 'Search for Entries',
         selectedOption: '',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
         autocompleteLoaderActive: 'loading options.',
         autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
         autocompleteNoResults: 'No results found.',

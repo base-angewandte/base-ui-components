@@ -36,6 +36,9 @@
       :assistive-text="{
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
+        optionAdded: assistiveText.optionAdded,
+        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+        optionRemoved: assistiveText.optionRemoved,
         results: assistiveText.results,
       }"
       :date-field-delay="dateFieldDelay"
@@ -697,6 +700,12 @@ export default {
      * <b>searchLabel</b>: label (not visible) used for search input field<br>
      * <b>selectedOption</b>: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **optionAdded**: only for mode `list` - text read when an option was added to selected list
+     *    (if BaseSearch type is type `chips`)
+     * **optionToRemoveSelected**: only for mode `list` - text read when a selected option is in
+     *    focus to be removed (if BaseSearch type is type `chips`)
+     * **optionRemoved**: only for mode `list` - text read when an option was removed
+     *    from selected list (if BaseSearch type is type `chips`)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
      * **autocompleteResultsRetrieved**: text announced when autocomplete results are returned.
@@ -728,6 +737,9 @@ export default {
         selectFilterLabel: 'Select filter',
         searchLabel: 'Search for Entries',
         selectedOption: '',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
         loaderActive: 'loading.',
         autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
         autocompleteNoResults: 'No results found.',
