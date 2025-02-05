@@ -60,9 +60,9 @@
       @keydown.stop="handleKeyDownEvent"
       @keydown.up.down.right.left="navigateDropDown"
       @keydown.tab="handleDropDownOnTabKey"
-      @keydown.enter.capture="selectOptionOnKeyEnter"
+      @keydown.enter.stop.prevent="selectOptionOnKeyEnter"
       @keydown.esc="isActive = false"
-      @value-validated="searchType === 'date' ? handleDateInput : null">
+      @value-validated="handleDateInput">
       <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
       <template #[filterSlotName]>
         <BaseChipsInputField
@@ -120,8 +120,9 @@
             || filterHasValues || (filter.type === 'text' && currentInput)"
           :class="['base-advanced-search-row__icon-button',
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
-          @keydown.tab="onTab"
           @focusin.stop.prevent
+          @keydown.tab="onTab"
+          @keydown.stop.prevent="removeFilter"
           @click.stop.prevent="removeFilter">
           <BaseIcon
             :title="assistiveText.removeFilter || 'Remove filter'"
@@ -154,6 +155,7 @@
           class="base-advanced-search-row__drop-down-body"
           @touchstart.stop=""
           @click.stop="">
+          <!-- FILTER AREA -->
           <template
             v-if="mode === 'list'"
             #before-list>
@@ -1642,7 +1644,7 @@ export default {
       } else if (this.filter.type === 'text') {
         const newTextArray = [].concat(this.currentInput);
         if (JSON.stringify(this.filter.filter_values) !== JSON.stringify(newTextArray)) {
-          this.filter.filter_values = [].concat(this.currentInput);
+          this.filter.filter_values = newTextArray;
           this.isActive = false;
         } else {
           this.isActive = !this.isActive;
