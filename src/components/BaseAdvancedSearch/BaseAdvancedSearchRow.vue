@@ -52,6 +52,7 @@
           ? activeControlledVocabularyEntry[identifierPropertyName.controlledVocabularyOption]
           // if everything else fails set undefined
           : undefined)"
+      :ignore-click-outside="['.base-advanced-search-row__drop-down-body']"
       :class="['base-advanced-search-row__search',
                { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
       @clicked-outside="onClickedOutsideSearch"
