@@ -118,10 +118,10 @@
       <template #below>
         <BaseForm
           v-if="mode === 'form' && formOpen"
-          :id="`${internalId}-form`"
           v-bind="amendedFormProps"
+          :model-value="formFilterValuesInt"
+          :form-id="`${internalId}-form`"
           :form-field-json="formFilterList"
-          :value-list="formFilterValuesInt"
           :label-property-name="labelPropertyName.formInputs"
           :identifier-property-name="identifierPropertyName.formInputs"
           :class="['base-advanced-search__search-form',
@@ -129,6 +129,7 @@
           @input-complete="updateFormFilters"
           @fetch-autocomplete="fetchFormAutocomplete"
           @form-mounted="formIsMounted"
+          @keydown.stop
           @click.stop>
           <template #label-addition="{ fieldName, groupNames }">
             <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
@@ -248,6 +249,8 @@
               booleanFilterLabel: assistiveText.collapsedBooleanFilterValue,
               optionToRemoveSelected: assistiveText.collapsedOptionToRemoveSelected,
             }"
+            @click.stop
+            @keydown.stop
             @remove-all="removeAllFilters" />
         </div>
       </template>
@@ -1128,7 +1131,7 @@ export default {
     formFilterValuesInt: {
       handler(val) {
         // get filters without default first to ensure comparability
-        const filtersWithoutDefault = { ...this.formFilterValues };
+        const filtersWithoutDefault = JSON.parse(JSON.stringify(this.formFilterValues));
         delete filtersWithoutDefault.default;
         // check if val is actually different from prop value
         if (JSON.stringify(val) !== JSON.stringify(filtersWithoutDefault)) {

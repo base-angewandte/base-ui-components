@@ -109,7 +109,8 @@
     <button
       :title="assistiveText.removeFiltersLabel"
       class="base-collapsed-filter-row__remove"
-      @click="removeFilters">
+      @keydown.stop="removeFilters"
+      @click.stop="removeFilters">
       <BaseIcon
         name="remove"
         class="base-collapsed-filter-row__remove-icon" />
