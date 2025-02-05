@@ -2,6 +2,7 @@
 import { highlightText } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { watch, computed, useSlots, toRef, useTemplateRef } from 'vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /** a multipurpose drop-down list */
 
@@ -351,11 +352,17 @@ function highlight(word) {
 
 /** NO OPTIONS SLOT */
 const slots = useSlots();
+// determine if no-options slot has any template or text content
+// (simply using !!slots['no-options'] does not work anymore in Vue 3 since comments etc
+// are evaluating to true as well
+const { slotHasContent } = useHasSlotContent(slots['no-options']);
 /**
- * determine if no-options slot has data
+ * determine if no options info element should be shown
  * @returns {ComputedRef<boolean>}
  */
-const noOptionsSlotHasData = computed(() => !!slots['no-options']);
+const showNoOptions = computed(() => {
+  return !props.dropDownOptions.length && (slotHasContent.value || props.dropDownNoOptionsInfo);
+});
 </script>
 
 <template>
@@ -419,7 +426,7 @@ const noOptionsSlotHasData = computed(() => !!slots['no-options']);
         </li>
       </template>
       <li
-        v-if="!dropDownOptions.length && (noOptionsSlotHasData || dropDownNoOptionsInfo)"
+        v-if="showNoOptions"
         :class="[
           'base-drop-down-list__option',
           'base-drop-down-list__no-options',
