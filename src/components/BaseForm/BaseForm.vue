@@ -345,6 +345,7 @@ export default {
         }
       },
       deep: true,
+      immediate: true,
     },
     valueListInt: {
       handler(val) {
@@ -363,15 +364,12 @@ export default {
 
       },
       deep: true,
-      immediate: true,
     },
     /**
      * if the form fields definition was changed from outside - reinitialize the internal value list
      */
     formFieldJson: {
       handler() {
-        // if new field specifications were set - also reset the properties of the value object
-        this.valueListInt = {};
         // initialize value object with new properties
         this.initializeValueObject();
       },
@@ -442,9 +440,11 @@ export default {
      * go through all fields relevant for display and assign an appropriate value
      */
     initializeValueObject() {
+      const newValueList = {};
       this.cleanedAndSortedFormFieldList.forEach((field) => {
-        this.valueListInt[field.name] = this.getInitialFieldValue(field);
+        newValueList[field.name] = this.getInitialFieldValue(field);
       });
+      this.valueListInt = newValueList;
     },
     /**
      * function to determine the appropriate value for a field
@@ -458,7 +458,7 @@ export default {
       const xAttrsFieldType = xAttrs?.field_type;
       // valid types in OpenAPI definition are 'number' and 'integer'
       if (['number', 'integer'].includes(type)) {
-        return value || '';
+        return value || null;
       }
       // check special case single-choice chips (is chips but is saved as
       // (multilang) object on backend)
