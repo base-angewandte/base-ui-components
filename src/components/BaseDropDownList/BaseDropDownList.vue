@@ -254,7 +254,9 @@ const activeOptionElement = computed(() => {
   // this can NOT be done via activeOptionIndex since the Vue docs state that the element reference
   // array DOES NOT necessarily have the same order!
   // (https://vuejs.org/guide/essentials/template-refs#refs-inside-v-for)
-  return options.value.find((option) => option?.id === activeOptionInt.value?.id) || null;
+  return options.value
+    .find((option) => option.id === activeOptionInt.value[props.identifierPropertyName])
+    || null;
 });
 
 /**
@@ -266,24 +268,23 @@ watch(() => props.activeSubOption, (val) => {
   if (val) {
     // get the relevant HTML element so the position can be determined
     const subOptionElement = document.getElementById(val.id);
-    // make sure an active sub-option was found
-    if (subOptionElement) {
+    // make sure an active option and sub-option was found
+    if (activeOptionElement.value && subOptionElement) {
       // combine the offsetTop of the active element and the offsetTop of the
       // sub-option (which is relative to the active element)
       const totalOffsetTop = activeOptionElement.value.offsetTop + subOptionElement.offsetTop;
-      // check if the sub-option total offsetTop is smaller than the scroll container offsetTop
+      // check if the sub-option top position is smaller than the scroll container offsetTop or larger
+      // than the top position + container size (= the offsetTop is out of the view window)
       // if yes - trigger scroll into view (up)
-      if (totalOffsetTop < scrollContainerElement.value.scrollTop) {
-        activeOptionElement.value.scrollIntoView({
-          behavior: 'auto',
-          block: 'nearest',
-        });
+      if (totalOffsetTop < scrollContainerElement.value.scrollTop
+        || totalOffsetTop > scrollContainerElement.value.scrollTop + scrollContainerHeight.value) {
+        // scrollIntoView is not working properly here so we set the position manually
+        scrollContainerElement.value.scrollTop = totalOffsetTop;
         // or check if the bottom of the active sub-option is not in view anymore - then adjust the
-        // scroll as well (down)
+        // scroll as well
+        // scrollIntoView is not working properly here so we set the position manually
       } else if (totalOffsetTop + subOptionElement.clientHeight > scrollContainerHeight.value + scrollContainerElement.value.scrollTop) {
-        activeOptionElement.value.scrollIntoView({
-          behavior: 'auto',
-        });
+        scrollContainerElement.value.scrollTop = scrollContainerElement.value.scrollTop + subOptionElement.clientHeight;
       }
     }
   }
