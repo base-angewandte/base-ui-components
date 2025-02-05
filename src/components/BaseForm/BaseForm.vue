@@ -773,7 +773,9 @@ export default {
             :class="[
               'base-form__input-field',
               `base-form__input-field--${rowType}`,
-              { 'base-form__input-field--top-margin': field.type === 'boolean' },
+              // for BaseToogle add a top margin in height of label if it is in a row with other elements
+              { 'base-form__input-field--top-margin': field.type === 'boolean'
+                && (data[index-1] || data[index+1]) },
               { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
             ]"
             @fetch-autocomplete="fetchAutocomplete"
@@ -1210,6 +1212,8 @@ export default {
 
           .base-form__input-component {
             flex: 1 1 auto;
+            /** make input fit the parent container */
+            min-width: 0;
 
             &.base-form__input-component--margin-bottom {
               margin-bottom: $spacing-small;

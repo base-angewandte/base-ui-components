@@ -1401,5 +1401,7 @@ export default {
   .base-form-field-creator__toggle {
     display: flex;
     flex-direction: column;
+    height: $input-field-line-height;
+    justify-content: center;
   }
 </style>
