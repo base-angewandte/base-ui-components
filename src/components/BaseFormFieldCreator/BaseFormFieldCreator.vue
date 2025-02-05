@@ -39,7 +39,7 @@ export default {
      * the field value
      */
     modelValue: {
-      type: [Object, String, Array, Date, Number, Boolean],
+      type: [Object, String, Array, Date, Number, Boolean, null],
       required: true,
     },
     /**
