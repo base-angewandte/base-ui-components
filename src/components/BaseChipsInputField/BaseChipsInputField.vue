@@ -627,12 +627,15 @@ export default {
         // other input fields (and potential drop downs / pop ups are closed)
         this.inputElement.click();
       }
-      // add a timeout so announcement is not interfered with by default drop down list announcement
-      setTimeout(() => {
-        // inform screen reader user
-        this.announcement = this.assistiveText.optionRemoved
-          .replace('{label}', optionLabel);
-      }, 1000);
+      // check if assistive text was set
+      if (this.assistiveText.optionRemoved) {
+        // add a timeout so announcement is not interfered with by default drop down list announcement
+        setTimeout(() => {
+          // inform screen reader user
+          this.announcement = this.assistiveText.optionRemoved
+            .replace('{label}', optionLabel);
+        }, 1000);
+      }
     },
     /**
      * adding an selected option to the array of selected options
