@@ -565,15 +565,14 @@ export default {
         this.fieldLoading = name;
         setTimeout(() => {
           // eslint-disable-next-line camelcase
-          const formAutocompleteResults = this.potentialResults
+          this.formDropDownLists[name] = this.potentialResults
             .find(category => category.filter_id === name).data
             .filter(entry => entry.title.toLowerCase()
               .includes(value.toLowerCase()));
-          this.$set(this.formDropDownLists, name, formAutocompleteResults);
           this.fieldLoading = '';
         }, 1000);
       } else {
-        this.$set(this.formDropDownLists, name, []);
+        this.formDropDownLists[name] = [];
       }
     },
   },
