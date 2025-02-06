@@ -251,6 +251,7 @@ const activeOptionInt = computed(() => {
  * @type {ComputedRef<HTMLElement|null>}
  */
 const activeOptionElement = computed(() => {
+  if (!options.value) return null;
   // this can NOT be done via activeOptionIndex since the Vue docs state that the element reference
   // array DOES NOT necessarily have the same order!
   // (https://vuejs.org/guide/essentials/template-refs#refs-inside-v-for)
