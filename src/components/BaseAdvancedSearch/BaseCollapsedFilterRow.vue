@@ -21,9 +21,7 @@
           'base-collapsed-filter-row__filter-list',
           { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
           { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
-        ]"
-        @mousedown="mouseDownHandler"
-        @touchstart="mouseDownHandler">
+        ]">
         <li
           v-for="(filter, filterIndex) in filtersInt"
           :key="filter.idInternal"
@@ -124,6 +122,7 @@ import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollaps
 import { hasData } from '@/utils/utils.js';
 import { computed, ref, useTemplateRef } from 'vue';
 import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
+import { useEventListener } from '@/composables/useEventListener.js';
 
 /**
  * component for BaseAdvancedSearch 'form' mode to display form filter values efficiently
@@ -277,6 +276,92 @@ export default {
      *  @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
      */
     const isScrolling = ref(false);
+    /**
+     * store the element scroll and mouse cursor position, needed for drag scrolling
+     * @type {Ref<UnwrapRef<Object>>}
+     * @property {number} pos.top - element scrollTop value
+     * @property {number} pos.left - element scrollLeft value
+     * @property {number} pos.x - cursor x position
+     * @property {number} pos.y - cursor y position
+     */
+    const pos = ref({ top: 0, left: 0, x: 0, y: 0 });
+
+    /**
+     * function triggered by mouse down on filter list, triggering scroll functionality
+     * @param {MouseEvent} event - the mouse down event
+     */
+    function mouseDownHandler(event) {
+      // check if filterList is actually scrollable
+      if (filterListScrollable.value) {
+        // save the current element scroll state and mouse position
+        pos.value = {
+          // The current scroll
+          left: scrollContainer.value.scrollLeft,
+          top: scrollContainer.value.scrollTop,
+          // Get the current mouse position
+          x: event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0),
+          y: event.clientY ?? (event.touches ? event.touches[0]?.clientY : 0),
+        };
+        // add event listeners for mousemove and mouseup to be able to trigger scroll
+        // for touch devices add touch event listeners
+        if (event.type === 'touchstart') {
+          document.addEventListener('touchmove', mouseMoveHandler);
+          document.addEventListener('touchend', mouseUpHandler);
+        } else {
+          // else add mouse events
+          document.addEventListener('mousemove', mouseMoveHandler);
+          document.addEventListener('mouseup', mouseUpHandler);
+        }
+        // Change the cursor and prevent user from selecting the text
+        isScrolling.value = true;
+      }
+    }
+
+    /**
+     * function triggered by document mouse move after event listeners were added
+     * in mouse down filter list element event
+     * @param {MouseEvent} e
+     */
+    function mouseMoveHandler(e) {
+      // get event position - touch event does not have clientX/clientY - fallback
+      // to touches position
+      const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
+      const eventYPosition = e.clientY ?? (e.touches ? e.touches[0]?.clientY : 0);
+      // How far the mouse has been moved
+      const dx = eventXPosition - pos.value.x;
+      const dy = eventYPosition - pos.value.y;
+
+      // Scroll the element
+      scrollContainer.value.scrollTop = pos.value.top - dy;
+      scrollContainer.value.scrollLeft = pos.value.left - dx;
+    }
+    /**
+     * function triggered by document mouse up after event listeners were added
+     * in mouse down filter list element event
+     */
+    function mouseUpHandler() {
+      // remove all the event listeners again
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+      document.removeEventListener('touchmove', mouseMoveHandler);
+      document.removeEventListener('touchend', mouseUpHandler);
+
+      // change the styling of the element back to normal
+      isScrolling.value = false;
+    }
+
+    // set event listeners on the scroll container
+    useEventListener({
+      target: scrollContainer,
+      event: 'mousedown',
+      callback: mouseDownHandler,
+    });
+    useEventListener({
+      target: scrollContainer,
+      event: 'touchstart',
+      callback: mouseDownHandler,
+    });
+
     return {
       scrollContainer,
       // fade out
@@ -296,15 +381,6 @@ export default {
        */
       filtersInt: [],
       /**
-      /**
-       * store the element scroll and mouse cursor position, needed for drag scrolling
-       * @type {Object}
-       * @property {number} top - element scrollTop value
-       * @property {number} left - element scrollLeft value
-       * @property {number} x - cursor x position
-       * @property {number} y - cursor y position
-       */
-      pos: { top: 0, left: 0, x: 0, y: 0 },
        * assistive text set when a chip was removed to be read
        * by screenreader
        * @type {string}
@@ -413,73 +489,8 @@ export default {
       setTimeout(() => {
         this.chipRemovedAssistiveText = '';
       }, 300);
-    },
-
-    /** SCROLL RELATED FUNCTIONALITIES */
-    /**
-     * function triggered by mouse down on filter list, triggering scroll functionality
-     * @param {MouseEvent} event - the mouse down event
-     */
-    mouseDownHandler(event) {
-      // check if filterList is actually scrollable
-      if (this.filterListScrollable) {
-        // save the current element scroll state and mouse position
-        this.pos = {
-          // The current scroll
-          left: this.scrollContainer.scrollLeft,
-          top: this.scrollContainer.scrollTop,
-          // Get the current mouse position
-          x: event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0),
-          y: event.clientY ?? (event.touches ? event.touches[0]?.clientY : 0),
-        };
-        // add event listeners for mousemove and mouseup to be able to trigger scroll
-        // for touch devices add touch event listeners
-        if (event.type === 'touchstart') {
-          document.addEventListener('touchmove', this.mouseMoveHandler);
-          document.addEventListener('touchend', this.mouseUpHandler);
-        } else {
-          // else add mouse events
-          document.addEventListener('mousemove', this.mouseMoveHandler);
-          document.addEventListener('mouseup', this.mouseUpHandler);
         }
-        // Change the cursor and prevent user from selecting the text
-        this.isScrolling = true;
-      }
-    },
-    /**
-     * function triggered by document mouse move after event listeners were added
-     * in mouse down filter list element event
-     * @param {MouseEvent} e
-     */
-    mouseMoveHandler(e) {
-      // get event position - touch event does not have clientX/clientY - fallback
-      // to touches position
-      const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
-      const eventYPosition = e.clientY ?? (e.touches ? e.touches[0]?.clientY : 0);
-      // How far the mouse has been moved
-      const dx = eventXPosition - this.pos.x;
-      const dy = eventYPosition - this.pos.y;
-
-      // Scroll the element
-      this.scrollContainer.scrollTop = this.pos.top - dy;
-      this.scrollContainer.scrollLeft = this.pos.left - dx;
-      // check if fade out needs to be shown / has changed
-      this.calcFadeOut();
-    },
-    /**
-     * function triggered by document mouse up after event listeners were added
-     * in mouse down filter list element event
-     */
-    mouseUpHandler() {
-      // remove all the event listeners again
-      document.removeEventListener('mousemove', this.mouseMoveHandler);
-      document.removeEventListener('mouseup', this.mouseUpHandler);
-      document.removeEventListener('touchmove', this.mouseMoveHandler);
-      document.removeEventListener('touchend', this.mouseUpHandler);
-
-      // change the styling of the element back to normal
-      this.isScrolling = false;
-    },
+      });
     },
 
     /** OTHER METHODS */
