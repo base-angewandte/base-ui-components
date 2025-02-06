@@ -74,7 +74,8 @@ export function useElementFadeOut({
     // set filter fade variables
     boxFadeOut.value = {
       // show fade out left as soon as scroll position is different from 0
-      [priorElementName]: scrollPosition !== 0,
+      // chose > 0 since also negative numbers possible on iOS Safari (at least in Browserstack)
+      [priorElementName]: scrollPosition > 0,
       // show fade out right as soon as scroll position is different from maximum position
       // but only if element exceeds available space
       [postElementName]: scrollMax !== 0 && scrollPosition < scrollMax,
