@@ -7,11 +7,11 @@
       :class="['base-collapsed-filter-row__filter-list-container',
                {
                  'base-collapsed-filter-row__filter-list-container__fade-right':
-                   filterFade.right,
+                   boxFadeOut.right,
                },
                {
                  'base-collapsed-filter-row__filter-list-container__fade-left':
-                   filterFade.left,
+                   boxFadeOut.left,
                }]">
       <!-- the actual list of filters -->
       <ul
@@ -122,6 +122,8 @@
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue';
 import { hasData } from '@/utils/utils.js';
+import { computed, ref, useTemplateRef } from 'vue';
+import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
 
 /**
  * component for BaseAdvancedSearch 'form' mode to display form filter values efficiently
@@ -239,6 +241,52 @@ export default {
     },
   },
   emits: ['update:filters', 'remove-all'],
+  setup() {
+    /**
+     * store the scroll drag element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const scrollContainer = useTemplateRef('filterList');
+    /** FADE OUT */
+    /**
+     * @type {Object} boxFadeOut - variable to steer filter mobile display fade outs
+     * also if element is scrollable is determined from this variable (see computed
+     * prop filterListScrollable)
+     * @property {boolean} boxFadeOut.left - left fade out
+     * @property {boolean} boxFadeOut.right - right fade out
+     * @type {function} calcFadeOut - function to recalculate fade out
+     */
+    const { boxFadeOut, calcFadeOut } = useElementFadeOut({
+      target: scrollContainer,
+      direction: 'horizontal',
+    });
+
+    /** DRAG SCROLL */
+    /**
+     * determine from fade out calculations if element is scrollable
+     * @returns {ComputedRef<boolean>}
+     */
+    const filterListScrollable = computed(() => {
+      return boxFadeOut.value.right || boxFadeOut.value.left;
+    });
+
+    /**
+     * set cursor styling according to current scroll state
+     * use variable instead of setting css class directly so child component
+     *  BaseCollapsedFilter item can also be steered easily
+     *  @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isScrolling = ref(false);
+    return {
+      scrollContainer,
+      // fade out
+      boxFadeOut,
+      calcFadeOut,
+      // scrolling
+      isScrolling,
+      filterListScrollable,
+    }
+  },
   data() {
     return {
       /**
@@ -248,17 +296,6 @@ export default {
        */
       filtersInt: [],
       /**
-       * variable to steer filter mobile display fade outs
-       * also if element is scrollable is determined from this variable (see computed
-       * prop filterListScrollable)
-       * @type {Object}
-       * @property {boolean} filterFade.left - left fade out
-       * @property {boolean} filterFade.right - right fade out
-       */
-      filterFade: {
-        left: false,
-        right: true,
-      },
       /**
        * store the element scroll and mouse cursor position, needed for drag scrolling
        * @type {Object}
@@ -268,38 +305,12 @@ export default {
        * @property {number} y - cursor y position
        */
       pos: { top: 0, left: 0, x: 0, y: 0 },
-      /**
-       * store the scroll drag element
-       * @type {?HTMLElement}
-       */
-      scrollContainer: null,
-      /**
-       * set cursor styling according to current scroll state
-       * use variable instead of setting css class directly so child component
-       *  BaseCollapsedFilter item can also be steered easily
-       */
-      isScrolling: false,
-      /**
-       * Resize Observer to trigger fade out calculations
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
-      /**
        * assistive text set when a chip was removed to be read
        * by screenreader
        * @type {string}
        */
       chipRemovedAssistiveText: '',
     };
-  },
-  computed: {
-    /**
-     * determine from fade out calculations if element is scrollable
-     * @returns {boolean}
-     */
-    filterListScrollable() {
-      return this.filterFade.right || this.filterFade.left;
-    },
   },
   watch: {
     /**
@@ -325,20 +336,6 @@ export default {
       },
       deep: true,
     },
-  },
-  mounted() {
-    // check if filter list exists (which it should since element only displayed
-    // if filter values are present)
-    if (this.$refs.filterList) {
-      // store the filter list element (which is the scroll container)
-      this.scrollContainer = this.$refs.filterList;
-    }
-    // add a resize observer for the fade out and scroll functionalities
-    this.initResizeObserver();
-  },
-  beforeUnmount() {
-    // remove resize observer from element
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.filterList);
   },
   methods: {
     /**
@@ -419,16 +416,6 @@ export default {
     },
 
     /** SCROLL RELATED FUNCTIONALITIES */
-
-    /**
-     * set up resize observer for filterList to be able to adjust filter fade out
-     * and scroll functionality
-     */
-    initResizeObserver() {
-      const tempResizeObserver = new ResizeObserver(this.calcFadeOut);
-      tempResizeObserver.observe(this.$refs.filterList);
-      this.resizeObserver = tempResizeObserver;
-    },
     /**
      * function triggered by mouse down on filter list, triggering scroll functionality
      * @param {MouseEvent} event - the mouse down event
@@ -493,22 +480,6 @@ export default {
       // change the styling of the element back to normal
       this.isScrolling = false;
     },
-    /**
-     * function to calculate if filterList fade out should be shown on element left and/or right border
-     */
-    calcFadeOut() {
-      // get current element scroll position
-      const scrollPosition = Math.floor(this.scrollContainer.scrollLeft);
-      // get element max scroll position
-      const scrollMax = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
-      // set filter fade variables
-      this.filterFade = {
-        // show fade out left as soon as scroll position is different from 0
-        left: scrollPosition !== 0,
-        // show fade out right as soon as scroll position is different from maximum position
-        // but only if element exceeds available space
-        right: scrollMax !== 0 && scrollPosition !== scrollMax,
-      };
     },
 
     /** OTHER METHODS */
