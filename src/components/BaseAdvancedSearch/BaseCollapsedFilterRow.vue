@@ -489,6 +489,11 @@ export default {
       setTimeout(() => {
         this.chipRemovedAssistiveText = '';
       }, 300);
+      // on iOS Safari the container remains the previous size so we scroll back to the max
+      // position manually
+      this.$nextTick(() => {
+        if (this.scrollContainer.scrollLeft + this.scrollContainer.clientWidth >= this.scrollContainer.scrollWidth) {
+          this.scrollContainer.scrollLeft = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
         }
       });
     },
@@ -580,7 +585,8 @@ export default {
       height: 100%;
       position: absolute;
       top: 0;
-      right: 0;
+      // need to add 1px because fade out not positioned perfectly else
+      right: -1px;
       background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
       z-index: map.get($zindex, chips-fadeout);
       pointer-events: none;
@@ -591,6 +597,8 @@ export default {
       overflow-x: auto;
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none;  /* Internet Explorer 10+ */
+      // need to add 1px because fade out not positioned perfectly else
+      margin-left: 1px;
 
       &::-webkit-scrollbar { /* WebKit */
         width: 0;
@@ -625,6 +633,7 @@ export default {
 
         .base-collapsed-filter-row__filter-label {
           font-size: $font-size-small;
+          line-height: normal;
           color: $font-color-second;
           white-space: nowrap;
           width: 100%;
