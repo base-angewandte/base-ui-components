@@ -423,8 +423,14 @@ export default {
     /**
      * function triggered when an input field input was completed (e.g. an option selected in chips input or
      *  an enter key triggered in BaseInput or after a date was validated)
+     * @param {string|number|Object|Array} value - the updated value
+     * @param {string} fieldName - the name of the field in question
+     * @param {number} index - if field is repeatable - the index in the valueList array
      */
-    onInputComplete() {
+    onInputComplete(value, fieldName, index = -1) {
+      // update the valueListInt
+      this.setFieldValue(value, fieldName, index);
+
       /**
        * event emitted once an input was completed (e.g. an option selected in chips input or
        *  an enter key triggered in BaseInput or after a date was validated)
@@ -432,6 +438,19 @@ export default {
        *  @property {string, number, Object, Array} - the updated value
        */
       this.$emit('input-complete', this.valueListInt);
+    },
+    /**
+     * triggered if value in form field changed
+     * @param {*} value - the altered field value
+     * @param {string} fieldName - the property name of the altered field
+     * @param {number} index - the field index if field is repeatable
+     */
+    setFieldValue(value, fieldName, index = -1) {
+      if (index >= 0) {
+        this.valueListInt[fieldName][index] = JSON.parse(JSON.stringify(value));
+      } else {
+        this.valueListInt[fieldName] = value ? JSON.parse(JSON.stringify(value)) : value;
+      }
     },
 
     /** FIELD VALUE INITIALIZATION */
@@ -779,7 +798,7 @@ export default {
               { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
             ]"
             @fetch-autocomplete="fetchAutocomplete"
-            @input-complete="onInputComplete">
+            @input-complete="onInputComplete($event, field.name)">
             <template #label-addition="{ fieldName, groupNames }">
               <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
               @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
@@ -896,7 +915,10 @@ export default {
                 :class="['base-form__input-component',
                          { 'base-form__input-component--margin-bottom': !multiplyButtonsInline(field) }]"
                 @fetch-autocomplete="fetchAutocomplete"
-                @input-complete="onInputComplete">
+                @input-complete="onInputComplete(
+                  $event,
+                  field.name,
+                  valueIndex)">
                 <template #label-addition="{ fieldName, groupNames }">
                   <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
                     @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
