@@ -421,7 +421,7 @@
 </template>
 
 <script>
-import { computed, ref, toRef } from 'vue';
+import { computed, ref, toRef, useTemplateRef } from 'vue';
 import { hasData, sort } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useId } from '@/composables/useId.js';
@@ -789,14 +789,14 @@ export default {
     /** GENERAL */
     /**
      * set up a reference to the root element (e.g. for announcer element)
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const advancedSearchRow = ref(null);
+    const advancedSearchRow = useTemplateRef('advancedSearchRow');
     /**
      * reference to the search element, needed for resizing actions
-     * @type {[null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseSearch = ref(null);
+    const baseSearch = useTemplateRef('baseSearch');
 
     /** FILTER DATA */
     /**
@@ -868,6 +868,10 @@ export default {
      */
     const internalRowId = computed(() => props.searchRowId || internalId);
 
+    /** LOCALIZATION */
+    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
+
+
     /** DROP DOWN NAVIGATION */
     const { navigate, isWithinArrayLimit } = useListNavigation();
 
@@ -923,11 +927,11 @@ export default {
 
     /** FOCUS HANDLING */
     /**
-     * the search input element stored in a variable so it can easily be focused again after
-     * option selection
-     * @type {?HTMLElement}
+     * get the native HTML input element which is stored in BaseSearch `inputElement`
+     * variable to enable manual focusing
+     * @type {ComputedRef<HTMLElement|null>}
      */
-    const searchInputElement = ref(null);
+    const searchInputElement = computed(() => baseSearch.value?.inputElement || null);
     /**
      * to control if search field is active (and drop down shown)
      * @type {Ref<UnwrapRef<boolean>>}
@@ -954,25 +958,11 @@ export default {
     });
 
     function filterChangeObserverAction() {
-      getSearchInputElement();
       if (filter.value.type !== currentFilterType.value && isActive.value) {
         if (searchInputElement.value) {
           searchInputElement.value.focus();
           currentFilterType.value = filter.value?.type || props.defaultFilter.type;
         }
-      }
-    }
-    /**
-     * function to get the current search input element
-     */
-    function getSearchInputElement() {
-      // get input elements
-      const inputElements = advancedSearchRow.value.getElementsByTagName('input');
-      // check if input elements were found
-      if (inputElements && inputElements.length) {
-        // if yes - transform HTMLElement list to Array and find the search input element
-        searchInputElement.value = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
-          && inputElem.id.includes(internalRowId.value));
       }
     }
 
@@ -1000,9 +990,6 @@ export default {
         }
       }
     }
-
-    /** LOCALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
 
     /** ACCESSIBILITY */
     /**
@@ -1964,14 +1951,6 @@ export default {
         // set variable false again after
         this.stopSearchClick = false;
       }
-    },
-    initObservers() {
-      const tempObserver = new MutationObserver(this.filterChangeObserverAction);
-      tempObserver.observe(this.$refs.advancedSearchRow, {
-        subtree: true,
-        childList: true,
-      });
-      this.observer = tempObserver;
     },
   },
 };
