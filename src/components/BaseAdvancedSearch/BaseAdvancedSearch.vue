@@ -783,7 +783,7 @@ export default {
      * get the native HTML input element stored in the `inputElement` variable in BaseSearch
      * @type {ComputedRef<HTMLElement|null>}
      */
-    const input = computed(() => mainSearch.value?.baseSearch?.inputElement || null);
+    const inputElement = computed(() => mainSearch.value?.baseSearch?.inputElement || null);
 
     /** INTERNAL ID */
     const internalId = useId();
@@ -803,7 +803,7 @@ export default {
     return {
       internalId,
       mainSearch,
-      input,
+      inputElement,
       searchContainer,
       announcement,
     };
@@ -1368,9 +1368,9 @@ export default {
         this.search();
       }
       // make sure the main search input element was found
-      if (this.input) {
+      if (this.inputElement) {
         // and if yes focus the 'new' last row
-        this.input.focus();
+        this.inputElement.focus();
       }
     },
     /**
