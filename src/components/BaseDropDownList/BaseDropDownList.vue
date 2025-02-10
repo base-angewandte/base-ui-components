@@ -1,7 +1,7 @@
 <script setup>
 import { highlightText } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
-import { watch, computed, useSlots, toRef, useTemplateRef } from 'vue';
+import { computed, useSlots, toRef, useTemplateRef, watch } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /** a multipurpose drop-down list */
@@ -158,19 +158,19 @@ const { getLangLabel } = useI18n(toRef(props, 'language'));
  * a reference to the single list options
  * @type {Readonly<ShallowRef<HTMLElement[] | null>>}
  */
-const options = useTemplateRef('options');
+const options = useTemplateRef('optionsEl');
 /**
  * a reference to the outermost element container - either this element or
  * dropDownList could be scroll container
  * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const dropDownContainer = useTemplateRef('dropDownContainer');
+const dropDownContainer = useTemplateRef('dropDownContainerEl');
 /**
  * a reference to the <ul> element - either this element or
  * dropDownContainer could be scroll container
  * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const dropDownList = useTemplateRef('dropDownList');
+const dropDownList = useTemplateRef('dropDownListEl');
 
 /**
  * filter out options that don't have a value to display
@@ -369,7 +369,7 @@ const showNoOptions = computed(() => {
 
 <template>
   <div
-    ref="dropDownContainer"
+    ref="dropDownContainerEl"
     :class="['base-drop-down-list__container',
              { 'base-drop-down-list__container-drop-down-style': displayAsDropDown }]"
     class="base-drop-down-list__container">
@@ -377,7 +377,7 @@ const showNoOptions = computed(() => {
     <slot name="before-list" />
     <ul
       :id="listId"
-      ref="dropDownList"
+      ref="dropDownListEl"
       :style="listBodyStyle"
       :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : null"
       role="listbox"
@@ -387,7 +387,7 @@ const showNoOptions = computed(() => {
         :key="dropDownOption[identifierPropertyName]">
         <li
           :id="dropDownOption[identifierPropertyName]"
-          ref="options"
+          ref="optionsEl"
           :value="dropDownOption[labelPropertyName]"
           :aria-selected="(selectStyled
             && dropDownOption[identifierPropertyName] === selectedOption[identifierPropertyName])
