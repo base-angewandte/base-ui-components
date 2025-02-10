@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, ref, computed, toRef, useTemplateRef } from 'vue';
+import {defineAsyncComponent, ref, computed, toRef, useTemplateRef, watch, onMounted} from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
@@ -376,11 +376,43 @@ export default {
     const isActiveInt = ref(false);
 
     /**
+     * keep externally set active variable and internal active variable in sync
+     * @param {boolean} val
+     */
+    watch(() => props.isActive, (val) => {
+      if (val !== isActiveInt.value) {
+        setFieldState(val);
+      }
+    }, {
+      immediate: true,
+    });
+    /**
+     * keep externally set active variable and internal active variable in sync
+     * @param {boolean} val
+     */
+    watch(isActiveInt, (val) => {
+      // if active was set true focus the input field
+      if (inputElement.value && val && props.setFocusOnActive
+        // however do not take away the focus from the remove button
+        && document.activeElement?.id !== `${idInt.value}-remove-icon`) {
+        inputElement.value.focus();
+      }
+      /**
+       * propagate active state changes of input field to parent
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      emit('update:is-active', val);
+    });
+
+    /**
      * set the active input field state (used for visual active indication)
      * @param {boolean} val - the value to be set
      */
     function setFieldState(val) {
-      isActiveInt.value = val;
+      if (val !== isActiveInt.value) {
+        isActiveInt.value = val;
+      }
     }
     /**
      * intercept click-outside event and close the component
@@ -402,6 +434,43 @@ export default {
       // here (e.g. drop downs)
       ignore: props.ignoreClickOutside,
     });
+
+    /**
+     * function triggered if click event or focus event happened inside the
+     * 'input-frame' element
+     * @param {FocusEvent|MouseEvent} event the native event
+     */
+    function clickedInside(event) {
+      if (!props.disabled) {
+        setFieldState(true);
+        /**
+         * Event emitted on click on input field <div>
+         *
+         * @event click-input-field
+         * @param {FocusEvent, MouseEvent} - event triggered by focusin or click
+         *
+         */
+        emit('click-input-field', event);
+      }
+    }
+    /**
+     * tab key does not always trigger the leaving of the input field but only if
+     * input remove icon is not present
+     * @param event
+     */
+    function handleInputTab(event) {
+      if (!showRemoveIcon.value || event.shiftKey) {
+        setFieldState(false);
+      }
+    }
+
+    onMounted(() => {
+      // on first render set the focus here manually
+      if (isActiveInt.value && inputElement.value) {
+        inputElement.value.focus();
+      }
+    });
+
     return {
       idInt,
       rootAttrs,
@@ -412,12 +481,15 @@ export default {
       inputMode,
       input,
       inputElement,
-      inputFrame,
-      isActiveInt,
       labelLocalized,
       internalValidationMessage,
       errorMessageInt,
+      // focus handling
+      inputFrame,
+      isActiveInt,
       setFieldState,
+      clickedInside,
+      handleInputTab,
     };
   },
   data() {
@@ -490,36 +562,6 @@ export default {
       immediate: true,
     },
     /**
-     * keep externally set active variable and internal active variable in sync
-     * @param {boolean} val
-     */
-    isActive: {
-      handler(val) {
-        if (val !== this.isActiveInt) {
-          this.isActiveInt = val;
-        }
-      },
-      immediate: true,
-    },
-    /**
-     * keep externally set active variable and internal active variable in sync
-     * @param {boolean} val
-     */
-    isActiveInt(val) {
-      // if active was set true focus the input field
-      if (this.inputElement && val && this.setFocusOnActive
-        // however do not take away the focus from the remove button
-        && document.activeElement?.id !== `${this.idInt}-remove-icon`) {
-        this.inputElement.focus();
-      }
-      /**
-       * propagate active state changes of input field to parent
-       * @event update:is-active
-       * @param {boolean} - is input field active
-       */
-      this.$emit('update:is-active', val);
-    },
-    /**
      * keep externally set invalid variable and internal invalid variable in sync
      * @param {boolean} val
      */
@@ -533,12 +575,6 @@ export default {
         this.$emit('update:invalid', val);
       }
     },
-  },
-  mounted() {
-    // on first render set the focus here manually
-    if (this.isActiveInt && this.inputElement) {
-      this.inputElement.focus();
-    }
   },
   methods: {
     /** INPUT EVENT HANDLING */
@@ -664,24 +700,6 @@ export default {
       }
     },
     /**
-     * function triggered if click event or focus event happened inside the
-     * 'input-frame' element
-     * @param {FocusEvent|MouseEvent} event the native event
-     */
-    clickedInside(event) {
-      if (!this.disabled) {
-        this.setFieldState(true);
-        /**
-         * Event emitted on click on input field <div>
-         *
-         * @event click-input-field
-         * @param {FocusEvent, MouseEvent} - event triggered by focusin or click
-         *
-         */
-        this.$emit('click-input-field', event);
-      }
-    },
-    /**
      * triggered on clear input button click and removes input and returns focus
      * to input field
      */
@@ -693,16 +711,6 @@ export default {
       this.updateModelValue();
       if (this.inputElement) {
         this.inputElement.focus();
-      }
-    },
-    /**
-     * tab key does not always trigger the leaving of the input field but only if
-     * input remove icon is not present
-     * @param event
-     */
-    handleInputTab(event) {
-      if (!this.showRemoveIcon || event.shiftKey) {
-        this.setFieldState(false);
       }
     },
 
@@ -921,7 +929,7 @@ export default {
                 <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                 <input
                   :id="idInt"
-                  ref="input"
+                  ref="inputField"
                   enterkeyhint="done"
                   autocomplete="off"
                   v-bind="forwardAttrs"
