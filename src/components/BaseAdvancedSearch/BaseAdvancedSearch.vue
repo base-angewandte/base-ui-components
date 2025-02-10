@@ -117,7 +117,7 @@
       <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
       <template #below>
         <BaseForm
-          v-if="mode === 'form' && formOpen"
+          v-if="mainSearch && mode === 'form' && formOpen/** check for mainSearch template ref to avoid hydration mismatches */"
           v-bind="amendedFormProps"
           :model-value="formFilterValuesInt"
           :form-id="`${internalId}-form`"
@@ -915,9 +915,11 @@ export default {
     filtersLoadingState() {
       return [
         ...this.appliedFiltersInt
-          .map((filter, index) => (this.autocompleteIndex === index)),
+          // also checking for mainSearch template reference here because if it is not
+          // rendered yet we will get a hydration mismatch in nuxt
+          .map((filter, index) => (this.mainSearch && this.autocompleteIndex === index)),
         // add one at the end for main search field (not added to applied filters array yet)
-        this.autocompleteIndex === this.appliedFiltersInt.length,
+        this.mainSearch && this.autocompleteIndex === this.appliedFiltersInt.length,
       ];
     },
     /**
