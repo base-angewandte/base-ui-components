@@ -835,8 +835,7 @@ export default {
      * width of this element
      */
     calcDropDownMinWidth() {
-      // get the base input element
-      const inputElement = this.$refs.chipsInputField;
+      // TODO: this is probably not working anymore??
       // see if it exists and has a width - if yes set drop down min width to the same
       if (this.chipsInputField && this.chipsInputField.$el && this.chipsInputField.$el.clientWidth) {
         this.dropDownMinWidth = `${this.chipsInputField.$el.clientWidth}px`;
