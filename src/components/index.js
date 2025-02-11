@@ -51,6 +51,7 @@ const BaseHlsVideo = defineAsyncComponent(() => import('@/components/BaseHlsVide
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
 import BaseFormGroups from '@/components/BaseFormGroups/BaseFormGroups.vue';
+import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch.vue';
 
 
 export {
@@ -104,4 +105,5 @@ export {
   BaseForm,
   BaseFormFieldCreator,
   BaseFormGroups,
+  BaseAdvancedSearch,
 };
