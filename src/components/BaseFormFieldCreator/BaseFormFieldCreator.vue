@@ -967,7 +967,7 @@ export default {
           v-if="dateType.includes('timerange')"
           :key="fieldKey + '_time'"
           v-model="fieldValueInt"
-          :input-id="fieldKey"
+          :input-id="fieldKey + '_time'"
           v-bind="fieldPropsInt"
           :label="dateType !== 'timerange' && field.properties.time_from.title
             ? field.properties.time_from.title : labelInt"
