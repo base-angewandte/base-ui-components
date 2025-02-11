@@ -233,7 +233,7 @@
           rendered -->
         <BaseDateInput
           v-if="dateType.includes('timerange')"
-          :id="fieldKey"
+          :id="fieldKey + '_time'"
           :key="fieldKey + '_time'"
           v-model="fieldValueInt"
           v-bind="fieldProps"

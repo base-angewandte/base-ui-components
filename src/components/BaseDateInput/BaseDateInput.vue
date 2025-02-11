@@ -461,6 +461,7 @@ export default {
       /**
        * internal input representation with all possible values for
        * date and time
+       * date format YYYY(-MM(-DD)) (storage format)
        * @typedef {Object} inputInt
        * @property {string} inputInt.date - attribute a single date or datetime date is stored in
        * @property {string} inputInt.date_from - storing daterange from
@@ -618,7 +619,7 @@ export default {
       get() {
         // if it is a time field just return the time_from value
         if (this.isFromTimeField) {
-          return this.inputInt.time_from;
+          return this.inputInt.time_from || '';
         }
         // else it is a date (either single or date_from) --> convert it into the
         // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
@@ -662,7 +663,7 @@ export default {
         // check if a to time field exists
         if (this.isToTimeField) {
           // return the appropriate attribute value
-          return this.inputInt.time || this.inputInt.time_to;
+          return this.inputInt.time || this.inputInt.time_to || '';
         }
         // else return the date_to attribute value
         return this.parseToDateDisplay(this.inputInt.date_to);
@@ -812,6 +813,10 @@ export default {
     },
   },
   watch: {
+    /**
+     * watch if dateInt (in storage format YYYY(MM-(DD)))
+     * changes and inform parent
+     */
     inputInt: {
       handler() {
         /**
@@ -851,10 +856,7 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          const isDateTimeField = this.type === 'datetime';
-          this.inputFrom = isDateTimeField
-            ? val.date : val.date ?? val.date_from ?? val.time ?? val.time_from ?? val ?? '';
-          this.inputTo = isDateTimeField ? val.time : val.date_to ?? val.time_to ?? '';
+          this.inputInt = JSON.parse(JSON.stringify(val));
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
@@ -1336,8 +1338,11 @@ export default {
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
           const tempDate = this.getDateString(this.convertToDate(this.parseToDateStorage(positiveDate)));
+          // now check if date in the format YYYY-(MM-(DD)) is valid
           if (!Number.isNaN(Date.parse(this.parseToDateStorage(tempDate)))) {
-            positiveDate = tempDate;
+            // if it is a valid date after conversion and if yes store it so it can
+            // be assigned back to inputFrom/inputTo
+            positiveDate = this.parseToDateDisplay(tempDate);
           } else {
             positiveDate = '';
           }
