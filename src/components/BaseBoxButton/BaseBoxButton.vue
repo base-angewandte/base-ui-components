@@ -5,36 +5,36 @@
     :box-size="boxSize"
     :box-ratio="boxRatio"
     :disabled="disabled"
-    :class="['base-box-button', { 'base-box-button-disabled': disabled }]"
+    :class="['base-box-button', { 'base-box-button--disabled': disabled }]"
     @clicked="clicked">
     <div
       v-if="boxStyle === 'large'"
-      class="button-box-content">
-      <div class="button-box-center">
+      class="base-box-button__content">
+      <div class="base-box-button__center">
         <div
-          class="button-box-image-row">
-          <div class="button-box-plus-container">
+          class="base-box-button__image-row">
+          <div class="base-box-button__plus-container">
             <BaseIcon
               v-if="showPlus"
               name="plus"
               alt="add"
-              class="button-box-icon button-box-plus" />
+              class="base-box-button__icon base-box-button__plus" />
           </div>
-          <div class="button-box-icon-container">
+          <div class="base-box-button__icon-container">
             <BaseIcon
               v-if="icon"
               :name="icon"
-              class="button-box-icon" />
+              class="base-box-button__icon" />
           </div>
         </div>
-        <div class="button-box-text">
+        <div class="base-box-button__text">
           {{ text }}
         </div>
       </div>
 
       <div
         ref="baseBoxSubtext"
-        :class="['button-box-subtext', { 'base-button-box__subtext-hidden': !showSubtext }]">
+        :class="['base-box-button__subtext', { 'base-button-box__subtext--hidden': !showSubtext }]">
         {{ subtext }}
       </div>
       <BaseBoxTooltip
@@ -43,12 +43,12 @@
     </div>
     <div
       v-else
-      class="button-box-content-small">
+      class="base-box-button__content--small">
       <BaseIcon
         v-if="icon"
         :name="icon"
-        class="button-box-icon button-box-icon-small" />
-      <div class="button-box-text-small">
+        class="base-box-button__icon base-box-button__icon--small" />
+      <div class="base-box-button__text-small">
         {{ text }}
       </div>
     </div>
@@ -221,7 +221,7 @@ export default {
       cursor: pointer;
     }
 
-    &.base-box-button-disabled {
+    &.base-box-button--disabled {
       cursor: default;
       color: $graytext-color;
 
@@ -231,25 +231,25 @@ export default {
       }
     }
 
-    .button-box-content {
+    .base-box-button__content {
       padding: $spacing;
       position: absolute;
       height: 100%;
       width: 100%;
 
-      .button-box-center {
+      .base-box-button__center {
         position: absolute;
         top: 50%;
         transform: translate(0, -50%);
         width: calc(100% - (2 * #{$spacing}));
 
-        .button-box-image-row {
+        .base-box-button__image-row {
           line-height: $icon-max;
           margin-bottom: $spacing;
           height: $icon-max;
           width: $icon-max;
 
-          .button-box-plus-container {
+          .base-box-button__plus-container {
             position: absolute;
             display: flex;
             align-items: center;
@@ -257,35 +257,35 @@ export default {
             width: 100%;
             left: calc(50% - 54px);
 
-            .button-box-plus {
+            .base-box-button__plus {
               height: $icon-large;
               width: $icon-large;
               max-width: $icon-large;
             }
           }
 
-          .button-box-icon-container {
+          .base-box-button__icon-container {
             width: calc(100% - (2 * #{$icon-large}));
             position: absolute;
             left: calc(50% - #{$icon-large});
 
-            .button-box-icon {
+            .base-box-button__icon {
               height: $icon-max;
               width: $icon-max;
               max-width: $icon-max;
             }
           }
         }
-        .button-box-text {
+        .base-box-button__text {
           height: calc(2 * #{$line-height})
         }
       }
 
-      .button-box-text, .button-box-subtext {
+      .base-box-button__text, .base-box-button__subtext {
         text-align: center;
       }
 
-      .button-box-subtext {
+      .base-box-button__subtext {
         margin-top: $spacing-small;
         padding-bottom: $spacing;
         font-size: $font-size-small;
@@ -293,26 +293,26 @@ export default {
         width: calc(100% - (2 * #{$spacing}));
         top: calc(50% + 52px);
 
-        &.base-button-box__subtext-hidden {
+        &.base-button-box__subtext--hidden {
           visibility: hidden;
         }
       }
     }
 
-    .button-box-icon {
+    .base-box-button__icon {
       pointer-events: none;
       touch-action: none;
     }
   }
 
-  .button-box-content-small {
+  .base-box-button__content--small {
     padding: $spacing;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 
-    .button-box-icon-small {
+    .base-box-button__icon--small {
       flex-shrink: 0;
       margin-right: $spacing;
       height: $icon-large;

@@ -6,7 +6,7 @@
     :disabled="disabled"
     :class="[
       'base-drop-box',
-      { 'base-box-button-disabled': disabled },
+      { 'base-box-button--disabled': disabled },
       { 'is-drag-over': isDragOver }]"
     @clicked="onClicked"
     @on-tooltip="onTooltip">
@@ -308,7 +308,7 @@ export default {
       }
     }
 
-    &.base-box-button-disabled {
+    &.base-box-button--disabled {
 
       .base-drop-box-inner {
         border-color: $graytext-color;
