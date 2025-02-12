@@ -1,62 +1,3 @@
-<template>
-  <BaseBox
-    ref="baseBoxEl"
-    :render-element-as="renderElementAs"
-    :box-size="boxSize"
-    :box-ratio="boxRatio"
-    :disabled="disabled"
-    :class="['base-box-button', { 'base-box-button--disabled': disabled }]"
-    @clicked="clicked">
-    <div
-      v-if="boxStyle === 'large'"
-      class="base-box-button__content">
-      <div class="base-box-button__center">
-        <div
-          class="base-box-button__image-row">
-          <div class="base-box-button__plus-container">
-            <BaseIcon
-              v-if="showPlus"
-              name="plus"
-              alt="add"
-              class="base-box-button__icon base-box-button__plus" />
-          </div>
-          <div class="base-box-button__icon-container">
-            <BaseIcon
-              v-if="icon"
-              :name="icon"
-              class="base-box-button__icon" />
-          </div>
-        </div>
-        <div class="base-box-button__text">
-          {{ text }}
-        </div>
-      </div>
-
-      <div
-        ref="baseBoxSubtextEl"
-        :class="['base-box-button__subtext', { 'base-button-box__subtext--hidden': !showSubtext }]">
-        {{ subtext }}
-      </div>
-      <BaseBoxTooltip
-        v-if="showTooltip"
-        @clicked="onTooltip" />
-    </div>
-    <div
-      v-else
-      class="base-box-button__content--small">
-      <BaseIcon
-        v-if="icon"
-        :name="icon"
-        class="base-box-button__icon base-box-button__icon--small" />
-      <div class="base-box-button__text-small">
-        {{ text }}
-      </div>
-    </div>
-    <!-- undocumented slot? TODO: why is this here, whats the purpose? -->
-    <slot />
-  </BaseBox>
-</template>
-
 <script>
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import { ref, defineAsyncComponent, useTemplateRef } from 'vue';
@@ -175,7 +116,7 @@ export default {
     function calcShowSubtext() {
       if (baseBoxSubtext.value && baseBox.value) {
         const subtextBottomPosition = baseBoxSubtext.value.offsetTop
-            + baseBoxSubtext.value.offsetHeight;
+          + baseBoxSubtext.value.offsetHeight;
         const boxHeight = baseBox.value.$el.offsetHeight;
         showSubtext.value = boxHeight >= subtextBottomPosition;
       }
@@ -217,6 +158,65 @@ export default {
   },
 };
 </script>
+
+<template>
+  <BaseBox
+    ref="baseBoxEl"
+    :render-element-as="renderElementAs"
+    :box-size="boxSize"
+    :box-ratio="boxRatio"
+    :disabled="disabled"
+    :class="['base-box-button', { 'base-box-button--disabled': disabled }]"
+    @clicked="clicked">
+    <div
+      v-if="boxStyle === 'large'"
+      class="base-box-button__content">
+      <div class="base-box-button__center">
+        <div
+          class="base-box-button__image-row">
+          <div class="base-box-button__plus-container">
+            <BaseIcon
+              v-if="showPlus"
+              name="plus"
+              alt="add"
+              class="base-box-button__icon base-box-button__plus" />
+          </div>
+          <div class="base-box-button__icon-container">
+            <BaseIcon
+              v-if="icon"
+              :name="icon"
+              class="base-box-button__icon" />
+          </div>
+        </div>
+        <div class="base-box-button__text">
+          {{ text }}
+        </div>
+      </div>
+
+      <div
+        ref="baseBoxSubtextEl"
+        :class="['base-box-button__subtext', { 'base-button-box__subtext--hidden': !showSubtext }]">
+        {{ subtext }}
+      </div>
+      <BaseBoxTooltip
+        v-if="showTooltip"
+        @clicked="onTooltip" />
+    </div>
+    <div
+      v-else
+      class="base-box-button__content--small">
+      <BaseIcon
+        v-if="icon"
+        :name="icon"
+        class="base-box-button__icon base-box-button__icon--small" />
+      <div class="base-box-button__text-small">
+        {{ text }}
+      </div>
+    </div>
+    <!-- undocumented slot? TODO: why is this here, whats the purpose? -->
+    <slot />
+  </BaseBox>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
