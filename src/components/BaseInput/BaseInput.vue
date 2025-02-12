@@ -5,6 +5,7 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Form Input Field Component
@@ -298,13 +299,14 @@ export default {
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
     /** LABEL ROW DISPLAY */
+
+    const { slotHasContent } = useHasSlotContent(slots['label-addition']);
     /**
      * variable to define if label low (with margin) should be displayed or not
      * @type {ComputedRef<boolean>}
      */
     const showLabelRow = computed(() => {
-      const slotElements = slots['label-addition'] ? slots['label-addition']() : [];
-      return props.showLabel || !!slotElements.length;
+      return props.showLabel || slotHasContent.value;
     });
 
     /** INPUT HANDLING */
@@ -387,6 +389,10 @@ export default {
        *
        */
       emit('clicked-outside', event);
+    }, {
+      // do not capture the event so other elements have the chance to intercept the
+      // event
+      capture: false,
     });
     return {
       idInt,
@@ -493,7 +499,9 @@ export default {
      */
     isActiveInt(val) {
       // if active was set true focus the input field
-      if (this.inputElement && val && this.setFocusOnActive) {
+      if (this.inputElement && val && this.setFocusOnActive
+        // however do not take away the focus from the remove button
+        && document.activeElement?.id !== `${this.idInt}-remove-icon`) {
         this.inputElement.focus();
       }
       /**
@@ -934,6 +942,7 @@ export default {
             <!-- wrapped in a button for accessibility -->
             <button
               v-if="showRemoveIcon"
+              :id="`${idInt}-remove-icon`"
               class="base-input__remove-icon-wrapper"
               @keydown.tab="blurInput"
               @click.stop="removeInput">
