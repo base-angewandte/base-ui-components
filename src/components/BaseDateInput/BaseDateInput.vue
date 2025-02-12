@@ -1113,7 +1113,16 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          this.inputInt = JSON.parse(JSON.stringify(val));
+          if (typeof this.input === 'string') {
+            this.inputInt.date = val;
+          } else {
+            this.inputInt = {
+              // keep all inputInt props
+              ...this.inputInt,
+              // and add the ones set by parent
+              ...JSON.parse(JSON.stringify(val)),
+            };
+          }
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
