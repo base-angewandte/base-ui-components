@@ -1,6 +1,6 @@
 <template>
   <BaseBox
-    ref="baseBox"
+    ref="baseBoxEl"
     :render-element-as="renderElementAs"
     :box-size="boxSize"
     :box-ratio="boxRatio"
@@ -33,7 +33,7 @@
       </div>
 
       <div
-        ref="baseBoxSubtext"
+        ref="baseBoxSubtextEl"
         :class="['base-box-button__subtext', { 'base-button-box__subtext--hidden': !showSubtext }]">
         {{ subtext }}
       </div>
@@ -59,7 +59,7 @@
 
 <script>
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
-import { ref, defineAsyncComponent } from 'vue';
+import { ref, defineAsyncComponent, useTemplateRef } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
@@ -155,9 +155,21 @@ export default {
   },
   emits: ['clicked', 'on-tooltip'],
   setup() {
-    const baseBox = ref(null);
-    const baseBoxSubtext = ref(null);
-    // to hide subtext if box is to small
+    /** SUBTEXT DISPLAY FUNCTIONALITY */
+    /**
+     * template reference to the box to determine box size
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const baseBox = useTemplateRef('baseBoxEl');
+    /**
+     * template reference to the subtext to determine subtext position
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const baseBoxSubtext = useTemplateRef('baseBoxSubtextEl');
+    /**
+     * variable to store subtext visiblity, to hide subtext if box is too small
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
     const showSubtext = ref(false);
 
     function calcShowSubtext() {
