@@ -50,9 +50,6 @@ export default {
   .base-tooltip-box {
     @media screen and (min-width: 641px) {
       max-width: 400px;
-      /* needs to be at least the same as the styleguide sidebar element (z-index: 1001)
-         and lower than the styleguide navbar element (z-index: 1002) */
-      z-index: 1001 !important;
     }
   }
 </style>
@@ -358,9 +355,6 @@ export default {
     .base-tooltip-box {
       width: 300px;
       height: 195px;
-      /* needs to be at least the same as the styleguide sidebar element (z-index: 1001)
-         and lower than the styleguide navbar element (z-index: 1002) */
-      z-index: 1001 !important;
     }
   }
 </style>
