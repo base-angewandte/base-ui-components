@@ -21,7 +21,7 @@ export default {
      */
     renderElementAs: {
       type: String,
-      default: 'div',
+      default: 'button',
     },
     /**
      * Define type of button box style: 'large' | 'small'
@@ -228,8 +228,10 @@ export default {
     align-items: center;
 
     &:focus,
+    &:active,
     &:hover:not([disabled]) {
       color: $app-color;
+      fill: $app-color;
       cursor: pointer;
     }
 
