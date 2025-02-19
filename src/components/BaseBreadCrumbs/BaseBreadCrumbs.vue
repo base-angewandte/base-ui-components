@@ -1,49 +1,10 @@
-<template>
-  <div
-    class="base-bread-crumbs">
-    <template
-      v-for="({ route, label, showLabel, icon }, index) in routes"
-      :key="route">
-      <BaseLink
-        external-link-target="_self"
-        :identifier-property-value="route"
-        :value="label"
-        :render-link-as="renderLinkAs"
-        :additional-attributes="{ ariaCurrentValue: 'page' }"
-        :class="['base-bread-crumbs__link', { 'base-bread-crumbs__link--icon-only': showLabel === false }]">
-        <template
-          #label>
-          <span class="base-bread-crumbs__label">
-            <BaseIcon
-              v-if="icon"
-              :key="label"
-              :name="icon"
-              :title="showLabel === false ? label : undefined"
-              :class="['base-bread-crumbs__icon',
-                       { 'base-bread-crumbs__icon--with-label': showLabel !== false }]" />
-            <span
-              v-if="showLabel !== false"
-              class="base-bread-crumbs__label-text">
-              {{ label }}
-            </span>
-          </span>
-        </template>
-      </BaseLink>
-      <BaseIcon
-        v-if="index < routes.length - 1"
-        :key="`${route}-separator`"
-        name="next"
-        class="base-bread-crumbs__separator" />
-    </template>
-  </div>
-</template>
-
 <script>
+import { defineAsyncComponent } from 'vue';
+import BaseLink from '@/components/BaseLink/BaseLink.vue';
+
 /**
  * component to display breadcrumb-style navigation
  */
-import { defineAsyncComponent } from 'vue';
-import BaseLink from '@/components/BaseLink/BaseLink.vue';
 
 export default {
   name: 'BaseBreadCrumbs',
@@ -83,6 +44,46 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    class="base-bread-crumbs">
+    <template
+      v-for="({ route, label, showLabel, icon }, index) in routes"
+      :key="route">
+      <BaseLink
+        external-link-target="_self"
+        :identifier-property-value="route"
+        :value="label"
+        :render-link-as="renderLinkAs"
+        :additional-attributes="{ ariaCurrentValue: 'page' }"
+        :class="['base-bread-crumbs__link', { 'base-bread-crumbs__link--icon-only': showLabel === false }]">
+        <template
+          #label>
+          <span class="base-bread-crumbs__label">
+            <BaseIcon
+              v-if="icon"
+              :key="label"
+              :name="icon"
+              :title="showLabel === false ? label : undefined"
+              :class="['base-bread-crumbs__icon',
+                       { 'base-bread-crumbs__icon--with-label': showLabel !== false }]" />
+            <span
+              v-if="showLabel !== false"
+              class="base-bread-crumbs__label-text">
+              {{ label }}
+            </span>
+          </span>
+        </template>
+      </BaseLink>
+      <BaseIcon
+        v-if="index < routes.length - 1"
+        :key="`${route}-separator`"
+        name="next"
+        class="base-bread-crumbs__separator" />
+    </template>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
