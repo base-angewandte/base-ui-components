@@ -366,6 +366,8 @@ export default {
       border: 1px solid $font-color-second;
       padding: 0;
       width: 24px;
+      // to prevent shrinking e.g. if parent is flex container
+      min-width: 24px;
       height: 24px;
 
       &:hover {
