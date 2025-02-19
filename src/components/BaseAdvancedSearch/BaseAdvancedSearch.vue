@@ -106,7 +106,7 @@
           icon-size="small"
           icon-position="right"
           :class="['base-advanced-search__expand-button',
-                   { 'base-button-icon-rotate-180': formOpen }]"
+                   { 'base-button--rotate-icon-180': formOpen }]"
           @click.prevent.stop="openAdvancedSearch"
           @keydown.enter.space.prevent.stop="openAdvancedSearch"
           @focusin.stop />

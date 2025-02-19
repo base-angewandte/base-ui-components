@@ -80,7 +80,7 @@
       icon="drop-down"
       icon-position="right"
       :text="showAll ? showLessText : showMoreText"
-      :class="{ 'base-button-icon-rotate-180': showAll }"
+      :class="{ 'base-button--rotate-icon-180': showAll }"
       @clicked="showAll = !showAll" />
   </div>
 </template>

@@ -234,7 +234,7 @@ export default {
       icon-position="right"
       :class="[
         'base-expand-box-button',
-        { 'base-button-icon-rotate-180': expandInt }]"
+        { 'base-button--rotate-icon-180': expandInt }]"
       @clicked="toggle" />
 
     <div

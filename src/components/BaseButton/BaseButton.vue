@@ -191,21 +191,21 @@ export default {
     :aria-describedby="description ? `${internalId}-description` : null"
     :type="buttonType"
     :class="['base-button',
-             `base-button-${buttonStyle}`,
-             `base-button-icon-${iconPosition}`,
-             `base-button-align-${alignText}`,
-             { 'base-button-background': hasBackgroundColor },
-             { 'base-button-active': active }]"
+             `base-button--${buttonStyle}`,
+             `base-button--icon-${iconPosition}`,
+             `base-button--align-${alignText}`,
+             { 'base-button--background': hasBackgroundColor },
+             { 'base-button--active': active }]"
     @click.prevent="clicked">
     <BaseIcon
       v-if="icon"
       :name="icon"
       :title="iconTitle"
-      :class="['base-button-icon',
-               'base-button-icon-' + iconSize,
-               { 'base-button-icon-colored': iconColored },
-               { 'base-button-icon-hide': hideIcon },
-               { 'base-button-icon-margin': buttonHasTextElement }]" />
+      :class="['base-button__icon',
+               'base-button__icon--' + iconSize,
+               { 'base-button__icon--colored': iconColored },
+               { 'base-button__icon--hide': hideIcon },
+               { 'base-button__icon--margin': buttonHasTextElement }]" />
 
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
@@ -218,7 +218,7 @@ export default {
       <span
         v-if="text && buttonStyle !== 'circle'"
         :id="internalId"
-        :class="['base-button-text', { 'base-button-text__nowrap': !buttonTextWrap }]">
+        :class="['base-button__text', { 'base-button__text--nowrap': !buttonTextWrap }]">
         {{ text }}
       </span>
     </slot>
@@ -255,15 +255,15 @@ export default {
     justify-content: center;
     color: inherit;
 
-    .base-button-text {
+    .base-button__text {
       text-align: center;
 
-      &.base-button-text__nowrap {
+      &.base-button__text--nowrap {
         white-space: nowrap;
       }
     }
 
-    .base-button-icon {
+    .base-button__icon {
       height: $icon-small;
       width: $icon-small;
       max-width: $icon-small;
@@ -271,7 +271,7 @@ export default {
       // added for drop icon animation
       transition: transform 0.5s ease;
 
-      &.base-button-icon-colored {
+      &.base-button__icon--colored {
         color: $app-color;
       }
     }
@@ -279,26 +279,26 @@ export default {
     /**
      * button-style: row
      */
-    &.base-button-row {
+    &.base-button--row {
       min-height: $row-height-large;
 
-      &.base-button-background {
+      &.base-button--background {
         background-color: white;
       }
 
-      .base-button-icon-large {
+      .base-button__icon--large {
         height: $icon-large;
         width: $icon-large;
         max-width: $icon-large;
       }
 
-      .base-button-icon-small {
+      .base-button__icon--small {
         height: $icon-medium;
         width: $icon-medium;
         max-width: $icon-medium;
       }
 
-      &.base-button-active {
+      &.base-button--active {
         /* TODO: adjust this to style guide if necessary */
         box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
         z-index: map.get($zindex, button-active);
@@ -308,26 +308,26 @@ export default {
     /**
      * button-style: single
      */
-    &.base-button-single {
+    &.base-button--single {
       min-height: $row-height-small;
 
-      &.base-button-background {
+      &.base-button--background {
         background-color: $button-header-color;
       }
 
-      .base-button-icon-large {
+      .base-button__icon--large {
         height: $icon-medium;
         width: $icon-medium;
         max-width: $icon-medium;
       }
 
-      .base-button-icon-small {
+      .base-button__icon--small {
         height: $icon-small;
         width: $icon-small;
         max-width: $icon-small;
       }
 
-      &.base-button-active .base-button-icon {
+      &.base-button--active .base-button__icon {
         color: $app-color;
       }
     }
@@ -335,31 +335,31 @@ export default {
     /**
      * button-style: secondary
      */
-    &.base-button-secondary {
+    &.base-button--secondary {
       font-size: $font-size-small;
       color: $font-color-second;
 
-      &.base-button-background {
+      &.base-button--background {
         background-color: $button-header-color;
       }
 
       &:disabled {
         color: $font-color-third;
 
-        &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
+        &:hover, &:focus, &:active, &:active .base-button__icon, &:focus .base-button__icon {
           color: $font-color-third;
         }
       }
     }
 
-    .base-button-icon-hide {
+    .base-button__icon--hide {
       visibility: hidden;
     }
 
     /**
      * button-style: circle
      */
-    &.base-button-circle {
+    &.base-button--circle {
       background-color: #ffffff;
       border-radius: 50%;
       color: $font-color-second;
@@ -381,49 +381,49 @@ export default {
     /**
      * modifiers
      */
-    &.base-button-active {
+    &.base-button--active {
       /* TODO: adjust this to style guide if necessary */
       box-shadow: $box-shadow-reg, inset 0 (-$border-active-width) 0 0 $app-color;
       z-index: map.get($zindex, button-active);
     }
 
-    &.base-button-align-left:not(&.base-button-icon-top) {
+    &.base-button--align-left:not(&.base-button__icon--top) {
       justify-content: flex-start;
     }
 
-    &.base-button-align-center {
+    &.base-button--align-center {
       justify-content: center;
     }
 
-    &.base-button-align-right:not(&.base-button-icon-top)  {
+    &.base-button--align-right:not(&.base-button__icon--top)  {
       justify-content: flex-end;
     }
 
-    &.base-button-icon-top {
+    &.base-button__icon--top {
       flex-direction: column;
       justify-content: center;
       line-height: $line-height;
     }
 
-    &.base-button-icon-left {
-      .base-button-icon-margin {
+    &.base-button--icon-left {
+      .base-button__icon--margin {
         margin-right: $spacing;
       }
     }
 
-    &.base-button-icon-right {
-      .base-button-icon {
+    &.base-button--icon-right {
+      .base-button__icon {
         order: 1;
 
-        &.base-button-icon-margin {
+        &.base-button__icon--margin {
           margin-left: $spacing;
         }
       }
     }
 
     /* class is set in following components: baseExpandBox and BaseAdvancedSearch */
-    &.base-button-icon-rotate-180 {
-      .base-button-icon {
+    &.base-button--rotate-icon-180 {
+      .base-button__icon {
         transform: rotate(180deg);
       }
     }
@@ -432,7 +432,7 @@ export default {
       color: $app-color;
     }
 
-    &:active .base-button-icon, &:focus .base-button-icon {
+    &:active .base-button__icon, &:focus .base-button__icon {
       color: $app-color;
     }
 
@@ -440,7 +440,7 @@ export default {
       cursor: default;
       color: $graytext-color;
 
-      &:hover, &:focus, &:active, &:active .base-button-icon, &:focus .base-button-icon {
+      &:hover, &:focus, &:active, &:active .base-button__icon, &:focus .base-button__icon {
         color: $graytext-color;
       }
     }
