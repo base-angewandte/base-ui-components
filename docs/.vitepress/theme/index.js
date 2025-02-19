@@ -1,10 +1,11 @@
-import DefaultTheme from 'vitepress/theme-without-fonts';
+import 'normalize.css';
+import BaseTheme from './base/base-theme.js';
 import VueLiveWithLayout from './components/vue-live-with-layout';
 const modules = import.meta.glob(['../../../src/**/*.vue'], { eager: true });
 import '../styles/app.scss';
 
 export default {
-  ...DefaultTheme,
+  ...BaseTheme,
   enhanceApp({ app }) {
     app.component('VueLive', VueLiveWithLayout);
     /**
