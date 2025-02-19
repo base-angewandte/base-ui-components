@@ -200,7 +200,8 @@ export default {
       </div>
       <BaseBoxTooltip
         v-if="showTooltip"
-        @clicked="onTooltip" />
+        @click.capture="onTooltip"
+        @keydown.enter.capture="onTooltip" />
     </div>
     <div
       v-else
