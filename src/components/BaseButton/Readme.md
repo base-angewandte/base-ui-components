@@ -72,12 +72,11 @@ const executeFire = function(){
   <BaseButton
     style="margin-right: 16px;"
     description="Custom Text"
-    text="Custom Text"
     icon="file-object"
     button-style="row"
     icon-size="large"
     @clicked="executeFire">
-    <template>Custom Text</template>
+    <template #text>Custom Text</template>
   </BaseButton>
   <BaseButton
     style="margin-right: 16px;"

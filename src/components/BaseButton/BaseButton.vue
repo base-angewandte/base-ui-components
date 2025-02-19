@@ -204,7 +204,8 @@ export default {
       :class="['base-button-icon',
                'base-button-icon-' + iconSize,
                { 'base-button-icon-colored': iconColored },
-               { 'base-button-icon-hide': hideIcon }]" />
+               { 'base-button-icon-hide': hideIcon },
+               { 'base-button-icon-margin': buttonHasTextElement }]" />
 
     <!-- @slot create custom content (e.g. icon) left of text -->
     <slot name="left-of-text" />
@@ -405,8 +406,8 @@ export default {
     }
 
     &.base-button-icon-left {
-      .base-button-icon + .base-button-text {
-        margin-left: $spacing;
+      .base-button-icon-margin {
+        margin-right: $spacing;
       }
     }
 
@@ -414,8 +415,8 @@ export default {
       .base-button-icon {
         order: 1;
 
-        & + .base-button-text {
-          margin-right: $spacing;
+        &.base-button-icon-margin {
+          margin-left: $spacing;
         }
       }
     }
