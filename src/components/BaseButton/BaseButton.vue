@@ -1,6 +1,7 @@
 <script>
 import { computed, defineAsyncComponent, useSlots } from 'vue';
 import { useId } from '@/composables/useId.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Standard buttons
@@ -148,18 +149,24 @@ export default {
   },
   emits: ['clicked'],
   setup(props) {
+    /** INTERNAL ID */
+      // create a unique id
+    const internalId = useId();
+
+    /** SET BUTTON LABEL */
     // access slots to check if it is filled later
     const slots = useSlots();
-    // create a unique id
-    const internalId = useId();
+    // slot is not directly accessible anymore - use composable to determine
+    // if slot has content
+    const { slotHasContent } = useHasSlotContent(slots.text);
 
     // compute if internal id should be set for aria-attribute
     // (no need if no text or slot is not used)
-    const setLabelIdReference = computed(() => !!props.text || !!slots.text);
+    const buttonHasTextElement = computed(() => !!props.text || slotHasContent.value);
 
     return {
       internalId,
-      setLabelIdReference,
+      buttonHasTextElement,
     };
   },
   methods: {
@@ -180,7 +187,7 @@ export default {
     ref="baseButton"
     :disabled="disabled || null"
     :aria-disabled="disabled || null"
-    :aria-labelledby="setLabelIdReference ? internalId : null"
+    :aria-labelledby="buttonHasTextElement ? internalId : null"
     :aria-describedby="description ? `${internalId}-description` : null"
     :type="buttonType"
     :class="['base-button',
