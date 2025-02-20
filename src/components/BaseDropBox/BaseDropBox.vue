@@ -18,6 +18,7 @@
         :sort="false"
         :group="dropElementName"
         :on-change="onDragChange"
+        :draggable="false"
         ghost-class="base-drop-box-ghost"
         class="base-drop-box-drag-area"
         @add="addEntry">
