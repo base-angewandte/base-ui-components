@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="baseDropdown"
+    ref="baseDropDownElement"
     v-click-outside="() => showDropDown = false"
     class="base-drop-down">
     <div
@@ -26,11 +26,11 @@
       @keydown.enter.esc.down.up.prevent="selectByKey"
       @keydown.tab="selectByKey">
       <div
-        ref="dropDownButton"
+        ref="dropDownButtonElement"
         :class="['base-drop-down-head-text-wrapper',
                  { 'base-drop-down-head-text-fade-out': showFadeOut }]">
         <span
-          ref="headText"
+          ref="headTextElement"
           class="base-drop-down-head-text">
           {{ selectedOptionInt }}
         </span>
@@ -80,11 +80,12 @@
 </template>
 
 <script>
-import { debounce } from '@/utils/utils.js';
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { toRef } from 'vue';
+import { computed, ref, toRef, useTemplateRef } from 'vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
  * Accessible drop down component
@@ -192,18 +193,61 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props) {
+    /**
+     * generally get a reference to the root template element
+     * (used for resize observer (fade out calc) and drop down height calc)
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const baseDropDown = useTemplateRef('baseDropDownElement')
+    /** INTERNATIONALIZATION */
     const { getLangLabel } = useI18n(toRef(props, 'language'));
+
+    /** RESIZE / FADE OUT HANDLING */
+    /**
+     * template reference to the area available for selected option text display
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const dropDownButton = useTemplateRef('dropDownButtonElement');
+    /**
+     * template reference to the actual selected option text
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const headText = useTemplateRef('headTextElement');
+
+    /**
+     * handle fade out for selected option text showing (if text does not fit)
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const showFadeOut = ref(false);
+
+    /**
+     * calc if the selected option text fits the area available for displaying the text
+     */
+    function setOverflow() {
+      const headerWidth = dropDownButton.value ? dropDownButton.value.getBoundingClientRect().width : 0;
+      const textWidth = headText.value ? headText.value.getBoundingClientRect().width : 0;
+      showFadeOut.value = textWidth > headerWidth;
+    }
+    const { debounce } = useDebounce();
+    useElementObserver({
+      type: 'resize',
+      target: baseDropDown,
+      callback: () => debounce(setOverflow, 50),
+    });
     return {
+      // root element reference
+      baseDropDown,
+      // internationalization
       getLangLabel,
+      // fade out handling
+      showFadeOut,
     };
   },
   data() {
     return {
       showDropDown: false,
       keySelectedIndex: -1,
-      showFadeOut: false,
       maxDropDownHeight: '0',
-      resizeObserver: null,
     };
   },
   computed: {
@@ -224,21 +268,7 @@ export default {
       }
     },
   },
-  mounted() {
-    this.initObserver();
-  },
-  beforeUnmount() {
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.baseDropdown);
-  },
   methods: {
-    initObserver() {
-      // create an observer with the set overflow calc function
-      const resizeObserver = new ResizeObserver(debounce(50, () => this.setOverflow()));
-      // put it on the relevant element
-      resizeObserver.observe(this.$refs.baseDropdown);
-      // store it
-      this.resizeObserver = resizeObserver;
-    },
     // event triggered by clicking on option or Enter after
     // selecting via keys
     selectValue(option) {
@@ -278,11 +308,6 @@ export default {
         !== this.$refs.dropdownContainer.clientHeight) {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
-    },
-    setOverflow() {
-      const headerWidth = this.$refs.dropDownButton ? this.$refs.dropDownButton.getBoundingClientRect().width : 0;
-      const textWidth = this.$refs.headText ? this.$refs.headText.getBoundingClientRect().width : 0;
-      this.showFadeOut = textWidth > headerWidth;
     },
   },
 };
