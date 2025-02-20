@@ -44,7 +44,7 @@
     </button>
     <div
       v-if="showDropDown"
-      ref="dropdownContainer"
+      ref="dropDownContainerElement"
       :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight }"
       class="base-drop-down-body">
       <!-- @slot create custom drop down body -->
@@ -83,7 +83,7 @@
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { computed, ref, toRef, useTemplateRef } from 'vue';
+import { computed, ref, toRef, useTemplateRef, watch } from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 import { useDebounce } from '@/composables/useDebounce.js';
@@ -240,6 +240,67 @@ export default {
       target: baseDropDown,
       callback: () => debounce(setOverflow, 50),
     });
+
+    /** DROP DOWN VISIBILITY & HEIGHT */
+    /**
+     *
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const showDropDown = ref(false);
+    /**
+     *
+     * @type {Ref<UnwrapRef<number>, UnwrapRef<number> | number>}
+     */
+    const maxDropDownHeight = ref(0);
+
+    watch(showDropDown, (val) => {
+      if (val) {
+        // option container element is not rendered yet so we need to calc the
+        // top position from the selected option container
+        const { y, height } = baseDropDown.value.getBoundingClientRect() || {};
+        // make sure the container will not go above space by ceiling the value
+        let dropDownTopPosition = Math.ceil(y + height);
+        // don't let drop-down size be larger than window (also taking into account
+        // virtual keyboard with visualViewport (which should not be present at this
+        // point but just in case)
+        // and also leave a little space to the window bottom
+        let maxHeight = window.visualViewport.height - dropDownTopPosition;
+        // TODO make min and max values configurable?
+        // if remaining space is more than 120px use the remaining space or
+        // max 300px
+        if (maxHeight > 120) {
+          // set the css property `max-height`
+          maxDropDownHeight.value = `${maxHeight > 300 ? 300 : maxHeight - 16}px`;
+          // if there is less than 120px remaining scroll the component into view
+        } else {
+          window.scrollTo(0, baseDropDown.value.offsetTop);
+          // and recalc the remaining space
+          const { y: newY, height: newHeight } = baseDropDown.value.getBoundingClientRect() || {};
+          dropDownTopPosition = Math.ceil(newY + newHeight);
+          maxHeight = window.visualViewport.height - dropDownTopPosition;
+          maxDropDownHeight.value = `${maxHeight > 300 ? 300 : maxHeight - 16}px`;
+          // also consider here that there could STILL be less than 120px remaining and
+          // make this the min
+          maxDropDownHeight.value = `${maxHeight > 300 ? 300 : (maxHeight < 120 ? 120 : maxHeight - 16)}px`;
+        }
+      }
+      // reset index on close
+      if (!val) {
+        keySelectedIndex.value = -1;
+      }
+    });
+
+    /** DROP DOWN NAVIGATION */
+    /**
+     * template reference to the options container
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const dropDownContainer = useTemplateRef('dropDownContainerElement');
+    /**
+     * index of currently active option in keyboard drop down navigation
+     * @type {Ref<UnwrapRef<number>, UnwrapRef<number> | number>}
+     */
+    const keySelectedIndex = ref(-1);
     return {
       // root element reference
       baseDropDown,
@@ -249,31 +310,16 @@ export default {
       getLangLabel,
       // fade out handling
       showFadeOut,
-    };
-  },
-  data() {
-    return {
-      showDropDown: false,
-      keySelectedIndex: -1,
-      maxDropDownHeight: '0',
+      // drop down handling
+      showDropDown,
+      maxDropDownHeight,
+      dropDownContainer,
+      keySelectedIndex,
     };
   },
   computed: {
     selectedOptionInt() {
       return this.getLangLabel(this.modelValue.label, true) || this.placeholder || '';
-    },
-  },
-  watch: {
-    showDropDown(val) {
-      if (val) {
-        // dont let drop down size be larger than window
-        const maxHeight = window.innerHeight - this.$el.offsetTop - 120;
-        this.maxDropDownHeight = `${maxHeight < 300 ? maxHeight : 300}px`;
-      }
-      // reset index on close
-      if (!val) {
-        this.keySelectedIndex = -1;
-      }
     },
   },
   methods: {
@@ -312,8 +358,8 @@ export default {
         this.showDropDown = false;
       }
       if (this.$refs.option && this.$refs.option[this.keySelectedIndex]
-        && this.$refs.dropdownContainer.scrollHeight
-        !== this.$refs.dropdownContainer.clientHeight) {
+        && this.dropDownContainer.scrollHeight
+        !== this.dropDownContainer.clientHeight) {
         this.$refs.option[this.keySelectedIndex].scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
@@ -418,6 +464,7 @@ export default {
       max-height: 300px;
       max-width: calc(100vw - 3 * #{$spacing});
       min-width: 100%;
+      min-height: 120px;
       overflow-y: auto;
       overflow-x: hidden;
       cursor: pointer;
