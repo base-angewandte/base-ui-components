@@ -1,84 +1,3 @@
-<template>
-  <div
-    ref="baseDropDownElement"
-    v-click-outside="() => showDropDown = false"
-    class="base-drop-down">
-    <div
-      :class="['base-drop-down-label-wrapper',
-               { hide: !getLangLabel(label, true) || !showLabel }]">
-      <!-- TODO: check if this is correct HTML - label associated with button? -->
-      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
-      <label
-        :for="getLangLabel(label) + '-' + idInt"
-        class="base-drop-down-label">
-        {{ getLangLabel(label, true) }}
-      </label>
-    </div>
-    <button
-      :id="getLangLabel(label) + '-' + idInt"
-      :aria-expanded="String(showDropDown)"
-      :style="{ 'background-color': headerBackgroundColor }"
-      :disabled="isDisabled"
-      :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing }]"
-      aria-haspopup="listbox"
-      type="button"
-      @click.prevent="showDropDown = !showDropDown"
-      @keydown.enter.esc.down.up.prevent="selectByKey"
-      @keydown.tab="selectByKey">
-      <div
-        ref="dropDownButtonElement"
-        :class="['base-drop-down-head-text-wrapper',
-                 { 'base-drop-down-head-text-fade-out': showFadeOut }]">
-        <span
-          ref="headTextElement"
-          class="base-drop-down-head-text">
-          {{ selectedOptionInt }}
-        </span>
-      </div>
-      <!-- @slot place elements right of header -->
-      <slot name="header-right">
-        <BaseIcon
-          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
-          name="drop-down" />
-      </slot>
-    </button>
-    <div
-      v-if="showDropDown"
-      ref="dropDownContainerElement"
-      :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight }"
-      class="base-drop-down-body">
-      <!-- @slot create custom drop down body -->
-      <slot>
-        <ul
-          :aria-labelledby="getLangLabel(label) + '-' + idInt"
-          role="listbox"
-          class="base-drop-down-body-list">
-          <li
-            v-for="(option, index) in options"
-            ref="option"
-            :key="option[valueProp]"
-            :class="[
-              'base-drop-down-option',
-              {
-                'base-drop-down-option-selected': modelValue
-                  && option[valueProp] === modelValue[valueProp],
-              },
-              { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
-            role="option"
-            :aria-selected="(modelValue
-              && option[valueProp] === modelValue[valueProp]).toString()"
-            tabindex="0"
-            @keydown.enter="selectValue(option)"
-            @keydown.tab="selectByKey"
-            @click="selectValue(option)">
-            {{ getLangLabel(option.label, true) }}
-          </li>
-        </ul>
-      </slot>
-    </div>
-  </div>
-</template>
-
 <script>
 import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
@@ -201,7 +120,7 @@ export default {
      */
     const baseDropDown = useTemplateRef('baseDropDownElement')
     /** ID HANDLING */
-    // create a persistent id via composable
+      // create a persistent id via composable
     const internalId = useId();
     // use either the prop provided one or the internally created one
     const idInt = computed(() => props.id || internalId);
@@ -366,6 +285,87 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="baseDropDownElement"
+    v-click-outside="() => showDropDown = false"
+    class="base-drop-down">
+    <div
+      :class="['base-drop-down-label-wrapper',
+               { hide: !getLangLabel(label, true) || !showLabel }]">
+      <!-- TODO: check if this is correct HTML - label associated with button? -->
+      <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
+      <label
+        :for="getLangLabel(label) + '-' + idInt"
+        class="base-drop-down-label">
+        {{ getLangLabel(label, true) }}
+      </label>
+    </div>
+    <button
+      :id="getLangLabel(label) + '-' + idInt"
+      :aria-expanded="String(showDropDown)"
+      :style="{ 'background-color': headerBackgroundColor }"
+      :disabled="isDisabled"
+      :class="['base-drop-down-head', { 'base-drop-down-head-spacing': withSpacing }]"
+      aria-haspopup="listbox"
+      type="button"
+      @click.prevent="showDropDown = !showDropDown"
+      @keydown.enter.esc.down.up.prevent="selectByKey"
+      @keydown.tab="selectByKey">
+      <div
+        ref="dropDownButtonElement"
+        :class="['base-drop-down-head-text-wrapper',
+                 { 'base-drop-down-head-text-fade-out': showFadeOut }]">
+        <span
+          ref="headTextElement"
+          class="base-drop-down-head-text">
+          {{ selectedOptionInt }}
+        </span>
+      </div>
+      <!-- @slot place elements right of header -->
+      <slot name="header-right">
+        <BaseIcon
+          :class="['base-drop-down-icon', { 'base-drop-down-icon-rotated': showDropDown }]"
+          name="drop-down" />
+      </slot>
+    </button>
+    <div
+      v-if="showDropDown"
+      ref="dropDownContainerElement"
+      :style="{ [alignDropDown]: 0, 'max-height': maxDropDownHeight }"
+      class="base-drop-down-body">
+      <!-- @slot create custom drop down body -->
+      <slot>
+        <ul
+          :aria-labelledby="getLangLabel(label) + '-' + idInt"
+          role="listbox"
+          class="base-drop-down-body-list">
+          <li
+            v-for="(option, index) in options"
+            ref="option"
+            :key="option[valueProp]"
+            :class="[
+              'base-drop-down-option',
+              {
+                'base-drop-down-option-selected': modelValue
+                  && option[valueProp] === modelValue[valueProp],
+              },
+              { 'base-drop-down-option-key-selected': keySelectedIndex === index }]"
+            role="option"
+            :aria-selected="(modelValue
+              && option[valueProp] === modelValue[valueProp]).toString()"
+            tabindex="0"
+            @keydown.enter="selectValue(option)"
+            @keydown.tab="selectByKey"
+            @click="selectValue(option)">
+            {{ getLangLabel(option.label, true) }}
+          </li>
+        </ul>
+      </slot>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
