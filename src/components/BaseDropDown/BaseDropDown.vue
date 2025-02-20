@@ -9,13 +9,13 @@
       <!-- TODO: check if this is correct HTML - label associated with button? -->
       <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
       <label
-        :for="getLangLabel(label) + '-' + id"
+        :for="getLangLabel(label) + '-' + idInt"
         class="base-drop-down-label">
         {{ getLangLabel(label, true) }}
       </label>
     </div>
     <button
-      :id="getLangLabel(label) + '-' + id"
+      :id="getLangLabel(label) + '-' + idInt"
       :aria-expanded="String(showDropDown)"
       :style="{ 'background-color': headerBackgroundColor }"
       :disabled="isDisabled"
@@ -50,7 +50,7 @@
       <!-- @slot create custom drop down body -->
       <slot>
         <ul
-          :aria-labelledby="getLangLabel(label) + '-' + id"
+          :aria-labelledby="getLangLabel(label) + '-' + idInt"
           role="listbox"
           class="base-drop-down-body-list">
           <li
@@ -84,6 +84,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useI18n } from '@/composables/useI18n.js';
 import { computed, ref, toRef, useTemplateRef } from 'vue';
+import { useId } from '@/composables/useId.js';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 import { useDebounce } from '@/composables/useDebounce.js';
 
@@ -199,6 +200,11 @@ export default {
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
     const baseDropDown = useTemplateRef('baseDropDownElement')
+    /** ID HANDLING */
+    // create a persistent id via composable
+    const internalId = useId();
+    // use either the prop provided one or the internally created one
+    const idInt = computed(() => props.id || internalId);
     /** INTERNATIONALIZATION */
     const { getLangLabel } = useI18n(toRef(props, 'language'));
 
@@ -237,6 +243,8 @@ export default {
     return {
       // root element reference
       baseDropDown,
+      // id handling
+      idInt,
       // internationalization
       getLangLabel,
       // fade out handling
