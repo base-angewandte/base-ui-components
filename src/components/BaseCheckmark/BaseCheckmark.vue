@@ -1,34 +1,3 @@
-<template>
-  <div
-    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @keydown.enter.stop="clicked"
-    @click.stop="clicked">
-    <input
-      :id="internalId"
-      v-model="checkedInt"
-      :name="label"
-      :value="radioValueInt"
-      :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', { 'base-checkbox-checked': checkedInt }]"
-      @keydown.enter.prevent="">
-    <div
-      :class="[
-        'base-checkmark-container',
-        'base-checkmark-container-' + checkBoxSize,
-        { 'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
-      <BaseIcon
-        v-if="markStyle === 'checkbox' && checkedInt"
-        :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
-        name="check-mark" />
-    </div>
-    <!-- need to disable because label is there - it is just in BaseInput component -->
-    <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
-    <label
-      :for="internalId"
-      :class="['base-checkbox-labeltext', { hide: !showLabel }]">{{ label }}</label>
-  </div>
-</template>
-
 <script>
 import { useId } from '@/composables/useId.js';
 import { defineAsyncComponent } from 'vue';
@@ -101,6 +70,7 @@ export default {
   },
   emits: ['update:modelValue'],
   setup() {
+    /** INTERNAL ID */
     const internalId = useId();
     return {
       internalId,
@@ -141,6 +111,37 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
+    @keydown.enter.stop="clicked"
+    @click.stop="clicked">
+    <input
+      :id="internalId"
+      v-model="checkedInt"
+      :name="label"
+      :value="radioValueInt"
+      :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
+      :class="['base-checkbox-input', { 'base-checkbox-checked': checkedInt }]"
+      @keydown.enter.prevent="">
+    <div
+      :class="[
+        'base-checkmark-container',
+        'base-checkmark-container-' + checkBoxSize,
+        { 'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
+      <BaseIcon
+        v-if="markStyle === 'checkbox' && checkedInt"
+        :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
+        name="check-mark" />
+    </div>
+    <!-- need to disable because label is there - it is just in BaseInput component -->
+    <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
+    <label
+      :for="internalId"
+      :class="['base-checkbox-labeltext', { hide: !showLabel }]">{{ label }}</label>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
