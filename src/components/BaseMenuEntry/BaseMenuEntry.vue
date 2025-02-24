@@ -1,8 +1,7 @@
 <template>
   <div
-    ref="menuEntry"
-    :tabindex="isSelectable && selectActive ? -1 : 0"
-    :href="'#' + title"
+    :tabindex="isSelectActive ? -1 : 0"
+    :href="!isSelectActive ? '#' + title : undefined"
     :class="['base-menu-entry',
              {
                'base-menu-entry-activatable': isActivatable && !isDisabled,
@@ -11,7 +10,7 @@
                'base-menu-entry-disabled': isDisabled,
                'base-menu-entry-text-fade-out': !showThumbnails && !rightSideSlotHasContent,
              }]"
-    :role="isSelectable && selectActive ? '' : 'link'"
+    :role="!isSelectActive ? 'link' : undefined"
     @keyup.enter.prevent="clicked"
     @click="clicked">
     <BaseIcon
@@ -92,7 +91,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent, useSlots } from 'vue';
+import { computed, defineAsyncComponent, useSlots } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
@@ -133,7 +132,7 @@ export default {
       default: '',
     },
     /**
-     * specifiy if item is active - which will display a border on right side
+     * specify if item is active - which will display a border on right side
      * and title in bold
      */
     isActive: {
@@ -208,9 +207,14 @@ export default {
     },
   },
   emits: ['clicked', 'selected'],
-  setup() {
+  setup(props) {
     /** GENERAL */
     const slots = useSlots();
+
+    /** ELEMENT TYPE RENDER */
+    // element should be rendered with role link and appropriate attributes unless
+    // select is active
+    const isSelectActive = computed(() => props.isSelectable && props.selectActive);
 
     /** THUMBNAILS */
     // check if thumbnails slot was populated
@@ -227,6 +231,7 @@ export default {
         ? useHasSlotContent(slots['right-side-elements']({})) : false;
 
     return {
+      isSelectActive,
       thumbnailsSlotHasContent,
       rightSideSlotHasContent,
     };
