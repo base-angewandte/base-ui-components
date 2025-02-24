@@ -9,7 +9,7 @@
                'base-menu-entry-active': isActive,
                'base-menu-entry-no-icon': !icon,
                'base-menu-entry-disabled': isDisabled,
-               'base-menu-entry-text-fade-out': !showThumbnails && !$slots['right-side-elements'],
+               'base-menu-entry-text-fade-out': !showThumbnails && !rightSideSlotHasContent,
              }]"
     :role="isSelectable && selectActive ? '' : 'link'"
     @keyup.enter.prevent="clicked"
@@ -23,7 +23,7 @@
     <div
       :class="[
         'base-menu-entry-text-wrapper',
-        { 'base-menu-entry-text-slide-overlay': showThumbnails && $slots.thumbnails
+        { 'base-menu-entry-text-slide-overlay': showThumbnails && thumbnailsSlotHasContent
           && isSelectable },
       ]">
       <!-- @slot text-content - use this slot to individualize the displayed text in the base
@@ -92,7 +92,8 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, useSlots } from 'vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Component to be used in Menu Entry List or as a sort of header element
@@ -207,6 +208,29 @@ export default {
     },
   },
   emits: ['clicked', 'selected'],
+  setup() {
+    /** GENERAL */
+    const slots = useSlots();
+
+    /** THUMBNAILS */
+    // check if thumbnails slot was populated
+    const { slotHasContent: thumbnailsSlotHasContent } = useHasSlotContent(slots.thumbnails);
+
+    /** TITLE FADE OUT */
+    // right-side-element slot allows for replacing all the menu entry content with custom
+    // content - so we also don't need the fade out if the slot is filled
+    // also check if slot is actually defined before passing it to composable because
+    // of the ({}) (see below)
+    const { slotHasContent: rightSideSlotHasContent } = slots['right-side-elements']
+        // slot binding object needs to be passed for `useSlots` for some reason
+        // (see https://github.com/vuejs/core/issues/4656)
+        ? useHasSlotContent(slots['right-side-elements']({})) : false;
+
+    return {
+      thumbnailsSlotHasContent,
+      rightSideSlotHasContent,
+    };
+  },
   data() {
     return {
       isSelectedInt: false,
