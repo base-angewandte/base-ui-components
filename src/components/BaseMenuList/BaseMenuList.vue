@@ -234,7 +234,7 @@ export default {
     getDragImage(event) {
       // get the relevant svg element from the base menu entry by class name
       // (necessary to use class name so thumbnail sgvs are not used if no icon is provided in list)
-      const entryIcon = event.item.getElementsByClassName('base-menu-entry-icon')[0];
+      const entryIcon = event.item.getElementsByClassName('base-menu-entry__icon')[0];
       // check if icon was set
       if (entryIcon) {
         // get the size to be able to set it to the drag image as well
