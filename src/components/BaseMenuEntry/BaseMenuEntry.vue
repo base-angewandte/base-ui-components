@@ -1,95 +1,3 @@
-<template>
-  <div
-    :tabindex="isSelectActive ? -1 : 0"
-    :href="!isSelectActive ? '#' + title : undefined"
-    :class="['base-menu-entry',
-             {
-               'base-menu-entry--activatable': isActivatable && !isDisabled,
-               'base-menu-entry--active': isActive,
-               'base-menu-entry--no-icon': !icon,
-               'base-menu-entry--disabled': isDisabled,
-               'base-menu-entry--text-fade-out': !showThumbnails && !rightSideSlotHasContent,
-             }]"
-    :role="!isSelectActive ? 'link' : undefined"
-    @keyup.enter.prevent="clicked"
-    @click="clicked">
-    <BaseIcon
-      v-if="icon"
-      ref="entryIcon"
-      :name="icon"
-      class="base-menu-entry__icon" />
-
-    <div
-      :class="[
-        'base-menu-entry__text-wrapper',
-        { 'base-menu-entry__text-slide-overlay': showThumbnails && thumbnailsSlotHasContent
-          && isSelectable },
-      ]">
-      <!-- @slot text-content - use this slot to individualize the displayed text in the base
-        menu entry. if this slot is used, prop title, subtext and description will not have any
-        effect. -->
-      <slot
-        name="text-content">
-        <div class="base-menu-entry__title-description-wrapper">
-          <div class="base-menu-entry__title-subtext-wrapper">
-            <div
-              v-if="title"
-              :class="['base-menu-entry__title',
-                       { 'base-menu-entry__title--bold': isActive || titleBold }]">
-              {{ title }}
-            </div>
-            <div
-              v-if="subtext"
-              class="base-menu-entry__subtext">
-              {{ subtext }}
-            </div>
-          </div>
-          <div class="base-menu-entry__description">
-            {{ description }}
-          </div>
-        </div>
-      </slot>
-    </div>
-    <!-- @slot add custom elements on the right side of the entry row. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
-      @binding { boolean } is-selected - true if value is selected -->
-    <slot
-      name="right-side-elements"
-      :is-selected="isSelectedInt">
-      <div
-        class="base-menu-entry__transition-container base-menu-entry--text-fade-out">
-        <TransitionGroup
-          ref="slideFade"
-          name="slide-fade"
-          @leave="slideFadeLeave"
-          @after-leave="slideFadeAfterLeave">
-          <div
-            :key="entryId"
-            class="slide-fade-group">
-            <div
-              v-if="showThumbnails"
-              :key="entryId + 'thumbnail'"
-              ref="thumbnailContainer"
-              class="base-menu-entry__thumbnail-container"
-              :style="{ '--cols': columns }">
-              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
-              <slot name="thumbnails" />
-            </div>
-            <BaseCheckmark
-              v-if="isSelectable && selectActive && !isDisabled"
-              :key="entryId + 'checkmark'"
-              :model-value="isSelected"
-              :label="title"
-              title="checkbox"
-              mark-style="checkbox"
-              class="base-menu-entry__checkbox"
-              @update:model-value="clicked" />
-          </div>
-        </TransitionGroup>
-      </div>
-    </slot>
-  </div>
-</template>
-
 <script>
 import { computed, defineAsyncComponent, useSlots } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
@@ -212,19 +120,19 @@ export default {
     const slots = useSlots();
 
     /** ELEMENT TYPE RENDER */
-    // element should be rendered with role link and appropriate attributes unless
-    // select is active
+      // element should be rendered with role link and appropriate attributes unless
+      // select is active
     const isSelectActive = computed(() => props.isSelectable && props.selectActive);
 
     /** THUMBNAILS */
-    // check if thumbnails slot was populated
+      // check if thumbnails slot was populated
     const { slotHasContent: thumbnailsSlotHasContent } = useHasSlotContent(slots.thumbnails);
 
     /** TITLE FADE OUT */
-    // right-side-element slot allows for replacing all the menu entry content with custom
-    // content - so we also don't need the fade out if the slot is filled
-    // also check if slot is actually defined before passing it to composable because
-    // of the ({}) (see below)
+      // right-side-element slot allows for replacing all the menu entry content with custom
+      // content - so we also don't need the fade out if the slot is filled
+      // also check if slot is actually defined before passing it to composable because
+      // of the ({}) (see below)
     const { slotHasContent: rightSideSlotHasContent } = slots['right-side-elements']
         // slot binding object needs to be passed for `useSlots` for some reason
         // (see https://github.com/vuejs/core/issues/4656)
@@ -305,6 +213,98 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :tabindex="isSelectActive ? -1 : 0"
+    :href="!isSelectActive ? '#' + title : undefined"
+    :class="['base-menu-entry',
+             {
+               'base-menu-entry--activatable': isActivatable && !isDisabled,
+               'base-menu-entry--active': isActive,
+               'base-menu-entry--no-icon': !icon,
+               'base-menu-entry--disabled': isDisabled,
+               'base-menu-entry--text-fade-out': !showThumbnails && !rightSideSlotHasContent,
+             }]"
+    :role="!isSelectActive ? 'link' : undefined"
+    @keyup.enter.prevent="clicked"
+    @click="clicked">
+    <BaseIcon
+      v-if="icon"
+      ref="entryIcon"
+      :name="icon"
+      class="base-menu-entry__icon" />
+
+    <div
+      :class="[
+        'base-menu-entry__text-wrapper',
+        { 'base-menu-entry__text-slide-overlay': showThumbnails && thumbnailsSlotHasContent
+          && isSelectable },
+      ]">
+      <!-- @slot text-content - use this slot to individualize the displayed text in the base
+        menu entry. if this slot is used, prop title, subtext and description will not have any
+        effect. -->
+      <slot
+        name="text-content">
+        <div class="base-menu-entry__title-description-wrapper">
+          <div class="base-menu-entry__title-subtext-wrapper">
+            <div
+              v-if="title"
+              :class="['base-menu-entry__title',
+                       { 'base-menu-entry__title--bold': isActive || titleBold }]">
+              {{ title }}
+            </div>
+            <div
+              v-if="subtext"
+              class="base-menu-entry__subtext">
+              {{ subtext }}
+            </div>
+          </div>
+          <div class="base-menu-entry__description">
+            {{ description }}
+          </div>
+        </div>
+      </slot>
+    </div>
+    <!-- @slot add custom elements on the right side of the entry row. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
+      @binding { boolean } is-selected - true if value is selected -->
+    <slot
+      name="right-side-elements"
+      :is-selected="isSelectedInt">
+      <div
+        class="base-menu-entry__transition-container base-menu-entry--text-fade-out">
+        <TransitionGroup
+          ref="slideFade"
+          name="slide-fade"
+          @leave="slideFadeLeave"
+          @after-leave="slideFadeAfterLeave">
+          <div
+            :key="entryId"
+            class="slide-fade-group">
+            <div
+              v-if="showThumbnails"
+              :key="entryId + 'thumbnail'"
+              ref="thumbnailContainer"
+              class="base-menu-entry__thumbnail-container"
+              :style="{ '--cols': columns }">
+              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
+              <slot name="thumbnails" />
+            </div>
+            <BaseCheckmark
+              v-if="isSelectable && selectActive && !isDisabled"
+              :key="entryId + 'checkmark'"
+              :model-value="isSelected"
+              :label="title"
+              title="checkbox"
+              mark-style="checkbox"
+              class="base-menu-entry__checkbox"
+              @update:model-value="clicked" />
+          </div>
+        </TransitionGroup>
+      </div>
+    </slot>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
