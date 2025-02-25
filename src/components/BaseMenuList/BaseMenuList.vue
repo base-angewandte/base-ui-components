@@ -1,7 +1,6 @@
 <template>
   <VueDraggable
     ref="draggable"
-    :model-value="list"
     :sort="false"
     :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
@@ -9,12 +8,13 @@
     :force-fallback="!dragAndDropCapable"
     :fallback-on-body="!dragAndDropCapable"
     tag="ul"
+    :model-value="listInt"
     class="base-menu-list"
     @choose="getDragImage"
     @start="dragStart"
     @end="dragEnd">
     <li
-      v-for="(item, index) in list"
+      v-for="(item, index) in listInt"
       :key="item.id || item.title"
       class="base-menu-list__list-entry">
       <BaseMenuEntry
@@ -87,6 +87,7 @@ export default {
     },
     /**
      * list of menu entries - array of objects
+     *  v-model:list may be used on this prop
      *   Entry properties that can be displayed:
      *
      *     *required*:
@@ -132,12 +133,18 @@ export default {
       default: 'menuEntry',
     },
   },
-  emits: ['selected', 'clicked'],
+  emits: ['selected', 'clicked', 'update:list'],
   data() {
     return {
       // have internally necessary props in separate array to prevent issues with
       // outside store mutations
       entryProps: [],
+      /**
+       * variable to determine which properties should be stored in variable
+       * `entryProps`
+       * @type {string[]}
+       */
+      entryPropsKeys: ['selected', 'active', 'error'],
       dragging: false,
       dragAndDropCapable: false,
       isDraggable: true,
@@ -148,11 +155,45 @@ export default {
        * @type {?SVGElement}
        */
       dragImg: null,
+      /**
+       * internal list representation needed for drag manipulations
+       * @type {Object[]}
+       */
+      listInt: [],
     };
   },
   watch: {
-    list() {
-      this.setInternalVar();
+    /**
+     * watch prop `list` for changes from outside
+     */
+    list: {
+      handler(val) {
+        // check if the provided list differs from the internal copy
+        if (JSON.stringify(val) !== JSON.stringify(this.listInt)) {
+          // if yes - update the internal copy
+          this.listInt = JSON.parse(JSON.stringify(val));
+          // and set `entryProps` variable accordingly managing
+          // state for every single entry
+          this.setInternalVar();
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+    /**
+     * watch internal representation of `list` to be able to
+     * update parent accordingly
+     */
+    listInt: {
+      handler(val) {
+        // check if internal list and external list differ
+        if (JSON.stringify(val) !== JSON.stringify(this.list)) {
+          // if yes - inform the parent
+          this.$emit('update:list', JSON.parse(JSON.stringify(this.listInt)));
+        }
+      },
+      deep: true,
+      immediate: true,
     },
     activeEntry(val) {
       this.entryProps.forEach((item) => {
@@ -176,9 +217,37 @@ export default {
     selectedList() {
       this.setInternalVar();
     },
-  },
-  created() {
-    this.setInternalVar();
+    /**
+     * watch variable `entryProps` - managing the state for every entry - to
+     * update the internal list IF the state prop is also present
+     * in the entry list provided by parent
+     */
+    entryProps: {
+      handler() {
+        // if entryProps changed update the internal list
+        this.listInt = this.listInt.map((entry, index) => {
+          // get all the object properties of the entry
+          const entryKeys = Object.keys(entry);
+          // now loop through internal state keys
+          return this.entryPropsKeys.reduce((prev, entryPropsKey) => {
+            // if key is also present in list - update the list property
+            if (entryKeys.includes(entryPropsKey)) {
+              return {
+                ...prev,
+                [entryPropsKey]: this.entryProps[index][entryPropsKey]
+              }
+            }
+            // otherwise just return the unaltered object
+            return prev;
+          }, {
+            // as a start use the entry as it currently is in listInt
+            ...entry,
+          });
+        });
+      },
+      deep: true,
+      immediate: true,
+    }
   },
   mounted() {
     this.isDraggable = !this.isMobile();
@@ -215,13 +284,13 @@ export default {
       this.$emit('selected', { index, selected });
     },
     setInternalVar() {
-      this.entryProps = this.list.map(entry => ({
-        ...{
+      this.entryProps = this.listInt.map(entry => {
+        return ({
           selected: entry.selected || this.selectedList.includes(entry.id),
           active: entry.active || false,
           error: entry.error || false,
-        },
-      }));
+        });
+      });
       if (this.entryProps.length && this.activeEntry >= 0) {
         this.entryProps[this.activeEntry].active = true;
       }
