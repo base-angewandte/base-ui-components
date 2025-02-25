@@ -6,14 +6,12 @@
     :sort="useDraggable ? false : undefined"
     :disabled="useDraggable ? !isDraggable || selectActive : undefined"
     :group="useDraggable ? { name: dragName, pull: 'clone', put: false } : undefined"
-    :set-data="useDraggable ? modifyDragItem : undefined"
-    :force-fallback="useDraggable ? !dragAndDropCapable : undefined"
-    :fallback-on-body="useDraggable ? !dragAndDropCapable : undefined"
+    :set-data="modifyDragItem"
     :tag="useDraggable ? 'ul' : undefined"
     class="base-menu-list"
-    @choose="useDraggable ? getDragImage : undefined"
-    @start="useDraggable ? dragStart : undefined"
-    @end="useDraggable ? dragEnd : undefined">
+    @choose="getDragImage"
+    @start="dragStart"
+    @end="dragEnd">
     <li
       v-for="(item, index) in listInt"
       :key="item.id || item.title"
