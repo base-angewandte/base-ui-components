@@ -1,7 +1,7 @@
 <template>
   <VueDraggable
     ref="draggable"
-    :value="list"
+    :model-value="list"
     :sort="false"
     :disabled="!isDraggable || selectActive"
     :group="{ name: dragName, pull: 'clone', put: false }"
