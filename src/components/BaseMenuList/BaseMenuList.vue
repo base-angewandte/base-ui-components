@@ -1,18 +1,19 @@
 <template>
-  <VueDraggable
+  <component
+    :is="draggableComponent"
     ref="draggable"
-    :sort="false"
-    :disabled="!isDraggable || selectActive"
-    :group="{ name: dragName, pull: 'clone', put: false }"
-    :set-data="modifyDragItem"
-    :force-fallback="!dragAndDropCapable"
-    :fallback-on-body="!dragAndDropCapable"
-    tag="ul"
-    :model-value="listInt"
+    :model-value="draggableList"
+    :sort="useDraggable ? false : undefined"
+    :disabled="useDraggable ? !isDraggable || selectActive : undefined"
+    :group="useDraggable ? { name: dragName, pull: 'clone', put: false } : undefined"
+    :set-data="useDraggable ? modifyDragItem : undefined"
+    :force-fallback="useDraggable ? !dragAndDropCapable : undefined"
+    :fallback-on-body="useDraggable ? !dragAndDropCapable : undefined"
+    :tag="useDraggable ? 'ul' : undefined"
     class="base-menu-list"
-    @choose="getDragImage"
-    @start="dragStart"
-    @end="dragEnd">
+    @choose="useDraggable ? getDragImage : undefined"
+    @start="useDraggable ? dragStart : undefined"
+    @end="useDraggable ? dragEnd : undefined">
     <li
       v-for="(item, index) in listInt"
       :key="item.id || item.title"
@@ -59,12 +60,12 @@
         </template>
       </BaseMenuEntry>
     </li>
-  </VueDraggable>
+  </component>
 </template>
 
 <script>
-import { VueDraggable } from 'vue-draggable-plus';
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * Base Component for SideBar Menu Entries
@@ -75,7 +76,6 @@ export default {
   name: 'BaseMenuList',
   components: {
     BaseMenuEntry,
-    VueDraggable,
   },
   props: {
     /**
@@ -132,6 +132,13 @@ export default {
       type: String,
       default: 'menuEntry',
     },
+    /**
+     * optionally use the component without vue-draggable
+     */
+    useDraggable: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: ['selected', 'clicked', 'update:list'],
   data() {
@@ -161,6 +168,28 @@ export default {
        */
       listInt: [],
     };
+  },
+  computed: {
+    /**
+     * make the vue-draggable import optional and either return
+     * the component or use the native `<ul>` element
+     * @returns {Object|string}
+     */
+    draggableComponent() {
+      if (this.useDraggable) {
+        return defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable));
+      }
+      return 'ul';
+    },
+    /**
+     * to only set model-value attribute if it is a vue-draggable
+     * component
+     * @returns {undefined|Object[]}
+     */
+    draggableList() {
+      if (this.useDraggable) return this.listInt;
+      return undefined;
+    }
   },
   watch: {
     /**
