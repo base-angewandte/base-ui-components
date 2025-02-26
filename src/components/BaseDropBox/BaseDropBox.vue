@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import { VueDraggable } from 'vue-draggable-plus';
 import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * An Element to drop files or other UI Elements into
@@ -54,7 +54,7 @@ export default {
   name: 'BaseDropBox',
   components: {
     BaseBoxButton,
-    VueDraggable,
+    VueDraggable: defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable)),
   },
   props: {
     /**
