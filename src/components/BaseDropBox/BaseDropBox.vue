@@ -1,5 +1,6 @@
 <template>
   <BaseBoxButton
+    ref="baseDropBoxElement"
     v-bind="$props"
     :box-ratio="boxRatio"
     :render-element-as="renderElementAs"
@@ -18,7 +19,7 @@
         :sort="false"
         :group="dropElementName"
         :on-change="onDragChange"
-        :draggable="false"
+        :disabled="disabled"
         ghost-class="base-drop-box-ghost"
         class="base-drop-box-drag-area"
         @add="addEntry">
@@ -159,33 +160,38 @@ export default {
   },
   mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable && this.dropType === 'files' && !this.disabled) {
+    if (this.dragAndDropCapable) {
       ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(((evt) => {
-        this.$refs.fileform.addEventListener(evt, ((e) => {
+        this.$refs.baseDropBoxElement.$el.addEventListener(evt, ((e) => {
           e.preventDefault();
-          e.stopPropagation();
-        }), false);
+        }), true);
       }));
-      this.$refs.fileform.addEventListener('drop', (e) => {
-        this.isDragOver = false;
-        /**
-         * event emitted when a file or an element is dropped on the box, emitting the type of event
-         *
-         * @event dropped-file
-         * @param { DragEvent } - propagating the triggered event
-         */
-        this.$emit('dropped-file', e);
-      });
-      ['dragenter', 'dragleave'].forEach(((evt) => {
-        this.$refs.fileform.addEventListener(evt, ((originalEvent) => {
-          // kind of hacky solution to prevent target element to change color
-          // only works when draggable prop is set on every draggable element on site
-          // otherwise it will light up on file drop boxes!
-          if (!originalEvent.dataTransfer.types.includes('draggable')) {
-            this.isDragOver = !this.isDragOver;
-          }
+      if (this.dropType === 'files') {
+        this.$refs.fileform.addEventListener('drop', (e) => {
+          this.isDragOver = false;
+          // if the element is disabled or drop event does not contain any files - do not emit
+          // the event and return
+          if (this.disabled || !e.dataTransfer?.files?.length) return;
+          /**
+           * event emitted when a file or an element is dropped on the box, emitting the type of event
+           *
+           * @event dropped-file
+           * @param { DragEvent } - propagating the triggered event
+           */
+          this.$emit('dropped-file', e);
+        });
+        ['dragenter', 'dragleave'].forEach(((evt) => {
+          this.$refs.fileform.addEventListener(evt, ((originalEvent) => {
+            if (this.disabled) return;
+            // kind of hacky solution to prevent target element to change color
+            // only works when draggable prop is set on every draggable element on site
+            // otherwise it will light up on file drop boxes!
+            if (!originalEvent.dataTransfer.types.includes('draggable')) {
+              this.isDragOver = !this.isDragOver;
+            }
+          }));
         }));
-      }));
+      }
     }
   },
   methods: {
