@@ -81,11 +81,16 @@ export default {
       default: () => ({}),
     },
     /**
-     * specify how the link element should be rendered -
-     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router` is necessary
+     * specify how a link element should be rendered
+     * this needs to be a valid vue link component string (e.g. `'RouterLink'`) or a component directly
+     * and vue-router is necessary
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     renderLinkElementAs: {
-      type: String,
+      type: [String, Object],
       default: 'RouterLink',
     },
   },

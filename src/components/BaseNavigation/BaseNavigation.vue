@@ -212,13 +212,23 @@ const props = defineProps({
   },
   /**
    * specify how link element should be rendered - this needs to be a
-   * valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router
-   * is necessary
+   * valid vue link component string (e.g. `'RouterLink'`) a component directly and
+   * vue-router is necessary or `'a'` for a native HTML link element
+   *
+   * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+   *  but you need to import the component as `import { NuxtLink } from '#components';`
+   *  and pass the component to the prop!
    */
   renderAs: {
-    type: String,
+    type: [String, Object],
     default: 'a',
-    validate: val => ['RouterLink', 'NuxtLink', 'a'].includes(val),
+    validate: (val) => {
+      if (typeof val === 'string') {
+        return ['RouterLink', 'NuxtLink', 'a'].includes(val)
+      }
+      return typeof val === 'object'
+        && val.name && ['RouterLink', 'NuxtLink'].includes(val);
+    },
   },
   /**
    * specify a label for the navigation bar - for accessibility reasons
