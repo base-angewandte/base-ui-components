@@ -73,7 +73,8 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, useSlots } from 'vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 export default {
   name: 'BaseInfoPanel',
@@ -177,28 +178,44 @@ export default {
     },
   },
   emits: ['action'],
-  computed: {
+  setup(props) {
+    /** ELEMENT DISPLAY / CONTENT CHECK */
+    const slots = useSlots();
+
+    // for icon element
+    const { slotHasContent: iconSlotHasContent } = useHasSlotContent(slots.icon);
     /**
      * should icon HTML element be rendered
      * @returns {boolean}
      */
-    useIconElement() {
-      return !!this.iconName || !!this.$slots.icon;
-    },
+    const useIconElement = computed(() => {
+      console.log(iconSlotHasContent.value);
+      return !!props.iconName || iconSlotHasContent.value;
+    });
+
+    // for element
+    const { slotHasContent: headerSlotHasContent } = useHasSlotContent(slots.header);
     /**
      * should header HTML element be rendered
      * @returns {boolean}
      */
-    useHeaderElement() {
-      return !!this.panelHeaderText || !!this.$slots.header;
-    },
+    const useHeaderElement = computed(() => !!props.panelHeaderText || headerSlotHasContent.value);
+
+    // for bottom element
+    const { slotHasContent: bottomSlotHasContent } = useHasSlotContent(slots.bottom);
     /**
      * should text body HTML element be rendered
      * @returns {boolean}
      */
-    useBottomElement() {
-      return !!this.buttonsConfig.length || !!this.$slots.bottom;
-    },
+    const useBottomElement = computed(() => !!props.buttonsConfig.length || bottomSlotHasContent.value);
+
+    return {
+      useIconElement,
+      useHeaderElement,
+      useBottomElement,
+    }
+  },
+  computed: {
     /**
      * since prop `text` can be string or array unify for internal rendering
      *  to always return an array
@@ -220,11 +237,11 @@ export default {
     /**
      * return the body HTML element - either a native `<div>` or if component
      *  is `expandable` then the BaseExpandBox component
-     * @returns {(function(): Promise<{VueComponent}>)|string}
+     * @returns {Object|string}
      */
     textBodyWrapper() {
       if (this.expandable) {
-        return () => import('@/components/BaseExpandBox/BaseExpandBox.vue');
+        return defineAsyncComponent(() => import('@/components/BaseExpandBox/BaseExpandBox.vue'));
       }
       return 'div';
     },
