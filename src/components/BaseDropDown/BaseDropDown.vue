@@ -464,7 +464,7 @@ export default {
       max-height: 300px;
       max-width: calc(100vw - 3 * #{$spacing});
       min-width: 100%;
-      min-height: 120px;
+      min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
       cursor: pointer;
