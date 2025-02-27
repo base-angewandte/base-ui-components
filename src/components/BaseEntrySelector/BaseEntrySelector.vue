@@ -138,6 +138,7 @@
           :list="entries"
           :active-entry="activeEntry"
           :selected-list="selectedListIds"
+          :use-draggable="useDraggable"
           class="base-entry-selector__body__entries"
           @clicked="entryClicked"
           @selected="selectEntry">
@@ -409,6 +410,13 @@ export default {
     showOptionsRow: {
       type: Boolean,
       default: true,
+    },
+    /**
+     * make the single menu list items draggable
+     */
+    useDraggable: {
+      type: Boolean,
+      default: false,
     },
     /**
      * this prop gives the option to add assistive text for screen readers.

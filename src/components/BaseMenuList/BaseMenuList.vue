@@ -124,18 +124,20 @@ export default {
       default: () => [],
     },
     /**
+     * make the single menu list items draggable
+     */
+    useDraggable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * specify the group name for the drag receiver
+     * **important**: if you intend to use the drag functionality set `useDraggable`
+     * to `true`
      */
     dragName: {
       type: String,
       default: 'menuEntry',
-    },
-    /**
-     * optionally use the component without vue-draggable
-     */
-    useDraggable: {
-      type: Boolean,
-      default: true,
     },
   },
   emits: ['selected', 'clicked', 'update:list'],
