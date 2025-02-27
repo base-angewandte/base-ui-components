@@ -1,9 +1,4 @@
 <script>
-/**
- * component to display different types of links
- * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
- */
-
 import { defineAsyncComponent, ref, getCurrentInstance, computed } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useEventListener } from '@/composables/useEventListener.js';
@@ -11,6 +6,11 @@ import { useDebounce } from '@/composables/useDebounce.js';
 import { useId } from '@/composables/useId.js';
 import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
+
+/**
+ * component to display different types of links
+ * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
+ */
 
 export default {
   name: 'BaseLink',
