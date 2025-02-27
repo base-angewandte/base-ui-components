@@ -72,6 +72,7 @@ import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import { useI18n } from '@/composables/useI18n.js';
 import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
 import { useTemplateRef } from 'vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
 
 export default {
   name: 'BaseEditControl',
@@ -172,9 +173,21 @@ export default {
 
     /** TITLE LINE FADE OUT */
     const titleLine = useTemplateRef('titleLineElement');
-    const { boxFadeOut } = useElementFadeOut({
+    const { boxFadeOut, calcFadeOut } = useElementFadeOut({
       target: titleLine,
       direction: 'horizontal',
+    });
+
+    // also consider the title text (or subtext changing) in fade out calc
+    useElementObserver({
+      type: 'mutation',
+      target: titleLine,
+      callback: calcFadeOut,
+      options: {
+        characterData: true,
+        subtree: true,
+      },
+      callOnMount: true,
     });
 
     return {
