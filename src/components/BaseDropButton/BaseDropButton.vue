@@ -405,6 +405,7 @@ export default {
       padding: $spacing-small $spacing;
       background: $background-color;
       color: inherit;
+      cursor: pointer;
 
       &.base-drop-button__toggle-button__active,
       &:hover {
