@@ -1,77 +1,3 @@
-<template>
-  <div
-    :class="['base-info-panel', { 'base-info-panel--box-shadow': boxShadow },
-             `base-info-panel--${panelStyle}`]">
-    <!-- LEFT SIDE - ICON -->
-    <div
-      v-if="useIconElement"
-      :class="['base-info-panel__icon-wrapper', `base-info-panel__icon-wrapper--${alignIconInt}`]">
-      <!-- @slot replace the left side icon element -->
-      <slot
-        name="icon">
-        <BaseIcon
-          :name="iconName"
-          :class="['base-info-panel__icon', `base-info-panel__icon--${panelStyle}`]" />
-      </slot>
-    </div>
-
-    <!-- RIGHT SIDE - TEXT -->
-    <div
-      class="base-info-panel__text-wrapper">
-      <!-- HEADER -->
-      <component
-        :is="renderPanelHeaderAs"
-        v-if="useHeaderElement"
-        class="base-info-panel__text-header">
-        <!-- @slot replace the header instead of using `panelHeaderText` -->
-        <slot
-          name="header">
-          {{ panelHeaderText }}
-        </slot>
-      </component>
-
-      <!-- BODY -->
-      <component
-        :is="textBodyWrapper"
-        v-bind="expandable ? expandBoxProps : false"
-        class="base-info-panel__text-body">
-        <!-- @slot replace the text body with something custom e.g. BaseTextList -->
-        <slot
-          name="text">
-          <p
-            v-for="paragraph in displayedText"
-            :key="paragraph">
-            {{ paragraph }}
-          </p>
-        </slot>
-        <!-- BOTTOM AREA -->
-        <div
-          v-if="useBottomElement"
-          class="base-info-panel__text-body-bottom">
-          <div
-            class="base-info-panel__button-row">
-            <template
-              v-if="!!buttonsConfig.length">
-              <BaseButton
-                v-for="{ id, label, icon, iconPosition, disabled } in buttonsConfig"
-                :key="id"
-                :text="label"
-                :icon="icon"
-                :disabled="disabled ?? false"
-                :icon-position="iconPosition || 'right'"
-                button-style="single"
-                icon-size="large"
-                @clicked="emitAction(id)" />
-            </template>
-            <!-- @slot replace buttons with custom elements or add some other custom element. If body is expandable these elements are rendered within the expand box.  -->
-            <slot name="bottom" />
-          </div>
-        </div>
-      </component>
-    </div>
-  </div>
-</template>
-
 <script>
 import { computed, defineAsyncComponent, useSlots } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
@@ -189,7 +115,6 @@ export default {
      * @returns {boolean}
      */
     const useIconElement = computed(() => {
-      console.log(iconSlotHasContent.value);
       return !!props.iconName || iconSlotHasContent.value;
     });
 
@@ -275,6 +200,80 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-info-panel', { 'base-info-panel--box-shadow': boxShadow },
+             `base-info-panel--${panelStyle}`]">
+    <!-- LEFT SIDE - ICON -->
+    <div
+      v-if="useIconElement"
+      :class="['base-info-panel__icon-wrapper', `base-info-panel__icon-wrapper--${alignIconInt}`]">
+      <!-- @slot replace the left side icon element -->
+      <slot
+        name="icon">
+        <BaseIcon
+          :name="iconName"
+          :class="['base-info-panel__icon', `base-info-panel__icon--${panelStyle}`]" />
+      </slot>
+    </div>
+
+    <!-- RIGHT SIDE - TEXT -->
+    <div
+      class="base-info-panel__text-wrapper">
+      <!-- HEADER -->
+      <component
+        :is="renderPanelHeaderAs"
+        v-if="useHeaderElement"
+        class="base-info-panel__text-header">
+        <!-- @slot replace the header instead of using `panelHeaderText` -->
+        <slot
+          name="header">
+          {{ panelHeaderText }}
+        </slot>
+      </component>
+
+      <!-- BODY -->
+      <component
+        :is="textBodyWrapper"
+        v-bind="expandable ? expandBoxProps : false"
+        class="base-info-panel__text-body">
+        <!-- @slot replace the text body with something custom e.g. BaseTextList -->
+        <slot
+          name="text">
+          <p
+            v-for="paragraph in displayedText"
+            :key="paragraph">
+            {{ paragraph }}
+          </p>
+        </slot>
+        <!-- BOTTOM AREA -->
+        <div
+          v-if="useBottomElement"
+          class="base-info-panel__text-body-bottom">
+          <div
+            class="base-info-panel__button-row">
+            <template
+              v-if="!!buttonsConfig.length">
+              <BaseButton
+                v-for="{ id, label, icon, iconPosition, disabled } in buttonsConfig"
+                :key="id"
+                :text="label"
+                :icon="icon"
+                :disabled="disabled ?? false"
+                :icon-position="iconPosition || 'right'"
+                button-style="single"
+                icon-size="large"
+                @clicked="emitAction(id)" />
+            </template>
+            <!-- @slot replace buttons with custom elements or add some other custom element. If body is expandable these elements are rendered within the expand box.  -->
+            <slot name="bottom" />
+          </div>
+        </div>
+      </component>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 @use "@/styles/variables" as *;
