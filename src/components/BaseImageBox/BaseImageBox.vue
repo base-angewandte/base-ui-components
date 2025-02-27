@@ -411,9 +411,15 @@ export default {
     },
     /**
      * define html element that should be rendered
+     * this could either be a native HTML element or a framework specific component
+     * name (e.g. `'RouterLink'`) or a component passed directly
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     renderElementAs: {
-      type: String,
+      type: [String, Object],
       default: 'div',
     },
     /**

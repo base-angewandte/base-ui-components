@@ -587,14 +587,21 @@ export default {
     },
     /**
      * specify if pagination elements should be a link element - if pagination element should
-     * be a link element - please specify the kind of element (currently only Vue components (e.g.
+     * be a link element - please specify the kind of element either as a string (e.g. `'RouterLink'`
+     * or pass the component directly (currently only Vue components (e.g.
      * [`RouterLink`](https://router.vuejs.org/guide/#router-link),
      * [`NuxtLink`](https://nuxtjs.org/docs/features/nuxt-components/#the-nuxtlink-component)) are supported)
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     usePaginationLinkElement: {
-      type: [String, Boolean],
+      type: [String, Boolean, Object],
       default: false,
-      validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
+      validator: val => (typeof val === 'boolean' && !val)
+        || (typeof val === 'string' && val)
+        || (typeof val === 'object' && val.name && ['NuxtLink', 'RouterLink'].includes(val.name)),
     },
     /**
      * set this variable `true` if pagination is used and data fetching is done per page
