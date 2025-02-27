@@ -1,196 +1,3 @@
-<template>
-  <div
-    :style="calcStyle"
-    class="base-entry-selector">
-    <!-- HEAD -->
-    <div
-      ref="head"
-      :class="['base-entry-selector__head',
-               { 'base-entry-selector__head--shadow': headHasShadow },
-               { 'base-entry-selector__head--padding': useSearch }]">
-      <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
-      <slot name="head">
-        <!-- default -->
-        <BaseSearch
-          v-if="useSearch"
-          v-model="filterString"
-          :show-image="true"
-          :placeholder="getI18nTerm(entrySelectorText.search)"
-          :assistive-text="{
-            loaderActive: assistiveText.loaderActive,
-            results: resultsAnnouncement,
-          }"
-          :class="['base-entry-selector__head__search-bar',
-                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
-          @update:model-value="filterEntries($event, 'title')" />
-      </slot>
-
-      <!-- BASE OPTIONS ROW -->
-      <div
-        v-if="showOptionsRow"
-        class="base-entry-selector__options">
-        <BaseOptions
-          ref="baseOptions"
-          v-model:show-options="showOptions"
-          :options-hidden="optionsHidden"
-          :use-options-button-on="'always'"
-          :show-after-options-below="true"
-          :options-button-icon="{
-            show: 'options-menu',
-            hide: 'options-menu',
-          }"
-          :options-button-text="entrySelectorText.options"
-          align-options="left">
-          <template
-            #afterOptions>
-            <div
-              class="base-entry-selector__dropdowns">
-              <!-- @slot to add custom elements at the end of the options row, e.g. custom drop downs -->
-              <slot name="after-options">
-                <!-- default -->
-                <BaseDropDown
-                  v-if="sortOptions.length"
-                  :id="`${sortConfig.label}-sort-drop-down`"
-                  ref="baseDropDown"
-                  v-model="sortParam"
-                  :label="sortConfig.label"
-                  :options="sortOptions"
-                  :with-spacing="false"
-                  :align-drop-down="entryTypes.length ? 'left' : 'right'"
-                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
-                  :value-prop="sortConfig.valuePropertyName"
-                  class="base-entry-selector__dropdowns__dropdown"
-                  @update:model-value="fetchEntries" />
-                <BaseDropDown
-                  v-if="entryTypes.length"
-                  :id="`${entryTypesConfig.label}-types-drop-down`"
-                  ref="baseDropDown"
-                  v-model="filterType"
-                  :label="entryTypesConfig.label"
-                  :options="entryTypes"
-                  :language="language"
-                  :with-spacing="false"
-                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
-                  :value-prop="entryTypesConfig.valuePropertyName"
-                  align-drop-down="right"
-                  class="base-entry-selector__dropdowns__dropdown"
-                  @update:model-value="filterEntries($event, 'type')" />
-              </slot>
-            </div>
-          </template>
-          <template
-            #options>
-            <!-- @slot add custom action (buttons) -->
-            <slot name="option-actions" />
-          </template>
-        </BaseOptions>
-      </div>
-      <!-- SELECTOR OPTIONS -->
-      <BaseSelectOptions
-        v-if="showOptions"
-        ref="selectOptions"
-        :select-text="getI18nTerm(entrySelectorText.selectAll)"
-        :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
-        :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
-        :list="selectableEntries"
-        :selected-list="selectedEntries"
-        :select-all-disabled="!!maxSelectedEntries
-          && (!(selectableEntries.length < (maxSelectedEntries - selectedListIds.length)
-            || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
-        @selected="changeAllSelectState">
-        <template #selectedText>
-          {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
-          ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
-          <span
-            v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
-            {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
-          </span>
-        </template>
-      </BaseSelectOptions>
-    </div>
-
-    <!-- BODY -->
-    <div
-      ref="body"
-      class="base-entry-selector__body">
-      <div
-        v-if="isLoading"
-        class="loading-area">
-        <BaseLoader
-          :text-on-loader-show="assistiveText.loaderActive"
-          :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
-      </div>
-
-      <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
-          @binding {Object[]} entries - list of entries to display
-          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
-          -->
-      <slot
-        name="entries"
-        :entries="entries"
-        :select-entry="selectEntry">
-        <!-- default -->
-        <BaseMenuList
-          v-if="entries.length"
-          key="menu-list"
-          ref="menuList"
-          :select-active="showOptions"
-          :list="entries"
-          :active-entry="activeEntry"
-          :selected-list="selectedListIds"
-          :use-draggable="useDraggable"
-          class="base-entry-selector__body__entries"
-          @clicked="entryClicked"
-          @selected="selectEntry">
-          <template #entry-text-content="{ item }">
-            <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
-            @binding {Object} item - the data of one single selector entry provided with `entries` -->
-            <slot
-              name="entry-text-content"
-              :item="item" />
-          </template>
-          <template #entry-right-side-elements="{ isSelected, item }">
-            <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
-               @binding { Object } item - the complete entry provided by list
-               @binding { boolean } is-selected - was item selected
-               @binding { boolean } select-active - is select mode of entry selector active -->
-            <slot
-              name="entry-right-side-elements"
-              :is-selected="isSelected"
-              :select-active="showOptions"
-              :item="item" />
-          </template>
-          <template
-            #thumbnails="{ item }">
-            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
-              @binding { Object } item - the data of one entry provided by `entries` prop -->
-            <slot
-              :item="item"
-              name="thumbnails" />
-          </template>
-        </BaseMenuList>
-        <div
-          v-else-if="!isLoading"
-          class="base-entry-selector__no-entries">
-          <p class="base-entry-selector__no-entries__title">
-            {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
-          </p>
-          <p class="base-entry-selector__no-entries__subtext">
-            {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
-          </p>
-        </div>
-      </slot>
-    </div>
-
-    <BasePagination
-      v-if="pageTotal > 1"
-      ref="pagination"
-      :total="pageTotal"
-      :model-value="pageNumber"
-      @update:model-value="setPage" />
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, ref, toRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
@@ -382,17 +189,17 @@ export default {
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => [
-        'noEntriesTitle',
-        'noEntriesSubtext',
-        'options',
-        'search',
-        'selectAll',
-        'selectNone',
-        'entriesSelected',
-        'maxEntriesReached',
-      ]
-        .every(prop => Object.keys(val).includes(prop))
-          && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
+          'noEntriesTitle',
+          'noEntriesSubtext',
+          'options',
+          'search',
+          'selectAll',
+          'selectNone',
+          'entriesSelected',
+          'maxEntriesReached',
+        ]
+          .every(prop => Object.keys(val).includes(prop))
+        && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
     },
     /**
      * define if search field should be shown.
@@ -722,6 +529,199 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :style="calcStyle"
+    class="base-entry-selector">
+    <!-- HEAD -->
+    <div
+      ref="head"
+      :class="['base-entry-selector__head',
+               { 'base-entry-selector__head--shadow': headHasShadow },
+               { 'base-entry-selector__head--padding': useSearch }]">
+      <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
+      <slot name="head">
+        <!-- default -->
+        <BaseSearch
+          v-if="useSearch"
+          v-model="filterString"
+          :show-image="true"
+          :placeholder="getI18nTerm(entrySelectorText.search)"
+          :assistive-text="{
+            loaderActive: assistiveText.loaderActive,
+            results: resultsAnnouncement,
+          }"
+          :class="['base-entry-selector__head__search-bar',
+                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
+          @update:model-value="filterEntries($event, 'title')" />
+      </slot>
+
+      <!-- BASE OPTIONS ROW -->
+      <div
+        v-if="showOptionsRow"
+        class="base-entry-selector__options">
+        <BaseOptions
+          ref="baseOptions"
+          v-model:show-options="showOptions"
+          :options-hidden="optionsHidden"
+          :use-options-button-on="'always'"
+          :show-after-options-below="true"
+          :options-button-icon="{
+            show: 'options-menu',
+            hide: 'options-menu',
+          }"
+          :options-button-text="entrySelectorText.options"
+          align-options="left">
+          <template
+            #afterOptions>
+            <div
+              class="base-entry-selector__dropdowns">
+              <!-- @slot to add custom elements at the end of the options row, e.g. custom drop downs -->
+              <slot name="after-options">
+                <!-- default -->
+                <BaseDropDown
+                  v-if="sortOptions.length"
+                  :id="`${sortConfig.label}-sort-drop-down`"
+                  ref="baseDropDown"
+                  v-model="sortParam"
+                  :label="sortConfig.label"
+                  :options="sortOptions"
+                  :with-spacing="false"
+                  :align-drop-down="entryTypes.length ? 'left' : 'right'"
+                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
+                  :value-prop="sortConfig.valuePropertyName"
+                  class="base-entry-selector__dropdowns__dropdown"
+                  @update:model-value="fetchEntries" />
+                <BaseDropDown
+                  v-if="entryTypes.length"
+                  :id="`${entryTypesConfig.label}-types-drop-down`"
+                  ref="baseDropDown"
+                  v-model="filterType"
+                  :label="entryTypesConfig.label"
+                  :options="entryTypes"
+                  :language="language"
+                  :with-spacing="false"
+                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
+                  :value-prop="entryTypesConfig.valuePropertyName"
+                  align-drop-down="right"
+                  class="base-entry-selector__dropdowns__dropdown"
+                  @update:model-value="filterEntries($event, 'type')" />
+              </slot>
+            </div>
+          </template>
+          <template
+            #options>
+            <!-- @slot add custom action (buttons) -->
+            <slot name="option-actions" />
+          </template>
+        </BaseOptions>
+      </div>
+      <!-- SELECTOR OPTIONS -->
+      <BaseSelectOptions
+        v-if="showOptions"
+        ref="selectOptions"
+        :select-text="getI18nTerm(entrySelectorText.selectAll)"
+        :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
+        :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
+        :list="selectableEntries"
+        :selected-list="selectedEntries"
+        :select-all-disabled="!!maxSelectedEntries
+          && (!(selectableEntries.length < (maxSelectedEntries - selectedListIds.length)
+            || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
+        @selected="changeAllSelectState">
+        <template #selectedText>
+          {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
+          ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
+          <span
+            v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
+            {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
+          </span>
+        </template>
+      </BaseSelectOptions>
+    </div>
+
+    <!-- BODY -->
+    <div
+      ref="body"
+      class="base-entry-selector__body">
+      <div
+        v-if="isLoading"
+        class="loading-area">
+        <BaseLoader
+          :text-on-loader-show="assistiveText.loaderActive"
+          :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
+      </div>
+
+      <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
+          @binding {Object[]} entries - list of entries to display
+          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
+          -->
+      <slot
+        name="entries"
+        :entries="entries"
+        :select-entry="selectEntry">
+        <!-- default -->
+        <BaseMenuList
+          v-if="entries.length"
+          key="menu-list"
+          ref="menuList"
+          :select-active="showOptions"
+          :list="entries"
+          :active-entry="activeEntry"
+          :selected-list="selectedListIds"
+          :use-draggable="useDraggable"
+          class="base-entry-selector__body__entries"
+          @clicked="entryClicked"
+          @selected="selectEntry">
+          <template #entry-text-content="{ item }">
+            <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
+            @binding {Object} item - the data of one single selector entry provided with `entries` -->
+            <slot
+              name="entry-text-content"
+              :item="item" />
+          </template>
+          <template #entry-right-side-elements="{ isSelected, item }">
+            <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
+               @binding { Object } item - the complete entry provided by list
+               @binding { boolean } is-selected - was item selected
+               @binding { boolean } select-active - is select mode of entry selector active -->
+            <slot
+              name="entry-right-side-elements"
+              :is-selected="isSelected"
+              :select-active="showOptions"
+              :item="item" />
+          </template>
+          <template
+            #thumbnails="{ item }">
+            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
+              @binding { Object } item - the data of one entry provided by `entries` prop -->
+            <slot
+              :item="item"
+              name="thumbnails" />
+          </template>
+        </BaseMenuList>
+        <div
+          v-else-if="!isLoading"
+          class="base-entry-selector__no-entries">
+          <p class="base-entry-selector__no-entries__title">
+            {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
+          </p>
+          <p class="base-entry-selector__no-entries__subtext">
+            {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
+          </p>
+        </div>
+      </slot>
+    </div>
+
+    <BasePagination
+      v-if="pageTotal > 1"
+      ref="pagination"
+      :total="pageTotal"
+      :model-value="pageNumber"
+      @update:model-value="setPage" />
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
