@@ -4,7 +4,9 @@
     <component
       :is="renderTitleAs"
       v-if="title"
-      class="base-edit-control__title  base-text-fade-out-background">
+      ref="titleLineElement"
+      :class="['base-edit-control__title',
+               { 'base-text-fade-out-background': boxFadeOut.right }]">
       <!-- @slot title slot -->
       <slot>
         {{ title }}
@@ -68,6 +70,8 @@
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import { useI18n } from '@/composables/useI18n.js';
+import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
+import { useTemplateRef } from 'vue';
 
 export default {
   name: 'BaseEditControl',
@@ -163,9 +167,19 @@ export default {
   },
   emits: ['saved', 'canceled', 'activated'],
   setup() {
+    /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
+
+    /** TITLE LINE FADE OUT */
+    const titleLine = useTemplateRef('titleLineElement');
+    const { boxFadeOut } = useElementFadeOut({
+      target: titleLine,
+      direction: 'horizontal',
+    });
+
     return {
       getI18nTerm,
+      boxFadeOut,
     };
   },
   computed: {
