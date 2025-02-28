@@ -1,14 +1,3 @@
-<template>
-  <img
-    :alt="alt"
-    :data-src="lazyload ? source : null"
-    :data-srcset="lazyload ? sourceSet : null"
-    :src="lazyload ? clearPng : source"
-    :srcset="lazyload ? null : sourceSet"
-    :class="['base-image', { lazyload: lazyload }]"
-    @error="emitError">
-</template>
-
 <script>
 import 'lazysizes';
 
@@ -75,6 +64,17 @@ export default {
   },
 };
 </script>
+
+<template>
+  <img
+    :alt="alt"
+    :data-src="lazyload ? source : null"
+    :data-srcset="lazyload ? sourceSet : null"
+    :src="lazyload ? clearPng : source"
+    :srcset="lazyload ? null : sourceSet"
+    :class="['base-image', { lazyload: lazyload }]"
+    @error="emitError">
+</template>
 
 <style lang="scss" scoped>
   .base-image {
