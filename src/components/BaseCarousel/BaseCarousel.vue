@@ -45,7 +45,6 @@
 </template>
 
 <script>
-import 'lazysizes';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
 
