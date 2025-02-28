@@ -47,6 +47,7 @@
 <script>
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
+import { useI18n } from '@/composables/useI18n.js';
 
 export default {
   name: 'BaseCarousel',
@@ -92,9 +93,33 @@ export default {
       type: [String, Object],
       default: 'RouterLink',
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers.
+     *
+     * properties:
+     * **gotoSlide**: describing a single pagination bullet
+     * **nextSlide**: describing the next button
+     * **prevSlide**: describing the previous button
+     * **roleDescription**: describing the role of outer swiper container
+     * **slide**: describing a single slide
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        gotoSlide: 'Go to slide {{index}}',
+        nextSlide: 'Next slide',
+        prevSlide: 'Previous slide',
+        roleDescription: 'Carousel element with {total} items',
+        slide: 'Slide',
+      }),
+      validator: val => Object.keys(val).every(key => ['gotoSlide', 'nextSlide', 'prevSlide', 'roleDescription', 'slide'].includes(key)),
+    },
   },
   emits: ['initialized', 'clicked'],
   setup() {
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
     /** CHECK ROUTER AVAILABILITY */
     // we need to access the current component instance
     // to check for router
@@ -106,6 +131,7 @@ export default {
      */
     const isRouterAvailable = computed(() => !!app.config.globalProperties?.$router);
     return {
+      getI18nTerm,
       isRouterAvailable,
     };
   },
@@ -160,6 +186,7 @@ export default {
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
       const { Swiper } = await import('swiper');
+      const { A11y } = await import('swiper/modules');
       const { Autoplay } = await import('swiper/modules');
       const { Keyboard } = await import('swiper/modules');
       const { Navigation } = await import('swiper/modules');
@@ -167,18 +194,50 @@ export default {
 
       this.swiperIsActive = true;
       this.swiperOptionsInt.init = false;
+
+      // add autoplay settings if needed
       if (this.swiperOptionsInt.autoplay) {
         this.swiperOptionsInt.autoplay = {};
         this.swiperOptionsInt.autoplay.delay = this.swiperOptionsInt.autoplayDelay || 3000;
         this.swiperOptionsInt.autoplay.disableOnInteraction = true;
       }
 
+      // enable accessibility settings
+      this.swiperOptionsInt.a11y = {
+        enabled: true,
+        containerMessage: '',
+        containerRole: 'region',
+        containerRoleDescriptionMessage: this.getI18nTerm(this.assistiveText.roleDescription).replace('{total}', this.items.length),
+        itemRoleDescriptionMessage: this.getI18nTerm(this.assistiveText.slide),
+        nextSlideMessage: this.getI18nTerm(this.assistiveText.nextSlide),
+        paginationBulletMessage: this.getI18nTerm(this.assistiveText.gotoSlide),
+        prevSlideMessage: this.getI18nTerm(this.assistiveText.prevSlide),
+        slideLabelMessage: '{{index}} / {{slidesLength}}',
+        // override with values from outside if defined
+        ...this.swiperOptions?.a11y,
+      }
+
+      // add classes for custom navigation elements
       this.swiperOptionsInt.navigation = {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
+        // override with values from outside if defined
+        ...this.swiperOptions?.navigation,
       };
-      this.swiperOptionsInt.modules = [Autoplay, Keyboard, Navigation, Pagination];
 
+      // define pagination elements
+      this.swiperOptionsInt.pagination = {
+        el: '.swiper-pagination',
+        clickable: true,
+        bulletElement: 'button',
+        // override with values from outside if defined
+        ...this.swiperOptions?.pagination,
+      };
+
+      // init swiper modules
+      this.swiperOptionsInt.modules = [A11y, Autoplay, Keyboard, Navigation, Pagination];
+
+      // init swiper
       setTimeout(() => {
         this.swiper = new Swiper('.swiper', this.swiperOptionsInt);
         this.swiper.init();

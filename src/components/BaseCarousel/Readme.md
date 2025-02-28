@@ -14,10 +14,6 @@
        keyboard: {
          enabled: true,
        },
-       pagination: {
-         el: '.swiper-pagination',
-         clickable: true,
-       },
        breakpoints: {
          640: {
            slidesPerView: 2,
