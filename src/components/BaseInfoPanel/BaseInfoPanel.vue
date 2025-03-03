@@ -52,7 +52,8 @@ export default {
       default: '',
     },
     /**
-     * define the HTML element as which the header should be rendered.
+     * define the HTML element as which the header should be rendered or
+     * use slot `header` instead.
      */
     renderPanelHeaderAs: {
       type: String,
@@ -222,16 +223,15 @@ export default {
     <div
       class="base-info-panel__text-wrapper">
       <!-- HEADER -->
-      <component
-        :is="renderPanelHeaderAs"
-        v-if="useHeaderElement"
-        class="base-info-panel__text-header">
-        <!-- @slot replace the header instead of using `panelHeaderText` -->
-        <slot
-          name="header">
+      <!-- @slot replace the header instead of using `panelHeaderText` -->
+      <slot
+        name="header">
+        <component
+          :is="renderPanelHeaderAs"
+          v-if="useHeaderElement">
           {{ panelHeaderText }}
-        </slot>
-      </component>
+        </component>
+      </slot>
 
       <!-- BODY -->
       <component
