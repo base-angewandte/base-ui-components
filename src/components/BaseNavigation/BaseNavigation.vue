@@ -3,51 +3,55 @@
     :aria-label="navigationLabel"
     class="base-navigation">
     <!-- VIEW FOR DESKTOP APPLICATIONS -->
-    <ul
-      v-if="!isMobile"
-      ref="desktopNavigationElement"
-      class="base-navigation__nav-items">
-      <!-- PRIMARY ELEMENTS -->
-      <li
-        v-for="element in primaryItems"
-        :key="`p-${element.id}`"
-        class="base-navigation__nav-item">
-        <BaseLink
-          :render-link-as="renderAs"
-          :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-          :aria-current="element.id === activeElementIdInt ? 'page' : null"
-          :identifier-property-value="element.route || undefined"
-          :url="element.url || undefined"
-          :class="['base-navigation__nav-item-link',
-                   { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
-          <template #label="{ label }">
-            <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-              {{ label }}
-            </span>
-          </template>
-        </BaseLink>
-      </li>
-      <!-- SECONDARY ELEMENTS -->
-      <li
-        v-for="element in secondaryItems"
-        :key="`s-${element.id}`"
-        class="base-navigation__nav-item base-navigation__nav-item--secondary">
-        <BaseLink
-          :render-link-as="renderAs"
-          :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-          :aria-current="element.id === activeElementIdInt ? 'page' : null"
-          :identifier-property-value="element.route || undefined"
-          :url="element.url || undefined"
-          :class="['base-navigation__nav-item-link',
-                   { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
-          <template #label="{ label }">
-            <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-              {{ label }}
-            </span>
-          </template>
-        </BaseLink>
-      </li>
-    </ul>
+    <!-- render desktop view if a) elements were mounted and window size is not mobile (-> default
+      rendered is mobile view) -->
+    <template
+      v-if="isMounted && !isMobile">
+      <ul
+        ref="desktopNavigationElement"
+        class="base-navigation__nav-items">
+        <!-- PRIMARY ELEMENTS -->
+        <li
+          v-for="element in primaryItems"
+          :key="`p-${element.id}`"
+          class="base-navigation__nav-item">
+          <BaseLink
+            :render-link-as="renderAs"
+            :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+            :aria-current="element.id === activeElementIdInt ? 'page' : null"
+            :identifier-property-value="element.route || undefined"
+            :url="element.url || undefined"
+            :class="['base-navigation__nav-item-link',
+                     { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
+            <template #label="{ label }">
+              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                {{ label }}
+              </span>
+            </template>
+          </BaseLink>
+        </li>
+        <!-- SECONDARY ELEMENTS -->
+        <li
+          v-for="element in secondaryItems"
+          :key="`s-${element.id}`"
+          class="base-navigation__nav-item base-navigation__nav-item--secondary">
+          <BaseLink
+            :render-link-as="renderAs"
+            :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+            :aria-current="element.id === activeElementIdInt ? 'page' : null"
+            :identifier-property-value="element.route || undefined"
+            :url="element.url || undefined"
+            :class="['base-navigation__nav-item-link',
+                     { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
+            <template #label="{ label }">
+              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                {{ label }}
+              </span>
+            </template>
+          </BaseLink>
+        </li>
+      </ul>
+    </template>
 
     <!-- MOBILE VIEW -->
     <template v-else>
@@ -75,7 +79,7 @@
         </div>
         <!-- HAMBURGER MENU -->
         <BaseButton
-          v-if="isMobile && mobileDropDownElements.length"
+          v-if="isMounted && isMobile && mobileDropDownElements.length"
           ref="menuButtonElement"
           button-style="row"
           text=""
@@ -143,7 +147,6 @@
 
 <script setup>
 import BaseLink from '@/components/BaseLink/BaseLink.vue';
-import { useDebounce } from '@/composables/useDebounce.js';
 import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, useTemplateRef, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 
@@ -266,14 +269,6 @@ const props = defineProps({
   },
 });
 
-// use the debounce function for window resize
-const { debounce } = useDebounce();
-// set up all the html elements that are needed for resize calculations
-// (mobile or desktop view)
-const mobileViewNavigation = useTemplateRef('mobileViewNavigationElement');
-const desktopNavigation = useTemplateRef('desktopNavigationElement');
-const menuButton = useTemplateRef('menuButtonElement');
-
 /** MOBILE NAV OPEN HANDLING */
 /**
  * variable to control navigation drop down on mobile
@@ -335,11 +330,26 @@ const activeElement = computed(() => {
 const activeElementIdInt = computed(() => activeElement.value?.id ?? '');
 
 /** MOBILE OR DESKTOP DISPLAY */
+// set up all the html elements that are needed for resize calculations
+// (mobile or desktop view)
+const mobileViewNavigation = useTemplateRef('mobileViewNavigationElement');
+const desktopNavigation = useTemplateRef('desktopNavigationElement');
+const menuButton = useTemplateRef('menuButtonElement');
+
 // get isMobile variable from window resize event listener
 const { isMobile } = useWindowResize({
   callback: resizeTriggered,
   mobileMaxSize: props.mobileSize,
+  setDebounce: 0,
+  callOnMounted: true,
 });
+
+/**
+ * only render desktop view when dom was mounted (to avoid hydration issues with SSR)
+ * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+ */
+const isMounted = ref(false);
+
 /**
  * after calculating all the element widths - should short label be shown?
  * @type {Ref<UnwrapRef<boolean>>}
@@ -382,77 +392,78 @@ const showSeparator = computed(() => {
  */
 function calcTextWidth() {
   // clone the navigation element in question
-  const cloneRef = isMobile.value ? mobileViewNavigation.value : desktopNavigation.value;
-  // clone the element
-  const clonedNavigation = cloneRef.cloneNode(true);
-  // get the element width (needed to set clone width and for mobile calculations)
-  const navigationWidth = cloneRef.clientWidth;
-  // set the cloned element width
-  clonedNavigation.style.maxWidth = `${navigationWidth}px`;
-  // add the cloned element to the DOM
-  cloneRef.parentElement.append(clonedNavigation);
-  // different elements need to be checked if it is mobile (<640px or custom mobileSize) or desktop
-  // also include MenuButton in check here since it is sometimes not rendered yet
-  if (isMobile.value && menuButton.value) {
-    // get the menu button width
-    const menuButtonWidth = menuButton.value.$el.clientWidth;
-    // get the link (<a>) element
-    const activeLinkElement = clonedNavigation.getElementsByTagName('a')[0];
-    // get the text (<span>) element
-    const activeTextElement = clonedNavigation.getElementsByTagName('span')[0];
-    // get the link element (<a>) of the active element
-    // const activeLinkElement = clonedNavigation.firstChild.firstChild;
-    // get the text element (<span>) of the active element
-    // const activeTextElement = activeLinkElement.firstChild;
-    // get the padding of the link element
-    const activeLinkPadding = Number(window.getComputedStyle(activeLinkElement).paddingLeft
-      .replace('px', ''));
-    // now set the regular label of the currently active element as innerText
-    activeTextElement.innerText = activeElement.value.label;
-    // check if short label should be shown by
-    // a) checking if active element label does not fit in the navigation width (- the menu button width)
-    showShortLabel.value = (navigationWidth - menuButtonWidth - (2 * activeLinkPadding)
-            < activeTextElement.scrollWidth)
+  const cloneRef = mobileViewNavigation.value || desktopNavigation.value;
+  // safeguard against element not existing
+  if (cloneRef) {
+    // clone the element
+    const clonedNavigation = cloneRef.cloneNode(true);
+    // get the element width (needed to set clone width and for mobile calculations)
+    const navigationWidth = cloneRef.clientWidth;
+    // set the cloned element width
+    clonedNavigation.style.maxWidth = `${navigationWidth}px`;
+    // add the cloned element to the DOM
+    cloneRef.parentElement.append(clonedNavigation);
+    // different elements need to be checked if it is mobile (<640px or custom mobileSize) or desktop
+    // also include MenuButton in check here since it is sometimes not rendered yet
+    if (isMobile.value && menuButton.value) {
+      // get the menu button width
+      const menuButtonWidth = menuButton.value.$el.clientWidth;
+      // get the link (<a>) element
+      const activeLinkElement = clonedNavigation.getElementsByTagName('a')[0];
+      // get the text (<span>) element
+      const activeTextElement = clonedNavigation.getElementsByTagName('span')[0];
+      // get the link element (<a>) of the active element
+      // const activeLinkElement = clonedNavigation.firstChild.firstChild;
+      // get the text element (<span>) of the active element
+      // const activeTextElement = activeLinkElement.firstChild;
+      // get the padding of the link element
+      const activeLinkPadding = Number(window.getComputedStyle(activeLinkElement).paddingLeft
+        .replace('px', ''));
+      // now set the regular label of the currently active element as innerText
+      activeTextElement.innerText = activeElement.value.label;
+      // check if short label should be shown by
+      // a) checking if active element label does not fit in the navigation width (- the menu button width)
+      showShortLabel.value = (navigationWidth - menuButtonWidth - (2 * activeLinkPadding)
+          < activeTextElement.scrollWidth)
         // b) if any of the dropdown entries does not fit into the navigation width
         || mobileDropDownElements.value.some((item) => {
           // assign the relevant label
           activeTextElement.innerText = item.label;
           // see if it fits
           return (Math.ceil(navigationWidth - (2 * activeLinkPadding))
-              < activeTextElement.scrollWidth);
+            < activeTextElement.scrollWidth);
         });
-  } else {
-    // get grandchildren of navigation element -> <li> elements
-    showShortLabel.value = [...clonedNavigation.childNodes].flat()
-    // filter out separation lines and other potential items that do not contain a link element
-      .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-navigation__nav-item-link')[0])
-    // check if one of the elements has text that does not fit the link element
-      .some((li, index) => {
-        // get the link (<a>) element
-        const linkElement = li.getElementsByTagName('a')[0] || li.firstChild;
-        // get the text (<span>) element
-        const textElement = li.getElementsByTagName('span')[0];
-        // set the innerText of the span to the full label of the element with the same index in the navElements array
-        textElement.innerText = navElements.value[index]?.label;
-        // get the link element padding to subtract from available width
-        const linkPadding = Number(window.getComputedStyle(linkElement).paddingLeft.replace('px', ''));
-        // check if text fits link element width of if scrollWidth exceeds it
-        return (Math.ceil(linkElement.clientWidth - (2 * linkPadding)) < textElement.scrollWidth);
-      });
+    } else {
+      // get grandchildren of navigation element -> <li> elements
+      showShortLabel.value = [...clonedNavigation.childNodes].flat()
+        // filter out separation lines and other potential items that do not contain a link element
+        .filter(li => li instanceof HTMLElement && li.getElementsByClassName('base-navigation__nav-item-link')[0])
+        // check if one of the elements has text that does not fit the link element
+        .some((li, index) => {
+          // get the link (<a>) element
+          const linkElement = li.getElementsByTagName('a')[0] || li.firstChild;
+          // get the text (<span>) element
+          const textElement = li.getElementsByTagName('span')[0];
+          // set the innerText of the span to the full label of the element with the same index in the navElements array
+          textElement.innerText = navElements.value[index]?.label;
+          // get the link element padding to subtract from available width
+          const linkPadding = Number(window.getComputedStyle(linkElement).paddingLeft.replace('px', ''));
+          // check if text fits link element width of if scrollWidth exceeds it
+          return (Math.ceil(linkElement.clientWidth - (2 * linkPadding)) < textElement.scrollWidth);
+        });
+    }
+    // remove the cloned elements
+    clonedNavigation.remove();
   }
-  // remove the cloned elements
-  clonedNavigation.remove();
 }
 /**
  * resize function with timeout to minimize number of label display recalculations
  */
 function resizeTriggered() {
-  debounce(() => {
-    // give mobile elements time to render
-    nextTick(() => {
-      calcTextWidth();
-    });
-  }, 0);
+  // give mobile elements time to render
+  nextTick(() => {
+    calcTextWidth();
+  });
 }
 
 // on mobile the menuButton is not rendered in time on mounted so
@@ -464,10 +475,7 @@ watch(menuButton, () => {
 });
 
 onMounted(() => {
-  nextTick(() => {
-    // get an initial calculation of the label and element widths
-    // calcTextWidth();
-  });
+  isMounted.value = true;
 });
 </script>
 
