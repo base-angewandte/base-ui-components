@@ -1,150 +1,3 @@
-<template>
-  <nav
-    :aria-label="navigationLabel"
-    class="base-navigation">
-    <!-- VIEW FOR DESKTOP APPLICATIONS -->
-    <!-- render desktop view if a) elements were mounted and window size is not mobile (-> default
-      rendered is mobile view) -->
-    <template
-      v-if="isMounted && !isMobile">
-      <ul
-        ref="desktopNavigationElement"
-        class="base-navigation__nav-items">
-        <!-- PRIMARY ELEMENTS -->
-        <li
-          v-for="element in primaryItems"
-          :key="`p-${element.id}`"
-          class="base-navigation__nav-item">
-          <BaseLink
-            :render-link-as="renderAs"
-            :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-            :aria-current="element.id === activeElementIdInt ? 'page' : null"
-            :identifier-property-value="element.route || undefined"
-            :url="element.url || undefined"
-            :class="['base-navigation__nav-item-link',
-                     { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
-            <template #label="{ label }">
-              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                {{ label }}
-              </span>
-            </template>
-          </BaseLink>
-        </li>
-        <!-- SECONDARY ELEMENTS -->
-        <li
-          v-for="element in secondaryItems"
-          :key="`s-${element.id}`"
-          class="base-navigation__nav-item base-navigation__nav-item--secondary">
-          <BaseLink
-            :render-link-as="renderAs"
-            :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-            :aria-current="element.id === activeElementIdInt ? 'page' : null"
-            :identifier-property-value="element.route || undefined"
-            :url="element.url || undefined"
-            :class="['base-navigation__nav-item-link',
-                     { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
-            <template #label="{ label }">
-              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                {{ label }}
-              </span>
-            </template>
-          </BaseLink>
-        </li>
-      </ul>
-    </template>
-
-    <!-- MOBILE VIEW -->
-    <template v-else>
-      <!-- THE VISIBLE NAV BAR WITH THE ACTIVE ELEMENT AND HAMBURGER MENU -->
-      <div
-        ref="mobileViewNavigationElement"
-        class="base-navigation__mobile-nav-bar">
-        <!-- ACTIVE NAV ITEM -->
-        <div
-          class="base-navigation__nav-item">
-          <BaseLink
-            :render-link-as="renderAs"
-            :value="showShortLabel && activeElement.shortLabel ?
-              activeElement.shortLabel : activeElement.label"
-            :additional-attributes="{ ariaCurrentValue: 'page', exactPath: true }"
-            :identifier-property-value="activeElement.route"
-            class="base-navigation__nav-item-link
-                   base-navigation__nav-item-link--active">
-            <template #label="{ label }">
-              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                {{ label }}
-              </span>
-            </template>
-          </BaseLink>
-        </div>
-        <!-- HAMBURGER MENU -->
-        <BaseButton
-          v-if="isMounted && isMobile && mobileDropDownElements.length"
-          ref="menuButtonElement"
-          button-style="row"
-          text=""
-          :icon-title="menuButtonLabel"
-          :icon="navOpen ? 'remove' : 'drag-lines'"
-          :aria-expanded="navOpen.toString()"
-          class="base-navigation__mobile-menu-button"
-          @clicked="navOpen = !navOpen" />
-      </div>
-      <!-- DROP DOWN MENU -->
-      <transition name="translateY">
-        <ul
-          v-if="navOpen"
-          class="base-navigation__drop-down">
-          <!-- PRIMARY ELEMENTS -->
-          <li
-            v-for="element in mobileLeftElements"
-            :key="`pm-${element.id}`"
-            class="base-navigation__nav-item">
-            <BaseLink
-              :render-link-as="renderAs"
-              :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-              :identifier-property-value="element.route || undefined"
-              :url="element.url || undefined"
-              :class="['base-navigation__nav-item-link',
-                       { 'base-navigation__nav-item-link--separator': mobileLeftElements.length
-                         + mobileRightElements.length > 2 },
-                       { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
-              @click="navOpen = false"
-              @keydown.enter="navOpen = false">
-              <template #label="{ label }">
-                <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                  {{ label }}
-                </span>
-              </template>
-            </BaseLink>
-          </li>
-          <!-- SECONDARY ELEMENTS -->
-          <li
-            v-for="element in mobileRightElements"
-            :key="`sm-${element.id}`"
-            :class="['base-navigation__nav-item', 'base-navigation__nav-item--secondary',
-                     { 'base-navigation__nav-item--separator': showSeparator }]">
-            <BaseLink
-              :render-link-as="renderAs"
-              :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-              :identifier-property-value="element.route || undefined"
-              :url="element.url || undefined"
-              :class="['base-navigation__nav-item-link',
-                       { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
-              @click="navOpen = false"
-              @keydown.enter="navOpen = false">
-              <template #label="{ label }">
-                <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
-                  {{ label }}
-                </span>
-              </template>
-            </BaseLink>
-          </li>
-        </ul>
-      </transition>
-    </template>
-  </nav>
-</template>
-
 <script setup>
 import BaseLink from '@/components/BaseLink/BaseLink.vue';
 import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, useTemplateRef, watch } from 'vue';
@@ -316,7 +169,7 @@ const activeElement = computed(() => {
   if (!element && !navElements.value.some(e => e.routeMatch) && !props.activeElementId) {
     // provide a warning to the user
     console.warn('Attention - no active element could be identified and the first list item will be used!'
-        + 'Please set an active element via prop `activeElementId` or `routeMatch` property.');
+      + 'Please set an active element via prop `activeElementId` or `routeMatch` property.');
   }
 
   // use the found element or if nothing was found use the first element in
@@ -384,7 +237,7 @@ const showSeparator = computed(() => {
   const rightElementsLength = mobileRightElements.value.length;
   const leftElementsLength = mobileLeftElements.value.length;
   return !!leftElementsLength && !!rightElementsLength
-      && (leftElementsLength + rightElementsLength) > 2;
+    && (leftElementsLength + rightElementsLength) > 2;
 });
 
 /**
@@ -478,6 +331,153 @@ onMounted(() => {
   isMounted.value = true;
 });
 </script>
+
+<template>
+  <nav
+    :aria-label="navigationLabel"
+    class="base-navigation">
+    <!-- VIEW FOR DESKTOP APPLICATIONS -->
+    <!-- render desktop view if a) elements were mounted and window size is not mobile (-> default
+      rendered is mobile view) -->
+    <template
+      v-if="isMounted && !isMobile">
+      <ul
+        ref="desktopNavigationElement"
+        class="base-navigation__nav-items">
+        <!-- PRIMARY ELEMENTS -->
+        <li
+          v-for="element in primaryItems"
+          :key="`p-${element.id}`"
+          class="base-navigation__nav-item">
+          <BaseLink
+            :render-link-as="renderAs"
+            :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+            :aria-current="element.id === activeElementIdInt ? 'page' : null"
+            :identifier-property-value="element.route || undefined"
+            :url="element.url || undefined"
+            :class="['base-navigation__nav-item-link',
+                     { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
+            <template #label="{ label }">
+              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                {{ label }}
+              </span>
+            </template>
+          </BaseLink>
+        </li>
+        <!-- SECONDARY ELEMENTS -->
+        <li
+          v-for="element in secondaryItems"
+          :key="`s-${element.id}`"
+          class="base-navigation__nav-item base-navigation__nav-item--secondary">
+          <BaseLink
+            :render-link-as="renderAs"
+            :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+            :aria-current="element.id === activeElementIdInt ? 'page' : null"
+            :identifier-property-value="element.route || undefined"
+            :url="element.url || undefined"
+            :class="['base-navigation__nav-item-link',
+                     { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]">
+            <template #label="{ label }">
+              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                {{ label }}
+              </span>
+            </template>
+          </BaseLink>
+        </li>
+      </ul>
+    </template>
+
+    <!-- MOBILE VIEW -->
+    <template v-else>
+      <!-- THE VISIBLE NAV BAR WITH THE ACTIVE ELEMENT AND HAMBURGER MENU -->
+      <div
+        ref="mobileViewNavigationElement"
+        class="base-navigation__mobile-nav-bar">
+        <!-- ACTIVE NAV ITEM -->
+        <div
+          class="base-navigation__nav-item">
+          <BaseLink
+            :render-link-as="renderAs"
+            :value="showShortLabel && activeElement.shortLabel ?
+              activeElement.shortLabel : activeElement.label"
+            :additional-attributes="{ ariaCurrentValue: 'page', exactPath: true }"
+            :identifier-property-value="activeElement.route"
+            class="base-navigation__nav-item-link
+                   base-navigation__nav-item-link--active">
+            <template #label="{ label }">
+              <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                {{ label }}
+              </span>
+            </template>
+          </BaseLink>
+        </div>
+        <!-- HAMBURGER MENU -->
+        <BaseButton
+          v-if="isMounted && isMobile && mobileDropDownElements.length"
+          ref="menuButtonElement"
+          button-style="row"
+          text=""
+          :icon-title="menuButtonLabel"
+          :icon="navOpen ? 'remove' : 'drag-lines'"
+          :aria-expanded="navOpen.toString()"
+          class="base-navigation__mobile-menu-button"
+          @clicked="navOpen = !navOpen" />
+      </div>
+      <!-- DROP DOWN MENU -->
+      <transition name="translateY">
+        <ul
+          v-if="navOpen"
+          class="base-navigation__drop-down">
+          <!-- PRIMARY ELEMENTS -->
+          <li
+            v-for="element in mobileLeftElements"
+            :key="`pm-${element.id}`"
+            class="base-navigation__nav-item">
+            <BaseLink
+              :render-link-as="renderAs"
+              :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+              :identifier-property-value="element.route || undefined"
+              :url="element.url || undefined"
+              :class="['base-navigation__nav-item-link',
+                       { 'base-navigation__nav-item-link--separator': mobileLeftElements.length
+                         + mobileRightElements.length > 2 },
+                       { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
+              @click="navOpen = false"
+              @keydown.enter="navOpen = false">
+              <template #label="{ label }">
+                <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                  {{ label }}
+                </span>
+              </template>
+            </BaseLink>
+          </li>
+          <!-- SECONDARY ELEMENTS -->
+          <li
+            v-for="element in mobileRightElements"
+            :key="`sm-${element.id}`"
+            :class="['base-navigation__nav-item', 'base-navigation__nav-item--secondary',
+                     { 'base-navigation__nav-item--separator': showSeparator }]">
+            <BaseLink
+              :render-link-as="renderAs"
+              :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
+              :identifier-property-value="element.route || undefined"
+              :url="element.url || undefined"
+              :class="['base-navigation__nav-item-link',
+                       { 'base-navigation__nav-item-link--active': activeElementIdInt === element.id }]"
+              @click="navOpen = false"
+              @keydown.enter="navOpen = false">
+              <template #label="{ label }">
+                <span :class="{ 'base-navigation__nav-item-link__text--truncation': showShortLabel }">
+                  {{ label }}
+                </span>
+              </template>
+            </BaseLink>
+          </li>
+        </ul>
+      </transition>
+    </template>
+  </nav>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
