@@ -41,6 +41,7 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
 import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection.vue';
 import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel.vue';
 import BaseIcon from './BaseIcon/BaseIcon.vue';
+import BaseInfoPanel from './BaseInfoPanel/BaseInfoPanel.vue';
 import BaseButton from './BaseButton/BaseButton.vue';
 import BaseMap from './BaseMap/BaseMap.vue';
 import BaseMapLocations from './BaseMapLocations/BaseMapLocations.vue';
@@ -58,6 +59,7 @@ export {
   BaseTooltipBox,
   BaseImage,
   BaseInput,
+  BaseInfoPanel,
   BaseDropDownList,
   BaseAutocompleteInput,
   BaseBox,
