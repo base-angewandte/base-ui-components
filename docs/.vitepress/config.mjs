@@ -92,12 +92,6 @@ export default defineConfig({
       },
     },
   },
-  rewrites: {
-    // don't have components running under /components but at root
-    // useful thing here: old links (in changelog) with /components in path will automatically
-    // be redirected
-    'components/:component': ':component',
-  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     repo: 'https://github.com/base-angewandte/base-ui-components',
@@ -138,7 +132,7 @@ export default defineConfig({
           return {
             text: componentName,
             // need to create link without /components so link appears active
-            link: '/' + componentName,
+            link: '/components/' + componentName,
           };
         }),
       },
