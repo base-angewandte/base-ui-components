@@ -4,8 +4,8 @@
     class="base-navigation">
     <!-- VIEW FOR DESKTOP APPLICATIONS -->
     <ul
-      ref="desktopNavigation"
       v-if="!isMobile"
+      ref="desktopNavigationElement"
       class="base-navigation__nav-items">
       <!-- PRIMARY ELEMENTS -->
       <li
@@ -53,7 +53,7 @@
     <template v-else>
       <!-- THE VISIBLE NAV BAR WITH THE ACTIVE ELEMENT AND HAMBURGER MENU -->
       <div
-        ref="mobileViewNavigation"
+        ref="mobileViewNavigationElement"
         class="base-navigation__mobile-nav-bar">
         <!-- ACTIVE NAV ITEM -->
         <div
@@ -76,7 +76,7 @@
         <!-- HAMBURGER MENU -->
         <BaseButton
           v-if="isMobile && mobileDropDownElements.length"
-          ref="menuButton"
+          ref="menuButtonElement"
           button-style="row"
           text=""
           :icon-title="menuButtonLabel"
@@ -144,7 +144,7 @@
 <script setup>
 import BaseLink from '@/components/BaseLink/BaseLink.vue';
 import { useDebounce } from '@/composables/useDebounce.js';
-import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, useTemplateRef, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 
 const BaseButton = defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue'));
@@ -270,9 +270,9 @@ const props = defineProps({
 const { debounce } = useDebounce();
 // set up all the html elements that are needed for resize calculations
 // (mobile or desktop view)
-const mobileViewNavigation = ref(null);
-const desktopNavigation = ref(null);
-const menuButton = ref(null);
+const mobileViewNavigation = useTemplateRef('mobileViewNavigationElement');
+const desktopNavigation = useTemplateRef('desktopNavigationElement');
+const menuButton = useTemplateRef('menuButtonElement');
 
 /** MOBILE NAV OPEN HANDLING */
 /**
