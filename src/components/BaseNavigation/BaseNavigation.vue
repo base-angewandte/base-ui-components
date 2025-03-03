@@ -4,8 +4,8 @@
     class="base-navigation">
     <!-- VIEW FOR DESKTOP APPLICATIONS -->
     <ul
-      v-if="true"
       ref="desktopNavigation"
+      v-if="!isMobile"
       class="base-navigation__nav-items">
       <!-- PRIMARY ELEMENTS -->
       <li
