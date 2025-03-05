@@ -24,6 +24,9 @@ $font-root-mobile: 16px;
   --vp-font-family-base: "Source Sans Pro", serif;
   // make title fit
   --vp-sidebar-width: 350px;
+  --vp-z-index-nav: 1000;
+  --vp-z-index-sidebar: 950;
+  --vp-z-index-local-nav: 900;
 }
 
 
