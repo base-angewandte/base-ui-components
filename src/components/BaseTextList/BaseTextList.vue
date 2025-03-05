@@ -109,7 +109,7 @@ export default {
      *  and pass the component to the prop!
      */
     renderLinkAs: {
-      type: String,
+      type: [String, Object],
       default: 'RouterLink',
     },
     /**
