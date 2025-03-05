@@ -1,149 +1,3 @@
-<template>
-  <div
-    :style="isSingleTextObject ? { '--columns': colsSingleTextObject } : null"
-    :class="[
-      'base-text-list',
-      'base-text-list--row-gap-' + rowGap,
-      {
-        'base-text-list--cols': hasColumns || isSingleTextObject && colsSingleTextObject > 1,
-        'base-text-list--cols-single-content': isSingleTextObject && colsSingleTextObject > 1,
-      }]">
-    <div
-      v-for="(item, index) in data"
-      :key="index"
-      class="base-text-list__group">
-      <component
-        :is="renderLabelAs"
-        v-if="item.label"
-        :class="['base-text-list__label', { 'base-text-list__label--mb': labelMarginBottom }]">
-        {{ getLangLabel(item.label) }}
-      </component>
-
-      <!-- Array as multiple columns -->
-      <template v-if="typeof item === 'object' && typeof item[0] === 'object'">
-        <BaseTextList
-          ref="baseTextList"
-          :cols="cols"
-          :data="item"
-          :identifier-property-name="identifierPropertyName"
-          :label-margin-bottom="labelMarginBottom"
-          :list-type="listType"
-          :render-label-as="renderLabelAs"
-          :style="{ '--columns': cols }"
-          :interpret-text-as-html="interpretTextAsHtml" />
-      </template>
-
-      <!-- String as text -->
-      <!-- get rid of prepending white-space -->
-      <p
-        v-else-if="item.data && typeof item.data === 'string'"
-        v-insert-text-as-html="{ value: item.data, interpretTextAsHtml }"
-        :class="[
-          'base-text-list__content',
-          { 'base-text-list__content--pre-line': !interpretTextAsHtml },
-          // render single content in columns
-          // eslint-disable-next-line vue/multiline-html-element-content-newline
-          { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
-
-      <!-- Array as unordered list -->
-      <ul
-        v-else-if="item.data && typeof item.data === 'object' && typeof item.data[0] === 'string'"
-        class="base-text-list__content">
-        <li
-          v-for="(arrayItem, listIndex) in item.data"
-          :key="listIndex"
-          v-insert-text-as-html="{ value: arrayItem, interpretTextAsHtml }" />
-      </ul>
-
-      <!-- Array/Objects -->
-      <template
-        v-else-if="item.data && typeof item.data === 'object'">
-        <!-- render as comma separated list -->
-        <template
-          v-if="!containKeys([].concat(item.data), 'label')">
-          <div class="base-text-list__content base-text-list__content--list">
-            <span
-              v-for="(objectItem, objectIndex) in [].concat(item.data)"
-              :key="objectItem.value"
-              v-clean-dom-nodes="{ recursive: false }"
-              :class="['base-link__wrapper', { 'base-link__wrapper--tooltip': isTooltip(objectItem)}]">
-              <!-- BaseLink: text, external, internal, text and tooltip -->
-              <BaseLink
-                :identifier-property-name="identifierPropertyName"
-                :identifier-property-value="objectItem[identifierPropertyName]"
-                :chip-query-name="chipQueryName"
-                :path="item.path"
-                :tooltip="objectItem.additional"
-                :type="item.id"
-                :url="objectItem.url"
-                :value="objectItem.value"
-                :alt-title="objectItem.altTitle"
-                :interpret-text-as-html="interpretTextAsHtml"
-                :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]">
-                <template #tooltip>
-                  <template v-if="isTooltip(objectItem)">
-                    <!-- @slot slot for tooltip content
-                         @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
-                    <slot
-                      :data="objectItem.additional"
-                      name="tooltip" />
-                  </template>
-                </template>
-                <!-- add directly after to avoid additional spaces - if this
-                  is separated there will be a space between link and comma -->
-              <!-- eslint-disable-next-line max-len -->
-              </BaseLink><span :key="`${objectIndex}-space`">{{ item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}</span>
-            </span>
-          </div>
-        </template>
-
-        <!-- render as data list -->
-        <template
-          v-if="containKeys([].concat(item.data), 'label')">
-          <dl
-            v-if="typeof item.data === 'object'"
-            :class="['base-text-list__content',
-                     'base-text-list__content--' + listType]">
-            <template
-              v-for="(objectItem) in [].concat(item.data)"
-              :key="objectItem.value">
-              <dt
-                class="base-text-list__content__label">
-                <template
-                  v-if="objectItem.label">
-                  {{ getLangLabel(objectItem.label) }}:&nbsp;
-                </template>
-              </dt>
-              <dd
-                class="base-text-list__content__label base-text-list__content__value">
-                <BaseLink
-                  :render-link-as="renderLinkAs"
-                  :identifier-property-name="identifierPropertyName"
-                  :identifier-property-value="objectItem[identifierPropertyName]"
-                  :chip-query-name="chipQueryName"
-                  :path="item.path"
-                  :tooltip="objectItem.additional"
-                  :tooltip-threshold-top="tooltipThresholdTop"
-                  :type="item.id"
-                  :url="objectItem.url"
-                  :value="objectItem.value"
-                  :alt-title="objectItem.altTitle"
-                  :interpret-text-as-html="interpretTextAsHtml">
-                  <!-- @slot slot for tooltip content
-                       @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
-                  <slot
-                    name="tooltip"
-                    :data="objectItem.additional" />
-                </BaseLink>
-              </dd>
-            </template>
-          </dl>
-        </template>
-      </template>
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent } from 'vue';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
@@ -355,6 +209,152 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :style="isSingleTextObject ? { '--columns': colsSingleTextObject } : null"
+    :class="[
+      'base-text-list',
+      'base-text-list--row-gap-' + rowGap,
+      {
+        'base-text-list--cols': hasColumns || isSingleTextObject && colsSingleTextObject > 1,
+        'base-text-list--cols-single-content': isSingleTextObject && colsSingleTextObject > 1,
+      }]">
+    <div
+      v-for="(item, index) in data"
+      :key="index"
+      class="base-text-list__group">
+      <component
+        :is="renderLabelAs"
+        v-if="item.label"
+        :class="['base-text-list__label', { 'base-text-list__label--mb': labelMarginBottom }]">
+        {{ getLangLabel(item.label) }}
+      </component>
+
+      <!-- Array as multiple columns -->
+      <template v-if="typeof item === 'object' && typeof item[0] === 'object'">
+        <BaseTextList
+          ref="baseTextList"
+          :cols="cols"
+          :data="item"
+          :identifier-property-name="identifierPropertyName"
+          :label-margin-bottom="labelMarginBottom"
+          :list-type="listType"
+          :render-label-as="renderLabelAs"
+          :style="{ '--columns': cols }"
+          :interpret-text-as-html="interpretTextAsHtml" />
+      </template>
+
+      <!-- String as text -->
+      <!-- get rid of prepending white-space -->
+      <p
+        v-else-if="item.data && typeof item.data === 'string'"
+        v-insert-text-as-html="{ value: item.data, interpretTextAsHtml }"
+        :class="[
+          'base-text-list__content',
+          { 'base-text-list__content--pre-line': !interpretTextAsHtml },
+          // render single content in columns
+          // eslint-disable-next-line vue/multiline-html-element-content-newline
+          { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
+
+      <!-- Array as unordered list -->
+      <ul
+        v-else-if="item.data && typeof item.data === 'object' && typeof item.data[0] === 'string'"
+        class="base-text-list__content">
+        <li
+          v-for="(arrayItem, listIndex) in item.data"
+          :key="listIndex"
+          v-insert-text-as-html="{ value: arrayItem, interpretTextAsHtml }" />
+      </ul>
+
+      <!-- Array/Objects -->
+      <template
+        v-else-if="item.data && typeof item.data === 'object'">
+        <!-- render as comma separated list -->
+        <template
+          v-if="!containKeys([].concat(item.data), 'label')">
+          <div class="base-text-list__content base-text-list__content--list">
+            <span
+              v-for="(objectItem, objectIndex) in [].concat(item.data)"
+              :key="objectItem.value"
+              v-clean-dom-nodes="{ recursive: false }"
+              :class="['base-link__wrapper', { 'base-link__wrapper--tooltip': isTooltip(objectItem)}]">
+              <!-- BaseLink: text, external, internal, text and tooltip -->
+              <BaseLink
+                :identifier-property-name="identifierPropertyName"
+                :identifier-property-value="objectItem[identifierPropertyName]"
+                :chip-query-name="chipQueryName"
+                :path="item.path"
+                :tooltip="objectItem.additional"
+                :type="item.id"
+                :url="objectItem.url"
+                :value="objectItem.value"
+                :alt-title="objectItem.altTitle"
+                :interpret-text-as-html="interpretTextAsHtml"
+                :class="['base-text-list__link', { 'base-link--chip-text-list': item.id }]">
+                <template #tooltip>
+                  <template v-if="isTooltip(objectItem)">
+                    <!-- @slot slot for tooltip content
+                         @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
+                    <slot
+                      :data="objectItem.additional"
+                      name="tooltip" />
+                  </template>
+                </template>
+                <!-- add directly after to avoid additional spaces - if this
+                  is separated there will be a space between link and comma -->
+                <!-- eslint-disable-next-line max-len -->
+              </BaseLink><span :key="`${objectIndex}-space`">{{ item.data.length && objectIndex !== item.data.length - 1 && !item.id ? ',&nbsp;' : '' }}</span>
+            </span>
+          </div>
+        </template>
+
+        <!-- render as data list -->
+        <template
+          v-if="containKeys([].concat(item.data), 'label')">
+          <dl
+            v-if="typeof item.data === 'object'"
+            :class="['base-text-list__content',
+                     'base-text-list__content--' + listType]">
+            <template
+              v-for="(objectItem) in [].concat(item.data)"
+              :key="objectItem.value">
+              <dt
+                class="base-text-list__content__label">
+                <template
+                  v-if="objectItem.label">
+                  {{ getLangLabel(objectItem.label) }}:&nbsp;
+                </template>
+              </dt>
+              <dd
+                class="base-text-list__content__label base-text-list__content__value">
+                <BaseLink
+                  :render-link-as="renderLinkAs"
+                  :identifier-property-name="identifierPropertyName"
+                  :identifier-property-value="objectItem[identifierPropertyName]"
+                  :chip-query-name="chipQueryName"
+                  :path="item.path"
+                  :tooltip="objectItem.additional"
+                  :tooltip-threshold-top="tooltipThresholdTop"
+                  :type="item.id"
+                  :url="objectItem.url"
+                  :value="objectItem.value"
+                  :alt-title="objectItem.altTitle"
+                  :interpret-text-as-html="interpretTextAsHtml">
+                  <!-- @slot slot for tooltip content
+                       @binding {array} data - the tooltip data that were provided with the `data` object property `additional` -->
+                  <slot
+                    name="tooltip"
+                    :data="objectItem.additional" />
+                </BaseLink>
+              </dd>
+            </template>
+          </dl>
+        </template>
+      </template>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
