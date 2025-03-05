@@ -107,6 +107,7 @@ export default {
       type: Object,
       default: () => ({
         gotoSlide: 'Go to slide {{index}}',
+        gotoSlide: 'Go to slide',
         nextSlide: 'Next slide',
         prevSlide: 'Previous slide',
         roleDescription: 'Carousel element with {total} items',
@@ -210,7 +211,7 @@ export default {
         containerRoleDescriptionMessage: this.getI18nTerm(this.assistiveText.roleDescription).replace('{total}', this.items.length),
         itemRoleDescriptionMessage: this.getI18nTerm(this.assistiveText.slide),
         nextSlideMessage: this.getI18nTerm(this.assistiveText.nextSlide),
-        paginationBulletMessage: this.getI18nTerm(this.assistiveText.gotoSlide),
+        paginationBulletMessage: `${this.getI18nTerm(this.assistiveText.gotoSlide)} {{index}}`,
         prevSlideMessage: this.getI18nTerm(this.assistiveText.prevSlide),
         slideLabelMessage: '{{index}} / {{slidesLength}}',
         // override with values from outside if defined
