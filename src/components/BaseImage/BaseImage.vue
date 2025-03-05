@@ -1,6 +1,4 @@
 <script>
-import 'lazysizes';
-
 /**
  * Component to render an image and optional lazy-loading
  */
@@ -53,6 +51,13 @@ export default {
         .map(width => `${size[width]} ${width}`)).join(', ') : null;
     },
   },
+  async mounted() {
+    // to avoid hydration problems with lazysizes in SSR mode
+    // check if component runs on client-side and import lazysizes if needed
+    if (window && this.lazyload) {
+      await import('lazysizes');
+    }
+  },
   methods: {
     emitError(event) {
       /**
@@ -83,6 +88,7 @@ export default {
     vertical-align: top;
     transition: opacity 250ms ease-in-out;
 
+    &.lazyload,
     &.lazyloading {
       opacity: 0;
     }
