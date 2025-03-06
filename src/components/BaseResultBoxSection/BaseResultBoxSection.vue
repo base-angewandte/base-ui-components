@@ -1,5 +1,7 @@
 <template>
-  <div class="base-result-box-section">
+  <div
+    ref="resultBoxSectionElement"
+    class="base-result-box-section">
     <!-- LOADER -->
     <div
       v-if="isLoading"
@@ -115,24 +117,26 @@
         <template v-if="entryListInt.length">
           <component
             :is="draggableComponent"
-            ref="resultBoxesArea"
-            v-model="visibleBoxes"
-            :animation="draggable ? 150 : null"
-            :tag="draggable ? 'ul' : null"
-            :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
+            ref="resultBoxesAreaElement"
+            :model-value="draggableBoxes"
+            :animation="draggable ? 150 : undefined"
+            :tag="draggable ? 'ul' : undefined"
+            :disabled="draggable ? !editModeActive : undefined"
+            :draggable="editModeActive ? '.base-result-box-section__result-box-item' : undefined"
             :aria-label="headerText"
+            :handle="draggable ? '.base-result-box-section__result-box-item__draggable .base-image-box' : undefined"
+            :force-fallback="draggable ? true : undefined"
+            :role="draggable ? 'list' : undefined"
             tabindex="0"
-            handle=".base-result-box-section__result-box-item__draggable .base-image-box"
-            force-fallback="true"
-            role="list"
-            class="base-result-box-section__boxes-container">
+            class="base-result-box-section__boxes-container"
             @start="dragStart"
             @end="dragEnd"
+            @update:model-value="draggableBoxes = $event">
             <li
               v-for="(entry, index) of visibleBoxes"
               :id="`li-${entry.id}`"
               :key="getPropValue(identifierPropertyName, entry)"
-              ref="resultBoxItem"
+              ref="resultBoxItemElement"
               :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
               :aria-label="getPropValue(titlePropertyName, entry)"
               :aria-grabbed="(movableElementId === entry.id).toString()"
@@ -267,11 +271,12 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
-import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+import { defineAsyncComponent, ref, useTemplateRef, watch } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useListNavigation } from '@/composables/useListNavigation.js';
 import { extractNestedPropertyValue } from '@/utils/utils.js';
+import { useId } from '@/composables/useId.js';
+import { useWindowResize } from '@/composables/useWindowResize.js';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 
 /**
  * A component to display rows of boxes with or without pagination
@@ -512,7 +517,7 @@ export default {
      */
     currentPageNumber: {
       type: Number,
-      default: null,
+      default: 1,
     },
     /**
      * how many rows should be shown with show more button (expandMode)
@@ -666,16 +671,120 @@ export default {
     },
   },
   emits: ['entry-clicked', 'items-per-row-changed', 'submit-action', 'update:edit-mode', 'update:expanded', 'update:current-page-number', 'update:selected-list', 'update:model-value'],
-  setup() {
-    /** BOX NAVIGATION */
-    // TODO: this does not seem to be used??
-    const { navigate } = useListNavigation();
+  setup(props, { emit }) {
+    /** INTERNAL ID HANDLING */
+      // unique persistent id to assign javascript calculated styles to
+    const elementId = useId();
+
+    /** BOX DISPLAY FUNCTIONALITIES */
+    /**
+     * a template reference to the root element to be able to add the css variable
+     * for items per row
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const resultBoxSection = useTemplateRef('resultBoxSectionElement');
+    /**
+     * template reference to the boxes container (needed for calculating avaiable space
+     * for boxes)
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const resultBoxesArea = useTemplateRef('resultBoxesAreaElement');
+    // how many items do fit in one row
+    const itemsPerRow = ref(props.initialItemsPerRow);
+    // try to only do initial box size calculation once
+    const initialBoxCalcDone = ref(false);
+
+    /**
+     * calc the number of boxes that fits the space as soon as the container
+     * has been rendered
+     */
+    watch(resultBoxesArea, (value) => {
+      // as soon as area is rendered and variable received a value calc
+      // how much space per box is available
+      if (value) {
+        calcBoxNumber();
+      }
+    });
+
+    // recalc box number on window resize
+    useWindowResize({
+      callback: calcBoxNumber,
+      setDebounce: 300,
+    })
+
+    /**
+     * calculate the box number according to available space and breaking points set
+     */
+    function calcBoxNumber() {
+      // get the result boxes parent - in case of draggable active this is a vue component
+      // and $el needs to be addressed - otherwise native HTML element can be used directly
+      const resultBoxesElement = resultBoxesArea.value && resultBoxesArea.value.$el
+        ? resultBoxesArea.value.$el : resultBoxesArea.value;
+      // if such an element was found and element has children (= boxes are rendered)
+      if (resultBoxesElement) {
+        // get the element width
+        const totalWidth = resultBoxesElement.clientWidth;
+        // create a copy of the prop to avoid direct prop mutation
+        const boxBreakpointsCopy = [...props.boxBreakpoints];
+        // calculate how many items should be displayed according to
+        // breakpoints set
+        itemsPerRow.value = boxBreakpointsCopy
+          // then also sorting should not be necessary anymore (maybe keep to
+          // be on the save side?
+          .sort((a, b) => a[0] > b[0])
+          // get the correct box number
+          .reduce((prev, [size, number]) => {
+            if (totalWidth > size) {
+              return number;
+            }
+            return prev;
+          }, 0);
+        // set the styles
+        // set a css variable that is responsible for the number of items
+        resultBoxSection.value.style.setProperty('--items-per-row', itemsPerRow.value);
+        // set the correct margins for the boxes
+        const nodeId = `base-result-box-section__box-style-${elementId}`;
+        let style = document.getElementById(nodeId);
+        // check if element already exists to only create it once
+        if (!style) {
+          // if not - create the style element
+          style = document.createElement('style');
+          // set an id
+          style.id = nodeId;
+          // append the style element
+          resultBoxSection.value.appendChild(style);
+        }
+        // set the actually css in the style element
+        style.innerHTML = `
+          .base-result-box-section__box-item-${elementId}:nth-child(n + ${itemsPerRow.value + 1}) {
+            margin-top: var(--spacing-regular);
+          }
+          .base-result-box-section__box-item-${elementId}:not(:nth-child(${itemsPerRow.value}n)) {
+            margin-right: var(--spacing-regular);
+          }`;
+        initialBoxCalcDone.value = true;
+        /**
+         * communicate to parent when items per row changed, either after initial
+         * render space calculations or when window was resized
+         * @event items-per-row-changed
+         * @param {number} - the new number of items that fit in a row
+         */
+        emit('items-per-row-changed', itemsPerRow.value);
+      }
+    }
 
     /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
 
     return {
-      navigate,
+      // internal id
+      elementId,
+      // box rendering
+      resultBoxesArea,
+      resultBoxSection,
+      itemsPerRow,
+      initialBoxCalcDone,
+      // i18n
       getI18nTerm,
     };
   },
@@ -692,15 +801,9 @@ export default {
       expandedInt: false,
       // store collapsed state on action start
       wasExpanded: false,
-      // how many items do fit in one row
-      itemsPerRow: null,
-      // try to only do initial box size calculation once
-      initialBoxCalcDone: false,
       // to manipulate selectedList internally
       selectedListInt: [],
       imageBoxesSelectable: false,
-      // unique id to assign javascript calculated styles to
-      elementId: null,
       // store state if component is mounted and window is present
       initialized: false,
       /**
@@ -725,7 +828,7 @@ export default {
     /**
      * to lazy load vuedraggable only if draggable mode is set true
      *
-     * @returns {string|(function(): Promise<U>)}
+     * @returns {string|ComponentPublicInstanceConstructor}
      */
     draggableComponent() {
       if (this.draggable) {
@@ -738,39 +841,52 @@ export default {
      * taking into consideration pagination and 'show more' functionality
      * @returns {Object[]}
      */
-    visibleBoxes: {
+    visibleBoxes() {
+      if (this.editModeActive && (this.draggable || !this.usePagination)) {
+        return [...this.entryListInt];
+      }
+      // if expand mode is used and status is collapsed and there
+      // are more items than can be displayed in the rows specified by 'show more'
+      // slice first few
+      if (!this.editModeActive && this.useExpandMode && !this.expandedInt && this.expandNeeded) {
+        // slice from 0 to number of rows * items per row - 1 so that the button
+        // take the last box
+        return this.entryListInt.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
+      }
+      // else if pagination is active and items are not fetched from outside
+      // slice items fitting one page
+      if (this.usePagination && !this.fetchDataExternally) {
+        // slice taking into account current pagination and the total number of
+        // visible items
+        return this.entryListInt
+          .slice(
+            (this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
+            this.currentPageNumberInt * this.visibleNumberOfItems,
+          );
+      }
+      if (this.fetchDataExternally) {
+        return this.modelValue.slice(0, this.visibleNumberOfItems);
+      }
+      // else return complete list
+      return this.entryListInt;
+    },
+    /**
+     * in order to only set model-value when the VueDraggable component
+     * is rendered (and not for the <li> element) add a separate computed
+     * variable
+     */
+    draggableBoxes: {
       get() {
-        if (this.editModeActive && (this.draggable || !this.usePagination)) {
-          return [...this.entryListInt];
-        }
-        // if expand mode is used and status is collapsed and there
-        // are more items than can be displayed in the rows specified by 'show more'
-        // slice first few
-        if (!this.editModeActive && this.useExpandMode && !this.expandedInt && this.expandNeeded) {
-          // slice from 0 to number of rows * items per row - 1 so that the button
-          // take the last box
-          return this.entryListInt.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
-        }
-        // else if pagination is active and items are not fetched from outside
-        // slice items fitting one page
-        if (this.usePagination && !this.fetchDataExternally) {
-          // slice taking into account current pagination and the total number of
-          // visible items
-          return this.entryListInt
-            .slice(
-              (this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
-              this.currentPageNumberInt * this.visibleNumberOfItems,
-            );
-        }
-        if (this.fetchDataExternally) {
-          return this.modelValue.slice(0, this.visibleNumberOfItems);
-        }
-        // else return complete list
-        return this.entryListInt;
+        // if boxes are not draggable do not set the attribute
+        if (!this.draggable) return undefined;
+        // else return the boxes computed in visibleBoxes
+        return this.visibleBoxes;
       },
+      // since boxes are only changed by draggable have set here now instead
+      // of in visibleBoxes
       set(val) {
         this.entryListInt = [...val];
-      },
+      }
     },
     /** PAGINATION AND EXPAND MODE */
     /**
@@ -939,14 +1055,14 @@ export default {
       setTimeout(() => {
         if (val) {
           this.$nextTick(() => {
-            if (this.$refs.resultBoxItem && this.$refs.resultBoxItem.length) {
-              this.$refs.resultBoxItem.forEach((element) => {
+            if (this.$refs.resultBoxItemElement && this.$refs.resultBoxItemElement.length) {
+              this.$refs.resultBoxItemElement.forEach((element) => {
                 const inputElement = element.getElementsByTagName('input');
                 inputElement[0].setAttribute('tabindex', '-1');
               });
               // it appears refs are not reactive and do not reflect reordering so we need
               // to look for the actual current first element in the visibleBoxes array
-              const firstElement = this.$refs.resultBoxItem
+              const firstElement = this.$refs.resultBoxItemElement
                 .find(element => element.id.includes(this.visibleBoxes[0].id));
               firstElement.focus({ preventScroll: true });
             }
@@ -1001,25 +1117,9 @@ export default {
     if (!this.useExpandMode) {
       this.expandedInt = true;
     }
-    this.itemsPerRow = this.initialItemsPerRow;
   },
   mounted() {
-    // create an element id to have an unique id to assign javascript calculated styles to
-    // note: done here, cause of mismatching ids (entries, class definition) in ssr-mode
-    this.elementId = this.$.uid;
-
-    if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
-      this.calcBoxNumber();
-    }
-    // need to get the correct number of boxes per row to calculate the visible
-    // number of items correctly
-    window.addEventListener('resize', this.resizeBoxes);
     this.initialized = true;
-  },
-  updated() {
-    if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
-      this.calcBoxNumber();
-    }
   },
   methods: {
     dragStart(event) {
@@ -1166,7 +1266,7 @@ export default {
      * event handler on keydown with arrow keys
      * @param {KeyboardEvent} event - the keydown event
      * @param {number} index - the index of the entry on which the event was triggered
-     *  in the visibleBoxes array
+     *  in the draggableBoxes array
      */
     moveEntry(event, index) {
       // reset assistive text
@@ -1180,15 +1280,15 @@ export default {
       // get new Index
       const newIndex = index + shiftIndex;
       // check if move is possible or if item is first or last respectively already
-      if (this.isWithinArrayLimit(this.visibleBoxes, shiftDown, newIndex)) {
-        // assign box list to variable so the set() of visibleBoxes is actually triggered
-        // when it is assigned again later on (doing it directly on visibleBoxes or entryListInt
+      if (this.isWithinArrayLimit(this.draggableBoxes, shiftDown, newIndex)) {
+        // assign box list to variable so the set() of draggableBoxes is actually triggered
+        // when it is assigned again later on (doing it directly on draggableBoxes or entryListInt
         // has no effect)
-        const newArray = this.visibleBoxes;
+        const newArray = this.draggableBoxes;
         // do swapping with array destructuring
         [newArray[index], newArray[newIndex]] = [newArray[newIndex], newArray[index]];
-        // assign it again to visibleBoxes variable
-        this.visibleBoxes = newArray;
+        // assign it again to draggableBoxes variable
+        this.draggableBoxes = newArray;
         // next tick so there is time to repaint and get new order
         this.$nextTick(() => {
           // get all box elements
@@ -1199,7 +1299,7 @@ export default {
         // add matching assistive text informing the user of the move and the new position
         this.currentAssistiveText = this.assistiveText.moved
           .replace('{pos}', newIndex + 1)
-          .replace('{total}', this.visibleBoxes.length);
+          .replace('{total}', this.draggableBoxes.length);
       }
     },
     /**
@@ -1210,82 +1310,6 @@ export default {
       this.currentAssistiveText = '';
     },
 
-    /** BOX DISPLAY FUNCTIONALITIES */
-    /**
-     * timeout function for resize event to limit the number of times
-     * box number is recalculated
-     */
-    resizeBoxes() {
-      // check if there is a timeout already set and clear it if yes
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = null;
-      }
-      // if yes set timeout to recalculate box number after
-      this.resizeTimeout = setTimeout(() => {
-        this.calcBoxNumber();
-      }, 300);
-    },
-    /**
-     * calculate the box number according to available space and breaking points set
-     */
-    calcBoxNumber() {
-      // get the result boxes parent - in case of draggable active this is a vue component
-      // and $el needs to be addressed - otherwise native HTML element can be used directly
-      const resultBoxesElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
-        ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
-      // if such an element was found and element has children (= boxes are rendered)
-      if (resultBoxesElement) {
-        // get the element width
-        const totalWidth = resultBoxesElement.clientWidth;
-        // create a copy of the prop to avoid direct prop mutation
-        const boxBreakpointsCopy = [...this.boxBreakpoints];
-        // calculate how many items should be displayed according to
-        // breakpoints set
-        this.itemsPerRow = boxBreakpointsCopy
-          // then also sorting should not be necessary anymore (maybe keep to
-          // be on the save side?
-          .sort((a, b) => a[0] > b[0])
-          // get the correct box number
-          .reduce((prev, [size, number]) => {
-            if (totalWidth > size) {
-              return number;
-            }
-            return prev;
-          }, 0);
-        // set the styles
-        // set a css variable that is responsible for the number of items
-        this.$el.style.setProperty('--items-per-row', this.itemsPerRow);
-        // set the correct margins for the boxes
-        const nodeId = `base-result-box-section__box-style-${this.elementId}`;
-        let style = document.getElementById(nodeId);
-        // check if element already exists to only create it once
-        if (!style) {
-          // if not - create the style element
-          style = document.createElement('style');
-          // set an id
-          style.id = nodeId;
-          // append the style element
-          this.$el.appendChild(style);
-        }
-        // set the actually css in the style element
-        style.innerHTML = `
-          .base-result-box-section__box-item-${this.elementId}:nth-child(n + ${this.itemsPerRow + 1}) {
-            margin-top: var(--spacing-regular);
-          }
-          .base-result-box-section__box-item-${this.elementId}:not(:nth-child(${this.itemsPerRow}n)) {
-            margin-right: var(--spacing-regular);
-          }`;
-        this.initialBoxCalcDone = true;
-        /**
-         * communicate to parent when items per row changed, either after initial
-         * render space calculations or when window was resized
-         * @event items-per-row-changed
-         * @param {number} - the new number of items that fit in a row
-         */
-        this.$emit('items-per-row-changed', this.itemsPerRow);
-      }
-    },
     /** PAGINATION */
     /**
      * function triggered when page in pagination component is selected
@@ -1403,6 +1427,16 @@ export default {
           visibility: hidden;
         }
 
+        &:before {
+          content: '';
+          height: 100%;
+          top: 0;
+          right: 0;
+          pointer-events: none;
+          background-color: transparent;
+          padding-bottom: 100%;
+        }
+
         &:focus-within:after {
           content: '';
           width: 100%;
@@ -1410,8 +1444,9 @@ export default {
           position: absolute;
           top: 0;
           right: 0;
-          border: 1px solid $app-color-secondary;
+          box-shadow: inset 0 0 0 1px var(--app-color-secondary, #b085f5);
           pointer-events: none;
+          background-color: transparent;
         }
 
         &:focus:not(:focus-visible) {

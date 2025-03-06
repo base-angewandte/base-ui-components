@@ -423,7 +423,7 @@ An example demonstrating slots
   <div class="section-canvas">
     <BaseResultBoxSection
       v-model:selected-list="selectedBoxes"
-      :entry-list="entriesList"
+      :model-value="entriesList"
       :is-loading="false"
       show-action-button-boxes
       title-property-name="parent.title"
@@ -451,7 +451,7 @@ An example demonstrating slots
 
       </template>
       <template
-        #optionButtons="scope">
+        #optionButtons>
         <BaseButton
           text="Custom Option 1"
           icon-size="large"
