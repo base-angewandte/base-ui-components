@@ -126,6 +126,8 @@
             force-fallback="true"
             role="list"
             class="base-result-box-section__boxes-container">
+            @start="dragStart"
+            @end="dragEnd"
             <li
               v-for="(entry, index) of visibleBoxes"
               :id="`li-${entry.id}`"
@@ -145,7 +147,7 @@
                        },
                        {
                          'base-result-box-section__result-box-item__dragging':
-                           movableElementId === entry.id,
+                           movableElementId === entry[identifierPropertyName],
                        }]"
               @keydown.enter="onEnterKey($event, entry, index)"
               @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
@@ -1020,6 +1022,28 @@ export default {
     }
   },
   methods: {
+    dragStart(event) {
+      this.movableElementId = event.data?.id;
+      const className = 'grabbing';
+      const html = document.getElementsByTagName('html').item(0);
+      if (html && new RegExp(className).test(html.className) === false) {
+        html.className += ' ' + className; // use a space in case there are other classNames
+      }
+    },
+    dragEnd() {
+      this.movableElementId = null;
+      const className = 'grabbing';
+      const html = document.getElementsByTagName('html').item(0);
+      if (html && new RegExp(className).test(html.className) === true) {
+        // Remove className with the added space (from setClassToHTMLElement)
+        html.className = html.className.replace(
+          new RegExp(' ' + className),
+          ''
+        );
+        // Remove className without added space (just in case)
+        html.className = html.className.replace(new RegExp(className), '');
+      }
+    },
     /** EDIT MODE FUNCTIONALITIES */
     /**
      * toggling of options when options are behind a 'options' button
@@ -1475,5 +1499,9 @@ export default {
       }
     }
   }
+}
+
+.sortable-chosen {
+  user-select: none;
 }
 </style>
