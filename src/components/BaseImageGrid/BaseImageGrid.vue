@@ -1,19 +1,3 @@
-<template>
-  <div
-    :class="['base-image-grid',
-             'base-image-grid--' + imagesInt.length]">
-    <div
-      v-for="(image, index) in imagesInt"
-      :key="'image' + index"
-      class="base-image-grid__item">
-      <BaseImage
-        :lazyload="true"
-        :src="src(image)"
-        :srcset="srcset(image)" />
-    </div>
-  </div>
-</template>
-
 <script>
 import BaseImage from '@/components/BaseImage/BaseImage.vue';
 
@@ -86,6 +70,22 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-image-grid',
+             'base-image-grid--' + imagesInt.length]">
+    <div
+      v-for="(image, index) in imagesInt"
+      :key="'image' + index"
+      class="base-image-grid__item">
+      <BaseImage
+        :lazyload="true"
+        :src="src(image)"
+        :srcset="srcset(image)" />
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;

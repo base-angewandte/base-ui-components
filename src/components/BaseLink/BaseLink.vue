@@ -1,9 +1,10 @@
 <script>
-import { defineAsyncComponent, ref, getCurrentInstance, computed } from 'vue';
+import { defineAsyncComponent, ref, getCurrentInstance, computed, useSlots } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useEventListener } from '@/composables/useEventListener.js';
 import { useDebounce } from '@/composables/useDebounce.js';
 import { useId } from '@/composables/useId.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
@@ -258,6 +259,12 @@ export default {
       callback: scrollResizeHandler,
     });
 
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    // slot is not directly accessible anymore - use composable to determine
+    // if slot has content
+    const { slotHasContent } = useHasSlotContent(slots.tooltip);
+
     /** DETERMINE ELEMENT TYPE */
     // we need to access the current component instance
     // to check for router
@@ -271,6 +278,7 @@ export default {
 
     return {
       internalId,
+      slotHasContent,
       showTooltip,
       isRouterAvailable,
     };
@@ -428,7 +436,7 @@ export default {
      */
     async tooltipClicked() {
       // check if there is content to display
-      if ((this.tooltip && this.$slots.tooltip) || this.tooltip.length) {
+      if ((this.tooltip && this.slotHasContent) || this.tooltip.length) {
         this.showTooltip = !this.showTooltip;
         return;
       }

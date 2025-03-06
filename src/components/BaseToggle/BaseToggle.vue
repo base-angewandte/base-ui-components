@@ -1,7 +1,8 @@
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
-import { computed } from 'vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+import { computed, useSlots } from 'vue';
 
 /**
  * Toggle Component
@@ -67,6 +68,11 @@ export default {
   setup(props) {
     // create id outside of computed to make sure we just have one fixed id
     const internalId = useId();
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    // slot is not directly accessible anymore - use composable to determine
+    // if slot has content
+    const { slotHasContent } = useHasSlotContent(slots.default);
     /**
      * check if an id was provided (to handle label input connection), if not
      *  use the created one
@@ -75,6 +81,7 @@ export default {
     const idInt = computed(() => props.inputId || internalId);
     return {
       idInt,
+      slotHasContent,
     };
   },
   data() {
@@ -149,10 +156,9 @@ export default {
         {{ label }}
       </span>
     </label>
-
     <span
-      v-if="(!!$slots.default && checkedInt && bindSlotToState)
-        || (!!$slots.default && !bindSlotToState)"
+      v-if="(slotHasContent && checkedInt && bindSlotToState)
+        || (slotHasContent && !bindSlotToState)"
       class="base-toggle__subtext">
       <!-- @slot slot after the label -->
       <slot />
