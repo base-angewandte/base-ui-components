@@ -496,7 +496,7 @@ An example demonstrating slots
           :box-size="{ width: 'calc(((100% - (var(--items-per-row) * 8rem/19))/ var(--items-per-row)) - 0.01rem)', height: '100%' }"
           icon="eye"
           box-style="small"
-          box-type="button"
+          render-element-as="button"
           :class="['custom-button',
                    { 'action-box-spacer': itemsPerRow < entriesList.length},
                    `base-result-box-section__box-item-${elementId}`]"
@@ -507,7 +507,7 @@ An example demonstrating slots
           :box-size="{ width: 'calc(((100% - (var(--items-per-row) * 8rem/19))/ var(--items-per-row)) - 0.01rem)', height: '100%' }"
           icon="eye"
           box-style="small"
-          box-type="button"
+          render-element-as="button"
           :class="['custom-button',
                    { 'action-box-spacer': itemsPerRow < entriesList.length},
                    `base-result-box-section__box-item-${elementId}`]"

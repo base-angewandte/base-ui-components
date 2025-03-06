@@ -208,7 +208,7 @@
                   :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
                   :icon="action.icon"
                   box-style="small"
-                  box-type="button"
+                  render-element-as="button"
                   :class="['base-result-box-section__box-item',
                            `base-result-box-section__box-item-${elementId}`]"
                   @clicked="submitAction(action.value)" />
@@ -220,7 +220,7 @@
               :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
               icon=""
               text=""
-              box-type="button"
+              render-element-as="button"
               :class="['base-result-box-section__box-item',
                        `base-result-box-section__box-item-${elementId}`]"
               @clicked="expandedInt = !expandedInt">
