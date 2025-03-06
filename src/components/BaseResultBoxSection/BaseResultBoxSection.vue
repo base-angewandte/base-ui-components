@@ -907,9 +907,10 @@ export default {
     },
     /**
      * number of pages (if pagination is active)
-     * @returns {number}
+     * @returns {?number}
      */
     pages() {
+      if (!this.initialBoxCalcDone) return null;
       return (this.total || this.entryListInt.length) && this.visibleNumberOfItems >= 0
         ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
     },
@@ -992,12 +993,12 @@ export default {
     // update internal page number if changed from outside
     currentPageNumber: {
       handler(val) {
-        if (val !== this.currentPageNumberInt) {
+        if (val && val !== this.currentPageNumberInt) {
           // check if number is larger than max number of pages currently available and
           // set to max possible value if yes instead
           // TODO: changed this to internal handling for now because it makes problems with
           // externally provided data but maybe it would make sense to get rid of it all together
-          this.currentPageNumberInt = val > this.pages && !this.fetchDataExternally
+          this.currentPageNumberInt = this.pages && val > this.pages && !this.fetchDataExternally
             ? this.pages : val;
         }
       },
