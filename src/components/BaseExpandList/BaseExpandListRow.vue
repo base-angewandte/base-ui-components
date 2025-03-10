@@ -615,17 +615,17 @@ export default {
 }
 
 .expand-enter-to,
-.expand-leave {
+.expand-leave-from {
   overflow: hidden;
 }
 
-.expand-enter,
+.expand-enter-from,
 .expand-leave-to {
   overflow: hidden;
   max-height: 0 !important;
 }
 
-.expand-enter {
+.expand-enter-from {
   .base-expand-item {
     border-color: transparent !important;
   }
