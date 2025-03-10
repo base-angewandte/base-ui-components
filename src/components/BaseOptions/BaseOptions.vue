@@ -96,6 +96,8 @@
 import { debounce } from '@/utils/utils.js';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import { useI18n } from '@/composables/useI18n.js';
+import { useSlots } from 'vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * a row that can display options responsively either hidden behind an options button
@@ -228,8 +230,22 @@ export default {
   },
   emits: ['option-triggered', 'update:show-options'],
   setup() {
+    /** ROW ELEMENTS RENDERING */
+    const slots = useSlots();
+    /**
+     * determine if before slot has data
+     * @returns {Boolean}
+     */
+    const { slotHasContent: beforeSlotHasData } = useHasSlotContent(slots.beforeOptions);
+    /**
+     * determine if after slot has data
+     * @returns {Boolean}
+     */
+    const { slotHasContent: afterSlotHasData } = useHasSlotContent(slots.afterOptions);
     const { getI18nTerm } = useI18n();
     return {
+      beforeSlotHasData,
+      afterSlotHasData,
       getI18nTerm,
     };
   },
@@ -337,20 +353,6 @@ export default {
      */
     wrapActions() {
       return this.rowWidth <= this.actionButtonsWidth;
-    },
-    /**
-     * determine if before slot has data
-     * @returns {Boolean}
-     */
-    beforeSlotHasData() {
-      return !!this.$slots.beforeOptions;
-    },
-    /**
-     * determine if after slot has data
-     * @returns {Boolean}
-     */
-    afterSlotHasData() {
-      return !!this.$slots.afterOptions;
     },
   },
   watch: {
