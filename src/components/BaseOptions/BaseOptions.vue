@@ -384,9 +384,17 @@ export default {
      */
     useOptionsButton: {
       handler(val) {
-        // make sure options are shown when options button is disabled and
-        // hidden behind the options button as soon as it is used
-        this.showOptionsInt = !val;
+        if (this.useOptionsButtonOn === 'mobile') {
+          // make sure options are shown when options button is not displayed
+          if (!val) {
+            this.showOptionsInt = true;
+          }
+          // and hidden behind the options button as soon as it is used
+          // (but only if options visibility was not set true from outside!)
+          if (val && !this.showOptions) {
+            this.showOptionsInt = false;
+          }
+        }
       },
       immediate: true,
     },
