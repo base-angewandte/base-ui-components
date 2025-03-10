@@ -1,7 +1,7 @@
 <template>
   <div class="base-options">
     <div
-      ref="optionsRow"
+      ref="optionsRowElement"
       :class="[
         'base-options__row',
         `base-options__row-${alignOptions}`,
@@ -96,7 +96,7 @@
 import { debounce } from '@/utils/utils.js';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useSlots } from 'vue';
+import { computed, useSlots, useTemplateRef } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
@@ -242,10 +242,26 @@ export default {
      * @returns {Boolean}
      */
     const { slotHasContent: afterSlotHasData } = useHasSlotContent(slots.afterOptions);
+
+    /**
+     * get a reference to the root component
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const optionsRow = useTemplateRef('optionsRowElement');
+    /**
+     * total row width needed to calc if options and after options
+     * should be shown inline
+     * @type {ComputedRef<number>}
+     */
+    const rowWidth = computed(() => optionsRow.value?.clientWidth || 4000);
+
+    /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
     return {
       beforeSlotHasData,
       afterSlotHasData,
+      optionsRow,
+      rowWidth,
       getI18nTerm,
     };
   },
@@ -261,12 +277,6 @@ export default {
        * @type {boolean}
        */
       isMobile: true,
-      /**
-       * total row width needed to calc if options and after options
-       * should be shown inline
-       * @type {number}
-       */
-      rowWidth: 4000,
       /**
        * beforeOptions element width needed to calc if options
        * should be shown inline
@@ -418,25 +428,23 @@ export default {
     },
   },
   mounted() {
-    // to listen to element with instead of window width create an observer!
-    this.initObserver();
-  },
-  updated() {
     // calc the width of all fixed width elements (beforeOptions,
     // options button, after Options)
     this.calcFixedElementWidth();
     if (this.showOptionsInt && this.$refs.actions) {
       this.calcOptionsWidth();
     }
+    // to listen to element with instead of window width create an observer!
+    this.initObserver();
   },
   beforeUnmount() {
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.optionsRow);
+    if (this.resizeObserver) this.resizeObserver.unobserve(this.optionsRow);
     if (this.mutationObserver && this.afterSlotHasData) this.mutationObserver.disconnect();
   },
   methods: {
     initObserver() {
       const resizeObserver = new ResizeObserver(debounce(50, this.resizeActions));
-      resizeObserver.observe(this.$refs.optionsRow);
+      resizeObserver.observe(this.optionsRow);
       this.resizeObserver = resizeObserver;
 
       if (this.afterSlotHasData) {
@@ -489,13 +497,8 @@ export default {
      * or window resize events
      */
     calcOptionsWidth() {
-      // get the complete options row element
-      const { optionsRow } = this.$refs;
-      if (optionsRow) {
-        this.rowWidth = optionsRow.clientWidth;
-      }
       // check if it is defined - if yes - calculate the width remaining for the action buttons
-      this.remainingActionsWidth = optionsRow ? this.rowWidth
+      this.remainingActionsWidth = this.optionsRow ? this.rowWidth
         - this.beforeOptionsWidth - this.afterOptionsWidth
         // only subtract options button if it is shown
         - (this.useOptionsButton ? this.optionsButtonWidth : 0)
