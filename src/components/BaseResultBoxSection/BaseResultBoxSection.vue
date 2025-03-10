@@ -131,6 +131,7 @@
             class="base-result-box-section__boxes-container"
             @start="dragStart"
             @end="dragEnd"
+            @click.capture="onBoxClick"
             @update:model-value="draggableBoxes = $event">
             <li
               v-for="(entry, index) of visibleBoxes"
@@ -1132,7 +1133,12 @@ export default {
       }
     },
     dragEnd() {
-      this.movableElementId = null;
+      // due to an click event being fired on Firefox on dragend (mouseup) we need
+      // to move the resetting of the movableElementId to the very end of the queue
+      // so when the click event comes i can check for an ongoing drag event (see below)
+      setTimeout(() => {
+        this.movableElementId = null;
+      }, 0)
       const className = 'grabbing';
       const html = document.getElementsByTagName('html').item(0);
       if (html && new RegExp(className).test(html.className) === true) {
@@ -1143,6 +1149,18 @@ export default {
         );
         // Remove className without added space (just in case)
         html.className = html.className.replace(new RegExp(className), '');
+      }
+    },
+    /**
+     * in Firefox a click event is triggered on dragend (mouseup) with vue-draggable
+     * which causes the box to get selected/unselected after dragging - to stop this
+     * we need to check here if drag is ongoing (=movableElementId is still set) and
+     * stop event propagation if yes
+     * @param {MouseEvent} event
+     */
+    onBoxClick(event) {
+      if (this.movableElementId) {
+        event.stopPropagation();
       }
     },
     /** EDIT MODE FUNCTIONALITIES */
