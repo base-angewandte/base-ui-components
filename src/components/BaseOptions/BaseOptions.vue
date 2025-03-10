@@ -338,9 +338,6 @@ export default {
     wrapActions() {
       return this.rowWidth <= this.actionButtonsWidth;
     },
-    wrapHeaderActions() {
-      return this.rowWidth - this.beforeOptionsWidth < this.actionButtonsWidth;
-    },
     /**
      * determine if before slot has data
      * @returns {Boolean}
