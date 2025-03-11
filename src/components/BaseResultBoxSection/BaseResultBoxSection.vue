@@ -127,7 +127,6 @@
             :handle="draggable ? '.base-result-box-section__result-box-item__draggable .base-image-box' : undefined"
             :force-fallback="draggable ? true : undefined"
             :role="draggable ? 'list' : undefined"
-            tabindex="0"
             class="base-result-box-section__boxes-container"
             @start="dragStart"
             @end="dragEnd"
@@ -1060,7 +1059,9 @@ export default {
             if (this.$refs.resultBoxItemElement && this.$refs.resultBoxItemElement.length) {
               this.$refs.resultBoxItemElement.forEach((element) => {
                 const inputElement = element.getElementsByTagName('input');
-                inputElement[0].setAttribute('tabindex', '-1');
+                if (inputElement?.length) {
+                  inputElement[0].setAttribute('tabindex', '-1');
+                }
               });
               // it appears refs are not reactive and do not reflect reordering so we need
               // to look for the actual current first element in the visibleBoxes array
@@ -1118,6 +1119,13 @@ export default {
   created() {
     if (!this.useExpandMode) {
       this.expandedInt = true;
+    }
+    // since prop `editMode` watcher does not have immediate flag set the
+    // internal variables in sync here and also already set `imageBoxesSelectable`
+    // since this is giving a hydration error with nuxt otherwise
+    this.editModeActive = this.editMode;
+    if (this.editModeActive) {
+      this.imageBoxesSelectable = true;
     }
   },
   mounted() {
@@ -1480,12 +1488,6 @@ export default {
         &__draggable {
           box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.25);
           cursor: move;
-        }
-
-        &__dragging {
-          &:focus-within:after {
-            border: 1px solid $app-color;
-          }
         }
       }
 
