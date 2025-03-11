@@ -1,275 +1,3 @@
-<template>
-  <div
-    ref="resultBoxSectionElement"
-    class="base-result-box-section">
-    <!-- LOADER -->
-    <div
-      v-if="isLoading"
-      class="base-result-box-section__loading">
-      <BaseLoader
-        :text-on-loader-show="assistiveText.loaderActive"
-        class="base-result-box-section__loader" />
-    </div>
-
-    <!-- RESULT BOX SECTION AREA -->
-    <div
-      class="base-result-box-section__container">
-      <!-- HEADER ROW -->
-      <div
-        v-if="showHeader"
-        class="base-result-box-section__header-row">
-        <!-- HEADER WITH OPTIONS -->
-        <BaseOptions
-          v-if="showOptions"
-          :show-options="editModeActive"
-          :options-button-icon="optionsButtonIcon"
-          :options-button-text="optionsButtonText"
-          use-options-button-on="always"
-          @update:show-options="optionsToggle">
-          <template #beforeOptions>
-            <!-- @slot add a custom header instead of headerText -->
-            <slot name="header">
-              <h3
-                v-if="headerText"
-                class="base-result-box-section__header">
-                {{ headerText }}
-              </h3>
-            </slot>
-          </template>
-
-          <!-- ACTIONS FOR BOXES -->
-          <template
-            #options>
-            <!-- @slot add custom option/action elements in the header row
-              @binding {Function} submit-action - the method that should be called after the action button was clicked
-            -->
-            <slot
-              name="optionButtons"
-              :submit-action="submitAction">
-              <!-- default iterate through optionsConfig array -->
-              <template v-for="action of actionButtonsConfig">
-                <BaseButton
-                  v-if="action.display === 'top' || action.display === 'all' || !action.display"
-                  :key="action.text"
-                  :text="getI18nString(action.text)"
-                  :icon="action.icon"
-                  :has-background-color="false"
-                  :disabled="action.disabled"
-                  icon-size="large"
-                  button-style="single"
-                  @clicked="submitAction(action.value)" />
-              </template>
-            </slot>
-          </template>
-        </BaseOptions>
-
-        <!-- HEADER ONLY -->
-        <template v-else>
-          <slot name="header">
-            <h3
-              v-if="headerText"
-              class="base-result-box-section__header">
-              {{ headerText }}
-            </h3>
-          </slot>
-        </template>
-      </div>
-
-      <div
-        :class="['base-result-box-section__background',
-                 {
-                   'base-result-box-section__background--white':
-                     editModeWhiteBackground && editModeActive,
-                 }]">
-        <!-- MESSAGE AND FOLLOW UP ACTION AREA FOR EDIT MODE -->
-        <!-- MESSAGE AREA -->
-        <div
-          v-if="editModeActive"
-          :key="headerText + '_messageArea'"
-          class="base-result-box-section__message-area">
-          <div class="base-result-box-section__message-area-text">
-            {{ messageText }}
-          </div>
-          <span class="base-result-box-section__message-area-subtext">{{ messageSubtext }}</span>
-          <!-- @slot add a custom element after the message area -->
-          <slot name="optionsMessageAreaAfter" />
-        </div>
-
-        <!-- SELECT OPTIONS (NUMBER OF SELECTED AND SELECT ALL) -->
-
-        <!-- adding a indicator of how many items are selected and 'select all' button
-        only shown in select mode -->
-        <BaseSelectOptions
-          v-if="editModeActive"
-          :key="headerText + '_selectOptions'"
-          :selected-number-text="getI18nString(selectOptionsText.entriesSelected)"
-          :select-text="getI18nString(selectOptionsText.selectAll)"
-          :deselect-text="getI18nString(selectOptionsText.selectNone)"
-          :list="visibleBoxes"
-          :selected-list="selectedListInt"
-          @selected="selectAllTriggered" />
-        <span
-          aria-live="assertive"
-          class="assistive-text">
-          {{ currentAssistiveText }}
-        </span>
-        <!-- BOXES AREA -->
-        <template v-if="entryListInt.length">
-          <component
-            :is="draggableComponent"
-            ref="resultBoxesAreaElement"
-            :model-value="draggableBoxes"
-            :animation="draggable ? 150 : undefined"
-            :tag="draggable ? 'ul' : undefined"
-            :disabled="draggable ? !editModeActive : undefined"
-            :draggable="editModeActive ? '.base-result-box-section__result-box-item' : undefined"
-            :aria-label="headerText"
-            :handle="draggable ? '.base-result-box-section__result-box-item__draggable .base-image-box' : undefined"
-            :force-fallback="draggable ? true : undefined"
-            :role="draggable ? 'list' : undefined"
-            class="base-result-box-section__boxes-container"
-            @start="dragStart"
-            @end="dragEnd"
-            @click.capture="onBoxClick"
-            @update:model-value="draggableBoxes = $event">
-            <li
-              v-for="(entry, index) of visibleBoxes"
-              :id="`li-${entry.id}`"
-              :key="getPropValue(identifierPropertyName, entry)"
-              ref="resultBoxItemElement"
-              :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
-              :aria-label="getPropValue(titlePropertyName, entry)"
-              :aria-grabbed="(movableElementId === entry.id).toString()"
-              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : null"
-              :class="['base-result-box-section__box-item',
-                       'base-result-box-section__result-box-item',
-                       { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
-                       `base-result-box-section__box-item-${elementId}`,
-                       {
-                         'base-result-box-section__result-box-item__draggable':
-                           draggable && editModeActive,
-                       },
-                       {
-                         'base-result-box-section__result-box-item__dragging':
-                           movableElementId === entry[identifierPropertyName],
-                       }]"
-              @keydown.enter="onEnterKey($event, entry, index)"
-              @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
-                ? moveEntry($event, index) : false"
-              @keydown.space.prevent="editModeActive ? entrySelected(
-                getPropValue(identifierPropertyName, entry), !isEntrySelected(entry)) : false"
-              @keydown.tab="cancelDragMode">
-              <!-- @slot result-box - for custom result boxes
-                @binding {Object} item - one list item of boxes to be displayed
-                @binding {number} index - the index of the item
-                @binding {boolean} select-active - are items in select mode
-                @binding {boolean} is-entry-selected - is the particular item currently selected
-                @binding {Function} entry-selected - method that should be called when an entry was selected
-              -->
-              <slot
-                :item="entry"
-                :index="index"
-                :select-active="editModeActive"
-                :is-entry-selected="isEntrySelected"
-                :entry-selected="entrySelected"
-                name="resultBox">
-                <BaseImageBox
-                  :key="getPropValue(identifierPropertyName, entry)"
-                  :selectable="imageBoxesSelectable"
-                  :draggable="editModeActive && draggable"
-                  :selected="isEntrySelected(entry)"
-                  :box-size="{ width: 'auto' }"
-                  :box-ratio="'100'"
-                  :title="getPropValue(titlePropertyName, entry)"
-                  :subtext="entry.subtext"
-                  :description="entry.description"
-                  :image-url="entry.imageUrl"
-                  :box-text="entry.text"
-                  :lazyload="true"
-                  @select-triggered="entrySelected(
-                    getPropValue(identifierPropertyName, entry), $event)"
-                  @clicked="entryClicked(getPropValue(identifierPropertyName, entry))" />
-              </slot>
-            </li>
-
-            <!-- ACTION BUTTONS -->
-            <!-- @slot add custom elements after result elements list use scoped slot prop `itemsPerRow` or dynamically adjusted css variable `--items-per-row` to adjust element width in accordance with other boxes
-              @binding {number} items-per-row - items per row calculated from container or page width
-              @binding {string} element-id - add a class `base-result-box-section__box-item-${elementId}` to action button element to include it in box size and styling calculations
-            -->
-            <slot
-              v-if="showActionButtonBoxes && editModeActive"
-              :items-per-row="itemsPerRow"
-              :element-id="elementId"
-              name="actionButtons">
-              <!-- default button -->
-              <template
-                v-for="action of actionButtonsConfig">
-                <BaseBoxButton
-                  v-if="action.display === 'bottom' || action.display === 'all' || !action.display"
-                  :key="action.value"
-                  :text="getI18nString(action.text)"
-                  :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
-                  :icon="action.icon"
-                  box-style="small"
-                  render-element-as="button"
-                  :class="['base-result-box-section__box-item',
-                           `base-result-box-section__box-item-${elementId}`]"
-                  @clicked="submitAction(action.value)" />
-              </template>
-            </slot>
-            <!-- EXPAND BUTTON -->
-            <BaseBoxButton
-              v-else-if="useExpandMode && !editModeActive && expandNeeded && initialBoxCalcDone"
-              :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
-              icon=""
-              text=""
-              render-element-as="button"
-              :class="['base-result-box-section__box-item',
-                       `base-result-box-section__box-item-${elementId}`]"
-              @clicked="expandedInt = !expandedInt">
-              <template #default>
-                <!-- needed to add v-if here again - otherwise strange side effects -->
-                <div
-                  v-if="!editModeActive"
-                  class="base-result-box-section__expand-button__content">
-                  <span
-                    v-if="!expandedInt"
-                    class="base-result-box-section__expand-button__content-number">
-                    {{ `+${(total || modelValue.length) - visibleBoxes.length}` }}
-                  </span>
-                  <span
-                    :class="[expandedInt
-                      ? 'base-result-box-section__expand-button__content-text-expanded'
-                      : 'base-result-box-section__expand-button__content-text-collapsed']">
-                    {{ expandedInt ? expandText.collapse : expandText.expand }}
-                  </span>
-                </div>
-              </template>
-            </BaseBoxButton>
-          </component>
-          <!-- PAGINATION -->
-          <!-- only shown if
-          * usePagination is true
-          * it is actually needed because there is more than one page
-          * edit mode is active and draggable functionality is not used
-          * edit mode is not active and rows are expanded (always true if
-            useExpandMode is set false) -->
-          <BasePagination
-            v-if="usePagination && showPagination && pages > 1
-              && ((editModeActive && !draggable)
-                || (!editModeActive && expandedInt))"
-            :key="'pagination-' + elementId"
-            :total="pages"
-            :model-value="currentPageNumberInt"
-            :use-link-element="usePaginationLinkElement"
-            @update:model-value="setPage" />
-        </template>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, ref, useTemplateRef, watch } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
@@ -1015,7 +743,7 @@ export default {
            *
            * @event update:current-page-number
            * @param {number} - the new page number
-          */
+           */
           this.$emit('update:current-page-number', this.currentPageNumberInt);
         }
       },
@@ -1235,7 +963,7 @@ export default {
     isEntrySelected(entry) {
       return this.selectedListInt
         .map(selectedEntry => this.getPropValue(this.identifierPropertyName, selectedEntry)
-        || selectedEntry).includes(this.getPropValue(this.identifierPropertyName, entry));
+          || selectedEntry).includes(this.getPropValue(this.identifierPropertyName, entry));
     },
     /**
      * function triggered when user has
@@ -1400,6 +1128,278 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="resultBoxSectionElement"
+    class="base-result-box-section">
+    <!-- LOADER -->
+    <div
+      v-if="isLoading"
+      class="base-result-box-section__loading">
+      <BaseLoader
+        :text-on-loader-show="assistiveText.loaderActive"
+        class="base-result-box-section__loader" />
+    </div>
+
+    <!-- RESULT BOX SECTION AREA -->
+    <div
+      class="base-result-box-section__container">
+      <!-- HEADER ROW -->
+      <div
+        v-if="showHeader"
+        class="base-result-box-section__header-row">
+        <!-- HEADER WITH OPTIONS -->
+        <BaseOptions
+          v-if="showOptions"
+          :show-options="editModeActive"
+          :options-button-icon="optionsButtonIcon"
+          :options-button-text="optionsButtonText"
+          use-options-button-on="always"
+          @update:show-options="optionsToggle">
+          <template #beforeOptions>
+            <!-- @slot add a custom header instead of headerText -->
+            <slot name="header">
+              <h3
+                v-if="headerText"
+                class="base-result-box-section__header">
+                {{ headerText }}
+              </h3>
+            </slot>
+          </template>
+
+          <!-- ACTIONS FOR BOXES -->
+          <template
+            #options>
+            <!-- @slot add custom option/action elements in the header row
+              @binding {Function} submit-action - the method that should be called after the action button was clicked
+            -->
+            <slot
+              name="optionButtons"
+              :submit-action="submitAction">
+              <!-- default iterate through optionsConfig array -->
+              <template v-for="action of actionButtonsConfig">
+                <BaseButton
+                  v-if="action.display === 'top' || action.display === 'all' || !action.display"
+                  :key="action.text"
+                  :text="getI18nString(action.text)"
+                  :icon="action.icon"
+                  :has-background-color="false"
+                  :disabled="action.disabled"
+                  icon-size="large"
+                  button-style="single"
+                  @clicked="submitAction(action.value)" />
+              </template>
+            </slot>
+          </template>
+        </BaseOptions>
+
+        <!-- HEADER ONLY -->
+        <template v-else>
+          <slot name="header">
+            <h3
+              v-if="headerText"
+              class="base-result-box-section__header">
+              {{ headerText }}
+            </h3>
+          </slot>
+        </template>
+      </div>
+
+      <div
+        :class="['base-result-box-section__background',
+                 {
+                   'base-result-box-section__background--white':
+                     editModeWhiteBackground && editModeActive,
+                 }]">
+        <!-- MESSAGE AND FOLLOW UP ACTION AREA FOR EDIT MODE -->
+        <!-- MESSAGE AREA -->
+        <div
+          v-if="editModeActive"
+          :key="headerText + '_messageArea'"
+          class="base-result-box-section__message-area">
+          <div class="base-result-box-section__message-area-text">
+            {{ messageText }}
+          </div>
+          <span class="base-result-box-section__message-area-subtext">{{ messageSubtext }}</span>
+          <!-- @slot add a custom element after the message area -->
+          <slot name="optionsMessageAreaAfter" />
+        </div>
+
+        <!-- SELECT OPTIONS (NUMBER OF SELECTED AND SELECT ALL) -->
+
+        <!-- adding a indicator of how many items are selected and 'select all' button
+        only shown in select mode -->
+        <BaseSelectOptions
+          v-if="editModeActive"
+          :key="headerText + '_selectOptions'"
+          :selected-number-text="getI18nString(selectOptionsText.entriesSelected)"
+          :select-text="getI18nString(selectOptionsText.selectAll)"
+          :deselect-text="getI18nString(selectOptionsText.selectNone)"
+          :list="visibleBoxes"
+          :selected-list="selectedListInt"
+          @selected="selectAllTriggered" />
+        <span
+          aria-live="assertive"
+          class="assistive-text">
+          {{ currentAssistiveText }}
+        </span>
+        <!-- BOXES AREA -->
+        <template v-if="entryListInt.length">
+          <component
+            :is="draggableComponent"
+            ref="resultBoxesAreaElement"
+            :model-value="draggableBoxes"
+            :animation="draggable ? 150 : undefined"
+            :tag="draggable ? 'ul' : undefined"
+            :disabled="draggable ? !editModeActive : undefined"
+            :draggable="editModeActive ? '.base-result-box-section__result-box-item' : undefined"
+            :aria-label="headerText"
+            :handle="draggable ? '.base-result-box-section__result-box-item__draggable .base-image-box' : undefined"
+            :force-fallback="draggable ? true : undefined"
+            :role="draggable ? 'list' : undefined"
+            class="base-result-box-section__boxes-container"
+            @start="dragStart"
+            @end="dragEnd"
+            @click.capture="onBoxClick"
+            @update:model-value="draggableBoxes = $event">
+            <li
+              v-for="(entry, index) of visibleBoxes"
+              :id="`li-${entry.id}`"
+              :key="getPropValue(identifierPropertyName, entry)"
+              ref="resultBoxItemElement"
+              :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
+              :aria-label="getPropValue(titlePropertyName, entry)"
+              :aria-grabbed="(movableElementId === entry.id).toString()"
+              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : null"
+              :class="['base-result-box-section__box-item',
+                       'base-result-box-section__result-box-item',
+                       { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
+                       `base-result-box-section__box-item-${elementId}`,
+                       {
+                         'base-result-box-section__result-box-item__draggable':
+                           draggable && editModeActive,
+                       },
+                       {
+                         'base-result-box-section__result-box-item__dragging':
+                           movableElementId === entry[identifierPropertyName],
+                       }]"
+              @keydown.enter="onEnterKey($event, entry, index)"
+              @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
+                ? moveEntry($event, index) : false"
+              @keydown.space.prevent="editModeActive ? entrySelected(
+                getPropValue(identifierPropertyName, entry), !isEntrySelected(entry)) : false"
+              @keydown.tab="cancelDragMode">
+              <!-- @slot result-box - for custom result boxes
+                @binding {Object} item - one list item of boxes to be displayed
+                @binding {number} index - the index of the item
+                @binding {boolean} select-active - are items in select mode
+                @binding {boolean} is-entry-selected - is the particular item currently selected
+                @binding {Function} entry-selected - method that should be called when an entry was selected
+              -->
+              <slot
+                :item="entry"
+                :index="index"
+                :select-active="editModeActive"
+                :is-entry-selected="isEntrySelected"
+                :entry-selected="entrySelected"
+                name="resultBox">
+                <BaseImageBox
+                  :key="getPropValue(identifierPropertyName, entry)"
+                  :selectable="imageBoxesSelectable"
+                  :draggable="editModeActive && draggable"
+                  :selected="isEntrySelected(entry)"
+                  :box-size="{ width: 'auto' }"
+                  :box-ratio="'100'"
+                  :title="getPropValue(titlePropertyName, entry)"
+                  :subtext="entry.subtext"
+                  :description="entry.description"
+                  :image-url="entry.imageUrl"
+                  :box-text="entry.text"
+                  :lazyload="true"
+                  @select-triggered="entrySelected(
+                    getPropValue(identifierPropertyName, entry), $event)"
+                  @clicked="entryClicked(getPropValue(identifierPropertyName, entry))" />
+              </slot>
+            </li>
+
+            <!-- ACTION BUTTONS -->
+            <!-- @slot add custom elements after result elements list use scoped slot prop `itemsPerRow` or dynamically adjusted css variable `--items-per-row` to adjust element width in accordance with other boxes
+              @binding {number} items-per-row - items per row calculated from container or page width
+              @binding {string} element-id - add a class `base-result-box-section__box-item-${elementId}` to action button element to include it in box size and styling calculations
+            -->
+            <slot
+              v-if="showActionButtonBoxes && editModeActive"
+              :items-per-row="itemsPerRow"
+              :element-id="elementId"
+              name="actionButtons">
+              <!-- default button -->
+              <template
+                v-for="action of actionButtonsConfig">
+                <BaseBoxButton
+                  v-if="action.display === 'bottom' || action.display === 'all' || !action.display"
+                  :key="action.value"
+                  :text="getI18nString(action.text)"
+                  :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
+                  :icon="action.icon"
+                  box-style="small"
+                  render-element-as="button"
+                  :class="['base-result-box-section__box-item',
+                           `base-result-box-section__box-item-${elementId}`]"
+                  @clicked="submitAction(action.value)" />
+              </template>
+            </slot>
+            <!-- EXPAND BUTTON -->
+            <BaseBoxButton
+              v-else-if="useExpandMode && !editModeActive && expandNeeded && initialBoxCalcDone"
+              :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
+              icon=""
+              text=""
+              render-element-as="button"
+              :class="['base-result-box-section__box-item',
+                       `base-result-box-section__box-item-${elementId}`]"
+              @clicked="expandedInt = !expandedInt">
+              <template #default>
+                <!-- needed to add v-if here again - otherwise strange side effects -->
+                <div
+                  v-if="!editModeActive"
+                  class="base-result-box-section__expand-button__content">
+                  <span
+                    v-if="!expandedInt"
+                    class="base-result-box-section__expand-button__content-number">
+                    {{ `+${(total || modelValue.length) - visibleBoxes.length}` }}
+                  </span>
+                  <span
+                    :class="[expandedInt
+                      ? 'base-result-box-section__expand-button__content-text-expanded'
+                      : 'base-result-box-section__expand-button__content-text-collapsed']">
+                    {{ expandedInt ? expandText.collapse : expandText.expand }}
+                  </span>
+                </div>
+              </template>
+            </BaseBoxButton>
+          </component>
+          <!-- PAGINATION -->
+          <!-- only shown if
+          * usePagination is true
+          * it is actually needed because there is more than one page
+          * edit mode is active and draggable functionality is not used
+          * edit mode is not active and rows are expanded (always true if
+            useExpandMode is set false) -->
+          <BasePagination
+            v-if="usePagination && showPagination && pages > 1
+              && ((editModeActive && !draggable)
+                || (!editModeActive && expandedInt))"
+            :key="'pagination-' + elementId"
+            :total="pages"
+            :model-value="currentPageNumberInt"
+            :use-link-element="usePaginationLinkElement"
+            @update:model-value="setPage" />
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
