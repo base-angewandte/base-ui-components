@@ -66,6 +66,10 @@ body {
   font-size: $font-size-large !important;
 }
 
+.VPLocalSearchBox {
+  z-index: 10000 !important;
+}
+
 .text, .vp-doc th, .vp-doc td, .vp-doc blockquote > p, .menu,
 .VPNavScreenMenuLink,
 .VPNavBarMenuLink, .pager-link .title {
