@@ -1032,7 +1032,7 @@ export default {
     transition: all 0.5s ease;
   }
 
-  .slide-fade-enter, .slide-fade-leave-to {
+  .slide-fade-enter-from, .slide-fade-leave-to {
     opacity: 0;
     transform: translateX(#{$spacing});
     margin-left: calc(-2 * #{$spacing});

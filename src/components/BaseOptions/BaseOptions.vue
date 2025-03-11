@@ -627,7 +627,7 @@ export default {
   transition: all 0.5s ease;
 }
 
-.slide-fade-options-enter {
+.slide-fade-options-enter-from {
   opacity: 0;
   transform: translateY(-#{2*$spacing});
 }
