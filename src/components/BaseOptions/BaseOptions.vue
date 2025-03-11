@@ -96,7 +96,7 @@
 import { debounce } from '@/utils/utils.js';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { computed, useSlots, useTemplateRef } from 'vue';
+import { useSlots, useTemplateRef } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
@@ -248,12 +248,6 @@ export default {
      * @type {Readonly<ShallowRef<unknown | null>>}
      */
     const optionsRow = useTemplateRef('optionsRowElement');
-    /**
-     * total row width needed to calc if options and after options
-     * should be shown inline
-     * @type {ComputedRef<number>}
-     */
-    const rowWidth = computed(() => optionsRow.value?.clientWidth || 4000);
 
     /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
@@ -261,7 +255,6 @@ export default {
       beforeSlotHasData,
       afterSlotHasData,
       optionsRow,
-      rowWidth,
       getI18nTerm,
     };
   },
@@ -277,6 +270,12 @@ export default {
        * @type {boolean}
        */
       isMobile: true,
+      /**
+       * total row width needed to calc if options and after options
+       * should be shown inline
+       * @type {number}
+       */
+      rowWidth: 4000,
       /**
        * beforeOptions element width needed to calc if options
        * should be shown inline
@@ -396,16 +395,14 @@ export default {
      */
     useOptionsButton: {
       handler(val) {
-        if (this.useOptionsButtonOn === 'mobile') {
-          // make sure options are shown when options button is not displayed
-          if (!val) {
-            this.showOptionsInt = true;
-          }
-          // and hidden behind the options button as soon as it is used
-          // (but only if options visibility was not set true from outside!)
-          if (val && !this.showOptions) {
-            this.showOptionsInt = false;
-          }
+        // make sure options are shown when options button is not displayed
+        if (!val) {
+          this.showOptionsInt = true;
+        }
+        // and hidden behind the options button as soon as it is used
+        // (but only if options visibility was not set true from outside!)
+        if (val && !this.showOptions) {
+          this.showOptionsInt = false;
         }
       },
       immediate: true,
@@ -428,14 +425,16 @@ export default {
     },
   },
   mounted() {
+    // to listen to element with instead of window width create an observer!
+    this.initObserver();
+  },
+  updated() {
     // calc the width of all fixed width elements (beforeOptions,
     // options button, after Options)
     this.calcFixedElementWidth();
     if (this.showOptionsInt && this.$refs.actions) {
       this.calcOptionsWidth();
     }
-    // to listen to element with instead of window width create an observer!
-    this.initObserver();
   },
   beforeUnmount() {
     if (this.resizeObserver) this.resizeObserver.unobserve(this.optionsRow);
@@ -497,6 +496,9 @@ export default {
      * or window resize events
      */
     calcOptionsWidth() {
+      if (this.optionsRow) {
+        this.rowWidth = this.optionsRow.clientWidth;
+      }
       // check if it is defined - if yes - calculate the width remaining for the action buttons
       this.remainingActionsWidth = this.optionsRow ? this.rowWidth
         - this.beforeOptionsWidth - this.afterOptionsWidth
