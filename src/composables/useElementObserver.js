@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 /**
  * @typedef {Object} IntersectionObserverOptions
@@ -19,7 +19,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 export function useElementObserver({ type, target, callback, options = {} }) {
   // create a reference to the provided target element, also check if value can
   // be used directly or if it is a vue component (then $el must be used)
-  const targetElement = computed(() => target.value.$el || target.value);
+  const targetElement = computed(() => target.value?.$el || target.value);
   // create an observer variable
   const observer = ref(null);
 
@@ -53,8 +53,19 @@ export function useElementObserver({ type, target, callback, options = {} }) {
   }
 
   onMounted(() => {
-    // initialize the observer
-    initObserver();
+    // check if element was already rendered
+    if (targetElement.value) {
+      // initialize the observer
+      initObserver();
+      // if not, put a watcher on it and init the observer as soon as it is rendered
+    } else {
+      watch(targetElement, (val) => {
+        if (val && !observer.value) {
+          // initialize the observer
+          initObserver();
+        }
+      });
+    }
   });
 
   onBeforeUnmount(() => {
