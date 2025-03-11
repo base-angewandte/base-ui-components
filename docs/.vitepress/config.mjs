@@ -54,6 +54,7 @@ export default defineConfig({
     }
   },
   cleanUrls: true,
+  appearance: false,
   outDir: path.resolve(__dirname, '../../styleguide'),
   vite: {
     plugins: [
