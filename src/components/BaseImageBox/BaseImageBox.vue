@@ -1,6 +1,6 @@
 <template>
   <BaseBox
-    ref="baseBox"
+    ref="baseBoxElement"
     :box-size="boxSize"
     :render-element-as="renderElementAs"
     :additional-attributes="linkTo ? { to: linkTo } : {}"
@@ -16,7 +16,7 @@
       <!-- HEADER -->
       <div
         v-if="showTitle"
-        ref="headerBox"
+        ref="headerBoxElement"
         :class="['base-image-box__header',
                  { 'base-image-box__header--bottom': imageFirst },
                  { 'base-image-box__header--center-text': centerHeader },
@@ -31,7 +31,7 @@
                      'base-image-box__header__text--bold',
                      { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]" />
           <div
-            v-if="$slots['title-right']"
+            v-if="titleRightSlotHasContent"
             class="base-image-box__header__row__additional">
             <!-- @slot create custom content (e.g. additional text or icon) right of the title -->
             <slot name="title-right" />
@@ -78,7 +78,7 @@
 
         <!-- ICONS -->
         <div
-          v-if="icon || !!$slots.icon"
+          v-if="icon || iconSlotHasContent"
           :class="['base-image-box__body__icon',
                    'base-image-box__icon',
                    'base-image-box__icon--' + iconSize]">
@@ -107,7 +107,7 @@
         <!-- alternative text, when no images are set -->
         <div
           v-if="!hasImages || !displayImage"
-          ref="boxText"
+          ref="boxTextElement"
           class="base-image-box__body__text">
           <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
           <slot
@@ -115,7 +115,7 @@
             name="text">
             <!-- default -->
             <div
-              ref="boxTextInner"
+              ref="boxTextInnerElement"
               :style="boxTextStyle"
               class="base-image-box__body__text__inner">
               <div
@@ -132,7 +132,7 @@
                    'base-image-box__body__footer--position-margin-' + imageFooterMargin,
                    { 'base-image-box__body__footer--invert': icon }]">
           <div
-            v-if="$slots['footer-left']"
+            v-if="footerLeftSlotHasContent"
             class="base-image-box__body__footer__left">
             <!-- @slot create custom content (e.g. featured icon for files) left of text -->
             <slot name="footer-left" />
@@ -161,7 +161,7 @@
           </div>
 
           <div
-            v-if="$slots['footer-right'] || playIcon"
+            v-if="footerRightSlotHasContent || playIcon"
             class="base-image-box__body__footer__right">
             <!-- display optional play icon e.g. for video, audio -->
             <BaseIcon
@@ -195,10 +195,11 @@
   </BaseBox>
 </template>
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref, useSlots, useTemplateRef } from 'vue';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
-import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+import { useWindowResize } from '@/composables/useWindowResize.js';
 
 /**
  * A component with the primary purpose to display
@@ -209,7 +210,7 @@ export default {
   name: 'BaseImageBox',
   components: {
     BaseBox,
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseCheckmark: defineAsyncComponent(() => import('@/components/BaseCheckmark/BaseCheckmark.vue')),
     BaseImage: defineAsyncComponent(() => import('@/components/BaseImage/BaseImage.vue')),
     BaseImageGrid: defineAsyncComponent(() => import('@/components/BaseImageGrid/BaseImageGrid.vue')),
@@ -451,6 +452,120 @@ export default {
     },
   },
   emits: ['clicked', 'select-triggered'],
+  setup(props) {
+    /** SLOT DISPLAY */
+    // import slots with vue
+    const slots = useSlots();
+    /**
+     * check if slot `icon` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: iconSlotHasContent } = useHasSlotContent(slots.icon);
+    /**
+     * check if slot `footer-right` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: footerRightSlotHasContent } = useHasSlotContent(slots['footer-right']);
+    /**
+     * check if slot `footer-left` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: footerLeftSlotHasContent } = useHasSlotContent(slots['footer-left']);
+    /**
+     * check if slot `title-right` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: titleRightSlotHasContent } = useHasSlotContent(slots['title-right']);
+
+    /** BOX TEXT DISPLAY */
+    /**
+     * template reference to the root element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const baseBox = useTemplateRef('baseBoxElement');
+    /**
+     * template reference to the root element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const headerBox = useTemplateRef('headerBoxElement');
+    /**
+     * template reference to the box text wrapper element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const boxText = useTemplateRef('boxTextElement');
+    /**
+     * template reference to the box text body element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const boxTextInner = useTemplateRef('boxTextInnerElement');
+
+    /**
+     * needed to set text height and line-clamp correctly after resize
+     * @type {[{}] extends [Ref] ? IfAny<{}, Ref<{}>, {}> : Ref<UnwrapRef<{}>, UnwrapRef<{}> | {}>}
+     */
+    const boxTextStyle = ref({});
+
+    // add an 'resize' event listener so boxText display can be re-calculated
+    useWindowResize({
+      callback: calcTextHeight,
+      setDebounce: 500,
+      callOnMounted: true,
+    });
+
+    /**
+     * function to calculate the text box height and and line-clamp
+     * based on actually box height (-description if necessary)
+     */
+    function calcTextHeight() {
+      // only do this if no image is present and the boxText variable has items
+      // and all the ui elements are there
+      if (!props.imageUrl && props.boxText.length
+        && baseBox.value && boxText.value) {
+        let headerHeight = 0;
+        if (headerBox.value) {
+          const elemInnerHeight = headerBox.value.clientHeight;
+          const boxMargin = headerBox.value.offsetTop;
+          headerHeight = elemInnerHeight + (2 * boxMargin);
+        }
+        // get single text line in the text element (for line height only)
+        const lineElement = boxTextInner.value[0] || boxTextInner.value;
+        // get the height of the complete box
+        const boxHeight = baseBox.value.$el.clientHeight;
+        // get the line height property
+        const lineHeight = window.getComputedStyle(lineElement, null)
+          .getPropertyValue('line-height').replace('px', '');
+        // get the box margin
+        const boxMargin = window.getComputedStyle(boxText.value, null)
+          .getPropertyValue('margin-bottom').replace('px', '');
+        // calculate the actual text box height from
+        // complete box height - header height - box margin (bottom)
+        let textBoxHeight = boxHeight - headerHeight - boxMargin;
+        // if there is a description also leave space for that so its not overlapping
+        // TODO: check if this is wanted
+        if (props.description) {
+          textBoxHeight -= lineHeight;
+        }
+        // calculate how many lines can be displayed
+        const lines = Math.floor(textBoxHeight / lineHeight);
+        // set the style of the text box
+        boxTextStyle.value = {
+          height: `${lineHeight * lines}px`,
+          '-webkit-line-clamp': lines,
+        };
+      }
+    }
+
+    return {
+      // slot display
+      iconSlotHasContent,
+      footerRightSlotHasContent,
+      footerLeftSlotHasContent,
+      titleRightSlotHasContent,
+      // text display
+      boxTextStyle,
+      calcTextHeight,
+    };
+  },
   data() {
     return {
       /**
@@ -458,17 +573,9 @@ export default {
        */
       selectedInt: false,
       /**
-       * needed to set text height and line-clamp correctly after resize
-       */
-      boxTextStyle: {},
-      /**
        * steer displaying of image in case of display error
        */
       displayImage: true,
-      /**
-       * timeout variable to only do height calculations after certain time
-       */
-      resizeTimeout: null,
     };
   },
   computed: {
@@ -527,19 +634,6 @@ export default {
   },
   mounted() {
     this.selectedInt = this.selected;
-
-    if (window) {
-      window.addEventListener('resize', this.resizeTriggered);
-    }
-
-    // calcTextHeight when component is really mounted, even in ssr mode
-    // otherwise the calculation will be wrong and not set as style attribute
-    this.$nextTick(() => {
-      this.calcTextHeight();
-    });
-  },
-  unmounted() {
-    window.removeEventListener('resize', this.resizeTriggered);
   },
   methods: {
     boxSelect() {
@@ -552,57 +646,6 @@ export default {
          * @event clicked
          */
         this.$emit('clicked');
-      }
-    },
-    resizeTriggered() {
-      // check if there is a timeout already set and clear it if yes
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = null;
-      }
-      this.resizeTimeout = setTimeout(() => {
-        this.calcTextHeight();
-      }, 500);
-    },
-    calcTextHeight() {
-      // only do this if no image is present and the boxText variable has items
-      // and all the ui elements are there
-      if (!this.imageUrl && this.boxText.length
-        && this.$refs.baseBox && this.$refs.boxText) {
-        let headerHeight = 0;
-        if (this.$refs.headerBox) {
-          const headerElem = this.$refs.headerBox;
-          const elemInnerHeight = headerElem.clientHeight;
-          const boxMargin = headerElem.offsetTop;
-          headerHeight = elemInnerHeight + (2 * boxMargin);
-        }
-        // get text-wrapper element
-        const elem = this.$refs.boxText;
-        // get single text line in the text element (for line height only)
-        const lineElement = this.$refs.boxTextInner[0] || this.$refs.boxTextInner;
-        // get the height of the complete box
-        const boxHeight = this.$refs.baseBox.$el.clientHeight;
-        // get the line height property
-        const lineHeight = window.getComputedStyle(lineElement, null)
-          .getPropertyValue('line-height').replace('px', '');
-        // get the box margin
-        const boxMargin = window.getComputedStyle(elem, null)
-          .getPropertyValue('margin-bottom').replace('px', '');
-        // calculate the actual text box height from
-        // complete box height - header height - box margin (bottom)
-        let textBoxHeight = boxHeight - headerHeight - boxMargin;
-        // if there is a description also leave space for that so its not overlapping
-        // TODO: check if this is wanted
-        if (this.description) {
-          textBoxHeight -= lineHeight;
-        }
-        // calculate how many lines can be displayed
-        const lines = Math.floor(textBoxHeight / lineHeight);
-        // set the style of the text box
-        this.boxTextStyle = {
-          height: `${lineHeight * lines}px`,
-          '-webkit-line-clamp': lines,
-        };
       }
     },
     /**
