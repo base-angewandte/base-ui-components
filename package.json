@@ -47,7 +47,7 @@
     "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
-    "swiper": "^11.1.10",
+    "swiper": "^11.2.4",
     "vue-datepicker-next": "^1.0.3",
     "vue-draggable-plus": "^0.5.3"
   },

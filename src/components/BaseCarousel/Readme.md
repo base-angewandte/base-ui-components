@@ -14,10 +14,6 @@
        keyboard: {
          enabled: true,
        },
-       pagination: {
-         el: '.swiper-pagination',
-         clickable: true,
-       },
        breakpoints: {
          640: {
            slidesPerView: 2,
@@ -40,24 +36,24 @@ export default {
         {
           title: 'Title',
           subtext: 'Subtitle',
-          description: 'Austellung 1',
+          description: 'Exhibition 1',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
-              '460w': 'https://picsum.photos/seed/firstonex/460/341',
+              '460w': 'https://picsum.photos/seed/art/341',
             },
             {
-              '640w': 'https://picsum.photos/seed/firstonex/640/480',
+              '640w': 'https://picsum.photos/seed/art/640/480',
             },
             {
-              '768w': 'https://picsum.photos/seed/firstonex/768/576',
+              '768w': 'https://picsum.photos/seed/art/768/576',
             },
           ],
         },
         {
           title: 'Title',
           subtext: 'Subtitle',
-          description: 'Austellung 2',
+          description: 'Exhibition 2',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
           previews: [
@@ -75,7 +71,7 @@ export default {
         {
           title: 'Title',
           subtext: 'Subtitle',
-          description: 'Austellung 3',
+          description: 'Exhibition 3',
           href: 'http://base.uni-ak.ac.at',
           previews: [
             {
@@ -92,7 +88,7 @@ export default {
         {
           title: 'Title',
           subtext: 'Subtitle',
-          description: 'Austellung 4',
+          description: 'Exhibition 4',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
           previews: [
@@ -110,7 +106,7 @@ export default {
         {
           title: 'Title',
           subtext: 'Subtitle',
-          description: 'Austellung',
+          description: 'Exhibition',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
           previews: [
@@ -128,7 +124,7 @@ export default {
         {
           title: 'Title',
           subtext: 'An item with no images',
-          description: 'Austellung',
+          description: 'Exhibition',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
         },
