@@ -162,7 +162,7 @@ export default {
 
     // compute if internal id should be set for aria-attribute
     // (no need if no text or slot is not used)
-    const buttonHasTextElement = computed(() => !!props.text || slotHasContent.value);
+    const buttonHasTextElement = computed(() => (!!props.text  || slotHasContent.value) && props.buttonStyle !== 'circle');
 
     return {
       internalId,
