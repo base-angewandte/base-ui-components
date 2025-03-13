@@ -106,7 +106,6 @@ export default {
     assistiveText: {
       type: Object,
       default: () => ({
-        gotoSlide: 'Go to slide {{index}}',
         gotoSlide: 'Go to slide',
         nextSlide: 'Next slide',
         prevSlide: 'Previous slide',
