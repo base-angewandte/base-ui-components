@@ -1,199 +1,3 @@
-<template>
-  <BaseBox
-    ref="baseBoxElement"
-    :box-size="boxSize"
-    :render-element-as="renderElementAs"
-    :additional-attributes="linkTo ? { to: linkTo } : {}"
-    box-ratio="100"
-    @clicked="boxSelect">
-    <div
-      :class="['base-image-box',
-               { 'base-image-box--hover': (playIcon || showTitleOnHover) && !selectable },
-               { 'base-image-box--hover-show-title': showTitleOnHover && !selectable },
-               { 'base-image-box--selectable': selectable },
-               { 'base-image-box--draggable': draggable }, // needs to be after selectable
-               { 'base-image-box--selected': selectable && selectedInt }]">
-      <!-- HEADER -->
-      <div
-        v-if="showTitle"
-        ref="headerBoxElement"
-        :class="['base-image-box__header',
-                 { 'base-image-box__header--bottom': imageFirst },
-                 { 'base-image-box__header--center-text': centerHeader },
-                 { 'base-image-box__header--separator-top': !hasImages && !imageShadow && imageFirst },
-                 { 'base-image-box__header--separator-bottom': !hasImages && !imageShadow && !imageFirst }]">
-        <div
-          class="base-image-box__header__row">
-          <div
-            v-insert-text-as-html="{ value: title, interpretTextAsHtml }"
-            :title="altTitleInt"
-            :class="['base-image-box__header__text',
-                     'base-image-box__header__text--bold',
-                     { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]" />
-          <div
-            v-if="titleRightSlotHasContent"
-            class="base-image-box__header__row__additional">
-            <!-- @slot create custom content (e.g. additional text or icon) right of the title -->
-            <slot name="title-right" />
-          </div>
-        </div>
-        <div
-          v-if="subtext"
-          class="base-image-box__header__row">
-          <div
-            v-insert-text-as-html="{ value: subtext, interpretTextAsHtml }"
-            :title="altSubtextInt"
-            class="base-image-box__header__text" />
-        </div>
-      </div>
-
-      <!-- BODY -->
-      <div
-        :class="['base-image-box__body',
-                 { 'base-image-box__body__shadow--top': imageShadowTop },
-                 { 'base-image-box__body__shadow--bottom': imageShadowBottom },
-                 { 'base-image-box__body__shadow--height-1-3': imageShadow && imageFirst },
-                 { 'base-image-box__body__shadow--height-1-2': imageShadow && !imageFirst }]">
-        <!-- IMAGE / IMAGE-GRID -->
-        <template
-          v-if="(imageUrl || images.length) && displayImage">
-          <!-- single image (handle errors, e.g. for uploads) -->
-          <BaseImage
-            v-if="imageUrl || (images && images.length === 1)"
-            ref="image"
-            :alt="altTitleInt"
-            :lazyload="lazyload"
-            :src="images && images.length === 1 ? src(images[0]) : src(imageUrl)"
-            :srcset="images && images.length === 1 ? srcset(images[0]) : srcset(imageUrl)"
-            :class="['base-image-box__body__image']"
-            @error="displayImage = false" />
-
-          <!-- image grid -->
-          <BaseImageGrid
-            v-if="images && images.length > 1"
-            :alt="altTitleInt"
-            :images="images"
-            :lazyload="lazyload" />
-        </template>
-
-        <!-- ICONS -->
-        <div
-          v-if="icon || iconSlotHasContent"
-          :class="['base-image-box__body__icon',
-                   'base-image-box__icon',
-                   'base-image-box__icon--' + iconSize]">
-          <!-- @slot create custom content (e.g. folder icon) -->
-          <slot
-            :icon="icon"
-            name="icon">
-            <!-- display optional icon for entries without an image -->
-            <BaseIcon
-              :name="icon"
-              :class="['base-image-box__icon',
-                       'base-image-box__icon--' + iconSize]" />
-          </slot>
-        </div>
-
-        <!-- display optional play icon e.g. for video, audio -->
-        <BaseIcon
-          v-if="playIcon"
-          name="play"
-          :class="['base-image-box__body__icon',
-                   'base-image-box__icon',
-                   'base-image-box__icon--play',
-                   'base-image-box__icon--' + iconSize]" />
-
-        <!-- BODY TEXT -->
-        <!-- alternative text, when no images are set -->
-        <div
-          v-if="!hasImages || !displayImage"
-          ref="boxTextElement"
-          class="base-image-box__body__text">
-          <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
-          <slot
-            :text="boxText"
-            name="text">
-            <!-- default -->
-            <div
-              ref="boxTextInnerElement"
-              :style="boxTextStyle"
-              class="base-image-box__body__text__inner">
-              <div
-                v-for="(entry, index) in boxText"
-                :key="index"
-                v-insert-text-as-html="{ value: entry, interpretTextAsHtml }" />
-            </div>
-          </slot>
-        </div>
-
-        <!-- FOOTER -->
-        <div
-          :class="['base-image-box__body__footer',
-                   'base-image-box__body__footer--position-margin-' + imageFooterMargin,
-                   { 'base-image-box__body__footer--invert': icon }]">
-          <div
-            v-if="footerLeftSlotHasContent"
-            class="base-image-box__body__footer__left">
-            <!-- @slot create custom content (e.g. featured icon for files) left of text -->
-            <slot name="footer-left" />
-          </div>
-
-          <div class="base-image-box__body__footer__center">
-            <div
-              v-if="showTitleOnHover"
-              v-insert-text-as-html="{ interpretTextAsHtml, value: title }"
-              :title="altTitleInt"
-              class="base-image-box__body__footer__title base-image-box__body__footer--bold" />
-            <div
-              v-if="description"
-              :title="description"
-              :class="['base-image-box__body__footer__text',
-                       { 'base-image-box__body__footer__text--bold': !additional }]">
-              {{ description }}
-            </div>
-            <div
-              v-if="additional"
-              :title="additional"
-              :class="['base-image-box__body__footer__text',
-                       'base-image-box__body__footer__text--bold']">
-              {{ additional }}
-            </div>
-          </div>
-
-          <div
-            v-if="footerRightSlotHasContent || playIcon"
-            class="base-image-box__body__footer__right">
-            <!-- display optional play icon e.g. for video, audio -->
-            <BaseIcon
-              v-if="playIcon"
-              name="play"
-              :class="['base-image-box__icon',
-                       'base-image-box__icon--small',
-                       'base-image-box__icon--play']" />
-            <!-- @slot create custom content (e.g. published icon for files) left of text -->
-            <slot name="footer-right" />
-          </div>
-        </div>
-      </div>
-
-      <!-- FEATURES -->
-      <div
-        class="base-image-box__features">
-        <transition
-          name="slide-fade">
-          <BaseCheckmark
-            v-if="selectable"
-            :model-value="selectedInt"
-            :label="altTitleInt"
-            mark-style="checkbox"
-            check-box-size="large"
-            class="base-image-box__checkbox"
-            @update:model-value="boxSelect" />
-        </transition>
-      </div>
-    </div>
-  </BaseBox>
-</template>
 <script>
 import { defineAsyncComponent, ref, useSlots, useTemplateRef } from 'vue';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
@@ -454,7 +258,7 @@ export default {
   emits: ['clicked', 'select-triggered'],
   setup(props) {
     /** SLOT DISPLAY */
-    // import slots with vue
+      // import slots with vue
     const slots = useSlots();
     /**
      * check if slot `icon` has content
@@ -672,6 +476,203 @@ export default {
   },
 };
 </script>
+
+<template>
+  <BaseBox
+    ref="baseBoxElement"
+    :box-size="boxSize"
+    :render-element-as="renderElementAs"
+    :additional-attributes="linkTo ? { to: linkTo } : {}"
+    box-ratio="100"
+    @clicked="boxSelect">
+    <div
+      :class="['base-image-box',
+               { 'base-image-box--hover': (playIcon || showTitleOnHover) && !selectable },
+               { 'base-image-box--hover-show-title': showTitleOnHover && !selectable },
+               { 'base-image-box--selectable': selectable },
+               { 'base-image-box--draggable': draggable }, // needs to be after selectable
+               { 'base-image-box--selected': selectable && selectedInt }]">
+      <!-- HEADER -->
+      <div
+        v-if="showTitle"
+        ref="headerBoxElement"
+        :class="['base-image-box__header',
+                 { 'base-image-box__header--bottom': imageFirst },
+                 { 'base-image-box__header--center-text': centerHeader },
+                 { 'base-image-box__header--separator-top': !hasImages && !imageShadow && imageFirst },
+                 { 'base-image-box__header--separator-bottom': !hasImages && !imageShadow && !imageFirst }]">
+        <div
+          class="base-image-box__header__row">
+          <div
+            v-insert-text-as-html="{ value: title, interpretTextAsHtml }"
+            :title="altTitleInt"
+            :class="['base-image-box__header__text',
+                     'base-image-box__header__text--bold',
+                     { 'base-image-box__header__text--2-lines': !subtext && titleRows === 'auto' }]" />
+          <div
+            v-if="titleRightSlotHasContent"
+            class="base-image-box__header__row__additional">
+            <!-- @slot create custom content (e.g. additional text or icon) right of the title -->
+            <slot name="title-right" />
+          </div>
+        </div>
+        <div
+          v-if="subtext"
+          class="base-image-box__header__row">
+          <div
+            v-insert-text-as-html="{ value: subtext, interpretTextAsHtml }"
+            :title="altSubtextInt"
+            class="base-image-box__header__text" />
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div
+        :class="['base-image-box__body',
+                 { 'base-image-box__body__shadow--top': imageShadowTop },
+                 { 'base-image-box__body__shadow--bottom': imageShadowBottom },
+                 { 'base-image-box__body__shadow--height-1-3': imageShadow && imageFirst },
+                 { 'base-image-box__body__shadow--height-1-2': imageShadow && !imageFirst }]">
+        <!-- IMAGE / IMAGE-GRID -->
+        <template
+          v-if="(imageUrl || images.length) && displayImage">
+          <!-- single image (handle errors, e.g. for uploads) -->
+          <BaseImage
+            v-if="imageUrl || (images && images.length === 1)"
+            ref="image"
+            :alt="altTitleInt"
+            :lazyload="lazyload"
+            :src="images && images.length === 1 ? src(images[0]) : src(imageUrl)"
+            :srcset="images && images.length === 1 ? srcset(images[0]) : srcset(imageUrl)"
+            :class="['base-image-box__body__image']"
+            @error="displayImage = false" />
+
+          <!-- image grid -->
+          <BaseImageGrid
+            v-if="images && images.length > 1"
+            :alt="altTitleInt"
+            :images="images"
+            :lazyload="lazyload" />
+        </template>
+
+        <!-- ICONS -->
+        <div
+          v-if="icon || iconSlotHasContent"
+          :class="['base-image-box__body__icon',
+                   'base-image-box__icon',
+                   'base-image-box__icon--' + iconSize]">
+          <!-- @slot create custom content (e.g. folder icon) -->
+          <slot
+            :icon="icon"
+            name="icon">
+            <!-- display optional icon for entries without an image -->
+            <BaseIcon
+              :name="icon"
+              :class="['base-image-box__icon',
+                       'base-image-box__icon--' + iconSize]" />
+          </slot>
+        </div>
+
+        <!-- display optional play icon e.g. for video, audio -->
+        <BaseIcon
+          v-if="playIcon"
+          name="play"
+          :class="['base-image-box__body__icon',
+                   'base-image-box__icon',
+                   'base-image-box__icon--play',
+                   'base-image-box__icon--' + iconSize]" />
+
+        <!-- BODY TEXT -->
+        <!-- alternative text, when no images are set -->
+        <div
+          v-if="!hasImages || !displayImage"
+          ref="boxTextElement"
+          class="base-image-box__body__text">
+          <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
+          <slot
+            :text="boxText"
+            name="text">
+            <!-- default -->
+            <div
+              ref="boxTextInnerElement"
+              :style="boxTextStyle"
+              class="base-image-box__body__text__inner">
+              <div
+                v-for="(entry, index) in boxText"
+                :key="index"
+                v-insert-text-as-html="{ value: entry, interpretTextAsHtml }" />
+            </div>
+          </slot>
+        </div>
+
+        <!-- FOOTER -->
+        <div
+          :class="['base-image-box__body__footer',
+                   'base-image-box__body__footer--position-margin-' + imageFooterMargin,
+                   { 'base-image-box__body__footer--invert': icon }]">
+          <div
+            v-if="footerLeftSlotHasContent"
+            class="base-image-box__body__footer__left">
+            <!-- @slot create custom content (e.g. featured icon for files) left of text -->
+            <slot name="footer-left" />
+          </div>
+
+          <div class="base-image-box__body__footer__center">
+            <div
+              v-if="showTitleOnHover"
+              v-insert-text-as-html="{ interpretTextAsHtml, value: title }"
+              :title="altTitleInt"
+              class="base-image-box__body__footer__title base-image-box__body__footer--bold" />
+            <div
+              v-if="description"
+              :title="description"
+              :class="['base-image-box__body__footer__text',
+                       { 'base-image-box__body__footer__text--bold': !additional }]">
+              {{ description }}
+            </div>
+            <div
+              v-if="additional"
+              :title="additional"
+              :class="['base-image-box__body__footer__text',
+                       'base-image-box__body__footer__text--bold']">
+              {{ additional }}
+            </div>
+          </div>
+
+          <div
+            v-if="footerRightSlotHasContent || playIcon"
+            class="base-image-box__body__footer__right">
+            <!-- display optional play icon e.g. for video, audio -->
+            <BaseIcon
+              v-if="playIcon"
+              name="play"
+              :class="['base-image-box__icon',
+                       'base-image-box__icon--small',
+                       'base-image-box__icon--play']" />
+            <!-- @slot create custom content (e.g. published icon for files) left of text -->
+            <slot name="footer-right" />
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <div
+        class="base-image-box__features">
+        <transition
+          name="slide-fade">
+          <BaseCheckmark
+            v-if="selectable"
+            :model-value="selectedInt"
+            :label="altTitleInt"
+            mark-style="checkbox"
+            check-box-size="large"
+            class="base-image-box__checkbox"
+            @update:model-value="boxSelect" />
+        </transition>
+      </div>
+    </div>
+  </BaseBox>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
