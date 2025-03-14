@@ -9,25 +9,27 @@ Component to render list data
     <div v-if="editControlEditMode">
       <BaseCheckmark
         v-model="toggleElements"
+        label="Use button elements"
         :radio-value="'button'"
         :show-label="true"
-        label="Use button elements"
         mark-style="radio" />
       <BaseCheckmark
         v-model="toggleElements"
+        label="Use toggle elements"
         :radio-value="'toggle'"
         :show-label="true"
-        label="Use toggle elements"
         mark-style="radio" />
     </div>
+
     <BaseEditControl
       title="Activities"
       :controls="true"
-      :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
       :edit="editControlEditMode"
+      :is-loading="expandListIsLoading"
+      :subtitle="'(' + expandList.filter(item => !item.hidden).length + ')'"
       @activated="activateExpandList"
       @canceled="cancelExpandList"
-      @saved="saveExpandList"/>
+      @saved="saveExpandList" />
 
     <BaseExpandList
       ref="baseExpandList"
@@ -44,7 +46,8 @@ Component to render list data
           :identifier-property-value="data.source"
           :space-after="!!data.additional"
           :tooltip="data.additional"
-          :type="data.type"/>
+          :type="data.type"
+          class="link" />
         <template v-if="data.attributes"> - {{ data.attributes.join(', ') }}</template>
       </template>
     </BaseExpandList>
@@ -72,7 +75,7 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  source: 'asdfasdf',
+                  source: 'BaseExpandList#demo',
                 },
                 {
                   value: 'animi voluptates',
@@ -93,7 +96,7 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  url: '#',
+                  url: 'https://base.uni-ak.ac.at',
                 },
               ],
             },
@@ -106,7 +109,7 @@ export default {
                     'rerum corporis voluptatibus',
                     'beatae occaecati non',
                   ],
-                  url: '#',
+                  url: 'https://base.uni-ak.ac.at',
                 },
                 {
                   value: 'quia quisquam',
@@ -114,7 +117,7 @@ export default {
                     'quae laudantium expedita',
                     'maxime omnis accusamus',
                   ],
-                  url: '#',
+                  url: 'https://base.uni-ak.ac.at',
                 },
                 {
                   value: 'qui nesciunt',
@@ -122,7 +125,7 @@ export default {
                     'molestiae commodi ipsum',
                     'eos dolorem in',
                   ],
-                  url: '#',
+                  url: 'https://base.uni-ak.ac.at',
                 },
               ],
             },
@@ -133,12 +136,12 @@ export default {
           hidden: false,
           data: [
             {
-              value: 'qui fugit',
+              value: 'qui nesciunt officiis quisquam officiis',
               attributes: [
-                'consequatur consequatur ipsa',
-                'et sunt delectus',
+                'rerum corporis voluptatibus',
+                'beatae occaecati non',
               ],
-              url: '#',
+              source: 'BaseExpandList#demo',
             },
             {
               value: 'molestiae error',
@@ -146,7 +149,7 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'cum ut',
@@ -154,7 +157,7 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'totam tenetur',
@@ -162,7 +165,7 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
           ],
         },
@@ -176,7 +179,7 @@ export default {
                 'est quos sed',
                 'sed molestiae veritatis',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'quis quis',
@@ -184,7 +187,7 @@ export default {
                 'non possimus possimus',
                 'nobis recusandae sed',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'mollitia quo',
@@ -192,7 +195,7 @@ export default {
                 'non magnam eius',
                 'harum exercitationem non',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
           ],
         },
@@ -206,7 +209,7 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'molestiae error',
@@ -214,7 +217,7 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'cum ut',
@@ -222,7 +225,7 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'totam tenetur',
@@ -230,7 +233,7 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
           ],
         },
@@ -244,7 +247,7 @@ export default {
                 'consequatur consequatur ipsa',
                 'et sunt delectus',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'molestiae error',
@@ -252,7 +255,7 @@ export default {
                 'nobis voluptatibus quae',
                 'iusto et voluptate',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'cum ut',
@@ -260,7 +263,7 @@ export default {
                 'sed ut perferendis',
                 'velit dicta voluptatem',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
             {
               value: 'totam tenetur',
@@ -268,7 +271,7 @@ export default {
                 'laudantium temporibus cupiditate',
                 'ducimus quos quia',
               ],
-              url: '#',
+              url: 'https://base.uni-ak.ac.at',
             },
           ],
         },
@@ -318,4 +321,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+  .link {
+    margin-right: 5px;
+  }
+</style>
 ```
