@@ -47,6 +47,7 @@ import BaseMap from './BaseMap/BaseMap.vue';
 import BaseMapLocations from './BaseMapLocations/BaseMapLocations.vue';
 import BaseExpandBox from './BaseExpandBox/BaseExpandBox.vue';
 import BaseBoxTooltip from './BaseBoxTooltip/BaseBoxTooltip.vue';
+import BaseExpandList from './BaseExpandList/BaseExpandList.vue';
 // importing BaseDateInput async to avoid SSR problems!
 const BaseDateInput = defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue'));
 // import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
@@ -102,4 +103,5 @@ export {
   BaseMapLocations,
   BaseExpandBox,
   BaseBoxTooltip,
+  BaseExpandList,
 };
