@@ -6,7 +6,7 @@ Component to render list data
 
 <template>
   <div style="background-color: rgb(240, 240, 240); padding: 16px;">
-    <div v-if="editExpandList">
+    <div v-if="editControlEditMode">
       <BaseCheckmark
         v-model="toggleElements"
         :radio-value="'button'"
@@ -24,7 +24,7 @@ Component to render list data
       title="Activities"
       :controls="true"
       :subtitle="'(' + baseExpandList.filter(item => !item.hidden).length + ')'"
-      :edit="editExpandList"
+      :edit="editControlEditMode"
       @activated="activateExpandList"
       @canceled="cancelExpandList"
       @saved="saveExpandList"/>
@@ -32,8 +32,9 @@ Component to render list data
     <BaseExpandList
       ref="baseExpandList"
       v-model:data="displayData"
-      :edit="editExpandList"
+      :edit="expandListEditMode"
       :control-type="toggleElements"
+      @update:edit-mode-is-ready="expandListIsReady($event)"
       @saved="saveExpandListEdit">
       <template
         #content="{ data }">
@@ -54,8 +55,10 @@ Component to render list data
 export default {
   data() {
     return {
-      editExpandList: false,
-      baseExpandList: [
+      editControlEditMode: false,
+      expandListIsLoading: false,
+      expandListEditMode: false,
+      expandList: [
         {
           label: 'Monographien',
           hidden: false,
@@ -276,28 +279,41 @@ export default {
   computed: {
     displayData: {
       set(val) {
-        this.baseExpandList = val;
+        this.expandList = val;
       },
       get() {
-        return this.editExpandList ? this.baseExpandList
-          : this.baseExpandList.filter(item => !item.hidden);
+        return this.expandListEditMode ? this.expandList
+          : this.expandList.filter(item => !item.hidden);
       },
     }
   },
   methods: {
     activateExpandList() {
-      this.editExpandList = true;
+      this.expandListEditMode = true;
     },
     cancelExpandList() {
-      this.editExpandList = false;
+      this.expandListEditMode = false;
+      this.editControlEditMode = false;
       this.$refs.baseExpandList.reset();
     },
     saveExpandList() {
-      this.editExpandList = false;
+      this.expandListEditMode = false;
+      this.editControlEditMode = false;
       this.$refs.baseExpandList.save();
     },
     saveExpandListEdit(val) {
-      this.baseExpandList = val;
+      this.expandList = val;
+    },
+    expandListIsReady(val) {
+      if (val) {
+        // set BaseEditControl component to edit mode
+        this.editControlEditMode = true;
+        // disable BaseEditControl component loader
+        this.expandListIsLoading = false;
+        return;
+      }
+      // enable BaseEditControl component loader
+      this.expandListIsLoading = true;
     },
   },
 };
