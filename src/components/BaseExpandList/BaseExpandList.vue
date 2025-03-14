@@ -1,99 +1,3 @@
-<template>
-  <div class="base-expand-list">
-    <!-- List items with clickable head to expand body -->
-    <div
-      :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
-      <ul
-        v-if="showList">
-        <BaseExpandListRow
-          v-for="(items, index) in data"
-          v-show="index < (showAll ? data.length : minItems)"
-          ref="baseExpandListRow"
-          :key="index"
-          :parent-index="index"
-          :data="items"
-          :multiple="multiple"
-          render-as="li"
-          @expanded-state="emitExpandedState">
-          <template
-            #content="props">
-            <!-- @slot a slot to provide customized entry row
-              @binding {Object} data - an object in `data` array -->
-            <slot
-              name="content"
-              :data="props.data" />
-          </template>
-        </BaseExpandListRow>
-      </ul>
-
-      <!-- Helper to load the draggable component asynchronously
-           <suspense> needed to avoid an DOMException error in nuxt context -->
-      <suspense>
-        <component
-          :is="Draggable"
-          v-if="showDraggableLoader" />
-      </suspense>
-
-      <!-- List items in draggable area -->
-      <template
-        v-if="showEditableList">
-        <div
-          aria-live="assertive"
-          class="assistive-text">
-          {{ assertiveText }}
-        </div>
-
-        <p
-          :id="`draggable-${internalId}`"
-          class="assistive-text">
-          {{ assistiveText['description'] }}
-        </p>
-
-        <div
-          ref="baseExpandListDraggable"
-          tabindex="0"
-          :aria-labelledby="`draggable-${internalId}`"
-          class="base-expand-list__draggable">
-          <component
-            :is="Draggable"
-            v-model="dataInt"
-            :draggable="'.base-expand-list__draggable__item'"
-            :handle="dragHandle"
-            :disabled="disabled"
-            animation="150"
-            class="base-expand-list__draggable">
-            <BaseExpandListRow
-              v-for="(item, index) in dataInt"
-              ref="baseExpandListRow"
-              :key="index"
-              :data="item"
-              :edit="true"
-              :edit-hide-text="editHideText"
-              :edit-show-text="editShowText"
-              :control-type="controlType"
-              :disabled="disabled"
-              class="base-expand-list__draggable__item"
-              @assistive="assistive($event, index)"
-              @sorted="sort($event, index)"
-              @update:data="updateData($event, index)" />
-          </component>
-        </div>
-      </template>
-    </div>
-
-    <BaseButton
-      v-if="showList && data.length > minItems"
-      :id="`base-expand-list-${internalId}`"
-      :aria-expanded="showAll ? 'true' : 'false'"
-      :has-background-color="false"
-      icon="drop-down"
-      icon-position="right"
-      :text="showAll ? showLessText : showMoreText"
-      :class="{ 'base-button--rotate-icon-180': showAll }"
-      @clicked="showAll = !showAll" />
-  </div>
-</template>
-
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseExpandListRow from '@/components/BaseExpandList/BaseExpandListRow.vue';
@@ -510,6 +414,102 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="base-expand-list">
+    <!-- List items with clickable head to expand body -->
+    <div
+      :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
+      <ul
+        v-if="showList">
+        <BaseExpandListRow
+          v-for="(items, index) in data"
+          v-show="index < (showAll ? data.length : minItems)"
+          ref="baseExpandListRow"
+          :key="index"
+          :parent-index="index"
+          :data="items"
+          :multiple="multiple"
+          render-as="li"
+          @expanded-state="emitExpandedState">
+          <template
+            #content="props">
+            <!-- @slot a slot to provide customized entry row
+              @binding {Object} data - an object in `data` array -->
+            <slot
+              name="content"
+              :data="props.data" />
+          </template>
+        </BaseExpandListRow>
+      </ul>
+
+      <!-- Helper to load the draggable component asynchronously
+           <suspense> needed to avoid an DOMException error in nuxt context -->
+      <suspense>
+        <component
+          :is="Draggable"
+          v-if="showDraggableLoader" />
+      </suspense>
+
+      <!-- List items in draggable area -->
+      <template
+        v-if="showEditableList">
+        <div
+          aria-live="assertive"
+          class="assistive-text">
+          {{ assertiveText }}
+        </div>
+
+        <p
+          :id="`draggable-${internalId}`"
+          class="assistive-text">
+          {{ assistiveText['description'] }}
+        </p>
+
+        <div
+          ref="baseExpandListDraggable"
+          tabindex="0"
+          :aria-labelledby="`draggable-${internalId}`"
+          class="base-expand-list__draggable">
+          <component
+            :is="Draggable"
+            v-model="dataInt"
+            :draggable="'.base-expand-list__draggable__item'"
+            :handle="dragHandle"
+            :disabled="disabled"
+            animation="150"
+            class="base-expand-list__draggable">
+            <BaseExpandListRow
+              v-for="(item, index) in dataInt"
+              ref="baseExpandListRow"
+              :key="index"
+              :data="item"
+              :edit="true"
+              :edit-hide-text="editHideText"
+              :edit-show-text="editShowText"
+              :control-type="controlType"
+              :disabled="disabled"
+              class="base-expand-list__draggable__item"
+              @assistive="assistive($event, index)"
+              @sorted="sort($event, index)"
+              @update:data="updateData($event, index)" />
+          </component>
+        </div>
+      </template>
+    </div>
+
+    <BaseButton
+      v-if="showList && data.length > minItems"
+      :id="`base-expand-list-${internalId}`"
+      :aria-expanded="showAll ? 'true' : 'false'"
+      :has-background-color="false"
+      icon="drop-down"
+      icon-position="right"
+      :text="showAll ? showLessText : showMoreText"
+      :class="{ 'base-button--rotate-icon-180': showAll }"
+      @clicked="showAll = !showAll" />
+  </div>
+</template>
 
 <style lang="scss" scoped>
   .base-expand-list {
