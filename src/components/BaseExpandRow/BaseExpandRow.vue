@@ -3,10 +3,7 @@
     :class="['base-expand-row',
              { 'base-expand-row--expandable': isExpandable },
              { 'base-expand-row--expanded': isExpandedInternal }]">
-    <div
-      :id="'base-expand-row-' + internalId"
-      class="base-expand-row-header"
-      :aria-expanded="isExpandable ? isExpandedInternal.toString() : null">
+    <div class="base-expand-row-header">
       <BaseCheckmark
         v-if="isSelectable"
         :key="internalId + 'checkmark'"
@@ -17,6 +14,9 @@
         @update:model-value="checkboxClicked" />
       <component
         :is="isExpandable ? 'button' : 'div'"
+        :id="'base-expand-row-' + internalId"
+        :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : null"
+        :aria-expanded="isExpandable ? isExpandedInternal.toString() : null"
         :type="isExpandable ? 'button' : null"
         :class="['base-expand-row-button', { selectable: isSelectable }]"
         @click="isExpandable ? clicked() : null">
@@ -26,13 +26,20 @@
           <!-- @slot slot to inject icon/image left side before label -->
           <slot name="icon">
             <BaseIcon
-              :name="icon"
-              title="open" />
+              :name="icon" />
           </slot>
         </div>
 
-        <div class="base-expand-row-title-subtitle-wrapper">
-          <div class="base-expand-row-title base-text-fade-out">
+        <div
+          class="base-expand-row-title-subtitle-wrapper">
+          <div
+            v-if="!title && !subtitle"
+            class="hide">
+            {{ getI18nTerm(assistiveText.label) }}
+          </div>
+          <div
+            v-if="title"
+            class="base-expand-row-title base-text-fade-out">
             {{ title }}
           </div>
           <div
@@ -44,14 +51,14 @@
         <BaseIcon
           v-if="isExpandable"
           name="drop-down"
-          title="open"
           class="base-expand-row-collapse-icon" />
       </component>
     </div>
     <div
-      role="region"
+      :id="'base-expand-row-panel-' + internalId"
       :aria-labelledby="'base-expand-row-' + internalId"
       :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
+      :role="'region'"
       :class="['base-expand-row-body', { 'base-expand-row-body-bg': bodyHasBackground }]">
       <!-- @slot slot for expanded content -->
       <slot />
@@ -64,6 +71,7 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
 import { computed, ref, useSlots } from 'vue';
 import { useId } from '@/composables/useId.js';
+import { useI18n } from '@/composables/useI18n.js';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 export default {
@@ -132,11 +140,24 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * provide assistive text for screen readers
+     * **label**: if `title` or `subtitle` is empty this text is read
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        label: 'Expandable element',
+      }),
+      validator: val => Object.keys(val).every(key => ['label'].includes(key)),
+    },
   },
   emits: ['selected', 'expanded'],
   setup(props) {
     /** INTERNAL ID */
     const internalId = useId();
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
     /** SLOTS */
     // access slots to check if it is filled later
     const slots = useSlots();
@@ -172,6 +193,7 @@ export default {
       isExpandable,
       isExpandedInternal,
       isSelectedInternal,
+      getI18nTerm,
       hasDefaultSlot,
       hasIconSlot,
     }
