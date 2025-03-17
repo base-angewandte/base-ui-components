@@ -1,25 +1,25 @@
 <template>
   <div
     :class="['base-expand-row',
-             { 'base-expand-row--expandable': expandable },
+             { 'base-expand-row--expandable': isExpandable },
              { 'base-expand-row--expanded': isExpandedInternal }]">
     <div
-      :id="'base-expand-row-' + id"
+      :id="'base-expand-row-' + internalId"
       class="base-expand-row-header"
-      :aria-expanded="expandable ? isExpandedInternal.toString() : null">
+      :aria-expanded="isExpandable ? isExpandedInternal.toString() : null">
       <BaseCheckmark
         v-if="isSelectable"
-        :key="id + 'checkmark'"
+        :key="internalId + 'checkmark'"
         title="checkbox"
         mark-style="checkbox"
         class="base-expand-row-checkbox"
         :model-value="isSelected"
         @update:model-value="checkboxClicked" />
       <component
-        :is="expandable ? 'button' : 'div'"
-        :type="expandable ? 'button' : null"
+        :is="isExpandable ? 'button' : 'div'"
+        :type="isExpandable ? 'button' : null"
         :class="['base-expand-row-button', { selectable: isSelectable }]"
-        @click="expandable ? clicked() : null">
+        @click="isExpandable ? clicked() : null">
         <div
           v-if="icon || hasIconSlot"
           class="base-expand-row-icon">
@@ -42,7 +42,7 @@
           </div>
         </div>
         <BaseIcon
-          v-if="expandable"
+          v-if="isExpandable"
           name="drop-down"
           title="open"
           class="base-expand-row-collapse-icon" />
@@ -50,7 +50,7 @@
     </div>
     <div
       role="region"
-      :aria-labelledby="'base-expand-row-' + id"
+      :aria-labelledby="'base-expand-row-' + internalId"
       :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
       :class="['base-expand-row-body', { 'base-expand-row-body-bg': bodyHasBackground }]">
       <!-- @slot slot for expanded content -->
@@ -62,6 +62,9 @@
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
+import { computed, ref, useSlots } from 'vue';
+import { useId } from '@/composables/useId.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 export default {
   name: 'BaseExpandRow',
@@ -131,17 +134,41 @@ export default {
     },
   },
   emits: ['selected', 'expanded'],
-  data() {
+  setup(props) {
+    /** INTERNAL ID */
+    const internalId = useId();
+    /** SLOTS */
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    /**
+     * check if slot `icon` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: hasIconSlot } = useHasSlotContent(slots.icon);
+    /** INTERNALS */
+    /**
+     * check if component is marked as selected
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isSelectedInternal = ref(props.isSelected);
+    /**
+     * check if component is expanded
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isExpandedInternal = ref(props.isExpanded);
+    /**
+     * check if component is expandable
+     * @type {ComputedRef<boolean>}
+     */
+    const isExpandable = computed(() => props.expandable);
+
     return {
-      id: null,
-      isExpandedInternal: false,
-      isSelectedInternal: false,
-    };
-  },
-  computed: {
-    hasIconSlot() {
-      return !!this.$slots.icon;
-    },
+      internalId,
+      isExpandable,
+      isExpandedInternal,
+      isSelectedInternal,
+      hasIconSlot,
+    }
   },
   watch: {
     /**
@@ -158,11 +185,6 @@ export default {
     isSelected(val) {
       this.isSelectedInternal = val;
     },
-  },
-  created() {
-    this.id = this.$.uid;
-    this.isSelectedInternal = this.isSelected;
-    this.isExpandedInternal = this.isExpanded;
   },
   methods: {
     clicked() {
