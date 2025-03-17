@@ -141,6 +141,11 @@ export default {
     // access slots to check if it is filled later
     const slots = useSlots();
     /**
+     * check if slot `default` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: hasDefaultSlot } = useHasSlotContent(slots.default);
+    /**
      * check if slot `icon` has content
      * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
      */
@@ -155,18 +160,19 @@ export default {
      * check if component is expanded
      * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
      */
-    const isExpandedInternal = ref(props.isExpanded);
+    const isExpandedInternal = ref(props.isExpanded && hasDefaultSlot.value);
     /**
      * check if component is expandable
      * @type {ComputedRef<boolean>}
      */
-    const isExpandable = computed(() => props.expandable);
+    const isExpandable = computed(() => props.expandable && hasDefaultSlot.value);
 
     return {
       internalId,
       isExpandable,
       isExpandedInternal,
       isSelectedInternal,
+      hasDefaultSlot,
       hasIconSlot,
     }
   },
