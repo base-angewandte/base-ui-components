@@ -1,102 +1,14 @@
-<template>
-  <div class="base-expand-list">
-    <!-- List items with clickable head to expand body -->
-    <div
-      :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
-      <ul
-        v-if="!edit">
-        <BaseExpandListRow
-          v-for="(items, index) in data"
-          v-show="index < (showAll ? data.length : minItems)"
-          ref="baseExpandListRow"
-          :key="index"
-          :parent-index="index"
-          :data="items"
-          :multiple="multiple"
-          render-as="li"
-          @expanded-state="emitExpandedState">
-          <template
-            #content="props">
-            <!-- @slot a slot to provide customized entry row
-              @binding {Object} data - an object in `data` array -->
-            <slot
-              name="content"
-              :data="props.data" />
-          </template>
-        </BaseExpandListRow>
-      </ul>
-
-      <!-- List items in draggable area -->
-      <template
-        v-if="edit">
-        <div
-          aria-live="assertive"
-          class="assistive-text">
-          {{ assertiveText }}
-        </div>
-
-        <p
-          :id="`draggable-${internalId}`"
-          class="assistive-text">
-          {{ assistiveText['description'] }}
-        </p>
-
-        <div
-          ref="baseExpandListDraggable"
-          tabindex="0"
-          :aria-labelledby="`draggable-${internalId}`"
-          class="base-expand-list__draggable">
-          <draggable
-            v-model="dataInt"
-            :draggable="'.base-expand-list__draggable__item'"
-            :handle="dragHandle"
-            :disabled="disabled"
-            animation="150"
-            class="base-expand-list__draggable">
-            <BaseExpandListRow
-              v-for="(item, index) in dataInt"
-              ref="baseExpandListRow"
-              :key="index"
-              :data="item"
-              :edit="true"
-              :edit-hide-text="editHideText"
-              :edit-show-text="editShowText"
-              :control-type="controlType"
-              :disabled="disabled"
-              class="base-expand-list__draggable__item"
-              @assistive="assistive($event, index)"
-              @sorted="sort($event, index)"
-              @update:data="updateData($event, index)" />
-          </draggable>
-        </div>
-      </template>
-    </div>
-
-    <BaseButton
-      v-if="!edit && data.length > minItems"
-      :id="`base-expand-list-${internalId}`"
-      :aria-expanded="showAll ? 'true' : 'false'"
-      :has-background-color="false"
-      icon="drop-down"
-      icon-position="right"
-      :text="showAll ? showLessText : showMoreText"
-      :class="{ 'base-button--rotate-icon-180': showAll }"
-      @clicked="showAll = !showAll" />
-  </div>
-</template>
-
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseExpandListRow from '@/components/BaseExpandList/BaseExpandListRow.vue';
 import { useId } from '@/composables/useId.js';
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 
 export default {
   name: 'BaseExpandList',
   components: {
     BaseButton,
     BaseExpandListRow,
-    Draggable: defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable)),
   },
   props: {
     /**
@@ -219,11 +131,38 @@ export default {
       default: false,
     },
   },
-  emits: ['saved', 'update:expanded', 'update:data'],
-  setup() {
+  emits: [
+    'saved',
+    'update:expanded',
+    'update:data',
+    /**
+     * triggered when async component is initialized
+     *
+     * @event update:edit-mode-is-ready
+     * @param {boolean} - the current loading state
+     */
+    'update:edit-mode-is-ready'],
+  setup(props, { emit }) {
+    /** HANDLE ASYNC COMPONENT */
+    // store state if component is loaded
+    const draggableIsLoaded = ref(false);
+    // load draggable component asynchronously, emit state when ready
+    const Draggable = defineAsyncComponent({
+      loader: async () => {
+        emit('update:edit-mode-is-ready', false);
+        const component = await import('vue-draggable-plus').then(m => m.VueDraggable);
+        emit('update:edit-mode-is-ready', true);
+        draggableIsLoaded.value = true;
+        return component;
+      },
+    });
+
     /** INTERNAL ID */
     const internalId = useId();
+
     return {
+      Draggable,
+      draggableIsLoaded,
       internalId,
     };
   },
@@ -246,6 +185,27 @@ export default {
         this.dataSorted = val;
       },
     },
+    /**
+     * evaluate if editable list is displayed
+     * @returns {boolean}
+     */
+    showEditableList() {
+      return this.edit && this.draggableIsLoaded;
+    },
+    /**
+     * evaluate if expandable list is displayed
+     * @returns {boolean}
+     */
+    showList() {
+      return (!this.draggableIsLoaded) || (!this.edit && this.draggableIsLoaded);
+    },
+    /**
+     * evaluate if a ghost component to load the draggable component asynchronously is displayed
+     * @returns {boolean}
+     */
+    showDraggableLoader() {
+      return this.edit && !this.draggableIsLoaded;
+    }
   },
   watch: {
     dataSorted: {
@@ -280,12 +240,16 @@ export default {
     edit(val) {
       this.assertiveText = '';
       if (val) {
-        this.$nextTick(() => {
-          // set focus draggable area on edit start
-          this.$refs.baseExpandListDraggable.focus({ preventScroll: true });
-        });
         // save a copy of original data in variable on edit activation
         this.originalData = JSON.parse(JSON.stringify(this.data));
+
+        if (this.draggableIsLoaded) {
+          this.$emit('update:edit-mode-is-ready', true);
+          this.$nextTick(() => {
+            // set focus draggable area on edit start
+            this.$refs.baseExpandListDraggable.focus({ preventScroll: true });
+          });
+        }
       }
     },
     /**
@@ -450,6 +414,100 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="base-expand-list">
+    <!-- List items with clickable head to expand body -->
+    <div
+      :class="['base-box-shadow', { 'base-box-shadow--edit': edit }]">
+      <ul
+        v-if="showList">
+        <BaseExpandListRow
+          v-for="(items, index) in data"
+          v-show="index < (showAll ? data.length : minItems)"
+          ref="baseExpandListRow"
+          :key="index"
+          :parent-index="index"
+          :data="items"
+          :multiple="multiple"
+          render-as="li"
+          @expanded-state="emitExpandedState">
+          <template
+            #content="props">
+            <!-- @slot a slot to provide customized entry row
+              @binding {Object} data - an object in `data` array -->
+            <slot
+              name="content"
+              :data="props.data" />
+          </template>
+        </BaseExpandListRow>
+      </ul>
+
+      <!-- Helper to load the draggable component asynchronously
+           <suspense> needed to avoid an DOMException error in nuxt context -->
+      <suspense v-if="showDraggableLoader">
+        <component :is="Draggable" />
+      </suspense>
+
+      <!-- List items in draggable area -->
+      <template
+        v-if="showEditableList">
+        <div
+          aria-live="assertive"
+          class="assistive-text">
+          {{ assertiveText }}
+        </div>
+
+        <p
+          :id="`draggable-${internalId}`"
+          class="assistive-text">
+          {{ assistiveText['description'] }}
+        </p>
+
+        <div
+          ref="baseExpandListDraggable"
+          tabindex="0"
+          :aria-labelledby="`draggable-${internalId}`"
+          class="base-expand-list__draggable">
+          <component
+            :is="Draggable"
+            v-model="dataInt"
+            :draggable="'.base-expand-list__draggable__item'"
+            :handle="dragHandle"
+            :disabled="disabled"
+            animation="150"
+            class="base-expand-list__draggable">
+            <BaseExpandListRow
+              v-for="(item, index) in dataInt"
+              ref="baseExpandListRow"
+              :key="index"
+              :data="item"
+              :edit="true"
+              :edit-hide-text="editHideText"
+              :edit-show-text="editShowText"
+              :control-type="controlType"
+              :disabled="disabled"
+              class="base-expand-list__draggable__item"
+              @assistive="assistive($event, index)"
+              @sorted="sort($event, index)"
+              @update:data="updateData($event, index)" />
+          </component>
+        </div>
+      </template>
+    </div>
+
+    <BaseButton
+      v-if="showList && data.length > minItems"
+      :id="`base-expand-list-${internalId}`"
+      :aria-expanded="showAll ? 'true' : 'false'"
+      :has-background-color="false"
+      icon="drop-down"
+      icon-position="right"
+      :text="showAll ? showLessText : showMoreText"
+      :class="{ 'base-button--rotate-icon-180': showAll }"
+      @clicked="showAll = !showAll" />
+  </div>
+</template>
 
 <style lang="scss" scoped>
   .base-expand-list {
