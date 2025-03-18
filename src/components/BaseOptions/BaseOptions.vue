@@ -1,104 +1,3 @@
-<template>
-  <div class="base-options">
-    <div
-      ref="optionsRowElement"
-      :class="[
-        'base-options__row',
-        `base-options__row-${alignOptions}`,
-        {
-          'base-options__row-wrap': !showOptionsInline
-            || (!useOptionsButton && remainingOptionsWidth < optionsWidth),
-        },
-      ]">
-      <div
-        v-if="beforeSlotHasData"
-        ref="beforeOptionsElement"
-        class="base-options__before">
-        <!-- @slot add an element before the options e.g. a header -->
-        <slot
-          name="beforeOptions" />
-      </div>
-      <div
-        v-if="alignOptions === 'right'"
-        class="base-options__spacer" />
-      <div
-        v-if="!optionsHidden && showOptionsInline && displayOptions"
-        ref="optionsElement"
-        :class="['base-options__options-inline',
-                 { 'base-options__options-inline-wrap': wrapOptions },
-                 { 'base-options__options-inline-left': alignOptions === 'left' },
-                 { 'base-options__options-inline-hidden': !optionsInitialized }]">
-        <!-- @slot add the actual options -->
-        <slot name="options">
-          <template v-if="optionsConfig.length">
-            <BaseButton
-              v-for="({ text, icon, disabled, value }, index) of optionsConfig"
-              :key="text + '_' + index"
-              :text="text"
-              :icon="icon"
-              :disabled="disabled || disableOptions.includes(value)"
-              :has-background-color="false"
-              icon-size="large"
-              button-style="single"
-              @clicked="optionTriggered(value)" />
-          </template>
-        </slot>
-      </div>
-      <BaseButton
-        v-if="!optionsHidden && useOptionsButton"
-        ref="optionsButtonElement"
-        :text="showOptionsInt ? getI18nTerm(optionsButtonText.hide)
-          : getI18nTerm(optionsButtonText.show)"
-        :icon="showOptionsInt ? optionsButtonIcon.hide : optionsButtonIcon.show"
-        :disabled="optionsButtonDisabled"
-        :class="[{ 'base-options__options-button-left': alignOptions === 'left' }]"
-        @clicked="showOptionsInt = !showOptionsInt" />
-      <div
-        v-if="alignOptions === 'left'"
-        class="base-options__spacer base-options__spacer-left" />
-      <div
-        v-if="showAfterOptionsInline && afterSlotHasData"
-        ref="afterOptionsElement"
-        class="base-options__after-inline">
-        <!-- @slot add elements after the options element -->
-        <slot name="afterOptions" />
-      </div>
-      <span
-        ref="fontSizeChangeDetectorElement"
-        class="hide base-options__font-size-detector">
-        &#10240;
-      </span>
-    </div>
-    <transition name="slide-fade-options">
-      <div
-        v-if="!optionsHidden && displayOptions && !showOptionsInline"
-        class="base-options__below">
-        <!-- @slot add the actual options -->
-        <slot name="options">
-          <template v-if="optionsConfig.length">
-            <BaseButton
-              v-for="(config, index) of optionsConfig"
-              :key="config.text + '_' + index"
-              :text="config.text"
-              :icon="config.icon"
-              :has-background-color="false"
-              icon-size="large"
-              button-style="single"
-              @clicked="optionTriggered(config.value)" />
-          </template>
-        </slot>
-      </div>
-    </transition>
-    <div
-      v-if="!showAfterOptionsInline && afterSlotHasData"
-      ref="afterOptionsBelowElement"
-      class="base-options__after">
-      <!-- @slot add elements after the options element -->
-      <slot name="afterOptions" />
-    </div>
-  </div>
-</template>
-
 <script>
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import { useI18n } from '@/composables/useI18n.js';
@@ -627,9 +526,9 @@ export default {
       return this.afterSlotHasData
         // b) options button is not used and there is enough space for them or
         && ((!this.useOptionsButton && this.remainingOptionsWidth > this.optionsWidth)
-        // c) options button is used and there is enough space left inline or
-        // showAfterOptionsBelow is false
-        || (this.useOptionsButton && (!this.showAfterOptionsBelow
+          // c) options button is used and there is enough space left inline or
+          // showAfterOptionsBelow is false
+          || (this.useOptionsButton && (!this.showAfterOptionsBelow
             || this.remainingOptionsWidth > 0)));
     },
     /**
@@ -658,6 +557,107 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="base-options">
+    <div
+      ref="optionsRowElement"
+      :class="[
+        'base-options__row',
+        `base-options__row-${alignOptions}`,
+        {
+          'base-options__row-wrap': !showOptionsInline
+            || (!useOptionsButton && remainingOptionsWidth < optionsWidth),
+        },
+      ]">
+      <div
+        v-if="beforeSlotHasData"
+        ref="beforeOptionsElement"
+        class="base-options__before">
+        <!-- @slot add an element before the options e.g. a header -->
+        <slot
+          name="beforeOptions" />
+      </div>
+      <div
+        v-if="alignOptions === 'right'"
+        class="base-options__spacer" />
+      <div
+        v-if="!optionsHidden && showOptionsInline && displayOptions"
+        ref="optionsElement"
+        :class="['base-options__options-inline',
+                 { 'base-options__options-inline-wrap': wrapOptions },
+                 { 'base-options__options-inline-left': alignOptions === 'left' },
+                 { 'base-options__options-inline-hidden': !optionsInitialized }]">
+        <!-- @slot add the actual options -->
+        <slot name="options">
+          <template v-if="optionsConfig.length">
+            <BaseButton
+              v-for="({ text, icon, disabled, value }, index) of optionsConfig"
+              :key="text + '_' + index"
+              :text="text"
+              :icon="icon"
+              :disabled="disabled || disableOptions.includes(value)"
+              :has-background-color="false"
+              icon-size="large"
+              button-style="single"
+              @clicked="optionTriggered(value)" />
+          </template>
+        </slot>
+      </div>
+      <BaseButton
+        v-if="!optionsHidden && useOptionsButton"
+        ref="optionsButtonElement"
+        :text="showOptionsInt ? getI18nTerm(optionsButtonText.hide)
+          : getI18nTerm(optionsButtonText.show)"
+        :icon="showOptionsInt ? optionsButtonIcon.hide : optionsButtonIcon.show"
+        :disabled="optionsButtonDisabled"
+        :class="[{ 'base-options__options-button-left': alignOptions === 'left' }]"
+        @clicked="showOptionsInt = !showOptionsInt" />
+      <div
+        v-if="alignOptions === 'left'"
+        class="base-options__spacer base-options__spacer-left" />
+      <div
+        v-if="showAfterOptionsInline && afterSlotHasData"
+        ref="afterOptionsElement"
+        class="base-options__after-inline">
+        <!-- @slot add elements after the options element -->
+        <slot name="afterOptions" />
+      </div>
+      <span
+        ref="fontSizeChangeDetectorElement"
+        class="hide base-options__font-size-detector">
+        &#10240;
+      </span>
+    </div>
+    <transition name="slide-fade-options">
+      <div
+        v-if="!optionsHidden && displayOptions && !showOptionsInline"
+        class="base-options__below">
+        <!-- @slot add the actual options -->
+        <slot name="options">
+          <template v-if="optionsConfig.length">
+            <BaseButton
+              v-for="(config, index) of optionsConfig"
+              :key="config.text + '_' + index"
+              :text="config.text"
+              :icon="config.icon"
+              :has-background-color="false"
+              icon-size="large"
+              button-style="single"
+              @clicked="optionTriggered(config.value)" />
+          </template>
+        </slot>
+      </div>
+    </transition>
+    <div
+      v-if="!showAfterOptionsInline && afterSlotHasData"
+      ref="afterOptionsBelowElement"
+      class="base-options__after">
+      <!-- @slot add elements after the options element -->
+      <slot name="afterOptions" />
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
