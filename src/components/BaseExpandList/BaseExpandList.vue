@@ -445,10 +445,8 @@ export default {
 
       <!-- Helper to load the draggable component asynchronously
            <suspense> needed to avoid an DOMException error in nuxt context -->
-      <suspense>
-        <component
-          :is="Draggable"
-          v-if="showDraggableLoader" />
+      <suspense v-if="showDraggableLoader">
+        <component :is="Draggable" />
       </suspense>
 
       <!-- List items in draggable area -->
