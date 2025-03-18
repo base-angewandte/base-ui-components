@@ -200,6 +200,14 @@ export default {
   },
   watch: {
     /**
+     * watch for expandable state changes from outside
+     * @param {boolean} val - the prop value set from outside
+     */
+    expandable(val) {
+      // when component is not expandable, collapse the content area
+      if (!val) this.isExpandedInternal = false;
+    },
+    /**
      * watch for expanded/collapsed state changes from outside
      * @param {boolean} val - the prop value set from outside
      */
