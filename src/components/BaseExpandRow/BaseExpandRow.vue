@@ -1,71 +1,3 @@
-<template>
-  <div
-    :class="['base-expand-row',
-             { 'base-expand-row--expandable': isExpandable },
-             { 'base-expand-row--expanded': isExpandedInternal }]">
-    <div class="base-expand-row__header">
-      <BaseCheckmark
-        v-if="isSelectable"
-        :key="internalId + 'checkmark'"
-        title="checkbox"
-        mark-style="checkbox"
-        :model-value="isSelected"
-        class="base-expand-row__header__checkbox"
-        @update:model-value="checkboxClicked" />
-      <component
-        :is="isExpandable ? 'button' : 'div'"
-        :id="'base-expand-row-' + internalId"
-        :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : null"
-        :aria-expanded="isExpandable ? isExpandedInternal.toString() : null"
-        :type="isExpandable ? 'button' : null"
-        :class="['base-expand-row__header__button', { selectable: isSelectable }]"
-        @click="isExpandable ? clicked() : null">
-        <div
-          v-if="icon || hasIconSlot"
-          class="base-expand-row__header__icon">
-          <!-- @slot slot to inject icon/image left side before label -->
-          <slot name="icon">
-            <BaseIcon
-              :name="icon" />
-          </slot>
-        </div>
-
-        <div
-          class="base-expand-row__header__wrapper">
-          <div
-            v-if="!title && !subtitle"
-            class="hide">
-            {{ getI18nTerm(assistiveText.label) }}
-          </div>
-          <div
-            v-if="title"
-            class="base-expand-row__header__title base-text-fade-out">
-            {{ title }}
-          </div>
-          <div
-            v-if="subtitle"
-            class="base-expand-row__header__subtitle base-text-fade-out">
-            {{ subtitle }}
-          </div>
-        </div>
-        <BaseIcon
-          v-if="isExpandable"
-          name="drop-down"
-          class="base-expand-row__header__collapse-icon" />
-      </component>
-    </div>
-    <div
-      :id="'base-expand-row-panel-' + internalId"
-      :aria-labelledby="'base-expand-row-' + internalId"
-      :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
-      :role="'region'"
-      :class="['base-expand-row__body', { 'base-expand-row__body--bg': bodyHasBackground }]">
-      <!-- @slot slot for expanded content -->
-      <slot />
-    </div>
-  </div>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
@@ -249,6 +181,73 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-expand-row',
+             { 'base-expand-row--expandable': isExpandable },
+             { 'base-expand-row--expanded': isExpandedInternal }]">
+    <div class="base-expand-row__header">
+      <BaseCheckmark
+        v-if="isSelectable"
+        :key="internalId + 'checkmark'"
+        mark-style="checkbox"
+        :model-value="isSelected"
+        class="base-expand-row__header__checkbox"
+        @update:model-value="checkboxClicked" />
+      <component
+        :is="isExpandable ? 'button' : 'div'"
+        :id="'base-expand-row-' + internalId"
+        :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : null"
+        :aria-expanded="isExpandable ? isExpandedInternal.toString() : null"
+        :type="isExpandable ? 'button' : null"
+        :class="['base-expand-row__header__button', { selectable: isSelectable }]"
+        @click="isExpandable ? clicked() : null">
+        <div
+          v-if="icon || hasIconSlot"
+          class="base-expand-row__header__icon">
+          <!-- @slot slot to inject icon/image left side before label -->
+          <slot name="icon">
+            <BaseIcon
+              :name="icon" />
+          </slot>
+        </div>
+
+        <div
+          class="base-expand-row__header__wrapper">
+          <div
+            v-if="!title && !subtitle"
+            class="hide">
+            {{ getI18nTerm(assistiveText.label) }}
+          </div>
+          <div
+            v-if="title"
+            class="base-expand-row__header__title base-text-fade-out">
+            {{ title }}
+          </div>
+          <div
+            v-if="subtitle"
+            class="base-expand-row__header__subtitle base-text-fade-out">
+            {{ subtitle }}
+          </div>
+        </div>
+        <BaseIcon
+          v-if="isExpandable"
+          name="drop-down"
+          class="base-expand-row__header__collapse-icon" />
+      </component>
+    </div>
+    <div
+      :id="'base-expand-row-panel-' + internalId"
+      :aria-labelledby="'base-expand-row-' + internalId"
+      :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
+      :role="'region'"
+      :class="['base-expand-row__body', { 'base-expand-row__body--bg': bodyHasBackground }]">
+      <!-- @slot slot for expanded content -->
+      <slot />
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
