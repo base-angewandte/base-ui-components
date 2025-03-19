@@ -122,7 +122,7 @@
                    { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
           @focusin.stop.prevent
           @keydown.tab="onTab"
-          @keydown.stop.prevent="removeFilter"
+          @keydown.enter.stop.prevent="removeFilter"
           @click.stop.prevent="removeFilter">
           <BaseIcon
             :title="assistiveText.removeFilter || 'Remove filter'"
