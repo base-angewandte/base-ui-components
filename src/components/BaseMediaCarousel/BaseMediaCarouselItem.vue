@@ -164,6 +164,7 @@ export default {
     return {
       getI18nTerm,
       isMobile,
+      footer,
       footerHeight,
     };
   },
