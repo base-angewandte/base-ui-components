@@ -645,7 +645,6 @@ export default {
           display: flex;
           flex-direction: row;
           white-space: nowrap;
-          align-items: center;
           flex: 1 0 auto;
           height: calc(#{$line-height} + #{$spacing-small});
 
