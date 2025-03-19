@@ -335,7 +335,7 @@ function calcPosition() {
   // the box overlaps the window left side
   if (attachToRect.x < boxWidth / 2) {
     css.value.left = `${spacing.value}px`;
-    css.value.right = ''; // clear right position
+    css.value.right = `${spacing.value}px`; // clear right position
     css.value['--triangle-left'] = `${attachToRect.left + attachToRect.width / 2 - spacing.value}px`;
     return;
   }
@@ -565,10 +565,6 @@ onUnmounted(() => {
       overflow: auto;
       max-height: calc(50vh - #{$spacing-large});
 
-      @media screen and (max-width: $mobile) {
-        max-height: 90vh;
-      }
-
       &--fade-out {
         &::before,
         &::after {
@@ -638,6 +634,7 @@ onUnmounted(() => {
         position: fixed;
         top: 0 !important;
         left: 0 !important;
+        right: 0 !important;
         width: 100vw;
         height: 100vh;
         max-height: 100vh;
@@ -684,6 +681,10 @@ onUnmounted(() => {
     &.base-tooltip-box--fullscreen-on-mobile {
       @media screen and (max-width: $mobile) {
         max-width: inherit;
+
+        .base-tooltip-box__body {
+          max-height: calc(100% - #{$spacing-large});
+        }
 
         .base-tooltip-box__inner {
           margin: 0;
