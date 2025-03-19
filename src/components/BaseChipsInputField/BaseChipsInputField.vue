@@ -588,7 +588,7 @@ export default {
       }
       // if an entry was set active for removal by any key action - announce it
       // to the screen reader user
-      if (this.indexActiveForRemove >= 0) {
+      if (this.assistiveText.optionToRemoveSelected && this.indexActiveForRemove >= 0) {
         // inform screen reader user
         this.announcement = this.assistiveText.optionToRemoveSelected
           .replace('{label}', this.selectedListInt[this.indexActiveForRemove][this.labelPropertyName]);
