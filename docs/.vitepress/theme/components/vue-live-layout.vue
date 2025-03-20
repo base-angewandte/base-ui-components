@@ -89,13 +89,6 @@ function clicked() {
   }
 }
 
-// have h2 in demo look different from regular styleguide h2
-.preview-code h2 {
-  font-size: 1.0em;
-  margin-bottom: 0;
-  border: 0;
-}
-
 .preview-code .preview {
   background-color: white!important;
 }
@@ -105,30 +98,8 @@ function clicked() {
   padding: 4px !important;
 }
 
-.preview table {
-  display: table;
-  margin: 0;
-  border-collapse: separate;
-  overflow-x: unset;
-}
-
-.preview td, .preview th {
-  border: none;
-  padding: 0;
-  background-color: white;
-}
-
-.preview tr {
-  background-color: transparent;
-  border-top: none;
-}
-
 .preview a {
   color: inherit;
-}
-
-.preview p, .preview ul, .preview ol {
-  line-height: unset;
 }
 
 .preview ul, .preview ol, .suggestions {
@@ -136,16 +107,6 @@ function clicked() {
   color: inherit;
   list-style-type: none;
   margin: 0;
-}
-
-.preview li, .suggestion, .sidebar li {
-  list-style: none;
-}
-
-.preview {
-  li + li {
-    margin: 0;
-  }
 }
 
 .preview h1, .preview h2, .preview h3 {

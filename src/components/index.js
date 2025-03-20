@@ -41,10 +41,14 @@ import BaseTextList from '@/components/BaseTextList/BaseTextList.vue';
 import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection.vue';
 import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel.vue';
 import BaseIcon from './BaseIcon/BaseIcon.vue';
+import BaseInfoPanel from './BaseInfoPanel/BaseInfoPanel.vue';
 import BaseButton from './BaseButton/BaseButton.vue';
 import BaseMap from './BaseMap/BaseMap.vue';
 import BaseMapLocations from './BaseMapLocations/BaseMapLocations.vue';
 import BaseExpandBox from './BaseExpandBox/BaseExpandBox.vue';
+import BaseBoxTooltip from './BaseBoxTooltip/BaseBoxTooltip.vue';
+import BaseExpandList from './BaseExpandList/BaseExpandList.vue';
+import BaseExpandRow from './BaseExpandRow/BaseExpandRow.vue';
 import BaseDateInput from '@/components/BaseDateInput/BaseDateInput.vue';
 // import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
 const BaseHlsVideo = defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue'));
@@ -61,6 +65,7 @@ export {
   BaseTooltipBox,
   BaseImage,
   BaseInput,
+  BaseInfoPanel,
   BaseDropDownList,
   BaseAutocompleteInput,
   BaseBox,
@@ -102,6 +107,9 @@ export {
   BaseMap,
   BaseMapLocations,
   BaseExpandBox,
+  BaseBoxTooltip,
+  BaseExpandList,
+  BaseExpandRow,
   BaseForm,
   BaseFormFieldCreator,
   BaseFormGroups,

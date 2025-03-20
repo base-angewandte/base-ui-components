@@ -23,7 +23,7 @@ export default defineConfig({
   description: 'A styleguide for base UI components, a component library for the university of Applied Arts Vienna',
   head: [
     ['meta', { name: 'theme-color', content: '#ffffff' }],
-    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
+    ['meta', { name: 'mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
     ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
     ['meta', { name: 'apple-mobile-web-app-title', content: 'base' }],
@@ -54,6 +54,7 @@ export default defineConfig({
     }
   },
   cleanUrls: true,
+  appearance: false,
   outDir: path.resolve(__dirname, '../../styleguide'),
   vite: {
     plugins: [
@@ -91,12 +92,6 @@ export default defineConfig({
         ],
       },
     },
-  },
-  rewrites: {
-    // don't have components running under /components but at root
-    // useful thing here: old links (in changelog) with /components in path will automatically
-    // be redirected
-    'components/:component': ':component',
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -138,7 +133,7 @@ export default defineConfig({
           return {
             text: componentName,
             // need to create link without /components so link appears active
-            link: '/' + componentName,
+            link: '/components/' + componentName,
           };
         }),
       },

@@ -6,6 +6,7 @@ Resize to see the 'mobile' effect!
 <template>
     <div class="options-background">
         <BaseOptions
+          :key="useOptionsButtonOn"
           v-model:show-options="optionsToggle"
           :options-config="[{
             text: 'button added via optionsConfig',
@@ -83,6 +84,7 @@ Advanced example with all slots filled. Choose different settings for available 
 <template>
     <div class="options-background">
       <BaseOptions
+        :key="useOptionsButtonOn"
         v-model:show-options="optionsToggle"
         :use-options-button-on="useOptionsButtonOn"
         :options-hidden="optionsHidden"
@@ -90,7 +92,7 @@ Advanced example with all slots filled. Choose different settings for available 
         :options-button-disabled="optionsButtonDisabled"
         :align-options="alignOptions">
         <template #beforeOptions>
-          <div>beforeOptions slot</div>
+          <div :style="{ whiteSpace: 'nowrap' }">beforeOptions slot</div>
         </template>
         <template
             #options>
@@ -108,7 +110,7 @@ Advanced example with all slots filled. Choose different settings for available 
                 button-style="single" />
         </template>
         <template #afterOptions>
-          <div>afterOptions slot element</div>
+          <div :style="{ whiteSpace: 'nowrap' }">afterOptions slot element</div>
         </template>
       </BaseOptions>
         <p class="options-settings">Choose settings:</p>
@@ -166,7 +168,6 @@ Advanced example with all slots filled. Choose different settings for available 
             @clicked="useOptionsButtonOn = 'mobile'" />
         </div>
     </div>
-
 </template>
 
 <script>

@@ -1,81 +1,3 @@
-<template>
-  <div
-    v-click-outside="() => showOptions = false"
-    class="base-drop-button">
-    <BaseButton
-      :text="primaryButtonInt[labelPropertyName]"
-      :icon="primaryButtonInt.icon || null"
-      icon-size="large"
-      :class="{ 'base-drop-button__button__multi': buttonsInt && buttonsInt.length }"
-      @clicked="fireAction(primaryButtonInt[identifierPropertyName])">
-      <template #left-of-text>
-        <!-- @slot create custom content (e.g. icon) left of text -->
-        <slot name="left-of-text" />
-      </template>
-      <template #right-of-text>
-        <!-- @slot create custom content (e.g. icon) right of text -->
-        <slot name="right-of-text" />
-      </template>
-    </BaseButton>
-    <div
-      v-if="buttonsInt && buttonsInt.length"
-      ref="dropArea"
-      class="base-drop-button__options-area">
-      <button
-        :aria-expanded="showOptions.toString()"
-        :aria-label="expandButtonLabel"
-        :class="['base-drop-button__toggle-button',
-                 { 'base-drop-button__toggle-button__active': showOptions }]"
-        type="button"
-        aria-haspopup="listbox"
-        @click.prevent="showOptions = !showOptions"
-        @keydown.enter.prevent="dropDownEnterAction"
-        @keydown.tab="activeOption = null"
-        @keydown.up.down.prevent="navigateOptions">
-        <BaseIcon
-          name="drop-down"
-          :class="['base-drop-button__drop-icon',
-                   { 'base-drop-button__drop-icon__rotated': showOptions }]" />
-      </button>
-      <BaseDropDownList
-        v-if="showOptions"
-        ref="dropDown"
-        :drop-down-options="buttonsInt"
-        :active-option="activeOption"
-        :active-styled="false"
-        :style="dropDownTransformation"
-        :aria-activedescendant="activeOption ? `button-${activeOption.action}` : null"
-        :identifier-property-name="identifierPropertyName"
-        :label-property-name="labelPropertyName"
-        :class="[
-          'base-drop-button__drop-down',
-          `base-drop-button__drop-down__${dropDownPosition.horizontal}`,
-          `base-drop-button__drop-down__${dropDownPosition.vertical}`,
-        ]">
-        <template #option="{ option }">
-          <button
-            :id="`button-${option[identifierPropertyName]}`"
-            :class="[
-              'base-drop-button__action',
-              {
-                'base-drop-button__action__active': activeOption
-                  && option[identifierPropertyName] === activeOption[identifierPropertyName],
-              }]"
-            type="button"
-            @keydown.up.down.prevent=""
-            @click.prevent="fireAction(option[identifierPropertyName])">
-            <BaseIcon
-              v-if="option.icon"
-              :name="option.icon"
-              class="base-drop-button__action-icon" />
-            <span>{{ option[labelPropertyName] }}</span>
-          </button>
-        </template>
-      </BaseDropDownList>
-    </div>
-  </div>
-</template>
-
 <script>
 import { vOnClickOutside } from '@vueuse/components';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
@@ -150,7 +72,7 @@ export default {
     const { navigate } = useListNavigation();
 
     /** RESIZE HANDLING */
-    // create reference to drop down element
+      // create reference to drop down element
     const dropDown = ref(null);
     // and the drop down parent element
     const dropArea = ref(null);
@@ -381,6 +303,84 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    v-click-outside="() => showOptions = false"
+    class="base-drop-button">
+    <BaseButton
+      :text="primaryButtonInt[labelPropertyName]"
+      :icon="primaryButtonInt.icon || null"
+      icon-size="large"
+      :class="{ 'base-drop-button__button__multi': buttonsInt && buttonsInt.length }"
+      @clicked="fireAction(primaryButtonInt[identifierPropertyName])">
+      <template #left-of-text>
+        <!-- @slot create custom content (e.g. icon) left of text -->
+        <slot name="left-of-text" />
+      </template>
+      <template #right-of-text>
+        <!-- @slot create custom content (e.g. icon) right of text -->
+        <slot name="right-of-text" />
+      </template>
+    </BaseButton>
+    <div
+      v-if="buttonsInt && buttonsInt.length"
+      ref="dropArea"
+      class="base-drop-button__options-area">
+      <button
+        :aria-expanded="showOptions.toString()"
+        :aria-label="expandButtonLabel"
+        :class="['base-drop-button__toggle-button',
+                 { 'base-drop-button__toggle-button__active': showOptions }]"
+        type="button"
+        aria-haspopup="listbox"
+        @click.prevent="showOptions = !showOptions"
+        @keydown.enter.prevent="dropDownEnterAction"
+        @keydown.tab="activeOption = null"
+        @keydown.up.down.prevent="navigateOptions">
+        <BaseIcon
+          name="drop-down"
+          :class="['base-drop-button__drop-icon',
+                   { 'base-drop-button__drop-icon__rotated': showOptions }]" />
+      </button>
+      <BaseDropDownList
+        v-if="showOptions"
+        ref="dropDown"
+        :drop-down-options="buttonsInt"
+        :active-option="activeOption"
+        :active-styled="false"
+        :style="dropDownTransformation"
+        :aria-activedescendant="activeOption ? `button-${activeOption.action}` : null"
+        :identifier-property-name="identifierPropertyName"
+        :label-property-name="labelPropertyName"
+        :class="[
+          'base-drop-button__drop-down',
+          `base-drop-button__drop-down__${dropDownPosition.horizontal}`,
+          `base-drop-button__drop-down__${dropDownPosition.vertical}`,
+        ]">
+        <template #option="{ option }">
+          <button
+            :id="`button-${option[identifierPropertyName]}`"
+            :class="[
+              'base-drop-button__action',
+              {
+                'base-drop-button__action__active': activeOption
+                  && option[identifierPropertyName] === activeOption[identifierPropertyName],
+              }]"
+            type="button"
+            @keydown.up.down.prevent=""
+            @click.prevent="fireAction(option[identifierPropertyName])">
+            <BaseIcon
+              v-if="option.icon"
+              :name="option.icon"
+              class="base-drop-button__action-icon" />
+            <span>{{ option[labelPropertyName] }}</span>
+          </button>
+        </template>
+      </BaseDropDownList>
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
 
@@ -405,6 +405,7 @@ export default {
       padding: $spacing-small $spacing;
       background: $background-color;
       color: inherit;
+      cursor: pointer;
 
       &.base-drop-button__toggle-button__active,
       &:hover {

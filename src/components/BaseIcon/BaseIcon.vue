@@ -1,24 +1,9 @@
-<template>
-  <svg
-    :aria-labelledby="title || desc ? ariaAttribute : null"
-    class="base-icon">
-    <title
-      v-if="title"
-      :id="'title_' + internalId">{{ title }}</title>
-    <desc
-      v-if="desc"
-      :id="'desc_' + internalId">{{ desc }}</desc>
-    <use
-      v-if="baseIcons"
-      :href="icon" />
-  </svg>
-</template>
+<script>
+import { useId } from '@/composables/useId.js';
 
-<script>/**
+/**
  * A wrapper component for base icons
  */
-
-import { useId } from '@/composables/useId.js';
 
 export default {
   name: 'BaseIcon',
@@ -92,6 +77,22 @@ export default {
   },
 };
 </script>
+
+<template>
+  <svg
+    :aria-labelledby="title || desc ? ariaAttribute : null"
+    class="base-icon">
+    <title
+      v-if="title"
+      :id="'title_' + internalId">{{ title }}</title>
+    <desc
+      v-if="desc"
+      :id="'desc_' + internalId">{{ desc }}</desc>
+    <use
+      v-if="baseIcons"
+      :href="icon" />
+  </svg>
+</template>
 
 <style lang="scss" scoped>
   .base-icon {

@@ -1,98 +1,6 @@
-<template>
-  <div
-    ref="menuEntry"
-    :tabindex="isSelectable && selectActive ? -1 : 0"
-    :href="'#' + title"
-    :class="['base-menu-entry',
-             {
-               'base-menu-entry-activatable': isActivatable && !isDisabled,
-               'base-menu-entry-active': isActive,
-               'base-menu-entry-no-icon': !icon,
-               'base-menu-entry-disabled': isDisabled,
-               'base-menu-entry-text-fade-out': !showThumbnails && !$slots['right-side-elements'],
-             }]"
-    :role="isSelectable && selectActive ? '' : 'link'"
-    @keyup.enter.prevent="clicked"
-    @click="clicked">
-    <BaseIcon
-      v-if="icon"
-      ref="entryIcon"
-      :name="icon"
-      class="base-menu-entry-icon" />
-
-    <div
-      :class="[
-        'base-menu-entry-text-wrapper',
-        { 'base-menu-entry-text-slide-overlay': showThumbnails && $slots.thumbnails
-          && isSelectable },
-      ]">
-      <!-- @slot text-content - use this slot to individualize the displayed text in the base
-        menu entry. if this slot is used, prop title, subtext and description will not have any
-        effect. -->
-      <slot
-        name="text-content">
-        <div class="base-menu-entry-title-description-wrapper">
-          <div class="base-menu-entry__title-subtext-wrapper">
-            <div
-              v-if="title"
-              :class="['base-menu-entry-title',
-                       { 'base-menu-entry-title-bold': isActive || titleBold }]">
-              {{ title }}
-            </div>
-            <div
-              v-if="subtext"
-              class="base-menu-entry-subtext">
-              {{ subtext }}
-            </div>
-          </div>
-          <div class="base-menu-entry-description">
-            {{ description }}
-          </div>
-        </div>
-      </slot>
-    </div>
-    <!-- @slot add custom elements on the right side of the entry row. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
-      @binding { boolean } is-selected - true if value is selected -->
-    <slot
-      name="right-side-elements"
-      :is-selected="isSelectedInt">
-      <div
-        class="base-menu-entry-transition-container base-menu-entry-text-fade-out">
-        <TransitionGroup
-          ref="slideFade"
-          name="slide-fade"
-          @leave="slideFadeLeave"
-          @after-leave="slideFadeAfterLeave">
-          <div
-            :key="entryId"
-            class="slide-fade-group">
-            <div
-              v-if="showThumbnails"
-              :key="entryId + 'thumbnail'"
-              ref="thumbnailContainer"
-              class="base-menu-entry-thumbnail-container"
-              :style="{ '--cols': columns }">
-              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
-              <slot name="thumbnails" />
-            </div>
-            <BaseCheckmark
-              v-if="isSelectable && selectActive && !isDisabled"
-              :key="entryId + 'checkmark'"
-              :model-value="isSelected"
-              :label="title"
-              title="checkbox"
-              mark-style="checkbox"
-              class="base-menu-entry-checkbox"
-              @update:model-value="clicked" />
-          </div>
-        </TransitionGroup>
-      </div>
-    </slot>
-  </div>
-</template>
-
 <script>
-import { defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, useSlots } from 'vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Component to be used in Menu Entry List or as a sort of header element
@@ -132,7 +40,7 @@ export default {
       default: '',
     },
     /**
-     * specifiy if item is active - which will display a border on right side
+     * specify if item is active - which will display a border on right side
      * and title in bold
      */
     isActive: {
@@ -207,6 +115,35 @@ export default {
     },
   },
   emits: ['clicked', 'selected'],
+  setup(props) {
+    /** GENERAL */
+    const slots = useSlots();
+
+    /** ELEMENT TYPE RENDER */
+      // element should be rendered with role link and appropriate attributes unless
+      // select is active
+    const isSelectActive = computed(() => props.isSelectable && props.selectActive);
+
+    /** THUMBNAILS */
+      // check if thumbnails slot was populated
+    const { slotHasContent: thumbnailsSlotHasContent } = useHasSlotContent(slots.thumbnails);
+
+    /** TITLE FADE OUT */
+      // right-side-element slot allows for replacing all the menu entry content with custom
+      // content - so we also don't need the fade out if the slot is filled
+      // also check if slot is actually defined before passing it to composable because
+      // of the ({}) (see below)
+    const { slotHasContent: rightSideSlotHasContent } = slots['right-side-elements']
+        // slot binding object needs to be passed for `useSlots` for some reason
+        // (see https://github.com/vuejs/core/issues/4656)
+        ? useHasSlotContent(slots['right-side-elements']({})) : false;
+
+    return {
+      isSelectActive,
+      thumbnailsSlotHasContent,
+      rightSideSlotHasContent,
+    };
+  },
   data() {
     return {
       isSelectedInt: false,
@@ -277,6 +214,98 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    :tabindex="isSelectActive ? -1 : 0"
+    :href="!isSelectActive ? '#' + title : undefined"
+    :class="['base-menu-entry',
+             {
+               'base-menu-entry--activatable': isActivatable && !isDisabled,
+               'base-menu-entry--active': isActive,
+               'base-menu-entry--no-icon': !icon,
+               'base-menu-entry--disabled': isDisabled,
+               'base-menu-entry--text-fade-out': !showThumbnails && !rightSideSlotHasContent,
+             }]"
+    :role="!isSelectActive ? 'link' : undefined"
+    @keyup.enter.prevent="clicked"
+    @click="clicked">
+    <BaseIcon
+      v-if="icon"
+      ref="entryIcon"
+      :name="icon"
+      class="base-menu-entry__icon" />
+
+    <div
+      :class="[
+        'base-menu-entry__text-wrapper',
+        { 'base-menu-entry__text-slide-overlay': showThumbnails && thumbnailsSlotHasContent
+          && isSelectable },
+      ]">
+      <!-- @slot text-content - use this slot to individualize the displayed text in the base
+        menu entry. if this slot is used, prop title, subtext and description will not have any
+        effect. -->
+      <slot
+        name="text-content">
+        <div class="base-menu-entry__title-description-wrapper">
+          <div class="base-menu-entry__title-subtext-wrapper">
+            <div
+              v-if="title"
+              :class="['base-menu-entry__title',
+                       { 'base-menu-entry__title--bold': isActive || titleBold }]">
+              {{ title }}
+            </div>
+            <div
+              v-if="subtext"
+              class="base-menu-entry__subtext">
+              {{ subtext }}
+            </div>
+          </div>
+          <div class="base-menu-entry__description">
+            {{ description }}
+          </div>
+        </div>
+      </slot>
+    </div>
+    <!-- @slot add custom elements on the right side of the entry row. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
+      @binding { boolean } is-selected - true if value is selected -->
+    <slot
+      name="right-side-elements"
+      :is-selected="isSelectedInt">
+      <div
+        class="base-menu-entry__transition-container base-menu-entry--text-fade-out">
+        <TransitionGroup
+          ref="slideFade"
+          name="slide-fade"
+          @leave="slideFadeLeave"
+          @after-leave="slideFadeAfterLeave">
+          <div
+            :key="entryId"
+            class="slide-fade-group">
+            <div
+              v-if="showThumbnails"
+              :key="entryId + 'thumbnail'"
+              ref="thumbnailContainer"
+              class="base-menu-entry__thumbnail-container"
+              :style="{ '--cols': columns }">
+              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
+              <slot name="thumbnails" />
+            </div>
+            <BaseCheckmark
+              v-if="isSelectable && selectActive && !isDisabled"
+              :key="entryId + 'checkmark'"
+              :model-value="isSelected"
+              :label="title"
+              title="checkbox"
+              mark-style="checkbox"
+              class="base-menu-entry__checkbox"
+              @update:model-value="clicked" />
+          </div>
+        </TransitionGroup>
+      </div>
+    </slot>
+  </div>
+</template>
+
 <style lang="scss" scoped>
 @use "sass:map";
   @use "@/styles/variables" as *;
@@ -295,17 +324,67 @@ export default {
       fill: $app-color;
       color: $app-color;
 
-      .base-menu-entry-icon,
-      .base-menu-entry-title,
-      .base-menu-entry-subtext,
-      .base-menu-entry-description {
+      .base-menu-entry__icon,
+      .base-menu-entry__title,
+      .base-menu-entry__subtext,
+      .base-menu-entry__description {
         fill: $app-color;
         color: $app-color;
       }
     }
 
+    &.base-menu-entry--no-icon {
+      padding-left: $spacing;
+    }
+
+    &.base-menu-entry--text-fade-out {
+      &::before {
+        left: inherit;
+        right: $spacing;
+      }
+    }
+
+    &.base-menu-entry--disabled {
+      .base-menu-entry__text-wrapper {
+        .base-menu-entry__title,
+        .base-menu-entry__description {
+          color: $graytext-color;
+        }
+      }
+
+      .base-menu-entry__thumbnail-container {
+        color: $graytext-color;
+      }
+    }
+
+    &.base-menu-entry--activatable {
+      cursor: pointer;
+      transition: box-shadow 0.2s ease;
+
+      &.base-menu-entry--active {
+        box-shadow: inset $border-active-width 0 0 0 $app-color;
+      }
+
+      &:hover, &:focus-within {
+        fill: $app-color;
+        color: $app-color;
+
+        .base-menu-entry__icon,
+        .base-menu-entry__icon path,
+        .base-menu-entry__icon use svg,
+        .base-menu-entry__icon use svg g,
+        .base-menu-entry__icon use svg g path,
+        .base-menu-entry__title,
+        .base-menu-entry__subtext,
+        .base-menu-entry__description {
+          fill: $app-color;
+          color: $app-color;
+        }
+      }
+    }
+
     // this class name is used in BaseMenuList for setting the drag image!!
-    .base-menu-entry-icon {
+    .base-menu-entry__icon {
       height: $icon-large;
       max-height: $icon-large;
       width: $icon-large;
@@ -314,11 +393,7 @@ export default {
       transition: fill 0.1s ease;
     }
 
-    &.base-menu-entry-no-icon {
-      padding-left: $spacing;
-    }
-
-    .base-menu-entry-text-wrapper {
+    .base-menu-entry__text-wrapper {
       flex-grow: 1;
       flex-shrink: 1;
       display: flex;
@@ -329,7 +404,7 @@ export default {
       overflow: hidden;
       margin-right: $spacing;
 
-      &.base-menu-entry-text-slide-overlay::after {
+      &.base-menu-entry__text-slide-overlay::after {
         content: '';
         width: calc(#{$icon-medium} +  (2 * #{$spacing}));
         height: 100%;
@@ -339,7 +414,7 @@ export default {
         background-color: white;
       }
 
-      .base-menu-entry-title-description-wrapper {
+      .base-menu-entry__title-description-wrapper {
         flex-shrink: 1;
         flex-grow: 1;
 
@@ -347,16 +422,16 @@ export default {
           display: flex;
           align-items: baseline;
 
-          .base-menu-entry-title {
+          .base-menu-entry__title {
             margin-right: $spacing;
 
-            &.base-menu-entry-title-bold {
+            &.base-menu-entry__title--bold {
               font-weight: bold;
             }
           }
         }
 
-        .base-menu-entry-description {
+        .base-menu-entry__description {
           color: $font-color-second;
           font-size: $font-size-small;
           white-space: nowrap;
@@ -365,31 +440,18 @@ export default {
       }
     }
 
-    &.base-menu-entry-disabled {
-      .base-menu-entry-text-wrapper {
-        .base-menu-entry-title,
-        .base-menu-entry-description {
-          color: $graytext-color;
-        }
-      }
-
-      .base-menu-entry-thumbnail-container {
-        color: $graytext-color;
-      }
-    }
-
-    .base-menu-entry-title + .base-menu-entry-subtext {
+    .base-menu-entry__title + .base-menu-entry__subtext {
       margin-left: 0;
     }
 
-    .base-menu-entry-subtext, .base-menu-entry-title {
+    .base-menu-entry__subtext, .base-menu-entry__title {
       position: relative;
       white-space: nowrap;
       overflow: hidden;
       transition: color 0.1s ease;
     }
 
-    .base-menu-entry-subtext {
+    .base-menu-entry__subtext {
       color: $font-color-second;
       font-size: $font-size-small;
       margin-right: $spacing;
@@ -398,40 +460,7 @@ export default {
       padding-right: $spacing;
     }
 
-    &.base-menu-entry-activatable {
-      cursor: pointer;
-      transition: box-shadow 0.2s ease;
-
-      &.base-menu-entry-active {
-        box-shadow: inset $border-active-width 0 0 0 $app-color;
-      }
-
-      &:hover, &:focus-within {
-        fill: $app-color;
-        color: $app-color;
-
-        .base-menu-entry-icon,
-        .base-menu-entry-icon path,
-        .base-menu-entry-icon use svg,
-        .base-menu-entry-icon use svg g,
-        .base-menu-entry-icon use svg g path,
-        .base-menu-entry-title,
-        .base-menu-entry-subtext,
-        .base-menu-entry-description {
-          fill: $app-color;
-          color: $app-color;
-        }
-      }
-    }
-
-    &.base-menu-entry-text-fade-out {
-      &::before {
-        left: inherit;
-        right: $spacing;
-      }
-    }
-
-    .base-menu-entry-transition-container {
+    .base-menu-entry__transition-container {
       position: absolute;
       right: 0;
       margin-right: $spacing;
@@ -441,7 +470,7 @@ export default {
       background: $box-color;
     }
 
-    .base-menu-entry-thumbnail-container {
+    .base-menu-entry__thumbnail-container {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap-reverse;
@@ -461,7 +490,7 @@ export default {
       }
     }
 
-    .base-menu-entry-checkbox {
+    .base-menu-entry__checkbox {
       background: $box-color;
       height: 100%;
       padding-left: $spacing;
@@ -488,16 +517,16 @@ export default {
     }
   }
 
-  .base-menu-entry-text-fade-out {
-    &::before {
-      content: '';
-      width: calc(#{$fade-out-width} + #{$spacing});
-      height: $row-height-large;
-      position: absolute;
-      top: 0;
-      left: calc(-#{$fade-out-width} - #{$spacing});
-      background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-      z-index: map.get($zindex, fadeout);
-    }
+.base-menu-entry--text-fade-out {
+  &::before {
+    content: '';
+    width: calc(#{$fade-out-width} + #{$spacing});
+    height: $row-height-large;
+    position: absolute;
+    top: 0;
+    left: calc(-#{$fade-out-width} - #{$spacing});
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+    z-index: map.get($zindex, fadeout);
   }
+}
 </style>

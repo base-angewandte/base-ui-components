@@ -1,16 +1,17 @@
 <script>
-/**
- * component to display different types of links
- * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
- */
-
-import { defineAsyncComponent, ref, getCurrentInstance, computed } from 'vue';
+import { defineAsyncComponent, ref, getCurrentInstance, computed, useSlots } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useEventListener } from '@/composables/useEventListener.js';
 import { useDebounce } from '@/composables/useDebounce.js';
 import { useId } from '@/composables/useId.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
+
+/**
+ * component to display different types of links
+ * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
+ */
 
 export default {
   name: 'BaseLink',
@@ -63,10 +64,15 @@ export default {
     },
     /**
      * specify how a link element should be rendered
-     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router is necessary
+     * this needs to be a valid vue link component string (e.g. `RouterLink`) or a component directly
+     * and vue-router is necessary
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     renderLinkAs: {
-      type: String,
+      type: [String, Object],
       default: 'RouterLink',
     },
     /**
@@ -253,6 +259,12 @@ export default {
       callback: scrollResizeHandler,
     });
 
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    // slot is not directly accessible anymore - use composable to determine
+    // if slot has content
+    const { slotHasContent } = useHasSlotContent(slots.tooltip);
+
     /** DETERMINE ELEMENT TYPE */
     // we need to access the current component instance
     // to check for router
@@ -266,6 +278,7 @@ export default {
 
     return {
       internalId,
+      slotHasContent,
       showTooltip,
       isRouterAvailable,
     };
@@ -423,7 +436,7 @@ export default {
      */
     async tooltipClicked() {
       // check if there is content to display
-      if ((this.tooltip && this.$slots.tooltip) || this.tooltip.length) {
+      if ((this.tooltip && this.slotHasContent) || this.tooltip.length) {
         this.showTooltip = !this.showTooltip;
         return;
       }

@@ -54,7 +54,7 @@ Expandable example using more config and slots
         }"
         class="expand-panel">
       <template #header>
-        <h4>Curriculum Information</h4>
+        <h3>Curriculum Information</h3>
       </template>
       <template #icon>
         <BaseIcon
