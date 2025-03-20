@@ -12,7 +12,8 @@
       :text="allSelected ? deselectText : selectText"
       :disabled="selectAllDisabled"
       button-style="secondary"
-      class="base-select-options__select-button"
+      :class="['base-select-options__select-button',
+               `base-select-options__select-button--margin-${reverse ? 'right' : 'left'}`]"
       @clicked="select" />
   </div>
 </template>
@@ -151,8 +152,14 @@ export default {
     }
 
     .base-select-options__select-button {
-      // to keep button aligned right when parent wraps
-      margin-left: auto;
+      &.base-select-options__select-button--left {
+        // to keep button aligned right when parent wraps
+        margin-left: auto;
+      }
+      &.base-select-options__select-button--margin-right {
+        // to keep button aligned left when parent wraps
+        margin-right: auto;
+      }
 
       &:hover,
       &:focus {
