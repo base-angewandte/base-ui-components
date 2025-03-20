@@ -14,11 +14,15 @@ export function useHasSlotContent(slot) {
    */
   const slotHasContent = computed(() => {
     if (!slot) return false
-    // if we get a slot that is not a function, we're in vue 2 and there is content, so it's not empty
-    if (typeof slot !== 'function') return true
-    // else get the nodes and loop through them
-    return vNodeHasContent(slot())
-  })
+    // check if slot was provided as function - this is the case
+    // if slotProps object was not provided (aka slots[slotname])
+    if (typeof slot === 'function') {
+      return vNodeHasContent(slot());
+    }
+    // if slot props object had to be provided (aka aka slots[slotname]({})) the
+    // array is passed directly
+    return vNodeHasContent(slot);
+  });
 
   /**
    * recursive function checking every node for content
