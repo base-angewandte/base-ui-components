@@ -1,66 +1,3 @@
-<template>
-  <component
-    :is="draggableComponent"
-    ref="draggable"
-    :model-value="draggableList"
-    :sort="useDraggable ? false : undefined"
-    :disabled="useDraggable ? !isDraggable || selectActive : undefined"
-    :group="useDraggable ? { name: dragName, pull: 'clone', put: false } : undefined"
-    :set-data="modifyDragItem"
-    :tag="useDraggable ? 'ul' : undefined"
-    class="base-menu-list"
-    @choose="getDragImage"
-    @start="dragStart"
-    @end="dragEnd">
-    <li
-      v-for="(item, index) in listInt"
-      :key="item.id || item.title"
-      class="base-menu-list__list-entry">
-      <BaseMenuEntry
-        ref="menuEntry"
-        :entry-id="item.id"
-        :title="item.title"
-        :is-active="entryProps[index].active"
-        :is-selected="entryProps[index].selected"
-        :is-disabled="item.disabled"
-        :icon="item.icon"
-        :description="item.description"
-        :is-selectable="true"
-        :select-active="selectActive"
-        @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)">
-        <template #text-content>
-          <!-- @slot use this slot to individualize the displayed text per
-            menu entry.
-            @binding { Object } item - the complete entry provided by list -->
-          <slot
-            name="entry-text-content"
-            :item="item" />
-        </template>
-        <template #right-side-elements="{ isSelected }">
-          <!-- @slot use this slot to add elements to the right side of an entry. This slot content
-            will be rendered in place of thumbnails and select checkbox so it will effectively
-            disable the display of selection elements and if select mode is desired, custom elements
-            should be provided
-             @binding { Object } item - the complete entry provided by list
-             @binding { boolean } is-selected - was item selected -->
-          <slot
-            name="entry-right-side-elements"
-            :is-selected="isSelected"
-            :item="item" />
-        </template>
-        <template
-          #thumbnails>
-          <!-- @slot Use this scoped slot to supply a list of thumbnails (i.e. [BaseIcon](BaseIcon)) for `item`, where `item` is one list element. See also the example below.-->
-          <slot
-            name="thumbnails"
-            :item="item" />
-        </template>
-      </BaseMenuEntry>
-    </li>
-  </component>
-</template>
-
 <script>
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
 import { defineAsyncComponent } from 'vue';
@@ -383,6 +320,69 @@ export default {
   },
 };
 </script>
+
+<template>
+  <component
+    :is="draggableComponent"
+    ref="draggable"
+    :model-value="draggableList"
+    :sort="useDraggable ? false : undefined"
+    :disabled="useDraggable ? !isDraggable || selectActive : undefined"
+    :group="useDraggable ? { name: dragName, pull: 'clone', put: false } : undefined"
+    :set-data="modifyDragItem"
+    :tag="useDraggable ? 'ul' : undefined"
+    class="base-menu-list"
+    @choose="getDragImage"
+    @start="dragStart"
+    @end="dragEnd">
+    <li
+      v-for="(item, index) in listInt"
+      :key="item.id || item.title"
+      class="base-menu-list__list-entry">
+      <BaseMenuEntry
+        ref="menuEntry"
+        :entry-id="item.id"
+        :title="item.title"
+        :is-active="entryProps[index].active"
+        :is-selected="entryProps[index].selected"
+        :is-disabled="item.disabled"
+        :icon="item.icon"
+        :description="item.description"
+        :is-selectable="true"
+        :select-active="selectActive"
+        @clicked="activateItem(index)"
+        @selected="selectItem(index, $event)">
+        <template #text-content>
+          <!-- @slot use this slot to individualize the displayed text per
+            menu entry.
+            @binding { Object } item - the complete entry provided by list -->
+          <slot
+            name="entry-text-content"
+            :item="item" />
+        </template>
+        <template #right-side-elements="{ isSelected }">
+          <!-- @slot use this slot to add elements to the right side of an entry. This slot content
+            will be rendered in place of thumbnails and select checkbox so it will effectively
+            disable the display of selection elements and if select mode is desired, custom elements
+            should be provided
+             @binding { Object } item - the complete entry provided by list
+             @binding { boolean } is-selected - was item selected -->
+          <slot
+            name="entry-right-side-elements"
+            :is-selected="isSelected"
+            :item="item" />
+        </template>
+        <template
+          #thumbnails>
+          <!-- @slot Use this scoped slot to supply a list of thumbnails (i.e. [BaseIcon](BaseIcon)) for `item`, where `item` is one list element. See also the example below.-->
+          <slot
+            name="thumbnails"
+            :item="item" />
+        </template>
+      </BaseMenuEntry>
+    </li>
+  </component>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
