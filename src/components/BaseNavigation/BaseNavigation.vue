@@ -581,17 +581,13 @@ onMounted(() => {
 }
 
 // drop down animations
-.translateY-enter {
-  transform:translateY(-10px);
-  opacity: 0;
-}
-
 .translateY-enter-active,.translateY-leave-active {
   transform-origin: top left 0;
   transition:.2s ease;
 }
 
-.translateY-leave-to{
+.translateY-enter-from,
+.translateY-leave-to {
   transform: translateY(-10px);
   opacity: 0;
 }
