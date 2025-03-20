@@ -419,6 +419,7 @@ export default {
       .base-button__icon {
         order: 1;
 
+        // this class is used in BaseAdvancedSearchRow
         &.base-button__icon--margin {
           margin-left: $spacing;
         }

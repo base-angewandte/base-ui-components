@@ -2037,10 +2037,6 @@ export default {
         height: $icon-medium;
         width: $icon-medium;
       }
-
-      .base-advanced-search-row__icon-button__text {
-        display: none;
-      }
     }
 
     .base-advanced-search-row__drop-down-body {
@@ -2208,11 +2204,17 @@ export default {
   width: $row-height-large;
 
   .base-advanced-search-row__add-filter-button__text {
-    display: none;
+    position: absolute;
+    top: auto;
+    left: -9999px;
   }
 
   &__shadow {
     box-shadow: $box-shadow-reg;
+  }
+
+  &.base-button:deep(.base-button__icon.base-button__icon--margin) {
+    margin-left: 0;
   }
 }
 
@@ -2236,8 +2238,10 @@ export default {
       width: 100%;
 
       .base-advanced-search-row__add-filter-button__text {
+        position: relative;
+        top: auto;
+        left: unset;
         display: inline;
-        margin-right: $spacing;
       }
     }
 
