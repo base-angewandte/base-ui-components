@@ -1,6 +1,9 @@
 <script>
 import { computed, defineAsyncComponent, useSlots } from 'vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+// loading component synchronously due a transition is missing on the first pass
+// when select-active is set to true
+import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
 
 /**
  * Component to be used in Menu Entry List or as a sort of header element
@@ -10,9 +13,8 @@ import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 export default {
   name: 'BaseMenuEntry',
   components: {
+    BaseCheckmark,
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
-    BaseCheckmark: defineAsyncComponent(() => import('@/components/BaseCheckmark/BaseCheckmark.vue')),
-
   },
   props: {
     /**
@@ -189,14 +191,14 @@ export default {
     },
     slideFadeLeave() {
       // safari fix: somehow transition needs to be triggered manually
-      this.$refs.slideFade.$el.style.right = '1px';
+      this.$refs.slideFade.style.right = '1px';
     },
     slideFadeAfterLeave() {
       // sometimes newly duplicated element has no html element yet so
       // check if element exists first
       if (this.$refs.slideFade) {
         // safari fix: reset transition
-        this.$refs.slideFade.$el.style.removeProperty('right');
+        this.$refs.slideFade.style.removeProperty('right');
       }
     },
     /**
@@ -272,34 +274,33 @@ export default {
       name="right-side-elements"
       :is-selected="isSelectedInt">
       <div
-        class="base-menu-entry__transition-container base-menu-entry--text-fade-out">
+        class="base-menu-entry__transition-container">
         <TransitionGroup
-          ref="slideFade"
           name="slide-fade"
           @leave="slideFadeLeave"
           @after-leave="slideFadeAfterLeave">
           <div
-            :key="entryId"
-            class="slide-fade-group">
+            :key="entryId + 'thumbnail'"
+            ref="slideFade"
+            class="slide-fade-group base-menu-entry--text-fade-out">
             <div
               v-if="showThumbnails"
-              :key="entryId + 'thumbnail'"
               ref="thumbnailContainer"
               class="base-menu-entry__thumbnail-container"
               :style="{ '--cols': columns }">
               <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
               <slot name="thumbnails" />
             </div>
-            <BaseCheckmark
-              v-if="isSelectable && selectActive && !isDisabled"
-              :key="entryId + 'checkmark'"
-              :model-value="isSelected"
-              :label="title"
-              title="checkbox"
-              mark-style="checkbox"
-              class="base-menu-entry__checkbox"
-              @update:model-value="clicked" />
           </div>
+          <BaseCheckmark
+            v-if="isSelectable && selectActive && !isDisabled"
+            :key="entryId + 'checkmark'"
+            :model-value="isSelected"
+            :label="title"
+            title="checkbox"
+            mark-style="checkbox"
+            class="base-menu-entry__checkbox"
+            @update:model-value="clicked" />
         </TransitionGroup>
       </div>
     </slot>
@@ -467,10 +468,11 @@ export default {
       height: 100%;
       display: flex;
       align-items: center;
-      background: $box-color;
     }
 
     .base-menu-entry__thumbnail-container {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       flex-wrap: wrap-reverse;
@@ -479,6 +481,7 @@ export default {
       align-items: flex-start;
       padding-left: $spacing;
       gap: $spacing;
+      background-color: $box-color;
       // calculate container width as sum of thumbnail columns and column gaps,
       // plus an extra $spacing to account for the padding-left applied above.
       // the count of columns is calculated in the setThumbnailColumns() method.
@@ -494,20 +497,37 @@ export default {
       background: $box-color;
       height: 100%;
       padding-left: $spacing;
+      z-index: 1;
     }
 
     .slide-fade-group {
       display: flex;
       align-items: center;
       height: 100%;
+      position: relative;
+      z-index: 101;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform: translateZ(0) scale(1, 1);
     }
 
-    .slide-fade-enter-active, .slide-fade-move, .slide-fade-leave-active {
-      transition: opacity 0.5s ease, transform 0.5s ease;
+    .slide-fade-enter-active,
+    .slide-fade-move,
+    .slide-fade-leave-active {
+      transition: opacity 0.5s ease, transform 0.5s ease-in-out;
     }
 
-    .slide-fade-enter, .slide-fade-leave-to {
+    .slide-fade-enter-from,
+    .slide-fade-leave-to {
       opacity: 0;
+    }
+
+    .slide-fade-enter-from {
+      // transition looks more natural with larger value
+      // when entering from the right side
+      transform: translateX($spacing + $spacing-small);
+    }
+
+    .slide-fade-leave-to {
       transform: translateX(#{$spacing});
     }
 
