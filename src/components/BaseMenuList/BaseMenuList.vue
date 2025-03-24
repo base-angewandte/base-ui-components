@@ -1,6 +1,7 @@
 <script>
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
+import { useWindowResize } from '@/composables/useWindowResize.js';
 
 /**
  * Base Component for SideBar Menu Entries
@@ -78,6 +79,23 @@ export default {
     },
   },
   emits: ['selected', 'clicked', 'update:list'],
+  setup() {
+    /**
+     * defines if menu list entries are draggable
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isDraggable = ref(false);
+    /** listen to window resize and set draggable state depending on window width */
+    useWindowResize({
+      callback: () => isDraggable.value = !(window.innerWidth < 640),
+      setDebounce: 250,
+      callOnMounted: true,
+    });
+
+    return {
+      isDraggable,
+    };
+  },
   data() {
     return {
       // have internally necessary props in separate array to prevent issues with
@@ -91,8 +109,6 @@ export default {
       entryPropsKeys: ['selected', 'active', 'error'],
       dragging: false,
       dragAndDropCapable: false,
-      isDraggable: true,
-      resizeTimeout: null,
       /**
        * chrome can not deal with delay if drag image is cloned from dom on setData directly
        * so image needs to be set previously and stored in variable
@@ -216,15 +232,7 @@ export default {
     }
   },
   mounted() {
-    this.isDraggable = !this.isMobile();
     this.dragAndDropCapable = ('DragEvent' in window);
-
-    window.addEventListener('resize', () => {
-      clearTimeout(this.resizeTimeout);
-      this.resizeTimeout = setTimeout(() => {
-        this.isDraggable = !this.isMobile();
-      }, 250);
-    });
   },
   methods: {
     // this function is called when a menu entry is clicked (when checkboxes not active)
@@ -313,9 +321,6 @@ export default {
         }
       }
       dataTransfer.setData('draggable', '');
-    },
-    isMobile() {
-      return window.innerWidth < 640;
     },
   },
 };
