@@ -167,16 +167,6 @@ export default {
       getI18nTerm,
     };
   },
-  data() {
-    return {
-      /**
-       * an observer to adjust displayed numbers according to component
-       * width
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
-    };
-  },
   computed: {
     /**
      * calculate the actual subset page numbers to be displayed
