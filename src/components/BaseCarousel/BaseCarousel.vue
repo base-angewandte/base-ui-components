@@ -1,49 +1,3 @@
-<template>
-  <div>
-    <div
-      class="base-carousel swiper">
-      <div
-        class="swiper-wrapper">
-        <div
-          v-for="(item, index) in items"
-          v-show="swiperIsActive"
-          :key="index"
-          :class="['base-carousel-slide', { 'swiper-slide': swiperIsActive }]">
-          <BaseImageBox
-            :title="item.title"
-            :subtext="subtext(item.subtext)"
-            :description="item.description"
-            :additional="item.additional"
-            :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '640w')"
-            :box-size="boxSize"
-            :lazyload="true"
-            :image-first="true"
-            :center-header="true"
-            :render-element-as="isRouterAvailable && item.href ? renderLinkElementAs : 'div'"
-            :link-to="isRouterAvailable && item.href ? item.href : ''"
-            style="margin-right: 0"
-            @clicked="boxClicked(item)" />
-        </div>
-      </div>
-
-      <div
-        v-if="items.length > 2"
-        class="swiper-pagination" />
-
-      <template
-        v-if="items.length > 1">
-        <BaseIcon
-          name="prev"
-          class="swiper-button swiper-button-prev" />
-
-        <BaseIcon
-          name="next"
-          class="swiper-button swiper-button-next" />
-      </template>
-    </div>
-  </div>
-</template>
-
 <script>
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
@@ -121,8 +75,8 @@ export default {
     const { getI18nTerm } = useI18n();
 
     /** CHECK ROUTER AVAILABILITY */
-    // we need to access the current component instance
-    // to check for router
+      // we need to access the current component instance
+      // to check for router
     const { app } = getCurrentInstance().appContext;
 
     /**
@@ -265,6 +219,52 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div>
+    <div
+      class="base-carousel swiper">
+      <div
+        class="swiper-wrapper">
+        <div
+          v-for="(item, index) in items"
+          v-show="swiperIsActive"
+          :key="index"
+          :class="['base-carousel-slide', { 'swiper-slide': swiperIsActive }]">
+          <BaseImageBox
+            :title="item.title"
+            :subtext="subtext(item.subtext)"
+            :description="item.description"
+            :additional="item.additional"
+            :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '640w')"
+            :box-size="boxSize"
+            :lazyload="true"
+            :image-first="true"
+            :center-header="true"
+            :render-element-as="isRouterAvailable && item.href ? renderLinkElementAs : 'div'"
+            :link-to="isRouterAvailable && item.href ? item.href : ''"
+            style="margin-right: 0"
+            @clicked="boxClicked(item)" />
+        </div>
+      </div>
+
+      <div
+        v-if="items.length > 2"
+        class="swiper-pagination" />
+
+      <template
+        v-if="items.length > 1">
+        <BaseIcon
+          name="prev"
+          class="swiper-button swiper-button-prev" />
+
+        <BaseIcon
+          name="next"
+          class="swiper-button swiper-button-next" />
+      </template>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
