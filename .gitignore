@@ -25,4 +25,5 @@ dist/
 /docs/components
 /docs/.vitepress/cache
 /docs/.vitepress/.temp
+/docs/.vitepress/config.mjs.timestamp*
 styleguide/
