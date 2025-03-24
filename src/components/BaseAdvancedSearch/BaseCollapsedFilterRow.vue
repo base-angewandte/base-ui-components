@@ -1,121 +1,3 @@
-<template>
-  <div
-    class="base-collapsed-filter-row">
-    <!-- Container to add fade out effect -->
-    <div
-      ref="filterListContainer"
-      :class="['base-collapsed-filter-row__filter-list-container',
-               {
-                 'base-collapsed-filter-row__filter-list-container__fade-right':
-                   boxFadeOut.right,
-               },
-               {
-                 'base-collapsed-filter-row__filter-list-container__fade-left':
-                   boxFadeOut.left,
-               }]">
-      <!-- the actual list of filters -->
-      <ul
-        ref="filterList"
-        :aria-description="assistiveText.appliedFiltersLabel"
-        :class="[
-          'base-collapsed-filter-row__filter-list',
-          { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
-          { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
-        ]">
-        <li
-          v-for="(filter, filterIndex) in filtersInt"
-          :key="filter.idInternal"
-          :aria-describedby="`${filter.idInternal}-label`"
-          tabindex="0"
-          :class="['base-collapsed-filter-row__filter',
-                   { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
-                     .fieldType === 'boolean' }]">
-          <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
-            <div
-              :id="`${filter.idInternal}-label`"
-              class="base-collapsed-filter-row__filter-label">
-              {{ filter.labelInternal }}
-            </div>
-            <!-- the chips for each filter -->
-            <ul
-              class="base-collapsed-filter-row__chips-list">
-              <!-- iterate through the filter values list -->
-              <template
-                v-for="(value, valueIndex) in filter.filter_values?.values">
-                <!-- check if filter.fieldType is an array to determine if it belongs to a field group -->
-                <template v-if="filter.filter_values.fieldType === 'group'">
-                  <!-- if yes - also iterate through those values -->
-                  <template
-                    v-for="(groupValue, groupIndex) in value.values"
-                    :key="groupValue.idInternal
-                      || `${groupValue.labelInternal}-${valueIndex}-${groupIndex}`">
-                    <BaseCollapsedFilterItem
-                      v-if="groupValue.labelInternal"
-                      :value="groupValue"
-                      :type="value.fieldType"
-                      :range-indicator="getRangeIndicator(value, groupIndex)"
-                      :scrollable="filterListScrollable"
-                      :is-scrolling="isScrolling"
-                      :date-time-text="dateTimeText"
-                      :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
-                        && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
-                        && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
-                      :assistive-text="{
-                        booleanFilterLabel: assistiveText.booleanFilterLabel
-                          ? assistiveText.booleanFilterLabel
-                            .replace('{label}', filter.labelInternal) : groupValue.labelInternal.toString(),
-                        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
-                      }"
-                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
-                  </template>
-                </template>
-                <template v-else>
-                  <BaseCollapsedFilterItem
-                    v-if="value.labelInternal"
-                    :key="value.idInternal || `${value.labelInternal}-${valueIndex}`"
-                    :value="value"
-                    :type="filter.filter_values.fieldType"
-                    :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
-                    :scrollable="filterListScrollable"
-                    :is-scrolling="isScrolling"
-                    :date-time-text="dateTimeText"
-                    :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
-                      && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
-                      && interpretLabelAsHtml.includes(filter.idInternal))"
-                    :assistive-text="{
-                      booleanFilterLabel: assistiveText.booleanFilterLabel
-                        ? assistiveText.booleanFilterLabel
-                          .replace('{label}', filter.labelInternal) : value.labelInternal.toString(),
-                      optionToRemoveSelected: assistiveText.optionToRemoveSelected,
-                    }"
-                    @remove-chip="removeChip(filterIndex, valueIndex)" />
-                </template>
-              </template>
-            </ul>
-          </template>
-        </li>
-      </ul>
-    </div>
-    <span
-      v-if="chipRemovedAssistiveText"
-      aria-live="assertive"
-      class="assistive-text">
-      {{ chipRemovedAssistiveText }}
-    </span>
-
-    <!-- remove all filters button -->
-    <button
-      :title="assistiveText.removeFiltersLabel"
-      class="base-collapsed-filter-row__remove"
-      @keydown.enter.stop="removeFilters"
-      @click.stop="removeFilters">
-      <BaseIcon
-        name="remove"
-        class="base-collapsed-filter-row__remove-icon" />
-    </button>
-  </div>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue';
@@ -548,6 +430,124 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    class="base-collapsed-filter-row">
+    <!-- Container to add fade out effect -->
+    <div
+      ref="filterListContainer"
+      :class="['base-collapsed-filter-row__filter-list-container',
+               {
+                 'base-collapsed-filter-row__filter-list-container__fade-right':
+                   boxFadeOut.right,
+               },
+               {
+                 'base-collapsed-filter-row__filter-list-container__fade-left':
+                   boxFadeOut.left,
+               }]">
+      <!-- the actual list of filters -->
+      <ul
+        ref="filterList"
+        :aria-description="assistiveText.appliedFiltersLabel"
+        :class="[
+          'base-collapsed-filter-row__filter-list',
+          { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
+          { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
+        ]">
+        <li
+          v-for="(filter, filterIndex) in filtersInt"
+          :key="filter.idInternal"
+          :aria-describedby="`${filter.idInternal}-label`"
+          tabindex="0"
+          :class="['base-collapsed-filter-row__filter',
+                   { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
+                     .fieldType === 'boolean' }]">
+          <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
+            <div
+              :id="`${filter.idInternal}-label`"
+              class="base-collapsed-filter-row__filter-label">
+              {{ filter.labelInternal }}
+            </div>
+            <!-- the chips for each filter -->
+            <ul
+              class="base-collapsed-filter-row__chips-list">
+              <!-- iterate through the filter values list -->
+              <template
+                v-for="(value, valueIndex) in filter.filter_values?.values">
+                <!-- check if filter.fieldType is an array to determine if it belongs to a field group -->
+                <template v-if="filter.filter_values.fieldType === 'group'">
+                  <!-- if yes - also iterate through those values -->
+                  <template
+                    v-for="(groupValue, groupIndex) in value.values"
+                    :key="groupValue.idInternal
+                      || `${groupValue.labelInternal}-${valueIndex}-${groupIndex}`">
+                    <BaseCollapsedFilterItem
+                      v-if="groupValue.labelInternal"
+                      :value="groupValue"
+                      :type="value.fieldType"
+                      :range-indicator="getRangeIndicator(value, groupIndex)"
+                      :scrollable="filterListScrollable"
+                      :is-scrolling="isScrolling"
+                      :date-time-text="dateTimeText"
+                      :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                        && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                        && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
+                      :assistive-text="{
+                        booleanFilterLabel: assistiveText.booleanFilterLabel
+                          ? assistiveText.booleanFilterLabel
+                            .replace('{label}', filter.labelInternal) : groupValue.labelInternal.toString(),
+                        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                      }"
+                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
+                  </template>
+                </template>
+                <template v-else>
+                  <BaseCollapsedFilterItem
+                    v-if="value.labelInternal"
+                    :key="value.idInternal || `${value.labelInternal}-${valueIndex}`"
+                    :value="value"
+                    :type="filter.filter_values.fieldType"
+                    :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
+                    :scrollable="filterListScrollable"
+                    :is-scrolling="isScrolling"
+                    :date-time-text="dateTimeText"
+                    :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                      && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                      && interpretLabelAsHtml.includes(filter.idInternal))"
+                    :assistive-text="{
+                      booleanFilterLabel: assistiveText.booleanFilterLabel
+                        ? assistiveText.booleanFilterLabel
+                          .replace('{label}', filter.labelInternal) : value.labelInternal.toString(),
+                      optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                    }"
+                    @remove-chip="removeChip(filterIndex, valueIndex)" />
+                </template>
+              </template>
+            </ul>
+          </template>
+        </li>
+      </ul>
+    </div>
+    <span
+      v-if="chipRemovedAssistiveText"
+      aria-live="assertive"
+      class="assistive-text">
+      {{ chipRemovedAssistiveText }}
+    </span>
+
+    <!-- remove all filters button -->
+    <button
+      :title="assistiveText.removeFiltersLabel"
+      class="base-collapsed-filter-row__remove"
+      @keydown.enter.stop="removeFilters"
+      @click.stop="removeFilters">
+      <BaseIcon
+        name="remove"
+        class="base-collapsed-filter-row__remove-icon" />
+    </button>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";

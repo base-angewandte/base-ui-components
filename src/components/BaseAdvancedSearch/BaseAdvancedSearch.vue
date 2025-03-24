@@ -1,291 +1,3 @@
-<template>
-  <div
-    ref="searchContainer"
-    class="base-advanced-search">
-    <!-- FILTER ROW LIST (MODE 'LIST') -->
-    <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
-      <BaseAdvancedSearchRow
-        v-for="(filter, index) in appliedFiltersInt"
-        :key="'filter-' + index"
-        :mode="mode"
-        :search-row-id="`${internalId}-${filter[identifierPropertyName.filter]}-${index}`"
-        :is-main-search="false"
-        :autocomplete-results="filtersAutocompleteResults[index]"
-        :filter-list="displayedFilters"
-        :applied-filter="filter"
-        :is-loading="filtersLoadingState[index]"
-        :default-filter="defaultFilter"
-        :placeholder="placeholder.filterRow || placeholder"
-        :autocomplete-property-names="autocompletePropertyNames"
-        :label-property-name="labelPropertyName"
-        :identifier-property-name="identifierPropertyName"
-        :drop-down-info-texts="dropDownInfoTexts"
-        :advanced-search-text="advancedSearchText"
-        :assistive-text="{
-          addFilter: assistiveText.addFilter,
-          removeFilter: assistiveText.removeFilter,
-          selectFilterLabel: assistiveText.selectFilterLabel,
-          searchLabel: assistiveText.searchLabel,
-          selectedOption: assistiveText.selectedOption,
-          optionAdded: assistiveText.optionAdded,
-          optionToRemoveSelected: assistiveText.optionToRemoveSelected,
-          optionRemoved: assistiveText.optionRemoved,
-          loaderActive: assistiveText.autocompleteLoaderActive,
-          autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
-          autocompleteNoResults: assistiveText.autocompleteNoResults,
-          autocompleteInitial: assistiveText.autocompleteInitial,
-          categoryAnnouncement: assistiveText.categoryAnnouncement,
-          optionsAnnouncement: assistiveText.optionsAnnouncement,
-        }"
-        :date-field-delay="dateFieldDelay"
-        :language="language"
-        :highlight-autocomplete-match="highlightAutocompleteMatch"
-        :highlight-autocomplete-tags="highlightAutocompleteTags"
-        class="base-advanced-search__filter-row"
-        @remove-filter="removeFilter($event, index)"
-        @update:applied-filter="updateFilter($event, index)"
-        @fetch-autocomplete-results="fetchAutocomplete($event, index)">
-        <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
-          <!-- @slot to allow for modification of the autocomplete option
-            @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
-            @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
-          <slot
-            name="autocomplete-option"
-            :option="autocompleteOption"
-            :collection-id="collectionId" />
-        </template>
-      </BaseAdvancedSearchRow>
-    </template>
-
-    <!-- MAIN FILTER -->
-    <BaseAdvancedSearchRow
-      ref="mainSearch"
-      v-model:applied-filter="mainFilter"
-      v-bind="$attrs"
-      :search-row-id="`main-${internalId}`"
-      :mode="mode"
-      :filter-list="displayedFilters"
-      :form-filter-list="formFilterList"
-      :default-filter="defaultFilter"
-      :autocomplete-results="filtersAutocompleteResults[mainFilterIndex]"
-      :is-loading="filtersLoadingState[mainFilterIndex]"
-      :placeholder="placeholder.main || placeholder"
-      :autocomplete-property-names="autocompletePropertyNames"
-      :label-property-name="labelPropertyName"
-      :identifier-property-name="identifierPropertyName"
-      :drop-down-info-texts="dropDownInfoTexts"
-      :advanced-search-text="advancedSearchText"
-      :assistive-text="{
-        addFilter: assistiveText.addFilter,
-        removeFilter: assistiveText.removeFilter,
-        selectFilterLabel: assistiveText.selectFilterLabel,
-        searchLabel: assistiveText.searchLabel,
-        selectedOption: assistiveText.selectedOption,
-        loaderActive: assistiveText.autocompleteLoaderActive,
-        autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
-        autocompleteNoResults: assistiveText.autocompleteNoResults,
-        autocompleteInitial: assistiveText.autocompleteInitial,
-        categoryAnnouncement: assistiveText.categoryAnnouncement,
-        optionsAnnouncement: assistiveText.optionsAnnouncement,
-        results: assistiveText.results,
-      }"
-      :date-field-delay="dateFieldDelay"
-      :language="language"
-      :highlight-autocomplete-match="highlightAutocompleteMatch"
-      :highlight-autocomplete-tags="highlightAutocompleteTags"
-      @add-filter-row="addFilterRow"
-      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
-      @option-selected="fillOptionToForm">
-      <!-- SHOW ADVANCED SEARCH FORM BUTTON (MODE 'FORM') -->
-      <template #after>
-        <BaseButton
-          v-if="mode === 'form'"
-          :text="showAdvancedSearchButtonText ? advancedSearchText.advancedButtonLabel : ''"
-          :aria-expanded="`${formOpen}`"
-          :aria-controls="`${internalId}-form`"
-          :description="advancedButtonDescription"
-          button-style="row"
-          icon="drop-down"
-          icon-size="small"
-          icon-position="right"
-          :class="['base-advanced-search__expand-button',
-                   { 'base-button--rotate-icon-180': formOpen }]"
-          @click.prevent.stop="openAdvancedSearch"
-          @keydown.enter.space.prevent.stop="openAdvancedSearch"
-          @focusin.stop />
-      </template>
-      <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
-      <template #below>
-        <BaseForm
-          v-if="mainSearch && mode === 'form' && formOpen/** check for mainSearch template ref to avoid hydration mismatches */"
-          v-bind="amendedFormProps"
-          :model-value="formFilterValuesInt"
-          :form-id="`${internalId}-form`"
-          :form-field-json="formFilterList"
-          :label-property-name="labelPropertyName.formInputs"
-          :identifier-property-name="identifierPropertyName.formInputs"
-          :class="['base-advanced-search__search-form',
-                   { 'base-advanced-search__search-form--hidden': !formMounted}]"
-          @input-complete="updateFormFilters"
-          @fetch-autocomplete="fetchFormAutocomplete"
-          @form-mounted="formIsMounted"
-          @keydown.stop
-          @click.stop>
-          <template #label-addition="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-label-addition"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template #pre-input-field="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-pre-input-field"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template
-            #input-field-addition-before="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-input-field-addition-before"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template #input-field-inline-before="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-input-field-inline-before"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template #input-field-addition-after="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-input-field-addition-after"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template #post-input-field="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-post-input-field"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template #error-icon>
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
-            <slot name="form-error-icon" />
-          </template>
-          <template #remove-icon>
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
-            <slot name="form-remove-icon" />
-          </template>
-          <template #below-input="{ fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              name="form-below-input"
-              :field-name="fieldName"
-              :group-names="groupNames" />
-          </template>
-          <template #drop-down-entry="{ option, fieldName, groupNames }">
-            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
-              @binding {object} option - the option object
-              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
-              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
-            <slot
-              :field-name="fieldName"
-              :group-names="groupNames"
-              :option="option"
-              name="form-drop-down-entry">
-              <template
-                v-if="mode === 'form'
-                  // check if value is boolean and was set true
-                  && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
-                    // or if it is an array and
-                    || (typeof renderFormChipsLabelAsHtml === 'object'
-                      // a) includes the field name
-                      && (renderFormChipsLabelAsHtml.includes(fieldName)
-                        // or b) this is nested field in a form group and the array
-                        // contains a (nested) object with the group names and an array with the field name
-                        || (groupNames?.length && renderFormChipsLabelAsHtml
-                          .some((arrayEntry) => typeof arrayEntry === 'object'
-                            && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
-                              .includes(fieldName))))))">
-                <span
-                  v-insert-text-as-html="{
-                    value: option[labelPropertyName.formInputs],
-                    interpretTextAsHtml: true,
-                  }" />
-              </template>
-            </slot>
-          </template>
-        </BaseForm>
-        <div
-          v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
-          <BaseCollapsedFilterRow
-            v-model:filters="collapsedFiltersArray"
-            :date-time-text="advancedSearchText.collapsedDateTime"
-            :interpret-label-as-html="renderFormChipsLabelAsHtml"
-            :assistive-text="{
-              removeFiltersLabel: assistiveText.removeAllFiltersLabel,
-              filterRemovedNotification: assistiveText.removeFilterValueNotification,
-              appliedFiltersLabel: assistiveText.collapsedAppliedFiltersLabel,
-              booleanFilterLabel: assistiveText.collapsedBooleanFilterValue,
-              optionToRemoveSelected: assistiveText.collapsedOptionToRemoveSelected,
-            }"
-            @click.stop
-            @keydown.stop
-            @remove-all="removeAllFilters" />
-        </div>
-      </template>
-      <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
-        <!-- @slot to allow for modification of the autocomplete option
-          @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
-          @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
-        <slot
-          name="autocomplete-option"
-          :option="autocompleteOption"
-          :collection-id="collectionId">
-          <!-- also automate the display of html for all fields specified directly in the component -->
-          <template
-            v-if="mode === 'form'
-              && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
-                || (typeof renderFormChipsLabelAsHtml === 'object'
-                  && renderFormChipsLabelAsHtml.includes(collectionId)))">
-            <span
-              v-insert-text-as-html="{
-                value: autocompleteOption[labelPropertyName.autocompleteOption],
-                interpretTextAsHtml: true,
-              }" />
-          </template>
-        </slot>
-      </template>
-    </BaseAdvancedSearchRow>
-    <span
-      v-if="assistiveTextNotification"
-      aria-live="assertive"
-      class="assistive-text">
-      {{ assistiveTextNotification }}
-    </span>
-  </div>
-</template>
-
 <script>
 import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
@@ -948,9 +660,9 @@ export default {
       /**
        * use formFieldValuesInt to create the correct structure for BaseCollapsedFilterRow
        * @returns {{
-         *  filter_values: { values: Object[], fieldType: string, fieldId: string },
-         *  label: string,
-         *  id: string,
+       *  filter_values: { values: Object[], fieldType: string, fieldId: string },
+       *  label: string,
+       *  id: string,
        *  }[]}
        */
       get() {
@@ -960,7 +672,7 @@ export default {
           // sort the values in the order of the form so the collapsed display has the same order
           .sort(([key1], [key2]) => {
             if (this.formFilterList[key1] && this.formFilterList[key2]
-                && this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
+              && this.formFilterList[key1]['x-attrs'].order > this.formFilterList[key2]['x-attrs'].order) {
               return 1;
             }
             return -1;
@@ -1106,11 +818,11 @@ export default {
         // d) or both have data but data are different from each other
         if (this.originalMainFilter
           && ((mainFilterHasData && this.originalMainFilter[this.identifierPropertyName.filter]
-            !== val[this.identifierPropertyName.filter])
-          || mainFilterHasData !== originalMainFilterHasData
-          || (mainFilterHasData && originalMainFilterHasData
-          && (JSON.stringify(this.originalMainFilter.filter_values
-              !== JSON.stringify(val.filter_values)))))) {
+              !== val[this.identifierPropertyName.filter])
+            || mainFilterHasData !== originalMainFilterHasData
+            || (mainFilterHasData && originalMainFilterHasData
+              && (JSON.stringify(this.originalMainFilter.filter_values
+                !== JSON.stringify(val.filter_values)))))) {
           // if so - update original data
           this.originalMainFilter = JSON.parse(JSON.stringify(this.mainFilter));
           // and trigger search
@@ -1871,6 +1583,294 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="searchContainer"
+    class="base-advanced-search">
+    <!-- FILTER ROW LIST (MODE 'LIST') -->
+    <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
+      <BaseAdvancedSearchRow
+        v-for="(filter, index) in appliedFiltersInt"
+        :key="'filter-' + index"
+        :mode="mode"
+        :search-row-id="`${internalId}-${filter[identifierPropertyName.filter]}-${index}`"
+        :is-main-search="false"
+        :autocomplete-results="filtersAutocompleteResults[index]"
+        :filter-list="displayedFilters"
+        :applied-filter="filter"
+        :is-loading="filtersLoadingState[index]"
+        :default-filter="defaultFilter"
+        :placeholder="placeholder.filterRow || placeholder"
+        :autocomplete-property-names="autocompletePropertyNames"
+        :label-property-name="labelPropertyName"
+        :identifier-property-name="identifierPropertyName"
+        :drop-down-info-texts="dropDownInfoTexts"
+        :advanced-search-text="advancedSearchText"
+        :assistive-text="{
+          addFilter: assistiveText.addFilter,
+          removeFilter: assistiveText.removeFilter,
+          selectFilterLabel: assistiveText.selectFilterLabel,
+          searchLabel: assistiveText.searchLabel,
+          selectedOption: assistiveText.selectedOption,
+          optionAdded: assistiveText.optionAdded,
+          optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+          optionRemoved: assistiveText.optionRemoved,
+          loaderActive: assistiveText.autocompleteLoaderActive,
+          autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
+          autocompleteNoResults: assistiveText.autocompleteNoResults,
+          autocompleteInitial: assistiveText.autocompleteInitial,
+          categoryAnnouncement: assistiveText.categoryAnnouncement,
+          optionsAnnouncement: assistiveText.optionsAnnouncement,
+        }"
+        :date-field-delay="dateFieldDelay"
+        :language="language"
+        :highlight-autocomplete-match="highlightAutocompleteMatch"
+        :highlight-autocomplete-tags="highlightAutocompleteTags"
+        class="base-advanced-search__filter-row"
+        @remove-filter="removeFilter($event, index)"
+        @update:applied-filter="updateFilter($event, index)"
+        @fetch-autocomplete-results="fetchAutocomplete($event, index)">
+        <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
+          <!-- @slot to allow for modification of the autocomplete option
+            @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+            @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
+          <slot
+            name="autocomplete-option"
+            :option="autocompleteOption"
+            :collection-id="collectionId" />
+        </template>
+      </BaseAdvancedSearchRow>
+    </template>
+
+    <!-- MAIN FILTER -->
+    <BaseAdvancedSearchRow
+      ref="mainSearch"
+      v-model:applied-filter="mainFilter"
+      v-bind="$attrs"
+      :search-row-id="`main-${internalId}`"
+      :mode="mode"
+      :filter-list="displayedFilters"
+      :form-filter-list="formFilterList"
+      :default-filter="defaultFilter"
+      :autocomplete-results="filtersAutocompleteResults[mainFilterIndex]"
+      :is-loading="filtersLoadingState[mainFilterIndex]"
+      :placeholder="placeholder.main || placeholder"
+      :autocomplete-property-names="autocompletePropertyNames"
+      :label-property-name="labelPropertyName"
+      :identifier-property-name="identifierPropertyName"
+      :drop-down-info-texts="dropDownInfoTexts"
+      :advanced-search-text="advancedSearchText"
+      :assistive-text="{
+        addFilter: assistiveText.addFilter,
+        removeFilter: assistiveText.removeFilter,
+        selectFilterLabel: assistiveText.selectFilterLabel,
+        searchLabel: assistiveText.searchLabel,
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.autocompleteLoaderActive,
+        autocompleteResultsRetrieved: assistiveText.autocompleteResultsRetrieved,
+        autocompleteNoResults: assistiveText.autocompleteNoResults,
+        autocompleteInitial: assistiveText.autocompleteInitial,
+        categoryAnnouncement: assistiveText.categoryAnnouncement,
+        optionsAnnouncement: assistiveText.optionsAnnouncement,
+        results: assistiveText.results,
+      }"
+      :date-field-delay="dateFieldDelay"
+      :language="language"
+      :highlight-autocomplete-match="highlightAutocompleteMatch"
+      :highlight-autocomplete-tags="highlightAutocompleteTags"
+      @add-filter-row="addFilterRow"
+      @fetch-autocomplete-results="fetchAutocomplete($event, mainFilterIndex)"
+      @option-selected="fillOptionToForm">
+      <!-- SHOW ADVANCED SEARCH FORM BUTTON (MODE 'FORM') -->
+      <template #after>
+        <BaseButton
+          v-if="mode === 'form'"
+          :text="showAdvancedSearchButtonText ? advancedSearchText.advancedButtonLabel : ''"
+          :aria-expanded="`${formOpen}`"
+          :aria-controls="`${internalId}-form`"
+          :description="advancedButtonDescription"
+          button-style="row"
+          icon="drop-down"
+          icon-size="small"
+          icon-position="right"
+          :class="['base-advanced-search__expand-button',
+                   { 'base-button--rotate-icon-180': formOpen }]"
+          @click.prevent.stop="openAdvancedSearch"
+          @keydown.enter.space.prevent.stop="openAdvancedSearch"
+          @focusin.stop />
+      </template>
+      <!-- ADVANCED SEARCH FORM (MODE 'FORM') -->
+      <template #below>
+        <BaseForm
+          v-if="mainSearch && mode === 'form' && formOpen/** check for mainSearch template ref to avoid hydration mismatches */"
+          v-bind="amendedFormProps"
+          :model-value="formFilterValuesInt"
+          :form-id="`${internalId}-form`"
+          :form-field-json="formFilterList"
+          :label-property-name="labelPropertyName.formInputs"
+          :identifier-property-name="identifierPropertyName.formInputs"
+          :class="['base-advanced-search__search-form',
+                   { 'base-advanced-search__search-form--hidden': !formMounted}]"
+          @input-complete="updateFormFilters"
+          @fetch-autocomplete="fetchFormAutocomplete"
+          @form-mounted="formIsMounted"
+          @keydown.stop
+          @click.stop>
+          <template #label-addition="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-label-addition"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #pre-input-field="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-pre-input-field"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template
+            #input-field-addition-before="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-addition-before"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #input-field-inline-before="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-inline-before"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #input-field-addition-after="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-input-field-addition-after"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #post-input-field="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-post-input-field"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #error-icon>
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
+            <slot name="form-error-icon" />
+          </template>
+          <template #remove-icon>
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots). -->
+            <slot name="form-remove-icon" />
+          </template>
+          <template #below-input="{ fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+            @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+            @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              name="form-below-input"
+              :field-name="fieldName"
+              :group-names="groupNames" />
+          </template>
+          <template #drop-down-entry="{ option, fieldName, groupNames }">
+            <!-- @slot all [BaseForm](BaseForm.html#slots) slots are available with the prefix 'form-'. For a more detailed description and demonstration refer to [BaseForm](BaseForm.html#slots).
+              @binding {object} option - the option object
+              @binding {string} field-name - the name of the displayed field (for time range fields there is a '-time' suffix added)
+              @binding {string[]} group-names - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+            <slot
+              :field-name="fieldName"
+              :group-names="groupNames"
+              :option="option"
+              name="form-drop-down-entry">
+              <template
+                v-if="mode === 'form'
+                  // check if value is boolean and was set true
+                  && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                    // or if it is an array and
+                    || (typeof renderFormChipsLabelAsHtml === 'object'
+                      // a) includes the field name
+                      && (renderFormChipsLabelAsHtml.includes(fieldName)
+                        // or b) this is nested field in a form group and the array
+                        // contains a (nested) object with the group names and an array with the field name
+                        || (groupNames?.length && renderFormChipsLabelAsHtml
+                          .some((arrayEntry) => typeof arrayEntry === 'object'
+                            && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
+                              .includes(fieldName))))))">
+                <span
+                  v-insert-text-as-html="{
+                    value: option[labelPropertyName.formInputs],
+                    interpretTextAsHtml: true,
+                  }" />
+              </template>
+            </slot>
+          </template>
+        </BaseForm>
+        <div
+          v-else-if="mode === 'form' && !formOpen && collapsedFiltersArray.length">
+          <BaseCollapsedFilterRow
+            v-model:filters="collapsedFiltersArray"
+            :date-time-text="advancedSearchText.collapsedDateTime"
+            :interpret-label-as-html="renderFormChipsLabelAsHtml"
+            :assistive-text="{
+              removeFiltersLabel: assistiveText.removeAllFiltersLabel,
+              filterRemovedNotification: assistiveText.removeFilterValueNotification,
+              appliedFiltersLabel: assistiveText.collapsedAppliedFiltersLabel,
+              booleanFilterLabel: assistiveText.collapsedBooleanFilterValue,
+              optionToRemoveSelected: assistiveText.collapsedOptionToRemoveSelected,
+            }"
+            @click.stop
+            @keydown.stop
+            @remove-all="removeAllFilters" />
+        </div>
+      </template>
+      <template #autocomplete-option="{ option: autocompleteOption, collectionId }">
+        <!-- @slot to allow for modification of the autocomplete option
+          @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+          @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
+        <slot
+          name="autocomplete-option"
+          :option="autocompleteOption"
+          :collection-id="collectionId">
+          <!-- also automate the display of html for all fields specified directly in the component -->
+          <template
+            v-if="mode === 'form'
+              && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
+                || (typeof renderFormChipsLabelAsHtml === 'object'
+                  && renderFormChipsLabelAsHtml.includes(collectionId)))">
+            <span
+              v-insert-text-as-html="{
+                value: autocompleteOption[labelPropertyName.autocompleteOption],
+                interpretTextAsHtml: true,
+              }" />
+          </template>
+        </slot>
+      </template>
+    </BaseAdvancedSearchRow>
+    <span
+      v-if="assistiveTextNotification"
+      aria-live="assertive"
+      class="assistive-text">
+      {{ assistiveTextNotification }}
+    </span>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;
