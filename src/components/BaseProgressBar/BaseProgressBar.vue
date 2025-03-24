@@ -1,53 +1,3 @@
-<template>
-  <div
-    ref="progressBarElement"
-    :aria-valuenow="progress"
-    role="progressbar"
-    aria-valuemin="0"
-    aria-valuemax="100"
-    class="base-progress-bar">
-    <div class="base-progress-bar__container">
-      <div
-        :style="{ width: `${progress}%` }"
-        class="base-progress-bar__progress">
-        <div
-          class="base-progress-bar__content">
-          <div
-            ref="fileNameElement"
-            :class="['base-progress-bar__file-name',
-                     { 'base-progress-bar__file-name--fade-out': showFadeOut }]">
-            {{ fileName }}
-          </div>
-          <span
-            v-if="fileSize"
-            class="base-progress-bar__file-size">
-            {{ fileSize }}
-          </span>
-          <BaseIcon
-            v-if="status === 'success'"
-            class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
-            name="success" />
-          <BaseIcon
-            v-if="status === 'fail'"
-            :title="errorMessage"
-            class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
-            name="attention" />
-          <BaseIcon
-            v-if="showRemove"
-            class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
-            name="remove"
-            @click="remove" />
-        </div>
-      </div>
-    </div>
-    <div
-      v-if="status === 'fail' && errorMessage"
-      class="base-progress-bar__error-message">
-      {{ errorMessage }}
-    </div>
-  </div>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { ref, useTemplateRef } from 'vue';
@@ -160,6 +110,56 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="progressBarElement"
+    :aria-valuenow="progress"
+    role="progressbar"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    class="base-progress-bar">
+    <div class="base-progress-bar__container">
+      <div
+        :style="{ width: `${progress}%` }"
+        class="base-progress-bar__progress">
+        <div
+          class="base-progress-bar__content">
+          <div
+            ref="fileNameElement"
+            :class="['base-progress-bar__file-name',
+                     { 'base-progress-bar__file-name--fade-out': showFadeOut }]">
+            {{ fileName }}
+          </div>
+          <span
+            v-if="fileSize"
+            class="base-progress-bar__file-size">
+            {{ fileSize }}
+          </span>
+          <BaseIcon
+            v-if="status === 'success'"
+            class="base-progress-bar__status-icon base-progress-bar__status-icon-success"
+            name="success" />
+          <BaseIcon
+            v-if="status === 'fail'"
+            :title="errorMessage"
+            class="base-progress-bar__status-icon base-progress-bar__status-icon-fail"
+            name="attention" />
+          <BaseIcon
+            v-if="showRemove"
+            class="base-progress-bar__status-icon base-progress-bar__status-icon-remove"
+            name="remove"
+            @click="remove" />
+        </div>
+      </div>
+    </div>
+    <div
+      v-if="status === 'fail' && errorMessage"
+      class="base-progress-bar__error-message">
+      {{ errorMessage }}
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
