@@ -41,19 +41,18 @@ export default {
       validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
     },
     /**
-     * specify aria labels for the pagination - this needs to be an object with the following
+     * this prop gives the option to add assistive text for screen readers
      * properties:
      *
-     *     **currentPage**: aria-label for the current page
-     *     **nextPage**: aria-label for the next page
-     *     **pagination**: aria-label for the pagination element description
-     *     **previousPage**: aria-label for the previous page
-     *     **toPage**: aria-label for all page buttons except the current one
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
      *
-     *  The values of this object might be plain text or a key for an i18n file
-     * This prop can be ignored when the `no-options` slot is used.
+     * The values of this object might be plain text or a key for an i18n file
      */
-    ariaLabels: {
+    assistiveText: {
       type: Object,
       default: () => ({
         currentPage: 'Current Page, Page',
@@ -260,7 +259,7 @@ export default {
 <template>
   <nav
     ref="pagination"
-    :aria-label="getI18nTerm(ariaLabels.pagination)"
+    :aria-label="getI18nTerm(assistiveText.pagination)"
     class="base-pagination">
     <component
       :is="numberElement"
@@ -271,7 +270,7 @@ export default {
         'base-pagination__arrow',
         { 'base-pagination__arrow-icon-inactive': active <= 1 },
       ]"
-      :aria-label="getI18nTerm(ariaLabels.previousPage)"
+      :aria-label="getI18nTerm(assistiveText.previousPage)"
       @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
       @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
       <BaseIcon
@@ -288,7 +287,7 @@ export default {
           :to="useLinkElement ? getLinkPath(n) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === n ? 'true' : null"
-          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
+          :aria-label="`${active === n ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
           @click.prevent="setActivePage(n)">
@@ -302,7 +301,7 @@ export default {
           :to="useLinkElement ? getLinkPath(1) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === 1 ? 'true' : null"
-          :aria-label="`${active === 1 ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${1}`"
+          :aria-label="`${active === 1 ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
           @keydown.enter="setActivePage(1)"
           @click.prevent="setActivePage(1)">
@@ -318,7 +317,7 @@ export default {
           :to="useLinkElement ? getLinkPath(n) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === n ? 'true' : null"
-          :aria-label="`${active === n ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${n}`"
+          :aria-label="`${active === n ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
           @click.prevent="setActivePage(n)">
@@ -333,7 +332,7 @@ export default {
           :to="useLinkElement ? getLinkPath(total) : null"
           :tabindex="!useLinkElement ? 0 : null"
           :aria-current="active === total ? 'true' : null"
-          :aria-label="`${active === total ? getI18nTerm(ariaLabels.currentPage) : getI18nTerm(ariaLabels.toPage)} ${total}`"
+          :aria-label="`${active === total ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${total}`"
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total }]"
           @keydown.enter="setActivePage(total)"
@@ -351,7 +350,7 @@ export default {
         'base-pagination__arrow',
         { 'base-pagination__arrow-icon-inactive': active >= total },
       ]"
-      :aria-label="getI18nTerm(ariaLabels.nextPage)"
+      :aria-label="getI18nTerm(assistiveText.nextPage)"
       @click.prevent="active + 1 <= total && !useLinkElement
         ? setActivePage(active + 1) : false"
       @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
