@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 import { createId } from '@/utils/utils.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
@@ -237,6 +237,18 @@ const emits = defineEmits(['update:model-value', 'fetch-dropdown-entries', 'upda
 
 /** ATTRS HANDLING */
 const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+/** INPUT ELEMENT */
+/**
+ * get the reference to the BaseInput component
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
+ */
+const baseInput = useTemplateRef('baseInput');
+/**
+ * get the native input element from BaseInput
+ * @type {ComputedRef<HTMLElement>}
+ */
+const inputElement = computed(() => baseInput.value?.inputElement || null);
 
 /** INPUT HANDLING */
 /**
@@ -481,9 +493,9 @@ function selectOption(selectedOption) {
 /** ACCESSIBILITY ANNOUNCEMENTS */
 /**
  * set up component reference
- * @type {Ref<UnwrapRef<null|HTMLElement>>}
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const autocompleteInput = ref(null);
+const autocompleteInput = useTemplateRef('autocompleteInput');
 // use composable to announce screen reader text on actions taken (e.g.
 // add chip to selected list or remove chip
 const { announcement } = useAnnouncer(autocompleteInput);
@@ -513,6 +525,15 @@ watch(filteredListInt, (val) => {
     }
   }, 1000);
 });
+
+// with composition API we need to specifically expose variables and functions that
+// should be available from outside
+defineExpose({
+  /**
+   * the native HTML input element
+   */
+  inputElement,
+})
 </script>
 
 <template>
@@ -521,6 +542,7 @@ watch(filteredListInt, (val) => {
     v-bind="rootAttrs"
     class="base-autocomplete-input">
     <BaseInput
+      ref="baseInput"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       v-bind="forwardAttrs"
@@ -548,6 +570,7 @@ watch(filteredListInt, (val) => {
       :assistive-text="{
         loaderActive: assistiveText.loaderActive,
       }"
+      :ignore-click-outside="['.base-autocomplete-input__drop-down']"
       role="combobox"
       class="base-autocomplete-input__input-field"
       @keydown.enter.prevent="onEnter"

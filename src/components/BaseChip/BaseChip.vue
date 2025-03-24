@@ -1,35 +1,3 @@
-<template>
-  <div
-    :class="['base-chip',
-             { 'base-chip__removable': isRemovable },
-             { 'base-chip__linked': isLinked },
-             { 'base-chip__active': chipActive }]">
-    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-    <div
-      ref="chipText"
-      v-insert-text-as-html="{ value: modelValueInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
-      :style="textStyling"
-      :contenteditable="editable ? 'true' : null"
-      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : null"
-      enterkeyhint="search"
-      class="base-chip__text"
-      @blur="updateText"
-      @keydown.enter.prevent="updateText"
-      @click.stop="clickAction" />
-    <span
-      v-if="assistiveText"
-      :id="`${internalId}_aria-label`"
-      class="hide">
-      {{ assistiveText }}
-    </span>
-    <BaseIcon
-      v-if="isRemovable"
-      name="remove"
-      class="base-chip__icon"
-      @click.stop="removeClicked" />
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent } from 'vue';
 import { useId } from '@/composables/useId.js';
@@ -180,6 +148,38 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-chip',
+             { 'base-chip__removable': isRemovable },
+             { 'base-chip__linked': isLinked },
+             { 'base-chip__active': chipActive }]">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div
+      ref="chipText"
+      v-insert-text-as-html="{ value: modelValueInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
+      :style="textStyling"
+      :contenteditable="editable ? 'true' : null"
+      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : null"
+      enterkeyhint="search"
+      class="base-chip__text"
+      @blur="updateText"
+      @keydown.enter.prevent="updateText"
+      @click.stop="clickAction" />
+    <span
+      v-if="assistiveText"
+      :id="`${internalId}_aria-label`"
+      class="hide">
+      {{ assistiveText }}
+    </span>
+    <BaseIcon
+      v-if="isRemovable"
+      name="remove"
+      class="base-chip__icon"
+      @click.stop="removeClicked" />
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";

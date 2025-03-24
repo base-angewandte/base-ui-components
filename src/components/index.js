@@ -49,10 +49,14 @@ import BaseExpandBox from './BaseExpandBox/BaseExpandBox.vue';
 import BaseBoxTooltip from './BaseBoxTooltip/BaseBoxTooltip.vue';
 import BaseExpandList from './BaseExpandList/BaseExpandList.vue';
 import BaseExpandRow from './BaseExpandRow/BaseExpandRow.vue';
-// importing BaseDateInput async to avoid SSR problems!
-const BaseDateInput = defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue'));
+import BaseDateInput from '@/components/BaseDateInput/BaseDateInput.vue';
 // import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
 const BaseHlsVideo = defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue'));
+import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
+import BaseForm from '@/components/BaseForm/BaseForm.vue';
+import BaseFormGroups from '@/components/BaseFormGroups/BaseFormGroups.vue';
+import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch.vue';
+
 
 export {
   BaseButton,
@@ -106,4 +110,8 @@ export {
   BaseBoxTooltip,
   BaseExpandList,
   BaseExpandRow,
+  BaseForm,
+  BaseFormFieldCreator,
+  BaseFormGroups,
+  BaseAdvancedSearch,
 };

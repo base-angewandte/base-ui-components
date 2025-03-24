@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, useTemplateRef, watch } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 
 /**
@@ -40,9 +40,9 @@ const props = defineProps({
 
 /**
  * set up a reference to the element to be able to attach the announcements element
- * @type {Ref<null|HTMLElement>}
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const loader = ref(null);
+const loader = useTemplateRef('loaderElement');
 /**
  * timeout variable to only set announcement after a certain time passed
  * @type {Ref<null|number>}
@@ -86,8 +86,8 @@ watch([loader, () => props.hide], () => {
 
 <template>
   <div
-    ref="loader"
-    :style="{ ...position, ...{ '--loader-color': loaderColor } }"
+    ref="loaderElement"
+    :style="{ ...position, ...{ '--loader-color': loaderColor || 'unset' } }"
     class="base-loader">
     <svg
       v-if="!hide"

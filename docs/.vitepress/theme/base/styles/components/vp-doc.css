@@ -154,8 +154,8 @@
   margin-top: 8px;
 }
 
-.vp-doc li > ol:not(.preview li + ol),
-.vp-doc li > ul:not(.preview li + ul) {
+.vp-doc li > ol:not(.preview li > ol),
+.vp-doc li > ul:not(.preview li > ul) {
   margin: 8px 0 0;
 }
 

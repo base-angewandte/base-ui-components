@@ -1,5 +1,5 @@
 <script>
-import { computed, defineAsyncComponent, ref, toRef } from 'vue';
+import { computed, defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import { sort, createId } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
@@ -358,6 +358,19 @@ export default {
      */
     const internalId = computed(() => props.inputId || generatedId);
 
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * get a reference to the BaseInput component
+     * @type {Readonly<ShallowRef<HTMLElement| null>>}
+     */
+    const baseInput = useTemplateRef('baseInput');
+    /**
+     * from the BaseInput get access to the native HTML input element
+     * this variable is accessed in BaseChipsInput (at least)
+     * @type {ComputedRef<HTMLElement>}
+     */
+    const inputElement = computed(() => baseInput.value?.inputElement || null);
+
     /** LIST NAVIGATION */
     const { navigate } = useListNavigation();
 
@@ -372,14 +385,16 @@ export default {
     /** ACCESSIBILITY ANNOUNCEMENTS */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInputField = ref(null);
+    const chipsInputField = useTemplateRef('chipsInputField');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsInputField);
     return {
       internalId,
+      baseInput,
+      inputElement,
       rootAttrs,
       forwardAttrs,
       navigate,
@@ -573,7 +588,7 @@ export default {
       }
       // if an entry was set active for removal by any key action - announce it
       // to the screen reader user
-      if (this.indexActiveForRemove >= 0) {
+      if (this.assistiveText.optionToRemoveSelected && this.indexActiveForRemove >= 0) {
         // inform screen reader user
         this.announcement = this.assistiveText.optionToRemoveSelected
           .replace('{label}', this.selectedListInt[this.indexActiveForRemove][this.labelPropertyName]);
@@ -607,19 +622,20 @@ export default {
        */
       this.$emit('removed', option);
       // lay the focus on the input field
-      const inputElements = this.$refs.baseInput.$el.getElementsByTagName('input');
-      const mainInputElement = Array.from(inputElements).find(elem => elem.id === this.internalId);
-      if (mainInputElement) {
+      if (this.inputElement) {
         // trigger an input click here instead of focus so that clicked-outside is triggered for all
         // other input fields (and potential drop downs / pop ups are closed)
-        mainInputElement.click();
+        this.inputElement.click();
       }
-      // add a timeout so announcement is not interfered with by default drop down list announcement
-      setTimeout(() => {
-        // inform screen reader user
-        this.announcement = this.assistiveText.optionRemoved
-          .replace('{label}', optionLabel);
-      }, 1000);
+      // check if assistive text was set
+      if (this.assistiveText.optionRemoved) {
+        // add a timeout so announcement is not interfered with by default drop down list announcement
+        setTimeout(() => {
+          // inform screen reader user
+          this.announcement = this.assistiveText.optionRemoved
+            .replace('{label}', optionLabel);
+        }, 1000);
+      }
     },
     /**
      * adding an selected option to the array of selected options
@@ -645,9 +661,12 @@ export default {
           this.selectedListInt[setIndex] = newEntry;
           // emit an event to inform parent of altered list
           this.updateParentList(this.selectedListInt);
-          // inform screen reader user
-          this.announcement = this.assistiveText.optionAdded
-            .replace('{label}', this.inputInt);
+          // make sure the assistiveText property was set
+          if (this.assistiveText.optionAdded) {
+            // and inform screen reader user
+            this.announcement = this.assistiveText.optionAdded
+              .replace('{label}', this.inputInt);
+          }
           // otherwise just emit event to parent (for informing user)
         } else {
           /**
@@ -817,7 +836,7 @@ export default {
       v-model:is-active="isActiveInt"
       :input-id="internalId"
       v-bind="forwardAttrs"
-      :field-type="inputType"
+      :input-type="inputType"
       :placeholder="allowMultipleEntries || !selectedListInt.length ? placeholder : ''"
       :label="label"
       :show-label="showLabel"

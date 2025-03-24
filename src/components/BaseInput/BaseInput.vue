@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, ref, computed, toRef } from 'vue';
+import {defineAsyncComponent, ref, computed, toRef, useTemplateRef, watch, onMounted} from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
@@ -91,7 +91,7 @@ export default {
      * @values text, number, password, email, url, search
      *
      */
-    fieldType: {
+    inputType: {
       type: String,
       default: 'text',
       validator: val => ['text', 'number', 'password', 'email', 'url', 'search'].includes(val),
@@ -217,7 +217,7 @@ export default {
       default: null,
     },
     /**
-     * set number of decimals (fieldType=number)<br>
+     * set number of decimals (inputType=number)<br>
      * Note: -1 is used for endless decimals
      */
     decimals: {
@@ -275,6 +275,14 @@ export default {
         loaderActive: 'loading.',
       }),
     },
+    /**
+     * add queryselector strings for elements that should not trigger a
+     * click outside event
+     */
+    ignoreClickOutside: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   emits: ['clicked-outside', 'click-input-field', 'update:invalid', 'update:is-active', 'update:model-value'],
   setup(props, { emit, slots }) {
@@ -321,7 +329,7 @@ export default {
      * @type {ComputedRef<null|string>}
      */
     const inputMode = computed(() => {
-      if (props.fieldType !== 'number') return null;
+      if (props.inputType !== 'number') return null;
       return props.decimals ? 'decimal' : 'numeric';
     });
     /**
@@ -336,9 +344,9 @@ export default {
     /** FOCUS HANDLING */
     /**
      * reference to the native HTML input element (if slot was not used and it exists)
-     * @type {Ref<UnwrapRef<HTMLElement|null>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const input = ref(null);
+    const input = useTemplateRef('input');
     /**
      * find and store the input element associated with this component in a variable
      * @type {ComputedRef<HTMLElement|null>}
@@ -364,15 +372,47 @@ export default {
 
     /** CLICK OUTSIDE HANDLING */
     // get the ref element for click outside
-    const inputFrame = ref(null);
+    const inputFrame = useTemplateRef('inputFrame');
     const isActiveInt = ref(false);
+
+    /**
+     * keep externally set active variable and internal active variable in sync
+     * @param {boolean} val
+     */
+    watch(() => props.isActive, (val) => {
+      if (val !== isActiveInt.value) {
+        setFieldState(val);
+      }
+    }, {
+      immediate: true,
+    });
+    /**
+     * keep externally set active variable and internal active variable in sync
+     * @param {boolean} val
+     */
+    watch(isActiveInt, (val) => {
+      // if active was set true focus the input field
+      if (inputElement.value && val && props.setFocusOnActive
+        // however do not take away the focus from the remove button
+        && document.activeElement?.id !== `${idInt.value}-remove-icon`) {
+        inputElement.value.focus();
+      }
+      /**
+       * propagate active state changes of input field to parent
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      emit('update:is-active', val);
+    });
 
     /**
      * set the active input field state (used for visual active indication)
      * @param {boolean} val - the value to be set
      */
     function setFieldState(val) {
-      isActiveInt.value = val;
+      if (val !== isActiveInt.value) {
+        isActiveInt.value = val;
+      }
     }
     /**
      * intercept click-outside event and close the component
@@ -390,10 +430,47 @@ export default {
        */
       emit('clicked-outside', event);
     }, {
-      // do not capture the event so other elements have the chance to intercept the
-      // event
-      capture: false,
+      // define elements that should not trigger a click outside event
+      // here (e.g. drop downs)
+      ignore: props.ignoreClickOutside,
     });
+
+    /**
+     * function triggered if click event or focus event happened inside the
+     * 'input-frame' element
+     * @param {FocusEvent|MouseEvent} event the native event
+     */
+    function clickedInside(event) {
+      if (!props.disabled) {
+        setFieldState(true);
+        /**
+         * Event emitted on click on input field <div>
+         *
+         * @event click-input-field
+         * @param {FocusEvent, MouseEvent} - event triggered by focusin or click
+         *
+         */
+        emit('click-input-field', event);
+      }
+    }
+    /**
+     * tab key does not always trigger the leaving of the input field but only if
+     * input remove icon is not present
+     * @param event
+     */
+    function handleInputTab(event) {
+      if (!showRemoveIcon.value || event.shiftKey) {
+        setFieldState(false);
+      }
+    }
+
+    onMounted(() => {
+      // on first render set the focus here manually
+      if (isActiveInt.value && inputElement.value) {
+        inputElement.value.focus();
+      }
+    });
+
     return {
       idInt,
       rootAttrs,
@@ -404,12 +481,15 @@ export default {
       inputMode,
       input,
       inputElement,
-      inputFrame,
-      isActiveInt,
       labelLocalized,
       internalValidationMessage,
       errorMessageInt,
+      // focus handling
+      inputFrame,
+      isActiveInt,
       setFieldState,
+      clickedInside,
+      handleInputTab,
     };
   },
   data() {
@@ -430,8 +510,8 @@ export default {
     };
   },
   computed: {
-    isFieldTypeNumber() {
-      return this.fieldType === 'number';
+    isInputTypeNumber() {
+      return this.inputType === 'number';
     },
     /**
      * compute actual invalid state considering value provided by parent
@@ -449,15 +529,15 @@ export default {
     modelValue: {
       handler(val) {
         // since internally all values are handled as strings we need to parse input
-        // with fieldType 'number' and also place the correct decimal separator
+        // with inputType 'number' and also place the correct decimal separator
         // since type float comes with '.'
-        let parsedValue = this.isFieldTypeNumber
+        let parsedValue = this.isInputTypeNumber
           ? this.translateFloat(val) : val;
 
         // now check if the value provided by parent is actually different from current
         // internal value
         if (parsedValue !== this.inputInt) {
-          if (this.isFieldTypeNumber) {
+          if (this.isInputTypeNumber) {
             // in case prop `decimals` is set (to not -1) add the appropriate number
             // of decimal places to the number
             // if data is null leave the field empty
@@ -482,36 +562,6 @@ export default {
       immediate: true,
     },
     /**
-     * keep externally set active variable and internal active variable in sync
-     * @param {boolean} val
-     */
-    isActive: {
-      handler(val) {
-        if (val !== this.isActiveInt) {
-          this.isActiveInt = val;
-        }
-      },
-      immediate: true,
-    },
-    /**
-     * keep externally set active variable and internal active variable in sync
-     * @param {boolean} val
-     */
-    isActiveInt(val) {
-      // if active was set true focus the input field
-      if (this.inputElement && val && this.setFocusOnActive
-        // however do not take away the focus from the remove button
-        && document.activeElement?.id !== `${this.idInt}-remove-icon`) {
-        this.inputElement.focus();
-      }
-      /**
-       * propagate active state changes of input field to parent
-       * @event update:is-active
-       * @param {boolean} - is input field active
-       */
-      this.$emit('update:is-active', val);
-    },
-    /**
      * keep externally set invalid variable and internal invalid variable in sync
      * @param {boolean} val
      */
@@ -526,23 +576,17 @@ export default {
       }
     },
   },
-  mounted() {
-    // on first render set the focus here manually
-    if (this.isActiveInt && this.inputElement) {
-      this.inputElement.focus();
-    }
-  },
   methods: {
     /** INPUT EVENT HANDLING */
     /**
-     * if input is fieldType 'number' we only want to allow certain keys
+     * if input is inputType 'number' we only want to allow certain keys
      * (yes disallowed characters will be filtered in input validation again as
      * well but why not stop the entering right here if possible then they don't have to
      * be removed again later)
      * @param event
      */
     onKeydown(event) {
-      if (this.isFieldTypeNumber) {
+      if (this.isInputTypeNumber) {
         const { key, ctrlKey } = event;
         // only allow comma keys if decimals are allowed
         const allowedDecimalKeys = this.decimals !== 0 ? ['\\.', ','] : [];
@@ -581,7 +625,7 @@ export default {
      */
     updateModelValue() {
       let parsedValue = this.inputInt;
-      if (this.isFieldTypeNumber) {
+      if (this.isInputTypeNumber) {
         // since internally value is always handled as string we need to transform
         // it back to a number in case field type is 'number' and also add the correct
         // decimal separator for type number ('.') again
@@ -602,7 +646,7 @@ export default {
      * 1) for special case iOS touch devices have
      *  up and down arrows that do not trigger any event other than blur and will
      *  cause the dropdowns of input fields to remain open
-     * 2) field `fieldType 'number'` handling
+     * 2) field `inputType 'number'` handling
      * @param {FocusEvent} event - the native blur event
      */
     onInputBlur(event) {
@@ -616,8 +660,8 @@ export default {
         // set input active state false
         this.setFieldState(false);
       }
-      // 2) check for fieldType number
-      if (this.isFieldTypeNumber) {
+      // 2) check for inputType number
+      if (this.isInputTypeNumber) {
         // clear value and return if value is NaN
         if (value === '' || Number.isNaN(Number(this.stringToFloat(value)))) {
           this.inputInt = '';
@@ -656,24 +700,6 @@ export default {
       }
     },
     /**
-     * function triggered if click event or focus event happened inside the
-     * 'input-frame' element
-     * @param {FocusEvent|MouseEvent} event the native event
-     */
-    clickedInside(event) {
-      if (!this.disabled) {
-        this.setFieldState(true);
-        /**
-         * Event emitted on click on input field <div>
-         *
-         * @event click-input-field
-         * @param {FocusEvent, MouseEvent} - event triggered by focusin or click
-         *
-         */
-        this.$emit('click-input-field', event);
-      }
-    },
-    /**
      * triggered on clear input button click and removes input and returns focus
      * to input field
      */
@@ -685,16 +711,6 @@ export default {
       this.updateModelValue();
       if (this.inputElement) {
         this.inputElement.focus();
-      }
-    },
-    /**
-     * tab key does not always trigger the leaving of the input field but only if
-     * input remove icon is not present
-     * @param event
-     */
-    handleInputTab(event) {
-      if (!this.showRemoveIcon || event.shiftKey) {
-        this.setFieldState(false);
       }
     },
 
@@ -714,7 +730,7 @@ export default {
       // Handle number inputs with input field type text.
       // Use a regular expression to validate the number format.
       // Invalid entries are restored with the previous valid value.
-      if (this.isFieldTypeNumber) {
+      if (this.isInputTypeNumber) {
         const decimalSeparator = this.decimals ? `\\${this.decimalSeparator}` : '';
         // if field type is number disallow every character except 0-9, e, +, - and the correct
         // decimal separator
@@ -767,7 +783,7 @@ export default {
         }
       }
 
-      if (this.fieldType !== 'number') {
+      if (this.inputType !== 'number') {
         // handle min length
         if (this.minLength && value && value.length < this.minLength) {
           this.internalValidationMessage = this.validationTexts.minLength.replace('{value}', this.minLength.toString());
@@ -913,11 +929,13 @@ export default {
                 <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                 <input
                   :id="idInt"
-                  ref="input"
+                  ref="inputField"
+                  enterkeyhint="done"
+                  autocomplete="off"
                   v-bind="forwardAttrs"
                   :value="inputInt"
                   :placeholder="placeholder"
-                  :type="isFieldTypeNumber ? 'text' : fieldType"
+                  :type="isInputTypeNumber ? 'text' : inputType"
                   :list="dropDownListId || null"
                   :disabled="disabled"
                   :aria-disabled="disabled.toString()"
@@ -929,8 +947,6 @@ export default {
                   :minlength="minLength"
                   :maxlength="maxLength"
                   :inputmode="inputMode"
-                  enterkeyhint="done"
-                  autocomplete="off"
                   :class="[inputClass, 'base-input__input',
                            { 'base-input__input__hidden': hideInputField }]"
                   @input.stop="onInput"
@@ -945,6 +961,7 @@ export default {
               :id="`${idInt}-remove-icon`"
               class="base-input__remove-icon-wrapper"
               @keydown.tab="blurInput"
+              @keydown.enter.stop="removeInput"
               @click.stop="removeInput">
               <!-- @slot use a custom icon instead of standard remove icon -->
               <slot name="remove-icon">

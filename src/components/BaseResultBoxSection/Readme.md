@@ -58,20 +58,20 @@ Test you component configuration on this example component!
         v-model="maxShowMoreRows"
         :disabled="!useExpandMode"
         label="maxShowMoreRows"
-        field-type="number"
+        input-type ="number"
         placeholder="choose a number of rows to be shown in expand mode"
         class="options-input" />
       <BaseInput
         v-model="maxRows"
         :disabled="!usePagination"
         label="maxRows"
-        field-type="number"
+        input-type ="number"
         placeholder="choose a number of rows to be shown with pagination"
         class="options-input" />
       <BaseInput
         v-model="numberOfBoxes"
         label="visible boxes (max 24)"
-        field-type="number"
+        input-type ="number"
         placeholder="specify a number of visible boxes, max. 24"
         class="options-input" />
     </div>

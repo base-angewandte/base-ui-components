@@ -1,5 +1,5 @@
 <script>
-import { computed, ref, defineAsyncComponent, toRef } from 'vue';
+import { computed, defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import { highlightText } from '@/utils/utils.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useI18n } from '@/composables/useI18n.js';
@@ -371,27 +371,23 @@ export default {
     /** INPUT ELEMENT HANDLING */
     /**
      * the BaseChipsInputField component
-     * @type {Ref<UnwrapRef<null>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInputField = ref(null);
-
+    const chipsInputField = useTemplateRef('chipsInputField');
     /**
      * get the HTML input element (in BaseInput)
      * @type {ComputedRef<null|HTMLElement>}
      */
-    const inputElem = computed(() => {
-      if (!chipsInputField.value || !chipsInputField.value.$el) return null;
-      const inputElements = chipsInputField.value.$el.getElementsByTagName('input');
-      return inputElements?.length ? inputElements[0] : null;
-    });
+    const inputElement = computed(() => chipsInputField.value?.inputElement || null);
+
     /**
      * ACCESSIBILITY ANNOUNCEMENT
      */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInput = ref(null);
+    const chipsInput = useTemplateRef('chipsInput');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsInput);
@@ -406,7 +402,7 @@ export default {
       getLangLabel,
       getI18nTerm,
       chipsInputField,
-      inputElem,
+      inputElement,
     };
   },
   data() {
@@ -555,8 +551,8 @@ export default {
       if (val) {
         this.addSelectedOption(val);
         // if input element was found - focus after chips select
-        if (this.inputElem && this.allowMultipleEntries) {
-          this.inputElem.focus();
+        if (this.inputElement && this.allowMultipleEntries) {
+          this.inputElement.focus();
         }
       }
     },
@@ -741,7 +737,7 @@ export default {
       // remove focus from input if element is single select
       if (!this.allowMultipleEntries) {
         this.chipsInputActive = false;
-        this.inputElem.blur();
+        this.inputElement.blur();
       }
       // make sure drop down is closed at the end of all variable updates
       setTimeout(() => {
@@ -839,11 +835,10 @@ export default {
      * width of this element
      */
     calcDropDownMinWidth() {
-      // get the base input element
-      const inputElement = this.$refs.chipsInputField;
+      // TODO: this is probably not working anymore??
       // see if it exists and has a width - if yes set drop down min width to the same
-      if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
-        this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
+      if (this.chipsInputField && this.chipsInputField.$el && this.chipsInputField.$el.clientWidth) {
+        this.dropDownMinWidth = `${this.chipsInputField.$el.clientWidth}px`;
       }
     },
     /**
@@ -853,8 +848,8 @@ export default {
       // optional close dropdown after selection
       if (this.closeDropdownOnOptionSelect && this.chipsInputActive) {
         this.chipsInputActive = false;
-        if (this.inputElem) {
-          this.inputElem.blur();
+        if (this.inputElement) {
+          this.inputElement.blur();
         }
       }
     },
@@ -895,6 +890,7 @@ export default {
       :drop-down-list-id="internalId"
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :loadable="allowDynamicDropDownEntries"
+      :ignore-click-outside="['.base-chips-input__drop-down']"
       role="combobox"
       @keydown.enter.prevent="onEnter"
       @keydown.up.down.prevent="onArrowKey"

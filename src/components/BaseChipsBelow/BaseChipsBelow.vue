@@ -1,5 +1,5 @@
 <script>
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import BaseChipsInput from '@/components/BaseChipsInput/BaseChipsInput.vue';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
@@ -18,6 +18,7 @@ export default {
     BaseChip: defineAsyncComponent(() => import('@/components/BaseChip/BaseChip.vue')),
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
+  inheritAttrs: false,
   props: {
     /**
      * list of selectable options objects with at least an identifier and a label property.
@@ -348,12 +349,25 @@ export default {
      */
     const internalId = computed(() => props.inputId || createdId);
 
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * get a reference to the ChipsInput component
+     * @type {Readonly<ShallowRef<HTMLElement| null>>}
+     */
+    const chipsInput = useTemplateRef('chipsInput');
+    /**
+     * from the ChipsInput get access to the native HTML input element (it is chained
+     * through from BaseInput)
+     * @type {ComputedRef<HTMLElement>}
+     */
+    const inputElement = computed(() => chipsInput.value?.inputElement || null);
+
     /** ACCESSIBILITY HANDLING */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsBelow = ref(null);
+    const chipsBelow = useTemplateRef('chipsBelow');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsBelow);
@@ -361,6 +375,7 @@ export default {
       rootAttrs,
       forwardAttrs,
       internalId,
+      inputElement,
       chipsBelow,
       announcement,
     };
@@ -424,9 +439,12 @@ export default {
      */
     renderList: {
       set(val) {
+        // create a copy of render list so the idInt is not deleted from
+        // renderList as well
+        const renderListCopy = JSON.parse(JSON.stringify(val));
         // update renderList but remove the internal id needed
         // for dragging and list generation
-        this.selectedBelowListInt = val.map((entry) => {
+        this.selectedBelowListInt = renderListCopy.map((entry) => {
           // eslint-disable-next-line no-param-reassign
           delete entry.idInt;
           return entry;
@@ -441,11 +459,11 @@ export default {
             // check if an id was already assigned to an item with that label which does not appear
             // in the array more than once (this is just a safeguard - in addOption double adding
             // of the same freetext should actually be prevented anyway)
-            const createdId = this.renderList ? this.renderList.filter((selectedOption) => {
+            const matchingLabelsList = this.renderList ? this.renderList.filter((selectedOption) => {
               return selectedOption[this.labelPropertyName] === entry[this.labelPropertyName];
             }) : undefined;
-            providedId = createdId && createdId.length === 1
-              ? createdId[0].idInt : entry[this.labelPropertyName] + createId();
+            providedId = matchingLabelsList && matchingLabelsList.length === 1
+              ? matchingLabelsList[0].idInt : entry[this.labelPropertyName] + createId();
           }
           return {
             ...{

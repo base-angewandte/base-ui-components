@@ -33,9 +33,12 @@ To see autocomplete results try typing 'zentrum'.
         categoryAnnouncement: 'Category {label}.',
         controlledVocabularyRetrieved: '{number} of options available.',
         optionsAnnouncement: '{number} options.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
       }"
-      @add-filter="addFilter"
       @fetch-autocomplete="fetchAutocomplete" />
+    {{ appliedFilters }}
   </div>
 </template>
 
@@ -241,9 +244,6 @@ export default {
     };
   },
   methods: {
-    addFilter() {
-      alert('Filter added!');
-    },
     fetchAutocomplete({ searchString, filter }) {
        if (searchString && (filter.type === 'text'
          || (filter.type === 'chips' && filter.freetext_allowed)) ) {
@@ -565,15 +565,14 @@ export default {
         this.fieldLoading = name;
         setTimeout(() => {
           // eslint-disable-next-line camelcase
-          const formAutocompleteResults = this.potentialResults
+          this.formDropDownLists[name] = this.potentialResults
             .find(category => category.filter_id === name).data
             .filter(entry => entry.title.toLowerCase()
               .includes(value.toLowerCase()));
-          this.$set(this.formDropDownLists, name, formAutocompleteResults);
           this.fieldLoading = '';
         }, 1000);
       } else {
-        this.$set(this.formDropDownLists, name, []);
+        this.formDropDownLists[name] = [];
       }
     },
   },
