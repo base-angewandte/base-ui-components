@@ -202,12 +202,16 @@ export default {
   },
   watch: {
     /**
-     * in case
+     * in case pagination is set via route - add a watcher here (however this only works
+     * with a query param 'page'!
      */
-    $route(to) {
-      if (this.useLinkElement && to && to.query && to.query.page && to.query.page !== this.active) {
-        this.active = Number(to.query.page);
-      }
+    $route: {
+      handler(to) {
+        if (!!this.useLinkElement && to?.query?.page && Number(to.query.page) !== Number(this.active)) {
+          this.active = Number(to.query.page);
+        }
+      },
+      immediate: true,
     },
     /**
      * if active number changes inform parent
