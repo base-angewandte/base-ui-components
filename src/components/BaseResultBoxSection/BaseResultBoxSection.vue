@@ -1270,8 +1270,8 @@ export default {
               ref="resultBoxItemElement"
               :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
               :aria-label="getPropValue(titlePropertyName, entry)"
-              :aria-grabbed="(movableElementId === entry.id).toString()"
-              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : null"
+              :aria-grabbed="movableElementId === entry.id"
+              :aria-selected="editModeActive ? isEntrySelected(entry) : null"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },

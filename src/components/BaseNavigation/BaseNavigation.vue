@@ -419,7 +419,7 @@ onMounted(() => {
           text=""
           :icon-title="menuButtonLabel"
           :icon="navOpen ? 'remove' : 'drag-lines'"
-          :aria-expanded="navOpen.toString()"
+          :aria-expanded="navOpen"
           class="base-navigation__mobile-menu-button"
           @clicked="navOpen = !navOpen" />
       </div>

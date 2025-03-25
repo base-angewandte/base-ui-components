@@ -199,7 +199,7 @@ export default {
         :is="isExpandable ? 'button' : 'div'"
         :id="'base-expand-row-' + internalId"
         :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : null"
-        :aria-expanded="isExpandable ? isExpandedInternal.toString() : null"
+        :aria-expanded="isExpandable ? isExpandedInternal : null"
         :type="isExpandable ? 'button' : null"
         :class="['base-expand-row__header__button', { selectable: isSelectable }]"
         @click="isExpandable ? clicked() : null">

@@ -464,7 +464,7 @@ export default {
     v-bind="linkAttributes"
     v-clean-dom-nodes
     :aria-controls="isTooltip ? `tooltipBox-${internalId}`: null"
-    :aria-expanded="isTooltip ? showTooltip.toString() : null"
+    :aria-expanded="isTooltip ? showTooltip : null"
     :aria-label="isChip || isTooltip ? title : null"
     :tabindex="isTooltip ? 0 : null"
     :title="title"

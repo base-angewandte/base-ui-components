@@ -327,7 +327,7 @@ export default {
       ref="dropArea"
       class="base-drop-button__options-area">
       <button
-        :aria-expanded="showOptions.toString()"
+        :aria-expanded="showOptions"
         :aria-label="expandButtonLabel"
         :class="['base-drop-button__toggle-button',
                  { 'base-drop-button__toggle-button__active': showOptions }]"
