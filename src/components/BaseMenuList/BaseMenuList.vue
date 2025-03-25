@@ -1,70 +1,7 @@
-<template>
-  <VueDraggable
-    ref="draggable"
-    :value="list"
-    :sort="false"
-    :disabled="!isDraggable || selectActive"
-    :group="{ name: dragName, pull: 'clone', put: false }"
-    :set-data="modifyDragItem"
-    :force-fallback="!dragAndDropCapable"
-    :fallback-on-body="!dragAndDropCapable"
-    tag="ul"
-    class="base-menu-list"
-    @choose="getDragImage"
-    @start="dragStart"
-    @end="dragEnd">
-    <li
-      v-for="(item, index) in list"
-      :key="item.id || item.title"
-      class="base-menu-list__list-entry">
-      <BaseMenuEntry
-        ref="menuEntry"
-        :entry-id="item.id"
-        :title="item.title"
-        :is-active="entryProps[index].active"
-        :is-selected="entryProps[index].selected"
-        :is-disabled="item.disabled"
-        :icon="item.icon"
-        :description="item.description"
-        :is-selectable="true"
-        :select-active="selectActive"
-        @clicked="activateItem(index)"
-        @selected="selectItem(index, $event)">
-        <template #text-content>
-          <!-- @slot use this slot to individualize the displayed text per
-            menu entry.
-            @binding { Object } item - the complete entry provided by list -->
-          <slot
-            name="entry-text-content"
-            :item="item" />
-        </template>isDraggable
-        <template #right-side-elements="{ isSelected }">
-          <!-- @slot use this slot to add elements to the right side of an entry. This slot content
-            will be rendered in place of thumbnails and select checkbox so it will effectively
-            disable the display of selection elements and if select mode is desired, custom elements
-            should be provided
-             @binding { Object } item - the complete entry provided by list
-             @binding { boolean } is-selected - was item selected -->
-          <slot
-            name="entry-right-side-elements"
-            :is-selected="isSelected"
-            :item="item" />
-        </template>
-        <template
-          #thumbnails>
-          <!-- @slot Use this scoped slot to supply a list of thumbnails (i.e. [BaseIcon](BaseIcon)) for `item`, where `item` is one list element. See also the example below.-->
-          <slot
-            name="thumbnails"
-            :item="item" />
-        </template>
-      </BaseMenuEntry>
-    </li>
-  </VueDraggable>
-</template>
-
 <script>
-import { VueDraggable } from 'vue-draggable-plus';
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
+import { defineAsyncComponent, ref } from 'vue';
+import { useWindowResize } from '@/composables/useWindowResize.js';
 
 /**
  * Base Component for SideBar Menu Entries
@@ -75,7 +12,6 @@ export default {
   name: 'BaseMenuList',
   components: {
     BaseMenuEntry,
-    VueDraggable,
   },
   props: {
     /**
@@ -87,6 +23,7 @@ export default {
     },
     /**
      * list of menu entries - array of objects
+     *  v-model:list may be used on this prop
      *   Entry properties that can be displayed:
      *
      *     *required*:
@@ -125,34 +62,120 @@ export default {
       default: () => [],
     },
     /**
+     * make the single menu list items draggable
+     */
+    useDraggable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * specify the group name for the drag receiver
+     * **important**: if you intend to use the drag functionality set `useDraggable`
+     * to `true`
      */
     dragName: {
       type: String,
       default: 'menuEntry',
     },
   },
-  emits: ['selected', 'clicked'],
+  emits: ['selected', 'clicked', 'update:list'],
+  setup() {
+    /**
+     * defines if menu list entries are draggable
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isDraggable = ref(false);
+    /** listen to window resize and set draggable state depending on window width */
+    useWindowResize({
+      callback: () => isDraggable.value = !(window.innerWidth < 640),
+      setDebounce: 250,
+      callOnMounted: true,
+    });
+
+    return {
+      isDraggable,
+    };
+  },
   data() {
     return {
       // have internally necessary props in separate array to prevent issues with
       // outside store mutations
       entryProps: [],
+      /**
+       * variable to determine which properties should be stored in variable
+       * `entryProps`
+       * @type {string[]}
+       */
+      entryPropsKeys: ['selected', 'active', 'error'],
       dragging: false,
       dragAndDropCapable: false,
-      isDraggable: true,
-      resizeTimeout: null,
       /**
        * chrome can not deal with delay if drag image is cloned from dom on setData directly
        * so image needs to be set previously and stored in variable
        * @type {?SVGElement}
        */
       dragImg: null,
+      /**
+       * internal list representation needed for drag manipulations
+       * @type {Object[]}
+       */
+      listInt: [],
     };
   },
+  computed: {
+    /**
+     * make the vue-draggable import optional and either return
+     * the component or use the native `<ul>` element
+     * @returns {Object|string}
+     */
+    draggableComponent() {
+      if (this.useDraggable) {
+        return defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable));
+      }
+      return 'ul';
+    },
+    /**
+     * to only set model-value attribute if it is a vue-draggable
+     * component
+     * @returns {undefined|Object[]}
+     */
+    draggableList() {
+      if (this.useDraggable) return this.listInt;
+      return undefined;
+    }
+  },
   watch: {
-    list() {
-      this.setInternalVar();
+    /**
+     * watch prop `list` for changes from outside
+     */
+    list: {
+      handler(val) {
+        // check if the provided list differs from the internal copy
+        if (JSON.stringify(val) !== JSON.stringify(this.listInt)) {
+          // if yes - update the internal copy
+          this.listInt = JSON.parse(JSON.stringify(val));
+          // and set `entryProps` variable accordingly managing
+          // state for every single entry
+          this.setInternalVar();
+        }
+      },
+      deep: true,
+      immediate: true,
+    },
+    /**
+     * watch internal representation of `list` to be able to
+     * update parent accordingly
+     */
+    listInt: {
+      handler(val) {
+        // check if internal list and external list differ
+        if (JSON.stringify(val) !== JSON.stringify(this.list)) {
+          // if yes - inform the parent
+          this.$emit('update:list', JSON.parse(JSON.stringify(this.listInt)));
+        }
+      },
+      deep: true,
+      immediate: true,
     },
     activeEntry(val) {
       this.entryProps.forEach((item) => {
@@ -176,20 +199,40 @@ export default {
     selectedList() {
       this.setInternalVar();
     },
-  },
-  created() {
-    this.setInternalVar();
+    /**
+     * watch variable `entryProps` - managing the state for every entry - to
+     * update the internal list IF the state prop is also present
+     * in the entry list provided by parent
+     */
+    entryProps: {
+      handler() {
+        // if entryProps changed update the internal list
+        this.listInt = this.listInt.map((entry, index) => {
+          // get all the object properties of the entry
+          const entryKeys = Object.keys(entry);
+          // now loop through internal state keys
+          return this.entryPropsKeys.reduce((prev, entryPropsKey) => {
+            // if key is also present in list - update the list property
+            if (entryKeys.includes(entryPropsKey)) {
+              return {
+                ...prev,
+                [entryPropsKey]: this.entryProps[index][entryPropsKey]
+              }
+            }
+            // otherwise just return the unaltered object
+            return prev;
+          }, {
+            // as a start use the entry as it currently is in listInt
+            ...entry,
+          });
+        });
+      },
+      deep: true,
+      immediate: true,
+    }
   },
   mounted() {
-    this.isDraggable = !this.isMobile();
     this.dragAndDropCapable = ('DragEvent' in window);
-
-    window.addEventListener('resize', () => {
-      clearTimeout(this.resizeTimeout);
-      this.resizeTimeout = setTimeout(() => {
-        this.isDraggable = !this.isMobile();
-      }, 250);
-    });
   },
   methods: {
     // this function is called when a menu entry is clicked (when checkboxes not active)
@@ -215,13 +258,13 @@ export default {
       this.$emit('selected', { index, selected });
     },
     setInternalVar() {
-      this.entryProps = this.list.map(entry => ({
-        ...{
+      this.entryProps = this.listInt.map(entry => {
+        return ({
           selected: entry.selected || this.selectedList.includes(entry.id),
           active: entry.active || false,
           error: entry.error || false,
-        },
-      }));
+        });
+      });
       if (this.entryProps.length && this.activeEntry >= 0) {
         this.entryProps[this.activeEntry].active = true;
       }
@@ -234,7 +277,7 @@ export default {
     getDragImage(event) {
       // get the relevant svg element from the base menu entry by class name
       // (necessary to use class name so thumbnail sgvs are not used if no icon is provided in list)
-      const entryIcon = event.item.getElementsByClassName('base-menu-entry-icon')[0];
+      const entryIcon = event.item.getElementsByClassName('base-menu-entry__icon')[0];
       // check if icon was set
       if (entryIcon) {
         // get the size to be able to set it to the drag image as well
@@ -279,12 +322,72 @@ export default {
       }
       dataTransfer.setData('draggable', '');
     },
-    isMobile() {
-      return window.innerWidth < 640;
-    },
   },
 };
 </script>
+
+<template>
+  <component
+    :is="draggableComponent"
+    ref="draggable"
+    :model-value="draggableList"
+    :sort="useDraggable ? false : undefined"
+    :disabled="useDraggable ? !isDraggable || selectActive : undefined"
+    :group="useDraggable ? { name: dragName, pull: 'clone', put: false } : undefined"
+    :set-data="modifyDragItem"
+    :tag="useDraggable ? 'ul' : undefined"
+    class="base-menu-list"
+    @choose="getDragImage"
+    @start="dragStart"
+    @end="dragEnd">
+    <li
+      v-for="(item, index) in listInt"
+      :key="item.id || item.title"
+      class="base-menu-list__list-entry">
+      <BaseMenuEntry
+        ref="menuEntry"
+        :entry-id="item.id"
+        :title="item.title"
+        :is-active="entryProps[index].active"
+        :is-selected="entryProps[index].selected"
+        :is-disabled="item.disabled"
+        :icon="item.icon"
+        :description="item.description"
+        :is-selectable="true"
+        :select-active="selectActive"
+        @clicked="activateItem(index)"
+        @selected="selectItem(index, $event)">
+        <template #text-content>
+          <!-- @slot use this slot to individualize the displayed text per
+            menu entry.
+            @binding { Object } item - the complete entry provided by list -->
+          <slot
+            name="entry-text-content"
+            :item="item" />
+        </template>
+        <template #right-side-elements="{ isSelected }">
+          <!-- @slot use this slot to add elements to the right side of an entry. This slot content
+            will be rendered in place of thumbnails and select checkbox so it will effectively
+            disable the display of selection elements and if select mode is desired, custom elements
+            should be provided
+             @binding { Object } item - the complete entry provided by list
+             @binding { boolean } is-selected - was item selected -->
+          <slot
+            name="entry-right-side-elements"
+            :is-selected="isSelected"
+            :item="item" />
+        </template>
+        <template
+          #thumbnails>
+          <!-- @slot Use this scoped slot to supply a list of thumbnails (i.e. [BaseIcon](BaseIcon)) for `item`, where `item` is one list element. See also the example below.-->
+          <slot
+            name="thumbnails"
+            :item="item" />
+        </template>
+      </BaseMenuEntry>
+    </li>
+  </component>
+</template>
 
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;

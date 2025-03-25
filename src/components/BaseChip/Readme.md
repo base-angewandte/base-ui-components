@@ -1,6 +1,6 @@
 ## Demo
 
-A chip that can be edited
+Chips with not-linked and linked styling - the latter one being editable
 
 ```vue live
 <template>

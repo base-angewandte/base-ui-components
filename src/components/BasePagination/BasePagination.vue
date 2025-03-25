@@ -30,15 +30,21 @@ export default {
       default: 1,
     },
     /**
-     * specify if pagination elements should be links - specify a vue link element or
-     * set the variable false if the element should not be a link
-     * (this needs vue-router)
+     * specify if pagination elements should be links - specify a vue link element (as
+     * string e.g. `'RouterLink` or pass the component directly) or set the variable `false`
+     * if element should not be a link (this needs vue-router)
      * currently only vue components (like 'RouterLink' or 'NuxtLink') are supported!
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     useLinkElement: {
-      type: [String, Boolean],
+      type: [String, Boolean, Object],
       default: false,
-      validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
+      validator: val => (typeof val === 'boolean' && !val)
+        || (typeof val === 'string' && val)
+        || (typeof val === 'object' && val.name && ['NuxtLink', 'RouterLink'].includes(val.name)),
     },
     /**
      * this prop gives the option to add assistive text for screen readers

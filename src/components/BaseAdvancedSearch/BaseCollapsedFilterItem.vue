@@ -1,43 +1,3 @@
-<template>
-  <div
-    ref="filterChip"
-    role="listitem"
-    tabindex="0"
-    class="base-collapsed-filter-item"
-    @keydown="removeChip">
-    <!-- if value is single value of date or time range add an 'from' or 'until' character -->
-    <span
-      v-if="isDateOrTimeRange"
-      class="base-collapsed-filter-item__until">
-      {{ rangeIndicator }}
-    </span>
-    <!-- per default use BaseChip component except for type `boolean`
-      enable interpret-text-as-html for chips input fields and chips WITH ids -->
-    <BaseChip
-      v-if="!isBoolean && hasValue"
-      :model-value="value.labelInternal"
-      :is-linked="true"
-      :text-styling="chipStyling"
-      :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
-      :assistive-text="filterItemLabel"
-      class="base-collapsed-filter-item__chip"
-      @remove-entry="removeChip" />
-    <!-- for boolean we use a checkmark icon instead of text -->
-    <div
-      v-else-if="isBoolean && hasValue"
-      class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
-      <BaseIcon
-        :title="filterItemLabel"
-        name="check-mark"
-        class="base-collapsed-filter-item__icon" />
-      <BaseIcon
-        name="remove"
-        class="base-collapsed-filter-item__icon-remove"
-        @click.stop="removeChip" />
-    </div>
-  </div>
-</template>
-
 <script>
 
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
@@ -177,6 +137,46 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="filterChip"
+    role="listitem"
+    tabindex="0"
+    class="base-collapsed-filter-item"
+    @keydown="removeChip">
+    <!-- if value is single value of date or time range add an 'from' or 'until' character -->
+    <span
+      v-if="isDateOrTimeRange"
+      class="base-collapsed-filter-item__until">
+      {{ rangeIndicator }}
+    </span>
+    <!-- per default use BaseChip component except for type `boolean`
+      enable interpret-text-as-html for chips input fields and chips WITH ids -->
+    <BaseChip
+      v-if="!isBoolean && hasValue"
+      :model-value="value.labelInternal"
+      :is-linked="true"
+      :text-styling="chipStyling"
+      :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
+      :assistive-text="filterItemLabel"
+      class="base-collapsed-filter-item__chip"
+      @remove-entry="removeChip" />
+    <!-- for boolean we use a checkmark icon instead of text -->
+    <div
+      v-else-if="isBoolean && hasValue"
+      class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
+      <BaseIcon
+        :title="filterItemLabel"
+        name="check-mark"
+        class="base-collapsed-filter-item__icon" />
+      <BaseIcon
+        name="remove"
+        class="base-collapsed-filter-item__icon-remove"
+        @click.stop="removeChip" />
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 @use "@/styles/variables" as *;

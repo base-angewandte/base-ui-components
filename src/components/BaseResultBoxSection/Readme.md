@@ -58,20 +58,20 @@ Test you component configuration on this example component!
         v-model="maxShowMoreRows"
         :disabled="!useExpandMode"
         label="maxShowMoreRows"
-        field-type="number"
+        input-type ="number"
         placeholder="choose a number of rows to be shown in expand mode"
         class="options-input" />
       <BaseInput
         v-model="maxRows"
         :disabled="!usePagination"
         label="maxRows"
-        field-type="number"
+        input-type ="number"
         placeholder="choose a number of rows to be shown with pagination"
         class="options-input" />
       <BaseInput
         v-model="numberOfBoxes"
         label="visible boxes (max 24)"
-        field-type="number"
+        input-type ="number"
         placeholder="specify a number of visible boxes, max. 24"
         class="options-input" />
     </div>
@@ -423,7 +423,7 @@ An example demonstrating slots
   <div class="section-canvas">
     <BaseResultBoxSection
       v-model:selected-list="selectedBoxes"
-      :entry-list="entriesList"
+      :model-value="entriesList"
       :is-loading="false"
       show-action-button-boxes
       title-property-name="parent.title"
@@ -451,7 +451,7 @@ An example demonstrating slots
 
       </template>
       <template
-        #optionButtons="scope">
+        #optionButtons>
         <BaseButton
           text="Custom Option 1"
           icon-size="large"
@@ -496,7 +496,7 @@ An example demonstrating slots
           :box-size="{ width: 'calc(((100% - (var(--items-per-row) * 8rem/19))/ var(--items-per-row)) - 0.01rem)', height: '100%' }"
           icon="eye"
           box-style="small"
-          box-type="button"
+          render-element-as="button"
           :class="['custom-button',
                    { 'action-box-spacer': itemsPerRow < entriesList.length},
                    `base-result-box-section__box-item-${elementId}`]"
@@ -507,7 +507,7 @@ An example demonstrating slots
           :box-size="{ width: 'calc(((100% - (var(--items-per-row) * 8rem/19))/ var(--items-per-row)) - 0.01rem)', height: '100%' }"
           icon="eye"
           box-style="small"
-          box-type="button"
+          render-element-as="button"
           :class="['custom-button',
                    { 'action-box-spacer': itemsPerRow < entriesList.length},
                    `base-result-box-section__box-item-${elementId}`]"

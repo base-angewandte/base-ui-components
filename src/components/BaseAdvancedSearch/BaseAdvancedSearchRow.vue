@@ -1,421 +1,5 @@
-<template>
-  <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
-  <div
-    ref="advancedSearchRow"
-    class="base-advanced-search-row"
-    @click="openDropDown">
-    <!-- SEARCH FIELD -->
-    <!-- note: the id is used in the javascript part as well as the parent component
-      BaseAdvancedSearch.vue - consider that when changing it! -->
-    <!-- note for @keydown.enter.capture: need to capture here so option select is handled
-      before input is blurred in search -->
-    <BaseSearch
-      ref="baseSearch"
-      v-model="currentInput"
-      v-model:selected-chips="selectedOptions"
-      v-model:is-active="isActive"
-      v-bind="$attrs"
-      :input-id="'search-input-' + internalRowId"
-      :show-pre-input-icon="isMainSearch
-        && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
-      :label="assistiveText.searchLabel || 'Search for Entries'"
-      :type="searchType"
-      :loadable="filter.type === 'text' || filter.type === 'chips'"
-      :is-loading="isLoading"
-      :placeholder="placeholder"
-      :drop-down-list-id="searchType === 'controlled' ? `controlled-options-${internalRowId}`
-        : 'autocomplete-options-' + internalRowId"
-      :language="language"
-      :identifier-property-name="useAutocompleteFunctionality
-        ? identifierPropertyName.autocompleteOption
-        : identifierPropertyName.controlledVocabularyOption"
-      :label-property-name="useAutocompleteFunctionality ? labelPropertyName.autocompleteOption
-        : labelPropertyName.controlledVocabularyOption"
-      :set-focus-on-active="false"
-      :clearable="false"
-      :assistive-text="{
-        selectedOption: assistiveText.selectedOption,
-        loaderActive: assistiveText.loaderActive,
-        results: assistiveText.results,
-      }"
-      :date-field-delay="dateFieldDelay"
-      :linked-list-option="activeEntry
-        // set option for autocomplete - check if collection select mode is active and set id of that if yes
-        ? (collectionSelect ? activeCollectionId
-          // or set the active entry id
-          : activeEntry[identifierPropertyName.autocompleteOption])
-        // else check if there is an active controlled vocabulary entry and set that if yes
-        : (activeControlledVocabularyEntry
-          ? activeControlledVocabularyEntry[identifierPropertyName.controlledVocabularyOption]
-          // if everything else fails set undefined
-          : undefined)"
-      :class="['base-advanced-search-row__search',
-               { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
-      @clicked-outside="onClickedOutsideSearch"
-      @click="onSearchClick"
-      @keydown="handleKeyDownEvent"
-      @keydown.up.down.right.left="navigateDropDown"
-      @keydown.tab="handleDropDownOnTabKey"
-      @keydown.enter.capture="selectOptionOnKeyEnter"
-      @keydown.esc="isActive = false"
-      @value-validated="handleDateInput">
-      <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
-      <template #[filterSlotName]>
-        <BaseChipsInputField
-          v-if="mode === 'list'"
-          v-model:selected-list="selectedFilter"
-          :input-id="'search-filter-select-' + internalRowId"
-          :allow-multiple-entries="false"
-          :allow-unknown-entries="false"
-          :allow-dynamic-drop-down-entries="false"
-          :linked-list-option="activeFilter
-            ? `filter-option-${activeFilter[identifierPropertyName.filter]}` : null"
-          :use-form-field-styling="false"
-          :show-input-border="false"
-          :show-label="false"
-          :label="assistiveText.selectFilterLabel || 'Select filter'"
-          :language="language"
-          :drop-down-list-id="'filter-options-' + internalRowId"
-          :identifier-property-name="identifierPropertyName.filter"
-          :label-property-name="labelPropertyName.filter"
-          :input-class="filterSlotName === 'input-field-addition-before'
-            ? '' : 'base-advanced-search-row__input-field'"
-          :class="['base-advanced-search-row__first-column',
-                   {
-                     'base-advanced-search-row__first-column__small':
-                       filterSlotName === 'input-field-addition-before',
-                   },
-                   'base-advanced-search-row__filter-input',
-                   {
-                     hide: isMainSearch && filter
-                       [identifierPropertyName.filter] === defaultFilter
-                         [identifierPropertyName.filter],
-                   },
-                   {
-                     'base-advanced-search-row__filter-input__date':
-                       filter.type.includes('date'),
-                   }]"
-          @click="isActive = true"
-          @keydown="handleKeyDownEvent"
-          @keydown.tab="handleDropDownOnTabKey"
-          @keydown.enter="selectFilter(activeFilter)"
-          @keydown.up.down="navigateFilters">
-          <template #chip="{ entry }">
-            <span
-              :id="entry.idInt"
-              :key="'chip-' + entry.idInt"
-              class="base-advanced-search-row__selected-filter-label">
-              {{ `#${getLangLabel(entry[labelPropertyName.filter], true)}` }}
-            </span>
-          </template>
-        </BaseChipsInputField>
-      </template>
-      <template #post-input-field>
-        <button
-          v-if="!isMainSearch
-            || filterHasValues || (filter.type === 'text' && currentInput)"
-          :class="['base-advanced-search-row__icon-button',
-                   { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
-          @keydown.tab="onTab"
-          @focusin.stop.prevent
-          @click.stop.prevent="removeFilter">
-          <BaseIcon
-            :title="assistiveText.removeFilter || 'Remove filter'"
-            name="remove"
-            class="base-advanced-search-row__search-row-icon" />
-        </button>
-        <!-- @slot add an element at the end of the search row (e.g. additional button) -->
-        <slot name="after" />
-      </template>
-
-      <!-- DROP DOWN BODY -->
-      <template #below-input>
-        <BaseDropDownList
-          v-if="isActive"
-          ref="dropDown"
-          :drop-down-options="resultListInt"
-          :active-option="{ [autocompletePropertyNames.id]: activeCollectionId }"
-          :list-id="'autocomplete-options-' + internalRowId"
-          :active-styled="false"
-          :has-sub-options="true"
-          :display-as-drop-down="false"
-          :use-custom-option-active-background-color="true"
-          :language="language"
-          :identifier-property-name="autocompletePropertyNames.id"
-          :label-property-name="autocompletePropertyNames.data"
-          :list-body-style="{
-            'max-height': '400px',
-            'overflow-y': 'auto',
-          }"
-          class="base-advanced-search-row__drop-down-body"
-          @touchstart.stop=""
-          @click.stop="">
-          <template
-            v-if="mode === 'list'"
-            #before-list>
-            <div
-              :class="['base-advanced-search-row__above-list-area',
-                       'base-advanced-search-row__area-padding',
-                       {
-                         'base-advanced-search-row__above-list-area-filters':
-                           filter.type === 'text' || filter.type === 'chips',
-                       }]">
-              <!-- FILTER SELECT LIST -->
-              <div
-                class="base-advanced-search-row__filter-area-wrapper">
-                <div
-                  class="base-advanced-search-row__first-column
-                base-advanced-search-row__filter-area">
-                  <div
-                    class="base-advanced-search-row__filter-area-header">
-                    <div class="base-advanced-search-row__filter-text">
-                      {{ getI18nTerm(getLangLabel(advancedSearchText.title)) }}
-                    </div>
-                    <div
-                      class="base-advanced-search-row__filter-subtext">
-                      {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
-                    </div>
-                  </div>
-                  <span
-                    class="base-advanced-search-row__filter-area-close"
-                    @keydown.enter="isActive = false"
-                    @click.stop="isActive = false">
-                    <BaseIcon
-                      class="rotate-180 base-advanced-search-row__filter-area-close-icon"
-                      name="drop-down" />
-                  </span>
-                </div>
-                <div
-                  :class="['base-advanced-search-row__columns',
-                           'base-advanced-search-row__filter-list-wrapper',
-                           {
-                             'base-advanced-search-row__filter-list-wrapper__fade-right':
-                               filterFade.right,
-                           },
-                           {
-                             'base-advanced-search-row__filter-list-wrapper__fade-left':
-                               filterFade.left,
-                           }]">
-                  <ul
-                    :id="'filter-options-' + internalRowId"
-                    ref="filterBox"
-                    role="listbox"
-                    class="base-advanced-search-row__filter-list">
-                    <li
-                      v-for="(singleFilter, index) in displayFilterList"
-                      :id="`filter-option-${singleFilter[identifierPropertyName.filter]}`"
-                      :key="index"
-                      ref="filterOption"
-                      :aria-selected="(filter && filter[identifierPropertyName.filter]
-                        === singleFilter[identifierPropertyName.filter]).toString()"
-                      tabindex="-1"
-                      class="base-advanced-search-row__filter base-advanced-search-row__column-item"
-                      :class="[{
-                                 'base-advanced-search-row__filter-active':
-                                   activeFilter === singleFilter,
-                               },
-                               {
-                                 'base-advanced-search-row__filter-selected':
-                                   filter && filter[identifierPropertyName.filter]
-                                     === singleFilter[identifierPropertyName.filter],
-                               }]"
-                      role="option"
-                      @keydown.enter.stop="selectFilter(singleFilter)"
-                      @click.stop="selectFilter(singleFilter)">
-                      {{ `#${singleFilter[labelPropertyName.filter]}` }}
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <!-- AUTOCOMPLETE OPTIONS LIST -->
-          <template
-            #option="{ option }">
-            <div
-              v-if="!filter || useAutocompleteFunctionality"
-              class="base-advanced-search-row__autocomplete-body">
-              <div
-                v-if="option[autocompletePropertyNames.data].length"
-                :class="['base-advanced-search-row__first-column',
-                         'base-advanced-search-row__autocomplete-collection',
-                ]">
-                <div class="base-advanced-search-row__autocomplete-collection-text">
-                  {{ option[autocompletePropertyNames.label] }}
-                  <span
-                    v-if="assistiveText.optionsAnnouncement"
-                    class="hide">{{ assistiveText.optionsAnnouncement
-                      .replace('{number}', option[autocompletePropertyNames.data].length) }}</span>
-                </div>
-              </div>
-
-              <!-- AUTOCOMPLETE OPTIONS -->
-              <BaseDropDownList
-                :drop-down-options="option[autocompletePropertyNames.data]"
-                :active-option="activeCollectionId === option[autocompletePropertyNames.id]
-                  ? activeEntry : {}"
-                :display-as-drop-down="false"
-                :list-id="'autocomplete-options-' + internalRowId"
-                :language="language"
-                :identifier-property-name="identifierPropertyName.autocompleteOption"
-                :label-property-name="labelPropertyName.autocompleteOption"
-                :use-highlight-string-match="highlightAutocompleteMatch"
-                :highlight-string-tags="highlightAutocompleteTags"
-                :highlight-string-match="currentInput"
-                class="base-advanced-search-row__autocomplete-options"
-                @update:selected-option="addOption(
-                  $event,
-                  option[autocompletePropertyNames.id],
-                )">
-                <template #option="{ option: autocompleteOption }">
-                  <!-- @slot to allow for modification of the autocomplete option
-                    @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
-                    @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
-                  <slot
-                    name="autocomplete-option"
-                    :option="autocompleteOption"
-                    :collection-id="option[autocompletePropertyNames.id]" />
-                </template>
-              </BaseDropDownList>
-            </div>
-          </template>
-
-          <!-- CHIPS (CONTROLLED VOCABULARY OPTIONS) AREA -->
-          <template
-            v-if="filter.type === 'chips' && !filter.freetext_allowed"
-            #after-list>
-            <div
-              class="base-advanced-search-row__above-list-area
-                 base-advanced-search-row__chips-area
-                 base-advanced-search-row__area-padding">
-              <div
-                :class="['base-advanced-search-row__chips-row',
-                         {
-                           'base-advanced-search-row__chips-row__no-options':
-                             filter.type === 'chips' && !displayedOptions.length,
-                         }]">
-                <div
-                  class="base-advanced-search-row__controlled-options-title
-                         base-advanced-search-row__first-column">
-                  {{ getI18nTerm(getLangLabel(advancedSearchText.availableOptions)) }}
-                </div>
-                <ul
-                  v-if="controlledVocabularyOptions && displayedOptions.length
-                    && (displayedOptions.length <= maxNumberControlledOptions
-                      || (currentInput && currentInput.length >= 4))"
-                  :id="`controlled-options-${internalRowId}`"
-                  role="listbox"
-                  class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
-                  <li
-                    v-for="chip in displayedOptions"
-                    :id="chip[identifierPropertyName.controlledVocabularyOption]"
-                    :key="chip[identifierPropertyName.controlledVocabularyOption]"
-                    :value="chip[labelPropertyName.controlledVocabularyOption]"
-                    :aria-selected="(activeControlledVocabularyEntry
-                      && chip[identifierPropertyName.controlledVocabularyOption]
-                        === activeControlledVocabularyEntry[identifierPropertyName
-                          .controlledVocabularyOption] || false).toString()"
-                    role="option"
-                    tabindex="0"
-                    class="base-advanced-search-row__column-item"
-                    @mouseenter="activeControlledVocabularyEntry = chip"
-                    @focusin="activeControlledVocabularyEntry = chip"
-                    @mouseleave="activeControlledVocabularyEntry = null"
-                    @focusout="activeControlledVocabularyEntry = null">
-                    <BaseChip
-                      :is-removable="false"
-                      :model-value="getLangLabel(chip[labelPropertyName.controlledVocabularyOption])"
-                      :chip-active="activeControlledVocabularyEntry
-                        && chip[identifierPropertyName.controlledVocabularyOption]
-                          === activeControlledVocabularyEntry[identifierPropertyName
-                            .controlledVocabularyOption]"
-                      class="base-advanced-search-row__option-chip"
-                      @clicked="addOption(chip)" />
-                  </li>
-                </ul>
-                <div
-                  v-else-if="isLoading"
-                  class="base-advanced-search-row__no-options
-                     base-advanced-search-row__area-padding">
-                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsOngoing, true)) }}
-                </div>
-                <!-- INFO if there are too many options to display (however from a certain
-                string length options are still displayed because this would be not very
-                user friendly else... -->
-                <div
-                  v-else-if="displayedOptions.length > maxNumberControlledOptions
-                    && (!currentInput || currentInput.length < 4)"
-                  class="base-advanced-search-row__no-options
-                  base-advanced-search-row__area-padding">
-                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsMaxOptions, true)) }}
-                </div>
-                <!-- IFNO if string does not match any options -->
-                <div
-                  v-else-if="currentInput && currentInput.length && !displayedOptions.length"
-                  class="base-advanced-search-row__no-options
-                     base-advanced-search-row__area-padding">
-                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoMatch, true)) }}
-                </div>
-                <!-- INFO if no more options are available (all options already added) -->
-                <div
-                  v-else-if="!displayedOptions.length"
-                  class="base-advanced-search-row__no-options
-                     base-advanced-search-row__area-padding">
-                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoOptions, true)) }}
-                </div>
-              </div>
-            </div>
-          </template>
-          <template
-            #no-options>
-            <div
-              v-if="useAutocompleteFunctionality"
-              :class="[
-                'base-advanced-search-row__no-options',
-                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality },
-              ]">
-              <div
-                v-if="!currentInput
-                  || (typeof currentInput === 'string' && !currentInput.trim())">
-                {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
-              </div>
-              <div
-                v-else-if="isLoading">
-                {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteOngoing, true)) }}
-              </div>
-              <div v-else>
-                {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteNoOptions, true)) }}
-              </div>
-            </div>
-          </template>
-        </BaseDropDownList>
-        <!-- @slot add an element below the primary row (same styling (box-shadow) as primary row element) -->
-        <slot name="below" />
-      </template>
-    </BaseSearch>
-    <BaseButton
-      v-if="mode === 'list' && isMainSearch"
-      icon="plus"
-      button-style="row"
-      icon-position="right"
-      :class="['base-advanced-search-row__add-filter-button',
-               { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
-      @clicked="addFilterRow"
-      @click.stop="">
-      <template #text="{ labelId }">
-        <span
-          :id="labelId"
-          class="base-advanced-search-row__add-filter-button__text">
-          {{ assistiveText.addFilter || 'Add filter' }}
-        </span>
-      </template>
-    </BaseButton>
-  </div>
-</template>
-
 <script>
-import { computed, ref, toRef } from 'vue';
+import { computed, ref, toRef, useTemplateRef } from 'vue';
 import { hasData, sort } from '@/utils/utils.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useId } from '@/composables/useId.js';
@@ -697,6 +281,12 @@ export default {
      * <b>searchLabel</b>: label (not visible) used for search input field<br>
      * <b>selectedOption</b>: text read when a selected option is focused (currently only
      *  working for type chips with autocomplete (=freetext_allowed))
+     * **optionAdded**: only for mode `list` - text read when an option was added to selected list
+     *    (if BaseSearch type is type `chips`)
+     * **optionToRemoveSelected**: only for mode `list` - text read when a selected option is in
+     *    focus to be removed (if BaseSearch type is type `chips`)
+     * **optionRemoved**: only for mode `list` - text read when an option was removed
+     *    from selected list (if BaseSearch type is type `chips`)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
      * **autocompleteResultsRetrieved**: text announced when autocomplete results are returned.
@@ -728,6 +318,9 @@ export default {
         selectFilterLabel: 'Select filter',
         searchLabel: 'Search for Entries',
         selectedOption: '',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
         loaderActive: 'loading.',
         autocompleteResultsRetrieved: '{optionsNumber} options found in {collectionsNumber} categories.',
         autocompleteNoResults: 'No results found.',
@@ -774,21 +367,76 @@ export default {
     /** GENERAL */
     /**
      * set up a reference to the root element (e.g. for announcer element)
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const advancedSearchRow = ref(null);
+    const advancedSearchRow = useTemplateRef('advancedSearchRow');
     /**
      * reference to the search element, needed for resizing actions
-     * @type {[null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseSearch = ref(null);
+    const baseSearch = useTemplateRef('baseSearch');
 
     /** FILTER DATA */
     /**
      * the currently selected filter
      * @type {Filter}
      */
-    const filter = ref(null);
+    const filter = ref({
+      ...props.defaultFilter,
+      filter_values: props.defaultFilter.values || setFilterValues(props.defaultFilter),
+    });
+
+    /**
+     * function to set the correct values for filter.filter_values attribute
+     *
+     * @param {Filter} newFilter - the newly selected filter
+     * @param {Filter} previousFilter - the previously set filter
+
+     * @returns {?string|Array|Object} the correct value type for the filter type
+     */
+    function setFilterValues(newFilter, previousFilter = {}) {
+      const previousFilterValues = previousFilter.filter_values;
+      const { type } = newFilter;
+      const freetextAllowed = newFilter.freetext_allowed;
+      if (type === 'date') {
+        // map the date from daterange to date if necessary
+        return previousFilter?.type.includes('date')
+        && previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
+      }
+      if (type === 'daterange') {
+        // check if it can be mapped from date to daterange
+        if (previousFilter.type.includes('date')) {
+          return {
+            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues || '' : '',
+            date_to: previousFilterValues?.to ? previousFilterValues.to : '',
+          };
+        }
+        // else just return empty object
+        return {
+          date_from: '',
+          date_to: '',
+        };
+      }
+      // check if both are autocomplete chips filters
+      if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
+        // check if new filter is a superset filter of the previous filter (=previous
+        // filter id is included in current filter 'subsets' property
+        if (newFilter.subsets?.includes(previousFilter[props.identifierPropertyName.filter])) {
+          return previousFilterValues;
+        }
+        // if both are chips with freetext keep options without id (=not specific entries)
+        return previousFilterValues?.length ? previousFilterValues
+          .filter(value => !value[props.identifierPropertyName.autocompleteOption]) : [];
+      }
+      // check if previous filter was text and new filter is autocomplete chips
+      if (previousFilter.type === 'text' && previousFilterValues?.length
+        && !!previousFilterValues[0] && type === 'chips' && freetextAllowed) {
+        return [{
+          [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
+        }];
+      }
+      return [];
+    }
 
     /** INTERNAL ID */
     const internalId = useId();
@@ -797,6 +445,10 @@ export default {
      * from internally created id
      */
     const internalRowId = computed(() => props.searchRowId || internalId);
+
+    /** LOCALIZATION */
+    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
+
 
     /** DROP DOWN NAVIGATION */
     const { navigate, isWithinArrayLimit } = useListNavigation();
@@ -842,17 +494,22 @@ export default {
         // SET CORRECT SLOT FOR SELECTED FILTER DISPLAY
         // get the width of the element
         const searchRowElementWidth = advancedSearchRow.value.clientWidth;
-        filterSlotName.value = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
+        // need to set time out and put this assignment at the end of all observer callback executions
+        // so it is not interfering with the still unfinished observer callback (making changes to DOM
+        // while observer callback is still ongoing, causing a loop)
+        setTimeout(() => {
+          filterSlotName.value = searchRowElementWidth >= 500 ? 'pre-input-field' : 'input-field-addition-before';
+        }, 0);
       }
     }
 
     /** FOCUS HANDLING */
     /**
-     * the search input element stored in a variable so it can easily be focused again after
-     * option selection
-     * @type {?HTMLElement}
+     * get the native HTML input element which is stored in BaseSearch `inputElement`
+     * variable to enable manual focusing
+     * @type {ComputedRef<HTMLElement|null>}
      */
-    const searchInputElement = ref(null);
+    const searchInputElement = computed(() => baseSearch.value?.inputElement || null);
     /**
      * to control if search field is active (and drop down shown)
      * @type {Ref<UnwrapRef<boolean>>}
@@ -861,7 +518,7 @@ export default {
     /**
      * store the current filter type to recognize when it changes and only take
      * action e.g. on focusing input field, after it was rendered
-     * @type {string}
+     * @type {Ref<UnwrapRef<string>>}
      */
     const currentFilterType = ref(props.appliedFilter ? props.appliedFilter.type : props.defaultFilter.type);
 
@@ -879,25 +536,11 @@ export default {
     });
 
     function filterChangeObserverAction() {
-      getSearchInputElement();
       if (filter.value.type !== currentFilterType.value && isActive.value) {
         if (searchInputElement.value) {
           searchInputElement.value.focus();
           currentFilterType.value = filter.value?.type || props.defaultFilter.type;
         }
-      }
-    }
-    /**
-     * function to get the current search input element
-     */
-    function getSearchInputElement() {
-      // get input elements
-      const inputElements = advancedSearchRow.value.getElementsByTagName('input');
-      // check if input elements were found
-      if (inputElements && inputElements.length) {
-        // if yes - transform HTMLElement list to Array and find the search input element
-        searchInputElement.value = Array.from(inputElements).find(inputElem => inputElem.id.includes('search-input')
-          && inputElem.id.includes(internalRowId.value));
       }
     }
 
@@ -926,9 +569,6 @@ export default {
       }
     }
 
-    /** LOCALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
-
     /** ACCESSIBILITY */
     /**
      * insert an HTML element with aria-live assertive that will announce the
@@ -943,6 +583,7 @@ export default {
       baseSearch,
       // filter data
       filter,
+      setFilterValues,
       // internal id
       internalRowId,
       // drop down navigation
@@ -1217,24 +858,10 @@ export default {
            * @event update:applied-filter
            * @property {Filter} val - the new currently applied filter
            */
-          this.$emit('update:applied-filter', { ...val });
+          this.$emit('update:applied-filter', JSON.parse(JSON.stringify(val)));
         }
       },
       deep: true,
-    },
-    defaultFilter: {
-      handler(val) {
-        // check if the props default defaultFilter is still applied
-        if (!this.filter || this.filter.id === 'default') {
-          this.filter = {
-            ...val,
-            // if filter is changed from outside this often means resetting a filter so previous
-            // values should not be taken over (=leave second argument of function empty here)
-            filter_values: this.setFilterValues(val),
-          };
-        }
-      },
-      immediate: true,
     },
     /**
      * watch if applied filter changes from outside
@@ -1245,21 +872,23 @@ export default {
        */
       handler(val) {
         // check if anything actually changed
-        if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
-          const newFilter = val || this.defaultFilter;
-          this.filter = {
+        if (JSON.stringify(val) !== JSON.stringify(this.filter)
+          && hasData(val.filter_values) !== hasData(this.filter.filter_values)) {
+          let newFilter = JSON.parse(JSON.stringify(val || this.defaultFilter));
+          newFilter = {
             ...newFilter,
             // if filter is changed from outside this often means resetting a filter so previous
             // values should not be taken over (=leave second argument of function empty here)
             filter_values: newFilter.filter_values || this.setFilterValues(newFilter),
           };
+          this.filter = newFilter;
           // check if the new filter has values
-          if (val && val.filter_values) {
+          if (newFilter && newFilter.filter_values) {
             // distinguish between date and others to assign to correct variable
-            if (val.type.includes('date')) {
-              this.currentInput = val.filter_values;
-            } else if (val.type === 'text') {
-              this.currentInput = val.filter_values[0] || '';
+            if (newFilter.type.includes('date')) {
+              this.currentInput = newFilter.filter_values;
+            } else if (newFilter.type === 'text') {
+              this.currentInput = newFilter.filter_values[0] || '';
             } else {
               this.currentInput = '';
             }
@@ -1448,7 +1077,7 @@ export default {
           // the category of the new filter - trigger the autocomplete fetch again
           if ((selectedFilter.type === 'text' || (selectedFilter.type === 'chips' && selectedFilter.freetext_allowed))
             && this.currentInput && !this.autocompleteResults
-            .some(category => category.filter_id === selectedFilter.id)) {
+              .some(category => category.filter_id === selectedFilter.id)) {
             this.$emit('fetch-autocomplete-results', { input: this.currentInput, filter: this.filter });
           }
         }
@@ -1518,7 +1147,7 @@ export default {
         // and currently active filter is not identical
         // with the category of the selected item
         && this.filter[this.identifierPropertyName.filter]
-          !== selectedOptionCollection
+        !== selectedOptionCollection
         // and selected item is not from a subset (so
         // if everything goes right category should be 'default')
         && !(this.filter.subsets && this.filter.subsets.length
@@ -1535,9 +1164,9 @@ export default {
         === this.defaultFilter[this.identifierPropertyName.filter]
           ? [].concat(entry[this.labelPropertyName.autocompleteOption]) : [].concat(entry);
         const oldFilterValues = this.filter.filter_values && this.filter.filter_values.length === 1
-          && typeof this.filter.filter_values[0] === 'string' ? [{
-            [this.labelPropertyName.autocompleteOption]: this.filter.filter_values[0],
-          }] : [];
+        && typeof this.filter.filter_values[0] === 'string' ? [{
+          [this.labelPropertyName.autocompleteOption]: this.filter.filter_values[0],
+        }] : [];
         this.filter = {
           ...newFilter,
           // check for filter_values property which does not exist in the filterList filters
@@ -1580,7 +1209,7 @@ export default {
       } else if (this.filter.type === 'text') {
         const newTextArray = [].concat(this.currentInput);
         if (JSON.stringify(this.filter.filter_values) !== JSON.stringify(newTextArray)) {
-          this.filter.filter_values = [].concat(this.currentInput);
+          this.filter.filter_values = newTextArray;
           this.isActive = false;
         } else {
           this.isActive = !this.isActive;
@@ -1785,7 +1414,7 @@ export default {
           // since this.activeCollectionId is just the id we need to get the collection label
           const collectionLabel = this.autocompleteResults
             .find(({ [this.autocompletePropertyNames.id]: id }) => id === this.activeCollectionId)[this
-              .autocompletePropertyNames.label];
+            .autocompletePropertyNames.label];
           // set the announcement and the collection label
           this.announcement = this.assistiveText.categoryAnnouncement
             .replace('{label}', collectionLabel);
@@ -1813,58 +1442,6 @@ export default {
 
     /** OTHERS */
 
-    /**
-     * function to set the correct values for filter.filter_values attribute
-     *
-     * @param {Filter} newFilter - the newly selected filter
-     * @param {Filter} previousFilter - the previously set filter
-
-     * @returns {?string|Array|Object} the correct value type for the filter type
-     */
-    setFilterValues(newFilter, previousFilter = {}) {
-      const previousFilterValues = previousFilter.filter_values;
-      const { type } = newFilter;
-      const freetextAllowed = newFilter.freetext_allowed;
-      if (type === 'date') {
-        // map the date from daterange to date if necessary
-        return previousFilter.type && previousFilter.type.includes('date')
-          && previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
-      }
-      if (type === 'daterange') {
-        // check if it can be mapped from date to daterange
-        if (previousFilter.type.includes('date')) {
-          return {
-            date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues || '' : '',
-            date_to: previousFilterValues && previousFilterValues.to ? previousFilterValues.to : '',
-          };
-        }
-        // else just return empty object
-        return {
-          date_from: '',
-          date_to: '',
-        };
-      }
-      // check if both are autocomplete chips filters
-      if (type === 'chips' && freetextAllowed && previousFilter.type === 'chips' && previousFilter.freetext_allowed) {
-        // check if new filter is a superset filter of the previous filter (=previous
-        // filter id is included in current filter 'subsets' property
-        if (newFilter.subsets
-          && newFilter.subsets.includes(previousFilter[this.identifierPropertyName.filter])) {
-          return previousFilterValues;
-        }
-        // if both are chips with freetext keep options without id (=not specific entries)
-        return previousFilterValues && previousFilterValues.length ? previousFilterValues
-          .filter(value => !value[this.identifierPropertyName.autocompleteOption]) : [];
-      }
-      // check if previous filter was text and new filter is autocomplete chips
-      if (previousFilter.type === 'text' && previousFilterValues && previousFilterValues.length
-        && !!previousFilterValues[0] && type === 'chips' && freetextAllowed) {
-        return [{
-          [this.labelPropertyName.autocompleteOption]: previousFilterValues[0],
-        }];
-      }
-      return [];
-    },
     /**
      * reset all filter row input and navigational variables
      */
@@ -1953,17 +1530,431 @@ export default {
         this.stopSearchClick = false;
       }
     },
-    initObservers() {
-      const tempObserver = new MutationObserver(this.filterChangeObserverAction);
-      tempObserver.observe(this.$refs.advancedSearchRow, {
-        subtree: true,
-        childList: true,
-      });
-      this.observer = tempObserver;
-    },
   },
 };
 </script>
+
+<template>
+  <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+  <div
+    ref="advancedSearchRow"
+    class="base-advanced-search-row"
+    @click="openDropDown">
+    <!-- SEARCH FIELD -->
+    <!-- note: the id is used in the javascript part as well as the parent component
+      BaseAdvancedSearch.vue - consider that when changing it! -->
+    <!-- note for @keydown.enter.capture: need to capture here so option select is handled
+      before input is blurred in search -->
+    <BaseSearch
+      ref="baseSearch"
+      v-model="currentInput"
+      v-model:selected-chips="selectedOptions"
+      v-model:is-active="isActive"
+      v-bind="$attrs"
+      :input-id="'search-input-' + internalRowId"
+      :show-pre-input-icon="isMainSearch
+        && filter[identifierPropertyName.filter] === defaultFilter[identifierPropertyName.filter]"
+      :label="assistiveText.searchLabel || 'Search for Entries'"
+      :search-type="searchType"
+      :loadable="filter.type === 'text' || filter.type === 'chips'"
+      :is-loading="isLoading"
+      :placeholder="placeholder"
+      :drop-down-list-id="searchType === 'controlled' ? `controlled-options-${internalRowId}`
+        : 'autocomplete-options-' + internalRowId"
+      :language="language"
+      :identifier-property-name="useAutocompleteFunctionality
+        ? identifierPropertyName.autocompleteOption
+        : identifierPropertyName.controlledVocabularyOption"
+      :label-property-name="useAutocompleteFunctionality ? labelPropertyName.autocompleteOption
+        : labelPropertyName.controlledVocabularyOption"
+      :set-focus-on-active="false"
+      :clearable="false"
+      :assistive-text="{
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.loaderActive,
+        optionAdded: assistiveText.optionAdded,
+        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+        optionRemoved: assistiveText.optionRemoved,
+        results: assistiveText.results,
+      }"
+      :date-field-delay="dateFieldDelay"
+      :linked-list-option="activeEntry
+        // set option for autocomplete - check if collection select mode is active and set id of that if yes
+        ? (collectionSelect ? activeCollectionId
+          // or set the active entry id
+          : activeEntry[identifierPropertyName.autocompleteOption])
+        // else check if there is an active controlled vocabulary entry and set that if yes
+        : (activeControlledVocabularyEntry
+          ? activeControlledVocabularyEntry[identifierPropertyName.controlledVocabularyOption]
+          // if everything else fails set undefined
+          : undefined)"
+      :ignore-click-outside="['.base-advanced-search-row__drop-down-body']"
+      :class="['base-advanced-search-row__search',
+               { 'base-advanced-search-row__search__shadow': applyBoxShadow }]"
+      @clicked-outside="onClickedOutsideSearch"
+      @click="onSearchClick"
+      @keydown.stop="handleKeyDownEvent"
+      @keydown.up.down.right.left="navigateDropDown"
+      @keydown.tab="handleDropDownOnTabKey"
+      @keydown.enter.stop.prevent="selectOptionOnKeyEnter"
+      @keydown.esc="isActive = false"
+      @value-validated="handleDateInput">
+      <!-- FIRST COLUMN OF SEARCH FIELD (FILTERS) -->
+      <template #[filterSlotName]>
+        <BaseChipsInputField
+          v-if="mode === 'list'"
+          v-model:selected-list="selectedFilter"
+          :input-id="'search-filter-select-' + internalRowId"
+          :allow-multiple-entries="false"
+          :allow-unknown-entries="false"
+          :allow-dynamic-drop-down-entries="false"
+          :linked-list-option="activeFilter
+            ? `filter-option-${activeFilter[identifierPropertyName.filter]}` : null"
+          :use-form-field-styling="false"
+          :show-input-border="false"
+          :show-label="false"
+          :label="assistiveText.selectFilterLabel || 'Select filter'"
+          :language="language"
+          :drop-down-list-id="'filter-options-' + internalRowId"
+          :identifier-property-name="identifierPropertyName.filter"
+          :label-property-name="labelPropertyName.filter"
+          :input-class="filterSlotName === 'input-field-addition-before'
+            ? '' : 'base-advanced-search-row__input-field'"
+          :class="['base-advanced-search-row__first-column',
+                   {
+                     'base-advanced-search-row__first-column__small':
+                       filterSlotName === 'input-field-addition-before',
+                   },
+                   'base-advanced-search-row__filter-input',
+                   {
+                     hide: isMainSearch && filter
+                       [identifierPropertyName.filter] === defaultFilter
+                         [identifierPropertyName.filter],
+                   },
+                   {
+                     'base-advanced-search-row__filter-input__date':
+                       filter.type.includes('date'),
+                   }]"
+          @click="isActive = true"
+          @keydown.stop="handleKeyDownEvent"
+          @keydown.tab="handleDropDownOnTabKey"
+          @keydown.enter="selectFilter(activeFilter)"
+          @keydown.up.down="navigateFilters">
+          <template #chip="{ entry }">
+            <span
+              :id="entry.idInt"
+              :key="'chip-' + entry.idInt"
+              class="base-advanced-search-row__selected-filter-label">
+              {{ `#${getLangLabel(entry[labelPropertyName.filter], true)}` }}
+            </span>
+          </template>
+        </BaseChipsInputField>
+      </template>
+      <template #post-input-field>
+        <button
+          v-if="!isMainSearch
+            || filterHasValues || (filter.type === 'text' && currentInput)"
+          :class="['base-advanced-search-row__icon-button',
+                   { 'base-advanced-search-row__icon-button__date': filter.type.includes('date') }]"
+          @focusin.stop.prevent
+          @keydown.tab="onTab"
+          @keydown.enter.stop.prevent="removeFilter"
+          @click.stop.prevent="removeFilter">
+          <BaseIcon
+            :title="assistiveText.removeFilter || 'Remove filter'"
+            name="remove"
+            class="base-advanced-search-row__search-row-icon" />
+        </button>
+        <!-- @slot add an element at the end of the search row (e.g. additional button) -->
+        <slot name="after" />
+      </template>
+
+      <!-- DROP DOWN BODY -->
+      <template #below-input>
+        <BaseDropDownList
+          v-if="isActive"
+          ref="dropDown"
+          :drop-down-options="resultListInt"
+          :active-option="{ [autocompletePropertyNames.id]: activeCollectionId }"
+          :list-id="'autocomplete-options-' + internalRowId"
+          :active-styled="false"
+          :active-sub-option="activeEntry"
+          :display-as-drop-down="false"
+          :use-custom-option-active-background-color="true"
+          :language="language"
+          :identifier-property-name="autocompletePropertyNames.id"
+          :label-property-name="autocompletePropertyNames.label"
+          :list-body-style="{
+            'max-height': '400px',
+            'overflow-y': 'auto',
+          }"
+          class="base-advanced-search-row__drop-down-body"
+          @touchstart.stop=""
+          @click.stop="">
+          <!-- FILTER AREA -->
+          <template
+            v-if="mode === 'list'"
+            #before-list>
+            <div
+              :class="['base-advanced-search-row__above-list-area',
+                       'base-advanced-search-row__area-padding',
+                       {
+                         'base-advanced-search-row__above-list-area-filters':
+                           filter.type === 'text' || filter.type === 'chips',
+                       }]">
+              <!-- FILTER SELECT LIST -->
+              <div
+                class="base-advanced-search-row__filter-area-wrapper">
+                <div
+                  class="base-advanced-search-row__first-column
+                base-advanced-search-row__filter-area">
+                  <div
+                    class="base-advanced-search-row__filter-area-header">
+                    <div class="base-advanced-search-row__filter-text">
+                      {{ getI18nTerm(getLangLabel(advancedSearchText.title)) }}
+                    </div>
+                    <div
+                      class="base-advanced-search-row__filter-subtext">
+                      {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
+                    </div>
+                  </div>
+                  <span
+                    class="base-advanced-search-row__filter-area-close"
+                    @keydown.enter="isActive = false"
+                    @click.stop="isActive = false">
+                    <BaseIcon
+                      class="rotate-180 base-advanced-search-row__filter-area-close-icon"
+                      name="drop-down" />
+                  </span>
+                </div>
+                <div
+                  :class="['base-advanced-search-row__columns',
+                           'base-advanced-search-row__filter-list-wrapper',
+                           {
+                             'base-advanced-search-row__filter-list-wrapper__fade-right':
+                               filterFade.right,
+                           },
+                           {
+                             'base-advanced-search-row__filter-list-wrapper__fade-left':
+                               filterFade.left,
+                           }]">
+                  <ul
+                    :id="'filter-options-' + internalRowId"
+                    ref="filterBox"
+                    role="listbox"
+                    class="base-advanced-search-row__filter-list">
+                    <li
+                      v-for="(singleFilter, index) in displayFilterList"
+                      :id="`filter-option-${singleFilter[identifierPropertyName.filter]}`"
+                      :key="index"
+                      ref="filterOption"
+                      :aria-selected="(filter && filter[identifierPropertyName.filter]
+                        === singleFilter[identifierPropertyName.filter]).toString()"
+                      tabindex="-1"
+                      class="base-advanced-search-row__filter base-advanced-search-row__column-item"
+                      :class="[{
+                                 'base-advanced-search-row__filter-active':
+                                   activeFilter === singleFilter,
+                               },
+                               {
+                                 'base-advanced-search-row__filter-selected':
+                                   filter && filter[identifierPropertyName.filter]
+                                     === singleFilter[identifierPropertyName.filter],
+                               }]"
+                      role="option"
+                      @keydown.enter.stop="selectFilter(singleFilter)"
+                      @click.stop="selectFilter(singleFilter)">
+                      {{ `#${singleFilter[labelPropertyName.filter]}` }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- AUTOCOMPLETE OPTIONS LIST -->
+          <template
+            #option="{ option }">
+            <div
+              v-if="!filter || useAutocompleteFunctionality"
+              class="base-advanced-search-row__autocomplete-body">
+              <div
+                v-if="option[autocompletePropertyNames.data].length"
+                :class="['base-advanced-search-row__first-column',
+                         'base-advanced-search-row__autocomplete-collection',
+                ]">
+                <div class="base-advanced-search-row__autocomplete-collection-text">
+                  {{ option[autocompletePropertyNames.label] }}
+                  <span
+                    v-if="assistiveText.optionsAnnouncement"
+                    class="hide">{{ assistiveText.optionsAnnouncement
+                      .replace('{number}', option[autocompletePropertyNames.data].length) }}</span>
+                </div>
+              </div>
+
+              <!-- AUTOCOMPLETE OPTIONS -->
+              <BaseDropDownList
+                :drop-down-options="option[autocompletePropertyNames.data]"
+                :active-option="activeCollectionId === option[autocompletePropertyNames.id]
+                  ? activeEntry : {}"
+                :display-as-drop-down="false"
+                :list-id="'autocomplete-options-' + internalRowId"
+                :language="language"
+                :identifier-property-name="identifierPropertyName.autocompleteOption"
+                :label-property-name="labelPropertyName.autocompleteOption"
+                :use-highlight-string-match="highlightAutocompleteMatch"
+                :highlight-string-tags="highlightAutocompleteTags"
+                :highlight-string-match="currentInput"
+                class="base-advanced-search-row__autocomplete-options"
+                @update:selected-option="addOption(
+                  $event,
+                  option[autocompletePropertyNames.id],
+                )">
+                <template #option="{ option: autocompleteOption }">
+                  <!-- @slot to allow for modification of the autocomplete option
+                    @binding {Object} option - the option object as specified in the [autocompletePropertyNames.data] array
+                    @binding {string} collection-id the currently active collection as provided in [autocompletePropertyNames.id] -->
+                  <slot
+                    name="autocomplete-option"
+                    :option="autocompleteOption"
+                    :collection-id="option[autocompletePropertyNames.id]" />
+                </template>
+              </BaseDropDownList>
+            </div>
+          </template>
+
+          <!-- CHIPS (CONTROLLED VOCABULARY OPTIONS) AREA -->
+          <template
+            v-if="filter.type === 'chips' && !filter.freetext_allowed"
+            #after-list>
+            <div
+              class="base-advanced-search-row__above-list-area
+                 base-advanced-search-row__chips-area
+                 base-advanced-search-row__area-padding">
+              <div
+                :class="['base-advanced-search-row__chips-row',
+                         {
+                           'base-advanced-search-row__chips-row__no-options':
+                             filter.type === 'chips' && !displayedOptions.length,
+                         }]">
+                <div
+                  class="base-advanced-search-row__controlled-options-title
+                         base-advanced-search-row__first-column">
+                  {{ getI18nTerm(getLangLabel(advancedSearchText.availableOptions)) }}
+                </div>
+                <ul
+                  v-if="controlledVocabularyOptions && displayedOptions.length
+                    && (displayedOptions.length <= maxNumberControlledOptions
+                      || (currentInput && currentInput.length >= 4))"
+                  :id="`controlled-options-${internalRowId}`"
+                  role="listbox"
+                  class="base-advanced-search-row__chips-list base-advanced-search-row__columns">
+                  <li
+                    v-for="chip in displayedOptions"
+                    :id="chip[identifierPropertyName.controlledVocabularyOption]"
+                    :key="chip[identifierPropertyName.controlledVocabularyOption]"
+                    :value="chip[labelPropertyName.controlledVocabularyOption]"
+                    :aria-selected="(activeControlledVocabularyEntry
+                      && chip[identifierPropertyName.controlledVocabularyOption]
+                        === activeControlledVocabularyEntry[identifierPropertyName
+                          .controlledVocabularyOption] || false).toString()"
+                    role="option"
+                    tabindex="0"
+                    class="base-advanced-search-row__column-item"
+                    @mouseenter="activeControlledVocabularyEntry = chip"
+                    @focusin="activeControlledVocabularyEntry = chip"
+                    @mouseleave="activeControlledVocabularyEntry = null"
+                    @focusout="activeControlledVocabularyEntry = null">
+                    <BaseChip
+                      :is-removable="false"
+                      :model-value="getLangLabel(chip[labelPropertyName.controlledVocabularyOption])"
+                      :chip-active="activeControlledVocabularyEntry
+                        && chip[identifierPropertyName.controlledVocabularyOption]
+                          === activeControlledVocabularyEntry[identifierPropertyName
+                            .controlledVocabularyOption]"
+                      class="base-advanced-search-row__option-chip"
+                      @clicked="addOption(chip)" />
+                  </li>
+                </ul>
+                <div
+                  v-else-if="isLoading"
+                  class="base-advanced-search-row__no-options
+                     base-advanced-search-row__area-padding">
+                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsOngoing, true)) }}
+                </div>
+                <!-- INFO if there are too many options to display (however from a certain
+                string length options are still displayed because this would be not very
+                user friendly else... -->
+                <div
+                  v-else-if="displayedOptions.length > maxNumberControlledOptions
+                    && (!currentInput || currentInput.length < 4)"
+                  class="base-advanced-search-row__no-options
+                  base-advanced-search-row__area-padding">
+                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsMaxOptions, true)) }}
+                </div>
+                <!-- IFNO if string does not match any options -->
+                <div
+                  v-else-if="currentInput && currentInput.length && !displayedOptions.length"
+                  class="base-advanced-search-row__no-options
+                     base-advanced-search-row__area-padding">
+                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoMatch, true)) }}
+                </div>
+                <!-- INFO if no more options are available (all options already added) -->
+                <div
+                  v-else-if="!displayedOptions.length"
+                  class="base-advanced-search-row__no-options
+                     base-advanced-search-row__area-padding">
+                  {{ getI18nTerm(getLangLabel(dropDownInfoTexts.chipsNoOptions, true)) }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <template
+            #no-options>
+            <div
+              v-if="useAutocompleteFunctionality"
+              :class="[
+                'base-advanced-search-row__no-options',
+                { 'base-advanced-search-row__no-options-hidden': !useAutocompleteFunctionality },
+              ]">
+              <div
+                v-if="!currentInput
+                  || (typeof currentInput === 'string' && !currentInput.trim())">
+                {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteInitial, true)) }}
+              </div>
+              <div
+                v-else-if="isLoading">
+                {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteOngoing, true)) }}
+              </div>
+              <div v-else>
+                {{ getI18nTerm(getLangLabel(dropDownInfoTexts.autocompleteNoOptions, true)) }}
+              </div>
+            </div>
+          </template>
+        </BaseDropDownList>
+        <!-- @slot add an element below the primary row (same styling (box-shadow) as primary row element) -->
+        <slot name="below" />
+      </template>
+    </BaseSearch>
+    <BaseButton
+      v-if="mode === 'list' && isMainSearch"
+      icon="plus"
+      button-style="row"
+      icon-position="right"
+      :class="['base-advanced-search-row__add-filter-button',
+               { 'base-advanced-search-row__add-filter-button__shadow': applyBoxShadow }]"
+      @clicked="addFilterRow"
+      @click.stop="">
+      <template #text="{ labelId }">
+        <span
+          :id="labelId"
+          class="base-advanced-search-row__add-filter-button__text">
+          {{ assistiveText.addFilter || 'Add filter' }}
+        </span>
+      </template>
+    </BaseButton>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";
@@ -2045,10 +2036,6 @@ export default {
       .base-advanced-search-row__search-row-icon {
         height: $icon-medium;
         width: $icon-medium;
-      }
-
-      .base-advanced-search-row__icon-button__text {
-        display: none;
       }
     }
 
@@ -2217,11 +2204,17 @@ export default {
   width: $row-height-large;
 
   .base-advanced-search-row__add-filter-button__text {
-    display: none;
+    position: absolute;
+    top: auto;
+    left: -9999px;
   }
 
   &__shadow {
     box-shadow: $box-shadow-reg;
+  }
+
+  &.base-button:deep(.base-button__icon.base-button__icon--margin) {
+    margin-left: 0;
   }
 }
 
@@ -2245,8 +2238,10 @@ export default {
       width: 100%;
 
       .base-advanced-search-row__add-filter-button__text {
+        position: relative;
+        top: auto;
+        left: unset;
         display: inline;
-        margin-right: $spacing;
       }
     }
 

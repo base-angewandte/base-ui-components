@@ -35,13 +35,13 @@ export function useAnnouncer(target, timeout = 300) {
   // watch the provided announcement value for changes and update
   // the element inner text if necessary
   watch(announcement, (val) => {
-    // first check if the target element exists, so assertive element could be set
-    if (!target.value) {
-      console.warn('Announcement element could not be set because the target reference is undefined!');
-      return;
-    }
     // if a string was set assign it to the HTML element created earlier
     if (val) {
+      // first check if the target element exists, so assertive element could be set
+      if (!target.value) {
+        console.warn('Announcement element could not be set because the target reference is undefined!');
+        return;
+      }
       assertiveElement.value.innerText = val;
       // afterward trigger the text clearance
       clearText();

@@ -4,6 +4,9 @@ import * as path from "path";
 import { fileURLToPath } from 'url'
 import vueLiveMd from './vue-live-md-it.mjs';
 import eslint from 'vite-plugin-eslint';
+import autoprefixer from 'autoprefixer';
+import postcssImport from 'postcss-import';
+import postcssDiscardComments from 'postcss-discard-comments';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +23,7 @@ export default defineConfig({
   description: 'A styleguide for base UI components, a component library for the university of Applied Arts Vienna',
   head: [
     ['meta', { name: 'theme-color', content: '#ffffff' }],
-    ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
+    ['meta', { name: 'mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
     ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
     ['meta', { name: 'apple-mobile-web-app-title', content: 'base' }],
@@ -51,6 +54,7 @@ export default defineConfig({
     }
   },
   cleanUrls: true,
+  appearance: false,
   outDir: path.resolve(__dirname, '../../styleguide'),
   vite: {
     plugins: [
@@ -75,13 +79,19 @@ export default defineConfig({
           quietDeps: true,
         },
       },
+      postcss: {
+        // the configuration was defined here (and not in an external file)
+        // to prevent in a npm-link-setup the plugins from being requested in the parent module
+        plugins: [
+          autoprefixer(),
+          // needed for import of external css (e.g. leaflet)
+          // needs to be before postcss-url to have leaflet background-images included
+          postcssImport(),
+          // remove comments
+          postcssDiscardComments(),
+        ],
+      },
     },
-  },
-  rewrites: {
-    // don't have components running under /components but at root
-    // useful thing here: old links (in changelog) with /components in path will automatically
-    // be redirected
-    'components/:component': ':component',
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -123,7 +133,7 @@ export default defineConfig({
           return {
             text: componentName,
             // need to create link without /components so link appears active
-            link: '/' + componentName,
+            link: '/components/' + componentName,
           };
         }),
       },

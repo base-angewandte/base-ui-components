@@ -1,3 +1,54 @@
+<script>
+import { defineAsyncComponent } from 'vue';
+import BaseLink from '@/components/BaseLink/BaseLink.vue';
+
+/**
+ * component to display breadcrumb-style navigation
+ */
+
+export default {
+  name: 'BaseBreadCrumbs',
+  components: {
+    BaseLink,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m)),
+  },
+  props: {
+    /**
+     * specify an array with the properties `route`, `label` and (optional) `icon` and `showLabel` that
+     *  should be used for navigation - these have to be internal
+     *  links, i.e. without a protocol like `http:` or `mailto:` in the url
+     * `showLabel` set to false is only considered if the `icon` property is set!
+     */
+    routes: {
+      type: Array,
+      default: () => [{ route: '', label: '' }],
+      validator: arr => !arr.some(
+        val => (val.route
+            // check that link is specified without protocol
+            && !!(val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
+              || val.route.match(/^mailto:/)
+              || val.route.match(/^tel:/)))
+          // and check that icon is specified when `showLabel` is
+          || (val.showLabel === false && !val.icon),
+      ),
+    },
+    /**
+     * specify how a link element should be rendered
+     * this needs to be a valid vue link component string (e.g. `'RouterLink'`) or a component directly
+     * and vue-router is necessary
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
+     */
+    renderLinkAs: {
+      type: [String, Object],
+      default: 'RouterLink',
+    },
+  },
+};
+</script>
+
 <template>
   <div
     class="base-bread-crumbs">
@@ -37,52 +88,6 @@
     </template>
   </div>
 </template>
-
-<script>
-/**
- * component to display breadcrumb-style navigation
- */
-import { defineAsyncComponent } from 'vue';
-import BaseLink from '@/components/BaseLink/BaseLink.vue';
-
-export default {
-  name: 'BaseBreadCrumbs',
-  components: {
-    BaseLink,
-    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue').then(m => m.default || m)),
-  },
-  props: {
-    /**
-     * specify an array with the properties `route`, `label` and (optional) `icon` and `showLabel` that
-     *  should be used for navigation - these have to be internal
-     *  links, i.e. without a protocol like `http:` or `mailto:` in the url
-     * `showLabel` set to false is only considered if the `icon` property is set!
-     */
-    routes: {
-      type: Array,
-      default: () => [{ route: '', label: '' }],
-      validator: arr => !arr.some(
-        val => (val.route
-            // check that link is specified without protocol
-            && !!(val.route.match(/^([a-z][a-z0-9+\-.]*:\/\/)/)
-              || val.route.match(/^mailto:/)
-              || val.route.match(/^tel:/)))
-          // and check that icon is specified when `showLabel` is
-          || (val.showLabel === false && !val.icon),
-      ),
-    },
-    /**
-     * specify how link element should be rendered - this needs to be a
-     * valid vue link component (e.g. RouterLink, NuxtLink) and vue-router
-     * is necessary
-     */
-    renderLinkAs: {
-      type: String,
-      default: 'RouterLink',
-    },
-  },
-};
-</script>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;

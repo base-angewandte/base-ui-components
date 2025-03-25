@@ -1,88 +1,3 @@
-<template>
-  <div
-    :class="['base-pop-up',
-             { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
-    <div
-      :class="[
-        'base-pop-up__background',
-        { 'base-pop-up__background--visible': overlayBackgroundVisible },
-      ]" />
-    <div
-      ref="popUpBody"
-      :aria-labelledby="headerId"
-      :aria-describedby="descriptionElementId"
-      role="alertdialog"
-      aria-modal="true"
-      class="popup-box">
-      <!-- POP UP HEADER -->
-      <div class="popup-header">
-        <!-- @slot add a custom header title instead of the text defined with the prop `title`.
-          @binding header-id {string, number} - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
-        <slot
-          name="header-title"
-          :header-id="headerId">
-          <div
-            :id="headerId"
-            tabindex="-1"
-            class="popup-title">
-            {{ title }}
-          </div>
-        </slot>
-        <!-- @event close -->
-        <button
-          v-if="!closeButtonDisabled"
-          type="button"
-          aria-label="close pop up"
-          class="base-popup__close-button"
-          @click="close">
-          <BaseIcon
-            class="popup-remove"
-            name="remove" />
-        </button>
-      </div>
-
-      <!-- POP UP CONTENT -->
-      <div class="popup-content">
-        <!-- @slot slot to fill the body of the box with custom content -->
-        <slot />
-        <div
-          v-if="showButtonRow"
-          class="popup-button-row">
-          <!-- @slot custom button row -->
-          <slot name="button-row">
-            <BaseButton
-              id="popup-left-button"
-              :text="buttonLeftText"
-              :icon="buttonLeftIcon"
-              :icon-position="'right'"
-              :icon-size="'small'"
-              class="base-popup-button"
-              @clicked="buttonLeft" />
-            <BaseButton
-              id="popup-right-button"
-              :text="buttonRightText"
-              :icon="!isLoading ? buttonRightIcon : ''"
-              :icon-position="'right'"
-              :icon-size="'small'"
-              :disabled="buttonRightDisabled"
-              class="base-popup-button"
-              @clicked="buttonRight">
-              <template
-                #right-of-text>
-                <span
-                  v-show="isLoading"
-                  class="base-popup-button-loader">
-                  <BaseLoader />
-                </span>
-              </template>
-            </BaseButton>
-          </slot>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 import { defineAsyncComponent, ref, watchEffect } from 'vue';
 import { useTabKeyHandler } from '@/composables/useTabKeyHandler.js';
@@ -232,11 +147,11 @@ export default {
     const popUpBody = ref(null);
 
     /** SCROLL LOCK HANDLING */
-    // set scroll lock
+      // set scroll lock
     const { toggleScrollLock } = usePopUpLock(popUpBody);
 
     /** TAB KEY HANDLING */
-    // init tab key handler
+      // init tab key handler
     const { focusableHTMLTags, disableHandler } = useTabKeyHandler(popUpBody, props.focusableElements.join(', '), props.disableTabKeyHandler);
     // watcher to set specific properties
     watchEffect(() => {
@@ -319,6 +234,91 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    :class="['base-pop-up',
+             { 'base-pop-up--fullscreen-on-mobile': fullscreenOnMobile }]">
+    <div
+      :class="[
+        'base-pop-up__background',
+        { 'base-pop-up__background--visible': overlayBackgroundVisible },
+      ]" />
+    <div
+      ref="popUpBody"
+      :aria-labelledby="headerId"
+      :aria-describedby="descriptionElementId"
+      role="alertdialog"
+      aria-modal="true"
+      class="popup-box">
+      <!-- POP UP HEADER -->
+      <div class="popup-header">
+        <!-- @slot add a custom header title instead of the text defined with the prop `title`.
+          @binding header-id {string, number} - set this id on your custom element as it is used by the aria-labelledby attribute of the pop up container -->
+        <slot
+          name="header-title"
+          :header-id="headerId">
+          <div
+            :id="headerId"
+            tabindex="-1"
+            class="popup-title">
+            {{ title }}
+          </div>
+        </slot>
+        <!-- @event close -->
+        <button
+          v-if="!closeButtonDisabled"
+          type="button"
+          aria-label="close pop up"
+          class="base-popup__close-button"
+          @click="close">
+          <BaseIcon
+            class="popup-remove"
+            name="remove" />
+        </button>
+      </div>
+
+      <!-- POP UP CONTENT -->
+      <div class="popup-content">
+        <!-- @slot slot to fill the body of the box with custom content -->
+        <slot />
+        <div
+          v-if="showButtonRow"
+          class="popup-button-row">
+          <!-- @slot custom button row -->
+          <slot name="button-row">
+            <BaseButton
+              id="popup-left-button"
+              :text="buttonLeftText"
+              :icon="buttonLeftIcon"
+              :icon-position="'right'"
+              :icon-size="'small'"
+              class="base-popup-button"
+              @clicked="buttonLeft" />
+            <BaseButton
+              id="popup-right-button"
+              :text="buttonRightText"
+              :icon="!isLoading ? buttonRightIcon : ''"
+              :icon-position="'right'"
+              :icon-size="'small'"
+              :disabled="buttonRightDisabled"
+              class="base-popup-button"
+              @clicked="buttonRight">
+              <template
+                #right-of-text>
+                <span
+                  v-show="isLoading"
+                  class="base-popup-button-loader">
+                  <BaseLoader />
+                </span>
+              </template>
+            </BaseButton>
+          </slot>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";

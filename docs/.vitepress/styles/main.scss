@@ -7,6 +7,9 @@
  * ref：https://v1.vuepress.vuejs.org/config/#index-styl
  */
 
+// defined here for styleguide, not in variables.scss because not needed for components
+$font-root-regular: 19px;
+$font-root-mobile: 16px;
 
 :root {
   // variables for base-components
@@ -21,46 +24,64 @@
   --vp-font-family-base: "Source Sans Pro", serif;
   // make title fit
   --vp-sidebar-width: 350px;
+  --vp-z-index-nav: 1000;
+  --vp-z-index-sidebar: 950;
+  --vp-z-index-local-nav: 900;
+}
+
+
+:root {
+  font-size: $font-root-mobile;
+
+  @media screen and (min-width: $mobile-min-width) {
+    font-size: $font-root-regular;
+  }
+}
+
+body {
+  font-size: $font-size-regular;
+  color: $font-color;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+.rotate-180 {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.hide {
+  position: absolute !important;
+  top: auto !important;
+  left: -9999px !important;
 }
 
 .title {
   font-size: $font-size-large !important;
+}
 
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-regular !important;
-  }
+.VPLocalSearchBox {
+  z-index: 10000 !important;
 }
 
 .text, .vp-doc th, .vp-doc td, .vp-doc blockquote > p, .menu,
 .VPNavScreenMenuLink,
 .VPNavBarMenuLink, .pager-link .title {
   font-size: $font-size-regular !important;
-
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-small !important;
-  }
 }
 
 .desc, .menu-text, .DocSearch-Button .DocSearch-Button-Placeholder,
-.outline-link, .outline-title, .details {
-  font-size: $font-size-small !important;
-}
+.outline-link, .top-link, .outline-title, .details {
+  font-size: $font-size-regular !important;
 
-
-
-body {
-  font-size: $font-size-regular;
-
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-small;
-  }
-}
-
-button {
-  font-size: $font-size-regular;
-
-  @media screen and (max-width: $mobile) {
-    font-size: $font-size-small;
+  @media screen and (min-width: $mobile-min-width) {
+    font-size: $font-size-small !important;
   }
 }
 
@@ -74,50 +95,22 @@ table {
   right: 1rem !important;
 }
 
-// leaflet is setting a tile z-index of 1000 so in order to prevent map overlaying sidebar
-.sidebar {
-  z-index: 1001;
+// leaflet is setting a tile z-index of 1000 so in order to prevent map overlaying styleguide header bar
+.leaflet-pane,
+.leaflet-control-container,
+.leaflet-top {
+  z-index: 10 !important;
 }
 
-.navbar {
-  z-index: 1002;
+// base button --active has a z-index of 100 set which interferes with the styleguide header bar
+.base-button--active {
+  z-index: 10 !important;
+}
+
+.base-expand .base-expand__body {
+  margin-top: 0 !important;
 }
 
 .home .hero img {
   max-width: 450px!important;
-}
-
-html {
-  font-size: $font-size-regular !important;
-  color: $font-color;
-  background-color: $background-color;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
-
-  &:root {
-    font-size: 19px !important;
-  }
-
-  .rotate-180 {
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
-  }
-
-  .hide {
-    position: absolute !important;
-    top: auto !important;
-    left: -9999px !important;
-  }
-}
-
-@media screen and (max-width: $mobile) {
-  html:root {
-    font-size: 16px;
-  }
 }

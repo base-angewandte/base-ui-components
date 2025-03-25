@@ -46,12 +46,19 @@ For slot demonstrations see [BaseChipsInput](BaseChipsInput) or [BaseInput](Base
   <div class="searchcontainer">
     <BaseSearch
       v-model="searchText"
-      :type="searchType"
+      v-model:selected-chips="selectedChips"
+      :search-type="searchType"
       :placeholder="placeholder"
       :show-pre-input-icon="false"
       label="Advanced Example"
       class="search" />
-    <div class="searchtext">{{ 'Your Search Value: ' + JSON.stringify(searchText) }}</div>
+    <div
+      class="searchtext">
+      {{ 'Your Search Value: ' + stringify(searchText) }}
+    </div>
+    <div
+      v-if="searchType === 'chips'"
+      class="searchtext">{{ 'Your selected Chips: ' + stringify(selectedChips) }}</div>
     <div class="buttonrow">
       <BaseButton
         :active="searchType === 'text'"
@@ -86,6 +93,7 @@ export default {
     return {
       searchText: '',
       searchType: 'text',
+      selectedChips: [],
     };
   },
   computed: {
@@ -100,6 +108,11 @@ export default {
         return 'Please select a date';
       }
       return '';
+    },
+  },
+  methods: {
+    stringify(val) {
+      return JSON.stringify(val);
     },
   },
 };

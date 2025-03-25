@@ -73,6 +73,12 @@ export default {
       return this.initialResults;
     }
   },
-}
+  watch: {
+    // reset the input when the list data structure changes
+    listIsObjects() {
+      this.autocompleteInput = '';
+    },
+  },
+};
 </script>
 ```

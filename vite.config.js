@@ -6,6 +6,7 @@ import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import eslint from 'vite-plugin-eslint';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
 import babel from '@rollup/plugin-babel';
 import { execSync } from 'child_process';
 
@@ -79,7 +80,10 @@ export default defineConfig({
           'hls.js/dist/hls.light.js': 'Hls',
         },
       },
-      plugins: [nodeResolve()],
+      plugins: [
+        nodeResolve(),
+        dynamicImportVars(),
+      ],
     },
   },
   css: {

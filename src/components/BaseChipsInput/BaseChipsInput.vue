@@ -1,142 +1,12 @@
-<template>
-  <div
-    ref="chipsInput"
-    class="base-chips-input">
-    <!-- TODO: check if really ALL props should be forwarded -->
-    <BaseChipsInputField
-      ref="baseInput"
-      v-model="input"
-      v-model:selected-list="selectedListInt"
-      v-model:is-active="chipsInputActive"
-      v-bind="chipsFieldInputProps"
-      :input-type="inputType"
-      :add-selected-entry-directly="false"
-      :drop-down-list-id="internalId"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
-      :loadable="allowDynamicDropDownEntries"
-      @keydown.enter.prevent="onEnter"
-      @keydown.up.down.prevent="onArrowKey"
-      @keydown="checkKeyEvent"
-      @click-input-field="onInputFocus"
-      @clicked-outside="onInputBlur">
-      <template #below-input>
-        <BaseDropDownList
-          v-if="chipsInputActive"
-          ref="dropDownList"
-          v-model:active-option="activeOption"
-          v-model:selected-option="selectedOption"
-          :drop-down-options="listInt"
-          :identifier-property-name="identifierPropertyName"
-          :label-property-name="labelPropertyName"
-          :list-id="internalId"
-          :style="{ 'min-width': dropDownMinWidth }"
-          :language="language"
-          :drop-down-no-options-info="dropDownNoOptionsInfo"
-          class="base-chips-input__drop-down"
-          @click.stop="closeDropDown"
-          @touchstart.stop="closeDropDown">
-          <template #option="{ option }">
-            <span
-              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
-              ref="option"
-              :key="option[labelPropertyName]">
-              {{ addNewChipText
-                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
-                : `${getI18nTerm('form.Add', -1, {
-                  value: getLangLabel(option[labelPropertyName], true),
-                })} ...` }}
-            </span>
-            <template
-              v-else-if="option">
-              <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
-                @binding {Object} item - the option passed to options list -->
-              <slot
-                :item="option"
-                name="drop-down-entry">
-                <!-- SLOT DEFAULT -->
-                <span
-                  v-if="option[identifierPropertyName]"
-                  :key="option[identifierPropertyName]"
-                  v-insert-text-as-html="{
-                    value: highlightStringMatch
-                      ? highlight(getLangLabel(option[labelPropertyName], true))
-                      : getLangLabel(option[labelPropertyName], true),
-                    interpretTextAsHtml: interpretChipsLabelAsHtml,
-                  }" />
-              </slot>
-            </template>
-          </template>
-          <template
-            #no-options>
-            <!-- @slot a slot to customize messages in case of no options present in drop down -->
-            <slot
-              name="no-options" />
-          </template>
-        </BaseDropDownList>
-        <!-- @slot to add elements below input fields e.g. add drop down -->
-        <slot name="below-input" />
-      </template>
-      <template
-        #label-addition>
-        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="label-addition" />
-      </template>
-      <template #pre-input-field>
-        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="pre-input-field" />
-      </template>
-      <template
-        #input-field-addition-before>
-        <!-- @slot Slot to allow for additional elements in the input field \<div\> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-inline-before>
-        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-inline-before" />
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input -->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-        <div
-          v-if="!allowMultipleEntries"
-          class="base-chips-input__single-dropdown"
-          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
-          @click.stop="chipsInputActive = !chipsInputActive">
-          <BaseIcon
-            :class="[
-              'base-chips-input__single-dropdown-icon',
-              {
-                'base-chips-input__single-dropdown-icon-rotated':
-                  chipsInputActive,
-              },
-            ]"
-            name="drop-down" />
-        </div>
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField).-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField). -->
-        <slot name="remove-icon" />
-      </template>
-    </BaseChipsInputField>
-  </div>
-</template>
-
 <script>
-import { computed, ref, defineAsyncComponent, toRef } from 'vue';
+import { computed, defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import { highlightText } from '@/utils/utils.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useId } from '@/composables/useId.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInputField.vue';
 
 /**
@@ -154,10 +24,7 @@ export default {
   directives: {
     insertTextAsHtml: InsertTextAsHtml,
   },
-  model: {
-    prop: 'selectedList',
-    event: 'selected-changed',
-  },
+  inheritAttrs: false,
   props: {
     /**
      * list of selectable options. needs to be a list with at least an identifier and a label
@@ -236,15 +103,6 @@ export default {
     allowDynamicDropDownEntries: {
       type: Boolean,
       default: false,
-    },
-    /**
-     * this prop was added because there was some action needed to be done before entry was added
-     * so this is possible if entry is not added to `modelValue` directly but only in parent
-     * component
-     */
-    addSelectedEntryDirectly: {
-      type: Boolean,
-      default: true,
     },
     /**
      * option to have the border of the input field not displayed
@@ -400,6 +258,9 @@ export default {
     },
     /**
      * set `true` if chip should be editable on click
+     * **caveat**: this will only work if prop `allowUnknownEntries` is also set `true`
+     * also setting this prop `true` will disable the dragging functionality (also see prop
+     * `draggable`)
      */
     chipsEditable: {
       type: Boolean,
@@ -490,37 +351,43 @@ export default {
       default: false,
     },
   },
-  emits: ['update:modelValue', 'fetch-dropdown-entries'],
+  emits: ['update:model-value', 'fetch-dropdown-entries'],
   setup(props) {
     /** DROP DOWN NAVIGATION */
     const { navigate } = useListNavigation();
     /** LOCALIZATION */
-    const { getLangLabel, getI18nTerm } = useI18n(toRef(props, 'language'));
+    const { getLangLabel, getI18nTerm, hasI18n } = useI18n(toRef(props, 'language'));
     /** COMPONENT ID */
-    const internalId = computed(() => props.inputId || useId());
+    // create an internal id in case there is none provided via props
+    const createdId = useId();
+    /**
+     * provide an internal id
+     * @type {ComputedRef<string|number>}
+     */
+    const internalId = computed(() => props.inputId || createdId);
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
     /** INPUT ELEMENT HANDLING */
     /**
      * the BaseChipsInputField component
-     * @type {Ref<UnwrapRef<null>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseInput = ref(null);
-
+    const chipsInputField = useTemplateRef('chipsInputField');
     /**
      * get the HTML input element (in BaseInput)
      * @type {ComputedRef<null|HTMLElement>}
      */
-    const inputElem = computed(() => {
-      if (!baseInput.value || !baseInput.value.$el) return null;
-      return baseInput.value.$el.getElementsByTagName('input')[0];
-    });
+    const inputElement = computed(() => chipsInputField.value?.inputElement || null);
+
     /**
      * ACCESSIBILITY ANNOUNCEMENT
      */
     /**
      * set up component reference
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInput = ref(null);
+    const chipsInput = useTemplateRef('chipsInput');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsInput);
@@ -529,10 +396,13 @@ export default {
       announcement,
       navigate,
       internalId,
+      rootAttrs,
+      forwardAttrs,
+      hasI18n,
       getLangLabel,
       getI18nTerm,
-      baseInput,
-      inputElem,
+      chipsInputField,
+      inputElement,
     };
   },
   data() {
@@ -586,7 +456,9 @@ export default {
      */
     chipsFieldInputProps() {
       const newProps = {
-        ...this.$attrs,
+        // all attributes not in props except for (class, style and data-base-id) and events will
+        // be forwarded to the native HTML input element
+        ...this.forwardAttrs,
         ...this.$props,
         // make sure the input id is always set
         inputId: this.$props.inputId || this.internalId,
@@ -679,8 +551,8 @@ export default {
       if (val) {
         this.addSelectedOption(val);
         // if input element was found - focus after chips select
-        if (this.inputElem && this.allowMultipleEntries) {
-          this.inputElem.focus();
+        if (this.inputElement && this.allowMultipleEntries) {
+          this.inputElement.focus();
         }
       }
     },
@@ -742,24 +614,34 @@ export default {
        * @param {Object[]} val
        */
       handler(val) {
-        this.selectedListInt = [...val];
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+          this.selectedListInt = JSON.parse(JSON.stringify(val));
+        }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * watch for changes to selectedListInt and propagate to parent if necessary
      * @param {Object[]} val
      */
-    selectedListInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
-        this.updateParentSelectedList(val);
-      }
+    selectedListInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
+          /**
+           * inform parent of changes to selected list
+           * @event update:model-value
+           * @property {Object[]} - the altered selectedList
+           */
+          this.$emit('update:model-value', JSON.parse(JSON.stringify(val)));
+        }
+      },
+      immediate: true,
+      deep: true,
     },
     /**
      * input is watched for follow up actions needed after input
      * --> fetch autocomplete entries
-     * --> inform parent of input (this however is not needed anymore since
-     * events of $attrs (former $listeners) from input are now propagated to parent anyways!)
      * @param {string} val
      */
     input(val) {
@@ -804,10 +686,14 @@ export default {
       }
     },
   },
-  mounted() {
+  created() {
     // add optional default entry to empty modelValue selected list only
     if (this.defaultEntry && !this.modelValue.length) {
-      this.selectedListInt.push(this.defaultEntry);
+      // create a copy of the default entry to remove the property `default`
+      const defaultValue = { ...this.defaultEntry };
+      delete defaultValue.default;
+      // and add the entry to selectedList
+      this.selectedListInt.push(defaultValue);
     }
   },
   methods: {
@@ -823,6 +709,8 @@ export default {
       // if unknown entries are allowed we need to remove the added
       // id again before pushing it to selectedListInt
       const newSelected = { ...selected };
+      // remove the default property if it is present
+      delete newSelected.default;
       if (this.allowUnknownEntries && newSelected[this.identifierPropertyName] === 'createNew') {
         delete newSelected[this.identifierPropertyName];
       }
@@ -836,8 +724,6 @@ export default {
         // after choosing the option
         this.chipsInputActive = false;
       }
-      // inform parent of the changes
-      this.updateParentSelectedList(this.selectedListInt);
       // make sure the assistive text exists
       if (this.assistiveText.optionAdded) {
         // announce the added option to the screen reader
@@ -851,30 +737,13 @@ export default {
       // remove focus from input if element is single select
       if (!this.allowMultipleEntries) {
         this.chipsInputActive = false;
-        this.inputElem.blur();
+        this.inputElement.blur();
       }
       // make sure drop down is closed at the end of all variable updates
       setTimeout(() => {
         // optional close dropdown after selection
         this.closeDropDown();
       }, 0);
-    },
-    /**
-     * method for emitting selected list changes to parent
-     * (called after adding or deleting an option to / from selected list)
-     *
-     * @param {Object[]} updatedList - the list that should be emitted in the event
-     */
-    updateParentSelectedList(updatedList) {
-      // only emit if updated list is different from parent list
-      if (JSON.stringify(this.modelValue) !== JSON.stringify(updatedList)) {
-        /**
-         * inform parent of changes to selected list
-         * @event update:modelValue
-         * @property {Object[]} - the altered selectedList
-         */
-        this.$emit('update:modelValue', [...updatedList]);
-      }
     },
 
     /** INPUT FIELD ACTIVE/INACTIVE HANDLING */
@@ -966,11 +835,10 @@ export default {
      * width of this element
      */
     calcDropDownMinWidth() {
-      // get the base input element
-      const inputElement = this.$refs.baseInput;
+      // TODO: this is probably not working anymore??
       // see if it exists and has a width - if yes set drop down min width to the same
-      if (inputElement && inputElement.$el && inputElement.$el.clientWidth) {
-        this.dropDownMinWidth = `${inputElement.$el.clientWidth}px`;
+      if (this.chipsInputField && this.chipsInputField.$el && this.chipsInputField.$el.clientWidth) {
+        this.dropDownMinWidth = `${this.chipsInputField.$el.clientWidth}px`;
       }
     },
     /**
@@ -980,8 +848,8 @@ export default {
       // optional close dropdown after selection
       if (this.closeDropdownOnOptionSelect && this.chipsInputActive) {
         this.chipsInputActive = false;
-        if (this.inputElem) {
-          this.inputElem.blur();
+        if (this.inputElement) {
+          this.inputElement.blur();
         }
       }
     },
@@ -1001,6 +869,144 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div
+    ref="chipsInput"
+    v-bind="rootAttrs"
+    class="base-chips-input">
+    <BaseChipsInputField
+      ref="chipsInputField"
+      v-model="input"
+      v-model:selected-list="selectedListInt"
+      v-model:is-active="chipsInputActive"
+      v-bind="chipsFieldInputProps"
+      :aria-autocomplete="'list'"
+      :aria-controls="`${internalId}-list-identifier`"
+      :aria-expanded="chipsInputActive"
+      :aria-haspopup="'listbox'"
+      :input-type="inputType"
+      :add-selected-entry-directly="false"
+      :drop-down-list-id="internalId"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :loadable="allowDynamicDropDownEntries"
+      :ignore-click-outside="['.base-chips-input__drop-down']"
+      role="combobox"
+      @keydown.enter.prevent="onEnter"
+      @keydown.up.down.prevent="onArrowKey"
+      @keydown="checkKeyEvent"
+      @click-input-field="onInputFocus"
+      @clicked-outside="onInputBlur">
+      <template #below-input>
+        <BaseDropDownList
+          v-if="chipsInputActive"
+          ref="dropDownList"
+          v-model:active-option="activeOption"
+          v-model:selected-option="selectedOption"
+          :drop-down-options="listInt"
+          :identifier-property-name="identifierPropertyName"
+          :label-property-name="labelPropertyName"
+          :list-id="internalId"
+          :style="{ 'min-width': dropDownMinWidth }"
+          :language="language"
+          :drop-down-no-options-info="dropDownNoOptionsInfo"
+          class="base-chips-input__drop-down"
+          @click.stop="closeDropDown"
+          @touchstart.stop="closeDropDown">
+          <template #option="{ option }">
+            <span
+              v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
+              ref="option"
+              :key="option[labelPropertyName]">
+              {{ addNewChipText
+                ? `${addNewChipText} ${getLangLabel(option[labelPropertyName], true)} ...`
+                : `${getI18nTerm('form.Add', -1, {
+                  value: getLangLabel(option[labelPropertyName], true),
+                  // if there is no i18n getI18nTerm will not return the value - so add it here manually
+                })} ${hasI18n ? '' : getLangLabel(option[labelPropertyName], true) }...` }}
+            </span>
+            <template
+              v-else-if="option">
+              <!-- @slot a slot to provide more advanced drop down entries per default only the `Object[labelPropertyName][?lang]` will be displayed
+                @binding {Object} item - the option passed to options list -->
+              <slot
+                :item="option"
+                name="drop-down-entry">
+                <!-- SLOT DEFAULT -->
+                <span
+                  v-if="option[identifierPropertyName]"
+                  :key="option[identifierPropertyName]"
+                  v-insert-text-as-html="{
+                    value: highlightStringMatch
+                      ? highlight(getLangLabel(option[labelPropertyName], true))
+                      : getLangLabel(option[labelPropertyName], true),
+                    interpretTextAsHtml: interpretChipsLabelAsHtml,
+                  }" />
+              </slot>
+            </template>
+          </template>
+          <template
+            #no-options>
+            <!-- @slot a slot to customize messages in case of no options present in drop down -->
+            <slot
+              name="no-options" />
+          </template>
+        </BaseDropDownList>
+        <!-- @slot to add elements below input fields e.g. add drop down -->
+        <slot name="below-input" />
+      </template>
+      <template
+        #label-addition>
+        <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs)). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="label-addition" />
+      </template>
+      <template #pre-input-field>
+        <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="pre-input-field" />
+      </template>
+      <template
+        #input-field-addition-before>
+        <!-- @slot Slot to allow for additional elements in the input field \<div\> (before <input>). for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <!-- @slot to add elements directly inline before the input (contrary to `input-field-addition-before` this does not wrap. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-inline-before" />
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input -->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+        <div
+          v-if="!allowMultipleEntries"
+          class="base-chips-input__single-dropdown"
+          @keydown.enter.stop="chipsInputActive = !chipsInputActive"
+          @click.stop="chipsInputActive = !chipsInputActive">
+          <BaseIcon
+            :class="[
+              'base-chips-input__single-dropdown-icon',
+              {
+                'base-chips-input__single-dropdown-icon-rotated':
+                  chipsInputActive,
+              },
+            ]"
+            name="drop-down" />
+        </div>
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField).-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField). -->
+        <slot name="remove-icon" />
+      </template>
+    </BaseChipsInputField>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;

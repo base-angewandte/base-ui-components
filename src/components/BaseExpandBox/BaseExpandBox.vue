@@ -1,9 +1,10 @@
 <script>
 import { debounce } from '@/utils/utils.js';
 import { useId } from '@/composables/useId.js';
-import { ref } from 'vue';
+import { useSlots, useTemplateRef } from 'vue';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Component to render content in expandable container
@@ -78,11 +79,41 @@ export default {
   },
   emits: ['update:expand', 'box-height'],
   setup() {
+    /** INTERNAL ID */
     const internalId = useId();
-    const content = ref();
-    const contentInner = ref();
+
+    /** SLOT VISIBILITY */
+    const slots = useSlots();
+    /**
+     * determine if header slot has content
+     * @type {boolean}
+     */
+    const { slotHasContent: headerSlotHasContent } = useHasSlotContent(slots.header);
+    /**
+     * determine if header slot has content
+     */
+    const { slotHasContent: footerSlotHasContent } = useHasSlotContent(slots.footer);
+
+
+    /** EXPAND BUTTON AND FADE OUT VISIBILITY */
+    /**
+     * template reference to the expand box content
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const content = useTemplateRef('contentElement');
+    /**
+     *
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const contentInner = useTemplateRef('contentInnerElement');
+
     return {
+      // internal id
       internalId,
+      // slot handling
+      headerSlotHasContent,
+      footerSlotHasContent,
+      // expand button and fade out
       content,
       contentInner,
     };
@@ -203,20 +234,20 @@ export default {
       { 'base-expand-box-auto-height': autoHeight },
       { 'base-expand-box-open': expandInt }]">
     <div
-      v-if="!!$slots.header"
+      v-if="headerSlotHasContent"
       class="base-expand-box-header">
       <!-- @slot slot to add additional information before expandable content -->
       <slot name="header" />
     </div>
     <div
-      ref="content"
+      ref="contentElement"
       :class="[
         'base-expand-box-content',
         { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">
       <div
         class="base-expand-box-content-inner">
         <!-- div is needed for calculation of content height -->
-        <div ref="contentInner">
+        <div ref="contentInnerElement">
           <!--
             @slot add expand box content here
           -->
@@ -234,11 +265,11 @@ export default {
       icon-position="right"
       :class="[
         'base-expand-box-button',
-        { 'base-button-icon-rotate-180': expandInt }]"
+        { 'base-button--rotate-icon-180': expandInt }]"
       @clicked="toggle" />
 
     <div
-      v-if="!!$slots.footer"
+      v-if="footerSlotHasContent"
       class="base-expand-box-footer">
       <div class="base-expand-box-footer-inner">
         <!-- @slot slot to add additional information after expandable content -->

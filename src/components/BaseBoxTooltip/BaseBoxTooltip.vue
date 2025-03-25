@@ -1,17 +1,3 @@
-<template>
-  <span
-    role="button"
-    class="base-box-tooltip"
-    tabindex="0"
-    @keydown.enter="clicked"
-    @click="clicked">
-    <BaseIcon
-      name="information"
-      alt="information"
-      class="base-box-tooltip-icon" />
-  </span>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
@@ -33,6 +19,20 @@ export default {
   },
 };
 </script>
+
+<template>
+  <span
+    role="button"
+    class="base-box-tooltip"
+    tabindex="0"
+    @keydown.enter="clicked"
+    @click="clicked">
+    <BaseIcon
+      name="information"
+      alt="information"
+      class="base-box-tooltip-icon" />
+  </span>
+</template>
 
 <style lang="scss" scoped>
 @use "sass:map";

@@ -9,6 +9,10 @@
   left: -9999px !important;
 }
 
+.grabbing {
+  cursor: grabbing !important;
+}
+
 *, *:before, *:after {
   box-sizing: border-box;
   margin: 0;
@@ -241,4 +245,8 @@ h1, h2, h3 {
   width: 1px;
   margin-left: -1000px;
   overflow: hidden;
+}
+
+.grabbing * {
+  cursor: grabbing;
 }

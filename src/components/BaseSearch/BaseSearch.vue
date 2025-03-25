@@ -1,104 +1,8 @@
-<template>
-  <!-- make this a form so that iOS recognizes it as 'search'
-  (also the action="." is needed for that) -->
-  <!-- ref is used in BaseAdvancedSearchRow! -->
-  <form
-    ref="search"
-    action="."
-    role="search"
-    class="base-search"
-    @submit.prevent
-    @keydown.enter.prevent>
-    <component
-      :is="inputComponent"
-      v-model="inputInt"
-      v-model:is-active="isActiveInt"
-      v-model:seledted-list="selectedChipsInt"
-      :input-id="idInt"
-      v-bind="$attrs"
-      :type="dateFieldType"
-      :show-label="false"
-      :use-form-field-styling="false"
-      :show-input-border="false"
-      :label="label"
-      :placeholder="placeholderInt"
-      :linked-list-option="linkedListOption"
-      :drop-down-list-id="dropDownListId || false.toString()"
-      :is-loading="isLoading"
-      :clearable="clearable"
-      :invalid="invalid"
-      :show-error-icon="showErrorIcon"
-      :language="languageInt"
-      :allow-unknown-entries="type === 'chips'"
-      :loadable="loadable"
-      :chips-editable="type === 'chips'"
-      :label-property-name="isFieldTypeChips ? labelPropertyName : null"
-      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
-      :set-focus-on-active="setFocusOnActive"
-      :add-selected-entry-directly="true"
-      :assistive-text="!type.includes('date') ? {
-        selectedOption: assistiveText.selectedOption,
-        loaderActive: assistiveText.loaderActive,
-      } : null"
-      :is-active-delay="dateFieldDelay"
-      :allow-multiple-entries="isFieldTypeChips ? type !== 'chipssingle' : null"
-      :chips-removable="type !== 'chipssingle'"
-      input-class="base-search__input-field"
-      field-type="search"
-      enterkeyhint="search"
-      class="base-search__input"
-      @keydown.enter="onEnter">
-      <template #pre-input-field>
-        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
-        <slot name="pre-input-field" />
-      </template>
-      <template #input-field-addition-before>
-        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
-        <slot name="input-field-addition-before" />
-      </template>
-      <template #input-field-inline-before>
-        <div
-          :class="[dateFieldType && showPreInputIcon
-            ? 'base-search__spacing-date' : 'base-search__spacing']" />
-        <!-- @slot a slot to exchange the magnifier icon with other elements -->
-        <slot name="input-field-inline-before">
-          <BaseIcon
-            v-if="showPreInputIcon"
-            name="magnifier"
-            :class="['base-search__magnifier-icon',
-                     { 'base-search__magnifier-icon__date': !!dateFieldType },
-                     { 'base-search__magnifier-icon__active': isActiveInt }]" />
-        </slot>
-      </template>
-      <template #input-field-addition-after>
-        <!-- @slot for adding elements after input. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="input-field-addition-after" />
-      </template>
-      <template #post-input-field>
-        <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="post-input-field" />
-        <div :class="{ 'base-search__spacing': dateFieldType }" />
-      </template>
-      <template #error-icon>
-        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="error-icon" />
-      </template>
-      <template #remove-icon>
-        <!-- @slot for adding custom input remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-        <slot name="remove-icon" />
-      </template>
-      <template #below-input>
-        <!-- @slot below-input slot added to e.g. add drop down -->
-        <slot name="below-input" />
-      </template>
-    </component>
-  </form>
-</template>
-
 <script>
-import { defineAsyncComponent, computed, ref, watch } from 'vue';
+import { defineAsyncComponent, computed, useTemplateRef, watch } from 'vue';
 import { useId } from '@/composables/useId.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
  * A basic text search to filter entries or files
@@ -114,7 +18,7 @@ export default {
   props: {
     /**
      * set input value from outside
-     *   for type `daterange` this needs to be an object with
+     *   for searchType `daterange` this needs to be an object with
      *   `date_from` and `date_to` properties!
      */
     modelValue: {
@@ -122,7 +26,7 @@ export default {
       default: '',
     },
     /**
-     * if input type is `chips` this is the prop to
+     * if input searchType is `chips` this is the prop to
      * pass selected options (chips).
      *  you may use the v-model directive on this prop
      */
@@ -171,7 +75,7 @@ export default {
      * specify the type of input field
      * @values text, chips, controlled, date, daterange, chipssingle
      */
-    type: {
+    searchType: {
       type: String,
       default: 'text',
       validator: val => ['text', 'chips', 'chipssingle', 'controlled', 'date', 'daterange'].includes(val),
@@ -272,6 +176,11 @@ export default {
      *  working for type chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **optionAdded**: text read when an option was added to selected list (for type `chips`)
+     * **optionToRemoveSelected**: text read when a selected option is in
+     *    focus to be removed (for type `chips`)
+     * **optionRemoved**: text read when an option was removed
+     *    from selected list (for type `chips`)
      * **results**: provide text that should be announced when the search has
      *  yielded results (or not).
      *
@@ -284,6 +193,9 @@ export default {
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
+        optionAdded: 'option {label} added to selected list.',
+        optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
+        optionRemoved: 'option {label} removed.',
         results: '',
       }),
     },
@@ -295,21 +207,51 @@ export default {
       default: 0,
     },
   },
-  emits: ['update:modelValue', 'update:selected-chips', 'update:is-active', 'update:assistive-text'],
+  emits: ['update:model-value', 'update:selected-chips', 'update:is-active', 'update:assistive-text'],
   setup(props, { emit }) {
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
     /** INTERNAL ID */
+      // get an internal id in case prop inputId is not set, but do it
+      // before the compute so its only calculated once and stays the same
+    const internalId = useId();
     /**
      * internally used id - eiter provided by props or use internally created one
      * @returns {string}
      */
-    const idInt = computed(() => props.inputId || useId());
+    const idInt = computed(() => props.inputId || internalId);
+
+    /** INPUT REF HANDLING */
+    /**
+     * we want to keep the reference to the native input HTML element and have it
+     * accessible for the parent
+     * so we create a reference to the Vue component first - this can be a BaseInput,
+     * BaseChipsInputField or BaseDateInput (all of which have the variable `inputElement`
+     * pointing to the native input element)
+     * @type {Readonly<ShallowRef<unknown | HTMLElement>>}
+     */
+    const inputComponent = useTemplateRef('inputComponent');
+    /**
+     * and then assign the component `input` variable as soon as the component
+     * is available
+     * this variable is used in BaseAdvancedSearch!!
+     * @type {ComputedRef<HTMLElement|null>}
+     */
+    const inputElement = computed(() => inputComponent.value?.inputElement || null);
+    /**
+     * in case of BaseDateInput there could be more than one input element so also expose
+     * all fields to the parent
+     * @type {ComputedRef<HTMLElement|null[]>}
+     */
+    const inputElements = computed(() => inputComponent.value?.inputElements || null);
 
     /** TAB KEY HANDLER */
     /**
      * set up a reference to the element to be able to attach the announcements element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const search = ref(null);
+    const search = useTemplateRef('search');
     /**
      * insert an HTML element with aria-live assertive that will announce the
      * search result
@@ -337,7 +279,11 @@ export default {
     });
 
     return {
+      rootAttrs,
+      forwardAttrs,
       idInt,
+      inputElement,
+      inputElements,
       search,
       // need to just export the announcement text because setting it in setup function
       // did not work in nuxt (respectively the watcher on assistiveText did not work)
@@ -376,31 +322,14 @@ export default {
      * @returns {null|(function(): Promise<HTMLElement>)|string}
      */
     inputComponent() {
-      if (this.type === 'text') {
+      if (this.searchType === 'text') {
         return 'BaseInput';
       } if (this.isFieldTypeChips) {
         return 'BaseChipsInputField';
-      } if (this.type === 'date' || this.type === 'daterange') {
+      } if (this.searchType === 'date' || this.searchType === 'daterange') {
         return 'BaseDateInput';
       }
       return null;
-    },
-    /**
-     * since v-model of BaseInput, BaseDateInput and BaseChipsInput deliver different values
-     *  (one the string input, one the date string or date object and one the selected chips)
-     *  we need to set and get the correct input for v-model here
-     */
-    searchValues: {
-      get() {
-        return this.type === 'chips' ? this.selectedChipsInt : this.inputInt;
-      },
-      set(val) {
-        if (this.type === 'chips') {
-          this.selectedChipsInt = [...val];
-        } else {
-          this.inputInt = val;
-        }
-      },
     },
     /**
      * compute the inputInt used for BaseInput v-model
@@ -409,29 +338,29 @@ export default {
      */
     inputInt: {
       /**
-       * set either textInputInt or dateInputInt depending on the type
-       * @param {string|{date_to: string, date_from: string}} val - depending on the type
+       * set either textInputInt or dateInputInt depending on the searchType
+       * @param {string|{date_to: string, date_from: string}} val - depending on the searchType
        * this is a date string, text string or an Object for 'daterange' with the following
        * properties:
        * @property {string} val.date_from
        * @property {string} val.date_to
        */
       set(val) {
-        if (this.type === 'date') {
+        if (this.searchType === 'date') {
           this.dateInputInt = val;
           /**
            * inform parent of changed input values (v-model)
            *
-           * @event update:modelValue
+           * @event update:model-value
            * @param {string, Object} - the altered input values
            */
-          this.$emit('update:modelValue', this.dateInputInt);
-        } else if (this.type === 'daterange') {
+          this.$emit('update:model-value', this.dateInputInt);
+        } else if (this.searchType === 'daterange') {
           this.dateInputInt = { ...val };
-          this.$emit('update:modelValue', this.dateInputInt);
+          this.$emit('update:model-value', this.dateInputInt);
         } else {
           this.textInputInt = val;
-          this.$emit('update:modelValue', this.textInputInt);
+          this.$emit('update:model-value', this.textInputInt);
         }
       },
       /**
@@ -441,10 +370,10 @@ export default {
       get() {
         // for date or daterange use dateInputInt and use correct type
         // this preserves the date when switching between date and daterange btw
-        if (this.type === 'date') {
+        if (this.searchType === 'date') {
           return this.dateInputInt.date_from || this.dateInputInt;
         }
-        if (this.type === 'daterange') {
+        if (this.searchType === 'daterange') {
           return typeof this.dateInputInt === 'object' ? this.dateInputInt : {
             date_from: this.dateInputInt,
             date_to: '',
@@ -456,20 +385,35 @@ export default {
       },
     },
     /**
-     * to easily access the type needed for BaseDateInput in case type
+     * in order to only attach the prop when it is a chips input we create a
+     * separate computed property
+     */
+    selectedChipsModelValue: {
+      set(val) {
+        this.selectedChipsInt = val;
+      },
+      get() {
+        if (this.isFieldTypeChips) {
+          return this.selectedChipsInt;
+        }
+        return null;
+      },
+    },
+    /**
+     * to easily access the type needed for BaseDateInput in case searchType
      * is 'date' or 'daterange'
      * @returns {string|boolean}
      */
     dateFieldType() {
-      if (this.type === 'date') {
+      if (this.searchType === 'date') {
         return 'single';
       }
-      if (this.type === 'daterange') {
+      if (this.searchType === 'daterange') {
         return 'daterange';
       }
-      // if type is neither 'date' or 'daterange' set the element attribute to false
+      // if searchType is neither 'date' or 'daterange' set the element attribute to null
       // so it does not show up in the rendered HTML
-      return false;
+      return null;
     },
     /**
      * compute adaptions necessary for BaseDateInput since this component currently
@@ -478,29 +422,29 @@ export default {
      */
     languageInt() {
       // adaptions for date input since only 'de', 'en', 'fr' available atm
-      if (this.type === 'date' || this.type === 'daterange') {
+      if (this.searchType === 'date' || this.searchType === 'daterange') {
         return ['de', 'en', 'fr'].includes(this.language) ? this.language : 'en';
       }
       return this.language;
     },
     /**
-     * determine if type is 'chips'
+     * determine if searchType is 'chips'
      * @returns {boolean}
      */
     isFieldTypeChips() {
-      return this.type.includes('chips') || this.type === 'controlled';
+      return this.searchType.includes('chips') || this.searchType === 'controlled';
     },
     placeholderInt() {
       if (typeof this.placeholder === 'string') {
         return this.placeholder;
       }
-      if (this.type.includes('date')) {
+      if (this.searchType.includes('date')) {
         return this.placeholder.date;
       }
-      if (this.type === 'controlled' || this.type === 'chipssingle') {
+      if (this.searchType === 'controlled' || this.searchType === 'chipssingle') {
         return this.placeholder.chips;
       }
-      return this.placeholder[this.type];
+      return this.placeholder[this.searchType];
     },
   },
   watch: {
@@ -513,7 +457,7 @@ export default {
         // if value is empty clear all input (to be able to reset the component completely)
         if (!val) {
           this.textInputInt = '';
-          this.dateInputInt = this.type === 'daterange' ? {
+          this.dateInputInt = this.searchType === 'daterange' ? {
             date_from: '',
             date_to: '',
           } : '';
@@ -530,7 +474,7 @@ export default {
      */
     inputInt(val) {
       if (val !== this.modelValue) {
-        this.$emit('update:modelValue', val);
+        this.$emit('update:model-value', val);
       }
     },
     /**
@@ -587,7 +531,11 @@ export default {
      */
     assistiveText: {
       handler(val) {
-        this.announcement = val.results;
+        // before updating check if value is different from already set value
+        // or that a value was provided for 'results'
+        if (val.results || (Boolean(val.results) !== Boolean(this.announcement))) {
+          this.announcement = val.results;
+        }
       },
       deep: true,
     },
@@ -604,6 +552,108 @@ export default {
   },
 };
 </script>
+
+<template>
+  <!-- make this a form so that iOS recognizes it as 'search'
+  (also the action="." is needed for that) -->
+  <!-- ref is used in BaseAdvancedSearchRow! -->
+  <form
+    ref="search"
+    v-bind="rootAttrs"
+    action="."
+    role="search"
+    class="base-search"
+    @submit.prevent
+    @keydown.enter.prevent>
+    <component
+      :is="inputComponent"
+      ref="inputComponent"
+      v-model="inputInt"
+      v-model:is-active="isActiveInt"
+      v-model:selected-list="selectedChipsModelValue"
+      v-bind="$attrs"
+      :input-id="idInt"
+      :date-type="dateFieldType"
+      :show-label="false"
+      :use-form-field-styling="false"
+      :show-input-border="false"
+      :label="label"
+      :placeholder="placeholderInt"
+      :linked-list-option="linkedListOption"
+      :drop-down-list-id="dropDownListId || null"
+      :is-loading="!dateFieldType ? isLoading : null"
+      :clearable="clearable"
+      :invalid="invalid"
+      :show-error-icon="showErrorIcon"
+      :language="languageInt"
+      :allow-unknown-entries="isFieldTypeChips ? searchType === 'chips' : null"
+      :loadable="!dateFieldType ? loadable : null"
+      :chips-editable="isFieldTypeChips ? searchType === 'chips' : null"
+      :label-property-name="isFieldTypeChips ? labelPropertyName : null"
+      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
+      :set-focus-on-active="setFocusOnActive"
+      :add-selected-entry-directly="isFieldTypeChips || null"
+      :assistive-text="!searchType.includes('date') ? {
+        selectedOption: assistiveText.selectedOption,
+        loaderActive: assistiveText.loaderActive,
+        optionAdded: assistiveText.optionAdded,
+        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+        optionRemoved: assistiveText.optionRemoved,
+      } : null"
+      :is-active-delay="searchType.includes('date') ? dateFieldDelay : null"
+      :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : null"
+      :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : null"
+      :input-type="'search'"
+      input-class="base-search__input-field"
+      enterkeyhint="search"
+      class="base-search__input"
+      @keydown.enter="onEnter">
+      <template #pre-input-field>
+        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
+        <slot name="pre-input-field" />
+      </template>
+      <template #input-field-addition-before>
+        <!-- @slot add elements within search but before all other elements. for an example see [BaseInput](BaseInput) -->
+        <slot name="input-field-addition-before" />
+      </template>
+      <template #input-field-inline-before>
+        <div
+          :class="[dateFieldType && showPreInputIcon
+            ? 'base-search__spacing-date' : 'base-search__spacing']" />
+        <!-- @slot a slot to exchange the magnifier icon with other elements -->
+        <slot name="input-field-inline-before">
+          <BaseIcon
+            v-if="showPreInputIcon"
+            name="magnifier"
+            :class="['base-search__magnifier-icon',
+                     { 'base-search__magnifier-icon__date': !!dateFieldType },
+                     { 'base-search__magnifier-icon__active': isActiveInt }]" />
+        </slot>
+      </template>
+      <template #input-field-addition-after>
+        <!-- @slot for adding elements after input. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="input-field-addition-after" />
+      </template>
+      <template #post-input-field>
+        <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="post-input-field" />
+        <div :class="{ 'base-search__spacing': dateFieldType }" />
+      </template>
+      <template #error-icon>
+        <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="error-icon" />
+      </template>
+      <template #remove-icon>
+        <!-- @slot for adding custom input remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+        <slot name="remove-icon" />
+      </template>
+      <template #below-input>
+        <!-- @slot below-input slot added to e.g. add drop down -->
+        <slot name="below-input" />
+      </template>
+    </component>
+  </form>
+</template>
 
 <style lang="scss" scoped>
 @use "@/styles/variables" as *;

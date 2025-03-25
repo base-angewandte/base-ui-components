@@ -37,7 +37,7 @@ All events emitted by the native input element (e.g. `@keydown`) contained in th
       :show-input-border="showInputBorder"
       :show-label="showLabel"
       :show-error-icon="showErrorIcon"
-      :field-type="type.value"
+      :input-type ="type.value"
       :loadable="true"
       :decimals="decimals"
       :decimal-separator="language.value === 'de' ? ',' : '.'"

@@ -47,7 +47,7 @@
     "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
-    "swiper": "^11.1.10",
+    "swiper": "^11.2.4",
     "vue-datepicker-next": "^1.0.3",
     "vue-draggable-plus": "^0.5.3"
   },
@@ -59,6 +59,7 @@
     "@commitlint/config-conventional": "^19.5.0",
     "@eslint/js": "^9.14.0",
     "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-dynamic-import-vars": "^2.1.5",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@vitejs/plugin-vue": "^5.2.0",
     "autoprefixer": "^10.4.20",

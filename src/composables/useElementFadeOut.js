@@ -7,10 +7,14 @@ import { useEventListener } from '@/composables/useEventListener.js';
 /**
  *
  * @param {Ref<HTMLElement>} target - this must be a reference(!) to an HTML element
- * @param direction
+ * @param {string} [direction='vertical']- should calculation be horizontal or vertical
+ *
  * @returns {{boxFadeOut: Ref<{ ['top'|'left']: boolean, ['bottom'|'right']: boolean }>, elementIsScrollable: ComputedRef<boolean>, calcFadeOut: function }}
  */
-export function useElementFadeOut({ target, direction = 'vertical' }) {
+export function useElementFadeOut({
+  target,
+  direction = 'vertical',
+}) {
   /**
    * get either the element itself or if it is a Vue component the child
    * (TODO: this probably will face problems if there is more than one root component?)
@@ -42,6 +46,18 @@ export function useElementFadeOut({ target, direction = 'vertical' }) {
     [postElementName]: false,
   });
 
+  // use composable here not inside mounted since it has an onMounted itself!
+  useEventListener({
+    target,
+    event: 'scroll',
+    callback: calcFadeOut,
+  });
+  useElementObserver({
+    type: 'resize',
+    target,
+    callback: calcFadeOut,
+  });
+
   /**
    * function calculating fade out left and right / top and bottom respectively which
    *  is returned with variable `boxFadeOut`
@@ -58,24 +74,13 @@ export function useElementFadeOut({ target, direction = 'vertical' }) {
     // set filter fade variables
     boxFadeOut.value = {
       // show fade out left as soon as scroll position is different from 0
-      [priorElementName]: scrollPosition !== 0,
+      // chose > 0 since also negative numbers possible on iOS Safari (at least in Browserstack)
+      [priorElementName]: scrollPosition > 0,
       // show fade out right as soon as scroll position is different from maximum position
       // but only if element exceeds available space
       [postElementName]: scrollMax !== 0 && scrollPosition < scrollMax,
     };
   }
-
-  // use composable here not inside mounted since it has an onMounted itself!
-  useEventListener({
-    target,
-    event: 'scroll',
-    callback: calcFadeOut,
-  });
-  useElementObserver({
-    type: 'resize',
-    target,
-    callback: calcFadeOut,
-  });
 
   /**
    * determine from fade out calculations if element is scrollable

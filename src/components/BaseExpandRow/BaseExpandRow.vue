@@ -1,67 +1,10 @@
-<template>
-  <div
-    :class="['base-expand-row',
-             { 'base-expand-row--expandable': expandable },
-             { 'base-expand-row--expanded': isExpandedInternal }]">
-    <div
-      :id="'base-expand-row-' + id"
-      class="base-expand-row-header"
-      :aria-expanded="expandable ? isExpandedInternal.toString() : null">
-      <BaseCheckmark
-        v-if="isSelectable"
-        :key="id + 'checkmark'"
-        title="checkbox"
-        mark-style="checkbox"
-        class="base-expand-row-checkbox"
-        :model-value="isSelected"
-        @update:model-value="checkboxClicked" />
-      <component
-        :is="expandable ? 'button' : 'div'"
-        :type="expandable ? 'button' : null"
-        :class="['base-expand-row-button', { selectable: isSelectable }]"
-        @click="expandable ? clicked() : null">
-        <div
-          v-if="icon || hasIconSlot"
-          class="base-expand-row-icon">
-          <!-- @slot slot to inject icon/image left side before label -->
-          <slot name="icon">
-            <BaseIcon
-              :name="icon"
-              title="open" />
-          </slot>
-        </div>
-
-        <div class="base-expand-row-title-subtitle-wrapper">
-          <div class="base-expand-row-title base-text-fade-out">
-            {{ title }}
-          </div>
-          <div
-            v-if="subtitle"
-            class="base-expand-row-subtitle base-text-fade-out">
-            {{ subtitle }}
-          </div>
-        </div>
-        <BaseIcon
-          v-if="expandable"
-          name="drop-down"
-          title="open"
-          class="base-expand-row-collapse-icon" />
-      </component>
-    </div>
-    <div
-      role="region"
-      :aria-labelledby="'base-expand-row-' + id"
-      :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
-      :class="['base-expand-row-body', { 'base-expand-row-body-bg': bodyHasBackground }]">
-      <!-- @slot slot for expanded content -->
-      <slot />
-    </div>
-  </div>
-</template>
-
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
+import { computed, ref, useSlots } from 'vue';
+import { useId } from '@/composables/useId.js';
+import { useI18n } from '@/composables/useI18n.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 export default {
   name: 'BaseExpandRow',
@@ -129,21 +72,73 @@ export default {
       type: Boolean,
       default: false,
     },
-  },
-  emits: ['selected', 'expanded'],
-  data() {
-    return {
-      id: null,
-      isExpandedInternal: false,
-      isSelectedInternal: false,
-    };
-  },
-  computed: {
-    hasIconSlot() {
-      return !!this.$slots.icon;
+    /**
+     * provide assistive text for screen readers
+     * **label**: if `title` or `subtitle` is empty this text is read
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        label: 'Expandable element',
+      }),
+      validator: val => Object.keys(val).every(key => ['label'].includes(key)),
     },
   },
+  emits: ['selected', 'expanded'],
+  setup(props) {
+    /** INTERNAL ID */
+    const internalId = useId();
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+    /** SLOTS */
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    /**
+     * check if slot `default` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: hasDefaultSlot } = useHasSlotContent(slots.default);
+    /**
+     * check if slot `icon` has content
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const { slotHasContent: hasIconSlot } = useHasSlotContent(slots.icon);
+    /** INTERNALS */
+    /**
+     * check if component is marked as selected
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isSelectedInternal = ref(props.isSelected);
+    /**
+     * check if component is expanded
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isExpandedInternal = ref(props.isExpanded && hasDefaultSlot.value);
+    /**
+     * check if component is expandable
+     * @type {ComputedRef<boolean>}
+     */
+    const isExpandable = computed(() => props.expandable && hasDefaultSlot.value);
+
+    return {
+      internalId,
+      isExpandable,
+      isExpandedInternal,
+      isSelectedInternal,
+      getI18nTerm,
+      hasDefaultSlot,
+      hasIconSlot,
+    }
+  },
   watch: {
+    /**
+     * watch for expandable state changes from outside
+     * @param {boolean} val - the prop value set from outside
+     */
+    expandable(val) {
+      // when component is not expandable, collapse the content area
+      if (!val) this.isExpandedInternal = false;
+    },
     /**
      * watch for expanded/collapsed state changes from outside
      * @param {boolean} val - the prop value set from outside
@@ -158,11 +153,6 @@ export default {
     isSelected(val) {
       this.isSelectedInternal = val;
     },
-  },
-  created() {
-    this.id = this.$.uid;
-    this.isSelectedInternal = this.isSelected;
-    this.isExpandedInternal = this.isExpanded;
   },
   methods: {
     clicked() {
@@ -192,6 +182,73 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    :class="['base-expand-row',
+             { 'base-expand-row--expandable': isExpandable },
+             { 'base-expand-row--expanded': isExpandedInternal }]">
+    <div class="base-expand-row__header">
+      <BaseCheckmark
+        v-if="isSelectable"
+        :key="internalId + 'checkmark'"
+        mark-style="checkbox"
+        :model-value="isSelected"
+        class="base-expand-row__header__checkbox"
+        @update:model-value="checkboxClicked" />
+      <component
+        :is="isExpandable ? 'button' : 'div'"
+        :id="'base-expand-row-' + internalId"
+        :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : null"
+        :aria-expanded="isExpandable ? isExpandedInternal.toString() : null"
+        :type="isExpandable ? 'button' : null"
+        :class="['base-expand-row__header__button', { selectable: isSelectable }]"
+        @click="isExpandable ? clicked() : null">
+        <div
+          v-if="icon || hasIconSlot"
+          class="base-expand-row__header__icon">
+          <!-- @slot slot to inject icon/image left side before label -->
+          <slot name="icon">
+            <BaseIcon
+              :name="icon" />
+          </slot>
+        </div>
+
+        <div
+          class="base-expand-row__header__wrapper">
+          <div
+            v-if="!title && !subtitle"
+            class="hide">
+            {{ getI18nTerm(assistiveText.label) }}
+          </div>
+          <div
+            v-if="title"
+            class="base-expand-row__header__title base-text-fade-out">
+            {{ title }}
+          </div>
+          <div
+            v-if="subtitle"
+            class="base-expand-row__header__subtitle base-text-fade-out">
+            {{ subtitle }}
+          </div>
+        </div>
+        <BaseIcon
+          v-if="isExpandable"
+          name="drop-down"
+          class="base-expand-row__header__collapse-icon" />
+      </component>
+    </div>
+    <div
+      :id="'base-expand-row-panel-' + internalId"
+      :aria-labelledby="'base-expand-row-' + internalId"
+      :aria-hidden="!isExpandedInternal ? 'true' : 'false'"
+      :role="'region'"
+      :class="['base-expand-row__body', { 'base-expand-row__body--bg': bodyHasBackground }]">
+      <!-- @slot slot for expanded content -->
+      <slot />
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
   @use "@/styles/variables" as *;
 
@@ -199,7 +256,7 @@ export default {
     margin-bottom: $border-width;
     background-color: $background-color;
 
-    .base-expand-row-header {
+    .base-expand-row__header {
       display: flex;
       justify-content: flex-start;
       align-items: center;
@@ -207,12 +264,12 @@ export default {
       box-shadow: $box-shadow-reg;
       transition: $box-transition;
 
-      .base-expand-row-checkbox {
+      .base-expand-row__header__checkbox {
         padding: 0 $spacing;
         width: $spacing * 3;
       }
 
-      .base-expand-row-button {
+      .base-expand-row__header__button {
         height: $row-height-large;
         padding: 0 $spacing;
         width: 100%;
@@ -220,26 +277,26 @@ export default {
         justify-content: flex-start;
         align-items: center;
 
-        .base-expand-row-title-subtitle-wrapper {
+        .base-expand-row__header__wrapper {
           flex: auto;
           margin-right: $spacing;
           overflow: hidden;
-
-          .base-expand-row-title {
-            color: $font-color;
-            text-align: left;
-            white-space: nowrap;
-          }
-
-          .base-expand-row-subtitle {
-            font-size: $font-size-small;
-            color: $font-color-second;
-            text-align: left;
-            white-space: nowrap;
-          }
         }
 
-        .base-expand-row-icon {
+        .base-expand-row__header__title {
+          color: $font-color;
+          text-align: left;
+          white-space: nowrap;
+        }
+
+        .base-expand-row__header__subtitle {
+          font-size: $font-size-small;
+          color: $font-color-second;
+          text-align: left;
+          white-space: nowrap;
+        }
+
+        .base-expand-row__header__icon {
           height: $icon-large;
           width: $icon-large;
           margin-right: $spacing;
@@ -252,7 +309,7 @@ export default {
           }
         }
 
-        .base-expand-row-collapse-icon {
+        .base-expand-row__header__collapse-icon {
           transition: $drop-down-arrow-animation;
           height: $icon-small;
           width: $icon-small;
@@ -262,7 +319,7 @@ export default {
 
         &.selectable {
           // if row is selectable, we must account for the width of the check box.
-          // therefore, decrease 100% width by the width of .base-expand-row-checkbox
+          // therefore, decrease 100% width by the width of .base-expand-row__header__checkbox
           width: calc(100% - #{$spacing} * 3);
           padding: 0 $spacing 0 0;
         }
@@ -273,24 +330,23 @@ export default {
       }
     }
 
-    .base-expand-row-body {
+    .base-expand-row__body {
       padding: $spacing;
 
-      &.base-expand-row-body-bg {
+      &.base-expand-row__body--bg {
         margin-top: $border-width;
         background-color: $box-color;
       }
     }
 
     &.base-expand-row--expandable {
-
-      .base-expand-row-button {
+      .base-expand-row__header__button {
 
         &:focus,
         &:hover {
           cursor: pointer;
 
-          .base-expand-row-collapse-icon {
+          .base-expand-row__header__collapse-icon {
             color: $app-color;
           }
         }
@@ -298,11 +354,10 @@ export default {
     }
 
     &.base-expand-row--expanded {
-
-      .base-expand-row-header {
-        .base-expand-row-button {
-          .base-expand-row-title-subtitle-wrapper {
-            .base-expand-row-title {
+      .base-expand-row__header {
+        .base-expand-row__header__button {
+          .base-expand-row__header__wrapper {
+            .base-expand-row__header__title {
               color: $font-color;
               font-weight: bold;
             }
@@ -310,16 +365,16 @@ export default {
         }
       }
 
-      .base-expand-row-body {
+      .base-expand-row__body {
         display: block;
       }
 
-      .base-expand-row-collapse-icon {
+      .base-expand-row__header__collapse-icon {
         transform: rotate(180deg);
       }
     }
 
-    .base-expand-row-body {
+    .base-expand-row__body {
       display: none;
     }
   }

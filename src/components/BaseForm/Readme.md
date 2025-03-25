@@ -51,9 +51,6 @@ Additionally, some features are derived from the OpenAPI definitions:<br>
 * **Min or Max length**: a min length error message will be triggered  automatically if `type` is `text` if field minLength is set in the openAPI definition and the min length is not reached.
   maxLength will also be enforced if specified in the OpenApi definition.
 
->Please note that this component should be rendered client side (important for SSR projects). So for example if you have a Nuxt project you will have to wrap the component in a `<client-only>` tag.
-
-
 ## Demo
 
 This is a basic (autocomplete functionality not working here) example how a form created from a [openAPI](https://www.openapis.org/) standard could look like
@@ -68,7 +65,7 @@ This is a basic (autocomplete functionality not working here) example how a form
         ref="formExtension"
         form-id="formTest"
         :form-field-json="fields"
-        :value-list="valueList"
+        v-model="valueList"
         :available-locales="['de', 'en']"
         :show-error-icon="true"
         :field-props="{
@@ -116,8 +113,7 @@ This is a basic (autocomplete functionality not working here) example how a form
               },
             ],
         }"
-        class="form"
-        @values-changed="valueList = { ...$event }">
+        class="form">
       <template #label-addition="{ fieldName, groupNames }">
         <template v-if="fieldName === 'isan'">
           test

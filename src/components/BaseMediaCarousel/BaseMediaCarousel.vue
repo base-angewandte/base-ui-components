@@ -452,7 +452,8 @@ export default {
     transition: all 300ms ease-in-out;
   }
 
-  .grow-enter, .grow-leave-to {
+  .grow-enter-from,
+  .grow-leave-to {
     transform: scale(0.33);
     opacity: 0;
   }

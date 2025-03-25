@@ -339,7 +339,8 @@ export default {
     margin-left: $spacing;
   }
 
-  .list-complete-enter, .list-complete-leave-to {
+  .list-complete-enter-from,
+  .list-complete-leave-to {
     opacity: 0;
     transform: translateY(-15px);
   }
