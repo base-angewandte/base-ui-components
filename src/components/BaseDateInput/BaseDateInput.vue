@@ -268,8 +268,8 @@ export default {
      * @type {{ from: Readonly<ShallowRef<null|HTMLElement>>, to: Readonly<ShallowRef<null|HTMLElement>> }}
      */
     const baseInput = {
-      from: useTemplateRef('baseInputFrom'),
-      to: useTemplateRef('baseInputTo'),
+      from: useTemplateRef('baseInputFromEl'),
+      to: useTemplateRef('baseInputToEl'),
     }
     /**
      * return the native input element found via BaseInput, in case there are two input fields
@@ -723,30 +723,30 @@ export default {
      * reference to the root element
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseDateInput = useTemplateRef('baseDateInput');
+    const baseDateInput = useTemplateRef('baseDateInputEl');
     /**
      * reference to the label element
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const labelElement = useTemplateRef('labelElement');
+    const labelElement = useTemplateRef('labelEl');
     /**
      * reference to the possible additions to the label row - switch buttons and `label-addition` slot
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const labelAdditions = useTemplateRef('labelAdditions');
+    const labelAdditions = useTemplateRef('labelAdditionsEl');
     /**
      * reference to the native input elements
      * @type {{ inputElementFrom: Readonly<ShallowRef<null|HTMLElement>>, inputElementTo: Readonly<ShallowRef<null|HTMLElement>> }}
      */
     const nativeInputElements = {
-      inputFromElement: useTemplateRef('inputFromElement'),
-      inputToElement: useTemplateRef('inputToElement'),
+      inputFromElement: useTemplateRef('inputFromEl'),
+      inputToElement: useTemplateRef('inputToEl'),
     };
     /**
      * reference to the BaseIcon component
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseIcon = useTemplateRef('baseIcon');
+    const baseIcon = useTemplateRef('baseIconEl');
     /**
      * store icon width in a variable
      * @type {ComputedRef<number>}
@@ -1679,7 +1679,7 @@ export default {
 
 <template>
   <div
-    ref="baseDateInput"
+    ref="baseDateInputEl"
     v-bind="rootAttrs"
     class="base-date-input">
     <div
@@ -1688,7 +1688,7 @@ export default {
                { 'base-date-input__label-row--visible': showLabel }]">
       <legend
         v-if="showLabel"
-        ref="labelElement"
+        ref="labelEl"
         class="base-date-input__label"
         @click.prevent="">
         {{ label }}
@@ -1698,7 +1698,7 @@ export default {
                  {'base-date-input__label-additions--switch-height': isSwitchableFormat },
                  {'base-date-input__label-additions--wrap': wrapLabelRow }]">
         <div
-          ref="labelAdditions"
+          ref="labelAdditionsEl"
           :class="['base-date-input__label-additions-inner',
                    {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
                    {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
@@ -1733,7 +1733,7 @@ export default {
           <slot name="input-field-inline-before" />
           <!-- INPUT FROM -->
           <BaseInput
-            ref="baseInputFrom"
+            ref="baseInputFromEl"
             v-model="inputFrom"
             :input-id="`input-${internalId}-from`"
             :label="label"
@@ -1777,7 +1777,7 @@ export default {
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
                       :id="`input-${internalId}-from`"
-                      ref="inputFromElement"
+                      ref="inputFromEl"
                       enterkeyhint="done"
                       autocomplete="off"
                       v-bind="forwardAttrs"
@@ -1807,7 +1807,7 @@ export default {
             </template>
             <template #post-input-field>
               <BaseIcon
-                ref="baseIcon"
+                ref="baseIconEl"
                 :name="isFromTimeField ? 'clock' : 'calendar-many'"
                 :class="['base-date-input__date-icon', { hide: !showIcons }]"
                 @click.stop="fromOpen = !fromOpen" />
@@ -1821,7 +1821,7 @@ export default {
           <!-- INPUT TO -->
           <BaseInput
             v-if="dateType !== 'single'"
-            ref="baseInputTo"
+            ref="baseInputToEl"
             v-model="inputTo"
             :input-id="`input-${internalId}-to`"
             :label="label"
@@ -1864,7 +1864,7 @@ export default {
                     <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                     <input
                       :id="`input-${internalId}-to`"
-                      ref="inputToElement"
+                      ref="inputToEl"
                       enterkeyhint="done"
                       autocomplete="off"
                       v-bind="forwardAttrs"

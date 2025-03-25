@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
@@ -150,7 +150,7 @@ const emits = defineEmits(['highlighted']);
 /**
  * set reference to map element
  */
-const mapElement = ref(null);
+const mapElement = useTemplateRef('mapEl');
 /**
  * define leaflet object  reference
  */
@@ -485,7 +485,7 @@ useElementObserver({
 
 <template>
   <div
-    ref="mapElement"
+    ref="mapEl"
     :style="cssProps"
     class="base-map" />
 </template>

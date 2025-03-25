@@ -1,5 +1,5 @@
 <script>
-import { defineAsyncComponent, ref, watchEffect } from 'vue';
+import { defineAsyncComponent, useTemplateRef, watchEffect } from 'vue';
 import { useTabKeyHandler } from '@/composables/useTabKeyHandler.js';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
@@ -144,7 +144,7 @@ export default {
   emits: ['button-left', 'button-right', 'close'],
   setup(props) {
     // get the pop up body ref for scroll lock
-    const popUpBody = ref(null);
+    const popUpBody = useTemplateRef('popUpBodyEl');
 
     /** SCROLL LOCK HANDLING */
       // set scroll lock
@@ -245,7 +245,7 @@ export default {
         { 'base-pop-up__background--visible': overlayBackgroundVisible },
       ]" />
     <div
-      ref="popUpBody"
+      ref="popUpBodyEl"
       :aria-labelledby="headerId"
       :aria-describedby="descriptionElementId"
       role="alertdialog"

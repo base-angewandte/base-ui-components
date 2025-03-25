@@ -243,7 +243,7 @@ const { rootAttrs, forwardAttrs } = useExtractAttrs();
  * get the reference to the BaseInput component
  * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const baseInput = useTemplateRef('baseInput');
+const baseInput = useTemplateRef('baseInputEl');
 /**
  * get the native input element from BaseInput
  * @type {ComputedRef<HTMLElement>}
@@ -495,7 +495,7 @@ function selectOption(selectedOption) {
  * set up component reference
  * @type {Readonly<ShallowRef<HTMLElement | null>>}
  */
-const autocompleteInput = useTemplateRef('autocompleteInput');
+const autocompleteInput = useTemplateRef('autocompleteInputEl');
 // use composable to announce screen reader text on actions taken (e.g.
 // add chip to selected list or remove chip
 const { announcement } = useAnnouncer(autocompleteInput);
@@ -538,11 +538,11 @@ defineExpose({
 
 <template>
   <div
-    ref="autocompleteInput"
+    ref="autocompleteInputEl"
     v-bind="rootAttrs"
     class="base-autocomplete-input">
     <BaseInput
-      ref="baseInput"
+      ref="baseInputEl"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       v-bind="forwardAttrs"

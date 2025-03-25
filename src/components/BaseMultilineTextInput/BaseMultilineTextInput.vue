@@ -162,7 +162,7 @@ export default {
      * get the reference to the BaseInput component
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const baseInput = useTemplateRef('baseInput');
+    const baseInput = useTemplateRef('baseInputEl');
     /**
      * get the native input element from BaseInput
      * @type {ComputedRef<HTMLElement>}
@@ -174,7 +174,7 @@ export default {
      * variable to store a reference the textarea element
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const textarea = useTemplateRef('textarea');
+    const textarea = useTemplateRef('textareaEl');
     const { boxFadeOut } = useElementFadeOut({
       target: textarea,
     });
@@ -272,7 +272,7 @@ export default {
 
 <template>
   <BaseInput
-    ref="baseInput"
+    ref="baseInputEl"
     v-model="fieldContent[activeTabInt]"
     v-model:is-active="isActive"
     v-bind="rootAttrs"
@@ -318,7 +318,7 @@ export default {
         <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
         <textarea
           :id="idInt"
-          ref="textarea"
+          ref="textareaEl"
           v-model="fieldContent[activeTabInt]"
           v-bind="forwardAttrs"
           :required="required"

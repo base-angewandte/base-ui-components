@@ -1,7 +1,7 @@
 <script>
 import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { ref } from 'vue';
+import { useTemplateRef } from 'vue';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
 import { useId } from '@/composables/useId.js';
 
@@ -90,7 +90,7 @@ export default {
   emits: ['download', 'hide'],
   setup() {
     /** POP UP LOCK */
-    const mediaCarousel = ref(null);
+    const mediaCarousel = useTemplateRef('mediaCarouselEl');
     const { toggleScrollLock, showElement: showInt } = usePopUpLock(mediaCarousel);
 
     /** PROVIDE A SWIPER ID */
@@ -319,7 +319,7 @@ export default {
     <transition name="grow">
       <div
         v-if="showInt"
-        ref="mediaCarousel"
+        ref="mediaCarouselEl"
         class="base-media-carousel">
         <div class="base-media-carousel__background" />
 

@@ -3,7 +3,7 @@ import { vOnClickOutside } from '@vueuse/components';
 import BaseButton from '@/components/BaseButton/BaseButton.vue';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useListNavigation } from '@/composables/useListNavigation.js';
-import { defineAsyncComponent, ref, watch } from 'vue';
+import { defineAsyncComponent, ref, useTemplateRef, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useDebounce } from '@/composables/useDebounce.js';
 
@@ -73,9 +73,9 @@ export default {
 
     /** RESIZE HANDLING */
       // create reference to drop down element
-    const dropDown = ref(null);
+    const dropDown = useTemplateRef('dropDownEl');
     // and the drop down parent element
-    const dropArea = ref(null);
+    const dropArea = useTemplateRef('dropAreaEl');
     /**
      * a variable to steer the css classes for drop down positioning (this way
      * scss variables can still be used)
@@ -324,7 +324,7 @@ export default {
     </BaseButton>
     <div
       v-if="buttonsInt && buttonsInt.length"
-      ref="dropArea"
+      ref="dropAreaEl"
       class="base-drop-button__options-area">
       <button
         :aria-expanded="showOptions"
@@ -344,7 +344,7 @@ export default {
       </button>
       <BaseDropDownList
         v-if="showOptions"
-        ref="dropDown"
+        ref="dropDownEl"
         :drop-down-options="buttonsInt"
         :active-option="activeOption"
         :active-styled="false"

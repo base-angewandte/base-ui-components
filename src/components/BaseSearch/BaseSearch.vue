@@ -231,7 +231,7 @@ export default {
      * pointing to the native input element)
      * @type {Readonly<ShallowRef<unknown | HTMLElement>>}
      */
-    const inputComponent = useTemplateRef('inputComponent');
+    const inputComponent = useTemplateRef('inputComponentEl');
     /**
      * and then assign the component `input` variable as soon as the component
      * is available
@@ -251,7 +251,7 @@ export default {
      * set up a reference to the element to be able to attach the announcements element
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const search = useTemplateRef('search');
+    const search = useTemplateRef('searchEl');
     /**
      * insert an HTML element with aria-live assertive that will announce the
      * search result
@@ -558,7 +558,7 @@ export default {
   (also the action="." is needed for that) -->
   <!-- ref is used in BaseAdvancedSearchRow! -->
   <form
-    ref="search"
+    ref="searchEl"
     v-bind="rootAttrs"
     action="."
     role="search"
@@ -567,7 +567,7 @@ export default {
     @keydown.enter.prevent>
     <component
       :is="inputComponent"
-      ref="inputComponent"
+      ref="inputComponentEl"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       v-model:selected-list="selectedChipsModelValue"

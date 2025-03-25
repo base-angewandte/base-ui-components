@@ -1,6 +1,6 @@
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, useTemplateRef } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useDebounce } from '@/composables/useDebounce.js';
@@ -82,7 +82,7 @@ export default {
     const active = ref(props.modelValue);
 
     /** PAGE NUMBER DISPLAY CALCULATIONS */
-    const pagination = ref(null);
+    const pagination = useTemplateRef('paginationEl');
     /**
      * total numbers to be displayed before the '...' depending on the width of the
      * pagination element (only relevant if not all numbers can be displayed)
@@ -264,7 +264,7 @@ export default {
 
 <template>
   <nav
-    ref="pagination"
+    ref="paginationEl"
     :aria-label="getI18nTerm(assistiveText.pagination)"
     class="base-pagination">
     <component

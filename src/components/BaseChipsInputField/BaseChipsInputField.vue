@@ -363,7 +363,7 @@ export default {
      * get a reference to the BaseInput component
      * @type {Readonly<ShallowRef<HTMLElement| null>>}
      */
-    const baseInput = useTemplateRef('baseInput');
+    const baseInput = useTemplateRef('baseInputEl');
     /**
      * from the BaseInput get access to the native HTML input element
      * this variable is accessed in BaseChipsInput (at least)
@@ -387,7 +387,7 @@ export default {
      * set up component reference
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsInputField = useTemplateRef('chipsInputField');
+    const chipsInputField = useTemplateRef('chipsInputFieldEl');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsInputField);
@@ -826,12 +826,12 @@ export default {
 
 <template>
   <div
-    ref="chipsInputField"
+    ref="chipsInputFieldEl"
     v-bind="rootAttrs"
     class="base-chips-input-field">
     <!-- INPUT LABEL AND FIELD -->
     <BaseInput
-      ref="baseInput"
+      ref="baseInputEl"
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       :input-id="internalId"

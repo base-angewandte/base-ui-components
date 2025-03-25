@@ -354,7 +354,7 @@ export default {
      * get a reference to the ChipsInput component
      * @type {Readonly<ShallowRef<HTMLElement| null>>}
      */
-    const chipsInput = useTemplateRef('chipsInput');
+    const chipsInput = useTemplateRef('chipsInputEl');
     /**
      * from the ChipsInput get access to the native HTML input element (it is chained
      * through from BaseInput)
@@ -367,7 +367,7 @@ export default {
      * set up component reference
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
-    const chipsBelow = useTemplateRef('chipsBelow');
+    const chipsBelow = useTemplateRef('chipsBelowEl');
     // use composable to announce screen reader text on actions taken (e.g.
     // add chip to selected list or remove chip
     const { announcement } = useAnnouncer(chipsBelow);
@@ -806,7 +806,7 @@ export default {
       return true;
     },
     /**
-     * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelow.validate();` from parent.<br>
+     * Validation can be triggered by executing e.g. `this.$refs.baseChipsBelowEl.validate();` from parent.<br>
      * Therefore, the component must have a reference set.
      * @public
      * @returns {boolean} - components error state
@@ -834,11 +834,11 @@ export default {
 
 <template>
   <div
-    ref="chipsBelow"
+    ref="chipsBelowEl"
     v-bind="rootAttrs"
     class="base-chips-below">
     <BaseChipsInput
-      ref="chipsInput"
+      ref="chipsInputEl"
       v-bind="chipsInputProps"
       :model-value="selectedBelowListInt"
       :close-dropdown-on-option-select="closeDropdownOnOptionSelect"

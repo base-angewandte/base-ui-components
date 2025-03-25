@@ -1,5 +1,5 @@
 <script>
-import {defineAsyncComponent, ref, computed, toRef, useTemplateRef, watch, onMounted} from 'vue';
+import { defineAsyncComponent, ref, computed, toRef, useTemplateRef, watch, onMounted } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import { useId } from '@/composables/useId.js';
@@ -372,7 +372,7 @@ export default {
 
     /** CLICK OUTSIDE HANDLING */
     // get the ref element for click outside
-    const inputFrame = useTemplateRef('inputFrame');
+    const inputFrame = useTemplateRef('inputFrameEl');
     const isActiveInt = ref(false);
 
     /**
@@ -887,7 +887,7 @@ export default {
       accessibility -->
     <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
     <div
-      ref="inputFrame"
+      ref="inputFrameEl"
       :class="['base-input__input-frame',
                { 'base-input__input-frame__border': showInputBorder },
                { 'base-input__input-frame__disabled': disabled },

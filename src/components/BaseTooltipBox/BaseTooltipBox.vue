@@ -7,7 +7,7 @@ import {
   onBeforeUnmount,
   onMounted,
   onUnmounted,
-  ref,
+  ref, useTemplateRef,
   watch,
   watchEffect,
 } from 'vue';
@@ -146,7 +146,7 @@ const emit = defineEmits(['close']);
 // define an internal id, needed for aria purposes
 const internalId = useId();
 // get reference to element
-const tooltipBox = ref(null);
+const tooltipBox = useTemplateRef('tooltipBoxEl');
 // the HTML element reference for the actual tooltip container
 const tooltipInner = ref(null);
 // ref variable for the container body (handling fade-out)
@@ -459,7 +459,7 @@ onUnmounted(() => {
 <template>
   <div
     :id="internalId"
-    ref="tooltipBox"
+    ref="tooltipBoxEl"
     role="dialog"
     tabindex="-1"
     :aria-labelledby="headerId"

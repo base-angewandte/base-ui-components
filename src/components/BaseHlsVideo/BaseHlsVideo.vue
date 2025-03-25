@@ -1,5 +1,5 @@
 <script>
-import { ref, defineAsyncComponent } from 'vue';
+import { ref, defineAsyncComponent, useTemplateRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 
 export default {
@@ -58,8 +58,8 @@ export default {
     const { getI18nTerm } = useI18n();
     const isLoading = ref(false);
     const hls = ref(() => {});
-    const playButton = ref(true);
-    const video = ref();
+    const playButton = useTemplateRef('playButtonEl');
+    const video = useTemplateRef('videoEl');
     return {
       getI18nTerm,
       isLoading,
@@ -173,7 +173,7 @@ export default {
 
     <button
       v-if="playButton && !isLoading"
-      ref="playButton"
+      ref="playButtonEl"
       :title="`${getI18nTerm(buttonTitle)} Video`"
       class="base-media-video__control"
       @keydown.enter.space="play"
@@ -185,7 +185,7 @@ export default {
 
     <!-- tabindex is needed for swiper to handle focus after using tab key -->
     <video
-      ref="video"
+      ref="videoEl"
       :style="displaySize"
       :poster="mediaPosterUrl"
       :tabindex="playButton ? '-1' : '0'"
