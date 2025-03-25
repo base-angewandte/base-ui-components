@@ -16,9 +16,9 @@ The different link types are selected by the properties passed.
   <div>
     <h2>examples of different link types:</h2>
     <template
-      v-for="(link, index) in links">
+      v-for="(link, index) in links"
+      :key="index">
       <BaseLink
-        :key="index"
         :identifier-property-name="'id'"
         :identifier-property-value="link.id"
         :chip-query-name="'chip-link'"
