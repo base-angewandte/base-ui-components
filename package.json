@@ -73,7 +73,7 @@
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globby": "^14.0.2",
     "gulp": "^5.0.0",
-    "gulp-conventional-changelog": "^5.0.0",
+    "gulp-conventional-changelog": "^4.0.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.10",
     "postcss": "^8.4.41",
