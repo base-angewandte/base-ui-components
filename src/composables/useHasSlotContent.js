@@ -17,10 +17,10 @@ export function useHasSlotContent(slot) {
     // check if slot was provided as function - this is the case
     // if slotProps object was not provided (aka slots[slotname])
     if (typeof slot === 'function') {
-      return vNodeHasContent(slot());
+      return vNodeHasContent(slot({}));
     }
     // if slot props object had to be provided (aka aka slots[slotname]({})) the
-    // array is passed directly
+    // array is passed directly (should only be the case if it is Vue2)
     return vNodeHasContent(slot);
   });
 

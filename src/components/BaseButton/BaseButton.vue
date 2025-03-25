@@ -157,10 +157,8 @@ export default {
     // access slots to check if it is filled later
     const slots = useSlots();
     // slot is not directly accessible anymore - use composable to determine
-    // if slot has content - but since we need to add a slotProps object check first
-    // if the slot exists
-    const { slotHasContent = false } = slots.text
-      ? useHasSlotContent(slots.text({})) : {};
+    // if slot has content
+    const { slotHasContent = false } = useHasSlotContent(slots.text);
 
     // compute if internal id should be set for aria-attribute
     // (no need if no text or slot is not used)

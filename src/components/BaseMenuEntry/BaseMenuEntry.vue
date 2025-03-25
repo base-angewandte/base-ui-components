@@ -133,12 +133,7 @@ export default {
     /** TITLE FADE OUT */
       // right-side-element slot allows for replacing all the menu entry content with custom
       // content - so we also don't need the fade out if the slot is filled
-      // also check if slot is actually defined before passing it to composable because
-      // of the ({}) (see below)
-    const { slotHasContent: rightSideSlotHasContent } = slots['right-side-elements']
-        // slot binding object needs to be passed for `useSlots` for some reason
-        // (see https://github.com/vuejs/core/issues/4656)
-        ? useHasSlotContent(slots['right-side-elements']({})) : false;
+    const { slotHasContent: rightSideSlotHasContent } = useHasSlotContent(slots['right-side-elements']);
 
     return {
       isSelectActive,
