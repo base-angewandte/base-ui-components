@@ -45,7 +45,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, './src/components/index.js'),
+      entry: resolve(__dirname, './src/index.js'),
       name: 'BaseUiComponents',
       fileName: 'base-ui-components',
     },
