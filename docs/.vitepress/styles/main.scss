@@ -13,20 +13,29 @@ $font-root-mobile: 16px;
 
 :root {
   // variables for base-components
-  --app-color: #3f51b5;
-  --app-color-secondary: #8e99f3;
+  --app-color: #673ab7;
+  --app-color-secondary: #b085f5;
   --map-cluster-bg: rgba(63, 81, 181, .4);
   --map-cluster-bg-inner :rgba(63, 81, 181, .85);
   --map-cluster-bg-hover: rgba(142, 153, 243, .4);
   --map-cluster-bg-inner-hover: rgba(142, 153, 243, .85);
-
   // variables for the theme
   --vp-font-family-base: "Source Sans Pro", serif;
+  --vp-home-hero-name-color: transparent;
+  --vp-c-brand-1: var(--app-color);
+  --vp-c-brand-2: var(--app-color);
+  --vp-c-brand-3: var(--app-color);
+  --vp-c-brand-soft: var(--app-color-secondary);
+  --vp-button-brand-hover-bg: var(--app-color-secondary);
+  --vp-home-hero-image-background-image: linear-gradient(143deg, rgba(103,58,183,1) 15%, rgba(255,152,0,1) 50%, rgba(156,39,176,1) 85%);
+  --vp-home-hero-name-background: linear-gradient(143deg, rgba(103,58,183,1) 15%, rgba(255,152,0,1) 50%, rgba(156,39,176,1) 85%);
   // make title fit
   --vp-sidebar-width: 350px;
   --vp-z-index-nav: 1000;
   --vp-z-index-sidebar: 950;
   --vp-z-index-local-nav: 900;
+  // increase layout max-width to have more room for tables
+  --vp-layout-max-width: 1800px;
 }
 
 
@@ -40,7 +49,6 @@ $font-root-mobile: 16px;
 
 body {
   font-size: $font-size-regular;
-  color: $font-color;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
@@ -66,13 +74,28 @@ body {
   font-size: $font-size-large !important;
 }
 
+// for the home page subtext set the max width to page width
+h1 + .text {
+  max-width: $page-max-width !important;
+}
+
+.VPHome[data-v-d8beba3b] {
+  margin-bottom: 0 !important;
+}
+
 .VPLocalSearchBox {
   z-index: 10000 !important;
 }
 
-.text, .vp-doc th, .vp-doc td, .vp-doc blockquote > p, .menu,
+// make default standart text size base application text size
+.vp-doc th, .vp-doc td, .vp-doc blockquote > p, .menu,
 .VPNavScreenMenuLink,
-.VPNavBarMenuLink, .pager-link .title {
+.VPNavBarMenuLink, .pager-link .title,
+.VPSidebarItem.level-1 .text,
+.VPSidebarItem.level-2 .text,
+.VPSidebarItem.level-3 .text,
+.VPSidebarItem.level-4 .text,
+.VPSidebarItem.level-5 .text {
   font-size: $font-size-regular !important;
 }
 
@@ -83,6 +106,29 @@ body {
   @media screen and (min-width: $mobile-min-width) {
     font-size: $font-size-small !important;
   }
+}
+
+// add focus and active styling of keyboard navigation indicators!
+.VPNavBarMenuLink:focus {
+  color: var(--vp-c-brand-1);
+}
+.DocSearch-Button:focus {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-alt);
+}
+.VPFeature.link:focus {
+  border-color: var(--vp-c-brand-1);
+}
+.VPButton.brand:focus {
+  background-color: var(--vp-button-brand-hover-bg);
+}
+.VPButton.alt:focus {
+  border-color: var(--app-color) !important;
+}
+
+// add more space to content body for tables
+.VPDoc.has-aside .content-container {
+  max-width: 1440px !important;
 }
 
 table {

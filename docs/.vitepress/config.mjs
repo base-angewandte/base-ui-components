@@ -101,8 +101,8 @@ export default defineConfig({
     editLink: false,
     // TODO: adding a footer would probably make sense?
     footer: {
-      message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2019-present Evan You'
+      message: 'Released under the Apache License, Version 2.0.',
+      copyright: 'Copyright © 2019-present <a href="https://angewandte.at" target="_blank">University of Applied Arts Vienna</a>'
     },
     nav: [
       {
@@ -122,6 +122,12 @@ export default defineConfig({
         // to http://localhost:port/buildSetup.md
         text: 'Development',
         link: '/development',
+      },
+      {
+        // development.md is created as hard link since softlink created weird redirects
+        // to http://localhost:port/buildSetup.md
+        text: 'Changelog',
+        link: 'https://github.com/base-angewandte/base-ui-components/blob/master/CHANGELOG.md',
       },
     ],
 

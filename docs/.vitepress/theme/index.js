@@ -1,11 +1,18 @@
 import 'normalize.css';
+import { h } from 'vue'
 import BaseTheme from './base/base-theme.js';
 import VueLiveWithLayout from './components/vue-live-with-layout';
+import HomeBelow from './components/HomeBelow.vue';
 const modules = import.meta.glob(['../../../src/**/*.vue'], { eager: true });
 import '../styles/app.scss';
 
 export default {
-  ...BaseTheme,
+  extends: BaseTheme,
+  Layout() {
+    return h(BaseTheme.Layout, null, {
+      'home-features-after': () => h(HomeBelow)
+    })
+  },
   enhanceApp({ app }) {
     app.component('VueLive', VueLiveWithLayout);
     /**
