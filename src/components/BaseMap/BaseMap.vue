@@ -6,6 +6,10 @@ import { useElementObserver } from '@/composables/useElementObserver.js';
  * A component to display a Leaflet-map with multiple locations
  */
 
+defineOptions({
+  name: 'BaseMap',
+});
+
 const props = defineProps({
   /**
    * define map attribution

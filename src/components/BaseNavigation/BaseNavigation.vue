@@ -3,6 +3,14 @@ import BaseLink from '@/components/BaseLink/BaseLink.vue';
 import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, useTemplateRef, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 
+/**
+ * navigation bar component tabs (internal or external links)
+ */
+
+defineOptions({
+  name: 'BaseNavigation',
+});
+
 const BaseButton = defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue'));
 
 const props = defineProps({

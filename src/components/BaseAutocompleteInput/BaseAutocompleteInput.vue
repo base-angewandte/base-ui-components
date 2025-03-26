@@ -13,6 +13,7 @@ import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
  */
 
 defineOptions({
+  name: 'BaseAutocompleteInput',
   inheritAttrs: false,
 });
 
