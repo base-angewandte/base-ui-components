@@ -904,6 +904,8 @@ export default {
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
+          :clearable="clearable"
+          :assistive-text="assistiveTextInt"
           class="base-form-field-creator__date-field"
           @value-validated="emitCompletedInputValues">
           <template
@@ -984,6 +986,8 @@ export default {
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
+          :clearable="clearable"
+          :assistive-text="assistiveTextInt"
           date-type="timerange"
           :class="['base-form-field-creator__date-field',
                    { 'base-form-field-creator__date-field--spacing': dateType.includes('date') }]"
@@ -1091,6 +1095,7 @@ export default {
       :invalid="invalid || fieldProps.invalid"
       :required="field.required || required || fieldProps.required"
       :error-message="errorMessage || fieldProps.errorMessage"
+      :clearable="clearable"
       :validation-texts="validationTexts.chips || fieldProps.validationTexts.chips"
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"
