@@ -978,10 +978,8 @@ export default {
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
           date-type="timerange"
-          class="base-form-field-creator__date-field"
-          @date-validated="emitCompletedInputValues">
           :class="['base-form-field-creator__date-field',
-          { 'base-form-field-creator__date-field--spacing': dateType.includes('date') }]"
+                   { 'base-form-field-creator__date-field--spacing': dateType.includes('date') }]"
           @value-validated="emitCompletedInputValues">
           <!-- only add slot here if it there is no first (date) field row -->
           <template
