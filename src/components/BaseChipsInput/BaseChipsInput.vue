@@ -438,12 +438,6 @@ export default {
        */
       chipsInputActive: false,
       /**
-       * the minimal width of the drop down element (calculated in js because ? )
-       * TODO: above...
-       * @type {string}
-       */
-      dropDownMinWidth: '100%',
-      /**
        * timeout for drop down options found announcer because otherwise
        * text not read if more than one character entered into input
        * @type {?number}
@@ -680,9 +674,6 @@ export default {
         this.$emit('fetch-dropdown-entries', { value: this.input, type: this.labelPropertyName });
       }
       if (val) {
-        // TODO: check again why this is needed bzw. it not sure if it is working
-        // properly
-        this.calcDropDownMinWidth();
         // reset the active option index to first item
         this.activeOptionIndex = 0;
       }
@@ -833,17 +824,6 @@ export default {
     /** OTHER FUNCTIONALITIES */
 
     /**
-     * calculate the minimum width of the drop down element by getting the
-     * width of this element
-     */
-    calcDropDownMinWidth() {
-      // TODO: this is probably not working anymore??
-      // see if it exists and has a width - if yes set drop down min width to the same
-      if (this.chipsInputField && this.chipsInputField.$el && this.chipsInputField.$el.clientWidth) {
-        this.dropDownMinWidth = `${this.chipsInputField.$el.clientWidth}px`;
-      }
-    },
-    /**
      * close dropdown
      */
     closeDropDown() {
@@ -909,7 +889,6 @@ export default {
           :identifier-property-name="identifierPropertyName"
           :label-property-name="labelPropertyName"
           :list-id="internalId"
-          :style="{ 'min-width': dropDownMinWidth }"
           :language="language"
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
@@ -1018,6 +997,7 @@ export default {
 
     .base-chips-input__drop-down {
       background: white;
+      min-width: 100%;
     }
 
     .base-chips-input__single-dropdown {
