@@ -674,7 +674,7 @@ export default {
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
         fieldKey: `${name}_${comboIndex}_${this.formId}`,
-        autocompleteLoading: this.fieldIsLoading === name,
+        autocompleteLoading: this.fieldIsLoading === name || singleFieldProps.isLoading,
         // add component props to form fields creator props if list contains a field_type 'group'
         fieldGroupParams: this.cleanedAndSortedFormFieldList
           .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')
