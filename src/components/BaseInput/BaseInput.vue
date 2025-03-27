@@ -268,11 +268,13 @@ export default {
      * provide assistive text for screen readers
      * **loaderActive**: if `loadable` is set `true` this text is read
      *  as soon as the loader is appearing (`isLoading` is set true)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      */
     assistiveText: {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
       }),
     },
     /**
@@ -973,8 +975,8 @@ export default {
               <!-- @slot use a custom icon instead of standard remove icon -->
               <slot name="remove-icon">
                 <BaseIcon
+                  :title="assistiveText?.clearInput || 'Clear input'"
                   name="remove"
-                  title="Clear input"
                   class="base-input__remove-icon" />
               </slot>
             </button>

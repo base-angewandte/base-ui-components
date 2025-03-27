@@ -222,14 +222,17 @@ const props = defineProps({
       default: () => ([]),
     },
     /**
-     * add text that is announced when results are being fetched (prop
-     *  `isLoading` is set `true`) and when results were retrieved (drop-down
+     * **loaderActive**: add text that is announced when results are being fetched (prop
+     *  `isLoading` is set `true`)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     * **resultsRetrieved**: text that is announced when results were retrieved (drop-down
      *  list changed)
      */
     assistiveText: {
       type: Object,
       default: () => ({
         loaderActive: 'drop-down options are loading.',
+        clearInput: 'Clear input',
         resultsRetrieved: '{number} options found with your input.',
       }),
     },
@@ -570,6 +573,7 @@ defineExpose({
       :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
       :assistive-text="{
         loaderActive: assistiveText.loaderActive,
+        clearInput: assistiveText.clearInput,
       }"
       :ignore-click-outside="['.base-autocomplete-input__drop-down']"
       role="combobox"

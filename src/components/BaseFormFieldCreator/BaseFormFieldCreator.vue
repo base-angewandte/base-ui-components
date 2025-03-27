@@ -230,6 +230,9 @@ export default {
      * this prop gives the option to add assistive text for screen readers
      * properties:
      *
+     * Options for all input types (except `boolean`):
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     *
      * Options for inputs type `autocomplete`, `chips`, `chips-below`:
      * **loaderActive**: text that is announced when options are being fetched (prop
      *  `isLoading` is set `true`)
@@ -251,6 +254,7 @@ export default {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
         resultsRetrieved: '{number} options in drop down.',
         optionAdded: 'option {label} added to selected list.',
         optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
@@ -543,6 +547,7 @@ export default {
       if (this.fieldType === 'autocomplete') {
         return {
           loaderActive: this.assistiveText.loaderActive || '',
+          clearInput: this.assistiveText.clearInput || '',
         };
       }
       if (this.fieldType === 'chips-below') {
@@ -550,7 +555,9 @@ export default {
         delete textObject.optionToRemoveSelected;
         return textObject;
       }
-      return undefined;
+      return {
+        clearInput: this.assistiveText.clearInput || '',
+      };
     },
   },
   watch: {

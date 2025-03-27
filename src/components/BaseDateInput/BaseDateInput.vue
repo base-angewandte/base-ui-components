@@ -232,6 +232,25 @@ export default {
       default: 'text',
       validator: val => ['text', 'search'].includes(val),
     },
+    /**
+     * provide assistive text for screen readers
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     *  this could either be just one string that is used for all fields or an object with
+     *  field specific text
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        clearInput: {
+          date_from: 'Clear input from',
+          date_to: 'Clear input to',
+          time_from: 'Clear input from',
+          time_to: 'Clear input to',
+          date: 'clear date',
+          time: 'clear time',
+        },
+      }),
+    },
   },
   emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
   setup(props, { emit, slots }) {
@@ -1742,6 +1761,12 @@ export default {
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
+            :assistive-text="{
+              clearInput: typeof assistiveText.clearInput === 'string'
+                ? assistiveText.clearInput
+                : assistiveText.clearInput?.date_from ?? assistiveText.clearInput?.time_from
+                  ?? assistiveText.clearInput?.date ?? 'clear input',
+            }"
             :required="required"
             :invalid="invalid"
             :disabled="disabled"
@@ -1830,6 +1855,12 @@ export default {
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
+            :assistive-text="{
+              clearInput: typeof assistiveText.clearInput === 'string'
+                ? assistiveText.clearInput
+                : assistiveText.clearInput?.date_to ?? assistiveText.clearInput?.time_to
+                  ?? assistiveText.clearInput?.time ?? 'clear input',
+            }"
             :required="required"
             :invalid="invalid"
             :disabled="disabled"

@@ -176,6 +176,7 @@ export default {
      *  working for type chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      * **optionAdded**: text read when an option was added to selected list (for type `chips`)
      * **optionToRemoveSelected**: text read when a selected option is in
      *    focus to be removed (for type `chips`)
@@ -193,6 +194,7 @@ export default {
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
         optionAdded: 'option {label} added to selected list.',
         optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
         optionRemoved: 'option {label} removed.',
@@ -596,6 +598,7 @@ export default {
       :assistive-text="!searchType.includes('date') ? {
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
+        clearInput: assistiveText.clearInput,
         optionAdded: assistiveText.optionAdded,
         optionToRemoveSelected: assistiveText.optionToRemoveSelected,
         optionRemoved: assistiveText.optionRemoved,

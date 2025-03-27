@@ -139,6 +139,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * provide assistive text for screen readers
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        clearInput: 'Clear input',
+      }),
+    },
   },
   emits: ['update:modelValue'],
   setup(props) {
@@ -286,6 +296,7 @@ export default {
     :show-error-icon="showErrorIcon"
     :error-message="errorMessage"
     :clearable="clearable"
+    :assistive-text="assistiveText"
     :use-fade-out="false"
     class="base-multiline-text-input">
     <template #label-addition>
