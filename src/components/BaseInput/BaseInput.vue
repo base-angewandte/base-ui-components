@@ -955,6 +955,13 @@ export default {
                   @blur="onInputBlur">
               </slot>
             </div>
+            <div
+              v-if="loadable"
+              class="base-input__loader">
+              <BaseLoader
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.loaderActive" />
+            </div>
             <!-- wrapped in a button for accessibility -->
             <button
               v-if="showRemoveIcon"
@@ -971,13 +978,6 @@ export default {
                   class="base-input__remove-icon" />
               </slot>
             </button>
-            <div
-              v-if="loadable"
-              class="base-input__loader">
-              <BaseLoader
-                :hide="!isLoading"
-                :text-on-loader-show="assistiveText.loaderActive" />
-            </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
           </div>
