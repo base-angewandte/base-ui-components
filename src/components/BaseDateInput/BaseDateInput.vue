@@ -14,7 +14,6 @@ import { useElementObserver } from '@/composables/useElementObserver.js';
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
  *
  * for date also a format switch between date | year is available
- *
  */
 
 export default {
@@ -274,8 +273,6 @@ export default {
       await import(`./../../../node_modules/vue-datepicker-next/locale/${newLang}.es.js`);
       // then update the vue-datepicker lang variable
       lang.value = newLang;
-    }, {
-      immediate: true,
     });
 
     /** ATTRS HANDLING */
@@ -1203,8 +1200,10 @@ export default {
     },
   },
   async mounted() {
-    // in order to avoid SSR and hydration problems only render the datepicker when component is
-    // mounted - this flag will serve as the notification to render
+    // in order to avoid SSR and hydration problems only render the datepicker when component is mounted
+    // first import the relevant language package
+    await import(`./../../../node_modules/vue-datepicker-next/locale/${this.language}.es.js`);
+    // then set mounted flag which will serve as the notification to render
     this.mounted = true;
   },
   updated() {
