@@ -230,6 +230,7 @@ export default {
      * properties:
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      * **resultsFound**: provide text that should be announced when the search has
      *  yielded results. Adding the string '{number}' will announce the total number
      *  of results found
@@ -242,6 +243,7 @@ export default {
         resultsFound: '{number} Results found.',
         noResultsFound: 'No results found.',
         loaderActive: 'Loading.',
+        clearInput: 'Clear input',
       }),
     },
   },
@@ -550,6 +552,7 @@ export default {
           :placeholder="getI18nTerm(entrySelectorText.search)"
           :assistive-text="{
             loaderActive: assistiveText.loaderActive,
+            clearInput: assistiveText.clearInput,
             results: resultsAnnouncement,
           }"
           :class="['base-entry-selector__head__search-bar',

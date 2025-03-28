@@ -25,6 +25,10 @@ import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
  *   for additional content e.g.: quick actions
  */
 
+defineOptions({
+  name: 'BaseTooltipBox',
+});
+
 const props = defineProps({
   /**
      * HTMLElement to attach the tooltip

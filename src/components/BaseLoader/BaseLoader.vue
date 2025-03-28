@@ -6,6 +6,10 @@ import { useAnnouncer } from '@/composables/useAnnouncer.js';
  * Minimal loader component to be reused in other components
  */
 
+defineOptions({
+  name: 'BaseLoader',
+});
+
 const props = defineProps({
   /**
    * define a color for the loader

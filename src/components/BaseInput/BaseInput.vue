@@ -268,11 +268,13 @@ export default {
      * provide assistive text for screen readers
      * **loaderActive**: if `loadable` is set `true` this text is read
      *  as soon as the loader is appearing (`isLoading` is set true)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      */
     assistiveText: {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
       }),
     },
     /**
@@ -955,6 +957,13 @@ export default {
                   @blur="onInputBlur">
               </slot>
             </div>
+            <div
+              v-if="loadable"
+              class="base-input__loader">
+              <BaseLoader
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.loaderActive" />
+            </div>
             <!-- wrapped in a button for accessibility -->
             <button
               v-if="showRemoveIcon"
@@ -966,18 +975,11 @@ export default {
               <!-- @slot use a custom icon instead of standard remove icon -->
               <slot name="remove-icon">
                 <BaseIcon
+                  :title="assistiveText?.clearInput || 'Clear input'"
                   name="remove"
-                  title="Clear input"
                   class="base-input__remove-icon" />
               </slot>
             </button>
-            <div
-              v-if="loadable"
-              class="base-input__loader">
-              <BaseLoader
-                :hide="!isLoading"
-                :text-on-loader-show="assistiveText.loaderActive" />
-            </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
           </div>

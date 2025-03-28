@@ -6,6 +6,11 @@ import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /** a multipurpose drop-down list */
 
+defineOptions({
+  name: 'BaseDropDownList',
+});
+
+
 const props = defineProps({
   /**
    * list of options to select from, this needs to be an object with identifier

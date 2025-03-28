@@ -280,6 +280,7 @@ export default {
      *  working for editable chips)
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      * **resultsRetrieved**: text that is announced when results were retrieved (drop down
      *  list changed)
      * **optionAdded**: text read when option was added to the selected list. string {label}
@@ -295,6 +296,7 @@ export default {
       default: () => ({
         selectedOption: '',
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
         resultsRetrieved: '{number} options in drop down.',
         optionAdded: 'option {label} added to selected list.',
         optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',

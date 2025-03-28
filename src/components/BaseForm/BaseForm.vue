@@ -192,6 +192,9 @@ export default {
      * this prop gives the option to add assistive text for screen readers
      * properties:
      *
+     * Options for all input types (except `boolean`):
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     *
      * Options for inputs type `autocomplete`, `chips`, `chips-below`:
      * **loaderActive**: text that is announced when options are being fetched (prop
      *  `isLoading` is set `true`)
@@ -213,6 +216,7 @@ export default {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
         resultsRetrieved: '{number} options in drop down.',
         optionAdded: 'option {label} added to selected list.',
         optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
@@ -670,7 +674,7 @@ export default {
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
         fieldKey: `${name}_${comboIndex}_${this.formId}`,
-        autocompleteLoading: this.fieldIsLoading === name,
+        autocompleteLoading: this.fieldIsLoading === name || singleFieldProps.isLoading,
         // add component props to form fields creator props if list contains a field_type 'group'
         fieldGroupParams: this.cleanedAndSortedFormFieldList
           .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')
