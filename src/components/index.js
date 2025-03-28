@@ -1,6 +1,3 @@
-import { defineAsyncComponent } from 'vue';
-
-const BaseHlsVideo = defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue'));
 import BaseAdvancedSearch from '@/components/BaseAdvancedSearch/BaseAdvancedSearch.vue';
 import BaseAutocompleteInput from '@/components/BaseAutocompleteInput/BaseAutocompleteInput.vue';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
@@ -28,6 +25,7 @@ import BaseExpandRow from './BaseExpandRow/BaseExpandRow.vue';
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
 import BaseFormFieldCreator from '@/components/BaseFormFieldCreator/BaseFormFieldCreator.vue';
 import BaseFormGroups from '@/components/BaseFormGroups/BaseFormGroups.vue';
+import BaseHlsVideo from '@/components/BaseHlsVideo/BaseHlsVideo.vue';
 import BaseIcon from './BaseIcon/BaseIcon.vue';
 import BaseImage from '@/components/BaseImage/BaseImage.vue';
 import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
