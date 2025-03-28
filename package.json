@@ -4,7 +4,7 @@
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://base.uni-ak.ac.at",
   "scripts": {
     "dev": "vite",

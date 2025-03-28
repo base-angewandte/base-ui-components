@@ -128,7 +128,7 @@ import 'base-ui-components/dist/lib/base-ui-components.css';
 
 ### License
 
-See [LICENSE](LICENSE.md)
+See [LICENSE](LICENSE.txt)
 
 
 <!-- logo angewandte -->
