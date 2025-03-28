@@ -66,9 +66,10 @@ export default defineConfig({
         'hls.js/dist/hls.light.js',
       ],
       output: {
-        assetFileNames: (assetInfo) => {
+        chunkFileNames: 'chunks/[name].[hash].js',
+        assetFileNames: ({ names }) => {
           // rename style file to base-ui-components.css
-          if (assetInfo.names?.includes('style.css')) return 'base-ui-components.css';
+          if (names && names.includes('style.css')) return 'base-ui-components.css';
           // for everything else return default (but without assets folder)
           return "[name]-[hash][extname]";
         },
