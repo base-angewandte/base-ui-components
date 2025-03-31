@@ -7,14 +7,21 @@ import { useEventListener } from '@/composables/useEventListener.js';
 /**
  *
  * @param {Ref<HTMLElement>} target - this must be a reference(!) to an HTML element
- * @param {string} [direction='vertical']- should calculation be horizontal or vertical
+ * @param {Object} options - additional options
+ * @property {string} [options.direction='vertical'] - should calculation be horizontal or vertical
+ * @property {string} [options.className='fade-out'] - specify the name of the class that should be
+ *  appended / removed on fade out (e.g. className 'fade-out' with direction 'horizontal' will
+ *  add the classes 'fade-out-left' and 'fade-out-right' respectively (styling for these classes
+ *  is already provided in lib.scss)
  *
  * @returns {{boxFadeOut: Ref<{ ['top'|'left']: boolean, ['bottom'|'right']: boolean }>, elementIsScrollable: ComputedRef<boolean>, calcFadeOut: function }}
  */
-export function useElementFadeOut({
-  target,
+export function useElementFadeOut(target, {
   direction = 'vertical',
+  className = 'fade-out',
 }) {
+
+  console.log('fade out', direction);
   /**
    * get either the element itself or if it is a Vue component the child
    * (TODO: this probably will face problems if there is more than one root component?)
@@ -34,7 +41,7 @@ export function useElementFadeOut({
    * horizontal: 'left' and 'right'
    * @type {string}
    */
-  const priorElementName = directionIsVertical ? 'top' : 'left';
+  const preElementName = directionIsVertical ? 'top' : 'left';
   const postElementName = directionIsVertical ? 'bottom' : 'right';
 
   /**
@@ -42,7 +49,7 @@ export function useElementFadeOut({
    * @type {Ref<{ ['top'|'left']: boolean, ['bottom'|'right']: boolean }>}
    */
   const boxFadeOut = ref({
-    [priorElementName]: false,
+    [preElementName]: false,
     [postElementName]: false,
   });
 
@@ -75,18 +82,33 @@ export function useElementFadeOut({
     boxFadeOut.value = {
       // show fade out left as soon as scroll position is different from 0
       // chose > 0 since also negative numbers possible on iOS Safari (at least in Browserstack)
-      [priorElementName]: scrollPosition > 0,
+      [preElementName]: scrollPosition > 0,
       // show fade out right as soon as scroll position is different from maximum position
       // but only if element exceeds available space
       [postElementName]: scrollMax !== 0 && scrollPosition < scrollMax,
     };
+    // add the necessary classes for the fade out (per default: `fade-out-left'
+    // or 'fade-out-top' and 'fade-out-right' / 'fade-out-botom') if className
+    // parameter is set
+    if (className) {
+      if (boxFadeOut.value[preElementName]) {
+        target.value.classList.add(`${className}-${preElementName}`);
+      } else {
+        target.value.classList.remove(`${className}-${preElementName}`);
+      }
+      if (boxFadeOut.value[postElementName]) {
+        target.value.classList.add(`${className}-${postElementName}`);
+      } else {
+        target.value.classList.remove(`${className}-${postElementName}`);
+      }
+    }
   }
 
   /**
    * determine from fade out calculations if element is scrollable
    * @type {ComputedRef<boolean>}
    */
-  const elementIsScrollable = computed(() => !!boxFadeOut.value[priorElementName]
+  const elementIsScrollable = computed(() => !!boxFadeOut.value[preElementName]
     || !!boxFadeOut.value[postElementName]);
 
   return { boxFadeOut, elementIsScrollable, calcFadeOut };

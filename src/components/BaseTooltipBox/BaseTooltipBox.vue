@@ -209,8 +209,9 @@ onClickOutside(tooltipInner, () => {
 /** FADE OUT RELATED FUNCTIONALITY */
 // use the whole boxFadeOut object instead of destructuring it because otherwise
 // reactivity is destroyed
-const { boxFadeOut, calcFadeOut } = useElementFadeOut({
-  target: body,
+const { boxFadeOut, calcFadeOut } = useElementFadeOut(body, {
+  // TODO: refactor to use build in classes and pseudo elements
+  className: '',
 });
 
 /** TOOLTIP POSITION HANDLING */

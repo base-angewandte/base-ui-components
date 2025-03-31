@@ -185,8 +185,9 @@ export default {
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
     const textarea = useTemplateRef('textareaEl');
-    const { boxFadeOut } = useElementFadeOut({
-      target: textarea,
+    const { boxFadeOut } = useElementFadeOut(textarea, {
+      // TODO: refactor to use build in classes and pseudo elements
+      className: '',
     });
 
     return {
