@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
@@ -22,7 +22,7 @@ export function useEventListener({
 }) {
   // in order to be able to use all kind of element we create a separate variable here
   const listenerContainer = computed(() => (target.value === undefined
-    ? target : target.value.$el || target.value));
+    ? target : target.value?.$el || target.value));
 
   /**
    * define a variable that can hold the debounce function in case debounce
@@ -47,7 +47,18 @@ export function useEventListener({
     if (callOnMounted) {
       callback();
     }
-    listenerContainer.value.addEventListener(event, listenerCallback.value, options);
+    if (listenerContainer.value) {
+      listenerContainer.value.addEventListener(event, listenerCallback.value, options);
+    } else {
+      watch(listenerContainer, (container) => {
+        if (container) {
+          if (callOnMounted) {
+            callback();
+          }
+          container.addEventListener(event, listenerCallback.value, options);
+        }
+      });
+    }
   });
 
   // and on before unmount it is removed again
