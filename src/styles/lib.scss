@@ -13,6 +13,12 @@
   cursor: grabbing !important;
 }
 
+.scrolling {
+  cursor: grabbing !important;
+  user-select: none;
+  touch-action: none;
+}
+
 // Fade out classes used in useElementFadeOut.js
 .fade-out-left::before {
   content: '';

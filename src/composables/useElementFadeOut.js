@@ -20,14 +20,12 @@ export function useElementFadeOut(target, {
   direction = 'vertical',
   className = 'fade-out',
 }) {
-
-  console.log('fade out', direction);
   /**
    * get either the element itself or if it is a Vue component the child
    * (TODO: this probably will face problems if there is more than one root component?)
    * @type {ComputedRef<HTMLElement>}
    */
-  const scrollContainer = computed(() => target.value.$el || target.value);
+  const scrollContainer = computed(() => target.value?.$el || target.value);
 
   /**
    * store the direction of the fade out (vertical or horizontal)
