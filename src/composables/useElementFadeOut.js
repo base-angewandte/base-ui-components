@@ -17,8 +17,13 @@ import { useEventListener } from '@/composables/useEventListener.js';
  * @returns {{boxFadeOut: Ref<{ ['top'|'left']: boolean, ['bottom'|'right']: boolean }>, elementIsScrollable: ComputedRef<boolean>, calcFadeOut: function }}
  */
 export function useElementFadeOut(target, {
+  // default options when single properties were not provided
   direction = 'vertical',
   className = 'fade-out',
+} = {
+  // default object when options were not provided
+  direction: 'vertical',
+  className: 'fade-out',
 }) {
   /**
    * get either the element itself or if it is a Vue component the child
