@@ -69,14 +69,16 @@ defineProps({
     default: () => ({}),
   },
 });
-const emits = defineEmits(['clicked']);
-
-function clicked(event) {
+const emits = defineEmits([
   /**
    * event emitted upon box click
    * @event clicked
    * @param {MouseEvent} - the native mouse event
    */
+  'clicked',
+]);
+
+function clicked(event) {
   emits('clicked', event);
 }
 </script>

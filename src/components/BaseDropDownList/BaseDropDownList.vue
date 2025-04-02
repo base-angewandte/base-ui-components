@@ -153,7 +153,16 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(['update:selected-option']);
+const emits = defineEmits([
+  /**
+   * inform parent if option was selected by mouse click
+   * (v-model on prop selectedOption can be used)
+   *
+   * @event update:selected-option
+   * @param {Object} - the selected option
+   */
+  'update:selected-option',
+]);
 
 /** INTERNATIONALIZATION */
 const { getLangLabel } = useI18n(toRef(props, 'language'));
@@ -203,13 +212,6 @@ function selected(selectedOption) {
   // do not emit the modified option but the originally provided one
   const originalOption = props.dropDownOptions
     .find((option) => option[props.identifierPropertyName] === selectedOption[props.identifierPropertyName]);
-  /**
-   * inform parent if option was selected by mouse click
-   * (v-model on prop selectedOption can be used)
-   *
-   * @event update:selected-option
-   * @param {Object} - the selected option
-   */
   emits('update:selected-option', originalOption);
 }
 

@@ -144,7 +144,14 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['close']);
+const emits = defineEmits([
+  /**
+   * Event emitted when close button is clicked or clicked-outside is triggered
+   * @event close
+   * @param {boolean} - the updated state
+   */
+  'close',
+]);
 
 /** GENERAL VARIABLES */
 // define an internal id, needed for aria purposes
@@ -174,12 +181,7 @@ const isClickOutsideActive = ref(false);
  * trigger event to remove/close the component
  */
 function close() {
-  /**
-   * Event emitted when close button is clicked or clicked-outside is triggered
-   * @event close
-   * @type {boolean}
-   */
-  emit('close');
+  emits('close');
 }
 
 /**
