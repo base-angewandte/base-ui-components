@@ -56,12 +56,12 @@ function clicked() {
   border-radius: 0;
 }
 .preview-code .preview {
-  background-color: rgb(249, 245, 245);
   box-sizing: border-box;
   padding: 12px;
 }
 .preview-code .prism-editor-wrapper {
   color: white;
+  background-color: #282c34;
 }
 
 .editor {
@@ -94,7 +94,6 @@ function clicked() {
 }
 
 .prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea {
-  background: #282c34 !important;
   padding: 4px !important;
 }
 
