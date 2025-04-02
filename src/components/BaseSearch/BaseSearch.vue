@@ -602,7 +602,9 @@ export default {
         optionAdded: assistiveText.optionAdded,
         optionToRemoveSelected: assistiveText.optionToRemoveSelected,
         optionRemoved: assistiveText.optionRemoved,
-      } : undefined"
+      } : {
+        clearInput: assistiveText.clearInput,
+      }"
       :is-active-delay="searchType.includes('date') ? dateFieldDelay : undefined"
       :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : undefined"
       :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : undefined"
