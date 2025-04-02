@@ -76,7 +76,7 @@ An example connected with an input field (displayAsDropDown: false) using all ki
       v-model:selected-list="selectedList"
       :allow-unknown-entries="false"
       :language="language"
-      :linked-list-option="active?.id ? active.id : undefined"
+      :linked-list-option="active?.id ? active.id : null"
       :show-label="false"
       drop-down-list-id="aSimpleTestList"
       identifier-property-name="id"
