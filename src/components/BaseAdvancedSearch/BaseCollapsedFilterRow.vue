@@ -134,8 +134,7 @@ export default {
       elementIsScrollable: filterListScrollable,
       isScrolling,
     } = useHorizontalDragScroll(scrollContainer, {
-      scrollableClassNames: [],
-      scrollingClassNames: [],
+      scrollableClassNames: ['base-collapsed-filter-row__filter-list__scrollable'],
     });
 
     return {
