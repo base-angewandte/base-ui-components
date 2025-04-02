@@ -405,7 +405,7 @@ function focusInitialElement() {
     // by default for box mode, focus the component container
     let focusElement = tooltipBox.value;
     // if the component is in popup mode and within mobile resolution, focus the popup title
-    if (props.typeOnMobile !== 'box' && isMobile) {
+    if (props.typeOnMobile !== 'box' && isMobile.value) {
       focusElement = props.headerId ? document.querySelector(`#${props.headerId}`) : undefined;
     }
     // if a specific element within the component is defined, try that one
