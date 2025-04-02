@@ -900,7 +900,7 @@ export default {
               @mouseup="onMouseUp"
               @end="onDragEnd">
               <TransitionGroup
-                :name="!drag ? 'flip-list' : null"
+                :name="!drag ? 'flip-list' : undefined"
                 type="transition">
                 <template
                   v-for="(entry, index) in selectedListInt">

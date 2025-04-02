@@ -384,7 +384,7 @@ const showNoOptions = computed(() => {
       :id="listId"
       ref="dropDownListEl"
       :style="listBodyStyle"
-      :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : null"
+      :aria-activedescendant="activeOption ? activeOption[identifierPropertyName] : undefined"
       role="listbox"
       class="base-drop-down-list">
       <template

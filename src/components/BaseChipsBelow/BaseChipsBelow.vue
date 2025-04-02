@@ -901,10 +901,10 @@ export default {
     <Component
       :is="draggableComponent"
       v-model="draggableList"
-      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: null"
-      :animation="draggable ? 200 : null"
-      :set-data="draggable ? setDragElement : null"
-      :handle="draggable ? '.base-chips-below__icon-handle' : null"
+      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: undefined"
+      :animation="draggable ? 200 : undefined"
+      :set-data="draggable ? setDragElement : undefined"
+      :handle="draggable ? '.base-chips-below__icon-handle' : undefined"
       @start="onDragStart"
       @end="onDragEnd(selectedBelowListInt, $event)">
       <TransitionGroup

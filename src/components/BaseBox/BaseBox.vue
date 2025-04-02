@@ -84,7 +84,7 @@ function clicked(event) {
 <template>
   <component
     :is="renderElementAs"
-    :disabled="disabled || null"
+    :disabled="disabled || undefined"
     :type="(renderElementAs === 'button') ? 'button' : ''"
     v-bind="additionalAttributes"
     :style="boxSize"

@@ -198,9 +198,9 @@ export default {
       <component
         :is="isExpandable ? 'button' : 'div'"
         :id="'base-expand-row-' + internalId"
-        :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : null"
-        :aria-expanded="isExpandable ? isExpandedInternal : null"
-        :type="isExpandable ? 'button' : null"
+        :aria-controls="isExpandable ? 'base-expand-row-panel-' + internalId : undefined"
+        :aria-expanded="isExpandable ? isExpandedInternal : undefined"
+        :type="isExpandable ? 'button' : undefined"
         :class="['base-expand-row__header__button', { selectable: isSelectable }]"
         @click="isExpandable ? clicked() : null">
         <div

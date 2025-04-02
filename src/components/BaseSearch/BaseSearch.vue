@@ -582,19 +582,19 @@ export default {
       :label="label"
       :placeholder="placeholderInt"
       :linked-list-option="linkedListOption"
-      :drop-down-list-id="dropDownListId || null"
-      :is-loading="!dateFieldType ? isLoading : null"
+      :drop-down-list-id="dropDownListId || undefined"
+      :is-loading="!dateFieldType ? isLoading : undefined"
       :clearable="clearable"
       :invalid="invalid"
       :show-error-icon="showErrorIcon"
       :language="languageInt"
-      :allow-unknown-entries="isFieldTypeChips ? searchType === 'chips' : null"
-      :loadable="!dateFieldType ? loadable : null"
-      :chips-editable="isFieldTypeChips ? searchType === 'chips' : null"
-      :label-property-name="isFieldTypeChips ? labelPropertyName : null"
-      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : null"
+      :allow-unknown-entries="isFieldTypeChips ? searchType === 'chips' : undefined"
+      :loadable="!dateFieldType ? loadable : undefined"
+      :chips-editable="isFieldTypeChips ? searchType === 'chips' : undefined"
+      :label-property-name="isFieldTypeChips ? labelPropertyName : undefined"
+      :identifier-property-name="isFieldTypeChips ? identifierPropertyName : undefined"
       :set-focus-on-active="setFocusOnActive"
-      :add-selected-entry-directly="isFieldTypeChips || null"
+      :add-selected-entry-directly="isFieldTypeChips || undefined"
       :assistive-text="!searchType.includes('date') ? {
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
@@ -602,10 +602,10 @@ export default {
         optionAdded: assistiveText.optionAdded,
         optionToRemoveSelected: assistiveText.optionToRemoveSelected,
         optionRemoved: assistiveText.optionRemoved,
-      } : null"
-      :is-active-delay="searchType.includes('date') ? dateFieldDelay : null"
-      :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : null"
-      :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : null"
+      } : undefined"
+      :is-active-delay="searchType.includes('date') ? dateFieldDelay : undefined"
+      :allow-multiple-entries="isFieldTypeChips ? searchType !== 'chipssingle' : undefined"
+      :chips-removable="isFieldTypeChips ? searchType !== 'chipssingle' : undefined"
       :input-type="'search'"
       input-class="base-search__input-field"
       enterkeyhint="search"

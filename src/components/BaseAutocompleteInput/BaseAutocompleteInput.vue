@@ -570,7 +570,7 @@ defineExpose({
       :language="language"
       :disabled="disabled"
       :drop-down-list-id="`${inputId}-list-identifier`"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : undefined"
       :assistive-text="{
         loaderActive: assistiveText.loaderActive,
         clearInput: assistiveText.clearInput,

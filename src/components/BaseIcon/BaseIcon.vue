@@ -80,7 +80,7 @@ export default {
 
 <template>
   <svg
-    :aria-labelledby="title || desc ? ariaAttribute : null"
+    :aria-labelledby="title || desc ? ariaAttribute : undefined"
     class="base-icon">
     <title
       v-if="title"
