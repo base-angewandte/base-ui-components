@@ -112,10 +112,10 @@ export function useHorizontalDragScroll(
   /**
    * function triggered by document pointer move after event listeners were added
    * in pointer down filter list element event
-   * @param {PointerEvent} e
+   * @param {PointerEvent} event
    */
-  function pointerMoveHandler(e) {
-    e.preventDefault();
+  function pointerMoveHandler(event) {
+    event.preventDefault();
     if (!clickModificationsSet.value) {
       // setPointerCapture solves the problem of consistent cursor style!
       // class applied to target element takes priority everywhere)
@@ -124,22 +124,35 @@ export function useHorizontalDragScroll(
       // of performance implications)
       // this is added here (and not in pointerdown) because otherwise click
       // event on elements (e.g. remove chips) also prevented
-      target.value.setPointerCapture(e.pointerId);
+      target.value.setPointerCapture(event.pointerId);
       // there is a click event caused by the drag that is executed after pointerup
       // this does not have any consequences on Firefox or Chrome but on Safari elements
       // are triggered (button click, drop down open etc) so we add a one-time event
       // listener to prevent default / propagation just for this one click event
       // this is added here and not in pointerdown because pointerdown is triggered
       // with every click even without drag and clicking would be permanently disabled
-      // document.addEventListener('click', preventPostDragClickEvent, true);
+      document.addEventListener('click', preventPostDragClickEvent, true);
+      // TODO: decide for one method
+      // alternatively create an overlay to prevent the click event
+      const overlay = document.createElement('div');
+      overlay.id = 'overlay';
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.height = '100%';
+      overlay.style.width = '100%';
+      // set transparent
+      overlay.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+      // select z-index larger than largest value in variables.scss
+      overlay.style.zIndex = '99999';
+      document.body.appendChild(overlay);
       clickModificationsSet.value = true;
     }
     // get event position - touch event does not have clientX/clientY - fallback
     // to touches position
-    const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
+    const eventXPosition = event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0);
     // How far the pointer has been moved
     const dx = eventXPosition - pos.value.x;
-
     // Scroll the element horizontally
     // eslint-disable-next-line no-param-reassign
     target.value.scrollLeft = pos.value.left - dx;
@@ -147,16 +160,26 @@ export function useHorizontalDragScroll(
   /**
    * function triggered by document pointer up after event listeners were added
    * in pointer down filter list element event
+   * @param {PointerEvent} event - the native pointerup event
    */
-  function pointerUpHandler() {
+  function pointerUpHandler(event) {
     // remove all the event listeners again
     target.value.removeEventListener('pointermove', pointerMoveHandler);
     target.value.removeEventListener('pointerup', pointerUpHandler);
     // and release the pointer again
-    // target.value.releasePointerCapture(event.pointerId);
+    target.value.releasePointerCapture(event.pointerId);
+
+    // also remove the overlay again that was put in place to prevent the
+    // pointerup followed click event
+    const overlay = document.getElementById('overlay');
+    if (overlay) {
+      document.body.removeChild(overlay);
+    }
 
     // change the styling of the element back to normal
     isScrolling.value = false;
+    // and remove the flag that was indicating that click prevent / pointer capture
+    // where done
     clickModificationsSet.value = false;
   }
 
@@ -167,13 +190,13 @@ export function useHorizontalDragScroll(
    *  in BaseAdvancedSearch if drag ends on search input field)
    * @param event
    */
-  // function preventPostDragClickEvent(event) {
-  //   // prevent everything related to that click event
-  //   event.stopPropagation();
-  //   event.preventDefault();
-  //   // and after this 1 click was prevented remove the listener again!
-  //   document.removeEventListener('click', preventPostDragClickEvent, true);
-  // }
+  function preventPostDragClickEvent(event) {
+    // prevent everything related to that click event
+    event.stopPropagation();
+    event.preventDefault();
+    // and after this 1 click was prevented remove the listener again!
+    document.removeEventListener('click', preventPostDragClickEvent, true);
+  }
 
   // set event listeners on the scroll container
   useEventListener({
