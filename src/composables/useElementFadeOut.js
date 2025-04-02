@@ -75,34 +75,36 @@ export function useElementFadeOut(target, {
    *  recalculated manually if necessary
    */
   function calcFadeOut() {
-    // get current element scroll position
-    const scrollPosition = direction === 'vertical' ? Math.ceil(scrollContainer.value.scrollTop)
-      : Math.ceil(scrollContainer.value.scrollLeft);
-    // get element max scroll position
-    const scrollMax = direction === 'vertical' ? scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight
-      : scrollContainer.value.scrollWidth - scrollContainer.value.clientWidth;
-    // set filter fade variables
-    boxFadeOut.value = {
-      // show fade out left as soon as scroll position is different from 0
-      // chose > 0 since also negative numbers possible on iOS Safari (at least in Browserstack)
-      [preElementName]: scrollPosition > 0,
-      // show fade out right as soon as scroll position is different from maximum position
-      // but only if element exceeds available space
-      [postElementName]: scrollMax !== 0 && scrollPosition < scrollMax,
-    };
-    // add the necessary classes for the fade out (per default: `fade-out-left'
-    // or 'fade-out-top' and 'fade-out-right' / 'fade-out-botom') if className
-    // parameter is set
-    if (className) {
-      if (boxFadeOut.value[preElementName]) {
-        target.value.classList.add(`${className}-${preElementName}`);
-      } else {
-        target.value.classList.remove(`${className}-${preElementName}`);
-      }
-      if (boxFadeOut.value[postElementName]) {
-        target.value.classList.add(`${className}-${postElementName}`);
-      } else {
-        target.value.classList.remove(`${className}-${postElementName}`);
+    if (scrollContainer.value) {
+      // get current element scroll position
+      const scrollPosition = direction === 'vertical' ? Math.ceil(scrollContainer.value.scrollTop)
+        : Math.ceil(scrollContainer.value.scrollLeft);
+      // get element max scroll position
+      const scrollMax = direction === 'vertical' ? scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight
+        : scrollContainer.value.scrollWidth - scrollContainer.value.clientWidth;
+      // set filter fade variables
+      boxFadeOut.value = {
+        // show fade out left as soon as scroll position is different from 0
+        // chose > 0 since also negative numbers possible on iOS Safari (at least in Browserstack)
+        [preElementName]: scrollPosition > 0,
+        // show fade out right as soon as scroll position is different from maximum position
+        // but only if element exceeds available space
+        [postElementName]: scrollMax !== 0 && scrollPosition < scrollMax,
+      };
+      // add the necessary classes for the fade out (per default: `fade-out-left'
+      // or 'fade-out-top' and 'fade-out-right' / 'fade-out-botom') if className
+      // parameter is set
+      if (className) {
+        if (boxFadeOut.value[preElementName]) {
+          scrollContainer.value.classList.add(`${className}-${preElementName}`);
+        } else {
+          scrollContainer.value.classList.remove(`${className}-${preElementName}`);
+        }
+        if (boxFadeOut.value[postElementName]) {
+          scrollContainer.value.classList.add(`${className}-${postElementName}`);
+        } else {
+          scrollContainer.value.classList.remove(`${className}-${postElementName}`);
+        }
       }
     }
   }
