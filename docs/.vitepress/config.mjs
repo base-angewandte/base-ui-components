@@ -29,10 +29,10 @@ export default defineConfig({
     ['meta', { name: 'apple-mobile-web-app-title', content: 'base' }],
     ['meta', { name: 'application-name', content: 'base' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
-    ['link', { rel: 'apple-touch-ico', sizes: '180x180', href: '/apple-touch-icon.png' }],
-    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
-    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
-    ['link', { rel: 'mask-icon', sizes: '180x180', href: '/safari-pinned-tab.svg' }],
+    ['link', { rel: 'apple-touch-ico', sizes: '180x180', href: 'https://base.uni-ak.ac.at/apple-touch-icon.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: 'https://base.uni-ak.ac.at/favicon-32x32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: 'https://base.uni-ak.ac.at/favicon-16x16.png' }],
+    ['link', { rel: 'mask-icon', sizes: '180x180', href: 'https://base.uni-ak.ac.at/safari-pinned-tab.svg' }],
     ['script', {}, 'var base_ui_icons = "/base-ui-components/base-ui-icons.svg";']
   ],
   // to preload the font file
