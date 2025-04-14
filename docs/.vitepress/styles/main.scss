@@ -100,7 +100,7 @@ h1 + .text {
 }
 
 .desc, .menu-text, .DocSearch-Button .DocSearch-Button-Placeholder,
-.outline-link, .top-link, .outline-title, .details {
+.outline-link, .top-link, .outline-title, .details, .VPLocalNavOutlineDropdown button {
   font-size: $font-size-regular !important;
 
   @media screen and (min-width: $mobile-min-width) {

@@ -870,7 +870,7 @@ export default {
       :input-type="inputType"
       :add-selected-entry-directly="false"
       :drop-down-list-id="internalId"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : undefined"
       :loadable="allowDynamicDropDownEntries"
       :ignore-click-outside="['.base-chips-input__drop-down']"
       role="combobox"

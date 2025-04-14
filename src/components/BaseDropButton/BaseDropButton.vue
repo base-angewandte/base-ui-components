@@ -309,7 +309,7 @@ export default {
     class="base-drop-button">
     <BaseButton
       :text="primaryButtonInt[labelPropertyName]"
-      :icon="primaryButtonInt.icon || null"
+      :icon="primaryButtonInt.icon || undefined"
       icon-size="large"
       :class="{ 'base-drop-button__button__multi': buttonsInt && buttonsInt.length }"
       @clicked="fireAction(primaryButtonInt[identifierPropertyName])">
@@ -349,7 +349,7 @@ export default {
         :active-option="activeOption"
         :active-styled="false"
         :style="dropDownTransformation"
-        :aria-activedescendant="activeOption ? `button-${activeOption.action}` : null"
+        :aria-activedescendant="activeOption ? `button-${activeOption.action}` : undefined"
         :identifier-property-name="identifierPropertyName"
         :label-property-name="labelPropertyName"
         :class="[

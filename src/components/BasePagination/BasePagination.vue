@@ -269,7 +269,7 @@ export default {
     class="base-pagination">
     <component
       :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : null"
+      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : undefined"
       :aria-disabled="active <= 1"
       :tabindex="active <= 1 ? -1 : 0"
       :class="[
@@ -290,9 +290,9 @@ export default {
           :is="numberElement"
           v-for="n in total"
           :key="n"
-          :to="useLinkElement ? getLinkPath(n) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === n ? 'true' : null"
+          :to="useLinkElement ? getLinkPath(n) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === n ? 'true' : undefined"
           :aria-label="`${active === n ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
@@ -304,9 +304,9 @@ export default {
         <component
           :is="numberElement"
           v-if="start !== 1"
-          :to="useLinkElement ? getLinkPath(1) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === 1 ? 'true' : null"
+          :to="useLinkElement ? getLinkPath(1) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === 1 ? 'true' : undefined"
           :aria-label="`${active === 1 ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${1}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
           @keydown.enter="setActivePage(1)"
@@ -320,9 +320,9 @@ export default {
           :is="numberElement"
           v-for="n in subset"
           :key="n"
-          :to="useLinkElement ? getLinkPath(n) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === n ? 'true' : null"
+          :to="useLinkElement ? getLinkPath(n) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === n ? 'true' : undefined"
           :aria-label="`${active === n ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${n}`"
           :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
           @keydown.enter="setActivePage(n)"
@@ -335,9 +335,9 @@ export default {
         <component
           :is="numberElement"
           v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
-          :to="useLinkElement ? getLinkPath(total) : null"
-          :tabindex="!useLinkElement ? 0 : null"
-          :aria-current="active === total ? 'true' : null"
+          :to="useLinkElement ? getLinkPath(total) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === total ? 'true' : undefined"
           :aria-label="`${active === total ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${total}`"
           :class="['base-pagination__number',
                    { 'base-pagination__number-active': active === total }]"
@@ -349,7 +349,7 @@ export default {
     </div>
     <component
       :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : null"
+      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : undefined"
       :aria-disabled="active >= total"
       :tabindex="active >= total ? -1 : 0"
       :class="[

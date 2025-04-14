@@ -212,7 +212,7 @@ export default {
 
 <template>
   <div
-    :style="isSingleTextObject ? { '--columns': colsSingleTextObject } : null"
+    :style="isSingleTextObject ? { '--columns': colsSingleTextObject } : undefined"
     :class="[
       'base-text-list',
       'base-text-list--row-gap-' + rowGap,

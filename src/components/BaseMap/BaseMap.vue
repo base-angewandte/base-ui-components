@@ -149,7 +149,17 @@ const props = defineProps({
 /**
  * define emits
  */
-const emits = defineEmits(['highlighted']);
+const emits = defineEmits([
+  /**
+   * Event emitted on mouseenter, mouseleave of a map marker
+   * mouseenter: index of the marker object in component property 'marker' array
+   * mouseleave: null
+   *
+   * @event highlighted
+   * @property {number} - array index or null
+   */
+  'highlighted',
+]);
 
 /**
  * set reference to map element
@@ -319,14 +329,6 @@ function resetAllMarker() {
  * @param value
  */
 function emitMarkerState(value) {
-  /**
-   * Event emitted on mouseenter, mouseleave of a map marker
-   * mouseenter: index of the marker object in component property 'marker' array
-   * mouseleave: null
-   *
-   * @event highlighted
-   * @property {number} - array index or null
-   */
   emits('highlighted', value);
 }
 

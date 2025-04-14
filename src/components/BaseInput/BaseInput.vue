@@ -938,7 +938,7 @@ export default {
                   :value="inputInt"
                   :placeholder="placeholder"
                   :type="isInputTypeNumber ? 'text' : inputType"
-                  :list="dropDownListId || null"
+                  :list="dropDownListId || undefined"
                   :disabled="disabled"
                   :aria-disabled="disabled"
                   :aria-activedescendant="linkedListOption"

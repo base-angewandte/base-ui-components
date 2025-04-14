@@ -69,14 +69,16 @@ defineProps({
     default: () => ({}),
   },
 });
-const emits = defineEmits(['clicked']);
-
-function clicked(event) {
+const emits = defineEmits([
   /**
    * event emitted upon box click
    * @event clicked
    * @param {MouseEvent} - the native mouse event
    */
+  'clicked',
+]);
+
+function clicked(event) {
   emits('clicked', event);
 }
 </script>
@@ -84,7 +86,7 @@ function clicked(event) {
 <template>
   <component
     :is="renderElementAs"
-    :disabled="disabled || null"
+    :disabled="disabled || undefined"
     :type="(renderElementAs === 'button') ? 'button' : ''"
     v-bind="additionalAttributes"
     :style="boxSize"

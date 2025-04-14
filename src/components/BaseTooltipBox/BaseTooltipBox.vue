@@ -144,7 +144,14 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['close']);
+const emits = defineEmits([
+  /**
+   * Event emitted when close button is clicked or clicked-outside is triggered
+   * @event close
+   * @param {boolean} - the updated state
+   */
+  'close',
+]);
 
 /** GENERAL VARIABLES */
 // define an internal id, needed for aria purposes
@@ -174,12 +181,7 @@ const isClickOutsideActive = ref(false);
  * trigger event to remove/close the component
  */
 function close() {
-  /**
-   * Event emitted when close button is clicked or clicked-outside is triggered
-   * @event close
-   * @type {boolean}
-   */
-  emit('close');
+  emits('close');
 }
 
 /**
@@ -405,7 +407,7 @@ function focusInitialElement() {
     // by default for box mode, focus the component container
     let focusElement = tooltipBox.value;
     // if the component is in popup mode and within mobile resolution, focus the popup title
-    if (props.typeOnMobile !== 'box' && isMobile) {
+    if (props.typeOnMobile !== 'box' && isMobile.value) {
       focusElement = props.headerId ? document.querySelector(`#${props.headerId}`) : undefined;
     }
     // if a specific element within the component is defined, try that one

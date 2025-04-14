@@ -237,7 +237,36 @@ const props = defineProps({
       }),
     },
   });
-const emits = defineEmits(['update:model-value', 'fetch-dropdown-entries', 'update:is-active', 'selected']);
+const emits = defineEmits([
+  /**
+   * event triggered when input changes - part of v-model
+   * @event update:model-value
+   * @param {string} - the altered input string
+   */
+  'update:model-value',
+  /**
+   * an event specifically triggered when drop-down should be fetched anew
+   * when `dynamicFetch` is set `true`
+   * @event fetch-dropdown-entries
+   * @property {string} value
+   */
+  'fetch-dropdown-entries',
+  /**
+   * update when active state of input field changes
+   * the v-model directive can be used on this event
+   * @event update:is-active
+   * @param {boolean} - is input field active
+   */
+  'update:is-active',
+  /**
+   * inform parent when an option was selected with all information provided in options list
+   * (mainly useful when options list was array of objects - if strings this information
+   * is provided with input event anyways)
+   * @event selected
+   * @param {string, Object} - selected option (if list of objects was provided the whole object)
+   */
+  'selected',
+]);
 
 /** ATTRS HANDLING */
 const { rootAttrs, forwardAttrs } = useExtractAttrs();
@@ -278,21 +307,10 @@ watch(() => props.modelValue, (val) => {
  */
 watch(inputInt, (val) => {
   if (val !== props.modelValue) {
-    /**
-     * event triggered when input changes - part of v-model
-     * @event update:model-value
-     * @param {string} - the altered input string
-     */
     emits('update:model-value', val);
   }
   // if options should be fetched dynamically trigger event when inputInt changes
   if (props.dynamicFetch) {
-    /**
-     * an event specifically triggered when drop-down should be fetched anew
-     * when `dynamicFetch` is set `true`
-     * @event fetch-dropdown-entries
-     * @property {string} value
-     */
     emits('fetch-dropdown-entries', { value: val });
   }
 });
@@ -429,12 +447,6 @@ watch(isActiveInt, (val) => {
   if (!val) {
     activeOptionIndex.value = -1;
   }
-  /**
-   * update when active state of input field changes
-   * the v-model directive can be used on this event
-   * @event update:is-active
-   * @param {boolean} - is input field active
-   */
   emits('update:is-active', val);
 });
 
@@ -481,13 +493,6 @@ function selectOption(selectedOption) {
         === selectedOption[props.identifierPropertyName]);
     emits('selected', originalOption);
   } else {
-    /**
-     * inform parent when an option was selected with all information provided in options list
-     * (mainly useful when options list was array of objects - if strings this information
-     * is provided with input event anyways)
-     * @event selected
-     * @param {string, Object} - selected option (if list of objects was provided the whole object)
-     */
     emits('selected', inputInt.value);
   }
   // close the drop-down and blur input
@@ -570,7 +575,7 @@ defineExpose({
       :language="language"
       :disabled="disabled"
       :drop-down-list-id="`${inputId}-list-identifier`"
-      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : null"
+      :linked-list-option="activeOption ? activeOption[identifierPropertyName] : undefined"
       :assistive-text="{
         loaderActive: assistiveText.loaderActive,
         clearInput: assistiveText.clearInput,
