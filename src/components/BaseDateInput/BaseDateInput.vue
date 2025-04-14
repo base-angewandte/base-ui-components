@@ -1129,7 +1129,7 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          if (typeof this.input === 'string') {
+          if (typeof this.modelValue === 'string') {
             this.inputInt.date = val;
           } else {
             this.inputInt = {
