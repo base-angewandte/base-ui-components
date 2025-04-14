@@ -116,6 +116,7 @@ export function useHorizontalDragScroll(
    */
   function pointerMoveHandler(event) {
     event.preventDefault();
+    // check for this flag variable so that overlay is on the first move event
     if (!clickModificationsSet.value) {
       // setPointerCapture solves the problem of consistent cursor style!
       // class applied to target element takes priority everywhere)
@@ -126,14 +127,11 @@ export function useHorizontalDragScroll(
       // event on elements (e.g. remove chips) also prevented
       target.value.setPointerCapture(event.pointerId);
       // there is a click event caused by the drag that is executed after pointerup
-      // this does not have any consequences on Firefox or Chrome but on Safari elements
-      // are triggered (button click, drop down open etc) so we add a one-time event
-      // listener to prevent default / propagation just for this one click event
+      // this does not have any consequences on Chrome but on Safari and Firefox elements
+      // are triggered (button click, drop down open etc) so we create an overlay to
+      // prevent the click event
       // this is added here and not in pointerdown because pointerdown is triggered
       // with every click even without drag and clicking would be permanently disabled
-      document.addEventListener('click', preventPostDragClickEvent, true);
-      // TODO: decide for one method
-      // alternatively create an overlay to prevent the click event
       const overlay = document.createElement('div');
       overlay.id = 'overlay';
       overlay.style.position = 'fixed';
@@ -181,21 +179,6 @@ export function useHorizontalDragScroll(
     // and remove the flag that was indicating that click prevent / pointer capture
     // where done
     clickModificationsSet.value = false;
-  }
-
-  /**
-   * function needed to prevent the click event that is induced after dragging
-   *  (the event does not have any consequences or Chrome or Firefox but on
-   *  Safari e.g. the elements are triggered - e.g. search drop down opening
-   *  in BaseAdvancedSearch if drag ends on search input field)
-   * @param event
-   */
-  function preventPostDragClickEvent(event) {
-    // prevent everything related to that click event
-    event.stopPropagation();
-    event.preventDefault();
-    // and after this 1 click was prevented remove the listener again!
-    document.removeEventListener('click', preventPostDragClickEvent, true);
   }
 
   // set event listeners on the scroll container
