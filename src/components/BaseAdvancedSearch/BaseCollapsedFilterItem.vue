@@ -184,7 +184,15 @@ export default {
 .base-collapsed-filter-item {
   flex-shrink: 0;
 
-  &:focus {
+  &:focus-visible {
+    /* Draw the focus when :focus-visible is supported */
+    .base-collapsed-filter-item__chip {
+      background-color: $app-color-secondary;
+    }
+  }
+
+  @supports not selector(:focus-visible) {
+    /* Fallback for browsers without :focus-visible support */
     .base-collapsed-filter-item__chip {
       background-color: $app-color-secondary;
     }
