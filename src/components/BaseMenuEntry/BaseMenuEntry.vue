@@ -216,7 +216,6 @@ export default {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     :tabindex="isSelectActive ? -1 : 0"
-    :href="!isSelectActive ? '#' + title : undefined"
     :class="['base-menu-entry',
              {
                'base-menu-entry--activatable': isActivatable && !isDisabled,
@@ -225,7 +224,8 @@ export default {
                'base-menu-entry--disabled': isDisabled,
                'base-menu-entry--text-fade-out': !showThumbnails && !rightSideSlotHasContent,
              }]"
-    :role="!isSelectActive ? 'link' : undefined"
+    :role="!isSelectActive ? 'option' : undefined"
+    :aria-selected="isActive"
     @keyup.enter.prevent="clicked"
     @click="clicked">
     <BaseIcon

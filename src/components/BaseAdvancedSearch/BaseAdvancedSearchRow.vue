@@ -1677,14 +1677,15 @@ export default {
                       {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
                     </div>
                   </div>
-                  <span
+                  <button
+                    tabindex="-1"
                     class="base-advanced-search-row__filter-area-close"
                     @keydown.enter="isActive = false"
                     @click.stop="isActive = false">
                     <BaseIcon
                       class="rotate-180 base-advanced-search-row__filter-area-close-icon"
                       name="drop-down" />
-                  </span>
+                  </button>
                 </div>
                 <div
                   :class="['base-advanced-search-row__columns',
