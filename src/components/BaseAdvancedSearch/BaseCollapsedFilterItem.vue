@@ -139,9 +139,11 @@ export default {
 </script>
 
 <template>
-  <div
+  <!-- this element NEEDS to be a listitem element because parent is <ul> and moving the keydown
+    event elsewhere had undesired side effects so disabling eslint rule -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+  <li
     ref="filterChip"
-    role="listitem"
     tabindex="0"
     class="base-collapsed-filter-item"
     @keydown="removeChip">
@@ -175,7 +177,7 @@ export default {
         class="base-collapsed-filter-item__icon-remove"
         @click.stop="removeChip" />
     </div>
-  </div>
+  </li>
 </template>
 
 <style scoped lang="scss">

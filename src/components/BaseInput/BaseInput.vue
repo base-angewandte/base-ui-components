@@ -885,9 +885,11 @@ export default {
     </div>
 
     <!-- ACTUAL INPUT FIELD -->
-    <!-- keydown event would have unwanted side effects here and is not relevant for
-      accessibility -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <!-- vuejs-accessibility/click-events-have-key-events: keydown event would have unwanted side
+      effects here and is not relevant for accessibility -->
+    <!-- vuejs-accessibility/no-static-element-interactions: click is just for handling focus no
+      interaction/accessibility needed -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events vuejs-accessibility/no-static-element-interactions -->
     <div
       ref="inputFrameEl"
       :class="['base-input__input-frame',

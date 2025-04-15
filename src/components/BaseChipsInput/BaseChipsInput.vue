@@ -961,6 +961,8 @@ export default {
       <template #post-input-field>
         <!-- @slot for adding elements at the end covering the whole height. for an example see [BaseChipsInputField](BaseChipsInputField)-->
         <slot name="post-input-field" />
+        <!-- this element is not needed for keyboard users or accessibility -->
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
         <div
           v-if="!allowMultipleEntries"
           class="base-chips-input__single-dropdown"

@@ -212,6 +212,8 @@ export default {
 </script>
 
 <template>
+  <!-- since role is set conditional eslint does not recognized this -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     :tabindex="isSelectActive ? -1 : 0"
     :href="!isSelectActive ? '#' + title : undefined"

@@ -1735,8 +1735,10 @@ export default {
     </div>
 
     <!-- FORM FIELDS -->
-    <!-- keydown event is counter productive to workflow here -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <!-- vuejs-accessibility/click-events-have-key-events: keydown event is counter productive to workflow here -->
+    <!-- vuejs-accessibility/no-static-element-interactions: click is just for handling focus no
+      interaction/accessibility needed -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events vuejs-accessibility/no-static-element-interactions -->
     <div
       v-click-outside="onClickOutsideHandler"
       class="base-date-input__field-wrapper"

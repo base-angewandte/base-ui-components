@@ -1263,6 +1263,8 @@ export default {
             @end="dragEnd"
             @click.capture="onBoxClick"
             @update:model-value="draggableBoxes = $event">
+            <!-- element NEEDS to be a listitem element since parent is <ul> -->
+            <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
             <li
               v-for="(entry, index) of visibleBoxes"
               :id="`li-${entry.id}`"
