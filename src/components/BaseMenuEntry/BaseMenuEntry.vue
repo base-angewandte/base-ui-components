@@ -22,7 +22,6 @@ export default {
      */
     entryId: {
       type: [Number, String],
-      default: null,
       required: true,
     },
     /**

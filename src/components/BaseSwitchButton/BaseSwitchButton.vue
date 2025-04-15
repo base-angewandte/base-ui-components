@@ -49,7 +49,6 @@ export default {
     modelValue: {
       type: String,
       required: true,
-      default: 'tab',
     },
     /**
      * specify the tabs as array of object with `value`, `label` and (optional) `icon` properties
