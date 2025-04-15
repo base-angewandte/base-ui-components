@@ -220,7 +220,7 @@ Additional helper classes are available in `src/styles/lib.scss` (e.g. a `.hide`
 
 ### Documentation Guidelines
 
-* We are using [Vuepress](ps://vuepress.vuejs.org) to automatically generate a [styleguide](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton.html#events) for all components. Therefore all component `props`, `events`, `slots` and public `methods` need to be documented in [JSDoc style](https://jsdoc.app/).
+* We are using [Vitepress](https://vitepress.dev/) to automatically generate a [styleguide](https://base-angewandte.github.io/base-ui-components/components/) for all components. Therefore all component `props`, `events`, `slots` and public `methods` need to be documented in [JSDoc style](https://jsdoc.app/).
 
 
 Example for props:
@@ -325,13 +325,13 @@ entryList: {
 DON'T:
 
 ```javascript
-validator: val => val === 'normal' || val === 'prominent',
+validator: val => val === 'normal' || val === 'prominent'
 ```
 
 DO:
 
 ```javascript
-validator: val => ['normal', 'prominent'].includes(val),
+validator: val => ['normal', 'prominent'].includes(val)
 ```
 
 * Each component should have a short meaningful description at the beginning of the script tag (but after imports). This is used in the styleguide as introduction to the component.

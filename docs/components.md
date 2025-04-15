@@ -34,7 +34,7 @@ All available components, their usage and demos can be found in our [styleguide]
 
 The code base is available at [GitHub](https://github.com/base-angewandte/base-ui-components).
 
-[Development Instructions](buildSetup.md)
+[Development Instructions](development.md)
 
 ### Customization
 
