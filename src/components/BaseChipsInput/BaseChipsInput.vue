@@ -818,6 +818,9 @@ export default {
           this.activeOptionIndex,
           true,
         );
+        if (this.activeOption && !this.activeOption[this.identifierPropertyName]) {
+          console.warn(`Selected option '${this.activeOption[this.labelPropertyName]}' will not be shown active due to missing identifier property!`);
+        }
       }
     },
 
