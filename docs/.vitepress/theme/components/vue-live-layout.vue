@@ -1,22 +1,3 @@
-<template>
-  <div class="preview-code">
-    <div class="preview block">
-      <slot name="preview" />
-    </div>
-    <div class="editor block">
-      <BaseButton
-        :text="`${showCode ? 'Hide' : 'Show' } code`"
-        icon="drop-down"
-        icon-position="right"
-        class="editor__button"
-        @clicked="clicked" />
-      <template v-if="showCode">
-        <slot name="editor" />
-      </template>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import "prismjs/themes/prism-tomorrow.css";
 import "vue-prism-editor/dist/prismeditor.min.css";
@@ -40,6 +21,25 @@ function clicked() {
   showCode.value = !showCode.value;
 }
 </script>
+
+<template>
+  <div class="preview-code">
+    <div class="preview block">
+      <slot name="preview" />
+    </div>
+    <div class="editor block">
+      <BaseButton
+        :text="`${showCode ? 'Hide' : 'Show' } code`"
+        icon="drop-down"
+        icon-position="right"
+        class="editor__button"
+        @clicked="clicked" />
+      <template v-if="showCode">
+        <slot name="editor" />
+      </template>
+    </div>
+  </div>
+</template>
 
 <style>
 .preview-code {
