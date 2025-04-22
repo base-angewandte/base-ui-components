@@ -48,11 +48,13 @@ export default [
     ignores: [
       "dist/",
       "build/",
+      "styleguide/",
       "config/*.js",
       "docs/.vitepress/cache/",
       // ignore root level config files of any kind
       ".*",
       "*.config.{js,cjs,mjs}",
+      "**/config.*.{js,cjs,mjs}",
       "gulpfile.js",
     ],
   },];
