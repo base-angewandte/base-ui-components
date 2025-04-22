@@ -36,8 +36,8 @@ export default [
         multiline: 'never',
       }],
       // allow debugger during development
-      'no-debugger': 0,
-      'no-console':  0,
+      'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+      'no-console': [process.env.NODE_ENV === 'production' ? 2 : 0, { allow: ['warn', 'error']}],
       // unfortunately our audio and video files do not have the required format
       // (.vtt files) included -->
       'vuejs-accessibility/media-has-caption': 0,
