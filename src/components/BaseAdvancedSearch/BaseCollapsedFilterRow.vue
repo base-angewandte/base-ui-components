@@ -131,8 +131,6 @@ export default {
     const {
       boxFadeOut,
       calcFadeOut,
-      elementIsScrollable: filterListScrollable,
-      isScrolling,
     } = useHorizontalDragScroll(scrollContainer, {
       scrollableClassNames: ['base-collapsed-filter-row__filter-list__scrollable'],
     });
@@ -142,9 +140,6 @@ export default {
       // fade out
       boxFadeOut,
       calcFadeOut,
-      // scrolling
-      isScrolling,
-      filterListScrollable,
     }
   },
   data() {
@@ -370,8 +365,6 @@ export default {
                       :value="groupValue"
                       :type="value.fieldType"
                       :range-indicator="getRangeIndicator(value, groupIndex)"
-                      :scrollable="filterListScrollable"
-                      :is-scrolling="isScrolling"
                       :date-time-text="dateTimeText"
                       :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                         && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
@@ -392,8 +385,6 @@ export default {
                     :value="value"
                     :type="filter.filter_values.fieldType"
                     :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
-                    :scrollable="filterListScrollable"
-                    :is-scrolling="isScrolling"
                     :date-time-text="dateTimeText"
                     :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                       && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
@@ -464,7 +455,8 @@ export default {
         height: 0;
       }
 
-      &.base-collapsed-filter-row__filter-list__scrollable {
+      &.base-collapsed-filter-row__filter-list__scrollable,
+      &.base-collapsed-filter-row__filter-list__scrollable * {
         cursor: grab;
       }
 

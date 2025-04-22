@@ -35,20 +35,6 @@ export default {
       default: 'from',
     },
     /**
-     * needed for cursor styling if over chips if list is scrollable
-     */
-    isScrolling: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * needed for cursor styling if over chips
-     */
-    scrollable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * if necessary selected chip text can be rendered as v-html directive
      * will only be applied to values with `idInternal`
      */
@@ -92,17 +78,6 @@ export default {
      */
     hasValue() {
       return !!this.value && !!this.value.labelInternal;
-    },
-    /**
-     * need to overwrite chips styling cursor and user-select in case
-     *  row is scrollable - if not return empty object
-     * @returns {{cursor: (string), userSelect: (string)}|{}}
-     */
-    chipStyling() {
-      return this.scrollable ? ({
-        cursor: this.isScrolling ? 'grabbing' : 'grab',
-        userSelect: this.isScrolling ? 'none' : 'unset',
-      }) : {};
     },
     filterItemLabel() {
       if (this.isBoolean && this.assistiveText.booleanFilterLabel
@@ -159,7 +134,6 @@ export default {
       v-if="!isBoolean && hasValue"
       :model-value="value.labelInternal"
       :is-linked="true"
-      :text-styling="chipStyling"
       :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
       :assistive-text="filterItemLabel"
       class="base-collapsed-filter-item__chip"
