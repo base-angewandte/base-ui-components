@@ -36,8 +36,8 @@ export default [
         multiline: 'never',
       }],
       // allow debugger during development
-      'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-      'no-console': [process.env.NODE_ENV === 'production' ? 2 : 0, { allow: ['warn', 'error']}],
+      'no-debugger': 0,
+      'no-console':  0,
       // unfortunately our audio and video files do not have the required format
       // (.vtt files) included -->
       'vuejs-accessibility/media-has-caption': 0,
@@ -48,11 +48,13 @@ export default [
     ignores: [
       "dist/",
       "build/",
+      "styleguide/",
       "config/*.js",
       "docs/.vitepress/cache/",
       // ignore root level config files of any kind
       ".*",
       "*.config.{js,cjs,mjs}",
+      "**/config.*.{js,cjs,mjs}",
       "gulpfile.js",
     ],
   },];
