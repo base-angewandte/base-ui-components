@@ -852,9 +852,9 @@ export default {
      */
     async function calcFadeOut(inputFields) {
       // first we need to determine the iconWidth IF it is shown
-      // only get once since the icon width should not change later on
-      if (!iconWidth.value && baseIcon.value?.$el) {
-        // get the icon HTML element
+      // only get once since the icon width should not change later on, but wait
+      // until icon is rendered (has a clientWidth)
+      if (!iconWidth.value && baseIcon.value?.$el?.clientWidth) {// get the icon HTML element
         const iconElement = baseIcon.value.$el;
         // get the margin that is also part of the icon width in the input field
         const iconMargin = Number(getComputedStyle(iconElement)['margin-left'].replace('px', ''));
