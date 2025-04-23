@@ -1,22 +1,3 @@
-<template>
-  <div class="preview-code">
-    <div class="preview block">
-      <slot name="preview" />
-    </div>
-    <div class="editor block">
-      <BaseButton
-        :text="`${showCode ? 'Hide' : 'Show' } code`"
-        icon="drop-down"
-        icon-position="right"
-        class="editor__button"
-        @clicked="clicked" />
-      <template v-if="showCode">
-        <slot name="editor" />
-      </template>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import "prismjs/themes/prism-tomorrow.css";
 import "vue-prism-editor/dist/prismeditor.min.css";
@@ -41,6 +22,25 @@ function clicked() {
 }
 </script>
 
+<template>
+  <div class="preview-code">
+    <div class="preview block">
+      <slot name="preview" />
+    </div>
+    <div class="editor block">
+      <BaseButton
+        :text="`${showCode ? 'Hide' : 'Show' } code`"
+        icon="drop-down"
+        icon-position="right"
+        class="editor__button"
+        @clicked="clicked" />
+      <template v-if="showCode">
+        <slot name="editor" />
+      </template>
+    </div>
+  </div>
+</template>
+
 <style>
 .preview-code {
   display: flex;
@@ -56,12 +56,12 @@ function clicked() {
   border-radius: 0;
 }
 .preview-code .preview {
-  background-color: rgb(249, 245, 245);
   box-sizing: border-box;
   padding: 12px;
 }
 .preview-code .prism-editor-wrapper {
   color: white;
+  background-color: #282c34;
 }
 
 .editor {
@@ -94,7 +94,6 @@ function clicked() {
 }
 
 .prism-editor-wrapper .prism-editor__editor, .prism-editor-wrapper .prism-editor__textarea {
-  background: #282c34 !important;
   padding: 4px !important;
 }
 

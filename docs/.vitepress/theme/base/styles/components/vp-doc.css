@@ -146,6 +146,10 @@
   list-style: disc;
 }
 
+.vp-doc li:not(.preview li) {
+  list-style: disc;
+}
+
 .vp-doc ol:not(.preview ol) {
   list-style: decimal;
 }

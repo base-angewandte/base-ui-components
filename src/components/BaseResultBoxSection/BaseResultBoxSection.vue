@@ -1263,6 +1263,8 @@ export default {
             @end="dragEnd"
             @click.capture="onBoxClick"
             @update:model-value="draggableBoxes = $event">
+            <!-- element NEEDS to be a listitem element since parent is <ul> -->
+            <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
             <li
               v-for="(entry, index) of visibleBoxes"
               :id="`li-${entry.id}`"
@@ -1271,7 +1273,7 @@ export default {
               :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
               :aria-label="getPropValue(titlePropertyName, entry)"
               :aria-grabbed="movableElementId === entry.id"
-              :aria-selected="editModeActive ? isEntrySelected(entry) : null"
+              :aria-selected="editModeActive ? isEntrySelected(entry) : undefined"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },

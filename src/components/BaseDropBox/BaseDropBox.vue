@@ -260,6 +260,8 @@ export default {
         ghost-class="base-drop-box-ghost"
         class="base-drop-box-drag-area"
         @add="addEntry">
+        <!-- these events are not relevant for accessibility -->
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
         <div
           class="base-drop-box-drag-area"
           @dragleave="dragLeave"

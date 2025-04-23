@@ -35,20 +35,6 @@ export default {
       default: 'from',
     },
     /**
-     * needed for cursor styling if over chips if list is scrollable
-     */
-    isScrolling: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * needed for cursor styling if over chips
-     */
-    scrollable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * if necessary selected chip text can be rendered as v-html directive
      * will only be applied to values with `idInternal`
      */
@@ -93,17 +79,6 @@ export default {
     hasValue() {
       return !!this.value && !!this.value.labelInternal;
     },
-    /**
-     * need to overwrite chips styling cursor and user-select in case
-     *  row is scrollable - if not return empty object
-     * @returns {{cursor: (string), userSelect: (string)}|{}}
-     */
-    chipStyling() {
-      return this.scrollable ? ({
-        cursor: this.isScrolling ? 'grabbing' : 'grab',
-        userSelect: this.isScrolling ? 'none' : 'unset',
-      }) : {};
-    },
     filterItemLabel() {
       if (this.isBoolean && this.assistiveText.booleanFilterLabel
         && this.assistiveText.optionToRemoveSelected) {
@@ -139,9 +114,11 @@ export default {
 </script>
 
 <template>
-  <div
+  <!-- this element NEEDS to be a listitem element because parent is <ul> and moving the keydown
+    event elsewhere had undesired side effects so disabling eslint rule -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+  <li
     ref="filterChip"
-    role="listitem"
     tabindex="0"
     class="base-collapsed-filter-item"
     @keydown="removeChip">
@@ -157,7 +134,6 @@ export default {
       v-if="!isBoolean && hasValue"
       :model-value="value.labelInternal"
       :is-linked="true"
-      :text-styling="chipStyling"
       :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
       :assistive-text="filterItemLabel"
       class="base-collapsed-filter-item__chip"
@@ -175,7 +151,7 @@ export default {
         class="base-collapsed-filter-item__icon-remove"
         @click.stop="removeChip" />
     </div>
-  </div>
+  </li>
 </template>
 
 <style scoped lang="scss">
@@ -184,7 +160,15 @@ export default {
 .base-collapsed-filter-item {
   flex-shrink: 0;
 
-  &:focus {
+  &:focus-visible {
+    /* Draw the focus when :focus-visible is supported */
+    .base-collapsed-filter-item__chip {
+      background-color: $app-color-secondary;
+    }
+  }
+
+  @supports not selector(:focus-visible) {
+    /* Fallback for browsers without :focus-visible support */
     .base-collapsed-filter-item__chip {
       background-color: $app-color-secondary;
     }

@@ -310,6 +310,7 @@ export default {
      * properties:
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      * **resultsRetrieved**: text that is announced when results were retrieved (drop down
      *  list changed)
      * **optionAdded**: text read when option was added to the selected list. string {label}
@@ -321,6 +322,7 @@ export default {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
         resultsRetrieved: '{number} options in drop down.',
         optionAdded: 'option {label} added to selected list.',
         optionRemoved: 'option {label} removed.',
@@ -899,10 +901,10 @@ export default {
     <Component
       :is="draggableComponent"
       v-model="draggableList"
-      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: null"
-      :animation="draggable ? 200 : null"
-      :set-data="draggable ? setDragElement : null"
-      :handle="draggable ? '.base-chips-below__icon-handle' : null"
+      :group="draggable ? { name: `chips-below-draggable-${internalId}` }: undefined"
+      :animation="draggable ? 200 : undefined"
+      :set-data="draggable ? setDragElement : undefined"
+      :handle="draggable ? '.base-chips-below__icon-handle' : undefined"
       @start="onDragStart"
       @end="onDragEnd(selectedBelowListInt, $event)">
       <TransitionGroup

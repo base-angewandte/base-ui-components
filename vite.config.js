@@ -67,12 +67,6 @@ export default defineConfig({
       ],
       output: {
         chunkFileNames: 'chunks/[name].[hash].js',
-        assetFileNames: ({ names }) => {
-          // rename style file to base-ui-components.css
-          if (names && names.includes('style.css')) return 'base-ui-components.css';
-          // for everything else return default (but without assets folder)
-          return "[name]-[hash][extname]";
-        },
         globals: {
           vue: 'Vue',
           swiper: 'Swiper',
@@ -90,7 +84,6 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        api: 'modern-compiler', // or "modern"
         // currently deprecation warnings from sass concerning legacy js API and from
         // datepicker - added the two settings below to not pollute console
         silenceDeprecations: ['legacy-js-api', 'import'],

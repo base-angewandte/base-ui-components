@@ -105,9 +105,10 @@ export default {
 
     /** TITLE LINE FADE OUT */
     const titleLine = useTemplateRef('titleLineElement');
-    const { boxFadeOut, calcFadeOut } = useElementFadeOut({
-      target: titleLine,
+    const { boxFadeOut, calcFadeOut } = useElementFadeOut(titleLine, {
       direction: 'horizontal',
+      // TODO: refactor to use build in classes and pseudo elements
+      className: '',
     });
 
     // also consider the title text (or subtext changing) in fade out calc

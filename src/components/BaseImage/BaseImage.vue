@@ -73,8 +73,8 @@ export default {
 <template>
   <img
     :alt="alt"
-    :data-src="lazyload ? source : null"
-    :data-srcset="lazyload ? sourceSet : null"
+    :data-src="lazyload ? source : undefined"
+    :data-srcset="lazyload ? sourceSet : undefined"
     :src="lazyload ? clearPng : source"
     :srcset="lazyload ? null : sourceSet"
     :class="['base-image', { lazyload: lazyload }]"

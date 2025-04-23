@@ -230,6 +230,9 @@ export default {
      * this prop gives the option to add assistive text for screen readers
      * properties:
      *
+     * Options for all input types (except `boolean`):
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     *
      * Options for inputs type `autocomplete`, `chips`, `chips-below`:
      * **loaderActive**: text that is announced when options are being fetched (prop
      *  `isLoading` is set `true`)
@@ -251,6 +254,7 @@ export default {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
         resultsRetrieved: '{number} options in drop down.',
         optionAdded: 'option {label} added to selected list.',
         optionToRemoveSelected: 'option {label} from selected list marked for removal. Press delete or backspace to remove.',
@@ -543,6 +547,7 @@ export default {
       if (this.fieldType === 'autocomplete') {
         return {
           loaderActive: this.assistiveText.loaderActive || '',
+          clearInput: this.assistiveText.clearInput || '',
         };
       }
       if (this.fieldType === 'chips-below') {
@@ -550,7 +555,9 @@ export default {
         delete textObject.optionToRemoveSelected;
         return textObject;
       }
-      return undefined;
+      return {
+        clearInput: this.assistiveText.clearInput || '',
+      };
     },
   },
   watch: {
@@ -747,12 +754,12 @@ export default {
       :label="labelInt"
       :show-label="fieldProps.showLabel !== undefined ? fieldProps.showLabel : showLabel"
       :placeholder="placeholderInt"
-      :tabs="fieldType === 'multiline' ? tabs : null"
+      :tabs="fieldType === 'multiline' ? tabs : undefined"
       :tab-labels="fieldType === 'multiline'
         ? fieldProps.tabLabels || tabs.map(tab => getI18nTerm(tab)) : null"
       :tabs-legend="fieldType === 'multiline'
         ? fieldProps.tabsLegend || getI18nTerm('form.textTabsLegend') : null"
-      :active-tab="fieldType === 'multiline' ? activeTab : null"
+      :active-tab="fieldType === 'multiline' ? activeTab : undefined"
       :list="fieldType === 'autocomplete'
         ? dropDownList?.length ? dropDownList : fieldProps.list || [] : null"
       :is-loading="autocompleteLoading"
@@ -897,6 +904,8 @@ export default {
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
+          :clearable="clearable"
+          :assistive-text="assistiveTextInt"
           class="base-form-field-creator__date-field"
           @value-validated="emitCompletedInputValues">
           <template
@@ -977,11 +986,11 @@ export default {
           :invalid="invalid || fieldProps.invalid"
           :required="required || fieldProps.required"
           :error-message="errorMessage || fieldProps.errorMessage"
+          :clearable="clearable"
+          :assistive-text="assistiveTextInt"
           date-type="timerange"
-          class="base-form-field-creator__date-field"
-          @date-validated="emitCompletedInputValues">
           :class="['base-form-field-creator__date-field',
-          { 'base-form-field-creator__date-field--spacing': dateType.includes('date') }]"
+                   { 'base-form-field-creator__date-field--spacing': dateType.includes('date') }]"
           @value-validated="emitCompletedInputValues">
           <!-- only add slot here if it there is no first (date) field row -->
           <template
@@ -1076,7 +1085,7 @@ export default {
       :language="formFieldXAttrs.set_label_language
         || fieldType === 'chips-below' ? language : ''"
       :drop-down-no-options-info="fieldProps.dropDownNoOptionsInfo || getI18nTerm('form.noMatch')"
-      :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : null"
+      :additional-prop-options="fieldType === 'chips-below' ? secondaryDropdown : undefined"
       :additional-prop-placeholder="fieldType === 'chips-below'
         ? fieldProps.additionalPropPlaceholder || getI18nTerm('form.selectRoles') : null"
       :additional-property-name="fieldType === 'chips-below'
@@ -1086,6 +1095,7 @@ export default {
       :invalid="invalid || fieldProps.invalid"
       :required="field.required || required || fieldProps.required"
       :error-message="errorMessage || fieldProps.errorMessage"
+      :clearable="clearable"
       :validation-texts="validationTexts.chips || fieldProps.validationTexts.chips"
       :show-error-icon="showErrorIcon"
       :identifier-property-name="fieldProps.identifierPropertyName || identifierPropertyName"

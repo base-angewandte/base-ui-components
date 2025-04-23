@@ -114,17 +114,16 @@ export default {
 
 <template>
   <div
-    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @keydown.enter.stop="clicked"
-    @click.stop="clicked">
+    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]">
     <input
       :id="internalId"
       v-model="checkedInt"
       :name="label"
       :value="radioValueInt"
       :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', { 'base-checkbox-checked': checkedInt }]"
-      @keydown.enter.prevent="">
+      :class="['base-checkbox-input', { 'base-checkbox-checked': !!checkedInt }]"
+      @keydown.enter.prevent.stop="clicked"
+      @click.stop="clicked">
     <div
       :class="[
         'base-checkmark-container',

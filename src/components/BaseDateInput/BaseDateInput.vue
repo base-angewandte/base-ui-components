@@ -231,6 +231,25 @@ export default {
       default: 'text',
       validator: val => ['text', 'search'].includes(val),
     },
+    /**
+     * provide assistive text for screen readers
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     *  this could either be just one string that is used for all fields or an object with
+     *  field specific text
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        clearInput: {
+          date_from: 'Clear input from',
+          date_to: 'Clear input to',
+          time_from: 'Clear input from',
+          time_to: 'Clear input to',
+          date: 'clear date',
+          time: 'clear time',
+        },
+      }),
+    },
   },
   emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
   setup(props, { emit, slots }) {
@@ -833,9 +852,9 @@ export default {
      */
     async function calcFadeOut(inputFields) {
       // first we need to determine the iconWidth IF it is shown
-      // only get once since the icon width should not change later on
-      if (!iconWidth.value && baseIcon.value?.$el) {
-        // get the icon HTML element
+      // only get once since the icon width should not change later on, but wait
+      // until icon is rendered (has a clientWidth)
+      if (!iconWidth.value && baseIcon.value?.$el?.clientWidth) {// get the icon HTML element
         const iconElement = baseIcon.value.$el;
         // get the margin that is also part of the icon width in the input field
         const iconMargin = Number(getComputedStyle(iconElement)['margin-left'].replace('px', ''));
@@ -1110,7 +1129,7 @@ export default {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          if (typeof this.input === 'string') {
+          if (typeof this.modelValue === 'string') {
             this.inputInt.date = val;
           } else {
             this.inputInt = {
@@ -1716,8 +1735,10 @@ export default {
     </div>
 
     <!-- FORM FIELDS -->
-    <!-- keydown event is counter productive to workflow here -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <!-- vuejs-accessibility/click-events-have-key-events: keydown event is counter productive to workflow here -->
+    <!-- vuejs-accessibility/no-static-element-interactions: click is just for handling focus no
+      interaction/accessibility needed -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events vuejs-accessibility/no-static-element-interactions -->
     <div
       v-click-outside="onClickOutsideHandler"
       class="base-date-input__field-wrapper"
@@ -1741,6 +1762,12 @@ export default {
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
+            :assistive-text="{
+              clearInput: typeof assistiveText.clearInput === 'string'
+                ? assistiveText.clearInput
+                : assistiveText.clearInput?.date_from ?? assistiveText.clearInput?.time_from
+                  ?? assistiveText.clearInput?.date ?? 'clear input',
+            }"
             :required="required"
             :invalid="invalid"
             :disabled="disabled"
@@ -1829,6 +1856,12 @@ export default {
             :use-form-field-styling="useFormFieldStyling"
             :show-input-border="showInputBorder"
             :clearable="clearable"
+            :assistive-text="{
+              clearInput: typeof assistiveText.clearInput === 'string'
+                ? assistiveText.clearInput
+                : assistiveText.clearInput?.date_to ?? assistiveText.clearInput?.time_to
+                  ?? assistiveText.clearInput?.time ?? 'clear input',
+            }"
             :required="required"
             :invalid="invalid"
             :disabled="disabled"

@@ -3,6 +3,14 @@ import BaseLink from '@/components/BaseLink/BaseLink.vue';
 import { computed, defineAsyncComponent, nextTick, ref, getCurrentInstance, onMounted, useTemplateRef, watch } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 
+/**
+ * navigation bar component tabs (internal or external links)
+ */
+
+defineOptions({
+  name: 'BaseNavigation',
+});
+
 const BaseButton = defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue'));
 
 const props = defineProps({
@@ -352,7 +360,7 @@ onMounted(() => {
           <BaseLink
             :render-link-as="renderAs"
             :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-            :aria-current="element.id === activeElementIdInt ? 'page' : null"
+            :aria-current="element.id === activeElementIdInt ? 'page' : undefined"
             :identifier-property-value="element.route || undefined"
             :url="element.url || undefined"
             :class="['base-navigation__nav-item-link',
@@ -372,7 +380,7 @@ onMounted(() => {
           <BaseLink
             :render-link-as="renderAs"
             :value="showShortLabel && element.shortLabel ? element.shortLabel : element.label"
-            :aria-current="element.id === activeElementIdInt ? 'page' : null"
+            :aria-current="element.id === activeElementIdInt ? 'page' : undefined"
             :identifier-property-value="element.route || undefined"
             :url="element.url || undefined"
             :class="['base-navigation__nav-item-link',

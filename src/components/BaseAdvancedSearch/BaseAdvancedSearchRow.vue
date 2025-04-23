@@ -12,6 +12,7 @@ import BaseChipsInputField from '@/components/BaseChipsInputField/BaseChipsInput
 import BaseChip from '@/components/BaseChip/BaseChip.vue';
 import BaseDropDownList from '@/components/BaseDropDownList/BaseDropDownList.vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useHorizontalDragScroll } from '@/composables/useHorizontalDragScroll.js';
 
 export default {
   name: 'BaseAdvancedSearchRow',
@@ -569,6 +570,15 @@ export default {
       }
     }
 
+    /** FILTER ROW FADE OUT */
+    /**
+     * template reference to the element containing the filter list
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const filterBox = useTemplateRef('filterBoxElement');
+
+    const { boxFadeOut: filterFade } = useHorizontalDragScroll(filterBox, {});
+
     /** ACCESSIBILITY */
     /**
      * insert an HTML element with aria-live assertive that will announce the
@@ -598,6 +608,9 @@ export default {
       searchInputElement,
       isActive,
       handleDropDownOnTabKey,
+      // fadeout
+      filterFade,
+      filterBox,
       // accessibility
       announcement,
     };
@@ -614,16 +627,6 @@ export default {
        * @type {?Filter}
        */
       activeFilter: null,
-      /**
-       * variable to steer filter mobile display fade outs
-       * @type {Object}
-       * @property {boolean} filterFade.left - left fade out
-       * @property {boolean} filterFade.right - right fade out
-       */
-      filterFade: {
-        left: false,
-        right: true,
-      },
       /**
        * for autocomplete drop down navigation - collection level
        * @type {?string}
@@ -928,11 +931,6 @@ export default {
      */
     isActive(val) {
       if (val) {
-        // reset filter fade (mobile view)
-        this.filterFade = {
-          left: false,
-          right: true,
-        };
         // if drop down was opened and there is no currently active entry (if there is, the options
         // are announced anyway) we announce the dropdown content
         if (!this.activeEntry) {
@@ -991,19 +989,6 @@ export default {
       // reset currently active vc entry if list changed
       this.activeControlledVocabularyEntry = null;
     },
-  },
-  updated() {
-    // if the filterBox element exists add
-    // the listener
-    if (this.$refs.filterBox) {
-      this.$refs.filterBox.addEventListener('scroll', this.calcFadeOut);
-    }
-  },
-  unmounted() {
-    // remove event listener again if element exists
-    if (this.$refs.filterBox) {
-      this.$refs.filterBox.removeEventListener('scroll', this.calcFadeOut);
-    }
   },
   methods: {
     /** FILTER ROW RELATED FUNCTIONALITIES */
@@ -1101,13 +1086,6 @@ export default {
     navigateFilters(event) {
       if (this.filterList.length && this.isActive && this.$refs.dropDown) {
         const currentIndex = this.filterList.indexOf(this.activeFilter);
-        const dropDownElement = this.$refs.dropDown.$el;
-        // if filters are out of view - scroll to top to make them visible
-        if (this.$refs.filterOption && dropDownElement.scrollTop !== 0) {
-          this.$refs.dropDown.$el.scrollTo({
-            top: 0,
-          });
-        }
         // determine if arrow was up or down - true if down, false for up
         const isArrowDown = event.key === 'ArrowDown';
         this.activeFilter = this.navigate(this.filterList, isArrowDown, currentIndex, true);
@@ -1452,26 +1430,6 @@ export default {
       this.activeControlledVocabularyEntry = null;
     },
     /**
-     * needed for mobile filter view to determine when to show fade out on filter list
-     *
-     * @param {Event} event - the event that triggered the recalculation
-     */
-    calcFadeOut(event) {
-      // get the target element
-      const scrollElement = event.target;
-      // get the actual scroll position
-      const scrollPosition = scrollElement.scrollLeft;
-      // determine the maximum possible scroll position
-      const scrollMax = scrollElement.scrollWidth - scrollElement.clientWidth;
-      // set filter fade variables
-      this.filterFade = {
-        // show fade out left as soon as scroll position is different from 0
-        left: scrollPosition !== 0,
-        // show fade out right as soon as scroll position is different from maximum position
-        right: scrollPosition !== scrollMax,
-      };
-    },
-    /**
      * function called on tab keydown on row 'x' or '+' icon
      * @param {KeyboardEvent} event - the keydown event
      */
@@ -1535,7 +1493,10 @@ export default {
 </script>
 
 <template>
-  <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+  <!-- vuejs-accessibility/click-events-have-key-events: keydown event is counter productive to workflow here -->
+  <!-- vuejs-accessibility/no-static-element-interactions: click is just for handling focus no
+    interaction/accessibility needed -->
+  <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events vuejs-accessibility/no-static-element-interactions -->
   <div
     ref="advancedSearchRow"
     class="base-advanced-search-row"
@@ -1543,8 +1504,6 @@ export default {
     <!-- SEARCH FIELD -->
     <!-- note: the id is used in the javascript part as well as the parent component
       BaseAdvancedSearch.vue - consider that when changing it! -->
-    <!-- note for @keydown.enter.capture: need to capture here so option select is handled
-      before input is blurred in search -->
     <BaseSearch
       ref="baseSearch"
       v-model="currentInput"
@@ -1718,14 +1677,15 @@ export default {
                       {{ getI18nTerm(getLangLabel(advancedSearchText.subtext)) }}
                     </div>
                   </div>
-                  <span
+                  <button
+                    tabindex="-1"
                     class="base-advanced-search-row__filter-area-close"
                     @keydown.enter="isActive = false"
                     @click.stop="isActive = false">
                     <BaseIcon
                       class="rotate-180 base-advanced-search-row__filter-area-close-icon"
                       name="drop-down" />
-                  </span>
+                  </button>
                 </div>
                 <div
                   :class="['base-advanced-search-row__columns',
@@ -1740,7 +1700,7 @@ export default {
                            }]">
                   <ul
                     :id="'filter-options-' + internalRowId"
-                    ref="filterBox"
+                    ref="filterBoxElement"
                     role="listbox"
                     class="base-advanced-search-row__filter-list">
                     <li
@@ -2213,8 +2173,12 @@ export default {
     box-shadow: $box-shadow-reg;
   }
 
+  // override the margin set as soon as slot has content - which is the case
+  // here but text is not shown > mobile
   &.base-button:deep(.base-button__icon.base-button__icon--margin) {
-    margin-left: 0;
+    @media screen and (min-width: $mobile-min-width) {
+      margin-left: 0;
+    }
   }
 }
 

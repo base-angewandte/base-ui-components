@@ -437,6 +437,7 @@ export default {
         <span
           ref="baseExpandItemHandle"
           :title="dataInt.label"
+          role="button"
           tabindex="0"
           class="base-expand-item__col base-expand-item__handle"
           @keydown.down.prevent.stop="moveItem('down')"

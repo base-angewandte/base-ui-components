@@ -185,10 +185,10 @@ export default {
 <template>
   <button
     ref="baseButton"
-    :disabled="disabled || null"
-    :aria-disabled="disabled || null"
-    :aria-labelledby="buttonHasTextElement ? internalId : null"
-    :aria-describedby="description ? `${internalId}-description` : null"
+    :disabled="disabled || undefined"
+    :aria-disabled="disabled || undefined"
+    :aria-labelledby="buttonHasTextElement ? internalId : undefined"
+    :aria-describedby="description ? `${internalId}-description` : undefined"
     :type="buttonType"
     :class="['base-button',
              `base-button--${buttonStyle}`,

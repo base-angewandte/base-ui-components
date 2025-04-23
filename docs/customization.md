@@ -26,7 +26,7 @@ that can be placed at the :root of your stylesheet:
     --background-color: #f0f0f0;
     // boxes background color, e.g. BasePagination
     --box-color: #ffffff;
-    
+
     // color used for the progress bar in BaseProgressBar
     --uploadbar-color: #999999;
     // BaseToggle customization colors
@@ -34,11 +34,14 @@ that can be placed at the :root of your stylesheet:
     --switch-svg-checked-color: #ffffff;
     // color used for inactive text
     --graytext-color: rgba(16, 16, 16, 0.3);
-    
+
     // used for user warnings in BaseProgressBar and BaseUploadPopUp
     --warning-color: #ff4444;
     // non-active color for BaseCarousel bullet points
     --pagination-bullet-color: #444444;
+
+  // specify a threshold value in px for the BaseTooltipBox top position calculation
+  --base-tooltip-box-threshold-top: 0;
 }
 
 ```
@@ -47,12 +50,13 @@ that can be placed at the :root of your stylesheet:
 
 Icons used within the components may be customized by providing a self-generated sprite sheet that would need to include icons with the following names:
 
-`add-existing-collection`, `add-existing-object`, `add-new-collection`, `add-new-object`, `archive-arrow`,
-`archive-empty`, `archive-sheets`, `arrow-left`, `attachment`, `attention`, `audio-object`, `calendar-many`,
-`calendar-number`, `camera`, `check-mark`, `clock`, `collection`, `download`, `drag-lines`, `drag-n-drop`,
-`drop-down`, `duplicate`, `edit`, `eye-hide`, `eye`, `file-object`, `forbidden`, `home`, `image-object`,
-`information`, `licence`, `logo`, `magnifier`, `next`, `options-menu`, `people`, `play`, `plus`, `prev`, `print`,
-`refresh`, `remove`, `save-file`, `share`, `sort`, `subscribe`, `success`, `text`, `unsubscribe`, `video-object`,
-`waste-bin`.
+`'add-existing-collection'`, `'add-existing-object'`, `'add-new-collection'`, `'add-new-object'`, `'archive-arrow'`,
+`'archive-empty'`, `'archive-sheets'`, `'arrow-left'`, `'arrow-right'`, `'attachment'`, `'attention'`, `'audio-object'`, `'calendar-many'`,
+`'calendar-number'`, `'camera'`, `'check-mark'`, `'clock'`, `'collection'`, `'download'`, `'drag-lines'`, `'drag-n-drop'`,
+`'drop-down'`, `'duplicate'`, `'edit'`, `'eye-hide'`, `'eye'`, `'file-object'`, `'forbidden'`, `'fullscreen'`, `'fullscreen-exit'`,
+`'grid'`, `'home'`, `'image-object'`, `'image-cropped'`, `'image-resized'`, `'information'`, `'institution'`, `'information-solo'`,
+`'licence'`, `'magnifier'`, `'minus'`, `'next'`, `'options-menu'`, `'people'`, `'people-filled'`, `'play'`, `'plus'`, `'prev'`, `'print'`,
+`'refresh'`, `'remove'`, `'save-file'`, `'separator-vertical'`, `'share'`, `'sort'`, `'subscribe'`, `'success'`, `'text'`, `'unsubscribe'`,
+`'video-object'`, `'waste-bin'`.
 
 To make sure the latest icons are included and for instructions on how to integrate the generated sprite sheet into your front end project please also check documentation in the [BaseIcon component](/components/BaseIcon).

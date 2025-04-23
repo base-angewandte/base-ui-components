@@ -2,6 +2,11 @@
 import { ref, defineAsyncComponent, useTemplateRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 
+/**
+ * Component to implement the <a href="https://github.com/video-dev/hls.js">HLS.js</a> JavaScript library which adds an HTTP Live Streaming client.
+ * It relies on HTML5 video and MediaSource Extensions for playback.
+ */
+
 export default {
   name: 'BaseHlsVideo',
   components: {
@@ -138,7 +143,8 @@ export default {
       });
     },
     /**
-     * play video
+     * initialize hls player and start video
+     * @public
      */
     play() {
       if (!this.video) return;
@@ -152,6 +158,7 @@ export default {
     },
     /**
      * pause video
+     * @public
      */
     pause() {
       if (!this.video) return;

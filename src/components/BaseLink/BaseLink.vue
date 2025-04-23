@@ -463,10 +463,10 @@ export default {
     :is="renderAs"
     v-bind="linkAttributes"
     v-clean-dom-nodes
-    :aria-controls="isTooltip ? `tooltipBox-${internalId}`: null"
-    :aria-expanded="isTooltip ? showTooltip : null"
-    :aria-label="isChip || isTooltip ? title : null"
-    :tabindex="isTooltip ? 0 : null"
+    :aria-controls="isTooltip ? `tooltipBox-${internalId}`: undefined"
+    :aria-expanded="isTooltip ? showTooltip : undefined"
+    :aria-label="isChip || isTooltip ? title : undefined"
+    :tabindex="isTooltip ? 0 : undefined"
     :title="title"
     :class="[
       'base-link',

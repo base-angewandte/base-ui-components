@@ -48,10 +48,10 @@ export default {
         {
           title: 'Video',
           additionalInfo: [
-            'Taken from: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+            'Taken from: https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8',
             'Archive Id: A987s4e1fsffeABXX57',
           ],
-          mediaUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+          mediaUrl: 'https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8',
           mediaPosterUrl: 'https://picsum.photos/seed/video/1200/650.jpg',
           mediaUrlSmall: 'https://picsum.photos/seed/video/400/300.jpg',
           displaySize: { 'width': '100%', 'max-width': '1000px' },

@@ -268,11 +268,13 @@ export default {
      * provide assistive text for screen readers
      * **loaderActive**: if `loadable` is set `true` this text is read
      *  as soon as the loader is appearing (`isLoading` is set true)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      */
     assistiveText: {
       type: Object,
       default: () => ({
         loaderActive: 'loading.',
+        clearInput: 'Clear input',
       }),
     },
     /**
@@ -883,9 +885,11 @@ export default {
     </div>
 
     <!-- ACTUAL INPUT FIELD -->
-    <!-- keydown event would have unwanted side effects here and is not relevant for
-      accessibility -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
+    <!-- vuejs-accessibility/click-events-have-key-events: keydown event would have unwanted side
+      effects here and is not relevant for accessibility -->
+    <!-- vuejs-accessibility/no-static-element-interactions: click is just for handling focus no
+      interaction/accessibility needed -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events vuejs-accessibility/no-static-element-interactions -->
     <div
       ref="inputFrameEl"
       :class="['base-input__input-frame',
@@ -936,7 +940,7 @@ export default {
                   :value="inputInt"
                   :placeholder="placeholder"
                   :type="isInputTypeNumber ? 'text' : inputType"
-                  :list="dropDownListId || null"
+                  :list="dropDownListId || undefined"
                   :disabled="disabled"
                   :aria-disabled="disabled"
                   :aria-activedescendant="linkedListOption"
@@ -955,6 +959,13 @@ export default {
                   @blur="onInputBlur">
               </slot>
             </div>
+            <div
+              v-if="loadable"
+              class="base-input__loader">
+              <BaseLoader
+                :hide="!isLoading"
+                :text-on-loader-show="assistiveText.loaderActive" />
+            </div>
             <!-- wrapped in a button for accessibility -->
             <button
               v-if="showRemoveIcon"
@@ -966,18 +977,11 @@ export default {
               <!-- @slot use a custom icon instead of standard remove icon -->
               <slot name="remove-icon">
                 <BaseIcon
+                  :title="assistiveText?.clearInput || 'Clear input'"
                   name="remove"
-                  title="Clear input"
                   class="base-input__remove-icon" />
               </slot>
             </button>
-            <div
-              v-if="loadable"
-              class="base-input__loader">
-              <BaseLoader
-                :hide="!isLoading"
-                :text-on-loader-show="assistiveText.loaderActive" />
-            </div>
             <!-- @slot for adding elements after input (e.g. used to add loader) -->
             <slot name="input-field-addition-after" />
           </div>

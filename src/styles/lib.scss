@@ -13,6 +13,36 @@
   cursor: grabbing !important;
 }
 
+.scrolling {
+  cursor: grabbing !important;
+  user-select: none;
+  touch-action: none;
+}
+
+// Fade out classes used in useElementFadeOut.js
+.fade-out-left::before {
+  content: '';
+  width: $fade-out-width;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  z-index: map.get($zindex, chips-fadeout);
+  pointer-events: none;
+}
+.fade-out-right::after {
+  content: '';
+  width: $fade-out-width;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  // need to add 1px because fade out not positioned perfectly else
+  right: -1px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
+  z-index: map.get($zindex, chips-fadeout);
+  pointer-events: none;
+}
+
 *, *:before, *:after {
   box-sizing: border-box;
   margin: 0;

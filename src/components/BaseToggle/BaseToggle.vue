@@ -112,6 +112,8 @@ export default {
 </script>
 
 <template>
+  <!-- events are just here to handle animation - no accessibility needed -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     :class="['base-toggle',
              { 'base-toggle--checked': checkedInt },

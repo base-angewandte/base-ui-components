@@ -49,7 +49,6 @@ export default {
     modelValue: {
       type: String,
       required: true,
-      default: () => (this.options[0] ? this.options[0].value : 'tab'),
     },
     /**
      * specify the tabs as array of object with `value`, `label` and (optional) `icon` properties

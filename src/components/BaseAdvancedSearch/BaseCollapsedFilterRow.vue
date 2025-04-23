@@ -2,9 +2,8 @@
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue';
 import { hasData } from '@/utils/utils.js';
-import { computed, ref, useTemplateRef } from 'vue';
-import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
-import { useEventListener } from '@/composables/useEventListener.js';
+import { useTemplateRef } from 'vue';
+import { useHorizontalDragScroll } from '@/composables/useHorizontalDragScroll.js';
 
 /**
  * component for BaseAdvancedSearch 'form' mode to display form filter values efficiently
@@ -128,120 +127,12 @@ export default {
      * @type {Readonly<ShallowRef<HTMLElement | null>>}
      */
     const scrollContainer = useTemplateRef('filterList');
-    /** FADE OUT */
-    /**
-     * @type {Object} boxFadeOut - variable to steer filter mobile display fade outs
-     * also if element is scrollable is determined from this variable (see computed
-     * prop filterListScrollable)
-     * @property {boolean} boxFadeOut.left - left fade out
-     * @property {boolean} boxFadeOut.right - right fade out
-     * @type {function} calcFadeOut - function to recalculate fade out
-     */
-    const { boxFadeOut, calcFadeOut } = useElementFadeOut({
-      target: scrollContainer,
-      direction: 'horizontal',
-    });
 
-    /** DRAG SCROLL */
-    /**
-     * determine from fade out calculations if element is scrollable
-     * @returns {ComputedRef<boolean>}
-     */
-    const filterListScrollable = computed(() => {
-      return boxFadeOut.value.right || boxFadeOut.value.left;
-    });
-
-    /**
-     * set cursor styling according to current scroll state
-     * use variable instead of setting css class directly so child component
-     *  BaseCollapsedFilter item can also be steered easily
-     *  @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
-     */
-    const isScrolling = ref(false);
-    /**
-     * store the element scroll and mouse cursor position, needed for drag scrolling
-     * @type {Ref<UnwrapRef<Object>>}
-     * @property {number} pos.top - element scrollTop value
-     * @property {number} pos.left - element scrollLeft value
-     * @property {number} pos.x - cursor x position
-     * @property {number} pos.y - cursor y position
-     */
-    const pos = ref({ top: 0, left: 0, x: 0, y: 0 });
-
-    /**
-     * function triggered by mouse down on filter list, triggering scroll functionality
-     * @param {MouseEvent} event - the mouse down event
-     */
-    function mouseDownHandler(event) {
-      // check if filterList is actually scrollable
-      if (filterListScrollable.value) {
-        // save the current element scroll state and mouse position
-        pos.value = {
-          // The current scroll
-          left: scrollContainer.value.scrollLeft,
-          top: scrollContainer.value.scrollTop,
-          // Get the current mouse position
-          x: event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0),
-          y: event.clientY ?? (event.touches ? event.touches[0]?.clientY : 0),
-        };
-        // add event listeners for mousemove and mouseup to be able to trigger scroll
-        // for touch devices add touch event listeners
-        if (event.type === 'touchstart') {
-          document.addEventListener('touchmove', mouseMoveHandler);
-          document.addEventListener('touchend', mouseUpHandler);
-        } else {
-          // else add mouse events
-          document.addEventListener('mousemove', mouseMoveHandler);
-          document.addEventListener('mouseup', mouseUpHandler);
-        }
-        // Change the cursor and prevent user from selecting the text
-        isScrolling.value = true;
-      }
-    }
-
-    /**
-     * function triggered by document mouse move after event listeners were added
-     * in mouse down filter list element event
-     * @param {MouseEvent} e
-     */
-    function mouseMoveHandler(e) {
-      // get event position - touch event does not have clientX/clientY - fallback
-      // to touches position
-      const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
-      const eventYPosition = e.clientY ?? (e.touches ? e.touches[0]?.clientY : 0);
-      // How far the mouse has been moved
-      const dx = eventXPosition - pos.value.x;
-      const dy = eventYPosition - pos.value.y;
-
-      // Scroll the element
-      scrollContainer.value.scrollTop = pos.value.top - dy;
-      scrollContainer.value.scrollLeft = pos.value.left - dx;
-    }
-    /**
-     * function triggered by document mouse up after event listeners were added
-     * in mouse down filter list element event
-     */
-    function mouseUpHandler() {
-      // remove all the event listeners again
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-      document.removeEventListener('touchmove', mouseMoveHandler);
-      document.removeEventListener('touchend', mouseUpHandler);
-
-      // change the styling of the element back to normal
-      isScrolling.value = false;
-    }
-
-    // set event listeners on the scroll container
-    useEventListener({
-      target: scrollContainer,
-      event: 'mousedown',
-      callback: mouseDownHandler,
-    });
-    useEventListener({
-      target: scrollContainer,
-      event: 'touchstart',
-      callback: mouseDownHandler,
+    const {
+      boxFadeOut,
+      calcFadeOut,
+    } = useHorizontalDragScroll(scrollContainer, {
+      scrollableClassNames: ['base-collapsed-filter-row__filter-list__scrollable'],
     });
 
     return {
@@ -249,9 +140,6 @@ export default {
       // fade out
       boxFadeOut,
       calcFadeOut,
-      // scrolling
-      isScrolling,
-      filterListScrollable,
     }
   },
   data() {
@@ -437,23 +325,13 @@ export default {
     <!-- Container to add fade out effect -->
     <div
       ref="filterListContainer"
-      :class="['base-collapsed-filter-row__filter-list-container',
-               {
-                 'base-collapsed-filter-row__filter-list-container__fade-right':
-                   boxFadeOut.right,
-               },
-               {
-                 'base-collapsed-filter-row__filter-list-container__fade-left':
-                   boxFadeOut.left,
-               }]">
+      :class="['base-collapsed-filter-row__filter-list-container']">
       <!-- the actual list of filters -->
       <ul
         ref="filterList"
         :aria-description="assistiveText.appliedFiltersLabel"
         :class="[
           'base-collapsed-filter-row__filter-list',
-          { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
-          { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
         ]">
         <li
           v-for="(filter, filterIndex) in filtersInt"
@@ -487,8 +365,6 @@ export default {
                       :value="groupValue"
                       :type="value.fieldType"
                       :range-indicator="getRangeIndicator(value, groupIndex)"
-                      :scrollable="filterListScrollable"
-                      :is-scrolling="isScrolling"
                       :date-time-text="dateTimeText"
                       :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                         && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
@@ -509,8 +385,6 @@ export default {
                     :value="value"
                     :type="filter.filter_values.fieldType"
                     :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
-                    :scrollable="filterListScrollable"
-                    :is-scrolling="isScrolling"
                     :date-time-text="dateTimeText"
                     :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
                       && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
@@ -568,30 +442,6 @@ export default {
     flex: 1 1 auto;
     overflow: hidden;
 
-    &.base-collapsed-filter-row__filter-list-container__fade-left::before {
-      content: '';
-      width: $fade-out-width;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-      z-index: map.get($zindex, chips-fadeout);
-      pointer-events: none;
-    }
-
-    &.base-collapsed-filter-row__filter-list-container__fade-right::after {
-      content: '';
-      width: $fade-out-width;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      // need to add 1px because fade out not positioned perfectly else
-      right: -1px;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
-      z-index: map.get($zindex, chips-fadeout);
-      pointer-events: none;
-    }
-
     .base-collapsed-filter-row__filter-list {
       display: flex;
       overflow-x: auto;
@@ -605,13 +455,9 @@ export default {
         height: 0;
       }
 
-      &.base-collapsed-filter-row__filter-list__scrollable {
+      &.base-collapsed-filter-row__filter-list__scrollable,
+      &.base-collapsed-filter-row__filter-list__scrollable * {
         cursor: grab;
-      }
-
-      &.base-collapsed-filter-row__filter-list__scrolling {
-        cursor: grabbing;
-        user-select: none;
       }
 
       .base-collapsed-filter-row__filter {
