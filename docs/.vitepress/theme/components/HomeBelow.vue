@@ -7,16 +7,19 @@ const currentlyUsedApps = ref([
     name: 'Showroom',
     icon: '/.vitepress/assets/icons/showroom.svg',
     link: 'https://portfolio-showroom.ac.at/',
+    github: 'https://github.com/base-angewandte/showroom-frontend',
   },
   {
     name: 'Portfolio',
     icon: '/.vitepress/assets/icons/portfolio.svg',
     link: 'https://portfolio-showroom.ac.at/',
+    github: 'https://github.com/base-angewandte/portfolio-frontend',
   },
   {
     name: 'Image',
     icon: '/.vitepress/assets/icons/image.svg',
     link: 'https://imageplus.at/',
+    github: 'https://github.com/base-angewandte/image-frontend',
   },
 ]);
 </script>
@@ -30,16 +33,28 @@ const currentlyUsedApps = ref([
     </p>
     <div
       class="home-below__apps">
-      <a
+      <div
         v-for="app in currentlyUsedApps"
-        :key="app.name"
-        :href="app.link"
-        class="home-below__app-link">
-        <img
-          :src="withBase(app.icon)"
-          :alt="app.name"
-          class="home-below__app-icon">
-      </a>
+        :key="app.name">
+        <a
+          :href="app.link"
+          class="home-below__app-link">
+          <img
+            :src="withBase(app.icon)"
+            :alt="app.name"
+            class="home-below__app-icon">
+        </a>
+        <a
+          v-if="app.github"
+          :href="app.github"
+          class="home-below__github-link-wrapper">
+          <span
+            style="--icon: url('https://api.iconify.design/simple-icons/github.svg');"
+            class="vpi-social-github">
+            View on Github
+          </span>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -76,9 +91,9 @@ const currentlyUsedApps = ref([
       display: block;
       border: 1px solid transparent;
       border-radius: 12px;
-      height: 100%;
       -webkit-transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
       transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
+      margin-bottom: $spacing-small;
 
       &:hover {
         box-shadow: $box-shadow-hov;
