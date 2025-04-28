@@ -150,7 +150,7 @@ export default {
       }),
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
   setup(props) {
     /** INTERNAL ID */
     /**
@@ -253,10 +253,10 @@ export default {
       /**
        * Event emitted on input, passing input string or input object
        *
-       * @event update:modelValue
+       * @event update:model-value
        * @param {string, Object} - the altered field input
        */
-      this.$emit('update:modelValue', this.emitFieldContent());
+      this.$emit('update:model-value', this.emitFieldContent());
     },
     setFieldContent(val) {
       if (this.tabs.length < 2) {

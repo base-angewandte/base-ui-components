@@ -68,7 +68,7 @@ export default {
       },
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
   setup() {
     /** INTERNAL ID */
     const internalId = useId();
@@ -103,10 +103,10 @@ export default {
        * event emitted on radio button / checkmark click,
        * emitting input label
        *
-       * @event update:modelValue
+       * @event update:model-value
        * @param {string, boolean} - emitting boolean value for checkmark or radio value
        */
-      this.$emit('update:modelValue', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
+      this.$emit('update:model-value', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
     },
   },
 };

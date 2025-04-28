@@ -78,7 +78,7 @@ export default {
       default: false,
     },
   },
-  emits: ['clicked', 'update:modelValue', 'remove-entry'],
+  emits: ['clicked', 'update:model-value', 'remove-entry'],
   setup() {
     const internalId = useId();
     return {
@@ -117,10 +117,10 @@ export default {
         /**
          * if chip is editable value is updated with this event
          *
-         * @event update:modelValue
+         * @event update:model-value
          * @param {string} - the displayed text string after edit
          */
-        this.$emit('update:modelValue', this.modelValueInt);
+        this.$emit('update:model-value', this.modelValueInt);
       }
     },
     clickAction(e) {
