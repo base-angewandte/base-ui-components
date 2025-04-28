@@ -62,6 +62,7 @@ In order to do so you can add the following variables to your main css/scss file
   --pagination-bullet-color: #444444;
 
   --base-tooltip-box-threshold-top: 0;
+  --header-height: 55px;
 }
 ```
 Then in your `main.js` file import your styles before the base-ui-components file. E.g.:
