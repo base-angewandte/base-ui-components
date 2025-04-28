@@ -831,19 +831,21 @@ export default {
      * overlay with label
      */
     function calcLabelAdditionsWidth() {
-      // get the complete element width
-      const observableWidth = baseDateInput.value.clientWidth;
-      // get the label margin
-      const labelMargin = props.showLabel
-        ? Number(getComputedStyle(labelElement.value)['margin-right'].replace('px', '')) : 0;
-      const labelWidth = props.showLabel ? labelElement.value.clientWidth : 0;
-      // calculate the remaining container space after label, label margin and date switch width
-      const spacingLeft = observableWidth
-        - labelWidth
-        - labelMargin
-        - labelAdditions.value.clientWidth;
-      // if no space is left set a class that sets label additions width to 100% so element has to wrap
-      wrapLabelRow.value = spacingLeft < 0;
+      if (baseDateInput.value) {
+        // get the complete element width
+        const observableWidth = baseDateInput.value.clientWidth;
+        // get the label margin
+        const labelMargin = props.showLabel
+          ? Number(getComputedStyle(labelElement.value)['margin-right'].replace('px', '')) : 0;
+        const labelWidth = props.showLabel ? labelElement.value.clientWidth : 0;
+        // calculate the remaining container space after label, label margin and date switch width
+        const spacingLeft = observableWidth
+          - labelWidth
+          - labelMargin
+          - labelAdditions.value.clientWidth;
+        // if no space is left set a class that sets label additions width to 100% so element has to wrap
+        wrapLabelRow.value = spacingLeft < 0;
+      }
     }
 
     /**
