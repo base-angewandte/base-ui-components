@@ -354,7 +354,8 @@ export default {
     valueListInt: {
       handler(val) {
         // make sure there are any changes not updated yet
-        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
+        if (Object.keys(this.formFieldJson)
+          .some((key) => JSON.stringify(this.modelValue[key]) !== JSON.stringify(val[key]))) {
           /**
            * event triggered when the values of a field were altered or a form
            * field was added or removed
