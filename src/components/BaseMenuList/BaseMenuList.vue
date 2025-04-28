@@ -196,8 +196,11 @@ export default {
         this.setInternalVar();
       }
     },
-    selectedList() {
-      this.setInternalVar();
+    selectedList: {
+      handler() {
+        this.setInternalVar();
+      },
+      deep: true,
     },
     /**
      * watch variable `entryProps` - managing the state for every entry - to

@@ -490,21 +490,25 @@ export default {
         }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * watch selectedChipsInt to sync with selectedChips prop provided by parent
      * @param {Object[]} val
      */
-    selectedChipsInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
-        /**
-         * inform parent of changes in selected chips
-         *
-         * @event update:selected-chips
-         * @param {Array} - the updated selected options list
-         */
-        this.$emit('update:selected-chips', val);
-      }
+    selectedChipsInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
+          /**
+           * inform parent of changes in selected chips
+           *
+           * @event update:selected-chips
+           * @param {Array} - the updated selected options list
+           */
+          this.$emit('update:selected-chips', val);
+        }
+      },
+      deep: true,
     },
     /**
      * sync internal active state with parent
