@@ -27,9 +27,12 @@ export function useI18n(language) {
       i18n.value = app.config.globalProperties.$i18n;
       t.value = app.config.globalProperties.$t;
       te.value = app.config.globalProperties.$te;
+      if (!app.config.globalProperties.$i18n) {
+        console.warn('$i18n was not found! make sure the plugin is enabled!');
+      }
     }
-    // else just return false
-    return i18nEnabled;
+    // make sure i18n was available in globalProperties
+    return !!i18n.value && i18nEnabled;
   });
 
   /**
