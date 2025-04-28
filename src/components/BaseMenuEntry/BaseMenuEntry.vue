@@ -269,36 +269,36 @@ export default {
     <slot
       name="right-side-elements"
       :is-selected="isSelectedInt">
-      <div
-        class="base-menu-entry__transition-container">
-        <TransitionGroup
-          name="slide-fade"
-          @leave="slideFadeLeave"
-          @after-leave="slideFadeAfterLeave">
+      <TransitionGroup
+        v-if="isSelectable || showThumbnails"
+        name="slide-fade"
+        tag="div"
+        class="base-menu-entry__transition-container"
+        @leave="slideFadeLeave"
+        @after-leave="slideFadeAfterLeave">
+        <div
+          v-if="showThumbnails"
+          :key="entryId + 'thumbnail'"
+          ref="slideFade"
+          class="slide-fade-group base-menu-entry--text-fade-out">
           <div
-            :key="entryId + 'thumbnail'"
-            ref="slideFade"
-            class="slide-fade-group base-menu-entry--text-fade-out">
-            <div
-              v-if="showThumbnails"
-              ref="thumbnailContainer"
-              class="base-menu-entry__thumbnail-container"
-              :style="{ '--cols': columns }">
-              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
-              <slot name="thumbnails" />
-            </div>
+            ref="thumbnailContainer"
+            class="base-menu-entry__thumbnail-container"
+            :style="{ '--cols': columns }">
+            <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
+            <slot name="thumbnails" />
           </div>
-          <BaseCheckmark
-            v-if="isSelectable && selectActive && !isDisabled"
-            :key="entryId + 'checkmark'"
-            :model-value="isSelected"
-            :label="title"
-            title="checkbox"
-            mark-style="checkbox"
-            class="base-menu-entry__checkbox"
-            @update:model-value="clicked" />
-        </TransitionGroup>
-      </div>
+        </div>
+        <BaseCheckmark
+          v-if="isSelectable && selectActive && !isDisabled"
+          :key="entryId + 'checkmark'"
+          :model-value="isSelected"
+          :label="title"
+          title="checkbox"
+          mark-style="checkbox"
+          class="base-menu-entry__checkbox"
+          @update:model-value="clicked" />
+      </TransitionGroup>
     </slot>
   </div>
 </template>
