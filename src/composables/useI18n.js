@@ -18,7 +18,7 @@ export function useI18n(language) {
    * @type {ComputedRef<any|boolean>}
    */
   const hasI18n = computed(() => {
-    const i18nEnabled = Boolean(app?.__VUE_I18N__);
+    const i18nEnabled = Boolean(app?.config?.globalProperties?.$i18n);
     // if the __VUE_I18N__ variable is set - return the global $i18n variable
     if (i18nEnabled) {
       // if i18n is present in the app set all the necessary
@@ -27,12 +27,8 @@ export function useI18n(language) {
       i18n.value = app.config.globalProperties.$i18n;
       t.value = app.config.globalProperties.$t;
       te.value = app.config.globalProperties.$te;
-      if (!app.config.globalProperties.$i18n) {
-        console.warn('$i18n was not found! make sure the plugin is enabled!');
-      }
     }
-    // make sure i18n was available in globalProperties
-    return !!i18n.value && i18nEnabled;
+    return i18nEnabled;
   });
 
   /**

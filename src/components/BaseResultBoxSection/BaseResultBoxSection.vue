@@ -693,18 +693,21 @@ export default {
       immediate: true,
     },
     // watch selectedList prop and assign to internal value if changes occur
-    selectedListInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
-        /**
-         * inform the parent of the changes in `selectedList` and provide
-         * the ids of all selected.
-         *   the v-model directive may be used on the corresponding prop
-         *
-         * @event update:selected-list
-         * @param {Array} - the list of selected entry ids
-         */
-        this.$emit('update:selected-list', val);
-      }
+    selectedListInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
+          /**
+           * inform the parent of the changes in `selectedList` and provide
+           * the ids of all selected.
+           *   the v-model directive may be used on the corresponding prop
+           *
+           * @event update:selected-list
+           * @param {Array} - the list of selected entry ids
+           */
+          this.$emit('update:selected-list', val);
+        }
+      },
+      deep: true,
     },
     // watch pages in case of deletion of items and take care
     // current page is not higher than total page number
