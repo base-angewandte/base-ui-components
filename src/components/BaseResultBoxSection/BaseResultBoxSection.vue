@@ -388,6 +388,27 @@ export default {
       }),
     },
     /**
+     * this prop gives the option to add assistive text for the pagination:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    paginationAssistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+    },
+    /**
      * `BaseResultBoxSection` is for example used to display search results - which contain a link
      * to the entry - in this case the focus should be on the link element so that navigation to
      * route link triggers on enter and focus on the list element itself is disabled (if not edit
@@ -1399,6 +1420,7 @@ export default {
             :total="pages"
             :model-value="currentPageNumberInt"
             :use-link-element="usePaginationLinkElement"
+            :assistive-text="paginationAssistiveText"
             @update:model-value="setPage" />
         </template>
       </div>

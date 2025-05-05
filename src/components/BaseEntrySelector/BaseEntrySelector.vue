@@ -246,6 +246,30 @@ export default {
         clearInput: 'Clear input',
       }),
     },
+    /**
+     * this prop gives the option to add assistive text for the pagination:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    paginationAssistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['currentPage', 'nextPage', 'pagination', 'previousPage', 'toPage']
+        .every(prop => Object.keys(val).includes(prop)),
+    }
   },
   emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
   setup(props) {
@@ -728,6 +752,7 @@ export default {
       ref="pagination"
       :total="pageTotal"
       :model-value="pageNumber"
+      :assistive-text="paginationAssistiveText"
       @update:model-value="setPage" />
   </div>
 </template>
