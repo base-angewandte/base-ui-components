@@ -31,12 +31,15 @@ and default (base project specific) role selection
         },
         {
           label: 'Magician',
+          id: 'Magician',
         },
         {
           label: 'Priest',
+          id: 'Priest',
         },
         {
           label: 'Farmer',
+          id: 'Farmer',
         }]"
       label="Select a Person">
       <template
@@ -141,10 +144,12 @@ export default {
       additionalPropOptions: [
         {
           label: 'Read',
+          id: 'Read',
           default: true,
         },
         {
           label: 'Edit',
+          id: 'Edit',
         },
       ],
       additionalPropDefaultOption: null,
