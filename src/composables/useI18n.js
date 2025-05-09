@@ -98,6 +98,7 @@ export function useI18n(language) {
   }
 
   return {
+    hasI18n,
     getI18nTerm,
     setLangLabels,
     getLangLabel,
