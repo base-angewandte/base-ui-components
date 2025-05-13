@@ -24,6 +24,7 @@ import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
 import BaseLink from '@/components/BaseLink/BaseLink.vue';
 import BaseBreadCrumbs from '@/components/BaseBreadCrumbs/BaseBreadCrumbs.vue';
 import BaseNavigation from '@/components/BaseNavigation/BaseNavigation.vue';
+import BaseNotification from '@/components/BaseNotification/BaseNotification.vue';
 import BaseCheckmark from '@/components/BaseCheckmark/BaseCheckmark.vue';
 import BaseCarousel from '@/components/BaseCarousel/BaseCarousel.vue';
 import BaseChipsBelow from '@/components/BaseChipsBelow/BaseChipsBelow.vue';
@@ -87,6 +88,7 @@ export {
   BaseLink,
   BaseBreadCrumbs,
   BaseNavigation,
+  BaseNotification,
   BaseCheckmark,
   BaseCarousel,
   BaseChipsBelow,
