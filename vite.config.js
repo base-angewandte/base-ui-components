@@ -45,7 +45,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, './src/components/index.js'),
+      entry: resolve(__dirname, './src/index.js'),
       name: 'BaseUiComponents',
       fileName: 'base-ui-components',
     },
@@ -66,6 +66,7 @@ export default defineConfig({
         'hls.js/dist/hls.light.js',
       ],
       output: {
+        chunkFileNames: 'assets/[name].[hash].js',
         globals: {
           vue: 'Vue',
           swiper: 'Swiper',
