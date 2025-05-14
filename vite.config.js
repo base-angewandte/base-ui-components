@@ -66,6 +66,7 @@ export default defineConfig({
         'hls.js/dist/hls.light.js',
       ],
       output: {
+        chunkFileNames: 'assets/[name].[hash].js',
         globals: {
           vue: 'Vue',
           swiper: 'Swiper',
