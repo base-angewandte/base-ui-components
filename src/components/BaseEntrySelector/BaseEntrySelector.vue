@@ -411,8 +411,12 @@ export default {
         // reset pageChanged flag
         this.pageChanged = false;
         // announce that entries have changed
-        this.resultsAnnouncement = this.assistiveText[this.entriesTotal ? 'resultsFound' : 'noResultsFound']
-          .replace('{number}', this.entriesTotal);
+        const announcementTextKey = this.entriesTotal ? 'resultsFound' : 'noResultsFound';
+        // safeguard against text not existing
+        if (this.assistiveText[announcementTextKey]) {
+          this.resultsAnnouncement = this.assistiveText[announcementTextKey]
+            .replace('{number}', this.entriesTotal);
+        }
         // and reset afterward so the same text would trigger the watcher again
         setTimeout(() => {
           this.resultsAnnouncement = '';
