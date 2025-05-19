@@ -15,16 +15,17 @@ app.use(BaseNotifications);
 app.mount('#app');
 ```
 
-The plugin can then be triggered with `$notifiy(options)`.
+The plugin can then be triggered with `$notify(options)`.
 
 ```vue live
+
 <template>
   <div>
     <BaseNotification
-      :has-header="false" />
+      :has-header="false"/>
     <BaseButton
       text="Trigger Notification"
-      @clicked="triggerNotification" />
+      @clicked="triggerNotification"/>
   </div>
 </template>
 <script>
@@ -46,29 +47,20 @@ export default {
 
 ## Using in Nuxt setup
 
-Please note that the [vue3-notification](https://github.com/kyvg/vue3-notification) library does not inherently support Nuxt 3.<br>
-To enable compatibility with Nuxt 3, use the [nuxt3-notification](https://github.com/windx-foobar/nuxt3-notifications) wrapper.
 
-Add package to your nuxt frontend
-```shell
-npm install nuxt3-notification
-```
+Add a `BaseNotifications` plugin to make the `BaseNotification` component globally available in your Nuxt frontend.
 
-Rename the component name in your nuxt.config.js
-```javascript
-export default defineNuxtConfig({
-  nuxtNotifications: {
-    componentName: 'Notifications',
-  },
+```js
+import { BaseNotifications } from 'base-ui-components';
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(BaseNotifications);
 });
 ```
 
 Add the component to your app
-```vue
-<script setup>
-import { BaseNotification } from 'base-ui-components';
-</script>
 
+```vue
 <template>
   <div>
     <BaseNotification
@@ -80,10 +72,12 @@ import { BaseNotification } from 'base-ui-components';
 </template>
 ```
 
-The plugin can then be triggered with `notifiy(options)` from the useNotification composable.
+The plugin can then be triggered with `notify(options)` from the useNotifications composable.
 ```vue
 <script setup>
-  const { notify } = useNotification();
+  import { useNotifications } from 'base-ui-components';
+
+  const { notify } = useNotifications();
 
   function triggerNotification() {
     notify({

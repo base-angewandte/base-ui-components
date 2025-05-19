@@ -41,7 +41,6 @@ import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
 import BaseMenuList from '@/components/BaseMenuList/BaseMenuList.vue';
 import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput.vue';
 import BaseNavigation from '@/components/BaseNavigation/BaseNavigation.vue';
-import BaseNotification from '@/components/BaseNotification/BaseNotification.vue';
 import BaseOptions from '@/components/BaseOptions/BaseOptions.vue';
 import BasePagination from '@/components/BasePagination/BasePagination.vue';
 import BasePopUp from '@/components/BasePopUp/BasePopUp.vue';
@@ -99,7 +98,6 @@ export {
   BaseMenuList,
   BaseMultilineTextInput,
   BaseNavigation,
-  BaseNotification,
   BaseOptions,
   BasePagination,
   BasePopUp,
