@@ -145,12 +145,30 @@ export default {
       isSelectedInt: false,
       // how many columns the thumbnail container takes
       columns: 0,
+      // toggle transition-group transition
+      transition: false,
     };
   },
   watch: {
     isSelected(val) {
       this.isSelectedInt = val;
     },
+    /**
+     * watch if selectActive changes and enable the transition
+     * and disable after a certain time
+     */
+    isSelectActive() {
+      this.transition = true;
+      this.disableTransition(500);
+    },
+    /**
+     * watch if thumbnails slot content changes and enable the transition
+     * and disable after a certain time
+     */
+    thumbnailsSlotHasContent() {
+      this.transition = true;
+      this.disableTransition(500);
+    }
   },
   mounted() {
     this.setThumbnailColumns();
@@ -182,6 +200,14 @@ export default {
          */
         this.$emit('clicked');
       }
+    },
+    /**
+     * disable transition after defined delay
+     * @param {Number} delay - time, in milliseconds, until method is executed
+     */
+    disableTransition(delay) {
+      // the delay should be the same as the slide-fade-move transition duration
+      setTimeout(() => this.transition = false, delay || 0);
     },
     slideFadeLeave() {
       // safari fix: somehow transition needs to be triggered manually
@@ -271,7 +297,7 @@ export default {
       :is-selected="isSelectedInt">
       <TransitionGroup
         v-if="isSelectable || showThumbnails"
-        name="slide-fade"
+        :name="transition ? 'slide-fade' : 'none'"
         tag="div"
         class="base-menu-entry__transition-container"
         @leave="slideFadeLeave"
@@ -494,6 +520,8 @@ export default {
       height: 100%;
       padding-left: $spacing;
       z-index: 1;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform: translateZ(0) scale(1, 1);
     }
 
     .slide-fade-group {
