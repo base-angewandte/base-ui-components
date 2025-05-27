@@ -262,6 +262,9 @@ export default {
       // on iOS Safari the container remains the previous size so we scroll back to the max
       // position manually
       this.$nextTick(() => {
+        // if the scroll container is not present anymore, do nothing
+        if (!this.scrollContainer) return;
+        // otherwise calculate and scroll back to max position
         if (this.scrollContainer.scrollLeft + this.scrollContainer.clientWidth >= this.scrollContainer.scrollWidth) {
           this.scrollContainer.scrollLeft = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
         }
