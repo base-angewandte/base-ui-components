@@ -15,10 +15,9 @@ app.use(BaseNotificationsPlugin);
 app.mount('#app');
 ```
 
-The plugin can then be triggered with `$notify(options)`.
+The plugin can then be triggered with `$notify(options)` in Options API.
 
 ```vue live
-
 <template>
   <div>
     <BaseNotification
@@ -45,34 +44,7 @@ export default {
 </script>
 ```
 
-## Using in Nuxt setup
-
-
-Add the `BaseNotificationsPlugin` to make the `BaseNotification` component globally available in your Nuxt frontend.
-
-```js
-import { BaseNotificationsPlugin } from 'base-ui-components';
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(BaseNotificationsPlugin);
-});
-```
-
-Add the component to your app
-
-```vue
-<template>
-  <div>
-    <BaseNotification
-      :has-header="false" />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
-</template>
-```
-
-The plugin can then be triggered with `notify(options)` from the useNotifications composable.
+In Composition API it can be triggered with `notify(options)` from the useNotifications composable.
 ```vue
 <script setup>
   import { useNotifications } from 'base-ui-components';
@@ -89,4 +61,38 @@ The plugin can then be triggered with `notify(options)` from the useNotification
     });
   }
 </script>
+```
+
+## Using in Nuxt setup
+
+
+Add the `BaseNotificationsPlugin` to make the `BaseNotification` component globally available in your Nuxt frontend.
+
+```js
+import { BaseNotificationsPlugin } from 'base-ui-components';
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(BaseNotificationsPlugin);
+  // in case you want to expose the $notify method add:
+  const notify = nuxtApp.vueApp.config.globalProperties.$notify;
+  return {
+    provide: {
+      notify,
+    }
+  };
+});
+```
+
+Add the component to your app
+
+```vue
+<template>
+  <div>
+    <BaseNotification
+      :has-header="false" />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
+</template>
 ```
