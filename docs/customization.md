@@ -42,6 +42,9 @@ that can be placed at the :root of your stylesheet:
 
   // specify a threshold value in px for the BaseTooltipBox top position calculation
   --base-tooltip-box-threshold-top: 0;
+  // specify the height of a header (e.g. base-header) - used to place notifications
+  // correctly
+  --header-height: 55px;
 }
 
 ```

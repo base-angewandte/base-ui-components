@@ -5,6 +5,13 @@ import VueLiveWithLayout from './components/vue-live-with-layout';
 import HomeBelow from './components/HomeBelow.vue';
 const modules = import.meta.glob(['../../../src/**/*.vue'], { eager: true });
 import '../styles/app.scss';
+import BaseNotifications from '@/plugins/base-notifications.js';
+
+const ignoreComponents = [
+  // we do not want to auto-import the component since it is registered
+  // by the plugin automatically
+  'BaseNotification',
+];
 
 export default {
   extends: BaseTheme,
@@ -23,8 +30,11 @@ export default {
      * Copyright (c) 2021 Vue Styleguidist
      */
     Object.entries(modules).forEach(([filePath, mod]) => {
-      const name = mod.default?.name || mod.name || filePath.split('/').pop().replace(/\..+$/, '')
+      const name = mod.default?.name || mod.name || filePath.split('/').pop().replace(/\..+$/, '');
+      if (ignoreComponents.includes(name)) return;
       app.component(name, mod.default)
-    })
+    });
+    // add the BaseNotifications plugin for the styleguide demo
+    app.use(BaseNotifications);
   }
 };
