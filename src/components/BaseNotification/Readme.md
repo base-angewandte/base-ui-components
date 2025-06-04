@@ -1,5 +1,3 @@
-## Demo
-
 BaseNotification is a plugin based on [vue3-notification](https://github.com/kyvg/vue3-notification).
 Use it by adding the plugin on app initialization:
 
@@ -14,6 +12,21 @@ const app = createApp(App);
 app.use(BaseNotificationsPlugin);
 app.mount('#app');
 ```
+
+And add the component to your app
+
+```vue
+<template>
+  <div>
+    <BaseNotification
+      :has-header="false" />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
+</template>
+```
+## Demo
 
 The plugin can then be triggered with `$notify(options)` in Options API.
 
@@ -81,18 +94,4 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   };
 });
-```
-
-Add the component to your app
-
-```vue
-<template>
-  <div>
-    <BaseNotification
-      :has-header="false" />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
-</template>
 ```
