@@ -254,7 +254,10 @@ export default {
     getLinkPath(page) {
       // check if router in project and link element is used and set link path accordingly if yes
       if (!!this.useLinkElement && this.$route) {
-        return ({ path: this.$route.fullPath, query: { page } });
+        return ({ path: this.$route.fullPath, query: {
+          ...this.$route.query,
+          page,
+        }});
       }
       return '';
     },
