@@ -1,5 +1,5 @@
-import BaseNotifications from '@/plugins/base-notifications.js';
+import BaseNotificationsPlugin from '@/plugins/base-notifications.js';
 
 export {
-  BaseNotifications,
+  BaseNotificationsPlugin,
 };

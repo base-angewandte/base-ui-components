@@ -7,11 +7,11 @@ Use it by adding the plugin on app initialization:
 import { createApp } from 'vue';
 import App from '@/App.vue';
 import {
-  BaseNotifications,
+  BaseNotificationsPlugin,
 } from 'base-ui-components';
 
 const app = createApp(App);
-app.use(BaseNotifications);
+app.use(BaseNotificationsPlugin);
 app.mount('#app');
 ```
 
@@ -48,13 +48,13 @@ export default {
 ## Using in Nuxt setup
 
 
-Add a `BaseNotifications` plugin to make the `BaseNotification` component globally available in your Nuxt frontend.
+Add the `BaseNotificationsPlugin` to make the `BaseNotification` component globally available in your Nuxt frontend.
 
 ```js
-import { BaseNotifications } from 'base-ui-components';
+import { BaseNotificationsPlugin } from 'base-ui-components';
 
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(BaseNotifications);
+  nuxtApp.vueApp.use(BaseNotificationsPlugin);
 });
 ```
 
