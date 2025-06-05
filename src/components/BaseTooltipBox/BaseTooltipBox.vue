@@ -204,7 +204,10 @@ useEventListener({
  */
 onClickOutside(tooltipInner, () => {
   if (isClickOutsideActive.value) {
-    close();
+    // fire the callback at the end of the execution queue
+    // is needed to perform calculations in the parent components after a click event
+    // otherwise, the tooltipBox will be closed too early
+    setTimeout(() => close(), 0);
   }
 });
 
