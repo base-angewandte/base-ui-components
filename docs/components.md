@@ -87,6 +87,7 @@ Additionally, base-ui-components export the following composables for re-use:
 * **useI18n**: get or set localized labels with vue-i18n
 * **useId**: create a persistent element id
 * **useListNavigation**: navigate a list
+* **useNotifications**: composable to trigger the BaseNotification component
 * **usePopUpLock**: set a body scroll lock on pop up opening
 * **useTabKeyHandler**: enable key events to remain within one element (e.g. pop up)
 * **useWindowResize**: listen to and carry out events on window resize
