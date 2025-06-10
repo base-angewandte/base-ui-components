@@ -142,6 +142,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /**
+   * specify options for the click-outside handler
+   * https://vueuse.org/core/onClickOutside/#type-declarations
+   */
+  clickOutsideOptions: {
+    type: Object,
+    default: () => ({
+      capture: false,
+    }),
+  },
 });
 
 const emits = defineEmits([
@@ -202,14 +212,15 @@ useEventListener({
 /**
  * intercept click-outside event and close the component
  */
-onClickOutside(tooltipInner, () => {
-  if (isClickOutsideActive.value) {
-    // fire the callback at the end of the execution queue
-    // is needed to perform calculations in the parent components after a click event
-    // otherwise, the tooltipBox will be closed too early
-    setTimeout(() => close(), 0);
-  }
-});
+onClickOutside(
+  tooltipInner,
+  () => {
+    if (isClickOutsideActive.value) {
+      close();
+    }
+  },
+  props.clickOutsideOptions,
+);
 
 /** FADE OUT RELATED FUNCTIONALITY */
 // use the whole boxFadeOut object instead of destructuring it because otherwise
