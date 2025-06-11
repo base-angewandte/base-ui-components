@@ -167,6 +167,7 @@ export default {
       const defaultSwiperOptions = {
         keyboard: true,
         loop: this.items.length > 3,
+        loopAddBlankSlides: false,
         spaceBetween: 16,
         speed: 750,
         slidesPerView: 1,
