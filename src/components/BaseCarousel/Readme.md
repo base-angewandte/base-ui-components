@@ -1,14 +1,12 @@
 ## Demo
+**Note:**
+In base Angewandte projects, slides are grouped with a maximum of three elements per view, depending on screen resolution.
+If there are fewer than three elements, the single element takes up 50% of the space; otherwise, it takes up 33%.<br>
+The default configuration with all settings can be found in the sample file code below.
 
 ```vue live
 <template>
   <div>
-    <p>
-      <strong>Note:</strong><br>
-      In base Angewandte projects, slides are grouped with a maximum of three elements per view, depending on screen resolution.
-      If there are fewer than three elements, the single element takes up 50% of the space; otherwise, it takes up 33%.<br>
-      The default configuration with all settings can be found in the sample file code below.
-    </p>
     <div class="container">
       <div>Number of Slides:</div>
       <BaseButton
