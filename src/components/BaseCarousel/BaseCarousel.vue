@@ -113,11 +113,13 @@ export default {
     items: {
       handler() {
         if (!this.swiperIsActive) return;
-        // destroy swiper but keep instance
-        this.swiper.destroy(true);
+        // the pagination and a11y doesn't update correctly, when items change,
+        // so destroy swiper but keep instance
+        this.swiper.destroy();
         // reinit swiper
         this.initSwiper();
       },
+      deep: true,
     },
     swiperOptions: {
       handler(val) {
