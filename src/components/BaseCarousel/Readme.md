@@ -31,6 +31,7 @@ The default configuration with all settings can be found in the sample file code
       :swiper-options="{
        keyboard: false,
        loop: itemsInt.length > 3,
+       loopAddBlankSlides: false,
        spaceBetween: 16,
        speed: 750,
        slidesPerView: 1,
