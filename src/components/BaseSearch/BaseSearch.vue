@@ -15,6 +15,7 @@ export default {
     BaseInput: defineAsyncComponent(() => import('@/components/BaseInput/BaseInput.vue')),
     BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
   },
+  inheritAttrs: false,
   props: {
     /**
      * set input value from outside
@@ -577,7 +578,7 @@ export default {
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       v-model:selected-list="selectedChipsModelValue"
-      v-bind="$attrs"
+      v-bind="forwardAttrs"
       :input-id="idInt"
       :date-type="dateFieldType"
       :show-label="false"
