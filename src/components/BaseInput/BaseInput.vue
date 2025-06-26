@@ -929,14 +929,17 @@ export default {
                 name="input">
                 <!-- instead of v-model we need to use :value because on android chrome value is not updated properly otherwise
                 also see https://stackoverflow.com/questions/75477442/vue-3-v-model-not-properly-updating-on-in-andoids-chrome -->
+                <!-- id attributes needs to be below v-bind in order to prevent an (accidental) overwrite from
+                  outside (and thus id not matching label anymore) -->
+                <!-- eslint-disable vue/attributes-order -->
                 <!-- need to disable because label is there (below)? -->
                 <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
                 <input
-                  :id="idInt"
                   ref="inputField"
                   enterkeyhint="done"
                   autocomplete="off"
                   v-bind="forwardAttrs"
+                  :id="idInt"
                   :value="inputInt"
                   :placeholder="placeholder"
                   :type="isInputTypeNumber ? 'text' : inputType"
@@ -957,6 +960,7 @@ export default {
                   @keydown="onKeydown"
                   @keydown.tab="handleInputTab"
                   @blur="onInputBlur">
+                <!-- eslint-enable vue/attributes-order -->
               </slot>
             </div>
             <div
