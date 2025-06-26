@@ -118,7 +118,7 @@ export default {
       /**
        * Event emitted on options switch, value of options object is emitted
        *
-       * @event switch
+       * @event update:model-value
        * @param { string } - the `value` of the selected option object
        */
       this.$emit('update:model-value', val);
