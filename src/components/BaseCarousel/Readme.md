@@ -29,9 +29,8 @@ The default configuration with all settings can be found in the sample file code
     <BaseCarousel
       :items="itemsInt"
       :swiper-options="{
-       keyboard: false,
-       loop: itemsInt.length > 3,
-       loopAddBlankSlides: false,
+       keyboard: true,
+       rewind: true,
        spaceBetween: 16,
        speed: 750,
        slidesPerView: 1,
@@ -58,7 +57,7 @@ export default {
       itemsInt: [],
       items: [
         {
-          title: 'Title',
+          title: 'Title 1',
           subtext: 'Subtitle',
           description: 'Exhibition 1',
           href: 'http://base.uni-ak.ac.at',
@@ -75,7 +74,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 2',
           subtext: 'Subtitle',
           description: 'Exhibition 2',
           additional: '07.05.2020 - 21.05.2020',
@@ -93,7 +92,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 3',
           subtext: 'Subtitle',
           description: 'Exhibition 3',
           href: 'http://base.uni-ak.ac.at',
@@ -110,7 +109,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 4',
           subtext: 'Subtitle',
           description: 'Exhibition 4',
           additional: '07.05.2020 - 21.05.2020',
@@ -128,7 +127,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 5',
           subtext: 'Subtitle',
           description: 'Exhibition',
           additional: '07.05.2020 - 21.05.2020',
@@ -146,11 +145,40 @@ export default {
           ],
         },
         {
-          title: 'Title',
-          subtext: 'An item with no images',
+          title: 'Title 6',
+          subtext: 'Subtitle',
           description: 'Exhibition',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://picsum.photos/seed/foo/460/341',
+            },
+            {
+              '640w': 'https://picsum.photos/seed/foo/640/480',
+            },
+            {
+              '768w': 'https://picsum.photos/seed/foo/768/576',
+            },
+          ],
+        },
+        {
+          title: 'Title 7',
+          subtext: 'Subtitle',
+          description: 'Exhibition',
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://picsum.photos/seed/bar/460/341',
+            },
+            {
+              '640w': 'https://picsum.photos/seed/bar/640/480',
+            },
+            {
+              '768w': 'https://picsum.photos/seed/bar/768/576',
+            },
+          ],
         },
       ],
     };
