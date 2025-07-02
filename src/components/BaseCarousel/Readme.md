@@ -1,40 +1,63 @@
 ## Demo
+**Note:**
+In base Angewandte projects, slides are grouped with a maximum of three elements per view, depending on screen resolution.
+If there are fewer than three elements, the single element takes up 50% of the space; otherwise, it takes up 33%.<br>
+The default configuration with all settings can be found in the sample file code below.
 
 ```vue live
 <template>
+  <div>
+    <div class="container">
+      <div>Number of Slides:</div>
+      <BaseButton
+        text="1"
+        :active="itemsInt.length === 1"
+        @clicked="numberOfItems(1)" />
+      <BaseButton
+        text="2"
+        :active="itemsInt.length === 2"
+        @clicked="numberOfItems(2)" />
+      <BaseButton
+        text="3"
+        :active="itemsInt.length === 3"
+        @clicked="numberOfItems(3)" />
+      <BaseButton
+        text="> 3"
+        :active="itemsInt.length > 3"
+        @clicked="(itemsInt = items)" />
+    </div>
     <BaseCarousel
-      :items="items"
+      :items="itemsInt"
       :swiper-options="{
+       keyboard: true,
+       rewind: true,
+       spaceBetween: 16,
+       speed: 750,
        slidesPerView: 1,
        slidesPerGroup: 1,
-       spaceBetween: 15,
-       autoplay: false,
-       loop: true,
-       speed: 750,
-       keyboard: {
-         enabled: true,
-       },
        breakpoints: {
          640: {
            slidesPerView: 2,
            slidesPerGroup: 2,
          },
          1024: {
-           slidesPerView: 3,
-           slidesPerGroup: 3,
+           slidesPerView: itemsInt.length < 3 ? 2 : 3,
+           slidesPerGroup: itemsInt.length < 3 ? 2 : 3,
          },
        },
      }"
-      @clicked="boxClicked" />
+     @clicked="boxClicked" />
+  </div>
 </template>
 
 <script>
 export default {
   data() {
     return {
+      itemsInt: [],
       items: [
         {
-          title: 'Title',
+          title: 'Title 1',
           subtext: 'Subtitle',
           description: 'Exhibition 1',
           href: 'http://base.uni-ak.ac.at',
@@ -51,7 +74,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 2',
           subtext: 'Subtitle',
           description: 'Exhibition 2',
           additional: '07.05.2020 - 21.05.2020',
@@ -69,7 +92,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 3',
           subtext: 'Subtitle',
           description: 'Exhibition 3',
           href: 'http://base.uni-ak.ac.at',
@@ -86,7 +109,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 4',
           subtext: 'Subtitle',
           description: 'Exhibition 4',
           additional: '07.05.2020 - 21.05.2020',
@@ -104,7 +127,7 @@ export default {
           ],
         },
         {
-          title: 'Title',
+          title: 'Title 5',
           subtext: 'Subtitle',
           description: 'Exhibition',
           additional: '07.05.2020 - 21.05.2020',
@@ -122,20 +145,69 @@ export default {
           ],
         },
         {
-          title: 'Title',
-          subtext: 'An item with no images',
+          title: 'Title 6',
+          subtext: 'Subtitle',
           description: 'Exhibition',
           additional: '07.05.2020 - 21.05.2020',
           href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://picsum.photos/seed/foo/460/341',
+            },
+            {
+              '640w': 'https://picsum.photos/seed/foo/640/480',
+            },
+            {
+              '768w': 'https://picsum.photos/seed/foo/768/576',
+            },
+          ],
+        },
+        {
+          title: 'Title 7',
+          subtext: 'Subtitle',
+          description: 'Exhibition',
+          additional: '07.05.2020 - 21.05.2020',
+          href: 'http://base.uni-ak.ac.at',
+          previews: [
+            {
+              '460w': 'https://picsum.photos/seed/bar/460/341',
+            },
+            {
+              '640w': 'https://picsum.photos/seed/bar/640/480',
+            },
+            {
+              '768w': 'https://picsum.photos/seed/bar/768/576',
+            },
+          ],
         },
       ],
     };
   },
+  created() {
+    this.itemsInt = this.items;
+  },
   methods: {
+    numberOfItems(value) {
+      const items = this.items.slice(0, value);
+      this.itemsInt = JSON.parse(JSON.stringify(items));
+    },
     boxClicked(item) {
       window.alert(`Box with title '${item.title || 'No title'}' was clicked`);
     },
   },
 };
 </script>
+
+<style>
+  .container {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+
+    > div,
+    > button {
+      margin-right: 8px;
+    }
+  }
+</style>
 ```
