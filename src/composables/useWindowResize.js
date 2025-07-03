@@ -25,7 +25,7 @@ export function useWindowResize({
    * variable to store window inner width
    * @type {Ref<UnwrapRef<number>>}
    */
-  const windowInnerWidth = ref(window?.innerWidth || 0);
+  const windowInnerWidth = ref(0);
   /**
    * is window width within mobile size
    * @type {ComputedRef<boolean>}

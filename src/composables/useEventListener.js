@@ -70,9 +70,7 @@ export function useEventListener({
       // if not - set up a watcher that will set up the listener as soon as the listenerContainer
       // has a value
     } else {
-      console.log('container not initialized yet');
       watch(listenerContainer, (container) => {
-        console.log('setting up now', container);
         if (container) {
           if (callOnMounted) {
             callback();
