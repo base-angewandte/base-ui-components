@@ -3,8 +3,9 @@ import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
  * put an even listener on an HTML element
- * @param {HTMLElement|Ref<HTMLElement>|Window} target - the html element the listener should be attached to - could be a native
- *  element (e.g. 'body') or a reference to an element (or a vue component)
+ * @param {HTMLElement|Ref<HTMLElement>|string} target - the html element the listener should be attached to - could be a native
+ *  element (e.g. 'body') or a reference to an element (or a vue component) - if window or document should be used just
+ *  provide the appropriate string (needed since window or document are not available in setup on server side rendering)
  * @param {string} event - the name of the event that should be listened to
  * @param {function} callback - the function to be executed when the event is triggered
  * @param {boolean|Object} [options={}] - the event listener options
@@ -44,27 +45,58 @@ export function useEventListener({
 
   // on mounted the listener is attached
   onMounted(() => {
-    if (callOnMounted) {
-      callback();
+    // check if a plain string was provided as target which we need to do for SSR, since we can not
+    // pass window or document element in setup
+    if (typeof listenerContainer.value === 'string') {
+      if (callOnMounted) {
+        callback();
+      }
+      if (listenerContainer.value === 'window') {
+        window.addEventListener(event, listenerCallback.value, options);
+      } else if (listenerContainer.value === 'document') {
+        document.addEventListener(event, listenerCallback.value, options);
+      } else {
+        console.warn(`${listenerContainer.value} is not a valid EventListener element`);
+      }
+      return;
     }
+    // else treat the listenerContainer as ref to an HTML element
+    // check if the element is already present
     if (listenerContainer.value) {
+      if (callOnMounted) {
+        callback();
+      }
       listenerContainer.value.addEventListener(event, listenerCallback.value, options);
+      // if not - set up a watcher that will set up the listener as soon as the listenerContainer
+      // has a value
     } else {
+      console.log('container not initialized yet');
       watch(listenerContainer, (container) => {
+        console.log('setting up now', container);
         if (container) {
           if (callOnMounted) {
             callback();
           }
           container.addEventListener(event, listenerCallback.value, options);
         }
-      });
+      }, { once: true });
     }
   });
 
   // and on before unmount it is removed again
   onBeforeUnmount(() => {
+    // check if a plain string was provided as target which we need to do for SSR, since we can not
+    // pass window or document element in setup
+    if (typeof listenerContainer.value === 'string') {
+      if (listenerContainer.value === 'window') {
+        window.removeEventListener(event, listenerCallback.value, options);
+      } else if (listenerContainer.value === 'document') {
+        document.removeEventListener(event, listenerCallback.value, options);
+      }
+      return;
+    }
     if (listenerContainer.value) {
-      listenerContainer.value.removeEventListener(event, listenerCallback.value);
+      listenerContainer.value.removeEventListener(event, listenerCallback.value, options);
     }
   });
 }

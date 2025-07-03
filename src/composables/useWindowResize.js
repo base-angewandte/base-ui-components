@@ -42,12 +42,13 @@ export function useWindowResize({
    * execute the function provided to the composable
    */
   function resize() {
-    windowInnerWidth.value = window.innerWidth;
+    // safeguard against window not being defined yet
+    windowInnerWidth.value = window?.innerWidth || 0;
     callback();
   }
 
   useEventListener({
-    target: window,
+    target: 'window',
     event: 'resize',
     callback: resize,
     setDebounce,

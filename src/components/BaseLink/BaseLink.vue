@@ -2,7 +2,6 @@
 import { defineAsyncComponent, ref, getCurrentInstance, computed, useSlots } from 'vue';
 import { useWindowResize } from '@/composables/useWindowResize.js';
 import { useEventListener } from '@/composables/useEventListener.js';
-import { useDebounce } from '@/composables/useDebounce.js';
 import { useId } from '@/composables/useId.js';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 import cleanDomNodes from '@/directives/cleanDomNodes.js';
@@ -225,10 +224,6 @@ export default {
      */
     const showTooltip = ref(false);
 
-    // get the debounce function to put a timeout
-    // on scroll and resize event listeners
-    const { debounce } = useDebounce();
-
     /**
      * close an open tooltip
      */
@@ -240,23 +235,24 @@ export default {
      * intercept scroll/resize event and close the tooltip
      */
     function scrollResizeHandler() {
-      debounce(() => {
-        if (showTooltip.value) {
-          closeTooltip();
-        }
-      }, 100);
+      if (showTooltip.value) {
+        closeTooltip();
+      }
     }
 
     // use the window resize event listener
     useWindowResize({
       callback: scrollResizeHandler,
+      setDebounce: 100,
     });
     // and additionally create a scroll event listener to also
     // close the tooltip when scrolling is happening on the page
     useEventListener({
-      target: window,
+      // need to pass a string since window not defined in setup for SSR
+      target: 'window',
       event: 'scroll',
       callback: scrollResizeHandler,
+      setDebounce: 100,
     });
 
     // access slots to check if it is filled later

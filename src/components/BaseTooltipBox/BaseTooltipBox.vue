@@ -204,7 +204,8 @@ function escEventHandler(e) {
 }
 
 useEventListener({
-  target: window,
+  // need to pass a string since window not defined in setup for SSR
+  target: 'window',
   event: 'keydown',
   callback: escEventHandler,
 });
