@@ -446,6 +446,8 @@ export default {
     /**
      * calc the number of boxes that fits the space as soon as the container
      * has been rendered
+     * (we can not use the useWindowResize callOnMounted since this is just considering
+     * window not the component)
      */
     watch(resultBoxesArea, (value) => {
       // as soon as area is rendered and variable received a value calc
@@ -453,10 +455,11 @@ export default {
       if (value) {
         calcBoxNumber();
       }
-    });
+    }, { once: true });
 
     // recalc box number on window resize
     useWindowResize({
+      target: 'resultboxsection',
       callback: calcBoxNumber,
       setDebounce: 300,
     })
@@ -512,6 +515,12 @@ export default {
             margin-right: var(--spacing-regular);
           }`;
         initialBoxCalcDone.value = true;
+      }
+    }
+
+    // in order to only trigger event when value has really changed create a watcher
+    watch(itemsPerRow, (val, oldVal) => {
+      if (val !== oldVal) {
         /**
          * communicate to parent when items per row changed, either after initial
          * render space calculations or when window was resized
@@ -520,7 +529,7 @@ export default {
          */
         emit('items-per-row-changed', itemsPerRow.value);
       }
-    }
+    });
 
     /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
