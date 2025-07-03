@@ -181,6 +181,7 @@ const isActive = ref(false);
 const { isMobile } = useWindowResize({
   callback: calcPosition,
   mobileMaxSize: props.mobileSize,
+  callOnMounted: true,
 });
 
 /** CLICK OUTSIDE HANDLING */
