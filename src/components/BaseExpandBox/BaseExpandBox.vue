@@ -164,10 +164,10 @@ export default {
      */
     initObserver() {
       // create a resize observer with calculation functions
-      const resizeObserver = new ResizeObserver(debounce(50, () => this.calcButtonVisibility));
+      const resizeObserver = new ResizeObserver(debounce(50, this.calcButtonVisibility));
 
       // create a mutation observer with calculation functions
-      const mutationObserver = new MutationObserver(() => this.calcButtonVisibility);
+      const mutationObserver = new MutationObserver(this.calcButtonVisibility);
 
       // attach the observers to the component
       resizeObserver.observe(this.content);
