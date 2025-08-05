@@ -8,6 +8,7 @@ export default {
   components: {
     BaseForm,
   },
+  inheritAttrs: false,
   props: {
     /**
      * the json object containing all the field information incl. `x-attrs` custom field
@@ -114,6 +115,7 @@ export default {
         .every(fieldProps => Object.keys(fieldProps)),
     },
   },
+  emits: ['update:model-value'],
   setup() {
     /** INTERNAL ID */
     /**
@@ -138,13 +140,10 @@ export default {
      * @returns {{}}
      */
     formProps() {
-      const newProps = {
+      return {
         ...this.forwardAttrs,
         ...this.$props,
       };
-      // this will be added in html per group
-      delete newProps.formFieldJson;
-      return newProps;
     },
     /**
      * the formFieldJSON needs to be separated in to the specific groups according
@@ -181,7 +180,32 @@ export default {
       }
       return groupedFormFields;
     },
+    /**
+     * provide the necessary values to each form specifically by mapping
+     * from the grouped form fields json
+     * @returns {{[fieldName: string]: *}[]}
+     */
+    formValuesGrouped() {
+      return this.formFieldsGrouped.map((group) => {
+        return Object.fromEntries(Object.keys(group).map((key) => [key, this.modelValue[key]]));
+      });
+    },
   },
+  methods: {
+    updateFormValues(val) {
+      /**
+       * event to inform parent of changes in form values
+       * @event update:model-value
+       * @type {Object}
+       */
+      this.$emit('update:model-value', {
+        // since only the values from a specific form is provided
+        // merge the values with the rest here
+        ...this.modelValue,
+        ...val,
+      });
+    }
+  }
 };
 </script>
 
@@ -189,12 +213,16 @@ export default {
   <div
     v-bind="rootAttrs"
     class="base-form-groups">
+    <!-- form-field-json and model-value are below v-bind because we want to overwrite
+      the values provided in props -->
     <BaseForm
       v-for="(formGroup, index) of formFieldsGrouped"
       :key="`${groupsId}-${index}`"
-      :form-field-json="formGroup"
       v-bind="formProps"
-      class="base-form-groups__group">
+      :form-field-json="formGroup"
+      :model-value="formValuesGrouped[index]"
+      class="base-form-groups__group"
+      @update:model-value="updateFormValues">
       <template #label-addition="{ fieldName }">
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
         @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property) -->
