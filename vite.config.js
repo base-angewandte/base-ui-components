@@ -64,6 +64,8 @@ export default defineConfig({
         'swiper',
         'hls.light.js',
         'hls.js/dist/hls.light.js',
+        'pdfjs-dist/legacy/build/pdf.mjs',
+        'pdfjs-dist/legacy/build/pdf.worker.mjs',
       ],
       output: {
         chunkFileNames: 'assets/[name].[hash].js',
@@ -73,6 +75,8 @@ export default defineConfig({
           'vue-i18n': 'VueI18n',
           'hls.light.js': 'Hls',
           'hls.js/dist/hls.light.js': 'Hls',
+          'pdfjs-dist/legacy/build/pdf.mjs': 'Pdfjs1',
+          'pdfjs-dist/legacy/build/pdf.worker.mjs': 'Pdfjs2',
         },
       },
       plugins: [
