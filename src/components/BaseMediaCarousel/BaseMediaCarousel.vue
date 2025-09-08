@@ -86,6 +86,27 @@ export default {
         },
       }),
     },
+    /**
+     * define the initial width for pdf pages
+     */
+    pdfInitialWidth: {
+      type: Number,
+      default: 1000,
+    },
+    /**
+     * defines the width of PDF pages in zoom mode
+     */
+    pdfZoomWidth: {
+      type: Number,
+      default: 2500,
+    },
+    /**
+     * define the max zoom factor in %
+     */
+    zoomMax: {
+      type: Number,
+      default: 250,
+    },
   },
   emits: ['download', 'hide'],
   setup() {
@@ -105,7 +126,17 @@ export default {
   },
   data() {
     return {
+      /**
+       * store the swiper instance
+       */
       swiper: undefined,
+      /**
+       * store the current zoom factor for baseZoomSlider
+       */
+      currentZoom: 100,
+      /**
+       * flag if component is mounted
+       */
       isMounted: false,
     };
   },
@@ -154,6 +185,7 @@ export default {
       const { Swiper } = await import('swiper');
       const { Keyboard } = await import('swiper/modules');
       const { Navigation } = await import('swiper/modules');
+      const { Zoom } = await import('swiper/modules');
 
       const additionalOptions = {
         init: false,
@@ -166,7 +198,14 @@ export default {
         // Threshold value in px.
         // If "touch distance" will be lower than this value then swiper will not move
         threshold: 10,
-        modules: [Navigation, Keyboard],
+        zoom: {
+          // maximum image zoom multiplier
+          maxRatio: this.zoomMax / 100,
+          // disable zoom-in by slide's double tap
+          // Todo: find solution to prevent double click event when it happens 'on' baseRangeSlider
+          toggle: false,
+        },
+        modules: [Navigation, Keyboard, Zoom],
       };
 
       this.swiper = new Swiper(`#${this.swiperId}`, {
@@ -185,6 +224,12 @@ export default {
           const media = this.$refs.baseMedia[this.swiper.activeIndex];
           media.$el.focus();
         }
+      });
+
+      // update currentZoom
+      this.swiper.on('zoomChange', (swiper, scale) => {
+        // get the value needed here
+        this.currentZoom = scale * 100;
       });
 
       // calc of slide width is wrong on first initialization using component in ssr
@@ -249,7 +294,7 @@ export default {
      * @return array
      */
     getFocusableItems() {
-      const focusable = 'button, audio, video[tabindex="0"]';
+      const focusable = 'button, audio, video[tabindex="0"], input[type="range"]';
       const focusableBySlide = [];
 
       this.$refs.baseMedia.forEach((slide) => {
@@ -310,6 +355,13 @@ export default {
        */
       this.$emit('download', value);
     },
+    /**
+     * set a zoom factor for swiper
+     * @param {number} value - current zoom factor in %
+     */
+    zoomSlide(value) {
+      this.swiper.zoom.in(value / 100);
+    },
   },
 };
 </script>
@@ -365,7 +417,12 @@ export default {
                 :orientation="media.orientation"
                 :previews="media.previews"
                 :hls-start-level="media.hlsStartLevel"
+                :current-zoom="currentZoom"
+                :zoom-active-width="pdfZoomWidth"
+                :zoom-initial-width="pdfInitialWidth"
+                :zoom-max="zoomMax"
                 tabindex="0"
+                @update:swiper-zoom="zoomSlide"
                 @download="download" />
             </div>
           </div>
@@ -385,6 +442,7 @@ export default {
   @use '../../../node_modules/swiper/modules/pagination.scss';
   @use '../../../node_modules/swiper/modules/keyboard.scss';
   @use '../../../node_modules/swiper/modules/autoplay.scss';
+  @use '../../../node_modules/swiper/modules/zoom.scss';
 
   .base-media-carousel {
     position: fixed;
@@ -414,6 +472,7 @@ export default {
       color: white;
       z-index: 5;
       transition: color 250ms ease-in-out;
+      mix-blend-mode: difference;
 
       &:focus,
       &:hover {
@@ -456,5 +515,10 @@ export default {
   .grow-leave-to {
     transform: scale(0.33);
     opacity: 0;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    mix-blend-mode: difference;
   }
 </style>

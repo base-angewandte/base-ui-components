@@ -1,8 +1,8 @@
 <script>
 import { defineAsyncComponent, ref } from 'vue';
-import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import { useI18n } from '@/composables/useI18n.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 
 /**
  * Component allowing for the display of images or streaming of
@@ -15,6 +15,8 @@ export default {
     BaseLoader,
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
     BaseHlsVideo: defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue')),
+    BasePdfViewer: defineAsyncComponent(() => import('@/components/BasePdfViewer/BasePdfViewer.vue')),
+    BaseRangeSlider: defineAsyncComponent(() => import('@/components/BaseRangeSlider/BaseRangeSlider.vue')),
   },
   props: {
     /**
@@ -126,8 +128,36 @@ export default {
       type: Number,
       default: undefined,
     },
+    /**
+     * define current zoom factor in %
+     */
+    currentZoom: {
+      type: Number,
+      default: 100,
+    },
+    /**
+     * define the initial width for pdf pages
+     */
+    pdfInitialWidth: {
+      type: Number,
+      default: 1000,
+    },
+    /**
+     * defines the width of PDF pages in zoom mode
+     */
+    pdfZoomWidth: {
+      type: Number,
+      default: 2500,
+    },
+    /**
+     * define the max zoom factor in %
+     */
+    zoomMax: {
+      type: Number,
+      default: 250,
+    },
   },
-  emits: ['download'],
+  emits: ['download', 'update:swiper-zoom'],
   setup() {
     /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
@@ -170,8 +200,32 @@ export default {
   },
   data() {
     return {
-      // variable for display image error handling
+      /**
+       * variable for display image error handling
+       * @type {boolean}
+       */
       displayImage: true,
+      /**
+       * variable to indicate the current zoom state
+       * @type {boolean}
+       */
+      isZoomActive: false,
+      /**
+       * variable to toggle zoom (BaseRangeSlider) for PDF viewer
+       * @type {boolean}
+       */
+      enableZoom: false,
+      /**
+       * variable to store current zoom value
+       * @type {Number}
+       */
+      currentZoomInt: 100,
+      /**
+       * variable to display pdf using BasePdfViewer.
+       * if false, display the document fallback
+       * @type {boolean}
+       */
+      displayPdf: true,
     };
   },
   computed: {
@@ -192,7 +246,7 @@ export default {
       }
       // check if pdf
       if (['pdf'].includes(docType.toLowerCase())) {
-        return 'document';
+        return 'pdf';
       }
       return '';
     },
@@ -218,13 +272,32 @@ export default {
         ? Object.values(this.previews[last])[0] : this.mediaUrl;
     },
   },
+  watch: {
+    currentZoom: {
+      handler(val) {
+        this.currentZoomInt = val;
+      },
+      immediate: true,
+    },
+  },
   methods: {
+    /**
+     * function to enable zoom mode for BasePdfViewer
+     * @param value
+     */
+    zoomPdf(value) {
+      this.currentZoomInt = value;
+      this.isZoomActive = true;
+      this.$emit('update:swiper-zoom', value);
+    },
     /**
      * function to trigger download action
      */
     download() {
       // check again if user is allowed to download
-      if (this.allowDownload || (!this.allowDownload && this.fileType === '')) {
+      if (this.allowDownload
+        || (!this.allowDownload && this.fileType === '')
+        || (!this.allowDownload && this.fileType === 'pdf')) {
         /**
          * download button clicked
          *
@@ -235,12 +308,6 @@ export default {
          */
         this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
       }
-    },
-    /**
-     * function to open pdf
-     */
-    openPdf() {
-      window.open(this.mediaUrl);
     },
   },
 };
@@ -296,6 +363,32 @@ export default {
         :src="mediaUrl"
         type="audio/mpeg">
     </audio>
+    <template
+      v-else-if="fileType === 'pdf' && displayPdf">
+      <div class="base-media-preview__pdf__toolbar">
+        <transition
+          name="fade"
+          mode="out-in">
+          <div v-if="enableZoom">
+            <BaseRangeSlider
+              v-model="currentZoomInt"
+              :min="100"
+              :max="zoomMax"
+              @update:model-value="zoomPdf" />
+          </div>
+        </transition>
+      </div>
+      <div class="swiper-zoom-container">
+        <BasePdfViewer
+          :src="mediaUrl"
+          :initial-width="pdfInitialWidth"
+          :zoom-width="pdfZoomWidth"
+          :zoom="isZoomActive"
+          class="base-media-preview__pdf swiper-zoom-target"
+          @initialized="enableZoom = true"
+          @error="displayPdf = false" />
+      </div>
+    </template>
     <div
       v-else
       class="base-media-preview-not-supported base-media-preview-error">
@@ -355,8 +448,9 @@ export default {
           {{ currentSlideInfo }}
         </p>
       </div>
+      <!-- enable the file download button for PDFs and unknown filetypes -->
       <div
-        v-if="allowDownload"
+        v-if="(allowDownload || fileType === 'pdf' || (!allowDownload && fileType === ''))"
         class="base-media-preview__info__col base-media-preview__info__col3">
         <BaseButton
           :text="infoTexts.download"
@@ -426,6 +520,24 @@ export default {
 
     .base-media-preview__audio {
       margin-top: auto;
+    }
+
+    .base-media-preview__pdf {
+      width: 100%;
+      max-height: calc(100vh - var(--footer-height) - #{$spacing} - 3rem - #{$spacing} - #{$spacing});
+      margin-top: auto;
+    }
+
+    .base-media-preview__pdf__toolbar {
+      position: relative;
+      z-index: 1000;
+      align-self: flex-start;
+      margin: $spacing;
+      min-height: $row-height-large;
+
+      @media screen and (max-width: $mobile) {
+        margin: $spacing 0;
+      }
     }
 
     .base-media-preview-not-supported {
@@ -574,5 +686,15 @@ export default {
       top: 50%;
       transform: translate(-50%, -75%);
     }
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 500ms ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>
