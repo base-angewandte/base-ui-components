@@ -87,6 +87,16 @@ const internalId = useId();
 const currentValue = ref();
 
 /**
+ * count decimals of a number
+ * @param number - number to analyse
+ * @returns {number} number of decimals
+ */
+function countDecimals(number) {
+  const str = number.toString();
+  return str.includes('.') ? str.split('.')[1].length : 0;
+}
+
+/**
  * increase/decrease value, respect min and max values
  * @param {number} stepSize
  */
@@ -94,7 +104,7 @@ function stepper(stepSize) {
   let newValue = +currentValue.value + stepSize;
   if (newValue < props.min) newValue = 0;
   if (newValue > props.max) newValue = props.max;
-  currentValue.value = newValue;
+  currentValue.value = newValue.toFixed(countDecimals(props.step));
 }
 
 /**
