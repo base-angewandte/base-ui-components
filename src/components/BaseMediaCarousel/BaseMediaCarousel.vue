@@ -35,6 +35,7 @@ export default {
      *  **orientation** `number` - define how the image should be rotated (EXIF orientation values) (only for type `image`)
      *  **previews** `Object[]` - specify an image `srcset` as an array of objects in the form `{ [mediawidth]: 'url' }` (only for type `image`)
      *  **hlsStartLevel** `number` - define startLevel (size) of hls-video
+     *  **thumbnail** `string` - url of a preview image for the medium
      *
      */
     items: {
@@ -417,6 +418,7 @@ export default {
                 :orientation="media.orientation"
                 :previews="media.previews"
                 :hls-start-level="media.hlsStartLevel"
+                :thumbnail="media.thumbnail"
                 :current-zoom="currentZoom"
                 :zoom-active-width="pdfZoomWidth"
                 :zoom-initial-width="pdfInitialWidth"

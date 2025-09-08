@@ -14,6 +14,7 @@ export default {
   components: {
     BaseLoader,
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseImage: defineAsyncComponent(() => import('@/components/BaseImage/BaseImage.vue')),
     BaseHlsVideo: defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue')),
     BasePdfViewer: defineAsyncComponent(() => import('@/components/BasePdfViewer/BasePdfViewer.vue')),
     BaseRangeSlider: defineAsyncComponent(() => import('@/components/BaseRangeSlider/BaseRangeSlider.vue')),
@@ -127,6 +128,13 @@ export default {
     hlsStartLevel: {
       type: Number,
       default: undefined,
+    },
+    /**
+     * url of a preview image for the medium
+     */
+    thumbnail: {
+      type: String,
+      default: '',
     },
     /**
      * define current zoom factor in %
@@ -392,34 +400,22 @@ export default {
     <div
       v-else
       class="base-media-preview-not-supported base-media-preview-error">
-      <p class="base-media-preview-not-supported-file-name">
-        {{ fileName }}
-      </p>
-      <div class="base-media-preview-not-supported-buttons">
-        <BaseButton
-          v-if="allowDownload || (!allowDownload && fileType === '')"
-          :text="getI18nTerm(infoTexts.download)"
-          icon="download"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button base-media-preview-not-supported-button"
-          @clicked="download" />
-        <BaseButton
-          v-if="(!isMobile && fileEnding === 'pdf')
-            || (!allowDownload && fileEnding === 'pdf')"
-          :text="getI18nTerm(infoTexts.view)"
-          icon="eye"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button base-media-preview-not-supported-button"
-          @clicked="openPdf()" />
+      <BaseImage
+        v-if="thumbnail"
+        :src="thumbnail"
+        :lazyload="true"
+        class="base-media-preview-not-supported__thumbnail" />
+      <div class="base-media-preview-not-supported__content">
+        <p class="base-media-preview-not-supported-file-name">
+          {{ fileName }}
+        </p>
+        <p
+          v-for="textline in additionalInfo"
+          :key="textline"
+          class="base-media-preview__not-supported-additional">
+          {{ textline }}
+        </p>
       </div>
-      <p
-        v-for="textline in additionalInfo"
-        :key="textline"
-        class="base-media-preview__not-supported-additional">
-        {{ textline }}
-      </p>
     </div>
     <div
       ref="footer"
@@ -546,9 +542,8 @@ export default {
       height: 20%;
       min-height: 200px;
       min-width: 200px;
-      width: 50%;
+      width: 35%;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       color: whitesmoke;
       margin-top: auto;
@@ -556,6 +551,29 @@ export default {
 
       @media screen and (max-width: $mobile) {
         width: 75%;
+      }
+
+      @media screen and (max-width: $tablet) {
+        width: 60%;
+      }
+
+      .base-media-preview-not-supported__thumbnail {
+        display: block;
+        width: auto;
+        height: 100%;
+        margin-right: $spacing;
+
+        @media screen and (max-width: $mobile) {
+          display: none;
+        }
+      }
+
+      &__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+        padding: $spacing-small 0;
       }
 
       .base-media-preview-not-supported-file-name {
