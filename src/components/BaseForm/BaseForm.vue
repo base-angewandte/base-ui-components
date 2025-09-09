@@ -291,7 +291,7 @@ export default {
       // where fieldList is an array with all fields that consecutively have the same field format
       return this.cleanedAndSortedFormFieldList.reduce((prev, curr) => {
         // save the field_format in a variable
-        const { field_format: fieldFormat, order, field_type: fieldType } = curr['x-attrs'];
+        const { field_format: fieldFormat, order, field_type: fieldType } = curr['x-attrs'] || {};
         const lastArrayElementIndex = prev.length - 1;
         // check if fields should be grouped (only for 'half' and 'third')
         if (fieldFormat && fieldType !== 'group'
