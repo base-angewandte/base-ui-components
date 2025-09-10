@@ -443,20 +443,6 @@ export default {
     // try to only do initial box size calculation once
     const initialBoxCalcDone = ref(false);
 
-    /**
-     * calc the number of boxes that fits the space as soon as the container
-     * has been rendered
-     * (we can not use the useWindowResize callOnMounted since this is just considering
-     * window not the component)
-     */
-    watch(resultBoxesArea, (value) => {
-      // as soon as area is rendered and variable received a value calc
-      // how much space per box is available
-      if (value) {
-        calcBoxNumber();
-      }
-    }, { once: true });
-
     // recalc box number on window resize
     useWindowResize({
       target: 'resultboxsection',
@@ -544,6 +530,7 @@ export default {
       initialBoxCalcDone,
       // i18n
       getI18nTerm,
+      calcBoxNumber,
     };
   },
   data() {
@@ -890,6 +877,15 @@ export default {
     }
   },
   mounted() {
+    /**
+     * Calculate the number of boxes that fit in the space.
+     * Do this during mounting to ensure that page transitions work correctly in Nuxt.
+     * Note: a watcher in setup() is currently triggered before the component is mounted
+     */
+    this.calcBoxNumber();
+    /**
+     * component is initialized and ready
+     */
     this.initialized = true;
   },
   methods: {
