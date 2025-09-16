@@ -76,9 +76,8 @@ export default {
       default: true,
     },
     /**
-     * define information texts for download and view (for pdfs) buttons in an
-     * object with the respective properties
-     *   could be strings or path to i18n json as well
+     * define information texts
+     * e.g. for download and view (for pdfs) buttons or error messages
      */
     infoTexts: {
       type: Object,
@@ -135,6 +134,7 @@ export default {
     },
     /**
      * url of a preview image for the medium
+     * e.g. used for files for which no special viewer is available
      */
     thumbnail: {
       type: String,
@@ -148,14 +148,14 @@ export default {
       default: 100,
     },
     /**
-     * define the initial width for pdf pages
+     * define the initial width (in pixels) for pdf pages
      */
     pdfInitialWidth: {
       type: Number,
       default: 1000,
     },
     /**
-     * defines the width of PDF pages in zoom mode
+     * defines the width (in pixels) of PDF pages in zoom mode
      */
     pdfZoomWidth: {
       type: Number,

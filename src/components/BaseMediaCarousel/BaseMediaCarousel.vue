@@ -35,7 +35,7 @@ export default {
      *  **orientation** `number` - define how the image should be rotated (EXIF orientation values) (only for type `image`)
      *  **previews** `Object[]` - specify an image `srcset` as an array of objects in the form `{ [mediawidth]: 'url' }` (only for type `image`)
      *  **hlsStartLevel** `number` - define startLevel (size) of hls-video
-     *  **thumbnail** `string` - url of a preview image for the medium
+     *  **thumbnail** `string` - url of a preview image, used for files for which no special viewer is available
      *
      */
     items: {
@@ -59,7 +59,8 @@ export default {
       default: true,
     },
     /**
-     * define information texts for download and view (for pdfs) buttons
+     * define information texts
+     * e.g. for download and view (for pdfs) buttons or error messages
      */
     infoTexts: {
       type: Object,
@@ -91,14 +92,14 @@ export default {
       }),
     },
     /**
-     * define the initial width for pdf pages
+     * define the initial width (in pixels) for pdf pages
      */
     pdfInitialWidth: {
       type: Number,
       default: 1000,
     },
     /**
-     * defines the width of PDF pages in zoom mode
+     * defines the width (in pixels) of PDF pages in zoom mode
      */
     pdfZoomWidth: {
       type: Number,
