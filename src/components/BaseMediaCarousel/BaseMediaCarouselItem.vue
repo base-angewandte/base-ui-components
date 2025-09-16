@@ -536,8 +536,18 @@ export default {
 
     .base-media-preview__pdf {
       width: 100%;
-      max-height: calc(100vh - var(--footer-height) - #{$spacing} - 3rem - #{$spacing} - #{$spacing});
+      max-height: calc(100vh - var(--footer-height) - #{$spacing-large});
       margin-top: auto;
+
+      @media screen and (max-width: $mobile) {
+        max-height: calc(100vh - var(--footer-height) - #{$spacing});
+
+        @supports (max-height: 100dvh) {
+          max-height: calc(100dvh - var(--footer-height) - #{$spacing});
+        }
+
+      }
+    }
 
     .base-media-preview__pdf__container {
       display: flex;
@@ -548,14 +558,16 @@ export default {
     }
 
     .base-media-preview__pdf__toolbar {
-      position: relative;
+      position: absolute;
+      top: $spacing;
+      left: $spacing;
       z-index: 1000;
       align-self: flex-start;
-      margin: $spacing;
       min-height: $row-height-large;
 
       @media screen and (max-width: $mobile) {
-        margin: $spacing 0;
+        top: $spacing-small;
+        left: $spacing-small;
       }
     }
 
