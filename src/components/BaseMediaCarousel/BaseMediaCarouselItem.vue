@@ -15,6 +15,7 @@ export default {
     BaseLoader,
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
     BaseImage: defineAsyncComponent(() => import('@/components/BaseImage/BaseImage.vue')),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseHlsVideo: defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue')),
     BasePdfViewer: defineAsyncComponent(() => import('@/components/BasePdfViewer/BasePdfViewer.vue')),
     BaseRangeSlider: defineAsyncComponent(() => import('@/components/BaseRangeSlider/BaseRangeSlider.vue')),
@@ -84,6 +85,9 @@ export default {
       default: () => ({
         download: 'Download',
         view: 'View',
+        error: {
+          pdf: 'The PDF couldn’t be opened in the PDF-Viewer.',
+        }
       }),
     },
     /**
@@ -386,7 +390,7 @@ export default {
           </div>
         </transition>
       </div>
-      <div class="swiper-zoom-container">
+      <div class="swiper-zoom-container base-media-preview__pdf__container">
         <BasePdfViewer
           :src="mediaUrl"
           :initial-width="pdfInitialWidth"
@@ -400,21 +404,33 @@ export default {
     <div
       v-else
       class="base-media-preview-not-supported base-media-preview-error">
-      <BaseImage
-        v-if="thumbnail"
-        :src="thumbnail"
-        :lazyload="true"
-        class="base-media-preview-not-supported__thumbnail" />
-      <div class="base-media-preview-not-supported__content">
-        <p class="base-media-preview-not-supported-file-name">
-          {{ fileName }}
-        </p>
-        <p
-          v-for="textline in additionalInfo"
-          :key="textline"
-          class="base-media-preview__not-supported-additional">
-          {{ textline }}
-        </p>
+      <div class="base-media-preview-not-supported__container">
+        <BaseImage
+          v-if="thumbnail"
+          :src="thumbnail"
+          :lazyload="true"
+          class="base-media-preview-not-supported__thumbnail" />
+        <div class="base-media-preview-not-supported__content">
+          <p class="base-media-preview-not-supported-file-name">
+            {{ fileName }}
+          </p>
+          <p
+            v-for="textline in additionalInfo"
+            :key="textline"
+            class="base-media-preview__not-supported-additional">
+            {{ textline }}
+          </p>
+        </div>
+      </div>
+      <div
+        v-if="!displayPdf"
+        class="base-media-preview-not-supported__error">
+        <BaseIcon
+          name="attention"
+          class="base-media-preview-not-supported__error__icon" />
+        <div class="base-media-preview-not-supported__error__text">
+          {{ infoTexts.error.pdf }}
+        </div>
       </div>
     </div>
     <div
@@ -522,6 +538,13 @@ export default {
       width: 100%;
       max-height: calc(100vh - var(--footer-height) - #{$spacing} - 3rem - #{$spacing} - #{$spacing});
       margin-top: auto;
+
+    .base-media-preview__pdf__container {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      height: 100%;
     }
 
     .base-media-preview__pdf__toolbar {
@@ -538,16 +561,20 @@ export default {
 
     .base-media-preview-not-supported {
       text-align: center;
-      background-color: rgba(0, 0, 0, 0.3);
-      height: 20%;
       min-height: 200px;
-      min-width: 200px;
-      width: 35%;
-      display: flex;
-      justify-content: center;
+      min-width: 500px;
+      max-width: 600px;
+      width: 40%;
+
       color: whitesmoke;
       margin-top: auto;
-      padding: $spacing;
+
+      &__container {
+        display: flex;
+        flex-wrap: wrap;
+        padding: $spacing;
+        background-color: rgba(0, 0, 0, 0.3);
+      }
 
       @media screen and (max-width: $mobile) {
         width: 75%;
@@ -555,12 +582,13 @@ export default {
 
       @media screen and (max-width: $tablet) {
         width: 60%;
+        min-width: 200px;
       }
 
       .base-media-preview-not-supported__thumbnail {
         display: block;
         width: auto;
-        height: 100%;
+        height: 200px;
         margin-right: $spacing;
 
         @media screen and (max-width: $mobile) {
@@ -573,7 +601,28 @@ export default {
         flex-direction: column;
         justify-content: center;
         flex: 1;
-        padding: $spacing-small 0;
+      }
+
+      &__error {
+        flex: 1 1 100%;
+        display: flex;
+        justify-content: center;
+        margin: $spacing-small-half $spacing 0;
+
+        &__icon {
+          margin-top: $spacing-small;
+          margin-right: $spacing-small;
+          width: $icon-small;
+          height: $icon-small;
+          min-width: $icon-small;
+          min-height: $icon-small;
+        }
+
+        &__text {
+          text-align: left;
+          font-size: $font-size-small;
+          word-break: normal;
+        }
       }
 
       .base-media-preview-not-supported-file-name {
@@ -627,6 +676,7 @@ export default {
       margin-top: auto;
       margin-left: -$spacing-small;
       margin-right: -$spacing-small;
+      line-height: $line-height;
 
       .base-media-preview__info__col1,
       .base-media-preview__info__col3 {
@@ -652,7 +702,6 @@ export default {
         margin-right: $spacing;
 
         .base-media-preview-info-text {
-          padding-bottom: $spacing-small-half;
           margin: 0;
         }
 

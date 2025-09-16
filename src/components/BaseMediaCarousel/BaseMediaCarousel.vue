@@ -66,6 +66,9 @@ export default {
       default: () => ({
         download: 'Download',
         view: 'View',
+        error: {
+          pdf: 'The PDF couldn’t be opened in the PDF-Viewer.',
+        }
       }),
     },
     /**
@@ -456,6 +459,10 @@ export default {
     display: flex;
     overflow: hidden;
 
+    @supports (height: 100dvh) {
+      height: 100dvh;
+    }
+
     &__background {
       position: absolute;
       top: 0;
@@ -467,14 +474,19 @@ export default {
 
     &__close {
       position: absolute;
-      top: $spacing-large;
+      top: $spacing;
       right: $spacing-large;
       width: $icon-large;
-      height: $icon-large;
+      height: 3rem;
       color: white;
       z-index: 5;
       transition: color 250ms ease-in-out;
       mix-blend-mode: difference;
+
+      @media screen and (max-width: $mobile) {
+        top: $spacing-small;
+        right: $spacing;
+      }
 
       &:focus,
       &:hover {
