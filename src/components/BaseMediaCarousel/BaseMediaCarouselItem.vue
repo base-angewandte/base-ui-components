@@ -228,6 +228,11 @@ export default {
        */
       enableZoom: false,
       /**
+       * define the max zoom factor in %
+       * @type {Number}
+       */
+      zoomMin: 100,
+      /**
        * variable to store current zoom value
        * @type {Number}
        */
@@ -294,12 +299,12 @@ export default {
   },
   methods: {
     /**
-     * function to enable zoom mode for BasePdfViewer
+     * function to toggle zoom mode for BasePdfViewer
      * @param value
      */
     zoomPdf(value) {
       this.currentZoomInt = value;
-      this.isZoomActive = true;
+      this.isZoomActive = this.currentZoomInt !== this.zoomMin;
       this.$emit('update:swiper-zoom', value);
     },
     /**
@@ -384,7 +389,7 @@ export default {
           <div v-if="enableZoom">
             <BaseRangeSlider
               v-model="currentZoomInt"
-              :min="100"
+              :min="zoomMin"
               :max="zoomMax"
               @update:model-value="zoomPdf" />
           </div>

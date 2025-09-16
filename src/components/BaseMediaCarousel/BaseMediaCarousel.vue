@@ -217,6 +217,13 @@ export default {
         ...additionalOptions,
       });
 
+      /**
+       * reset zoom before slide changes
+       */
+      this.swiper.on('beforeSlideChangeStart', () => {
+        if (this.currentZoom !== 100) this.currentZoom = 100;
+      });
+
       this.swiper.on('slideChange', () => {
         this.mediaPause();
       });
