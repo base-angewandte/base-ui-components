@@ -63,7 +63,7 @@ const emits = defineEmits([
  * reference to the container where canvas elements (PDF pages) will be inserted.
  * bound via <div ref="canvasContainer" /> in the template.
  */
-const canvasContainer = useTemplateRef('canvasContainer');
+const canvasContainer = useTemplateRef('canvasContainerEl');
 
 /**
  * controls visibility of the loading spinner while fetching or rendering pages
@@ -243,7 +243,7 @@ watch(() => [props.zoom, props.zoomWidth], renderPages, { immediate: true });
 
     <!-- Container for rendered PDF pages -->
     <div
-      ref="canvasContainer"
+      ref="canvasContainerEl"
       class="base-pdf-viewer__container" />
   </div>
 </template>
