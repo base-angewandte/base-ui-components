@@ -2,6 +2,7 @@
 import { defineAsyncComponent, ref } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
+import { useId } from '@/composables/useId.js';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 
 /**
@@ -141,11 +142,18 @@ export default {
       default: '',
     },
     /**
-     * define current zoom factor in %
+     * define current zoom object
+     * <b>id</b> {string} - the identifier of the current slide<br>
+     * <b>value</b> {number} - the zoom factor of the current slide in %
      */
     currentZoom: {
-      type: Number,
-      default: 100,
+      type: Object,
+      default: () => ({
+        id: null,
+        value: 100,
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['id', 'value'].every(prop => Object.keys(val).includes(prop)),
     },
     /**
      * define the initial width (in pixels) for pdf pages
@@ -171,6 +179,9 @@ export default {
   },
   emits: ['download', 'update:swiper-zoom'],
   setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+
     /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
 
@@ -208,6 +219,7 @@ export default {
       isMobile,
       footer,
       footerHeight,
+      internalId,
     };
   },
   data() {
@@ -291,21 +303,23 @@ export default {
   },
   watch: {
     currentZoom: {
-      handler(val) {
-        this.currentZoomInt = val;
+      handler(obj) {
+        if (obj.id !== this.internalId) return;
+        this.currentZoomInt = obj.value;
       },
       immediate: true,
+      deep: true,
     },
   },
   methods: {
     /**
      * function to toggle zoom mode for BasePdfViewer
-     * @param value
+     * @param {number} value - current zoom value
      */
     zoomPdf(value) {
       this.currentZoomInt = value;
       this.isZoomActive = this.currentZoomInt !== this.zoomMin;
-      this.$emit('update:swiper-zoom', value);
+      this.$emit('update:swiper-zoom', { id: this.internalId, value: value });
     },
     /**
      * function to trigger download action

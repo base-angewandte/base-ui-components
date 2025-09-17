@@ -136,9 +136,14 @@ export default {
        */
       swiper: undefined,
       /**
-       * store the current zoom factor for baseZoomSlider
+       * store the current zoom factor for baseRangeSlider
+       * Note: the id is needed to address the right slide.
+       *       the id is added, when zoom is triggered
        */
-      currentZoom: 100,
+      currentZoom: {
+        id: null,
+        value: 100,
+      },
       /**
        * flag if component is mounted
        */
@@ -222,7 +227,7 @@ export default {
        * reset zoom before slide changes
        */
       this.swiper.on('beforeSlideChangeStart', () => {
-        if (this.currentZoom !== 100) this.currentZoom = 100;
+        if (this.currentZoom.value !== 100) this.currentZoom.value = 100;
       });
 
       this.swiper.on('slideChange', () => {
@@ -241,7 +246,7 @@ export default {
       // update currentZoom
       this.swiper.on('zoomChange', (swiper, scale) => {
         // get the value needed here
-        this.currentZoom = scale * 100;
+        this.currentZoom.value = scale * 100;
       });
 
       // calc of slide width is wrong on first initialization using component in ssr
@@ -369,10 +374,11 @@ export default {
     },
     /**
      * set a zoom factor for swiper
-     * @param {number} value - current zoom factor in %
+     * @param {Object} obj - current zoom factor in %
      */
-    zoomSlide(value) {
-      this.swiper.zoom.in(value / 100);
+    zoomSlide(obj) {
+      this.currentZoom = obj;
+      this.swiper.zoom.in(obj.value / 100);
     },
   },
 };
