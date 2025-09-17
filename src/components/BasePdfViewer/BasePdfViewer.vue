@@ -66,6 +66,12 @@ const emits = defineEmits([
 const canvasContainer = useTemplateRef('canvasContainerEl');
 
 /**
+ * state of component
+ * used to cancel current render tasks
+ */
+const mounted = ref(true);
+
+/**
  * controls visibility of the loading spinner while fetching or rendering pages
  */
 const isLoading = ref(false);
@@ -80,24 +86,7 @@ let pdfDoc = null;
  * tracks the latest rendering version.
  * increased to cancel obsolete rendering tasks when re-rendering
  */
-let renderVersion = 0;
-
-/**
- * list of currently running PDF render tasks.
- * used to cancel them before starting a new render pass.
- */
-let activeRenderTasks = [];
-
-/**
- * cancels all currently active render tasks.
- * prevents race conditions where pages render out of order
- */
-function cancelActiveRenderTasks() {
-  for (let i = 0; i < activeRenderTasks.length; i++) {
-    activeRenderTasks[i].cancel();
-  }
-  activeRenderTasks = [];
-}
+let renderVersion = ref(0);
 
 /**
  * dynamically imports pdf.js (and its worker) and loads the specified PDF file.
@@ -128,8 +117,8 @@ function getScaleForPage(naturalWidth) {
 async function renderPages() {
   if (!canvasContainer.value || !pdfDoc) return;
 
-  const newVersion = ++renderVersion;
-  cancelActiveRenderTasks();
+  renderVersion.value++;
+  const newVersion = renderVersion.value;
   isLoading.value = true;
 
   // create empty canvases for all pages up front
@@ -139,16 +128,17 @@ async function renderPages() {
     c.style.marginBottom = '16px';
     return c;
   });
-  canvases.forEach(c => fragment.appendChild(c));
-
-  if (newVersion !== renderVersion) return;
+  canvases.forEach((canvas) => fragment.appendChild(canvas));
   canvasContainer.value.innerHTML = '';
   canvasContainer.value.appendChild(fragment);
 
   // render each page
-  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-    if (newVersion !== renderVersion) break;
+  for (let pageNum = 1, n = pdfDoc.numPages; pageNum <= n; pageNum++) {
+    // stop the current page rendering when a new render version is requested
+    // or the component is unmounted
+    if (newVersion !== renderVersion.value || !mounted.value) break;
 
+    // define page properties
     const page = await pdfDoc.getPage(pageNum);
     const naturalViewport = page.getViewport({ scale: 1 });
     const scale = getScaleForPage(naturalViewport.width);
@@ -160,7 +150,6 @@ async function renderPages() {
     canvas.height = Math.floor(viewport.height);
 
     const task = page.render({ canvasContext: context, viewport });
-    activeRenderTasks.push(task);
 
     try {
       await task.promise;
@@ -172,7 +161,7 @@ async function renderPages() {
     }
   }
 
-  if (newVersion === renderVersion) {
+  if (newVersion === renderVersion.value) {
     isLoading.value = false;
   }
 }
@@ -217,7 +206,7 @@ useElementObserver({
 /**
  * cancel all renders if the component unmounts
  */
-onUnmounted(cancelActiveRenderTasks);
+onUnmounted(() => mounted.value = false);
 
 /**
  * reload PDF when the `src` changes (only if one is already loaded)
@@ -229,7 +218,7 @@ watch(() => props.src, (newSrc) => {
 /**
  * watch for zoom changes and trigger re-render
  */
-watch(() => [props.zoom, props.zoomWidth], renderPages, { immediate: true });
+watch(() => [props.zoom, props.zoomWidth], () => renderPages);
 </script>
 
 <template>
