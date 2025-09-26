@@ -200,6 +200,7 @@ async function renderPages(startPage = 1) {
         emits('error', true);
       }
     } finally {
+      // eslint-disable-next-line no-console
       if (debug) console.log(`${internalId} - page ${pageNum} rendered`);
     }
   }
@@ -241,6 +242,7 @@ async function renderPdf(src) {
  */
 function stopRendering() {
   renderPagesAllowed.value = false;
+  // eslint-disable-next-line no-console
   if (debug) console.log(`${internalId} - rendering stopped on page: ${lastRenderedPage.value}`);
 }
 
@@ -255,6 +257,7 @@ function resumeRendering() {
   renderPagesAllowed.value = true;
   if (!pdfDoc || allPagesRendered.value) return;
   renderPages(lastRenderedPage.value + 1);
+  // eslint-disable-next-line no-console
   if (debug) console.log(`${internalId} - rendering resumed on page:  ${lastRenderedPage.value + 1}`);
 }
 
@@ -290,6 +293,7 @@ watch(() => props.src, (newSrc) => {
  * watch for zoom changes and trigger re-render
  */
 watch(() => [props.zoom, props.zoomWidth], () => {
+  // eslint-disable-next-line no-console
   if (debug) console.log(`${internalId} - render PDF with ${props.zoom ? 'high' : 'low'} resolution`);
   renderPagesAllowed.value = true;
   lastRenderedPage.value = 0;
