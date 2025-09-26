@@ -177,10 +177,6 @@ watch(() => currentValue.value, (newValue) => {
   background-color: $background-color;
   min-height: $row-height-large;
 
-  &:hover {
-    box-shadow: $box-shadow-edit;
-  }
-
   &__label {
     display: none;
   }

@@ -405,6 +405,7 @@ export default {
               v-model="currentZoomInt"
               :min="zoomMin"
               :max="zoomMax"
+              class="base-media-preview__pdf__range-slider"
               @update:model-value="zoomPdf" />
           </div>
         </transition>
@@ -588,6 +589,12 @@ export default {
       @media screen and (max-width: $mobile) {
         top: $spacing-small;
         left: $spacing-small;
+      }
+    }
+
+    .base-media-preview__pdf__range-slider {
+      &:hover {
+        box-shadow: $box-shadow-edit;
       }
     }
 
