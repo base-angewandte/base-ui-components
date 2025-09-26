@@ -411,6 +411,7 @@ export default {
       </div>
       <div class="swiper-zoom-container base-media-preview__pdf__container">
         <BasePdfViewer
+          ref="pdfViewer"
           :src="mediaUrl"
           :initial-width="pdfInitialWidth"
           :zoom-width="pdfZoomWidth"

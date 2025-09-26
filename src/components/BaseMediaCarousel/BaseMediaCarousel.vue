@@ -6,8 +6,9 @@ import { usePopUpLock } from '@/composables/usePopUpLock.js';
 import { useId } from '@/composables/useId.js';
 
 /**
- * Component allowing sliding through images,
- * audio, video (currently only hls format) and files
+ * Component for browsing various file formats.
+ * Supports images, audio, video (currently HLS only), and PDF through dedicated viewers.
+ * For unknown formats, a preview image is shown when available, with an option to download the file.
  */
 
 export default {
@@ -224,10 +225,31 @@ export default {
       });
 
       /**
-       * reset zoom before slide changes
+       * On slide change, reset the PDF zoom factor to 100% and control rendering
+       * (pause on inactive slides, resume on the active slide).
+       *
+       * A `setTimeout` is used to defer execution:
+       * without it, the pdfViewer's zoom watcher may run
+       * after `stopRendering`, unintentionally resuming rendering.
        */
-      this.swiper.on('beforeSlideChangeStart', () => {
+      this.swiper.on('transitionStart', () => {
+        // reset zoom before slide changes
         if (this.currentZoom.value !== 100) this.currentZoom.value = 100;
+
+        // pause/resume PDF rendering
+        setTimeout(() => {
+          const slides = this.$refs.baseMedia;
+          slides.forEach((slide, i) => {
+            const pdfViewer = slide.$refs.pdfViewer;
+            if (pdfViewer) {
+              if (i === this.swiper.activeIndex) {
+                pdfViewer.resumeRendering();
+              } else {
+                pdfViewer.stopRendering();
+              }
+            }
+          });
+        }, 0);
       });
 
       this.swiper.on('slideChange', () => {

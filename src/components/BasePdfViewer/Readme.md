@@ -5,14 +5,9 @@ See also the implementation in [BaseMediaCarousel](BaseMediaCarousel)
 
 ```vue live
 <template>
-  <BaseButton
-    buttonStyle="single"
-    :text="`zoom ${zoom}`"
-    :icon="zoom ? 'fullscreen-exit' : 'fullscreen'"
-    button-style="single"
-    @clicked="zoom = !zoom"/>
   <div class="container">
     <BasePdfViewer
+      ref="pdfViewer"
       :src="pdfSrc"
       :zoom="zoom" />
   </div>
@@ -26,12 +21,26 @@ export default {
       zoom: false,
     };
   },
+  methods: {
+    /**
+     * Methods for parent components to control rendering.
+     */
+    stopRendering() {
+      this.$refs.pdfViewer.stopRendering();
+    },
+    resumeRendering() {
+      this.$refs.pdfViewer.resumeRendering();
+    },
+  },
 };
 </script>
 
 <style>
   .container {
     position: relative;
+    min-height: 20vh;
+    max-height: 50vh;
+    overflow: auto;
   }
 </style>
 ```
