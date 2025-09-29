@@ -188,8 +188,8 @@ export default {
         contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.internalId}`);
         // append the temporary element to the component
         this.$el.appendChild(contentInnerTemp);
-        // get the height of the temporary element
-        const contentInnerTempHeight = contentInnerTemp.offsetHeight;
+        // get the height of the temporary element as fractional value
+        const contentInnerTempHeight = contentInnerTemp.getBoundingClientRect().height;
         // remove  element
         this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.internalId}`));
         // set button visibility
@@ -247,7 +247,8 @@ export default {
       <div
         class="base-expand-box-content-inner">
         <!-- div is needed for calculation of content height -->
-        <div ref="contentInnerElement">
+        <div
+          ref="contentInnerElement">
           <!--
             @slot add expand box content here
           -->
