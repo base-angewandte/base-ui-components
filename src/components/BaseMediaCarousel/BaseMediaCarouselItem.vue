@@ -727,7 +727,7 @@ export default {
       margin-top: auto;
       margin-left: -$spacing-small;
       margin-right: -$spacing-small;
-      line-height: $line-height;
+      line-height: normal;
 
       .base-media-preview__info__col1,
       .base-media-preview__info__col3 {
@@ -753,6 +753,7 @@ export default {
         margin-right: $spacing;
 
         .base-media-preview-info-text {
+          padding-bottom: $spacing-small-half;
           margin: 0;
         }
 
