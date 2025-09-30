@@ -595,6 +595,8 @@ export default {
     }
 
     .base-media-preview__pdf__range-slider {
+      box-shadow: $box-shadow-hov;
+
       &:hover {
         box-shadow: $box-shadow-edit;
       }
