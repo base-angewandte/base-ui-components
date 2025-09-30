@@ -89,6 +89,8 @@ export default {
           pdf: 'The PDF couldn’t be opened in the PDF-Viewer.',
         }
       }),
+      validator: val => ['download', 'view', 'error'].every(prop => Object.keys(val).includes(prop))
+        && val?.error?.pdf,
     },
     /**
      * define how the image should be rotated (EXIF orientation values)
@@ -444,7 +446,7 @@ export default {
         </div>
       </div>
       <div
-        v-if="!displayPdf"
+        v-if="!displayPdf && infoTexts?.error?.pdf"
         class="base-media-preview-not-supported__error">
         <BaseIcon
           name="attention"

@@ -72,6 +72,8 @@ export default {
           pdf: 'The PDF couldn’t be opened in the PDF-Viewer.',
         }
       }),
+      validator: val => ['download', 'view', 'error'].every(prop => Object.keys(val).includes(prop))
+        && val?.error?.pdf,
     },
     /**
      * steer the display of the lightbox
