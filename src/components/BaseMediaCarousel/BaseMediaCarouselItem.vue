@@ -648,15 +648,25 @@ export default {
         flex: 1 1 100%;
         display: flex;
         justify-content: center;
-        margin: $spacing-small-half $spacing 0;
+        align-items: center;
+        padding: $spacing-small;
+        margin-top: $spacing-small;
+        background-color: rgba(0, 0, 0, 0.3);
+
+        @media screen and (max-width: $mobile) {
+          align-items: normal;
+        }
 
         &__icon {
-          margin-top: $spacing-small;
           margin-right: $spacing-small;
           width: $icon-small;
           height: $icon-small;
           min-width: $icon-small;
           min-height: $icon-small;
+
+          @media screen and (max-width: $mobile) {
+            margin-top: $spacing-small;
+          }
         }
 
         &__text {
