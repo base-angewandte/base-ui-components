@@ -64,6 +64,9 @@ export default defineConfig({
         'swiper',
         'hls.light.js',
         'hls.js/dist/hls.light.js',
+        'leaflet',
+        'leaflet.markercluster',
+        'leaflet-responsive-popup',
       ],
       output: {
         chunkFileNames: 'assets/[name].[hash].js',
@@ -73,6 +76,9 @@ export default defineConfig({
           'vue-i18n': 'VueI18n',
           'hls.light.js': 'Hls',
           'hls.js/dist/hls.light.js': 'Hls',
+          'leaflet': 'Leaflet',
+          'leaflet.markercluster': 'LeafletMarkerCluster',
+          'leaflet-responsive-popup': 'LeafletResponsivePopup',
         },
       },
       plugins: [
