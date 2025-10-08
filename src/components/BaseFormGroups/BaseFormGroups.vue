@@ -45,6 +45,13 @@ export default {
       default: () => [],
     },
     /**
+     * an id for field groups to still have unique field ids
+     */
+    formId: {
+      type: String,
+      default: '',
+    },
+    /**
      * define additional style for the form
      * should be an object eg. `{ 'padding-top': 0 }`.
      *  note: this applies to [BaseForm](BaseForm) not the wrapper
@@ -221,6 +228,7 @@ export default {
       v-bind="formProps"
       :form-field-json="formGroup"
       :model-value="formValuesGrouped[index]"
+      :form-id="`${formId}-${index}`"
       class="base-form-groups__group"
       @update:model-value="updateFormValues">
       <template #label-addition="{ fieldName }">
