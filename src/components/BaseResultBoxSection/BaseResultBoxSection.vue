@@ -504,6 +504,20 @@ export default {
       }
     }
 
+    /**
+     * calc the number of boxes that fits the space as soon as the container
+     * has been rendered
+     * (we can not use the useWindowResize callOnMounted since this is just considering
+     * window not the component)
+     */
+    watch(resultBoxesArea, (value) => {
+      // as soon as area is rendered and variable received a value calc
+      // how much space per box is available
+      if (value) {
+        calcBoxNumber();
+      }
+    }, { once: true });
+
     // in order to only trigger event when value has really changed create a watcher
     watch(itemsPerRow, (val, oldVal) => {
       if (val !== oldVal) {
