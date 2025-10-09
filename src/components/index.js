@@ -43,8 +43,10 @@ import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMult
 import BaseNavigation from '@/components/BaseNavigation/BaseNavigation.vue';
 import BaseOptions from '@/components/BaseOptions/BaseOptions.vue';
 import BasePagination from '@/components/BasePagination/BasePagination.vue';
+import BasePdfViewer from '@/components/BasePdfViewer/BasePdfViewer.vue';
 import BasePopUp from '@/components/BasePopUp/BasePopUp.vue';
 import BaseProgressBar from '@/components/BaseProgressBar/BaseProgressBar.vue';
+import BaseRangeSlider from '@/components/BaseRangeSlider/BaseRangeSlider.vue';
 import BaseResultBoxSection from '@/components/BaseResultBoxSection/BaseResultBoxSection.vue';
 import BaseSearch from '@/components/BaseSearch/BaseSearch.vue';
 import BaseSelectOptions from '@/components/BaseSelectOptions/BaseSelectOptions.vue';
@@ -100,8 +102,10 @@ export {
   BaseNavigation,
   BaseOptions,
   BasePagination,
+  BasePdfViewer,
   BasePopUp,
   BaseProgressBar,
+  BaseRangeSlider,
   BaseResultBoxSection,
   BaseSearch,
   BaseSelectOptions,
