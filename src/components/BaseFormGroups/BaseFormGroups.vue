@@ -2,6 +2,7 @@
 import { useId } from '@/composables/useId.js';
 import BaseForm from '@/components/BaseForm/BaseForm.vue';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { computed, ref } from 'vue';
 
 export default {
   name: 'BaseFormGroups',
@@ -122,8 +123,8 @@ export default {
         .every(fieldProps => Object.keys(fieldProps)),
     },
   },
-  emits: ['update:model-value'],
-  setup() {
+  emits: ['update:model-value', 'input-complete', 'fetch-autocomplete', 'form-mounted'],
+  setup(props, { emit }) {
     /** INTERNAL ID */
     /**
      * create an internal id for looping purposes
@@ -134,34 +135,16 @@ export default {
     /** ATTRS HANDLING */
     const { rootAttrs, forwardAttrs } = useExtractAttrs();
 
-    return {
-      groupsId,
-      rootAttrs,
-      forwardAttrs,
-    };
-  },
-  computed: {
-    /**
-     * modify the component $props, so they can be forwarded to BaseForm directly via
-     * v-bind
-     * @returns {{}}
-     */
-    formProps() {
-      return {
-        ...this.forwardAttrs,
-        ...this.$props,
-      };
-    },
     /**
      * the formFieldJSON needs to be separated in to the specific groups according
      * to `form_group` `x-attrs` field.
      *  Fields that do not have the attribute set will be added at the end.
      * @returns {Object[]}
      */
-    formFieldsGrouped() {
+    const formFieldsGrouped = computed(() => {
       const groupedFormFields = [];
       const noGroupFields = {};
-      Object.entries(this.formFieldJson).forEach(([key, value]) => {
+      Object.entries(props.formFieldJson).forEach(([key, value]) => {
         // check if the array index position exists already
         if (value['x-attrs'] && value['x-attrs'].form_group) {
           // if yes add the field information object to it (-1 because it is a 1-based
@@ -186,33 +169,76 @@ export default {
         groupedFormFields.push(noGroupFields);
       }
       return groupedFormFields;
-    },
+    });
+
     /**
      * provide the necessary values to each form specifically by mapping
      * from the grouped form fields json
      * @returns {{[fieldName: string]: *}[]}
      */
-    formValuesGrouped() {
-      return this.formFieldsGrouped.map((group) => {
-        return Object.fromEntries(Object.keys(group).map((key) => [key, this.modelValue[key]]));
+    const formValuesGrouped = computed(() => {
+      return formFieldsGrouped.value.map((group) => {
+        return Object.fromEntries(Object.keys(group).map((key) => [key, props.modelValue[key]]));
       });
-    },
-  },
-  methods: {
-    updateFormValues(val) {
-      /**
-       * event to inform parent of changes in form values
-       * @event update:model-value
-       * @type {Object}
-       */
-      this.$emit('update:model-value', {
-        // since only the values from a specific form is provided
-        // merge the values with the rest here
-        ...this.modelValue,
-        ...val,
+    });
+
+    /**
+     * to only emit value when all forms are mounted - keep state with this variable
+     * @type {Ref<UnwrapRef<boolean[]>, UnwrapRef<boolean[]> | boolean[]>}
+     */
+    const formsMounted = ref(Array.from({length: formFieldsGrouped.value.length}, () => false));
+
+    /**
+     * call when a form was mounted
+     * @param {number} index - index of the form in the forms array
+     */
+    function formMounted(index) {
+      // set the state variable true
+      formsMounted.value[index] = true;
+      // and check if all forms were mounted already
+      if (allFormsMounted.value) {
+        // if yes - emit value
+        emit('form-mounted');
+      }
+    }
+
+    function updateFormValues(val) {
+      emit('update:model-value', {
+        ...props.modelValue,
+        ...JSON.parse(JSON.stringify(val)),
       });
     }
-  }
+
+    const allFormsMounted = computed(() => !formsMounted.value.some(mountedVal => !mountedVal));
+
+    return {
+      groupsId,
+      rootAttrs,
+      forwardAttrs,
+      formFieldsGrouped,
+      formValuesGrouped,
+      formMounted,
+      updateFormValues,
+      allFormsMounted,
+    };
+  },
+  computed: {
+    /**
+     * modify the component $props, so they can be forwarded to BaseForm directly via
+     * v-bind
+     * @returns {{}}
+     */
+    formProps() {
+      const newProps = JSON.parse(JSON.stringify(this.$props));
+      delete newProps.formFieldJson;
+      delete newProps.formId;
+      delete newProps.modelValue;
+      return {
+        ...this.forwardAttrs,
+        ...newProps,
+      };
+    },
+  },
 };
 </script>
 
@@ -230,6 +256,9 @@ export default {
       :model-value="formValuesGrouped[index]"
       :form-id="`${formId}-${index}`"
       class="base-form-groups__group"
+      @fetch-autocomplete="$emit('fetch-autocomplete', $event)"
+      @input-complete="$emit('input-complete', $event)"
+      @form-mounted="formMounted(index)"
       @update:model-value="updateFormValues">
       <template #label-addition="{ fieldName }">
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
