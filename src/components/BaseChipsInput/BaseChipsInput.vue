@@ -898,7 +898,7 @@ export default {
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
           @click.stop="closeDropDown"
-          @touchstart.stop="closeDropDown">
+          @touchstart.stop.passive="closeDropDown">
           <template #option="{ option }">
             <span
               v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"
