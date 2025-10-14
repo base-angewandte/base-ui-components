@@ -260,48 +260,72 @@ export default {
       @input-complete="$emit('input-complete', $event)"
       @form-mounted="formMounted(index)"
       @update:model-value="updateFormValues">
-      <template #label-addition="{ fieldName }">
+      <template #label-addition="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
-        @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name - in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="label-addition"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
-      <template #pre-input-field="{ fieldName }">
+      <template #pre-input-field="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot slot to add elements within the form field but in a row before the actual input field. For an example see [BaseInput](BaseInput).
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="pre-input-field"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
       <template
-        #input-field-addition-before="{ fieldName }">
+        #input-field-addition-before="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>).
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="input-field-addition-before"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
-      <template #input-field-inline-before="{ fieldName }">
+      <template #input-field-inline-before="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap. For an example see [BaseInput](BaseInput).
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="input-field-inline-before"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
-      <template #input-field-addition-after="{ fieldName }">
+      <template #input-field-addition-after="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot for adding elements after input
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="input-field-addition-after"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
-      <template #post-input-field="{ fieldName }">
+      <template #post-input-field="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot for adding elements at the end covering the whole height
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="post-input-field"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
       <template #error-icon>
         <!-- @slot use a custom icon instead of standard error/warning icon -->
@@ -312,12 +336,16 @@ export default {
         @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
         <slot name="remove-icon" />
       </template>
-      <template #below-input="{ fieldName }">
+      <template #below-input="{ fieldName, groupNames, index: fieldIndex }">
         <!-- @slot below-input slot added to e.g. add drop down
-        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property) -->
+        @binding {string} field-name in order to use slot for only one field use a if condition with the form field name (the object property)
+        @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+        @binding {number} index - in case field is repeatable the index of the field -->
         <slot
           name="below-input"
-          :field-name="fieldName" />
+          :field-name="fieldName"
+          :group-names="groupNames"
+          :index="fieldIndex" />
       </template>
     </BaseForm>
   </div>
