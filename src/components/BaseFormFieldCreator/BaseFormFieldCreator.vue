@@ -1223,59 +1223,71 @@ export default {
           @input-complete="emitCompletedInputValues"
           @fetch-autocomplete="subFormFetchAutocomplete">
           <template
-            #label-addition="{ fieldName, groupNames }">
+            #label-addition="{ fieldName, groupNames, index }">
             <!-- @slot Slot to allow for additional elements on the right side of the label row <div> (e.g. language tabs))
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="label-addition" />
           </template>
-          <template #pre-input-field="{ fieldName, groupNames }">
+          <template #pre-input-field="{ fieldName, groupNames, index }">
             <!-- @slot slot to add elements within the form field but in a row before the actual input field. for an example see [BaseInput](BaseInput)
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="pre-input-field" />
           </template>
           <template
-            #input-field-addition-before="{ fieldName, groupNames }">
+            #input-field-addition-before="{ fieldName, groupNames, index }">
             <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>)
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="input-field-addition-before" />
           </template>
-          <template #input-field-inline-before="{ fieldName, groupNames }">
+          <template #input-field-inline-before="{ fieldName, groupNames, index }">
             <!-- @slot to add elements directly inline before the input (contrary to input-field-addition-before this does not wrap). for an example see [BaseInput](BaseInput)
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="input-field-inline-before" />
           </template>
-          <template #input-field-addition-after="{ fieldName, groupNames }">
+          <template #input-field-addition-after="{ fieldName, groupNames, index }">
             <!-- @slot for adding elements after input
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="input-field-addition-after" />
           </template>
-          <template #post-input-field="{ fieldName, groupNames }">
+          <template #post-input-field="{ fieldName, groupNames, index }">
             <!-- @slot for adding elements at the end covering the whole height
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="post-input-field" />
           </template>
           <template #error-icon>
@@ -1288,13 +1300,15 @@ export default {
             <slot
               name="remove-icon" />
           </template>
-          <template #below-input="{ fieldName, groupNames }">
+          <template #below-input="{ fieldName, groupNames, index }">
             <!-- @slot below-input slot added to e.g. add drop down
               @binding {string} field-name - the name of the current field for identification purposes
-              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names -->
+              @binding {string[]} groupNames - in case the slot is for a subform (form group) field, `groupNames` contains the parent field groups names
+              @binding {number} index - in case field is repeatable the index of the field -->
             <slot
               :field-name="fieldName"
               :group-names="(groupNames ? groupNames : []).concat(field.name)"
+              :index="index"
               name="below-input" />
           </template>
           <template #drop-down-entry="{ option, fieldName, groupNames }">
