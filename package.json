@@ -57,6 +57,7 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/plugin-transform-runtime": "^7.24.7",
     "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.28.4",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@eslint/js": "^9.14.0",
@@ -116,13 +117,5 @@
   ],
   "lint-staged": {
     "**/*.{js,vue}": "npm run lint:js"
-  },
-  "overrides": {
-    "@babel/traverse": {
-      "globals": "^13.24.0"
-    },
-    "@babel/preset-env": {
-      "globals": "^13.24.0"
-    }
   }
 }
