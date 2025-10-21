@@ -1,6 +1,6 @@
 <script>
 import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
-import { debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
+import { createId, debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
 import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import { useId } from '@/composables/useId.js';
@@ -748,6 +748,19 @@ export default {
       if (!this.assistiveText.advancedButtonDescription) return '';
       return this.assistiveText.advancedButtonDescription
         .replace('{state}', this.assistiveText.formState[this.formOpen ? 'close' : 'open']);
+    },
+    /**
+     * create a list of the filters with an unique id for rendering
+     * purposes (v-for key needs to be permanent)
+     * created separate variable so appliedFiltersInt can be kept in
+     * sync with appliedFilters prop without extra prop causing problems in comparison
+     * @returns {(Filter&{uid: string})[]}
+     */
+    keyedAppliedFiltersInt() {
+      return this.appliedFiltersInt.map((filter) => ({
+        ...filter,
+        uid: createId(),
+      }));
     },
   },
   watch: {
@@ -1591,8 +1604,8 @@ export default {
     <!-- FILTER ROW LIST (MODE 'LIST') -->
     <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
       <BaseAdvancedSearchRow
-        v-for="(filter, index) in appliedFiltersInt"
-        :key="'filter-' + index"
+        v-for="(filter, index) in keyedAppliedFiltersInt"
+        :key="filter.uid"
         :mode="mode"
         :search-row-id="`${internalId}-${filter[identifierPropertyName.filter]}-${index}`"
         :is-main-search="false"
